@@ -955,6 +955,10 @@ class Pic extends AbstractPlugin
                 $pageNumbers = array_combine($pageNumbers, $pageNumbers);
 
                 foreach ($pageNumbers as $page => &$val) {
+                    if (! isset($paginatorPictures[$page - 1])) {
+                        unset($pageNumbers[$page]);
+                        continue;
+                    }
                     $pic = $paginatorPictures[$page - 1];
 
                     $val = $controller->url()->fromRoute(
