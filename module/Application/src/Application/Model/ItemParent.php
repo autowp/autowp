@@ -812,42 +812,26 @@ class ItemParent
 
         $updates = 0;
 
+        $stmt = $this->itemParentCacheTable->getAdapter()->query('
+            INSERT INTO item_parent_cache (item_id, parent_id, diff, tuning, sport, design) 
+            VALUES (:item_id, :parent_id, :diff, :tuning, :sport, :design)
+            ON DUPLICATE KEY UPDATE 
+                diff = VALUES(diff),
+                tuning = VALUES(tuning),
+                sport = VALUES(sport),
+                design = VALUES(design) 
+        ');
+
         foreach ($parentInfo as $parentId => $info) {
-            $primaryKey = [
+            $result = $stm->execute([
                 'item_id'   => $itemId,
-                'parent_id' => $parentId
-            ];
-            $row = $this->itemParentCacheTable->select($primaryKey)->current();
-
-            if ($row) {
-                $set = [];
-                if ($row['diff'] != $info['diff']) {
-                    $set['diff'] = $info['diff'];
-                }
-
-                if ($row['tuning'] xor $info['tuning']) {
-                    $set['tuning'] = $info['tuning'] ? 1 : 0;
-                }
-
-                if ($row['sport'] xor $info['sport']) {
-                    $set['sport'] = $info['sport'] ? 1 : 0;
-                }
-
-                if ($row['design'] xor $info['design']) {
-                    $set['design'] = $info['design'] ? 1 : 0;
-                }
-
-                if ($set) {
-                    $updates += $this->itemParentCacheTable->update($set, $primaryKey);
-                }
-            } else {
-                $updates += $this->itemParentCacheTable->insert(array_replace([
-                    'diff'      => $info['diff'],
-                    'tuning'    => $info['tuning'] ? 1 : 0,
-                    'sport'     => $info['sport'] ? 1 : 0,
-                    'design'    => $info['design'] ? 1 : 0
-                ], $primaryKey));
-            }
+                'parent_id' => $parentId,
+                'diff'      => $info['diff'],
+                'tuning'    => $info['tuning'] ? 1 : 0,
+                'sport'     => $info['sport'] ? 1 : 0,
+                'design'    => $info['design'] ? 1 : 0
+            ]);
+            $updates += $result->getAffectedRows();
         }
 
         $filter = [
