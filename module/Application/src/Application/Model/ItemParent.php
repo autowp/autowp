@@ -485,7 +485,7 @@ class ItemParent
         }
 
         $this->itemParentLanguageTable->getAdapter()->query('
-            INSERT INTO item_parent_language (item_id, parent_id, language, name, is_auto) 
+            INSERT INTO item_parent_language (item_id, parent_id, language, name, is_auto)
             VALUES (:item_id, :parent_id, :language, :name, :is_auto)
             ON DUPLICATE KEY UPDATE name = VALUES(name), is_auto = VALUES(is_auto)
         ', array_replace([
@@ -813,17 +813,17 @@ class ItemParent
         $updates = 0;
 
         $stmt = $this->itemParentCacheTable->getAdapter()->query('
-            INSERT INTO item_parent_cache (item_id, parent_id, diff, tuning, sport, design) 
+            INSERT INTO item_parent_cache (item_id, parent_id, diff, tuning, sport, design)
             VALUES (:item_id, :parent_id, :diff, :tuning, :sport, :design)
-            ON DUPLICATE KEY UPDATE 
+            ON DUPLICATE KEY UPDATE
                 diff = VALUES(diff),
                 tuning = VALUES(tuning),
                 sport = VALUES(sport),
-                design = VALUES(design) 
+                design = VALUES(design)
         ');
 
         foreach ($parentInfo as $parentId => $info) {
-            $result = $stm->execute([
+            $result = $stmt->execute([
                 'item_id'   => $itemId,
                 'parent_id' => $parentId,
                 'diff'      => $info['diff'],
