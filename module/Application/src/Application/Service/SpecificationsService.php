@@ -614,7 +614,8 @@ class SpecificationsService
 
                     foreach ($value as $oneValue) {
                         $userValueDataTable->getAdapter()->query('
-                            INSERT INTO `' . $userValueDataTable->getTable() . '` (attribute_id, item_id, user_id, ordering, value)
+                            INSERT INTO `' . $userValueDataTable->getTable() . '`
+                                (attribute_id, item_id, user_id, ordering, value)
                             VALUES (:attribute_id, :item_id, :user_id, :ordering, :value)
                             ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
                         ', array_replace($userValuePrimaryKey, [
