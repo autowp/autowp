@@ -360,7 +360,10 @@ class CatalogueController extends AbstractActionController
             ],
             'item_type_id' => Item::FACTORY,
             'descendant' => [
-                'ancestor_or_self' => $brandId
+                'ancestor_or_self' => [
+                    'id'         => $brandId,
+                    'stock_only' => true
+                ]
             ],
             'pictures' => [
                 'status' => Picture::STATUS_ACCEPTED
