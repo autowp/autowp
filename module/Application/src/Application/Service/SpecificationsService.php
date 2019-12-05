@@ -644,13 +644,13 @@ class SpecificationsService
 
                 if (! $userValue || $valueChanged) {
                     $this->userValueTable->getAdapter()->query('
-                        INSERT INTO attrs_user_values (attribute_id, item_id, user_id, add_date, update_date) 
+                        INSERT INTO attrs_user_values (attribute_id, item_id, user_id, add_date, update_date)
                         VALUES (:attribute_id, :item_id, :user_id, NOW(), NOW())
                         ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
                     ', $userValuePrimaryKey);
 
                     $userValueDataTable->getAdapter()->query('
-                        INSERT INTO `' . $userValueDataTable->getTable() . '` (attribute_id, item_id, user_id, value) 
+                        INSERT INTO `' . $userValueDataTable->getTable() . '` (attribute_id, item_id, user_id, value)
                         VALUES (:attribute_id, :item_id, :user_id, :value)
                         ON DUPLICATE KEY UPDATE value = VALUES(value)
                     ', array_replace($userValuePrimaryKey, [
@@ -1646,7 +1646,7 @@ class SpecificationsService
 
             // descriptor
             $this->valueTable->getAdapter()->query('
-                INSERT INTO attrs_values (attribute_id, item_id, update_date) 
+                INSERT INTO attrs_values (attribute_id, item_id, update_date)
                 VALUES (:attribute_id, :item_id, NOW())
                 ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
             ', $primaryKey);
@@ -1658,12 +1658,21 @@ class SpecificationsService
                     $somethingChanges = true;
                 }
 
+                $stmt = $valueDataTable->getAdapter()->query('
+                    INSERT INTO `' . $valueDataTable->getTable() . '` (attribute_id, item_id, ordering, value)
+                    VALUES (:attribute_id, :item_id. :ordering, :value)
+                    ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
+                ');
+
                 foreach ($actualValue['value'] as $ordering => $value) {
-                    $valueDataTable->insert(array_replace([
+                    $result = $stmt->execute(array_replace([
                         'ordering' => $ordering,
                         'value'    => $value
                     ], $primaryKey));
-                    $somethingChanges = true;
+
+                    if ($result->getAffectedRows() > 0) {
+                        $somethingChanges = true;
+                    }
                 }
             } else {
                 $set = ['value' => $actualValue['value']];
