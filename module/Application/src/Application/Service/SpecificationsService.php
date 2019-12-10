@@ -1664,22 +1664,41 @@ class SpecificationsService
                     $somethingChanges = true;
                 }
 
+                $stmt = $valueDataTable->getAdapter()->query('
+                    INSERT INTO `' . $valueDataTable->getTable() . '` (attribute_id, item_id, ordering, value)
+                    VALUES (:attribute_id, :item_id. :ordering, :value)
+                    ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
+                ');
+
                 foreach ($actualValue['value'] as $ordering => $value) {
-                    $valueDataTable->insert(array_replace([
+                    $result = $stmt->execute(array_replace([
                         'ordering' => $ordering,
                         'value'    => $value
                     ], $primaryKey));
-                    $somethingChanges = true;
+
+                    if ($result->getAffectedRows() > 0) {
+                        $somethingChanges = true;
+                    }
                 }
             } else {
-                $result = $valueDataTable->getAdapter()->query('
-                    INSERT INTO ' . $valueDataTable->getTable() . ' (attribute_id, item_id, value)
-                    VALUES (:attribute_id, :item_id, :value)
-                    ON DUPLICATE KEY UPDATE value = VALUES(value)
-                ', array_replace([
-                    'value' => $actualValue['value']
-                ], $primaryKey));
-                $somethingChanges = $result->getAffectedRows() > 0;
+                $set = ['value' => $actualValue['value']];
+                $row = $valueDataTable->select($primaryKey)->current();
+                if (! $row) {
+                    $valueDataTable->insert(array_replace($set, $primaryKey));
+                    $somethingChanges = true;
+                } else {
+                    if ($actualValue['value'] === null || $row['value'] === null) {
+                        $valueDifferent = $actualValue['value'] !== $row['value'];
+                    } else {
+                        $valueDifferent = $actualValue['value'] != $row['value'];
+                    }
+                    if ($valueDifferent) {
+                        $affected = $valueDataTable->update($set, $primaryKey);
+                        if ($affected > 0) {
+                            $somethingChanges = true;
+                        }
+                    }
+                }
             }
 
             if ($somethingChanges) {
