@@ -234,16 +234,27 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         if ($set) {
-            $primaryKey = [
+            $values = [
                 'item_id'  => $item['id'],
                 'language' => $language
             ];
-
-            if ($row) {
-                $this->table->update($set, $primaryKey);
-            } else {
-                $this->table->insert(array_merge($set, $primaryKey));
+            $sqlInserts = ['item_id', 'language'];
+            $sqlValues = [':item_id', ':language'];
+            $sqlUpdates = [];
+            foreach ($set as $key => $value) {
+                $sqlInserts[] = $key;
+                $sqlValues[] = ':' . $key;
+                $sqlUpdates[] = $key . ' = VALUES(' . $key . ')';
+                $values[$key] = $value;
             }
+
+            $sql = '
+                INSERT INTO item_language (' . implode(', ', $sqlInserts) . ')
+                VALUES (' . implode(', ', $sqlValues) . ')
+                ON DUPLICATE KEY UPDATE ' . implode(', ', $sqlUpdates) . '
+            ';
+
+            $this->table->getAdapter()->query($sql, $values);
 
             $this->itemParent->refreshAutoByVehicle($item['id']);
         }
