@@ -1666,7 +1666,7 @@ class SpecificationsService
 
                 $stmt = $valueDataTable->getAdapter()->query('
                     INSERT INTO `' . $valueDataTable->getTable() . '` (attribute_id, item_id, ordering, value)
-                    VALUES (:attribute_id, :item_id. :ordering, :value)
+                    VALUES (:attribute_id, :item_id, :ordering, :value)
                     ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
                 ');
 
