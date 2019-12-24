@@ -28,11 +28,11 @@ class AclTest extends AbstractHttpControllerTestCase
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $view->user()->inheritsRole('moder');
-        $this->assertInternalType('bool', $result);
+        $this->assertIsBool($result);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $view->user()->isAllowed('pictures', 'edit');
-        $this->assertInternalType('bool', $result);
+        $this->assertIsBool($result);
     }
 
     public function testAclControllerPluginRegisters()
@@ -43,9 +43,9 @@ class AclTest extends AbstractHttpControllerTestCase
         $plugin = $manager->get('user');
 
         $result = $plugin()->inheritsRole('moder');
-        $this->assertInternalType('bool', $result);
+        $this->assertIsBool($result);
 
         $result = $plugin()->isAllowed('pictures', 'edit');
-        $this->assertInternalType('bool', $result);
+        $this->assertIsBool($result);
     }
 }

@@ -35,7 +35,7 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
         $helper = $viewHelperManager->get('userText');
 
         $result = $helper($text);
-        $this->assertContains($expected, $result);
+        $this->assertStringContainsString($expected, $result);
     }
 
     public static function usersProvider()
