@@ -4,9 +4,7 @@ namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Autowp\User\Model\User;
-
 use Application\Hydrator\Api\AttrAttributeHydrator;
 use Application\Hydrator\Api\AttrConflictHydrator;
 use Application\Hydrator\Api\AttrUserValueHydrator;

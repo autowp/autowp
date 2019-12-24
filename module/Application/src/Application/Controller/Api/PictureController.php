@@ -14,13 +14,11 @@ use Zend\Uri\Uri;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage;
 use Autowp\User\Model\User;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Controller\Plugin\Pic;
 use Application\DuplicateFinder;

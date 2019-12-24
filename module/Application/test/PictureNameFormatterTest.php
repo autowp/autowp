@@ -3,7 +3,6 @@
 namespace ApplicationTest\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Application\PictureNameFormatter;
 
 class PictureNameFormatterTest extends AbstractHttpControllerTestCase

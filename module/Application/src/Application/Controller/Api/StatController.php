@@ -4,9 +4,7 @@ namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
-
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\Item;
 use Application\Model\Picture;

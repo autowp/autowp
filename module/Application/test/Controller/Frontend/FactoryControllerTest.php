@@ -5,7 +5,6 @@ namespace ApplicationTest\Frontend\Controller;
 use Exception;
 use Zend\Http\Request;
 use Zend\Http\Header\Cookie;
-
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
 use Application\Test\AbstractHttpControllerTestCase;

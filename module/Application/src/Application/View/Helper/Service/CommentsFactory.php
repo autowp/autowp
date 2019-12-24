@@ -5,7 +5,6 @@ namespace Application\View\Helper\Service;
 use Autowp\Comments\CommentsService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\Comments as Helper;
 
 class CommentsFactory implements FactoryInterface

@@ -6,9 +6,7 @@ use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
-
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Controller\Plugin\Pic;
 use Application\Model\Brand;
 use Application\Model\Picture;

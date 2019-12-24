@@ -4,7 +4,6 @@ namespace Application\Controller\Api\Service;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Api\AclController as Controller;
 
 class AclControllerFactory implements FactoryInterface

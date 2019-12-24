@@ -5,7 +5,6 @@ namespace Application\Controller\Frontend\Service;
 use Application\Model\CarOfDay;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Frontend\YandexController as Controller;
 
 class YandexControllerFactory implements FactoryInterface

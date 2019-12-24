@@ -6,7 +6,6 @@ use Application\FileSize;
 use Application\Language;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\FileSize as Helper;
 
 class FileSizeFactory implements FactoryInterface

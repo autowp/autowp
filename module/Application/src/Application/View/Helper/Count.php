@@ -13,10 +13,10 @@ class Count extends AbstractHelper
         } else {
             $result = $count - $new;
             if ($new) {
-                $result .= '+<span>'.$new.'</span>';
+                $result .= '+<span>' . $new . '</span>';
             }
         }
 
-        return '<span class="count">('.$result.')</span>';
+        return '<span class="count">(' . $result . ')</span>';
     }
 }

@@ -4,14 +4,11 @@ namespace Application\Controller\Api;
 
 use DateInterval;
 use DateTime;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
-
 use Autowp\User\Model\User;
-
 use Application\Hydrator\Api\RestHydrator;
 
 class PulseController extends AbstractActionController

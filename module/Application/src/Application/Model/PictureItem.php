@@ -5,7 +5,6 @@ namespace Application\Model;
 use ArrayObject;
 use Exception;
 use InvalidArgumentException;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 

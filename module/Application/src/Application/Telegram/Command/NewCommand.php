@@ -4,7 +4,6 @@ namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
 use Zend\Db\TableGateway\TableGateway;
-
 use Application\Model\Item;
 
 class NewCommand extends Command

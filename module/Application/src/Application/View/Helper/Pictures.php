@@ -4,9 +4,7 @@ namespace Application\View\Helper;
 
 use ArrayObject;
 use Zend\View\Helper\AbstractHelper;
-
 use Autowp\Comments;
-
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
@@ -66,7 +64,7 @@ class Pictures extends AbstractHelper
     {
         $data = [
             'isModer'         => $isModer,
-            'resolution'      => $picture['width'].'×'.$picture['height'],
+            'resolution'      => $picture['width'] . '×' . $picture['height'],
             'status'          => $picture['status'],
             'views'           => $picture['views'],
             'msgCount'        => $picture['msgCount'],
@@ -169,7 +167,7 @@ class Pictures extends AbstractHelper
         if ($isModer && $picture['name']) {
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             $title = $this->view->escapeHtmlAttr($this->view->translate('picture-preview/special-name'));
-            $escName = '<span style="color:darkgreen" title="'.$title.'">' . $escName . '</span>';
+            $escName = '<span style="color:darkgreen" title="' . $title . '">' . $escName . '</span>';
         }
 
         $moderVote = $this->getModerVote($picture['id']);
@@ -185,7 +183,7 @@ class Pictures extends AbstractHelper
             }
         }
 
-        return '<div class="'.implode(' ', $classes).'">' .
+        return '<div class="' . implode(' ', $classes) . '">' .
                     '<div class="thumbnail">' .
                         /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $view->htmlA($url, $imageHtml, false) .

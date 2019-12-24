@@ -6,10 +6,8 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Controller\Plugin\Pic;
 use Application\HostManager;

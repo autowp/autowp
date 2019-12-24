@@ -4,7 +4,6 @@ namespace Application\Form\Moder;
 
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
-
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class ItemLanguage extends Form implements InputFilterProviderInterface

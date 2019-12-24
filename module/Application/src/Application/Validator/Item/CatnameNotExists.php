@@ -3,7 +3,6 @@
 namespace Application\Validator\Item;
 
 use Zend\Validator\AbstractValidator;
-
 use Application\Model\Item;
 
 class CatnameNotExists extends AbstractValidator

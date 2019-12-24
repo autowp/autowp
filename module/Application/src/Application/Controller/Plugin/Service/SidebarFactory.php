@@ -5,7 +5,6 @@ namespace Application\Controller\Plugin\Service;
 use Application\Model\BrandNav;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Plugin\Sidebar as Plugin;
 
 class SidebarFactory implements FactoryInterface

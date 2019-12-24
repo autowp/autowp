@@ -3,7 +3,6 @@
 namespace AutowpTest\Traffic\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Autowp\Traffic\Controller\BanController;
 use Zend\Http\Request;
 use Zend\Http\Header\Cookie;

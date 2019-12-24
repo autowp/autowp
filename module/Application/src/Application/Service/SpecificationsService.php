@@ -7,15 +7,12 @@ use Application\Validator\Attrs\IsIntOrNull;
 use ArrayObject;
 use Exception;
 use NumberFormatter;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\Input;
 use Zend\InputFilter\ArrayInput;
 use Zend\Paginator;
-
 use Autowp\User\Model\User;
-
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\ItemParent;

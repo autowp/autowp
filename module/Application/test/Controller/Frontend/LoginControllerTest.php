@@ -9,7 +9,6 @@ use DateTime;
 use Zend\Http\Request;
 use Zend\Json\Json;
 use Zend\Uri\UriFactory;
-
 use Application\Controller\Api\LoginController;
 use Application\Test\AbstractHttpControllerTestCase;
 
@@ -107,7 +106,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $uri = UriFactory::factory($json['url']);
 
         $this->assertRegExp(
-            '|^https://www\.facebook\.com/v[0-9.]+/dialog/oauth'.
+            '|^https://www\.facebook\.com/v[0-9.]+/dialog/oauth' .
                 '\?scope=public_profile&state=[0-9a-z]+' .
                 '&response_type=code&approval_prompt=auto' .
                 '&redirect_uri=https%3A%2F%2Fen\.localhost%2Flogin%2Fcallback' .

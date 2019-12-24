@@ -5,7 +5,6 @@ namespace Application\Controller\Api\Service;
 use Interop\Container\ContainerInterface;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Api\PageController as Controller;
 
 class PageControllerFactory implements FactoryInterface

@@ -5,7 +5,6 @@ namespace Application\View\Helper\Service;
 use Application\HostManager;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\HostManager as Helper;
 
 class HostManagerFactory implements FactoryInterface

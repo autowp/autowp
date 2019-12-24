@@ -3,7 +3,6 @@
 namespace Application\Validator\User;
 
 use Zend\Validator\AbstractValidator;
-
 use Autowp\User\Model\User;
 
 class EmailExists extends AbstractValidator

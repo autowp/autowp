@@ -5,7 +5,6 @@ namespace Autowp\Comments;
 use ArrayObject;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
-
 use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;

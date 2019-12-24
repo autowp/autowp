@@ -6,7 +6,6 @@ use Application\Service\TelegramService;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Autowp\Message\MessageService;
 
 /**

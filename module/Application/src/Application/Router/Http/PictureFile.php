@@ -3,7 +3,6 @@
 namespace Application\Router\Http;
 
 use Exception;
-
 use Traversable;
 use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;

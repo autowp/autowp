@@ -5,7 +5,6 @@ namespace Application\Hydrator\Api;
 use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-
 use Application\Hydrator\Api\Strategy\PerspectiveGroups as HydratorPerspectiveGroupsStrategy;
 
 class PerspectivePageHydrator extends RestHydrator

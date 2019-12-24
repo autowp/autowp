@@ -4,15 +4,12 @@ namespace Application\Controller\Api;
 
 use Autowp\ExternalLoginService\AbstractService;
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\UserAccount;
 

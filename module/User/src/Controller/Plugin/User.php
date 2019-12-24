@@ -6,7 +6,6 @@ use ArrayObject;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Permissions\Acl\Acl;
-
 use Autowp\User\Model\User as UserModel;
 
 class User extends AbstractPlugin

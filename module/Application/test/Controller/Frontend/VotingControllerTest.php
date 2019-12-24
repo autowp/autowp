@@ -5,7 +5,6 @@ namespace ApplicationTest\Frontend\Controller;
 use Zend\Db\Sql;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
-
 use Application\Controller\Api\VotingController;
 use Application\Test\AbstractHttpControllerTestCase;
 

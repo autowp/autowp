@@ -11,7 +11,6 @@ use Autowp\User\Model\User;
 use Autowp\Votings\Votings;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\CommentsController as Controller;
 
 class CommentsControllerFactory implements FactoryInterface

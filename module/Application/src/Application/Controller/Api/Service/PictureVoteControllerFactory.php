@@ -5,7 +5,6 @@ namespace Application\Controller\Api\Service;
 use Application\Model\PictureVote;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Api\PictureVoteController as Controller;
 
 class PictureVoteControllerFactory implements FactoryInterface

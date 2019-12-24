@@ -3,7 +3,6 @@
 namespace Application\Most\Adapter;
 
 use Exception;
-
 use Zend\Db\Sql;
 
 class Attr extends AbstractAdapter
@@ -36,12 +35,12 @@ class Attr extends AbstractAdapter
 
         $select
             ->where([
-                $tableName.'.attribute_id' => $attribute['id'],
-                $tableName.'.value IS NOT NULL'
+                $tableName . '.attribute_id' => $attribute['id'],
+                $tableName . '.value IS NOT NULL'
             ])
-            ->join($tableName, 'item.id = '.$tableName.'.item_id', [])
-            ->order($tableName.'.value ' . $this->order)
-            ->group(['item.id', $tableName.'.value']);
+            ->join($tableName, 'item.id = ' . $tableName . '.item_id', [])
+            ->order($tableName . '.value ' . $this->order)
+            ->group(['item.id', $tableName . '.value']);
 
         $result = [];
         foreach ($this->itemTable->selectWith($select) as $car) {

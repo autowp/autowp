@@ -13,7 +13,6 @@ use Application\Service\SpecificationsService;
 use Autowp\Message\MessageService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Api\ItemController as Controller;
 use Application\Hydrator\Api\Strategy\Image;
 

@@ -3,7 +3,6 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
-
 use Exception;
 
 class Breadcrumbs extends AbstractHelper
@@ -42,10 +41,10 @@ class Breadcrumbs extends AbstractHelper
 
                 if ($url) {
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
-                    $items[] = '<li class="breadcrumb-item">'.$this->view->htmlA(['href' => $url], $name).'</li>';
+                    $items[] = '<li class="breadcrumb-item">' . $this->view->htmlA(['href' => $url], $name) . '</li>';
                 } else {
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
-                    $items[] = '<li class="breadcrumb-item">'.$this->view->escapeHtml($name).'</li>';
+                    $items[] = '<li class="breadcrumb-item">' . $this->view->escapeHtml($name) . '</li>';
                 }
             }
 
@@ -55,7 +54,7 @@ class Breadcrumbs extends AbstractHelper
                 return '';
             }
 
-            return  '<nav aria-label="breadcrumb"><ol class="breadcrumb">'. implode($items). '</ol></nav>';
+            return  '<nav aria-label="breadcrumb"><ol class="breadcrumb">' . implode($items) . '</ol></nav>';
         } catch (Exception $e) {
             print $e->getMessage();
         }

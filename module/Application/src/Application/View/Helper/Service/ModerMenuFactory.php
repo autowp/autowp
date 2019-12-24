@@ -6,7 +6,6 @@ use Application\Model\Picture;
 use Autowp\Comments\CommentsService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\ModerMenu as Helper;
 
 class ModerMenuFactory implements FactoryInterface

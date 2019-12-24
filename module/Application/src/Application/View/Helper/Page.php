@@ -51,7 +51,7 @@ class Page extends AbstractHelper
             case 'name':
             case 'title':
             case 'breadcrumbs':
-                $key = 'page/' . $this->doc['id']. '/' . $name;
+                $key = 'page/' . $this->doc['id'] . '/' . $name;
 
                 $result = $this->view->translate($key);
                 if (! $result || $result == $key) {
@@ -59,7 +59,7 @@ class Page extends AbstractHelper
                 }
 
                 if ((! $result || $result == $key) && ($name != 'name')) {
-                    $key = 'page/' . $this->doc['id']. '/name';
+                    $key = 'page/' . $this->doc['id'] . '/name';
 
                     $result = $this->view->translate($key);
                     if (! $result || $result == $key) {

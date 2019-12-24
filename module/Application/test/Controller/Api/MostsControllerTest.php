@@ -4,7 +4,6 @@ namespace ApplicationTest\Controller\Api;
 
 use Zend\Http\Request;
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Application\Controller\Api\MostsController;
 
 class MostsControllerTest extends AbstractHttpControllerTestCase

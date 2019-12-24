@@ -6,7 +6,6 @@ use Application\Model\Item;
 use Application\Model\VehicleType;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Api\ItemVehicleTypeController as Controller;
 
 class ItemVehicleTypeControllerFactory implements FactoryInterface

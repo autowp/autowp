@@ -5,7 +5,6 @@ namespace Application\Controller\Plugin\Service;
 use Application\Model\Catalogue;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Plugin\Catalogue as Plugin;
 
 class CatalogueFactory implements FactoryInterface

@@ -4,9 +4,7 @@ namespace Application\Model;
 
 use Collator;
 use Transliterator;
-
 use Zend\Db\Sql;
-
 use Autowp\Image;
 
 class Brand

@@ -4,9 +4,7 @@ namespace Application\Hydrator\Api;
 
 use Exception;
 use Traversable;
-
 use Zend\Hydrator\Exception\InvalidArgumentException;
-
 use Autowp\User\Model\User;
 
 class VotingVariantVoteHydrator extends RestHydrator

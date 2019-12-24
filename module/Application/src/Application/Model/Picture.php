@@ -6,14 +6,11 @@ use Application\Comments;
 use DateTime;
 use DateTimeZone;
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Math\Rand;
 use Zend\Paginator;
-
 use Autowp\ZFComponents\Filter\FilenameSafe;
-
 use Application\Model\Item as ItemModel;
 
 class Picture
@@ -1012,7 +1009,7 @@ class Picture
                 } else {
                     $carFolder = $filenameFilter->filter($car['name']);
                     $firstChar = mb_substr($carFolder, 0, 1);
-                    $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
+                    $result = $firstChar . '/' . $carFolder . '/' . $carCatname;
                 }
             }
         } elseif (count($items) > 0) {

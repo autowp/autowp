@@ -3,7 +3,6 @@
 namespace ApplicationTest\Controller\Api;
 
 use Zend\Http\Request;
-
 use Application\Controller\Api\RatingController;
 use Application\Test\AbstractHttpControllerTestCase;
 

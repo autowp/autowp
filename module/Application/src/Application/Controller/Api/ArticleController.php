@@ -7,7 +7,6 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator;
 use Zend\View\Model\JsonModel;
-
 use Application\Hydrator\Api\RestHydrator;
 
 class ArticleController extends AbstractActionController

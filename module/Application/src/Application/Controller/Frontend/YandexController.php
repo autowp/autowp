@@ -4,9 +4,7 @@ namespace Application\Controller\Frontend;
 
 use DateTime;
 use DateTimeZone;
-
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\CarOfDay;
 

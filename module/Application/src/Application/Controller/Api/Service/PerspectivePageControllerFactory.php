@@ -5,7 +5,6 @@ namespace Application\Controller\Api\Service;
 use Application\Hydrator\Api\PerspectivePageHydrator;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Api\PerspectivePageController as Controller;
 
 class PerspectivePageControllerFactory implements FactoryInterface

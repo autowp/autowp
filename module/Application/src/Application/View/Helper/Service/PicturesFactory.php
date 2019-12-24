@@ -8,7 +8,6 @@ use Application\Model\PictureView;
 use Autowp\Comments\CommentsService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\Pictures as Helper;
 
 class PicturesFactory implements FactoryInterface

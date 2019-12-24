@@ -5,9 +5,7 @@ namespace Application\Controller;
 use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Autowp\User\Model\User;
-
 use Application\Controller\Plugin\Pic;
 use Application\Model\CarOfDay;
 use Application\Model\Categories;
@@ -401,7 +399,7 @@ class IndexController extends AbstractActionController
             return $this->redirect()->toRoute('ng', [
                 'path' => ''
             ], [
-                'fragment' => '!/'.$path . ($query ? '?'.$query : '')
+                'fragment' => '!/' . $path . ($query ? '?' . $query : '')
             ], false);
         }
     }

@@ -5,18 +5,15 @@ namespace Application\Hydrator\Api;
 use Application\Comments;
 use Exception;
 use Traversable;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Permissions\Acl\Acl;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Stdlib\ArrayUtils;
-
 use Autowp\Image\StorageInterface;
 use Autowp\TextStorage;
 use Autowp\User\Model\User;
-
 use Application\ItemNameFormatter;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;

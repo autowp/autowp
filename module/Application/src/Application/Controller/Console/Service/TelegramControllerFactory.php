@@ -5,7 +5,6 @@ namespace Application\Controller\Console\Service;
 use Application\Service\TelegramService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Console\TelegramController as Controller;
 
 class TelegramControllerFactory implements FactoryInterface

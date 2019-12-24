@@ -5,12 +5,10 @@ namespace Application\Controller\Console;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Uri\UriFactory;
-
 use Autowp\Message\MessageService;
 use Autowp\TextStorage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
-
 use Application\Controller\Plugin\Pic;
 use Application\DuplicateFinder;
 use Application\HostManager;
@@ -155,7 +153,7 @@ class CatalogueController extends AbstractActionController
         }
 
         foreach ($rows as $picture) {
-            print $picture['id']. PHP_EOL;
+            print $picture['id'] . PHP_EOL;
 
             $previousStatusUserId = $picture['change_status_user_id'];
 

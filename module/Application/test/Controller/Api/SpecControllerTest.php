@@ -5,7 +5,6 @@ namespace ApplicationTest\Controller\Api;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
-
 use Application\Controller\Api\SpecController;
 use Application\Test\AbstractHttpControllerTestCase;
 

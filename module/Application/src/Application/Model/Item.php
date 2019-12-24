@@ -5,13 +5,11 @@ namespace Application\Model;
 use ArrayObject;
 use DateTime;
 use Exception;
-
 use geoPHP;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 use Zend\Router\Http\TreeRouteStack;
-
 use Autowp\TextStorage\Service as TextStorage;
 
 class Item
@@ -963,7 +961,7 @@ class Item
             ];
         }
 
-        $alias = $prefix.'ip2';
+        $alias = $prefix . 'ip2';
 
         $columns = [];
 
@@ -971,7 +969,7 @@ class Item
             $columns = $this->applyColumns($options['columns'], $alias, $language);
         }
 
-        $select->join([$alias => 'item_parent'], $id . ' = ' . $alias. '.parent_id', $columns);
+        $select->join([$alias => 'item_parent'], $id . ' = ' . $alias . '.parent_id', $columns);
 
         if (isset($options['link_catname']) && $options['link_catname']) {
             $select->where([$alias . '.catname' => $options['link_catname']]);
@@ -995,7 +993,7 @@ class Item
             ];
         }
 
-        $alias = $prefix.'ip1';
+        $alias = $prefix . 'ip1';
 
         $columns = [];
 
@@ -1044,7 +1042,7 @@ class Item
             ];
         }
 
-        $alias = $prefix.'ipc1';
+        $alias = $prefix . 'ipc1';
 
         $group = [];
         $columns = [];
@@ -1082,9 +1080,9 @@ class Item
             switch ($options['link_type']) {
                 case ItemParent::TYPE_DEFAULT:
                     $select->where([
-                        'not ' .$alias . '.sport',
-                        'not ' .$alias . '.tuning',
-                        'not ' .$alias . '.design'
+                        'not ' . $alias . '.sport',
+                        'not ' . $alias . '.tuning',
+                        'not ' . $alias . '.design'
                     ]);
                     break;
                 case ItemParent::TYPE_SPORT:
@@ -1176,8 +1174,8 @@ class Item
         }
 
         if ($options['item_type_id']) {
-            $alias = $prefix.'i1';
-            $select->join([$alias => 'item'], $id . ' = ' . $alias. '.id', []);
+            $alias = $prefix . 'i1';
+            $select->join([$alias => 'item'], $id . ' = ' . $alias . '.id', []);
             if (is_array($options['item_type_id'])) {
                 $select->where([new Sql\Predicate\In($alias . '.item_type_id', $options['item_type_id'])]);
             } else {
@@ -1193,7 +1191,7 @@ class Item
 
         if ($options['descendant_or_self']) {
             $group[] = 'item.id';
-            $alias = $prefix.'ipc2';
+            $alias = $prefix . 'ipc2';
 
             $columns = [];
             if (is_array($options['descendant_or_self'])) {
@@ -1240,7 +1238,7 @@ class Item
 
         if ($options['ancestor']) {
             $group[] = 'item.id';
-            $alias = $prefix.'ipc3';
+            $alias = $prefix . 'ipc3';
             $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.item_id', [])
                 ->where([$alias . '.item_id != ' . $alias . '.parent_id']);
 
@@ -1257,7 +1255,7 @@ class Item
 
         if ($options['ancestor_or_self']) {
             $group[] = 'item.id';
-            $alias = $prefix.'ipc4';
+            $alias = $prefix . 'ipc4';
             $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.item_id', []);
 
             if (is_array($options['ancestor_or_self'])) {

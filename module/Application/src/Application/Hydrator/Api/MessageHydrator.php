@@ -4,13 +4,10 @@ namespace Application\Hydrator\Api;
 
 use Exception;
 use Traversable;
-
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Stdlib\ArrayUtils;
-
 use Autowp\User\Model\User;
-
 use Application\View\Helper\UserText;
 
 class MessageHydrator extends RestHydrator

@@ -6,7 +6,6 @@ use Autowp\User\Auth\Adapter\Id;
 use Autowp\User\Auth\Adapter\Login;
 use Autowp\User\Auth\Adapter\Remember;
 use Autowp\User\Model\User;
-
 use Application\Service\UsersService;
 use Application\Test\AbstractHttpControllerTestCase;
 

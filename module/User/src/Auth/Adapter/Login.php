@@ -6,7 +6,6 @@ use Zend\Db\Sql;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
-
 use Autowp\User\Model\User;
 
 class Login implements AdapterInterface

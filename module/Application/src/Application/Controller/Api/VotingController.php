@@ -7,10 +7,8 @@ use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\User\Controller\Plugin\User;
 use Autowp\Votings;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 

@@ -3,7 +3,6 @@
 namespace AutowpTest\User\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Autowp\User\Controller\Plugin\User;
 use Zend\Authentication\AuthenticationService;
 use Autowp\User\Auth\Adapter\Id;

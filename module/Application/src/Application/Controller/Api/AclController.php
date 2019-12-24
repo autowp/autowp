@@ -9,9 +9,7 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Validator;
 use Zend\View\Model\JsonModel;
-
 use Autowp\User\Controller\Plugin\User;
-
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 

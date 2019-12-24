@@ -6,7 +6,6 @@ use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\AttrController;
 

@@ -6,18 +6,15 @@ use ArrayIterator;
 use ArrayObject;
 use DateTime;
 use Exception;
-
 use geoPHP;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Router\Http\TreeRouteStack;
-
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\TextStorage;
 use Autowp\User\Model\User;
-
 use Application\ItemNameFormatter;
 use Application\Model\Brand;
 use Application\Model\Catalogue;

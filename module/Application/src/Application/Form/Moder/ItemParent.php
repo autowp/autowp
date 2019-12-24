@@ -5,13 +5,11 @@ namespace Application\Form\Moder;
 use Application\Validator\ItemParent\CatnameNotExists;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 use Traversable;
-
 use Zend\Form\Element;
 use Zend\Form\ElementInterface;
 use Zend\Form\Exception;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
-
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class ItemParent extends Form implements InputFilterProviderInterface

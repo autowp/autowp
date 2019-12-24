@@ -33,9 +33,9 @@ class EngineConfiguration
 
         if ($layout) {
             if ($cylinders) {
-                $result = $layout.$cylinders;
+                $result = $layout . $cylinders;
             } else {
-                $result = $layout.'?';
+                $result = $layout . '?';
             }
         } else {
             if ($cylinders) {

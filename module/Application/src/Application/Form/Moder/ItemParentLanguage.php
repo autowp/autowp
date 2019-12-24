@@ -3,13 +3,11 @@
 namespace Application\Form\Moder;
 
 use Traversable;
-
 use Zend\Form\Element;
 use Zend\Form\ElementInterface;
 use Zend\Form\Exception;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
-
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class ItemParentLanguage extends Form implements InputFilterProviderInterface

@@ -3,7 +3,6 @@
 namespace Autowp\Traffic\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Autowp\Traffic\TrafficControl;
 
 class BanController extends AbstractActionController

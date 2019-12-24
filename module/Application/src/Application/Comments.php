@@ -4,15 +4,12 @@ namespace Application;
 
 use Exception;
 use InvalidArgumentException;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
-
 use Autowp\Comments\CommentsService;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
-
 use Application\Model\Item;
 use Application\Model\Picture;
 

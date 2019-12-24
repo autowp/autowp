@@ -3,7 +3,6 @@
 namespace ApplicationTest\Controller;
 
 use Zend\Db\Sql;
-
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Service\PictureService;

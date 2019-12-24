@@ -5,7 +5,6 @@ namespace Application\View\Helper\Service;
 use Application\Model\Picture;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\InlinePicture as Helper;
 
 class InlinePictureFactory implements FactoryInterface

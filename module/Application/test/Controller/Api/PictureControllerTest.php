@@ -8,7 +8,6 @@ use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
-
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\PictureController;
 use Application\Test\AbstractHttpControllerTestCase;

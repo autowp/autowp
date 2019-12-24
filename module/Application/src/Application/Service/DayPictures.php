@@ -5,12 +5,9 @@ namespace Application\Service;
 use DateTime;
 use DateTimeZone;
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Paginator;
-
 use Autowp\Commons\Db\Table\Row;
-
 use Application\Model\Picture;
 
 class DayPictures

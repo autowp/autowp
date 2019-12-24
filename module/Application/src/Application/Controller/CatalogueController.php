@@ -12,12 +12,10 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
 use Zend\Router\Http\TreeRouteStack;
-
 use Autowp\Comments;
 use Autowp\Image\Storage;
 use Autowp\TextStorage;
 use Autowp\User\Model\User;
-
 use Application\Controller\Plugin\Car;
 use Application\Controller\Plugin\Pic;
 use Application\ItemNameFormatter;
@@ -189,12 +187,12 @@ class CatalogueController extends AbstractActionController
     {
         $shortName = $carName;
         $patterns = [
-            preg_quote($brand['name'].'-', '|') => '',
+            preg_quote($brand['name'] . '-', '|') => '',
             preg_quote($brand['name'], '|') => '',
             '[[:space:]]+' => ' '
         ];
         foreach ($patterns as $pattern => $replacement) {
-            $shortName = preg_replace('|'.$pattern.'|isu', $replacement, $shortName);
+            $shortName = preg_replace('|' . $pattern . '|isu', $replacement, $shortName);
         }
 
         $shortName = trim($shortName);
@@ -410,7 +408,7 @@ class CatalogueController extends AbstractActionController
 
             $isModer = $this->user()->inheritsRole('pictures-moder');
 
-            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_10_' . $language . '_' . $httpsFlag . '_' . (int)$isModer;
+            $key = 'BRAND_' . $brand['id'] . '_TOP_PICTURES_10_' . $language . '_' . $httpsFlag . '_' . (int)$isModer;
             $success = false;
             $topPictures = $this->cache->getItem($key, $success);
             if (! $success) {
@@ -1053,8 +1051,8 @@ class CatalogueController extends AbstractActionController
                     'link_catname' => $pathNode,
                     'parent'       => $parent,
                     'columns'      => [
-                        'cp_'.$idx.'_item_id' => 'parent_id',
-                        'cp_'.$idx.'_name'    => 'link_name'
+                        'cp_' . $idx . '_item_id' => 'parent_id',
+                        'cp_' . $idx . '_name'    => 'link_name'
                     ]
                 ];
             }
@@ -1083,8 +1081,8 @@ class CatalogueController extends AbstractActionController
             }
             foreach ($path as $idx => $pathNode) {
                 $ridx = count($path) - $idx - 1;
-                $idKey = 'cp_'.$ridx.'_item_id';
-                $nameKey = 'cp_'.$ridx.'_name';
+                $idKey = 'cp_' . $ridx . '_item_id';
+                $nameKey = 'cp_' . $ridx . '_name';
 
                 if (! $currentCar[$nameKey]) {
                     $ids[] = $currentCar[$idKey];
@@ -1123,8 +1121,8 @@ class CatalogueController extends AbstractActionController
             ];
 
             foreach ($path as $idx => $pathNode) {
-                $nameKey = 'cp_'.$idx.'_name';
-                $idKey = 'cp_'.$idx.'_item_id';
+                $nameKey = 'cp_' . $idx . '_name';
+                $idKey = 'cp_' . $idx . '_item_id';
 
                 $breadcrumbName = $currentCar[$nameKey];
                 if (! $breadcrumbName) {

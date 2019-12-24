@@ -4,7 +4,6 @@ namespace Application\Validator\User;
 
 use Zend\Db\Sql;
 use Zend\Validator\AbstractValidator;
-
 use Autowp\User\Model\User;
 
 class Login extends AbstractValidator

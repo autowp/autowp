@@ -4,7 +4,6 @@ namespace ApplicationTest\Frontend\Controller;
 
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
-
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\PictureController;
 

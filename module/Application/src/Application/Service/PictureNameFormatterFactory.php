@@ -6,7 +6,6 @@ use Application\ItemNameFormatter;
 use Application\Model\Picture;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\PictureNameFormatter as Model;
 
 class PictureNameFormatterFactory implements FactoryInterface

@@ -4,7 +4,6 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\View\Model\ViewModel;
-
 use Application\Model\BrandNav;
 
 class Sidebar extends AbstractPlugin

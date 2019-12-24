@@ -6,13 +6,11 @@ use ArrayObject;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
-
 use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Paginator;
-
 use Autowp\Commons\Db\Table\Row;
 
 class User
@@ -92,7 +90,7 @@ class User
         if ($lastMessageTime) {
             $messagingInterval = $this->getMessagingInterval($row);
             if ($messagingInterval) {
-                $interval = new DateInterval('PT'.$messagingInterval.'S');
+                $interval = new DateInterval('PT' . $messagingInterval . 'S');
                 return $lastMessageTime->add($interval);
             }
         }

@@ -3,7 +3,6 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
-
 use Application\HostManager as AppHostManager;
 
 class HostManager extends AbstractHelper

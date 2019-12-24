@@ -3,7 +3,6 @@
 namespace Application\Model;
 
 use Zend\Db\TableGateway\TableGateway;
-
 use Autowp\User\Model\User;
 
 class UserItemSubscribe

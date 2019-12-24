@@ -3,7 +3,6 @@
 namespace Application\Test;
 
 use Exception;
-
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Test\PHPUnit\Controller\AbstractConsoleControllerTestCase as ZendTestCase;
 

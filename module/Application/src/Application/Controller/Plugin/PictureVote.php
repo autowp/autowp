@@ -5,9 +5,7 @@ namespace Application\Controller\Plugin;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-
 use Autowp\User\Model\User;
-
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
 

@@ -5,7 +5,6 @@ namespace Application\View\Helper\Service;
 use Application\Language;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\Language as Helper;
 
 class LanguageFactory implements FactoryInterface

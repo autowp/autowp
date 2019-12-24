@@ -3,13 +3,11 @@
 namespace Application\Router\Http;
 
 use Exception;
-
 use Traversable;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;
 use Zend\Stdlib\RequestInterface as Request;
-
 use Application\Model\Item;
 use Application\Model\ItemParent;
 

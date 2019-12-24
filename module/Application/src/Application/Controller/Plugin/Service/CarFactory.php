@@ -10,7 +10,6 @@ use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Plugin\Car as Plugin;
 
 class CarFactory implements FactoryInterface

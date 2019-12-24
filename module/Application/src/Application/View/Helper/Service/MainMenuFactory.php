@@ -5,7 +5,6 @@ namespace Application\View\Helper\Service;
 use Application\MainMenu;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\MainMenu as Helper;
 
 class MainMenuFactory implements FactoryInterface

@@ -3,7 +3,6 @@
 namespace Application\View\Helper;
 
 use Autowp\Comments\CommentsService;
-
 use Zend\View\Helper\AbstractHelper;
 
 class Comments extends AbstractHelper
