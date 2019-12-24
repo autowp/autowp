@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <ruleset name="Zend Framework coding standard">
     <rule ref="./vendor/squizlabs/php_codesniffer/src/Standards/PSR12/ruleset.xml"/>
+    <config name="installed_paths" value="vendor/phpcompatibility/php-compatibility" />
 
     <!-- Paths to check -->
     <file>module/Application/src</file>
