@@ -522,7 +522,7 @@ class PictureHydrator extends RestHydrator
             $newMessages = $this->comments->service()->getNewMessages(
                 Comments::PICTURES_TYPE_ID,
                 $object['id'],
-                $this->userId
+                (int) $this->userId
             );
             $picture['comments_count'] = [
                 'total' => $msgCount,
