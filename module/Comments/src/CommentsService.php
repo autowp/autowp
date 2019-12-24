@@ -231,7 +231,7 @@ class CommentsService
      */
     public function get($type, $item, int $userId, int $perPage = 0, int $page = 0)
     {
-        return $this->getRecursive($type, $item, null, $userId, $perPage, $page);
+        return $this->getRecursive($type, $item, 0, $userId, $perPage, $page);
     }
 
     /**
