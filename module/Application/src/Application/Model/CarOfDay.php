@@ -4,7 +4,6 @@ namespace Application\Model;
 
 use DateInterval;
 use DateTime;
-
 use Exception;
 use Facebook;
 use GuzzleHttp\Exception\BadResponseException;
@@ -14,9 +13,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Http\Client;
 use Zend\Http\Request;
 use Zend\Json\Json;
-
 use Autowp\Image;
-
 use Application\ItemNameFormatter;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
@@ -141,7 +138,7 @@ class CarOfDay
     {
         $itemId = $this->getCarOfDayCadidate();
         if ($itemId) {
-            print $itemId ."\n";
+            print $itemId . "\n";
 
             $now = new DateTime();
             $this->setItemOfDay($now, $itemId, null);
@@ -185,7 +182,7 @@ class CarOfDay
     private static function ucfirst($str)
     {
         $fc = mb_strtoupper(mb_substr($str, 0, 1));
-        return $fc.mb_substr($str, 1);
+        return $fc . mb_substr($str, 1);
     }
 
     public function putCurrentToTwitter(array $twOptions)

@@ -3,13 +3,11 @@
 namespace Autowp\Traffic;
 
 use DateTime;
-
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use Zend\Json\Json;
-
 use Application\Service\RabbitMQ;
 
 class TrafficControl

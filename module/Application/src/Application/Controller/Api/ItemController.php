@@ -6,7 +6,6 @@ use ArrayObject;
 use Autowp\Image\Storage;
 use Collator;
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\Factory;
@@ -23,15 +22,12 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use geoPHP;
 use Point;
-
 use Autowp\Message\MessageService;
 use Autowp\User\Controller\Plugin\User;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 use Autowp\ZFComponents\Filter\SingleSpaces;
-
 use Application\Controller\Plugin\Car;
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
@@ -1762,7 +1758,7 @@ class ItemController extends AbstractRestfulController
             $message = sprintf(
                 'Редактирование мета-информации автомобиля %s',
                 htmlspecialchars($this->car()->formatName($item, 'en')) .
-                ( count($htmlChanges) ? '<p>'.implode('<br />', $htmlChanges).'</p>' : '')
+                ( count($htmlChanges) ? '<p>' . implode('<br />', $htmlChanges) . '</p>' : '')
             );
             $this->log($message, [
                 'items' => $item['id']

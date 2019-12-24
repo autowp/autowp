@@ -3,7 +3,6 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
-
 use Application\Language as AppLanguage;
 
 class Language extends AbstractHelper

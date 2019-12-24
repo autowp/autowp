@@ -6,9 +6,7 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\Referer;
 

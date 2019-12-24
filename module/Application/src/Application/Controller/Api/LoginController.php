@@ -5,7 +5,6 @@ namespace Application\Controller\Api;
 use Autowp\ExternalLoginService\AbstractService;
 use Exception;
 use Imagick;
-
 use Zend\Authentication\AuthenticationService;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -15,13 +14,11 @@ use Zend\Uri\Http as HttpUri;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
 use ZF\ApiProblem\ApiProblem;
-
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\Image\Storage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRemember;
-
 use Application\Model\UserAccount;
 use Application\Service\UsersService;
 

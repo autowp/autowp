@@ -3,7 +3,6 @@
 namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-
 use Application\Language as AppLanguage;
 
 class Language extends AbstractPlugin

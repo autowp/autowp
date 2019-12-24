@@ -5,7 +5,6 @@ namespace Application\View\Helper\Service;
 use Application\LanguagePicker;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\LanguagePicker as Helper;
 
 class LanguagePickerFactory implements FactoryInterface

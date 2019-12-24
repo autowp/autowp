@@ -6,9 +6,7 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
@@ -25,8 +23,7 @@ use Application\Service\DayPictures;
  */
 class NewController extends AbstractRestfulController
 {
-    const PER_PAGE = 30;
-    const BRAND_ALL = 'all';
+    private const PER_PAGE = 30;
 
     /**
      * @var Picture

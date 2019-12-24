@@ -3,7 +3,6 @@
 namespace Application\Controller\Api;
 
 use DateTime;
-
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -11,10 +10,8 @@ use Zend\Paginator;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
-
 use Application\Comments;
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;

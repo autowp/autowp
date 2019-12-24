@@ -3,7 +3,6 @@
 namespace Application\Validator\Attrs;
 
 use Zend\I18n\Validator\IsInt;
-
 use Application\Service\SpecificationsService;
 
 class IsIntOrNull extends IsInt

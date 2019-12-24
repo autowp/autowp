@@ -3,7 +3,6 @@
 namespace Application\Model\Item;
 
 use Zend\Db\Sql;
-
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Picture;

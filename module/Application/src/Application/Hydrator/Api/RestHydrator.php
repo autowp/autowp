@@ -3,12 +3,10 @@
 namespace Application\Hydrator\Api;
 
 use Traversable;
-
 use Zend\Hydrator\AbstractHydrator;
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\HydratorOptionsInterface;
 use Zend\Stdlib\ArrayUtils;
-
 use Application\Hydrator\Api\Filter\PropertyFilter;
 use Application\Hydrator\Api\Strategy\HydratorStrategy;
 

@@ -12,7 +12,7 @@ class Acceleration extends AbstractAdapter
 
     protected $order;
 
-    const MPH60_TO_KMH100 = 0.98964381346271110050637609692728;
+    private const MPH60_TO_KMH100 = 0.98964381346271110050637609692728;
     /**
      * @var array|ArrayObject|null
      */

@@ -3,7 +3,6 @@
 namespace Application\Controller\Api;
 
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
@@ -12,9 +11,7 @@ use Zend\Paginator;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\User\Model\User;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;

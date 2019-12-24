@@ -39,7 +39,7 @@ class LanguagePriority
             $quoted[] = $adapter->platform->quoteValue($lang);
         }
 
-        return 'FIELD(language, '.implode(', ', $quoted).')';
+        return 'FIELD(language, ' . implode(', ', $quoted) . ')';
     }
 
     public function getSelectItemName(string $language, Adapter $adapter): string

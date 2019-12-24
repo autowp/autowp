@@ -4,27 +4,24 @@ namespace Application;
 
 use Exception;
 use InvalidArgumentException;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
-
 use Autowp\Comments\CommentsService;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
-
 use Application\Model\Item;
 use Application\Model\Picture;
 
 class Comments
 {
-    const PREVIEW_LENGTH = 60;
+    private const PREVIEW_LENGTH = 60;
 
-    const PICTURES_TYPE_ID = 1;
-    const ITEM_TYPE_ID = 2;
-    const VOTINGS_TYPE_ID = 3;
-    const ARTICLES_TYPE_ID = 4;
-    const FORUMS_TYPE_ID = 5;
+    public const PICTURES_TYPE_ID = 1;
+    public const ITEM_TYPE_ID = 2;
+    public const VOTINGS_TYPE_ID = 3;
+    public const ARTICLES_TYPE_ID = 4;
+    public const FORUMS_TYPE_ID = 5;
 
     /**
      * @var CommentsService

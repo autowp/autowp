@@ -3,12 +3,11 @@
 namespace Application\Validator\ItemParent;
 
 use Zend\Validator\AbstractValidator;
-
 use Application\Model\ItemParent;
 
 class CatnameNotExists extends AbstractValidator
 {
-    const EXISTS = 'itemParentCatnameAlreadyExists';
+    private const EXISTS = 'itemParentCatnameAlreadyExists';
 
     protected $messageTemplates = [
         self::EXISTS => "Item parent catname '%value%' already exists"

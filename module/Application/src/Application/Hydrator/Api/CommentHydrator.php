@@ -4,16 +4,13 @@ namespace Application\Hydrator\Api;
 
 use Exception;
 use Traversable;
-
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
-
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
-
 use Application\Comments;
 use Application\Model\Picture;
 use Application\View\Helper\UserText;

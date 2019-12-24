@@ -3,18 +3,16 @@
 namespace Application\Model;
 
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 class ItemParent
 {
-    const MAX_CATNAME = 150;
-    const MAX_LANGUAGE_NAME = 255;
+    public const MAX_CATNAME = 150;
+    public const MAX_LANGUAGE_NAME = 255;
 
-    const
+    public const
         TYPE_DEFAULT = 0,
         TYPE_TUNING = 1,
         TYPE_SPORT = 2,
@@ -168,13 +166,13 @@ class ItemParent
         $name = $vehicleName;
         foreach ($aliases as $alias) {
             $name = str_ireplace('by The ' . $alias . ' Company', '', $name);
-            $name = str_ireplace('by '.$alias, '', $name);
-            $name = str_ireplace('di '.$alias, '', $name);
-            $name = str_ireplace('par '.$alias, '', $name);
-            $name = str_ireplace($alias.'-', '', $name);
-            $name = str_ireplace('-'.$alias, '', $name);
+            $name = str_ireplace('by ' . $alias, '', $name);
+            $name = str_ireplace('di ' . $alias, '', $name);
+            $name = str_ireplace('par ' . $alias, '', $name);
+            $name = str_ireplace($alias . '-', '', $name);
+            $name = str_ireplace('-' . $alias, '', $name);
 
-            $name = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $name);
+            $name = preg_replace('/\b' . preg_quote($alias, '/') . '\b/iu', '', $name);
         }
 
         $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));

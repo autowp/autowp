@@ -6,7 +6,6 @@ use DateTime;
 use Exception;
 use GuzzleHttp\Client;
 use Zend\Json\Json;
-
 use Application\Service\RabbitMQ;
 
 class Referer

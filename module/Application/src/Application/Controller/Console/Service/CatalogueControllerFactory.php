@@ -14,7 +14,6 @@ use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Console\CatalogueController as Controller;
 
 class CatalogueControllerFactory implements FactoryInterface

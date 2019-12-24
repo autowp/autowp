@@ -4,7 +4,6 @@ namespace Application\Model\Item;
 
 use ArrayObject;
 use Zend\Router\Http\TreeRouteStack;
-
 use Application\Controller\Plugin\Pic;
 use Application\Model\Catalogue;
 use Application\Service\SpecificationsService;

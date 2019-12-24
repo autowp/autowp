@@ -3,7 +3,6 @@
 namespace Application\Permissions;
 
 use Exception;
-
 use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;

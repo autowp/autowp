@@ -3,7 +3,6 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Application\Model\Referer;
 
 class PictureFileController extends AbstractActionController
@@ -102,10 +101,10 @@ class PictureFileController extends AbstractActionController
         $this->getResponse()
             ->getHeaders()
             ->addHeaders([
-                'Expires'          => gmdate("D, d M Y H:i:s", time() + $expiresTime)." GMT",
+                'Expires'          => gmdate("D, d M Y H:i:s", time() + $expiresTime) . " GMT",
                 'Pragma'           => 'public',
                 'Content-Length'   => filesize($filepath),
-                'Cache-Control'    => "max-age=".$expiresTime.", public, must-revalidate",
+                'Cache-Control'    => "max-age=" . $expiresTime . ", public, must-revalidate",
                 'X-Accel-Redirect' => '/pic-accel/' . $file
             ]);
 

@@ -4,12 +4,9 @@ namespace Application;
 
 use Autowp\User\Model\User;
 use Exception;
-
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
-
 use Autowp\Cron;
-
 use Application\Service\PictureService;
 use Zend\Session\SessionManager;
 

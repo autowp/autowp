@@ -5,15 +5,15 @@ namespace Application\Model;
 use ArrayObject;
 use Exception;
 use InvalidArgumentException;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 class PictureItem
 {
-    const PICTURE_CONTENT = 1,
-          PICTURE_AUTHOR = 2,
-          PICTURE_COPYRIGHTS = 3;
+    public const
+        PICTURE_CONTENT = 1,
+        PICTURE_AUTHOR = 2,
+        PICTURE_COPYRIGHTS = 3;
 
     /**
      * @var TableGateway
@@ -75,7 +75,7 @@ class PictureItem
         }
 
         $result = $this->table->getAdapter()->query('
-            INSERT IGNORE INTO picture_item (picture_id, item_id, type) 
+            INSERT IGNORE INTO picture_item (picture_id, item_id, type)
             VALUES (:picture_id, :item_id, :type)
         ', [
             'picture_id' => $pictureId,

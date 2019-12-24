@@ -3,7 +3,6 @@
 namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-
 use Application\Language;
 use Application\FileSize as AppFileSize;
 

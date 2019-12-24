@@ -3,7 +3,6 @@
 namespace ApplicationTest\Frontend\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Application\Controller\Api\InboxController;
 
 class InboxControllerTest extends AbstractHttpControllerTestCase

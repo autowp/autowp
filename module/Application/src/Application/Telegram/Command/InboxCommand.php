@@ -5,7 +5,6 @@ namespace Application\Telegram\Command;
 use Telegram\Bot\Commands\Command;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-
 use Application\Model\Item;
 
 class InboxCommand extends Command

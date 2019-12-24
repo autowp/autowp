@@ -5,7 +5,6 @@ namespace Application\Controller\Plugin;
 use Exception;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Router\Http\TreeRouteStack;
-
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\ItemParent;

@@ -4,7 +4,6 @@ namespace Application\Provider\UserId;
 
 use Zend\Authentication\AuthenticationService;
 use Zend\Stdlib\RequestInterface;
-
 use ZF\OAuth2\Provider\UserId\UserIdProviderInterface;
 
 class OAuth2UserIdProvider implements UserIdProviderInterface

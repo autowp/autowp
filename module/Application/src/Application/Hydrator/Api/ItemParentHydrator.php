@@ -4,13 +4,10 @@ namespace Application\Hydrator\Api;
 
 use Exception;
 use Traversable;
-
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
-
 use Autowp\User\Model\User;
-
 use Application\Model\Item;
 use Application\Model\ItemParent;
 

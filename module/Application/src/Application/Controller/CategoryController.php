@@ -5,7 +5,6 @@ namespace Application\Controller;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-
 use Application\Model\Categories;
 use Application\Model\Item;
 

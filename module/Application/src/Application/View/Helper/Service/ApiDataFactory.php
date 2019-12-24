@@ -4,7 +4,6 @@ namespace Application\View\Helper\Service;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Hydrator\Api\UserHydrator;
 use Application\View\Helper\ApiData as Helper;
 

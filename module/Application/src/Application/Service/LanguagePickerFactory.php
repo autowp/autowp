@@ -4,7 +4,6 @@ namespace Application\Service;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\LanguagePicker;
 
 class LanguagePickerFactory implements FactoryInterface

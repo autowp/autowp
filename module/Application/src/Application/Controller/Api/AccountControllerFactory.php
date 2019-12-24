@@ -4,7 +4,6 @@ namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Model\UserAccount;
 
 class AccountControllerFactory implements FactoryInterface

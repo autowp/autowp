@@ -7,16 +7,12 @@ use ArrayObject;
 use Autowp\Comments\Attention;
 use Autowp\TextStorage;
 use Exception;
-
 use geoPHP;
 use ImagickException;
 use Point;
-
 use Zend\Db\Sql;
-
 use Autowp\Comments\CommentsService;
 use Autowp\Image;
-
 use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Model\Picture;
@@ -25,7 +21,7 @@ use Application\Model\UserPicture;
 
 class PictureService
 {
-    const QUEUE_LIFETIME = 7; // days
+    public const QUEUE_LIFETIME = 7; // days
 
     /**
      * @var Picture

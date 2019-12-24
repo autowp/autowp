@@ -4,7 +4,6 @@ namespace Application\Hydrator\Api\Strategy;
 
 use Interop\Container\ContainerInterface;
 use Zend\Hydrator\Strategy\StrategyInterface;
-
 use Autowp\Image\Storage;
 
 class Image implements StrategyInterface

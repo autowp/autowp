@@ -6,7 +6,6 @@ use Application\Hydrator\Api\TrafficHydrator;
 use Autowp\Traffic\TrafficControl;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Api\TrafficController as Controller;
 
 class TrafficControllerFactory implements FactoryInterface

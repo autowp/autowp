@@ -396,13 +396,13 @@ class BrandNav
                 $name = $langName ? $langName : $brandItemRow['car_name'];
                 foreach ($aliases as $alias) {
                     $name = str_ireplace('by The ' . $alias . ' Company', '', $name);
-                    $name = str_ireplace('by '.$alias, '', $name);
-                    $name = str_ireplace('di '.$alias, '', $name);
-                    $name = str_ireplace('par '.$alias, '', $name);
-                    $name = str_ireplace($alias.'-', '', $name);
-                    $name = str_ireplace('-'.$alias, '', $name);
+                    $name = str_ireplace('by ' . $alias, '', $name);
+                    $name = str_ireplace('di ' . $alias, '', $name);
+                    $name = str_ireplace('par ' . $alias, '', $name);
+                    $name = str_ireplace($alias . '-', '', $name);
+                    $name = str_ireplace('-' . $alias, '', $name);
 
-                    $name = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $name);
+                    $name = preg_replace('/\b' . preg_quote($alias, '/') . '\b/iu', '', $name);
                 }
 
                 $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));

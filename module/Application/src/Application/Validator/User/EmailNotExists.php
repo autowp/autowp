@@ -3,12 +3,11 @@
 namespace Application\Validator\User;
 
 use Zend\Validator\AbstractValidator;
-
 use Autowp\User\Model\User;
 
 class EmailNotExists extends AbstractValidator
 {
-    const EXISTS = 'userEmailExists';
+    private const EXISTS = 'userEmailExists';
 
     protected $messageTemplates = [
         self::EXISTS => "E-mail '%value%' already registered"

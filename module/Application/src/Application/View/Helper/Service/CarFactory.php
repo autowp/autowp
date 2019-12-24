@@ -5,7 +5,6 @@ namespace Application\View\Helper\Service;
 use Application\ItemNameFormatter;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\Car as Helper;
 
 class CarFactory implements FactoryInterface

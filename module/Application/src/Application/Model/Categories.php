@@ -8,7 +8,7 @@ use Zend\Router\Http\TreeRouteStack;
 
 class Categories
 {
-    const NEW_DAYS = 7;
+    public const NEW_DAYS = 7;
 
     /**
      * @var TreeRouteStack

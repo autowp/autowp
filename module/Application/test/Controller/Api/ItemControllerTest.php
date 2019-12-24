@@ -3,12 +3,10 @@
 namespace ApplicationTest\Controller\Api;
 
 use Exception;
-
 use Zend\Http\Header\Cookie;
 use Zend\Http\Headers;
 use Zend\Http\Request;
 use Zend\Json\Json;
-
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemLanguageController;
 use Application\Controller\Api\ItemLinkController;
@@ -28,7 +26,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @return int
      * @throws Exception
      */
-    private function createItem($params):int
+    private function createItem($params): int
     {
         $this->reset();
 
@@ -44,9 +42,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
-        $itemId = $parts[count($parts) - 1];
-
-        return $itemId;
+        return $parts[count($parts) - 1];
     }
 
     private function createVehicle(array $params = [])
@@ -93,6 +89,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     private function getRandomBrand()
     {
@@ -210,9 +207,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
-        $pictureId = $parts[count($parts) - 1];
-
-        return $pictureId;
+        return $parts[count($parts) - 1];
     }
 
     /**
@@ -228,7 +223,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch(
-            'https://www.autowp.ru/api/picture-item/' . $pictureId. '/' . $itemId . '/1',
+            'https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/1',
             Request::METHOD_PUT,
             [
                 'perspective_id' => $perspectiveId
@@ -278,7 +273,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch(
-            'https://www.autowp.ru/api/item-parent/'.$itemId.'/'.$parentId,
+            'https://www.autowp.ru/api/item-parent/' . $itemId . '/' . $parentId,
             Request::METHOD_GET
         );
 
@@ -293,6 +288,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testEngineUnderTheHoodPreviews()
     {
@@ -332,6 +328,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testCreateCarAndAddToBrand()
     {
@@ -394,6 +391,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testCreateBrand()
     {
@@ -462,6 +460,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testBlacklistedCatnameNotAllowedManually()
     {
@@ -482,7 +481,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch(
-            'https://www.autowp.ru/api/item-parent/'.$childVehicleId.'/'.$parentVehicleId,
+            'https://www.autowp.ru/api/item-parent/' . $childVehicleId . '/' . $parentVehicleId,
             Request::METHOD_PUT,
             [
                 'catname' => 'sport'
@@ -503,6 +502,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testSubscription()
     {
@@ -541,6 +541,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
     }
 
+    /**
+     * @throws Exception
+     */
     public function testItemParentAutoCatnameIsNotEmpty()
     {
         $parentId = $this->createVehicle([
@@ -558,6 +561,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testItemPoint()
     {
@@ -588,6 +592,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testEngineVehicles()
     {
@@ -637,6 +642,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testFields()
     {
@@ -644,7 +650,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
             'fields' => 'childs_count,name_html,name_text,name_default,description,' .
                 'has_text,brands,spec_editor_url,specs_url,categories,' .
-                'twins_groups,url,more_pictures_url,preview_pictures,design,'.
+                'twins_groups,url,more_pictures_url,preview_pictures,design,' .
                 'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
             'limit'  => 100
         ]);

@@ -4,7 +4,6 @@ namespace ApplicationTest\Api\Controller;
 
 use Exception;
 use Zend\Http\Request;
-
 use Application\Controller\Api\LoginController;
 use Application\Controller\Api\RestorePasswordController;
 use Application\Controller\Api\UserController;
@@ -70,7 +69,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
     public function testRestorePassword()
     {
-        $email = 'test'.microtime(true).'@example.com';
+        $email = 'test' . microtime(true) . '@example.com';
         $password = 'password';
         $newPassword = 'password2';
         $name = 'User, who restore password';

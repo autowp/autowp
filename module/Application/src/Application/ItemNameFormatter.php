@@ -72,12 +72,12 @@ class ItemNameFormatter
             }
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             $escapedSpec = $this->renderer->escapeHtml($item['spec']);
-            $result .= ' <span '.implode(' ', $attrs).'>' . $escapedSpec . '</span>';
+            $result .= ' <span ' . implode(' ', $attrs) . '>' . $escapedSpec . '</span>';
         }
 
         if (strlen($item['body']) > 0) {
             /* @phan-suppress-next-line PhanUndeclaredMethod */
-            $result .= ' ('.$this->renderer->escapeHtml($item['body']).')';
+            $result .= ' (' . $this->renderer->escapeHtml($item['body']) . ')';
         }
 
         $by = (int)$item['begin_year'];
@@ -114,8 +114,8 @@ class ItemNameFormatter
                 /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/years', $language));
                 $result .=
-                    '<small>'.
-                        ' \'<span class="realyears" title="'.$title.'">' .
+                    '<small>' .
+                        ' \'<span class="realyears" title="' . $title . '">' .
                             $this->renderYearsHtml(
                                 $item['today'],
                                 $by,
@@ -183,7 +183,7 @@ class ItemNameFormatter
         }
 
         if (strlen($item['body']) > 0) {
-            $result .= ' ('.$item['body'].')';
+            $result .= ' (' . $item['body'] . ')';
         }
 
         $by = (int)$item['begin_year'];
@@ -264,7 +264,7 @@ class ItemNameFormatter
     private function monthsRange($from, $to)
     {
         return ($from ? sprintf('%02d', $from) : '??') .
-               '–'.
+               '–' .
                ($to ? sprintf('%02d', $to) : '??');
     }
 
@@ -294,15 +294,15 @@ class ItemNameFormatter
         }
 
         if ($equalS) {
-            return (($bm ? sprintf($this->textMonthFormat, $bm) : '') . $by).
-                   '–'.
-                   ($em ? sprintf($this->textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey % 100));
+            return (($bm ? sprintf($this->textMonthFormat, $bm) : '') . $by) .
+                   '–' .
+                   ($em ? sprintf($this->textMonthFormat, $em) : '') . ($em ? $ey : sprintf('%02d', $ey % 100));
         }
 
-        return  (($bm ? sprintf($this->textMonthFormat, $bm) : '').($by ? $by : '????')).
+        return  (($bm ? sprintf($this->textMonthFormat, $bm) : '') . ($by ? $by : '????')) .
                 (
                     $ey
-                        ? '–'.($em ? sprintf($this->textMonthFormat, $em) : '').$ey
+                        ? '–' . ($em ? sprintf($this->textMonthFormat, $em) : '') . $ey
                         : $this->missedEndYearYearsSuffix($today, $by, $language)
                 );
     }
@@ -323,7 +323,7 @@ class ItemNameFormatter
 
         if ($equalS) {
             return (($bm ? sprintf($this->monthFormat, $bm) : '') . $by) .
-                   '–'.
+                   '–' .
                    ($em ? sprintf($this->monthFormat, $em) : '') . ($em ? $ey : sprintf('%02d', $ey % 100));
         }
 

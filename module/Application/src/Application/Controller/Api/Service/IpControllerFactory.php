@@ -5,7 +5,6 @@ namespace Application\Controller\Api\Service;
 use Application\Hydrator\Api\IpHydrator;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Api\IpController as Controller;
 
 class IpControllerFactory implements FactoryInterface

@@ -5,11 +5,9 @@ namespace Application\Controller\Api;
 use Application\Comments;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User;
-
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\Picture;

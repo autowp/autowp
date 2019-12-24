@@ -3,7 +3,6 @@
 namespace Application\Validator\Attrs;
 
 use Zend\I18n\Validator\IsFloat;
-
 use Application\Service\SpecificationsService;
 
 class IsFloatOrNull extends IsFloat

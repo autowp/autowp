@@ -10,7 +10,6 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
-
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\Picture;

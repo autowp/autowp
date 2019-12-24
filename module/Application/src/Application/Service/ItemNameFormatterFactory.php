@@ -4,7 +4,6 @@ namespace Application\Service;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\ItemNameFormatter as Model;
 
 class ItemNameFormatterFactory implements FactoryInterface

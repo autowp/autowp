@@ -6,7 +6,6 @@ use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\Pic as Helper;
 
 class PicFactory implements FactoryInterface

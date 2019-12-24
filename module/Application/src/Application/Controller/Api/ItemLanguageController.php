@@ -9,11 +9,9 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Uri\Uri;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service as TextStorage;
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Controller\Plugin\Car;
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;

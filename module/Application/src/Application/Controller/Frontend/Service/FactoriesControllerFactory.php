@@ -5,7 +5,6 @@ namespace Application\Controller\Frontend\Service;
 use Application\Model\Item;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\FactoriesController as Controller;
 
 class FactoriesControllerFactory implements FactoryInterface

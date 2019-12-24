@@ -4,7 +4,6 @@ namespace ApplicationTest\Controller\Api;
 
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
-
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\UserController;
 
@@ -17,7 +16,7 @@ class UserControllerTest extends AbstractHttpControllerTestCase
      */
     public function testDelete()
     {
-        $email = 'test'.microtime(true).'@example.com';
+        $email = 'test' . microtime(true) . '@example.com';
         $password = 'password';
 
         $this->dispatch('https://www.autowp.ru/api/user', Request::METHOD_POST, [

@@ -3,10 +3,8 @@
 namespace Application\Service;
 
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-
 use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\Picture;
@@ -381,9 +379,9 @@ class Mosts
 
     private function betweenYearsExpr($from, $to)
     {
-        return '(item.begin_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
-               'item.end_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
-               '(item.begin_order_cache < "'.$from.'-01-01" and item.end_order_cache > "'.$to.'-12-31"))';
+        return '(item.begin_order_cache between "' . $from . '-01-01" and "' . $to . '-12-31" or ' .
+               'item.end_order_cache between "' . $from . '-01-01" and "' . $to . '-12-31" or ' .
+               '(item.begin_order_cache < "' . $from . '-01-01" and item.end_order_cache > "' . $to . '-12-31"))';
     }
 
     public function getYears()
@@ -446,14 +444,14 @@ class Mosts
                     'where'  => $this->betweenYearsExpr(2000, 2009)
                 ],
                 [
-                    'name'   => 'mosts/period/2010-'.($prevYear % 100),
-                    'folder' => '2010-'.($prevYear % 100),
+                    'name'   => 'mosts/period/2010-' . ($prevYear % 100),
+                    'folder' => '2010-' . ($prevYear % 100),
                     'where'  => $this->betweenYearsExpr(2010, $prevYear)
                 ],
                 [
                     'name'   => 'mosts/period/present',
                     'folder' => 'today',
-                    'where'  => '(item.end_order_cache >="'.$cy.'-01-01" and item.end_order_cache<"2100-01-01" ' .
+                    'where'  => '(item.end_order_cache >="' . $cy . '-01-01" and item.end_order_cache<"2100-01-01" ' .
                                 'or item.end_order_cache is null and item.today)'
                 ]
             ];
@@ -720,7 +718,7 @@ class Mosts
         foreach ($ratings as $id => $most) {
             $mosts[] = [
                 'active' => $id == $mostId,
-                'name'   => 'most/'.$most['catName'],
+                'name'   => 'most/' . $most['catName'],
                 'params' => [
                     'most_catname'  => $most['catName'],
                     'shape_catname' => $carTypeCatname,

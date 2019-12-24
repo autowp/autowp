@@ -5,7 +5,6 @@ namespace Application\Telegram\Command;
 use Telegram\Bot\Commands\Command;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Math\Rand;
-
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 

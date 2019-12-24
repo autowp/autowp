@@ -3,7 +3,6 @@
 namespace AutowpTest\User\View;
 
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Autowp\User\View\Helper\User;
 use DateTime;
 use Zend\Authentication\AuthenticationService;

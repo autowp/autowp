@@ -13,7 +13,6 @@ use Application\Service\SpecificationsService;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\IndexController as Controller;
 
 class IndexControllerFactory implements FactoryInterface

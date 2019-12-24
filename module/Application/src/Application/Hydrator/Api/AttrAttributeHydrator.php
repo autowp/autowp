@@ -4,12 +4,9 @@ namespace Application\Hydrator\Api;
 
 use Exception;
 use Traversable;
-
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Stdlib\ArrayUtils;
-
 use Autowp\User\Model\User;
-
 use Application\Hydrator\Api\Filter\PropertyFilter;
 use Application\Hydrator\Api\Strategy\HydratorStrategy;
 use Application\Model\Item;

@@ -7,7 +7,6 @@ namespace Application;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Json\Json;
-
 use Application\Service\RabbitMQ;
 
 class DuplicateFinder

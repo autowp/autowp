@@ -7,7 +7,6 @@ use Application\Model\PictureModerVote;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Plugin\PictureVote as Plugin;
 
 class PictureVoteFactory implements FactoryInterface

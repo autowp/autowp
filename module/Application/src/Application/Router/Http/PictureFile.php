@@ -3,7 +3,6 @@
 namespace Application\Router\Http;
 
 use Exception;
-
 use Traversable;
 use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;
@@ -11,7 +10,7 @@ use Zend\Stdlib\RequestInterface as Request;
 
 class PictureFile implements RouteInterface
 {
-    const URI_DELIMITER = '/';
+    private const URI_DELIMITER = '/';
 
     private $defaults = [];
 

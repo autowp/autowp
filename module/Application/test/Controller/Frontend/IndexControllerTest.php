@@ -3,7 +3,6 @@
 namespace ApplicationTest\Frontend\Controller;
 
 use Application\Controller\IndexController;
-
 use Application\Test\AbstractHttpControllerTestCase;
 
 class IndexControllerTest extends AbstractHttpControllerTestCase

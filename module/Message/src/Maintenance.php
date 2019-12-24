@@ -3,7 +3,6 @@
 namespace Autowp\Message;
 
 use Autowp\Cron;
-
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
 

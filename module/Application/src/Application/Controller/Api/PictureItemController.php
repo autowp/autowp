@@ -8,10 +8,8 @@ use Zend\Paginator;
 use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Controller\Plugin\Pic;
 use Application\Hydrator\Api\RestHydrator;

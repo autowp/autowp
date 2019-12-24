@@ -3,7 +3,6 @@
 namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-
 use Application\Model\Catalogue as CatalogueModel;
 
 class Catalogue extends AbstractPlugin

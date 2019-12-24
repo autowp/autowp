@@ -114,11 +114,13 @@ class PageTitle extends AbstractStandalone
      */
     public function setDefaultAttachOrder($setType)
     {
-        if (! in_array($setType, [
+        if (
+            ! in_array($setType, [
             AbstractContainer::APPEND,
             AbstractContainer::SET,
             AbstractContainer::PREPEND
-        ])) {
+            ])
+        ) {
             throw new Exception\DomainException(
                 "You must use a valid attach order: 'PREPEND', 'APPEND' or 'SET'"
             );

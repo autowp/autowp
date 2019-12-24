@@ -5,11 +5,9 @@ namespace Application\Controller\Console;
 use Autowp\Image\StorageInterface;
 use geoPHP;
 use Point;
-
 use Zend\Db\Sql;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Model\Picture;

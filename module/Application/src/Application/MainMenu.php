@@ -7,9 +7,7 @@ use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
-
 use Autowp\Message\MessageService;
-
 use Application\Model\Categories;
 
 class MainMenu

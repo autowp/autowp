@@ -4,7 +4,6 @@ namespace Autowp\User;
 
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
-
 use Autowp\Cron;
 
  //TODO: extract to zf-components

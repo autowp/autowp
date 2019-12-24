@@ -5,7 +5,6 @@ namespace Application\Controller\Plugin\Service;
 use Application\Model\Log;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Plugin\Log as Plugin;
 
 class LogFactory implements FactoryInterface

@@ -4,9 +4,7 @@ namespace Application\InputFilter;
 
 use InvalidArgumentException;
 use Traversable;
-
 use Zend\InputFilter\InputFilter;
-
 use Application\Service\SpecificationsService;
 
 class AttrUserValueCollectionInputFilter extends InputFilter

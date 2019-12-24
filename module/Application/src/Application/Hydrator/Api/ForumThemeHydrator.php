@@ -4,17 +4,14 @@ namespace Application\Hydrator\Api;
 
 use Exception;
 use Traversable;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Paginator;
 use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
-
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
-
 use Application\Comments;
 
 class ForumThemeHydrator extends RestHydrator

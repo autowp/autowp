@@ -6,7 +6,6 @@ use Application\Model\Brand;
 use Application\Model\Picture;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\PictureController as Controller;
 
 class PictureControllerFactory implements FactoryInterface

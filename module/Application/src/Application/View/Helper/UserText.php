@@ -5,15 +5,12 @@ namespace Application\View\Helper;
 use Application\Controller\CatalogueController;
 use Application\Controller\PictureController;
 use Exception;
-
 use Zend\Http\Exception\InvalidArgumentException;
 use Zend\Http\Request;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Uri;
 use Zend\View\Helper\AbstractHtmlElement;
-
 use Autowp\User\Model\User as UserModel;
-
 use Application\Model\Picture;
 
 class UserText extends AbstractHtmlElement
@@ -148,7 +145,7 @@ class UserText extends AbstractHtmlElement
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return '<a href="'.$this->view->escapeHtmlAttr($url).'">' . $this->view->escapeHtml($url) . '</a>';
+        return '<a href="' . $this->view->escapeHtmlAttr($url) . '">' . $this->view->escapeHtml($url) . '</a>';
     }
 
     private function tryUserLink(Uri\Uri $uri)

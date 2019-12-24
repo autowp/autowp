@@ -3,10 +3,8 @@
 namespace Application\Controller\Api;
 
 use IntlDateFormatter;
-
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
-
 use Application\Model\CarOfDay;
 
 class DonateController extends AbstractActionController

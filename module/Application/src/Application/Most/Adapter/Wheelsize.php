@@ -4,7 +4,6 @@ namespace Application\Most\Adapter;
 
 use Exception;
 use Zend\Db\Sql;
-
 use Application\WheelSize as WheelsizeObject;
 
 class Wheelsize extends AbstractAdapter

@@ -3,10 +3,8 @@
 namespace Application\Most\Adapter;
 
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-
 use Application\Most;
 
 abstract class AbstractAdapter

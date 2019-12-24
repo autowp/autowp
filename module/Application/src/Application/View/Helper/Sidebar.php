@@ -3,7 +3,6 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
-
 use Autowp\Message\MessageService;
 
 class Sidebar extends AbstractHtmlElement

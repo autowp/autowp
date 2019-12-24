@@ -6,9 +6,7 @@ use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
-
 use Autowp\User\Model\User;
-
 use Application\Comments;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
@@ -82,7 +80,7 @@ class RatingController extends AbstractActionController
         foreach ($rows as $idx => $user) {
             $brands = [];
             if ($idx < 5) {
-                $cacheKey = 'RATING_USER_BRAND_5_'.$precisionLimit.'_' . $user['id'];
+                $cacheKey = 'RATING_USER_BRAND_5_' . $precisionLimit . '_' . $user['id'];
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
                     $data = $this->item->getCountPairs([

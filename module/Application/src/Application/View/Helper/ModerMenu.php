@@ -3,9 +3,7 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
-
 use Autowp\Comments;
-
 use Application\Model\Picture;
 
 class ModerMenu extends AbstractHtmlElement

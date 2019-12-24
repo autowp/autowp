@@ -6,27 +6,24 @@ use Application\Comments;
 use DateTime;
 use DateTimeZone;
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Math\Rand;
 use Zend\Paginator;
-
 use Autowp\ZFComponents\Filter\FilenameSafe;
-
 use Application\Model\Item as ItemModel;
 
 class Picture
 {
-    const
+    public const
         STATUS_ACCEPTED = 'accepted',
         STATUS_REMOVING = 'removing',
         STATUS_REMOVED  = 'removed',
         STATUS_INBOX    = 'inbox';
 
-    const MAX_NAME = 255;
+    public const MAX_NAME = 255;
 
-    const IDENTITY_LENGTH = 6;
+    private const IDENTITY_LENGTH = 6;
 
     /**
      * @var TableGateway
@@ -1012,7 +1009,7 @@ class Picture
                 } else {
                     $carFolder = $filenameFilter->filter($car['name']);
                     $firstChar = mb_substr($carFolder, 0, 1);
-                    $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
+                    $result = $firstChar . '/' . $carFolder . '/' . $carCatname;
                 }
             }
         } elseif (count($items) > 0) {
