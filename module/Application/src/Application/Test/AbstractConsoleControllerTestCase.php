@@ -10,7 +10,7 @@ abstract class AbstractConsoleControllerTestCase extends ZendTestCase
 {
     protected $applicationConfigPath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (! $this->applicationConfigPath) {
             throw new Exception("Application config path not provided");
@@ -21,7 +21,7 @@ abstract class AbstractConsoleControllerTestCase extends ZendTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
