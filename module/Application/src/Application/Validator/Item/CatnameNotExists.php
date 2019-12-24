@@ -7,7 +7,7 @@ use Application\Model\Item;
 
 class CatnameNotExists extends AbstractValidator
 {
-    const EXISTS = 'itemCatnameAlreadyExists';
+    private const EXISTS = 'itemCatnameAlreadyExists';
 
     protected $messageTemplates = [
         self::EXISTS => "Catname '%value%' already exists"

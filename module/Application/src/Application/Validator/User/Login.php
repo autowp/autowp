@@ -8,7 +8,7 @@ use Autowp\User\Model\User;
 
 class Login extends AbstractValidator
 {
-    const USER_NOT_FOUND = 'userNotFound';
+    private const USER_NOT_FOUND = 'userNotFound';
 
     protected $messageTemplates = [
         self::USER_NOT_FOUND => "login/user-%value%-not-found"

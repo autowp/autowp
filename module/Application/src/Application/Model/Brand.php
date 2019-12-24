@@ -9,15 +9,13 @@ use Autowp\Image;
 
 class Brand
 {
-    const TOP_COUNT = 150;
+    private const TOP_COUNT = 150;
 
-    const NEW_DAYS = 7;
+    private const NEW_DAYS = 7;
 
-    const MAX_NAME = 80;
+    public const MAX_FULLNAME = 255;
 
-    const MAX_FULLNAME = 255;
-
-    const ICON_FORMAT = 'brandicon';
+    private const ICON_FORMAT = 'brandicon';
 
     /**
      * @var Item

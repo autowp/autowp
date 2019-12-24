@@ -12,7 +12,7 @@ use Application\Model\Picture;
 
 class DayPictures
 {
-    const DEFAULT_TIMEZONE = 'UTC';
+    private const DEFAULT_TIMEZONE = 'UTC';
 
     /**
      * @var DateTimeZone

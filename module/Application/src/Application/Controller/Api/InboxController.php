@@ -23,9 +23,6 @@ use Application\Model\Picture;
  */
 class InboxController extends AbstractRestfulController
 {
-    const PER_PAGE = 18;
-    const BRAND_ALL = 'all';
-
     /**
      * @var Picture
      */

@@ -11,7 +11,7 @@ use Autowp\User\Model\User;
 
 class Log
 {
-    const EVENTS_PER_PAGE = 40;
+    private const EVENTS_PER_PAGE = 40;
 
     /**
      * @var TableGateway

@@ -15,10 +15,10 @@ use Autowp\Commons\Db\Table\Row;
 
 class User
 {
-    const MIN_NAME = 2;
-    const MAX_NAME = 50;
-    const MIN_PASSWORD = 6;
-    const MAX_PASSWORD = 50;
+    public const MIN_NAME = 2;
+    public const MAX_NAME = 50;
+    public const MIN_PASSWORD = 6;
+    public const MAX_PASSWORD = 50;
 
     /**
      * @var TableGateway
@@ -60,7 +60,12 @@ class User
         ]);
     }
 
-    private function getMessagingInterval($row)
+    /**
+     * @param $row
+     * @return int
+     * @throws Exception
+     */
+    private function getMessagingInterval($row): int
     {
         $date = Row::getDateTimeByColumnType('timestamp', $row['reg_date']);
 
@@ -78,11 +83,16 @@ class User
         return max($row['messaging_interval'], $defaultInterval);
     }
 
-    public function getNextMessageTime(int $userId)
+    /**
+     * @param int $userId
+     * @return DateTime|null
+     * @throws Exception
+     */
+    public function getNextMessageTime(int $userId): ?DateTime
     {
         $row = $this->table->select(['id' => $userId])->current();
         if (! $row) {
-            return false;
+            return null;
         }
 
         $lastMessageTime = Row::getDateTimeByColumnType('timestamp', $row['last_message_time']);
@@ -95,7 +105,7 @@ class User
             }
         }
 
-        return false;
+        return null;
     }
 
     public function getTable(): TableGateway
@@ -103,7 +113,13 @@ class User
         return $this->table;
     }
 
-    private function applyIdFilter(Sql\Select $select, $value, string $id)
+    /**
+     * @param Sql\Select $select
+     * @param $value
+     * @param string $id
+     * @throws Exception
+     */
+    private function applyIdFilter(Sql\Select $select, $value, string $id): void
     {
         if (is_array($value)) {
             $value = array_values($value);
@@ -129,6 +145,11 @@ class User
         $select->where([$id => $value]);
     }
 
+    /**
+     * @param $options
+     * @return Sql\Select
+     * @throws Exception
+     */
     private function getSelect($options): Sql\Select
     {
         if (! is_array($options)) {
@@ -213,6 +234,7 @@ class User
      * @suppress PhanUndeclaredMethod
      * @param $options
      * @return array|ArrayObject|null
+     * @throws Exception
      */
     public function getRow($options)
     {
@@ -221,6 +243,11 @@ class User
         return $this->table->selectWith($select)->current();
     }
 
+    /**
+     * @param $options
+     * @return array
+     * @throws Exception
+     */
     public function getRows($options): array
     {
         $select = $this->getSelect($options);
@@ -233,6 +260,11 @@ class User
         return $result;
     }
 
+    /**
+     * @param array $options
+     * @return Paginator\Paginator
+     * @throws Exception
+     */
     public function getPaginator(array $options): Paginator\Paginator
     {
         return new Paginator\Paginator(
@@ -243,6 +275,11 @@ class User
         );
     }
 
+    /**
+     * @param array $options
+     * @return int
+     * @throws Exception
+     */
     public function getCount(array $options): int
     {
         return $this->getPaginator($options)->getTotalItemCount();
@@ -252,6 +289,7 @@ class User
      * @suppress PhanUndeclaredMethod
      * @param array $options
      * @return bool
+     * @throws Exception
      */
     public function isExists(array $options): bool
     {

@@ -13,7 +13,7 @@ use Application\Model\ItemParent;
 
 class Catalogue implements RouteInterface
 {
-    const DELIMETER = '/';
+    private const DELIMETER = '/';
 
     private $defaults = [];
 

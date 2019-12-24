@@ -14,17 +14,18 @@ use Autowp\TextStorage\Service as TextStorage;
 
 class Item
 {
-    const VEHICLE   = 1,
-          ENGINE    = 2,
-          CATEGORY  = 3,
-          TWINS     = 4,
-          BRAND     = 5,
-          FACTORY   = 6,
-          MUSEUM    = 7,
-          PERSON    = 8,
-          COPYRIGHT = 9;
+    public const
+        VEHICLE   = 1,
+        ENGINE    = 2,
+        CATEGORY  = 3,
+        TWINS     = 4,
+        BRAND     = 5,
+        FACTORY   = 6,
+        MUSEUM    = 7,
+        PERSON    = 8,
+        COPYRIGHT = 9;
 
-    const MAX_NAME = 100;
+    public const MAX_NAME = 100;
 
     /**
      * @var TableGateway

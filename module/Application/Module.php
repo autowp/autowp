@@ -20,7 +20,7 @@ class Module implements
     Feature\ConsoleBannerProviderInterface,
     Feature\ConfigProviderInterface
 {
-    const VERSION = '1.0dev';
+    public const VERSION = '1.0dev';
 
     public function getConfig()
     {

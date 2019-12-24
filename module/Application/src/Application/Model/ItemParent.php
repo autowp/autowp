@@ -9,10 +9,10 @@ use Autowp\ZFComponents\Filter\FilenameSafe;
 
 class ItemParent
 {
-    const MAX_CATNAME = 150;
-    const MAX_LANGUAGE_NAME = 255;
+    public const MAX_CATNAME = 150;
+    public const MAX_LANGUAGE_NAME = 255;
 
-    const
+    public const
         TYPE_DEFAULT = 0,
         TYPE_TUNING = 1,
         TYPE_SPORT = 2,

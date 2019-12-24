@@ -23,8 +23,7 @@ use Application\Service\DayPictures;
  */
 class NewController extends AbstractRestfulController
 {
-    const PER_PAGE = 30;
-    const BRAND_ALL = 'all';
+    private const PER_PAGE = 30;
 
     /**
      * @var Picture

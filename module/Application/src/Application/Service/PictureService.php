@@ -21,7 +21,7 @@ use Application\Model\UserPicture;
 
 class PictureService
 {
-    const QUEUE_LIFETIME = 7; // days
+    public const QUEUE_LIFETIME = 7; // days
 
     /**
      * @var Picture

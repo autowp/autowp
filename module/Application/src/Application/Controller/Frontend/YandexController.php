@@ -16,7 +16,7 @@ use Application\Model\CarOfDay;
  */
 class YandexController extends AbstractActionController
 {
-    const DATE_FORMAT = 'Y-m-d';
+    private const DATE_FORMAT = 'Y-m-d';
 
     private $secret;
 

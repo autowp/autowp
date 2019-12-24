@@ -10,7 +10,7 @@ use Zend\Stdlib\RequestInterface as Request;
 
 class FilePath implements RouteInterface
 {
-    const URI_DELIMITER = '/';
+    private const URI_DELIMITER = '/';
 
     private $defaults = [];
 

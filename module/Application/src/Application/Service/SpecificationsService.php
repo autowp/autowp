@@ -22,14 +22,15 @@ use Application\Spec\Table\Car as CarSpecTable;
 
 class SpecificationsService
 {
-    const ENGINE_ZONE_ID = 5;
+    private const ENGINE_ZONE_ID = 5;
 
-    const NULL_VALUE_STR = '-';
+    public const NULL_VALUE_STR = '-';
 
-    const WEIGHT_NONE          = 0,
-          WEIGHT_FIRST_ACTUAL  = 1,
-          WEIGHT_SECOND_ACTUAL = 0.1,
-          WEIGHT_WRONG         = -1;
+    private const
+        WEIGHT_NONE          = 0,
+        WEIGHT_FIRST_ACTUAL  = 1,
+        WEIGHT_SECOND_ACTUAL = 0.1,
+        WEIGHT_WRONG         = -1;
 
     /**
      * @var TableGateway
