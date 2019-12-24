@@ -104,8 +104,12 @@
 		"cs-fix" : "phpcbf --encoding=utf-8",
 		"test" : "phpunit --colors=always",
 		"phpmd" : "phpmd config,module,public_html text ruleset.xml --suffixes php,phtml",
-        "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility",
-        "post-update-cmd" : "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility"
+        "post-install-cmd": [
+          "[ ! -f vendor/bin/phpcs ] || vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility"
+        ],
+        "post-update-cmd" : [
+          "[ ! -f vendor/bin/phpcs ] || vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility"
+        ]
 	},
 	"homepage" : "http://wheelsage.org/",
 	"support" : {
