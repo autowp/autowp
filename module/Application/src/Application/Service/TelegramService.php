@@ -4,15 +4,12 @@ namespace Application\Service;
 
 use Autowp\Message\MessageService;
 use Exception;
-
 use Telegram\Bot\Api;
 use Telegram\Bot\Exceptions\TelegramSDKException;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
-
 use Autowp\User\Model\User;
-
 use Application\HostManager;
 use Application\Model\Item;
 use Application\Model\Picture;

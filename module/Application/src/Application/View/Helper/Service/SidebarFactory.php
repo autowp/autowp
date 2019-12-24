@@ -5,7 +5,6 @@ namespace Application\View\Helper\Service;
 use Autowp\Message\MessageService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\Sidebar as Helper;
 
 class SidebarFactory implements FactoryInterface

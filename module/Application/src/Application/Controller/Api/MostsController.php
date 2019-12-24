@@ -4,11 +4,9 @@ namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
-
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User;
 use Autowp\TextStorage;
-
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Catalogue;
 use Application\Model\Item;

@@ -7,7 +7,7 @@ use Zend\Validator\AbstractValidator;
 
 class UnitId extends AbstractValidator
 {
-    const INVALID = 'invalidUnitId';
+    private const INVALID = 'invalidUnitId';
 
     protected $messageTemplates = [
         self::INVALID => "Unit is invalid"

@@ -3,7 +3,6 @@
 namespace Application\Controller\Console;
 
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Application\Service\TelegramService;
 
 class TelegramController extends AbstractActionController

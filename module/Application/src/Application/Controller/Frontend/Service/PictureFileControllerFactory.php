@@ -5,7 +5,6 @@ namespace Application\Controller\Frontend\Service;
 use Application\Model\Referer;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\PictureFileController as Controller;
 
 class PictureFileControllerFactory implements FactoryInterface

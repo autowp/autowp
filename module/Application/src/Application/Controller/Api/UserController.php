@@ -7,7 +7,6 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Imagick;
-
 use ReCaptcha\ReCaptcha;
 use Zend\Authentication\AuthenticationService;
 use Zend\InputFilter\InputFilter;
@@ -17,13 +16,11 @@ use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image\Storage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Service\UsersService;

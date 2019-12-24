@@ -6,19 +6,16 @@ use Application\Model\ItemParent;
 use Exception;
 use geoPHP;
 use Traversable;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
-
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
 use Autowp\TextStorage;
 use Autowp\User\Model\User;
-
 use Application\Comments;
 use Application\DuplicateFinder;
 use Application\Model\Item;
@@ -605,7 +602,7 @@ class PictureHydrator extends RestHydrator
             $newMessages = $this->comments->service()->getNewMessages(
                 Comments::PICTURES_TYPE_ID,
                 $object['id'],
-                $this->userId
+                (int) $this->userId
             );
             $picture['comments_count'] = [
                 'total' => $msgCount,
@@ -743,9 +740,9 @@ class PictureHydrator extends RestHydrator
                             continue;
                         }
 
-                        $exifStr .= '<p>['.htmlspecialchars($key).']';
+                        $exifStr .= '<p>[' . htmlspecialchars($key) . ']';
                         foreach ($section as $name => $val) {
-                            $exifStr .= "<br />".htmlspecialchars($name).": ";
+                            $exifStr .= "<br />" . htmlspecialchars($name) . ": ";
                             if (is_array($val)) {
                                 $exifStr .= htmlspecialchars(implode(', ', $val));
                             } else {

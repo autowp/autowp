@@ -8,7 +8,6 @@ use Application\Model\Picture;
 use Application\Service\Mosts;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\CatalogueController as Controller;
 
 class CatalogueControllerFactory implements FactoryInterface

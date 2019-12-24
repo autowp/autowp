@@ -4,9 +4,7 @@ namespace Application\Controller\Frontend;
 
 use DateTime;
 use DateTimeZone;
-
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\CarOfDay;
 
@@ -18,7 +16,7 @@ use Application\Model\CarOfDay;
  */
 class YandexController extends AbstractActionController
 {
-    const DATE_FORMAT = 'Y-m-d';
+    private const DATE_FORMAT = 'Y-m-d';
 
     private $secret;
 

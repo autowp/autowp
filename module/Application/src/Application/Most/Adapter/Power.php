@@ -35,13 +35,13 @@ class Power extends AbstractAdapter
         $valuesTableName = $valuesTable->getTable();
 
         $select
-            ->join($valuesTableName, 'item.id = '.$valuesTableName.'.item_id', [])
+            ->join($valuesTableName, 'item.id = ' . $valuesTableName . '.item_id', [])
             ->where([
-                $valuesTableName.'.attribute_id' => $powerAttr['id'],
-                $valuesTableName.'.value > 0'
+                $valuesTableName . '.attribute_id' => $powerAttr['id'],
+                $valuesTableName . '.value > 0'
             ])
-            ->group(['item.id', $valuesTableName.'.value'])
-            ->order($valuesTableName.'.value ' . $this->order)
+            ->group(['item.id', $valuesTableName . '.value'])
+            ->order($valuesTableName . '.value ' . $this->order)
             ->limit($this->most->getCarsCount());
 
         $result = [];
@@ -93,7 +93,7 @@ class Power extends AbstractAdapter
                     $a[] = $turbo;
                 }
 
-                $html .= '<p class="note">'.implode(', ', $a).'</p>';
+                $html .= '<p class="note">' . implode(', ', $a) . '</p>';
             }
 
             $result[] = [
@@ -112,9 +112,9 @@ class Power extends AbstractAdapter
     {
         if ($layout) {
             if ($cylinders) {
-                $result = $layout.$cylinders;
+                $result = $layout . $cylinders;
             } else {
-                $result = $layout.'?';
+                $result = $layout . '?';
             }
         } else {
             if ($cylinders) {

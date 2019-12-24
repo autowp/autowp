@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Exception;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -59,6 +60,11 @@ class CatalogueController extends AbstractActionController
         $this->brand = $brand;
     }
 
+    /**
+     * @param callable $callback
+     * @return array|ViewModel
+     * @throws Exception
+     */
     private function doBrandAction(callable $callback)
     {
         $language = $this->language();
@@ -88,6 +94,10 @@ class CatalogueController extends AbstractActionController
         return $carsCount >= $this->mostsMinCarsCount;
     }
 
+    /**
+     * @return array|ViewModel
+     * @throws Exception
+     */
     public function brandMostsAction()
     {
         return $this->doBrandAction(function ($brand) {

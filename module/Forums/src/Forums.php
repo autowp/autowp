@@ -3,11 +3,9 @@
 namespace Autowp\Forums;
 
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
-
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
@@ -17,12 +15,12 @@ use Autowp\User\Model\User;
  */
 class Forums
 {
-    const TOPICS_PER_PAGE = 20;
-    const MESSAGES_PER_PAGE = 20;
+    public const TOPICS_PER_PAGE = 20;
+    private const MESSAGES_PER_PAGE = 20;
 
-    const STATUS_NORMAL = 'normal';
-    const STATUS_CLOSED = 'closed';
-    const STATUS_DELETED = 'deleted';
+    public const STATUS_NORMAL = 'normal';
+    public const STATUS_CLOSED = 'closed';
+    public const STATUS_DELETED = 'deleted';
 
     /**
      * @var TableGateway
@@ -72,17 +70,27 @@ class Forums
         return $this->comments->canUnSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
+    /**
+     * @param $topicId
+     * @param $userId
+     * @throws Exception
+     */
     public function subscribe($topicId, $userId)
     {
         $this->comments->subscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
+    /**
+     * @param $topicId
+     * @param $userId
+     * @throws Exception
+     */
     public function unsubscribe($topicId, $userId)
     {
         $this->comments->unSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
-    public function open(int $topicId)
+    public function open(int $topicId): void
     {
         $this->topicTable->update([
             'status' => self::STATUS_NORMAL
@@ -91,7 +99,7 @@ class Forums
         ]);
     }
 
-    public function close(int $topicId)
+    public function close(int $topicId): void
     {
         $this->topicTable->update([
             'status' => self::STATUS_CLOSED
@@ -113,7 +121,7 @@ class Forums
         );
 
         if ($needAttention) {
-            throw new Exception("Cannot delete row when moderator attention not closed");
+            return false;
         }
 
         $this->topicTable->update([
@@ -182,7 +190,7 @@ class Forums
      * @return array
      * @throws Exception
      */
-    public function getTopicList(int $themeId, int $page, int $userId)
+    public function getTopicList(int $themeId, int $page, int $userId): array
     {
         $select = new Sql\Select($this->topicTable->getTable());
         $select
@@ -272,7 +280,7 @@ class Forums
      * @return array
      * @throws Exception
      */
-    public function getThemePage($themeId, $page, $userId, $isModerator)
+    public function getThemePage($themeId, $page, $userId, $isModerator): array
     {
         $select = new Sql\Select($this->themeTable->getTable());
         $select->where(['id = ?' => (int)$themeId]);
@@ -362,7 +370,7 @@ class Forums
         return $id;
     }
 
-    public function getTheme(int $themeId)
+    public function getTheme(int $themeId): array
     {
         $theme = $this->themeTable->select([
             'id = ?' => $themeId
@@ -382,7 +390,7 @@ class Forums
     /**
      * @return array
      */
-    public function getThemes()
+    public function getThemes(): array
     {
         $select = new Sql\Select($this->themeTable->getTable());
         $select->order('position');
@@ -403,7 +411,7 @@ class Forums
      * @param int $themeId
      * @return array
      */
-    public function getTopics(int $themeId)
+    public function getTopics(int $themeId): array
     {
         $select = new Sql\Select($this->topicTable->getTable());
         $select
@@ -438,10 +446,10 @@ class Forums
         return $result;
     }
 
-    public function moveMessage($messageId, $topicId)
+    public function moveMessage(int $messageId, int $topicId): bool
     {
         $topic = $this->topicTable->select([
-            'id = ?' => (int)$topicId
+            'id' => $topicId
         ])->current();
         if (! $topic) {
             return false;
@@ -452,17 +460,17 @@ class Forums
         return true;
     }
 
-    public function moveTopic(int $topicId, int $themeId)
+    public function moveTopic(int $topicId, int $themeId): bool
     {
         $topic = $this->topicTable->select([
-            'id = ?' => $topicId
+            'id' => $topicId
         ])->current();
         if (! $topic) {
             return false;
         }
 
         $theme = $this->themeTable->select([
-            'id = ?' => $themeId
+            'id' => $themeId
         ])->current();
         if (! $theme) {
             return false;
@@ -473,7 +481,7 @@ class Forums
         $this->topicTable->update([
             'theme_id' => $theme['id']
         ], [
-            'id = ?' => $topic['id']
+            'id' => $topic['id']
         ]);
 
         $this->updateThemeStat($theme['id']);
@@ -484,11 +492,11 @@ class Forums
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $topicId
+     * @param int $topicId
      * @param array $options
      * @return array|bool
      */
-    public function getTopic($topicId, array $options = [])
+    public function getTopic(int $topicId, array $options = []): array
     {
         $defaults = [
             'isModerator' => null,
@@ -497,7 +505,7 @@ class Forums
         $options = array_replace($defaults, $options);
 
         $select = new Sql\Select($this->topicTable->getTable());
-        $select->where(['forums_topics.id = ?' => (int)$topicId]);
+        $select->where(['forums_topics.id = ?' => $topicId]);
 
         if ($options['isModerator'] !== null) {
             if (! $options['isModerator']) {
@@ -524,7 +532,7 @@ class Forums
         ];
     }
 
-    public function getMessagePage($messageId)
+    public function getMessagePage(int $messageId)
     {
         $message = $this->comments->getMessageRow($messageId);
         if (! $message) {
@@ -555,7 +563,7 @@ class Forums
      * @param int $topicId
      * @param int $userId
      */
-    public function registerTopicView(int $topicId, int $userId)
+    public function registerTopicView(int $topicId, int $userId): void
     {
         $this->topicTable->update([
             'views' => new Sql\Expression('views+1')
@@ -618,13 +626,18 @@ class Forums
         ];
     }
 
-    public function addMessage($values)
+    /**
+     * @param $values
+     * @return int
+     * @throws Exception
+     */
+    public function addMessage($values): int
     {
         if (! $values['ip']) {
             $values['ip'] = '127.0.0.1';
         }
 
-        $messageId = $this->comments->add([
+        $messageId = (int) $this->comments->add([
             'typeId'             => \Application\Comments::FORUMS_TYPE_ID,
             'itemId'             => $values['topic_id'],
             'parentId'           => $values['parent_id'] ? $values['parent_id'] : null,
@@ -645,12 +658,12 @@ class Forums
         return $messageId;
     }
 
-    public function getSubscribersIds(int $topicId)
+    public function getSubscribersIds(int $topicId): array
     {
         return $this->comments->getSubscribersIds(\Application\Comments::FORUMS_TYPE_ID, $topicId);
     }
 
-    public function getSubscribedTopics(int $userId)
+    public function getSubscribedTopics(int $userId): array
     {
         $select = new Sql\Select($this->topicTable->getTable());
         $select

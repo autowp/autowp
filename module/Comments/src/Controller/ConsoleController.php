@@ -3,7 +3,6 @@
 namespace Autowp\Comments\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Autowp\Comments\CommentsService;
 
 class ConsoleController extends AbstractActionController

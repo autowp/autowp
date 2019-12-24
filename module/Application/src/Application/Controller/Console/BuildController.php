@@ -3,7 +3,6 @@
 namespace Application\Controller\Console;
 
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Application\Model\Brand;
 
 class BuildController extends AbstractActionController

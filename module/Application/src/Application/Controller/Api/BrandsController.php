@@ -9,7 +9,6 @@ use Zend\I18n\Translator\TranslatorInterface;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\View\Model\JsonModel;
-
 use Application\Model\Brand;
 use Application\Model\Item;
 use Application\Model\Picture;

@@ -7,7 +7,6 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\MvcEvent;
-
 use Autowp\User\Model\User;
 
 class RememberDispatchListener extends AbstractListenerAggregate

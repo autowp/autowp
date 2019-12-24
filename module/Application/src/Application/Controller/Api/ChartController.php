@@ -6,7 +6,6 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
 use Application\Service\SpecificationsService;
 
 /**

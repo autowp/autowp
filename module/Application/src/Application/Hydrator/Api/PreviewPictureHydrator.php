@@ -4,7 +4,6 @@ namespace Application\Hydrator\Api;
 
 use Exception;
 use Traversable;
-
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Stdlib\ArrayUtils;
 

@@ -11,11 +11,9 @@ use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
 use ZF\ApiProblem\ApiProblem;
-
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserPasswordRemind;
-
 use Application\HostManager;
 use Application\Service\UsersService;
 

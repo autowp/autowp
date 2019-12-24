@@ -4,7 +4,6 @@ namespace Application\Controller\Api\Plugin;
 
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 

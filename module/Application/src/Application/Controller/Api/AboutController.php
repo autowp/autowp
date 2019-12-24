@@ -6,10 +6,8 @@ use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Permissions\Acl\Acl;
 use Zend\View\Model\JsonModel;
-
 use Autowp\Comments;
 use Autowp\User\Model\User;
-
 use Application\Model\Item;
 use Application\Model\Picture;
 

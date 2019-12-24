@@ -3,7 +3,6 @@
 namespace AutowpTest\User\View;
 
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Autowp\User\View\Helper\User;
 use DateTime;
 use Zend\Authentication\AuthenticationService;
@@ -150,7 +149,7 @@ class HelperTest extends AbstractHttpControllerTestCase
         $auth = new AuthenticationService();
         $auth->authenticate($adapter);
 
-        $this->assertContains('55502f40dc8b7c769880b10874abc9d0', $this->getHelper()->__invoke()->avatar());
+        $this->assertStringContainsString('55502f40dc8b7c769880b10874abc9d0', $this->getHelper()->__invoke()->avatar());
     }
 
     public function testToString()
@@ -166,6 +165,6 @@ class HelperTest extends AbstractHttpControllerTestCase
         $auth = new AuthenticationService();
         $auth->authenticate($adapter);
 
-        $this->assertContains('tester', $this->getHelper()->__invoke()->__toString());
+        $this->assertStringContainsString('tester', $this->getHelper()->__invoke()->__toString());
     }
 }

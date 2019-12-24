@@ -3,7 +3,6 @@
 namespace ApplicationTest\Controller\Api;
 
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Application\Controller\Api\PulseController;
 
 class PulseControllerTest extends AbstractHttpControllerTestCase

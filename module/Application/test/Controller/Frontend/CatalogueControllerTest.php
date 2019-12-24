@@ -7,7 +7,6 @@ use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
-
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\PictureController;
@@ -33,7 +32,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
             ])
             ->getMock();
 
-        $mock->method('indexImage')->willReturn(true);
+        $mock->method('indexImage');
 
         $serviceManager->setService(DuplicateFinder::class, $mock);
     }
@@ -296,7 +295,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         // request
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/'.$brand['catname'].'/cars', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/cars', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -323,7 +322,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/'.$brand['catname'].'/recent', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/recent', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -371,7 +370,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         // request concept
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/'.$brand['catname'].'/concepts', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/concepts', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -474,7 +473,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/bmw/other/'.$picture['identity'].'/', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/bmw/other/' . $picture['identity'] . '/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -501,7 +500,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/bmw/mixed/'.$picture['identity'].'/', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/bmw/mixed/' . $picture['identity'] . '/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -528,7 +527,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/bmw/logotypes/'.$picture['identity'].'/', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/bmw/logotypes/' . $picture['identity'] . '/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -698,7 +697,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/'.$brand['catname'], Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/' . $brand['catname'], Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');

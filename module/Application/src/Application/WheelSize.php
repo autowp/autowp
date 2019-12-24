@@ -49,7 +49,7 @@ class WheelSize
             $series = $this->series ? $this->series : '??';
             $radius = $this->radius ? $this->radius : '??';
 
-            return $width.'/'.$series.' R'.$radius;
+            return $width . '/' . $series . ' R' . $radius;
         }
 
         return null;
@@ -61,7 +61,7 @@ class WheelSize
             $rimWidth = $this->rimWidth ? $this->rimWidth : '?';
             $radius = $this->radius ? $this->radius : '??';
 
-            return $rimWidth.'J × '.$radius;
+            return $rimWidth . 'J × ' . $radius;
         }
 
         return null;

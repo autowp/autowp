@@ -7,7 +7,7 @@ use Zend\Db\TableGateway\TableGateway;
 
 class PictureModerVote
 {
-    const MAX_LENGTH = 80;
+    public const MAX_LENGTH = 80;
 
     /**
      * @var TableGateway

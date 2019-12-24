@@ -5,17 +5,14 @@ namespace Application\Service;
 use DateTime;
 use DateTimeZone;
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Paginator;
-
 use Autowp\Commons\Db\Table\Row;
-
 use Application\Model\Picture;
 
 class DayPictures
 {
-    const DEFAULT_TIMEZONE = 'UTC';
+    private const DEFAULT_TIMEZONE = 'UTC';
 
     /**
      * @var DateTimeZone

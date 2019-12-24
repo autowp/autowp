@@ -6,13 +6,12 @@ use Zend\Db\Adapter\Exception\InvalidQueryException;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
-
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 
 class Log
 {
-    const EVENTS_PER_PAGE = 40;
+    private const EVENTS_PER_PAGE = 40;
 
     /**
      * @var TableGateway

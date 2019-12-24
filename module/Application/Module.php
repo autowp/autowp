@@ -10,6 +10,7 @@ use Zend\ModuleManager\Feature;
 use Zend\Mvc\MvcEvent;
 use Zend\Stdlib\ArrayUtils;
 use Zend\View\Helper\PaginationControl;
+
 use function Sentry\captureException;
 
 class Module implements
@@ -19,7 +20,7 @@ class Module implements
     Feature\ConsoleBannerProviderInterface,
     Feature\ConfigProviderInterface
 {
-    const VERSION = '1.0dev';
+    public const VERSION = '1.0dev';
 
     public function getConfig()
     {
@@ -136,7 +137,7 @@ class Module implements
     private function sendErrorEmail(Throwable $exception, $serviceManager)
     {
         $message = get_class($exception) . PHP_EOL .
-            'File: ' . $exception->getFile() . ' (' . $exception->getLine(). ')' . PHP_EOL .
+            'File: ' . $exception->getFile() . ' (' . $exception->getLine() . ')' . PHP_EOL .
             'Message: ' . $exception->getMessage() . PHP_EOL .
             'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
 

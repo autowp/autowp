@@ -5,7 +5,6 @@ namespace ApplicationTest\Model;
 use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
-
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
 use Application\Model\Twins;

@@ -6,16 +6,13 @@ use DateTime;
 use DateInterval;
 use Exception;
 use Traversable;
-
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
-
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
-
 use Application\Model\Picture;
 use Application\Model\UserAccount;
 

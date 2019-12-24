@@ -3,10 +3,8 @@
 namespace Autowp\Votings;
 
 use DateTime;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-
 use Autowp\Commons\Db\Table\Row;
 
 class Votings

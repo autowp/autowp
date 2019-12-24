@@ -3,7 +3,6 @@
 namespace Application\Controller\Api;
 
 use ArrayObject;
-
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -12,10 +11,8 @@ use Zend\Uri\Uri;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\Message\MessageService;
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Controller\Plugin\Car;
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;

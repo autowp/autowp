@@ -6,9 +6,7 @@ use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
 use Autowp\User\Model\User;
-
 use Application\Hydrator\Api\ItemHydrator;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Brand;

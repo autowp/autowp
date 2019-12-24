@@ -3,7 +3,6 @@
 namespace ApplicationTest\Model;
 
 use Application\Test\AbstractHttpControllerTestCase;
-
 use Application\Model\CarOfDay;
 
 class CarOfDayTest extends AbstractHttpControllerTestCase

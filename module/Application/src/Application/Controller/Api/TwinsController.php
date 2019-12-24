@@ -5,7 +5,6 @@ namespace Application\Controller\Api;
 use Zend\Cache\Storage\StorageInterface;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
 use Application\Model\Twins;
 
 /**

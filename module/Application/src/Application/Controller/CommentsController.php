@@ -4,16 +4,13 @@ namespace Application\Controller;
 
 use DateTime;
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\ViewModel;
-
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Autowp\Votings\Votings;
-
 use Application\Comments;
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;

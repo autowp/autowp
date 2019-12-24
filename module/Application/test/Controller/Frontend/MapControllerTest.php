@@ -3,7 +3,6 @@
 namespace ApplicationTest\Frontend\Controller;
 
 use Zend\Http\Request;
-
 use Application\Controller\Api\MapController;
 use Application\Test\AbstractHttpControllerTestCase;
 

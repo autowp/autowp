@@ -5,17 +5,14 @@ namespace Application\Service;
 use ArrayObject;
 use DateTime;
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mail;
-
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
 use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
 use Autowp\User\Model\User;
-
 use Application\Model\Contact;
 use Application\Model\Picture;
 use Application\Model\UserAccount;
@@ -147,7 +144,7 @@ class UsersService
      */
     private function emailCheckCode($email)
     {
-        return md5($this->emailSalt. $email . microtime());
+        return md5($this->emailSalt . $email . microtime());
     }
 
     /**
@@ -278,7 +275,7 @@ class UsersService
             $values = [
                 'email' => $user['email_to_check'],
                 'name'  => $user['name'],
-                'url'   => 'https://'.$hostname.'/ng/account/emailcheck/' . $user['email_check_code']
+                'url'   => 'https://' . $hostname . '/ng/account/emailcheck/' . $user['email_check_code']
             ];
 
             $subject = $this->translator->translate('users/registration/email-confirm-subject');
@@ -287,7 +284,7 @@ class UsersService
             $subject = sprintf($subject, $hostname);
             $message = sprintf(
                 $message,
-                'http://'.$hostname.'/',
+                'http://' . $hostname . '/',
                 $values['email'],
                 $values['url'],
                 $hostname
@@ -315,7 +312,7 @@ class UsersService
             $values = [
                 'email' => $user['email_to_check'],
                 'name'  => $user['name'],
-                'url'   => 'https://'.$hostname.'/ng/account/emailcheck/' . $user['email_check_code']
+                'url'   => 'https://' . $hostname . '/ng/account/emailcheck/' . $user['email_check_code']
             ];
 
             $subject = $this->translator->translate('users/change-email/confirm-subject');
@@ -476,7 +473,7 @@ class UsersService
         );
 
         foreach ($rows as $row) {
-            print 'Delete ' . $row['id']. ' ' . $row['name']. ' ' . PHP_EOL;
+            print 'Delete ' . $row['id'] . ' ' . $row['name'] . ' ' . PHP_EOL;
 
             $this->delete($row['id']);
         }

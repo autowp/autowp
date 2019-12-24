@@ -7,15 +7,12 @@ use Application\Validator\Attrs\IsIntOrNull;
 use ArrayObject;
 use Exception;
 use NumberFormatter;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\Input;
 use Zend\InputFilter\ArrayInput;
 use Zend\Paginator;
-
 use Autowp\User\Model\User;
-
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\ItemParent;
@@ -25,14 +22,15 @@ use Application\Spec\Table\Car as CarSpecTable;
 
 class SpecificationsService
 {
-    const ENGINE_ZONE_ID = 5;
+    private const ENGINE_ZONE_ID = 5;
 
-    const NULL_VALUE_STR = '-';
+    public const NULL_VALUE_STR = '-';
 
-    const WEIGHT_NONE          = 0,
-          WEIGHT_FIRST_ACTUAL  = 1,
-          WEIGHT_SECOND_ACTUAL = 0.1,
-          WEIGHT_WRONG         = -1;
+    private const
+        WEIGHT_NONE          = 0,
+        WEIGHT_FIRST_ACTUAL  = 1,
+        WEIGHT_SECOND_ACTUAL = 0.1,
+        WEIGHT_WRONG         = -1;
 
     /**
      * @var TableGateway
@@ -583,7 +581,7 @@ class SpecificationsService
         ];
 
         if ($attribute['isMultiple']) {
-            // remove value descriptiors
+            // remove value descriptors
             $this->userValueTable->delete([
                 'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $itemId,
@@ -603,19 +601,25 @@ class SpecificationsService
                 }
 
                 if (count($value)) {
-                    // insert new descriptiors and values
-                    $this->userValueTable->insert(array_replace([
-                        'add_date'     => new Sql\Expression('NOW()'),
-                        'update_date'  => new Sql\Expression('NOW()'),
-                    ], $userValuePrimaryKey));
+                    // insert new descriptors and values
+                    $this->userValueTable->getAdapter()->query('
+                        INSERT INTO attrs_user_values (attribute_id, item_id, user_id, add_date, update_date)
+                        VALUES (:attribute_id, :item_id, :user_id, NOW(), NOW())
+                        ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
+                    ', $userValuePrimaryKey);
+
                     $ordering = 1;
 
                     foreach ($value as $oneValue) {
-                        $userValueDataTable->insert(array_replace([
-                            'ordering'     => $ordering,
-                            'value'        => $oneValue
-                        ], $userValuePrimaryKey));
-
+                        $userValueDataTable->getAdapter()->query('
+                            INSERT INTO `' . $userValueDataTable->getTable() . '`
+                                (attribute_id, item_id, user_id, ordering, value)
+                            VALUES (:attribute_id, :item_id, :user_id, :ordering, :value)
+                            ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
+                        ', array_replace($userValuePrimaryKey, [
+                            'ordering' => $ordering,
+                            'value'    => $oneValue
+                        ]));
                         $ordering++;
                     }
                 }
@@ -1660,7 +1664,7 @@ class SpecificationsService
 
                 $stmt = $valueDataTable->getAdapter()->query('
                     INSERT INTO `' . $valueDataTable->getTable() . '` (attribute_id, item_id, ordering, value)
-                    VALUES (:attribute_id, :item_id. :ordering, :value)
+                    VALUES (:attribute_id, :item_id, :ordering, :value)
                     ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
                 ');
 

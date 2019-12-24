@@ -3,10 +3,8 @@
 namespace Application;
 
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-
 use Application\Most\Adapter\AbstractAdapter;
 use Application\Service\SpecificationsService;
 

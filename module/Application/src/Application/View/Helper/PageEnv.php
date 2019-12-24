@@ -3,7 +3,6 @@
 namespace Application\View\Helper;
 
 use Application\Language as AppLanguage;
-
 use Zend\Db\TableGateway\TableGateway;
 use Zend\View\Helper\AbstractHelper;
 

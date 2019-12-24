@@ -3,7 +3,6 @@
 namespace Application\Model\Item\ListBuilder;
 
 use Exception;
-
 use Application\Model\ItemParent;
 
 class CatalogueItem extends Catalogue

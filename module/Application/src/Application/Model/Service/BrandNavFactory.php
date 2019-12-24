@@ -9,7 +9,6 @@ use Application\Model\Picture;
 use Application\Model\VehicleType;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Model\BrandNav as Model;
 
 class BrandNavFactory implements FactoryInterface

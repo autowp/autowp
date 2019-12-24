@@ -8,7 +8,6 @@ use Application\Model\Categories;
 use Autowp\Message\MessageService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\MainMenu;
 
 class MainMenuFactory implements FactoryInterface

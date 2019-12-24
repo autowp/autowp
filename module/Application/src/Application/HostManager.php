@@ -4,7 +4,6 @@ namespace Application;
 
 use Zend\Uri\UriFactory;
 use Zend\Uri\Uri;
-
 use Exception;
 
 class HostManager

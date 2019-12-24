@@ -6,7 +6,6 @@ use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Plugin\Car as Plugin;
 
 class CarFactory implements FactoryInterface

@@ -4,7 +4,6 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-
 use Application\Model\Item;
 
 class FactoriesController extends AbstractActionController

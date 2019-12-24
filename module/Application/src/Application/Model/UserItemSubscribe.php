@@ -3,7 +3,6 @@
 namespace Application\Model;
 
 use Zend\Db\TableGateway\TableGateway;
-
 use Autowp\User\Model\User;
 
 class UserItemSubscribe
@@ -26,15 +25,13 @@ class UserItemSubscribe
 
     public function subscribe(int $userId, int $itemId)
     {
-        $primaryKey = [
+        $this->table->getAdapter()->query('
+            INSERT IGNORE INTO user_item_subscribe (user_id, item_id) 
+            VALUES (:user_id, :item_id)
+        ', [
             'user_id' => $userId,
             'item_id' => $itemId
-        ];
-
-        $row = $this->table->select($primaryKey)->current();
-        if (! $row) {
-            $this->table->insert($primaryKey);
-        }
+        ]);
     }
 
     public function unsubscribe(int $userId, int $itemId)

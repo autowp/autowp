@@ -5,15 +5,15 @@ namespace Application\Model;
 use ArrayObject;
 use Exception;
 use InvalidArgumentException;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 class PictureItem
 {
-    const PICTURE_CONTENT = 1,
-          PICTURE_AUTHOR = 2,
-          PICTURE_COPYRIGHTS = 3;
+    public const
+        PICTURE_CONTENT = 1,
+        PICTURE_AUTHOR = 2,
+        PICTURE_COPYRIGHTS = 3;
 
     /**
      * @var TableGateway
@@ -74,15 +74,16 @@ class PictureItem
             throw new InvalidArgumentException("Combination not allowed");
         }
 
-        $row = $this->getRow($pictureId, $itemId, $type);
+        $result = $this->table->getAdapter()->query('
+            INSERT IGNORE INTO picture_item (picture_id, item_id, type)
+            VALUES (:picture_id, :item_id, :type)
+        ', [
+            'picture_id' => $pictureId,
+            'item_id'    => $itemId,
+            'type'       => $type
+        ]);
 
-        if (! $row) {
-            $this->table->insert([
-                'picture_id' => $pictureId,
-                'item_id'    => $itemId,
-                'type'       => $type
-            ]);
-
+        if ($result->getAffectedRows() > 0) {
             $this->updateContentCount($pictureId);
         }
     }

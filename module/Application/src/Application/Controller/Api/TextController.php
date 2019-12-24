@@ -4,7 +4,6 @@ namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
 use Autowp\TextStorage;
 
 class TextController extends AbstractRestfulController

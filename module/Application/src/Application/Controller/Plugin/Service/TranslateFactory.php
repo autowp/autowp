@@ -4,7 +4,6 @@ namespace Application\Controller\Plugin\Service;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Plugin\Translate as Plugin;
 
 class TranslateFactory implements FactoryInterface

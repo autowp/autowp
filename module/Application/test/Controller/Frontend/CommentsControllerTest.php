@@ -8,7 +8,6 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
-
 use Application\Controller\Api\CommentController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\CommentsController;
@@ -32,7 +31,7 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
             ])
             ->getMock();
 
-        $mock->method('indexImage')->willReturn(true);
+        $mock->method('indexImage');
 
         $serviceManager->setService(DuplicateFinder::class, $mock);
     }
@@ -125,7 +124,7 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         // create sub-comment
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $url = 'https://www.autowp.ru/comments/add/type_id/'.$comment['type_id'].'/item_id/' . $comment['item_id'];
+        $url = 'https://www.autowp.ru/comments/add/type_id/' . $comment['type_id'] . '/item_id/' . $comment['item_id'];
         $this->dispatch($url, Request::METHOD_POST, [
             'moderator_attention' => 0,
             'parent_id'           => $comment['id'],
@@ -281,7 +280,7 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         // resolve
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $url = 'https://www.autowp.ru/comments/add/type_id/'.$comment['type_id'].'/item_id/' . $comment['item_id'];
+        $url = 'https://www.autowp.ru/comments/add/type_id/' . $comment['type_id'] . '/item_id/' . $comment['item_id'];
         $this->dispatch($url, Request::METHOD_POST, [
             'moderator_attention' => 0,
             'parent_id'           => $comment['id'],

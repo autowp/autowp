@@ -7,7 +7,7 @@ use Zend\Validator\AbstractValidator;
 
 class AttributeId extends AbstractValidator
 {
-    const INVALID = 'invalidAttributeId';
+    private const INVALID = 'invalidAttributeId';
 
     protected $messageTemplates = [
         self::INVALID => "Attribute is invalid"

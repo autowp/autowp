@@ -3,7 +3,6 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
-
 use Application\Hydrator\Api\RestHydrator;
 
 class ApiData extends AbstractHelper

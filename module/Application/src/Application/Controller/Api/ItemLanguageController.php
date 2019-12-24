@@ -9,11 +9,9 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Uri\Uri;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service as TextStorage;
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Controller\Plugin\Car;
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
@@ -196,7 +194,7 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         if (array_key_exists('text', $data)) {
-            $text = $data['text'];
+            $text = (string) $data['text'];
             $textChanged = false;
             if ($row && $row['text_id']) {
                 $textChanged = ($text != $this->textStorage->getText($row['text_id']));
@@ -234,16 +232,27 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         if ($set) {
-            $primaryKey = [
+            $values = [
                 'item_id'  => $item['id'],
                 'language' => $language
             ];
-
-            if ($row) {
-                $this->table->update($set, $primaryKey);
-            } else {
-                $this->table->insert(array_merge($set, $primaryKey));
+            $sqlInserts = ['item_id', 'language'];
+            $sqlValues = [':item_id', ':language'];
+            $sqlUpdates = [];
+            foreach ($set as $key => $value) {
+                $sqlInserts[] = $key;
+                $sqlValues[] = ':' . $key;
+                $sqlUpdates[] = $key . ' = VALUES(' . $key . ')';
+                $values[$key] = $value;
             }
+
+            $sql = '
+                INSERT INTO item_language (' . implode(', ', $sqlInserts) . ')
+                VALUES (' . implode(', ', $sqlValues) . ')
+                ON DUPLICATE KEY UPDATE ' . implode(', ', $sqlUpdates) . '
+            ';
+
+            $this->table->getAdapter()->query($sql, $values);
 
             $this->itemParent->refreshAutoByVehicle($item['id']);
         }

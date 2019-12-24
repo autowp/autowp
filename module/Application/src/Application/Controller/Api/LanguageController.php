@@ -3,7 +3,6 @@
 namespace Application\Controller\Api;
 
 use Locale;
-
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 

@@ -7,7 +7,7 @@ use Zend\Validator\AbstractValidator;
 
 class TypeId extends AbstractValidator
 {
-    const INVALID = 'invalidTypeId';
+    private const INVALID = 'invalidTypeId';
 
     protected $messageTemplates = [
         self::INVALID => "Type is invalid"

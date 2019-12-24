@@ -7,9 +7,7 @@ use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
 use Zend\Mail\Transport\TransportInterface;
-
 use Autowp\User\Model\UserRemember;
-
 use Application\Controller\Api\AttrController;
 use Application\Controller\Api\LoginController;
 use Application\Controller\Api\UserController;
@@ -113,7 +111,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
      */
     public function testProfileRename()
     {
-        $email = 'test'.microtime(true).'@example.com';
+        $email = 'test' . microtime(true) . '@example.com';
         $password = 'password';
         $name1 = 'First name';
         $name2 = 'Second name';

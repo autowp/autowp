@@ -5,7 +5,6 @@ namespace Application\View\Helper\Service;
 use Application\Language;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\View\Helper\PageEnv as Helper;
 
 class PageEnvFactory implements FactoryInterface

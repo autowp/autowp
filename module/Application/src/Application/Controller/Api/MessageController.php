@@ -6,10 +6,8 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 

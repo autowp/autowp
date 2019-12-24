@@ -7,13 +7,11 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator;
 use Zend\View\Model\JsonModel;
-
 use Application\Hydrator\Api\RestHydrator;
 
 class ArticleController extends AbstractActionController
 {
-    const ARTICLES_PER_PAGE = 10;
-    const PREVIEW_CAT_PATH = '/img/articles/preview/';
+    public const PREVIEW_CAT_PATH = '/img/articles/preview/';
 
     /**
      * @var InputFilter

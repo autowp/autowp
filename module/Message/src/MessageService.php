@@ -6,10 +6,8 @@ use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
-
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
-
 use Application\Service\TelegramService;
 
 /**
@@ -27,9 +25,9 @@ class MessageService
      */
     private $userModel;
 
-    const MESSAGES_PER_PAGE = 20;
+    private const MESSAGES_PER_PAGE = 20;
 
-    const MAX_TEXT = 2000;
+    public const MAX_TEXT = 2000;
 
     /**
      * @var TelegramService
@@ -45,7 +43,13 @@ class MessageService
         $this->userModel = $userModel;
     }
 
-    public function send($fromId, int $toId, string $message)
+    /**
+     * @param $fromId
+     * @param int $toId
+     * @param string $message
+     * @throws Exception
+     */
+    public function send($fromId, int $toId, string $message): void
     {
         $message = trim($message);
         $msgLength = mb_strlen($message);
@@ -399,6 +403,13 @@ class MessageService
         ];
     }
 
+    /**
+     * @param int $userId
+     * @param $rows
+     * @param array $options
+     * @return array
+     * @throws Exception
+     */
     private function prepareList(int $userId, $rows, array $options = [])
     {
         $defaults = [

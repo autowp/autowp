@@ -3,7 +3,6 @@
 namespace Application;
 
 use Zend\View\Renderer\PhpRenderer;
-
 use Application\Model\Picture;
 
 class PictureNameFormatter

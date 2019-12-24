@@ -3,7 +3,6 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Application\Controller\Plugin\Pic;
 
 /**
@@ -36,7 +35,7 @@ class IndexController extends AbstractActionController
             return $this->redirect()->toRoute('ng', [
                 'path' => ''
             ], [
-                'fragment' => '!/'.$path . ($query ? '?'.$query : '')
+                'fragment' => '!/' . $path . ($query ? '?' . $query : '')
             ], false);
         }
     }

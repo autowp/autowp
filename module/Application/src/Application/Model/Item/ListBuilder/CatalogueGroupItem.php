@@ -3,9 +3,7 @@
 namespace Application\Model\Item\ListBuilder;
 
 use Exception;
-
 use Autowp\TextStorage;
-
 use Application\Model\Item;
 use Application\Model\ItemParent;
 

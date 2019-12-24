@@ -3,23 +3,21 @@
 namespace Application\Model;
 
 use Collator;
+use Exception;
+use ImagickException;
 use Transliterator;
-
 use Zend\Db\Sql;
-
 use Autowp\Image;
 
 class Brand
 {
-    const TOP_COUNT = 150;
+    private const TOP_COUNT = 150;
 
-    const NEW_DAYS = 7;
+    private const NEW_DAYS = 7;
 
-    const MAX_NAME = 80;
+    public const MAX_FULLNAME = 255;
 
-    const MAX_FULLNAME = 255;
-
-    const ICON_FORMAT = 'brandicon';
+    private const ICON_FORMAT = 'brandicon';
 
     /**
      * @var Item
@@ -128,8 +126,8 @@ class Brand
     {
         $i = 0;
         $number = '';
-        while (isset($char{$i})) {
-            $number .= ord($char{$i});
+        while (isset($char[$i])) {
+            $number .= ord($char[$i]);
             ++$i;
         }
         return $number;
@@ -265,9 +263,9 @@ class Brand
      * @param string $language
      * @param $callback
      * @return array|null
-     * @throws \Exception
+     * @throws Exception
      */
-    private function fetchBrand(string $language, $callback)
+    private function fetchBrand(string $language, $callback): ?array
     {
         $select = $this->item->getSelect([
             'language'     => $language,
@@ -292,20 +290,38 @@ class Brand
         ];
     }
 
-    public function getBrandById(int $id, string $language)
+    /**
+     * @param int $id
+     * @param string $language
+     * @return array|null
+     * @throws Exception
+     */
+    public function getBrandById(int $id, string $language): ?array
     {
         return $this->fetchBrand($language, function (Sql\Select $select) use ($id) {
             $select->where(['item.id' => $id]);
         });
     }
 
-    public function getBrandByCatname(string $catname, string $language)
+    /**
+     * @param string $catname
+     * @param string $language
+     * @return array|null
+     * @throws Exception
+     */
+    public function getBrandByCatname(string $catname, string $language): ?array
     {
         return $this->fetchBrand($language, function (Sql\Select $select) use ($catname) {
             $select->where(['item.catname' => $catname]);
         });
     }
 
+    /**
+     * @param $options
+     * @param callable|null $callback
+     * @return array
+     * @throws Exception
+     */
     public function getList($options, callable $callback = null): array
     {
         if (is_string($options)) {
@@ -371,7 +387,15 @@ class Brand
         return $items;
     }
 
-    public function createIconsSprite(Image\Storage $imageStorage, $destImg, $destCss)
+    /**
+     * @param Image\Storage $imageStorage
+     * @param string $destImg
+     * @param string $destCss
+     * @throws Image\Storage\Exception
+     * @throws ImagickException
+     * @throws Exception
+     */
+    public function createIconsSprite(Image\Storage $imageStorage, string $destImg, string $destCss)
     {
         $list = $this->getList([
             'language' => 'en',

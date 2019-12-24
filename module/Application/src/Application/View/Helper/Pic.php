@@ -4,7 +4,6 @@ namespace Application\View\Helper;
 
 use ArrayObject;
 use Zend\View\Helper\AbstractHtmlElement;
-
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
 

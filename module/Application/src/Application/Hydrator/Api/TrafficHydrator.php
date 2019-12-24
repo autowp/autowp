@@ -4,11 +4,9 @@ namespace Application\Hydrator\Api;
 
 use Exception;
 use Traversable;
-
 use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
-
 use Autowp\User\Model\User;
 
 class TrafficHydrator extends RestHydrator
@@ -79,7 +77,7 @@ class TrafficHydrator extends RestHydrator
             }
         }
 
-        $object['whois_url'] = 'http://nic.ru/whois/?query='.urlencode($object['ip']);
+        $object['whois_url'] = 'http://nic.ru/whois/?query=' . urlencode($object['ip']);
         unset($object['ban']['ip']);
 
 

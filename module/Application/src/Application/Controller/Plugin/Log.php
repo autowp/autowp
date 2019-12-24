@@ -4,7 +4,6 @@ namespace Application\Controller\Plugin;
 
 use Exception;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-
 use Application\Model\Log as Model;
 
 class Log extends AbstractPlugin

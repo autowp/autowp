@@ -5,7 +5,6 @@ namespace Application\Controller\Plugin\Service;
 use Application\Language;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Application\Controller\Plugin\Language as Plugin;
 
 class LanguageFactory implements FactoryInterface

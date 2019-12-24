@@ -3,18 +3,16 @@
 namespace Application\Model;
 
 use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 class ItemParent
 {
-    const MAX_CATNAME = 150;
-    const MAX_LANGUAGE_NAME = 255;
+    public const MAX_CATNAME = 150;
+    public const MAX_LANGUAGE_NAME = 255;
 
-    const
+    public const
         TYPE_DEFAULT = 0,
         TYPE_TUNING = 1,
         TYPE_SPORT = 2,
@@ -168,13 +166,13 @@ class ItemParent
         $name = $vehicleName;
         foreach ($aliases as $alias) {
             $name = str_ireplace('by The ' . $alias . ' Company', '', $name);
-            $name = str_ireplace('by '.$alias, '', $name);
-            $name = str_ireplace('di '.$alias, '', $name);
-            $name = str_ireplace('par '.$alias, '', $name);
-            $name = str_ireplace($alias.'-', '', $name);
-            $name = str_ireplace('-'.$alias, '', $name);
+            $name = str_ireplace('by ' . $alias, '', $name);
+            $name = str_ireplace('di ' . $alias, '', $name);
+            $name = str_ireplace('par ' . $alias, '', $name);
+            $name = str_ireplace($alias . '-', '', $name);
+            $name = str_ireplace('-' . $alias, '', $name);
 
-            $name = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $name);
+            $name = preg_replace('/\b' . preg_quote($alias, '/') . '\b/iu', '', $name);
         }
 
         $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));
@@ -485,7 +483,7 @@ class ItemParent
         }
 
         $this->itemParentLanguageTable->getAdapter()->query('
-            INSERT INTO item_parent_language (item_id, parent_id, language, name, is_auto) 
+            INSERT INTO item_parent_language (item_id, parent_id, language, name, is_auto)
             VALUES (:item_id, :parent_id, :language, :name, :is_auto)
             ON DUPLICATE KEY UPDATE name = VALUES(name), is_auto = VALUES(is_auto)
         ', array_replace([
@@ -812,42 +810,26 @@ class ItemParent
 
         $updates = 0;
 
+        $stmt = $this->itemParentCacheTable->getAdapter()->query('
+            INSERT INTO item_parent_cache (item_id, parent_id, diff, tuning, sport, design)
+            VALUES (:item_id, :parent_id, :diff, :tuning, :sport, :design)
+            ON DUPLICATE KEY UPDATE
+                diff = VALUES(diff),
+                tuning = VALUES(tuning),
+                sport = VALUES(sport),
+                design = VALUES(design)
+        ');
+
         foreach ($parentInfo as $parentId => $info) {
-            $primaryKey = [
+            $result = $stmt->execute([
                 'item_id'   => $itemId,
-                'parent_id' => $parentId
-            ];
-            $row = $this->itemParentCacheTable->select($primaryKey)->current();
-
-            if ($row) {
-                $set = [];
-                if ($row['diff'] != $info['diff']) {
-                    $set['diff'] = $info['diff'];
-                }
-
-                if ($row['tuning'] xor $info['tuning']) {
-                    $set['tuning'] = $info['tuning'] ? 1 : 0;
-                }
-
-                if ($row['sport'] xor $info['sport']) {
-                    $set['sport'] = $info['sport'] ? 1 : 0;
-                }
-
-                if ($row['design'] xor $info['design']) {
-                    $set['design'] = $info['design'] ? 1 : 0;
-                }
-
-                if ($set) {
-                    $updates += $this->itemParentCacheTable->update($set, $primaryKey);
-                }
-            } else {
-                $updates += $this->itemParentCacheTable->insert(array_replace([
-                    'diff'      => $info['diff'],
-                    'tuning'    => $info['tuning'] ? 1 : 0,
-                    'sport'     => $info['sport'] ? 1 : 0,
-                    'design'    => $info['design'] ? 1 : 0
-                ], $primaryKey));
-            }
+                'parent_id' => $parentId,
+                'diff'      => $info['diff'],
+                'tuning'    => $info['tuning'] ? 1 : 0,
+                'sport'     => $info['sport'] ? 1 : 0,
+                'design'    => $info['design'] ? 1 : 0
+            ]);
+            $updates += $result->getAffectedRows();
         }
 
         $filter = [

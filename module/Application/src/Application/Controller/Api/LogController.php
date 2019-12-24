@@ -6,9 +6,7 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
-
 use Autowp\User\Controller\Plugin\User;
-
 use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Log;
