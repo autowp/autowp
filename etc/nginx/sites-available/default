@@ -2,9 +2,6 @@ server {
     listen 80;
     listen [::]:80;
 
-    access_log off;
-    error_log /app/logs/nginx-error.log error;
-
     gzip_static on;
 
     gzip on;
