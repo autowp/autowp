@@ -42,9 +42,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
-        $itemId = $parts[count($parts) - 1];
-
-        return $itemId;
+        return $parts[count($parts) - 1];
     }
 
     private function createVehicle(array $params = [])
@@ -91,6 +89,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     private function getRandomBrand()
     {
@@ -208,9 +207,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
-        $pictureId = $parts[count($parts) - 1];
-
-        return $pictureId;
+        return $parts[count($parts) - 1];
     }
 
     /**
@@ -291,6 +288,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testEngineUnderTheHoodPreviews()
     {
@@ -330,6 +328,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testCreateCarAndAddToBrand()
     {
@@ -392,6 +391,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testCreateBrand()
     {
@@ -460,6 +460,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testBlacklistedCatnameNotAllowedManually()
     {
@@ -501,6 +502,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testSubscription()
     {
@@ -539,6 +541,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
     }
 
+    /**
+     * @throws Exception
+     */
     public function testItemParentAutoCatnameIsNotEmpty()
     {
         $parentId = $this->createVehicle([
@@ -556,6 +561,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testItemPoint()
     {
@@ -586,6 +592,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testEngineVehicles()
     {
@@ -635,6 +642,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function testFields()
     {
