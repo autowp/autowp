@@ -156,7 +156,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             ])
             ->getMock();
 
-        $mock->method('indexImage')->willReturn(true);
+        $mock->method('indexImage');
 
         $serviceManager->setService(DuplicateFinder::class, $mock);
     }
