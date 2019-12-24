@@ -19,7 +19,7 @@ before_install:
 script:
   - docker exec -it autowp_test_web sh -c "./install-dev-db.sh" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./install-dev.sh" || travis_terminate 1;
-  - docker exec -it autowp_test_web sh -c "./cc-test-reporter before-build" || travis_terminate 1;
+  - docker exec -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" -it autowp_test_web sh -c "./cc-test-reporter before-build" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./vendor/bin/security-checker security:check composer.lock"
   - docker exec -it autowp_test_web sh -c "./vendor/bin/phpcs --encoding=utf-8" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./vendor/bin/phpcf module" || travis_terminate 1;
@@ -31,7 +31,7 @@ script:
 
 after_success:
   - docker exec -it autowp_test_web bash -c "./vendor/bin/coveralls -v"
-  - docker exec -it autowp_test_web bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./logs/clover.xml"
+  - docker exec -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" -it autowp_test_web bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./logs/clover.xml"
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
     docker push $DOCKER_REPO;
