@@ -1,7 +1,8 @@
 import * as $ from 'jquery';
-import * as filesize from 'filesize';
 import './gallery.scss';
 import { Util } from './util';
+
+const filesize = require('../../node_modules/filesize/lib/filesize.es6');
 
 interface Dimension {
     width: number;

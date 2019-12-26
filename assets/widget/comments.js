@@ -42,7 +42,7 @@ var Comments = function(element) {
 
         function postVote(value) {
             self.postVote($vote.data('id'), value, function(newVote) {
-                newVote = parseInt(newVote);
+                newVote = parseInt(newVote, 10);
                 $vote.find('.value')
                     .text((newVote > 0 ? '+' : '') + newVote)
                     .removeClass('zero');

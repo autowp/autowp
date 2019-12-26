@@ -1,6 +1,5 @@
 /.idea
 /mysql
-/composer.lock
 /composer.phar
 /node_modules
 /bower_components
@@ -9,7 +8,6 @@
 /data
 /logs
 /goautowp/goautowp
-/package-lock.json
 /frontend
 /goautowp/logs
 /cc-test-reporter

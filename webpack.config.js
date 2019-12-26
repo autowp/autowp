@@ -1,12 +1,12 @@
-var webpack = require('webpack');
-var path = require("path");
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var ManifestPlugin = require('webpack-manifest-plugin');
-var CompressionPlugin = require("compression-webpack-plugin");
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const webpack = require('webpack');
+const path = require("path");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
+const CompressionPlugin = require("compression-webpack-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
-var prod = process.argv.indexOf('-p') !== -1;
+const prod = process.argv.indexOf('-p') !== -1;
 
 module.exports = {
     context: __dirname,
@@ -30,32 +30,33 @@ module.exports = {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
                 exclude: /node_modules|vendor/
-            }, {
+            },
+            {
                 test: /\.js$/, // include .js files
                 exclude: /node_modules/, // exclude any and all files in the node_modules folder
-                use:[
-                  'jshint-loader',
-                  {
-                      loader: "jshint-loader",
-                      options: {
-                          camelcase: false,
-                          emitErrors: false,
-                          failOnHint: false
-                      }
-                  }
-                ]
-            }, { test: /bootstrap/, use: {
-                loader: 'imports-loader',
-                options: {'jQuery': 'jquery'}
-            }},
-            { test: /Jcrop/, use: {
-                loader: 'imports-loader',
-                options: {'jQuery': 'jquery'}
-            }},
-            { test: /tagsinput/, use: {
-                loader: 'imports-loader',
-                options: {'window.jQuery': 'jquery'}
-            }},
+                loader: 'eslint-loader'
+            },
+            {
+                test: /bootstrap/,
+                use: {
+                    loader: 'imports-loader',
+                    options: {'jQuery': 'jquery'}
+                }
+            },
+            {
+                test: /Jcrop/,
+                use: {
+                    loader: 'imports-loader',
+                    options: {'jQuery': 'jquery'}
+                }
+            },
+            {
+                test: /tagsinput/,
+                use: {
+                    loader: 'imports-loader',
+                    options: {'window.jQuery': 'jquery'}
+                }
+            },
             {
                 test: /.html$/,
                 use: {
@@ -64,10 +65,7 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: "css-loader"
-                })
+                use: [MiniCssExtractPlugin.loader, 'css-loader']
             },
             /*{
                 test: /\.less$/,
@@ -78,10 +76,7 @@ module.exports = {
             },*/
             {
                 test: /\.scss$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: "css-loader!sass-loader"
-                })
+                use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
             },
             //{test: /\.(jpe?g|png|gif|svg)$/i, loader: "file-loader?name=img/[name].[ext]"},
             {
@@ -142,8 +137,11 @@ module.exports = {
         ]
     },
     plugins: [
-        new ExtractTextPlugin({
-            filename: "css/[name].[hash].css"
+        new MiniCssExtractPlugin({
+            // Options similar to the same options in webpackOptions.output
+            // both options are optional
+            filename: "css/[name].[hash].css",
+            chunkFilename: 'css/[id].[hash].css',
         }),
         new ManifestPlugin(),
         //new webpack.optimize.CommonsChunkPlugin("vendor", "js/vendor.bundle.js"), //.[chunkhash]
@@ -183,7 +181,7 @@ module.exports = {
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru|be|zh-cn|fr|pt-br|uk/)
     ].concat(prod ? [
         new CompressionPlugin({
-            asset: "[path].gz[query]",
+            filename: "[path].gz[query]",
             algorithm: "gzip",
             test: /\.js$|\.css$|\.svg$|\.eot$|\.woff2?$|\.ttf$/,
             threshold: 10240,

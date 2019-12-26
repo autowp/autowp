@@ -27,7 +27,7 @@ module.exports = {
                         trigger: 'manual',
                         content: html,
                         html: true,
-                        placement: 'bottom',
+                        placement: 'bottom'
                     });
                     $self.data('loaded', true);
                     if ($self.data('over')) {

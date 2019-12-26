@@ -21,7 +21,7 @@
 		"ext-gd" : "*",
         "ext-fileinfo" : "*",
         "ext-bcmath": "*",
-		"irazasyed/telegram-bot-sdk" : "^2.3",
+		"irazasyed/telegram-bot-sdk" : "dev-patch-3",
 		"phayes/geophp" : "^1.2",
 		"michelf/php-markdown" : "^1.8.0",
 		"autowp/external-login-service" : "^1.4.0",
@@ -86,7 +86,12 @@
 			"AutowpTest\\" : "test/"
 		}
 	},
-	"repositories" : [{
+	"repositories" : [
+        {
+            "type" : "git",
+            "url" : "https://github.com/autowp/telegram-bot-sdk"
+        },
+        {
 			"type" : "git",
 			"url" : "https://github.com/autowp/oauth2-vkontakte"
 		}
