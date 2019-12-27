@@ -90,7 +90,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
     composer clearcache
 
-COPY package.json package.lock ./
+COPY package.json package-lock.json ./
 
 RUN npm install -y -qq --production && \
     npm cache clean --force
