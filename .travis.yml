@@ -30,7 +30,7 @@ script:
   - sonar-scanner || true
 
 after_success:
-  - docker exec -it autowp_test_web bash -c "./vendor/bin/coveralls -v"
+  - docker exec -it autowp_test_web bash -c "./vendor/bin/php-coveralls -v"
   - docker exec -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" -it autowp_test_web bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
