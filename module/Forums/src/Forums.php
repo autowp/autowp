@@ -370,13 +370,13 @@ class Forums
         return $id;
     }
 
-    public function getTheme(int $themeId): array
+    public function getTheme(int $themeId): ?array
     {
         $theme = $this->themeTable->select([
             'id = ?' => $themeId
         ])->current();
         if (! $theme) {
-            return false;
+            return null;
         }
 
         return [
@@ -494,9 +494,9 @@ class Forums
      * @suppress PhanUndeclaredMethod
      * @param int $topicId
      * @param array $options
-     * @return array|bool
+     * @return array|null
      */
-    public function getTopic(int $topicId, array $options = []): array
+    public function getTopic(int $topicId, array $options = []): ?array
     {
         $defaults = [
             'isModerator' => null,
@@ -521,7 +521,7 @@ class Forums
 
         $topic = $this->topicTable->selectWith($select)->current();
         if (! $topic) {
-            return false;
+            return null;
         }
 
         return [

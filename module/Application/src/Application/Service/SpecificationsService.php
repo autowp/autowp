@@ -551,7 +551,7 @@ class SpecificationsService
      * @param int $id
      * @return NULL|array
      */
-    public function getAttribute(int $id)
+    public function getAttribute(int $id): ?array
     {
         $this->loadAttributes();
 
@@ -570,6 +570,10 @@ class SpecificationsService
     public function setUserValue2(int $uid, int $attributeId, int $itemId, $value, bool $empty)
     {
         $attribute = $this->getAttribute($attributeId);
+        if (! $attribute) {
+            throw new Exception("attribute `$attributeId` not found");
+        }
+
         $somethingChanged = false;
 
         $userValueDataTable = $this->getUserValueDataTable($attribute['typeId']);
@@ -695,6 +699,9 @@ class SpecificationsService
     public function setUserValue(int $uid, int $attributeId, int $itemId, $value)
     {
         $attribute = $this->getAttribute($attributeId);
+        if (! $attribute) {
+            throw new Exception("attribute `$attributeId` not found");
+        }
         $somethingChanged = false;
 
         $userValueDataTable = $this->getUserValueDataTable($attribute['typeId']);
@@ -1010,6 +1017,9 @@ class SpecificationsService
         }
 
         $attribute = $this->getAttribute($attribute);
+        if (! $attribute) {
+            throw new Exception("attribute `$attribute` not found");
+        }
 
         $valuesTable = $this->getValueDataTable($attribute['typeId']);
 
@@ -1712,6 +1722,10 @@ class SpecificationsService
     public function updateActualValue(int $attributeId, int $itemId)
     {
         $attribute = $this->getAttribute($attributeId);
+        if (! $attribute) {
+            throw new Exception("attribute `$attributeId` not found");
+        }
+
         return $this->updateAttributeActualValue($attribute, $itemId);
     }
 
@@ -1998,6 +2012,14 @@ class SpecificationsService
         ];
     }
 
+    /**
+     * @param int $attributeId
+     * @param int $itemId
+     * @param int $userId
+     * @param string $language
+     * @return mixed|string|null
+     * @throws Exception
+     */
     public function getUserValueText(int $attributeId, int $itemId, int $userId, string $language)
     {
         if (! $itemId) {
@@ -2105,6 +2127,9 @@ class SpecificationsService
                 }
 
                 $attribute = $this->getAttribute($aid);
+                if (! $attribute) {
+                    throw new Exception("attribute `$aid` not found");
+                }
 
                 if ($attribute['isMultiple']) {
                     if (! isset($values[$id][$aid])) {
@@ -2409,6 +2434,9 @@ class SpecificationsService
         $conflicts = [];
         foreach ($paginator->getCurrentItems() as $valueRow) {
             $attribute = $this->getAttribute($valueRow['attribute_id']);
+            if (! $attribute) {
+                throw new Exception("attribute `{$valueRow['attribute_id']}` not found");
+            }
 
             $unit = null;
             if ($attribute['unitId']) {

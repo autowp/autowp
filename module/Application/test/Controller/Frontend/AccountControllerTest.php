@@ -46,9 +46,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
-        $userId = $parts[count($parts) - 1];
-
-        return $userId;
+        return (int) $parts[count($parts) - 1];
     }
 
     private function activateUser()

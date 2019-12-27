@@ -5,6 +5,10 @@ namespace Application\View\Helper;
 use Zend\View\Helper\AbstractHelper;
 use Application\Hydrator\Api\RestHydrator;
 
+/**
+ * Class ApiData
+ * @package Application\View\Helper
+ */
 class ApiData extends AbstractHelper
 {
     /**

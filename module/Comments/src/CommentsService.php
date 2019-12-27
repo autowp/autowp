@@ -68,7 +68,7 @@ class CommentsService
      * @param array $data
      * @return int
      */
-    public function add(array $data)
+    public function add(array $data): int
     {
         $typeId = (int)$data['typeId'];
         $itemId = (int)$data['itemId'];
@@ -83,11 +83,11 @@ class CommentsService
                 'id = ?'      => $parentId
             ])->current();
             if (! $parentMessage) {
-                return false;
+                return 0;
             }
 
             if ($parentMessage['deleted']) {
-                return false;
+                return 0;
             }
         }
 

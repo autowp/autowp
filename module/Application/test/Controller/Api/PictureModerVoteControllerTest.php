@@ -107,9 +107,7 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
-        $itemId = $parts[count($parts) - 1];
-
-        return $itemId;
+        return (int) $parts[count($parts) - 1];
     }
 
     /**
