@@ -334,7 +334,7 @@ return [
 
     'gulp-rev' => [
         'manifest' => __DIR__ . '/../../../public_html/dist/manifest.json',
-        'prefix'   => '/dist/'
+        'prefix'   => ''
     ],
 
     'mosts_min_vehicles_count' => (int)getenv('AUTOWP_MOSTS_MIN_VEHICLES_COUNT'),

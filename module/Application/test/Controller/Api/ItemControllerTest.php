@@ -42,7 +42,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
-        return $parts[count($parts) - 1];
+        return (int) $parts[count($parts) - 1];
     }
 
     private function createVehicle(array $params = [])

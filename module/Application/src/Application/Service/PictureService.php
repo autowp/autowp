@@ -85,6 +85,7 @@ class PictureService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @throws Image\Storage\Exception
      */
     public function clearQueue()
     {
@@ -205,6 +206,9 @@ class PictureService
         $pictureId = (int) $this->picture->getTable()->getLastInsertValue();
 
         $picture = $this->picture->getRow(['id' => (int)$pictureId]);
+        if (! $picture) {
+            throw new Exception("Picture `$pictureId` not found");
+        }
 
         if ($itemId) {
             $this->pictureItem->setPictureItems($pictureId, PictureItem::PICTURE_CONTENT, [$itemId]);

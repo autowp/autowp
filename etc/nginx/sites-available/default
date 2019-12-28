@@ -2,9 +2,6 @@ server {
     listen 80;
     listen [::]:80;
 
-    access_log off;
-    error_log /app/logs/nginx-error.log error;
-
     gzip_static on;
 
     gzip on;
@@ -69,9 +66,10 @@ server {
         rewrite ^/pictures/(.*)$ /picture-file/index/?file=$1;
     }
 
-    location ~* ^.+\.(jpg|jpeg|gif|css|js|ico|png|txt|woff|woff2|ttf)$ {
+    location ~* ^.+\.(jpg|jpeg|gif|css|js|ico|png|txt|woff|woff2|ttf|svg)$ {
         root /app/public_html;
         expires 7d;
+        access_log off;
         error_log off;
     }
 

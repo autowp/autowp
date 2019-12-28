@@ -2,6 +2,7 @@
 
 namespace Application\InputFilter;
 
+use Exception;
 use InvalidArgumentException;
 use Traversable;
 use Zend\InputFilter\InputFilter;
@@ -146,6 +147,10 @@ class AttrUserValueCollectionInputFilter extends InputFilter
             }
 
             $attribute = $this->specService->getAttribute($data['attribute_id']);
+            if (! $attribute) {
+                throw new Exception("attribute `{$data['attribute_id']}` not found");
+            }
+
             if ($attribute['isMultiple']) {
                 $data['value'] = (array)$data['value'];
             }

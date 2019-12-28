@@ -1,16 +1,13 @@
 .idea
 /mysql
-/composer.lock
 /composer.phar
 /node_modules
 /bower_components
 /vendor
 /.buildpath
 /data
-/mysql
 /logs
 /goautowp/goautowp
-/package-lock.json
 /frontend
 /goautowp/logs
-/.idea
+/cc-test-reporter

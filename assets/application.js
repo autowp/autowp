@@ -1,15 +1,16 @@
+import i18next from 'i18next';
+
 var Navbar = require("navbar/navbar.js");
 var $ = require("jquery");
-var i18next = require('i18next');
 
 require("bootstrap/bootstrap");
 require("styles.scss");
 require("flags/flags");
 
 var resources = {};
-$.map(['en', 'fr', 'ru', 'zh', 'be', 'pt-br', 'uk'], function(language) {
+$.map(['en', 'fr', 'ru', 'zh', 'be', 'pt-br', 'uk'], function (language) {
     resources[language] = {
-        translation: require("languages/"+language+".json")
+        translation: require("languages/" + language + ".json")
     };
 });
 
@@ -19,10 +20,10 @@ i18next.init({
 });
 
 var doc = document;
-$(function() {
+$(function () {
     Navbar.init();
 
-    $('a.picture-hover-preview').each(function() {
+    $('a.picture-hover-preview').each(function () {
         var href = $(this).attr('href');
         var element = null;
         var anchor = $(this);
@@ -30,15 +31,17 @@ $(function() {
 
         var fadeOutTimer = null;
 
-        function over() {
+        function over()
+        {
             clearInterval(fadeOutTimer);
             fadeOutTimer = null;
         }
 
-        function out() {
+        function out()
+        {
             clearInterval(fadeOutTimer);
             fadeOutTimer = null;
-            fadeOutTimer = setInterval(function() {
+            fadeOutTimer = setInterval(function () {
                 element.hide();
                 clearInterval(fadeOutTimer);
             }, 1500);
@@ -60,7 +63,7 @@ $(function() {
 
             if (!loaded) {
                 loaded = true;
-                $.get(href, {preview: 1}, function(html) {
+                $.get(href, {preview: 1}, function (html) {
                     element.empty().append(html);
                     var offset = anchor.offset();
                     element.css({
@@ -75,25 +78,25 @@ $(function() {
 
     });
 
-    $('[data-module]').each(function() {
+    $('[data-module]').each(function () {
         var element = this;
         var moduleName = $(this).data('module');
-        require(['widget/' + moduleName], function(Module) {
+        require(['widget/' + moduleName], function (Module) {
             Module(element);
         });
     });
 
-    $('[data-page-module]').each(function() {
+    $('[data-page-module]').each(function () {
         var moduleName = $(this).data('page-module');
         var moduleOptions = $(this).data('page-module-options');
-        require(['pages/' + moduleName], function(Module) {
+        require(['pages/' + moduleName], function (Module) {
             Module.init(moduleOptions);
         });
     });
 
     $('footer [data-toggle="tooltip"]').tooltip();
 
-    $('form.login').on('submit', function(e) {
+    $('form.login').on('submit', function (e) {
         e.preventDefault();
 
         var $form = $(this);
@@ -108,29 +111,28 @@ $(function() {
                 password: $form.find(':input[name=password]').val(),
                 remember: $form.find(':input[name=remember]').prop('checked') ? 1 : 0
             }
-        }).then(function() {
+        }).then(function () {
             window.location = '/ng/login/ok';
-        }, function(response) {
+        }, function (response) {
             if (response.status === 400) {
-                $.each(response.responseJSON.invalid_params, function(field, errors) {
-                    var $input = $form.find(':input[name='+field+']');
-                    $.map(errors, function(message) {
+                $.each(response.responseJSON.invalid_params, function (field, errors) {
+                    var $input = $form.find(':input[name=' + field + ']');
+                    $.map(errors, function (message) {
                         var $p = $('<p class="help-block" />').text(message);
                         $p.insertAfter($input);
                     });
                 });
-
             } else {
                 console.log(response);
             }
         });
     });
 
-    $(document.body).on('click', 'a.logout', function() {
+    $(document.body).on('click', 'a.logout', function () {
         $.ajax({
             method: 'DELETE',
             url: '/api/login'
-        }).then(function() {
+        }).then(function () {
 
             window.location = '/ng/login';
 

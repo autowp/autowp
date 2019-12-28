@@ -86,11 +86,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
 
 COPY ./etc/ /etc/
 
-COPY composer.json /app/composer.json
+COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
     composer clearcache
 
-COPY package.json /app/package.json
+COPY package.json package-lock.json ./
 
 RUN npm install -y -qq --production && \
     npm cache clean --force

@@ -3,6 +3,8 @@
 namespace Application\Controller\Api;
 
 use Application\Comments;
+use Exception;
+use ImagickException;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use Autowp\Comments\CommentsService;
@@ -82,13 +84,19 @@ class ItemGalleryController extends AbstractRestfulController
         $rows = $this->picture->getRows($filter);
         foreach ($rows as $index => $row) {
             if ($row['identity'] == $identity) {
-                return floor($index / $this->itemsPerPage) + 1;
+                return (int) floor($index / $this->itemsPerPage) + 1;
             }
         }
 
         return 1;
     }
 
+    /**
+     * @return array|JsonModel
+     * @throws Storage\Exception
+     * @throws ImagickException
+     * @throws Exception
+     */
     public function galleryAction()
     {
         $id = $this->params()->fromRoute('id');

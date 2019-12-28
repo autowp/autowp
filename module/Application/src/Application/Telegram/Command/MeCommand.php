@@ -2,6 +2,7 @@
 
 namespace Application\Telegram\Command;
 
+use Exception;
 use Telegram\Bot\Commands\Command;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Math\Rand;
@@ -44,6 +45,7 @@ class MeCommand extends Command
 
     /**
      * @inheritdoc
+     * @throws Exception
      */
     public function handle($arguments)
     {
@@ -72,10 +74,12 @@ class MeCommand extends Command
 
             $userRow = $this->userModel->getRow((int)$telegramChatRow['user_id']);
 
-            $this->replyWithMessage([
-                'disable_web_page_preview' => true,
-                'text' => 'You identified as ' . $userRow['name']
-            ]);
+            if ($userRow) {
+                $this->replyWithMessage([
+                    'disable_web_page_preview' => true,
+                    'text' => 'You identified as ' . $userRow['name']
+                ]);
+            }
 
             return;
         }

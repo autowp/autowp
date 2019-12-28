@@ -836,6 +836,11 @@ class Mosts
         return $result;
     }
 
+    /**
+     * @param array $options
+     * @return mixed
+     * @throws Exception
+     */
     public function getItems(array $options)
     {
         $defaults = [

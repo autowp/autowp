@@ -1,6 +1,5 @@
-ecmaFeatures:
-  modules: true
-  jsx: true
+parserOptions:
+  sourceType: "module"
 
 env:
   amd: true
@@ -57,7 +56,6 @@ rules:
   no-case-declarations: 2
   no-div-regex: 2
   no-else-return: 0
-  no-empty-label: 2
   no-empty-pattern: 2
   no-eq-null: 2
   no-eval: 2
@@ -78,7 +76,7 @@ rules:
   no-native-reassign: 2
   no-new-func: 2
   no-new-wrappers: 2
-  no-new: 2
+  # no-new: 2
   no-octal-escape: 2
   no-octal: 2
   no-proto: 2
@@ -117,7 +115,7 @@ rules:
 
   # Node.js and CommonJS
   callback-return: 2
-  global-require: 2
+  # global-require: 2
   handle-callback-err: 2
   no-mixed-requires: 0
   no-new-require: 0

@@ -73,7 +73,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return array|ArrayObject
+     * @return array|ArrayObject|null
      */
     private function getLogedInUser()
     {
