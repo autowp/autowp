@@ -5,9 +5,7 @@ namespace Application\Controller;
 use Exception;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-
 use Autowp\Image\Storage;
-
 use Application\Model\Brand;
 use Application\Model\Catalogue;
 use Application\Model\Item;
@@ -230,5 +228,4 @@ class CatalogueController extends AbstractActionController
             return $data;
         });
     }
-
 }

@@ -679,7 +679,6 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($isModer) {
-
             if ($this->filterComposite->filter('comments_attentions_count')) {
                 $result['comments_attentions_count'] = $this->comments->service()->getTotalMessagesCount([
                     'attention' => Attention::REQUIRED,
