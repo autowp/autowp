@@ -549,7 +549,7 @@ class PictureController extends AbstractRestfulController
                 'user_id'  => $user ? $user['id'] : null,
                 'fields'   => $data['fields'],
                 'item_id'  => (int) $data['item_id'],
-                'paginator_item_id'  => (int) $data['paginator']['item_id'],
+                'paginator_item_id' => (int) $data['paginator']['item_id'],
             ]);
 
             $pictures = [];

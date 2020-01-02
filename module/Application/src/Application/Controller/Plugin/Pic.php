@@ -195,40 +195,33 @@ class Pic extends AbstractPlugin
                 if (count($paths) > 0) {
                     $path = $paths[0];
 
+                    $escapedPath = array_map(function ($string) {
+                        return urlencode($string);
+                    }, $path['path']);
+
                     if ($path['car_catname']) {
-                        $url = $this->httpRouter->assemble([
-                            'action'        => 'brand-item-picture',
-                            'brand_catname' => $path['brand_catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                            'picture_id'    => $row['identity']
-                        ], [
-                            'name'            => 'catalogue',
-                            'force_canonical' => $options['canonical']
-                        ]);
+                        $url = '/ng/' . urlencode($path['brand_catname']) .
+                               '/' . urlencode($path['car_catname']) .
+                               ($escapedPath ? '/' . implode('/', $escapedPath) : '') .
+                               '/pictures/' . urlencode($row['identity']);
                     } else {
                         $perspectiveId = $this->pictureItem->getPerspective($row['id'], $carId);
 
                         switch ($perspectiveId) {
                             case 22:
-                                $action = 'logotypes-picture';
+                                $action = 'logotypes';
                                 break;
                             case 25:
-                                $action = 'mixed-picture';
+                                $action = 'mixed';
                                 break;
                             default:
-                                $action = 'other-picture';
+                                $action = 'other';
                                 break;
                         }
 
-                        $url = $this->httpRouter->assemble([
-                            'action'        => $action,
-                            'brand_catname' => $path['brand_catname'],
-                            'picture_id'    => $row['identity']
-                        ], [
-                            'name' => 'catalogue',
-                            'force_canonical' => $options['canonical']
-                        ]);
+                        $url = '/ng/' . urlencode($path['brand_catname']) .
+                               '/' . $action .
+                               '/' . urlencode($row['identity']);
                     }
                 }
             }

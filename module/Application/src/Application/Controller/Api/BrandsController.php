@@ -13,6 +13,7 @@ use Application\Model\Brand;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
+use Zend\View\Model\ViewModel;
 
 /**
  * Class BrandsController
@@ -91,10 +92,6 @@ class BrandsController extends AbstractActionController
             foreach ($items as &$line) {
                 foreach ($line as &$char) {
                     foreach ($char['brands'] as &$item) {
-                        $item['url'] = $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand',
-                            'brand_catname' => $item['catname']
-                        ]);
                         $item['new_cars_url'] = $this->url()->fromRoute('brands/newcars', [
                             'brand_id' => $item['id'],
                         ]);
@@ -119,6 +116,10 @@ class BrandsController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @return ViewModel
+     * @throws Exception
+     */
     public function sectionsAction()
     {
         $language = $this->language();
@@ -136,6 +137,13 @@ class BrandsController extends AbstractActionController
         return new JsonModel($this->brandSections($language, $brand['id'], $brand['catname']));
     }
 
+    /**
+     * @param string $language
+     * @param int $brandId
+     * @param string $brandCatname
+     * @return array
+     * @throws Exception
+     */
     private function brandSections(
         string $language,
         int $brandId,
