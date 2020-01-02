@@ -13,6 +13,9 @@ use Application\Most;
 
 class Mosts
 {
+    /**
+     * @var array
+     */
     private $ratings = [
         [
             'catName'   => 'fastest',
@@ -460,7 +463,7 @@ class Mosts
         return $this->years;
     }
 
-    public function getRatings()
+    public function getRatings(): array
     {
         return $this->ratings;
     }
@@ -476,7 +479,7 @@ class Mosts
         return $this->perspectiveGroups;
     }
 
-    public function getCarTypes(int $brandId)
+    public function getCarTypes(int $brandId): array
     {
         $carTypes = [];
         foreach ($this->vehicleType->getRows(0, $brandId) as $row) {
@@ -501,7 +504,7 @@ class Mosts
         return $carTypes;
     }
 
-    private function getCarTypeData($carType)
+    private function getCarTypeData($carType): array
     {
         return [
             'id'      => (int)$carType['id'],
@@ -511,7 +514,13 @@ class Mosts
         ];
     }
 
-    private function getOrientedPictureList($carId, array $perspectiveGroupIds)
+    /**
+     * @param $carId
+     * @param array $perspectiveGroupIds
+     * @return array
+     * @throws Exception
+     */
+    private function getOrientedPictureList($carId, array $perspectiveGroupIds): array
     {
         $pictures = [];
 

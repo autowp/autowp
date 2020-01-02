@@ -2,6 +2,8 @@
 
 namespace Application\Controller\Api;
 
+use Exception;
+use ImagickException;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Autowp\Image\Storage;
@@ -79,6 +81,12 @@ class MostsController extends AbstractActionController
         $this->pictureNameFormatter = $pictureNameFormatter;
     }
 
+    /**
+     * @return JsonModel
+     * @throws Storage\Exception
+     * @throws ImagickException
+     * @throws Exception
+     */
     public function getItemsAction()
     {
         $user = $this->user()->get();
@@ -87,12 +95,14 @@ class MostsController extends AbstractActionController
         $yearsCatname = (string)$this->params()->fromQuery('years_catname');
         $carTypeCatname = (string)$this->params()->fromQuery('type_catname');
         $mostCatname = (string)$this->params()->fromQuery('rating_catname');
+        $brandID = (int)$this->params()->fromQuery('brand_id');
 
         $list = $this->mosts->getItems([
             'language' => $language,
             'most'     => $mostCatname,
             'years'    => $yearsCatname,
-            'carType'  => $carTypeCatname
+            'carType'  => $carTypeCatname,
+            'brandId'  => $brandID
         ]);
 
         // images
@@ -183,17 +193,12 @@ class MostsController extends AbstractActionController
 
     public function getMenuAction()
     {
-        /*$data = $this->mosts->getData([
-            'language' => $language,
-            'most'     => $mostCatname,
-            'years'    => $yearsCatname,
-            'carType'  => $carTypeCatname
-        ]);*/
+        $brandID = (int)$this->params()->fromQuery('brand_id');
 
         return new JsonModel([
             'years'         => $this->mosts->getYearsMenu(),
             'ratings'       => $this->mosts->getRatingsMenu(),
-            'vehilce_types' => $this->mosts->getCarTypes(0)
+            'vehilce_types' => $this->mosts->getCarTypes($brandID)
         ]);
     }
 }
