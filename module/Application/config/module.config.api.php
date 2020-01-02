@@ -2937,10 +2937,7 @@ return [
                             'item' => [
                                 'type' => 'Segment',
                                 'options' => [
-                                    'route'    => '/:id',
-                                    'defaults' => [
-                                        'action' => 'voting'
-                                    ],
+                                    'route' => '/:id',
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [

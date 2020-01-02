@@ -3,6 +3,7 @@
 namespace Autowp\Votings;
 
 use DateTime;
+use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Autowp\Commons\Db\Table\Row;
@@ -34,7 +35,13 @@ class Votings
         $this->voteTable = $voteTable;
     }
 
-    private function canVote($voting, int $userId)
+    /**
+     * @param $voting
+     * @param int $userId
+     * @return bool
+     * @throws Exception
+     */
+    private function canVote($voting, int $userId): bool
     {
         if (! $userId) {
             return false;
@@ -72,7 +79,14 @@ class Votings
         return true;
     }
 
-    public function getVoting(int $id, int $filter, int $userId)
+    /**
+     * @param int $id
+     * @param int $filter
+     * @param int $userId
+     * @return array|null
+     * @throws Exception
+     */
+    public function getVoting(int $id, int $filter, int $userId): ?array
     {
         $voting = $this->votingTable->select([
             'id' => $id
@@ -85,7 +99,7 @@ class Votings
         $variants = [];
         $vvRows = $this->variantTable->select(function (Sql\Select $select) use ($voting) {
             $select
-                ->where(['voting_id = ?' => $voting['id']])
+                ->where(['voting_id' => $voting['id']])
                 ->order('position');
         });
 
@@ -191,8 +205,9 @@ class Votings
      * @param int|array $variantId
      * @param int $userId
      * @return bool
+     * @throws Exception
      */
-    public function vote(int $id, $variantId, int $userId)
+    public function vote(int $id, $variantId, int $userId): bool
     {
         $voting = $this->votingTable->select([
             'id' => $id
