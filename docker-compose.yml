@@ -55,9 +55,9 @@ web:
     SENTRY_RELEASE: "dev"
     TRAFFIC_URL: http://traffic
     AUTOWP_FORCE_HTTPS: ""
-    AUTOWP_S3_KEY: ""
-    AUTOWP_S3_SECRET: ""
-    AUTOWP_S3_ENDPOINT: ""
+    AUTOWP_S3_KEY: 040JJYSRWKEG8FP4DCQE
+    AUTOWP_S3_SECRET: CC2secCLdW49LReoOXmhhXwBeZsbSIL3N0b5kWLp
+    AUTOWP_S3_ENDPOINT: http://amd:7480
     AUTOWP_IMAGE_FORMAT_BUCKET: dev-format
     AUTOWP_IMAGE_MUSEUM_BUCKET: dev-museum
     AUTOWP_IMAGE_USER_BUCKET: dev-user
@@ -72,6 +72,8 @@ web:
   - ./public_html:/app/public_html
   - ./vendor:/app/vendor
   - ./etc/nginx/conf.d:/etc/nginx/conf.d
+  #- ./etc/php/7.3/fpm/php-fpm.conf:/etc/php/7.3/fpm/php-fpm.conf
+  #- ./etc/php/7.3/fpm/pool.d/www.conf:/etc/php/7.3/fpm/pool.d/www.conf
   - ./etc/nginx/sites-available:/etc/nginx/sites-available
   - ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
   - ./composer.json:/app/composer.json
@@ -119,8 +121,8 @@ frontend:
   restart: always
   volumes:
   - "./frontend:/usr/share/nginx/html"
-  - "/home/dmitry/eclipse-workspace/autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
-  - "/home/dmitry/eclipse-workspace/autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
+  - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
+  - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
 
 rabbitmq:
   image: rabbitmq:management

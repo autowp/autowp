@@ -815,7 +815,11 @@ class ItemHydrator extends RestHydrator
 
                         $route = null;
                         foreach ($cataloguePaths as $cataloguePath) {
-                            $route = array_merge(['/', $cataloguePath['brand_catname'], $cataloguePath['car_catname']], $cataloguePath['path']);
+                            $route = array_merge([
+                                '/',
+                                $cataloguePath['brand_catname'],
+                                $cataloguePath['car_catname']
+                            ], $cataloguePath['path']);
                             break;
                         }
 
