@@ -10,7 +10,7 @@ return [
     ],
     'router' => [
         'routes' => [
-           'ng' => [
+            'ng' => [
                 'type' => 'Regex',
                 'options' => [
                     'regex'    => '/ng/(?<path>[/a-zA-Z0-9_-]+)?',
@@ -59,15 +59,6 @@ return [
                                 'action' => 'newcars',
                             ]
                         ]
-                    ]
-                ]
-            ],
-            'catalogue' => [
-                'type' => Router\Http\Catalogue::class,
-                'options' => [
-                    'defaults' => [
-                        'controller' => Controller\CatalogueController::class,
-                        'action'     => 'brand'
                     ]
                 ]
             ],

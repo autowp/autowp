@@ -50,7 +50,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\BrandsController::class          => Controller\Frontend\Service\BrandsControllerFactory::class,
-            Controller\CatalogueController::class       => Controller\Frontend\Service\CatalogueControllerFactory::class,
             Controller\CategoryController::class        => Controller\Frontend\Service\CategoryControllerFactory::class,
             Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
             Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,

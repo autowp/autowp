@@ -2,7 +2,6 @@
 
 namespace Application\View\Helper;
 
-use Application\Controller\CatalogueController;
 use Application\Controller\PictureController;
 use Exception;
 use Zend\Http\Exception\InvalidArgumentException;
@@ -54,6 +53,11 @@ class UserText extends AbstractHtmlElement
         $this->userModel = $userModel;
     }
 
+    /**
+     * @param $text
+     * @return array|string
+     * @throws Exception
+     */
     public function __invoke($text)
     {
         $out = [];
@@ -199,10 +203,6 @@ class UserText extends AbstractHtmlElement
             [
                 'controller' => PictureController::class,
                 'action'     => 'index'
-            ],
-            [
-                'controller' => CatalogueController::class,
-                'action'     => 'brand-item-picture'
             ]
         ];
 
