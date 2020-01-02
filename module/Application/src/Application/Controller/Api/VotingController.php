@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use Exception;
 use Zend\InputFilter\InputFilter;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -48,6 +49,10 @@ class VotingController extends AbstractRestfulController
         $this->variantVoteHydrator = $variantVoteHydrator;
     }
 
+    /**
+     * @return array|JsonModel
+     * @throws Exception
+     */
     public function getItemAction()
     {
         $id = (int)$this->params('id');

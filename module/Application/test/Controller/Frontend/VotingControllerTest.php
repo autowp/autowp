@@ -3,6 +3,7 @@
 namespace ApplicationTest\Frontend\Controller;
 
 use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Application\Controller\Api\VotingController;
@@ -29,12 +30,13 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
     {
         $tables = $this->getApplication()->getServiceManager()->get('TableManager');
 
+        /** @var $table TableGateway */
         $table = $tables->get('voting');
         $table->insert([
             'name'         => 'Test vote',
             'multivariant' => 0,
             'begin_date'   => new Sql\Expression('CURDATE()'),
-            'end_date'     => "2020-01-01",
+            'end_date'     => "2050-01-01",
             'votes'        => 0,
             'text'         => "Test vote text"
         ]);
@@ -57,6 +59,7 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
         ]);
         $variantId = $table->getLastInsertValue();
 
+        $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/voting/' . $id, Request::METHOD_PATCH, [
             'vote' => $variantId
