@@ -1,29 +1,30 @@
 var $ = require('jquery');
-var i18next = require('i18next');
+import i18next from 'i18next';
 
-var Widget = function(element) {
+var Widget = function (element) {
 
     var $element = $(element);
 
-    $element.on('click', '.btn-cancel-vote', function(e) {
+    $element.on('click', '.btn-cancel-vote', function (e) {
         e.preventDefault();
 
         $.ajax({
             method: 'DELETE',
             url: $(this).closest('[data-module]').data('url')
-        }).done(function() {
+        }).done(function () {
             window.location = window.location;
         });
     });
 
-    $element.on('click', '[data-vote]', function(e) {
+    $element.on('click', '[data-vote]', function (e) {
         e.preventDefault();
 
         var $this = $(this),
             reason = $this.data('reason'),
             vote = $this.data('vote');
 
-        function send(reason, vote, save, done) {
+        function send(reason, vote, save, done)
+        {
             $.ajax({
                 method: 'PUT',
                 url: $this.closest('[data-module]').data('url'),
@@ -36,7 +37,7 @@ var Widget = function(element) {
         }
 
         if (reason) {
-            send(reason, vote, 0, function() {
+            send(reason, vote, 0, function () {
                 window.location = window.location;
             });
         } else {
@@ -60,12 +61,12 @@ var Widget = function(element) {
                 $reason.focus();
             });
 
-            $btnSend.on('click', function() {
+            $btnSend.on('click', function () {
                 reason = $reason.val();
                 if (reason) {
                     // $(this).button('loading');
                     var save = $modal.find(':input[name=save]').val();
-                    send(reason, vote, save, function() {
+                    send(reason, vote, save, function () {
                         $modal.modal('hide');
                         window.location = window.location;
                     });
@@ -75,11 +76,10 @@ var Widget = function(element) {
             $modal.modal({
                 show: true
             });
-
         }
     });
 };
 
-module.exports = function(element) {
+module.exports = function (element) {
     new Widget(element);
 };

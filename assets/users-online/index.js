@@ -1,15 +1,16 @@
 var $ = require('jquery');
-var i18next = require('i18next');
+import i18next from 'i18next';
 
 export function bind(element) {
-    $(element).each(function() {
+    $(element).each(function () {
         var
             $modal = null,
             $body = null,
             $btnRefresh = null,
             url = '/api/user/online';
 
-        function reload() {
+        function reload()
+        {
             if (!$modal) {
                 $modal = $(require('./online.html'));
 
@@ -18,7 +19,7 @@ export function bind(element) {
                 $modal.find('.btn-secondary').text(i18next.t("dialog/close"));
 
                 $body = $modal.find('.modal-body');
-                $btnRefresh = $modal.find('.btn-primary').on('click', function(e) {
+                $btnRefresh = $modal.find('.btn-primary').on('click', function (e) {
                     e.preventDefault();
                     reload();
                 });
@@ -27,9 +28,9 @@ export function bind(element) {
             $modal.modal();
 
             // $btnRefresh.button('loading');
-            $.get(url, {}, function(response) {
+            $.get(url, {}, function (response) {
                 $body.empty();
-                $.map(response.items, function(user) {
+                $.map(response.items, function (user) {
                     var $e = $('<span class="user"><i class="fa fa-user"></i> </span>')
                         .toggleClass('muted', !!user.deleted)
                         .toggleClass('long-away', !!user.long_away)
@@ -48,7 +49,7 @@ export function bind(element) {
             });
         }
 
-        $(this).on('click', function(e) {
+        $(this).on('click', function (e) {
             e.preventDefault();
             reload();
         });
