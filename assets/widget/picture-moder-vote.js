@@ -1,9 +1,10 @@
 var $ = require('jquery');
-import i18next from 'i18next';
+var i18next = require('i18next').default;
 
-var Widget = function (element) {
+const Widget = function (element) {
+    "use strict";
 
-    var $element = $(element);
+    const $element = $(element);
 
     $element.on('click', '.btn-cancel-vote', function (e) {
         e.preventDefault();
@@ -19,7 +20,7 @@ var Widget = function (element) {
     $element.on('click', '[data-vote]', function (e) {
         e.preventDefault();
 
-        var $this = $(this),
+        let $this = $(this),
             reason = $this.data('reason'),
             vote = $this.data('vote');
 
