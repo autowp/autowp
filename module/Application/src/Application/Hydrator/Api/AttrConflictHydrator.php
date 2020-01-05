@@ -109,8 +109,6 @@ class AttrConflictHydrator extends RestHydrator
             );
         }
 
-        $result['url'] = '/ng/cars/specifications-editor?item_id=' . $object['item_id'];
-
         if ($this->filterComposite->filter('values')) {
             $userValueTable = $this->specService->getUserValueTable();
 

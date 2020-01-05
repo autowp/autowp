@@ -3,11 +3,6 @@
 namespace Application;
 
 return [
-    'route_manager' => [
-        'factories' => [
-            Router\Http\Catalogue::class => Router\Http\CatalogueFactory::class
-        ]
-    ],
     'router' => [
         'routes' => [
             'ng' => [
@@ -41,95 +36,6 @@ return [
                     ],
                 ],
             ],
-            'brands' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/brands',
-                    'defaults' => [
-                        'controller' => Controller\BrandsController::class,
-                    ],
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'newcars' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route'  => '/newcars/:brand_id',
-                            'defaults' => [
-                                'action' => 'newcars',
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            'category-newcars' => [
-                'type' => 'Segment',
-                'options' => [
-                    'route'  => '/category/newcars/:item_id',
-                    'defaults' => [
-                        'controller' => Controller\CategoryController::class,
-                        'action'     => 'newcars',
-                    ]
-                ]
-            ],
-            'comments' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/comments',
-                    'defaults' => [
-                        'controller' => Controller\CommentsController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'add' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/add/type_id/:type_id/item_id/:item_id',
-                            'defaults' => [
-                                'action' => 'add',
-                            ],
-                        ]
-                    ],
-                    'delete' => [
-                        'type' => 'Literal',
-                        'options' => [
-                            'route'    => '/delete',
-                            'defaults' => [
-                                'action' => 'delete',
-                            ]
-                        ]
-                    ],
-                    'restore' => [
-                        'type' => 'Literal',
-                        'options' => [
-                            'route'    => '/restore',
-                            'defaults' => [
-                                'action' => 'restore',
-                            ]
-                        ]
-                    ],
-                    'vote' => [
-                        'type' => 'Literal',
-                        'options' => [
-                            'route'    => '/vote',
-                            'defaults' => [
-                                'action' => 'vote',
-                            ]
-                        ]
-                    ],
-                    'votes' => [
-                        'type' => 'Literal',
-                        'options' => [
-                            'route'    => '/votes',
-                            'defaults' => [
-                                'action' => 'votes',
-                            ]
-                        ]
-                    ]
-                ]
-            ],
             'donate-success' => [
                 'type' => 'Literal',
                 'options' => [
@@ -138,38 +44,6 @@ return [
                         'controller' => Controller\DonateController::class,
                         'action'     => 'success',
                     ],
-                ]
-            ],
-            'factories' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/factory',
-                    'defaults' => [
-                        'controller' => Controller\FactoriesController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'newcars' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route'  => '/newcars/:item_id',
-                            'defaults' => [
-                                'action' => 'newcars',
-                            ]
-                        ]
-                    ],
-                ]
-            ],
-            'inbox' => [ // TODO: delete
-                'type'    => 'Segment',
-                'options' => [
-                    'route' => '/inbox[/:brand][/:date][/page:page][/]',
-                    'defaults' => [
-                        'controller' => Controller\InboxController::class,
-                        'action'     => 'index'
-                    ]
                 ]
             ],
             'login' => [
@@ -191,27 +65,6 @@ return [
                             ],
                         ]
                     ]
-                ]
-            ],
-            'picture' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/picture',
-                    'defaults' => [
-                        'controller' => Controller\PictureController::class,
-                    ],
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'picture' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route'    => '/[:picture_id]',
-                            'defaults' => [
-                                'action' => 'index',
-                            ],
-                        ],
-                    ],
                 ]
             ],
             'telegram-webhook' => [
@@ -245,7 +98,6 @@ return [
                     ]
                 ]
             ],
-
         ]
     ]
 ];

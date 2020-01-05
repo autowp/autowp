@@ -120,14 +120,14 @@ class ListBuilder
 
     /**
      * @param ArrayObject|array $item
-     * @return string|NULL
+     * @return array|null
      */
-    public function getSpecificationsUrl($item)
+    public function getSpecificationsRoute($item): ?array
     {
         $hasSpecs = $this->specsService->hasSpecs($item['id']);
 
         if (! $hasSpecs) {
-            return false;
+            return null;
         }
 
         $cataloguePaths = $this->getCataloguePath($item, [
@@ -135,14 +135,7 @@ class ListBuilder
             'breakOnFirst' => true
         ]);
         foreach ($cataloguePaths as $path) {
-            return $this->router->assemble([
-                'action'        => 'brand-item-specifications',
-                'brand_catname' => $path['brand_catname'],
-                'car_catname'   => $path['car_catname'],
-                'path'          => $path['path']
-            ], [
-                'name' => 'catalogue'
-            ]);
+            return array_merge(['/', $path['brand_catname'], $path['car_catname']], $path['path']);
         }
 
         return null;

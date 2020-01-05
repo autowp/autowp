@@ -219,11 +219,15 @@ class PictureController extends AbstractRestfulController
 
         if ($pictureRow) {
             $imageInfo = $this->imageStorage()->getImage($pictureRow['image_id']);
+
+            $uri = $this->hostManager->getUriByLanguage($this->language());
+            $uri->setPath('/picture/' . urlencode($pictureRow['identity']));
+
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->pic()->url($pictureRow['identity'], true)
+                'page'   => $uri->toString()
             ];
         }
 
@@ -249,11 +253,15 @@ class PictureController extends AbstractRestfulController
 
         if ($pictureRow) {
             $imageInfo = $this->imageStorage()->getImage($pictureRow['image_id']);
+
+            $uri = $this->hostManager->getUriByLanguage($this->language());
+            $uri->setPath('/picture/' . urlencode($pictureRow['identity']));
+
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->pic()->url($pictureRow['identity'], true)
+                'page'   => $uri->toString()
             ];
         }
 
@@ -305,11 +313,15 @@ class PictureController extends AbstractRestfulController
 
         if ($pictureRow) {
             $imageInfo = $this->imageStorage()->getImage($pictureRow['image_id']);
+
+            $uri = $this->hostManager->getUriByLanguage($this->language());
+            $uri->setPath('/picture/' . urlencode($pictureRow['identity']));
+
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->pic()->url($pictureRow['identity'], true)
+                'page'   => $uri->toString()
             ];
         }
 
@@ -836,9 +848,11 @@ class PictureController extends AbstractRestfulController
                             if ($owner && ($owner['id'] != $user['id'])) {
                                 $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
+                                $uri->setPath('/picture/' . urlencode($picture['identity']));
+
                                 $message = sprintf(
                                     $this->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
-                                    $this->pic()->url($picture['identity'], true, $uri)
+                                    $uri->toString()
                                 );
 
                                 $this->message->send(null, $owner['id'], $message);
@@ -852,9 +866,13 @@ class PictureController extends AbstractRestfulController
                     if ($previousStatusUserId != $user['id']) {
                         $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
                         if ($prevUser) {
+                            $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
+
+                            $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
+
                             $message = sprintf(
                                 'Принята картинка %s',
-                                $this->pic()->url($picture['identity'], true)
+                                $uri->toString()
                             );
                             $this->message->send(null, $prevUser['id'], $message);
                         }
@@ -910,13 +928,16 @@ class PictureController extends AbstractRestfulController
                             'pictures' => $picture['id']
                         ]);
 
-                        $pictureUrl = $this->pic()->url($picture['identity'], true);
                         if ($previousStatusUserId != $user['id']) {
                             $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
                             if ($prevUser) {
+                                $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
+
+                                $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
+
                                 $message = sprintf(
                                     'С картинки %s снят статус "принято"',
-                                    $pictureUrl
+                                    $uri->toString()
                                 );
                                 $this->message->send(null, $prevUser['id'], $message);
                             }
@@ -951,9 +972,11 @@ class PictureController extends AbstractRestfulController
                             }
                         }
 
+                        $uri->setPath('/picture/' . urlencode($picture['identity']));
+
                         $message = sprintf(
                             $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner['language']),
-                            $this->pic()->url($picture['identity'], true, $uri),
+                            $uri->toString(),
                             implode("\n", $reasons)
                         );
 
@@ -1314,8 +1337,8 @@ class PictureController extends AbstractRestfulController
             foreach ($recepients as $recepient) {
                 $uri = $this->hostManager->getUriByLanguage($recepient['language']);
 
-                $url = $this->pic()->url($picture['identity'], true, $uri);
-                $replaceUrl = $this->pic()->url($replacePicture['identity'], true, $uri);
+                $url = $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
+                $replaceUrl = $uri->setPath('/picture/' . urlencode($replacePicture['identity']))->toString();
 
                 $moderUrl = $this->url()->fromRoute('ng', ['path' => ''], [
                     'force_canonical' => true,

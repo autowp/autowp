@@ -143,13 +143,16 @@ class PictureModerVoteController extends AbstractRestfulController
             'pictures' => $picture['id']
         ]);
 
-        $pictureUrl = $this->pic()->url($picture['identity'], true);
         if ($previousStatusUserId != $user['id']) {
             $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
             if ($prevUser) {
+                $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
+
+                $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
+
                 $message = sprintf(
                     'С картинки %s снят статус "принято"',
-                    $pictureUrl
+                    $uri->toString()
                 );
                 $this->message->send(null, $prevUser['id'], $message);
             }

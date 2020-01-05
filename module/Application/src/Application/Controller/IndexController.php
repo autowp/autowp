@@ -3,14 +3,11 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-use Application\Controller\Plugin\Pic;
 
 /**
  * Class IndexController
  * @package Application\Controller
  *
- * @method Pic pic()
- * @method string language()
  */
 class IndexController extends AbstractActionController
 {

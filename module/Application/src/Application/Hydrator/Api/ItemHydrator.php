@@ -414,8 +414,8 @@ class ItemHydrator extends RestHydrator
             $result['engine_inherit'] = (bool) $object['engine_inherit'];
         }
 
-        if ($this->filterComposite->filter('specs_url')) {
-            $result['specs_url'] = $listBuilder->getSpecificationsUrl($object);
+        if ($this->filterComposite->filter('specs_route')) {
+            $result['specs_route'] = $listBuilder->getSpecificationsRoute($object);
         }
 
         if ($this->filterComposite->filter('can_edit_specs')) {

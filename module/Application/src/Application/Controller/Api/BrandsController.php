@@ -88,18 +88,6 @@ class BrandsController extends AbstractActionController
         $items = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $items = $this->brand->getFullBrandsList($language);
-
-            foreach ($items as &$line) {
-                foreach ($line as &$char) {
-                    foreach ($char['brands'] as &$item) {
-                        $item['new_cars_url'] = $this->url()->fromRoute('brands/newcars', [
-                            'brand_id' => $item['id'],
-                        ]);
-                    }
-                }
-            }
-            unset($line, $char, $item);
-
             $this->cache->setItem($cacheKey, $items);
         }
 
@@ -441,5 +429,46 @@ class BrandsController extends AbstractActionController
         }
 
         return $select;
+    }
+
+    /**
+     * @return ViewModel
+     * @throws Exception
+     */
+    public function newItemsAction()
+    {
+        $brand = $this->itemModel->getRow([
+            'item_type_id' => Item::BRAND,
+            'id'           => (int)$this->params()->fromRoute('id')
+        ]);
+
+        if (! $brand) {
+            return $this->notFoundAction();
+        }
+
+        $language = $this->language();
+
+        $langName = $this->itemModel->getName($brand['id'], $language);
+
+        $carList = $this->itemModel->getRows([
+            'ancestor'        => $brand['id'],
+            'created_in_days' => 7,
+            'limit'           => 30,
+            'order'           => 'item.add_datetime DESC'
+        ]);
+
+        $cars = [];
+        foreach ($carList as $car) {
+            $cars[] = $this->itemModel->getNameData($car, $language);
+        }
+
+        $viewModel = new ViewModel([
+            'brand'     => $brand,
+            'carList'   => $cars,
+            'name'      => $langName ? $langName : $brand['name']
+        ]);
+        $viewModel->setTerminal(true);
+
+        return $viewModel;
     }
 }

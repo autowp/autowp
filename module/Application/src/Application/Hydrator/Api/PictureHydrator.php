@@ -325,11 +325,7 @@ class PictureHydrator extends RestHydrator
         $picture = [
             'id'             => (int)$object['id'],
             'identity'       => (string)$object['identity'],
-            'url'            => $this->router->assemble([
-                'picture_id' => $object['identity']
-            ], [
-                'name' => 'picture/picture'
-            ]),
+            'url'            => '/ng/picture/' . urlencode($object['identity']),
             'resolution'     => (int)$object['width'] . '×' . (int)$object['height'],
             'status'         => $object['status'],
             'owner_id'       => $object['owner_id'] ? (int)$object['owner_id'] : null,

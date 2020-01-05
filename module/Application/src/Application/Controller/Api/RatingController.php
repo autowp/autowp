@@ -100,11 +100,8 @@ class RatingController extends AbstractActionController
                             'item_type_id' => Item::BRAND
                         ]);
                         $brands[] = [
-                            'name' => $row['name'],
-                            'url'  => $this->url()->fromRoute('catalogue', [
-                                'action'        => 'brand',
-                                'brand_catname' => $row['catname']
-                            ]),
+                            'name'  => $row['name'],
+                            'route' => ['/', $row['catname']],
                             'value' => $value
                         ];
                     }
@@ -164,11 +161,8 @@ class RatingController extends AbstractActionController
 
                     foreach ($rows as $brand) {
                         $brands[] = [
-                            'name' => $brand['name'],
-                            'url'  => $this->url()->fromRoute('catalogue', [
-                                'action'        => 'brand',
-                                'brand_catname' => $brand['catname']
-                            ]),
+                            'name'  => $brand['name'],
+                            'route' => ['/', $brand['catname']],
                         ];
                     }
                 }

@@ -133,7 +133,7 @@ class UserHydrator extends RestHydrator
                 'id'        => (int)$object['id'],
                 'name'      => $object['name'],
                 'deleted'   => $deleted,
-                'url'       => '/ng/users/' . ($object['identity'] ? $object['identity'] : 'user' . $object['id']),
+                'route'     => ['/users', ($object['identity'] ? $object['identity'] : 'user' . $object['id'])],
                 'long_away' => $longAway,
                 'green'     => $isGreen,
                 'identity'  => $object['identity']

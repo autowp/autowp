@@ -122,17 +122,8 @@ class IndexController extends AbstractRestfulController
         $brands = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             // cache missing
-
-            $items = $this->brand->getTopBrandsList($language);
-            foreach ($items as &$item) {
-                $item['new_cars_url'] = $this->url()->fromRoute('brands/newcars', [
-                    'brand_id' => $item['id']
-                ]);
-            }
-            unset($item);
-
             $brands = [
-                'brands' => $items,
+                'brands' => $this->brand->getTopBrandsList($language),
                 'total'  => $this->item->getCount([
                     'item_type_id' => Item::BRAND
                 ])
@@ -210,13 +201,6 @@ class IndexController extends AbstractRestfulController
         $categories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $categories = $this->categories->getCategoriesList(null, $language, 15, 'name');
-
-            foreach ($categories as &$category) {
-                $category['new_cars_url'] = $this->url()->fromRoute('category-newcars', [
-                    'item_id' => $category['id']
-                ]);
-            }
-            unset($category);
 
             $this->cache->setItem($cacheKey, $categories);
         }
@@ -346,7 +330,7 @@ class IndexController extends AbstractRestfulController
                 'engine_vehicles' => true,
                 'url' => true,
                 'can_edit_specs' => true,
-                'specs_url' => true,
+                'specs_route' => true,
                 'more_pictures_url' => true,
                 'categories' => [
                     'catname'   => true,
@@ -442,23 +426,14 @@ class IndexController extends AbstractRestfulController
 
                         foreach ($cataloguePaths as $path) {
                             if ($path['type'] == 'brand') {
-                                $url = $this->router->assemble([
-                                    'action'        => 'brand',
-                                    'brand_catname' => $path['brand_catname'],
-                                ], [
-                                    'name' => 'catalogue'
-                                ]);
+                                $route = ['/', $path['brand_catname']];
                             } else {
-                                $url = $this->router->assemble([
-                                    'action'        => 'brand-item-pictures',
-                                    'brand_catname' => $path['brand_catname'],
-                                    'car_catname'   => $path['car_catname'],
-                                    'path'          => $path['path']
-                                ], [
-                                    'name' => 'catalogue'
-                                ]);
+                                $route = array_merge(
+                                    ['/', $path['brand_catname'], $path['car_catname']],
+                                    $path['path']
+                                );
                             }
-                            $item['public_url'] = $url;
+                            $item['public_route'] = $route;
                             break;
                         }
                     }

@@ -200,10 +200,7 @@ class UserText extends AbstractHtmlElement
     private function tryPictureLinkParams(array $params)
     {
         $map = [
-            [
-                'controller' => PictureController::class,
-                'action'     => 'index'
-            ]
+
         ];
 
         $pictureId = null;

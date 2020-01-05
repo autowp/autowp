@@ -49,14 +49,8 @@ $mailTransport = $mailTypes[$mailType];
 return [
     'controllers' => [
         'factories' => [
-            Controller\BrandsController::class          => Controller\Frontend\Service\BrandsControllerFactory::class,
-            Controller\CategoryController::class        => Controller\Frontend\Service\CategoryControllerFactory::class,
-            Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
             Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,
-            Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,
             Controller\IndexController::class           => InvokableFactory::class,
-            Controller\InboxController::class           => InvokableFactory::class,
-            Controller\PictureController::class         => Controller\Frontend\PictureControllerFactory::class,
             Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
             Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,
             Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,
@@ -77,7 +71,6 @@ return [
             'oauth2'      => Factory\OAuth2PluginFactory::class,
             'pic'         => Controller\Plugin\Service\PicFactory::class,
             'pictureVote' => Controller\Plugin\Service\PictureVoteFactory::class,
-            'sidebar'     => Controller\Plugin\Service\SidebarFactory::class,
             'translate'   => Controller\Plugin\Service\TranslateFactory::class,
         ]
     ],

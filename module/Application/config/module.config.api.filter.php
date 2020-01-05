@@ -1591,7 +1591,7 @@ return [
                         'options' => ['fields' => ['childs_count', 'childs_counts', 'name_html',
                             'name_text', 'name_default', 'name_only', 'other_names', 'description', 'text',
                             'has_text', 'brands',
-                            'spec_editor_url', 'specs_url', 'categories',
+                            'spec_editor_url', 'specs_route', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
                             'catname', 'is_concept', 'spec_id', 'begin_year',

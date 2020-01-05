@@ -167,9 +167,11 @@ class CatalogueController extends AbstractActionController
                         $uri = UriFactory::factory('https://www.autowp.ru');
                     }
 
+                    $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
+
                     $message = sprintf(
                         $this->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
-                        $this->pic()->url($picture['identity'], true, $uri)
+                        $uri->toString()
                     );
 
                     $this->message->send(null, $owner['id'], $message);
@@ -181,9 +183,13 @@ class CatalogueController extends AbstractActionController
             if ($previousStatusUserId != $userId) {
                 $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
                 if ($prevUser) {
+                    $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
+
+                    $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
+
                     $message = sprintf(
                         'Принята картинка %s',
-                        $this->pic()->url($picture['identity'], true)
+                        $uri->toString()
                     );
                     $this->message->send(null, $prevUser['id'], $message);
                 }

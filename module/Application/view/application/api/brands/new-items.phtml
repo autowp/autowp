@@ -1,14 +1,11 @@
 <?php if (count($this->carList)) { ?>
     <?php if ($this->brand['logo_id']) { ?>
-        <?=$this->htmlA($this->url('catalogue', [
-            'action'        => 'brand',
-            'brand_catname' => $this->brand['catname']
-        ]), $this->img($this->brand['logo_id'], [
+        <?=$this->img($this->brand['logo_id'], [
             'alt'    => '',
             'title'  => $this->name,
             'style'  => "float:right;margin:0 0 5px 5px",
             'format' => 'brandicon2'
-        ]), false)?>
+        ])?>
     <?php } ?>
     <?php foreach ($this->carList as $car) {?>
         <p><?=$this->car()->htmlTitle($car)?></p>

@@ -633,20 +633,17 @@ return [
                                     ],
                                 ],
                             ],
-                            'sections' => [
+                            'item' => [
                                 'type' => 'Segment',
                                 'options' => [
-                                    'route'    => '/:id',
-                                    'defaults' => [
-                                        'action'     => 'sections'
-                                    ],
+                                    'route' => '/:id',
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
                                     'sections' => [
                                         'type' => 'Literal',
                                         'options' => [
-                                            'route'    => '/sections',
+                                            'route' => '/sections',
                                         ],
                                         'may_terminate' => false,
                                         'child_routes'  => [
@@ -656,6 +653,24 @@ return [
                                                     'verb'    => 'get',
                                                     'defaults' => [
                                                         'action' => 'sections'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ],
+                                    'new-items' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route'  => '/new-items',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes'  => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'new-items',
                                                     ]
                                                 ]
                                             ],

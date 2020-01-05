@@ -114,9 +114,8 @@ class Categories
             $langName = $this->itemModel->getName($item['id'], $language);
 
             $category = [
-                'id'             => $item['id'],
+                'id'             => (int) $item['id'],
                 'catname'        => $item['catname'],
-                'url'            => '/ng/category/' . urlencode($item['catname']),
                 'name'           => $langName ? $langName : $item['name'],
                 'short_name'     => $langName ? $langName : $item['name'],
                 'cars_count'     => $item['cars_count'],

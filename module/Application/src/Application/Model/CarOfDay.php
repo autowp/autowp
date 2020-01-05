@@ -519,50 +519,27 @@ class CarOfDay
         $result = [];
         foreach ($carOfDayPictures as $idx => $row) {
             if ($row) {
-                $url = null;
+                $route = null;
                 foreach ($paths as $path) {
                     switch ($path['type']) {
                         case 'brand':
-                            $url = $this->router->assemble([
-                                'picture_id' => $row['identity']
-                            ], [
-                                'name' => 'picture/picture'
-                            ]);
+                            $route = ['/picture', $row['identity']];
                             break;
                         case 'brand-item':
-                            $url = $this->router->assemble([
-                                'action'        => 'brand-item-picture',
-                                'brand_catname' => $path['brand_catname'],
-                                'car_catname'   => $path['car_catname'],
-                                'path'          => $path['path'],
-                                'picture_id'    => $row['identity']
-                            ], [
-                                'name' => 'catalogue'
-                            ]);
+                            $route = array_merge(
+                                ['/', $path['brand_catname'], $path['car_catname']],
+                                $path['path'],
+                                ['pictures',  $row['identity']]
+                            );
                             break;
                         case 'category':
-                            $url = '/ng/category/' . urlencode($path['category_catname']) .
-                                   '/pictures/' . urlencode($row['identity']);
+                            $route = ['/category', $path['category_catname'], 'pictures', $row['identity']];
                             break;
                         case 'person':
-                            $url = '/ng/persons/' . $path['id'];
+                            $route = ['/persons', $path['id']];
                             break;
                     }
                 }
-
-                /*if (! $url) {
-                 foreach ($categoryPaths as $path) {
-                 $url = $this->router->assemble([
-                 'action'           => 'category-picture',
-                 'category_catname' => $path['category_catname'],
-                 'item_id'          => $path['item_id'],
-                 'path'             => $path['path'],
-                 'picture_id'       => $row['identity']
-                 ], [
-                 'name' => 'categories'
-                 ]);
-                 }
-                 }*/
 
                 $format = $idx == 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
                 $thumb = isset($imagesInfo[$format][$idx]) ? $imagesInfo[$format][$idx] : null;
@@ -578,27 +555,12 @@ class CarOfDay
                     'name' => isset($names[$row['id']])
                         ? $this->pictureNameFormatter->format($names[$row['id']], $language)
                         : null,
-                    'url'  => $url
+                    'url'  => $route
                 ];
             }
         }
 
         return $result;
-    }
-
-    public function getItemOfDay(int $itemId, $userId, string $language)
-    {
-        $carOfDay = $this->itemModel->getRow([
-            'id' => (int)$itemId
-        ]);
-
-        return [
-            'itemTypeId' => $carOfDay['item_type_id'],
-            'name'       => $this->itemModel->getNameData($carOfDay, $language),
-            'pictures'   => $this->getItemOfDayPictures($itemId, $language),
-            'links'      => $this->carLinks($carOfDay, $language),
-            'userId'     => $userId
-        ];
     }
 
     /**
@@ -690,121 +652,6 @@ class CarOfDay
         }
 
         return $pictures;
-    }
-
-    private function carLinks($car, $language)
-    {
-        $items = [];
-
-        $totalPictures = $this->picture->getCount([
-            'status' => Picture::STATUS_ACCEPTED,
-            'item' => [
-                'ancestor_or_self' => $car['id']
-            ]
-        ]);
-
-        if ($car['item_type_id'] == Item::CATEGORY) {
-            $items[] = [
-                'icon'  => 'align-left',
-                'url'   => '/ng/category/' . urlencode($car['catname']),
-                'text'  => $this->translator->translate('carlist/details')
-            ];
-
-            if ($totalPictures > 6) {
-                $items[] = [
-                    'icon'  => 'th',
-                    'url'   => '/ng/category/' . urlencode($car['catname']) . '/pictures',
-                    'text'  => $this->translator->translate('carlist/all pictures'),
-                    'count' => $totalPictures
-                ];
-            }
-        } else {
-            $cataloguePaths = $this->catalogue->getCataloguePaths($car['id']);
-
-            if ($totalPictures > 6) {
-                foreach ($cataloguePaths as $path) {
-                    if ($path['type'] == 'brand') {
-                        $url = $this->router->assemble([
-                            'action'        => 'brand',
-                            'brand_catname' => $path['brand_catname'],
-                        ], [
-                            'name' => 'catalogue'
-                        ]);
-                        $items[] = [
-                            'icon'  => 'th',
-                            'url'   => $url,
-                            'text'  => $this->translator->translate('carlist/details'),
-                            'count' => $totalPictures
-                        ];
-                    } else {
-                        $url = $this->router->assemble([
-                            'action' => 'brand-item-pictures',
-                            'brand_catname' => $path['brand_catname'],
-                            'car_catname' => $path['car_catname'],
-                            'path' => $path['path']
-                        ], [
-                            'name' => 'catalogue'
-                        ]);
-                        $items[] = [
-                            'icon'  => 'th',
-                            'url'   => $url,
-                            'text'  => $this->translator->translate('carlist/all pictures'),
-                            'count' => $totalPictures
-                        ];
-                    }
-                    break;
-                }
-            }
-
-            if ($this->specsService->hasSpecs($car['id'])) {
-                foreach ($cataloguePaths as $path) {
-                    $items[] = [
-                        'icon'  => 'list-alt',
-                        'url'   => $this->router->assemble([
-                            'action'        => 'brand-item-specifications',
-                            'brand_catname' => $path['brand_catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path']
-                        ], [
-                            'name' => 'catalogue'
-                        ]),
-                        'text'  => $this->translator->translate('carlist/specifications')
-                    ];
-                    break;
-                }
-            }
-
-            foreach ($this->twins->getCarGroups($car['id']) as $twinsGroup) {
-                $items[] = [
-                    'icon'  => 'adjust',
-                    'url'   => '/ng/twins/group/' . $twinsGroup['id'],
-                    'text'  => $this->translator->translate('carlist/twins')
-                ];
-            }
-
-            $categoryRows = $this->itemModel->getRows([
-                'language'     => $language,
-                'columns'      => ['catname', 'name'],
-                'item_type_id' => Item::CATEGORY,
-                'child'        => [
-                    'item_type_id' => [Item::VEHICLE, Item::ENGINE],
-                    'descendant'   => $car['id']
-                ]
-            ]);
-
-            foreach ($categoryRows as $category) {
-                $items[] = [
-                    'icon'  => 'tag',
-                    'url'   => '/ng/category/' . urlencode($category['catname']),
-                    'text'  => $this->itemNameFormatter->format(
-                        $category,
-                        $language
-                    )
-                ];
-            }
-        }
-
-        return $items;
     }
 
     public function isComplies(int $itemId): bool

@@ -278,14 +278,9 @@ class TelegramService
     private function getPictureUrl($chatId, $picture)
     {
         $uri = $this->getUriByChatId($chatId);
+        $uri->setPath('/picture/' . urlencode($picture['identity']));
 
-        return $this->router->assemble([
-            'picture_id' => $picture['identity']
-        ], [
-            'name'            => 'picture/picture',
-            'force_canonical' => true,
-            'uri'             => $uri
-        ]);
+        return $uri->toString();
     }
 
     private function getUriByChatId($chatId)
@@ -329,17 +324,17 @@ class TelegramService
         ]);
 
         foreach ($chatRows as $chatRow) {
-            $url = $this->router->assemble(['path' => ''], [
-                'name'            => 'ng',
-                'force_canonical' => true,
-                'uri'             => $this->getUriByChatId($chatRow['chat_id'])
-            ]) . 'account/messages' . ($fromId ? '' : '?folder=system');
+            $uri = $this->getUriByChatId($chatRow['chat_id']);
+            $uri->setPath('/account/messages');
+            if (! $fromId) {
+                $uri->setQuery(['folder' => 'system']);
+            }
 
             $telegramMessage = sprintf(
                 "%s: \n%s\n\n%s",
                 $fromName,
                 $text,
-                $url
+                $uri->toString()
             );
 
             $this->sendMessage([

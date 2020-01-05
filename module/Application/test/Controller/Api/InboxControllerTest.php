@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Frontend\Controller;
+namespace ApplicationTest\Frontend\Controller\Api;
 
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\InboxController;

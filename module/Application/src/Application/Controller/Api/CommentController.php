@@ -480,7 +480,7 @@ class CommentController extends AbstractRestfulController
                 if ($parentMessageAuthor && ! $parentMessageAuthor['deleted']) {
                     $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor['language']);
 
-                    $url = $this->comments->getMessageUrl($messageId, true, $uri) . '#msg' . $messageId;
+                    $url = $this->comments->getMessageUrl($messageId, $uri) . '#msg' . $messageId;
                     $moderUrl = $this->url()->fromRoute('ng', ['path' => ''], [
                         'force_canonical' => true,
                         'uri'             => $uri

@@ -649,7 +649,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
             'fields' => 'childs_count,name_html,name_text,name_default,description,' .
-                'has_text,brands,spec_editor_url,specs_url,categories,' .
+                'has_text,brands,spec_editor_url,specs_route,categories,' .
                 'twins_groups,url,more_pictures_url,preview_pictures,design,' .
                 'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
             'limit'  => 100
@@ -664,5 +664,59 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
 
         $this->assertNotEmpty($json['items']);
+    }
+
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
+    public function testCreateCategoryAddItemAndGet()
+    {
+        $catname = 'catname-' . (10000 * microtime(true));
+
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
+            'item_type_id' => 3,
+            'name'         => 'Test category',
+            'catname'      => $catname,
+            'begin_year'   => 2000,
+            'end_year'     => 2000
+        ]);
+
+        $this->assertResponseStatusCode(201);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/post');
+        $this->assertActionName('post');
+
+        $this->assertHasResponseHeader('Location');
+
+        $header = $this->getResponse()->getHeaders()->get('Location');
+        $path = $header->uri()->getPath();
+
+        $this->assertStringStartsWith('/api/item/', $path);
+
+        $path = explode('/', $path);
+        $categoryId = (int)array_pop($path);
+
+        $this->assertNotEmpty($categoryId);
+
+        // add item to category
+        $this->reset();
+
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch(
+            'https://www.autowp.ru/api/item-parent',
+            Request::METHOD_POST,
+            [
+                'item_id'   => 1,
+                'parent_id' => $categoryId
+            ]
+        );
+
+        $this->assertResponseStatusCode(201);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemParentController::class);
+        $this->assertMatchedRouteName('api/item-parent/post');
+        $this->assertActionName('post');
     }
 }

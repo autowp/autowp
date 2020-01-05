@@ -87,7 +87,7 @@ class Comments
         $this->userModel = $userModel;
     }
 
-    public function getMessageUrl($messageId, $canonical = false, $uri = null)
+    public function getMessageUrl(int $messageId, $uri)
     {
         $message = $this->service->getMessageRow($messageId);
 
@@ -95,10 +95,22 @@ class Comments
             throw new InvalidArgumentException("Message `$messageId` not found");
         }
 
-        return $this->getMessageRowUrl($message, $canonical, $uri);
+        return $this->getMessageRowUrl($message, true, $uri);
     }
 
-    public function getMessageRowUrl($message, $canonical = false, $uri = null)
+    public function getMessageRowUrl($message, $canonical = false, $uri = null): string
+    {
+        $path = $this->getMessageRowPath($message, $canonical, $uri);
+        if (! $canonical || ! $uri) {
+            return $path;
+        }
+
+        $uri->setPath($path);
+
+        return $uri->toString();
+    }
+
+    public function getMessageRowPath($message)
     {
         $url = null;
 
@@ -109,13 +121,7 @@ class Comments
                     throw new Exception("Picture `{$message['item_id']}` not found");
                 }
 
-                $url = $this->router->assemble([
-                    'picture_id' => $picture['identity']
-                ], [
-                    'name'            => 'picture/picture',
-                    'force_canonical' => $canonical,
-                    'uri'             => $uri
-                ]);
+                $url = '/picture/' . urlencode($picture['identity']);
                 break;
 
             case self::ITEM_TYPE_ID:
@@ -125,20 +131,10 @@ class Comments
                 }
                 switch ($item['item_type_id']) {
                     case Item::TWINS:
-                        $url = $this->router->assemble([
-                            'id' => $item['id']
-                        ], [
-                            'name'            => 'ng',
-                            'force_canonical' => $canonical,
-                            'uri'             => $uri
-                        ]) . 'twins/group/' . $item['id'];
+                        $url = '/twins/group/' . $item['id'];
                         break;
                     case Item::MUSEUM:
-                        $url = $this->router->assemble([], [
-                            'name'            => 'ng',
-                            'force_canonical' => $canonical,
-                            'uri'             => $uri
-                        ]) . 'museums/' . $item['id'];
+                        $url = '/museums/' . $item['id'];
                         break;
                     default:
                         throw new Exception(sprintf(
@@ -150,13 +146,7 @@ class Comments
                 break;
 
             case self::VOTINGS_TYPE_ID:
-                $url = $this->router->assemble([
-                    'path' => ''
-                ], [
-                    'name'            => 'ng',
-                    'force_canonical' => $canonical,
-                    'uri'             => $uri
-                ]) . 'voting/' . $message['item_id'];
+                $url = '/voting/' . $message['item_id'];
                 break;
 
             case self::ARTICLES_TYPE_ID:
@@ -166,23 +156,11 @@ class Comments
                 if (! $article) {
                     throw new Exception("Article `{$message['item_id']}` not found");
                 }
-                $url = $this->router->assemble([
-                    'path' => ''
-                ], [
-                    'name'            => 'ng',
-                    'force_canonical' => $canonical,
-                    'uri'             => $uri
-                ]) . 'articles/' . urlencode($article['catname']);
+                $url = '/articles/' . urlencode($article['catname']);
                 break;
 
             case self::FORUMS_TYPE_ID:
-                $url = $this->router->assemble([
-                    'path' => ''
-                ], [
-                    'name'            => 'ng',
-                    'force_canonical' => $canonical,
-                    'uri'             => $uri
-                ]) . 'forums/message/' . $message['id'];
+                $url = '/forums/message/' . $message['id'];
                 break;
 
             default:
@@ -300,16 +278,10 @@ class Comments
             }
 
             $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
+            $uri->setPath('/users/' . ($author['identity'] ? $author['identity'] : 'user' . $author['id']));
+            $userUrl = $uri->toString();
 
-            $url = $this->getMessageUrl($messageId, true, $uri) . '#msg' . $messageId;
-
-            $userUrl = $this->router->assemble([
-                'path' => ''
-            ], [
-                'name'            => 'ng',
-                'force_canonical' => true,
-                'uri'             => $uri
-            ]) . 'users/' . ($author['identity'] ? $author['identity'] : 'user' . $author['id']);
+            $url = $this->getMessageUrl($messageId, $uri) . '#msg' . $messageId;
 
             $message = sprintf(
                 $this->translator->translate('pm/user-%s-post-new-message-%s', 'default', $subscriber['language']),

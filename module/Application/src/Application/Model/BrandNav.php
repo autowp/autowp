@@ -129,18 +129,6 @@ class BrandNav
         return $sections;
     }
 
-    /**
-     * @param string $route
-     * @param array $params
-     * @return string
-     */
-    private function url($route, array $params)
-    {
-        return $this->router->assemble($params, [
-            'name' => $route
-        ]);
-    }
-
     private function otherGroups(
         string $language,
         int $brandId,
@@ -170,10 +158,6 @@ class BrandNav
 
                 if ($hasConcepts) {
                     $groups['concepts'] = [
-                        'url' => $this->url('catalogue', [
-                            'action'        => 'concepts',
-                            'brand_catname' => $brandCatname
-                        ]),
                         'name' => $this->translator->translate('concepts and prototypes'),
                     ];
                 }
@@ -190,10 +174,6 @@ class BrandNav
 
             if ($logoPicturesCount > 0) {
                 $groups['logo'] = [
-                    'url' => $this->url('catalogue', [
-                        'action'        => 'logotypes',
-                        'brand_catname' => $brandCatname
-                    ]),
                     'name'  => $this->translator->translate('logotypes'),
                     'count' => $logoPicturesCount
                 ];
@@ -209,10 +189,6 @@ class BrandNav
             ]);
             if ($mixedPicturesCount > 0) {
                 $groups['mixed'] = [
-                    'url' => $this->url('catalogue', [
-                        'action' => 'mixed',
-                        'brand_catname' => $brandCatname
-                    ]),
                     'name'  => $this->translator->translate('mixed'),
                     'count' => $mixedPicturesCount
                 ];
@@ -228,10 +204,6 @@ class BrandNav
             ]);
             if ($unsortedPicturesCount > 0) {
                 $groups['unsorted'] = [
-                    'url'     => $this->url('catalogue', [
-                        'action'        => 'other',
-                        'brand_catname' => $brandCatname
-                    ]),
                     'name'  => $this->translator->translate('unsorted'),
                     'count' => $unsortedPicturesCount
                 ];
@@ -378,12 +350,6 @@ class BrandNav
 
         $groups = [];
         foreach ($rows as $brandItemRow) {
-            $url = $this->url('catalogue', [
-                'action'        => 'brand-item',
-                'brand_catname' => $brandCatname,
-                'car_catname'   => $brandItemRow['brand_item_catname']
-            ]);
-
             $name = $this->itemParent->getNamePreferLanguage(
                 $brandItemRow['brand_id'],
                 $brandItemRow['item_id'],
@@ -414,7 +380,6 @@ class BrandNav
 
             $groups[] = [
                 'item_id' => $brandItemRow['item_id'],
-                'url'     => $url,
                 'name'    => $name,
             ];
         }
@@ -468,13 +433,7 @@ class BrandNav
                 'engine' => [
                     'name'        => 'catalogue/section/engines',
                     'car_type_id' => null,
-                    'item_type_id' => Item::ENGINE,
-                    'url'          => $this->router->assemble([
-                        'brand_catname' => $brandCatname,
-                        'action'        => 'engines'
-                    ], [
-                        'name' => 'catalogue'
-                    ])
+                    'item_type_id' => Item::ENGINE
                 ]
             ];
 

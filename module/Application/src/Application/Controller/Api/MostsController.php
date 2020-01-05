@@ -152,23 +152,22 @@ class MostsController extends AbstractActionController
                 if ($picture) {
                     $id = $picture['id'];
 
-                    $url = null;
+                    $route = null;
                     foreach ($paths as $path) {
-                        $url = $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-picture',
-                            'brand_catname' => $path['brand_catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                            'picture_id'    => $picture['identity']
-                        ]);
+                        $route = array_merge(
+                            ['/', $path['brand_catname'], $path['car_catname']],
+                            $path['path'],
+                            ['pictures', $picture['identity']]
+                        );
+                        break;
                     }
 
                     $pictures[] = [
-                        'name' => isset($names[$id])
+                        'name'  => isset($names[$id])
                             ? $this->pictureNameFormatter->format($names[$id], $language)
                             : null,
-                        'src'  => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
-                        'url'  => $url
+                        'src'   => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
+                        'route' => $route
                     ];
                     $idx++;
                 } else {
