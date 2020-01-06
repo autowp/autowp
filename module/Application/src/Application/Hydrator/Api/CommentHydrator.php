@@ -176,8 +176,8 @@ class CommentHydrator extends RestHydrator
                 $result['preview'] = $this->comments->getMessagePreview($object['message']);
             }
 
-            if ($this->filterComposite->filter('url')) {
-                $result['url'] = $this->comments->getMessageRowUrl($object);
+            if ($this->filterComposite->filter('route')) {
+                $result['route'] = $this->comments->getMessageRowRoute($object);
             }
 
             if ($this->filterComposite->filter('text_html')) {

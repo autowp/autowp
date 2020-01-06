@@ -12,6 +12,7 @@ use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Application\Model\Item;
 use Application\Model\Picture;
+use Zend\Uri\Uri;
 
 class Comments
 {
@@ -87,7 +88,13 @@ class Comments
         $this->userModel = $userModel;
     }
 
-    public function getMessageUrl(int $messageId, $uri)
+    /**
+     * @param int $messageId
+     * @param Uri $uri
+     * @return string
+     * @throws Exception
+     */
+    public function getMessageUrl(int $messageId, Uri $uri): string
     {
         $message = $this->service->getMessageRow($messageId);
 
@@ -95,25 +102,25 @@ class Comments
             throw new InvalidArgumentException("Message `$messageId` not found");
         }
 
-        return $this->getMessageRowUrl($message, true, $uri);
-    }
+        $route = $this->getMessageRowRoute($message);
 
-    public function getMessageRowUrl($message, $canonical = false, $uri = null): string
-    {
-        $path = $this->getMessageRowPath($message, $canonical, $uri);
-        if (! $canonical || ! $uri) {
-            return $path;
-        }
+        array_walk($route, function (&$item) {
+            $item = urlencode($item);
+        });
 
-        $uri->setPath($path);
+        $uri->setPath('/' . implode('/', $route));
+        $uri->setFragment('msg' . $messageId);
 
         return $uri->toString();
     }
 
-    public function getMessageRowPath($message)
+    /**
+     * @param $message
+     * @return array
+     * @throws Exception
+     */
+    public function getMessageRowRoute($message): array
     {
-        $url = null;
-
         switch ($message['type_id']) {
             case self::PICTURES_TYPE_ID:
                 $picture = $this->picture->getRow(['id' => (int)$message['item_id']]);
@@ -121,7 +128,7 @@ class Comments
                     throw new Exception("Picture `{$message['item_id']}` not found");
                 }
 
-                $url = '/picture/' . urlencode($picture['identity']);
+                $url = ['picture', $picture['identity']];
                 break;
 
             case self::ITEM_TYPE_ID:
@@ -131,10 +138,10 @@ class Comments
                 }
                 switch ($item['item_type_id']) {
                     case Item::TWINS:
-                        $url = '/twins/group/' . $item['id'];
+                        $url = ['twins', 'group', $item['id']];
                         break;
                     case Item::MUSEUM:
-                        $url = '/museums/' . $item['id'];
+                        $url = ['museums', $item['id']];
                         break;
                     default:
                         throw new Exception(sprintf(
@@ -146,7 +153,7 @@ class Comments
                 break;
 
             case self::VOTINGS_TYPE_ID:
-                $url = '/voting/' . $message['item_id'];
+                $url = ['voting', $message['item_id']];
                 break;
 
             case self::ARTICLES_TYPE_ID:
@@ -156,11 +163,11 @@ class Comments
                 if (! $article) {
                     throw new Exception("Article `{$message['item_id']}` not found");
                 }
-                $url = '/articles/' . urlencode($article['catname']);
+                $url = ['articles', $article['catname']];
                 break;
 
             case self::FORUMS_TYPE_ID:
-                $url = '/forums/message/' . $message['id'];
+                $url = ['forums', 'message', $message['id']];
                 break;
 
             default:
@@ -281,7 +288,7 @@ class Comments
             $uri->setPath('/users/' . ($author['identity'] ? $author['identity'] : 'user' . $author['id']));
             $userUrl = $uri->toString();
 
-            $url = $this->getMessageUrl($messageId, $uri) . '#msg' . $messageId;
+            $url = $this->getMessageUrl($messageId, $uri);
 
             $message = sprintf(
                 $this->translator->translate('pm/user-%s-post-new-message-%s', 'default', $subscriber['language']),

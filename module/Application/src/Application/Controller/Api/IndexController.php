@@ -251,10 +251,7 @@ class IndexController extends AbstractRestfulController
                     'id'        => $item['id'],
                     'name'      => $item['name'],
                     'count'     => $item['count'],
-                    'new_count' => $item['new_count'],
-                    'new_url'   => $this->url()->fromRoute('factories/newcars', [
-                        'item_id' => $item['id']
-                    ])
+                    'new_count' => $item['new_count']
                 ];
             }
 
@@ -331,7 +328,6 @@ class IndexController extends AbstractRestfulController
                 'url' => true,
                 'can_edit_specs' => true,
                 'specs_route' => true,
-                'more_pictures_url' => true,
                 'categories' => [
                     'catname'   => true,
                     'name_html' => true

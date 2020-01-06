@@ -118,7 +118,6 @@ return [
             LanguagePicker::class                => Service\LanguagePickerFactory::class,
             MainMenu::class                      => Service\MainMenuFactory::class,
             Model\Brand::class                   => Model\BrandFactory::class,
-            Model\BrandNav::class                => Model\Service\BrandNavFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\Catalogue::class               => Model\Service\CatalogueFactory::class,
             Model\Categories::class              => Model\Service\CategoriesFactory::class,

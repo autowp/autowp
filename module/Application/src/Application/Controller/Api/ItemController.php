@@ -1681,7 +1681,7 @@ class ItemController extends AbstractRestfulController
                             ),
                             $this->userUrl($user, $uri),
                             $this->car()->formatName($item, $subscriber['language']),
-                            $this->carModerUrl($item, $uri)
+                            $this->itemModerUrl($item, $uri)
                         );
 
                         $this->message->send(null, $subscriber['id'], $message);
@@ -1718,7 +1718,7 @@ class ItemController extends AbstractRestfulController
                                 $this->userUrl($user, $uri),
                                 $engine['name'],
                                 $this->car()->formatName($item, $subscriber['language']),
-                                $this->carModerUrl($item, $uri)
+                                $this->itemModerUrl($item, $uri)
                             );
 
                             $this->message->send(null, $subscriber['id'], $message);
@@ -1759,7 +1759,7 @@ class ItemController extends AbstractRestfulController
                             $this->userUrl($user, $uri),
                             $engine['name'],
                             $this->car()->formatName($item, $subscriber['language']),
-                            $this->carModerUrl($item, $uri)
+                            $this->itemModerUrl($item, $uri)
                         );
 
                         $this->message->send(null, $subscriber['id'], $message);
@@ -1827,9 +1827,9 @@ class ItemController extends AbstractRestfulController
                             'default',
                             $subscriber['language']
                         ),
-                        $this->userModerUrl($user, true, $uri),
+                        $this->userUrl($user, $uri),
                         $this->car()->formatName($item, $subscriber['language']),
-                        $this->itemModerUrl($item, true, null, $uri),
+                        $this->itemModerUrl($item['id'], $uri),
                         ( count($changes) ? implode("\n", $changes) : '')
                     );
 
@@ -1842,59 +1842,30 @@ class ItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
-    private function userUrl($user, $uri = null)
-    {
-        return $this->url()->fromRoute('ng', ['path' => ''], [
-            'force_canonical' => true,
-            'uri'             => $uri
-        ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
-    }
-
-    private function carModerUrl($item, $uri = null)
-    {
-        $url = 'moder/items/item/' . $item['id'];
-
-        return $this->url()->fromRoute('ng', ['path' => ''], [
-            'force_canonical' => true,
-            'uri'             => $uri
-        ]) . $url;
-    }
-
     /**
      * @param array|ArrayObject $user
-     * @param bool $full
      * @param Uri $uri
      * @return string
      */
-    private function userModerUrl($user, $full = false, $uri = null)
+    private function userUrl($user, Uri $uri): string
     {
-        return $this->url()->fromRoute('ng', ['path' => ''], [
-            'force_canonical' => $full,
-            'uri'             => $uri
-        ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
+        $u = clone $uri;
+        $u->setPath('/users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']));
+
+        return $u->toString();
     }
 
     /**
-     * @param array|ArrayObject $item
-     * @param bool $full
-     * @param null $tab
-     * @param null $uri
+     * @param int $itemID
+     * @param Uri $uri
      * @return string
      */
-    private function itemModerUrl($item, $full = false, $tab = null, $uri = null)
+    private function itemModerUrl(int $itemID, Uri $uri): string
     {
-        $url = 'moder/items/item/' . $item['id'];
+        $u = clone $uri;
+        $u->setPath('/moder/items/item/' . $itemID);
 
-        if ($tab) {
-            $url .= '?' . http_build_query([
-                'tab' => $tab
-            ]);
-        }
-
-        return $this->url()->fromRoute('ng', ['path' => ''], [
-            'force_canonical' => $full,
-            'uri'             => $uri
-        ]) . $url;
+        return $u->toString();
     }
 
     private function buildChangesMessage($oldData, $newData, $language)

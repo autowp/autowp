@@ -560,14 +560,12 @@ class ItemHydrator extends RestHydrator
         }
 
         $totalPictures = null;
-        $pictures = [];
         $cFetcher = null;
         $showTotalPictures = $this->filterComposite->filter('total_pictures');
-        $showMorePicturesUrl = $this->filterComposite->filter('more_pictures_url');
         $showPreviewPictures = $this->filterComposite->filter('preview_pictures');
         $onlyExactlyPictures = false;
 
-        if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
+        if ($showTotalPictures || $showPreviewPictures) {
             $pictureItemTypeId = null;
             if (isset($this->previewPictures['type_id']) && $this->previewPictures['type_id']) {
                 $pictureItemTypeId = $this->previewPictures['type_id'];
@@ -836,14 +834,6 @@ class ItemHydrator extends RestHydrator
 
             if ($showTotalPictures) {
                 $result['total_pictures'] = $totalPictures;
-            }
-
-            if ($showMorePicturesUrl) {
-                if (count($pictures) < $totalPictures) {
-                    $result['more_pictures_url'] = $listBuilder->getPicturesUrl($object);
-                } else {
-                    $result['more_pictures_url'] = null;
-                }
             }
 
             if ($this->filterComposite->filter('pictures_count')) {

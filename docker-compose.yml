@@ -67,7 +67,6 @@ web:
   - ./config:/app/config
   - ./data:/app/data
   - ./cache:/app/cache
-  - ./assets:/app/assets
   - ./module:/app/module
   - ./public_html:/app/public_html
   - ./vendor:/app/vendor

@@ -72,8 +72,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         unzip \
         xmlstarlet \
     && \
-    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -qq -y nodejs && \
     DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y && \
     \
     cat /etc/ImageMagick-6/policy.xml | \
@@ -90,15 +88,8 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
     composer clearcache
 
-COPY package.json package-lock.json ./
-
-RUN npm install -y -qq --production && \
-    npm cache clean --force
-
 COPY . /app
 
 RUN chmod +x zf && \
     chmod +x start.sh && \
-    crontab ./crontab && \
-    ./node_modules/.bin/webpack -p && \
-    rm -rf ./node_modules/
+    crontab ./crontab

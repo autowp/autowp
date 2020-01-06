@@ -108,17 +108,6 @@ class ListBuilder
     }
 
     /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param ArrayObject|array $item
-     * @return string|NULL
-     */
-    public function getPicturesUrl($item)
-    {
-        return null;
-    }
-
-    /**
      * @param ArrayObject|array $item
      * @return array|null
      */

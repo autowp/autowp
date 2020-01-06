@@ -6,6 +6,7 @@ use Application\Comments;
 use ArrayObject;
 use Exception;
 use geoPHP;
+use ImagickException;
 use Point;
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
@@ -582,29 +583,21 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @param array|ArrayObject $user
-     * @param bool $full
      * @param Uri $uri
      * @return string
      */
-    private function userModerUrl($user, $full = false, $uri = null)
+    private function userModerUrl($user, Uri $uri): string
     {
-        return $this->url()->fromRoute('ng', ['path' => ''], [
-            'force_canonical' => $full,
-            'uri'             => $uri
-        ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
-    }
+        $u = clone $uri;
+        $u->setPath('/users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']));
 
-    private function pictureUrl($picture, $forceCanonical = false, $uri = null)
-    {
-        return $this->url()->fromRoute('index', [], [
-            'force_canonical' => $forceCanonical,
-            'uri'             => $uri
-        ]) . 'ng/moder/pictures/' . $picture['id'];
+        return $u->toString();
     }
 
     /**
      * @return ForbiddenAction|ApiProblemResponse
      * @throws Storage\Exception
+     * @throws ImagickException
      */
     public function postAction()
     {
@@ -806,6 +799,7 @@ class PictureController extends AbstractRestfulController
                             $userRow = $this->userModel->getRow((int)$userId);
                             if ($userRow) {
                                 $uri = $this->hostManager->getUriByLanguage($userRow['language']);
+                                $uri->setPath('/moder/pictures/' . $picture['id']);
 
                                 $message = sprintf(
                                     $this->translate(
@@ -813,9 +807,9 @@ class PictureController extends AbstractRestfulController
                                         'default',
                                         $userRow['language']
                                     ),
-                                    $this->userModerUrl($user, true, $uri),
+                                    $this->userModerUrl($user, $uri),
                                     $this->pic()->name($picture, $userRow['language']),
-                                    $this->pictureUrl($picture, true, $uri)
+                                    $uri->toString()
                                 );
 
                                 $this->message->send(null, $userRow['id'], $message);
@@ -968,7 +962,7 @@ class PictureController extends AbstractRestfulController
                         foreach ($deleteRequests as $request) {
                             $user = $this->userModel->getRow((int)$request['user_id']);
                             if ($user) {
-                                $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request['reason'];
+                                $reasons[] = $this->userModerUrl($user, $uri) . ' : ' . $request['reason'];
                             }
                         }
 
@@ -1339,11 +1333,8 @@ class PictureController extends AbstractRestfulController
 
                 $url = $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
                 $replaceUrl = $uri->setPath('/picture/' . urlencode($replacePicture['identity']))->toString();
-
-                $moderUrl = $this->url()->fromRoute('ng', ['path' => ''], [
-                    'force_canonical' => true,
-                    'uri'             => $uri
-                ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
+                $moderUrl = $uri->setPath('/users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']))
+                                ->toString();
 
                 $message = sprintf(
                     $this->translate('pm/user-%s-accept-replace-%s-%s', 'default', $recepient['language']),

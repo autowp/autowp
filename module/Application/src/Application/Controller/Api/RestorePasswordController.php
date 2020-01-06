@@ -151,20 +151,14 @@ class RestorePasswordController extends AbstractRestfulController
         $code = $this->userPasswordRemind->createToken($user['id']);
 
         $uri = $this->hostManager->getUriByLanguage($user['language']);
-
-        $url = $this->url()->fromRoute('ng', [
-            'path' => 'restore-password/new'
-        ], [
-            'force_canonical' => true,
-            'uri'             => $uri,
-            'query'           => [
-                'code' => $code
-            ]
+        $uri->setPath('restore-password/new');
+        $uri->setQuery([
+            'code' => $code
         ]);
 
         $message = sprintf(
             $this->translate('restore-password/new-password/mail/body-%s', 'default', $user['language']),
-            $url
+            $uri->toString()
         );
 
         $mail = new Mail\Message();

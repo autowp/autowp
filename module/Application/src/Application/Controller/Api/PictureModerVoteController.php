@@ -86,14 +86,6 @@ class PictureModerVoteController extends AbstractRestfulController
         $this->userModel = $userModel;
     }
 
-    private function pictureUrl($picture, $forceCanonical = false, $uri = null)
-    {
-        return $this->url()->fromRoute('index', [], [
-            'force_canonical' => $forceCanonical,
-            'uri'             => $uri
-        ]) . 'ng/moder/pictures/' . $picture['id'];
-    }
-
     private function notifyVote($picture, $vote, $reason)
     {
         $owner = $this->userModel->getRow((int)$picture['owner_id']);
@@ -101,6 +93,7 @@ class PictureModerVoteController extends AbstractRestfulController
         if ($ownerIsModer) {
             if ($owner['id'] != $this->user()->get()['id']) {
                 $uri = $this->hostManager->getUriByLanguage($owner['language']);
+                $uri->setPath('/moder/pictures/' . $picture['id']);
 
                 $message = sprintf(
                     $this->translate(
@@ -110,7 +103,7 @@ class PictureModerVoteController extends AbstractRestfulController
                         'default',
                         $owner['language']
                     ),
-                    $this->pictureUrl($picture, true, $uri),
+                    $uri->toString(),
                     $reason
                 );
 
