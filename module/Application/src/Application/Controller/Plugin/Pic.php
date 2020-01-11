@@ -51,9 +51,9 @@ class Pic extends AbstractPlugin
         $this->picture = $picture;
     }
 
-    public function href($row)
+    public function route($row): array
     {
-        $url = null;
+        $route = ['/picture', $row['identity']];
 
         $itemIds = $this->pictureItem->getPictureItems($row['id'], PictureItem::PICTURE_CONTENT);
         if ($itemIds) {
@@ -70,19 +70,15 @@ class Pic extends AbstractPlugin
                     'stockFirst'   => true
                 ]);
 
-
                 if (count($paths) > 0) {
                     $path = $paths[0];
 
-                    $escapedPath = array_map(function ($string) {
-                        return urlencode($string);
-                    }, $path['path']);
-
                     if ($path['car_catname']) {
-                        $url = '/ng/' . urlencode($path['brand_catname']) .
-                               '/' . urlencode($path['car_catname']) .
-                               ($escapedPath ? '/' . implode('/', $escapedPath) : '') .
-                               '/pictures/' . urlencode($row['identity']);
+                        $route = array_merge(
+                            ['/', $path['brand_catname'], $path['car_catname']],
+                            $path['path'],
+                            ['pictures', $row['identity']]
+                        );
                     } else {
                         $perspectiveId = $this->pictureItem->getPerspective($row['id'], $carId);
 
@@ -98,19 +94,13 @@ class Pic extends AbstractPlugin
                                 break;
                         }
 
-                        $url = '/ng/' . urlencode($path['brand_catname']) .
-                               '/' . $action .
-                               '/' . urlencode($row['identity']);
+                        $route = ['/', $path['brand_catname'], $action, $row['identity']];
                     }
                 }
             }
         }
 
-        if (! $url) {
-            $url = '/ng/picture/' . urlencode($row['identity']);
-        }
-
-        return $url;
+        return $route;
     }
 
     public function name($pictureRow, $language)

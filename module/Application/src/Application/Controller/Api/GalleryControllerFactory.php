@@ -11,18 +11,18 @@ use Autowp\Comments\CommentsService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class ItemGalleryControllerFactory implements FactoryInterface
+class GalleryControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param ContainerInterface $container
      * @param $requestedName
      * @param array|null $options
-     * @return ItemGalleryController
+     * @return GalleryController
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new ItemGalleryController(
+        return new GalleryController(
             $container->get(Picture::class),
             $container->get(PictureItem::class),
             $container->get(Item::class),

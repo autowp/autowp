@@ -1,6 +1,6 @@
-web:
+backend:
   image: autowp/autowp
-  container_name: autowp_test_web
+  container_name: autowp_test_backend
   restart: always
   environment:
     CODECLIMATE_REPO_TOKEN: ${CODECLIMATE_REPO_TOKEN}
@@ -113,6 +113,9 @@ frontend:
   image: autowp/autowp-frontend
   container_name: autowp_test_frontend
   restart: always
+  links:
+  - backend
+  - goautowp
 
 rabbitmq:
   image: rabbitmq

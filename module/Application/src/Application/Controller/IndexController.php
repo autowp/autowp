@@ -11,15 +11,7 @@ use Zend\Mvc\Controller\AbstractActionController;
  */
 class IndexController extends AbstractActionController
 {
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function indexAction()
-    {
-        return $this->redirect()->toUrl('/ng/');
-    }
-
-    public function ngAction()
     {
         $path = $this->params('path');
 
@@ -29,11 +21,8 @@ class IndexController extends AbstractActionController
 
             $query = $uri->getQuery();
 
-            return $this->redirect()->toRoute('ng', [
-                'path' => ''
-            ], [
-                'fragment' => '!/' . $path . ($query ? '?' . $query : '')
-            ], false);
+            $url = '/#!/' . $path . ($query ? '?' . $query : '');
+            return $this->redirect()->toUrl($url);
         }
     }
 }

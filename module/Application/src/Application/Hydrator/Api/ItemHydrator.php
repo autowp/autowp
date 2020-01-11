@@ -3,6 +3,8 @@
 namespace Application\Hydrator\Api;
 
 use Application\Comments;
+use Application\Controller\Plugin\Pic;
+use ArrayObject;
 use Autowp\Comments\Attention;
 use Exception;
 use Traversable;
@@ -55,6 +57,9 @@ class ItemHydrator extends RestHydrator
      */
     private $catalogue;
 
+    /**
+     * @var Pic
+     */
     private $picHelper;
 
     /**
@@ -322,16 +327,57 @@ class ItemHydrator extends RestHydrator
         return $row ? (int)$row['count'] : 0;
     }
 
+    private function getCataloguePath(int $id, array $options): array
+    {
+        if (! isset($this->cataloguePaths[$id])) {
+            $this->cataloguePaths[$id] = $this->catalogue->getCataloguePaths($id, $options);
+        }
+
+        return $this->cataloguePaths[$id];
+    }
+
+    /**
+     * @param int $itemID
+     * @param array $options
+     * @return string[]|null
+     */
+    public function getDetailsRoute(int $itemID, array $options): ?array
+    {
+        $cataloguePaths = $this->getCataloguePath($itemID, $options);
+
+        foreach ($cataloguePaths as $cPath) {
+            return array_merge(['/', $cPath['brand_catname'], $cPath['car_catname']], $cPath['path']);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param int $itemID
+     * @return string[]|null
+     */
+    public function getSpecificationsRoute(int $itemID): ?array
+    {
+        $hasSpecs = $this->specsService->hasSpecs($itemID);
+
+        if (! $hasSpecs) {
+            return null;
+        }
+
+        $cataloguePaths = $this->getCataloguePath($itemID, [
+            'toBrand'      => true,
+            'breakOnFirst' => true
+        ]);
+        foreach ($cataloguePaths as $path) {
+            return array_merge(['/', $path['brand_catname'], $path['car_catname']], $path['path']);
+        }
+
+        return null;
+    }
+
     public function extract($object)
     {
         $nameData = $this->getNameData($object, $this->language);
-
-        $listBuilder = new Item\ListBuilder([
-            'catalogue'    => $this->catalogue,
-            'router'       => $this->router,
-            'picHelper'    => $this->picHelper,
-            'specsService' => $this->specsService
-        ]);
 
         $isModer = false;
         $role = $this->getUserRole();
@@ -415,7 +461,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('specs_route')) {
-            $result['specs_route'] = $listBuilder->getSpecificationsRoute($object);
+            $result['specs_route'] = $this->getSpecificationsRoute($object);
         }
 
         if ($this->filterComposite->filter('can_edit_specs')) {
@@ -598,19 +644,16 @@ class ItemHydrator extends RestHydrator
                 'totalPictures' => $totalPictures
             ]);
 
-            $extractUrl = isset($this->fields['preview_pictures']['url']);
+            $extractRoute = isset($this->fields['preview_pictures']['route']);
 
-            foreach ($pictures as &$picture) {
-                if ($picture && $extractUrl) {
-                    if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
-                        $url = $this->picHelper->href($picture['row']);
-                    } else {
-                        $url = $listBuilder->getPictureUrl($object, $picture['row']);
+            if ($extractRoute) {
+                foreach ($pictures as &$picture) {
+                    if ($picture) {
+                        $picture['route'] = $this->picHelper->route($picture['row']);
                     }
-                    $picture['url'] = $url;
                 }
+                unset($picture);
             }
-            unset($picture);
 
             $result['preview_pictures'] = $this->extractValue('preview_pictures', $pictures);
         }
@@ -887,7 +930,7 @@ class ItemHydrator extends RestHydrator
 
                     case Item::ENGINE:
                     case Item::VEHICLE:
-                        $route = $listBuilder->getDetailsRoute($object, [
+                        $route = $this->getDetailsRoute($object, [
                             'breakOnFirst' => true,
                             'toBrand'      => $this->routeBrandID,
                             'stockFirst'   => true

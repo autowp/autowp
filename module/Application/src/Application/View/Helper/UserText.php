@@ -154,14 +154,14 @@ class UserText extends AbstractHtmlElement
 
     private function tryUserLink(Uri\Uri $uri)
     {
-        $match = preg_match('|^(/ng)?/users/([^/]+)$|isu', $uri->getPath(), $matches);
+        $match = preg_match('|^/users/([^/]+)$|isu', $uri->getPath(), $matches);
 
         if (! $match) {
             return false;
         }
 
         $userId = null;
-        $userIdentity = $matches[2];
+        $userIdentity = $matches[1];
 
         $match = preg_match('|^user([0-9]+)$|isu', $userIdentity, $matches);
         if ($match) {

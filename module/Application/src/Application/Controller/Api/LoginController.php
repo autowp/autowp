@@ -229,7 +229,7 @@ class LoginController extends AbstractRestfulController
             'user_id'  => null,
             'language' => $this->language(),
             'service'  => $serviceId,
-            'url'      => '/ng/login'
+            'url'      => '/login'
         ]);
 
         return new JsonModel([

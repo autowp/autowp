@@ -1,25 +1,25 @@
 <?php
 
-namespace Application\View\Helper\Service;
+namespace Application\Controller\Api;
 
-use Application\MainMenu;
+use Application\Service\TelegramService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\View\Helper\MainMenu as Helper;
+use Application\Controller\Api\TelegramController as Controller;
 
-class MainMenuFactory implements FactoryInterface
+class TelegramControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param ContainerInterface $container
      * @param $requestedName
      * @param array|null $options
-     * @return Helper
+     * @return Controller
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Helper(
-            $container->get(MainMenu::class)
+        return new Controller(
+            $container->get(TelegramService::class)
         );
     }
 }

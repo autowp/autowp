@@ -24,7 +24,7 @@ class ModerMenu extends AbstractHtmlElement
         $this->picture = $picture;
     }
 
-    public function __invoke($data = false)
+    public function __invoke()
     {
         $items = [];
 
@@ -35,7 +35,7 @@ class ModerMenu extends AbstractHtmlElement
             ]);
 
             $items[] = [
-                'href'  => '/ng/moder/pictures?order=1&status=inbox',
+                'href'  => '/moder/pictures?order=1&status=inbox',
                 'label' => $this->view->translate('moder-menu/inbox'),
                 'count' => $inboxCount,
                 'icon'  => 'fa fa-th'
@@ -46,11 +46,7 @@ class ModerMenu extends AbstractHtmlElement
             ]);
 
             $items[] = [
-                'href'  => $this->view->url('ng', ['path' => 'moder/comments'], [
-                    'query' => [
-                        'moderator_attention' => Comments\Attention::REQUIRED
-                    ]
-                ]),
+                'href'  => '/moder/comments?moderator_attention=1',
                 'label' => $this->view->page(110)->name,
                 'count' => $attentionCount,
                 'icon'  => 'fa fa-comment'
@@ -59,26 +55,19 @@ class ModerMenu extends AbstractHtmlElement
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($this->view->user()->inheritsRole('pages-moder')) {
                 $items[] = [
-                    'href'  => '/ng/moder/pages',
+                    'href'  => '/moder/pages',
                     'label' => $this->view->page(68)->name,
                     'icon'  => 'fa fa-book'
                 ];
             }
 
             $items[] = [
-                'href'  => '/ng/moder/items',
+                'href'  => '/moder/items',
                 'label' => $this->view->page(131)->name,
                 'icon'  => 'fa fa-car'
             ];
         }
 
-        if ($data) {
-            return $items;
-        }
-
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->view->partial('application/moder-menu', [
-            'items' => $items
-        ]);
+        return $items;
     }
 }

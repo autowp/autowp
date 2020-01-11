@@ -5,27 +5,6 @@ namespace Application;
 return [
     'router' => [
         'routes' => [
-            'ng' => [
-                'type' => 'Regex',
-                'options' => [
-                    'regex'    => '/ng/(?<path>[/a-zA-Z0-9_-]+)?',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action'     => 'ng',
-                    ],
-                    'spec' => '/ng/%path%',
-                ]
-            ],
-            'picture-file' => [
-                'type' => Router\Http\PictureFile::class,
-                'options' => [
-                    'defaults' => [
-                        'hostname'   => getenv('AUTOWP_PICTURES_HOST'),
-                        'controller' => Controller\PictureFileController::class,
-                        'action'     => 'index'
-                    ]
-                ]
-            ],
             'index' => [
                 'type' => 'Literal',
                 'options' => [
@@ -35,16 +14,6 @@ return [
                         'action'     => 'index',
                     ],
                 ],
-            ],
-            'donate-success' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/donate/success',
-                    'defaults' => [
-                        'controller' => Controller\DonateController::class,
-                        'action'     => 'success',
-                    ],
-                ]
             ],
             'login' => [
                 'type' => 'Literal',
@@ -66,16 +35,6 @@ return [
                         ]
                     ]
                 ]
-            ],
-            'telegram-webhook' => [
-                'type' => 'Segment',
-                'options' => [
-                    'route'    => '/telegram/webhook/token/:token',
-                    'defaults' => [
-                        'controller' => Controller\TelegramController::class,
-                        'action'     => 'webhook',
-                    ],
-                ],
             ],
             'yandex' => [
                 'type' => 'Literal',

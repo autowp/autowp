@@ -43,7 +43,6 @@ return [
             'inlinePicture'  => View\Helper\Service\InlinePictureFactory::class,
             'language'       => View\Helper\Service\LanguageFactory::class,
             'languagePicker' => View\Helper\Service\LanguagePickerFactory::class,
-            'mainMenu'       => View\Helper\Service\MainMenuFactory::class,
             'moderMenu'      => View\Helper\Service\ModerMenuFactory::class,
             'page'           => View\Helper\Service\PageFactory::class,
             'pageEnv'        => View\Helper\Service\PageEnvFactory::class,

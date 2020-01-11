@@ -2,6 +2,8 @@ server {
     listen 80;
     listen [::]:80;
 
+    charset     utf-8;
+
     gzip_static on;
 
     gzip on;
@@ -26,44 +28,10 @@ server {
         empty_gif;
     }
 
-    location ^~ /ng/ {
-        proxy_pass http://frontend;
-    }
-
-    location ^~ /pic-accel/ {
-        internal;
-        alias   /app/public_html/;
-    }
-
-    location = / {
-        rewrite .* /index.php;
-    }
-
-    location /index.php {
+    location /api/ {
         fastcgi_pass  unix:/var/run/php/fpm-autowp.sock;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
         include       fastcgi_params;
-    }
-
-    location /go-api/ {
-        proxy_pass http://goautowp;
-    }
-
-    location / {
-        root /app/public_html;
-        try_files $uri $uri/ /index.php$is_args$args;
-        charset    utf-8;
-    }
-
-    location = /robots.txt {
-        expires 7d;
-        root /app/public_html;
-
-        try_files /robots/$http_host.txt /robots/robots.txt;
-    }
-
-    location ^~ /pictures/ {
-        rewrite ^/pictures/(.*)$ /picture-file/index/?file=$1;
     }
 
     location ~* ^.+\.(jpg|jpeg|gif|css|js|ico|png|txt|woff|woff2|ttf|svg)$ {

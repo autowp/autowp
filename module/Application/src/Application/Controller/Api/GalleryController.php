@@ -24,7 +24,7 @@ use Application\PictureNameFormatter;
  * @method Storage imageStorage()
  * @method string language()
  */
-class ItemGalleryController extends AbstractRestfulController
+class GalleryController extends AbstractRestfulController
 {
     /**
      * @var Picture
@@ -99,18 +99,23 @@ class ItemGalleryController extends AbstractRestfulController
      */
     public function galleryAction()
     {
-        $id = $this->params()->fromRoute('id');
+        $itemID = (int)$this->params()->fromQuery('item_id');
 
         $filter = [
             'order'  => 'resolution_desc',
             'status' => Picture::STATUS_ACCEPTED,
-            'item'   => [
-                'ancestor_or_self' => $id
-            ]
         ];
+
+        if ($itemID) {
+            $filter['item']['ancestor_or_self'] = $itemID;
+        }
 
         $page = $this->params()->fromQuery('page');
         $pictureIdentity = $this->params()->fromQuery('picture_identity');
+
+        if (! $itemID && ! $pictureIdentity) {
+            return $this->forbiddenAction();
+        }
 
         switch ($this->params()->fromQuery('status')) {
             case Picture::STATUS_INBOX:
@@ -130,6 +135,10 @@ class ItemGalleryController extends AbstractRestfulController
         $language = $this->language();
 
         if ($pictureIdentity) {
+            if (! $itemID) {
+                $filter['identity'] = $pictureIdentity;
+            }
+
             // look for page of that picture
             $filterCopy = $filter;
             unset($filterCopy['status']);
@@ -214,7 +223,7 @@ class ItemGalleryController extends AbstractRestfulController
                 continue;
             }
 
-            $id = (int)$row['id'];
+            $itemID = (int)$row['id'];
 
             $sUrl = $image->getSrc();
 
@@ -239,10 +248,10 @@ class ItemGalleryController extends AbstractRestfulController
             $msgCount = $row['messages'];
             $newMsgCount = 0;
             if ($userId) {
-                $newMsgCount = isset($newMessages[$id]) ? $newMessages[$id] : $msgCount;
+                $newMsgCount = isset($newMessages[$itemID]) ? $newMessages[$itemID] : $msgCount;
             }
 
-            $name = isset($names[$id]) ? $names[$id] : null;
+            $name = isset($names[$itemID]) ? $names[$itemID] : null;
             $name = $this->pictureNameFormatter->format($name, $language);
 
             $itemsData = $this->pictureItem->getData([
@@ -268,7 +277,7 @@ class ItemGalleryController extends AbstractRestfulController
             }
 
             $gallery[] = [
-                'id'          => $id,
+                'id'          => $itemID,
                 'identity'    => $row['identity'],
                 'sourceUrl'   => $sUrl,
                 'crop'        => $crop,

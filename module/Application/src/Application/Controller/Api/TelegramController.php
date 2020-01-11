@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Controller;
+namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;

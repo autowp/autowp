@@ -2,6 +2,7 @@
 
 namespace Application\View\Helper\Service;
 
+use Application\MainMenu;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Application\Hydrator\Api\UserHydrator;
@@ -20,7 +21,8 @@ class ApiDataFactory implements FactoryInterface
     {
         $hydrators = $container->get('HydratorManager');
         return new Helper(
-            $hydrators->get(UserHydrator::class)
+            $hydrators->get(UserHydrator::class),
+            $container->get(MainMenu::class)
         );
     }
 }

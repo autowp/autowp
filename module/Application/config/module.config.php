@@ -49,10 +49,7 @@ $mailTransport = $mailTypes[$mailType];
 return [
     'controllers' => [
         'factories' => [
-            Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,
             Controller\IndexController::class           => InvokableFactory::class,
-            Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
-            Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,
             Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,
         ],
     ],

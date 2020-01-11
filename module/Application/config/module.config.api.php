@@ -57,7 +57,7 @@ return [
             Controller\Api\IndexController::class           => Controller\Api\IndexControllerFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
-            Controller\Api\ItemGalleryController::class     => Controller\Api\ItemGalleryControllerFactory::class,
+            Controller\Api\GalleryController::class         => Controller\Api\GalleryControllerFactory::class,
             Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
             Controller\Api\ItemLinkController::class        => Controller\Api\ItemLinkControllerFactory::class,
             Controller\Api\ItemParentController::class      => Controller\Api\ItemParentControllerFactory::class,
@@ -84,6 +84,7 @@ return [
             Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
             Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
             Controller\Api\StatController::class            => Controller\Api\StatControllerFactory::class,
+            Controller\Api\TelegramController::class        => Controller\Api\TelegramControllerFactory::class,
             Controller\Api\TextController::class            => Controller\Api\TextControllerFactory::class,
             Controller\Api\TimezoneController::class        => InvokableFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
@@ -1030,6 +1031,25 @@ return [
                             ]
                         ]
                     ],
+                    'gallery' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route' => '/gallery',
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'get' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'controller' => Controller\Api\GalleryController::class,
+                                        'action'     => 'gallery'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
                     'hotlinks' => [
                         'type' => 'Literal',
                         'options' => [
@@ -1564,25 +1584,6 @@ return [
                                                     'verb' => 'get',
                                                     'defaults' => [
                                                         'action' => 'child-specifications'
-                                                    ]
-                                                ]
-                                            ]
-                                        ]
-                                    ],
-                                    'gallery' => [
-                                        'type' => 'Literal',
-                                        'options' => [
-                                            'route' => '/gallery',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes' => [
-                                            'get' => [
-                                                'type' => 'Method',
-                                                'options' => [
-                                                    'verb' => 'get',
-                                                    'defaults' => [
-                                                        'controller' => Controller\Api\ItemGalleryController::class,
-                                                        'action'     => 'gallery'
                                                     ]
                                                 ]
                                             ]
@@ -2575,6 +2576,16 @@ return [
                                 ]
                             ]
                         ]
+                    ],
+                    'telegram-webhook' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            'route'    => '/telegram/webhook/token/:token',
+                            'defaults' => [
+                                'controller' => Controller\Api\TelegramController::class,
+                                'action'     => 'webhook',
+                            ],
+                        ],
                     ],
                     'text' => [
                         'type' => 'Literal',

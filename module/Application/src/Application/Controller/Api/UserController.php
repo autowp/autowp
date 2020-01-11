@@ -593,7 +593,7 @@ class UserController extends AbstractRestfulController
                     'id'        => $row['id'],
                     'name'      => $row['name'],
                     'deleted'   => $deleted,
-                    'url'       => '/ng/users/' . ($row['identity'] ? $row['identity'] : 'user' . $row['id']),
+                    'url'       => '/users/' . ($row['identity'] ? $row['identity'] : 'user' . $row['id']),
                     'long_away' => $longAway,
                     'green'     => $isGreen,
                     'identity'  => $row['identity'],

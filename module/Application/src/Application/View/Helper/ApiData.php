@@ -16,9 +16,15 @@ class ApiData extends AbstractHelper
      */
     private $userHydrator;
 
-    public function __construct(RestHydrator $userHydrator)
+    /**
+     * @var \Application\MainMenu
+     */
+    private $mainMenu;
+
+    public function __construct(RestHydrator $userHydrator, \Application\MainMenu $mainMenu)
     {
         $this->userHydrator = $userHydrator;
+        $this->mainMenu = $mainMenu;
     }
 
     public function __invoke()
@@ -46,7 +52,7 @@ class ApiData extends AbstractHelper
         $moderMenu = null;
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->view->user()->inheritsRole('moder')) {
-            $moderMenu = $this->view->moderMenu(true);
+            $moderMenu = $this->view->moderMenu();
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -65,7 +71,7 @@ class ApiData extends AbstractHelper
             'languages'  => $languages,
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             'isModer'    => $this->view->user()->inheritsRole('moder'),
-            'mainMenu'   => $this->view->mainMenu(true, true),
+            'mainMenu'   => $this->mainMenu->getMenu(null, true),
             'moderMenu'  => $moderMenu,
             'sidebar'    => $this->view->sidebar(true),
             'user'       => $userData

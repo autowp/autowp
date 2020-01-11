@@ -46,7 +46,7 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
                 '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;user1">tester</a>'
             ],
             [
-                'http://www.autowp.ru/ng/users/user1',
+                'http://www.autowp.ru/users/user1',
                 '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;user1">tester</a>'
             ],
             [
@@ -60,7 +60,7 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
                 'tester2</a>'
             ],
             [
-                'http://www.autowp.ru/ng/users/identity',
+                'http://www.autowp.ru/users/identity',
                 '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;identity">' .
                 'tester2</a>'
             ],

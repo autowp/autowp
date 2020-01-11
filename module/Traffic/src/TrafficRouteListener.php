@@ -52,7 +52,6 @@ class TrafficRouteListener extends AbstractListenerAggregate
         '/api/perspective-page',
         '/api/picture-moder-vote-template',
         '/api/voting',
-        '/ng/',
         '/comments',
         '/donate',
         '/factory',
