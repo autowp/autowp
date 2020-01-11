@@ -2292,6 +2292,24 @@ return [
                                             ],
                                         ]
                                     ],
+                                    'canonical-route' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/canonical-route'
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'delete' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'canonical-route'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ],
                                     'item' => [
                                         'type' => 'Method',
                                         'options' => [

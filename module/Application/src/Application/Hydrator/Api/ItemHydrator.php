@@ -461,7 +461,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('specs_route')) {
-            $result['specs_route'] = $this->getSpecificationsRoute($object);
+            $result['specs_route'] = $this->getSpecificationsRoute($object['id']);
         }
 
         if ($this->filterComposite->filter('can_edit_specs')) {

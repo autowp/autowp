@@ -202,6 +202,19 @@ class PictureController extends AbstractRestfulController
         $this->pictureService = $pictureService;
     }
 
+    public function canonicalRouteAction()
+    {
+        $picture = $this->picture->getRow(['identity' => (string)$this->params('id')]);
+
+        if (! $picture) {
+            return $this->notFoundAction();
+        }
+
+        $route = $this->pic()->route($picture, true);
+
+        return new JsonModel($route);
+    }
+
     /**
      * @return JsonModel
      * @throws Storage\Exception

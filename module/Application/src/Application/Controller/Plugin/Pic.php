@@ -51,9 +51,12 @@ class Pic extends AbstractPlugin
         $this->picture = $picture;
     }
 
-    public function route($row): array
+    public function route($row, $catalogueOnly = false): ?array
     {
-        $route = ['/picture', $row['identity']];
+        $route = null;
+        if (! $catalogueOnly) {
+            ['/picture', $row['identity']];
+        }
 
         $itemIds = $this->pictureItem->getPictureItems($row['id'], PictureItem::PICTURE_CONTENT);
         if ($itemIds) {

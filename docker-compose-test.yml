@@ -83,7 +83,6 @@ backend:
   links:
   - memcached
   - mysql
-  - frontend
   - rabbitmq
   - traffic
   - goautowp
