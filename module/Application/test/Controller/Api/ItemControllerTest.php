@@ -636,7 +636,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertArrayHasKey('engine_vehicles', $json);
         foreach ($json['engine_vehicles'] as $item) {
             $this->assertNotEmpty($item['name_html']);
-            $this->assertNotEmpty($item['url']);
         }
     }
 

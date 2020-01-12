@@ -151,7 +151,7 @@ class RestorePasswordController extends AbstractRestfulController
         $code = $this->userPasswordRemind->createToken($user['id']);
 
         $uri = $this->hostManager->getUriByLanguage($user['language']);
-        $uri->setPath('restore-password/new');
+        $uri->setPath('/restore-password/new');
         $uri->setQuery([
             'code' => $code
         ]);
