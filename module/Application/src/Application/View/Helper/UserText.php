@@ -131,7 +131,7 @@ class UserText extends AbstractHtmlElement
                 return $result;
             }
 
-            try {
+            /*try {
                 $request = new Request();
                 $request->setUri($uri);
 
@@ -145,7 +145,7 @@ class UserText extends AbstractHtmlElement
                     }
                 }
             } catch (InvalidArgumentException $e) {
-            }
+            }*/
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -197,7 +197,7 @@ class UserText extends AbstractHtmlElement
      * @return boolean
      * @throws Exception
      */
-    private function tryPictureLinkParams(array $params)
+    /*private function tryPictureLinkParams(array $params)
     {
         $map = [
 
@@ -224,11 +224,11 @@ class UserText extends AbstractHtmlElement
             ]);
 
             if ($picture) {
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
+                * @phan-suppress-next-line PhanUndeclaredMethod *
                 return $this->view->inlinePicture($picture);
             }
         }
 
         return false;
-    }
+    }*/
 }
