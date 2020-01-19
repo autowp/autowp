@@ -14,7 +14,7 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
         $serviceManager = $this->getApplicationServiceLocator();
 
         $model = $serviceManager->get(CarOfDay::class);
-        $result = $model->getCarOfDayCadidate();
+        $result = $model->getCarOfDayCandidate();
 
         $this->assertNotEmpty($result);
     }

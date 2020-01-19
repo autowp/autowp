@@ -110,7 +110,7 @@ class CarOfDay
         $this->table = $table;
     }
 
-    public function getCarOfDayCadidate(): int
+    public function getCarOfDayCandidate(): int
     {
         $sql = '
             SELECT c.id, count(p.id) AS p_count
@@ -136,7 +136,7 @@ class CarOfDay
 
     public function pick()
     {
-        $itemId = $this->getCarOfDayCadidate();
+        $itemId = $this->getCarOfDayCandidate();
         if ($itemId) {
             print $itemId . "\n";
 
