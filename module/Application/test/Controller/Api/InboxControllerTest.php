@@ -4,6 +4,7 @@ namespace ApplicationTest\Frontend\Controller\Api;
 
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\PictureController;
+use Application\DuplicateFinder;
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\InboxController;
 use Exception;
@@ -13,6 +14,25 @@ use Zend\Http\Request;
 class InboxControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+
+    private function mockDuplicateFinder()
+    {
+        $serviceManager = $this->getApplicationServiceLocator();
+
+        $tables = $serviceManager->get('TableManager');
+
+        $mock = $this->getMockBuilder(DuplicateFinder::class)
+            ->setMethods(['indexImage'])
+            ->setConstructorArgs([
+                $serviceManager->get('RabbitMQ'),
+                $tables->get('df_distance')
+            ])
+            ->getMock();
+
+        $mock->method('indexImage');
+
+        $serviceManager->setService(DuplicateFinder::class, $mock);
+    }
 
     /**
      * @suppress PhanUndeclaredMethod
