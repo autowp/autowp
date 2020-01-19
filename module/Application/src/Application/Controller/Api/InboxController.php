@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use Exception;
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -45,6 +46,10 @@ class InboxController extends AbstractRestfulController
         $this->inputFilter = $inputFilter;
     }
 
+    /**
+     * @return array
+     * @throws Exception
+     */
     private function getBrandControl(): array
     {
         $language = $this->language();
@@ -77,6 +82,10 @@ class InboxController extends AbstractRestfulController
         return $brandOptions;
     }
 
+    /**
+     * @return array|JsonModel|ApiProblemResponse
+     * @throws Exception
+     */
     public function indexAction()
     {
         $this->inputFilter->setData($this->params()->fromQuery());
