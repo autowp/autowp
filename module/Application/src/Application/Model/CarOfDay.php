@@ -545,17 +545,17 @@ class CarOfDay
                 $thumb = isset($imagesInfo[$format][$idx]) ? $imagesInfo[$format][$idx] : null;
 
                 $result[] = [
-                    'thumb'  => $thumb
+                    'thumb' => $thumb
                         ? [
                             'src'    => $thumb->getSrc(),
                             'width'  => $thumb->getWidth(),
                             'height' => $thumb->getHeight()
                         ]
                         : null,
-                    'name' => isset($names[$row['id']])
+                    'name'  => isset($names[$row['id']])
                         ? $this->pictureNameFormatter->format($names[$row['id']], $language)
                         : null,
-                    'url'  => $route
+                    'route' => $route
                 ];
             }
         }
