@@ -106,8 +106,14 @@ class GalleryController extends AbstractRestfulController
             'status' => Picture::STATUS_ACCEPTED,
         ];
 
+        $exact = (bool) $this->params()->fromQuery('exact');
+
         if ($itemID) {
-            $filter['item']['ancestor_or_self'] = $itemID;
+            if ($exact) {
+                $filter['item'] = $itemID;
+            } else {
+                $filter['item']['ancestor_or_self'] = $itemID;
+            }
         }
 
         $page = $this->params()->fromQuery('page');
