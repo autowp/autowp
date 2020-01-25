@@ -719,6 +719,10 @@ class ItemHydrator extends RestHydrator
             ]);
         }
 
+        if ($this->filterComposite->filter('is_group')) {
+            $result['is_group'] = (bool)$object['is_group'];
+        }
+
         if ($isModer) {
             if ($this->filterComposite->filter('comments_attentions_count')) {
                 $result['comments_attentions_count'] = $this->comments->service()->getTotalMessagesCount([
@@ -762,10 +766,6 @@ class ItemHydrator extends RestHydrator
                     $value = (int)$object['spec_id'];
                     $result['spec_id'] = $value > 0 ? $value : null;
                 }
-            }
-
-            if ($this->filterComposite->filter('is_group')) {
-                $result['is_group'] = (bool)$object['is_group'];
             }
 
             if ($this->filterComposite->filter('begin_model_year')) {
