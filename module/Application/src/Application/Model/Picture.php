@@ -631,6 +631,7 @@ class Picture
                     break;
                 case 'similarity':
                     $select->order('df_distance.distance ASC');
+                    $group[] = 'df_distance.distance';
                     break;
                 case 'removing_date':
                     $select->order(['pictures.removing_date DESC', 'pictures.id']);
