@@ -333,24 +333,24 @@ class ItemController extends AbstractRestfulController
 
         $select = new Sql\Select($this->itemModel->getTable()->getTable());
 
-        $group = false;
+        $group = [];
         $columns = [Sql\Select::SQL_STAR];
         $itemLanguageJoined = false;
 
         $match = $data['descendant_pictures']
               && ($data['descendant_pictures']['status'] || $data['descendant_pictures']['owner_id']);
         if ($match) {
-            $group = true;
+            $group['item.id'] = true;
 
-            $columns = [];
+            $joinColumns = [];
             if (isset($data['fields']['current_pictures_count'])) {
-                $columns['current_pictures_count'] = new Sql\Expression('COUNT(distinct pictures.id)');
+                $joinColumns['current_pictures_count'] = new Sql\Expression('COUNT(distinct pictures.id)');
             }
 
             $select
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
-                ->join('pictures', 'picture_item.picture_id = pictures.id', $columns);
+                ->join('pictures', 'picture_item.picture_id = pictures.id', $joinColumns);
 
             if (isset($data['descendant_pictures']['status']) && $data['descendant_pictures']['status']) {
                 $select->where(['pictures.status' => $data['descendant_pictures']['status']]);
@@ -388,7 +388,7 @@ class ItemController extends AbstractRestfulController
             }
             $select->where(['item_language.name like ?' => $data['name']]);
 
-            $group = true;
+            $group['item.id'] = true;
         }
 
         if (strlen($data['concept'])) {
@@ -433,7 +433,7 @@ class ItemController extends AbstractRestfulController
                     'item.item_type_id'  => Item::FACTORY,
                 ]);
 
-            $group = true;
+            $group['item.id'] = true;
             $data['order'] = 'cars_count_desc';
             $data['fields']['factories_of_brand_cars_count'] = true;
             $columns['factories_of_brand_cars_count'] = new Sql\Expression('count(1)');
@@ -447,7 +447,7 @@ class ItemController extends AbstractRestfulController
                 $select->order('item.id DESC');
                 break;
             case 'childs_count':
-                $group = true;
+                $group['item.id'] = true;
                 $select
                     ->join('item_parent', 'item_parent.parent_id = item.id', [
                         'childs_count' => new Sql\Expression('count(item_parent.item_id)')
@@ -463,7 +463,7 @@ class ItemController extends AbstractRestfulController
                     $select->join('item_language', 'item.id = item_language.item_id', []);
                 }
                 $select->order([new Sql\Expression('length(item_language.name)'), 'item_language.name']);
-                $group = true;
+                $group['item.id'] = true;
                 break;
             case 'name_nat':
                 $select->order(['item.name']);
@@ -510,7 +510,7 @@ class ItemController extends AbstractRestfulController
                 ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', [])
                 ->where(['ipc2.parent_id' => (int)$data['have_common_childs_with']]);
 
-            $group = true;
+            $group['item.id'] = true;
         }
 
         if ($isModer) {
@@ -532,7 +532,7 @@ class ItemController extends AbstractRestfulController
             }
 
             if ($data['descendant']) {
-                $group = true;
+                $group['item.id'] = true;
                 $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
                     ->where(['item_parent_cache.item_id' => $data['descendant']]);
             }
@@ -555,7 +555,7 @@ class ItemController extends AbstractRestfulController
             }
 
             if ($data['vehicle_childs_type_id']) {
-                $group = true;
+                $group['item.id'] = true;
                 $select
                     ->join(
                         ['cpc_childs' => 'item_parent_cache'],
@@ -601,7 +601,7 @@ class ItemController extends AbstractRestfulController
                     ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', [])
                     ->where(['textstorage_text.text like ?' => '%' . $data['text'] . '%']);
 
-                $group = true;
+                $group['item.id'] = true;
             }
 
             if ($data['suggestions_to']) {
@@ -622,7 +622,7 @@ class ItemController extends AbstractRestfulController
                         new Sql\Predicate\In('item.id', $subSelect)
                     ]);
 
-                $group = true;
+                $group['item.id'] = true;
             }
 
             if ($data['have_childs_of_type']) {
@@ -631,7 +631,7 @@ class ItemController extends AbstractRestfulController
                     ->join(['child' => 'item'], 'ipc3.item_id = child.id', [])
                     ->where(['child.item_type_id' => (int)$data['have_childs_of_type']]);
 
-                $group = true;
+                $group['item.id'] = true;
             }
 
             if ($data['have_childs_with_parent_of_type']) {
@@ -641,7 +641,7 @@ class ItemController extends AbstractRestfulController
                     ->join(['child2' => 'item'], 'ip5.parent_id = child2.id', [])
                     ->where(['child2.item_type_id' => (int)$data['have_childs_with_parent_of_type']]);
 
-                $group = true;
+                $group['item.id'] = true;
             }
 
             if ($data['engine_id']) {
@@ -751,7 +751,7 @@ class ItemController extends AbstractRestfulController
                     $select->where(['item.end_model_year' => $endModelYear]);
                 }
 
-                $group = true;
+                $group['item.id'] = true;
             }
 
             if ($data['exclude_self_and_childs']) {
@@ -809,7 +809,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if ($group) {
-            $select->group('item.id');
+            $select->group(array_keys($group));
         }
 
         $select->columns($columns);
