@@ -1047,7 +1047,14 @@ class ItemController extends AbstractRestfulController
                     ['name' => 'StringTrim']
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
+                    ['name' => 'Digits'],
+                    [
+                        'name' => 'Between',
+                        'options' => [
+                            'min' => 1500,
+                            'max' => 2100
+                        ]
+                    ]
                 ]
             ],
             'begin_model_year_fraction' => [
@@ -1070,7 +1077,14 @@ class ItemController extends AbstractRestfulController
                     ['name' => 'StringTrim']
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
+                    ['name' => 'Digits'],
+                    [
+                        'name' => 'Between',
+                        'options' => [
+                            'min' => 1500,
+                            'max' => 2100
+                        ]
+                    ]
                 ]
             ],
             'end_model_year_fraction' => [
@@ -1093,7 +1107,14 @@ class ItemController extends AbstractRestfulController
                     ['name' => 'StringTrim']
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
+                    ['name' => 'Digits'],
+                    [
+                        'name' => 'Between',
+                        'options' => [
+                            'min' => 1500,
+                            'max' => 2100
+                        ]
+                    ]
                 ]
             ],
             'begin_month' => [
@@ -1111,7 +1132,14 @@ class ItemController extends AbstractRestfulController
                     ['name' => 'StringTrim']
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
+                    ['name' => 'Digits'],
+                    [
+                        'name' => 'Between',
+                        'options' => [
+                            'min' => 1500,
+                            'max' => 2100
+                        ]
+                    ]
                 ]
             ],
             'end_month' => [
