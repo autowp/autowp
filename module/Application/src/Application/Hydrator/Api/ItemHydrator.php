@@ -4,7 +4,7 @@ namespace Application\Hydrator\Api;
 
 use Application\Comments;
 use Application\Controller\Plugin\Pic;
-use ArrayObject;
+use Application\Model\PerspectivePictureFetcher;
 use Autowp\Comments\Attention;
 use Exception;
 use Traversable;
@@ -617,26 +617,20 @@ class ItemHydrator extends RestHydrator
                 $pictureItemTypeId = $this->previewPictures['type_id'];
             }
 
-            $perspectivePageId = null;
+            $perspectivePageId = 0;
             if (isset($this->previewPictures['perspective_page_id']) && $this->previewPictures['perspective_page_id']) {
                 $perspectivePageId = $this->previewPictures['perspective_page_id'];
             }
 
-            $cFetcher = new Item\PerspectivePictureFetcher([
+            $cFetcher = new PerspectivePictureFetcher([
                 'pictureModel'         => $this->picture,
-                'itemModel'            => $this->itemModel,
                 'perspective'          => $this->perspective,
-                'type'                 => null,
                 'onlyExactlyPictures'  => $onlyExactlyPictures,
-                'dateSort'             => false,
-                'disableLargePictures' => false,
                 'perspectivePageId'    => $perspectivePageId,
-                'onlyChilds'           => [],
                 'pictureItemTypeId'    => $pictureItemTypeId
             ]);
 
-            $carsTotalPictures = $cFetcher->getTotalPictures([$object['id']], $onlyExactlyPictures);
-            $totalPictures = isset($carsTotalPictures[$object['id']]) ? (int)$carsTotalPictures[$object['id']] : 0;
+            $totalPictures = $cFetcher->getTotalPictures($object['id'], $onlyExactlyPictures);
         }
 
         if ($showPreviewPictures) {
@@ -647,7 +641,7 @@ class ItemHydrator extends RestHydrator
             $extractRoute = isset($this->fields['preview_pictures']['route']);
 
             if ($extractRoute) {
-                foreach ($pictures as &$picture) {
+                foreach ($pictures['pictures'] as &$picture) {
                     if ($picture) {
                         $picture['route'] = $this->picHelper->route($picture['row']);
                     }
@@ -655,7 +649,12 @@ class ItemHydrator extends RestHydrator
                 unset($picture);
             }
 
-            $result['preview_pictures'] = $this->extractValue('preview_pictures', $pictures);
+            $result['preview_pictures'] = [
+                'large_format' => $pictures['large_format'],
+                'pictures'     => $this->extractValue('preview_pictures', $pictures['pictures'], [
+                    'large_format' => $pictures['large_format'],
+                ])
+            ];
         }
 
         if ($this->filterComposite->filter('brands')) {

@@ -22,6 +22,9 @@ class PreviewPictureHydrator extends RestHydrator
         parent::__construct();
         $strategy = new Strategy\Picture($serviceManager);
         $this->addStrategy('picture', $strategy);
+
+        $strategy = new Strategy\Image($serviceManager);
+        $this->addStrategy('thumb', $strategy);
     }
 
     /**
@@ -60,7 +63,7 @@ class PreviewPictureHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object, $context = null)
     {
         $result = [];
 
@@ -70,6 +73,17 @@ class PreviewPictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('picture')) {
             $result['picture'] = $this->extractValue('picture', $object['row']);
+        }
+
+        $largeFormat = is_array($context) && isset($context['large_format']) && $context['large_format'];
+
+        if (isset($object['row']['image_id'])) {
+            $result['thumb'] = $this->extractValue('thumb', [
+                'image' => $object['row']['image_id'],
+                'format' => $largeFormat ? 'picture-thumb-large' : 'picture-thumb-medium'
+            ]);
+        } else {
+            $result['thumb'] = null;
         }
 
         return $result;
