@@ -71,9 +71,7 @@ class PreviewPictureHydrator extends RestHydrator
             $result['url'] = $object['url'];
         }
 
-        if ($this->filterComposite->filter('picture')) {
-            $result['picture'] = $this->extractValue('picture', $object['row']);
-        }
+        $result['picture'] = $this->extractValue('picture', $object['row']);
 
         $largeFormat = is_array($context) && isset($context['large_format']) && $context['large_format'];
 
