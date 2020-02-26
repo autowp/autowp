@@ -421,13 +421,21 @@ class IndexController extends AbstractRestfulController
                         ]);
 
                         foreach ($cataloguePaths as $path) {
-                            if ($path['type'] == 'brand') {
-                                $route = ['/', $path['brand_catname']];
-                            } else {
-                                $route = array_merge(
-                                    ['/', $path['brand_catname'], $path['car_catname']],
-                                    $path['path']
-                                );
+                            switch ($path['type']) {
+                                case 'brand':
+                                    $route = ['/', $path['brand_catname']];
+                                    break;
+                                case 'category':
+                                    $route = ['/categories', $path['category_catname']];
+                                    break;
+                                case 'person':
+                                    $route = ['/persons', $path['id']];
+                                    break;
+                                default:
+                                    $route = array_merge(
+                                        ['/', $path['brand_catname'], $path['car_catname']],
+                                        $path['path']
+                                    );
                             }
                             $item['public_route'] = $route;
                             break;

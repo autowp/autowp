@@ -2,10 +2,7 @@
 
 namespace Application\Controller\Plugin\Service;
 
-use Application\Model\Catalogue;
-use Application\Model\Item;
 use Application\Model\Picture;
-use Application\Model\PictureItem;
 use Application\PictureNameFormatter;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
@@ -24,9 +21,6 @@ class PicFactory implements FactoryInterface
     {
         return new Plugin(
             $container->get(PictureNameFormatter::class),
-            $container->get(PictureItem::class),
-            $container->get(Catalogue::class),
-            $container->get(Item::class),
             $container->get(Picture::class)
         );
     }

@@ -124,45 +124,37 @@ class Catalogue
         if ($toBrand === false) {
             $select = new Sql\Select($this->itemTable->getTable());
             $select
-                ->columns(['catname'])
+                ->columns(['id', 'catname', 'item_type_id'])
                 ->where([
                     'id'           => $id,
-                    'item_type_id' => Item::CATEGORY
+                    new Sql\Predicate\In('item_type_id', [Item::CATEGORY, Item::PERSON])
                 ]);
 
             $category = $this->itemTable->selectWith($select)->current();
 
             if ($category) {
-                $result[] = [
-                    'type'             => 'category',
-                    'category_catname' => $category['catname']
-                ];
+                switch ($category['item_type_id']) {
+                    case Item::CATEGORY:
+                        $result[] = [
+                            'type'             => 'category',
+                            'category_catname' => $category['catname']
+                        ];
 
-                if ($breakOnFirst && count($result)) {
-                    return $result;
-                }
-            }
-        }
+                        if ($breakOnFirst && count($result)) {
+                            return $result;
+                        }
+                        break;
 
-        if ($toBrand === false) {
-            $select = new Sql\Select($this->itemTable->getTable());
-            $select
-                ->columns(['id'])
-                ->where([
-                    'id'           => $id,
-                    'item_type_id' => Item::PERSON
-                ]);
+                    case Item::PERSON:
+                        $result[] = [
+                            'type' => 'person',
+                            'id'   => $category['id']
+                        ];
 
-            $person = $this->itemTable->selectWith($select)->current();
-
-            if ($person) {
-                $result[] = [
-                    'type' => 'person',
-                    'id'   => $person['id']
-                ];
-
-                if ($breakOnFirst && count($result)) {
-                    return $result;
+                        if ($breakOnFirst && count($result)) {
+                            return $result;
+                        }
+                        break;
                 }
             }
         }

@@ -6,6 +6,7 @@ use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Hydrator\Api\PictureHydrator;
 use Application\Model\CarOfDay;
+use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
@@ -55,7 +56,8 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(Item::class),
             $container->get(Picture::class),
             $container->get(User::class),
-            $container->get(PictureService::class)
+            $container->get(PictureService::class),
+            $container->get(Catalogue::class)
         );
     }
 }

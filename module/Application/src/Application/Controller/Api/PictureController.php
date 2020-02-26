@@ -3,6 +3,7 @@
 namespace Application\Controller\Api;
 
 use Application\Comments;
+use Application\Model\Catalogue;
 use ArrayObject;
 use Exception;
 use geoPHP;
@@ -155,6 +156,11 @@ class PictureController extends AbstractRestfulController
      */
     private $message;
 
+    /**
+     * @var Catalogue
+     */
+    private $catalogue;
+
     public function __construct(
         RestHydrator $hydrator,
         PictureItem $pictureItem,
@@ -176,7 +182,8 @@ class PictureController extends AbstractRestfulController
         Item $item,
         Picture $picture,
         User $userModel,
-        PictureService $pictureService
+        PictureService $pictureService,
+        Catalogue $catalogue
     ) {
         $this->carOfDay = $carOfDay;
 
@@ -200,8 +207,13 @@ class PictureController extends AbstractRestfulController
         $this->item = $item;
         $this->userModel = $userModel;
         $this->pictureService = $pictureService;
+        $this->catalogue = $catalogue;
     }
 
+    /**
+     * @return array|JsonModel
+     * @throws Exception
+     */
     public function canonicalRouteAction()
     {
         $picture = $this->picture->getRow(['identity' => (string)$this->params('id')]);
@@ -210,7 +222,70 @@ class PictureController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $route = $this->pic()->route($picture, true);
+        $route = null;
+
+        $itemIds = $this->pictureItem->getPictureItems($picture['id'], PictureItem::PICTURE_CONTENT);
+        if ($itemIds) {
+            $itemIds = $this->item->getIds([
+                'id'           => $itemIds,
+                'item_type_id' => [Item::BRAND, Item::VEHICLE, Item::ENGINE, Item::PERSON]
+            ]);
+
+            if ($itemIds) {
+                $carId = $itemIds[0];
+
+                $paths = $this->catalogue->getCataloguePaths($carId, [
+                    'breakOnFirst' => true,
+                    'stockFirst'   => true,
+                    'toBrand'      => false
+                ]);
+
+                if (count($paths) > 0) {
+                    $path = $paths[0];
+
+                    switch ($path['type']) {
+                        case 'brand':
+                            if ($path['car_catname']) {
+                                $route = array_merge(
+                                    ['/', $path['brand_catname'], $path['car_catname']],
+                                    $path['path'],
+                                    ['pictures', $picture['identity']]
+                                );
+                            } else {
+                                $perspectiveId = $this->pictureItem->getPerspective($picture['id'], $carId);
+
+                                switch ($perspectiveId) {
+                                    case 22:
+                                        $action = 'logotypes';
+                                        break;
+                                    case 25:
+                                        $action = 'mixed';
+                                        break;
+                                    default:
+                                        $action = 'other';
+                                        break;
+                                }
+
+                                $route = ['/', $path['brand_catname'], $action, $picture['identity']];
+                            }
+                            break;
+                        case 'brand-item':
+                            $route = array_merge(
+                                ['/', $path['brand_catname'], $path['car_catname']],
+                                $path['path'],
+                                ['pictures',  $picture['identity']]
+                            );
+                            break;
+                        case 'category':
+                            $route = ['/category', $path['category_catname'], 'pictures', $picture['identity']];
+                            break;
+                        case 'person':
+                            $route = ['/persons', $path['id'], $picture['identity']];
+                            break;
+                    }
+                }
+            }
+        }
 
         return new JsonModel($route);
     }

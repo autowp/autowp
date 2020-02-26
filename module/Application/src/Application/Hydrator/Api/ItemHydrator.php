@@ -152,6 +152,8 @@ class ItemHydrator extends RestHydrator
      */
     private $routeBrandID;
 
+    private $cataloguePaths = [];
+
     public function __construct(
         $serviceManager
     ) {
@@ -643,7 +645,7 @@ class ItemHydrator extends RestHydrator
             if ($extractRoute) {
                 foreach ($pictures['pictures'] as &$picture) {
                     if ($picture) {
-                        $picture['route'] = $this->picHelper->route($picture['row']);
+                        $picture['route'] = ['/picture', $picture['identity']];
                     }
                 }
                 unset($picture);
@@ -929,7 +931,7 @@ class ItemHydrator extends RestHydrator
 
                     case Item::ENGINE:
                     case Item::VEHICLE:
-                        $route = $this->getDetailsRoute($object, [
+                        $route = $this->getDetailsRoute($object['id'], [
                             'breakOnFirst' => true,
                             'toBrand'      => $this->routeBrandID,
                             'stockFirst'   => true
