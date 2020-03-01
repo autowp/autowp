@@ -2,6 +2,8 @@
 
 namespace Application\Controller\Api;
 
+use Application\Controller\Plugin\Log;
+use Exception;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -24,6 +26,7 @@ use Application\Model\UserPicture;
  * @method string language()
  * @method ForbiddenAction forbiddenAction()
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ * @method Log log(string $message, array $objects)
  */
 class PictureModerVoteController extends AbstractRestfulController
 {
@@ -86,6 +89,12 @@ class PictureModerVoteController extends AbstractRestfulController
         $this->userModel = $userModel;
     }
 
+    /**
+     * @param $picture
+     * @param $vote
+     * @param $reason
+     * @throws Exception
+     */
     private function notifyVote($picture, $vote, $reason)
     {
         $owner = $this->userModel->getRow((int)$picture['owner_id']);
@@ -112,6 +121,10 @@ class PictureModerVoteController extends AbstractRestfulController
         }
     }
 
+    /**
+     * @param $picture
+     * @throws Exception
+     */
     private function unaccept($picture)
     {
         $previousStatusUserId = $picture['change_status_user_id'];
@@ -155,14 +168,22 @@ class PictureModerVoteController extends AbstractRestfulController
     /**
      * Return single resource
      *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param  mixed $id
+     * @param mixed $id
      * @return mixed
+     * @throws Exception
      */
     public function get($id)
     {
-        return $this->notFoundAcation();
+        if (! $this->user()->isAllowed('picture', 'moder_vote')) {
+            return $this->forbiddenAction();
+        }
+
+        $picture = $this->picture->getRow(['id' => (int)$id]);
+        if (! $picture) {
+            return $this->notFoundAction();
+        }
+
+
     }
 
     /**
@@ -172,7 +193,7 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     public function getList()
     {
-        return $this->notFoundAcation();
+        return $this->notFoundAction();
     }
 
     /**
@@ -181,7 +202,7 @@ class PictureModerVoteController extends AbstractRestfulController
      * @param mixed $id
      * @param mixed $data
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function update($id, $data)
     {
@@ -269,7 +290,7 @@ class PictureModerVoteController extends AbstractRestfulController
      *
      * @param mixed $id
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete($id)
     {

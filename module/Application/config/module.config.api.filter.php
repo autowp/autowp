@@ -2700,6 +2700,18 @@ return [
                         ['name' => 'Digits']
                     ]
                 ],
+                'perspective_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'perspective_exclude_id' => [
+                    'required' => false
+                ],
             ],
             'accepted_in_days' => [
                 'required' => false,
@@ -2880,6 +2892,18 @@ return [
                     'validators' => [
                         ['name' => 'Digits']
                     ]
+                ],
+                'perspective_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'perspective_exclude_id' => [
+                    'required' => false
                 ],
             ],
             'accepted_in_days' => [

@@ -536,7 +536,7 @@ class PictureController extends AbstractRestfulController
         }
 
         if ($data['perspective_exclude_id']) {
-            $parts = explode(',', $data['perspective_id']);
+            $parts = explode(',', $data['perspective_exclude_id']);
             $value = [];
             foreach ($parts as $part) {
                 $part = (int)$part;

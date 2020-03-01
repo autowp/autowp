@@ -281,6 +281,12 @@ class ItemHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param $object
+     * @param string $language
+     * @return array
+     * @throws Exception
+     */
     private function getNameData($object, string $language = 'en'): array
     {
         if (! is_string($language)) {
@@ -377,6 +383,11 @@ class ItemHydrator extends RestHydrator
         return null;
     }
 
+    /**
+     * @param object $object
+     * @return array
+     * @throws Exception
+     */
     public function extract($object)
     {
         $nameData = $this->getNameData($object, $this->language);
@@ -389,7 +400,9 @@ class ItemHydrator extends RestHydrator
 
         $result = [
             'id'           => (int)$object['id'],
-            'item_type_id' => (int)$object['item_type_id']
+            'item_type_id' => (int)$object['item_type_id'],
+            'catname'      => $object['catname'],
+            'is_group'     => (bool)$object['is_group']
         ];
 
         if ($this->filterComposite->filter('alt_names')) {
@@ -533,10 +546,6 @@ class ItemHydrator extends RestHydrator
             }
 
             $result['other_names'] = $otherNames;
-        }
-
-        if ($this->filterComposite->filter('catname')) {
-            $result['catname'] = $object['catname'];
         }
 
         if ($this->filterComposite->filter('current_pictures_count')) {
@@ -720,11 +729,9 @@ class ItemHydrator extends RestHydrator
             ]);
         }
 
-        if ($this->filterComposite->filter('is_group')) {
-            $result['is_group'] = (bool)$object['is_group'];
-        }
-
         if ($isModer) {
+            $result['body'] = (string)$object['body'];
+
             if ($this->filterComposite->filter('comments_attentions_count')) {
                 $result['comments_attentions_count'] = $this->comments->service()->getTotalMessagesCount([
                     'attention' => Attention::REQUIRED,
@@ -746,10 +753,6 @@ class ItemHydrator extends RestHydrator
                     ],
                     'status' => Picture::STATUS_INBOX,
                 ]);
-            }
-
-            if ($this->filterComposite->filter('body')) {
-                $result['body'] = (string)$object['body'];
             }
 
             if ($this->filterComposite->filter('is_concept')) {
@@ -1024,6 +1027,11 @@ class ItemHydrator extends RestHydrator
         return $this->acl->isAllowed($role, $resource, $privilege);
     }
 
+    /**
+     * @param $engine
+     * @return array
+     * @throws Exception
+     */
     private function getVehiclesOnEngine($engine)
     {
         $result = [];
@@ -1055,6 +1063,11 @@ class ItemHydrator extends RestHydrator
         return $result;
     }
 
+    /**
+     * @param $item
+     * @return array
+     * @throws Exception
+     */
     private function getItemPublicRoutes($item)
     {
         if ($item['item_type_id'] == Item::FACTORY) {
@@ -1084,6 +1097,12 @@ class ItemHydrator extends RestHydrator
         return $this->walkUpUntilBrand((int)$item['id'], []);
     }
 
+    /**
+     * @param int $id
+     * @param array $path
+     * @return array
+     * @throws Exception
+     */
     private function walkUpUntilBrand(int $id, array $path): array
     {
         $routes = [];
