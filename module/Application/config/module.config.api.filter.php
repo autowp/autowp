@@ -2682,6 +2682,24 @@ return [
                         ['name' => 'Digits'],
                     ]
                 ],
+                'exact_item_link_type' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'exact_item_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
             ],
             'accepted_in_days' => [
                 'required' => false,
@@ -2843,6 +2861,24 @@ return [
                     ],
                     'validators' => [
                         ['name' => 'Digits'],
+                    ]
+                ],
+                'exact_item_link_type' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'exact_item_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
                     ]
                 ],
             ],

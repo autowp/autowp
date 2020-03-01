@@ -110,10 +110,20 @@ class GalleryController extends AbstractRestfulController
 
         if ($itemID) {
             if ($exact) {
-                $filter['item'] = $itemID;
+                $filter['item']['id'] = $itemID;
             } else {
                 $filter['item']['ancestor_or_self'] = $itemID;
             }
+        }
+
+        $exactItemID = (int) $this->params()->fromQuery('exact_item_id');
+        if ($exactItemID) {
+            $filter['item']['id'] = $exactItemID;
+        }
+
+        $exactItemLinkType = (int) $this->params()->fromQuery('exact_item_link_type');
+        if ($exactItemLinkType) {
+            $filter['item']['link_type'] = $exactItemLinkType;
         }
 
         $page = $this->params()->fromQuery('page');
@@ -141,7 +151,7 @@ class GalleryController extends AbstractRestfulController
         $language = $this->language();
 
         if ($pictureIdentity) {
-            if (! $itemID) {
+            if (! $itemID && !$exactItemID) {
                 $filter['identity'] = $pictureIdentity;
             }
 

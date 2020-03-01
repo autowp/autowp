@@ -646,11 +646,11 @@ class PictureController extends AbstractRestfulController
 
         if ($limit > 0) {
             $this->hydrator->setOptions([
-                'language' => $this->language(),
-                'user_id'  => $user ? $user['id'] : null,
-                'fields'   => $data['fields'],
-                'item_id'  => (int) $data['item_id'],
-                'paginator_item_id' => (int) $data['paginator']['item_id'],
+                'language'  => $this->language(),
+                'user_id'   => $user ? $user['id'] : null,
+                'fields'    => $data['fields'],
+                'item_id'   => (int) $data['item_id'],
+                'paginator' => $data['paginator'],
             ]);
 
             $pictures = [];

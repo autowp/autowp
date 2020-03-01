@@ -54,9 +54,9 @@ class PictureHydrator extends RestHydrator
     private $itemID = 0;
 
     /**
-     * @var int
+     * @var array
      */
-    private $paginatorItemID = 0;
+    private $paginator;
 
     /**
      * @var PictureNameFormatter
@@ -226,8 +226,8 @@ class PictureHydrator extends RestHydrator
             $this->itemID = (int) $options['item_id'];
         }
 
-        if (isset($options['paginator_item_id'])) {
-            $this->paginatorItemID = (int) $options['paginator_item_id'];
+        if (isset($options['paginator'])) {
+            $this->paginator = $options['paginator'];
         }
 
         return $this;
@@ -263,8 +263,6 @@ class PictureHydrator extends RestHydrator
 
     private function getItemRoute(int $itemID, int $targetItemID): ?array
     {
-        //print "getItemRoute($itemID, $targetItemID)\n";
-        //var_dump($targetItemID);
         $row = $this->itemModel->getRow([
             'id' => $itemID
         ]);
@@ -278,7 +276,6 @@ class PictureHydrator extends RestHydrator
         }
 
         $isMatched = ! $targetItemID || $parents || $itemID == $targetItemID;
-        //var_dump($isMatched, $parents, $row['id']);
         if (! $isMatched) {
             return null;
         }
@@ -344,14 +341,24 @@ class PictureHydrator extends RestHydrator
             $picture['path'] = $this->getPath($object['id'], $this->itemID);
         }
 
-        if ($this->filterComposite->filter('paginator') && $this->paginatorItemID) {
+        if ($this->filterComposite->filter('paginator') && $this->paginator) {
             $filter = [
                 'order'  => 'resolution_desc',
                 'status' => $object['status'],
-                'item'   => [
-                    'ancestor_or_self' => $this->paginatorItemID
-                ]
             ];
+
+            if ($this->paginator['item_id']) {
+                $filter['item']['ancestor_or_self'] = $this->paginator['item_id'];
+            }
+
+            if ($this->paginator['exact_item_id']) {
+                $filter['item']['id'] = $this->paginator['exact_item_id'];
+            }
+
+            if ($this->paginator['exact_item_link_type']) {
+                $filter['item']['link_type'] = $this->paginator['exact_item_link_type'];
+            }
+
             $paginator = $this->picture->getPaginator($filter);
 
             $total = $paginator->getTotalItemCount();

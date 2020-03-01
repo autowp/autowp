@@ -645,7 +645,7 @@ class ItemHydrator extends RestHydrator
             if ($extractRoute) {
                 foreach ($pictures['pictures'] as &$picture) {
                     if ($picture) {
-                        $picture['route'] = ['/picture', $picture['identity']];
+                        $picture['route'] = ['/picture', $picture['row']['identity']];
                     }
                 }
                 unset($picture);
