@@ -5,11 +5,11 @@ namespace Application\Model;
 use ArrayObject;
 use DateTime;
 use Exception;
+use GeometryCollection;
 use geoPHP;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
-use Zend\Router\Http\TreeRouteStack;
 use Autowp\TextStorage\Service as TextStorage;
 
 class Item
@@ -695,6 +695,10 @@ class Item
         return $result;
     }
 
+    /**
+     * @param int $itemId
+     * @throws Exception
+     */
     public function updateInteritance(int $itemId)
     {
         $item = $this->itemTable->select(['id' => $itemId])->current();
@@ -705,6 +709,10 @@ class Item
         $this->updateItemInteritance($item);
     }
 
+    /**
+     * @param $car
+     * @throws Exception
+     */
     private function updateItemInteritance($car)
     {
         $parents = $this->getRows([
@@ -855,6 +863,11 @@ class Item
         }
     }
 
+    /**
+     * @param int $parentId
+     * @return int
+     * @throws Exception
+     */
     public function getVehiclesAndEnginesCount(int $parentId): int
     {
         return $this->getCount([
@@ -890,6 +903,11 @@ class Item
         $this->itemPointTable->insert(array_replace($set, $primaryKey));
     }
 
+    /**
+     * @param int $itemId
+     * @return array|bool|GeometryCollection|mixed|null
+     * @throws exception
+     */
     public function getPoint(int $itemId)
     {
         $point = null;
@@ -907,6 +925,13 @@ class Item
         return $this->itemTable;
     }
 
+    /**
+     * @param array $columns
+     * @param string $itemParentAlias
+     * @param $language
+     * @return array
+     * @throws Exception
+     */
     private function applyColumns(array $columns, string $itemParentAlias, $language)
     {
         $result = [];
@@ -954,6 +979,15 @@ class Item
         return $result;
     }
 
+    /**
+     * @param Sql\Select $select
+     * @param $options
+     * @param $prefix
+     * @param $language
+     * @param string $id
+     * @return array
+     * @throws Exception
+     */
     private function applyChildFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
     {
         if (! is_array($options)) {
@@ -986,6 +1020,15 @@ class Item
         ), $alias . '.item_id', $alias);
     }
 
+    /**
+     * @param Sql\Select $select
+     * @param $options
+     * @param $prefix
+     * @param $language
+     * @param string $id
+     * @return array
+     * @throws Exception
+     */
     private function applyParentFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
     {
         if (! is_array($options)) {
@@ -1035,6 +1078,15 @@ class Item
         return $group;
     }
 
+    /**
+     * @param Sql\Select $select
+     * @param $options
+     * @param $prefix
+     * @param $language
+     * @param string $id
+     * @return array
+     * @throws Exception
+     */
     private function applyDescendantFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
     {
         if (! is_array($options)) {
@@ -1109,6 +1161,12 @@ class Item
         return $group;
     }
 
+    /**
+     * @param Sql\Select $select
+     * @param string $alias
+     * @param $value
+     * @throws Exception
+     */
     private function applyLinkTypeFilter(Sql\Select $select, string $alias, $value)
     {
         $column = $alias . '.type';
@@ -1122,6 +1180,12 @@ class Item
         }
     }
 
+    /**
+     * @param Sql\Select $select
+     * @param $value
+     * @param string $id
+     * @throws Exception
+     */
     private function applyIdFilter(Sql\Select $select, $value, string $id)
     {
         if (is_array($value)) {
@@ -1148,6 +1212,14 @@ class Item
         $select->where([$id => $value]);
     }
 
+    /**
+     * @param Sql\Select $select
+     * @param array $options
+     * @param $id
+     * @param string $prefix
+     * @return array
+     * @throws Exception
+     */
     private function applyFilters(Sql\Select $select, array $options, $id, string $prefix): array
     {
         $defaults = [
@@ -1672,6 +1744,11 @@ class Item
         return $select;
     }
 
+    /**
+     * @param array $options
+     * @return Paginator\Paginator
+     * @throws Exception
+     */
     public function getPaginator(array $options): Paginator\Paginator
     {
         return new Paginator\Paginator(
@@ -1682,6 +1759,11 @@ class Item
         );
     }
 
+    /**
+     * @param array $options
+     * @return int
+     * @throws Exception
+     */
     public function getCount(array $options): int
     {
         return $this->getPaginator($options)->getTotalItemCount();
@@ -1772,6 +1854,11 @@ class Item
         return (bool)$this->itemTable->selectWith($select)->current();
     }
 
+    /**
+     * @param array $options
+     * @return array
+     * @throws Exception
+     */
     public function getRows(array $options): array
     {
         $select = $this->getSelect($options);
@@ -1783,6 +1870,11 @@ class Item
         return $result;
     }
 
+    /**
+     * @param array $options
+     * @return array
+     * @throws Exception
+     */
     public function getIds(array $options): array
     {
         $select = $this->getSelect($options);
@@ -1797,6 +1889,12 @@ class Item
         return $result;
     }
 
+    /**
+     * @param int $itemId
+     * @param string $language
+     * @return array|null
+     * @throws Exception
+     */
     public function getDesignInfo(int $itemId, string $language)
     {
         $brand = $this->getRow([

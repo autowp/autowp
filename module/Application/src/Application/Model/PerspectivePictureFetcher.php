@@ -73,7 +73,7 @@ class PerspectivePictureFetcher
             ->columns([
                 'id', 'name',
                 'image_id', 'width', 'height', 'identity',
-                'status', 'owner_id', 'filesize'
+                'status', 'owner_id', 'filesize', 'add_date', 'dpi_x', 'dpi_y', 'point'
             ])
             ->join(
                 'picture_item',

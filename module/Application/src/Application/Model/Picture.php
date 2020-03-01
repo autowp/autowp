@@ -190,6 +190,13 @@ class Picture
         }
     }
 
+    /**
+     * @param Sql\Select $select
+     * @param $options
+     * @param bool $forceJoinItem
+     * @return array
+     * @throws Exception
+     */
     private function applyItemFilters(Sql\Select $select, $options, bool $forceJoinItem)
     {
         if (! is_array($options)) {
@@ -861,6 +868,11 @@ class Picture
         return (bool)$this->table->selectWith($select)->current();
     }
 
+    /**
+     * @param array $options
+     * @return array
+     * @throws Exception
+     */
     public function getRows(array $options): array
     {
         $select = $this->getSelect($options);
@@ -872,6 +884,11 @@ class Picture
         return $result;
     }
 
+    /**
+     * @param array $options
+     * @return array
+     * @throws Exception
+     */
     public function getIds(array $options): array
     {
         $select = $this->getSelect($options);

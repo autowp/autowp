@@ -108,6 +108,11 @@ class ItemParentHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param object $object
+     * @return array
+     * @throws Exception
+     */
     public function extract($object)
     {
         $result = [

@@ -3,6 +3,7 @@
 namespace Application\Controller\Api;
 
 use ArrayObject;
+use Exception;
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -300,6 +301,10 @@ class ItemParentController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
+    /**
+     * @return ForbiddenAction|array|ApiProblemResponse
+     * @throws Exception
+     */
     public function postAction()
     {
         $canMove = $this->user()->isAllowed('car', 'move');
@@ -404,6 +409,10 @@ class ItemParentController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ForbiddenAction|array|ApiProblemResponse
+     * @throws Exception
+     */
     public function putAction()
     {
         $canMove = $this->user()->isAllowed('car', 'move');
@@ -509,6 +518,7 @@ class ItemParentController extends AbstractRestfulController
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @throws Exception
      */
     public function deleteAction()
     {
