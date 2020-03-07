@@ -1,4 +1,4 @@
-FROM ubuntu:eoan
+FROM ubuntu:focal
 
 LABEL maintainer="dmitry@pereslegin.ru"
 
@@ -39,31 +39,22 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         nginx \
         openssh-client \
         optipng \
-        php \
-        php-bcmath \
-        php-ctype \
-        php-curl \
-        php-dom \
-        php-exif \
-        php-fileinfo \
-        php-fpm \
-        php-ftp \
-        php-iconv \
-        php-imagick \
-        php-intl \
-        php-json \
-        php-gd \
-        php-mbstring \
-        php-memcached \
-        php-mysql \
-        php-opcache \
-        php-pdo \
-        php-phar \
-        php-simplexml \
-        php-tokenizer \
-        php-xml \
-        php-xmlwriter \
-        php-zip \
+        php7.4 \
+        php7.4-bcmath \
+        php7.4-common \
+        php7.4-curl \
+        php7.4-fpm \
+        php7.4-imagick \
+        php7.4-intl \
+        php7.4-json \
+        php7.4-gd \
+        php7.4-mbstring \
+        php7.4-memcached \
+        php7.4-mysql \
+        php7.4-opcache \
+        php7.4-tokenizer \
+        php7.4-xml \
+        php7.4-zip \
         pngquant \
         rsyslog \
         ssmtp \
