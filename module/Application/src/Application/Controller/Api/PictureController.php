@@ -488,7 +488,8 @@ class PictureController extends AbstractRestfulController
             12 => 'likes',
             13 => 'dislikes',
             14 => 'status',
-            15 => 'accept_datetime_desc'
+            15 => 'accept_datetime_desc',
+            16 => 'perspectives',
         ];
 
         switch ($data['order']) {
