@@ -9,18 +9,15 @@ use Autowp\Comments\CommentsService;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CommentsFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Comments
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Comments
     {
         $tables = $container->get('TableManager');
         return new Comments(

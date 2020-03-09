@@ -4,18 +4,15 @@ namespace Application\Controller\Api;
 
 use Application\Model\Referer;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class HotlinksControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return HotlinksController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): HotlinksController
     {
         return new HotlinksController(
             $container->get(Referer::class)

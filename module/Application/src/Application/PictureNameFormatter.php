@@ -2,39 +2,35 @@
 
 namespace Application;
 
-use Zend\View\Renderer\PhpRenderer;
 use Application\Model\Picture;
+use Laminas\I18n\Translator\TranslatorInterface;
+use Laminas\View\Renderer\PhpRenderer;
+
+use function count;
+use function implode;
+use function mb_strtoupper;
+use function mb_substr;
 
 class PictureNameFormatter
 {
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var PhpRenderer
-     */
-    private $renderer;
+    private PhpRenderer $renderer;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
     public function __construct(
-        $translator,
+        TranslatorInterface $translator,
         PhpRenderer $renderer,
         ItemNameFormatter $itemNameFormatter,
         Picture $picture
     ) {
-
-        $this->translator = $translator;
-        $this->renderer = $renderer;
+        $this->translator        = $translator;
+        $this->renderer          = $renderer;
         $this->itemNameFormatter = $itemNameFormatter;
-        $this->picture = $picture;
+        $this->picture           = $picture;
     }
 
     private static function mbUcfirst($str)
@@ -49,14 +45,6 @@ class PictureNameFormatter
 
     public function format($picture, $language)
     {
-        /*if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
-            $names = $this->picture->getNameData([$picture->toArray()], [
-                'language' => $language,
-                'large'    => true
-            ]);
-            $picture = $names[$picture['id']];
-        }*/
-
         if (isset($picture['name']) && $picture['name']) {
             return $picture['name'];
         }
@@ -69,7 +57,7 @@ class PictureNameFormatter
             }
 
             return implode(', ', $result);
-        } elseif (count($picture['items']) == 1) {
+        } elseif (count($picture['items']) === 1) {
             $item = $picture['items'][0];
 
             $result = [];
@@ -99,7 +87,7 @@ class PictureNameFormatter
                 $result[] = $this->renderer->escapeHtml($item['name']);
             }
             return implode(', ', $result);
-        } elseif (count($picture['items']) == 1) {
+        } elseif (count($picture['items']) === 1) {
             $item = $picture['items'][0];
 
             $result = [];

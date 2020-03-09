@@ -2,14 +2,13 @@
 
 namespace Application\Model;
 
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\TableGateway\TableGateway;
+
+use function str_replace;
 
 class UserAccount
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     public function __construct(TableGateway $table)
     {
@@ -20,7 +19,7 @@ class UserAccount
     {
         $row = $this->table->select([
             'user_id'    => $userId,
-            'service_id' => $service
+            'service_id' => $service,
         ])->current();
         if (! $row) {
             return '';
@@ -33,7 +32,7 @@ class UserAccount
     {
         $row = $this->table->select([
             'external_id' => $externalId,
-            'service_id'  => $service
+            'service_id'  => $service,
         ])->current();
         if (! $row) {
             return 0;
@@ -45,17 +44,17 @@ class UserAccount
     public function getAccounts(int $userId): array
     {
         $rows = $this->table->select([
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
 
         $result = [];
         foreach ($rows as $row) {
             $result[] = [
-                'id'         => (int)$row['id'],
+                'id'         => (int) $row['id'],
                 'name'       => $row['name'],
                 'link'       => $row['link'],
                 'icon'       => 'fa fa-' . str_replace('googleplus', 'google-plus', $row['service_id']),
-                'service_id' => $row['service_id']
+                'service_id' => $row['service_id'],
             ];
         }
 
@@ -64,16 +63,16 @@ class UserAccount
 
     public function haveAccountsForOtherServices(int $userId, int $id): bool
     {
-        return (bool)$this->table->select([
+        return (bool) $this->table->select([
             'user_id' => $userId,
-            'id != ?' => $id
+            'id != ?' => $id,
         ])->current();
     }
 
     public function removeAccount(int $id)
     {
         $affected = $this->table->delete([
-            'id' => $id
+            'id' => $id,
         ]);
 
         return $affected > 0;
@@ -82,7 +81,7 @@ class UserAccount
     public function removeUserAccounts(int $userId)
     {
         $this->table->delete([
-            'user_id = ?' => $userId
+            'user_id = ?' => $userId,
         ]);
     }
 
@@ -105,7 +104,7 @@ class UserAccount
             'user_id'      => $data['user_id'],
             'used_for_reg' => $data['used_for_reg'],
             'name'         => $data['name'],
-            'link'         => (string) $data['link']
+            'link'         => (string) $data['link'],
         ]);
     }
 }

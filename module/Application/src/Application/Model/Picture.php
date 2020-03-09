@@ -3,15 +3,38 @@
 namespace Application\Model;
 
 use Application\Comments;
+use Application\Model\Item as ItemModel;
+use ArrayAccess;
+use ArrayObject;
+use Autowp\ZFComponents\Filter\FilenameSafe;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Math\Rand;
-use Zend\Paginator;
-use Autowp\ZFComponents\Filter\FilenameSafe;
-use Application\Model\Item as ItemModel;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Math\Rand;
+use Laminas\Paginator;
+
+use function array_keys;
+use function array_merge;
+use function array_replace;
+use function array_unique;
+use function array_values;
+use function count;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_numeric;
+use function is_scalar;
+use function mb_substr;
+use function rand;
+use function sort;
+use function str_replace;
+use function strlen;
+use function trim;
+use function usort;
+
+use const SORT_STRING;
 
 class Picture
 {
@@ -25,31 +48,19 @@ class Picture
 
     private const IDENTITY_LENGTH = 6;
 
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemTable;
+    private TableGateway $itemTable;
 
-    /**
-     * @var PictureModerVote
-     */
-    private $pictureModerVote;
+    private PictureModerVote $pictureModerVote;
 
-    private $pictureItemTable;
+    private TableGateway $pictureItemTable;
 
-    private $prefixedPerspectives = [5, 6, 17, 20, 21, 22, 23, 24, 28];
+    private array $prefixedPerspectives = [5, 6, 17, 20, 21, 22, 23, 24, 28];
 
-    private $perspective;
+    private Perspective $perspective;
 
-    /**
-     * @var LanguagePriority
-     */
-    private $languagePriority;
+    private LanguagePriority $languagePriority;
 
     public function __construct(
         TableGateway $table,
@@ -58,11 +69,11 @@ class Picture
         TableGateway $pictureItemTable,
         Perspective $perspective
     ) {
-        $this->table = $table;
-        $this->itemTable = $itemTable;
+        $this->table            = $table;
+        $this->itemTable        = $itemTable;
         $this->pictureModerVote = $pictureModerVote;
         $this->pictureItemTable = $pictureItemTable;
-        $this->perspective = $perspective;
+        $this->perspective      = $perspective;
 
         $this->languagePriority = new LanguagePriority();
     }
@@ -72,7 +83,7 @@ class Picture
         if (is_array($value)) {
             $value = array_values($value);
 
-            if (count($value) == 1) {
+            if (count($value) === 1) {
                 $this->applyIdFilter($select, $value[0], $id);
                 return;
             }
@@ -97,15 +108,15 @@ class Picture
     {
         if (! is_array($options)) {
             $options = [
-                'id' => $options
+                'id' => $options,
             ];
         }
 
         $defaults = [
             'id'    => null,
-            'group' => null
+            'group' => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         if ($options['id'] !== null) {
             $this->applyIdFilter($select, $options['id'], 'picture_item.perspective_id');
@@ -130,9 +141,9 @@ class Picture
 
         $defaults = [
             'id'        => null,
-            'link_type' => null
+            'link_type' => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $select->join(['ipc_ancestor' => 'item_parent_cache'], $idColumn . ' = ipc_ancestor.item_id', []);
 
@@ -158,9 +169,9 @@ class Picture
         }
 
         $defaults = [
-            'id' => null
+            'id' => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         if ($options['id']) {
             $subSelect = new Sql\Select();
@@ -181,9 +192,9 @@ class Picture
     private function applyEngineFilter(Sql\Select $select, $options)
     {
         $defaults = [
-            'ancestor_or_self' => null
+            'ancestor_or_self' => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         if ($options['ancestor_or_self'] !== null) {
             $this->applyAncestorFilter($select, $options['ancestor_or_self'], 'item.engine_item_id');
@@ -191,35 +202,32 @@ class Picture
     }
 
     /**
-     * @param Sql\Select $select
-     * @param $options
-     * @param bool $forceJoinItem
-     * @return array
+     * @param array|int $options
      * @throws Exception
      */
-    private function applyItemFilters(Sql\Select $select, $options, bool $forceJoinItem)
+    private function applyItemFilters(Sql\Select $select, $options, bool $forceJoinItem): array
     {
         if (! is_array($options)) {
             $options = [
-                'id' => $options
+                'id' => $options,
             ];
         }
 
         $defaults = [
-            'id'                  => null,
-            'item_type_id'        => null,
-            'ancestor_or_self'    => null,
+            'id'                       => null,
+            'item_type_id'             => null,
+            'ancestor_or_self'         => null,
             'exclude_ancestor_or_self' => null,
-            'perspective'         => null,
-            'perspective_is_null' => null,
-            'perspective_exclude' => null,
-            'vehicle_type'        => null,
-            'parent'              => null,
-            'contains_picture'    => null,
-            'engine'              => null,
-            'link_type'           => null,
+            'perspective'              => null,
+            'perspective_is_null'      => null,
+            'perspective_exclude'      => null,
+            'vehicle_type'             => null,
+            'parent'                   => null,
+            'contains_picture'         => null,
+            'engine'                   => null,
+            'link_type'                => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $joinItem = $forceJoinItem;
 
@@ -262,7 +270,7 @@ class Picture
         }
 
         if ($options['perspective_is_null'] !== null) {
-            $this->applyIdFilter($select, Item::VEHICLE, 'item.item_type_id');
+            $this->applyIdFilter($select, ItemModel::VEHICLE, 'item.item_type_id');
             $select->where(['picture_item.type' => PictureItem::PICTURE_CONTENT]);
             if ($options['perspective_is_null']) {
                 $select->where([new Sql\Predicate\IsNull('picture_item.perspective_id')]);
@@ -274,7 +282,7 @@ class Picture
         if ($options['perspective_exclude']) {
             $predicate = new Sql\Predicate\PredicateSet([
                 new Sql\Predicate\NotIn('picture_item.perspective_id', $options['perspective_exclude']),
-                new Sql\Predicate\IsNull('picture_item.perspective_id')
+                new Sql\Predicate\IsNull('picture_item.perspective_id'),
             ], Sql\Predicate\PredicateSet::COMBINED_BY_OR);
 
             $select->where($predicate);
@@ -334,7 +342,7 @@ class Picture
                             'pictures.id',
                             Sql\Predicate\Operator::TYPE_IDENTIFIER,
                             Sql\Predicate\Operator::TYPE_IDENTIFIER
-                        )
+                        ),
                     ]);
                     $select->join(
                         ['ct' => 'comment_topic'],
@@ -351,11 +359,9 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param array $options
-     * @return Sql\Select
      * @throws Exception
      */
-    public function getSelect(array $options)
+    public function getSelect(array $options): Sql\Select
     {
         $defaults = [
             'id'               => null,
@@ -388,22 +394,22 @@ class Picture
             'add_date'         => null,
             'accept_date'      => null,
             'timezone'         => null,
-            'added_from'       => null
+            'added_from'       => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $forceJoinItem = false;
-        if ($options['order'] == 'ancestor_stock_front_first') {
+        if ($options['order'] === 'ancestor_stock_front_first') {
             $forceJoinItem = true;
         }
 
         $select = $this->table->getSql()->select();
-        $group = $options['group'];
+        $group  = $options['group'];
 
-        $joinPdr = false;
-        $joinLeftComments = false;
-        $joinComments = false;
-        $joinVotesSummary = false;
+        $joinPdr              = false;
+        $joinLeftComments     = false;
+        $joinComments         = false;
+        $joinVotesSummary     = false;
         $joinLeftVotesSummary = false;
 
         if (isset($options['columns']) && $options['columns']) {
@@ -411,7 +417,7 @@ class Picture
         }
 
         if ($options['identity'] !== null) {
-            $select->where(['pictures.identity' => (string)$options['identity']]);
+            $select->where(['pictures.identity' => (string) $options['identity']]);
         }
 
         if ($options['id'] !== null) {
@@ -458,7 +464,7 @@ class Picture
                 throw new Exception("Timezone not provided");
             }
 
-            $timezone = new DateTimeZone($options['timezone']);
+            $timezone   = new DateTimeZone($options['timezone']);
             $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
 
             $date = DateTime::createFromFormat('Y-m-d', $options['added_from'], $timezone);
@@ -467,9 +473,8 @@ class Picture
             $start->setTime(0, 0, 0);
             $start->setTimezone($dbTimezine);
 
-
             $select->where([
-                'pictures.add_date > ?' => $start->format(MYSQL_DATETIME_FORMAT)
+                'pictures.add_date > ?' => $start->format(MYSQL_DATETIME_FORMAT),
             ]);
         }
 
@@ -484,7 +489,7 @@ class Picture
 
         if ($options['item']) {
             $subGroup = $this->applyItemFilters($select, $options['item'], $forceJoinItem);
-            $group = array_merge($group, $subGroup);
+            $group    = array_merge($group, $subGroup);
         }
 
         if ($options['has_comments'] !== null) {
@@ -584,8 +589,8 @@ class Picture
             $select->where([
                 new Sql\Predicate\Expression(
                     'pictures.accept_datetime > DATE_SUB(CURDATE(), INTERVAL ? DAY)',
-                    [(int)$options['accepted_in_days']]
-                )
+                    [(int) $options['accepted_in_days']]
+                ),
             ]);
         }
 
@@ -612,7 +617,7 @@ class Picture
                         'pictures.width DESC',
                         'pictures.height DESC',
                         'pictures.add_date DESC',
-                        'pictures.id DESC'
+                        'pictures.id DESC',
                     ]);
                     break;
                 case 'resolution_asc':
@@ -648,7 +653,7 @@ class Picture
                     $select->order([
                         'picture_vote_summary.positive DESC',
                         'pictures.add_date DESC',
-                        'pictures.id DESC'
+                        'pictures.id DESC',
                     ]);
                     break;
                 case 'dislikes':
@@ -656,7 +661,7 @@ class Picture
                     $select->order([
                         'picture_vote_summary.negative DESC',
                         'pictures.add_date DESC',
-                        'pictures.id DESC'
+                        'pictures.id DESC',
                     ]);
                     break;
                 case 'status':
@@ -681,7 +686,7 @@ class Picture
                         new Sql\Expression('picture_item.perspective_id = 10 desc'),
                         new Sql\Expression('picture_item.perspective_id = 1 desc'),
                         new Sql\Expression('picture_item.perspective_id = 7 desc'),
-                        new Sql\Expression('picture_item.perspective_id = 8 desc')
+                        new Sql\Expression('picture_item.perspective_id = 8 desc'),
                     ]);
                     break;
 
@@ -690,7 +695,7 @@ class Picture
                     $select->order([
                         new Sql\Expression('picture_item.perspective_id=7 DESC'),
                         new Sql\Expression('picture_item.perspective_id=8 DESC'),
-                        new Sql\Expression('picture_item.perspective_id=1 DESC')
+                        new Sql\Expression('picture_item.perspective_id=1 DESC'),
                     ]);
                     break;
 
@@ -700,8 +705,10 @@ class Picture
                         ->join('perspectives', 'picture_item.perspective_id = perspectives.id', [], $select::JOIN_LEFT)
                         ->order([
                             'perspectives.position',
-                            'pictures.width DESC', 'pictures.height DESC',
-                            'pictures.add_date DESC', 'pictures.id DESC'
+                            'pictures.width DESC',
+                            'pictures.height DESC',
+                            'pictures.add_date DESC',
+                            'pictures.id DESC',
                         ]);
                     break;
 
@@ -748,7 +755,6 @@ class Picture
             );
         }
 
-
         $group = array_unique($group, SORT_STRING);
 
         if ($group) {
@@ -766,7 +772,7 @@ class Picture
 
     private function setDateFilter(Sql\Select $select, string $column, string $date, string $timezone)
     {
-        $timezone = new DateTimeZone($timezone);
+        $timezone   = new DateTimeZone($timezone);
         $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
 
         $dateObj = DateTime::createFromFormat('Y-m-d', $date, $timezone);
@@ -788,7 +794,7 @@ class Picture
                 $column,
                 $start->format(MYSQL_DATETIME_FORMAT),
                 $end->format(MYSQL_DATETIME_FORMAT)
-            )
+            ),
         ]);
     }
 
@@ -809,8 +815,6 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param array $options
-     * @return int
      * @throws Exception
      */
     public function getCountDistinct(array $options): int
@@ -831,15 +835,14 @@ class Picture
         $countSelect->from(['original_select' => $select]);
 
         $statement = $this->itemTable->getSql()->prepareStatementForSqlObject($countSelect);
-        $row = $statement->execute()->current();
+        $row       = $statement->execute()->current();
 
         return (int) $row['count'];
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param array $options
-     * @return array|\ArrayObject|null
+     * @return array|ArrayObject|null
      * @throws Exception
      */
     public function getRow(array $options)
@@ -852,8 +855,6 @@ class Picture
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param array $options
-     * @return bool
      * @throws Exception
      */
     public function isExists(array $options): bool
@@ -865,12 +866,10 @@ class Picture
         $select->columns(['id']);
         $select->limit(1);
 
-        return (bool)$this->table->selectWith($select)->current();
+        return (bool) $this->table->selectWith($select)->current();
     }
 
     /**
-     * @param array $options
-     * @return array
      * @throws Exception
      */
     public function getRows(array $options): array
@@ -885,8 +884,6 @@ class Picture
     }
 
     /**
-     * @param array $options
-     * @return array
      * @throws Exception
      */
     public function getIds(array $options): array
@@ -897,7 +894,7 @@ class Picture
 
         $result = [];
         foreach ($this->table->selectWith($select) as $row) {
-            $result[] = (int)$row['id'];
+            $result[] = (int) $row['id'];
         }
 
         return $result;
@@ -932,7 +929,7 @@ class Picture
 
         $primaryItems = [];
         foreach ($items as $item) {
-            if ($item['type'] == PictureItem::PICTURE_CONTENT) {
+            if ($item['type'] === PictureItem::PICTURE_CONTENT) {
                 $primaryItems[] = $item;
             }
         }
@@ -944,7 +941,7 @@ class Picture
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
                 ->where([
                     'item.item_type_id'       => ItemModel::BRAND,
-                    'picture_item.picture_id' => $pictureId
+                    'picture_item.picture_id' => $pictureId,
                 ]);
 
             $brands = $this->itemTable->selectWith($select);
@@ -962,13 +959,13 @@ class Picture
             foreach ($primaryItems as $item) {
                 $parts[] = $filenameFilter->filter($item['name']);
             }
-            $itemCatname = implode('/', $parts);
+            $itemCatname  = implode('/', $parts);
             $itemFilename = implode('_', $parts);
 
-            $result = ($brandsFolder ? $brandsFolder . '/' : '') . $itemCatname . '/' . $itemFilename;
+            $result    = ($brandsFolder ? $brandsFolder . '/' : '') . $itemCatname . '/' . $itemFilename;
             $firstChar = mb_substr($result, 0, 1);
-            $result = $firstChar . '/' . $result;
-        } elseif (count($primaryItems) == 1) {
+            $result    = $firstChar . '/' . $result;
+        } elseif (count($primaryItems) === 1) {
             $car = $primaryItems[0];
 
             $carCatname = $filenameFilter->filter($car['name']);
@@ -977,7 +974,7 @@ class Picture
             $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
                 ->where([
                     'item.item_type_id'         => ItemModel::BRAND,
-                    'item_parent_cache.item_id' => $car['id']
+                    'item_parent_cache.item_id' => $car['id'],
                 ]);
 
             $brands = $this->itemTable->selectWith($select);
@@ -1004,16 +1001,16 @@ class Picture
                 $carFolder = trim($carFolder, '_-');
 
                 $brandsFolder = implode('/', $f);
-                $firstChar = mb_substr($brandsFolder, 0, 1);
+                $firstChar    = mb_substr($brandsFolder, 0, 1);
 
                 $result = $firstChar . '/' . $brandsFolder . '/' . $carFolder . '/' . $carCatname;
             } else {
-                if (count($sBrands) == 1) {
+                if (count($sBrands) === 1) {
                     $sBrandsA = array_values($sBrands);
-                    $brand = $sBrandsA[0];
+                    $brand    = $sBrandsA[0];
 
                     $brandFolder = $filenameFilter->filter($brand['catname']);
-                    $firstChar = mb_substr($brandFolder, 0, 1);
+                    $firstChar   = mb_substr($brandFolder, 0, 1);
 
                     $carFolder = $carCatname;
                     $carFolder = trim(str_replace($brandFolder, '', $carFolder), '_-');
@@ -1022,12 +1019,12 @@ class Picture
                         $firstChar,
                         $brandFolder,
                         $carFolder,
-                        $carCatname
+                        $carCatname,
                     ]);
                 } else {
                     $carFolder = $filenameFilter->filter($car['name']);
                     $firstChar = mb_substr($carFolder, 0, 1);
-                    $result = $firstChar . '/' . $carFolder . '/' . $carCatname;
+                    $result    = $firstChar . '/' . $carFolder . '/' . $carCatname;
                 }
             }
         } elseif (count($items) > 0) {
@@ -1035,9 +1032,9 @@ class Picture
             foreach ($items as $item) {
                 $parts[] = $filenameFilter->filter($item['name']);
             }
-            $folder = implode('/', $parts);
+            $folder    = implode('/', $parts);
             $firstChar = mb_substr($folder, 0, 1);
-            $result = $firstChar . '/' . $folder;
+            $result    = $firstChar . '/' . $folder;
         }
 
         $result = str_replace('//', '/', $result);
@@ -1069,10 +1066,7 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $pictureId
-     * @param int $userId
      * @param $isFirstTimeAccepted
-     * @return bool
      * @throws Exception
      */
     public function accept(int $pictureId, int $userId, &$isFirstTimeAccepted): bool
@@ -1088,7 +1082,7 @@ class Picture
 
         $set = [
             'status'                => self::STATUS_ACCEPTED,
-            'change_status_user_id' => $userId
+            'change_status_user_id' => $userId,
         ];
 
         if (! $picture['accept_datetime']) {
@@ -1107,7 +1101,7 @@ class Picture
             $identity = $this->randomIdentity();
 
             $exists = $this->isExists([
-                'identity' => $identity
+                'identity' => $identity,
             ]);
         } while ($exists);
 
@@ -1116,7 +1110,7 @@ class Picture
 
     private function randomIdentity()
     {
-        $alpha = "abcdefghijklmnopqrstuvwxyz";
+        $alpha  = "abcdefghijklmnopqrstuvwxyz";
         $number = "0123456789";
 
         return Rand::getString(1, $alpha) . Rand::getString(self::IDENTITY_LENGTH - 1, $alpha . $number);
@@ -1130,29 +1124,27 @@ class Picture
         $select = $this->table->getSql()->select();
         $select->columns(['sum' => new Sql\Expression('sum(filesize)')]);
         $row = $this->table->selectWith($select)->current();
-        return $row ? (int)$row['sum'] : 0;
+        return $row ? (int) $row['sum'] : 0;
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param $rows
-     * @param array $options
-     * @return array
+     * @param array|ArrayAccess $rows
      */
-    public function getNameData($rows, array $options = [])
+    public function getNameData($rows, array $options = []): array
     {
         $result = [];
 
-        $language = isset($options['language']) ? $options['language'] : 'en';
-        $large = isset($options['large']) && $options['large'];
+        $language = $options['language'] ?? 'en';
+        $large    = isset($options['large']) && $options['large'];
 
         // prefetch
-        $itemIds = [];
+        $itemIds        = [];
         $perspectiveIds = [];
         foreach ($rows as $index => $row) {
             $pictureItemRows = $this->pictureItemTable->select([
                 'picture_id' => $row['id'],
-                'type'       => PictureItem::PICTURE_CONTENT
+                'type'       => PictureItem::PICTURE_CONTENT,
             ]);
 
             foreach ($pictureItemRows as $pictureItemRow) {
@@ -1169,11 +1161,15 @@ class Picture
 
             $columns = [
                 'id',
-                'begin_model_year', 'end_model_year',
-                'begin_model_year_fraction', 'end_model_year_fraction',
+                'begin_model_year',
+                'end_model_year',
+                'begin_model_year_fraction',
+                'end_model_year_fraction',
                 'body',
                 'name' => new Sql\Expression('(' . $subSelect . ')'),
-                'begin_year', 'end_year', 'today',
+                'begin_year',
+                'end_year',
+                'today',
             ];
             if ($large) {
                 $columns[] = 'begin_month';
@@ -1190,21 +1186,21 @@ class Picture
 
             foreach ($this->itemTable->selectWith($select) as $row) {
                 $data = [
-                    'begin_model_year' => $row['begin_model_year'],
-                    'end_model_year'   => $row['end_model_year'],
+                    'begin_model_year'          => $row['begin_model_year'],
+                    'end_model_year'            => $row['end_model_year'],
                     'begin_model_year_fraction' => $row['begin_model_year_fraction'],
                     'end_model_year_fraction'   => $row['end_model_year_fraction'],
-                    'spec'             => $row['spec'],
-                    'spec_full'        => $row['spec_full'],
-                    'body'             => $row['body'],
-                    'name'             => $row['name'],
-                    'begin_year'       => $row['begin_year'],
-                    'end_year'         => $row['end_year'],
-                    'today'            => $row['today']
+                    'spec'                      => $row['spec'],
+                    'spec_full'                 => $row['spec_full'],
+                    'body'                      => $row['body'],
+                    'name'                      => $row['name'],
+                    'begin_year'                => $row['begin_year'],
+                    'end_year'                  => $row['end_year'],
+                    'today'                     => $row['today'],
                 ];
                 if ($large) {
                     $data['begin_month'] = $row['begin_month'];
-                    $data['end_month'] = $row['end_month'];
+                    $data['end_month']   = $row['end_month'];
                 }
                 $items[$row['id']] = $data;
             }
@@ -1215,14 +1211,14 @@ class Picture
         foreach ($rows as $index => $row) {
             if ($row['name']) {
                 $result[$row['id']] = [
-                    'name' => $row['name']
+                    'name' => $row['name'],
                 ];
                 continue;
             }
 
             $subRows = $this->pictureItemTable->select([
                 'picture_id' => $row['id'],
-                'type'       => PictureItem::PICTURE_CONTENT
+                'type'       => PictureItem::PICTURE_CONTENT,
             ]);
 
             $pictureItemRows = [];
@@ -1231,31 +1227,29 @@ class Picture
             }
 
             usort($pictureItemRows, function ($rowA, $rowB) use ($itemIds) {
-                $a = isset($itemIds[$rowA['item_id']]) ? $itemIds[$rowA['item_id']] : 0;
-                $b = isset($itemIds[$rowB['item_id']]) ? $itemIds[$rowB['item_id']] : 0;
+                $a = $itemIds[$rowA['item_id']] ?? 0;
+                $b = $itemIds[$rowB['item_id']] ?? 0;
 
-                if ($a == $b) {
+                if ($a === $b) {
                     return 0;
                 }
-                return ($a < $b) ? -1 : 1;
+                return $a < $b ? -1 : 1;
             });
 
             $resultItems = [];
             foreach ($pictureItemRows as $pictureItemRow) {
-                $itemId = $pictureItemRow['item_id'];
+                $itemId        = $pictureItemRow['item_id'];
                 $perspectiveId = $pictureItemRow['perspective_id'];
 
-                $item = isset($items[$itemId]) ? $items[$itemId] : [];
+                $item = $items[$itemId] ?? [];
 
                 $resultItems[] = array_replace($item, [
-                    'perspective' => isset($perspectives[$perspectiveId])
-                        ? $perspectives[$perspectiveId]
-                        : null
+                    'perspective' => $perspectives[$perspectiveId] ?? null,
                 ]);
             }
 
             $result[$row['id']] = [
-                'items' => $resultItems
+                'items' => $resultItems,
             ];
         }
 
@@ -1264,8 +1258,6 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param int $limit
-     * @return array
      */
     public function getTopLikes(int $limit): array
     {
@@ -1279,7 +1271,7 @@ class Picture
 
         $result = [];
         foreach ($this->table->selectWith($select) as $row) {
-            $result[(int)$row['owner_id']] = (int)$row['volume'];
+            $result[(int) $row['owner_id']] = (int) $row['volume'];
         }
 
         return $result;
@@ -1287,9 +1279,6 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param int $userId
-     * @param int $limit
-     * @return array
      */
     public function getTopOwnerFans(int $userId, int $limit): array
     {
@@ -1297,7 +1286,7 @@ class Picture
             ->columns([])
             ->join('picture_vote', 'pictures.id = picture_vote.picture_id', [
                 'user_id',
-                'volume' => new Sql\Expression('count(1)')
+                'volume' => new Sql\Expression('count(1)'),
             ])
             ->where(['pictures.owner_id' => $userId])
             ->group('picture_vote.user_id')
@@ -1306,7 +1295,7 @@ class Picture
 
         $result = [];
         foreach ($this->table->selectWith($select) as $row) {
-            $result[(int)$row['user_id']] = (int)$row['volume'];
+            $result[(int) $row['user_id']] = (int) $row['volume'];
         }
 
         return $result;

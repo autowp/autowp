@@ -2,92 +2,67 @@
 
 namespace Application\Controller\Api;
 
-use ReCaptcha\ReCaptcha;
-use Zend\Authentication\AuthenticationService;
-use Zend\InputFilter\InputFilter;
-use Zend\Mail;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Session\Container;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use ZF\ApiProblem\ApiProblem;
+use Application\HostManager;
+use Application\Service\UsersService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserPasswordRemind;
-use Application\HostManager;
-use Application\Service\UsersService;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mail;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Session\Container;
+use Laminas\View\Model\JsonModel;
+use ReCaptcha\ReCaptcha;
+
+use function sprintf;
 
 /**
- * Class RestorePasswordController
- * @package Application\Controller\Api
- *
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */
 class RestorePasswordController extends AbstractRestfulController
 {
-    /**
-     * @var UsersService
-     */
-    private $service;
+    private UsersService $service;
 
-    /**
-     * @var InputFilter
-     */
-    private $requestInputFilter;
+    private InputFilter $requestInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $newPasswordInputFilter;
+    private InputFilter $newPasswordInputFilter;
 
-    private $transport;
+    private Mail\Transport\TransportInterface $transport;
 
-    /**
-     * @var HostManager
-     */
-    private $hostManager;
+    private HostManager $hostManager;
 
-    /**
-     * @var UserPasswordRemind
-     */
-    private $userPasswordRemind;
+    private UserPasswordRemind $userPasswordRemind;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var array
-     */
-    private $recaptcha;
+    private array $recaptcha;
 
-    /**
-     * @var bool
-     */
-    private $captchaEnabled;
+    private bool $captchaEnabled;
 
     public function __construct(
         UsersService $service,
         InputFilter $requestInputFilter,
         InputFilter $newPasswordInputFilter,
-        $transport,
+        Mail\Transport\TransportInterface $transport,
         HostManager $hostManager,
         UserPasswordRemind $userPasswordRemind,
         User $userModel,
         array $recaptcha,
         bool $captchaEnabled
     ) {
-        $this->service = $service;
-        $this->requestInputFilter = $requestInputFilter;
+        $this->service                = $service;
+        $this->requestInputFilter     = $requestInputFilter;
         $this->newPasswordInputFilter = $newPasswordInputFilter;
-        $this->transport = $transport;
-        $this->hostManager = $hostManager;
-        $this->userPasswordRemind = $userPasswordRemind;
-        $this->userModel = $userModel;
-        $this->recaptcha = $recaptcha;
-        $this->captchaEnabled = $captchaEnabled;
+        $this->transport              = $transport;
+        $this->hostManager            = $hostManager;
+        $this->userPasswordRemind     = $userPasswordRemind;
+        $this->userModel              = $userModel;
+        $this->recaptcha              = $recaptcha;
+        $this->captchaEnabled         = $captchaEnabled;
     }
 
     public function requestAction()
@@ -102,14 +77,14 @@ class RestorePasswordController extends AbstractRestfulController
 
         if ($this->captchaEnabled) {
             $namespace = new Container('Captcha');
-            $verified = isset($namespace->success) && $namespace->success;
+            $verified  = isset($namespace->success) && $namespace->success;
 
             if (! $verified) {
                 $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
 
                 $captchaResponse = null;
                 if (isset($data['captcha'])) {
-                    $captchaResponse = (string)$data['captcha'];
+                    $captchaResponse = (string) $data['captcha'];
                 }
 
                 /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -120,9 +95,9 @@ class RestorePasswordController extends AbstractRestfulController
                         new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                             'invalid_params' => [
                                 'captcha' => [
-                                    'invalid' => 'Captcha is invalid'
-                                ]
-                            ]
+                                    'invalid' => 'Captcha is invalid',
+                                ],
+                            ],
                         ])
                     );
                 }
@@ -140,8 +115,8 @@ class RestorePasswordController extends AbstractRestfulController
         $values = $this->requestInputFilter->getValues();
 
         $user = $this->userModel->getRow([
-            'email'       => (string)$values['email'],
-            'not_deleted' => true
+            'email'       => (string) $values['email'],
+            'not_deleted' => true,
         ]);
 
         if (! $user) {
@@ -153,7 +128,7 @@ class RestorePasswordController extends AbstractRestfulController
         $uri = $this->hostManager->getUriByLanguage($user['language']);
         $uri->setPath('/restore-password/new');
         $uri->setQuery([
-            'code' => $code
+            'code' => $code,
         ]);
 
         $message = sprintf(
@@ -179,13 +154,13 @@ class RestorePasswordController extends AbstractRestfulController
         $this->getResponse()->setStatusCode(201);
 
         return new JsonModel([
-            'ok' => true
+            'ok' => true,
         ]);
     }
 
     public function newGetAction()
     {
-        $code = (string)$this->params()->fromQuery('code');
+        $code = (string) $this->params()->fromQuery('code');
 
         if (! $code) {
             return $this->notFoundAction();
@@ -198,7 +173,7 @@ class RestorePasswordController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'code' => $code
+            'code' => $code,
         ]);
     }
 
@@ -220,7 +195,7 @@ class RestorePasswordController extends AbstractRestfulController
 
         $values = $this->newPasswordInputFilter->getValues();
 
-        $code = (string)$values['code'];
+        $code = (string) $values['code'];
 
         $userId = $this->userPasswordRemind->getUserId($code);
 
@@ -228,7 +203,7 @@ class RestorePasswordController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $user = $this->userModel->getRow((int)$userId);
+        $user = $this->userModel->getRow((int) $userId);
 
         if (! $user) {
             return $this->notFoundAction();

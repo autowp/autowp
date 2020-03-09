@@ -6,10 +6,7 @@ use Application\Hydrator\Api\PictureHydrator as Hydrator;
 
 class Picture extends HydratorStrategy
 {
-    /**
-     * @return Hydrator
-     */
-    protected function getHydrator()
+    protected function getHydrator(): Hydrator
     {
         if (! $this->hydrator) {
             $this->hydrator = new Hydrator($this->serviceManager);

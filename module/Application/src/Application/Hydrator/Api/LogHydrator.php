@@ -3,21 +3,19 @@
 namespace Application\Hydrator\Api;
 
 use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
 use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Stdlib\ArrayUtils;
+
+use function is_array;
 
 class LogHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
 
         $strategy = new Strategy\User($serviceManager);
@@ -35,10 +33,9 @@ class LogHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -59,9 +56,8 @@ class LogHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return LogHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -96,7 +92,6 @@ class LogHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

@@ -2,118 +2,90 @@
 
 namespace Application\Controller\Api;
 
-use DateTime;
-use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Http\Request;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\Forums\Forums;
-use Autowp\Message\MessageService;
-use Autowp\User\Model\User;
-use Autowp\Votings\Votings;
 use Application\Comments;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
+use Autowp\Forums\Forums;
+use Autowp\Message\MessageService;
+use Autowp\User\Model\User;
+use Autowp\Votings\Votings;
+use DateTime;
+use Exception;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\Request;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function array_key_exists;
+use function array_keys;
+use function get_object_vars;
+use function is_numeric;
+use function sprintf;
+use function strlen;
 
 /**
- * Class CommentController
- * @package Application\Controller\Api
- *
  * @method \Autowp\User\Controller\Plugin\User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */
 class CommentController extends AbstractRestfulController
 {
-    /**
-     * @var Comments
-     */
-    private $comments;
+    /** @var Comments */
+    private Comments $comments;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var TableGateway
-     */
-    private $userTable;
+    /** @var TableGateway */
+    private TableGateway $userTable;
 
-    /**
-     * @var InputFilter
-     */
-    private $postInputFilter;
+    /** @var InputFilter */
+    private InputFilter $postInputFilter;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    /** @var User */
+    private User $userModel;
 
-    /**
-     * @var HostManager
-     */
-    private $hostManager;
+    /** @var HostManager */
+    private HostManager $hostManager;
 
-    /**
-     * @var MessageService
-     */
-    private $message;
+    /** @var MessageService */
+    private MessageService $message;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    /** @var Picture */
+    private Picture $picture;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    /** @var Item */
+    private Item $item;
 
-    /**
-     * @var Votings
-     */
-    private $votings;
+    /** @var Votings */
+    private Votings $votings;
 
-    /**
-     * @var TableGateway
-     */
-    private $articleTable;
+    /** @var TableGateway */
+    private TableGateway $articleTable;
 
-    /**
-     * @var Forums
-     */
-    private $forums;
+    /** @var Forums */
+    private Forums $forums;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    /** @var InputFilter */
+    private InputFilter $listInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $publicListInputFilter;
+    /** @var InputFilter */
+    private InputFilter $publicListInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $putInputFilter;
+    /** @var InputFilter */
+    private InputFilter $putInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $getInputFilter;
+    /** @var InputFilter */
+    private InputFilter $getInputFilter;
 
     public function __construct(
         Comments $comments,
@@ -133,22 +105,22 @@ class CommentController extends AbstractRestfulController
         TableGateway $articleTable,
         Forums $forums
     ) {
-        $this->comments = $comments;
-        $this->hydrator = $hydrator;
-        $this->userTable = $userTable;
-        $this->listInputFilter = $listInputFilter;
+        $this->comments              = $comments;
+        $this->hydrator              = $hydrator;
+        $this->userTable             = $userTable;
+        $this->listInputFilter       = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
-        $this->postInputFilter = $postInputFilter;
-        $this->putInputFilter = $putInputFilter;
-        $this->getInputFilter = $getInputFilter;
-        $this->userModel = $userModel;
-        $this->hostManager = $hostManager;
-        $this->message = $message;
-        $this->picture = $picture;
-        $this->item = $item;
-        $this->votings = $votings;
-        $this->articleTable = $articleTable;
-        $this->forums = $forums;
+        $this->postInputFilter       = $postInputFilter;
+        $this->putInputFilter        = $putInputFilter;
+        $this->getInputFilter        = $getInputFilter;
+        $this->userModel             = $userModel;
+        $this->hostManager           = $hostManager;
+        $this->message               = $message;
+        $this->picture               = $picture;
+        $this->item                  = $item;
+        $this->votings               = $votings;
+        $this->articleTable          = $articleTable;
+        $this->forums                = $forums;
     }
 
     public function subscribeAction()
@@ -158,8 +130,8 @@ class CommentController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $itemId = (int)$this->params('item_id');
-        $typeId = (int)$this->params('type_id');
+        $itemId = (int) $this->params('item_id');
+        $typeId = (int) $this->params('type_id');
 
         switch ($this->getRequest()->getMethod()) {
             case Request::METHOD_POST:
@@ -167,7 +139,7 @@ class CommentController extends AbstractRestfulController
                 $this->comments->service()->subscribe($typeId, $itemId, $user['id']);
 
                 return new JsonModel([
-                    'status' => true
+                    'status' => true,
                 ]);
                 break;
 
@@ -175,7 +147,7 @@ class CommentController extends AbstractRestfulController
                 $this->comments->service()->unSubscribe($typeId, $itemId, $user['id']);
 
                 return new JsonModel([
-                    'status' => true
+                    'status' => true,
                 ]);
                 break;
         }
@@ -200,7 +172,7 @@ class CommentController extends AbstractRestfulController
         $values = $inputFilter->getValues();
 
         $options = [
-            'order' => 'comment_message.datetime DESC'
+            'order' => 'comment_message.datetime DESC',
         ];
 
         if ($values['item_id']) {
@@ -243,7 +215,7 @@ class CommentController extends AbstractRestfulController
             if ($values['user']) {
                 if (! is_numeric($values['user'])) {
                     $userRow = $this->userTable->select([
-                        'identity' => $values['user']
+                        'identity' => $values['user'],
                     ])->current();
                     if ($userRow) {
                         $values['user'] = $userRow['id'];
@@ -258,7 +230,7 @@ class CommentController extends AbstractRestfulController
             }
 
             if ($values['pictures_of_item_id']) {
-                $options['type'] = Comments::PICTURES_TYPE_ID;
+                $options['type']     = Comments::PICTURES_TYPE_ID;
                 $options['callback'] = function (Sql\Select $select) use ($values) {
                     $select
                         ->join('pictures', 'comment_message.item_id = pictures.id', [])
@@ -278,9 +250,9 @@ class CommentController extends AbstractRestfulController
                         [
                             'invalid_params' => [
                                 'item_id' => [
-                                    'invalid' => 'item_id or user_id is required'
-                                ]
-                            ]
+                                    'invalid' => 'item_id or user_id is required',
+                                ],
+                            ],
                         ]
                     )
                 );
@@ -291,7 +263,7 @@ class CommentController extends AbstractRestfulController
 
         $limit = null;
         if (strlen($values['limit']) > 0) {
-            $limit = (int)$values['limit'];
+            $limit = (int) $values['limit'];
             $limit = $limit >= 0 ? $limit : 0;
         }
 
@@ -300,14 +272,14 @@ class CommentController extends AbstractRestfulController
             ->setCurrentPageNumber($values['page']);
 
         $result = [
-            'paginator' => get_object_vars($paginator->getPages())
+            'paginator' => get_object_vars($paginator->getPages()),
         ];
 
         if ($limit > 0 || $limit === null) {
             $this->hydrator->setOptions([
                 'fields'   => $values['fields'],
                 'language' => $this->language(),
-                'user_id'  => $user ? $user['id'] : null
+                'user_id'  => $user ? $user['id'] : null,
             ]);
 
             $comments = [];
@@ -375,8 +347,8 @@ class CommentController extends AbstractRestfulController
 
         $data = $this->postInputFilter->getValues();
 
-        $itemId = (int)$data['item_id'];
-        $typeId = (int)$data['type_id'];
+        $itemId = (int) $data['item_id'];
+        $typeId = (int) $data['type_id'];
 
         if ($this->needWait()) {
             return new ApiProblemResponse(
@@ -388,9 +360,9 @@ class CommentController extends AbstractRestfulController
                     [
                         'invalid_params' => [
                             'message' => [
-                                'invalid' => 'Too often'
-                            ]
-                        ]
+                                'invalid' => 'Too often',
+                            ],
+                        ],
                     ]
                 )
             );
@@ -426,10 +398,9 @@ class CommentController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-
         $moderatorAttention = false;
         if ($this->user()->isAllowed('comment', 'moderator-attention')) {
-            $moderatorAttention = (bool)$data['moderator_attention'];
+            $moderatorAttention = (bool) $data['moderator_attention'];
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -441,11 +412,11 @@ class CommentController extends AbstractRestfulController
         $messageId = $this->comments->service()->add([
             'typeId'             => $typeId,
             'itemId'             => $itemId,
-            'parentId'           => $data['parent_id'] ? (int)$data['parent_id'] : null,
+            'parentId'           => $data['parent_id'] ? (int) $data['parent_id'] : null,
             'authorId'           => $currentUser['id'],
             'message'            => $data['message'],
             'ip'                 => $ip,
-            'moderatorAttention' => $moderatorAttention
+            'moderatorAttention' => $moderatorAttention,
         ]);
 
         if (! $messageId) {
@@ -453,9 +424,9 @@ class CommentController extends AbstractRestfulController
         }
 
         $this->userModel->getTable()->update([
-            'last_message_time' => new Sql\Expression('NOW()')
+            'last_message_time' => new Sql\Expression('NOW()'),
         ], [
-            'id' => $currentUser['id']
+            'id' => $currentUser['id'],
         ]);
 
         if ($this->user()->inheritsRole('moder')) {
@@ -464,27 +435,27 @@ class CommentController extends AbstractRestfulController
             }
         }
 
-        if ($typeId == Comments::FORUMS_TYPE_ID) {
+        if ($typeId === Comments::FORUMS_TYPE_ID) {
             $this->userModel->getTable()->update([
                 'forums_messages'   => new Sql\Expression('forums_messages + 1'),
-                'last_message_time' => new Sql\Expression('NOW()')
+                'last_message_time' => new Sql\Expression('NOW()'),
             ], [
-                'id' => $currentUser['id']
+                'id' => $currentUser['id'],
             ]);
         }
 
         if ($data['parent_id']) {
             $authorId = $this->comments->service()->getMessageAuthorId($data['parent_id']);
-            if ($authorId && ($authorId != $currentUser['id'])) {
-                $parentMessageAuthor = $this->userModel->getTable()->select(['id' => (int)$authorId])->current();
+            if ($authorId && ($authorId !== $currentUser['id'])) {
+                $parentMessageAuthor = $this->userModel->getTable()->select(['id' => (int) $authorId])->current();
                 if ($parentMessageAuthor && ! $parentMessageAuthor['deleted']) {
                     $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor['language']);
 
-                    $url = $this->comments->getMessageUrl($messageId, $uri);
-                    $path = '/users/' .
-                            ($currentUser['identity'] ? $currentUser['identity'] : 'user' . $currentUser['id']);
+                    $url      = $this->comments->getMessageUrl($messageId, $uri);
+                    $path     = '/users/'
+                            . ($currentUser['identity'] ? $currentUser['identity'] : 'user' . $currentUser['id']);
                     $moderUrl = $uri->setPath($path)->toString();
-                    $message = sprintf(
+                    $message  = sprintf(
                         $this->translate(
                             'pm/user-%s-replies-to-you-%s',
                             'default',
@@ -501,7 +472,7 @@ class CommentController extends AbstractRestfulController
         $this->comments->notifySubscribers($messageId);
 
         $url = $this->url()->fromRoute('api/comment/item/get', [
-            'id' => $messageId
+            'id' => $messageId,
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -517,13 +488,13 @@ class CommentController extends AbstractRestfulController
         }
 
         //TODO: prevent load message from admin forum
-        $row = $this->comments->service()->getMessageRow((int)$this->params('id'));
+        $row = $this->comments->service()->getMessageRow((int) $this->params('id'));
         if (! $row) {
             return $this->notFoundAction();
         }
 
         $request = $this->getRequest();
-        $data = (array)$this->processBodyContent($request);
+        $data    = (array) $this->processBodyContent($request);
 
         $fields = [];
         foreach (array_keys($data) as $key) {
@@ -556,9 +527,9 @@ class CommentController extends AbstractRestfulController
                         [
                             'invalid_params' => [
                                 'user_vote' => [
-                                    'invalid' => $this->translate('comments/vote/no-more-votes')
-                                ]
-                            ]
+                                    'invalid' => $this->translate('comments/vote/no-more-votes'),
+                                ],
+                            ],
                         ]
                     )
                 );
@@ -579,9 +550,9 @@ class CommentController extends AbstractRestfulController
                         [
                             'invalid_params' => [
                                 'user_vote' => [
-                                    'invalid' => $result['error']
-                                ]
-                            ]
+                                    'invalid' => $result['error'],
+                                ],
+                            ],
                         ]
                     )
                 );
@@ -601,7 +572,7 @@ class CommentController extends AbstractRestfulController
         }
 
         if (array_key_exists('item_id', $values)) {
-            $isForum = $row['type_id'] == Comments::FORUMS_TYPE_ID;
+            $isForum = $row['type_id'] === Comments::FORUMS_TYPE_ID;
             if ($isForum && $this->user()->isAllowed('forums', 'moderate')) {
                 $this->comments->service()->moveMessage($row['id'], $row['type_id'], $values['item_id']);
             }
@@ -624,7 +595,7 @@ class CommentController extends AbstractRestfulController
         $values = $this->getInputFilter->getValues();
 
         //TODO: prevent load message from admin forum
-        $row = $this->comments->service()->getMessageRow((int)$this->params('id'));
+        $row = $this->comments->service()->getMessageRow((int) $this->params('id'));
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -633,7 +604,7 @@ class CommentController extends AbstractRestfulController
             'fields'   => $values['fields'],
             'language' => $this->language(),
             'user_id'  => $user ? $user['id'] : null,
-            'limit'    => $values['limit']
+            'limit'    => $values['limit'],
         ]);
 
         return new JsonModel($this->hydrator->extract($row));

@@ -2,20 +2,17 @@
 
 namespace Application\Service;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
 use Application\HostManager as Model;
+use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class HostManagerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Model
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Model
     {
         return new Model(
             $container->get('Config')['hosts']

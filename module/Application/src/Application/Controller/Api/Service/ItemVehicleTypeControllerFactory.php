@@ -2,22 +2,19 @@
 
 namespace Application\Controller\Api\Service;
 
+use Application\Controller\Api\ItemVehicleTypeController as Controller;
 use Application\Model\Item;
 use Application\Model\VehicleType;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Controller\Api\ItemVehicleTypeController as Controller;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemVehicleTypeControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Controller
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
         return new Controller(
             $container->get(VehicleType::class),

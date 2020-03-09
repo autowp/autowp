@@ -6,18 +6,15 @@ use Application\Model\Log;
 use Application\Model\Picture;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class LogFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Log
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Log
     {
         $tables = $container->get('TableManager');
         return new Log(

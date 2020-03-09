@@ -2,26 +2,20 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Application\Controller\Api\ArticleController;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
-use Application\Controller\Api\ArticleController;
+use Exception;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Traversable;
 
 class ArticleHydrator extends RestHydrator
 {
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var TableGateway
-     */
-    private $htmlTable;
+    private TableGateway $htmlTable;
 
     public function __construct(
         $serviceManager
@@ -36,16 +30,15 @@ class ArticleHydrator extends RestHydrator
         $strategy = new DateTimeFormatterStrategy();
         $this->addStrategy('date', $strategy);
 
-        $tables = $serviceManager->get('TableManager');
+        $tables          = $serviceManager->get('TableManager');
         $this->htmlTable = $tables->get('htmls');
     }
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -62,8 +55,8 @@ class ArticleHydrator extends RestHydrator
         $date = Row::getDateTimeByColumnType('timestamp', $object['first_enabled_datetime']);
 
         $result = [
-            'id'          => (int)$object['id'],
-            'author_id'   => (int)$object['author_id'],
+            'id'          => (int) $object['id'],
+            'author_id'   => (int) $object['author_id'],
             'catname'     => $object['catname'],
             'preview_url' => $previewUrl,
             'name'        => $object['name'],
@@ -71,7 +64,7 @@ class ArticleHydrator extends RestHydrator
         ];
 
         if ($this->filterComposite->filter('author')) {
-            $user = $this->userModel->getRow((int)$object['author_id']);
+            $user = $this->userModel->getRow((int) $object['author_id']);
 
             $result['author'] = $user ? $this->extractValue('author', $user) : null;
         }
@@ -81,8 +74,8 @@ class ArticleHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('html')) {
-            $htmlRow = $this->htmlTable->select([
-                'id' => (int)$object['html_id']
+            $htmlRow        = $this->htmlTable->select([
+                'id' => (int) $object['html_id'],
             ])->current();
             $result['html'] = $htmlRow ? $htmlRow['html'] : null;
         }
@@ -92,7 +85,6 @@ class ArticleHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

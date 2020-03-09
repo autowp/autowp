@@ -2,14 +2,12 @@
 
 namespace Autowp\Traffic\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
 use Autowp\Traffic\TrafficControl;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class BanController extends AbstractActionController
 {
-    /**
-     * @var TrafficControl
-     */
+    /** @var TrafficControl */
     private $service;
 
     public function __construct(TrafficControl $service)

@@ -3,24 +3,25 @@
 namespace Application\View\Helper;
 
 use Application\Language as AppLanguage;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\View\Helper\AbstractHelper;
+
+use function array_replace;
+use function array_reverse;
+use function in_array;
+use function is_array;
+use function str_replace;
+use function urlencode;
 
 class PageEnv extends AbstractHelper
 {
-    /**
-     * @var TableGateway
-     */
+    /** @var TableGateway */
     private $pageTable;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $onPath = [];
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $language = 'en';
 
     public function __construct(AppLanguage $language, TableGateway $pageTable)
@@ -30,11 +31,7 @@ class PageEnv extends AbstractHelper
         $this->language = $language->getLanguage();
     }
 
-    /**
-     * @param array $options
-     * @return $this
-     */
-    public function __invoke(array $options = [])
+    public function __invoke(array $options = []): self
     {
         if ($options === []) {
             return $this;
@@ -46,18 +43,18 @@ class PageEnv extends AbstractHelper
             'pageTitle'          => null,
             'args'               => [],
             'breadcrumbsReplace' => null,
-            'encodeUrl'          => true
+            'encodeUrl'          => true,
         ];
 
         $options = array_replace($defaults, $options);
 
         $view = $this->view;
 
-        $args = is_array($options['args']) ? $options['args'] : [];
-        $preparedUrlArgs = [];
+        $args             = is_array($options['args']) ? $options['args'] : [];
+        $preparedUrlArgs  = [];
         $preparedNameArgs = [];
         foreach ($args as $key => $value) {
-            $preparedUrlArgs['%' . $key . '%'] = $options['encodeUrl'] ? urlencode($value) : $value;
+            $preparedUrlArgs['%' . $key . '%']  = $options['encodeUrl'] ? urlencode($value) : $value;
             $preparedNameArgs['%' . $key . '%'] = $value;
         }
 
@@ -73,12 +70,12 @@ class PageEnv extends AbstractHelper
         $page = null;
         if (isset($options['pageId'])) {
             $page = $this->pageTable->select([
-                'id' => $options['pageId']
+                'id' => $options['pageId'],
             ])->current();
         }
 
         if ($page) {
-            $name = $this->replaceArgs($view->page($page)->name, $preparedNameArgs);
+            $name  = $this->replaceArgs($view->page($page)->name, $preparedNameArgs);
             $title = $this->replaceArgs($view->page($page)->title, $preparedNameArgs);
             $title = $title ? $title : $name;
 
@@ -100,7 +97,7 @@ class PageEnv extends AbstractHelper
                 $this->onPath[] = $currentDoc['id'];
 
                 if (! $currentDoc['is_group_node']) {
-                    if ($replace && ($replace['pageId'] == $currentDoc['id'])) {
+                    if ($replace && ($replace['pageId'] === $currentDoc['id'])) {
                         foreach (array_reverse($replace['breadcrumbs']) as $breadcrumb) {
                             $view->breadcrumbs($breadcrumb['url'], $breadcrumb['name'], 'prepend');
                         }
@@ -121,7 +118,7 @@ class PageEnv extends AbstractHelper
                     }
                 }
                 $currentDoc = $this->pageTable->select([
-                    'id' => $currentDoc['parent_id']
+                    'id' => $currentDoc['parent_id'],
                 ])->current();
             } while ($currentDoc);
         }

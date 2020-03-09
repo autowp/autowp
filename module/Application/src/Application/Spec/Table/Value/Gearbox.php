@@ -2,7 +2,7 @@
 
 namespace Application\Spec\Table\Value;
 
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
 
 class Gearbox
 {
@@ -12,24 +12,22 @@ class Gearbox
 
     public function __construct(array $options)
     {
-        $this->type = $options['type'];
+        $this->type  = $options['type'];
         $this->gears = $options['gears'];
-        $this->name = $options['name'];
+        $this->name  = $options['name'];
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param PhpRenderer $view
      * @param $attribute
      * @param $value
      * @param $values
-     * @return mixed
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values)
+    public function render(PhpRenderer $view, $attribute, $value, $values): string
     {
-        $type = isset($values[$this->type]) ? $values[$this->type] : null;
-        $gears = isset($values[$this->gears]) ? $values[$this->gears] : null;
-        $name = isset($values[$this->name]) ? $values[$this->name] : null;
+        $type  = $values[$this->type] ?? null;
+        $gears = $values[$this->gears] ?? null;
+        $name  = $values[$this->name] ?? null;
 
         $result = '';
         if ($type) {

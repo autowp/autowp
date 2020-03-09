@@ -2,44 +2,37 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Permissions\Acl\Acl;
-use Zend\Stdlib\ArrayUtils;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\User;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function gethostbyaddr;
+use function is_array;
 
 class IpHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    private $userRole = null;
+    private ?string $userRole;
 
-    private $acl;
+    private Acl $acl;
 
-    /**
-     * @var TrafficControl
-     */
-    private $trafficControl;
+    private TrafficControl $trafficControl;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
 
-        $this->acl = $serviceManager->get(Acl::class);
+        $this->acl            = $serviceManager->get(Acl::class);
         $this->trafficControl = $serviceManager->get(TrafficControl::class);
-        $this->userModel = $serviceManager->get(User::class);
+        $this->userModel      = $serviceManager->get(User::class);
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('user', $strategy);
@@ -50,10 +43,9 @@ class IpHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -74,9 +66,8 @@ class IpHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return IpHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -89,7 +80,7 @@ class IpHydrator extends RestHydrator
     public function extract($ip)
     {
         $result = [
-            'address' => $ip
+            'address' => $ip,
         ];
         if ($this->filterComposite->filter('hostname')) {
             $result['hostname'] = gethostbyaddr($ip);
@@ -97,17 +88,17 @@ class IpHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('blacklist')) {
             $canView = false;
-            $role = $this->getUserRole();
+            $role    = $this->getUserRole();
             if ($role) {
                 $canView = $this->acl->inheritsRole($role, 'moder');
             }
 
             if ($canView) {
                 $result['blacklist'] = null;
-                $ban = $this->trafficControl->getBanInfo($ip);
+                $ban                 = $this->trafficControl->getBanInfo($ip);
                 if ($ban) {
-                    $user = $this->userModel->getRow((int)$ban['by_user_id']);
-                    $ban['user'] = $user ? $this->extractValue('user', $user) : null;
+                    $user         = $this->userModel->getRow((int) $ban['by_user_id']);
+                    $ban['user']  = $user ? $this->extractValue('user', $user) : null;
                     $ban['up_to'] = $this->extractValue('up_to', $ban['up_to']);
 
                     $result['blacklist'] = $ban;
@@ -128,8 +119,6 @@ class IpHydrator extends RestHydrator
                 'remove_from_blacklist' => $canBan,
             ];
 
-
-
             /*if ($canBan) {
                 $this->banForm->setAttribute('action', $this->url()->fromRoute('ban/ban-ip', [
                     'ip' => inet_ntop($picture['ip'])
@@ -145,7 +134,6 @@ class IpHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

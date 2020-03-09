@@ -2,20 +2,18 @@
 
 namespace Application;
 
-use Zend\Authentication\AuthenticationService;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Mvc\MvcEvent;
 use Autowp\User\Model\User;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Mvc\MvcEvent;
 
 class UserLastOnlineDispatchListener extends AbstractListenerAggregate
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param EventManagerInterface $events
-     * @param int                   $priority
+     * @param int $priority
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
@@ -24,11 +22,8 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
 
     /**
      * Test if the content-type received is allowable.
-     *
-     * @param  MvcEvent $e
-     * @return null
      */
-    public function onDispatch(MvcEvent $e)
+    public function onDispatch(MvcEvent $e): void
     {
         $request = $e->getRequest();
 
@@ -36,7 +31,7 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
             $auth = new AuthenticationService();
             if ($auth->hasIdentity()) {
                 $serviceManager = $e->getApplication()->getServiceManager();
-                $userModel = $serviceManager->get(User::class);
+                $userModel      = $serviceManager->get(User::class);
                 $userModel->registerVisit($auth->getIdentity(), $request);
             }
         }

@@ -2,14 +2,12 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
 use Application\Model\Picture;
+use Laminas\View\Helper\AbstractHelper;
 
 class InlinePicture extends AbstractHelper
 {
-    /**
-     * @var Picture
-     */
+    /** @var Picture */
     private $picture;
 
     public function __construct(Picture $picture)
@@ -33,13 +31,13 @@ class InlinePicture extends AbstractHelper
             'alt'     => $name,
             'title'   => $name,
             'shuffle' => true,
-            'class'  => 'rounded border border-light'
+            'class'   => 'rounded border border-light',
         ]);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $view->htmlA([
             'href'  => $url,
-            'class' => 'd-inline-block rounded'
+            'class' => 'd-inline-block rounded',
         ], $imageHtml, false);
     }
 }

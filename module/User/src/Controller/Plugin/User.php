@@ -3,61 +3,54 @@
 namespace Autowp\User\Controller\Plugin;
 
 use ArrayObject;
-use Zend\Authentication\AuthenticationService;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use Zend\Permissions\Acl\Acl;
 use Autowp\User\Model\User as UserModel;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Permissions\Acl\Acl;
+
+use function array_key_exists;
+use function is_array;
 
 class User extends AbstractPlugin
 {
-    /**
-     * @var Acl
-     */
+    /** @var Acl */
     private $acl;
 
-    /**
-     * @var UserModel
-     */
-    private $userModel = null;
+    /** @var UserModel */
+    private $userModel;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $users = [];
 
-    /**
-     * @var array|ArrayObject
-     */
-    private $user = null;
+    /** @var array|ArrayObject */
+    private $user;
 
     public function __construct(Acl $acl, UserModel $userModel)
     {
-        $this->acl = $acl;
+        $this->acl       = $acl;
         $this->userModel = $userModel;
     }
 
     /**
-     * @param int $id
      * @return array|ArrayObject
      */
-    private function user($id)
+    private function user(int $id)
     {
         if (! $id) {
             return null;
         }
 
         if (! array_key_exists($id, $this->users)) {
-            $this->users[$id] = $this->userModel->getRow(['id' => (int)$id]);
+            $this->users[$id] = $this->userModel->getRow(['id' => (int) $id]);
         }
 
         return $this->users[$id];
     }
 
     /**
-     * @param mixed $user
-     * @return User
+     * @param null|array|ArrayObject $user
      */
-    public function __invoke($user = null)
+    public function __invoke($user = null): self
     {
         if ($user === null) {
             $user = $this->getLogedInUser();
@@ -86,12 +79,9 @@ class User extends AbstractPlugin
         return $this->user($auth->getIdentity());
     }
 
-    /**
-     * @return bool
-     */
-    public function logedIn()
+    public function logedIn(): bool
     {
-        return (bool)$this->getLogedInUser();
+        return (bool) $this->getLogedInUser();
     }
 
     /**
@@ -102,23 +92,14 @@ class User extends AbstractPlugin
         return $this->user;
     }
 
-    /**
-     * @param  string $resource
-     * @param  string $privilege
-     * @return boolean
-     */
-    public function isAllowed($resource = null, $privilege = null)
+    public function isAllowed(string $resource, string $privilege): bool
     {
         return $this->user
             && $this->user['role']
             && $this->acl->isAllowed($this->user['role'], $resource, $privilege);
     }
 
-    /**
-     * @param  string $inherit
-     * @return boolean
-     */
-    public function inheritsRole($inherit)
+    public function inheritsRole(string $inherit): bool
     {
         return $this->user
             && $this->user['role']
@@ -126,7 +107,7 @@ class User extends AbstractPlugin
             && $this->acl->inheritsRole($this->user['role'], $inherit);
     }
 
-    public function timezone()
+    public function timezone(): string
     {
         return $this->user && $this->user['timezone']
             ? $this->user['timezone']

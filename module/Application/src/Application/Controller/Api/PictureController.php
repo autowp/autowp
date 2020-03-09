@@ -3,30 +3,12 @@
 namespace Application\Controller\Api;
 
 use Application\Comments;
-use Application\Model\Catalogue;
-use ArrayObject;
-use Exception;
-use geoPHP;
-use ImagickException;
-use Point;
-use Zend\Db\Sql;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Uri\Uri;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\Comments\CommentsService;
-use Autowp\Image\Storage;
-use Autowp\Message\MessageService;
-use Autowp\TextStorage;
-use Autowp\User\Model\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Controller\Plugin\Pic;
 use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\CarOfDay;
+use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
@@ -35,131 +17,120 @@ use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
 use Application\Service\PictureService;
 use Application\Service\TelegramService;
+use ArrayObject;
+use Autowp\Comments\CommentsService;
+use Autowp\Image\Storage;
+use Autowp\Message\MessageService;
+use Autowp\TextStorage;
+use Autowp\User\Model\User;
+use Exception;
+use geoPHP;
+use ImagickException;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Sql;
+use Laminas\Http\PhpEnvironment\Response;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Uri\Uri;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+use Point;
+
+use function array_key_exists;
+use function array_keys;
+use function array_merge;
+use function array_replace;
+use function count;
+use function explode;
+use function get_object_vars;
+use function htmlspecialchars;
+use function implode;
+use function in_array;
+use function max;
+use function min;
+use function round;
+use function sprintf;
+use function strlen;
+use function urlencode;
 
 /**
- * Class PictureController
- * @package Application\Controller\Api
- *
  * @method Pic pic()
  * @method string language()
  * @method Storage imageStorage()
  * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method void log(string $message, array $objects)
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */
 class PictureController extends AbstractRestfulController
 {
-    /**
-     * @var CarOfDay
-     */
-    private $carOfDay;
+    /** @var CarOfDay */
+    private CarOfDay $carOfDay;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var PictureItem
-     */
-    private $pictureItem;
+    /** @var PictureItem */
+    private PictureItem $pictureItem;
 
-    /**
-     * @var DuplicateFinder
-     */
-    private $duplicateFinder;
+    /** @var DuplicateFinder */
+    private DuplicateFinder $duplicateFinder;
 
-    /**
-     * @var UserPicture
-     */
-    private $userPicture;
+    /** @var UserPicture */
+    private UserPicture $userPicture;
 
-    /**
-     * @var Log
-     */
-    private $log;
+    /** @var Log */
+    private Log $log;
 
-    /**
-     * @var HostManager
-     */
-    private $hostManager;
+    /** @var HostManager */
+    private HostManager $hostManager;
 
-    /**
-     * @var InputFilter
-     */
-    private $itemInputFilter;
+    /** @var InputFilter */
+    private InputFilter $itemInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $postInputFilter;
+    /** @var InputFilter */
+    private InputFilter $postInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    /** @var InputFilter */
+    private InputFilter $listInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $publicListInputFilter;
+    /** @var InputFilter */
+    private InputFilter $publicListInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $editInputFilter;
+    /** @var InputFilter */
+    private InputFilter $editInputFilter;
 
-    /**
-     * @var TextStorage\Service
-     */
-    private $textStorage;
+    /** @var TextStorage\Service */
+    private TextStorage\Service $textStorage;
 
-    /**
-     * @var CommentsService
-     */
-    private $comments;
+    /** @var CommentsService */
+    private CommentsService $comments;
 
-    /**
-     * @var PictureModerVote
-     */
-    private $pictureModerVote;
+    /** @var PictureModerVote */
+    private PictureModerVote $pictureModerVote;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    /** @var Item */
+    private Item $item;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    /** @var Picture */
+    private Picture $picture;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    /** @var User */
+    private User $userModel;
 
-    /**
-     * @var PictureService
-     */
-    private $pictureService;
+    /** @var PictureService */
+    private PictureService $pictureService;
 
-    /**
-     * @var TelegramService
-     */
-    private $telegram;
+    /** @var TelegramService */
+    private TelegramService $telegram;
 
-    /**
-     * @var MessageService
-     */
-    private $message;
+    /** @var MessageService */
+    private MessageService $message;
 
-    /**
-     * @var Catalogue
-     */
-    private $catalogue;
+    /** @var Catalogue */
+    private Catalogue $catalogue;
 
     public function __construct(
         RestHydrator $hydrator,
@@ -187,27 +158,27 @@ class PictureController extends AbstractRestfulController
     ) {
         $this->carOfDay = $carOfDay;
 
-        $this->hydrator = $hydrator;
-        $this->pictureItem = $pictureItem;
-        $this->duplicateFinder = $duplicateFinder;
-        $this->userPicture = $userPicture;
-        $this->log = $log;
-        $this->hostManager = $hostManager;
-        $this->telegram = $telegram;
-        $this->message = $message;
-        $this->itemInputFilter = $itemInputFilter;
-        $this->postInputFilter = $postInputFilter;
-        $this->listInputFilter = $listInputFilter;
+        $this->hydrator              = $hydrator;
+        $this->pictureItem           = $pictureItem;
+        $this->duplicateFinder       = $duplicateFinder;
+        $this->userPicture           = $userPicture;
+        $this->log                   = $log;
+        $this->hostManager           = $hostManager;
+        $this->telegram              = $telegram;
+        $this->message               = $message;
+        $this->itemInputFilter       = $itemInputFilter;
+        $this->postInputFilter       = $postInputFilter;
+        $this->listInputFilter       = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
-        $this->editInputFilter = $editInputFilter;
-        $this->textStorage = $textStorage;
-        $this->comments = $comments;
-        $this->pictureModerVote = $pictureModerVote;
-        $this->picture = $picture;
-        $this->item = $item;
-        $this->userModel = $userModel;
-        $this->pictureService = $pictureService;
-        $this->catalogue = $catalogue;
+        $this->editInputFilter       = $editInputFilter;
+        $this->textStorage           = $textStorage;
+        $this->comments              = $comments;
+        $this->pictureModerVote      = $pictureModerVote;
+        $this->picture               = $picture;
+        $this->item                  = $item;
+        $this->userModel             = $userModel;
+        $this->pictureService        = $pictureService;
+        $this->catalogue             = $catalogue;
     }
 
     /**
@@ -216,7 +187,7 @@ class PictureController extends AbstractRestfulController
      */
     public function canonicalRouteAction()
     {
-        $picture = $this->picture->getRow(['identity' => (string)$this->params('id')]);
+        $picture = $this->picture->getRow(['identity' => (string) $this->params('id')]);
 
         if (! $picture) {
             return $this->notFoundAction();
@@ -228,7 +199,7 @@ class PictureController extends AbstractRestfulController
         if ($itemIds) {
             $itemIds = $this->item->getIds([
                 'id'           => $itemIds,
-                'item_type_id' => [Item::BRAND, Item::VEHICLE, Item::ENGINE, Item::PERSON]
+                'item_type_id' => [Item::BRAND, Item::VEHICLE, Item::ENGINE, Item::PERSON],
             ]);
 
             if ($itemIds) {
@@ -237,7 +208,7 @@ class PictureController extends AbstractRestfulController
                 $paths = $this->catalogue->getCataloguePaths($carId, [
                     'breakOnFirst' => true,
                     'stockFirst'   => true,
-                    'toBrand'      => false
+                    'toBrand'      => false,
                 ]);
 
                 if (count($paths) > 0) {
@@ -291,19 +262,18 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return JsonModel
      * @throws Storage\Exception
      * @throws Exception
      */
-    public function randomPictureAction()
+    public function randomPictureAction(): JsonModel
     {
         $pictureRow = $this->picture->getRow([
             'status' => Picture::STATUS_ACCEPTED,
-            'order'  => 'random'
+            'order'  => 'random',
         ]);
 
         $result = [
-            'status' => false
+            'status' => false,
         ];
 
         if ($pictureRow) {
@@ -316,28 +286,26 @@ class PictureController extends AbstractRestfulController
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $uri->toString()
+                'page'   => $uri->toString(),
             ];
         }
 
         return new JsonModel($result);
     }
 
-
     /**
-     * @return JsonModel
      * @throws Storage\Exception
      * @throws Exception
      */
-    public function newPictureAction()
+    public function newPictureAction(): JsonModel
     {
         $pictureRow = $this->picture->getRow([
             'status' => Picture::STATUS_ACCEPTED,
-            'order'  => 'accept_datetime_desc'
+            'order'  => 'accept_datetime_desc',
         ]);
 
         $result = [
-            'status' => false
+            'status' => false,
         ];
 
         if ($pictureRow) {
@@ -350,42 +318,40 @@ class PictureController extends AbstractRestfulController
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $uri->toString()
+                'page'   => $uri->toString(),
             ];
         }
 
         return new JsonModel($result);
     }
 
-
     /**
-     * @return JsonModel
      * @throws Storage\Exception
      * @throws Exception
      */
-    public function carOfDayPictureAction()
+    public function carOfDayPictureAction(): JsonModel
     {
         $itemOfDay = $this->carOfDay->getCurrent();
 
         $pictureRow = null;
 
         if ($itemOfDay) {
-            $carRow = $this->item->getRow(['id' => (int)$itemOfDay['item_id']]);
+            $carRow = $this->item->getRow(['id' => (int) $itemOfDay['item_id']]);
             if ($carRow) {
                 foreach ([31, null] as $groupId) {
                     $filter = [
                         'status' => Picture::STATUS_ACCEPTED,
                         'item'   => [
-                            'ancestor_or_self' => $carRow['id']
+                            'ancestor_or_self' => $carRow['id'],
                         ],
-                        'order'  => 'resolution_desc'
+                        'order'  => 'resolution_desc',
                     ];
 
                     if ($groupId) {
                         $filter['item']['perspective'] = [
-                            'group' => $groupId
+                            'group' => $groupId,
                         ];
-                        $filter['order'] = 'perspective_group';
+                        $filter['order']               = 'perspective_group';
                     }
 
                     $pictureRow = $this->picture->getRow($filter);
@@ -397,7 +363,7 @@ class PictureController extends AbstractRestfulController
         }
 
         $result = [
-            'status' => false
+            'status' => false,
         ];
 
         if ($pictureRow) {
@@ -410,7 +376,7 @@ class PictureController extends AbstractRestfulController
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $uri->toString()
+                'page'   => $uri->toString(),
             ];
         }
 
@@ -420,7 +386,7 @@ class PictureController extends AbstractRestfulController
     public function indexAction()
     {
         $isModer = $this->user()->inheritsRole('moder');
-        $user = $this->user()->get();
+        $user    = $this->user()->get();
 
         $inputFilter = $isModer ? $this->listInputFilter : $this->publicListInputFilter;
         $inputFilter->setData($this->params()->fromQuery());
@@ -431,14 +397,14 @@ class PictureController extends AbstractRestfulController
 
         $data = $inputFilter->getValues();
 
-        if ($data['status'] == 'inbox' && ! $user) {
+        if ($data['status'] === 'inbox' && ! $user) {
             return new ApiProblemResponse(
                 new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                     'invalid_params' => [
                         'item_id' => [
-                            'invalid' => 'inbox not allowed anonymously'
-                        ]
-                    ]
+                            'invalid' => 'inbox not allowed anonymously',
+                        ],
+                    ],
                 ])
             );
         }
@@ -449,16 +415,16 @@ class PictureController extends AbstractRestfulController
                     new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                         'invalid_params' => [
                             'item_id' => [
-                                'invalid' => 'item_id or owner_id is required'
-                            ]
-                        ]
+                                'invalid' => 'item_id or owner_id is required',
+                            ],
+                        ],
                     ])
                 );
             }
         }
 
         $filter = [
-            'timezone' => $this->user()->timezone()
+            'timezone' => $this->user()->timezone(),
         ];
 
         if ($data['identity']) {
@@ -474,15 +440,15 @@ class PictureController extends AbstractRestfulController
         }
 
         $orders = [
-            1 => 'add_date_desc',
-            2 => 'add_date_asc',
-            3 => 'resolution_desc',
-            4 => 'resolution_asc',
-            5 => 'filesize_desc',
-            6 => 'filesize_asc',
-            7 => 'comments',
-            8 => 'views',
-            9 => 'moder_votes',
+            1  => 'add_date_desc',
+            2  => 'add_date_asc',
+            3  => 'resolution_desc',
+            4  => 'resolution_asc',
+            5  => 'filesize_desc',
+            6  => 'filesize_asc',
+            7  => 'comments',
+            8  => 'views',
+            9  => 'moder_votes',
             10 => 'similarity',
             11 => 'removing_date',
             12 => 'likes',
@@ -513,8 +479,8 @@ class PictureController extends AbstractRestfulController
                     break;
                 case 'custom1':
                     $filter['status'] = [
-                    Picture::STATUS_INBOX,
-                    Picture::STATUS_ACCEPTED
+                        Picture::STATUS_INBOX,
+                        Picture::STATUS_ACCEPTED,
                     ];
                     break;
             }
@@ -529,7 +495,7 @@ class PictureController extends AbstractRestfulController
         }
 
         if ($data['perspective_id']) {
-            if ($data['perspective_id'] == 'null') {
+            if ($data['perspective_id'] === 'null') {
                 $filter['item']['perspective_is_null'] = true;
             } else {
                 $filter['item']['perspective'] = (int) $data['perspective_id'];
@@ -540,7 +506,7 @@ class PictureController extends AbstractRestfulController
             $parts = explode(',', $data['perspective_exclude_id']);
             $value = [];
             foreach ($parts as $part) {
-                $part = (int)$part;
+                $part = (int) $part;
                 if ($part) {
                     $value[] = $part;
                 }
@@ -563,9 +529,9 @@ class PictureController extends AbstractRestfulController
 
         if ($isModer) {
             if (strlen($data['comments'])) {
-                if ($data['comments'] == '1') {
+                if ($data['comments'] === '1') {
                     $filter['has_comments'] = true;
-                } elseif ($data['comments'] == '0') {
+                } elseif ($data['comments'] === '0') {
                     $filter['has_comments'] = false;
                 }
             }
@@ -580,7 +546,7 @@ class PictureController extends AbstractRestfulController
 
             if ($data['similar']) {
                 $filter['has_similar'] = true;
-                $data['order'] = 10;
+                $data['order']         = 10;
             }
 
             if (strlen($data['requests'])) {
@@ -604,9 +570,9 @@ class PictureController extends AbstractRestfulController
             }
 
             if (strlen($data['replace'])) {
-                if ($data['replace'] == '1') {
+                if ($data['replace'] === '1') {
                     $filter['is_replace'] = true;
-                } elseif ($data['replace'] == '0') {
+                } elseif ($data['replace'] === '0') {
                     $filter['is_replace'] = false;
                 }
             }
@@ -631,7 +597,7 @@ class PictureController extends AbstractRestfulController
         $paginator = $this->picture->getPaginator($filter);
 
         if (strlen($data['limit']) > 0) {
-            $limit = (int)$data['limit'];
+            $limit = (int) $data['limit'];
             $limit = $limit >= 0 ? $limit : 0;
         } else {
             $limit = 1;
@@ -642,7 +608,7 @@ class PictureController extends AbstractRestfulController
             ->setCurrentPageNumber($data['page']);
 
         $result = [
-            'paginator' => get_object_vars($paginator->getPages())
+            'paginator' => get_object_vars($paginator->getPages()),
         ];
 
         if ($limit > 0) {
@@ -672,8 +638,6 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @param array|ArrayObject $user
-     * @param Uri $uri
-     * @return string
      */
     private function userModerUrl($user, Uri $uri): string
     {
@@ -684,7 +648,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return ForbiddenAction|ApiProblemResponse
      * @throws Storage\Exception
      * @throws ImagickException
      */
@@ -707,18 +670,18 @@ class PictureController extends AbstractRestfulController
 
         $values = $this->postInputFilter->getValues();
 
-        $itemId = (int)$values['item_id'];
-        $replacePictureId = (int)$values['replace_picture_id'];
-        $perspectiveId = (int)$values['perspective_id'];
+        $itemId           = (int) $values['item_id'];
+        $replacePictureId = (int) $values['replace_picture_id'];
+        $perspectiveId    = (int) $values['perspective_id'];
 
         if (! $itemId && ! $replacePictureId) {
             return new ApiProblemResponse(
                 new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                     'invalid_params' => [
                         'item_id' => [
-                            'invalid' => 'item_id or replace_picture_id is required'
-                        ]
-                    ]
+                            'invalid' => 'item_id or replace_picture_id is required',
+                        ],
+                    ],
                 ])
             );
         }
@@ -730,11 +693,11 @@ class PictureController extends AbstractRestfulController
             $itemId,
             $perspectiveId,
             $replacePictureId,
-            (string)$values['comment']
+            (string) $values['comment']
         );
 
         $url = $this->url()->fromRoute('api/picture/picture/item', [
-            'id' => $picture['id']
+            'id' => $picture['id'],
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -753,13 +716,13 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->picture->getRow(['id' => (int)$this->params('id')]);
+        $picture = $this->picture->getRow(['id' => (int) $this->params('id')]);
 
         if (! $picture) {
             return $this->notFoundAction();
         }
 
-        $data = (array)$this->processBodyContent($this->getRequest());
+        $data            = (array) $this->processBodyContent($this->getRequest());
         $validationGroup = array_keys($data); // TODO: intersect with real keys
         if (! $validationGroup) {
             return $this->forbiddenAction();
@@ -779,24 +742,24 @@ class PictureController extends AbstractRestfulController
 
         if (isset($data['crop'])) {
             $canCrop = $this->user()->isAllowed('picture', 'crop')
-                    || ($picture['owner_id'] == $user['id']) && ($picture['status'] == Picture::STATUS_INBOX);
+                    || ($picture['owner_id'] === $user['id']) && ($picture['status'] === Picture::STATUS_INBOX);
 
             if (! $canCrop) {
                 return $this->forbiddenAction();
             }
 
-            $left = round($data['crop']['left']);
-            $top = round($data['crop']['top']);
-            $width = round($data['crop']['width']);
+            $left   = round($data['crop']['left']);
+            $top    = round($data['crop']['top']);
+            $width  = round($data['crop']['width']);
             $height = round($data['crop']['height']);
 
-            $left = max(0, $left);
-            $left = min($picture['width'], $left);
+            $left  = max(0, $left);
+            $left  = min($picture['width'], $left);
             $width = max(1, $width);
             $width = min($picture['width'], $width);
 
-            $top = max(0, $top);
-            $top = min($picture['height'], $top);
+            $top    = max(0, $top);
+            $top    = min($picture['height'], $top);
             $height = max(1, $height);
             $height = min($picture['height'], $height);
 
@@ -806,7 +769,7 @@ class PictureController extends AbstractRestfulController
                     'left'   => $left,
                     'top'    => $top,
                     'width'  => $width,
-                    'height' => $height
+                    'height' => $height,
                 ];
             }
 
@@ -816,14 +779,14 @@ class PictureController extends AbstractRestfulController
                 'Выделение области на картинке %s',
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
-                'pictures' => $picture['id']
+                'pictures' => $picture['id'],
             ]);
         }
 
         if ($isModer) {
             if (array_key_exists('replace_picture_id', $data)) {
                 if ($picture['replace_picture_id'] && ! $data['replace_picture_id']) {
-                    $replacePicture = $this->picture->getRow(['id' => (int)$picture['replace_picture_id']]);
+                    $replacePicture = $this->picture->getRow(['id' => (int) $picture['replace_picture_id']]);
                     if (! $replacePicture) {
                         return $this->notFoundAction();
                     }
@@ -840,7 +803,7 @@ class PictureController extends AbstractRestfulController
                         htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
                     ), [
-                        'pictures' => [$picture['id'], $replacePicture['id']]
+                        'pictures' => [$picture['id'], $replacePicture['id']],
                     ]);
                 }
             }
@@ -869,7 +832,7 @@ class PictureController extends AbstractRestfulController
                 if ($picture['copyrights_text_id']) {
                     $this->textStorage->setText($picture['copyrights_text_id'], $text, $user['id']);
                 } elseif ($text) {
-                    $textId = $this->textStorage->createText($text, $user['id']);
+                    $textId                    = $this->textStorage->createText($text, $user['id']);
                     $set['copyrights_text_id'] = $textId;
                 }
 
@@ -877,15 +840,15 @@ class PictureController extends AbstractRestfulController
                     'Редактирование текста копирайтов изображения %s',
                     htmlspecialchars($this->pic()->name($picture, $this->language()))
                 ), [
-                    'pictures' => $picture['id']
+                    'pictures' => $picture['id'],
                 ]);
 
                 if ($picture['copyrights_text_id']) {
                     $userIds = $this->textStorage->getTextUserIds($picture['copyrights_text_id']);
 
                     foreach ($userIds as $userId) {
-                        if ($userId != $user['id']) {
-                            $userRow = $this->userModel->getRow((int)$userId);
+                        if ($userId !== $user['id']) {
+                            $userRow = $this->userModel->getRow((int) $userId);
                             if ($userRow) {
                                 $uri = $this->hostManager->getUriByLanguage($userRow['language']);
                                 $uri->setPath('/moder/pictures/' . $picture['id']);
@@ -909,10 +872,10 @@ class PictureController extends AbstractRestfulController
             }
 
             if (isset($data['status'])) {
-                $user = $this->user()->get();
+                $user                 = $this->user()->get();
                 $previousStatusUserId = $picture['change_status_user_id'];
 
-                if ($data['status'] == Picture::STATUS_ACCEPTED) {
+                if ($data['status'] === Picture::STATUS_ACCEPTED) {
                     $canAccept = $this->canAccept($picture);
 
                     if (! $canAccept) {
@@ -921,14 +884,14 @@ class PictureController extends AbstractRestfulController
 
                     $success = $this->picture->accept($picture['id'], $user['id'], $isFirstTimeAccepted);
                     if ($success) {
-                        $owner = $this->userModel->getRow((int)$picture['owner_id']);
+                        $owner = $this->userModel->getRow((int) $picture['owner_id']);
 
                         if ($owner) {
                             $this->userPicture->refreshPicturesCount($owner['id']);
                         }
 
                         if ($isFirstTimeAccepted) {
-                            if ($owner && ($owner['id'] != $user['id'])) {
+                            if ($owner && ($owner['id'] !== $user['id'])) {
                                 $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                                 $uri->setPath('/picture/' . urlencode($picture['identity']));
@@ -945,9 +908,8 @@ class PictureController extends AbstractRestfulController
                         }
                     }
 
-
-                    if ($previousStatusUserId != $user['id']) {
-                        $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
+                    if ($previousStatusUserId !== $user['id']) {
+                        $prevUser = $this->userModel->getRow((int) $previousStatusUserId);
                         if ($prevUser) {
                             $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
 
@@ -965,12 +927,12 @@ class PictureController extends AbstractRestfulController
                         'Картинка %s принята',
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
                     ), [
-                        'pictures' => $picture['id']
+                        'pictures' => $picture['id'],
                     ]);
                 }
 
-                if ($data['status'] == Picture::STATUS_INBOX) {
-                    if ($picture['status'] == Picture::STATUS_REMOVING) {
+                if ($data['status'] === Picture::STATUS_INBOX) {
+                    if ($picture['status'] === Picture::STATUS_REMOVING) {
                         $canRestore = $this->user()->isAllowed('picture', 'restore');
                         if (! $canRestore) {
                             return $this->forbiddenAction();
@@ -978,16 +940,16 @@ class PictureController extends AbstractRestfulController
 
                         $set = array_replace($set, [
                             'status'                => Picture::STATUS_INBOX,
-                            'change_status_user_id' => $user['id']
+                            'change_status_user_id' => $user['id'],
                         ]);
 
                         $this->log(sprintf(
                             'Картинки `%s` восстановлена из очереди удаления',
                             htmlspecialchars($this->pic()->name($picture, $this->language()))
                         ), [
-                            'pictures' => $picture['id']
+                            'pictures' => $picture['id'],
                         ]);
-                    } elseif ($picture['status'] == Picture::STATUS_ACCEPTED) {
+                    } elseif ($picture['status'] === Picture::STATUS_ACCEPTED) {
                         $canUnaccept = $this->user()->isAllowed('picture', 'unaccept');
                         if (! $canUnaccept) {
                             return $this->forbiddenAction();
@@ -995,9 +957,9 @@ class PictureController extends AbstractRestfulController
 
                         $this->picture->getTable()->update([
                             'status'                => Picture::STATUS_INBOX,
-                            'change_status_user_id' => $user['id']
+                            'change_status_user_id' => $user['id'],
                         ], [
-                            'id' => $picture['id']
+                            'id' => $picture['id'],
                         ]);
 
                         if ($picture['owner_id']) {
@@ -1008,11 +970,11 @@ class PictureController extends AbstractRestfulController
                             'С картинки %s снят статус "принято"',
                             htmlspecialchars($this->pic()->name($picture, $this->language()))
                         ), [
-                            'pictures' => $picture['id']
+                            'pictures' => $picture['id'],
                         ]);
 
-                        if ($previousStatusUserId != $user['id']) {
-                            $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
+                        if ($previousStatusUserId !== $user['id']) {
+                            $prevUser = $this->userModel->getRow((int) $previousStatusUserId);
                             if ($prevUser) {
                                 $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
 
@@ -1028,28 +990,28 @@ class PictureController extends AbstractRestfulController
                     }
                 }
 
-                if ($data['status'] == Picture::STATUS_REMOVING) {
+                if ($data['status'] === Picture::STATUS_REMOVING) {
                     $canDelete = $this->pictureCanDelete($picture);
                     if (! $canDelete) {
                         return $this->forbiddenAction();
                     }
 
                     $user = $this->user()->get();
-                    $set = array_replace($set, [
+                    $set  = array_replace($set, [
                         'status'                => Picture::STATUS_REMOVING,
                         'removing_date'         => new Sql\Expression('CURDATE()'),
-                        'change_status_user_id' => $user['id']
+                        'change_status_user_id' => $user['id'],
                     ]);
 
-                    $owner = $this->userModel->getRow((int)$picture['owner_id']);
-                    if ($owner && $owner['id'] != $user['id']) {
+                    $owner = $this->userModel->getRow((int) $picture['owner_id']);
+                    if ($owner && $owner['id'] !== $user['id']) {
                         $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                         $deleteRequests = $this->pictureModerVote->getNegativeVotes($picture['id']);
 
                         $reasons = [];
                         foreach ($deleteRequests as $request) {
-                            $user = $this->userModel->getRow((int)$request['user_id']);
+                            $user = $this->userModel->getRow((int) $request['user_id']);
                             if ($user) {
                                 $reasons[] = $this->userModerUrl($user, $uri) . ' : ' . $request['reason'];
                             }
@@ -1070,7 +1032,7 @@ class PictureController extends AbstractRestfulController
                         'Картинка %s поставлена в очередь на удаление',
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
                     ), [
-                        'pictures' => $picture['id']
+                        'pictures' => $picture['id'],
                     ]);
                 }
             }
@@ -1078,7 +1040,7 @@ class PictureController extends AbstractRestfulController
             if (isset($data['point']['lat'], $data['point']['lng'])) {
                 if ($data['point']['lat'] && $data['point']['lng']) {
                     geoPHP::version();
-                    $point = new Point($data['point']['lng'], $data['point']['lat']);
+                    $point        = new Point($data['point']['lng'], $data['point']['lat']);
                     $set['point'] = new Sql\Expression('ST_GeomFromText(?)', [$point->out('wkt')]);
                 } else {
                     $set['point'] = null;
@@ -1088,7 +1050,7 @@ class PictureController extends AbstractRestfulController
 
         if ($set) {
             $this->picture->getTable()->update($set, [
-                'id' => $picture['id']
+                'id' => $picture['id'],
             ]);
         }
 
@@ -1097,7 +1059,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return ForbiddenAction|array|JsonModel|ApiProblemResponse
      * @throws Exception
      */
     public function itemAction()
@@ -1122,7 +1083,7 @@ class PictureController extends AbstractRestfulController
             'fields'   => $data['fields'],
         ]);
 
-        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
+        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -1137,7 +1098,7 @@ class PictureController extends AbstractRestfulController
         }
 
         $canDelete = false;
-        $user = $this->user()->get();
+        $user      = $this->user()->get();
         if ($this->user()->isAllowed('picture', 'remove')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $canDelete = true;
@@ -1147,7 +1108,7 @@ class PictureController extends AbstractRestfulController
                 $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
                 $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
 
-                $canDelete = ($deleteVotes > $acceptVotes);
+                $canDelete = $deleteVotes > $acceptVotes;
             }
         }
 
@@ -1155,7 +1116,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return ForbiddenAction|array
      * @throws Storage\Exception
      */
     public function normalizeAction()
@@ -1164,12 +1124,12 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
+        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
 
-        $canNormalize = $row['status'] == Picture::STATUS_INBOX
+        $canNormalize = $row['status'] === Picture::STATUS_INBOX
                      && $this->user()->isAllowed('picture', 'normalize');
 
         if (! $canNormalize) {
@@ -1184,7 +1144,7 @@ class PictureController extends AbstractRestfulController
             'К картинке %s применён normalize',
             htmlspecialchars($this->pic()->name($row, $this->language()))
         ), [
-            'pictures' => $row['id']
+            'pictures' => $row['id'],
         ]);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -1192,7 +1152,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return ForbiddenAction|array
      * @throws Storage\Exception
      */
     public function flopAction()
@@ -1202,12 +1161,12 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
+        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
 
-        $canFlop = $row['status'] == Picture::STATUS_INBOX
+        $canFlop = $row['status'] === Picture::STATUS_INBOX
                 && $this->user()->isAllowed('picture', 'flop');
 
         if (! $canFlop) {
@@ -1222,7 +1181,7 @@ class PictureController extends AbstractRestfulController
             'К картинке %s применён flop',
             htmlspecialchars($this->pic()->name($row, $this->language()))
         ), [
-            'pictures' => $row['id']
+            'pictures' => $row['id'],
         ]);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -1230,7 +1189,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return ForbiddenAction|array
      * @throws Exception
      */
     public function repairAction()
@@ -1239,14 +1197,14 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
+        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
 
         if ($row['image_id']) {
             $this->imageStorage()->flush([
-                'image' => $row['image_id']
+                'image' => $row['image_id'],
             ]);
         }
 
@@ -1255,7 +1213,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return ForbiddenAction|array
      * @throws Storage\Exception
      */
     public function correctFileNamesAction()
@@ -1264,14 +1221,14 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
+        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
 
         if ($row['image_id']) {
             $this->imageStorage()->changeImageName($row['image_id'], [
-                'pattern' => $this->picture->getFileNamePattern($row['id'])
+                'pattern' => $this->picture->getFileNamePattern($row['id']),
             ]);
         }
 
@@ -1280,13 +1237,13 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return array
+     * @return Response|array
      * @throws Exception
      */
     public function deleteSimilarAction()
     {
-        $srcPicture = $this->picture->getRow(['id' => (int)$this->params('id')]);
-        $dstPicture = $this->picture->getRow(['id' => (int)$this->params('similar_picture_id')]);
+        $srcPicture = $this->picture->getRow(['id' => (int) $this->params('id')]);
+        $dstPicture = $this->picture->getRow(['id' => (int) $this->params('similar_picture_id')]);
 
         if (! $srcPicture || ! $dstPicture) {
             return $this->notFoundAction();
@@ -1295,7 +1252,7 @@ class PictureController extends AbstractRestfulController
         $this->duplicateFinder->hideSimilar($srcPicture['id'], $dstPicture['id']);
 
         $this->log('Отменёно предупреждение о повторе', [
-            'pictures' => [$srcPicture['id'], $dstPicture['id']]
+            'pictures' => [$srcPicture['id'], $dstPicture['id']],
         ]);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -1345,7 +1302,7 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->picture->getRow(['id' => (int)$this->params('id')]);
+        $picture = $this->picture->getRow(['id' => (int) $this->params('id')]);
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -1354,7 +1311,7 @@ class PictureController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $replacePicture = $this->picture->getRow(['id' => (int)$picture['replace_picture_id']]);
+        $replacePicture = $this->picture->getRow(['id' => (int) $picture['replace_picture_id']]);
         if (! $replacePicture) {
             return $this->notFoundAction();
         }
@@ -1366,17 +1323,17 @@ class PictureController extends AbstractRestfulController
         $user = $this->user()->get();
 
         // statuses
-        if ($picture['status'] != Picture::STATUS_ACCEPTED) {
+        if ($picture['status'] !== Picture::STATUS_ACCEPTED) {
             $set = [
                 'status'                => Picture::STATUS_ACCEPTED,
-                'change_status_user_id' => $user['id']
+                'change_status_user_id' => $user['id'],
             ];
             if (! $picture['accept_datetime']) {
                 $set['accept_datetime'] = new Sql\Expression('NOW()');
             }
 
             $this->picture->getTable()->update($set, [
-                'id' => $picture['id']
+                'id' => $picture['id'],
             ]);
 
             if ($picture['owner_id']) {
@@ -1388,9 +1345,9 @@ class PictureController extends AbstractRestfulController
             $this->picture->getTable()->update([
                 'status'                => Picture::STATUS_REMOVING,
                 'removing_date'         => new Sql\Expression('now()'),
-                'change_status_user_id' => $user['id']
+                'change_status_user_id' => $user['id'],
             ], [
-                'id' => $replacePicture['id']
+                'id' => $replacePicture['id'],
             ]);
             if ($replacePicture['owner_id']) {
                 $this->userPicture->refreshPicturesCount($replacePicture['owner_id']);
@@ -1406,9 +1363,9 @@ class PictureController extends AbstractRestfulController
         );
 
         // pms
-        $owner = $this->userModel->getRow((int)$picture['owner_id']);
-        $replaceOwner = $this->userModel->getRow((int)$replacePicture['owner_id']);
-        $recepients = [];
+        $owner        = $this->userModel->getRow((int) $picture['owner_id']);
+        $replaceOwner = $this->userModel->getRow((int) $replacePicture['owner_id']);
+        $recepients   = [];
         if ($owner) {
             $recepients[$owner['id']] = $owner;
         }
@@ -1420,9 +1377,9 @@ class PictureController extends AbstractRestfulController
             foreach ($recepients as $recepient) {
                 $uri = $this->hostManager->getUriByLanguage($recepient['language']);
 
-                $url = $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
+                $url        = $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
                 $replaceUrl = $uri->setPath('/picture/' . urlencode($replacePicture['identity']))->toString();
-                $moderUrl = $uri->setPath('/users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']))
+                $moderUrl   = $uri->setPath('/users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']))
                                 ->toString();
 
                 $message = sprintf(
@@ -1442,7 +1399,7 @@ class PictureController extends AbstractRestfulController
             htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), [
-            'pictures' => [$picture['id'], $replacePicture['id']]
+            'pictures' => [$picture['id'], $replacePicture['id']],
         ]);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -1459,17 +1416,17 @@ class PictureController extends AbstractRestfulController
 
         $acceptedCount = $this->picture->getCount([
             'status' => Picture::STATUS_ACCEPTED,
-            'user'   => $user['id']
+            'user'   => $user['id'],
         ]);
 
         $inboxCount = $this->picture->getCount([
             'status' => Picture::STATUS_INBOX,
-            'user'   => $user['id']
+            'user'   => $user['id'],
         ]);
 
         return new JsonModel([
             'inboxCount'    => $inboxCount,
-            'acceptedCount' => $acceptedCount
+            'acceptedCount' => $acceptedCount,
         ]);
     }
 }

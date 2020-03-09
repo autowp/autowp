@@ -2,21 +2,17 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
 use Autowp\User\Model\User;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Traversable;
 
 class VotingVariantVoteHydrator extends RestHydrator
 {
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
 
         $this->userModel = $serviceManager->get(User::class);
@@ -27,10 +23,9 @@ class VotingVariantVoteHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -40,11 +35,11 @@ class VotingVariantVoteHydrator extends RestHydrator
     public function extract($object)
     {
         $result = [
-            'user_id' => (int)$object['user_id'],
+            'user_id' => (int) $object['user_id'],
         ];
 
         if ($this->filterComposite->filter('user')) {
-            $user = $this->userModel->getRow((int)$object['user_id']);
+            $user = $this->userModel->getRow((int) $object['user_id']);
 
             $result['user'] = $user ? $this->extractValue('user', $user) : null;
         }
@@ -54,7 +49,6 @@ class VotingVariantVoteHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

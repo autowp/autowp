@@ -2,8 +2,10 @@
 
 namespace Application\Controller\Api\Service;
 
+use Application\Controller\Api\ItemController as Controller;
 use Application\HostManager;
 use Application\Hydrator\Api\ItemHydrator;
+use Application\Hydrator\Api\Strategy\Image;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\ItemParent;
@@ -12,24 +14,19 @@ use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
 use Autowp\Message\MessageService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Controller\Api\ItemController as Controller;
-use Application\Hydrator\Api\Strategy\Image;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Controller
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
         $hydrators = $container->get('HydratorManager');
-        $filters = $container->get('InputFilterManager');
-        $tables = $container->get('TableManager');
+        $filters   = $container->get('InputFilterManager');
+        $tables    = $container->get('TableManager');
         return new Controller(
             $hydrators->get(ItemHydrator::class),
             new Image($container),

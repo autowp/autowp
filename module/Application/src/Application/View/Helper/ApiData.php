@@ -2,29 +2,22 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
 use Application\Hydrator\Api\RestHydrator;
+use Application\MainMenu;
+use Laminas\View\Helper\AbstractHelper;
 
-/**
- * Class ApiData
- * @package Application\View\Helper
- */
 class ApiData extends AbstractHelper
 {
-    /**
-     * @var RestHydrator
-     */
+    /** @var RestHydrator */
     private $userHydrator;
 
-    /**
-     * @var \Application\MainMenu
-     */
+    /** @var MainMenu */
     private $mainMenu;
 
-    public function __construct(RestHydrator $userHydrator, \Application\MainMenu $mainMenu)
+    public function __construct(RestHydrator $userHydrator, MainMenu $mainMenu)
     {
         $this->userHydrator = $userHydrator;
-        $this->mainMenu = $mainMenu;
+        $this->mainMenu     = $mainMenu;
     }
 
     public function __invoke()
@@ -33,18 +26,18 @@ class ApiData extends AbstractHelper
 
         $languages = [];
         foreach ($this->view->languagePicker() as $item) {
-            $active = $item['language'] == $language;
+            $active      = $item['language'] === $language;
             $languages[] = [
                 'url'    => $item['url'],
                 'name'   => $item['name'],
                 'flag'   => $item['flag'],
-                'active' => $active
+                'active' => $active,
             ];
             if (! $active) {
                 $this->view->headLink([
                     'rel'      => 'alternate',
                     'href'     => $item['url'],
-                    'hreflang' => $item['language']
+                    'hreflang' => $item['language'],
                 ]);
             }
         }
@@ -56,25 +49,25 @@ class ApiData extends AbstractHelper
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $user = $this->view->user()->get();
+        $user     = $this->view->user()->get();
         $userData = null;
         if ($user) {
             $this->userHydrator->setOptions([
                 'language' => $language,
                 'fields'   => [],
-                'user_id'  => $user['id']
+                'user_id'  => $user['id'],
             ]);
             $userData = $this->userHydrator->extract($user);
         }
 
         return [
-            'languages'  => $languages,
+            'languages' => $languages,
             /* @phan-suppress-next-line PhanUndeclaredMethod */
-            'isModer'    => $this->view->user()->inheritsRole('moder'),
-            'mainMenu'   => $this->mainMenu->getMenu(null, true),
-            'moderMenu'  => $moderMenu,
-            'sidebar'    => $this->view->sidebar(true),
-            'user'       => $userData
+            'isModer'   => $this->view->user()->inheritsRole('moder'),
+            'mainMenu'  => $this->mainMenu->getMenu(null, true),
+            'moderMenu' => $moderMenu,
+            'sidebar'   => $this->view->sidebar(true),
+            'user'      => $userData,
         ];
     }
 }

@@ -2,8 +2,12 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
 use Exception;
+use Laminas\View\Helper\AbstractHelper;
+
+use function array_pop;
+use function array_unshift;
+use function implode;
 
 class Breadcrumbs extends AbstractHelper
 {
@@ -37,7 +41,7 @@ class Breadcrumbs extends AbstractHelper
             $items = [];
             foreach ($this->data as $node) {
                 $name = $node['name'];
-                $url = $node['url'];
+                $url  = $node['url'];
 
                 if ($url) {
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -54,7 +58,7 @@ class Breadcrumbs extends AbstractHelper
                 return '';
             }
 
-            return  '<nav aria-label="breadcrumb"><ol class="breadcrumb">' . implode($items) . '</ol></nav>';
+            return '<nav aria-label="breadcrumb"><ol class="breadcrumb">' . implode($items) . '</ol></nav>';
         } catch (Exception $e) {
             print $e->getMessage();
         }

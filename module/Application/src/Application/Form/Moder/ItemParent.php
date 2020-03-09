@@ -4,21 +4,21 @@ namespace Application\Form\Moder;
 
 use Application\Validator\ItemParent\CatnameNotExists;
 use Autowp\ZFComponents\Filter\FilenameSafe;
-use Traversable;
-use Zend\Form\Element;
-use Zend\Form\ElementInterface;
-use Zend\Form\Exception;
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilterProviderInterface;
 use Autowp\ZFComponents\Filter\SingleSpaces;
+use Laminas\Form\Element;
+use Laminas\Form\ElementInterface;
+use Laminas\Form\Exception;
+use Laminas\Form\Form;
+use Laminas\InputFilter\InputFilterProviderInterface;
+use Traversable;
 
 class ItemParent extends Form implements InputFilterProviderInterface
 {
-    private $languages = [];
+    private array $languages = [];
 
-    private $parentId = null;
+    private int $parentId;
 
-    private $itemId = null;
+    private int $itemId;
 
     public function __construct($name = null, $options = [])
     {
@@ -32,8 +32,8 @@ class ItemParent extends Form implements InputFilterProviderInterface
                 'type'    => 'Text',
                 'options' => [
                     'label'     => 'Catname',
-                    'maxlength' => \Application\Model\ItemParent::MAX_CATNAME
-                ]
+                    'maxlength' => \Application\Model\ItemParent::MAX_CATNAME,
+                ],
             ],
             [
                 'name'    => 'type',
@@ -46,8 +46,8 @@ class ItemParent extends Form implements InputFilterProviderInterface
                         \Application\Model\ItemParent::TYPE_SPORT   => 'catalogue/sport',
                         \Application\Model\ItemParent::TYPE_DESIGN  => 'catalogue/design',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         foreach ($elements as $element) {
@@ -59,8 +59,8 @@ class ItemParent extends Form implements InputFilterProviderInterface
                 'name'    => $language,
                 'type'    => ItemParentLanguage::class,
                 'options' => [
-                    'label' => $language
-                ]
+                    'label' => $language,
+                ],
             ]);
             $this->get($language)->setWrapElements(true)->prepare();
         }
@@ -105,7 +105,7 @@ class ItemParent extends Form implements InputFilterProviderInterface
         return $this;
     }
 
-    public function setItemId($itemId)
+    public function setItemId($itemId): self
     {
         $this->itemId = $itemId;
 
@@ -114,36 +114,34 @@ class ItemParent extends Form implements InputFilterProviderInterface
 
     /**
      * Should return an array specification compatible with
-     * {@link Zend\InputFilter\Factory::createInputFilter()}.
-     *
-     * @return array
+     * {@link Laminas\InputFilter\Factory::createInputFilter()}.
      */
-    public function getInputFilterSpecification()
+    public function getInputFilterSpecification(): array
     {
         return [
             'catname' => [
-                'required' => false,
-                'filters' => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
                     ['name' => SingleSpaces::class],
-                    ['name' => FilenameSafe::class]
+                    ['name' => FilenameSafe::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => \Application\Model\ItemParent::MAX_CATNAME
-                        ]
+                            'max' => \Application\Model\ItemParent::MAX_CATNAME,
+                        ],
                     ],
                     [
-                        'name' => CatnameNotExists::class,
+                        'name'    => CatnameNotExists::class,
                         'options' => [
                             'parentId'     => $this->parentId,
-                            'ignoreItemId' => $this->itemId
-                        ]
-                    ]
-                ]
+                            'ignoreItemId' => $this->itemId,
+                        ],
+                    ],
+                ],
             ],
         ];
     }

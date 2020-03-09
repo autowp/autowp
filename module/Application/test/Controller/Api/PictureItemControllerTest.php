@@ -2,11 +2,11 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
-use Zend\Json\Json;
 use Application\Controller\Api\PictureItemController;
 use Application\Test\AbstractHttpControllerTestCase;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+use Laminas\Json\Json;
 
 class PictureItemControllerTest extends AbstractHttpControllerTestCase
 {
@@ -19,7 +19,7 @@ class PictureItemControllerTest extends AbstractHttpControllerTestCase
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/picture-item', Request::METHOD_GET, [
-            'fields' => 'item,picture,area'
+            'fields' => 'item,picture,area',
         ]);
 
         $this->assertResponseStatusCode(200);

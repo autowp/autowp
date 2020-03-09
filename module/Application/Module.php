@@ -2,16 +2,31 @@
 
 namespace Application;
 
+use Laminas\Console\Adapter\AdapterInterface as Console;
+use Laminas\EventManager\EventInterface as Event;
+use Laminas\Loader\StandardAutoloader;
+use Laminas\Mail;
+use Laminas\ModuleManager\Feature;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Stdlib\ArrayUtils;
+use Laminas\View\Helper\PaginationControl;
 use Throwable;
-use Zend\Console\Adapter\AdapterInterface as Console;
-use Zend\EventManager\EventInterface as Event;
-use Zend\Mail;
-use Zend\ModuleManager\Feature;
-use Zend\Mvc\MvcEvent;
-use Zend\Stdlib\ArrayUtils;
-use Zend\View\Helper\PaginationControl;
 
+use function define;
+use function defined;
+use function error_reporting;
+use function file_exists;
+use function filemtime;
+use function get_class;
+use function ini_set;
+use function realpath;
 use function Sentry\captureException;
+use function Sentry\init;
+use function time;
+use function touch;
+
+use const E_ALL;
+use const PHP_EOL;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
@@ -52,10 +67,10 @@ class Module implements
         return $config;
     }
 
-    public function getAutoloaderConfig()
+    public function getAutoloaderConfig(): array
     {
         return [
-            'Zend\Loader\StandardAutoloader' => [
+            StandardAutoloader::class => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ],
@@ -76,9 +91,9 @@ class Module implements
         PaginationControl::setDefaultViewPartial('paginator');
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $application = $e->getApplication();
+        $application    = $e->getApplication();
         $serviceManager = $application->getServiceManager();
-        $eventManager = $application->getEventManager();
+        $eventManager   = $application->getEventManager();
 
         //handle the dispatch error (exception)
         $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'handleError']);
@@ -99,7 +114,7 @@ class Module implements
         $config = $serviceManager->get('Config');
 
         if (isset($config['sentry']['dsn']) && $config['sentry']['dsn']) {
-            \Sentry\init([
+            init([
                 'dsn'         => $config['sentry']['dsn'],
                 'environment' => $config['sentry']['environment'],
                 'release'     => $config['sentry']['release'],
@@ -125,7 +140,7 @@ class Module implements
             $filePath = __DIR__ . '/../../data/email-error';
             if (file_exists($filePath)) {
                 $mtime = filemtime($filePath);
-                $diff = time() - $mtime;
+                $diff  = time() - $mtime;
                 if ($diff > 60) {
                     touch($filePath);
                     $this->sendErrorEmail($exception, $serviceManager);
@@ -136,10 +151,10 @@ class Module implements
 
     private function sendErrorEmail(Throwable $exception, $serviceManager)
     {
-        $message = get_class($exception) . PHP_EOL .
-            'File: ' . $exception->getFile() . ' (' . $exception->getLine() . ')' . PHP_EOL .
-            'Message: ' . $exception->getMessage() . PHP_EOL .
-            'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
+        $message = get_class($exception) . PHP_EOL
+            . 'File: ' . $exception->getFile() . ' (' . $exception->getLine() . ')' . PHP_EOL
+            . 'Message: ' . $exception->getMessage() . PHP_EOL
+            . 'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
 
         $mail = new Mail\Message();
         $mail
@@ -155,26 +170,22 @@ class Module implements
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param Console $console
-     * @return string
      */
-    public function getConsoleBanner(Console $console)
+    public function getConsoleBanner(Console $console): string
     {
         return 'WheelsAge Module';
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param Console $console
-     * @return array
      */
-    public function getConsoleUsage(Console $console)
+    public function getConsoleUsage(Console $console): array
     {
         //description command
         return [
             'db_migrations_version'             => 'Get current migration version',
             'db_migrations_migrate [<version>]' => 'Execute migrate',
-            'db_migrations_generate'            => 'Generate new migration class'
+            'db_migrations_generate'            => 'Generate new migration class',
         ];
     }
 }

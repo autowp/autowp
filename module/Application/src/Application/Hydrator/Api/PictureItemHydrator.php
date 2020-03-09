@@ -2,48 +2,37 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Permissions\Acl\Acl;
-use Zend\Stdlib\ArrayUtils;
-use Autowp\User\Model\User;
 use Application\Model\Item;
 use Application\Model\Picture;
+use Autowp\User\Model\User;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function is_array;
 
 class PictureItemHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    private $userRole = null;
+    private ?string $userRole;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    private $acl;
+    private Acl $acl;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
 
-        $this->item = $serviceManager->get(Item::class);
-        $this->picture = $serviceManager->get(Picture::class);
+        $this->item      = $serviceManager->get(Item::class);
+        $this->picture   = $serviceManager->get(Picture::class);
         $this->userModel = $serviceManager->get(User::class);
 
         $this->acl = $serviceManager->get(Acl::class);
@@ -57,10 +46,9 @@ class PictureItemHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -81,12 +69,11 @@ class PictureItemHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return PictureItemHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
-        if ($this->userId != $userId) {
-            $this->userId = $userId;
+        if ($this->userId !== $userId) {
+            $this->userId   = $userId;
             $this->userRole = null;
 
             $this->getStrategy('item')->setUserId($userId);
@@ -98,40 +85,40 @@ class PictureItemHydrator extends RestHydrator
     public function extract($object)
     {
         $result = [
-            'picture_id'     => (int)$object['picture_id'],
-            'item_id'        => (int)$object['item_id'],
-            'type'           => (int)$object['type'],
-            'perspective_id' => (int)$object['perspective_id'],
+            'picture_id'     => (int) $object['picture_id'],
+            'item_id'        => (int) $object['item_id'],
+            'type'           => (int) $object['type'],
+            'perspective_id' => (int) $object['perspective_id'],
         ];
 
         $isModer = false;
-        $role = $this->getUserRole();
+        $role    = $this->getUserRole();
         if ($role) {
             $isModer = $this->acl->inheritsRole($role, 'moder');
         }
 
         if ($this->filterComposite->filter('item')) {
-            $row = $this->item->getRow(['id' => (int)$object['item_id']]);
+            $row = $this->item->getRow(['id' => (int) $object['item_id']]);
 
             $result['item'] = $row ? $this->extractValue('item', $row) : null;
         }
 
         if ($isModer) {
             if ($this->filterComposite->filter('picture')) {
-                $row = $this->picture->getRow(['id' => (int)$object['picture_id']]);
+                $row = $this->picture->getRow(['id' => (int) $object['picture_id']]);
 
                 $result['picture'] = $row ? $this->extractValue('picture', $row) : null;
             }
 
             if ($this->filterComposite->filter('area')) {
-                $hasArea = $object['crop_width'] && $object['crop_height'];
+                $hasArea        = $object['crop_width'] && $object['crop_height'];
                 $result['area'] = null;
                 if ($hasArea) {
                     $result['area'] = [
-                        'left'   => (int)$object['crop_left'],
-                        'top'    => (int)$object['crop_top'],
-                        'width'  => (int)$object['crop_width'],
-                        'height' => (int)$object['crop_height'],
+                        'left'   => (int) $object['crop_left'],
+                        'top'    => (int) $object['crop_top'],
+                        'width'  => (int) $object['crop_width'],
+                        'height' => (int) $object['crop_height'],
                     ];
                 }
             }
@@ -155,7 +142,6 @@ class PictureItemHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

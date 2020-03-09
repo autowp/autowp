@@ -2,12 +2,12 @@
 
 namespace AutowpTest\User\Auth;
 
+use Application\Service\UsersService;
+use Application\Test\AbstractHttpControllerTestCase;
 use Autowp\User\Auth\Adapter\Id;
 use Autowp\User\Auth\Adapter\Login;
 use Autowp\User\Auth\Adapter\Remember;
 use Autowp\User\Model\User;
-use Application\Service\UsersService;
-use Application\Test\AbstractHttpControllerTestCase;
 
 class AdapterTest extends AbstractHttpControllerTestCase
 {
@@ -18,7 +18,7 @@ class AdapterTest extends AbstractHttpControllerTestCase
         $this->getApplication(); // to initialize
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(User::class);
+        $userModel      = $serviceManager->get(User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
@@ -32,12 +32,12 @@ class AdapterTest extends AbstractHttpControllerTestCase
         $this->getApplication(); // to initialize
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(User::class);
-        $userService = $serviceManager->get(UsersService::class);
+        $userModel      = $serviceManager->get(User::class);
+        $userService    = $serviceManager->get(UsersService::class);
 
-        $expr = $userService->getPasswordHashExpr('123456');
+        $expr    = $userService->getPasswordHashExpr('123456');
         $adapter = new Login($userModel, 'test@example.com', $expr);
-        $result = $adapter->authenticate();
+        $result  = $adapter->authenticate();
 
         $this->assertTrue($result->isValid());
     }
@@ -47,7 +47,7 @@ class AdapterTest extends AbstractHttpControllerTestCase
         $this->getApplication(); // to initialize
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(User::class);
+        $userModel      = $serviceManager->get(User::class);
 
         $adapter = new Remember($userModel);
         $adapter->setCredential('admin-token');

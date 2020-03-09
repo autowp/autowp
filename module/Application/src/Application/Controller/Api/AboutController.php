@@ -2,41 +2,32 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Sql;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Permissions\Acl\Acl;
-use Zend\View\Model\JsonModel;
-use Autowp\Comments;
-use Autowp\User\Model\User;
 use Application\Model\Item;
 use Application\Model\Picture;
+use Autowp\Comments;
+use Autowp\User\Model\User;
+use Laminas\Db\Sql;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\View\Model\JsonModel;
+
+use function array_values;
+use function ksort;
+use function round;
+
+use const SORT_NUMERIC;
 
 class AboutController extends AbstractRestfulController
 {
-    /**
-     * @var Acl
-     */
-    private $acl;
+    private Acl $acl;
 
-    /**
-     * @var Comments\CommentsService
-     */
-    private $comments;
+    private Comments\CommentsService $comments;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(
         Acl $acl,
@@ -45,10 +36,10 @@ class AboutController extends AbstractRestfulController
         Item $item,
         User $userModel
     ) {
-        $this->acl = $acl;
-        $this->comments = $comments;
-        $this->picture = $picture;
-        $this->item = $item;
+        $this->acl       = $acl;
+        $this->comments  = $comments;
+        $this->picture   = $picture;
+        $this->item      = $item;
         $this->userModel = $userModel;
     }
 
@@ -73,22 +64,22 @@ class AboutController extends AbstractRestfulController
                 'not deleted',
                 new Sql\Predicate\In('role', $greenUserRoles),
                 '(identity is null or identity <> "autowp")',
-                'last_online > DATE_SUB(CURDATE(), INTERVAL 6 MONTH)'
+                'last_online > DATE_SUB(CURDATE(), INTERVAL 6 MONTH)',
             ]);
 
             foreach ($greenUsers as $greenUser) {
-                $contributors[(int)$greenUser['id']] = (int)$greenUser['id'];
+                $contributors[(int) $greenUser['id']] = (int) $greenUser['id'];
             }
         }
 
         $picturesUsers = $this->userModel->getRows([
             'not_deleted' => true,
             'order'       => 'pictures_total desc',
-            'limit'       => 20
+            'limit'       => 20,
         ]);
 
         foreach ($picturesUsers as $greenUser) {
-            $contributors[(int)$greenUser['id']] = (int)$greenUser['id'];
+            $contributors[(int) $greenUser['id']] = (int) $greenUser['id'];
         }
 
         ksort($contributors, SORT_NUMERIC);
@@ -113,7 +104,7 @@ class AboutController extends AbstractRestfulController
             'pictures_size'    => $this->picture->getTotalPicturesSize(),
             'total_users'      => $totalUsers,
             'total_cars'       => $totalCars,
-            'total_comments'   => $totalComments
+            'total_comments'   => $totalComments,
         ]);
     }
 }

@@ -3,10 +3,10 @@
 namespace Application\Test;
 
 use Exception;
-use Zend\Db\Adapter\AdapterInterface;
-use Zend\Test\PHPUnit\Controller\AbstractConsoleControllerTestCase as ZendTestCase;
+use Laminas\Db\Adapter\AdapterInterface;
+use Laminas\Test\PHPUnit\Controller\AbstractConsoleControllerTestCase as LaminasTestCase;
 
-abstract class AbstractConsoleControllerTestCase extends ZendTestCase
+abstract class AbstractConsoleControllerTestCase extends LaminasTestCase
 {
     protected $applicationConfigPath;
 

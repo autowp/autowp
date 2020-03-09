@@ -2,7 +2,7 @@
 
 namespace Application\Log\Processor;
 
-use Zend\Log\Processor\ProcessorInterface;
+use Laminas\Log\Processor\ProcessorInterface;
 
 class Url implements ProcessorInterface
 {

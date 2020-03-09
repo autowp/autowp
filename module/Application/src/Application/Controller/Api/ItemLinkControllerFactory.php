@@ -4,22 +4,19 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\ItemLinkHydrator;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemLinkControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return ItemLinkController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ItemLinkController
     {
-        $tables = $container->get('TableManager');
+        $tables    = $container->get('TableManager');
         $hydrators = $container->get('HydratorManager');
-        $filters = $container->get('InputFilterManager');
+        $filters   = $container->get('InputFilterManager');
 
         return new ItemLinkController(
             $tables->get('links'),

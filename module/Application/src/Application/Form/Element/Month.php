@@ -3,31 +3,30 @@
 namespace Application\Form\Element;
 
 use DateTime;
+use Exception;
 use IntlDateFormatter;
+use Laminas\Form\Element\Select;
+use Laminas\Form\ElementInterface;
+use Laminas\Form\Exception\InvalidArgumentException;
+use Laminas\InputFilter\InputProviderInterface;
 use Traversable;
-use Zend\Form\ElementInterface;
-use Zend\Form\Element\Select;
-use Zend\Form\Exception\InvalidArgumentException;
-use Zend\InputFilter\InputProviderInterface;
 
 class Month extends Select implements InputProviderInterface
 {
     protected $attributes = [
-        'type' => 'select'
+        'type' => 'select',
     ];
 
-    /**
-     * @var null|string
-     */
+    /** @var null|string */
     protected $label = 'month';
 
-    private $language = 'en';
+    private string $language = 'en';
 
     /**
      * @param array|Traversable $options
      * @return Month|ElementInterface
      * @throws InvalidArgumentException
-     * @throws \Exception
+     * @throws Exception
      */
     public function setOptions($options)
     {
@@ -37,7 +36,7 @@ class Month extends Select implements InputProviderInterface
 
         if (! isset($options['options']) && ! isset($options['value_options'])) {
             $multioptions = [
-                '' => '--'
+                '' => '--',
             ];
 
             $dateFormatter = new IntlDateFormatter(
@@ -71,16 +70,14 @@ class Month extends Select implements InputProviderInterface
      * Provide default input rules for this element
      *
      * Attaches a phone number validator.
-     *
-     * @return array
      */
-    public function getInputSpecification()
+    public function getInputSpecification(): array
     {
         return [
-            'name' => $this->getName(),
-            'required' => true,
-            'filters' => [
-                ['name' => 'StringTrim']
+            'name'       => $this->getName(),
+            'required'   => true,
+            'filters'    => [
+                ['name' => 'StringTrim'],
             ],
             'validators' => [
                 ['name' => 'Digits'],
@@ -89,10 +86,10 @@ class Month extends Select implements InputProviderInterface
                     'options' => [
                         'min'       => 1,
                         'max'       => 12,
-                        'inclusive' => true
-                    ]
-                ]
-            ]
+                        'inclusive' => true,
+                    ],
+                ],
+            ],
         ];
     }
 }

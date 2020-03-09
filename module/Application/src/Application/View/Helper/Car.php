@@ -2,14 +2,12 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
 use Application\ItemNameFormatter;
+use Laminas\View\Helper\AbstractHelper;
 
 class Car extends AbstractHelper
 {
-    /**
-     * @var ItemNameFormatter
-     */
+    /** @var ItemNameFormatter */
     private $itemNameFormatter;
 
     public function __construct(ItemNameFormatter $itemNameFormatter)

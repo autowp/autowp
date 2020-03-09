@@ -4,22 +4,19 @@ namespace Application\Service;
 
 use Application\Language;
 use Application\LanguagePicker;
+use Application\MainMenu;
 use Application\Model\Categories;
 use Autowp\Message\MessageService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\MainMenu;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class MainMenuFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return MainMenu
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): MainMenu
     {
         $tables = $container->get('TableManager');
         return new MainMenu(

@@ -4,7 +4,7 @@ namespace Application;
 
 use Application\Controller\Api\CommentController;
 use Application\Controller\Api\CommentControllerFactory;
-use Zend\ServiceManager\Factory\InvokableFactory;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
     'hydrators' => [

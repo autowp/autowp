@@ -19,9 +19,9 @@
         $module = $this->layout()->moduleName;
     }
 
-use Zend\Json\Json; ?>
+use Laminas\Json\Json; ?>
 <?=$this->doctype() . PHP_EOL ?>
-<html dir="ltr" lang="<?=$this->language()?>"<?=$module ? ' data-page-module="'.$this->escapeHtmlAttr($module).'"' : ''?><?=$moduleOptions ? ' data-page-module-options="'.$this->escapeHtmlAttr(Zend\Json\Json::encode($moduleOptions)).'"' : ''?>>
+<html dir="ltr" lang="<?=$this->language()?>"<?=$module ? ' data-page-module="'.$this->escapeHtmlAttr($module).'"' : ''?><?=$moduleOptions ? ' data-page-module-options="'.$this->escapeHtmlAttr(Laminas\Json\Json::encode($moduleOptions)).'"' : ''?>>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">

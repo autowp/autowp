@@ -2,10 +2,13 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Exception;
-use Zend\View\Helper\Placeholder\Container\AbstractContainer;
-use Zend\View\Helper\Placeholder\Container\AbstractStandalone;
-use Zend\View\Helper\TranslatorAwareTrait;
+use Laminas\View\Exception;
+use Laminas\View\Helper\Placeholder\Container\AbstractContainer;
+use Laminas\View\Helper\Placeholder\Container\AbstractStandalone;
+use Laminas\View\Helper\TranslatorAwareTrait;
+
+use function implode;
+use function in_array;
 
 class PageTitle extends AbstractStandalone
 {
@@ -13,38 +16,33 @@ class PageTitle extends AbstractStandalone
 
     /**
      * Registry key for placeholder
-     *
-     * @var string
      */
-    protected $regKey = 'Application_View_Helper_PageTitle2';
+    protected string $regKey = 'Application_View_Helper_PageTitle2';
 
     /**
      * Default title rendering order (i.e. order in which each title attached)
-     *
-     * @var string
      */
-    protected $defaultAttachOrder = null;
+    protected string $defaultAttachOrder;
 
     /**
      * Retrieve placeholder for title element and optionally set state
      *
-     * @param string $title
-     * @param string $setType
-     * @return PageTitle
+     * @param null|string $title
+     * @param null|string $setType
      */
-    public function __invoke($title = null, $setType = null)
+    public function __invoke($title = null, $setType = null): self
     {
         if (null === $setType) {
-            $setType = (null === $this->getDefaultAttachOrder())
+            $setType = null === $this->getDefaultAttachOrder()
                 ? AbstractContainer::APPEND
                 : $this->getDefaultAttachOrder();
         }
 
         $title = (string) $title;
         if ($title !== '') {
-            if ($setType == AbstractContainer::SET) {
+            if ($setType === AbstractContainer::SET) {
                 $this->set($title);
-            } elseif ($setType == AbstractContainer::PREPEND) {
+            } elseif ($setType === AbstractContainer::PREPEND) {
                 $this->prepend($title);
             } else {
                 $this->append($title);
@@ -56,13 +54,10 @@ class PageTitle extends AbstractStandalone
 
     /**
      * Render title (wrapped by title tag)
-     *
-     * @param  string|null $indent
-     * @return string
      */
-    public function toString($indent = null)
+    public function toString(?string $indent = null): string
     {
-        $indent = (null !== $indent)
+        $indent = null !== $indent
             ? $this->getWhitespace($indent)
             : $this->getIndent();
 
@@ -73,10 +68,8 @@ class PageTitle extends AbstractStandalone
 
     /**
      * Render title string
-     *
-     * @return string
      */
-    public function renderTitle()
+    public function renderTitle(): string
     {
         $items = [];
 
@@ -86,11 +79,11 @@ class PageTitle extends AbstractStandalone
         }
 
         $separator = $this->getSeparator();
-        $output = '';
+        $output    = '';
 
         $prefix = $this->getPrefix();
         if ($prefix) {
-            $output  .= $prefix;
+            $output .= $prefix;
         }
 
         $output .= implode($separator, $items);
@@ -101,7 +94,7 @@ class PageTitle extends AbstractStandalone
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $output = ($this->autoEscape) ? $this->escape($output) : $output;
+        $output = $this->autoEscape ? $this->escape($output) : $output;
 
         return $output;
     }
@@ -110,15 +103,14 @@ class PageTitle extends AbstractStandalone
      * Set a default order to add titles
      *
      * @param string $setType
-     * @return PageTitle
      */
-    public function setDefaultAttachOrder($setType)
+    public function setDefaultAttachOrder($setType): self
     {
         if (
             ! in_array($setType, [
-            AbstractContainer::APPEND,
-            AbstractContainer::SET,
-            AbstractContainer::PREPEND
+                AbstractContainer::APPEND,
+                AbstractContainer::SET,
+                AbstractContainer::PREPEND,
             ])
         ) {
             throw new Exception\DomainException(
@@ -132,14 +124,11 @@ class PageTitle extends AbstractStandalone
 
     /**
      * Get the default attach order, if any.
-     *
-     * @return mixed
      */
-    public function getDefaultAttachOrder()
+    public function getDefaultAttachOrder(): string
     {
         return $this->defaultAttachOrder;
     }
-
 
     /**
      * Create and return a callback for normalizing title items.

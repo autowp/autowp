@@ -3,21 +3,20 @@
 namespace Application\View\Helper;
 
 use ArrayObject;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\View\Helper\AbstractHelper;
+
+use function is_array;
+use function is_numeric;
 
 class Page extends AbstractHelper
 {
-    /**
-     * @var TableGateway
-     */
+    /** @var TableGateway */
     private $pageTable;
 
     private $doc;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $pages = [];
 
     public function __construct(TableGateway $pageTable)
@@ -30,7 +29,7 @@ class Page extends AbstractHelper
         if ($value) {
             $doc = null;
 
-            if (($value instanceof ArrayObject) || is_array($value)) {
+            if ($value instanceof ArrayObject || is_array($value)) {
                 $doc = $value;
             } elseif (is_numeric($value)) {
                 $doc = $this->getPageById($value);
@@ -54,15 +53,15 @@ class Page extends AbstractHelper
                 $key = 'page/' . $this->doc['id'] . '/' . $name;
 
                 $result = $this->view->translate($key);
-                if (! $result || $result == $key) {
+                if (! $result || $result === $key) {
                     $result = $this->view->translate($key, null, 'en');
                 }
 
-                if ((! $result || $result == $key) && ($name != 'name')) {
+                if ((! $result || $result === $key) && ($name !== 'name')) {
                     $key = 'page/' . $this->doc['id'] . '/name';
 
                     $result = $this->view->translate($key);
-                    if (! $result || $result == $key) {
+                    if (! $result || $result === $key) {
                         $result = $this->view->translate($key, null, 'en');
                     }
                 }
@@ -75,13 +74,13 @@ class Page extends AbstractHelper
 
     private function getPageById($id)
     {
-        $id = (int)$id;
+        $id = (int) $id;
         if (isset($this->pages[$id])) {
             return $this->pages[$id];
         }
 
         $row = $this->pageTable->select([
-            'id' => (int)$id
+            'id' => (int) $id,
         ])->current();
 
         $this->pages[$id] = $row;

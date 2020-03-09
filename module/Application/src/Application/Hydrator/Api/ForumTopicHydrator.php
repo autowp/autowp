@@ -2,53 +2,38 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Permissions\Acl\Acl;
-use Zend\Stdlib\ArrayUtils;
+use Application\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
-use Application\Comments;
+use Exception;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function is_array;
 
 class ForumTopicHydrator extends RestHydrator
 {
-    /**
-     * @var Comments
-     */
-    private $comments;
+    private Comments $comments;
 
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    private $acl;
+    private Acl $acl;
 
-    /**
-     * @var TableGateway
-     */
-    private $themeTable;
+    private TableGateway $themeTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $topicTable;
+    private TableGateway $topicTable;
 
-    /**
-     * @var Forums
-     */
-    private $forums;
+    private Forums $forums;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
@@ -56,11 +41,11 @@ class ForumTopicHydrator extends RestHydrator
 
         $this->userModel = $serviceManager->get(User::class);
 
-        $this->userId = null;
+        $this->userId = 0;
 
         $this->acl = $serviceManager->get(Acl::class);
 
-        $tables = $serviceManager->get('TableManager');
+        $tables           = $serviceManager->get('TableManager');
         $this->themeTable = $tables->get('forums_themes');
         $this->topicTable = $tables->get('forums_topics');
 
@@ -87,10 +72,9 @@ class ForumTopicHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -111,9 +95,8 @@ class ForumTopicHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return ForumTopicHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -129,11 +112,11 @@ class ForumTopicHydrator extends RestHydrator
         $date = Row::getDateTimeByColumnType('timestamp', $object['add_datetime']);
 
         $result = [
-            'id'           => (int)$object['id'],
+            'id'           => (int) $object['id'],
             'name'         => $object['name'],
             'add_datetime' => $this->extractValue('add_datetime', $date),
             'status'       => $object['status'],
-            'theme_id'     => (int)$object['theme_id']
+            'theme_id'     => (int) $object['theme_id'],
         ];
 
         if ($this->filterComposite->filter('last_message')) {
@@ -141,7 +124,7 @@ class ForumTopicHydrator extends RestHydrator
                 Comments::FORUMS_TYPE_ID,
                 $object['id']
             );
-            $lastMessage = false;
+            $lastMessage    = false;
             if ($lastMessageRow) {
                 $lastMessage = $lastMessageRow ? $this->extractValue('last_message', $lastMessageRow) : null;
             }
@@ -160,31 +143,31 @@ class ForumTopicHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('messages')) {
             if ($this->userId) {
-                $stat = $this->comments->service()->getTopicStatForUser(
+                $stat        = $this->comments->service()->getTopicStatForUser(
                     Comments::FORUMS_TYPE_ID,
                     $object['id'],
                     $this->userId
                 );
-                $messages = $stat['messages'];
+                $messages    = $stat['messages'];
                 $newMessages = $stat['newMessages'];
             } else {
-                $stat = $this->comments->service()->getTopicStat(
+                $stat        = $this->comments->service()->getTopicStat(
                     Comments::FORUMS_TYPE_ID,
                     $object['id']
                 );
-                $messages = $stat['messages'];
+                $messages    = $stat['messages'];
                 $newMessages = 0;
             }
 
             $oldMessages = $messages - $newMessages;
 
-            $result['messages'] = $messages;
+            $result['messages']     = $messages;
             $result['old_messages'] = $oldMessages;
             $result['new_messages'] = $newMessages;
         }
 
         if ($this->filterComposite->filter('theme')) {
-            $row = $this->themeTable->select(['id' => (int)$object['theme_id']])->current();
+            $row             = $this->themeTable->select(['id' => (int) $object['theme_id']])->current();
             $result['theme'] = $this->extractValue('theme', $row);
         }
 
@@ -202,7 +185,6 @@ class ForumTopicHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

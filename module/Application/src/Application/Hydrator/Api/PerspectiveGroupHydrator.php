@@ -5,15 +5,13 @@ namespace Application\Hydrator\Api;
 use Application\Hydrator\Api\Strategy\Perspectives as HydratorPerspectivesStrategy;
 use Application\Model\Perspective;
 use Exception;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class PerspectiveGroupHydrator extends RestHydrator
 {
-    /**
-     * @var Perspective
-     */
-    private $perspective;
+    private Perspective $perspective;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
@@ -26,8 +24,8 @@ class PerspectiveGroupHydrator extends RestHydrator
     public function extract($object)
     {
         $result = [
-            'id'   => (int)$object['id'],
-            'name' => $object['name']
+            'id'   => (int) $object['id'],
+            'name' => $object['name'],
         ];
 
         if ($this->filterComposite->filter('perspectives')) {
@@ -42,7 +40,6 @@ class PerspectiveGroupHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

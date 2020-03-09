@@ -2,85 +2,48 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Cache\Storage\StorageInterface;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Validator;
-use Zend\View\Model\JsonModel;
 use Autowp\User\Controller\Plugin\User;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Cache\Storage\StorageInterface;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Validator;
+use Laminas\View\Model\JsonModel;
+
+use function explode;
 
 /**
- * Class AclController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */
 class AclController extends AbstractRestfulController
 {
-    /**
-     * @var string
-     */
-    private $cacheKey = 'acl_cache_key';
+    private string $cacheKey = 'acl_cache_key';
 
-    /**
-     * @var StorageInterface
-     */
-    private $cache;
+    private StorageInterface $cache;
 
-    /**
-     * @var TableGateway
-     */
-    private $privilegeAllowedTable;
+    private TableGateway $privilegeAllowedTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $privilegeDeniedTable;
+    private TableGateway $privilegeDeniedTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $resourceTable;
+    private TableGateway $resourceTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $privilegeTable;
+    private TableGateway $privilegeTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $roleTable;
+    private TableGateway $roleTable;
 
-    /**
-     * @var InputFilter
-     */
-    private $rolesInputFilter;
+    private InputFilter $rolesInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $roleParentsPostFilter;
+    private InputFilter $roleParentsPostFilter;
 
-    /**
-     * @var TableGateway
-     */
-    private $roleParentTable;
+    private TableGateway $roleParentTable;
 
-    /**
-     * @var InputFilter
-     */
-    private $rolesPostFilter;
+    private InputFilter $rolesPostFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $rulesPostFilter;
+    private InputFilter $rulesPostFilter;
 
     public function __construct(
         StorageInterface $cache,
@@ -97,19 +60,19 @@ class AclController extends AbstractRestfulController
     ) {
         $this->cache = $cache;
 
-        $this->roleTable = $roleTable;
+        $this->roleTable       = $roleTable;
         $this->roleParentTable = $roleParentTable;
 
-        $this->resourceTable = $resourceTable;
+        $this->resourceTable  = $resourceTable;
         $this->privilegeTable = $privilegeTable;
 
         $this->privilegeAllowedTable = $privilegeAllowedTable;
-        $this->privilegeDeniedTable = $privilegeDeniedTable;
+        $this->privilegeDeniedTable  = $privilegeDeniedTable;
 
         $this->roleParentsPostFilter = $roleParentsPostFilter;
-        $this->rolesInputFilter = $rolesInputFilter;
-        $this->rolesPostFilter = $rolesPostFilter;
-        $this->rulesPostFilter = $rulesPostFilter;
+        $this->rolesInputFilter      = $rolesInputFilter;
+        $this->rolesPostFilter       = $rolesPostFilter;
+        $this->rulesPostFilter       = $rulesPostFilter;
     }
 
     public function isAllowedAction()
@@ -123,7 +86,7 @@ class AclController extends AbstractRestfulController
             'result' => $this->user()->isAllowed( // @phan-suppress-current-line PhanUndeclaredMethod
                 $this->params()->fromQuery('resource'),
                 $this->params()->fromQuery('privilege')
-            )
+            ),
         ]);
     }
 
@@ -134,9 +97,9 @@ class AclController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        $user = $this->user()->get();
+        $user   = $this->user()->get();
         $result = [
-            $user->role => true
+            $user->role => true,
         ];
 
         $roles = $this->params()->fromQuery('roles');
@@ -167,7 +130,7 @@ class AclController extends AbstractRestfulController
         foreach ($this->roleTable->selectWith($select) as $role) {
             $roles[] = [
                 'name'   => $role['name'],
-                'childs' => $this->getRoles($role['id'])
+                'childs' => $this->getRoles($role['id']),
             ];
         }
 
@@ -190,13 +153,13 @@ class AclController extends AbstractRestfulController
             $roles = [];
             foreach ($this->roleTable->select([]) as $role) {
                 $roles[] = [
-                    'name' => $role['name']
+                    'name' => $role['name'],
                 ];
             }
         }
 
         return new JsonModel([
-            'items' => $roles
+            'items' => $roles,
         ]);
     }
 
@@ -216,7 +179,7 @@ class AclController extends AbstractRestfulController
         $data = $this->rolesPostFilter->getValues();
 
         $this->roleTable->insert([
-            'name' => $data['name']
+            'name' => $data['name'],
         ]);
 
         $this->resetCache();
@@ -229,26 +192,26 @@ class AclController extends AbstractRestfulController
     {
         $resources = [];
         foreach ($this->resourceTable->select([]) as $resource) {
-            $id = $resource['id'];
+            $id   = $resource['id'];
             $rows = $this->privilegeTable->select([
-                'resource_id' => $id
+                'resource_id' => $id,
             ]);
 
             $privileges = [];
             foreach ($rows as $privilege) {
                 $privileges[] = [
-                    'name' => $privilege['name']
+                    'name' => $privilege['name'],
                 ];
             }
 
             $resources[] = [
                 'name'       => $resource['name'],
-                'privileges' => $privileges
+                'privileges' => $privileges,
             ];
         }
 
         return new JsonModel([
-            'items' => $resources
+            'items' => $resources,
         ]);
     }
 
@@ -279,7 +242,7 @@ class AclController extends AbstractRestfulController
                 'resource'  => $row['resource'],
                 'privilege' => $row['privilege'],
                 'role'      => $row['role'],
-                'allowed'   => true
+                'allowed'   => true,
             ];
         }
 
@@ -306,12 +269,12 @@ class AclController extends AbstractRestfulController
                 'resource'  => $row['resource'],
                 'privilege' => $row['privilege'],
                 'role'      => $row['role'],
-                'allowed'   => false
+                'allowed'   => false,
             ];
         }
 
         return new JsonModel([
-            'items' => $rules
+            'items' => $rules,
         ]);
     }
 
@@ -327,7 +290,7 @@ class AclController extends AbstractRestfulController
         }
 
         $validator = new Validator\InArray([
-            'haystack' => $avaliableRoles
+            'haystack' => $avaliableRoles,
         ]);
         $this->rulesPostFilter->get('role')->getValidatorChain()->attach($validator);
 
@@ -337,7 +300,7 @@ class AclController extends AbstractRestfulController
         }
 
         $validator = new Validator\InArray([
-            'haystack' => $avaliableResources
+            'haystack' => $avaliableResources,
         ]);
         $this->rulesPostFilter->get('resource')->getValidatorChain()->attach($validator);
 
@@ -351,14 +314,14 @@ class AclController extends AbstractRestfulController
         $data = $this->rulesPostFilter->getValues();
 
         $role = $this->roleTable->select([
-            'name' => $data['role']
+            'name' => $data['role'],
         ])->current();
         if (! $role) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
 
         $resource = $this->resourceTable->select([
-            'name' => $data['resource']
+            'name' => $data['resource'],
         ])->current();
         if (! $resource) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
@@ -366,7 +329,7 @@ class AclController extends AbstractRestfulController
 
         $privilege = $this->privilegeTable->select([
             'name'        => $data['privilege'],
-            'resource_id' => $resource['id']
+            'resource_id' => $resource['id'],
         ])->current();
         if (! $privilege) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
@@ -374,7 +337,7 @@ class AclController extends AbstractRestfulController
 
         $where = [
             'role_id = ?'      => $role['id'],
-            'privilege_id = ?' => $privilege['id']
+            'privilege_id = ?' => $privilege['id'],
         ];
 
         $this->privilegeDeniedTable->delete($where);
@@ -383,12 +346,12 @@ class AclController extends AbstractRestfulController
         if ($data['allowed']) {
             $this->privilegeAllowedTable->insert([
                 'privilege_id' => $privilege['id'],
-                'role_id'      => $role['id']
+                'role_id'      => $role['id'],
             ]);
         } else {
             $this->privilegeDeniedTable->insert([
                 'privilege_id' => $privilege['id'],
-                'role_id'      => $role['id']
+                'role_id'      => $role['id'],
             ]);
         }
 
@@ -401,7 +364,7 @@ class AclController extends AbstractRestfulController
     public function roleAction()
     {
         $role = $this->roleTable->select([
-            'name' => $this->params()->fromRoute('role')
+            'name' => $this->params()->fromRoute('role'),
         ])->current();
 
         if (! $role) {
@@ -409,14 +372,14 @@ class AclController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'name' => $role['name']
+            'name' => $role['name'],
         ]);
     }
 
     public function roleParentsAction()
     {
         $role = $this->roleTable->select([
-            'name' => $this->params()->fromRoute('role')
+            'name' => $this->params()->fromRoute('role'),
         ])->current();
 
         if (! $role) {
@@ -426,18 +389,18 @@ class AclController extends AbstractRestfulController
         $select = new Sql\Select($this->roleTable->getTable());
         $select->join('acl_roles_parents', 'acl_roles.id = acl_roles_parents.parent_role_id', [])
             ->where([
-                'acl_roles_parents.role_id' => $role['id']
+                'acl_roles_parents.role_id' => $role['id'],
             ]);
 
         $items = [];
         foreach ($this->roleTable->selectWith($select) as $row) {
             $items[] = [
-                'name' => $row['name']
+                'name' => $row['name'],
             ];
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
@@ -448,7 +411,7 @@ class AclController extends AbstractRestfulController
         }
 
         $role = $this->roleTable->select([
-            'name' => $this->params()->fromRoute('role')
+            'name' => $this->params()->fromRoute('role'),
         ])->current();
 
         if (! $role) {
@@ -456,15 +419,15 @@ class AclController extends AbstractRestfulController
         }
 
         $avaliableRoles = [];
-        $rows = $this->roleTable->select([ //TODO: filter already parents
-            'name <> ?' => $role['name']
+        $rows           = $this->roleTable->select([ //TODO: filter already parents
+            'name <> ?' => $role['name'],
         ]);
         foreach ($rows as $row) {
             $avaliableRoles[] = $row['name'];
         }
 
         $validator = new Validator\InArray([
-            'haystack' => $avaliableRoles
+            'haystack' => $avaliableRoles,
         ]);
 
         $this->roleParentsPostFilter->get('role')->getValidatorChain()->attach($validator);
@@ -479,7 +442,7 @@ class AclController extends AbstractRestfulController
         $data = $this->roleParentsPostFilter->getValues();
 
         $parentRole = $this->roleTable->select([
-            'name' => $data['role']
+            'name' => $data['role'],
         ])->current();
 
         if (! $parentRole) {
@@ -488,7 +451,7 @@ class AclController extends AbstractRestfulController
 
         $this->roleParentTable->insert([
             'role_id'        => $role['id'],
-            'parent_role_id' => $parentRole['id']
+            'parent_role_id' => $parentRole['id'],
         ]);
 
         $this->resetCache();

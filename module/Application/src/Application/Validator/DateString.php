@@ -4,7 +4,9 @@ namespace Application\Validator;
 
 use DateTime;
 use DateTimeImmutable;
-use Zend\Validator\Date;
+use Laminas\Validator\Date;
+
+use function gettype;
 
 class DateString extends Date
 {

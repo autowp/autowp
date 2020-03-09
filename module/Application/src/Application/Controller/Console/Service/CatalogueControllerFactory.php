@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Console\Service;
 
+use Application\Controller\Console\CatalogueController;
 use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Model\Item;
@@ -12,22 +13,19 @@ use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service;
+use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Controller\Console\CatalogueController as Controller;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CatalogueControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Controller
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): CatalogueController
     {
-        return new Controller(
+        return new CatalogueController(
             $container->get(ItemParent::class),
             $container->get(PictureItem::class),
             $container->get(SpecificationsService::class),
@@ -37,7 +35,8 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(Service::class),
             $container->get(DuplicateFinder::class),
             $container->get(Item::class),
-            $container->get(Picture::class)
+            $container->get(Picture::class),
+            $container->get(User::class)
         );
     }
 }

@@ -2,11 +2,13 @@
 
 namespace Autowp\User\Auth\Adapter;
 
-use Zend\Db\Sql;
-use Zend\Authentication\Adapter\AdapterInterface;
-use Zend\Authentication\Result;
-use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
 use Autowp\User\Model\User;
+use Laminas\Authentication\Adapter\AdapterInterface;
+use Laminas\Authentication\Adapter\Exception\InvalidArgumentException;
+use Laminas\Authentication\Result;
+use Laminas\Db\Sql;
+
+use function mb_strpos;
 
 class Login implements AdapterInterface
 {
@@ -15,29 +17,25 @@ class Login implements AdapterInterface
      *
      * @var string
      */
-    private $identity = null;
+    private $identity;
 
     /**
      * $_credential - Credential values
      *
      * @var Sql\Expression
      */
-    private $credentialExpr = null;
+    private $credentialExpr;
 
-    /**
-     * @var array
-     */
-    private $authenticateResultInfo = null;
+    /** @var array */
+    private $authenticateResultInfo;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     private $userModel;
 
     public function __construct(User $userModel, $identity, Sql\Expression $credentialExpr)
     {
-        $this->userModel = $userModel;
-        $this->identity = (string)$identity;
+        $this->userModel      = $userModel;
+        $this->identity       = (string) $identity;
         $this->credentialExpr = $credentialExpr;
     }
 
@@ -50,22 +48,22 @@ class Login implements AdapterInterface
 
         $filter = [
             'not deleted',
-            'password' => $this->credentialExpr
+            'password' => $this->credentialExpr,
         ];
         if (mb_strpos($this->identity, '@') !== false) {
-            $filter['e_mail'] = (string)$this->identity;
+            $filter['e_mail'] = (string) $this->identity;
         } else {
-            $filter['login'] = (string)$this->identity;
+            $filter['login'] = (string) $this->identity;
         }
 
         $userRow = $this->userModel->getTable()->select($filter)->current();
 
         if (! $userRow) {
-            $this->authenticateResultInfo['code'] = Result::FAILURE_IDENTITY_NOT_FOUND;
+            $this->authenticateResultInfo['code']       = Result::FAILURE_IDENTITY_NOT_FOUND;
             $this->authenticateResultInfo['messages'][] = 'A record with the supplied identity could not be found.';
         } else {
-            $this->authenticateResultInfo['code'] = Result::SUCCESS;
-            $this->authenticateResultInfo['identity'] = (int)$userRow['id'];
+            $this->authenticateResultInfo['code']       = Result::SUCCESS;
+            $this->authenticateResultInfo['identity']   = (int) $userRow['id'];
             $this->authenticateResultInfo['messages'][] = 'Authentication successful.';
         }
 
@@ -78,13 +76,12 @@ class Login implements AdapterInterface
      * required pieces of information.
      *
      * @throws InvalidArgumentException - in the event that setup was not done properly
-     * @return true
      */
-    private function authenticateSetup()
+    private function authenticateSetup(): bool
     {
         $exception = null;
 
-        if ($this->identity == '') {
+        if ($this->identity === '') {
             $exception = 'A value for the identity was not provided prior to authentication.';
         } elseif ($this->credentialExpr === null) {
             $exception = 'A credential value was not provided prior to authentication.';
@@ -97,7 +94,7 @@ class Login implements AdapterInterface
         $this->authenticateResultInfo = [
             'code'     => Result::FAILURE,
             'identity' => null,
-            'messages' => []
+            'messages' => [],
         ];
 
         return true;

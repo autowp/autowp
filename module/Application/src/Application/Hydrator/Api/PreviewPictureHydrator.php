@@ -3,22 +3,20 @@
 namespace Application\Hydrator\Api;
 
 use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
 use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Stdlib\ArrayUtils;
+
+use function is_array;
 
 class PreviewPictureHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    private $userRole = null;
+    private ?string $userRole;
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
         $strategy = new Strategy\Picture($serviceManager);
         $this->addStrategy('picture', $strategy);
@@ -29,10 +27,9 @@ class PreviewPictureHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -53,8 +50,8 @@ class PreviewPictureHydrator extends RestHydrator
 
     public function setUserId($userId)
     {
-        if ($this->userId != $userId) {
-            $this->userId = $userId;
+        if ($this->userId !== $userId) {
+            $this->userId   = $userId;
             $this->userRole = null;
         }
 
@@ -77,8 +74,8 @@ class PreviewPictureHydrator extends RestHydrator
 
         if (isset($object['row']['image_id'])) {
             $result['thumb'] = $this->extractValue('thumb', [
-                'image' => $object['row']['image_id'],
-                'format' => $largeFormat ? 'picture-thumb-large' : 'picture-thumb-medium'
+                'image'  => $object['row']['image_id'],
+                'format' => $largeFormat ? 'picture-thumb-large' : 'picture-thumb-medium',
             ]);
         } else {
             $result['thumb'] = null;
@@ -89,7 +86,6 @@ class PreviewPictureHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

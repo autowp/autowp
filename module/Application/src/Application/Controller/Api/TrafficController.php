@@ -2,35 +2,30 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
+use Application\Hydrator\Api\RestHydrator;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
-use Application\Hydrator\Api\RestHydrator;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function trim;
 
 /**
- * Class TrafficController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  */
 class TrafficController extends AbstractRestfulController
 {
-    /**
-     * @var TrafficControl
-     */
-    private $service;
+    /** @var TrafficControl */
+    private TrafficControl $service;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
     public function __construct(TrafficControl $service, RestHydrator $hydrator)
     {
-        $this->service = $service;
+        $this->service  = $service;
         $this->hydrator = $hydrator;
     }
 
@@ -54,7 +49,7 @@ class TrafficController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $result
+            'items' => $result,
         ]);
     }
 
@@ -75,7 +70,7 @@ class TrafficController extends AbstractRestfulController
         unset($row);*/
 
         return new JsonModel([
-            'items' => $data
+            'items' => $data,
         ]);
     }
 

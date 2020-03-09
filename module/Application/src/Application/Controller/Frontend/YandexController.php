@@ -2,35 +2,34 @@
 
 namespace Application\Controller\Frontend;
 
+use Application\Model\CarOfDay;
 use DateTime;
 use DateTimeZone;
-use Zend\Mvc\Controller\AbstractActionController;
-use Application\Controller\Plugin\ForbiddenAction;
-use Application\Model\CarOfDay;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+
+use function implode;
+use function preg_match;
+use function sha1;
 
 /**
- * Class YandexController
- * @package Application\Controller\Frontend
- *
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  */
 class YandexController extends AbstractActionController
 {
     private const DATE_FORMAT = 'Y-m-d';
 
-    private $secret;
+    private string $secret;
 
-    private $price;
+    private int $price;
 
-    /**
-     * @var CarOfDay
-     */
-    private $itemOfDay;
+    /** @var CarOfDay */
+    private CarOfDay $itemOfDay;
 
     public function __construct(array $config, CarOfDay $itemOfDay)
     {
-        $this->secret = $config['secret'];
-        $this->price = $config['price'];
+        $this->secret    = $config['secret'];
+        $this->price     = $config['price'];
         $this->itemOfDay = $itemOfDay;
     }
 
@@ -60,36 +59,45 @@ class YandexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $fields = ['notification_type', 'operation_id', 'amount', 'currency',
-            'datetime', 'sender', 'codepro', 'notification_secret', 'label'];
+        $fields = [
+            'notification_type',
+            'operation_id',
+            'amount',
+            'currency',
+            'datetime',
+            'sender',
+            'codepro',
+            'notification_secret',
+            'label',
+        ];
 
         $str = [];
         foreach ($fields as $field) {
-            if ($field == 'notification_secret') {
+            if ($field === 'notification_secret') {
                 $str[] = $this->secret;
             } else {
-                $str[] = (string)$this->params()->fromPost($field);
+                $str[] = (string) $this->params()->fromPost($field);
             }
         }
         $str = implode('&', $str);
 
-        $sha1Hash = (string)$this->params()->fromPost('sha1_hash');
+        $sha1Hash = (string) $this->params()->fromPost('sha1_hash');
 
         if (sha1($str) !== $sha1Hash) {
             return $this->forbiddenAction();
         }
 
         $currency = $this->params()->fromPost('currency');
-        if ($currency != 643) {
+        if ($currency !== 643) {
             return $this->forbiddenAction();
         }
 
-        $withdrawAmount = (float)$this->params()->fromPost('withdraw_amount');
+        $withdrawAmount = (float) $this->params()->fromPost('withdraw_amount');
         if ($withdrawAmount < $this->price) {
             return $this->forbiddenAction();
         }
 
-        $label = (string)$this->params()->fromPost('label');
+        $label = (string) $this->params()->fromPost('label');
         if (! preg_match('|^vod/([0-9]{4}-[0-9]{2}-[0-9]{2})/([0-9]+)/([0-9]+)$|isu', $label, $matches)) {
             return $this->forbiddenAction();
         }
@@ -104,8 +112,8 @@ class YandexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemId = (int)$matches[2];
-        $userId = (int)$matches[3];
+        $itemId = (int) $matches[2];
+        $userId = (int) $matches[3];
 
         if (! $itemId) {
             return $this->forbiddenAction();

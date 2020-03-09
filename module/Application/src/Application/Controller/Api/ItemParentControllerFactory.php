@@ -11,21 +11,18 @@ use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
 use Autowp\Message\MessageService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemParentControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return ItemParentController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ItemParentController
     {
         $hydrators = $container->get('HydratorManager');
-        $filters = $container->get('InputFilterManager');
+        $filters   = $container->get('InputFilterManager');
         return new ItemParentController(
             $hydrators->get(ItemParentHydrator::class),
             $filters->get('api_item_parent_list'),

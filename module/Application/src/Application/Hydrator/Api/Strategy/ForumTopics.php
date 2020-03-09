@@ -3,15 +3,13 @@
 namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\ForumTopicHydrator as Hydrator;
+use ArrayAccess;
 
 class ForumTopics extends HydratorStrategy
 {
-    private $userId;
+    private int $userId;
 
-    /**
-     * @return Hydrator
-     */
-    protected function getHydrator()
+    protected function getHydrator(): Hydrator
     {
         if (! $this->hydrator) {
             $this->hydrator = new Hydrator($this->serviceManager);
@@ -20,7 +18,10 @@ class ForumTopics extends HydratorStrategy
         return $this->hydrator;
     }
 
-    public function extract($value)
+    /**
+     * @param array|ArrayAccess $value
+     */
+    public function extract($value): array
     {
         $hydrator = $this->getHydrator();
 
@@ -35,7 +36,7 @@ class ForumTopics extends HydratorStrategy
         return $result;
     }
 
-    public function setUserId($userId)
+    public function setUserId(int $userId): self
     {
         $this->userId = $userId;
 

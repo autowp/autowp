@@ -2,7 +2,9 @@
 
 namespace Application\Spec\Table\Value;
 
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
+
+use function sprintf;
 
 class Wheel
 {
@@ -13,26 +15,24 @@ class Wheel
 
     public function __construct(array $options)
     {
-        $this->tyrewidth = $options['tyrewidth'];
+        $this->tyrewidth  = $options['tyrewidth'];
         $this->tyreseries = $options['tyreseries'];
-        $this->radius = $options['radius'];
-        $this->rimwidth = $options['rimwidth'];
+        $this->radius     = $options['radius'];
+        $this->rimwidth   = $options['rimwidth'];
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param PhpRenderer $view
      * @param $attribute
      * @param $value
      * @param $values
-     * @return string
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values)
+    public function render(PhpRenderer $view, $attribute, $value, $values): string
     {
-        $tyreWidth = isset($values[$this->tyrewidth]) ? $values[$this->tyrewidth] : null;
-        $tyreSeries = isset($values[$this->tyreseries]) ? $values[$this->tyreseries] : null;
-        $radius = isset($values[$this->radius]) ? $values[$this->radius] : null;
-        $rimWidth = isset($values[$this->rimwidth]) ? $values[$this->rimwidth] : null;
+        $tyreWidth  = $values[$this->tyrewidth] ?? null;
+        $tyreSeries = $values[$this->tyreseries] ?? null;
+        $radius     = $values[$this->radius] ?? null;
+        $rimWidth   = $values[$this->rimwidth] ?? null;
 
         $diskName = null;
         if ($rimWidth || $radius) {

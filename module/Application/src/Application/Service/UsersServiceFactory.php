@@ -10,19 +10,16 @@ use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
-use Zend\Mail\Transport\TransportInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\Mail\Transport\TransportInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class UsersServiceFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return UsersService
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): UsersService
     {
         $config = $container->get('Config');
         $tables = $container->get('TableManager');

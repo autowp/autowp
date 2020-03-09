@@ -2,56 +2,35 @@
 
 namespace Application\Model;
 
-use Zend\Db\Adapter\Exception\InvalidQueryException;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Paginator;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
+use Laminas\Db\Adapter\Exception\InvalidQueryException;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Paginator;
+
+use function array_replace;
+use function strpos;
 
 class Log
 {
     private const EVENTS_PER_PAGE = 40;
 
-    /**
-     * @var TableGateway
-     */
-    private $eventTable;
+    private TableGateway $eventTable;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var TableGateway
-     */
-    private $eventArticleTable;
+    private TableGateway $eventArticleTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $eventItemTable;
+    private TableGateway $eventItemTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $eventPictureTable;
+    private TableGateway $eventPictureTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $eventUserTable;
+    private TableGateway $eventUserTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemTable;
+    private TableGateway $itemTable;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(
         Picture $picture,
@@ -63,28 +42,25 @@ class Log
         TableGateway $itemTable,
         User $userModel
     ) {
-        $this->itemTable = $itemTable;
-        $this->eventTable = $logTable;
-        $this->picture = $picture;
+        $this->itemTable         = $itemTable;
+        $this->eventTable        = $logTable;
+        $this->picture           = $picture;
         $this->eventArticleTable = $eventArticleTable;
-        $this->eventItemTable = $eventItemTable;
+        $this->eventItemTable    = $eventItemTable;
         $this->eventPictureTable = $eventPictureTable;
-        $this->eventUserTable = $eventUserTable;
-        $this->userModel = $userModel;
+        $this->eventUserTable    = $eventUserTable;
+        $this->userModel         = $userModel;
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $userId
-     * @param string $message
-     * @param array $objects
      */
     public function addEvent(int $userId, string $message, array $objects)
     {
         $this->eventTable->insert([
             'description'  => $message,
             'user_id'      => $userId,
-            'add_datetime' => new Sql\Expression('NOW()')
+            'add_datetime' => new Sql\Expression('NOW()'),
         ]);
         $id = $this->eventTable->getLastInsertValue();
 
@@ -97,15 +73,15 @@ class Log
             'items'    => [],
             'pictures' => [],
             'users'    => [],
-            'articles' => []
+            'articles' => [],
         ];
-        $items = array_replace($defaults, $items);
+        $items    = array_replace($defaults, $items);
 
-        foreach ((array)$items['items'] as $item) {
+        foreach ((array) $items['items'] as $item) {
             try {
                 $this->eventItemTable->insert([
                     'log_event_id' => $id,
-                    'item_id'      => $item
+                    'item_id'      => $item,
                 ]);
             } catch (InvalidQueryException $e) {
                 if (strpos($e->getMessage(), 'Duplicate entry') === false) {
@@ -114,11 +90,11 @@ class Log
             }
         }
 
-        foreach ((array)$items['pictures'] as $item) {
+        foreach ((array) $items['pictures'] as $item) {
             try {
                 $this->eventPictureTable->insert([
                     'log_event_id' => $id,
-                    'picture_id'   => $item
+                    'picture_id'   => $item,
                 ]);
             } catch (InvalidQueryException $e) {
                 if (strpos($e->getMessage(), 'Duplicate entry') === false) {
@@ -127,11 +103,11 @@ class Log
             }
         }
 
-        foreach ((array)$items['users'] as $item) {
+        foreach ((array) $items['users'] as $item) {
             try {
                 $this->eventUserTable->insert([
                     'log_event_id' => $id,
-                    'user_id'      => $item
+                    'user_id'      => $item,
                 ]);
             } catch (InvalidQueryException $e) {
                 if (strpos($e->getMessage(), 'Duplicate entry') === false) {
@@ -140,11 +116,11 @@ class Log
             }
         }
 
-        foreach ((array)$items['articles'] as $item) {
+        foreach ((array) $items['articles'] as $item) {
             try {
                 $this->eventArticleTable->insert([
                     'log_event_id' => $id,
-                    'article_id'      => $item
+                    'article_id'   => $item,
                 ]);
             } catch (InvalidQueryException $e) {
                 if (strpos($e->getMessage(), 'Duplicate entry') === false) {
@@ -162,35 +138,35 @@ class Log
             'picture_id' => null,
             'user_id'    => null,
             'page'       => null,
-            'language'   => 'en'
+            'language'   => 'en',
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $select = new Sql\Select($this->eventTable->getTable());
         $select->order(['add_datetime DESC', 'id DESC']);
 
-        $articleId = (int)$options['article_id'];
+        $articleId = (int) $options['article_id'];
         if ($articleId) {
             $select
                 ->join('log_events_articles', 'log_events.id = log_events_articles.log_event_id', [])
                 ->where(['log_events_articles.article_id = ?' => $articleId]);
         }
 
-        $itemId = (int)$options['item_id'];
+        $itemId = (int) $options['item_id'];
         if ($itemId) {
             $select
                 ->join('log_events_item', 'log_events.id = log_events_item.log_event_id', [])
                 ->where(['log_events_item.item_id = ?' => $itemId]);
         }
 
-        $pictureId = (int)$options['picture_id'];
+        $pictureId = (int) $options['picture_id'];
         if ($pictureId) {
             $select
                 ->join('log_events_pictures', 'log_events.id = log_events_pictures.log_event_id', [])
                 ->where(['log_events_pictures.picture_id = ?' => $pictureId]);
         }
 
-        $userId = (int)$options['user_id'];
+        $userId = (int) $options['user_id'];
         if ($userId) {
             $select->where(['log_events.user_id = ?' => $userId]);
         }
@@ -215,21 +191,21 @@ class Log
             }
 
             $pictureRows = $this->picture->getRows([
-                'log' => $event['id']
+                'log' => $event['id'],
             ]);
 
             $events[] = [
-                'user'     => $this->userModel->getRow((int)$event['user_id']),
+                'user'     => $this->userModel->getRow((int) $event['user_id']),
                 'date'     => Row::getDateTimeByColumnType('timestamp', $event['add_datetime']),
                 'desc'     => $event['description'],
                 'items'    => $itemRows,
-                'pictures' => $pictureRows
+                'pictures' => $pictureRows,
             ];
         }
 
         return [
             'paginator' => $paginator,
-            'events'    => $events
+            'events'    => $events,
         ];
     }
 }

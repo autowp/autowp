@@ -7,21 +7,18 @@ use Application\Hydrator\Api\ForumTopicHydrator;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ForumControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return ForumController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ForumController
     {
         $hydrators = $container->get('HydratorManager');
-        $filters = $container->get('InputFilterManager');
+        $filters   = $container->get('InputFilterManager');
         return new ForumController(
             $container->get(Forums::class),
             $container->get(User::class),

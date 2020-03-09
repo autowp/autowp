@@ -17,7 +17,7 @@ class TranslatorTest extends AbstractHttpControllerTestCase
     public function testTranslatorWorks($text, $expected, $language)
     {
         $serviceManager = $this->getApplicationServiceLocator();
-        $translator = $serviceManager->get('MvcTranslator');
+        $translator     = $serviceManager->get('MvcTranslator');
 
         $result = $translator->translate($text, 'default', $language);
 

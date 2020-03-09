@@ -2,24 +2,22 @@
 
 namespace Application\Validator\ItemParent;
 
-use Zend\Validator\AbstractValidator;
 use Application\Model\ItemParent;
+use Laminas\Validator\AbstractValidator;
 
 class CatnameNotExists extends AbstractValidator
 {
     private const EXISTS = 'itemParentCatnameAlreadyExists';
 
     protected $messageTemplates = [
-        self::EXISTS => "Item parent catname '%value%' already exists"
+        self::EXISTS => "Item parent catname '%value%' already exists",
     ];
 
     private $parentId;
 
     private $ignoreItemId;
 
-    /**
-     * @var ItemParent
-     */
+    /** @var ItemParent */
     private $itemParent;
 
     public function setItemParent(ItemParent $itemParent)
@@ -49,7 +47,7 @@ class CatnameNotExists extends AbstractValidator
 
         $row = $this->itemParent->getRowByCatname($this->parentId, $value);
 
-        if ($this->ignoreItemId && $row['item_id'] == $this->ignoreItemId) {
+        if ($this->ignoreItemId && $row['item_id'] === $this->ignoreItemId) {
             $row = null;
         }
 

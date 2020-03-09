@@ -2,22 +2,19 @@
 
 namespace Application\Controller\Plugin\Service;
 
+use Application\Controller\Plugin\Car as Plugin;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Controller\Plugin\Car as Plugin;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CarFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Plugin
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Plugin
     {
         return new Plugin(
             $container->get(ItemNameFormatter::class),

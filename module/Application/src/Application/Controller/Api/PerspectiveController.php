@@ -2,38 +2,31 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
- * Class PerspectiveController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method string language()
  */
 class PerspectiveController extends AbstractRestfulController
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    /** @var TableGateway */
+    private TableGateway $table;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
     public function __construct(RestHydrator $hydrator, TableGateway $table)
     {
         $this->hydrator = $hydrator;
-        $this->table = $table;
+        $this->table    = $table;
     }
 
     public function indexAction()
@@ -44,20 +37,20 @@ class PerspectiveController extends AbstractRestfulController
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => []
+            'fields'   => [],
         ]);
 
         $select = new Sql\Select($this->table->getTable());
         $select->order('position');
 
-        $rows = $this->table->selectWith($select);
+        $rows  = $this->table->selectWith($select);
         $items = [];
         foreach ($rows as $row) {
             $items[] = $this->hydrator->extract($row);
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 }

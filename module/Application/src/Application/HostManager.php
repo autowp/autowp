@@ -2,16 +2,14 @@
 
 namespace Application;
 
-use Zend\Uri\UriFactory;
-use Zend\Uri\Uri;
 use Exception;
+use Laminas\Uri\Uri;
+use Laminas\Uri\UriFactory;
 
 class HostManager
 {
-    /**
-     * @var array
-     */
-    private $hosts;
+    /** @var array */
+    private array $hosts;
 
     public function __construct(array $hosts)
     {
@@ -19,11 +17,9 @@ class HostManager
     }
 
     /**
-     * @param string $language
-     * @return Uri
      * @throws Exception
      */
-    public function getUriByLanguage($language)
+    public function getUriByLanguage(string $language): Uri
     {
         if (! isset($this->hosts[$language])) {
             throw new Exception("Host for language `$language` not found");
@@ -34,7 +30,7 @@ class HostManager
         return UriFactory::factory('https://' . $hostname);
     }
 
-    public function getCookieDomain($language)
+    public function getCookieDomain(string $language): string
     {
         if (! isset($this->hosts[$language])) {
             throw new Exception("Host for language `$language` not found");

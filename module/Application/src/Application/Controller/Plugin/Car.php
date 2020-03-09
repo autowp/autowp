@@ -4,44 +4,36 @@ namespace Application\Controller\Plugin;
 
 use Application\ItemNameFormatter;
 use Application\Model\Item;
+use ArrayAccess;
 use Exception;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class Car extends AbstractPlugin
 {
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    /** @var ItemNameFormatter */
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    /** @var Item */
+    private Item $itemModel;
 
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
         Item $item
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
-        $this->itemModel = $item;
+        $this->itemModel         = $item;
     }
 
-    /**
-     * @return Car
-     */
-    public function __invoke()
+    public function __invoke(): self
     {
         return $this;
     }
 
     /**
-     * @param $vehicle
-     * @param $language
-     * @return mixed|string
+     * @param array|ArrayAccess $vehicle
      * @throws Exception
      */
-    public function formatName($vehicle, $language)
+    public function formatName($vehicle, string $language): string
     {
         return $this->itemNameFormatter->format(
             $this->itemModel->getNameData($vehicle, $language),

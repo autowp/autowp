@@ -3,39 +3,43 @@
 namespace Application;
 
 use Exception;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\Http\Request;
-use Zend\Mvc\MvcEvent;
-use Zend\Session\ManagerInterface;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Http\Request;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Session\ManagerInterface;
+
+use function in_array;
+use function session_get_cookie_params;
+use function session_name;
+use function session_unset;
+use function setcookie;
+use function time;
+
+use const PHP_SAPI;
 
 class SessionDispatchListener extends AbstractListenerAggregate
 {
     /**
-     * @param EventManagerInterface $events
-     * @param int                   $priority
+     * @param int $priority
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
         $this->listeners[] = $events->attach(MvcEvent::EVENT_BOOTSTRAP, [$this, 'onBootstrap'], $priority);
     }
 
-    /**
-     * @param  MvcEvent $e
-     * @return null
-     */
-    public function onBootstrap(MvcEvent $e)
+    public function onBootstrap(MvcEvent $e): void
     {
-        if (php_sapi_name() == "cli") {
+        if (PHP_SAPI === "cli") {
             return;
         }
 
         $request = $e->getRequest();
         if ($request instanceof Request) {
             $serviceManager = $e->getApplication()->getServiceManager();
-            $config = $serviceManager->get('Config');
+            $config         = $serviceManager->get('Config');
             $sessionManager = $serviceManager->get(ManagerInterface::class);
-            $sessionConfig = $sessionManager->getConfig();
+            $sessionConfig  = $sessionManager->getConfig();
 
             $cookieDomain = $this->getHostCookieDomain($request, $config['hosts']);
             if ($cookieDomain) {
@@ -66,13 +70,13 @@ class SessionDispatchListener extends AbstractListenerAggregate
         }
     }
 
-    private function getHostCookieDomain(Request $request, $hosts)
+    private function getHostCookieDomain(Request $request, $hosts): ?string
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $hostname = $request->getUri()->getHost();
 
         foreach ($hosts as $host) {
-            if ($host['hostname'] == $hostname) {
+            if ($host['hostname'] === $hostname) {
                 return $host['cookie'];
             }
 

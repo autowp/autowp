@@ -7,27 +7,19 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
+use function count;
+use function sleep;
+
 class RabbitMQ
 {
-    /**
-     * @var array
-     */
-    private $config;
+    private array $config;
 
-    /**
-     * @var AMQPStreamConnection
-     */
-    private $connection;
+    private AMQPStreamConnection $connection;
 
-    /**
-     * @var AMQPChannel[]
-     */
-    private $channels = [];
+    /** @var AMQPChannel[] */
+    private array $channels = [];
 
-    /**
-     * @var string
-     */
-    private $consumerTag = 'consumer';
+    private string $consumerTag = 'consumer';
 
     public function __construct(array $config)
     {
@@ -41,7 +33,7 @@ class RabbitMQ
         }
 
         $connection = null;
-        $exception = null;
+        $exception  = null;
         for ($i = 0; $i < 3 && ! $connection; $i++) {
             try {
                 $connection = new AMQPStreamConnection(
@@ -95,8 +87,8 @@ class RabbitMQ
     public function send(string $queue, string $body)
     {
         $message = new AMQPMessage($body, [
-            'content_type' => 'application/json',
-            'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT
+            'content_type'  => 'application/json',
+            'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT,
         ]);
         $this->getChannel($queue)->basic_publish($message, $queue);
     }

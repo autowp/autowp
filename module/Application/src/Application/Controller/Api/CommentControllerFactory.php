@@ -12,22 +12,19 @@ use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Autowp\Votings\Votings;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CommentControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return CommentController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): CommentController
     {
         $hydrators = $container->get('HydratorManager');
-        $filters = $container->get('InputFilterManager');
-        $tables = $container->get('TableManager');
+        $filters   = $container->get('InputFilterManager');
+        $tables    = $container->get('TableManager');
         return new CommentController(
             $container->get(Comments::class),
             $hydrators->get(CommentHydrator::class),

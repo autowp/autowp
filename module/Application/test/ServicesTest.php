@@ -16,7 +16,7 @@ use Application\Test\AbstractHttpControllerTestCase;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service;
-use Zend\Permissions\Acl\Acl;
+use Laminas\Permissions\Acl\Acl;
 
 class ServicesTest extends AbstractHttpControllerTestCase
 {

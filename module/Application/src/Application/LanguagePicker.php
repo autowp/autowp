@@ -2,29 +2,24 @@
 
 namespace Application;
 
+use Laminas\Http\PhpEnvironment\Request;
+
 class LanguagePicker
 {
-    private $request;
+    private Request $request;
 
-    /**
-     * @var array
-     */
-    private $hosts = [];
+    private array $hosts = [];
 
-    public function __construct($request, $hosts)
+    public function __construct(Request $request, array $hosts)
     {
         $this->request = $request;
-        $this->hosts = $hosts;
+        $this->hosts   = $hosts;
     }
 
-    /**
-     * @return array
-     */
-    public function getItems()
+    public function getItems(): array
     {
         $languages = [];
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $uri = $this->request->getUri();
         foreach ($this->hosts as $itemLanguage => $item) {
             $clone = clone $uri;
@@ -35,7 +30,7 @@ class LanguagePicker
                 'language' => $itemLanguage,
                 'hostname' => $item['hostname'],
                 'flag'     => $item['flag'],
-                'url'      => $clone->__toString()
+                'url'      => $clone->__toString(),
             ];
         }
 

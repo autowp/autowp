@@ -2,42 +2,36 @@
 
 namespace Application\Controller\Plugin;
 
-use ArrayObject;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
+use ArrayObject;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class Pic extends AbstractPlugin
 {
-    /**
-     * @var PictureNameFormatter
-     */
-    private $pictureNameFormatter;
+    private PictureNameFormatter $pictureNameFormatter;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
     public function __construct(
         PictureNameFormatter $pictureNameFormatter,
         Picture $picture
     ) {
         $this->pictureNameFormatter = $pictureNameFormatter;
-        $this->picture = $picture;
+        $this->picture              = $picture;
     }
 
     public function name($pictureRow, $language)
     {
         if ($pictureRow instanceof ArrayObject) {
-            $pictureRow = (array)$pictureRow;
+            $pictureRow = (array) $pictureRow;
         }
 
         $names = $this->picture->getNameData([$pictureRow], [
             'language' => $language,
-            'large'    => true
+            'large'    => true,
         ]);
-        $name = $names[$pictureRow['id']];
+        $name  = $names[$pictureRow['id']];
 
         return $this->pictureNameFormatter->format($name, $language);
     }

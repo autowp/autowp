@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Autowp\Traffic;
 
-use Zend\Authentication\AuthenticationService;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Mvc\MvcEvent;
 use Autowp\User\Model\User;
-use Zend\Permissions\Acl\Acl;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Permissions\Acl\Acl;
+
+use function strlen;
+use function strncasecmp;
 
 class TrafficRouteListener extends AbstractListenerAggregate
 {
@@ -56,14 +59,12 @@ class TrafficRouteListener extends AbstractListenerAggregate
         '/donate',
         '/factory',
         '/login',
-        '/telegram'
+        '/telegram',
     ];
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param EventManagerInterface $events
-     * @param int                   $priority
+     * @param int $priority
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
@@ -82,7 +83,6 @@ class TrafficRouteListener extends AbstractListenerAggregate
     }
 
     /**
-     * @param  MvcEvent $e
      * @return null
      */
     public function onRoute(MvcEvent $e)
@@ -102,10 +102,10 @@ class TrafficRouteListener extends AbstractListenerAggregate
             $unlimitedTraffic = false;
             if ($auth->hasIdentity()) {
                 $userModel = $serviceManager->get(User::class);
-                $user = $userModel->getRow(['id' => (int)$auth->getIdentity()]);
+                $user      = $userModel->getRow(['id' => (int) $auth->getIdentity()]);
 
                 if ($user) {
-                    $acl = $serviceManager->get(Acl::class);
+                    $acl              = $serviceManager->get(Acl::class);
                     $unlimitedTraffic = $acl->isAllowed($user['role'], 'website', 'unlimited-traffic');
                 }
             }

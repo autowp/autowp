@@ -2,21 +2,18 @@
 
 namespace Application\Validator\Attr;
 
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Validator\AbstractValidator;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Validator\AbstractValidator;
 
 class AttributeId extends AbstractValidator
 {
     private const INVALID = 'invalidAttributeId';
 
-    protected $messageTemplates = [
-        self::INVALID => "Attribute is invalid"
+    protected array $messageTemplates = [
+        self::INVALID => "Attribute is invalid",
     ];
 
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     public function setTable(TableGateway $table)
     {
@@ -30,7 +27,7 @@ class AttributeId extends AbstractValidator
         $this->setValue($value);
 
         $row = $this->table->select([
-            'id' => (int)$value
+            'id' => (int) $value,
         ]);
 
         if (! $row) {

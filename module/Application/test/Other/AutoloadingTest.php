@@ -2,8 +2,8 @@
 
 namespace ApplicationTest\Other;
 
+use Laminas\Form\Form;
 use PHPUnit\Framework\TestCase;
-use Zend\Form\Form;
 
 class AutoloadingTest extends TestCase
 {

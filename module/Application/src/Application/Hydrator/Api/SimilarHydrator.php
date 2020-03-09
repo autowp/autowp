@@ -5,15 +5,13 @@ namespace Application\Hydrator\Api;
 use Application\Hydrator\Api\Strategy\Picture as HydratorPictureStrategy;
 use Application\Model\Picture;
 use Exception;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class SimilarHydrator extends RestHydrator
 {
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
@@ -26,12 +24,12 @@ class SimilarHydrator extends RestHydrator
     public function extract($object)
     {
         $result = [
-            'picture_id' => (int)$object['picture_id'],
-            'distance'   => $object['distance']
+            'picture_id' => (int) $object['picture_id'],
+            'distance'   => $object['distance'],
         ];
 
         if ($this->filterComposite->filter('picture')) {
-            $row = $this->picture->getRow(['id' => (int)$object['picture_id']]);
+            $row = $this->picture->getRow(['id' => (int) $object['picture_id']]);
             if ($row) {
                 $result['picture'] = $this->extractValue('picture', $row);
             } else {
@@ -44,7 +42,6 @@ class SimilarHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

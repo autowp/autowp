@@ -2,9 +2,9 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Zend\Http\Request;
-use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\MostsController;
+use Application\Test\AbstractHttpControllerTestCase;
+use Laminas\Http\Request;
 
 class MostsControllerTest extends AbstractHttpControllerTestCase
 {
@@ -25,7 +25,7 @@ class MostsControllerTest extends AbstractHttpControllerTestCase
     {
         $this->dispatch('https://www.autowp.ru/api/mosts/items', Request::METHOD_GET, [
             'rating_catname' => 'fastest',
-            'type_catname'   => 'car'
+            'type_catname'   => 'car',
         ]);
 
         $this->assertResponseStatusCode(200);

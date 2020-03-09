@@ -2,39 +2,32 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Paginator;
-use Zend\View\Model\JsonModel;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\Item;
 use Application\Model\VehicleType;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Paginator;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
- * Class ItemVehicleTypeController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  */
 class ItemVehicleTypeController extends AbstractRestfulController
 {
-    /**
-     * @var VehicleType
-     */
-    private $vehicleType;
+    /** @var VehicleType */
+    private VehicleType $vehicleType;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    /** @var Item */
+    private Item $item;
 
     public function __construct(
         VehicleType $vehicleType,
         Item $item
     ) {
         $this->vehicleType = $vehicleType;
-        $this->item = $item;
+        $this->item        = $item;
     }
 
     public function indexAction()
@@ -63,13 +56,13 @@ class ItemVehicleTypeController extends AbstractRestfulController
         $items = [];
         foreach ($paginator->getCurrentItems() as $row) {
             $items[] = [
-                'item_id'         => (int)$row['vehicle_id'],
-                'vehicle_type_id' => (int)$row['vehicle_type_id'],
+                'item_id'         => (int) $row['vehicle_id'],
+                'vehicle_type_id' => (int) $row['vehicle_type_id'],
             ];
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
@@ -114,12 +107,12 @@ class ItemVehicleTypeController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $vehicleTypeId = (int)$this->params('vehicle_type_id');
-        $itemId        = (int)$this->params('item_id');
+        $vehicleTypeId = (int) $this->params('vehicle_type_id');
+        $itemId        = (int) $this->params('item_id');
 
         $itemRow = $this->item->getRow([
             'id'           => $itemId,
-            'item_type_id' => [Item::VEHICLE, Item::TWINS]
+            'item_type_id' => [Item::VEHICLE, Item::TWINS],
         ]);
 
         if (! $itemRow) {
@@ -130,7 +123,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
 
         $url = $this->url()->fromRoute('api/item-vehicle-type/item/get', [
             'vehicle_type_id' => $vehicleTypeId,
-            'item_id'         => $itemId
+            'item_id'         => $itemId,
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 

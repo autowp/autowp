@@ -2,31 +2,23 @@
 
 namespace Application\Model;
 
-use Zend\Db\Adapter\Driver\ResultInterface;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use ArrayObject;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+
+use function array_merge;
+use function count;
+use function is_array;
 
 class VehicleType
 {
-    /**
-     * @var TableGateway
-     */
-    private $vehicleTypeTable;
+    private TableGateway $vehicleTypeTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemVehicleTypeTable;
+    private TableGateway $itemVehicleTypeTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemParentTable;
+    private TableGateway $itemParentTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $vehicleTypeParentTable;
+    private TableGateway $vehicleTypeParentTable;
 
     public function __construct(
         TableGateway $itemVehicleTypeTable,
@@ -34,23 +26,21 @@ class VehicleType
         TableGateway $vehicleTypeParentTable,
         TableGateway $vehicleTypeTable
     ) {
-        $this->vehicleTypeTable = $vehicleTypeTable;
-        $this->itemVehicleTypeTable = $itemVehicleTypeTable;
-        $this->itemParentTable = $itemParentTable;
+        $this->vehicleTypeTable       = $vehicleTypeTable;
+        $this->itemVehicleTypeTable   = $itemVehicleTypeTable;
+        $this->itemParentTable        = $itemParentTable;
         $this->vehicleTypeParentTable = $vehicleTypeParentTable;
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $vehicleId
-     * @param int $type
      */
     public function removeVehicleType(int $vehicleId, int $type): void
     {
         $deleted = $this->itemVehicleTypeTable->delete([
             'vehicle_id = ?'      => $vehicleId,
             'vehicle_type_id = ?' => $type,
-            'not inherited'
+            'not inherited',
         ]);
 
         if ($deleted > 0) {
@@ -74,7 +64,7 @@ class VehicleType
         $inherited = false;
 
         if (! $types) {
-            $types = $this->getInheritedIds($vehicleId);
+            $types     = $this->getInheritedIds($vehicleId);
             $inherited = true;
         }
 
@@ -97,7 +87,7 @@ class VehicleType
         }
 
         $filter = [
-            'vehicle_id' => $vehicleId
+            'vehicle_id' => $vehicleId,
         ];
         if ($types) {
             $filter[] = new Sql\Predicate\NotIn('vehicle_type_id', $types);
@@ -113,15 +103,15 @@ class VehicleType
 
     private function setRow(int $vehicleId, int $type, bool $inherited): bool
     {
-        /* @var $result ResultInterface */
+        /** @var ResultInterface $result */
         $result = $this->itemVehicleTypeTable->getAdapter()->query('
-            INSERT INTO vehicle_vehicle_type (vehicle_id, vehicle_type_id, inherited) 
+            INSERT INTO vehicle_vehicle_type (vehicle_id, vehicle_type_id, inherited)
             VALUES (:vehicle_id, :vehicle_type_id, :inherited)
             ON DUPLICATE KEY UPDATE inherited = VALUES(inherited)
         ', [
-            'vehicle_id'      => $vehicleId,
-            'vehicle_type_id' => $type,
-            'inherited'       => $inherited ? 1 : 0
+        'vehicle_id'      => $vehicleId,
+        'vehicle_type_id' => $type,
+        'inherited'       => $inherited ? 1 : 0,
         ]);
 
         return $result->getAffectedRows() > 0;
@@ -137,7 +127,7 @@ class VehicleType
 
         $result = [];
         foreach ($this->itemVehicleTypeTable->selectWith($select) as $row) {
-            $result[] = (int)$row['vehicle_type_id'];
+            $result[] = (int) $row['vehicle_type_id'];
         }
 
         return $result;
@@ -145,7 +135,6 @@ class VehicleType
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $vehicleId
      */
     public function refreshInheritanceFromParents(int $vehicleId): void
     {
@@ -155,7 +144,7 @@ class VehicleType
             // do not inherit when own value
             $affected = $this->itemVehicleTypeTable->delete([
                 'vehicle_id' => $vehicleId,
-                'inherited'
+                'inherited',
             ]);
             if ($affected > 0) {
                 $this->refreshInheritance($vehicleId);
@@ -185,9 +174,6 @@ class VehicleType
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $vehicleId
-     * @param bool $inherited
-     * @return array
      */
     public function getVehicleTypes(int $vehicleId, bool $inherited = false): array
     {
@@ -195,12 +181,12 @@ class VehicleType
         $select->columns(['vehicle_type_id'])
             ->where([
                 'vehicle_id' => $vehicleId,
-                $inherited ? 'inherited' : 'not inherited'
+                $inherited ? 'inherited' : 'not inherited',
             ]);
 
         $result = [];
         foreach ($this->itemVehicleTypeTable->selectWith($select) as $row) {
-            $result[] = (int)$row['vehicle_type_id'];
+            $result[] = (int) $row['vehicle_type_id'];
         }
 
         return $result;
@@ -210,7 +196,7 @@ class VehicleType
     {
         $row = $this->itemVehicleTypeTable->select([
             'vehicle_id'      => $vehicleId,
-            'vehicle_type_id' => $typeId
+            'vehicle_type_id' => $typeId,
         ])->current();
 
         if (! $row) {
@@ -218,8 +204,8 @@ class VehicleType
         }
 
         return [
-            'item_id'         => (int)$row['vehicle_id'],
-            'vehicle_type_id' => (int)$row['vehicle_type_id'],
+            'item_id'         => (int) $row['vehicle_id'],
+            'vehicle_type_id' => (int) $row['vehicle_type_id'],
         ];
     }
 
@@ -236,27 +222,24 @@ class VehicleType
         return $select;
     }
 
-    /**
-     * @return TableGateway
-     */
-    public function getItemTable()
+    public function getItemTable(): TableGateway
     {
         return $this->itemVehicleTypeTable;
     }
 
-    public function rebuildParents()
+    public function rebuildParents(): void
     {
         $this->delete([]);
 
         $this->rebuildStep([0], 0);
     }
 
-    private function rebuildStep(array $id, int $level)
+    private function rebuildStep(array $id, int $level): void
     {
         $select = new Sql\Select($this->vehicleTypeTable->getTable());
         $select->columns(['id']);
 
-        if ($id[0] == 0) {
+        if ($id[0] === 0) {
             $select->where(['parent_id is null']);
         } else {
             $select->where(['parent_id' => $id[0]]);
@@ -266,7 +249,7 @@ class VehicleType
             $this->vehicleTypeParentTable->insert([
                 'id'        => $row['id'],
                 'parent_id' => $row['id'],
-                'level'     => $level
+                'level'     => $level,
             ]);
 
             $this->rebuildStep(array_merge([$row['id']], $id), $level + 1);
@@ -274,20 +257,23 @@ class VehicleType
 
         --$level;
         foreach ($id as $tid) {
-            if ($tid && ( $id[0] != $tid )) {
+            if ($tid && ( $id[0] !== $tid )) {
                 $this->vehicleTypeParentTable->insert([
                     'id'        => $id[0],
                     'parent_id' => $tid,
-                    'level'     => --$level
+                    'level'     => --$level,
                 ]);
             }
         }
     }
 
+    /**
+     * @return array|ArrayObject
+     */
     public function getRowByCatname(string $catname)
     {
         return $this->vehicleTypeTable->select([
-            'catname' => $catname
+            'catname' => $catname,
         ])->current();
     }
 
@@ -359,9 +345,9 @@ class VehicleType
         $result = [];
         foreach ($this->vehicleTypeTable->selectWith($select) as $row) {
             $result[] = [
-                'id'     => (int)$row['id'],
+                'id'     => (int) $row['id'],
                 'name'   => $row['name'],
-                'childs' => $this->getTree($row['id'])
+                'childs' => $this->getTree($row['id']),
             ];
         }
 
@@ -370,26 +356,24 @@ class VehicleType
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param int $brandId
-     * @return array
      */
     public function getBrandVehicleTypes(int $brandId): array
     {
         $select = new Sql\Select($this->vehicleTypeTable->getTable());
 
         $select->columns([
-                'id',
-                'name',
-                'catname',
-                'cars_count' => new Sql\Expression('COUNT(DISTINCT item.id)')
-            ])
+            'id',
+            'name',
+            'catname',
+            'cars_count' => new Sql\Expression('COUNT(DISTINCT item.id)'),
+        ])
             ->join('vehicle_vehicle_type', 'car_types.id = vehicle_vehicle_type.vehicle_type_id', [])
             ->join('item', 'vehicle_vehicle_type.vehicle_id = item.id', [])
             ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
             ->where([
                 'item_parent_cache.parent_id' => $brandId,
                 '(item.begin_year or item.begin_model_year)',
-                'not item.is_group'
+                'not item.is_group',
             ])
             ->group('car_types.id')
             ->order('car_types.position');
@@ -397,10 +381,10 @@ class VehicleType
         $result = [];
         foreach ($this->vehicleTypeTable->selectWith($select) as $row) {
             $result[] = [
-                'id'        => (int)$row['id'],
+                'id'        => (int) $row['id'],
                 'name'      => $row['name'],
                 'catname'   => $row['catname'],
-                'carsCount' => (int)$row['cars_count']
+                'carsCount' => (int) $row['cars_count'],
             ];
         }
 

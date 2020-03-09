@@ -2,7 +2,8 @@
 
 namespace Application\Spec\Table\Value;
 
-use Zend\View\Renderer\PhpRenderer;
+use ArrayAccess;
+use Laminas\View\Renderer\PhpRenderer;
 
 class BootVolume
 {
@@ -17,18 +18,15 @@ class BootVolume
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param PhpRenderer $view
-     * @param $attribute
+     * @param array|ArrayAccess $attribute
      * @param $value
-     * @param $values
-     * @return mixed|string
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values)
+    public function render(PhpRenderer $view, $attribute, $value, array $values): string
     {
-        $min = isset($values[$this->min]) ? $values[$this->min] : null;
-        $max = isset($values[$this->max]) ? $values[$this->max] : null;
+        $min = $values[$this->min] ?? null;
+        $max = $values[$this->max] ?? null;
 
-        if ($min && $max && ($min != $max)) {
+        if ($min && $max && ($min !== $max)) {
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             $html = $view->escapeHtml($min) . '&ndash;' . $max;
         } elseif ($min) {
@@ -41,10 +39,10 @@ class BootVolume
         if ($html && isset($attribute['unit']) && $attribute['unit']) {
             $html .=
             /* @phan-suppress-next-line PhanUndeclaredMethod */
-            ' <span class="unit" title="' . $view->escapeHtmlAttr($attribute['unit']['name']) . '">' .
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-                $view->escapeHtml($view->translate($attribute['unit']['abbr'])) .
-            '</span>';
+            ' <span class="unit" title="' . $view->escapeHtmlAttr($attribute['unit']['name']) . '">'
+            . /* @phan-suppress-next-line PhanUndeclaredMethod */
+                $view->escapeHtml($view->translate($attribute['unit']['abbr']))
+            . '</span>';
         }
 
         return $html;

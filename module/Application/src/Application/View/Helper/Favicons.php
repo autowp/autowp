@@ -2,8 +2,14 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
-use Zend\Json\Json;
+use Laminas\Json\Json;
+use Laminas\View\Helper\AbstractHelper;
+
+use function file_exists;
+use function file_get_contents;
+use function implode;
+
+use const PHP_EOL;
 
 class Favicons extends AbstractHelper
 {

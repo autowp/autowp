@@ -3,59 +3,61 @@
 namespace Autowp\User\View\Helper;
 
 use ArrayObject;
+use Autowp\Commons\Db\Table\Row;
+use Autowp\User\Model\User as UserModel;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Zend\Authentication\AuthenticationService;
-use Zend\View\Helper\AbstractHelper;
-use Zend\View\Exception\InvalidArgumentException;
-use Zend\Permissions\Acl\Acl;
-use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\User as UserModel;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\View\Exception\InvalidArgumentException;
+use Laminas\View\Helper\AbstractHelper;
+
+use function implode;
+use function is_array;
 
 class User extends AbstractHelper
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    /** @var UserModel */
+    private UserModel $userModel;
 
-    /**
-     * @var array
-     */
-    private $users = [];
+    /** @var array */
+    private array $users = [];
 
-    /**
-     * @var array|ArrayObject|null
-     */
-    private $user = null;
+    /** @var array|ArrayObject|null */
+    private $user;
 
-    /**
-     * @var Acl
-     */
-    private $acl;
+    /** @var Acl */
+    private Acl $acl;
 
     public function __construct(Acl $acl, UserModel $userModel)
     {
-        $this->acl = $acl;
+        $this->acl       = $acl;
         $this->userModel = $userModel;
     }
 
-    private function user($id)
+    /**
+     * @return ArrayObject|array|null
+     * @throws Exception
+     */
+    private function user(int $id)
     {
         if (! $id) {
             return null;
         }
 
         if (! isset($this->users[$id])) {
-            $this->users[$id] = $this->userModel->getRow(['id' => (int)$id]);
+            $this->users[$id] = $this->userModel->getRow(['id' => $id]);
         }
 
         return $this->users[$id];
     }
 
-    public function __invoke($user = null)
+    /**
+     * @param array|ArrayObject|null $user
+     */
+    public function __invoke($user = null): self
     {
         if ($user === null) {
             $user = $this->getLogedInUser();
@@ -86,7 +88,7 @@ class User extends AbstractHelper
 
     public function logedIn(): bool
     {
-        return (bool)$this->getLogedInUser();
+        return (bool) $this->getLogedInUser();
     }
 
     /**
@@ -100,7 +102,7 @@ class User extends AbstractHelper
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function __toString()
+    public function __toString(): string
     {
         try {
             $user = $this->user;
@@ -110,15 +112,15 @@ class User extends AbstractHelper
             }
 
             if ($user['deleted']) {
-                return '<span class="muted"><i class="fa fa-user" aria-hidden="true"></i> ' .
-                           /* @phan-suppress-next-line PhanUndeclaredMethod */
-                           $this->view->escapeHtml($this->view->translate('deleted-user')) .
-                       '</span>';
+                return '<span class="muted"><i class="fa fa-user" aria-hidden="true"></i> '
+                           . /* @phan-suppress-next-line PhanUndeclaredMethod */
+                           $this->view->escapeHtml($this->view->translate('deleted-user'))
+                       . '</span>';
             }
 
             $url = '/users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
 
-            $classes = ['user'];
+            $classes    = ['user'];
             $lastOnline = Row::getDateTimeByColumnType('timestamp', $user['last_online']);
             if ($lastOnline) {
                 $date = new DateTime();
@@ -135,11 +137,11 @@ class User extends AbstractHelper
             }
 
             $result =
-                '<span class="' . implode(' ', $classes) . '">' .
-                    '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;' .
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
-                    $this->view->htmlA($url, $user['name']) .
-                '</span>';
+                '<span class="' . implode(' ', $classes) . '">'
+                    . '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;'
+                    . /* @phan-suppress-next-line PhanUndeclaredMethod */
+                    $this->view->htmlA($url, $user['name'])
+                . '</span>';
         } catch (Exception $e) {
             $result = $e->getMessage();
 
@@ -175,7 +177,7 @@ class User extends AbstractHelper
             // gravatar
             return $this->view->gravatar($user['e_mail'], [
                 'img_size'    => 70,
-                'default_img' => 'https://www.autowp.ru/_.gif'
+                'default_img' => 'https://www.autowp.ru/_.gif',
             ])->__toString();
         }
 
@@ -184,9 +186,6 @@ class User extends AbstractHelper
 
     /**
      * @suppress PhanTypeArraySuspiciousNullable
-     * @param string $resource
-     * @param string $privilege
-     * @return bool
      */
     public function isAllowed(string $resource, string $privilege): bool
     {
@@ -197,8 +196,6 @@ class User extends AbstractHelper
 
     /**
      * @suppress PhanTypeArraySuspiciousNullable
-     * @param string $inherit
-     * @return bool
      */
     public function inheritsRole(string $inherit): bool
     {
@@ -211,7 +208,7 @@ class User extends AbstractHelper
     /**
      * @suppress PhanTypeArraySuspiciousNullable
      */
-    public function timezone()
+    public function timezone(): string
     {
         return $this->user && $this->user['timezone']
             ? $this->user['timezone']
@@ -220,10 +217,8 @@ class User extends AbstractHelper
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param DateTime|null $time
-     * @return string
      */
-    public function humanTime(DateTime $time = null)
+    public function humanTime(?DateTime $time = null): string
     {
         if ($time === null) {
             throw new InvalidArgumentException('Expected parameter $time was not provided.');
@@ -238,10 +233,8 @@ class User extends AbstractHelper
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param DateTime|null $time
-     * @return string
      */
-    public function humanDate(DateTime $time = null)
+    public function humanDate(?DateTime $time = null): string
     {
         if ($time === null) {
             throw new InvalidArgumentException('Expected parameter $time was not provided.');

@@ -2,46 +2,39 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Stdlib\ArrayUtils;
-use Autowp\User\Model\User;
 use Application\Hydrator\Api\Filter\PropertyFilter;
 use Application\Hydrator\Api\Strategy\HydratorStrategy;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
+use Autowp\User\Model\User;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function array_keys;
+use function in_array;
+use function is_array;
 
 class AttrAttributeHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specService;
+    private SpecificationsService $specService;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->userId = null;
+        $this->userId = 0;
 
-        $this->item = $serviceManager->get(Item::class);
-        $this->userModel = $serviceManager->get(User::class);
+        $this->item        = $serviceManager->get(Item::class);
+        $this->userModel   = $serviceManager->get(User::class);
         $this->specService = $serviceManager->get(SpecificationsService::class);
 
         $strategy = new Strategy\AttrAttributes($serviceManager);
@@ -50,10 +43,9 @@ class AttrAttributeHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -74,9 +66,8 @@ class AttrAttributeHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return AttrAttributeHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -91,8 +82,8 @@ class AttrAttributeHydrator extends RestHydrator
             'description' => $object['description'],
             'type_id'     => $object['typeId'],
             'unit_id'     => $object['unitId'],
-            'is_multiple' => (bool)$object['isMultiple'],
-            'precision'   => $object['precision']
+            'is_multiple' => (bool) $object['isMultiple'],
+            'precision'   => $object['precision'],
         ];
 
         if ($this->filterComposite->filter('unit')) {
@@ -114,7 +105,6 @@ class AttrAttributeHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

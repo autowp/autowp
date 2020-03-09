@@ -2,52 +2,40 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Paginator;
-use Zend\Permissions\Acl\Acl;
-use Zend\Stdlib\ArrayUtils;
+use Application\Comments;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
-use Application\Comments;
+use Exception;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Paginator;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function is_array;
 
 class ForumThemeHydrator extends RestHydrator
 {
-    /**
-     * @var Comments
-     */
-    private $comments;
+    private Comments $comments;
 
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    private $userRole = null;
+    private ?string $userRole;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    private $acl;
+    private Acl $acl;
 
-    /**
-     * @var TableGateway
-     */
-    private $themeTable;
+    private TableGateway $themeTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $topicTable;
+    private TableGateway $topicTable;
 
-    private $topics = [];
+    private array $topics = [];
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
@@ -55,11 +43,11 @@ class ForumThemeHydrator extends RestHydrator
 
         $this->userModel = $serviceManager->get(User::class);
 
-        $this->userId = null;
+        $this->userId = 0;
 
         $this->acl = $serviceManager->get(Acl::class);
 
-        $tables = $serviceManager->get('TableManager');
+        $tables           = $serviceManager->get('TableManager');
         $this->themeTable = $tables->get('forums_themes');
         $this->topicTable = $tables->get('forums_topics');
 
@@ -84,10 +72,9 @@ class ForumThemeHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -112,9 +99,8 @@ class ForumThemeHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return ForumThemeHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -132,18 +118,18 @@ class ForumThemeHydrator extends RestHydrator
     public function extract($object)
     {
         $result = [
-            'id'             => (int)$object['id'],
+            'id'             => (int) $object['id'],
             'name'           => $object['name'],
-            'topics_count'   => (int)$object['topics'],
-            'messages_count' => (int)$object['messages'],
-            'disable_topics' => (bool)$object['disable_topics']
+            'topics_count'   => (int) $object['topics'],
+            'messages_count' => (int) $object['messages'],
+            'disable_topics' => (bool) $object['disable_topics'],
         ];
 
         if ($this->filterComposite->filter('description')) {
             $result['description'] = $object['description'];
         }
 
-        $fetchLastTopic = $this->filterComposite->filter('last_topic');
+        $fetchLastTopic   = $this->filterComposite->filter('last_topic');
         $fetchLastMessage = $this->filterComposite->filter('last_message');
 
         if ($fetchLastTopic || $fetchLastMessage) {
@@ -153,7 +139,7 @@ class ForumThemeHydrator extends RestHydrator
                 ->where([
                     new Sql\Predicate\In('forums_topics.status', [Forums::STATUS_NORMAL, Forums::STATUS_CLOSED]),
                     'forums_theme_parent.parent_id' => $object['id'],
-                    'comment_topic.type_id'         => Comments::FORUMS_TYPE_ID
+                    'comment_topic.type_id'         => Comments::FORUMS_TYPE_ID,
                 ])
                 ->order('comment_topic.last_update DESC')
                 ->limit(1);
@@ -196,7 +182,7 @@ class ForumThemeHydrator extends RestHydrator
                 ->order('position');
 
             $isModerator = false;
-            $role = $this->getUserRole();
+            $role        = $this->getUserRole();
             if ($role) {
                 $isModerator = $this->acl->inheritsRole($role, 'moder');
             }
@@ -205,7 +191,7 @@ class ForumThemeHydrator extends RestHydrator
                 $select->where(['not is_moderator']);
             }
 
-            $rows = $this->themeTable->selectWith($select);
+            $rows             = $this->themeTable->selectWith($select);
             $result['themes'] = $this->extractValue('themes', $rows); // id, name
         }
 
@@ -216,7 +202,7 @@ class ForumThemeHydrator extends RestHydrator
                 ->where([
                     new Sql\Predicate\In('forums_topics.status', [Forums::STATUS_CLOSED, Forums::STATUS_NORMAL]),
                     'comment_topic.type_id = ?' => Comments::FORUMS_TYPE_ID,
-                    'forums_topics.theme_id' => (int)$object['id']
+                    'forums_topics.theme_id'    => (int) $object['id'],
                 ])
                 ->order('comment_topic.last_update DESC');
 
@@ -232,7 +218,7 @@ class ForumThemeHydrator extends RestHydrator
 
             $result['topics'] = [
                 'items'     => $this->extractValue('topics', $paginator->getCurrentItems()),
-                'paginator' => $paginator->getPages()
+                'paginator' => $paginator->getPages(),
             ];
         }
 
@@ -241,7 +227,6 @@ class ForumThemeHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

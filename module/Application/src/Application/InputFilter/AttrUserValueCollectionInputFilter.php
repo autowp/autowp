@@ -2,33 +2,27 @@
 
 namespace Application\InputFilter;
 
+use Application\Service\SpecificationsService;
 use Exception;
 use InvalidArgumentException;
+use Laminas\InputFilter\InputFilter;
 use Traversable;
-use Zend\InputFilter\InputFilter;
-use Application\Service\SpecificationsService;
+
+use function get_class;
+use function gettype;
+use function is_array;
+use function is_object;
+use function sprintf;
 
 class AttrUserValueCollectionInputFilter extends InputFilter
 {
-    /**
-     * @var array[]
-     */
-    private $collectionValues = [];
+    private array $collectionValues = [];
 
-    /**
-     * @var array[]
-     */
-    private $collectionRawValues = [];
+    private array $collectionRawValues = [];
 
-    /**
-     * @var array
-     */
-    private $collectionMessages = [];
+    private array $collectionMessages = [];
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specService;
+    private SpecificationsService $specService;
 
     public function __construct(SpecificationsService $specService)
     {
@@ -37,11 +31,8 @@ class AttrUserValueCollectionInputFilter extends InputFilter
 
     /**
      * Get the input filter used when looping the data
-     *
-     * @param int $attributeId
-     * @return InputFilter|null
      */
-    public function getInputFilter(int $attributeId): ?InputFilter
+    public function getInputFilter(int $attributeId): ?parent
     {
         $valueSpec = $this->specService->getFilterSpec($attributeId);
         if (! $valueSpec) {
@@ -49,41 +40,41 @@ class AttrUserValueCollectionInputFilter extends InputFilter
         }
 
         $spec = [
-            'user_id'  => [
+            'user_id'      => [
                 'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'attribute_id'  => [
+            'attribute_id' => [
                 'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'item_id'  => [
+            'item_id'      => [
                 'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'empty'  => [
-                'required'   => false,
+            'empty'        => [
+                'required'    => false,
                 'allow_empty' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                'filters'     => [
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'value'  => $valueSpec
+            'value'        => $valueSpec,
         ];
 
         $inputFilter = new InputFilter();
@@ -95,9 +86,11 @@ class AttrUserValueCollectionInputFilter extends InputFilter
     }
 
     /**
+     * @param  null|array|Traversable $data null is cast to an empty array.
+     *
      * {@inheritdoc}
      */
-    public function setData($data)
+    public function setData($data): self
     {
         if (! (is_array($data) || $data instanceof Traversable)) {
             throw new InvalidArgumentException(sprintf(
@@ -126,12 +119,14 @@ class AttrUserValueCollectionInputFilter extends InputFilter
 
     /**
      * {@inheritdoc}
-     * @param mixed $context Ignored, but present to retain signature compatibility.
+     *
+     * @param null|mixed $context Ignored, but present to retain signature compatibility.
+     * @throws Exception
      */
-    public function isValid($context = null)
+    public function isValid($context = null): bool
     {
         $this->collectionMessages = [];
-        $valid = true;
+        $valid                    = true;
 
         if (! $this->data) {
             $this->clearValues();
@@ -152,7 +147,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
             }
 
             if ($attribute['isMultiple']) {
-                $data['value'] = (array)$data['value'];
+                $data['value'] = (array) $data['value'];
             }
 
             $inputFilter->setData($data);
@@ -160,12 +155,12 @@ class AttrUserValueCollectionInputFilter extends InputFilter
             if ($inputFilter->isValid()) {
                 $this->validInputs[$key] = $inputFilter->getValidInput();
             } else {
-                $valid = false;
+                $valid                          = false;
                 $this->collectionMessages[$key] = $inputFilter->getMessages();
-                $this->invalidInputs[$key] = $inputFilter->getInvalidInput();
+                $this->invalidInputs[$key]      = $inputFilter->getInvalidInput();
             }
 
-            $this->collectionValues[$key] = $inputFilter->getValues();
+            $this->collectionValues[$key]    = $inputFilter->getValues();
             $this->collectionRawValues[$key] = $inputFilter->getRawValues();
         }
 
@@ -175,7 +170,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
     /**
      * {@inheritdoc}
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->collectionValues;
     }
@@ -183,27 +178,23 @@ class AttrUserValueCollectionInputFilter extends InputFilter
     /**
      * {@inheritdoc}
      */
-    public function getRawValues()
+    public function getRawValues(): array
     {
         return $this->collectionRawValues;
     }
 
     /**
      * Clear collectionValues
-     *
-     * @return array[]
      */
-    public function clearValues()
+    public function clearValues(): array
     {
         return $this->collectionValues = [];
     }
 
     /**
      * Clear collectionRawValues
-     *
-     * @return array[]
      */
-    public function clearRawValues()
+    public function clearRawValues(): array
     {
         return $this->collectionRawValues = [];
     }
@@ -211,7 +202,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
     /**
      * {@inheritdoc}
      */
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->collectionMessages;
     }

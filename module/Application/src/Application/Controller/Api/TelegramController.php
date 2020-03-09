@@ -2,37 +2,42 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
 use Application\Service\TelegramService;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+use Telegram\Bot\Exceptions\TelegramSDKException;
 
+/**
+ * @method ViewModel forbiddenAction
+ */
 class TelegramController extends AbstractActionController
 {
-    /**
-     * @var TelegramService
-     */
-    private $service;
+    private TelegramService $service;
 
     public function __construct(TelegramService $service)
     {
         $this->service = $service;
     }
 
+    /**
+     * @return ViewModel
+     * @throws TelegramSDKException
+     */
     public function webhookAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
-        if (! $this->service->checkTokenMatch($this->params('token'))) {
+        if (! $this->service->checkTokenMatch((string) $this->params('token'))) {
             return $this->forbiddenAction();
         }
 
         $this->service->commandsHandler(true);
 
         return new JsonModel([
-            'status' => true
+            'status' => true,
         ]);
     }
 }

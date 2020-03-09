@@ -2,50 +2,52 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
 use Application\Service\SpecificationsService;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+
+use function array_keys;
+use function array_merge;
+use function array_unique;
+use function array_values;
+use function in_array;
+use function ksort;
+use function sort;
+
+use const SORT_NUMERIC;
 
 /**
- * Class ChartController
- * @package Application\Controller\Api
- *
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */
 class ChartController extends AbstractRestfulController
 {
-    private $parameters = [
-        1, 2, 3, 47
+    private array $parameters = [
+        1,
+        2,
+        3,
+        47,
     ];
 
-    private $specs = [
-        1, 29
+    private array $specs = [
+        1,
+        29,
     ];
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specsService = null;
+    private SpecificationsService $specsService;
 
-    /**
-     * @var TableGateway
-     */
-    private $specTable;
+    private TableGateway $specTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $attributeTable;
+    private TableGateway $attributeTable;
 
     public function __construct(
         SpecificationsService $specsService,
         TableGateway $specTable,
         TableGateway $attributeTable
     ) {
-        $this->specsService = $specsService;
-        $this->specTable = $specTable;
+        $this->specsService   = $specsService;
+        $this->specTable      = $specTable;
         $this->attributeTable = $attributeTable;
     }
 
@@ -57,12 +59,12 @@ class ChartController extends AbstractRestfulController
         foreach ($rows as $row) {
             $params[] = [
                 'name' => $this->translate($row['name']),
-                'id'   => (int)$row['id']
+                'id'   => (int) $row['id'],
             ];
         }
 
         return new JsonModel([
-            'parameters' => $params
+            'parameters' => $params,
         ]);
     }
 
@@ -74,7 +76,7 @@ class ChartController extends AbstractRestfulController
 
         $ids = [];
         foreach ($this->specTable->selectWith($select) as $row) {
-            $ids[] = (int)$row['id'];
+            $ids[] = (int) $row['id'];
         }
 
         $result = [$id];
@@ -90,7 +92,7 @@ class ChartController extends AbstractRestfulController
      */
     public function dataAction()
     {
-        $id = (int)$this->params()->fromQuery('id');
+        $id = (int) $this->params()->fromQuery('id');
 
         if (! in_array($id, $this->parameters)) {
             return $this->notFoundAction();
@@ -112,18 +114,18 @@ class ChartController extends AbstractRestfulController
 
             $select = new Sql\Select($dataTable->getTable());
             $select->columns([
-                    'year'  => new Sql\Expression('year(item.begin_order_cache)'),
-                    'value' => new Sql\Expression('round(avg(value))')
-                ])
+                'year'  => new Sql\Expression('year(item.begin_order_cache)'),
+                'value' => new Sql\Expression('round(avg(value))'),
+            ])
                 ->join('item', $dataTableName . '.item_id = item.id', [])
                 ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
                 ->join('car_types_parents', 'vehicle_vehicle_type.vehicle_type_id = car_types_parents.id', [])
                 ->where([
                     $dataTableName . '.attribute_id' => $attrRow['id'],
-                    'car_types_parents.parent_id' => 29,
+                    'car_types_parents.parent_id'    => 29,
                     'item.begin_order_cache',
                     'item.begin_order_cache < "2100-01-01 00:00:00"',
-                    new Sql\Predicate\In('item.spec_id', $specIds)
+                    new Sql\Predicate\In('item.spec_id', $specIds),
                 ])
                 ->group('year')
                 ->order('year');
@@ -134,8 +136,8 @@ class ChartController extends AbstractRestfulController
             }
 
             $datasets[] = [
-                'title'  => $specRow['name'],
-                'pairs'  => $pairs,
+                'title' => $specRow['name'],
+                'pairs' => $pairs,
             ];
         }
 
@@ -161,13 +163,13 @@ class ChartController extends AbstractRestfulController
         foreach ($datasets as $dataset) {
             $result[] = [
                 'name'   => $dataset['title'],
-                'values' => array_values($dataset['pairs'])
+                'values' => array_values($dataset['pairs']),
             ];
         }
 
         return new JsonModel([
             'years'    => $years,
-            'datasets' => $result
+            'datasets' => $result,
         ]);
     }
 }

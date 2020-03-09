@@ -4,21 +4,20 @@ namespace Application\Validator\Item;
 
 use Application\Model\Item;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+
+use function array_replace;
 
 class CatnameNotExistsFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return CatnameNotExists
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): CatnameNotExists
     {
         return new CatnameNotExists(array_replace($options, [
-            'item' => $container->get(Item::class)
+            'item' => $container->get(Item::class),
         ]));
     }
 }

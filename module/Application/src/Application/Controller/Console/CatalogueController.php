@@ -2,13 +2,6 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Authentication\AuthenticationService;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Uri\UriFactory;
-use Autowp\Message\MessageService;
-use Autowp\TextStorage;
-use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
-use Autowp\User\Model\User;
 use Application\Controller\Plugin\Pic;
 use Application\DuplicateFinder;
 use Application\HostManager;
@@ -18,11 +11,23 @@ use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
+use Autowp\Message\MessageService;
+use Autowp\TextStorage;
+use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
+use Autowp\User\Model\User;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Uri\UriFactory;
+
+use function htmlspecialchars;
+use function sleep;
+use function sprintf;
+use function urlencode;
+use function var_dump;
+
+use const PHP_EOL;
 
 /**
- * Class CatalogueController
- * @package Application\Controller\Console
- *
  * @method Pic pic()
  * @method void log(string $message, array $objects)
  * @method string language()
@@ -30,60 +35,38 @@ use Application\Service\TelegramService;
  */
 class CatalogueController extends AbstractActionController
 {
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    /** @var ItemParent */
+    private ItemParent $itemParent;
 
-    /**
-     * @var PictureItem
-     */
-    private $pictureItem;
+    /** @var PictureItem */
+    private PictureItem $pictureItem;
 
-    /**
-     * @var TextStorage\Service
-     */
-    private $textStorage;
+    /** @var TextStorage\Service */
+    private TextStorage\Service $textStorage;
 
-    /**
-     * @var MessageService
-     */
-    private $message;
+    /** @var MessageService */
+    private MessageService $message;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    /** @var Item */
+    private Item $itemModel;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    /** @var Picture */
+    private Picture $picture;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    /** @var User */
+    private User $userModel;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specService;
+    /** @var SpecificationsService */
+    private SpecificationsService $specService;
 
-    /**
-     * @var HostManager
-     */
-    private $hostManager;
+    /** @var HostManager */
+    private HostManager $hostManager;
 
-    /**
-     * @var TelegramService
-     */
-    private $telegram;
+    /** @var TelegramService */
+    private TelegramService $telegram;
 
-    /**
-     * @var DuplicateFinder
-     */
-    private $duplicateFinder;
+    /** @var DuplicateFinder */
+    private DuplicateFinder $duplicateFinder;
 
     public function __construct(
         ItemParent $itemParent,
@@ -98,17 +81,17 @@ class CatalogueController extends AbstractActionController
         Picture $picture,
         User $userModel
     ) {
-        $this->itemParent = $itemParent;
-        $this->pictureItem = $pictureItem;
-        $this->specService = $specService;
-        $this->hostManager = $hostManager;
-        $this->telegram = $telegram;
-        $this->message = $message;
-        $this->textStorage = $textStorage;
+        $this->itemParent      = $itemParent;
+        $this->pictureItem     = $pictureItem;
+        $this->specService     = $specService;
+        $this->hostManager     = $hostManager;
+        $this->telegram        = $telegram;
+        $this->message         = $message;
+        $this->textStorage     = $textStorage;
         $this->duplicateFinder = $duplicateFinder;
-        $this->itemModel = $itemModel;
-        $this->picture = $picture;
-        $this->userModel = $userModel;
+        $this->itemModel       = $itemModel;
+        $this->picture         = $picture;
+        $this->userModel       = $userModel;
     }
 
     public function refreshBrandVehicleAction()
@@ -128,7 +111,7 @@ class CatalogueController extends AbstractActionController
             ->where([
                 'type = ?'   => Picture::UNSORTED_TYPE_ID,
                 'status = ?' => Picture::STATUS_INBOX,
-                'add_date < DATE_SUB(NOW(), INTERVAL 2 YEAR)'
+                'add_date < DATE_SUB(NOW(), INTERVAL 2 YEAR)',
             ])
             ->order('id');
 
@@ -139,7 +122,7 @@ class CatalogueController extends AbstractActionController
         $adapter = new IdAuthAdapter($this->userModel);
         $adapter->setIdentity($userId);
 
-        $auth = new AuthenticationService();
+        $auth   = new AuthenticationService();
         $result = $auth->authenticate($adapter);
 
         if (! $result->isValid()) {
@@ -159,8 +142,8 @@ class CatalogueController extends AbstractActionController
 
             $success = $this->picture->accept($picture['id'], $userId, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
-                $owner = $this->userModel->getRow((int)$picture['owner_id']);
-                if ($owner && ($owner['id'] != $userId)) {
+                $owner = $this->userModel->getRow((int) $picture['owner_id']);
+                if ($owner && ($owner['id'] !== $userId)) {
                     $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                     if (! $uri) {
@@ -180,8 +163,8 @@ class CatalogueController extends AbstractActionController
                 $this->telegram->notifyPicture($picture['id']);
             }
 
-            if ($previousStatusUserId != $userId) {
-                $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
+            if ($previousStatusUserId !== $userId) {
+                $prevUser = $this->userModel->getRow((int) $previousStatusUserId);
                 if ($prevUser) {
                     $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
 
@@ -199,7 +182,7 @@ class CatalogueController extends AbstractActionController
                 'Картинка %s принята',
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
-                'pictures' => $picture['id']
+                'pictures' => $picture['id'],
             ]);
 
             sleep(20);
@@ -211,7 +194,7 @@ class CatalogueController extends AbstractActionController
     public function rebuildCarOrderCacheAction()
     {
         $paginator = $this->itemModel->getPaginator([
-            'columns' => ['id']
+            'columns' => ['id'],
         ]);
         $paginator->setItemCountPerPage(100);
 

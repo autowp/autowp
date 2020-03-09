@@ -5,32 +5,27 @@ namespace Application\Hydrator\Api;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
 use Exception;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class AttrValueHydrator extends RestHydrator
 {
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specService;
+    private SpecificationsService $specService;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->item = $serviceManager->get(Item::class);
+        $this->item        = $serviceManager->get(Item::class);
         $this->specService = $serviceManager->get(SpecificationsService::class);
     }
 
     public function extract($object)
     {
         $result = [
-            'attribute_id' => (int)$object['attribute_id'],
-            'item_id'      => (int)$object['item_id']
+            'attribute_id' => (int) $object['attribute_id'],
+            'item_id'      => (int) $object['item_id'],
         ];
 
         if ($this->filterComposite->filter('value')) {
@@ -50,7 +45,6 @@ class AttrValueHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

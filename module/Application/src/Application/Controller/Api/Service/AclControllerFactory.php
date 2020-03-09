@@ -2,23 +2,20 @@
 
 namespace Application\Controller\Api\Service;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
 use Application\Controller\Api\AclController as Controller;
+use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class AclControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Controller
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
         $filters = $container->get('InputFilterManager');
-        $tables = $container->get('TableManager');
+        $tables  = $container->get('TableManager');
         return new Controller(
             $container->get('longCache'),
             $filters->get('api_acl_roles_list'),

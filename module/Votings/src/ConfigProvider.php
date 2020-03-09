@@ -8,7 +8,7 @@ class ConfigProvider
     {
         return [
             'dependencies' => $this->getDependencyConfig(),
-            'tables'       => $this->getTablesConfig()
+            'tables'       => $this->getTablesConfig(),
         ];
     }
 
@@ -16,16 +16,16 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                Votings::class => VotingsFactory::class
-            ]
+                Votings::class => VotingsFactory::class,
+            ],
         ];
     }
 
     public function getTablesConfig(): array
     {
         return [
-            'voting' => [],
-            'voting_variant' => [],
+            'voting'              => [],
+            'voting_variant'      => [],
             'voting_variant_vote' => [],
         ];
     }

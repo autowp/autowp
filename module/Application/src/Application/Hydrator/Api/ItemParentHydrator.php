@@ -2,57 +2,44 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Permissions\Acl\Acl;
-use Zend\Stdlib\ArrayUtils;
-use Autowp\User\Model\User;
 use Application\Model\Item;
 use Application\Model\ItemParent;
+use Autowp\User\Model\User;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function is_array;
 
 class ItemParentHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    private $userRole = null;
+    private ?string $userRole;
 
-    private $router;
+    private TreeRouteStack $router;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    private ItemParent $itemParent;
 
-    /**
-     * @var Acl
-     */
-    private $acl;
+    private Acl $acl;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
 
-        $this->router = $serviceManager->get('HttpRouter');
+        $this->router     = $serviceManager->get('HttpRouter');
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
         $this->item = $serviceManager->get(Item::class);
 
-        $this->acl = $serviceManager->get(Acl::class);
+        $this->acl       = $serviceManager->get(Acl::class);
         $this->userModel = $serviceManager->get(User::class);
 
         $strategy = new Strategy\Item($serviceManager);
@@ -70,10 +57,9 @@ class ItemParentHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -94,9 +80,8 @@ class ItemParentHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return ItemParentHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -110,32 +95,31 @@ class ItemParentHydrator extends RestHydrator
 
     /**
      * @param object $object
-     * @return array
      * @throws Exception
      */
-    public function extract($object)
+    public function extract($object): array
     {
         $result = [
-            'item_id'   => (int)$object['item_id'],
-            'parent_id' => (int)$object['parent_id'],
-            'type_id'   => (int)$object['type'],
+            'item_id'   => (int) $object['item_id'],
+            'parent_id' => (int) $object['parent_id'],
+            'type_id'   => (int) $object['type'],
             'catname'   => $object['catname'],
         ];
 
         $isModer = false;
-        $role = $this->getUserRole();
+        $role    = $this->getUserRole();
         if ($role) {
             $isModer = $this->acl->inheritsRole($role, 'moder');
         }
 
         if ($this->filterComposite->filter('item')) {
-            $item = $this->item->getRow(['id' => $object['item_id']]);
+            $item           = $this->item->getRow(['id' => $object['item_id']]);
             $result['item'] = $item ? $this->extractValue('item', $item) : null;
         }
 
         if ($isModer) {
             if ($this->filterComposite->filter('parent')) {
-                $item = $this->item->getRow(['id' => $object['parent_id']]);
+                $item             = $this->item->getRow(['id' => $object['parent_id']]);
                 $result['parent'] = $item ? $this->extractValue('parent', $item) : null;
             }
 
@@ -149,15 +133,15 @@ class ItemParentHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('duplicate_parent')) {
                 $duplicateRow = $this->item->getRow([
-                    'exclude_id' => $object['parent_id'],
-                    'child' => [
-                        'id' => $object['item_id'],
-                        'link_type' => ItemParent::TYPE_DEFAULT
+                    'exclude_id'       => $object['parent_id'],
+                    'child'            => [
+                        'id'        => $object['item_id'],
+                        'link_type' => ItemParent::TYPE_DEFAULT,
                     ],
                     'ancestor_or_self' => [
                         'id'         => $object['parent_id'],
-                        'stock_only' => true
-                    ]
+                        'stock_only' => true,
+                    ],
                 ]);
 
                 $result['duplicate_parent'] = $duplicateRow
@@ -166,12 +150,12 @@ class ItemParentHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('duplicate_child')) {
                 $duplicateRow = $this->item->getRow([
-                    'exclude_id' => $object['item_id'],
-                    'parent' => [
-                        'id' => $object['parent_id'],
-                        'link_type' => $object['type']
+                    'exclude_id'         => $object['item_id'],
+                    'parent'             => [
+                        'id'        => $object['parent_id'],
+                        'link_type' => $object['type'],
                     ],
-                    'descendant_or_self' => $object['item_id']
+                    'descendant_or_self' => $object['item_id'],
                 ]);
 
                 $result['duplicate_child'] = $duplicateRow
@@ -184,7 +168,6 @@ class ItemParentHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

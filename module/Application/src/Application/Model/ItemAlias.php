@@ -2,23 +2,20 @@
 
 namespace Application\Model;
 
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\TableGateway\TableGateway;
+
+use function mb_strlen;
+use function usort;
 
 class ItemAlias
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
     public function __construct(TableGateway $table, Item $itemModel)
     {
-        $this->table = $table;
+        $this->table     = $table;
         $this->itemModel = $itemModel;
     }
 
@@ -27,7 +24,7 @@ class ItemAlias
         $aliases = [];
 
         $rows = $this->table->select([
-            'item_id' => $itemId
+            'item_id' => $itemId,
         ]);
         foreach ($rows as $row) {
             if ($row['name']) {
@@ -44,10 +41,10 @@ class ItemAlias
             $la = mb_strlen($a);
             $lb = mb_strlen($b);
 
-            if ($la == $lb) {
+            if ($la === $lb) {
                 return 0;
             }
-            return ($la > $lb) ? -1 : 1;
+            return $la > $lb ? -1 : 1;
         });
 
         return $aliases;

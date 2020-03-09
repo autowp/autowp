@@ -2,54 +2,71 @@
 
 namespace Application\Controller\Api;
 
-use Application\Model\Categories;
-use ArrayObject;
-use Autowp\Image\Storage;
-use Collator;
-use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\Factory;
-use Zend\InputFilter\InputFilter;
-use Zend\InputFilter\InputFilterInterface;
-use Zend\InputFilter\InputFilterPluginManager;
-use Zend\Hydrator\Strategy\StrategyInterface;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Paginator\Adapter\DbSelect;
-use Zend\Paginator\Paginator;
-use Zend\Session\Container;
-use Zend\Uri\Uri;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
-use geoPHP;
-use Point;
-use Autowp\Message\MessageService;
-use Autowp\User\Controller\Plugin\User;
-use Autowp\ZFComponents\Filter\FilenameSafe;
-use Autowp\ZFComponents\Filter\SingleSpaces;
 use Application\Controller\Plugin\Car;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Hydrator\Api\Strategy\Image;
 use Application\ItemNameFormatter;
 use Application\Model\Brand;
 use Application\Model\Catalogue;
+use Application\Model\Categories;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Picture;
 use Application\Model\UserItemSubscribe;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
+use ArrayObject;
+use Autowp\Image\Storage;
+use Autowp\Message\MessageService;
+use Autowp\User\Controller\Plugin\User;
+use Autowp\ZFComponents\Filter\FilenameSafe;
+use Autowp\ZFComponents\Filter\SingleSpaces;
+use Collator;
+use Exception;
+use geoPHP;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Hydrator\Strategy\StrategyInterface;
+use Laminas\InputFilter\Factory;
+use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
+use Laminas\InputFilter\InputFilterPluginManager;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Paginator\Adapter\DbSelect;
+use Laminas\Paginator\Paginator;
+use Laminas\Session\Container;
+use Laminas\Uri\Uri;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+use Point;
+
+use function array_key_exists;
+use function array_keys;
+use function array_merge;
+use function array_unshift;
+use function array_values;
+use function count;
+use function date;
+use function explode;
+use function get_object_vars;
+use function htmlspecialchars;
+use function implode;
+use function in_array;
+use function is_string;
+use function preg_match;
+use function print_r;
+use function sprintf;
+use function str_replace;
+use function strlen;
+use function trim;
+use function usort;
 
 /**
- * Class ItemController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  * @method Catalogue catalogue()
@@ -60,87 +77,55 @@ use Application\Service\SpecificationsService;
  */
 class ItemController extends AbstractRestfulController
 {
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var StrategyInterface
-     */
-    private $logoHydrator;
+    /** @var StrategyInterface */
+    private StrategyInterface $logoHydrator;
 
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    /** @var ItemNameFormatter */
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    /** @var InputFilter */
+    private InputFilter $listInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $itemInputFilter;
+    /** @var InputFilter */
+    private InputFilter $itemInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $itemLogoPutFilter;
+    /** @var InputFilter */
+    private InputFilter $itemLogoPutFilter;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specificationsService;
+    /** @var SpecificationsService */
+    private SpecificationsService $specificationsService;
 
-    /**
-     * @var HostManager
-     */
-    private $hostManager;
+    /** @var HostManager */
+    private HostManager $hostManager;
 
-    /**
-     * @var MessageService
-     */
-    private $message;
+    /** @var MessageService */
+    private MessageService $message;
 
-    /**
-     * @var UserItemSubscribe
-     */
-    private $userItemSubscribe;
+    /** @var UserItemSubscribe */
+    private UserItemSubscribe $userItemSubscribe;
 
-    /**
-     * @var TableGateway
-     */
-    private $specTable;
+    /** @var TableGateway */
+    private TableGateway $specTable;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    /** @var ItemParent */
+    private ItemParent $itemParent;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    /** @var Item */
+    private Item $itemModel;
 
-    /**
-     * @var VehicleType
-     */
-    private $vehicleType;
+    /** @var VehicleType */
+    private VehicleType $vehicleType;
 
-    /**
-     * @var InputFilterPluginManager
-     */
-    private $inputFilterManager;
+    /** @var InputFilterPluginManager */
+    private InputFilterPluginManager $inputFilterManager;
 
-    private $collators = [];
+    private array $collators = [];
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specsService = null;
+    /** @var SpecificationsService */
+    private SpecificationsService $specsService;
 
     public function __construct(
         RestHydrator $hydrator,
@@ -160,22 +145,22 @@ class ItemController extends AbstractRestfulController
         InputFilterPluginManager $inputFilterManager,
         SpecificationsService $specsService
     ) {
-        $this->hydrator = $hydrator;
-        $this->logoHydrator = $logoHydrator;
-        $this->itemNameFormatter = $itemNameFormatter;
-        $this->listInputFilter = $listInputFilter;
-        $this->itemInputFilter = $itemInputFilter;
-        $this->itemLogoPutFilter = $itemLogoPutFilter;
+        $this->hydrator              = $hydrator;
+        $this->logoHydrator          = $logoHydrator;
+        $this->itemNameFormatter     = $itemNameFormatter;
+        $this->listInputFilter       = $listInputFilter;
+        $this->itemInputFilter       = $itemInputFilter;
+        $this->itemLogoPutFilter     = $itemLogoPutFilter;
         $this->specificationsService = $specificationsService;
-        $this->itemParent = $itemParent;
-        $this->hostManager = $hostManager;
-        $this->message = $message;
-        $this->userItemSubscribe = $userItemSubscribe;
-        $this->specTable = $specTable;
-        $this->itemModel = $itemModel;
-        $this->vehicleType = $vehicleType;
-        $this->inputFilterManager = $inputFilterManager;
-        $this->specsService = $specsService;
+        $this->itemParent            = $itemParent;
+        $this->hostManager           = $hostManager;
+        $this->message               = $message;
+        $this->userItemSubscribe     = $userItemSubscribe;
+        $this->specTable             = $specTable;
+        $this->itemModel             = $itemModel;
+        $this->vehicleType           = $vehicleType;
+        $this->inputFilterManager    = $inputFilterManager;
+        $this->specsService          = $specsService;
     }
 
     private function getCollator($language)
@@ -192,8 +177,8 @@ class ItemController extends AbstractRestfulController
         $coll = $this->getCollator($language);
         switch ($language) {
             case 'zh':
-                $aIsHan = (bool)preg_match("/^\p{Han}/u", $a);
-                $bIsHan = (bool)preg_match("/^\p{Han}/u", $b);
+                $aIsHan = (bool) preg_match("/^\p{Han}/u", $a);
+                $bIsHan = (bool) preg_match("/^\p{Han}/u", $b);
 
                 if ($aIsHan && ! $bIsHan) {
                     return -1;
@@ -216,24 +201,26 @@ class ItemController extends AbstractRestfulController
     {
         $currentCategory = $this->itemModel->getRow([
             'item_type_id' => Item::CATEGORY,
-            'catname'      => (string)$this->params()->fromQuery('catname')
+            'catname'      => (string) $this->params()->fromQuery('catname'),
         ]);
 
         if (! $currentCategory) {
             return $this->notFoundAction();
         }
 
-        $breadcrumbs = [[
-            'catname' => null,
-            'item'    => $currentCategory
-        ]];
+        $breadcrumbs = [
+            [
+                'catname' => null,
+                'item'    => $currentCategory,
+            ],
+        ];
 
         $parentCategory = $currentCategory;
 
         while (true) {
             $parentCategory = $this->itemModel->getRow([
                 'item_type_id' => Item::CATEGORY,
-                'child'        => $parentCategory['id']
+                'child'        => $parentCategory['id'],
             ]);
 
             if (! $parentCategory) {
@@ -241,12 +228,12 @@ class ItemController extends AbstractRestfulController
             }
 
             array_unshift($breadcrumbs, [
-                'catname'   => null,
-                'item'      => $parentCategory,
+                'catname' => null,
+                'item'    => $parentCategory,
             ]);
         }
 
-        $path = (string)$this->params()->fromQuery('path');
+        $path = (string) $this->params()->fromQuery('path');
         $path = $path ? explode('/', $path) : [];
 
         $currentCar = $currentCategory;
@@ -254,8 +241,8 @@ class ItemController extends AbstractRestfulController
             $currentCar = $this->itemModel->getRow([
                 'parent' => [
                     'id'           => $currentCar['id'],
-                    'link_catname' => $pathNode
-                ]
+                    'link_catname' => $pathNode,
+                ],
             ]);
 
             if (! $currentCar) {
@@ -263,18 +250,18 @@ class ItemController extends AbstractRestfulController
             }
 
             $breadcrumbs[] = [
-                'catname'   => $pathNode,
-                'item'      => $currentCar
+                'catname' => $pathNode,
+                'item'    => $currentCar,
             ];
         }
 
         $user = $this->user()->get();
 
         $fields = [
-            'name_html'   => true,
-            'name_text'   => true,
-            'name_only'   => true,
-            'catname'     => true,
+            'name_html' => true,
+            'name_text' => true,
+            'name_only' => true,
+            'catname'   => true,
         ];
 
         $this->hydrator->setOptions([
@@ -287,21 +274,21 @@ class ItemController extends AbstractRestfulController
 
         $parentID = null;
         foreach ($breadcrumbs as $idx => $item) {
-            if ($idx == count($breadcrumbs) - 1) {
+            if ($idx === count($breadcrumbs) - 1) {
                 $fields['description'] = true;
                 $this->hydrator->setFields($fields);
             }
 
-            $items[] = [
+            $items[]  = [
                 'catname'   => $item['catname'],
                 'parent_id' => $parentID,
                 'item'      => $this->hydrator->extract($item['item']),
             ];
-            $parentID = (int)$item['item']['id'];
+            $parentID = (int) $item['item']['id'];
         }
 
         return new JsonModel([
-            'path' => $items
+            'path' => $items,
         ]);
     }
 
@@ -317,8 +304,8 @@ class ItemController extends AbstractRestfulController
         $params = $this->params()->fromQuery();
 
         if (isset($params['type_id'])) {
-            $typeID = (int)$params['type_id'];
-            if ($typeID == Item::BRAND) {
+            $typeID = (int) $params['type_id'];
+            if ($typeID === Item::BRAND) {
                 $this->listInputFilter->get('limit')->getValidatorChain()->getValidators()[1]['instance']->setMax(5000);
             }
         }
@@ -333,8 +320,8 @@ class ItemController extends AbstractRestfulController
 
         $select = new Sql\Select($this->itemModel->getTable()->getTable());
 
-        $group = [];
-        $columns = [Sql\Select::SQL_STAR];
+        $group              = [];
+        $columns            = [Sql\Select::SQL_STAR];
         $itemLanguageJoined = false;
 
         $match = $data['descendant_pictures']
@@ -370,11 +357,11 @@ class ItemController extends AbstractRestfulController
         }
 
         if ($data['catname']) {
-            $select->where(['item.catname' => (string)$data['catname']]);
+            $select->where(['item.catname' => (string) $data['catname']]);
         }
 
         if ($data['related_groups_of']) {
-            $groups = $this->itemModel->getRelatedCarGroups((int)$data['related_groups_of']);
+            $groups = $this->itemModel->getRelatedCarGroups((int) $data['related_groups_of']);
             if (! $groups) {
                 $groups = [0 => 0];
             }
@@ -409,14 +396,14 @@ class ItemController extends AbstractRestfulController
 
         if ($data['dateful']) {
             $select->where([
-                '(item.begin_year is not null or item.begin_model_year is not null)'
+                '(item.begin_year is not null or item.begin_model_year is not null)',
             ]);
         }
 
         if ($data['dateless']) {
             $select->where([
                 'item.begin_year is null',
-                'item.begin_model_year is null'
+                'item.begin_model_year is null',
             ]);
         }
 
@@ -433,10 +420,10 @@ class ItemController extends AbstractRestfulController
                     'item.item_type_id'  => Item::FACTORY,
                 ]);
 
-            $group['item.id'] = true;
-            $data['order'] = 'cars_count_desc';
+            $group['item.id']                                = true;
+            $data['order']                                   = 'cars_count_desc';
             $data['fields']['factories_of_brand_cars_count'] = true;
-            $columns['factories_of_brand_cars_count'] = new Sql\Expression('count(1)');
+            $columns['factories_of_brand_cars_count']        = new Sql\Expression('count(1)');
         }
 
         switch ($data['order']) {
@@ -450,7 +437,7 @@ class ItemController extends AbstractRestfulController
                 $group['item.id'] = true;
                 $select
                     ->join('item_parent', 'item_parent.parent_id = item.id', [
-                        'childs_count' => new Sql\Expression('count(item_parent.item_id)')
+                        'childs_count' => new Sql\Expression('count(item_parent.item_id)'),
                     ])
                     ->order('childs_count desc');
                 break;
@@ -470,7 +457,7 @@ class ItemController extends AbstractRestfulController
                 break;
             case 'categories_first':
                 $select->order(array_merge([
-                    new Sql\Expression('item.item_type_id != ?', Item::CATEGORY)
+                    new Sql\Expression('item.item_type_id != ?', Item::CATEGORY),
                 ], $this->catalogue()->itemOrdering()));
                 break;
             case 'cars_count_desc':
@@ -482,7 +469,7 @@ class ItemController extends AbstractRestfulController
                     'item.body',
                     'item.spec_id',
                     'item.begin_order_cache',
-                    'item.end_order_cache'
+                    'item.end_order_cache',
                 ]);
                 break;
         }
@@ -508,7 +495,7 @@ class ItemController extends AbstractRestfulController
             $select
                 ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', [])
                 ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', [])
-                ->where(['ipc2.parent_id' => (int)$data['have_common_childs_with']]);
+                ->where(['ipc2.parent_id' => (int) $data['have_common_childs_with']]);
 
             $group['item.id'] = true;
         }
@@ -516,7 +503,7 @@ class ItemController extends AbstractRestfulController
         if ($isModer) {
             if ($data['last_item']) {
                 $namespace = new Container('Moder_Car');
-                $itemId = isset($namespace->lastCarId) ? (int)$namespace->lastCarId : 0;
+                $itemId    = isset($namespace->lastCarId) ? (int) $namespace->lastCarId : 0;
                 $select->where(['item.id' => $itemId]);
             }
 
@@ -526,7 +513,7 @@ class ItemController extends AbstractRestfulController
                     ->where(['ile.name not like ?' => $data['name_exclude']]);
             }
 
-            $id = (int)$this->params()->fromQuery('id');
+            $id = (int) $this->params()->fromQuery('id');
             if ($id) {
                 $select->where(['item.id' => $id]);
             }
@@ -538,7 +525,7 @@ class ItemController extends AbstractRestfulController
             }
 
             if ($data['vehicle_type_id']) {
-                if ($data['vehicle_type_id'] == 'empty') {
+                if ($data['vehicle_type_id'] === 'empty') {
                     $select
                         ->join(
                             'vehicle_vehicle_type',
@@ -580,7 +567,7 @@ class ItemController extends AbstractRestfulController
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
                     ->where([
                         'item_parent_cache.parent_id' => $data['ancestor_id'],
-                        'item_parent_cache.item_id <> item_parent_cache.parent_id'
+                        'item_parent_cache.item_id <> item_parent_cache.parent_id',
                     ]);
             }
 
@@ -610,7 +597,7 @@ class ItemController extends AbstractRestfulController
                     ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
                     ->where([
                         'item.item_type_id'         => Item::BRAND,
-                        'item_parent_cache.item_id' => $data['suggestions_to']
+                        'item_parent_cache.item_id' => $data['suggestions_to'],
                     ]);
 
                 $select
@@ -619,7 +606,7 @@ class ItemController extends AbstractRestfulController
                     ->where([
                         'item.item_type_id' => Item::BRAND,
                         'ils2.item_id'      => $data['suggestions_to'],
-                        new Sql\Predicate\In('item.id', $subSelect)
+                        new Sql\Predicate\In('item.id', $subSelect),
                     ]);
 
                 $group['item.id'] = true;
@@ -629,7 +616,7 @@ class ItemController extends AbstractRestfulController
                 $select
                     ->join(['ipc3' => 'item_parent_cache'], 'item.id = ipc3.parent_id', [])
                     ->join(['child' => 'item'], 'ipc3.item_id = child.id', [])
-                    ->where(['child.item_type_id' => (int)$data['have_childs_of_type']]);
+                    ->where(['child.item_type_id' => (int) $data['have_childs_of_type']]);
 
                 $group['item.id'] = true;
             }
@@ -639,13 +626,13 @@ class ItemController extends AbstractRestfulController
                     ->join(['ipc4' => 'item_parent_cache'], 'item.id = ipc4.parent_id', [])
                     ->join(['ip5' => 'item_parent'], 'ipc4.item_id = ip5.item_id', [])
                     ->join(['child2' => 'item'], 'ip5.parent_id = child2.id', [])
-                    ->where(['child2.item_type_id' => (int)$data['have_childs_with_parent_of_type']]);
+                    ->where(['child2.item_type_id' => (int) $data['have_childs_with_parent_of_type']]);
 
                 $group['item.id'] = true;
             }
 
             if ($data['engine_id']) {
-                $select->where(['item.engine_item_id' => (int)$data['engine_id']]);
+                $select->where(['item.engine_item_id' => (int) $data['engine_id']]);
             }
 
             if ($data['is_group']) {
@@ -655,51 +642,51 @@ class ItemController extends AbstractRestfulController
             if ($data['autocomplete']) {
                 $query = $data['autocomplete'];
 
-                $beginYear = false;
-                $endYear = false;
-                $today = false;
-                $body = false;
+                $beginYear      = false;
+                $endYear        = false;
+                $today          = false;
+                $body           = false;
                 $beginModelYear = null;
-                $endModelYear = null;
+                $endModelYear   = null;
 
-                $pattern = "|^" .
-                    "(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?" .
-                    "$|isu";
+                $pattern = "|^"
+                    . "(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?"
+                    . "$|isu";
 
                 if (preg_match($pattern, $query, $match)) {
-                    $query = trim($match[5]);
-                    $body = isset($match[7]) ? trim($match[7]) : null;
-                    $beginYear = isset($match[9]) ? (int)$match[9] : null;
-                    $endYear = isset($match[11]) ? $match[11] : null;
-                    $beginModelYear = isset($match[2]) ? (int)$match[2] : null;
-                    $endModelYear = isset($match[4]) ? $match[4] : null;
+                    $query          = trim($match[5]);
+                    $body           = isset($match[7]) ? trim($match[7]) : null;
+                    $beginYear      = isset($match[9]) ? (int) $match[9] : null;
+                    $endYear        = $match[11] ?? null;
+                    $beginModelYear = isset($match[2]) ? (int) $match[2] : null;
+                    $endModelYear   = $match[4] ?? null;
 
-                    if ($endYear == 'н.в.') {
-                        $today = true;
+                    if ($endYear === 'н.в.') {
+                        $today   = true;
                         $endYear = false;
                     } else {
                         $eyLength = strlen($endYear);
                         if ($eyLength) {
-                            if ($eyLength == 2) {
+                            if ($eyLength === 2) {
                                 $endYear = $beginYear - $beginYear % 100 + $endYear;
                             } else {
-                                $endYear = (int)$endYear;
+                                $endYear = (int) $endYear;
                             }
                         } else {
                             $endYear = false;
                         }
                     }
 
-                    if ($endModelYear == 'н.в.') {
-                        $today = true;
+                    if ($endModelYear === 'н.в.') {
+                        $today        = true;
                         $endModelYear = false;
                     } else {
                         $eyLength = strlen($endModelYear);
                         if ($eyLength) {
-                            if ($eyLength == 2) {
+                            if ($eyLength === 2) {
                                 $endModelYear = $beginModelYear - $beginModelYear % 100 + $endModelYear;
                             } else {
-                                $endModelYear = (int)$endModelYear;
+                                $endModelYear = (int) $endModelYear;
                             }
                         } else {
                             $endModelYear = false;
@@ -710,12 +697,12 @@ class ItemController extends AbstractRestfulController
                 $specId = null;
                 if ($query) {
                     $specRow = $this->specTable->select([
-                        new Sql\Predicate\Expression('INSTR(?, short_name)', $query)
+                        new Sql\Predicate\Expression('INSTR(?, short_name)', $query),
                     ])->current();
 
                     if ($specRow) {
                         $specId = $specRow['id'];
-                        $query = trim(str_replace($specRow['short_name'], '', $query));
+                        $query  = trim(str_replace($specRow['short_name'], '', $query));
                     }
                 }
 
@@ -779,7 +766,7 @@ class ItemController extends AbstractRestfulController
                             Item::CATEGORY,
                             Item::TWINS,
                             Item::BRAND,
-                            Item::FACTORY
+                            Item::FACTORY,
                         ];
                         break;
                     case Item::ENGINE:
@@ -788,18 +775,18 @@ class ItemController extends AbstractRestfulController
                             Item::CATEGORY,
                             Item::TWINS,
                             Item::BRAND,
-                            Item::FACTORY
+                            Item::FACTORY,
                         ];
                         break;
                     case Item::BRAND:
                         $allowedItemTypes = [
                             Item::CATEGORY,
-                            Item::BRAND
+                            Item::BRAND,
                         ];
                         break;
                     case Item::CATEGORY:
                         $allowedItemTypes = [
-                            Item::CATEGORY
+                            Item::CATEGORY,
                         ];
                         break;
                 }
@@ -829,9 +816,9 @@ class ItemController extends AbstractRestfulController
                 ->setCurrentPageNumber($data['page']);
         } catch (Exception $e) {
             throw new Exception(
-                'SQL Error : ' .
-                print_r($this->params()->fromQuery(), true) . "\n" .
-                $select->getSqlString($this->itemModel->getTable()->getAdapter()->getPlatform())
+                'SQL Error : '
+                . print_r($this->params()->fromQuery(), true) . "\n"
+                . $select->getSqlString($this->itemModel->getTable()->getAdapter()->getPlatform())
             );
         }
 
@@ -841,11 +828,11 @@ class ItemController extends AbstractRestfulController
         }
 
         $this->hydrator->setOptions([
-            'language' => $this->language(),
-            'fields'   => $data['fields'],
-            'user_id'  => $user ? $user['id'] : null,
+            'language'         => $this->language(),
+            'fields'           => $data['fields'],
+            'user_id'          => $user ? $user['id'] : null,
             'preview_pictures' => $previewPictures,
-            'route_brand_id' => $data['route_brand_id']
+            'route_brand_id'   => $data['route_brand_id'],
         ]);
 
         $rows = [];
@@ -853,12 +840,11 @@ class ItemController extends AbstractRestfulController
             $rows[] = $row;
         }
 
-        if ($data['order'] == 'name_nat') {
+        if ($data['order'] === 'name_nat') {
             $language = $this->language();
             usort($rows, function ($a, $b) use ($language) {
-
-                if ($a['position'] != $b['position']) {
-                    return ($a['position'] < $b['position']) ? -1 : 1;
+                if ($a['position'] !== $b['position']) {
+                    return $a['position'] < $b['position'] ? -1 : 1;
                 }
 
                 return $this->compareName($a['name'], $b['name'], $language);
@@ -872,7 +858,7 @@ class ItemController extends AbstractRestfulController
 
         return new JsonModel([
             'paginator' => get_object_vars($paginator->getPages()),
-            'items'     => $items
+            'items'     => $items,
         ]);
     }
 
@@ -898,7 +884,7 @@ class ItemController extends AbstractRestfulController
         $groups = [
             'numbers' => [],
             'english' => [],
-            'other'   => []
+            'other'   => [],
         ];
 
         foreach ($chars as $char) {
@@ -912,7 +898,7 @@ class ItemController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'groups' => array_values($groups)
+            'groups' => array_values($groups),
         ]);
     }
 
@@ -928,7 +914,7 @@ class ItemController extends AbstractRestfulController
 
         $data = $this->itemInputFilter->getValues();
 
-        $row = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        $row = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
 
         if (! $row) {
             return $this->notFoundAction();
@@ -937,283 +923,277 @@ class ItemController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
         ]);
 
         return new JsonModel($this->hydrator->extract($row));
     }
 
-    /**
-     * @param int $itemTypeId
-     * @param bool $post
-     * @param $itemId
-     * @return InputFilterInterface
-     */
-    private function getInputFilter($itemTypeId, $post, $itemId)
+    private function getInputFilter(int $itemTypeId, bool $post, int $itemId): InputFilterInterface
     {
         $select = new Sql\Select($this->specTable->getTable());
         $select->columns(['id']);
         $specOptions = [];
         foreach ($this->specTable->selectWith($select) as $row) {
-            $specOptions[] = (int)$row['id'];
+            $specOptions[] = (int) $row['id'];
         }
         $specOptions[] = 'inherited';
 
         $spec = [
-            'name' => [
-                'required' => $post,
-                'filters' => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'min' => 2,
-                            'max' => Item::MAX_NAME
-                        ]
-                    ]
-                ]
-            ],
-            'full_name' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'max' => Brand::MAX_FULLNAME
-                        ]
-                    ]
-                ]
-            ],
-            'catname' => [
-                'required' => false,
-                'filters'  => [
+            'name'                      => [
+                'required'   => $post,
+                'filters'    => [
                     ['name' => 'StringTrim'],
                     ['name' => SingleSpaces::class],
-                    ['name' => FilenameSafe::class]
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'min' => 2,
+                            'max' => Item::MAX_NAME,
+                        ],
+                    ],
+                ],
+            ],
+            'full_name'                 => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'max' => Brand::MAX_FULLNAME,
+                        ],
+                    ],
+                ],
+            ],
+            'catname'                   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class],
+                    ['name' => FilenameSafe::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 3,
-                            'max' => 100
-                        ]
+                            'max' => 100,
+                        ],
                     ],
                     [
                         'name'    => 'ItemCatnameNotExists',
                         'options' => [
-                            'exclude' => $itemId
-                        ]
-                    ]
-                ]
+                            'exclude' => $itemId,
+                        ],
+                    ],
+                ],
             ],
-            'body' => [
-                'required' => false,
-                'filters' => [
+            'body'                      => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => 20
-                        ]
-                    ]
-                ]
+                            'max' => 20,
+                        ],
+                    ],
+                ],
             ],
-            'spec_id' => [
-                'required' => false,
+            'spec_id'                   => [
+                'required'   => false,
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
-                            'haystack' => $specOptions
-                        ]
-                    ]
-                ]
+                            'haystack' => $specOptions,
+                        ],
+                    ],
+                ],
             ],
-            'begin_model_year' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'begin_model_year'          => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
                     [
-                        'name' => 'Between',
+                        'name'    => 'Between',
                         'options' => [
                             'min' => 1500,
-                            'max' => 2100
-                        ]
-                    ]
-                ]
+                            'max' => 2100,
+                        ],
+                    ],
+                ],
             ],
             'begin_model_year_fraction' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
-                            'haystack' => ['¼', '½', '¾']
-                        ]
-                    ]
-                ]
+                            'haystack' => ['¼', '½', '¾'],
+                        ],
+                    ],
+                ],
             ],
-            'end_model_year' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'end_model_year'            => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
                     [
-                        'name' => 'Between',
+                        'name'    => 'Between',
                         'options' => [
                             'min' => 1500,
-                            'max' => 2100
-                        ]
-                    ]
-                ]
+                            'max' => 2100,
+                        ],
+                    ],
+                ],
             ],
-            'end_model_year_fraction' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'end_model_year_fraction'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
-                            'haystack' => ['¼', '½', '¾']
-                        ]
-                    ]
-                ]
+                            'haystack' => ['¼', '½', '¾'],
+                        ],
+                    ],
+                ],
             ],
-            'begin_year' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'begin_year'                => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
                     [
-                        'name' => 'Between',
+                        'name'    => 'Between',
                         'options' => [
                             'min' => 1500,
-                            'max' => 2100
-                        ]
-                    ]
-                ]
+                            'max' => 2100,
+                        ],
+                    ],
+                ],
             ],
-            'begin_month' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'begin_month'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'end_year' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'end_year'                  => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
                     [
-                        'name' => 'Between',
+                        'name'    => 'Between',
                         'options' => [
                             'min' => 1500,
-                            'max' => 2100
-                        ]
-                    ]
-                ]
+                            'max' => 2100,
+                        ],
+                    ],
+                ],
             ],
-            'end_month' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'end_month'                 => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'today' => [
-                'required'    => false,
-                'allow_empty' => true
-            ],
-            'is_concept' => [
-                'required'    => false,
-                'allow_empty' => true
-            ],
-            'is_group' => [
-                'required'    => false,
-                'allow_empty' => true
-            ],
-            'lat' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
-                ]
-            ],
-            'lng' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
-                ]
-            ],
-            'produced' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'Digits'],
                 ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
             ],
-            'produced_exactly' => [
-                'required'    => false,
-                'allow_empty' => true
-            ],
-            'subscription' => [
-                'required'    => false,
-                'allow_empty' => true
-            ],
-            'engine_id' => [
+            'today'                     => [
                 'required'    => false,
                 'allow_empty' => true,
+            ],
+            'is_concept'                => [
+                'required'    => false,
+                'allow_empty' => true,
+            ],
+            'is_group'                  => [
+                'required'    => false,
+                'allow_empty' => true,
+            ],
+            'lat'                       => [
+                'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'StringTrim'],
                 ],
-            ]
+            ],
+            'lng'                       => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                ],
+            ],
+            'produced'                  => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'produced_exactly'          => [
+                'required'    => false,
+                'allow_empty' => true,
+            ],
+            'subscription'              => [
+                'required'    => false,
+                'allow_empty' => true,
+            ],
+            'engine_id'                 => [
+                'required'    => false,
+                'allow_empty' => true,
+                'filters'     => [
+                    ['name' => 'StringTrim'],
+                ],
+            ],
         ];
         //var_dump(1235); exit;
         $pointFields = in_array($itemTypeId, [
             Item::FACTORY,
-            Item::MUSEUM
+            Item::MUSEUM,
         ]);
         if (! $pointFields) {
             unset($spec['lat'], $spec['lng']);
         }
 
-        if ($itemTypeId != Item::BRAND) {
+        if ($itemTypeId !== Item::BRAND) {
             unset($spec['full_name']);
         }
 
-        if ($itemTypeId != Item::VEHICLE) {
+        if ($itemTypeId !== Item::VEHICLE) {
             unset($spec['engine_id']);
         }
 
@@ -1259,7 +1239,7 @@ class ItemController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(400, 'Invalid item_type_id'));
         }
 
-        $itemTypeId = (int)$data['item_type_id'];
+        $itemTypeId = (int) $data['item_type_id'];
 
         $inputFilter = $this->getInputFilter($itemTypeId, true, null);
 
@@ -1292,7 +1272,7 @@ class ItemController extends AbstractRestfulController
             'is_concept_inherit' => 1,
             'spec_inherit'       => 1,
             'is_concept'         => 0,
-            'add_datetime'       => new Sql\Expression('NOW()')
+            'add_datetime'       => new Sql\Expression('NOW()'),
         ];
 
         if (array_key_exists('name', $values)) {
@@ -1304,7 +1284,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('body', $values)) {
-            $set['body'] = (string)$values['body'];
+            $set['body'] = (string) $values['body'];
         }
 
         if (array_key_exists('begin_year', $values)) {
@@ -1316,7 +1296,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('end_year', $values)) {
-            $endYear = $values['end_year'] ? $values['end_year'] : null;
+            $endYear         = $values['end_year'] ? $values['end_year'] : null;
             $set['end_year'] = $endYear;
 
             if ($endYear) {
@@ -1359,26 +1339,26 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('is_concept', $values)) {
-            $set['is_concept_inherit'] = ((string)$values['is_concept']) == 'inherited' ? 1 : 0;
+            $set['is_concept_inherit'] = ((string) $values['is_concept']) === 'inherited' ? 1 : 0;
             if (! $set['is_concept_inherit']) {
                 $set['is_concept'] = $values['is_concept'] ? 1 : 0;
             }
         }
 
         if (array_key_exists('catname', $values)) {
-            if (! $values['catname'] || $values['catname'] == '_') {
-                $filter = new FilenameSafe();
+            if (! $values['catname'] || $values['catname'] === '_') {
+                $filter            = new FilenameSafe();
                 $values['catname'] = $filter->filter($values['name']);
             }
 
             $set['catname'] = $values['catname'];
         } else {
-            $filter = new FilenameSafe();
+            $filter            = new FilenameSafe();
             $values['catname'] = $filter->filter($values['name']);
         }
 
         if (array_key_exists('produced', $values)) {
-            $set['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
+            $set['produced'] = strlen($values['produced']) ? (int) $values['produced'] : null;
         }
 
         if (array_key_exists('produced_exactly', $values)) {
@@ -1410,7 +1390,7 @@ class ItemController extends AbstractRestfulController
                 $set['spec_inherit'] = 1;
             } else {
                 $set['spec_inherit'] = 0;
-                $set['spec_id'] = $values['spec_id'] ? (int)$values['spec_id'] : null;
+                $set['spec_id']      = $values['spec_id'] ? (int) $values['spec_id'] : null;
             }
         }
 
@@ -1436,7 +1416,7 @@ class ItemController extends AbstractRestfulController
 
         $this->vehicleType->refreshInheritanceFromParents($itemId);
 
-        $namespace = new Container('Moder_Car');
+        $namespace            = new Container('Moder_Car');
         $namespace->lastCarId = $itemId;
 
         $this->userItemSubscribe->subscribe($user['id'], $itemId);
@@ -1450,11 +1430,11 @@ class ItemController extends AbstractRestfulController
             'Создан новый автомобиль %s',
             htmlspecialchars($this->car()->formatName($item, 'en'))
         ), [
-            'items' => $itemId
+            'items' => $itemId,
         ]);
 
         $url = $this->url()->fromRoute('api/item/item/get', [
-            'id' => $itemId
+            'id' => $itemId,
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -1468,7 +1448,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -1477,7 +1457,7 @@ class ItemController extends AbstractRestfulController
         $user = $this->user()->get();
 
         $request = $this->getRequest();
-        $data = (array)$this->processBodyContent($request);
+        $data    = (array) $this->processBodyContent($request);
 
         $inputFilter = $this->getInputFilter($item['item_type_id'], false, $item['id']);
 
@@ -1503,10 +1483,10 @@ class ItemController extends AbstractRestfulController
 
         $values = $inputFilter->getValues();
 
-        $set = [];
+        $set          = [];
         $updateActual = false;
-        $notifyMeta = false;
-        $subscribe = false;
+        $notifyMeta   = false;
+        $subscribe    = false;
 
         if (array_key_exists('subscription', $values)) {
             if ($values['subscription']) {
@@ -1517,39 +1497,39 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('name', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta  = true;
+            $subscribe   = true;
             $set['name'] = $values['name'];
             $this->itemModel->setLanguageName($item['id'], 'xx', $values['name']);
         }
 
         if (array_key_exists('full_name', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta       = true;
+            $subscribe        = true;
             $set['full_name'] = $values['full_name'] ? $values['full_name'] : null;
         }
 
         if (array_key_exists('body', $values)) {
-            $notifyMeta = true;
-            $set['body'] = (string)$values['body'];
+            $notifyMeta  = true;
+            $set['body'] = (string) $values['body'];
         }
 
         if (array_key_exists('begin_year', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta        = true;
+            $subscribe         = true;
             $set['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
         }
 
         if (array_key_exists('begin_month', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta         = true;
+            $subscribe          = true;
             $set['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
         }
 
         if (array_key_exists('end_year', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
-            $endYear = $values['end_year'] ? $values['end_year'] : null;
+            $notifyMeta      = true;
+            $subscribe       = true;
+            $endYear         = $values['end_year'] ? $values['end_year'] : null;
             $set['end_year'] = $endYear;
 
             if ($endYear && $endYear < date('Y')) {
@@ -1558,16 +1538,16 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('end_month', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta       = true;
+            $subscribe        = true;
             $set['end_month'] = $values['end_month'] ? $values['end_month'] : null;
         }
 
         if (array_key_exists('today', $values)) {
             $notifyMeta = true;
-            $subscribe = true;
+            $subscribe  = true;
             if (is_string($values['today'])) {
-                $values['today'] = strlen($values['today']) ? (bool)strlen($values['today']) : null;
+                $values['today'] = strlen($values['today']) ? (bool) strlen($values['today']) : null;
             }
             if ($values['today'] !== null) {
                 $set['today'] = $values['today'] ? 1 : 0;
@@ -1577,36 +1557,36 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('begin_model_year', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta              = true;
+            $subscribe               = true;
             $set['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
         }
 
         if (array_key_exists('end_model_year', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta            = true;
+            $subscribe             = true;
             $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
         }
 
         if (array_key_exists('begin_model_year_fraction', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta                       = true;
+            $subscribe                        = true;
             $set['begin_model_year_fraction'] = $values['begin_model_year_fraction']
                 ? $values['begin_model_year_fraction']
                 : null;
         }
 
         if (array_key_exists('end_model_year_fraction', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta                     = true;
+            $subscribe                      = true;
             $set['end_model_year_fraction'] = $values['end_model_year_fraction']
                 ? $values['end_model_year_fraction']
                 : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta                = true;
+            $subscribe                 = true;
             $set['is_concept_inherit'] = $values['is_concept'] === 'inherited' ? 1 : 0;
             if (! $set['is_concept_inherit']) {
                 $set['is_concept'] = $values['is_concept'] ? 1 : 0;
@@ -1615,9 +1595,9 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('catname', $values)) {
             $notifyMeta = true;
-            $subscribe = true;
+            $subscribe  = true;
             if (! $values['catname']) {
-                $filter = new FilenameSafe();
+                $filter            = new FilenameSafe();
                 $values['catname'] = $filter->filter($values['name']);
             }
 
@@ -1625,14 +1605,14 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('produced', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
-            $set['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
+            $notifyMeta      = true;
+            $subscribe       = true;
+            $set['produced'] = strlen($values['produced']) ? (int) $values['produced'] : null;
         }
 
         if (array_key_exists('produced_exactly', $values)) {
-            $notifyMeta = true;
-            $subscribe = true;
+            $notifyMeta              = true;
+            $subscribe               = true;
             $set['produced_exactly'] = $values['produced_exactly'] ? 1 : 0;
         }
 
@@ -1640,8 +1620,8 @@ class ItemController extends AbstractRestfulController
             case Item::VEHICLE:
             case Item::ENGINE:
                 if (array_key_exists('is_group', $values)) {
-                    $notifyMeta = true;
-                    $subscribe = true;
+                    $notifyMeta    = true;
+                    $subscribe     = true;
                     $hasChildItems = $this->itemParent->hasChildItems($item['id']);
 
                     if ($hasChildItems) {
@@ -1662,12 +1642,12 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('spec_id', $values)) {
             $notifyMeta = true;
-            $subscribe = true;
+            $subscribe  = true;
             if ($values['spec_id'] === 'inherited') {
                 $set['spec_inherit'] = 1;
             } else {
                 $set['spec_inherit'] = 0;
-                $set['spec_id'] = $values['spec_id'] ? (int)$values['spec_id'] : null;
+                $set['spec_id']      = $values['spec_id'] ? (int) $values['spec_id'] : null;
             }
         }
 
@@ -1681,9 +1661,9 @@ class ItemController extends AbstractRestfulController
             }
 
             $updateActual = true;
-            $subscribe = true;
+            $subscribe    = true;
 
-            if ($values['engine_id'] == 'inherited') {
+            if ($values['engine_id'] === 'inherited') {
                 $set['engine_inherit'] = 1;
                 $set['engine_item_id'] = null;
 
@@ -1692,13 +1672,13 @@ class ItemController extends AbstractRestfulController
                     htmlspecialchars($this->car()->formatName($item, 'en'))
                 );
                 $this->log($message, [
-                    'items' => $item['id']
+                    'items' => $item['id'],
                 ]);
 
                 $user = $this->user()->get();
 
                 foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                    if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                    if ($subscriber && ($subscriber['id'] !== $user['id'])) {
                         $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                         $message = sprintf(
@@ -1716,7 +1696,7 @@ class ItemController extends AbstractRestfulController
                     }
                 }
             } elseif ($values['engine_id'] === null || $values['engine_id'] === '') {
-                $engine = $this->itemModel->getRow(['id' => (int)$item['engine_item_id']]);
+                $engine = $this->itemModel->getRow(['id' => (int) $item['engine_item_id']]);
 
                 $set['engine_inherit'] = 0;
                 $set['engine_item_id'] = null;
@@ -1728,13 +1708,13 @@ class ItemController extends AbstractRestfulController
                         htmlspecialchars($engine['name'])
                     );
                     $this->log($message, [
-                        'items' => $item['id']
+                        'items' => $item['id'],
                     ]);
 
                     $user = $this->user()->get();
 
                     foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                        if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                        if ($subscriber && ($subscriber['id'] !== $user['id'])) {
                             $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                             $message = sprintf(
@@ -1755,8 +1735,8 @@ class ItemController extends AbstractRestfulController
                 }
             } else {
                 $engine = $this->itemModel->getRow([
-                    'id'           => (int)$values['engine_id'],
-                    'item_type_id' => Item::ENGINE
+                    'id'           => (int) $values['engine_id'],
+                    'item_type_id' => Item::ENGINE,
                 ]);
                 if (! $engine) {
                     return $this->notFoundAction();
@@ -1771,11 +1751,11 @@ class ItemController extends AbstractRestfulController
                     htmlspecialchars($engine['name'])
                 );
                 $this->log($message, [
-                    'items' => $item['id']
+                    'items' => $item['id'],
                 ]);
 
                 foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                    if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                    if ($subscriber && ($subscriber['id'] !== $user['id'])) {
                         $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                         $message = sprintf(
@@ -1796,16 +1776,15 @@ class ItemController extends AbstractRestfulController
             }
         }
 
-
         if ($set) {
             $this->itemModel->getTable()->update($set, [
-                'id' => $item['id']
+                'id' => $item['id'],
             ]);
         }
 
         if (isset($values['lat'], $values['lng'])) {
             $subscribe = true;
-            $point = null;
+            $point     = null;
             if (strlen($values['lat']) && strlen($values['lng'])) {
                 geoPHP::version(); // for autoload classes
                 $point = new Point($values['lng'], $values['lat']);
@@ -1827,7 +1806,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if ($notifyMeta) {
-            $newData = $item = $this->itemModel->getRow(['id' => $item['id']]);
+            $newData     = $item = $this->itemModel->getRow(['id' => $item['id']]);
             $htmlChanges = [];
             foreach ($this->buildChangesMessage($oldData, $newData, 'en') as $line) {
                 $htmlChanges[] = htmlspecialchars($line);
@@ -1835,16 +1814,16 @@ class ItemController extends AbstractRestfulController
 
             $message = sprintf(
                 'Редактирование мета-информации автомобиля %s',
-                htmlspecialchars($this->car()->formatName($item, 'en')) .
-                ( count($htmlChanges) ? '<p>' . implode('<br />', $htmlChanges) . '</p>' : '')
+                htmlspecialchars($this->car()->formatName($item, 'en'))
+                . ( count($htmlChanges) ? '<p>' . implode('<br />', $htmlChanges) . '</p>' : '')
             );
             $this->log($message, [
-                'items' => $item['id']
+                'items' => $item['id'],
             ]);
 
             $user = $this->user()->get();
             foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                if ($subscriber && ($subscriber['id'] !== $user['id'])) {
                     $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                     $changes = $this->buildChangesMessage($oldData, $newData, $subscriber['language']);
@@ -1858,7 +1837,7 @@ class ItemController extends AbstractRestfulController
                         $this->userUrl($user, $uri),
                         $this->car()->formatName($item, $subscriber['language']),
                         $this->itemModerUrl($item['id'], $uri),
-                        ( count($changes) ? implode("\n", $changes) : '')
+                        count($changes) ? implode("\n", $changes) : ''
                     );
 
                     $this->message->send(null, $subscriber['id'], $message);
@@ -1872,8 +1851,6 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @param array|ArrayObject $user
-     * @param Uri $uri
-     * @return string
      */
     private function userUrl($user, Uri $uri): string
     {
@@ -1883,11 +1860,6 @@ class ItemController extends AbstractRestfulController
         return $u->toString();
     }
 
-    /**
-     * @param int $itemID
-     * @param Uri $uri
-     * @return string
-     */
     private function itemModerUrl(int $itemID, Uri $uri): string
     {
         $u = clone $uri;
@@ -1899,22 +1871,22 @@ class ItemController extends AbstractRestfulController
     private function buildChangesMessage($oldData, $newData, $language)
     {
         $fields = [
-            'name'             => ['str', 'moder/vehicle/changes/name-%s-%s'],
-            'body'             => ['str', 'moder/vehicle/changes/body-%s-%s'],
-            'begin_year'       => ['int', 'moder/vehicle/changes/from/year-%s-%s'],
-            'begin_month'      => ['int', 'moder/vehicle/changes/from/month-%s-%s'],
-            'end_year'         => ['int', 'moder/vehicle/changes/to/year-%s-%s'],
-            'end_month'        => ['int', 'moder/vehicle/changes/to/month-%s-%s'],
-            'today'            => ['bool', 'moder/vehicle/changes/to/today-%s-%s'],
-            'produced'         => ['int', 'moder/vehicle/changes/produced/count-%s-%s'],
-            'produced_exactly' => ['bool', 'moder/vehicle/changes/produced/exactly-%s-%s'],
-            'is_concept'       => ['bool', 'moder/vehicle/changes/is-concept-%s-%s'],
-            'is_group'         => ['bool', 'moder/vehicle/changes/is-group-%s-%s'],
-            'begin_model_year' => ['int', 'moder/vehicle/changes/model-years/from-%s-%s'],
-            'end_model_year'   => ['int', 'moder/vehicle/changes/model-years/to-%s-%s'],
+            'name'                      => ['str', 'moder/vehicle/changes/name-%s-%s'],
+            'body'                      => ['str', 'moder/vehicle/changes/body-%s-%s'],
+            'begin_year'                => ['int', 'moder/vehicle/changes/from/year-%s-%s'],
+            'begin_month'               => ['int', 'moder/vehicle/changes/from/month-%s-%s'],
+            'end_year'                  => ['int', 'moder/vehicle/changes/to/year-%s-%s'],
+            'end_month'                 => ['int', 'moder/vehicle/changes/to/month-%s-%s'],
+            'today'                     => ['bool', 'moder/vehicle/changes/to/today-%s-%s'],
+            'produced'                  => ['int', 'moder/vehicle/changes/produced/count-%s-%s'],
+            'produced_exactly'          => ['bool', 'moder/vehicle/changes/produced/exactly-%s-%s'],
+            'is_concept'                => ['bool', 'moder/vehicle/changes/is-concept-%s-%s'],
+            'is_group'                  => ['bool', 'moder/vehicle/changes/is-group-%s-%s'],
+            'begin_model_year'          => ['int', 'moder/vehicle/changes/model-years/from-%s-%s'],
+            'end_model_year'            => ['int', 'moder/vehicle/changes/model-years/to-%s-%s'],
             'begin_model_year_fraction' => ['int', 'moder/vehicle/changes/model-years-fraction/from-%s-%s'],
             'end_model_year_fraction'   => ['int', 'moder/vehicle/changes/model-years-fraction/to-%s-%s'],
-            'spec_id'          => ['spec_id', 'moder/vehicle/changes/spec-%s-%s'],
+            'spec_id'                   => ['spec_id', 'moder/vehicle/changes/spec-%s-%s'],
             //'vehicle_type_id'  => ['vehicle_type_id', 'moder/vehicle/changes/car-type-%s-%s']
         ];
 
@@ -1923,26 +1895,26 @@ class ItemController extends AbstractRestfulController
             $message = $this->translate($info[1], 'default', $language);
             switch ($info[0]) {
                 case 'int':
-                    $old = is_null($oldData[$field]) ? null : (int)$oldData[$field];
-                    $new = is_null($newData[$field]) ? null : (int)$newData[$field];
+                    $old = $oldData[$field] === null ? null : (int) $oldData[$field];
+                    $new = $newData[$field] === null ? null : (int) $newData[$field];
                     if ($old !== $new) {
                         $changes[] = sprintf($message, $old, $new);
                     }
                     break;
                 case 'str':
-                    $old = is_null($oldData[$field]) ? null : (string)$oldData[$field];
-                    $new = is_null($newData[$field]) ? null : (string)$newData[$field];
+                    $old = $oldData[$field] === null ? null : (string) $oldData[$field];
+                    $new = $newData[$field] === null ? null : (string) $newData[$field];
                     if ($old !== $new) {
                         $changes[] = sprintf($message, $old, $new);
                     }
                     break;
                 case 'bool':
-                    $old = is_null($oldData[$field])
+                    $old = $oldData[$field] === null
                         ? null
                         : $this->translate($oldData[$field]
                             ? 'moder/vehicle/changes/boolean/true'
                             : 'moder/vehicle/changes/boolean/false');
-                    $new = is_null($newData[$field])
+                    $new = $newData[$field] === null
                         ? null
                         : $this->translate($newData[$field]
                             ? 'moder/vehicle/changes/boolean/true'
@@ -1956,8 +1928,8 @@ class ItemController extends AbstractRestfulController
                     $old = $oldData[$field];
                     $new = $newData[$field];
                     if ($old !== $new) {
-                        $old = $this->specTable->select(['id' => (int)$old])->current();
-                        $new = $this->specTable->select(['id' => (int)$new])->current();
+                        $old       = $this->specTable->select(['id' => (int) $old])->current();
+                        $new       = $this->specTable->select(['id' => (int) $new])->current();
                         $changes[] = sprintf(
                             $message,
                             $old ? $old['short_name'] : '-',
@@ -1977,7 +1949,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -1987,7 +1959,7 @@ class ItemController extends AbstractRestfulController
         }
 
         return new JsonModel($this->logoHydrator->extract([
-            'image' => $item['logo_id']
+            'image' => $item['logo_id'],
         ]));
     }
 
@@ -1997,7 +1969,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -2020,9 +1992,9 @@ class ItemController extends AbstractRestfulController
         $imageId = $this->imageStorage()->addImageFromFile($values['file']['tmp_name'], 'brand');
 
         $this->itemModel->getTable()->update([
-            'logo_id' => $imageId
+            'logo_id' => $imageId,
         ], [
-            'id' => $item['id']
+            'id' => $item['id'],
         ]);
 
         if ($oldImageId) {
@@ -2033,7 +2005,7 @@ class ItemController extends AbstractRestfulController
             'Закачен логотип %s',
             htmlspecialchars($item['name'])
         ), [
-            'items' => $item['id']
+            'items' => $item['id'],
         ]);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -2043,10 +2015,10 @@ class ItemController extends AbstractRestfulController
     private function carTreeWalk($car, int $parentType = 0)
     {
         $data = [
-            'id'     => (int)$car['id'],
+            'id'     => (int) $car['id'],
             'name'   => $this->car()->formatName($car, $this->language()),
             'childs' => [],
-            'type'   => $parentType ? $parentType : null
+            'type'   => $parentType ? $parentType : null,
         ];
 
         $table = $this->itemParent->getTable();
@@ -2061,7 +2033,7 @@ class ItemController extends AbstractRestfulController
         foreach ($table->selectWith($select) as $itemParentRow) {
             $carRow = $this->itemModel->getRow(['id' => $itemParentRow['item_id']]);
             if ($carRow) {
-                $data['childs'][] = $this->carTreeWalk($carRow, (int)$itemParentRow['type']);
+                $data['childs'][] = $this->carTreeWalk($carRow, (int) $itemParentRow['type']);
             }
         }
 
@@ -2075,13 +2047,13 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
         return new JsonModel([
-            'item' => $this->carTreeWalk($item)
+            'item' => $this->carTreeWalk($item),
         ]);
     }
 
@@ -2091,7 +2063,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -2110,13 +2082,13 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
         $specs = $this->specsService->specifications([$item], [
-            'language' => $this->language()
+            'language' => $this->language(),
         ]);
 
         $viewModel = new ViewModel([
@@ -2128,18 +2100,18 @@ class ItemController extends AbstractRestfulController
 
     public function childSpecificationsAction()
     {
-        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
         $childItems = $this->itemModel->getRows([
             'order'  => $this->catalogue()->itemOrdering(),
-            'parent' => $item['id']
+            'parent' => $item['id'],
         ]);
 
         $specs = $this->specsService->specifications($childItems, [
-            'language' => $this->language()
+            'language' => $this->language(),
         ]);
 
         $viewModel = new ViewModel([
@@ -2156,7 +2128,7 @@ class ItemController extends AbstractRestfulController
         $list = $this->vehicleType->getBrandVehicleTypes($brandID);
 
         return new JsonModel([
-            'items' => $list
+            'items' => $list,
         ]);
     }
 
@@ -2164,7 +2136,7 @@ class ItemController extends AbstractRestfulController
     {
         $category = $this->itemModel->getRow([
             'item_type_id' => Item::CATEGORY,
-            'id'           => (int)$this->params('item_id')
+            'id'           => (int) $this->params('item_id'),
         ]);
         if (! $category) {
             return $this->notFoundAction();
@@ -2174,13 +2146,13 @@ class ItemController extends AbstractRestfulController
 
         $rows = $this->itemModel->getRows([
             'item_type_id' => [Item::VEHICLE, Item::ENGINE],
-            'order' => new Sql\Expression('MAX(ip1.timestamp) DESC'),
-            'parent' => [
+            'order'        => new Sql\Expression('MAX(ip1.timestamp) DESC'),
+            'parent'       => [
                 'item_type_id'     => [Item::CATEGORY, Item::FACTORY],
                 'ancestor_or_self' => $category['id'],
-                'linked_in_days'   => Categories::NEW_DAYS
+                'linked_in_days'   => Categories::NEW_DAYS,
             ],
-            'limit' => 20
+            'limit'        => 20,
         ]);
 
         $items = [];
@@ -2189,7 +2161,7 @@ class ItemController extends AbstractRestfulController
         }
 
         $viewModel = new ViewModel([
-            'items' => $items
+            'items' => $items,
         ]);
         $viewModel->setTerminal(true);
 

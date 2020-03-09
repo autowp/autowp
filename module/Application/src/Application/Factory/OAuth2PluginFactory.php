@@ -1,28 +1,20 @@
 <?php
 
-/**
- * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
- */
-
 namespace Application\Factory;
 
-use OAuth2\Server as OAuth2Server;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Interop\Container\ContainerInterface;
 use Application\Controller\Api\Plugin\Oauth2 as OAuth2Plugin;
+use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\FactoryInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use OAuth2\Server as OAuth2Server;
 
 class OAuth2PluginFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return OAuth2Plugin
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): OAuth2Plugin
     {
         $services = $container->get('ServiceManager');
 
@@ -30,7 +22,7 @@ class OAuth2PluginFactory implements FactoryInterface
         // OAuth2\Server instance, wrap it in a closure.
         $oauth2ServerFactory = $services->get('ZF\OAuth2\Service\OAuth2Server');
         if ($oauth2ServerFactory instanceof OAuth2Server) {
-            $oauth2Server = $oauth2ServerFactory;
+            $oauth2Server        = $oauth2ServerFactory;
             $oauth2ServerFactory = function () use ($oauth2Server) {
                 return $oauth2Server;
             };
@@ -42,12 +34,8 @@ class OAuth2PluginFactory implements FactoryInterface
         );
     }
 
-    /**
-     * @param ServiceLocatorInterface $controllers
-     * @return OAuth2Plugin
-     */
-    public function createService(ServiceLocatorInterface $controllers)
+    public function createService(ServiceLocatorInterface $controllers): OAuth2Plugin
     {
-        return $this($controllers, OAuth2PluginFactory::class);
+        return $this($controllers, self::class);
     }
 }

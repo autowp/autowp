@@ -2,82 +2,61 @@
 
 namespace Application\Model;
 
+use Application\ItemNameFormatter;
+use Application\PictureNameFormatter;
+use Application\Service\SpecificationsService;
+use Autowp\Image;
 use DateInterval;
 use DateTime;
 use Exception;
 use Facebook;
 use GuzzleHttp\Exception\BadResponseException;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\Client;
+use Laminas\Http\Request;
+use Laminas\I18n\Translator\TranslatorInterface;
+use Laminas\Json\Json;
+use Laminas\Router\Http\TreeRouteStack;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Twitter;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Http\Client;
-use Zend\Http\Request;
-use Zend\Json\Json;
-use Autowp\Image;
-use Application\ItemNameFormatter;
-use Application\PictureNameFormatter;
-use Application\Service\SpecificationsService;
+
+use function array_merge;
+use function array_replace;
+use function array_shift;
+use function count;
+use function mb_strtoupper;
+use function mb_substr;
+use function sprintf;
+
+use const PHP_EOL;
 
 class CarOfDay
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var Image\Storage
-     */
-    private $imageStorage;
+    private Image\Storage $imageStorage;
 
-    /**
-     * @var Catalogue
-     */
-    private $catalogue;
+    private Catalogue $catalogue;
 
-    private $router;
+    private TreeRouteStack $router;
 
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specsService = null;
+    private SpecificationsService $specsService;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
-    /**
-     * @var Perspective
-     */
-    private $perspective;
+    private Perspective $perspective;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    private ItemParent $itemParent;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var Twins
-     */
-    private $twins;
+    private Twins $twins;
 
-    /**
-     * @var PictureNameFormatter
-     */
-    private $pictureNameFormatter;
+    private PictureNameFormatter $pictureNameFormatter;
 
     public function __construct(
         TableGateway $table,
@@ -94,17 +73,17 @@ class CarOfDay
         Twins $twins,
         PictureNameFormatter $pictureNameFormatter
     ) {
-        $this->itemNameFormatter = $itemNameFormatter;
-        $this->imageStorage = $imageStorage;
-        $this->catalogue = $catalogue;
-        $this->router = $router;
-        $this->translator = $translator;
-        $this->specsService = $specsService;
-        $this->itemModel = $itemModel;
-        $this->perspective = $perspective;
-        $this->itemParent = $itemParent;
-        $this->picture = $picture;
-        $this->twins = $twins;
+        $this->itemNameFormatter    = $itemNameFormatter;
+        $this->imageStorage         = $imageStorage;
+        $this->catalogue            = $catalogue;
+        $this->router               = $router;
+        $this->translator           = $translator;
+        $this->specsService         = $specsService;
+        $this->itemModel            = $itemModel;
+        $this->perspective          = $perspective;
+        $this->itemParent           = $itemParent;
+        $this->picture              = $picture;
+        $this->twins                = $twins;
         $this->pictureNameFormatter = $pictureNameFormatter;
 
         $this->table = $table;
@@ -129,7 +108,7 @@ class CarOfDay
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, 5]);
-        $row = $resultSet->current();
+        $row       = $resultSet->current();
 
         return $row ? (int) $row['id'] : 0;
     }
@@ -163,7 +142,7 @@ class CarOfDay
 
         return $row ? [
             'item_id' => $row['item_id'],
-            'user_id' => $row['user_id']
+            'user_id' => $row['user_id'],
         ] : null;
     }
 
@@ -173,9 +152,9 @@ class CarOfDay
             'status' => Picture::STATUS_ACCEPTED,
             'item'   => [
                 'ancestor_or_self' => $itemId,
-                'perspective'      => $perspective ? $perspective : null
+                'perspective'      => $perspective ? $perspective : null,
             ],
-            'order'  => 'resolution_desc'
+            'order'  => 'resolution_desc',
         ]);
     }
 
@@ -189,7 +168,7 @@ class CarOfDay
     {
         $dayRow = $this->table->select([
             'day_date = CURDATE()',
-            'not twitter_sent'
+            'not twitter_sent',
         ])->current();
 
         if (! $dayRow) {
@@ -198,7 +177,7 @@ class CarOfDay
         }
 
         $car = $this->itemModel->getRow([
-            'id' => (int)$dayRow['item_id']
+            'id' => (int) $dayRow['item_id'],
         ]);
 
         if (! $car) {
@@ -228,7 +207,7 @@ class CarOfDay
 
         $url = 'https://wheelsage.org/picture/' . $picture['identity'];
 
-        if ($car['item_type_id'] == Item::VEHICLE) {
+        if ($car['item_type_id'] === Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
@@ -240,7 +219,6 @@ class CarOfDay
             $url
         );
 
-
         $server = new Twitter([
             'identifier'   => $twOptions['oauthOptions']['consumerKey'],
             'secret'       => $twOptions['oauthOptions']['consumerSecret'],
@@ -251,20 +229,20 @@ class CarOfDay
         $tokenCredentials->setIdentifier($twOptions['token']['oauth_token']);
         $tokenCredentials->setSecret($twOptions['token']['oauth_token_secret']);
 
-        $url = 'https://api.twitter.com/1.1/statuses/update.json';
-        $params = [
-            'status' => $text
+        $url     = 'https://api.twitter.com/1.1/statuses/update.json';
+        $params  = [
+            'status' => $text,
         ];
         $headers = $server->getHeaders($tokenCredentials, 'POST', $url, $params);
 
         try {
             $server->createHttpClient()->post($url, [
                 'headers'     => $headers,
-                'form_params' => $params
+                'form_params' => $params,
             ]);
         } catch (BadResponseException $e) {
-            $response = $e->getResponse();
-            $body = $response->getBody();
+            $response   = $e->getResponse();
+            $body       = $response->getBody();
             $statusCode = $response->getStatusCode();
 
             throw new Exception(
@@ -273,9 +251,9 @@ class CarOfDay
         }
 
         $this->table->update([
-            'twitter_sent' => 1
+            'twitter_sent' => 1,
         ], [
-            'day_date' => $dayRow['day_date']
+            'day_date' => $dayRow['day_date'],
         ]);
 
         print 'ok' . PHP_EOL;
@@ -285,7 +263,7 @@ class CarOfDay
     {
         $dayRow = $this->table->select([
             'day_date = CURDATE()',
-            'not facebook_sent'
+            'not facebook_sent',
         ])->current();
 
         if (! $dayRow) {
@@ -294,7 +272,7 @@ class CarOfDay
         }
 
         $car = $this->itemModel->getRow([
-            'id' => (int)$dayRow['item_id']
+            'id' => (int) $dayRow['item_id'],
         ]);
 
         if (! $car) {
@@ -324,7 +302,7 @@ class CarOfDay
 
         $url = 'https://wheelsage.org/picture/' . $picture['identity'];
 
-        if ($car['item_type_id'] == Item::VEHICLE) {
+        if ($car['item_type_id'] === Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
@@ -333,13 +311,13 @@ class CarOfDay
         $fb = new Facebook\Facebook([
             'app_id'                => $fbOptions['app_id'],
             'app_secret'            => $fbOptions['app_secret'],
-            'default_graph_version' => 'v2.8'
+            'default_graph_version' => 'v2.8',
         ]);
 
         $linkData = [
             'link'    => $url,
-            'message' => self::ucfirst($title) . ': ' .
-                $this->itemNameFormatter->format($this->itemModel->getNameData($car, 'en'), 'en'),
+            'message' => self::ucfirst($title) . ': '
+                . $this->itemNameFormatter->format($this->itemModel->getNameData($car, 'en'), 'en'),
         ];
 
         try {
@@ -354,9 +332,9 @@ class CarOfDay
         }
 
         $this->table->update([
-            'facebook_sent' => 1
+            'facebook_sent' => 1,
         ], [
-            'day_date' => $dayRow['day_date']
+            'day_date' => $dayRow['day_date'],
         ]);
 
         print 'ok' . PHP_EOL;
@@ -368,7 +346,7 @@ class CarOfDay
 
         $dayRow = $this->table->select([
             'day_date = CURDATE()',
-            'not vk_sent'
+            'not vk_sent',
         ])->current();
 
         if (! $dayRow) {
@@ -377,7 +355,7 @@ class CarOfDay
         }
 
         $car = $this->itemModel->getRow([
-            'id' => (int)$dayRow['item_id']
+            'id' => (int) $dayRow['item_id'],
         ]);
 
         if (! $car) {
@@ -405,11 +383,9 @@ class CarOfDay
             return;
         }
 
-
-
         $url = 'https://autowp.ru/picture/' . $picture['identity'];
 
-        if ($car['item_type_id'] == Item::VEHICLE) {
+        if ($car['item_type_id'] === Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'ru');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'ru');
@@ -420,7 +396,7 @@ class CarOfDay
             $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language)
         );
 
-        $client = new Client('https://api.vk.com/method/wall.post');
+        $client   = new Client('https://api.vk.com/method/wall.post');
         $response = $client
             ->setMethod(Request::METHOD_POST)
             ->setParameterPost([
@@ -429,7 +405,7 @@ class CarOfDay
                 'message'      => $text,
                 'attachments'  => $url,
                 'access_token' => $vkOptions['token'],
-                'v'            => '5.73'
+                'v'            => '5.73',
             ])
             ->send();
 
@@ -443,9 +419,9 @@ class CarOfDay
         }
 
         $this->table->update([
-            'vk_sent' => 1
+            'vk_sent' => 1,
         ], [
-            'day_date' => $dayRow['day_date']
+            'day_date' => $dayRow['day_date'],
         ]);
 
         print 'ok' . PHP_EOL;
@@ -456,7 +432,7 @@ class CarOfDay
      */
     public function getNextDates()
     {
-        $now = new DateTime();
+        $now      = new DateTime();
         $interval = new DateInterval('P1D');
 
         $result = [];
@@ -464,12 +440,12 @@ class CarOfDay
         for ($i = 0; $i < 10; $i++) {
             $dayRow = $this->table->select([
                 'day_date' => $now->format('Y-m-d'),
-                'item_id is not null'
+                'item_id is not null',
             ])->current();
 
             $result[] = [
                 'date' => clone $now,
-                'free' => ! $dayRow
+                'free' => ! $dayRow,
             ];
 
             $now->add($interval);
@@ -481,7 +457,7 @@ class CarOfDay
     public function getItemOfDayPictures(int $itemId, string $language): array
     {
         $carOfDay = $this->itemModel->getRow([
-            'id' => (int)$itemId
+            'id' => (int) $itemId,
         ]);
 
         $carOfDayPictures = $this->getOrientedPictureList($itemId);
@@ -490,7 +466,7 @@ class CarOfDay
         $formatRequests = [];
         foreach ($carOfDayPictures as $idx => $picture) {
             if ($picture) {
-                $format = $idx == 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
+                $format                        = $idx === 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
                 $formatRequests[$format][$idx] = $picture['image_id'];
             }
         }
@@ -508,12 +484,12 @@ class CarOfDay
             }
         }
         $names = $this->picture->getNameData($notEmptyPics, [
-            'language' => $language
+            'language' => $language,
         ]);
 
         $paths = $this->catalogue->getCataloguePaths($carOfDay['id'], [
             'breakOnFirst' => true,
-            'toBrand'      => false
+            'toBrand'      => false,
         ]);
 
         $result = [];
@@ -541,21 +517,21 @@ class CarOfDay
                     }
                 }
 
-                $format = $idx == 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
-                $thumb = isset($imagesInfo[$format][$idx]) ? $imagesInfo[$format][$idx] : null;
+                $format = $idx === 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
+                $thumb  = $imagesInfo[$format][$idx] ?? null;
 
                 $result[] = [
                     'thumb' => $thumb
                         ? [
                             'src'    => $thumb->getSrc(),
                             'width'  => $thumb->getWidth(),
-                            'height' => $thumb->getHeight()
+                            'height' => $thumb->getHeight(),
                         ]
                         : null,
                     'name'  => isset($names[$row['id']])
                         ? $this->pictureNameFormatter->format($names[$row['id']], $language)
                         : null,
-                    'route' => $route
+                    'route' => $route,
                 ];
             }
         }
@@ -565,11 +541,9 @@ class CarOfDay
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $itemId
-     * @return array
      * @throws Exception
      */
-    private function getOrientedPictureList(int $itemId)
+    private function getOrientedPictureList(int $itemId): array
     {
         $perspectivesGroupIds = $this->perspective->getPageGroupIds(5);
 
@@ -584,8 +558,8 @@ class CarOfDay
                 'id_exclude' => $usedIds,
                 'status'     => Picture::STATUS_ACCEPTED,
                 'item'       => [
-                    'ancestor_or_self' => $itemId
-                ]
+                    'ancestor_or_self' => $itemId,
+                ],
             ]);
 
             $select
@@ -598,9 +572,12 @@ class CarOfDay
                 ->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', [], $select::JOIN_LEFT)
                 ->where(['mp.group_id' => $groupId])
                 ->order([
-                    'ipc_ancestor.sport', 'ipc_ancestor.tuning', 'mp.position',
+                    'ipc_ancestor.sport',
+                    'ipc_ancestor.tuning',
+                    'mp.position',
                     'picture_vote_summary.positive DESC',
-                    'pictures.width DESC', 'pictures.height DESC'
+                    'pictures.width DESC',
+                    'pictures.height DESC',
                 ])
                 ->group(['ipc_ancestor.sport', 'ipc_ancestor.tuning', 'mp.position'])
                 ->limit(1);
@@ -609,7 +586,7 @@ class CarOfDay
 
             if ($picture) {
                 $pictures[] = $picture;
-                $usedIds[] = $picture['id'];
+                $usedIds[]  = $picture['id'];
             } else {
                 $pictures[] = null;
             }
@@ -640,13 +617,13 @@ class CarOfDay
                 'id_exclude' => $usedIds,
                 'status'     => Picture::STATUS_ACCEPTED,
                 'item'       => [
-                    'ancestor_or_self' => $itemId
+                    'ancestor_or_self' => $itemId,
                 ],
-                'limit'      => count($left)
+                'limit'      => count($left),
             ]);
 
             foreach ($rows as $pic) {
-                $key = array_shift($left);
+                $key            = array_shift($left);
                 $pictures[$key] = $pic;
             }
         }
@@ -670,15 +647,15 @@ class CarOfDay
         ';
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, $itemId, 3]);
-        $row = $resultSet->current();
+        $row       = $resultSet->current();
 
         return (bool) $row;
     }
 
     public function setItemOfDay(DateTime $dateTime, $itemId, $userId)
     {
-        $itemId = (int)$itemId;
-        $userId = (int)$userId;
+        $itemId = (int) $itemId;
+        $userId = (int) $userId;
 
         if (! $this->isComplies($itemId)) {
             return false;
@@ -687,7 +664,7 @@ class CarOfDay
         $dateStr = $dateTime->format('Y-m-d');
 
         $primaryKey = [
-            'day_date' => $dateStr
+            'day_date' => $dateStr,
         ];
 
         $dayRow = $this->table->select($primaryKey)->current();
@@ -698,7 +675,7 @@ class CarOfDay
 
         $set = [
             'item_id' => $itemId,
-            'user_id' => $userId ? $userId : null
+            'user_id' => $userId ? $userId : null,
         ];
 
         if ($dayRow) {

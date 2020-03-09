@@ -2,16 +2,15 @@
 
 namespace Application\Controller\Api;
 
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
 use Locale;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
+
+use function array_keys;
 
 class LanguageController extends AbstractRestfulController
 {
-    /**
-     * @var array
-     */
-    private $hosts;
+    private array $hosts;
 
     public function __construct(array $hosts)
     {
@@ -26,7 +25,7 @@ class LanguageController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $languages
+            'items' => $languages,
         ]);
     }
 }

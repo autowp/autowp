@@ -2,67 +2,51 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Router\Http\TreeRouteStack;
-use Zend\Stdlib\ArrayUtils;
-use Autowp\User\Model\User;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
+use Autowp\User\Model\User;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function is_array;
 
 class AttrConflictHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specService;
+    private SpecificationsService $specService;
 
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var TreeRouteStack
-     */
-    private $router;
+    private TreeRouteStack $router;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->userId = null;
+        $this->userId = 0;
 
-        $this->item = $serviceManager->get(Item::class);
-        $this->userModel = $serviceManager->get(User::class);
-        $this->specService = $serviceManager->get(SpecificationsService::class);
+        $this->item              = $serviceManager->get(Item::class);
+        $this->userModel         = $serviceManager->get(User::class);
+        $this->specService       = $serviceManager->get(SpecificationsService::class);
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
-        $this->router = $serviceManager->get('HttpRouter');
+        $this->router            = $serviceManager->get('HttpRouter');
     }
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -83,9 +67,8 @@ class AttrConflictHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return AttrConflictHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -95,7 +78,7 @@ class AttrConflictHydrator extends RestHydrator
     public function extract($object)
     {
         $result = [
-            'item_id'   => (int)$object['item_id'],
+            'item_id'   => (int) $object['item_id'],
             'attribute' => (string) $object['attribute'],
             'unit'      => $object['unit'],
         ];
@@ -115,7 +98,7 @@ class AttrConflictHydrator extends RestHydrator
             // other users values
             $userValueRows = $userValueTable->select([
                 'attribute_id' => $object['attribute_id'],
-                'item_id'      => $object['item_id']
+                'item_id'      => $object['item_id'],
             ]);
 
             $values = [];
@@ -127,7 +110,7 @@ class AttrConflictHydrator extends RestHydrator
                         $userValueRow['user_id'],
                         $this->language
                     ),
-                    'user_id' => (int)$userValueRow['user_id']
+                    'user_id' => (int) $userValueRow['user_id'],
                 ];
             }
 
@@ -139,7 +122,6 @@ class AttrConflictHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

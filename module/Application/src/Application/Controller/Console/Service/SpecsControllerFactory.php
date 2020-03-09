@@ -2,21 +2,18 @@
 
 namespace Application\Controller\Console\Service;
 
+use Application\Controller\Console\SpecsController as Controller;
 use Application\Service\SpecificationsService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Controller\Console\SpecsController as Controller;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SpecsControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Controller
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
         return new Controller(
             $container->get(SpecificationsService::class)

@@ -3,19 +3,16 @@
 namespace Application\Session\Service;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Zend\Session\SaveHandler\Cache;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Laminas\Session\SaveHandler\Cache;
 
 class SaveHandlerCacheFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Cache
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Cache
     {
         return new Cache($container->get('sessionCache'));
     }

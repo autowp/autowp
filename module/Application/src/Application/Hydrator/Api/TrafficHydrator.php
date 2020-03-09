@@ -2,35 +2,34 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Permissions\Acl\Acl;
-use Zend\Stdlib\ArrayUtils;
 use Autowp\User\Model\User;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function is_array;
+use function urlencode;
 
 class TrafficHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    protected $userId = null;
+    protected int $userId;
 
-    private $acl;
+    private Acl $acl;
 
-    private $router;
+    private TreeRouteStack $router;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->router = $serviceManager->get('HttpRouter');
-        $this->acl = $serviceManager->get(Acl::class);
+        $this->router    = $serviceManager->get('HttpRouter');
+        $this->acl       = $serviceManager->get(Acl::class);
         $this->userModel = $serviceManager->get(User::class);
 
         $strategy = new Strategy\User($serviceManager);
@@ -39,10 +38,9 @@ class TrafficHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -80,13 +78,11 @@ class TrafficHydrator extends RestHydrator
         $object['whois_url'] = 'http://nic.ru/whois/?query=' . urlencode($object['ip']);
         unset($object['ban']['ip']);
 
-
         return $object;
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */
@@ -97,7 +93,7 @@ class TrafficHydrator extends RestHydrator
 
     public function setUserId($userId)
     {
-        if ($this->userId != $userId) {
+        if ($this->userId !== $userId) {
             $this->userId = $userId;
         }
 

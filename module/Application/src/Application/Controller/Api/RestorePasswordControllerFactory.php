@@ -7,22 +7,21 @@ use Application\Service\UsersService;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserPasswordRemind;
 use Interop\Container\ContainerInterface;
-use Zend\Mail\Transport\TransportInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\Mail\Transport\TransportInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+
+use function getenv;
 
 class RestorePasswordControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return RestorePasswordController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): RestorePasswordController
     {
         $filters = $container->get('InputFilterManager');
-        $config = $container->get('Config');
+        $config  = $container->get('Config');
 
         return new RestorePasswordController(
             $container->get(UsersService::class),
@@ -33,7 +32,7 @@ class RestorePasswordControllerFactory implements FactoryInterface
             $container->get(UserPasswordRemind::class),
             $container->get(User::class),
             $config['recaptcha'],
-            (bool)getenv('AUTOWP_CAPTCHA')
+            (bool) getenv('AUTOWP_CAPTCHA')
         );
     }
 }

@@ -2,31 +2,24 @@
 
 namespace Application\Hydrator\Api\Strategy;
 
-use Interop\Container\ContainerInterface;
-use Zend\Hydrator\Strategy\StrategyInterface;
+use ArrayAccess;
 use Autowp\Image\Storage;
+use ImagickException;
+use Interop\Container\ContainerInterface;
+use Laminas\Hydrator\Strategy\StrategyInterface;
 
 class Image implements StrategyInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $serviceManager;
+    private ContainerInterface $serviceManager;
 
-    /**
-     * @var Storage
-     */
-    private $imageStorage;
+    private Storage $imageStorage;
 
     public function __construct(ContainerInterface $serviceManager)
     {
         $this->serviceManager = $serviceManager;
     }
 
-    /**
-     * @return Storage
-     */
-    private function getImageStorage()
+    private function getImageStorage(): Storage
     {
         if (! $this->imageStorage) {
             $this->imageStorage = $this->serviceManager->get(Storage::class);
@@ -35,7 +28,11 @@ class Image implements StrategyInterface
         return $this->imageStorage;
     }
 
-    public function extract($value)
+    /**
+     * @param array|ArrayAccess $value
+     * @throws ImagickException
+     */
+    public function extract($value): ?array
     {
         $photo = null;
 

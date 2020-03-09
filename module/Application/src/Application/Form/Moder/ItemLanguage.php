@@ -2,9 +2,9 @@
 
 namespace Application\Form\Moder;
 
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilterProviderInterface;
 use Autowp\ZFComponents\Filter\SingleSpaces;
+use Laminas\Form\Form;
+use Laminas\InputFilter\InputFilterProviderInterface;
 
 class ItemLanguage extends Form implements InputFilterProviderInterface
 {
@@ -14,37 +14,37 @@ class ItemLanguage extends Form implements InputFilterProviderInterface
 
         $elements = [
             [
-                'name' => 'name',
-                'type' => 'Text',
-                'options' => [
+                'name'       => 'name',
+                'type'       => 'Text',
+                'options'    => [
                     'label' => 'moder/vehicle/name',
                 ],
                 'attributes' => [
-                    'maxlength'  => 255,
+                    'maxlength' => 255,
                 ],
             ],
             [
-                'name' => 'text',
-                'type' => 'Textarea',
-                'options' => [
+                'name'       => 'text',
+                'type'       => 'Textarea',
+                'options'    => [
                     'label' => 'moder/item/short-description',
                 ],
                 'attributes' => [
-                    'maxlength'  => 65536,
-                    'rows'       => 5
+                    'maxlength' => 65536,
+                    'rows'      => 5,
                 ],
             ],
             [
-                'name' => 'full_text',
-                'type' => 'Textarea',
-                'options' => [
+                'name'       => 'full_text',
+                'type'       => 'Textarea',
+                'options'    => [
                     'label' => 'moder/item/full-description',
                 ],
                 'attributes' => [
-                    'maxlength'  => 65536,
-                    'rows'       => 10
+                    'maxlength' => 65536,
+                    'rows'      => 10,
                 ],
-            ]
+            ],
         ];
 
         foreach ($elements as $element) {
@@ -53,51 +53,49 @@ class ItemLanguage extends Form implements InputFilterProviderInterface
     }
 
     /**
-    * Should return an array specification compatible with
-    * {@link Zend\InputFilter\Factory::createInputFilter()}.
-    *
-    * @return array
-    */
-    public function getInputFilterSpecification()
+     * Should return an array specification compatible with
+     * {@link Laminas\InputFilter\Factory::createInputFilter()}.
+     */
+    public function getInputFilterSpecification(): array
     {
         return [
-            'name' => [
+            'name'      => [
                 'required' => false,
-                'filters' => [
+                'filters'  => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
-                ]
+                    ['name' => SingleSpaces::class],
+                ],
             ],
-            'text' => [
-                'required' => false,
-                'filters' => [
+            'text'      => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => 65536
-                        ]
-                    ]
-                ]
+                            'max' => 65536,
+                        ],
+                    ],
+                ],
             ],
             'full_text' => [
-                'required' => false,
-                'filters' => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => 65536
-                        ]
-                    ]
-                ]
-            ]
+                            'max' => 65536,
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }

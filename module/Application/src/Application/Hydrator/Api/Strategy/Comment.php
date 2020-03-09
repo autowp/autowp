@@ -3,18 +3,13 @@
 namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\CommentHydrator as Hydrator;
+use ArrayAccess;
 
 class Comment extends HydratorStrategy
 {
-    /**
-     * @var int|null
-     */
-    protected $userId = null;
+    protected int $userId;
 
-    /**
-     * @return Hydrator
-     */
-    protected function getHydrator()
+    protected function getHydrator(): Hydrator
     {
         if (! $this->hydrator) {
             $this->hydrator = new Hydrator($this->serviceManager);
@@ -23,7 +18,10 @@ class Comment extends HydratorStrategy
         return $this->hydrator;
     }
 
-    public function extract($value)
+    /**
+     * @param array|ArrayAccess $value
+     */
+    public function extract($value): array
     {
         $hydrator = $this->getHydrator();
 
@@ -34,7 +32,7 @@ class Comment extends HydratorStrategy
         return $hydrator->extract($value);
     }
 
-    public function setUserId($userId)
+    public function setUserId(int $userId): self
     {
         $this->userId = $userId;
 

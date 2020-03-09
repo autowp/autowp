@@ -2,17 +2,17 @@
 
 namespace Application\Form\Moder;
 
-use Traversable;
-use Zend\Form\Element;
-use Zend\Form\ElementInterface;
-use Zend\Form\Exception;
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilterProviderInterface;
 use Autowp\ZFComponents\Filter\SingleSpaces;
+use Laminas\Form\Element;
+use Laminas\Form\ElementInterface;
+use Laminas\Form\Exception;
+use Laminas\Form\Form;
+use Laminas\InputFilter\InputFilterProviderInterface;
+use Traversable;
 
 class ItemParentLanguage extends Form implements InputFilterProviderInterface
 {
-    private $language = 'en';
+    private string $language = 'en';
 
     /**
      * @param  array|Traversable $options
@@ -36,15 +36,15 @@ class ItemParentLanguage extends Form implements InputFilterProviderInterface
 
         $elements = [
             [
-                'name'    => 'name',
-                'type'    => 'Text',
-                'options' => [
-                    'label' => 'Name'
+                'name'       => 'name',
+                'type'       => 'Text',
+                'options'    => [
+                    'label' => 'Name',
                 ],
                 'attributes' => [
-                    'maxlength' => \Application\Model\ItemParent::MAX_LANGUAGE_NAME
-                ]
-            ]
+                    'maxlength' => \Application\Model\ItemParent::MAX_LANGUAGE_NAME,
+                ],
+            ],
         ];
 
         foreach ($elements as $element) {
@@ -54,29 +54,27 @@ class ItemParentLanguage extends Form implements InputFilterProviderInterface
 
     /**
      * Should return an array specification compatible with
-     * {@link Zend\InputFilter\Factory::createInputFilter()}.
-     *
-     * @return array
+     * {@link Laminas\InputFilter\Factory::createInputFilter()}.
      */
-    public function getInputFilterSpecification()
+    public function getInputFilterSpecification(): array
     {
         return [
             'name' => [
-                'required' => false,
-                'filters'  => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => \Application\Model\ItemParent::MAX_LANGUAGE_NAME
-                        ]
-                    ]
-                ]
-            ]
+                            'max' => \Application\Model\ItemParent::MAX_LANGUAGE_NAME,
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }

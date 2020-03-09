@@ -2,23 +2,41 @@
 
 namespace Application\Service;
 
-use Application\Validator\Attrs\IsFloatOrNull;
-use Application\Validator\Attrs\IsIntOrNull;
-use ArrayObject;
-use Exception;
-use NumberFormatter;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\Input;
-use Zend\InputFilter\ArrayInput;
-use Zend\Paginator;
-use Autowp\User\Model\User;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
 use Application\Spec\Table\Car as CarSpecTable;
+use Application\Validator\Attrs\IsFloatOrNull;
+use Application\Validator\Attrs\IsIntOrNull;
+use ArrayAccess;
+use ArrayObject;
+use Autowp\User\Model\User;
+use Exception;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\I18n\Translator\TranslatorInterface;
+use Laminas\InputFilter\ArrayInput;
+use Laminas\InputFilter\Input;
+use Laminas\Paginator;
+use NumberFormatter;
+
+use function array_diff;
+use function array_intersect;
+use function array_key_exists;
+use function array_keys;
+use function array_merge;
+use function array_replace;
+use function array_reverse;
+use function array_unique;
+use function count;
+use function implode;
+use function in_array;
+use function is_array;
+use function reset;
+use function serialize;
+use function strlen;
 
 class SpecificationsService
 {
@@ -32,144 +50,69 @@ class SpecificationsService
         WEIGHT_SECOND_ACTUAL = 0.1,
         WEIGHT_WRONG         = -1;
 
-    /**
-     * @var TableGateway
-     */
-    private $attributeTable = null;
+    private TableGateway $attributeTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $listOptionsTable = null;
+    private TableGateway $listOptionsTable;
 
-    /**
-     * @var array
-     */
-    private $listOptions = [];
+    private array $listOptions = [];
 
-    private $listOptionsChilds = [];
+    private array $listOptionsChilds = [];
 
-    /**
-     * @var TableGateway
-     */
-    private $unitTable = null;
+    private TableGateway $unitTable;
 
-    private $units = null;
+    private array $units;
 
-    /**
-     * @var TableGateway
-     */
-    private $userValueTable = null;
+    private TableGateway $userValueTable;
 
-    private $attributes = null;
+    private array $attributes;
 
-    private $childs = null;
+    private array $childs;
 
-    private $zoneAttrs = [];
+    private array $zoneAttrs = [];
 
-    /**
-     * @var array
-     */
-    private $carChildsCache = [];
+    private array $carChildsCache = [];
 
-    /**
-     * @var array
-     */
-    private $engineAttributes = null;
+    private array $engineAttributes;
 
-    /**
-     * @var TableGateway
-     */
-    private $typeTable;
+    private TableGateway $typeTable;
 
-    /**
-     * @var array
-     */
-    private $types = null;
+    private array $types;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    private $valueWeights = [];
+    private array $valueWeights = [];
 
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    private ItemParent $itemParent;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var VehicleType
-     */
-    private $vehicleType;
+    private VehicleType $vehicleType;
 
-    /**
-     * @var TableGateway
-     */
-    private $zoneAttributeTable;
+    private TableGateway $zoneAttributeTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $userValueFloatTable;
+    private TableGateway $userValueFloatTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $userValueIntTable;
+    private TableGateway $userValueIntTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $userValueListTable;
+    private TableGateway $userValueListTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $userValueStringTable;
+    private TableGateway $userValueStringTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $valueTable;
+    private TableGateway $valueTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $valueFloatTable;
+    private TableGateway $valueFloatTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $valueIntTable;
+    private TableGateway $valueIntTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $valueListTable;
+    private TableGateway $valueListTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $valueStringTable;
+    private TableGateway $valueStringTable;
 
     public function __construct(
         $translator,
@@ -195,29 +138,29 @@ class SpecificationsService
         TableGateway $valueListTable,
         TableGateway $valueStringTable
     ) {
-        $this->translator = $translator;
+        $this->translator        = $translator;
         $this->itemNameFormatter = $itemNameFormatter;
-        $this->itemModel = $itemModel;
-        $this->itemParent = $itemParent;
-        $this->picture = $picture;
-        $this->vehicleType = $vehicleType;
-        $this->userModel = $userModel;
+        $this->itemModel         = $itemModel;
+        $this->itemParent        = $itemParent;
+        $this->picture           = $picture;
+        $this->vehicleType       = $vehicleType;
+        $this->userModel         = $userModel;
 
-        $this->unitTable = $unitTable;
-        $this->listOptionsTable = $listOptionsTable;
-        $this->typeTable = $typeTable;
-        $this->attributeTable = $attributeTable;
-        $this->zoneAttributeTable = $zoneAttributeTable;
-        $this->userValueTable = $userValueTable;
-        $this->userValueFloatTable = $userValueFloatTable;
-        $this->userValueIntTable = $userValueIntTable;
-        $this->userValueListTable = $userValueListTable;
+        $this->unitTable            = $unitTable;
+        $this->listOptionsTable     = $listOptionsTable;
+        $this->typeTable            = $typeTable;
+        $this->attributeTable       = $attributeTable;
+        $this->zoneAttributeTable   = $zoneAttributeTable;
+        $this->userValueTable       = $userValueTable;
+        $this->userValueFloatTable  = $userValueFloatTable;
+        $this->userValueIntTable    = $userValueIntTable;
+        $this->userValueListTable   = $userValueListTable;
         $this->userValueStringTable = $userValueStringTable;
-        $this->valueTable = $valueTable;
-        $this->valueFloatTable = $valueFloatTable;
-        $this->valueIntTable = $valueIntTable;
-        $this->valueListTable = $valueListTable;
-        $this->valueStringTable = $valueStringTable;
+        $this->valueTable           = $valueTable;
+        $this->valueFloatTable      = $valueFloatTable;
+        $this->valueIntTable        = $valueIntTable;
+        $this->valueListTable       = $valueListTable;
+        $this->valueStringTable     = $valueStringTable;
     }
 
     private function loadUnits()
@@ -225,11 +168,11 @@ class SpecificationsService
         if ($this->units === null) {
             $units = [];
             foreach ($this->unitTable->select([]) as $unit) {
-                $id = (int)$unit['id'];
+                $id         = (int) $unit['id'];
                 $units[$id] = [
                     'id'   => $id,
                     'name' => $unit['name'],
-                    'abbr' => $unit['abbr']
+                    'abbr' => $unit['abbr'],
                 ];
             }
 
@@ -248,14 +191,14 @@ class SpecificationsService
     {
         $this->loadUnits();
 
-        $id = (int)$id;
+        $id = (int) $id;
 
-        return isset($this->units[$id]) ? $this->units[$id] : null;
+        return $this->units[$id] ?? null;
     }
 
     public function getZoneIdByCarTypeId(int $itemTypeId, array $vehicleTypeIds)
     {
-        if ($itemTypeId == Item::ENGINE) {
+        if ($itemTypeId === Item::ENGINE) {
             return self::ENGINE_ZONE_ID;
         }
 
@@ -280,9 +223,9 @@ class SpecificationsService
             $rows = $this->listOptionsTable->selectWith($select);
 
             foreach ($rows as $row) {
-                $aid = (int)$row['attribute_id'];
-                $id = (int)$row['id'];
-                $pid = (int)$row['parent_id'];
+                $aid = (int) $row['attribute_id'];
+                $id  = (int) $row['id'];
+                $pid = (int) $row['parent_id'];
                 if (! isset($this->listOptions[$aid])) {
                     $this->listOptions[$aid] = [];
                 }
@@ -312,9 +255,9 @@ class SpecificationsService
         $result = [];
         if (isset($this->listOptionsChilds[$aid][$parentId])) {
             foreach ($this->listOptionsChilds[$aid][$parentId] as $childId) {
-                $result[] = [
-                    'id'   => (int)$childId,
-                    'name' => $this->translator->translate($this->listOptions[$aid][$childId])
+                $result[]     = [
+                    'id'   => (int) $childId,
+                    'name' => $this->translator->translate($this->listOptions[$aid][$childId]),
                 ];
                 $childOptions = $this->getListOptionsArrayRecursive($aid, $childId);
                 foreach ($childOptions as &$value) {
@@ -346,8 +289,8 @@ class SpecificationsService
         $result = [];
         if (isset($this->listOptionsChilds[$aid][$parentId])) {
             foreach ($this->listOptionsChilds[$aid][$parentId] as $childId) {
-                $result[(int)$childId] = $this->translator->translate($this->listOptions[$aid][$childId]);
-                $childOptions = $this->getListOptions($aid, $childId);
+                $result[(int) $childId] = $this->translator->translate($this->listOptions[$aid][$childId]);
+                $childOptions           = $this->getListOptions($aid, $childId);
                 foreach ($childOptions as &$value) {
                     $value = '…' . $this->translator->translate($value);
                 }
@@ -371,7 +314,7 @@ class SpecificationsService
 
     public function getFilterSpec(int $attributeId)
     {
-        $filters = [];
+        $filters    = [];
         $validators = [];
 
         $attribute = $this->getAttribute($attributeId);
@@ -404,29 +347,29 @@ class SpecificationsService
                     $validators[] = [
                         'name'    => 'StringLength',
                         'options' => [
-                            'max' => $type['maxlength']
-                        ]
+                            'max' => $type['maxlength'],
+                        ],
                     ];
                 }
                 break;
 
             case 2: // int
-                $filters = [['name' => 'StringTrim']];
+                $filters    = [['name' => 'StringTrim']];
                 $validators = [
                     [
                         'name'    => IsIntOrNull::class,
-                        'options' => ['locale' => 'en_US']
-                    ]
+                        'options' => ['locale' => 'en_US'],
+                    ],
                 ];
                 break;
 
             case 3: // float
-                $filters = [['name' => 'StringTrim']];
+                $filters    = [['name' => 'StringTrim']];
                 $validators = [
                     [
                         'name'    => IsFloatOrNull::class,
-                        'options' => ['locale' => 'en_US']
-                    ]
+                        'options' => ['locale' => 'en_US'],
+                    ],
                 ];
                 break;
 
@@ -437,16 +380,16 @@ class SpecificationsService
             case 5: // checkbox
                 $validators = [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 '',
                                 '-',
                                 '0',
-                                '1'
-                            ]
-                        ]
-                    ]
+                                '1',
+                            ],
+                        ],
+                    ],
                 ];
                 break;
 
@@ -464,11 +407,11 @@ class SpecificationsService
                 }
                 $validators = [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
-                            'haystack' => $haystack
-                        ]
-                    ]
+                            'haystack' => $haystack,
+                        ],
+                    ],
                 ];
                 if ($attribute['isMultiple']) {
                     $inputType = ArrayInput::class;
@@ -480,7 +423,7 @@ class SpecificationsService
             'type'       => $inputType,
             'required'   => false,
             'filters'    => $filters,
-            'validators' => $validators
+            'validators' => $validators,
         ];
     }
 
@@ -497,7 +440,7 @@ class SpecificationsService
 
         $result = [];
         foreach ($this->zoneAttributeTable->selectWith($select) as $row) {
-            $result[] = (int)$row['attribute_id'];
+            $result[] = (int) $row['attribute_id'];
         }
 
         $this->zoneAttrs[$id] = $result;
@@ -505,30 +448,27 @@ class SpecificationsService
         return $result;
     }
 
-    /**
-     * @return SpecificationsService
-     */
-    private function loadAttributes()
+    private function loadAttributes(): self
     {
         if ($this->attributes === null) {
-            $array = [];
+            $array  = [];
             $childs = [];
 
             $select = new Sql\Select($this->attributeTable->getTable());
             $select->order('position');
 
             foreach ($this->attributeTable->selectWith($select) as $row) {
-                $id = (int)$row['id'];
-                $pid = (int)$row['parent_id'];
+                $id         = (int) $row['id'];
+                $pid        = (int) $row['parent_id'];
                 $array[$id] = [
                     'id'          => $id,
                     'name'        => $row['name'],
                     'description' => $row['description'],
-                    'typeId'      => (int)$row['type_id'],
-                    'unitId'      => (int)$row['unit_id'],
+                    'typeId'      => (int) $row['type_id'],
+                    'unitId'      => (int) $row['unit_id'],
                     'isMultiple'  => $row['multiple'],
                     'precision'   => $row['precision'],
-                    'parentId'    => $pid ? $pid : null
+                    'parentId'    => $pid ? $pid : null,
                 ];
                 if (! isset($childs[$id])) {
                     $childs[$id] = [];
@@ -541,30 +481,22 @@ class SpecificationsService
             }
 
             $this->attributes = $array;
-            $this->childs = $childs;
+            $this->childs     = $childs;
         }
 
         return $this;
     }
 
-    /**
-     * @param int $id
-     * @return NULL|array
-     */
     public function getAttribute(int $id): ?array
     {
         $this->loadAttributes();
 
-        return isset($this->attributes[$id]) ? $this->attributes[$id] : null;
+        return $this->attributes[$id] ?? null;
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $uid
-     * @param int $attributeId
-     * @param int $itemId
      * @param $value
-     * @param bool $empty
      * @throws Exception
      */
     public function setUserValue2(int $uid, int $attributeId, int $itemId, $value, bool $empty)
@@ -581,7 +513,7 @@ class SpecificationsService
         $userValuePrimaryKey = [
             'attribute_id' => $attribute['id'],
             'item_id'      => $itemId,
-            'user_id'      => $uid
+            'user_id'      => $uid,
         ];
 
         if ($attribute['isMultiple']) {
@@ -621,9 +553,9 @@ class SpecificationsService
                             VALUES (:attribute_id, :item_id, :user_id, :ordering, :value)
                             ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
                         ', array_replace($userValuePrimaryKey, [
-                            'ordering' => $ordering,
-                            'value'    => $oneValue
-                        ]));
+    'ordering' => $ordering,
+    'value'    => $oneValue,
+]));
                         $ordering++;
                     }
                 }
@@ -645,7 +577,7 @@ class SpecificationsService
                 if ($userValueData) {
                     $valueChanged = $value === null
                         ? $userValueData['value'] !== null
-                        : $userValueData['value'] != $value;
+                        : $userValueData['value'] !== $value;
                 } else {
                     $valueChanged = true;
                 }
@@ -662,8 +594,8 @@ class SpecificationsService
                         VALUES (:attribute_id, :item_id, :user_id, :value)
                         ON DUPLICATE KEY UPDATE value = VALUES(value)
                     ', array_replace($userValuePrimaryKey, [
-                        'value' => $value
-                    ]));
+    'value' => $value,
+]));
 
                     $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
                 }
@@ -690,9 +622,6 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $uid
-     * @param int $attributeId
-     * @param int $itemId
      * @param $value
      * @throws Exception
      */
@@ -709,7 +638,7 @@ class SpecificationsService
         $userValuePrimaryKey = [
             'attribute_id' => $attribute['id'],
             'item_id'      => $itemId,
-            'user_id'      => $uid
+            'user_id'      => $uid,
         ];
 
         if ($attribute['isMultiple']) {
@@ -724,14 +653,14 @@ class SpecificationsService
             $userValueDataTable->delete($userValuePrimaryKey);
 
             if ($value) {
-                $empty = true;
+                $empty    = true;
                 $valueNot = false;
                 foreach ($value as $oneValue) {
                     if ($oneValue) {
                         $empty = false;
                     }
 
-                    if ($oneValue == self::NULL_VALUE_STR) {
+                    if ($oneValue === self::NULL_VALUE_STR) {
                         $valueNot = true;
                     }
                 }
@@ -739,8 +668,8 @@ class SpecificationsService
                 if (! $empty) {
                     // insert new descriptiors and values
                     $this->userValueTable->insert(array_replace([
-                        'add_date'     => new Sql\Expression('NOW()'),
-                        'update_date'  => new Sql\Expression('NOW()'),
+                        'add_date'    => new Sql\Expression('NOW()'),
+                        'update_date' => new Sql\Expression('NOW()'),
                     ], $userValuePrimaryKey));
                     $ordering = 1;
 
@@ -750,8 +679,8 @@ class SpecificationsService
 
                     foreach ($value as $oneValue) {
                         $userValueDataTable->insert(array_replace([
-                            'ordering'     => $ordering,
-                            'value'        => $oneValue
+                            'ordering' => $ordering,
+                            'value'    => $oneValue,
                         ], $userValuePrimaryKey));
 
                         $ordering++;
@@ -768,14 +697,14 @@ class SpecificationsService
                 // insert update value
                 $userValueData = $userValueDataTable->select($userValuePrimaryKey)->current();
 
-                if ($value == self::NULL_VALUE_STR) {
+                if ($value === self::NULL_VALUE_STR) {
                     $value = null;
                 }
 
                 if ($userValueData) {
                     $valueChanged = $value === null
                         ? $userValueData['value'] !== null
-                        : $userValueData['value'] != $value;
+                        : $userValueData['value'] !== $value;
                 } else {
                     $valueChanged = true;
                 }
@@ -784,11 +713,11 @@ class SpecificationsService
                     if (! $userValue) {
                         $this->userValueTable->insert(array_replace([
                             'add_date'    => new Sql\Expression('NOW()'),
-                            'update_date' => new Sql\Expression('NOW()')
+                            'update_date' => new Sql\Expression('NOW()'),
                         ], $userValuePrimaryKey));
                     } else {
                         $this->userValueTable->update([
-                            'update_date' => new Sql\Expression('NOW()')
+                            'update_date' => new Sql\Expression('NOW()'),
                         ], $userValuePrimaryKey);
                     }
 
@@ -836,7 +765,7 @@ class SpecificationsService
 
         $result = [];
         foreach ($this->attributeTable->selectWith($select) as $row) {
-            $result[] = (int)$row['id'];
+            $result[] = (int) $row['id'];
         }
 
         $this->engineAttributes = $result;
@@ -846,7 +775,6 @@ class SpecificationsService
 
     /**
      * @param array $attribute
-     * @param int $itemId
      */
     private function propageteEngine($attribute, int $itemId)
     {
@@ -859,7 +787,7 @@ class SpecificationsService
         }
 
         $vehicles = $this->itemModel->getTable()->select([
-            'engine_item_id' => $itemId
+            'engine_item_id' => $itemId,
         ]);
 
         foreach ($vehicles as $vehicle) {
@@ -878,9 +806,9 @@ class SpecificationsService
 
     private function haveOwnAttributeValue(int $attributeId, int $itemId): bool
     {
-        return (bool)$this->userValueTable->select([
+        return (bool) $this->userValueTable->select([
             'attribute_id' => $attributeId,
-            'item_id'      => $itemId
+            'item_id'      => $itemId,
         ])->current();
     }
 
@@ -893,7 +821,7 @@ class SpecificationsService
             $haveValue = $this->haveOwnAttributeValue($attribute['id'], $childId);
 
             if (! $haveValue) {
-                $value = $this->calcInheritedValue($attribute, $childId);
+                $value   = $this->calcInheritedValue($attribute, $childId);
                 $changed = $this->setActualValue($attribute, $childId, $value);
                 if ($changed) {
                     $this->propagateInheritance($attribute, $childId);
@@ -924,10 +852,10 @@ class SpecificationsService
         return $this->picture->getRow([
             'status' => Picture::STATUS_ACCEPTED,
             'item'   => [
-                'ancestor_or_self' => $car['id']
+                'ancestor_or_self' => $car['id'],
             ],
             'order'  => $order,
-            'group'  => ['picture_item.perspective_id']
+            'group'  => ['picture_item.perspective_id'],
         ]);
     }
 
@@ -936,12 +864,12 @@ class SpecificationsService
         $defaults = [
             'zone'      => null,
             'parent'    => null,
-            'recursive' => false
+            'recursive' => false,
         ];
-        $options = array_merge($defaults, $options);
+        $options  = array_merge($defaults, $options);
 
-        $zone = $options['zone'];
-        $parent = $options['parent'];
+        $zone      = $options['zone'];
+        $parent    = $options['parent'];
         $recursive = $options['recursive'];
 
         $this->loadAttributes();
@@ -995,7 +923,7 @@ class SpecificationsService
                 $attr['childs'] = $this->getAttributes([
                     'zone'      => $zone,
                     'parent'    => $attr['id'],
-                    'recursive' => $recursive
+                    'recursive' => $recursive,
                 ]);
             }
         }
@@ -1005,12 +933,9 @@ class SpecificationsService
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $attribute
-     * @param int $itemId
-     * @return array|null
      * @throws Exception
      */
-    public function getActualValue(int $attribute, int $itemId)
+    public function getActualValue(int $attribute, int $itemId): ?array
     {
         if (! $itemId) {
             throw new Exception("item_id not set");
@@ -1027,7 +952,7 @@ class SpecificationsService
         $select->columns(['value'])
             ->where([
                 'attribute_id' => $attribute['id'],
-                'item_id'      => $itemId
+                'item_id'      => $itemId,
             ]);
 
         if ($attribute['isMultiple']) {
@@ -1055,9 +980,6 @@ class SpecificationsService
     }
 
     /**
-     * @param int $attributeId
-     * @param int $itemId
-     * @param int $userId
      * @throws Exception
      */
     public function deleteUserValue(int $attributeId, int $itemId, int $userId)
@@ -1074,15 +996,15 @@ class SpecificationsService
         $valueDataTable = $this->getUserValueDataTable($attribute['typeId']);
 
         $valueDataTable->delete([
-            'attribute_id = ?' => (int)$attribute['id'],
+            'attribute_id = ?' => (int) $attribute['id'],
             'item_id = ?'      => $itemId,
-            'user_id = ?'      => $userId
+            'user_id = ?'      => $userId,
         ]);
 
         $this->userValueTable->delete([
-            'attribute_id = ?' => (int)$attribute['id'],
+            'attribute_id = ?' => (int) $attribute['id'],
             'item_id = ?'      => $itemId,
-            'user_id = ?'      => $userId
+            'user_id = ?'      => $userId,
         ]);
 
         $this->updateActualValue($attribute['id'], $itemId);
@@ -1111,13 +1033,13 @@ class SpecificationsService
     {
         $options = array_merge([
             'contextCarId' => null,
-            'language'   => 'en'
+            'language'     => 'en',
         ], $options);
 
-        $language = $options['language'];
-        $contextCarId = (int)$options['contextCarId'];
+        $language     = $options['language'];
+        $contextCarId = (int) $options['contextCarId'];
 
-        $topPerspectives = [10, 1, 7, 8, 11, 12, 2, 4, 13, 5];
+        $topPerspectives    = [10, 1, 7, 8, 11, 12, 2, 4, 13, 5];
         $bottomPerspectives = [13, 2, 9, 6, 5];
 
         $ids = [];
@@ -1130,7 +1052,7 @@ class SpecificationsService
         $zoneIds = [];
         foreach ($cars as $car) {
             $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
-            $zoneId = $this->getZoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
+            $zoneId         = $this->getZoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
 
             $zoneIds[$zoneId] = true;
         }
@@ -1140,14 +1062,14 @@ class SpecificationsService
         if ($zoneMixed) {
             $specsZoneId = null;
         } else {
-            $keys = array_keys($zoneIds);
+            $keys        = array_keys($zoneIds);
             $specsZoneId = reset($keys);
         }
 
         $attributes = $this->getAttributes([
             'zone'      => $specsZoneId,
             'recursive' => true,
-            'parent'    => 0
+            'parent'    => 0,
         ]);
 
         $engineNameAttr = 100;
@@ -1177,14 +1099,14 @@ class SpecificationsService
         unset($itemActualValues); // prevent future bugs
 
         foreach ($cars as $car) {
-            $itemId = (int)$car['id'];
+            $itemId = (int) $car['id'];
 
             //$values = $this->loadValues($attributes, $itemId);
-            $values = isset($actualValues[$itemId]) ? $actualValues[$itemId] : [];
+            $values = $actualValues[$itemId] ?? [];
 
             // append engine name
             if (! (isset($values[$engineNameAttr]) && $values[$engineNameAttr]) && $car['engine_item_id']) {
-                $engineRow = $this->itemModel->getTable()->select(['id' => (int)$car['engine_item_id']])->current();
+                $engineRow = $this->itemModel->getTable()->select(['id' => (int) $car['engine_item_id']])->current();
                 if ($engineRow) {
                     $values[$engineNameAttr] = $engineRow['name'];
                 }
@@ -1198,12 +1120,12 @@ class SpecificationsService
                 $name = $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language);
             }
 
-            $topPicture = $this->specPicture($car, $topPerspectives);
+            $topPicture        = $this->specPicture($car, $topPerspectives);
             $topPictureRequest = null;
             if ($topPicture) {
                 $topPictureRequest = $topPicture['image_id'];
             }
-            $bottomPicture = $this->specPicture($car, $bottomPerspectives);
+            $bottomPicture        = $this->specPicture($car, $bottomPerspectives);
             $bottomPictureRequest = null;
             if ($bottomPicture) {
                 $bottomPictureRequest = $bottomPicture['image_id'];
@@ -1221,7 +1143,7 @@ class SpecificationsService
                 'bottomPicture'        => $bottomPicture,
                 'bottomPictureRequest' => $bottomPictureRequest,
                 'carType'              => null,
-                'values'               => $values
+                'values'               => $values,
             ];
         }
 
@@ -1253,7 +1175,7 @@ class SpecificationsService
             if (count($attribute['childs']) > 0) {
                 $haveValue = true;
             } else {
-                $id = $attribute['id'];
+                $id        = $attribute['id'];
                 $haveValue = false;
                 foreach ($cars as $car) {
                     if (isset($car['values'][$id])) {
@@ -1337,17 +1259,17 @@ class SpecificationsService
                 return $value;
 
             case 5: // checkbox
-                return is_null($value) ? null : ($value ? 'да' : 'нет');
+                return $value === null ? null : ($value ? 'да' : 'нет');
 
             case 6: // select
             case 7: // select
                 if ($value) {
                     if (is_array($value)) {
-                        $text = [];
+                        $text     = [];
                         $nullText = false;
                         foreach ($value as $v) {
                             if ($v === null) {
-                                $text[] = null;
+                                $text[]   = null;
                                 $nullText = true;
                             } else {
                                 $text[] = $this->getListOptionsText($attribute['id'], $v);
@@ -1369,7 +1291,7 @@ class SpecificationsService
 
         $userValueDataRows = $userValuesDataTable->select([
             'attribute_id' => $attribute['id'],
-            'item_id'      => $itemId
+            'item_id'      => $itemId,
         ]);
 
         // group by users
@@ -1385,11 +1307,11 @@ class SpecificationsService
         if (count($data) <= 0) {
             return [
                 'value' => null,
-                'empty' => true
+                'empty' => true,
             ];
         }
 
-        $idx = 0;
+        $idx      = 0;
         $registry = $freshness = $ratios = [];
         foreach ($data as $uid => $valueRows) {
             if ($attribute['isMultiple']) {
@@ -1407,7 +1329,7 @@ class SpecificationsService
             $row = $this->userValueTable->select([
                 'attribute_id' => $attribute['id'],
                 'item_id'      => $itemId,
-                'user_id'      => $uid
+                'user_id'      => $uid,
             ])->current();
             if (! $row) {
                 throw new Exception('Row(rows) without descriptors');
@@ -1423,12 +1345,12 @@ class SpecificationsService
 
             if ($matchRegIdx === null) {
                 $registry[$idx] = $value;
-                $matchRegIdx = $idx;
+                $matchRegIdx    = $idx;
                 $idx++;
             }
 
             if (! isset($ratios[$matchRegIdx])) {
-                $ratios[$matchRegIdx] = 0;
+                $ratios[$matchRegIdx]    = 0;
                 $freshness[$matchRegIdx] = null;
             }
             $ratios[$matchRegIdx] += $this->getUserValueWeight($uid);
@@ -1440,63 +1362,56 @@ class SpecificationsService
 
         // select max
         $maxValueRatio = 0;
-        $maxValueIdx = null;
+        $maxValueIdx   = null;
         foreach ($ratios as $idx => $ratio) {
-            if (is_null($maxValueIdx) || $maxValueRatio <= $ratio) {
-                $maxValueIdx = $idx;
+            if ($maxValueIdx === null || $maxValueRatio <= $ratio) {
+                $maxValueIdx   = $idx;
                 $maxValueRatio = $ratio;
             }
         }
         $actualValue = $registry[$maxValueIdx];
-        $empty = false;
+        $empty       = false;
 
         return [
             'value' => $actualValue,
-            'empty' => $empty
+            'empty' => $empty,
         ];
     }
 
-    /**
-     * @param int $attrId
-     * @return boolean
-     */
-    private function isEngineAttributeId(int $attrId)
+    private function isEngineAttributeId(int $attrId): bool
     {
         return in_array($attrId, $this->getEngineAttributeIds());
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     *
-     * @param array $attribute
-     * @param int $itemId
-     * @return mixed
+     * @param array|ArrayAccess $attribute
      * @throws Exception
      */
-    private function calcEngineValue($attribute, int $itemId)
+    private function calcEngineValue($attribute, int $itemId): array
     {
         if (! $this->isEngineAttributeId($attribute['id'])) {
             return [
                 'empty' => true,
-                'value' => null
+                'value' => null,
             ];
         }
 
         $carRow = $this->itemModel->getTable()->select([
-            'id' => $itemId
+            'id' => $itemId,
         ])->current();
 
         if (! $carRow) {
             return [
                 'empty' => true,
-                'value' => null
+                'value' => null,
             ];
         }
 
         if (! $carRow['engine_item_id']) {
             return [
                 'empty' => true,
-                'value' => null
+                'value' => null,
             ];
         }
 
@@ -1506,25 +1421,25 @@ class SpecificationsService
             $valueDataRow = $valueDataTable->select([
                 'attribute_id' => $attribute['id'],
                 'item_id'      => $carRow['engine_item_id'],
-                'value IS NOT NULL'
+                'value IS NOT NULL',
             ])->current();
 
             if ($valueDataRow) {
                 return [
                     'empty' => false,
-                    'value' => $valueDataRow['value']
+                    'value' => $valueDataRow['value'],
                 ];
             } else {
                 return [
                     'empty' => true,
-                    'value' => null
+                    'value' => null,
                 ];
             }
         } else {
             $valueDataRows = $valueDataTable->select([
                 'attribute_id' => $attribute['id'],
                 'item_id'      => $carRow['engine_item_id'],
-                'value IS NOT NULL'
+                'value IS NOT NULL',
             ]);
 
             if (count($valueDataRows)) {
@@ -1535,12 +1450,12 @@ class SpecificationsService
 
                 return [
                     'empty' => false,
-                    'value' => $value
+                    'value' => $value,
                 ];
             } else {
                 return [
                     'empty' => true,
-                    'value' => null
+                    'value' => null,
                 ];
             }
         }
@@ -1548,16 +1463,14 @@ class SpecificationsService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param $attribute
-     * @param int $itemId
-     * @return array
+     * @param array|ArrayAccess $attribute
      * @throws Exception
      */
-    private function calcInheritedValue($attribute, int $itemId)
+    private function calcInheritedValue($attribute, int $itemId): array
     {
         $actualValue = [
             'empty' => true,
-            'value' => null
+            'value' => null,
         ];
 
         $parentIds = $this->itemParent->getParentIds($itemId);
@@ -1566,13 +1479,13 @@ class SpecificationsService
 
         if (count($parentIds) > 0) {
             if (! $attribute['isMultiple']) {
-                $idx = 0;
+                $idx      = 0;
                 $registry = [];
-                $ratios = [];
+                $ratios   = [];
 
                 $valueDataRows = $valueDataTable->select([
                     'attribute_id' => $attribute['id'],
-                    new Sql\Predicate\In('item_id', $parentIds)
+                    new Sql\Predicate\In('item_id', $parentIds),
                 ]);
 
                 foreach ($valueDataRows as $valueDataRow) {
@@ -1588,7 +1501,7 @@ class SpecificationsService
 
                     if ($matchRegIdx === null) {
                         $registry[$idx] = $value;
-                        $matchRegIdx = $idx;
+                        $matchRegIdx    = $idx;
                         $idx++;
                     }
 
@@ -1600,20 +1513,20 @@ class SpecificationsService
 
                 // select max
                 $maxValueRatio = 0;
-                $maxValueIdx = null;
+                $maxValueIdx   = null;
                 foreach ($ratios as $idx => $ratio) {
-                    if (is_null($maxValueIdx)) {
-                        $maxValueIdx = $idx;
+                    if ($maxValueIdx === null) {
+                        $maxValueIdx   = $idx;
                         $maxValueRatio = $ratio;
                     } elseif ($maxValueRatio <= $ratio) {
-                        $maxValueIdx = $idx;
+                        $maxValueIdx   = $idx;
                         $maxValueRatio = $ratio;
                     }
                 }
                 if ($maxValueIdx !== null) {
                     $actualValue = [
                         'empty' => false,
-                        'value' => $registry[$maxValueIdx]
+                        'value' => $registry[$maxValueIdx],
                     ];
                 }
             } else {
@@ -1627,12 +1540,9 @@ class SpecificationsService
     /**
      * @suppress PhanDeprecatedFunction
      * @param $attribute
-     * @param int $itemId
-     * @param array $actualValue
-     * @return bool
      * @throws Exception
      */
-    private function setActualValue($attribute, int $itemId, array $actualValue)
+    private function setActualValue($attribute, int $itemId, array $actualValue): bool
     {
         $valueDataTable = $this->getValueDataTable($attribute['typeId']);
 
@@ -1681,7 +1591,7 @@ class SpecificationsService
                 foreach ($actualValue['value'] as $ordering => $value) {
                     $result = $stmt->execute(array_replace([
                         'ordering' => $ordering,
-                        'value'    => $value
+                        'value'    => $value,
                     ], $primaryKey));
 
                     if ($result->getAffectedRows() > 0) {
@@ -1694,10 +1604,10 @@ class SpecificationsService
                     VALUES (:attribute_id, :item_id, :value)
                     ON DUPLICATE KEY UPDATE value = VALUES(value)
                 ', [
-                    'value'        => $actualValue['value'],
-                    'attribute_id' => $attribute['id'],
-                    'item_id'      => $itemId,
-                ]);
+    'value'        => $actualValue['value'],
+    'attribute_id' => $attribute['id'],
+    'item_id'      => $itemId,
+]);
 
                 if ($result->getAffectedRows() > 0) {
                     $somethingChanges = true;
@@ -1706,7 +1616,7 @@ class SpecificationsService
 
             if ($somethingChanges) {
                 $this->valueTable->update([
-                    'update_date' => new Sql\Expression('now()')
+                    'update_date' => new Sql\Expression('now()'),
                 ], $primaryKey);
             }
         }
@@ -1742,7 +1652,7 @@ class SpecificationsService
     /**
      * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
-     * @return boolean|array
+     * @return bool|array
      */
     public function hasSpecs($itemId)
     {
@@ -1758,20 +1668,20 @@ class SpecificationsService
 
             $result = [];
             foreach ($itemId as $id) {
-                $result[(int)$id] = false;
+                $result[(int) $id] = false;
             }
 
             foreach ($this->valueTable->selectWith($select) as $row) {
-                $result[(int)$row['item_id']] = true;
+                $result[(int) $row['item_id']] = true;
             }
 
             return $result;
         }
 
-        $select->where(['item_id' => (int)$itemId])
+        $select->where(['item_id' => (int) $itemId])
             ->limit(1);
 
-        return (bool)$this->valueTable->selectWith($select)->current();
+        return (bool) $this->valueTable->selectWith($select)->current();
     }
 
     public function twinsGroupsHasSpecs(array $groupIds): array
@@ -1781,8 +1691,6 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
-     * @param int $itemId
-     * @return int
      */
     public function getSpecsCount(int $itemId): int
     {
@@ -1792,13 +1700,13 @@ class SpecificationsService
 
         $row = $this->valueTable->selectWith($select)->current();
 
-        return $row ? (int)$row['count'] : 0;
+        return $row ? (int) $row['count'] : 0;
     }
 
     /**
      * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
-     * @return boolean|array
+     * @return bool|array
      */
     public function hasChildSpecs($itemId)
     {
@@ -1816,10 +1724,10 @@ class SpecificationsService
 
             $result = [];
             foreach ($itemId as $id) {
-                $result[(int)$id] = false;
+                $result[(int) $id] = false;
             }
             foreach ($this->valueTable->selectWith($select) as $row) {
-                $result[(int)$row['parent_id']] = true;
+                $result[(int) $row['parent_id']] = true;
             }
             return $result;
         }
@@ -1854,9 +1762,6 @@ class SpecificationsService
         }
     }
 
-    /**
-     * @param int $itemId
-     */
     public function updateInheritedValues(int $itemId)
     {
         foreach ($this->getAttributes() as $attribute) {
@@ -1871,10 +1776,8 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param $itemId
-     * @return array
      */
-    public function getContributors($itemId): array
+    public function getContributors(int $itemId): array
     {
         if (! $itemId) {
             return [];
@@ -1882,13 +1785,13 @@ class SpecificationsService
 
         $select = new Sql\Select($this->userValueTable->getTable());
         $select->columns(['user_id', 'c' => new Sql\Expression('COUNT(1)')])
-            ->where([new Sql\Predicate\In('item_id', (array)$itemId)])
+            ->where([new Sql\Predicate\In('item_id', (array) $itemId)])
             ->group('user_id')
             ->order('c desc');
 
         $result = [];
         foreach ($this->userValueTable->selectWith($select) as $row) {
-            $result[(int)$row['user_id']] = (int)$row['c'];
+            $result[(int) $row['user_id']] = (int) $row['c'];
         }
 
         return $result;
@@ -1910,11 +1813,11 @@ class SpecificationsService
                 return $value;
 
             case 5: // checkbox
-                return is_null($value) ? null : ($value ? 1 : 0);
+                return $value === null ? null : ($value ? 1 : 0);
 
             case 6: // select
             case 7: // tree select
-                return is_null($value) ? null : (int)$value;
+                return $value === null ? null : (int) $value;
                 break;
         }
         return null;
@@ -1936,9 +1839,9 @@ class SpecificationsService
         $select = new Sql\Select($valuesTable->getTable());
         $select->columns(['value'])
             ->where([
-                'attribute_id' => (int)$attribute['id'],
+                'attribute_id' => (int) $attribute['id'],
                 'item_id'      => $itemId,
-                'user_id'      => $userId
+                'user_id'      => $userId,
             ]);
 
         if ($attribute['isMultiple']) {
@@ -1973,9 +1876,9 @@ class SpecificationsService
         $select = new Sql\Select($valuesTable->getTable());
         $select->columns(['value'])
             ->where([
-                'attribute_id' => (int)$attribute['id'],
+                'attribute_id' => (int) $attribute['id'],
                 'item_id'      => $itemId,
-                'user_id'      => $userId
+                'user_id'      => $userId,
             ]);
 
         if ($attribute['isMultiple']) {
@@ -1990,28 +1893,24 @@ class SpecificationsService
         if (count($values) <= 0) {
             return [
                 'value' => null,
-                'empty' => false
+                'empty' => false,
             ];
         }
 
         if ($attribute['isMultiple']) {
             return [
                 'value' => $values,
-                'empty' => $values === [null]
+                'empty' => $values === [null],
             ];
         }
 
         return [
             'value' => $values[0],
-            'empty' => $values[0] === null
+            'empty' => $values[0] === null,
         ];
     }
 
     /**
-     * @param int $attributeId
-     * @param int $itemId
-     * @param int $userId
-     * @param string $language
      * @return mixed|string|null
      * @throws Exception
      */
@@ -2032,9 +1931,9 @@ class SpecificationsService
 
         $select->columns(['value'])
             ->where([
-                'attribute_id' => (int)$attribute['id'],
+                'attribute_id' => (int) $attribute['id'],
                 'item_id'      => $itemId,
-                'user_id'      => $userId
+                'user_id'      => $userId,
             ]);
 
         if ($attribute['isMultiple']) {
@@ -2048,7 +1947,7 @@ class SpecificationsService
 
         if (count($values) > 1) {
             return implode(', ', $values);
-        } elseif (count($values) == 1) {
+        } elseif (count($values) === 1) {
             if ($values[0] === null) {
                 return null;
             } else {
@@ -2084,11 +1983,9 @@ class SpecificationsService
     }
 
     /**
-     * @param array $itemIds
-     * @return array
      * @throws Exception
      */
-    private function getItemsActualValues($itemIds)
+    private function getItemsActualValues(array $itemIds): array
     {
         if (count($itemIds) <= 0) {
             return [];
@@ -2114,8 +2011,8 @@ class SpecificationsService
             }
 
             foreach ($valueDataTable->selectWith($select) as $row) {
-                $aid = (int)$row['attribute_id'];
-                $id = (int)$row['item_id'];
+                $aid   = (int) $row['attribute_id'];
+                $id    = (int) $row['item_id'];
                 $value = $this->prepareValue($typeId, $row['value']);
                 if (! isset($values[$id])) {
                     $values[$id] = [];
@@ -2150,13 +2047,13 @@ class SpecificationsService
 
         $attributes = $this->getAttributes([
             'zone'   => $zoneId,
-            'parent' => null
+            'parent' => null,
         ]);
 
         $requests = [];
 
         foreach ($attributes as $attribute) {
-            $typeId = $attribute['typeId'];
+            $typeId     = $attribute['typeId'];
             $isMultiple = $attribute['isMultiple'] ? 1 : 0;
             if ($typeId) {
                 if (! isset($requests[$typeId][$isMultiple])) {
@@ -2182,8 +2079,8 @@ class SpecificationsService
                 }
 
                 foreach ($valueDataTable->selectWith($select) as $row) {
-                    $aid = (int)$row['attribute_id'];
-                    $id = (int)$row['item_id'];
+                    $aid   = (int) $row['attribute_id'];
+                    $id    = (int) $row['item_id'];
                     $value = $this->prepareValue($typeId, $row['value']);
                     if (! isset($values[$id])) {
                         $values[$id] = [];
@@ -2204,21 +2101,19 @@ class SpecificationsService
     }
 
     /**
-     * @param int $typeId
-     * @return array
      * @throws Exception
      */
-    public function getType(int $typeId)
+    public function getType(int $typeId): array
     {
         if ($this->types === null) {
             $this->types = [];
             foreach ($this->typeTable->select() as $row) {
-                $this->types[(int)$row['id']] = [
-                    'id'        => (int)$row['id'],
+                $this->types[(int) $row['id']] = [
+                    'id'        => (int) $row['id'],
                     'name'      => $row['name'],
                     'element'   => $row['element'],
                     'maxlength' => $row['maxlength'],
-                    'size'      => $row['size']
+                    'size'      => $row['size'],
                 ];
             }
         }
@@ -2250,20 +2145,20 @@ class SpecificationsService
             'item_id = ?'      => $itemId,
         ]);
 
-        $userValues = [];
+        $userValues   = [];
         $uniqueValues = [];
         foreach ($userValueRows as $userValueRow) {
-            $v = $this->getUserValue($attribute['id'], $itemId, $userValueRow['user_id']);
-            $serializedValue = serialize($v);
-            $uniqueValues[] = $serializedValue;
+            $v                                    = $this->getUserValue($attribute['id'], $itemId, $userValueRow['user_id']);
+            $serializedValue                      = serialize($v);
+            $uniqueValues[]                       = $serializedValue;
             $userValues[$userValueRow['user_id']] = [
                 'value' => $serializedValue,
-                'date'  => $userValueRow['update_date']
+                'date'  => $userValueRow['update_date'],
             ];
         }
 
         $uniqueValues = array_unique($uniqueValues);
-        $hasConflict = count($uniqueValues) > 1;
+        $hasConflict  = count($uniqueValues) > 1;
 
         $valueRow = $this->valueTable->select([
             'attribute_id' => $attribute['id'],
@@ -2276,7 +2171,7 @@ class SpecificationsService
         }
 
         $this->valueTable->update([
-            'conflict' => $hasConflict ? 1 : 0
+            'conflict' => $hasConflict ? 1 : 0,
         ], [
             'attribute_id' => $attribute['id'],
             'item_id'      => $itemId,
@@ -2287,10 +2182,10 @@ class SpecificationsService
         if ($hasConflict) {
             $actualValue = serialize($this->getActualValue($attributeId, $itemId));
 
-            $minDate = null; // min date of actual value
+            $minDate           = null; // min date of actual value
             $actualValueVoters = 0;
             foreach ($userValues as $userId => $userValue) {
-                if ($userValue['value'] == $actualValue) {
+                if ($userValue['value'] === $actualValue) {
                     $actualValueVoters++;
                     if ($minDate === null || $minDate > $userValue['date']) {
                         $minDate = $userValue['date'];
@@ -2299,13 +2194,13 @@ class SpecificationsService
             }
 
             foreach ($userValues as $userId => $userValue) {
-                $matchActual = $userValue['value'] == $actualValue;
-                $conflict = $matchActual ? -1 : 1;
+                $matchActual = $userValue['value'] === $actualValue;
+                $conflict    = $matchActual ? -1 : 1;
 
                 if ($actualValueVoters > 1) {
                     if ($matchActual) {
-                        $isFirstMatchActual = $userValue['date'] == $minDate;
-                        $weight = $isFirstMatchActual ? self::WEIGHT_FIRST_ACTUAL : self::WEIGHT_SECOND_ACTUAL;
+                        $isFirstMatchActual = $userValue['date'] === $minDate;
+                        $weight             = $isFirstMatchActual ? self::WEIGHT_FIRST_ACTUAL : self::WEIGHT_SECOND_ACTUAL;
                     } else {
                         $weight = self::WEIGHT_WRONG;
                     }
@@ -2315,7 +2210,7 @@ class SpecificationsService
 
                 $affectedRows = $this->userValueTable->update([
                     'conflict' => $conflict,
-                    'weight'   => $weight
+                    'weight'   => $weight,
                 ], [
                     'user_id = ?'      => $userId,
                     'attribute_id = ?' => $attributeId,
@@ -2329,7 +2224,7 @@ class SpecificationsService
         } else {
             $affectedRows = $this->userValueTable->update([
                 'conflict' => 0,
-                'weight'   => self::WEIGHT_NONE
+                'weight'   => self::WEIGHT_NONE,
             ], [
                 'attribute_id = ?' => $attributeId,
                 'item_id = ?'      => $itemId,
@@ -2349,7 +2244,7 @@ class SpecificationsService
      */
     public function refreshUserConflicts($userId)
     {
-        $userId = (array)$userId;
+        $userId = (array) $userId;
 
         if (count($userId)) {
             $pSelect = 'SELECT sum(weight) FROM attrs_user_values WHERE user_id = users.id AND weight > 0';
@@ -2363,7 +2258,7 @@ class SpecificationsService
             $this->userModel->getTable()->update([
                 'specs_weight' => $expr,
             ], [
-                new Sql\Predicate\In('id', $userId)
+                new Sql\Predicate\In('id', $userId),
             ]);
         }
     }
@@ -2375,8 +2270,8 @@ class SpecificationsService
             ->quantifier($select::QUANTIFIER_DISTINCT)
             ->join(
                 'attrs_user_values',
-                'attrs_values.attribute_id = attrs_user_values.attribute_id ' .
-                    'and attrs_values.item_id = attrs_user_values.item_id',
+                'attrs_values.attribute_id = attrs_user_values.attribute_id '
+                    . 'and attrs_values.item_id = attrs_user_values.item_id',
                 []
             )
             ->where(['attrs_user_values.conflict']);
@@ -2395,22 +2290,22 @@ class SpecificationsService
 
     public function getConflicts(int $userId, $filter, int $page, int $perPage)
     {
-        $userId = (int)$userId;
+        $userId = (int) $userId;
 
         $select = new Sql\Select($this->valueTable->getTable());
         $select
             ->join(
                 'attrs_user_values',
-                'attrs_values.attribute_id = attrs_user_values.attribute_id ' .
-                    'and attrs_values.item_id = attrs_user_values.item_id',
+                'attrs_values.attribute_id = attrs_user_values.attribute_id '
+                    . 'and attrs_values.item_id = attrs_user_values.item_id',
                 []
             )
             ->where(['attrs_user_values.user_id' => $userId])
             ->order('attrs_values.update_date desc');
 
-        if ($filter == 'minus-weight') {
+        if ($filter === 'minus-weight') {
             $select->where(['attrs_user_values.weight < 0']);
-        } elseif ($filter == 0) {
+        } elseif ($filter === 0) {
             $select->where(['attrs_values.conflict']);
         } elseif ($filter > 0) {
             $select->where(['attrs_user_values.conflict > 0']);
@@ -2439,23 +2334,23 @@ class SpecificationsService
             }
 
             $attributeName = [];
-            $cAttr = $attribute;
+            $cAttr         = $attribute;
             do {
                 $attributeName[] = $this->translator->translate($cAttr['name']);
-                $cAttr = $this->getAttribute((int)$cAttr['parentId']);
+                $cAttr           = $this->getAttribute((int) $cAttr['parentId']);
             } while ($cAttr);
 
             $conflicts[] = [
-                'attribute_id' => (int)$valueRow['attribute_id'],
-                'item_id'      => (int)$valueRow['item_id'],
+                'attribute_id' => (int) $valueRow['attribute_id'],
+                'item_id'      => (int) $valueRow['item_id'],
                 'attribute'    => implode(' / ', array_reverse($attributeName)),
-                'unit'         => $unit
+                'unit'         => $unit,
             ];
         }
 
         return [
             'conflicts' => $conflicts,
-            'paginator' => $paginator
+            'paginator' => $paginator,
         ];
     }
 
@@ -2466,7 +2361,7 @@ class SpecificationsService
 
         $userIds = [];
         foreach ($this->userValueTable->selectWith($select) as $row) {
-            $userIds[] = (int)$row['user_id'];
+            $userIds[] = (int) $row['user_id'];
         }
 
         $this->refreshUserConflicts($userIds);
@@ -2486,7 +2381,7 @@ class SpecificationsService
         );
 
         $this->userModel->getTable()->update([
-            'specs_weight' => $expr
+            'specs_weight' => $expr,
         ], []);
     }
 

@@ -2,51 +2,42 @@
 
 namespace Application\Controller\Api;
 
-use Exception;
-use Zend\InputFilter\InputFilter;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
+use Application\Hydrator\Api\RestHydrator;
 use Autowp\User\Controller\Plugin\User;
 use Autowp\Votings;
-use Application\Controller\Plugin\ForbiddenAction;
-use Application\Hydrator\Api\RestHydrator;
+use Exception;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
- * Class VotingController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  */
 class VotingController extends AbstractRestfulController
 {
-    /**
-     * @var Votings\Votings
-     */
-    private $service;
+    /** @var Votings\Votings */
+    private Votings\Votings $service;
 
-    /**
-     * @var InputFilter
-     */
-    private $variantVoteInputFilter;
+    /** @var InputFilter */
+    private InputFilter $variantVoteInputFilter;
 
-    /**
-     * @var RestHydrator
-     */
-    private $variantVoteHydrator;
+    /** @var RestHydrator */
+    private RestHydrator $variantVoteHydrator;
 
     public function __construct(
         Votings\Votings $service,
         InputFilter $variantVoteInputFilter,
         RestHydrator $variantVoteHydrator
     ) {
-        $this->service = $service;
+        $this->service                = $service;
         $this->variantVoteInputFilter = $variantVoteInputFilter;
-        $this->variantVoteHydrator = $variantVoteHydrator;
+        $this->variantVoteHydrator    = $variantVoteHydrator;
     }
 
     /**
@@ -55,12 +46,12 @@ class VotingController extends AbstractRestfulController
      */
     public function getItemAction()
     {
-        $id = (int)$this->params('id');
-        $filter = (int)$this->params()->fromQuery('filter');
+        $id     = (int) $this->params('id');
+        $filter = (int) $this->params()->fromQuery('filter');
 
         $user = $this->user()->get();
 
-        $data = $this->service->getVoting($id, $filter, $user ? (int)$user['id'] : 0);
+        $data = $this->service->getVoting($id, $filter, $user ? (int) $user['id'] : 0);
 
         if (! $data) {
             return $this->notFoundAction();
@@ -69,7 +60,7 @@ class VotingController extends AbstractRestfulController
         $strategy = new DateTimeFormatterStrategy();
 
         $data['begin_date'] = $strategy->extract($data['begin_date']);
-        $data['end_date'] = $strategy->extract($data['end_date']);
+        $data['end_date']   = $strategy->extract($data['end_date']);
 
         return new JsonModel($data);
     }
@@ -88,7 +79,7 @@ class VotingController extends AbstractRestfulController
 
         $this->variantVoteHydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => isset($values['fields']) ? $values['fields'] : []
+            'fields'   => $values['fields'] ?? [],
         ]);
 
         $result = [];
@@ -97,7 +88,7 @@ class VotingController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $result
+            'items' => $result,
         ]);
     }
 
@@ -108,10 +99,10 @@ class VotingController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $id = (int)$this->params('id');
+        $id = (int) $this->params('id');
 
-        $data = $this->processBodyContent($this->getRequest());
-        $variant = isset($data['vote']) ? (array)$data['vote'] : [];
+        $data    = $this->processBodyContent($this->getRequest());
+        $variant = isset($data['vote']) ? (array) $data['vote'] : [];
 
         $success = $this->service->vote(
             $id,

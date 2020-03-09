@@ -2,81 +2,61 @@
 
 namespace Application\Controller\Api;
 
-use DateTime;
-use Zend\Db\Sql;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Paginator;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
+use Application\Comments;
+use Application\Hydrator\Api\RestHydrator;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
-use Application\Comments;
-use Application\Controller\Plugin\ForbiddenAction;
-use Application\Hydrator\Api\RestHydrator;
+use DateTime;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Sql;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Paginator;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function array_key_exists;
+use function array_keys;
 
 /**
- * Class ForumController
- * @package Application\Controller\Api
- *
  * @method \Autowp\User\Controller\Plugin\User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */
 class ForumController extends AbstractRestfulController
 {
-    /**
-     * @var Forums
-     */
-    private $forums;
+    /** @var Forums */
+    private Forums $forums;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    /** @var User */
+    private User $userModel;
 
-    /**
-     * @var RestHydrator
-     */
-    private $themeHydrator;
+    /** @var RestHydrator */
+    private RestHydrator $themeHydrator;
 
-    /**
-     * @var RestHydrator
-     */
-    private $topicHydrator;
+    /** @var RestHydrator */
+    private RestHydrator $topicHydrator;
 
-    /**
-     * @var InputFilter
-     */
-    private $themeListInputFilter;
+    /** @var InputFilter */
+    private InputFilter $themeListInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $themeInputFilter;
+    /** @var InputFilter */
+    private InputFilter $themeInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $topicListInputFilter;
+    /** @var InputFilter */
+    private InputFilter $topicListInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $topicGetInputFilter;
+    /** @var InputFilter */
+    private InputFilter $topicGetInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $topicPutInputFilter;
+    /** @var InputFilter */
+    private InputFilter $topicPutInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $topicPostInputFilter;
+    /** @var InputFilter */
+    private InputFilter $topicPostInputFilter;
 
     public function __construct(
         Forums $forums,
@@ -90,15 +70,15 @@ class ForumController extends AbstractRestfulController
         InputFilter $topicPutInputFilter,
         InputFilter $topicPostInputFilter
     ) {
-        $this->forums = $forums;
-        $this->userModel = $userModel;
-        $this->themeHydrator = $themeHydrator;
-        $this->topicHydrator = $topicHydrator;
+        $this->forums               = $forums;
+        $this->userModel            = $userModel;
+        $this->themeHydrator        = $themeHydrator;
+        $this->topicHydrator        = $topicHydrator;
         $this->themeListInputFilter = $themeListInputFilter;
-        $this->themeInputFilter = $themeInputFilter;
+        $this->themeInputFilter     = $themeInputFilter;
         $this->topicListInputFilter = $topicListInputFilter;
-        $this->topicGetInputFilter = $topicGetInputFilter;
-        $this->topicPutInputFilter = $topicPutInputFilter;
+        $this->topicGetInputFilter  = $topicGetInputFilter;
+        $this->topicPutInputFilter  = $topicPutInputFilter;
         $this->topicPostInputFilter = $topicPostInputFilter;
     }
 
@@ -111,13 +91,13 @@ class ForumController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'subscriptionsCount' => $this->forums->getSubscribedTopicsCount($user['id'])
+            'subscriptionsCount' => $this->forums->getSubscribedTopicsCount($user['id']),
         ]);
     }
 
     public function getThemesAction()
     {
-        $user = $this->user()->get();
+        $user   = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
         $isModerator = $this->user()->inheritsRole('moder');
@@ -146,7 +126,7 @@ class ForumController extends AbstractRestfulController
         $this->themeHydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            'user_id'  => $userId
+            'user_id'  => $userId,
         ]);
 
         $items = [];
@@ -155,7 +135,7 @@ class ForumController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
@@ -172,7 +152,7 @@ class ForumController extends AbstractRestfulController
         $data = $this->themeInputFilter->getValues();
 
         $select = $this->forums->getThemeTable()->getSql()->select()
-            ->where(['id' => (int)$this->params('id')]);
+            ->where(['id' => (int) $this->params('id')]);
 
         if (! $isModerator) {
             $select->where(['not is_moderator']);
@@ -183,14 +163,14 @@ class ForumController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $user = $this->user()->get();
+        $user   = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
         $this->themeHydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
             'user_id'  => $userId,
-            'topics'   => $data['topics']
+            'topics'   => $data['topics'],
         ]);
 
         return new JsonModel($this->themeHydrator->extract($row));
@@ -198,7 +178,7 @@ class ForumController extends AbstractRestfulController
 
     public function getTopicsAction()
     {
-        $user = $this->user()->get();
+        $user   = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
         $isModerator = $this->user()->inheritsRole('moder');
@@ -226,7 +206,7 @@ class ForumController extends AbstractRestfulController
         }
 
         if ($data['theme_id']) {
-            $select->where(['forums_topics.theme_id' => (int)$data['theme_id']]);
+            $select->where(['forums_topics.theme_id' => (int) $data['theme_id']]);
         }
 
         if ($data['subscription']) {
@@ -248,7 +228,7 @@ class ForumController extends AbstractRestfulController
         $this->topicHydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            'user_id'  => $userId
+            'user_id'  => $userId,
         ]);
 
         $paginator = new Paginator\Paginator(
@@ -266,7 +246,7 @@ class ForumController extends AbstractRestfulController
 
         return new JsonModel([
             'items'     => $items,
-            'paginator' => $paginator->getPages()
+            'paginator' => $paginator->getPages(),
         ]);
     }
 
@@ -279,13 +259,13 @@ class ForumController extends AbstractRestfulController
 
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
 
-        $row = $this->forums->getTopic((int)$this->params('id'));
+        $row = $this->forums->getTopic((int) $this->params('id'));
         if (! $row) {
             return $this->notFoundAction();
         }
 
         $request = $this->getRequest();
-        $data = (array)$this->processBodyContent($request);
+        $data    = (array) $this->processBodyContent($request);
 
         $fields = [];
         foreach (array_keys($data) as $key) {
@@ -405,15 +385,15 @@ class ForumController extends AbstractRestfulController
                     [
                         'invalid_params' => [
                             'text' => [
-                                'invalid' => $this->translate('forums/need-wait-to-post')
-                            ]
-                        ]
+                                'invalid' => $this->translate('forums/need-wait-to-post'),
+                            ],
+                        ],
                     ]
                 )
             );
         }
 
-        $data['user_id'] = $user['id'];
+        $data['user_id']  = $user['id'];
         $data['theme_id'] = $theme['id'];
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $data['ip'] = $request->getServer('REMOTE_ADDR');
@@ -423,13 +403,13 @@ class ForumController extends AbstractRestfulController
         $this->userModel->getTable()->update([
             'forums_topics'     => new Sql\Expression('forums_topics + 1'),
             'forums_messages'   => new Sql\Expression('forums_messages + 1'),
-            'last_message_time' => new Sql\Expression('NOW()')
+            'last_message_time' => new Sql\Expression('NOW()'),
         ], [
-            'id' => $user['id']
+            'id' => $user['id'],
         ]);
 
         $url = $this->url()->fromRoute('api/forum/topic/item/get', [
-            'id' => $topicId
+            'id' => $topicId,
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -447,13 +427,13 @@ class ForumController extends AbstractRestfulController
 
         $data = $this->topicGetInputFilter->getValues();
 
-        $user = $this->user()->get();
+        $user   = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
         $isModerator = $this->user()->inheritsRole('moder');
 
         $select = $this->forums->getTopicTable()->getSql()->select();
-        $select->where(['forums_topics.id' => (int)$this->params('id')]);
+        $select->where(['forums_topics.id' => (int) $this->params('id')]);
 
         if (! $isModerator) {
             $select
@@ -470,7 +450,7 @@ class ForumController extends AbstractRestfulController
         $this->topicHydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            'user_id'  => $userId
+            'user_id'  => $userId,
         ]);
 
         return new JsonModel($this->topicHydrator->extract($row));

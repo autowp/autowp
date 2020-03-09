@@ -8,17 +8,14 @@ class PerspectiveHydrator extends RestHydrator
 {
     public function extract($object)
     {
-        $result = [
-            'id'   => (int)$object['id'],
-            'name' => $object['name']
+        return [
+            'id'   => (int) $object['id'],
+            'name' => $object['name'],
         ];
-
-        return $result;
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

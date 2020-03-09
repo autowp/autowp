@@ -5,20 +5,17 @@ namespace Application\Controller\Api;
 use Application\Hydrator\Api\VotingVariantVoteHydrator;
 use Autowp\Votings\Votings;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class VotingControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return VotingController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): VotingController
     {
-        $filters = $container->get('InputFilterManager');
+        $filters   = $container->get('InputFilterManager');
         $hydrators = $container->get('HydratorManager');
         return new VotingController(
             $container->get(Votings::class),

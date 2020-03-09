@@ -2,62 +2,55 @@
 
 namespace Application\Telegram\Command;
 
-use Exception;
-use Telegram\Bot\Commands\Command;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Math\Rand;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
+use Exception;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Math\Rand;
+use Telegram\Bot\Commands\Command;
+
+use function array_replace;
+use function count;
+use function preg_split;
+use function strcmp;
+use function trim;
+
+use const PHP_EOL;
 
 class MeCommand extends Command
 {
-    /**
-     * @var string Command Name
-     */
-    protected $name = "me";
+    protected string $name = "me";
 
-    /**
-     * @var string Command Description
-     */
-    protected $description = "Command to identify you as autowp.ru user";
+    protected string $description = "Command to identify you as autowp.ru user";
 
-    /**
-     * @var MessageService
-     */
-    private $message;
+    private MessageService $message;
 
-    /**
-     * @var TableGateway
-     */
-    private $telegramChatTable;
+    private TableGateway $telegramChatTable;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(MessageService $message, TableGateway $telegramChatTable, User $userModel)
     {
-        $this->message = $message;
+        $this->message           = $message;
         $this->telegramChatTable = $telegramChatTable;
-        $this->userModel = $userModel;
+        $this->userModel         = $userModel;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      * @throws Exception
      */
     public function handle($arguments)
     {
         $args = preg_split('|[[:space:]]+|', trim($arguments));
-        if ($args[0] == '') {
+        if ($args[0] === '') {
             $args = [];
         }
 
-        $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
+        $chatId = (int) $this->getUpdate()->getMessage()->getChat()->getId();
 
         $primaryKey = [
-            'chat_id' => $chatId
+            'chat_id' => $chatId,
         ];
 
         $telegramChatRow = $this->telegramChatTable->select($primaryKey)->current();
@@ -66,35 +59,35 @@ class MeCommand extends Command
             if (! $telegramChatRow || ! $telegramChatRow['user_id']) {
                 $this->replyWithMessage([
                     'disable_web_page_preview' => true,
-                    'text' => 'Use this command to identify you as autowp.ru user.' . PHP_EOL .
-                              'For example type "/me 12345" to identify you as user number 12345'
+                    'text'                     => 'Use this command to identify you as autowp.ru user.' . PHP_EOL
+                              . 'For example type "/me 12345" to identify you as user number 12345',
                 ]);
                 return;
             }
 
-            $userRow = $this->userModel->getRow((int)$telegramChatRow['user_id']);
+            $userRow = $this->userModel->getRow((int) $telegramChatRow['user_id']);
 
             if ($userRow) {
                 $this->replyWithMessage([
                     'disable_web_page_preview' => true,
-                    'text' => 'You identified as ' . $userRow['name']
+                    'text'                     => 'You identified as ' . $userRow['name'],
                 ]);
             }
 
             return;
         }
-        $userId = (int)$args[0];
+        $userId = (int) $args[0];
 
         $userRow = $this->userModel->getRow($userId);
 
         if (! $userRow) {
             $this->replyWithMessage([
-                'text' => 'User "' . $args[0] . '" not found'
+                'text' => 'User "' . $args[0] . '" not found',
             ]);
             return;
         }
 
-        if (count($args) == 1) {
+        if (count($args) === 1) {
             $token = Rand::getString(20);
 
             $set = ['token' => $token];
@@ -110,28 +103,28 @@ class MeCommand extends Command
             $this->message->send(null, $userRow['id'], $message);
 
             $this->replyWithMessage([
-                'text' => 'Check your personal messages / system notifications'
+                'text' => 'Check your personal messages / system notifications',
             ]);
             return;
         }
 
-        $token = (string)$args[1];
+        $token = (string) $args[1];
 
-        if (! $telegramChatRow || strcmp($telegramChatRow['token'], $token) != 0) {
+        if (! $telegramChatRow || strcmp($telegramChatRow['token'], $token) !== 0) {
             $command = '/me ' . $userRow['id'];
             $this->replyWithMessage([
-                'text' => "Token not matched. Try again with `$command`"
+                'text' => "Token not matched. Try again with `$command`",
             ]);
             return;
         }
 
         $this->telegramChatTable->update([
             'user_id' => $userRow['id'],
-            'token'   => null
+            'token'   => null,
         ], $primaryKey);
 
         $this->replyWithMessage([
-            'text' => "Complete. Nice to see you, `{$userRow['name']}`"
+            'text' => "Complete. Nice to see you, `{$userRow['name']}`",
         ]);
     }
 }

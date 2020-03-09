@@ -2,22 +2,19 @@
 
 namespace Application\Controller\Api\Service;
 
+use Application\Controller\Api\TrafficController as Controller;
 use Application\Hydrator\Api\TrafficHydrator;
 use Autowp\Traffic\TrafficControl;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Controller\Api\TrafficController as Controller;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class TrafficControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Controller
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
         $hydrators = $container->get('HydratorManager');
         return new Controller(

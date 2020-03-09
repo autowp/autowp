@@ -2,21 +2,25 @@
 
 namespace Application\View\Helper;
 
-use Application\Controller\PictureController;
-use Exception;
-use Zend\Http\Exception\InvalidArgumentException;
-use Zend\Http\Request;
-use Zend\Router\Http\TreeRouteStack;
-use Zend\Uri;
-use Zend\View\Helper\AbstractHtmlElement;
-use Autowp\User\Model\User as UserModel;
 use Application\Model\Picture;
+use Autowp\User\Model\User as UserModel;
+use Exception;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\Uri;
+use Laminas\View\Helper\AbstractHtmlElement;
+
+use function implode;
+use function in_array;
+use function mb_strlen;
+use function mb_strpos;
+use function mb_substr;
+use function preg_match;
+use function str_replace;
+use function strlen;
 
 class UserText extends AbstractHtmlElement
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $parseUrlHosts = [
         'www.autowp.ru',
         'en.autowp.ru',
@@ -28,37 +32,29 @@ class UserText extends AbstractHtmlElement
         'be.wheelsage.org',
         'br.wheelsage.org',
         'uk.wheelsage.org',
-        'wheelsage.org'
+        'wheelsage.org',
     ];
 
-    /**
-     * @var TreeRouteStack
-     */
+    /** @var TreeRouteStack */
     private $router;
 
-    /**
-     * @var Picture
-     */
+    /** @var Picture */
     private $picture;
 
-    /**
-     * @var UserModel
-     */
+    /** @var UserModel */
     private $userModel;
 
     public function __construct($router, Picture $picture, UserModel $userModel)
     {
-        $this->router = $router;
-        $this->picture = $picture;
+        $this->router    = $router;
+        $this->picture   = $picture;
         $this->userModel = $userModel;
     }
 
     /**
-     * @param $text
-     * @return array|string
      * @throws Exception
      */
-    public function __invoke($text)
+    public function __invoke(string $text): string
     {
         $out = [];
 
@@ -66,13 +62,13 @@ class UserText extends AbstractHtmlElement
         while ($text && preg_match($regexp, $text, $regs)) {
             if ($regs[1]) {
                 $umatch = $regs[1];
-                $url = $umatch;
+                $url    = $umatch;
             } else {
                 $umatch = $regs[2];
-                $url = 'http://' . $umatch;
+                $url    = 'http://' . $umatch;
             }
 
-            $linkPos = mb_strpos($text, $umatch);
+            $linkPos     = mb_strpos($text, $umatch);
             $matchLength = mb_strlen($umatch);
             if ($linkPos === false) {
                 throw new Exception("Error during parse urls");
@@ -93,11 +89,7 @@ class UserText extends AbstractHtmlElement
         return $out;
     }
 
-    /**
-     * @param string $text
-     * @return string
-     */
-    private function preparePlainText($text)
+    private function preparePlainText(string $text): string
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $out = $this->view->escapeHtml($text);
@@ -108,11 +100,10 @@ class UserText extends AbstractHtmlElement
 
     /**
      * @param $url
-     * @return bool|string
      * @throws Exception
      * @SuppressWarnings(PHPMD.EmptyCatchBlock)
      */
-    private function processHref($url)
+    private function processHref($url): string
     {
         try {
             $uri = Uri\UriFactory::factory($url);
@@ -160,17 +151,17 @@ class UserText extends AbstractHtmlElement
             return false;
         }
 
-        $userId = null;
+        $userId       = null;
         $userIdentity = $matches[1];
 
         $match = preg_match('|^user([0-9]+)$|isu', $userIdentity, $matches);
         if ($match) {
             $userIdentity = null;
-            $userId = (int)$matches[1];
+            $userId       = (int) $matches[1];
         }
 
         if ($userId) {
-            $user = $this->userModel->getRow(['id' => (int)$userId]);
+            $user = $this->userModel->getRow(['id' => (int) $userId]);
 
             if ($user) {
                 /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -180,7 +171,7 @@ class UserText extends AbstractHtmlElement
 
         if ($userIdentity) {
             $user = $this->userModel->getRow([
-                'identity' => (string)$userIdentity
+                'identity' => (string) $userIdentity,
             ]);
 
             if ($user) {
@@ -193,11 +184,9 @@ class UserText extends AbstractHtmlElement
     }
 
     /**
-     * @param array $params
-     * @return boolean
      * @throws Exception
-     */
-    /*private function tryPictureLinkParams(array $params)
+
+    private function tryPictureLinkParams(array $params): bool
     {
         $map = [
 

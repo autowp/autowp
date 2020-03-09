@@ -3,19 +3,18 @@
 namespace AutowpTest\User\View;
 
 use Application\Test\AbstractHttpControllerTestCase;
+use Autowp\User\Auth\Adapter\Id;
 use Autowp\User\View\Helper\User;
 use DateTime;
-use Zend\Authentication\AuthenticationService;
-use Autowp\User\Auth\Adapter\Id;
+use Laminas\Authentication\AuthenticationService;
+
+use function gmmktime;
 
 class HelperTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
-    /**
-     * @return User
-     */
-    private function getHelper()
+    private function getHelper(): User
     {
         return $this->getApplicationServiceLocator()->get('ViewHelperManager')->get(User::class);
     }
@@ -25,7 +24,7 @@ class HelperTest extends AbstractHttpControllerTestCase
         $this->assertFalse($this->getHelper()->__invoke()->logedIn());
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
@@ -41,7 +40,7 @@ class HelperTest extends AbstractHttpControllerTestCase
         $this->assertNull($this->getHelper()->get());
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
@@ -57,7 +56,7 @@ class HelperTest extends AbstractHttpControllerTestCase
         $this->assertFalse($this->getHelper()->__invoke()->isAllowed('car', 'edit_meta'));
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(3);
@@ -73,7 +72,7 @@ class HelperTest extends AbstractHttpControllerTestCase
         $this->assertFalse($this->getHelper()->__invoke()->inheritsRole('moder'));
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(3);
@@ -89,7 +88,7 @@ class HelperTest extends AbstractHttpControllerTestCase
         $this->assertEquals('UTC', $this->getHelper()->__invoke()->timezone());
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
@@ -103,11 +102,11 @@ class HelperTest extends AbstractHttpControllerTestCase
     public function testHumanTime()
     {
         $time = gmmktime(0, 0, 0, 1, 1, 2000);
-        $dt = new DateTime();
+        $dt   = new DateTime();
         $dt->setTimestamp($time);
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
@@ -121,11 +120,11 @@ class HelperTest extends AbstractHttpControllerTestCase
     public function testHumanDate()
     {
         $time = gmmktime(0, 0, 0, 1, 1, 2000);
-        $dt = new DateTime();
+        $dt   = new DateTime();
         $dt->setTimestamp($time);
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
@@ -141,7 +140,7 @@ class HelperTest extends AbstractHttpControllerTestCase
         $this->assertEquals('', $this->getHelper()->__invoke()->avatar());
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
@@ -157,7 +156,7 @@ class HelperTest extends AbstractHttpControllerTestCase
         $this->assertEquals('', $this->getHelper()->__invoke()->__toString());
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);

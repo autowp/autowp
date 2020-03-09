@@ -2,50 +2,43 @@
 
 namespace Application\Controller\Api;
 
+use Application\Model\UserAccount;
 use Autowp\ExternalLoginService\AbstractService;
-use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
-use Application\Model\UserAccount;
+use Exception;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function array_replace;
 
 /**
- * Class AccountController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method string language()
  */
 class AccountController extends AbstractRestfulController
 {
-    /**
-     * @var UserAccount
-     */
-    private $userAccount;
+    /** @var UserAccount */
+    private UserAccount $userAccount;
 
-    /**
-     * @var ExternalLoginServices
-     */
-    private $externalLoginServices;
+    /** @var ExternalLoginServices */
+    private ExternalLoginServices $externalLoginServices;
 
-    /**
-     * @var TableGateway
-     */
-    private $loginStateTable;
+    /** @var TableGateway */
+    private TableGateway $loginStateTable;
 
     public function __construct(
         UserAccount $userAccount,
         ExternalLoginServices $externalLoginServices,
         TableGateway $loginStateTable
     ) {
-        $this->userAccount = $userAccount;
+        $this->userAccount           = $userAccount;
         $this->externalLoginServices = $externalLoginServices;
-        $this->loginStateTable = $loginStateTable;
+        $this->loginStateTable       = $loginStateTable;
     }
 
     private function canRemoveAccount(int $id): bool
@@ -78,21 +71,19 @@ class AccountController extends AbstractRestfulController
         $accounts = [];
         foreach ($this->userAccount->getAccounts($user['id']) as $row) {
             $accounts[] = array_replace($row, [
-                'can_remove' => $this->canRemoveAccount($row['id'])
+                'can_remove' => $this->canRemoveAccount($row['id']),
             ]);
         }
 
         return new JsonModel([
-            'items' => $accounts
+            'items' => $accounts,
         ]);
     }
 
     /**
-     * @param string $serviceId
-     * @return AbstractService
      * @throws Exception
      */
-    private function getExternalLoginService($serviceId)
+    private function getExternalLoginService(string $serviceId): AbstractService
     {
         $service = $this->externalLoginServices->get($serviceId);
 
@@ -117,7 +108,7 @@ class AccountController extends AbstractRestfulController
 
         $params = $this->processBodyContent($request);
 
-        $serviceId = isset($params['service']) ? $params['service'] : null;
+        $serviceId = $params['service'] ?? null;
 
         if (! $serviceId) {
             return $this->notFoundAction();
@@ -133,11 +124,11 @@ class AccountController extends AbstractRestfulController
             'user_id'  => $user['id'],
             'language' => $this->language(),
             'service'  => $serviceId,
-            'url'      => '/account/accounts'
+            'url'      => '/account/accounts',
         ]);
 
         return new JsonModel([
-            'url' => $loginUrl
+            'url' => $loginUrl,
         ]);
     }
 
@@ -148,11 +139,11 @@ class AccountController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $id = (int)$this->params('id');
+        $id = (int) $this->params('id');
 
         if (! $this->canRemoveAccount($id)) {
             return $this->forward()->dispatch(self::class, [
-                'action' => 'remove-account-failed'
+                'action' => 'remove-account-failed',
             ]);
         }
 

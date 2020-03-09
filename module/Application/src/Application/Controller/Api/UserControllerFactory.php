@@ -7,23 +7,22 @@ use Application\Service\UsersService;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
 use Interop\Container\ContainerInterface;
-use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+
+use function getenv;
 
 class UserControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return UserController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): UserController
     {
         $hydrators = $container->get('HydratorManager');
-        $filters = $container->get('InputFilterManager');
-        $config = $container->get('Config');
+        $filters   = $container->get('InputFilterManager');
+        $config    = $container->get('Config');
 
         return new UserController(
             $container->get(Acl::class),
@@ -36,7 +35,7 @@ class UserControllerFactory implements FactoryInterface
             $container->get(UsersService::class),
             $container->get(User::class),
             $config['recaptcha'],
-            (bool)getenv('AUTOWP_CAPTCHA'),
+            (bool) getenv('AUTOWP_CAPTCHA'),
             $container->get(UserRename::class),
             $config['hosts']
         );

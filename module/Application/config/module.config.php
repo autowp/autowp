@@ -10,11 +10,11 @@ use Autowp\ExternalLoginService\Twitter;
 use Autowp\ExternalLoginService\Vk;
 use Autowp\ZFComponents\Resources;
 use Exception;
-use Zend\I18n\Translator\Loader\PhpArray;
-use Zend\InputFilter\InputFilterAbstractServiceFactory;
-use Zend\Mvc\I18n\TranslatorFactory;
-use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Factory\InvokableFactory;
+use Laminas\I18n\Translator\Loader\PhpArray;
+use Laminas\InputFilter\InputFilterAbstractServiceFactory;
+use Laminas\Mvc\I18n\TranslatorFactory;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 $host = getenv('AUTOWP_HOST');
 $hostCookie = ($host == 'localhost' ? '' : '.' . $host);
@@ -87,13 +87,13 @@ return [
             ],
             [
                 'type'     => PhpArray::class,
-                'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
-                'pattern'  => \Zend\I18n\Translator\Resources::getPatternForValidator()
+                'base_dir' => \Laminas\I18n\Translator\Resources::getBasePath(),
+                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForValidator()
             ],
             [
                 'type'     => PhpArray::class,
-                'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
-                'pattern'  => \Zend\I18n\Translator\Resources::getPatternForCaptcha()
+                'base_dir' => \Laminas\I18n\Translator\Resources::getBasePath(),
+                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForCaptcha()
             ],
             [
                 'type'     => PhpArray::class,
@@ -149,7 +149,7 @@ return [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
         ],
         'abstract_factories' => [
-            'Zend\Cache\Service\StorageCacheAbstractServiceFactory'
+            'Laminas\Cache\Service\StorageCacheAbstractServiceFactory'
         ]
     ],
 

@@ -3,8 +3,8 @@
 namespace Application\Model;
 
 use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 class ItemParent
@@ -18,24 +18,15 @@ class ItemParent
         TYPE_SPORT = 2,
         TYPE_DESIGN = 3;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemTable;
+    private TableGateway $itemTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemParentTable;
+    private TableGateway $itemParentTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemParentLanguageTable;
+    private TableGateway $itemParentLanguageTable;
 
-    private $languages = ['en'];
+    private array $languages = ['en'];
 
-    private $allowedCombinations = [
+    private array $allowedCombinations = [
         Item::VEHICLE => [
             Item::VEHICLE => true
         ],
@@ -63,27 +54,15 @@ class ItemParent
         Item::COPYRIGHT => [],
     ];
 
-    private $catnameBlacklist = ['sport', 'tuning', 'related', 'pictures', 'specifications'];
+    private array $catnameBlacklist = ['sport', 'tuning', 'related', 'pictures', 'specifications'];
 
-    /**
-     * @var TableGateway
-     */
-    private $specTable;
+    private TableGateway $specTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemParentCacheTable;
+    private TableGateway $itemParentCacheTable;
 
-    /**
-     * @var ItemAlias
-     */
-    private $itemAlias;
+    private ItemAlias $itemAlias;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
     public function __construct(
         array $languages,
@@ -267,10 +246,9 @@ class ItemParent
      * @param int $parentId
      * @param int $itemId
      * @param array $options
-     * @return bool
      * @throws Exception
      */
-    public function create(int $parentId, int $itemId, array $options = [])
+    public function create(int $parentId, int $itemId, array $options = []): bool
     {
         $parentRow = $this->itemTable->select(['id' => $parentId])->current();
         $itemRow = $this->itemTable->select(['id' => $itemId])->current();
@@ -632,9 +610,6 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $itemId
-     * @param bool $stockFirst
-     * @return array
      */
     public function getParentRows(int $itemId, bool $stockFirst = false): array
     {
@@ -706,10 +681,6 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
-     * @param int $parentId
-     * @param int $itemId
-     * @param string $language
-     * @return string
      */
     public function getNamePreferLanguage(int $parentId, int $itemId, string $language): string
     {
@@ -853,7 +824,6 @@ class ItemParent
     /**
      * @suppress PhanUndeclaredMethod
      * @param int $parentId
-     * @return bool
      */
     public function hasChildItems(int $parentId): bool
     {
@@ -867,8 +837,6 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
-     * @param int $parentId
-     * @return int
      */
     public function getChildItemsCount(int $parentId): int
     {
@@ -882,8 +850,6 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
-     * @param int $itemId
-     * @return int
      */
     public function getParentItemsCount(int $itemId): int
     {
@@ -897,8 +863,6 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param array $parentIds
-     * @return array
      */
     public function getChildItemsCountArray(array $parentIds): array
     {
@@ -921,9 +885,6 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param array $parentIds
-     * @param array $typeIds
-     * @return array
      */
     public function getChildItemsCountArrayByTypes(array $parentIds, array $typeIds): array
     {
@@ -958,18 +919,13 @@ class ItemParent
         return $result;
     }
 
-    /**
-     * @return TableGateway
-     */
-    public function getTable()
+    public function getTable(): TableGateway
     {
         return $this->itemParentTable;
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param int $itemId
-     * @return array
      */
     public function getChildItemLinkTypesCount(int $itemId): array
     {

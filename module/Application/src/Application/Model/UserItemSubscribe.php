@@ -2,20 +2,14 @@
 
 namespace Application\Model;
 
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\TableGateway\TableGateway;
 use Autowp\User\Model\User;
 
 class UserItemSubscribe
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(TableGateway $table, User $userModel)
     {
@@ -26,7 +20,7 @@ class UserItemSubscribe
     public function subscribe(int $userId, int $itemId)
     {
         $this->table->getAdapter()->query('
-            INSERT IGNORE INTO user_item_subscribe (user_id, item_id) 
+            INSERT IGNORE INTO user_item_subscribe (user_id, item_id)
             VALUES (:user_id, :item_id)
         ', [
             'user_id' => $userId,

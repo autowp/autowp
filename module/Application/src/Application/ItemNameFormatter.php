@@ -4,25 +4,31 @@ namespace Application;
 
 use ArrayAccess;
 use Exception;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\I18n\Translator\TranslatorInterface;
+use Laminas\View\Renderer\PhpRenderer;
+
+use function array_merge;
+use function array_replace;
+use function date;
+use function implode;
+use function is_array;
+use function sprintf;
+use function strlen;
 
 class ItemNameFormatter
 {
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var PhpRenderer
-     */
-    private $renderer;
+    private PhpRenderer $renderer;
 
-    private $monthFormat = '<small class="month">%02d.</small>';
+    private string $monthFormat = '<small class="month">%02d.</small>';
 
-    private $textMonthFormat = '%02d.';
+    private string $textMonthFormat = '%02d.';
 
-    public function __construct($translator, PhpRenderer $renderer)
+    public function __construct(TranslatorInterface $translator, PhpRenderer $renderer)
     {
         $this->translator = $translator;
-        $this->renderer = $renderer;
+        $this->renderer   = $renderer;
     }
 
     private function translate($string, $language)
@@ -37,25 +43,25 @@ class ItemNameFormatter
         }
 
         if ($item instanceof ArrayAccess) {
-            $item = (array)$item;
+            $item = (array) $item;
         }
 
         $defaults = [
-            'begin_model_year' => null,
-            'end_model_year'   => null,
+            'begin_model_year'          => null,
+            'end_model_year'            => null,
             'begin_model_year_fraction' => null,
             'end_model_year_fraction'   => null,
-            'spec'             => null,
-            'spec_full'        => null,
-            'body'             => null,
-            'name'             => null,
-            'begin_year'       => null,
-            'end_year'         => null,
-            'today'            => null,
-            'begin_month'      => null,
-            'end_month'        => null
+            'spec'                      => null,
+            'spec_full'                 => null,
+            'body'                      => null,
+            'name'                      => null,
+            'begin_year'                => null,
+            'end_year'                  => null,
+            'today'                     => null,
+            'begin_month'               => null,
+            'end_month'                 => null,
         ];
-        $item = array_replace($defaults, $item);
+        $item     = array_replace($defaults, $item);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $this->renderer->escapeHtml($item['name']);
@@ -67,12 +73,12 @@ class ItemNameFormatter
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
                     'title="' . $this->renderer->escapeHtmlAttr($item['spec_full']) . '"',
                     'data-toggle="tooltip"',
-                    'data-placement="top"'
+                    'data-placement="top"',
                 ]);
             }
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             $escapedSpec = $this->renderer->escapeHtml($item['spec']);
-            $result .= ' <span ' . implode(' ', $attrs) . '>' . $escapedSpec . '</span>';
+            $result     .= ' <span ' . implode(' ', $attrs) . '>' . $escapedSpec . '</span>';
         }
 
         if (strlen($item['body']) > 0) {
@@ -80,43 +86,43 @@ class ItemNameFormatter
             $result .= ' (' . $this->renderer->escapeHtml($item['body']) . ')';
         }
 
-        $by = (int)$item['begin_year'];
-        $bm = (int)$item['begin_month'];
-        $ey = (int)$item['end_year'];
-        $em = (int)$item['end_month'];
+        $by = (int) $item['begin_year'];
+        $bm = (int) $item['begin_month'];
+        $ey = (int) $item['end_year'];
+        $em = (int) $item['end_month'];
 
-        $bmy = (int)$item['begin_model_year'];
-        $emy = (int)$item['end_model_year'];
+        $bmy = (int) $item['begin_model_year'];
+        $emy = (int) $item['end_model_year'];
 
         $bmyf = $item['begin_model_year_fraction'];
         $emyf = $item['end_model_year_fraction'];
 
-        $bs = (int)($by / 100);
-        $es = (int)($ey / 100);
+        $bs = (int) ($by / 100);
+        $es = (int) ($ey / 100);
 
         $useModelYear = $bmy || $emy;
 
-        $equalS = $bs && $es && ($bs == $es);
-        $equalY = $equalS && $by && $ey && ($by == $ey);
-        $equalM = $equalY && $bm && $em && ($bm == $em);
+        $equalS = $bs && $es && ($bs === $es);
+        $equalY = $equalS && $by && $ey && ($by === $ey);
+        $equalM = $equalY && $bm && $em && ($bm === $em);
 
         if ($useModelYear) {
             /* @phan-suppress-next-line PhanUndeclaredMethod */
-            $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language));
-            $result = '<span title="' . $title . '">' .
-                          $this->renderer->escapeHtml( // @phan-suppress-current-line PhanUndeclaredMethod
+            $title  = $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language));
+            $result = '<span title="' . $title . '">'
+                          . $this->renderer->escapeHtml( // @phan-suppress-current-line PhanUndeclaredMethod
                               $this->getModelYearsPrefix($bmy, $bmyf, $emy, $emyf, $item['today'], $language)
-                          ) .
-                      '</span> ' .
-                      $result;
+                          )
+                      . '</span> '
+                      . $result;
 
             if ($by > 0 || $ey > 0) {
                 /* @phan-suppress-next-line PhanUndeclaredMethod */
-                $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/years', $language));
+                $title   = $this->renderer->escapeHtmlAttr($this->translate('carlist/years', $language));
                 $result .=
-                    '<small>' .
-                        ' \'<span class="realyears" title="' . $title . '">' .
-                            $this->renderYearsHtml(
+                    '<small>'
+                        . ' \'<span class="realyears" title="' . $title . '">'
+                            . $this->renderYearsHtml(
                                 $item['today'],
                                 $by,
                                 $bm,
@@ -126,9 +132,9 @@ class ItemNameFormatter
                                 $equalY,
                                 $equalM,
                                 $language
-                            ) .
-                        '</span>' .
-                    '</small>';
+                            )
+                        . '</span>'
+                    . '</small>';
             }
         } else {
             if ($by > 0 || $ey > 0) {
@@ -149,32 +155,36 @@ class ItemNameFormatter
         return $result;
     }
 
-    public function format($item, $language)
+    /**
+     * @param array|ArrayAccess $item
+     * @throws Exception
+     */
+    public function format($item, string $language): string
     {
         if (! $item instanceof ArrayAccess && ! is_array($item)) {
             throw new Exception("`item` must be array or ArrayAccess");
         }
 
         if ($item instanceof ArrayAccess) {
-            $item = (array)$item;
+            $item = (array) $item;
         }
 
         $defaults = [
-            'begin_model_year' => null,
-            'end_model_year'   => null,
+            'begin_model_year'          => null,
+            'end_model_year'            => null,
             'begin_model_year_fraction' => null,
             'end_model_year_fraction'   => null,
-            'spec'             => null,
-            'spec_full'        => null,
-            'body'             => null,
-            'name'             => null,
-            'begin_year'       => null,
-            'end_year'         => null,
-            'today'            => null,
-            'begin_month'      => null,
-            'end_month'        => null
+            'spec'                      => null,
+            'spec_full'                 => null,
+            'body'                      => null,
+            'name'                      => null,
+            'begin_year'                => null,
+            'end_year'                  => null,
+            'today'                     => null,
+            'begin_month'               => null,
+            'end_month'                 => null,
         ];
-        $item = array_replace($defaults, $item);
+        $item     = array_replace($defaults, $item);
 
         $result = $item['name'];
 
@@ -186,25 +196,25 @@ class ItemNameFormatter
             $result .= ' (' . $item['body'] . ')';
         }
 
-        $by = (int)$item['begin_year'];
-        $bm = (int)$item['begin_month'];
-        $ey = (int)$item['end_year'];
-        $em = (int)$item['end_month'];
+        $by = (int) $item['begin_year'];
+        $bm = (int) $item['begin_month'];
+        $ey = (int) $item['end_year'];
+        $em = (int) $item['end_month'];
 
-        $bmy = (int)$item['begin_model_year'];
-        $emy = (int)$item['end_model_year'];
+        $bmy = (int) $item['begin_model_year'];
+        $emy = (int) $item['end_model_year'];
 
         $bmyf = $item['begin_model_year_fraction'];
         $emyf = $item['end_model_year_fraction'];
 
-        $bs = (int)($by / 100);
-        $es = (int)($ey / 100);
+        $bs = (int) ($by / 100);
+        $es = (int) ($ey / 100);
 
         $useModelYear = $bmy || $emy;
 
-        $equalS = $bs && $es && ($bs == $es);
-        $equalY = $equalS && $by && $ey && ($by == $ey);
-        $equalM = $equalY && $bm && $em && ($bm == $em);
+        $equalS = $bs && $es && ($bs === $es);
+        $equalY = $equalS && $by && $ey && ($by === $ey);
+        $equalM = $equalY && $bm && $em && ($bm === $em);
 
         if ($useModelYear) {
             $result = $this->getModelYearsPrefix($bmy, $bmyf, $emy, $emyf, $item['today'], $language) . ' ' . $result;
@@ -229,14 +239,14 @@ class ItemNameFormatter
 
     private function getModelYearsPrefix($begin, $beginFraction, $end, $endFraction, $today, $language)
     {
-        $bms = (int)($begin / 100);
-        $ems = (int)($end / 100);
+        $bms = (int) ($begin / 100);
+        $ems = (int) ($end / 100);
 
-        if ($end == $begin && $beginFraction == $endFraction) {
+        if ($end === $begin && $beginFraction === $endFraction) {
             return $begin . $endFraction;
         }
 
-        if ($bms == $ems) {
+        if ($bms === $ems) {
             return $begin . $beginFraction . '–' . sprintf('%02d', $end % 100) . $endFraction;
         }
 
@@ -252,7 +262,7 @@ class ItemNameFormatter
             return $begin . $beginFraction . '–??';
         }
 
-        $currentYear = (int)date('Y');
+        $currentYear = (int) date('Y');
 
         if ($begin >= $currentYear) {
             return $begin . $beginFraction;
@@ -263,14 +273,14 @@ class ItemNameFormatter
 
     private function monthsRange($from, $to)
     {
-        return ($from ? sprintf('%02d', $from) : '??') .
-               '–' .
-               ($to ? sprintf('%02d', $to) : '??');
+        return ($from ? sprintf('%02d', $from) : '??')
+               . '–'
+               . ($to ? sprintf('%02d', $to) : '??');
     }
 
     private function missedEndYearYearsSuffix($today, $by, $language)
     {
-        $cy = (int)date('Y');
+        $cy = (int) date('Y');
 
         if ($by >= $cy) {
             return '';
@@ -294,13 +304,13 @@ class ItemNameFormatter
         }
 
         if ($equalS) {
-            return (($bm ? sprintf($this->textMonthFormat, $bm) : '') . $by) .
-                   '–' .
-                   ($em ? sprintf($this->textMonthFormat, $em) : '') . ($em ? $ey : sprintf('%02d', $ey % 100));
+            return (($bm ? sprintf($this->textMonthFormat, $bm) : '') . $by)
+                   . '–'
+                   . ($em ? sprintf($this->textMonthFormat, $em) : '') . ($em ? $ey : sprintf('%02d', $ey % 100));
         }
 
-        return  (($bm ? sprintf($this->textMonthFormat, $bm) : '') . ($by ? $by : '????')) .
-                (
+        return (($bm ? sprintf($this->textMonthFormat, $bm) : '') . ($by ? $by : '????'))
+                . (
                     $ey
                         ? '–' . ($em ? sprintf($this->textMonthFormat, $em) : '') . $ey
                         : $this->missedEndYearYearsSuffix($today, $by, $language)
@@ -322,15 +332,13 @@ class ItemNameFormatter
         }
 
         if ($equalS) {
-            return (($bm ? sprintf($this->monthFormat, $bm) : '') . $by) .
-                   '–' .
-                   ($em ? sprintf($this->monthFormat, $em) : '') . ($em ? $ey : sprintf('%02d', $ey % 100));
+            return (($bm ? sprintf($this->monthFormat, $bm) : '') . $by)
+                   . '–'
+                   . ($em ? sprintf($this->monthFormat, $em) : '') . ($em ? $ey : sprintf('%02d', $ey % 100));
         }
 
-
-
-        return  (($bm ? sprintf($this->monthFormat, $bm) : '') . ($by ? $by : '????')) .
-                (
+        return (($bm ? sprintf($this->monthFormat, $bm) : '') . ($by ? $by : '????'))
+                . (
                     $ey
                         ? '–' . ($em ? sprintf($this->monthFormat, $em) : '') . $ey
                         : $this->renderer->escapeHtml( // @phan-suppress-currenet-line PhanUndeclaredMethod

@@ -3,13 +3,11 @@
 namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\PerspectiveGroupHydrator as Hydrator;
+use ArrayAccess;
 
 class PerspectiveGroups extends HydratorStrategy
 {
-    /**
-     * @return Hydrator
-     */
-    protected function getHydrator()
+    protected function getHydrator(): Hydrator
     {
         if (! $this->hydrator) {
             $this->hydrator = new Hydrator($this->serviceManager);
@@ -18,7 +16,10 @@ class PerspectiveGroups extends HydratorStrategy
         return $this->hydrator;
     }
 
-    public function extract($value)
+    /**
+     * @param array|ArrayAccess $value
+     */
+    public function extract($value): array
     {
         $hydrator = $this->getHydrator();
 

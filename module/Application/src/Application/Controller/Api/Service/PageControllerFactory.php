@@ -2,21 +2,18 @@
 
 namespace Application\Controller\Api\Service;
 
-use Interop\Container\ContainerInterface;
-use Zend\Db\Adapter\AdapterInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
 use Application\Controller\Api\PageController as Controller;
+use Interop\Container\ContainerInterface;
+use Laminas\Db\Adapter\AdapterInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PageControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Controller
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
         $filters = $container->get('InputFilterManager');
         return new Controller(

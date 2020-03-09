@@ -3,16 +3,13 @@
 namespace Application\Test;
 
 use Exception;
-use Zend\Db\Adapter\AdapterInterface;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase as ZendTestCase;
+use Laminas\Db\Adapter\AdapterInterface;
+use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase as LaminasTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.NumberOfChildren)
- *
- * @author dmitry
- *
  */
-abstract class AbstractHttpControllerTestCase extends ZendTestCase
+abstract class AbstractHttpControllerTestCase extends LaminasTestCase
 {
     protected $applicationConfigPath;
 

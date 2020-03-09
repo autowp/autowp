@@ -8,7 +8,7 @@ class Car extends AbstractTable
 
     public function __construct($cars, $attributes)
     {
-        $this->cars = $cars;
+        $this->cars       = $cars;
         $this->attributes = $attributes;
     }
 

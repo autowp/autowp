@@ -3,24 +3,33 @@
 namespace Application\Router\Http;
 
 use Exception;
+use Laminas\Router\Http\RouteInterface;
+use Laminas\Router\Http\RouteMatch;
+use Laminas\Stdlib\RequestInterface as Request;
 use Traversable;
-use Zend\Router\Http\RouteInterface;
-use Zend\Router\Http\RouteMatch;
-use Zend\Stdlib\RequestInterface as Request;
+
+use function array_replace;
+use function count;
+use function explode;
+use function implode;
+use function method_exists;
+use function strlen;
+use function trim;
+use function urldecode;
+use function urlencode;
 
 class PictureFile implements RouteInterface
 {
     private const URI_DELIMITER = '/';
 
-    private $defaults = [];
+    private array $defaults = [];
 
     /**
      * Create a new route with given options.
      *
      * @param  array|Traversable $options
-     * @return PictureFile
      */
-    public static function factory($options = [])
+    public static function factory($options = []): self
     {
         return new self($options);
     }
@@ -30,18 +39,14 @@ class PictureFile implements RouteInterface
         $this->defaults = $options['defaults'];
     }
 
-    /**
-     * @param Request $request
-     * @return \Zend\Router\RouteMatch|null
-     */
-    public function match(Request $request)
+    public function match(Request $request): ?RouteMatch
     {
         if (! method_exists($request, 'getUri')) {
             return null;
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $uri = $request->getUri();
+        $uri  = $request->getUri();
         $path = $uri->getPath();
 
         $length = strlen($path);
@@ -55,13 +60,13 @@ class PictureFile implements RouteInterface
         if (! count($path)) {
             return null;
         }
-        if ($path[0] != 'pictures') {
+        if ($path[0] !== 'pictures') {
             return null;
         }
 
         $variables = [
             'hostname' => $uri->getHost(),
-            'file'     => implode('/', $path)
+            'file'     => implode('/', $path),
         ];
 
         return new RouteMatch(array_replace($this->defaults, $variables), $length);
@@ -94,10 +99,8 @@ class PictureFile implements RouteInterface
 
     /**
      * Get a list of parameters used while assembling.
-     *
-     * @return array
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return [];
     }

@@ -8,20 +8,17 @@ use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class NewControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return NewController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): NewController
     {
-        $filters = $container->get('InputFilterManager');
+        $filters   = $container->get('InputFilterManager');
         $hydrators = $container->get('HydratorManager');
 
         return new NewController(

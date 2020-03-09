@@ -2,13 +2,8 @@
 
 namespace Application\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
+use Laminas\Mvc\Controller\AbstractActionController;
 
-/**
- * Class IndexController
- * @package Application\Controller
- *
- */
 class IndexController extends AbstractActionController
 {
     public function indexAction()

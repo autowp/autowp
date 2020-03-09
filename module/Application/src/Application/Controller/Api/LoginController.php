@@ -2,30 +2,31 @@
 
 namespace Application\Controller\Api;
 
+use Application\Model\UserAccount;
+use Application\Service\UsersService;
 use Autowp\ExternalLoginService\AbstractService;
-use Exception;
-use Imagick;
-use Zend\Authentication\AuthenticationService;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Uri\Http as HttpUri;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use ZF\ApiProblem\ApiProblem;
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\Image\Storage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRemember;
-use Application\Model\UserAccount;
-use Application\Service\UsersService;
+use Exception;
+use Imagick;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Uri\Http as HttpUri;
+use Laminas\View\Model\JsonModel;
+
+use function file_get_contents;
+use function trim;
+use function uniqid;
 
 /**
- * Class LoginController
- * @package Application\Controller\Api
- *
  * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method Storage imageStorage()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
@@ -34,45 +35,21 @@ use Application\Service\UsersService;
  */
 class LoginController extends AbstractRestfulController
 {
-    /**
-     * @var UsersService
-     */
-    private $service;
+    private UsersService $service;
 
-    /**
-     * @var ExternalLoginServices
-     */
-    private $externalLoginServices;
+    private ExternalLoginServices $externalLoginServices;
 
-    /**
-     * @var InputFilter
-     */
-    private $loginInputFilter;
+    private InputFilter $loginInputFilter;
 
-    /**
-     * @var array
-     */
-    private $hosts = [];
+    private array $hosts = [];
 
-    /**
-     * @var UserRemember
-     */
-    private $userRemember;
+    private UserRemember $userRemember;
 
-    /**
-     * @var UserAccount
-     */
-    private $userAccount;
+    private UserAccount $userAccount;
 
-    /**
-     * @var TableGateway
-     */
-    private $loginStateTable;
+    private TableGateway $loginStateTable;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(
         UsersService $service,
@@ -84,23 +61,20 @@ class LoginController extends AbstractRestfulController
         TableGateway $loginStateTable,
         User $userModel
     ) {
-
-        $this->service = $service;
+        $this->service               = $service;
         $this->externalLoginServices = $externalLoginServices;
-        $this->loginInputFilter = $loginInputFilter;
-        $this->hosts = $hosts;
-        $this->userRemember = $userRemember;
-        $this->userAccount = $userAccount;
-        $this->loginStateTable = $loginStateTable;
-        $this->userModel = $userModel;
+        $this->loginInputFilter      = $loginInputFilter;
+        $this->hosts                 = $hosts;
+        $this->userRemember          = $userRemember;
+        $this->userAccount           = $userAccount;
+        $this->loginStateTable       = $loginStateTable;
+        $this->userModel             = $userModel;
     }
 
     /**
-     * @param string $serviceId
-     * @return AbstractService
      * @throws Exception
      */
-    private function getExternalLoginService($serviceId)
+    private function getExternalLoginService(string $serviceId): AbstractService
     {
         $service = $this->externalLoginServices->get($serviceId);
 
@@ -130,7 +104,7 @@ class LoginController extends AbstractRestfulController
 
         $adapter = $this->service->getAuthAdapterLogin($values['login'], $values['password']);
 
-        $auth = new AuthenticationService();
+        $auth   = new AuthenticationService();
         $result = $auth->authenticate($adapter);
 
         if (! $result->isValid()) {
@@ -138,13 +112,12 @@ class LoginController extends AbstractRestfulController
                 new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                     'invalid_params' => [
                         'login' => [
-                            'invalid' => $this->translate('login/login-or-password-is-incorrect')
-                        ]
-                    ]
+                            'invalid' => $this->translate('login/login-or-password-is-incorrect'),
+                        ],
+                    ],
                 ])
             );
         }
-
 
         if ($values['remember']) {
             $token = $this->userRemember->createToken($this->user()->get()['id']);
@@ -174,37 +147,37 @@ class LoginController extends AbstractRestfulController
             'facebook'    => [
                 'name'  => 'Facebook',
                 'icon'  => 'fa-facebook',
-                'color' => '#3b5998'
+                'color' => '#3b5998',
             ],
             'vk'          => [
-                'name' => 'VK',
-                'icon' => 'fa-vk',
-                'color' => '#43648c'
+                'name'  => 'VK',
+                'icon'  => 'fa-vk',
+                'color' => '#43648c',
             ],
             'google-plus' => [
-                'name' => 'Google+',
-                'icon' => 'fa-google',
-                'color' => '#dd4b39'
+                'name'  => 'Google+',
+                'icon'  => 'fa-google',
+                'color' => '#dd4b39',
             ],
             'twitter'     => [
-                'name' => 'Twitter',
-                'icon' => 'fa-twitter',
-                'color' => '#55acee'
+                'name'  => 'Twitter',
+                'icon'  => 'fa-twitter',
+                'color' => '#55acee',
             ],
-            'github'     => [
-                'name' => 'Github',
-                'icon' => 'fa-github',
-                'color' => '#000000'
+            'github'      => [
+                'name'  => 'Github',
+                'icon'  => 'fa-github',
+                'color' => '#000000',
             ],
-            'linkedin'     => [
-                'name' => 'LinkedIn',
-                'icon' => 'fa-linkedin',
-                'color' => '#046293'
+            'linkedin'    => [
+                'name'  => 'LinkedIn',
+                'icon'  => 'fa-linkedin',
+                'color' => '#046293',
             ],
         ];
 
         return new JsonModel([
-            'items' => $services
+            'items' => $services,
         ]);
     }
 
@@ -229,23 +202,23 @@ class LoginController extends AbstractRestfulController
             'user_id'  => null,
             'language' => $this->language(),
             'service'  => $serviceId,
-            'url'      => '/login'
+            'url'      => '/login',
         ]);
 
         return new JsonModel([
-            'url' => $url
+            'url' => $url,
         ]);
     }
 
     public function callbackAction()
     {
-        $state = (string)$this->params()->fromQuery('state');
+        $state = (string) $this->params()->fromQuery('state');
         if (! $state) { // twitter workaround
-            $state = (string)$this->params()->fromQuery('oauth_token');
+            $state = (string) $this->params()->fromQuery('oauth_token');
         }
 
         $stateRow = $this->loginStateTable->select([
-            'state' => $state
+            'state' => $state,
         ])->current();
 
         if (! $stateRow) {
@@ -254,7 +227,7 @@ class LoginController extends AbstractRestfulController
 
         $params = $this->params()->fromQuery();
 
-        if ($stateRow['language'] != $this->language()) {
+        if ($stateRow['language'] !== $this->language()) {
             if (! isset($this->hosts[$stateRow['language']])) {
                 throw new Exception("Host {$stateRow['language']} not found");
             }
@@ -262,7 +235,7 @@ class LoginController extends AbstractRestfulController
             $url = $this->url()->fromRoute('login/callback', [], [
                 'force_canonical' => true,
                 'query'           => $params,
-                'uri'             => new HttpUri('https://' . $this->hosts[$stateRow['language']]['hostname'])
+                'uri'             => new HttpUri('https://' . $this->hosts[$stateRow['language']]['hostname']),
             ]);
             return $this->redirect()->toUrl($url);
         }
@@ -274,7 +247,7 @@ class LoginController extends AbstractRestfulController
         }
 
         $data = $service->getData([
-            'language' => $stateRow['language']
+            'language' => $stateRow['language'],
         ]);
 
         if (! $data) {
@@ -292,7 +265,7 @@ class LoginController extends AbstractRestfulController
 
         if (! $userId) {
             if ($stateRow['user_id']) {
-                $uRow = $this->userModel->getRow((int)$stateRow['user_id']);
+                $uRow = $this->userModel->getRow((int) $stateRow['user_id']);
                 if (! $uRow) {
                     throw new Exception("Account `{$stateRow['user_id']}` not found");
                 }
@@ -307,7 +280,7 @@ class LoginController extends AbstractRestfulController
                     'email'    => null,
                     'password' => uniqid(),
                     'name'     => $data->getName(),
-                    'ip'       => $ip
+                    'ip'       => $ip,
                 ], $this->language());
             }
 
@@ -338,7 +311,7 @@ class LoginController extends AbstractRestfulController
                         $imageSampler->convertImagick($imagick, null, $format);
 
                         $newImageId = $this->imageStorage()->addImageFromImagick($imagick, 'user', [
-                            's3' => true
+                            's3' => true,
                         ]);
 
                         $imagick->clear();
@@ -346,9 +319,9 @@ class LoginController extends AbstractRestfulController
                         $oldImageId = $uRow['img'];
 
                         $this->userModel->getTable()->update([
-                            'img' => $newImageId
+                            'img' => $newImageId,
                         ], [
-                            'id' => $uRow['id']
+                            'id' => $uRow['id'],
                         ]);
 
                         if ($oldImageId) {
@@ -358,7 +331,7 @@ class LoginController extends AbstractRestfulController
                 }
             }
         } else {
-            $uRow = $this->userModel->getRow((int)$userId);
+            $uRow = $this->userModel->getRow((int) $userId);
             if (! $uRow) {
                 throw new Exception('Not linked account row');
             }
@@ -376,12 +349,12 @@ class LoginController extends AbstractRestfulController
         $url = $stateRow['url'];
 
         $this->loginStateTable->delete([
-            'state' => $stateRow['state']
+            'state' => $stateRow['state'],
         ]);
 
         $adapter = new IdAuthAdapter($this->userModel);
         $adapter->setIdentity($uRow['id']);
-        $auth = new AuthenticationService();
+        $auth       = new AuthenticationService();
         $authResult = $auth->authenticate($adapter);
         if ($authResult->isValid()) {
             return $this->redirect()->toUrl($url);

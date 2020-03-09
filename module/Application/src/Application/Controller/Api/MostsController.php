@@ -2,13 +2,6 @@
 
 namespace Application\Controller\Api;
 
-use Exception;
-use ImagickException;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Autowp\Image\Storage;
-use Autowp\User\Controller\Plugin\User;
-use Autowp\TextStorage;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Catalogue;
 use Application\Model\Item;
@@ -16,11 +9,17 @@ use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use Application\Service\Mosts;
+use Autowp\Image\Storage;
+use Autowp\TextStorage;
+use Autowp\User\Controller\Plugin\User;
+use Exception;
+use ImagickException;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+
+use function array_merge;
 
 /**
- * Class MostsController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
  * @method string language()
  * @method Storage imageStorage()
@@ -28,40 +27,19 @@ use Application\Service\Mosts;
  */
 class MostsController extends AbstractActionController
 {
-    /**
-     * @var TextStorage\Service
-     */
-    private $textStorage;
+    private TextStorage\Service $textStorage;
 
-    /**
-     * @var Perspective
-     */
-    private $perspective;
+    private Perspective $perspective;
 
-    /**
-     * @var Mosts
-     */
-    private $mosts;
+    private Mosts $mosts;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var RestHydrator
-     */
-    private $itemHydrator;
+    private RestHydrator $itemHydrator;
 
-    /**
-     * @var PictureNameFormatter
-     */
-    private $pictureNameFormatter;
+    private PictureNameFormatter $pictureNameFormatter;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
     public function __construct(
         TextStorage\Service $textStorage,
@@ -72,63 +50,62 @@ class MostsController extends AbstractActionController
         RestHydrator $itemHydrator,
         PictureNameFormatter $pictureNameFormatter
     ) {
-        $this->itemHydrator = $itemHydrator;
-        $this->textStorage = $textStorage;
-        $this->itemModel = $itemModel;
-        $this->perspective = $perspective;
-        $this->mosts = $mosts;
-        $this->picture = $picture;
+        $this->itemHydrator         = $itemHydrator;
+        $this->textStorage          = $textStorage;
+        $this->itemModel            = $itemModel;
+        $this->perspective          = $perspective;
+        $this->mosts                = $mosts;
+        $this->picture              = $picture;
         $this->pictureNameFormatter = $pictureNameFormatter;
     }
 
     /**
-     * @return JsonModel
      * @throws Storage\Exception
      * @throws ImagickException
      * @throws Exception
      */
-    public function getItemsAction()
+    public function getItemsAction(): JsonModel
     {
         $user = $this->user()->get();
 
-        $language = $this->language();
-        $yearsCatname = (string)$this->params()->fromQuery('years_catname');
-        $carTypeCatname = (string)$this->params()->fromQuery('type_catname');
-        $mostCatname = (string)$this->params()->fromQuery('rating_catname');
-        $brandID = (int)$this->params()->fromQuery('brand_id');
+        $language       = $this->language();
+        $yearsCatname   = (string) $this->params()->fromQuery('years_catname');
+        $carTypeCatname = (string) $this->params()->fromQuery('type_catname');
+        $mostCatname    = (string) $this->params()->fromQuery('rating_catname');
+        $brandID        = (int) $this->params()->fromQuery('brand_id');
 
         $list = $this->mosts->getItems([
             'language' => $language,
             'most'     => $mostCatname,
             'years'    => $yearsCatname,
             'carType'  => $carTypeCatname,
-            'brandId'  => $brandID
+            'brandId'  => $brandID,
         ]);
 
         // images
         $formatRequests = [];
-        $allPictures = [];
-        $idx = 0;
+        $allPictures    = [];
+        $idx            = 0;
         foreach ($list['cars'] as $car) {
             foreach ($car['pictures'] as $picture) {
                 if ($picture) {
                     $formatRequests[$idx++] = $picture['image_id'];
-                    $allPictures[] = $picture;
+                    $allPictures[]          = $picture;
                 }
             }
         }
 
         $imageStorage = $this->imageStorage();
-        $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb-medium');
+        $imagesInfo   = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb-medium');
 
         $names = $this->picture->getNameData($allPictures, [
-            'language' => $language
+            'language' => $language,
         ]);
 
         $this->itemHydrator->setOptions([
             'language' => $language,
             'fields'   => ['name_html' => true, 'description' => true],
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
         ]);
 
         $unit = null;
@@ -139,13 +116,13 @@ class MostsController extends AbstractActionController
             ];
         }
 
-        $idx = 0;
+        $idx    = 0;
         $result = [];
         foreach ($list['cars'] as $car) {
             $pictures = [];
 
             $paths = $this->catalogue()->getCataloguePaths($car['car']['id'], [
-                'breakOnFirst' => true
+                'breakOnFirst' => true,
             ]);
 
             foreach ($car['pictures'] as $picture) {
@@ -167,7 +144,7 @@ class MostsController extends AbstractActionController
                             ? $this->pictureNameFormatter->format($names[$id], $language)
                             : null,
                         'src'   => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
-                        'route' => $route
+                        'route' => $route,
                     ];
                     $idx++;
                 } else {
@@ -178,26 +155,25 @@ class MostsController extends AbstractActionController
             $result[] = [
                 'item'       => $this->itemHydrator->extract($car['car']),
                 'pictures'   => $pictures,
-                'value_text' => isset($car['valueText']) ? $car['valueText'] : null,
-                'value_html' => isset($car['valueHtml']) ? $car['valueHtml'] : null,
-                'unit'       => $unit
+                'value_text' => $car['valueText'] ?? null,
+                'value_html' => $car['valueHtml'] ?? null,
+                'unit'       => $unit,
             ];
         }
 
-
         return new JsonModel([
-            'items' => $result
+            'items' => $result,
         ]);
     }
 
     public function getMenuAction()
     {
-        $brandID = (int)$this->params()->fromQuery('brand_id');
+        $brandID = (int) $this->params()->fromQuery('brand_id');
 
         return new JsonModel([
             'years'         => $this->mosts->getYearsMenu(),
             'ratings'       => $this->mosts->getRatingsMenu(),
-            'vehilce_types' => $this->mosts->getCarTypes($brandID)
+            'vehilce_types' => $this->mosts->getCarTypes($brandID),
         ]);
     }
 }

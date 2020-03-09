@@ -2,14 +2,23 @@
 
 namespace ApplicationTest\Frontend\Controller\Api;
 
+use Application\Controller\Api\InboxController;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\PictureController;
 use Application\DuplicateFinder;
 use Application\Test\AbstractHttpControllerTestCase;
-use Application\Controller\Api\InboxController;
 use Exception;
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+
+use function array_replace;
+use function copy;
+use function count;
+use function explode;
+use function sys_get_temp_dir;
+use function tempnam;
+
+use const UPLOAD_ERR_OK;
 
 class InboxControllerTest extends AbstractHttpControllerTestCase
 {
@@ -25,7 +34,7 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
-                $tables->get('df_distance')
+                $tables->get('df_distance'),
             ])
             ->getMock();
 
@@ -37,7 +46,6 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      * @param $params
-     * @return int
      * @throws Exception
      */
     private function createItem($params): int
@@ -54,8 +62,8 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
@@ -63,14 +71,13 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
     {
         return $this->createItem(array_replace([
             'item_type_id' => 1,
-            'name'         => 'Some vehicle'
+            'name'         => 'Some vehicle',
         ], $params));
     }
 
     /**
      * @suppress PhanUndeclaredMethod
      * @param $vehicleId
-     * @return int
      * @throws Exception
      */
     private function addPictureToItem($vehicleId): int
@@ -86,7 +93,7 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
-        $file = tempnam(sys_get_temp_dir(), 'upl');
+        $file     = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
@@ -96,12 +103,12 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
                 'tmp_name' => $file,
                 'name'     => $filename,
                 'error'    => UPLOAD_ERR_OK,
-                'type'     => 'image/jpeg'
-            ]
+                'type'     => 'image/jpeg',
+            ],
         ]);
 
         $this->dispatch('https://www.autowp.ru/api/picture', Request::METHOD_POST, [
-            'item_id' => $vehicleId
+            'item_id' => $vehicleId,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -111,8 +118,8 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return $parts[count($parts) - 1];
     }
 

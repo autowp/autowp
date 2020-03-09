@@ -2,28 +2,19 @@
 
 namespace Application\Model;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Router\Http\TreeRouteStack;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Router\Http\TreeRouteStack;
 
 class Categories
 {
     public const NEW_DAYS = 7;
 
-    /**
-     * @var TreeRouteStack
-     */
-    private $router;
+    private TreeRouteStack $router;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemTable;
+    private TableGateway $itemTable;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
     public function __construct(
         TreeRouteStack $router,
@@ -39,11 +30,8 @@ class Categories
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param $parentId
-     * @param $order
-     * @return Sql\Select
      */
-    private function getCategoriesSelect($parentId, $order)
+    private function getCategoriesSelect(int $parentId, string $order): Sql\Select
     {
         $select = new Sql\Select($this->itemTable->getTable());
         $select
@@ -55,7 +43,7 @@ class Categories
                 'new_cars_count' => new Sql\Expression(
                     'COUNT(IF(ip_cat2car.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY), 1, NULL))',
                     self::NEW_DAYS
-                )
+                ),
             ])
             ->where(['item.item_type_id = ?' => Item::CATEGORY])
             ->group('item.id')
@@ -66,7 +54,7 @@ class Categories
             ->join(['top_car' => 'item'], 'ip_cat2car.item_id = top_car.id', [])
             ->where(new Sql\Predicate\In('top_car.item_type_id', [
                 Item::VEHICLE,
-                Item::ENGINE
+                Item::ENGINE,
             ]));
 
         if ($parentId) {
@@ -76,7 +64,7 @@ class Categories
                     'item.id = category_item_parent.item_id',
                     []
                 )
-                ->where(['category_item_parent.parent_id = ?' => (int)$parentId]);
+                ->where(['category_item_parent.parent_id = ?' => parentId]);
         } else {
             $select
                 ->join(
@@ -99,7 +87,7 @@ class Categories
         return $select;
     }
 
-    public function getCategoriesList($parentId, $language, $limit, $order)
+    public function getCategoriesList(int $parentId, string $language, int $limit, string $order): array
     {
         $select = $this->getCategoriesSelect($parentId, $order);
 

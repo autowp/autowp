@@ -2,81 +2,66 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Permissions\Acl\Acl;
-use Zend\Stdlib\ArrayUtils;
-use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\User;
 use Application\Comments;
-use Application\Model\Picture;
-use Application\View\Helper\UserText;
 use Application\Hydrator\Api\Filter\PropertyFilter;
 use Application\Hydrator\Api\Strategy\HydratorStrategy;
+use Application\Model\Picture;
+use Application\View\Helper\UserText;
+use Autowp\Commons\Db\Table\Row;
+use Autowp\User\Model\User;
+use Exception;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function array_keys;
+use function inet_ntop;
+use function is_array;
 
 class CommentHydrator extends RestHydrator
 {
-    /**
-     * @var Comments
-     */
-    private $comments;
+    private Comments $comments;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    private $userRole = null;
+    private ?string $userRole;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var UserText
-     */
-    private $userText;
+    private UserText $userText;
 
-    /**
-     * @var TableGateway
-     */
-    private $voteTable;
+    private TableGateway $voteTable;
 
-    private $acl;
+    private Acl $acl;
 
-    /**
-     * @var int
-     */
-    private $limit;
+    private int $limit;
 
-    private $router;
+    private TreeRouteStack $router;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
         $this->comments = $serviceManager->get(Comments::class);
-        $this->router = $serviceManager->get('HttpRouter');
+        $this->router   = $serviceManager->get('HttpRouter');
 
-        $this->picture = $serviceManager->get(Picture::class);
+        $this->picture   = $serviceManager->get(Picture::class);
         $this->userModel = $serviceManager->get(User::class);
 
         $this->userText = $serviceManager->get('ViewHelperManager')->get('userText');
 
-        $this->userId = null;
+        $this->userId = 0;
 
         $this->acl = $serviceManager->get(Acl::class);
 
-        $tables = $serviceManager->get('TableManager');
+        $tables          = $serviceManager->get('TableManager');
         $this->voteTable = $tables->get('comment_vote');
 
         $strategy = new DateTimeFormatterStrategy();
@@ -91,10 +76,9 @@ class CommentHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -111,7 +95,7 @@ class CommentHydrator extends RestHydrator
         }
 
         if (isset($options['limit'])) {
-            $this->limit = (int)$options['limit'];
+            $this->limit = (int) $options['limit'];
         }
 
         return $this;
@@ -119,9 +103,8 @@ class CommentHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return CommentHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -134,20 +117,20 @@ class CommentHydrator extends RestHydrator
     public function extract($object)
     {
         $canRemove = false;
-        $isModer = false;
+        $isModer   = false;
         $canViewIP = false;
-        $role = $this->getUserRole();
+        $role      = $this->getUserRole();
         if ($role) {
             $canRemove = $this->acl->isAllowed($role, 'comment', 'remove');
-            $isModer = $this->acl->inheritsRole($role, 'moder');
+            $isModer   = $this->acl->inheritsRole($role, 'moder');
             $canViewIP = $this->acl->isAllowed($role, 'user', 'ip');
         }
 
         $result = [
-            'id'      => (int)$object['id'],
+            'id'      => (int) $object['id'],
             'deleted' => (bool) $object['deleted'],
-            'item_id' => (int)$object['item_id'],
-            'type_id' => (int)$object['type_id'],
+            'item_id' => (int) $object['item_id'],
+            'type_id' => (int) $object['type_id'],
         ];
 
         if ($this->filterComposite->filter('is_new')) {
@@ -155,7 +138,7 @@ class CommentHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('datetime')) {
-            $addDate = Row::getDateTimeByColumnType('timestamp', $object['datetime']);
+            $addDate            = Row::getDateTimeByColumnType('timestamp', $object['datetime']);
             $result['datetime'] = $this->extractValue('datetime', $addDate);
         }
 
@@ -185,7 +168,7 @@ class CommentHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('vote')) {
-                $result['vote'] = (int)$object['vote'];
+                $result['vote'] = (int) $object['vote'];
             }
 
             if ($this->filterComposite->filter('user_vote')) {
@@ -193,9 +176,9 @@ class CommentHydrator extends RestHydrator
                 if ($this->userId) {
                     $voteRow = $this->voteTable->select([
                         'comment_id = ?' => $object['id'],
-                        'user_id = ?'    => (int)$this->userId
+                        'user_id = ?'    => (int) $this->userId,
                     ])->current();
-                    $vote = $voteRow ? $voteRow['vote'] : null;
+                    $vote    = $voteRow ? $voteRow['vote'] : null;
                 }
 
                 $result['user_vote'] = $vote;
@@ -207,7 +190,7 @@ class CommentHydrator extends RestHydrator
                 'item_id'   => $object['item_id'],
                 'type'      => $object['type_id'],
                 'parent_id' => $object['id'],
-                'order'     => 'comment_message.datetime ASC'
+                'order'     => 'comment_message.datetime ASC',
             ]);
 
             $paginator->setItemCountPerPage(500); // limit for safety
@@ -218,32 +201,32 @@ class CommentHydrator extends RestHydrator
         if ($this->filterComposite->filter('status')) {
             if ($isModer) {
                 $status = null;
-                if ($object['type_id'] == Comments::PICTURES_TYPE_ID) {
-                    $picture = $this->picture->getRow(['id' => (int)$object['item_id']]);
+                if ($object['type_id'] === Comments::PICTURES_TYPE_ID) {
+                    $picture = $this->picture->getRow(['id' => (int) $object['item_id']]);
                     if ($picture) {
                         switch ($picture['status']) {
                             case Picture::STATUS_ACCEPTED:
                                 $status = [
                                     'class' => 'success',
-                                    'name'  => 'moder/picture/acceptance/accepted'
+                                    'name'  => 'moder/picture/acceptance/accepted',
                                 ];
                                 break;
                             case Picture::STATUS_INBOX:
                                 $status = [
                                     'class' => 'warning',
-                                    'name'  => 'moder/picture/acceptance/inbox'
+                                    'name'  => 'moder/picture/acceptance/inbox',
                                 ];
                                 break;
                             case Picture::STATUS_REMOVED:
                                 $status = [
                                     'class' => 'danger',
-                                    'name'  => 'moder/picture/acceptance/removed'
+                                    'name'  => 'moder/picture/acceptance/removed',
                                 ];
                                 break;
                             case Picture::STATUS_REMOVING:
                                 $status = [
                                     'class' => 'danger',
-                                    'name'  => 'moder/picture/acceptance/removing'
+                                    'name'  => 'moder/picture/acceptance/removing',
                                 ];
                                 break;
                         }
@@ -267,7 +250,6 @@ class CommentHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

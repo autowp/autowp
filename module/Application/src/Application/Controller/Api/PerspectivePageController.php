@@ -2,46 +2,37 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
- * Class PerspectivePageController
- * @package Application\Controller\Api
- *
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  */
 class PerspectivePageController extends AbstractRestfulController
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    /** @var TableGateway */
+    private TableGateway $table;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    /** @var InputFilter */
+    private InputFilter $listInputFilter;
 
     public function __construct(RestHydrator $hydrator, InputFilter $listInputFilter, TableGateway $table)
     {
-        $this->table = $table;
-        $this->hydrator = $hydrator;
+        $this->table           = $table;
+        $this->hydrator        = $hydrator;
         $this->listInputFilter = $listInputFilter;
     }
 
@@ -61,7 +52,7 @@ class PerspectivePageController extends AbstractRestfulController
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => $data['fields']
+            'fields'   => $data['fields'],
         ]);
 
         $select = new Sql\Select($this->table->getTable());
@@ -73,7 +64,7 @@ class PerspectivePageController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 }

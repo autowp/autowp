@@ -2,24 +2,21 @@
 
 namespace Application\Controller\Api\Service;
 
+use Application\Controller\Api\PerspectiveController as Controller;
 use Application\Hydrator\Api\PerspectiveHydrator;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Controller\Api\PerspectiveController as Controller;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PerspectiveControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Controller
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
         $hydrators = $container->get('HydratorManager');
-        $tables = $container->get('TableManager');
+        $tables    = $container->get('TableManager');
         return new Controller(
             $hydrators->get(PerspectiveHydrator::class),
             $tables->get('perspectives')

@@ -2,7 +2,9 @@
 
 namespace Application\Spec\Table;
 
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
+
+use function ucfirst;
 
 abstract class AbstractTable
 {
@@ -10,59 +12,59 @@ abstract class AbstractTable
 
     protected $renderMap = [
         85 => [
-            'name' => 'wheel',
-            'options'  => [
+            'name'    => 'wheel',
+            'options' => [
                 'tyrewidth'  => 87,
                 'tyreseries' => 90,
                 'radius'     => 88,
-                'rimwidth'   => 89
-            ]
+                'rimwidth'   => 89,
+            ],
         ],
         86 => [
-            'name' => 'wheel',
-            'options'  => [
+            'name'    => 'wheel',
+            'options' => [
                 'tyrewidth'  => 91,
                 'tyreseries' => 94,
                 'radius'     => 92,
-                'rimwidth'   => 93
-            ]
+                'rimwidth'   => 93,
+            ],
         ],
         19 => [
-            'name' => 'enginePlacement',
-            'options'  => [
+            'name'    => 'enginePlacement',
+            'options' => [
                 'placement'   => 20,
                 'orientation' => 21,
-            ]
+            ],
         ],
         60 => [
-            'name' => 'bootVolume',
-            'options'  => [
+            'name'    => 'bootVolume',
+            'options' => [
                 'min' => 61,
                 'max' => 62,
-            ]
+            ],
         ],
         57 => [
-            'name' => 'fuelTank',
-            'options'  => [
+            'name'    => 'fuelTank',
+            'options' => [
                 'primary'   => 58,
                 'secondary' => 59,
-            ]
+            ],
         ],
         24 => [
-            'name' => 'engineConfiguration',
-            'options'  => [
+            'name'    => 'engineConfiguration',
+            'options' => [
                 'cylindersCount'  => 25,
                 'cylindersLayout' => 26,
-                'valvesCount'     => 27
-            ]
+                'valvesCount'     => 27,
+            ],
         ],
         42 => [
-            'name' => 'gearbox',
-            'options'  => [
+            'name'    => 'gearbox',
+            'options' => [
                 'type'  => 43,
                 'gears' => 44,
                 'name'  => 139,
-            ]
+            ],
         ],
     ];
 
@@ -86,14 +88,14 @@ abstract class AbstractTable
     {
         $attrId = $attribute['id'];
 
-        $value = isset($values[$attrId]) ? $values[$attrId] : null;
+        $value = $values[$attrId] ?? null;
 
         if (isset($this->renderMap[$attrId])) {
-            $map = $this->renderMap[$attrId];
-            $rendererName = $map['name'];
+            $map             = $this->renderMap[$attrId];
+            $rendererName    = $map['name'];
             $rendererOptions = $map['options'];
         } else {
-            $rendererName = 'defaultValue';
+            $rendererName    = 'defaultValue';
             $rendererOptions = [];
         }
 

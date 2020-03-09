@@ -3,24 +3,33 @@
 namespace Application\Router\Http;
 
 use Exception;
+use Laminas\Router\Http\RouteInterface;
+use Laminas\Router\Http\RouteMatch;
+use Laminas\Stdlib\RequestInterface as Request;
 use Traversable;
-use Zend\Router\Http\RouteInterface;
-use Zend\Router\Http\RouteMatch;
-use Zend\Stdlib\RequestInterface as Request;
+
+use function array_merge;
+use function array_replace;
+use function count;
+use function explode;
+use function implode;
+use function method_exists;
+use function strlen;
+use function urldecode;
+use function urlencode;
 
 class FilePath implements RouteInterface
 {
     private const URI_DELIMITER = '/';
 
-    private $defaults = [];
+    private array $defaults = [];
 
     /**
      * Create a new route with given options.
      *
      * @param  array|Traversable $options
-     * @return FilePath
      */
-    public static function factory($options = [])
+    public static function factory($options = []): self
     {
         return new self($options);
     }
@@ -53,7 +62,7 @@ class FilePath implements RouteInterface
         }
 
         $variables = [
-            'file' => implode('/', $path)
+            'file' => implode('/', $path),
         ];
 
         return new RouteMatch(array_replace($this->defaults, $variables), $length);
@@ -61,12 +70,9 @@ class FilePath implements RouteInterface
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $params
-     * @param array $options
-     * @return string
      * @throws Exception
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string
     {
         $data = array_merge($this->defaults, $params);
 
@@ -85,10 +91,8 @@ class FilePath implements RouteInterface
 
     /**
      * Get a list of parameters used while assembling.
-     *
-     * @return array
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return [];
     }

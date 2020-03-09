@@ -5,29 +5,29 @@ namespace Application\Telegram\Command;
 use Telegram\Bot\Actions;
 use Telegram\Bot\Commands\Command;
 
+use function sprintf;
+
+use const PHP_EOL;
+
 class StartCommand extends Command
 {
-    /**
-     * @var string Command Name
-     */
+    /** @var string Command Name */
     protected $name = "start";
 
-    /**
-     * @var string Command Description
-     */
+    /** @var string Command Description */
     protected $description = "Start Command to get you started";
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function handle($arguments)
     {
         $this->replyWithMessage([
-            'text' => 'Hello! Welcome to our bot, Here are our available commands:'
+            'text' => 'Hello! Welcome to our bot, Here are our available commands:',
         ]);
 
         $this->replyWithChatAction([
-            'action' => Actions::TYPING
+            'action' => Actions::TYPING,
         ]);
 
         $commands = $this->getTelegram()->getCommands();
@@ -41,7 +41,7 @@ class StartCommand extends Command
         // Reply with the commands list
         $this->replyWithMessage([
             'disable_web_page_preview' => true,
-            'text' => $response
+            'text'                     => $response,
         ]);
 
         // Trigger another command dynamically from within this command

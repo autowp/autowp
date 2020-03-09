@@ -3,13 +3,13 @@
 namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\PreviewPictureHydrator as Hydrator;
+use ArrayAccess;
+
+use function is_array;
 
 class PreviewPictures extends HydratorStrategy
 {
-    /**
-     * @return Hydrator
-     */
-    protected function getHydrator()
+    protected function getHydrator(): Hydrator
     {
         if (! $this->hydrator) {
             $this->hydrator = new Hydrator($this->serviceManager);
@@ -18,7 +18,11 @@ class PreviewPictures extends HydratorStrategy
         return $this->hydrator;
     }
 
-    public function extract($value, $context = null)
+    /**
+     * @param array|ArrayAccess $value
+     * @param null|mixed        $context
+     */
+    public function extract($value, $context = null): array
     {
         $hydrator = $this->getHydrator();
 
@@ -30,7 +34,7 @@ class PreviewPictures extends HydratorStrategy
         $result = [];
         foreach ($value as $row) {
             $result[] = $hydrator->extract($row, [
-                'large_format' => $largeFormat
+                'large_format' => $largeFormat,
             ]);
 
             $largeFormat = false;

@@ -2,36 +2,29 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Stdlib\ArrayUtils;
-use Autowp\User\Model\User;
 use Application\View\Helper\UserText;
+use Autowp\User\Model\User;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function is_array;
 
 class MessageHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var UserText
-     */
-    private $userText;
+    private UserText $userText;
 
-    private $router;
+    private TreeRouteStack $router;
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
 
         $this->userModel = $serviceManager->get(User::class);
@@ -55,10 +48,9 @@ class MessageHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -79,9 +71,8 @@ class MessageHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return MessageHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -93,21 +84,21 @@ class MessageHydrator extends RestHydrator
     public function extract($object)
     {
         $result = [
-            'id'                => (int)$object['id'],
-            'text_html'         => $this->userText->__invoke($object['contents']),
-            'is_new'            => $object['isNew'],
-            'can_delete'        => $object['canDelete'],
-            'can_reply'         => $object['canReply'],
-            'date'              => $this->extractValue('date', $object['date']),
-            'all_messages_link' => $object['allMessagesLink'],
-            'dialog_count'      => $object['dialogCount'],
-            'author_id'         => $object['author_id'] ? (int) $object['author_id'] : null,
-            'to_user_id'        => $object['to_user_id'] ? (int) $object['to_user_id'] : null,
-            'dialog_with_user_id' => $object['dialog_with_user_id']
+            'id'                  => (int) $object['id'],
+            'text_html'           => $this->userText->__invoke($object['contents']),
+            'is_new'              => $object['isNew'],
+            'can_delete'          => $object['canDelete'],
+            'can_reply'           => $object['canReply'],
+            'date'                => $this->extractValue('date', $object['date']),
+            'all_messages_link'   => $object['allMessagesLink'],
+            'dialog_count'        => $object['dialogCount'],
+            'author_id'           => $object['author_id'] ? (int) $object['author_id'] : null,
+            'to_user_id'          => $object['to_user_id'] ? (int) $object['to_user_id'] : null,
+            'dialog_with_user_id' => $object['dialog_with_user_id'],
         ];
 
         if ($this->filterComposite->filter('author')) {
-            $author = $this->userModel->getRow((int)$object['author_id']);
+            $author = $this->userModel->getRow((int) $object['author_id']);
 
             $result['author'] = $author ? $this->extractValue('author', $author) : null;
         }
@@ -125,7 +116,6 @@ class MessageHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

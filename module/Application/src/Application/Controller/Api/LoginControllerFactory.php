@@ -7,21 +7,18 @@ use Application\Service\UsersService;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRemember;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class LoginControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return LoginController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): LoginController
     {
         $filters = $container->get('InputFilterManager');
-        $tables = $container->get('TableManager');
+        $tables  = $container->get('TableManager');
         return new LoginController(
             $container->get(UsersService::class),
             $container->get('ExternalLoginServiceManager'),

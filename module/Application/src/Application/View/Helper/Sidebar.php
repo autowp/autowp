@@ -2,14 +2,12 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHtmlElement;
 use Autowp\Message\MessageService;
+use Laminas\View\Helper\AbstractHtmlElement;
 
 class Sidebar extends AbstractHtmlElement
 {
-    /**
-     * @var MessageService
-     */
+    /** @var MessageService */
     private $message;
 
     public function __construct(MessageService $message)
@@ -25,18 +23,18 @@ class Sidebar extends AbstractHtmlElement
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             $count = $this->message->getNewCount($this->view->user()->get()['id']);
 
-            $newPersonalMessages = (int)$count;
+            $newPersonalMessages = (int) $count;
         }
 
         if ($data) {
             return [
-                'newPersonalMessages' => $newPersonalMessages
+                'newPersonalMessages' => $newPersonalMessages,
             ];
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->view->partial('application/sidebar-right', [
-            'newPersonalMessages' => $newPersonalMessages
+            'newPersonalMessages' => $newPersonalMessages,
         ]);
     }
 }

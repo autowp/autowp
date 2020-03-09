@@ -4,8 +4,8 @@ namespace AutowpTest\Traffic\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
 use Autowp\Traffic\Controller\BanController;
-use Zend\Http\Request;
-use Zend\Http\Header\Cookie;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
 
 class BanControllerTest extends AbstractHttpControllerTestCase
 {
@@ -39,7 +39,7 @@ class BanControllerTest extends AbstractHttpControllerTestCase
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/ban/ban-ip/ip/127.0.0.1', Request::METHOD_POST, [
             'period' => '1',
-            'reason' => 'test'
+            'reason' => 'test',
         ]);
 
         $this->assertResponseStatusCode(302);

@@ -2,51 +2,38 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\User\Model\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Contact;
+use Autowp\User\Model\User;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
- * Class ContactsController
- * @package Application\Controller\Api
- *
  * @method \Autowp\User\Controller\Plugin\User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  */
 class ContactsController extends AbstractRestfulController
 {
-    /**
-     * @var Contact
-     */
-    private $contact;
+    /** @var Contact */
+    private Contact $contact;
 
-    /**
-     * @var TableGateway
-     */
-    private $userTable;
+    /** @var TableGateway */
+    private TableGateway $userTable;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    /** @var User */
+    private User $userModel;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    /** @var InputFilter */
+    private InputFilter $listInputFilter;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
     public function __construct(
         Contact $contact,
@@ -55,11 +42,11 @@ class ContactsController extends AbstractRestfulController
         InputFilter $listInputFilter,
         RestHydrator $hydrator
     ) {
-        $this->contact = $contact;
-        $this->userTable = $userTable;
-        $this->userModel = $userModel;
+        $this->contact         = $contact;
+        $this->userTable       = $userTable;
+        $this->userModel       = $userModel;
         $this->listInputFilter = $listInputFilter;
-        $this->hydrator = $hydrator;
+        $this->hydrator        = $hydrator;
     }
 
     public function indexAction()
@@ -81,12 +68,12 @@ class ContactsController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $params['fields'],
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
         ]);
 
         $userRows = $this->userModel->getRows([
             'in_contacts' => $user['id'],
-            'order'       => ['users.deleted', 'users.name']
+            'order'       => ['users.deleted', 'users.name'],
         ]);
 
         $items = [];
@@ -95,20 +82,20 @@ class ContactsController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
     public function getAction()
     {
-        $id = (int)$this->params('id');
+        $id = (int) $this->params('id');
 
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();
         }
 
-        if ($currentUser['id'] == $id) {
+        if ($currentUser['id'] === $id) {
             return $this->notFoundAction();
         }
 
@@ -120,7 +107,7 @@ class ContactsController extends AbstractRestfulController
         $this->getResponse()->setStatusCode(200);
 
         return new JsonModel([
-            'contact_user_id' => $id
+            'contact_user_id' => $id,
         ]);
     }
 
@@ -129,20 +116,20 @@ class ContactsController extends AbstractRestfulController
      */
     public function putAction()
     {
-        $id = (int)$this->params('id');
+        $id = (int) $this->params('id');
 
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->forbiddenAction();
         }
 
-        if ($currentUser['id'] == $id) {
+        if ($currentUser['id'] === $id) {
             return $this->notFoundAction();
         }
 
         $user = $this->userTable->select([
-            'id = ?' => (int)$id,
-            'not deleted'
+            'id = ?' => (int) $id,
+            'not deleted',
         ])->current();
 
         if (! $user) {
@@ -155,25 +142,25 @@ class ContactsController extends AbstractRestfulController
         $this->getResponse()->setStatusCode(200);
 
         return new JsonModel([
-            'status' => true
+            'status' => true,
         ]);
     }
 
     public function deleteAction()
     {
-        $id = (int)$this->params('id');
+        $id = (int) $this->params('id');
 
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();
         }
 
-        if ($currentUser['id'] == $id) {
+        if ($currentUser['id'] === $id) {
             return $this->notFoundAction();
         }
 
         $user = $this->userTable->select([
-            'id' => (int)$id
+            'id' => (int) $id,
         ])->current();
 
         if (! $user) {
@@ -186,7 +173,7 @@ class ContactsController extends AbstractRestfulController
         $this->getResponse()->setStatusCode(204);
 
         return new JsonModel([
-            'status' => true
+            'status' => true,
         ]);
     }
 }

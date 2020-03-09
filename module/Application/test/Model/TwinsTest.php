@@ -2,23 +2,24 @@
 
 namespace ApplicationTest\Model;
 
-use Exception;
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
 use Application\Model\Twins;
 use Application\Test\AbstractHttpControllerTestCase;
+use Exception;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+
+use function array_replace;
+use function count;
+use function explode;
 
 class TwinsTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
-
     /**
      * @suppress PhanUndeclaredMethod
-     * @param array $params
-     * @return int
      * @throws Exception
      */
     private function createItem(array $params): int
@@ -35,18 +36,13 @@ class TwinsTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
-        $itemId = $parts[count($parts) - 1];
-
-        return $itemId;
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
+        return $parts[count($parts) - 1];
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $itemId
-     * @param int $parentId
-     * @param array $params
      * @throws Exception
      */
     private function addItemParent(int $itemId, int $parentId, array $params = []): void
@@ -59,7 +55,7 @@ class TwinsTest extends AbstractHttpControllerTestCase
             Request::METHOD_POST,
             array_replace([
                 'item_id'   => $itemId,
-                'parent_id' => $parentId
+                'parent_id' => $parentId,
             ], $params)
         );
 
@@ -74,17 +70,17 @@ class TwinsTest extends AbstractHttpControllerTestCase
     {
         $vehicle1Id = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'First vehicle'
+            'name'         => 'First vehicle',
         ]);
 
         $vehicle2Id = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'Second vehicle'
+            'name'         => 'Second vehicle',
         ]);
 
         $groupId = $this->createItem([
             'item_type_id' => 4,
-            'name'         => 'Twins group'
+            'name'         => 'Twins group',
         ]);
 
         $this->addItemParent($vehicle1Id, $groupId);

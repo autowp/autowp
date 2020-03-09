@@ -2,21 +2,15 @@
 
 namespace Application\Controller\Plugin;
 
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use Application\Language;
 use Application\FileSize as AppFileSize;
+use Application\Language;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class FileSize extends AbstractPlugin
 {
-    /**
-     * @var AppFileSize
-     */
-    private $filesize;
+    private AppFileSize $filesize;
 
-    /**
-     * @var Language
-     */
-    private $language;
+    private Language $language;
 
     public function __construct(Language $language, AppFileSize $filesize)
     {
@@ -26,12 +20,8 @@ class FileSize extends AbstractPlugin
 
     /**
      * Formats filesize with specified precision
-     *
-     * @param integer $fileSize Filesize in bytes
-     * @param integer $precision Precision
-     * @return string
      */
-    public function __invoke($fileSize, $precision = 0)
+    public function __invoke(int $fileSize, int $precision = 0): string
     {
         return $this->filesize->__invoke($fileSize, $precision);
     }

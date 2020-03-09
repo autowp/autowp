@@ -2,61 +2,47 @@
 
 namespace Application\Hydrator\Api;
 
-use DateTime;
-use DateTimeZone;
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Router\Http\TreeRouteStack;
-use Zend\Stdlib\ArrayUtils;
-use Autowp\User\Model\User;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
+use Autowp\User\Model\User;
+use DateTime;
+use DateTimeZone;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function array_reverse;
+use function is_array;
 
 class AttrUserValueHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specService;
+    private SpecificationsService $specService;
 
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var TreeRouteStack
-     */
-    private $router;
+    private TreeRouteStack $router;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->userId = null;
+        $this->userId = 0;
 
-        $this->item = $serviceManager->get(Item::class);
-        $this->userModel = $serviceManager->get(User::class);
-        $this->specService = $serviceManager->get(SpecificationsService::class);
+        $this->item              = $serviceManager->get(Item::class);
+        $this->userModel         = $serviceManager->get(User::class);
+        $this->specService       = $serviceManager->get(SpecificationsService::class);
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
-        $this->router = $serviceManager->get('HttpRouter');
+        $this->router            = $serviceManager->get('HttpRouter');
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('user', $strategy);
@@ -67,10 +53,9 @@ class AttrUserValueHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -91,9 +76,8 @@ class AttrUserValueHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return AttrUserValueHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -107,19 +91,19 @@ class AttrUserValueHydrator extends RestHydrator
     {
         $updateDate = null;
         if ($object['update_date']) {
-            $timezone = new DateTimeZone(MYSQL_TIMEZONE);
+            $timezone   = new DateTimeZone(MYSQL_TIMEZONE);
             $updateDate = DateTime::createFromFormat(MYSQL_DATETIME_FORMAT, $object['update_date'], $timezone);
         }
 
         $result = [
             'update_date'  => $updateDate ? $updateDate->format(DateTime::ISO8601) : null,
-            'item_id'      => (int)$object['item_id'],
-            'attribute_id' => (int)$object['attribute_id'],
-            'user_id'      => (int)$object['user_id'],
+            'item_id'      => (int) $object['item_id'],
+            'attribute_id' => (int) $object['attribute_id'],
+            'user_id'      => (int) $object['user_id'],
         ];
 
         if ($this->filterComposite->filter('value')) {
-            $value = $this->specService->getUserValue2(
+            $value           = $this->specService->getUserValue2(
                 $object['attribute_id'],
                 $object['item_id'],
                 $object['user_id']
@@ -144,14 +128,14 @@ class AttrUserValueHydrator extends RestHydrator
         if ($this->filterComposite->filter('path')) {
             $attributeTable = $this->specService->getAttributeTable();
 
-            $path = [];
+            $path      = [];
             $attribute = $attributeTable->select(['id' => $object['attribute_id']])->current();
             if ($attribute) {
                 $parents = [];
-                $parent = $attribute;
+                $parent  = $attribute;
                 do {
                     $parents[] = $parent['name'];
-                    $parent = $attributeTable->select(['id' => $parent['parent_id']])->current();
+                    $parent    = $attributeTable->select(['id' => $parent['parent_id']])->current();
                 } while ($parent);
 
                 $path = array_reverse($parents);
@@ -176,7 +160,7 @@ class AttrUserValueHydrator extends RestHydrator
             $user = null;
             if ($object['item_id']) {
                 $itemRow = $this->item->getRow([
-                    'id' => (int) $object['item_id']
+                    'id' => (int) $object['item_id'],
                 ]);
                 if ($itemRow) {
                     $user = $this->extractValue('item', $itemRow);
@@ -191,7 +175,6 @@ class AttrUserValueHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

@@ -2,17 +2,14 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
 
 class SpecController extends AbstractRestfulController
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     public function __construct(TableGateway $table)
     {
@@ -26,20 +23,20 @@ class SpecController extends AbstractRestfulController
 
         if ($parentId) {
             $select->where([
-                'parent_id' => $parentId
+                'parent_id' => $parentId,
             ]);
         } else {
             $select->where(['parent_id is null']);
         }
 
-        $rows = $this->table->selectWith($select);
+        $rows   = $this->table->selectWith($select);
         $result = [];
         foreach ($rows as $row) {
             $result[] = [
-                'id'         => (int)$row['id'],
+                'id'         => (int) $row['id'],
                 'name'       => $row['name'],
                 'short_name' => $row['short_name'],
-                'childs'     => $this->getSpecOptions($row['id'])
+                'childs'     => $this->getSpecOptions($row['id']),
             ];
         }
 

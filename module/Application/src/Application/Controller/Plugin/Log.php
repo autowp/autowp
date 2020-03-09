@@ -2,16 +2,13 @@
 
 namespace Application\Controller\Plugin;
 
-use Exception;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Application\Model\Log as Model;
+use Exception;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class Log extends AbstractPlugin
 {
-    /**
-     * @var Model
-     */
-    private $log;
+    private Model $log;
 
     public function __construct(Model $log)
     {

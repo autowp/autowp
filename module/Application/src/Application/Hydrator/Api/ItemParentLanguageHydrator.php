@@ -8,17 +8,14 @@ class ItemParentLanguageHydrator extends RestHydrator
 {
     public function extract($object)
     {
-        $result = [
+        return [
             'language' => $object['language'],
-            'name'     => $object['name']
+            'name'     => $object['name'],
         ];
-
-        return $result;
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

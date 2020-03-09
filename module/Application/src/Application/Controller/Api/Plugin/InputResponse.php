@@ -2,10 +2,10 @@
 
 namespace Application\Controller\Api\Plugin;
 
-use Zend\InputFilter\Input;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\InputFilter\Input;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class InputResponse extends AbstractPlugin
 {

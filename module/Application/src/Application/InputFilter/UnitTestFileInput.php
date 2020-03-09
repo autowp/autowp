@@ -2,12 +2,10 @@
 
 namespace Application\InputFilter;
 
-use Zend\InputFilter\FileInput;
+use Laminas\InputFilter\FileInput;
 
 class UnitTestFileInput extends FileInput
 {
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $autoPrependUploadValidator = false;
 }

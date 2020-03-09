@@ -2,40 +2,33 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Paginator;
-use Zend\View\Model\JsonModel;
 use Application\Hydrator\Api\RestHydrator;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Paginator;
+use Laminas\View\Model\JsonModel;
+
+use function get_object_vars;
 
 class ArticleController extends AbstractActionController
 {
     public const PREVIEW_CAT_PATH = '/img/articles/preview/';
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    private InputFilter $listInputFilter;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    private RestHydrator $hydrator;
 
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     public function __construct(
         TableGateway $table,
         InputFilter $listInputFilter,
         RestHydrator $hydrator
     ) {
-        $this->table = $table;
+        $this->table           = $table;
         $this->listInputFilter = $listInputFilter;
-        $this->hydrator = $hydrator;
+        $this->hydrator        = $hydrator;
     }
 
     public function indexAction()
@@ -64,7 +57,6 @@ class ArticleController extends AbstractActionController
             ->setItemCountPerPage($data['limit'] > 0 ? $data['limit'] : 1)
             ->setCurrentPageNumber($data['page']);
 
-
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
@@ -77,7 +69,7 @@ class ArticleController extends AbstractActionController
 
         return new JsonModel([
             'paginator' => get_object_vars($paginator->getPages()),
-            'items'     => $items
+            'items'     => $items,
         ]);
     }
 }

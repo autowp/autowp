@@ -2,9 +2,9 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Zend\Http\Request;
-use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\AboutController;
+use Application\Test\AbstractHttpControllerTestCase;
+use Laminas\Http\Request;
 
 class AboutControllerTest extends AbstractHttpControllerTestCase
 {

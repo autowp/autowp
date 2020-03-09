@@ -2,8 +2,13 @@
 
 namespace Application\Filter\Api;
 
-use Zend\Filter\AbstractFilter;
-use Zend\Stdlib\ArrayUtils;
+use Laminas\Filter\AbstractFilter;
+use Laminas\Stdlib\ArrayUtils;
+
+use function explode;
+use function is_string;
+use function strpos;
+use function substr;
 
 class FieldsFilter extends AbstractFilter
 {
@@ -20,15 +25,15 @@ class FieldsFilter extends AbstractFilter
     {
         $dotPos = strpos($value, '.');
         if ($dotPos !== false) {
-            $fieldName = substr($value, 0, $dotPos);
+            $fieldName  = substr($value, 0, $dotPos);
             $fieldValue = $this->parseValue(substr($value, $dotPos + 1));
         } else {
-            $fieldName = $value;
+            $fieldName  = $value;
             $fieldValue = true;
         }
 
         return [
-            $fieldName => $fieldValue
+            $fieldName => $fieldValue,
         ];
     }
 

@@ -2,33 +2,24 @@
 
 namespace Application\Controller\Plugin;
 
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Application\Model\Catalogue as CatalogueModel;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class Catalogue extends AbstractPlugin
 {
-    /**
-     * @var CatalogueModel
-     */
-    private $catalogue;
+    private CatalogueModel $catalogue;
 
     public function __construct(CatalogueModel $catalogue)
     {
         $this->catalogue = $catalogue;
     }
 
-    /**
-     * @return CatalogueModel
-     */
-    public function __invoke()
+    public function __invoke(): CatalogueModel
     {
         return $this->getCatalogue();
     }
 
-    /**
-     * @return CatalogueModel
-     */
-    public function getCatalogue()
+    public function getCatalogue(): CatalogueModel
     {
         return $this->catalogue;
     }

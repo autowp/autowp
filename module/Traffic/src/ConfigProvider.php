@@ -2,8 +2,8 @@
 
 namespace Autowp\Traffic;
 
-use Zend\Router\Http\Literal;
-use Zend\Router\Http\Segment;
+use Laminas\Router\Http\Literal;
+use Laminas\Router\Http\Segment;
 
 class ConfigProvider
 {
@@ -20,8 +20,8 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                Controller\BanController::class     => Controller\BanControllerFactory::class,
-            ]
+                Controller\BanController::class => Controller\BanControllerFactory::class,
+            ],
         ];
     }
 
@@ -32,8 +32,8 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                TrafficControl::class => Service\TrafficControlFactory::class
-            ]
+                TrafficControl::class => Service\TrafficControlFactory::class,
+            ],
         ];
     }
 
@@ -42,8 +42,8 @@ class ConfigProvider
         return [
             'routes' => [
                 'ban' => [
-                    'type' => Literal::class,
-                    'options' => [
+                    'type'          => Literal::class,
+                    'options'       => [
                         'route'    => '/ban',
                         'defaults' => [
                             'controller' => Controller\BanController::class,
@@ -52,27 +52,27 @@ class ConfigProvider
                     ],
                     'may_terminate' => false,
                     'child_routes'  => [
-                        'ban-ip' => [
-                            'type' => Segment::class,
+                        'ban-ip'   => [
+                            'type'    => Segment::class,
                             'options' => [
-                                'route'  => '/ban-ip/ip/:ip',
+                                'route'    => '/ban-ip/ip/:ip',
                                 'defaults' => [
                                     'action' => 'ban-ip',
-                                ]
-                            ]
+                                ],
+                            ],
                         ],
                         'unban-ip' => [
-                            'type' => Segment::class,
+                            'type'    => Segment::class,
                             'options' => [
-                                'route'  => '/unban-ip/ip/:ip',
+                                'route'    => '/unban-ip/ip/:ip',
                                 'defaults' => [
                                     'action' => 'unban-ip',
-                                ]
-                            ]
+                                ],
+                            ],
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
     }
 }

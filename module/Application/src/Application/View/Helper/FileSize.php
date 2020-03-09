@@ -2,21 +2,15 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
-use Application\Language as AppLanguage;
 use Application\FileSize as AppFileSize;
+use Application\Language as AppLanguage;
+use Laminas\View\Helper\AbstractHelper;
 
 class FileSize extends AbstractHelper
 {
-    /**
-     * @var AppFileSize
-     */
-    private $filesize;
+    private AppFileSize $filesize;
 
-    /**
-     * @var AppLanguage
-     */
-    private $language;
+    private AppLanguage $language;
 
     public function __construct(AppLanguage $language, AppFileSize $filesize)
     {
@@ -26,12 +20,8 @@ class FileSize extends AbstractHelper
 
     /**
      * Formats filesize with specified precision
-     *
-     * @param integer $fileSize Filesize in bytes
-     * @param integer $precision Precision
-     * @return string
      */
-    public function __invoke($fileSize, $precision = 0)
+    public function __invoke(int $fileSize, int $precision = 0): string
     {
         return $this->filesize->__invoke($fileSize, $precision);
     }

@@ -2,15 +2,12 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Mvc\Controller\AbstractActionController;
 use Application\Service\SpecificationsService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class SpecsController extends AbstractActionController
 {
-    /**
-     * @var SpecificationsService
-     */
-    private $specsService = null;
+    private SpecificationsService $specsService;
 
     public function __construct(SpecificationsService $specsService)
     {

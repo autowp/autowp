@@ -3,7 +3,7 @@
 namespace Application;
 
 use Application\InputFilter\AttrUserValueCollectionInputFilter;
-use Zend\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilter;
 
 use Autowp\Comments\Attention;
 use Autowp\Comments\CommentsService;

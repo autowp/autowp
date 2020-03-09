@@ -14,18 +14,15 @@ use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
 use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CarOfDayFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return CarOfDay
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): CarOfDay
     {
         $tables = $container->get('TableManager');
         return new CarOfDay(

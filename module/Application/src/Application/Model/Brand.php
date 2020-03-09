@@ -2,12 +2,36 @@
 
 namespace Application\Model;
 
+use Autowp\Image;
 use Collator;
 use Exception;
 use ImagickException;
+use Laminas\Db\Sql;
 use Transliterator;
-use Zend\Db\Sql;
-use Autowp\Image;
+
+use function array_replace;
+use function array_values;
+use function ceil;
+use function chmod;
+use function count;
+use function escapeshellarg;
+use function exec;
+use function file_put_contents;
+use function floor;
+use function implode;
+use function is_numeric;
+use function is_string;
+use function mb_strtoupper;
+use function mb_substr;
+use function ord;
+use function preg_match;
+use function sprintf;
+use function sqrt;
+use function str_replace;
+use function sys_get_temp_dir;
+use function tempnam;
+use function uksort;
+use function usort;
 
 class Brand
 {
@@ -19,12 +43,9 @@ class Brand
 
     private const ICON_FORMAT = 'brandicon';
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    private $collators = [];
+    private array $collators = [];
 
     public function __construct(Item $item)
     {
@@ -45,8 +66,8 @@ class Brand
         $coll = $this->getCollator($language);
         switch ($language) {
             case 'zh':
-                $aIsHan = (bool)preg_match("/^\p{Han}/u", $a);
-                $bIsHan = (bool)preg_match("/^\p{Han}/u", $b);
+                $aIsHan = (bool) preg_match("/^\p{Han}/u", $a);
+                $bIsHan = (bool) preg_match("/^\p{Han}/u", $b);
 
                 if ($aIsHan && ! $bIsHan) {
                     return -1;
@@ -67,10 +88,8 @@ class Brand
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
-     * @param string $language
-     * @return array
      */
-    public function getTopBrandsList(string $language)
+    public function getTopBrandsList(string $language): array
     {
         $subSelect = new Sql\Select(['product' => 'item']);
         $subSelect->columns([new Sql\Expression('count(distinct product.id)')])
@@ -81,12 +100,14 @@ class Brand
         $rows = $this->item->getRows([
             'language'     => $language,
             'columns'      => [
-                'id', 'catname', 'name',
-                'cars_count' => $subSelect
+                'id',
+                'catname',
+                'name',
+                'cars_count' => $subSelect,
             ],
             'item_type_id' => Item::BRAND,
             'limit'        => self::TOP_COUNT,
-            'order'        => 'cars_count DESC'
+            'order'        => 'cars_count DESC',
         ]);
 
         $items = [];
@@ -100,18 +121,18 @@ class Brand
                     new Sql\Predicate\Expression(
                         'item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)',
                         [self::NEW_DAYS]
-                    )
+                    ),
                 ]);
             $row = $this->item->getTable()->selectWith($select)->current();
 
-            $newCarsCount = $row ? (int)$row['count'] : 0;
+            $newCarsCount = $row ? (int) $row['count'] : 0;
 
             $items[] = [
                 'id'             => $brandRow['id'],
                 'catname'        => $brandRow['catname'],
                 'name'           => $brandRow['name'],
                 'cars_count'     => $brandRow['cars_count'],
-                'new_cars_count' => $newCarsCount
+                'new_cars_count' => $newCarsCount,
             ];
         }
 
@@ -124,7 +145,7 @@ class Brand
 
     private function utfCharToNumber($char)
     {
-        $i = 0;
+        $i      = 0;
         $number = '';
         while (isset($char[$i])) {
             $number .= ord($char[$i]);
@@ -135,10 +156,8 @@ class Brand
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param string $language
-     * @return array
      */
-    public function getFullBrandsList(string $language)
+    public function getFullBrandsList(string $language): array
     {
         $select = new Sql\Select(['ipc_all' => 'item_parent_cache']);
         $select->columns([new Sql\Expression('COUNT(DISTINCT pictures.id)')])
@@ -146,23 +165,23 @@ class Brand
             ->join('pictures', 'picture_item.picture_id = pictures.id', [])
             ->where([
                 'item.id = ipc_all.parent_id',
-                'pictures.status' => Picture::STATUS_ACCEPTED
+                'pictures.status' => Picture::STATUS_ACCEPTED,
             ]);
 
         $rows = $this->getList([
             'language' => $language,
             'columns'  => [
                 'logo_id',
-                'cars_count' => new Sql\Expression(
+                'cars_count'     => new Sql\Expression(
                     'COUNT(subitem.id)'
                 ),
                 'new_cars_count' => new Sql\Expression(
                     'COUNT(IF(subitem.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY), 1, NULL))',
                     [self::NEW_DAYS]
                 ),
-                'pictures_count' => $select
-            ]
-        ], function (Sql\Select $select) use ($language) {
+                'pictures_count' => $select,
+            ],
+        ], function (Sql\Select $select) {
             $select
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
                 ->where(['item_parent_cache.item_id <> item_parent_cache.parent_id'])
@@ -174,7 +193,7 @@ class Brand
             'numbers'  => [],
             'cyrillic' => [],
             'latin'    => [],
-            'other'    => []
+            'other'    => [],
         ];
 
         $tr = Transliterator::create('Any-Latin;Latin-ASCII;');
@@ -188,14 +207,14 @@ class Brand
 
             $char = mb_substr($name, 0, 1);
 
-            $isNumber = preg_match("/^[0-9]$/u", $char);
+            $isNumber   = preg_match("/^[0-9]$/u", $char);
             $isCyrillic = false;
-            $isLatin = false;
+            $isLatin    = false;
 
             if (! $isNumber) {
                 $isHan = preg_match("/^\p{Han}$/u", $char);
                 if ($isHan) {
-                    $char = mb_substr($tr->transliterate($char), 0, 1);
+                    $char    = mb_substr($tr->transliterate($char), 0, 1);
                     $isLatin = true;
                 }
 
@@ -225,7 +244,7 @@ class Brand
                 $result[$line][$char] = [
                     'id'     => $this->utfCharToNumber($char),
                     'char'   => $char,
-                    'brands' => []
+                    'brands' => [],
                 ];
             }
 
@@ -234,13 +253,13 @@ class Brand
                 $row['unsortedpictures_count'];*/
 
             $result[$line][$char]['brands'][] = [
-                'id'             => (int)$row['id'],
-                'name'           => $name,
-                'catname'        => $row['catname'],
-                'logo_id'        => $row['logo_id'],
-                'totalPictures'  => (int)$row['pictures_count'],
-                'newCars'        => (int)$row['new_cars_count'],
-                'totalCars'      => (int)$row['cars_count']
+                'id'            => (int) $row['id'],
+                'name'          => $name,
+                'catname'       => $row['catname'],
+                'logo_id'       => $row['logo_id'],
+                'totalPictures' => (int) $row['pictures_count'],
+                'newCars'       => (int) $row['new_cars_count'],
+                'totalCars'     => (int) $row['cars_count'],
             ];
         }
 
@@ -260,9 +279,7 @@ class Brand
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param string $language
      * @param $callback
-     * @return array|null
      * @throws Exception
      */
     private function fetchBrand(string $language, $callback): ?array
@@ -270,7 +287,7 @@ class Brand
         $select = $this->item->getSelect([
             'language'     => $language,
             'columns'      => ['id', 'catname', 'name', 'full_name', 'logo_id'],
-            'item_type_id' => Item::BRAND
+            'item_type_id' => Item::BRAND,
         ]);
 
         $callback($select);
@@ -291,9 +308,6 @@ class Brand
     }
 
     /**
-     * @param int $id
-     * @param string $language
-     * @return array|null
      * @throws Exception
      */
     public function getBrandById(int $id, string $language): ?array
@@ -304,9 +318,6 @@ class Brand
     }
 
     /**
-     * @param string $catname
-     * @param string $language
-     * @return array|null
      * @throws Exception
      */
     public function getBrandByCatname(string $catname, string $language): ?array
@@ -318,29 +329,27 @@ class Brand
 
     /**
      * @param $options
-     * @param callable|null $callback
-     * @return array
      * @throws Exception
      */
-    public function getList($options, callable $callback = null): array
+    public function getList($options, ?callable $callback = null): array
     {
         if (is_string($options)) {
             $options = [
-                'language' => $options
+                'language' => $options,
             ];
         }
 
         $defaults = [
             'language' => 'en',
-            'columns'  => []
+            'columns'  => [],
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $columns = [
             'id',
             'catname',
             'position',
-            'name'
+            'name',
         ];
         foreach ($options['columns'] as $column => $expr) {
             switch ($expr) {
@@ -360,10 +369,10 @@ class Brand
         }
 
         $select = $this->item->getSelect([
-            'language'     => (string)$options['language'],
+            'language'     => (string) $options['language'],
             'columns'      => $columns,
             'item_type_id' => Item::BRAND,
-            'order'        => 'item.position'
+            'order'        => 'item.position',
         ]);
 
         if ($callback) {
@@ -376,9 +385,8 @@ class Brand
         }
 
         usort($items, function ($a, $b) use ($options) {
-
-            if ($a['position'] != $b['position']) {
-                return ($a['position'] < $b['position']) ? -1 : 1;
+            if ($a['position'] !== $b['position']) {
+                return $a['position'] < $b['position'] ? -1 : 1;
             }
 
             return $this->compareName($a['name'], $b['name'], $options['language']);
@@ -388,9 +396,6 @@ class Brand
     }
 
     /**
-     * @param Image\Storage $imageStorage
-     * @param string $destImg
-     * @param string $destCss
      * @throws Image\Storage\Exception
      * @throws ImagickException
      * @throws Exception
@@ -400,8 +405,8 @@ class Brand
         $list = $this->getList([
             'language' => 'en',
             'columns'  => [
-                'logo_id'
-            ]
+                'logo_id',
+            ],
         ], function ($select) {
             $select->where(['logo_id']);
         });
@@ -419,14 +424,14 @@ class Brand
             }
 
             if ($img) {
-                $img = str_replace('http://i.wheelsage.org/', PUBLIC_DIR . '/', $img);
-                $catname = str_replace('.', '_', $brand['catname']);
+                $img              = str_replace('http://i.wheelsage.org/', PUBLIC_DIR . '/', $img);
+                $catname          = str_replace('.', '_', $brand['catname']);
                 $images[$catname] = escapeshellarg($img);
             }
         }
 
         $count = count($images);
-        $width = (int)ceil(sqrt($count));
+        $width = (int) ceil(sqrt($count));
         if ($width <= 0) {
             $width = 1;
         }
@@ -443,11 +448,11 @@ class Brand
         chmod($cmdFilename, 0700);
         exec($cmdFilename);
 
-        $css = [];
+        $css   = [];
         $index = 0;
         foreach ($images as $catname => $img) {
-            $top = floor($index / $width);
-            $left = $index - $top * $width;
+            $top   = floor($index / $width);
+            $left  = $index - $top * $width;
             $css[] = sprintf(
                 '.brandicon.brandicon-%s {background-position: -%dpx -%dpx}',
                 $catname,

@@ -3,63 +3,41 @@
 namespace Application\Controller\Api;
 
 use Application\Comments;
-use Exception;
-use ImagickException;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use Autowp\Comments\CommentsService;
-use Autowp\Image\Storage;
-use Autowp\User\Controller\Plugin\User;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\PictureNameFormatter;
+use Autowp\Comments\CommentsService;
+use Autowp\Image\Storage;
+use Autowp\User\Controller\Plugin\User;
+use Exception;
+use ImagickException;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+
+use function floor;
 
 /**
- * Class ItemGalleryController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
  * @method Storage imageStorage()
  * @method string language()
  */
 class GalleryController extends AbstractRestfulController
 {
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var CommentsService
-     */
-    private $comments;
+    private CommentsService $comments;
 
-    /**
-     * @var PictureNameFormatter
-     */
-    private $pictureNameFormatter;
+    private PictureNameFormatter $pictureNameFormatter;
 
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var PictureItem
-     */
-    private $pictureItem;
+    private PictureItem $pictureItem;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
-    /**
-     * @var integer
-     */
-    private $itemsPerPage = 10;
+    private int $itemsPerPage = 10;
 
     public function __construct(
         Picture $picture,
@@ -69,21 +47,21 @@ class GalleryController extends AbstractRestfulController
         PictureNameFormatter $pictureNameFormatter,
         ItemNameFormatter $itemNameFormatter
     ) {
-        $this->picture = $picture;
-        $this->pictureItem = $pictureItem;
-        $this->itemModel = $itemModel;
-        $this->comments = $comments;
+        $this->picture              = $picture;
+        $this->pictureItem          = $pictureItem;
+        $this->itemModel            = $itemModel;
+        $this->comments             = $comments;
         $this->pictureNameFormatter = $pictureNameFormatter;
-        $this->itemNameFormatter = $itemNameFormatter;
+        $this->itemNameFormatter    = $itemNameFormatter;
     }
 
     private function getPicturePage(array $filter, $identity): int
     {
         unset($filter['identity']);
         $filter['columns'] = ['identity'];
-        $rows = $this->picture->getRows($filter);
+        $rows              = $this->picture->getRows($filter);
         foreach ($rows as $index => $row) {
-            if ($row['identity'] == $identity) {
+            if ($row['identity'] === $identity) {
                 return (int) floor($index / $this->itemsPerPage) + 1;
             }
         }
@@ -99,7 +77,7 @@ class GalleryController extends AbstractRestfulController
      */
     public function galleryAction()
     {
-        $itemID = (int)$this->params()->fromQuery('item_id');
+        $itemID = (int) $this->params()->fromQuery('item_id');
 
         $filter = [
             'order'  => 'resolution_desc',
@@ -126,7 +104,7 @@ class GalleryController extends AbstractRestfulController
             $filter['item']['link_type'] = $exactItemLinkType;
         }
 
-        $page = $this->params()->fromQuery('page');
+        $page            = $this->params()->fromQuery('page');
         $pictureIdentity = $this->params()->fromQuery('picture_identity');
 
         if (! $itemID && ! $pictureIdentity) {
@@ -151,14 +129,14 @@ class GalleryController extends AbstractRestfulController
         $language = $this->language();
 
         if ($pictureIdentity) {
-            if (! $itemID && !$exactItemID) {
+            if (! $itemID && ! $exactItemID) {
                 $filter['identity'] = $pictureIdentity;
             }
 
             // look for page of that picture
             $filterCopy = $filter;
             unset($filterCopy['status']);
-            $filterCopy['columns'] = ['status'];
+            $filterCopy['columns']  = ['status'];
             $filterCopy['identity'] = $pictureIdentity;
 
             $row = $this->picture->getRow($filterCopy);
@@ -168,12 +146,18 @@ class GalleryController extends AbstractRestfulController
             }
 
             $filter['status'] = $row['status'];
-            $page = $this->getPicturePage($filter, $pictureIdentity);
+            $page             = $this->getPicturePage($filter, $pictureIdentity);
         }
 
         $filter['columns'] = [
-            'id', 'identity', 'name', 'width', 'height',
-            'image_id', 'filesize', 'messages'
+            'id',
+            'identity',
+            'name',
+            'width',
+            'height',
+            'image_id',
+            'filesize',
+            'messages',
         ];
 
         $paginator = $this->picture->getPaginator($filter);
@@ -185,38 +169,37 @@ class GalleryController extends AbstractRestfulController
         $rows = $paginator->getCurrentItems();
 
         // prefetch
-        $ids = [];
+        $ids          = [];
         $fullRequests = [];
         $cropRequests = [];
-        $crops = [];
-        $imageIds = [];
+        $crops        = [];
+        $imageIds     = [];
         foreach ($rows as $idx => $picture) {
-            $imageId = (int)$picture['image_id'];
+            $imageId            = (int) $picture['image_id'];
             $fullRequests[$idx] = $imageId;
 
             $crop = $imageStorage->getImageCrop($imageId);
 
             if ($crop) {
                 $cropRequests[$idx] = $imageId;
-                $crops[$idx] = $crop;
+                $crops[$idx]        = $crop;
             }
-            $ids[] = (int)$picture['id'];
-            $imageIds[] = (int)$imageId;
+            $ids[]      = (int) $picture['id'];
+            $imageIds[] = (int) $imageId;
         }
 
         // images
-        $images = $imageStorage->getImages($imageIds);
+        $images         = $imageStorage->getImages($imageIds);
         $fullImagesInfo = $imageStorage->getFormatedImages($fullRequests, 'picture-gallery-full');
         $cropImagesInfo = $imageStorage->getFormatedImages($cropRequests, 'picture-gallery');
 
-
         // names
         $names = $this->picture->getNameData($rows, [
-            'language' => $language
+            'language' => $language,
         ]);
 
         // comments
-        $userId = $this->user()->get()['id'];
+        $userId      = $this->user()->get()['id'];
         $newMessages = [];
         if ($userId) {
             $newMessages = $this->comments->getNewMessages(
@@ -228,18 +211,18 @@ class GalleryController extends AbstractRestfulController
 
         $gallery = [];
         foreach ($rows as $idx => $row) {
-            $imageId = (int)$row['image_id'];
+            $imageId = (int) $row['image_id'];
 
             if (! $imageId) {
                 continue;
             }
 
-            $image = isset($images[$imageId]) ? $images[$imageId] : null;
+            $image = $images[$imageId] ?? null;
             if (! $image) {
                 continue;
             }
 
-            $itemID = (int)$row['id'];
+            $itemID = (int) $row['id'];
 
             $sUrl = $image->getSrc();
 
@@ -261,23 +244,23 @@ class GalleryController extends AbstractRestfulController
 
             $full = isset($fullImagesInfo[$idx]) ? $fullImagesInfo[$idx]->toArray() : null;
 
-            $msgCount = $row['messages'];
+            $msgCount    = $row['messages'];
             $newMsgCount = 0;
             if ($userId) {
-                $newMsgCount = isset($newMessages[$itemID]) ? $newMessages[$itemID] : $msgCount;
+                $newMsgCount = $newMessages[$itemID] ?? $msgCount;
             }
 
-            $name = isset($names[$itemID]) ? $names[$itemID] : null;
+            $name = $names[$itemID] ?? null;
             $name = $this->pictureNameFormatter->format($name, $language);
 
             $itemsData = $this->pictureItem->getData([
                 'picture'      => $row['id'],
-                'onlyWithArea' => true
+                'onlyWithArea' => true,
             ]);
 
             $areas = [];
             foreach ($itemsData as $pictureItem) {
-                $item = $this->itemModel->getRow(['id' => $pictureItem['item_id']]);
+                $item    = $this->itemModel->getRow(['id' => $pictureItem['item_id']]);
                 $areas[] = [
                     'area' => [
                         'left'   => $pictureItem['area'][0] / $image->getWidth(),
@@ -288,7 +271,7 @@ class GalleryController extends AbstractRestfulController
                     'name' => $this->itemNameFormatter->formatHtml(
                         $this->itemModel->getNameData($item, $language),
                         $language
-                    )
+                    ),
                 ];
             }
 
@@ -302,7 +285,7 @@ class GalleryController extends AbstractRestfulController
                 'newMessages' => $newMsgCount,
                 'name'        => $name,
                 'filesize'    => (int) $row['filesize'],
-                'areas'       => $areas
+                'areas'       => $areas,
             ];
         }
 

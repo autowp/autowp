@@ -2,7 +2,9 @@
 
 namespace Application\Spec\Table\Value;
 
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
+
+use function implode;
 
 class EnginePlacement
 {
@@ -11,22 +13,20 @@ class EnginePlacement
 
     public function __construct(array $options)
     {
-        $this->placement = $options['placement'];
+        $this->placement   = $options['placement'];
         $this->orientation = $options['orientation'];
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param PhpRenderer $view
      * @param $attribute
      * @param $value
      * @param $values
-     * @return string
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values)
+    public function render(PhpRenderer $view, $attribute, $value, $values): string
     {
-        $placement = isset($values[$this->placement]) ? $values[$this->placement] : null;
-        $orientation = isset($values[$this->orientation]) ? $values[$this->orientation] : null;
+        $placement   = $values[$this->placement] ?? null;
+        $orientation = $values[$this->orientation] ?? null;
 
         $array = [];
         if ($placement) {

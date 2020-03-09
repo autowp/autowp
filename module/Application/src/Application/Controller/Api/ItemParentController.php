@@ -2,20 +2,7 @@
 
 namespace Application\Controller\Api;
 
-use ArrayObject;
-use Exception;
-use Zend\Db\Sql;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Paginator;
-use Zend\Uri\Uri;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\Message\MessageService;
-use Autowp\User\Controller\Plugin\User;
 use Application\Controller\Plugin\Car;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
@@ -23,80 +10,61 @@ use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
+use ArrayObject;
+use Autowp\Message\MessageService;
+use Autowp\User\Controller\Plugin\User;
+use Exception;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Sql;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Paginator;
+use Laminas\Uri\Uri;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function array_key_exists;
+use function array_keys;
+use function get_object_vars;
+use function htmlspecialchars;
+use function sprintf;
+use function strlen;
 
 /**
- * Class ItemParentController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method void log(string $message, array $objects)
  * @method Car car()
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */
 class ItemParentController extends AbstractRestfulController
 {
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    private RestHydrator $hydrator;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    private ItemParent $itemParent;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specificationsService;
+    private SpecificationsService $specificationsService;
 
-    /**
-     * @var HostManager
-     */
-    private $hostManager;
+    private HostManager $hostManager;
 
-    /**
-     * @var MessageService
-     */
-    private $message;
+    private MessageService $message;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    private InputFilter $listInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $itemInputFilter;
+    private InputFilter $itemInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $postInputFilter;
+    private InputFilter $postInputFilter;
 
-    /**
-     * @var UserItemSubscribe
-     */
-    private $userItemSubscribe;
+    private UserItemSubscribe $userItemSubscribe;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
-    /**
-     * @var VehicleType
-     */
-    private $vehicleType;
+    private VehicleType $vehicleType;
 
-    /**
-     * @var InputFilter
-     */
-    private $putInputFilter;
+    private InputFilter $putInputFilter;
 
     public function __construct(
         RestHydrator $hydrator,
@@ -112,19 +80,19 @@ class ItemParentController extends AbstractRestfulController
         Item $itemModel,
         VehicleType $vehicleType
     ) {
-        $this->hydrator = $hydrator;
+        $this->hydrator        = $hydrator;
         $this->listInputFilter = $listInputFilter;
         $this->itemInputFilter = $itemInputFilter;
         $this->postInputFilter = $postInputFilter;
-        $this->putInputFilter = $putInputFilter;
+        $this->putInputFilter  = $putInputFilter;
 
-        $this->itemParent = $itemParent;
+        $this->itemParent            = $itemParent;
         $this->specificationsService = $specificationsService;
-        $this->hostManager = $hostManager;
-        $this->message = $message;
-        $this->userItemSubscribe = $userItemSubscribe;
-        $this->itemModel = $itemModel;
-        $this->vehicleType = $vehicleType;
+        $this->hostManager           = $hostManager;
+        $this->message               = $message;
+        $this->userItemSubscribe     = $userItemSubscribe;
+        $this->itemModel             = $itemModel;
+        $this->vehicleType           = $vehicleType;
     }
 
     /**
@@ -233,7 +201,7 @@ class ItemParentController extends AbstractRestfulController
                     'item.body',
                     'item.spec_id',
                     'item.begin_order_cache',
-                    'item.end_order_cache'
+                    'item.end_order_cache',
                 ]);
                 break;
         }
@@ -255,7 +223,7 @@ class ItemParentController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
         ]);
 
         $items = [];
@@ -265,7 +233,7 @@ class ItemParentController extends AbstractRestfulController
 
         return new JsonModel([
             'paginator' => get_object_vars($paginator->getPages()),
-            'items'     => $items
+            'items'     => $items,
         ]);
     }
 
@@ -285,8 +253,8 @@ class ItemParentController extends AbstractRestfulController
         $data = $this->itemInputFilter->getValues();
 
         $row = $this->itemParent->getRow(
-            (int)$this->params('parent_id'),
-            (int)$this->params('item_id')
+            (int) $this->params('parent_id'),
+            (int) $this->params('item_id')
         );
         if (! $row) {
             return $this->notFoundAction();
@@ -295,14 +263,13 @@ class ItemParentController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
         ]);
 
         return new JsonModel($this->hydrator->extract($row));
     }
 
     /**
-     * @return ForbiddenAction|array|ApiProblemResponse
      * @throws Exception
      */
     public function postAction()
@@ -329,14 +296,14 @@ class ItemParentController extends AbstractRestfulController
         $data = $this->postInputFilter->getValues();
 
         $item = $this->itemModel->getRow([
-            'id' => (int)$data['item_id']
+            'id' => (int) $data['item_id'],
         ]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
         $parentItem = $this->itemModel->getRow([
-            'id' => (int)$data['parent_id']
+            'id' => (int) $data['parent_id'],
         ]);
         if (! $parentItem) {
             return $this->notFoundAction();
@@ -350,7 +317,7 @@ class ItemParentController extends AbstractRestfulController
             $params['type'] = $data['type_id'];
         }
 
-        $this->itemParent->create((int)$parentItem['id'], (int)$item['id'], $params);
+        $this->itemParent->create((int) $parentItem['id'], (int) $item['id'], $params);
 
         $this->itemModel->updateInteritance($item['id']);
 
@@ -364,7 +331,7 @@ class ItemParentController extends AbstractRestfulController
             htmlspecialchars($this->car()->formatName($item, 'en'))
         );
         $this->log($message, [
-            'items' => [$item['id'], $parentItem['id']]
+            'items' => [$item['id'], $parentItem['id']],
         ]);
 
         $user = $this->user()->get();
@@ -379,7 +346,7 @@ class ItemParentController extends AbstractRestfulController
         }
 
         foreach ($subscribers as $subscriber) {
-            if ($subscriber['id'] != $user['id']) {
+            if ($subscriber['id'] !== $user['id']) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                 $message = sprintf(
@@ -401,7 +368,7 @@ class ItemParentController extends AbstractRestfulController
 
         $url = $this->url()->fromRoute('api/item-parent/item/get', [
             'parent_id' => $parentItem['id'],
-            'item_id'   => $item['id']
+            'item_id'   => $item['id'],
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -410,7 +377,6 @@ class ItemParentController extends AbstractRestfulController
     }
 
     /**
-     * @return ForbiddenAction|array|ApiProblemResponse
      * @throws Exception
      */
     public function putAction()
@@ -466,7 +432,7 @@ class ItemParentController extends AbstractRestfulController
         if (array_key_exists('parent_id', $data) && $data['parent_id']) {
             $success = $this->itemParent->move($row['item_id'], $row['parent_id'], $data['parent_id']);
             if ($success) {
-                $item = $this->itemModel->getRow(['id' => $row['item_id']]);
+                $item      = $this->itemModel->getRow(['id' => $row['item_id']]);
                 $oldParent = $this->itemModel->getRow(['id' => $row['parent_id']]);
                 $newParent = $this->itemModel->getRow(['id' => $data['parent_id']]);
 
@@ -477,7 +443,7 @@ class ItemParentController extends AbstractRestfulController
                     htmlspecialchars($this->car()->formatName($newParent, 'en'))
                 );
                 $this->log($message, [
-                    'items' => [$item['id'], $newParent['id'], $oldParent['id']]
+                    'items' => [$item['id'], $newParent['id'], $oldParent['id']],
                 ]);
 
                 $this->itemModel->updateInteritance($item['id']);
@@ -492,8 +458,6 @@ class ItemParentController extends AbstractRestfulController
 
     /**
      * @param array|ArrayObject $user
-     * @param Uri $uri
-     * @return string
      */
     private function userModerUrl($user, Uri $uri): string
     {
@@ -503,11 +467,6 @@ class ItemParentController extends AbstractRestfulController
         return $u->toString();
     }
 
-    /**
-     * @param int $itemID
-     * @param Uri $uri
-     * @return string
-     */
     private function itemModerUrl(int $itemID, Uri $uri): string
     {
         $u = clone $uri;
@@ -533,8 +492,8 @@ class ItemParentController extends AbstractRestfulController
         }
 
         $row = $this->itemParent->getRow(
-            (int)$this->params('parent_id'),
-            (int)$this->params('item_id')
+            (int) $this->params('parent_id'),
+            (int) $this->params('item_id')
         );
         if (! $row) {
             return $this->notFoundAction();
@@ -564,7 +523,8 @@ class ItemParentController extends AbstractRestfulController
             htmlspecialchars($this->car()->formatName($item, 'en'))
         );
         $this->log($message, [
-            'items' => $item['id'], $parentItem['id']
+            'items' => $item['id'],
+            $parentItem['id'],
         ]);
 
         $user = $this->user()->get();
@@ -579,7 +539,7 @@ class ItemParentController extends AbstractRestfulController
         }
 
         foreach ($subscribers as $subscriber) {
-            if ($subscriber['id'] != $user['id']) {
+            if ($subscriber['id'] !== $user['id']) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                 $message = sprintf(

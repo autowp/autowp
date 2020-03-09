@@ -2,30 +2,33 @@
 
 namespace Application\Controller\Api;
 
+use Application\Controller\Plugin\Car;
+use Application\HostManager;
+use Application\Hydrator\Api\RestHydrator;
+use Application\Model\Item;
+use Application\Model\ItemParent;
+use Application\Model\UserItemSubscribe;
 use ArrayObject;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Uri\Uri;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service as TextStorage;
 use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\Car;
-use Application\Controller\Plugin\ForbiddenAction;
-use Application\HostManager;
-use Application\Hydrator\Api\RestHydrator;
-use Application\Model\ItemParent;
-use Application\Model\UserItemSubscribe;
-use Application\Model\Item;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Uri\Uri;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function array_key_exists;
+use function array_keys;
+use function htmlspecialchars;
+use function implode;
+use function sprintf;
 
 /**
- * Class ItemLanguageController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  * @method Car car()
@@ -34,50 +37,32 @@ use Application\Model\Item;
  */
 class ItemLanguageController extends AbstractRestfulController
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    /** @var TableGateway */
+    private TableGateway $table;
 
-    /**
-     * @var TextStorage
-     */
-    private $textStorage;
+    /** @var TextStorage */
+    private TextStorage $textStorage;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    /** @var ItemParent */
+    private ItemParent $itemParent;
 
-    /**
-     * @var HostManager
-     */
-    private $hostManager;
+    /** @var HostManager */
+    private HostManager $hostManager;
 
-    /**
-     * @var InputFilter
-     */
-    private $putInputFilter;
+    /** @var InputFilter */
+    private InputFilter $putInputFilter;
 
-    /**
-     * @var UserItemSubscribe
-     */
-    private $userItemSubscribe;
+    /** @var UserItemSubscribe */
+    private UserItemSubscribe $userItemSubscribe;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    /** @var Item */
+    private Item $item;
 
-    /**
-     * @var MessageService
-     */
-    private $message;
+    /** @var MessageService */
+    private MessageService $message;
 
     public function __construct(
         TableGateway $table,
@@ -90,15 +75,15 @@ class ItemLanguageController extends AbstractRestfulController
         UserItemSubscribe $userItemSubscribe,
         Item $item
     ) {
-        $this->table = $table;
-        $this->textStorage = $textStorage;
-        $this->hydrator = $hydrator;
-        $this->itemParent = $itemParent;
-        $this->hostManager = $hostManager;
-        $this->putInputFilter = $putInputFilter;
-        $this->message = $message;
+        $this->table             = $table;
+        $this->textStorage       = $textStorage;
+        $this->hydrator          = $hydrator;
+        $this->itemParent        = $itemParent;
+        $this->hostManager       = $hostManager;
+        $this->putInputFilter    = $putInputFilter;
+        $this->message           = $message;
         $this->userItemSubscribe = $userItemSubscribe;
-        $this->item = $item;
+        $this->item              = $item;
     }
 
     public function indexAction()
@@ -108,8 +93,8 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         $rows = $this->table->select([
-            'item_id'       => (int)$this->params('id'),
-            'language <> ?' => 'xx'
+            'item_id'       => (int) $this->params('id'),
+            'language <> ?' => 'xx',
         ]);
 
         $items = [];
@@ -118,7 +103,7 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
@@ -129,8 +114,8 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         $row = $this->table->select([
-            'item_id'  => (int)$this->params('id'),
-            'language' => (string)$this->params('language')
+            'item_id'  => (int) $this->params('id'),
+            'language' => (string) $this->params('language'),
         ])->current();
 
         if (! $row) {
@@ -146,7 +131,7 @@ class ItemLanguageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $item = $this->item->getRow(['id' => (int)$this->params('id')]);
+        $item = $this->item->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -172,11 +157,11 @@ class ItemLanguageController extends AbstractRestfulController
 
         $data = $this->putInputFilter->getValues();
 
-        $language = (string)$this->params('language');
+        $language = (string) $this->params('language');
 
         $row = $this->table->select([
             'item_id'  => $item['id'],
-            'language' => $language
+            'language' => $language,
         ])->current();
 
         $set = [];
@@ -185,25 +170,25 @@ class ItemLanguageController extends AbstractRestfulController
 
         if (array_key_exists('name', $data)) {
             $oldName = $row ? $row['name'] : '';
-            $newName = (string)$data['name'];
+            $newName = (string) $data['name'];
 
             if ($oldName !== $newName) {
                 $set['name'] = $newName;
-                $changes[] = 'moder/vehicle/name';
+                $changes[]   = 'moder/vehicle/name';
             }
         }
 
         if (array_key_exists('text', $data)) {
-            $text = (string) $data['text'];
+            $text        = (string) $data['text'];
             $textChanged = false;
             if ($row && $row['text_id']) {
-                $textChanged = ($text != $this->textStorage->getText($row['text_id']));
+                $textChanged = $text !== $this->textStorage->getText($row['text_id']);
 
                 $this->textStorage->setText($row['text_id'], $text, $user['id']);
             } elseif ($text) {
                 $textChanged = true;
 
-                $textId = $this->textStorage->createText($text, $user['id']);
+                $textId         = $this->textStorage->createText($text, $user['id']);
                 $set['text_id'] = $textId;
             }
 
@@ -213,16 +198,16 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         if (array_key_exists('full_text', $data)) {
-            $fullText = $data['full_text'];
+            $fullText        = $data['full_text'];
             $fullTextChanged = false;
             if ($row && $row['full_text_id']) {
-                $fullTextChanged = ($fullText != $this->textStorage->getText($row['full_text_id']));
+                $fullTextChanged = $fullText !== $this->textStorage->getText($row['full_text_id']);
 
                 $this->textStorage->setText($row['full_text_id'], $fullText, $user['id']);
             } elseif ($fullText) {
                 $fullTextChanged = true;
 
-                $fullTextId = $this->textStorage->createText($fullText, $user['id']);
+                $fullTextId          = $this->textStorage->createText($fullText, $user['id']);
                 $set['full_text_id'] = $fullTextId;
             }
 
@@ -232,16 +217,16 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         if ($set) {
-            $values = [
+            $values     = [
                 'item_id'  => $item['id'],
-                'language' => $language
+                'language' => $language,
             ];
             $sqlInserts = ['item_id', 'language'];
-            $sqlValues = [':item_id', ':language'];
+            $sqlValues  = [':item_id', ':language'];
             $sqlUpdates = [];
             foreach ($set as $key => $value) {
                 $sqlInserts[] = $key;
-                $sqlValues[] = ':' . $key;
+                $sqlValues[]  = ':' . $key;
                 $sqlUpdates[] = $key . ' = VALUES(' . $key . ')';
                 $values[$key] = $value;
             }
@@ -263,7 +248,7 @@ class ItemLanguageController extends AbstractRestfulController
             $language = $this->language();
 
             foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                if ($subscriber && ($subscriber['id'] !== $user['id'])) {
                     $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                     $changesStr = [];
@@ -295,7 +280,7 @@ class ItemLanguageController extends AbstractRestfulController
                 'Редактирование языковых названия, описания и полного описания автомобиля %s',
                 htmlspecialchars($this->car()->formatName($item, 'en')) //TODO: formatter
             ), [
-                'items' => $item['id']
+                'items' => $item['id'],
             ]);
         }
 
@@ -305,8 +290,6 @@ class ItemLanguageController extends AbstractRestfulController
 
     /**
      * @param array|ArrayObject $user
-     * @param Uri $uri
-     * @return string
      */
     private function userModerUrl($user, Uri $uri): string
     {
@@ -316,11 +299,6 @@ class ItemLanguageController extends AbstractRestfulController
         return $u->toString();
     }
 
-    /**
-     * @param int $itemID
-     * @param Uri $uri
-     * @return string
-     */
     private function itemModerUrl(int $itemID, Uri $uri): string
     {
         $u = clone $uri;

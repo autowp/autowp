@@ -2,21 +2,21 @@
 
 namespace Application;
 
+use Application\Service\PictureService;
+use Autowp\Cron;
 use Autowp\User\Model\User;
 use Exception;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\AbstractListenerAggregate;
-use Autowp\Cron;
-use Application\Service\PictureService;
-use Zend\Session\SessionManager;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Session\SessionManager;
+
+use function sprintf;
 
 class Maintenance extends AbstractListenerAggregate
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param EventManagerInterface $events
-     * @param int                   $priority
+     * @param int $priority
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
@@ -28,7 +28,7 @@ class Maintenance extends AbstractListenerAggregate
     {
         print "Daily maintenance\n";
 
-        $application = $event->getApplication();
+        $application    = $event->getApplication();
         $serviceManager = $application->getServiceManager();
 
         /* $comments = $serviceManager->get(Comments::class);
@@ -55,7 +55,7 @@ class Maintenance extends AbstractListenerAggregate
     {
         print "Midnight\n";
 
-        $application = $event->getApplication();
+        $application    = $event->getApplication();
         $serviceManager = $application->getServiceManager();
 
         $carOfDay = $serviceManager->get(Model\CarOfDay::class);

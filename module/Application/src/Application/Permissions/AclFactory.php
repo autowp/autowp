@@ -3,27 +3,26 @@
 namespace Application\Permissions;
 
 use Exception;
-use Zend\Cache\Storage\StorageInterface;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Permissions\Acl\Acl;
-use Zend\Permissions\Acl\Role\GenericRole;
-use Zend\Permissions\Acl\Resource\GenericResource;
 use Interop\Container\ContainerInterface;
+use Laminas\Cache\Storage\StorageInterface;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\Permissions\Acl\Resource\GenericResource;
+use Laminas\Permissions\Acl\Role\GenericRole;
+use Laminas\ServiceManager\FactoryInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+
+use function in_array;
 
 class AclFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Acl
+     * @param string $requestedName
      * @throws Exception
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Acl
     {
         $services = $container->get('ServiceManager');
 
@@ -35,7 +34,7 @@ class AclFactory implements FactoryInterface
         $key = 'acl_cache_key';
 
         $success = false;
-        $acl = $cache->getItem($key, $success);
+        $acl     = $cache->getItem($key, $success);
 
         if (! $success) {
             $acl = new Acl();
@@ -56,23 +55,21 @@ class AclFactory implements FactoryInterface
     }
 
     /**
-     * @param ServiceLocatorInterface $controllers
-     * @return Acl
      * @throws Exception
      */
-    public function createService(ServiceLocatorInterface $controllers)
+    public function createService(ServiceLocatorInterface $controllers): Acl
     {
-        return $this($controllers, AclFactory::class);
+        return $this($controllers, self::class);
     }
 
-    private function load(Acl $acl, ContainerInterface $container)
+    private function load(Acl $acl, ContainerInterface $container): void
     {
         $tables = $container->get('TableManager');
 
-        $roleTable = $tables->get('acl_roles');
-        $resourceTable = $tables->get('acl_resources');
+        $roleTable             = $tables->get('acl_roles');
+        $resourceTable         = $tables->get('acl_resources');
         $privilegeAllowedTable = $tables->get('acl_roles_privileges_allowed');
-        $privilegeDeniedTable = $tables->get('acl_roles_privileges_denied');
+        $privilegeDeniedTable  = $tables->get('acl_roles_privileges_denied');
 
         $loaded = [];
         foreach ($roleTable->select([]) as $role) {
@@ -138,7 +135,7 @@ class AclFactory implements FactoryInterface
         }
     }
 
-    private function addRole(Acl $acl, TableGateway $roleTable, $role, array &$loaded, $deep)
+    private function addRole(Acl $acl, TableGateway $roleTable, $role, array &$loaded, $deep): void
     {
         if ($deep > 10) {
             throw new Exception('Roles deep overflow');
@@ -153,7 +150,7 @@ class AclFactory implements FactoryInterface
             $select
                 ->join('acl_roles_parents', 'acl_roles.id = acl_roles_parents.parent_role_id', [])
                 ->where([
-                    'acl_roles_parents.role_id = ?' => $role['id']
+                    'acl_roles_parents.role_id = ?' => $role['id'],
                 ]);
         });
 

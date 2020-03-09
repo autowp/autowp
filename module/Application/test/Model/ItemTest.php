@@ -43,23 +43,30 @@ class ItemTest extends AbstractHttpControllerTestCase
             $this->assertTrue(true);
         }
 
-        $result = $model->getRow(['id' => [
-            'test' => ''
-        ]]);
+        $result = $model->getRow([
+            'id' => [
+                'test' => '',
+            ],
+        ]);
         $this->assertEmpty($result);
 
         try {
-            $result = $model->getRow(['id' => [
-                'test' => null
-            ]]);
+            $result = $model->getRow([
+                'id' => [
+                    'test' => null,
+                ],
+            ]);
             $this->assertEmpty($result);
         } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
-        $result = $model->getRow(['id' => [
-            null, false
-        ]]);
+        $result = $model->getRow([
+            'id' => [
+                null,
+                false,
+            ],
+        ]);
         $this->assertEmpty($result);
     }
 }

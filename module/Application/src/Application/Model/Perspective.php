@@ -2,24 +2,20 @@
 
 namespace Application\Model;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+
+use function count;
 
 class Perspective
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var TableGateway
-     */
-    private $groupTable;
+    private TableGateway $groupTable;
 
     public function __construct(TableGateway $table, TableGateway $groupTable)
     {
-        $this->table = $table;
+        $this->table      = $table;
         $this->groupTable = $groupTable;
     }
 
@@ -28,8 +24,8 @@ class Perspective
         $options = [];
         foreach ($this->table->selectWith($select) as $row) {
             $options[] = [
-                'id'   => (int)$row['id'],
-                'name' => $row['name']
+                'id'   => (int) $row['id'],
+                'name' => $row['name'],
             ];
         }
 
@@ -68,7 +64,7 @@ class Perspective
 
         $result = [];
         foreach ($this->table->selectWith($select) as $row) {
-            $result[(int)$row['id']] = $row['name'];
+            $result[(int) $row['id']] = $row['name'];
         }
 
         return $result;
@@ -98,7 +94,7 @@ class Perspective
 
         $ids = [];
         foreach ($this->groupTable->selectWith($select) as $row) {
-            $ids[] = (int)$row['id'];
+            $ids[] = (int) $row['id'];
         }
 
         return $ids;

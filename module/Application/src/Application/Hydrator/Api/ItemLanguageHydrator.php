@@ -4,17 +4,13 @@ namespace Application\Hydrator\Api;
 
 use Autowp\TextStorage;
 use Exception;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class ItemLanguageHydrator extends RestHydrator
 {
-    /**
-     * @var TextStorage\Service
-     */
-    private $textStorage;
+    private TextStorage\Service $textStorage;
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
 
         $this->textStorage = $serviceManager->get(TextStorage\Service::class);
@@ -46,7 +42,6 @@ class ItemLanguageHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

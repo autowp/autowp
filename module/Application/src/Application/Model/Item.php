@@ -3,14 +3,33 @@
 namespace Application\Model;
 
 use ArrayObject;
+use Autowp\TextStorage\Service as TextStorage;
 use DateTime;
 use Exception;
 use GeometryCollection;
 use geoPHP;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Paginator;
-use Autowp\TextStorage\Service as TextStorage;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Paginator;
+
+use function array_diff;
+use function array_keys;
+use function array_merge;
+use function array_replace;
+use function array_search;
+use function array_splice;
+use function array_unique;
+use function array_values;
+use function count;
+use function is_array;
+use function is_numeric;
+use function is_scalar;
+use function key;
+use function min;
+use function str_repeat;
+use function substr;
+
+use const SORT_STRING;
 
 class Item
 {
@@ -27,55 +46,25 @@ class Item
 
     public const MAX_NAME = 100;
 
-    /**
-     * @var TableGateway
-     */
-    private $specTable;
+    private TableGateway $specTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemTable;
+    private TableGateway $itemTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemPointTable;
+    private TableGateway $itemPointTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $vehicleTypeParentTable;
+    private TableGateway $vehicleTypeParentTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemLanguageTable;
+    private TableGateway $itemLanguageTable;
 
-    /**
-     * @var TextStorage
-     */
-    private $textStorage;
+    private TextStorage $textStorage;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemParentCacheTable;
+    private TableGateway $itemParentCacheTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemParentTable;
+    private TableGateway $itemParentTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemParentLanguageTable;
+    private TableGateway $itemParentLanguageTable;
 
-    /**
-     * @var LanguagePriority
-     */
-    private $languagePriority;
+    private LanguagePriority $languagePriority;
 
     public function __construct(
         TableGateway $specTable,
@@ -88,31 +77,28 @@ class Item
         TableGateway $itemParentLanguageTable,
         TableGateway $itemParentCacheTable
     ) {
-        $this->specTable = $specTable;
-        $this->itemTable = $itemTable;
-        $this->itemPointTable = $itemPointTable;
-        $this->vehicleTypeParentTable = $vehicleTypeParentTable;
-        $this->itemLanguageTable = $itemLanguageTable;
-        $this->textStorage = $textStorage;
-        $this->itemParentTable = $itemParentTable;
+        $this->specTable               = $specTable;
+        $this->itemTable               = $itemTable;
+        $this->itemPointTable          = $itemPointTable;
+        $this->vehicleTypeParentTable  = $vehicleTypeParentTable;
+        $this->itemLanguageTable       = $itemLanguageTable;
+        $this->textStorage             = $textStorage;
+        $this->itemParentTable         = $itemParentTable;
         $this->itemParentLanguageTable = $itemParentLanguageTable;
-        $this->itemParentCacheTable = $itemParentCacheTable;
+        $this->itemParentCacheTable    = $itemParentCacheTable;
 
         $this->languagePriority = new LanguagePriority();
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $engineId
-     * @param array $options
-     * @return array
      */
     public function getEngineVehiclesGroups(int $engineId, array $options = []): array
     {
         $defaults = [
-            'groupJoinLimit' => null
+            'groupJoinLimit' => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $select = new Sql\Select($this->itemTable->getTable());
         $select->columns(['id'])
@@ -120,7 +106,7 @@ class Item
             ->where(['item_parent_cache.parent_id' => $engineId]);
         $vehicleIds = [];
         foreach ($this->itemTable->selectWith($select) as $row) {
-            $vehicleIds[] = (int)$row['id'];
+            $vehicleIds[] = (int) $row['id'];
         }
 
         $vectors = [];
@@ -131,12 +117,12 @@ class Item
                 ->where([
                     'item.item_type_id'         => self::VEHICLE,
                     'item_parent_cache.item_id' => $vehicleId,
-                    'item_parent_cache.item_id != item_parent_cache.parent_id'
+                    'item_parent_cache.item_id != item_parent_cache.parent_id',
                 ])
                 ->order('item_parent_cache.diff desc');
             $parentIds = [];
             foreach ($this->itemParentCacheTable->selectWith($select) as $row) {
-                $parentIds[] = (int)$row['parent_id'];
+                $parentIds[] = (int) $row['parent_id'];
             }
 
             // remove parents
@@ -147,7 +133,7 @@ class Item
                 }
             }
 
-            $vector = $parentIds;
+            $vector   = $parentIds;
             $vector[] = $vehicleId;
 
             $vectors[] = $vector;
@@ -157,19 +143,18 @@ class Item
             return $vehicleIds;
         }
 
-
         do {
             // look for same root
 
             $matched = false;
             for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
                 for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
-                    if ($vectors[$i][0] == $vectors[$j][0]) {
+                    if ($vectors[$i][0] === $vectors[$j][0]) {
                         $matched = true;
                         // matched root
                         $newVector = [];
-                        $length = min(count($vectors[$i]), count($vectors[$j]));
-                        for ($k = 0; $k < $length && $vectors[$i][$k] == $vectors[$j][$k]; $k++) {
+                        $length    = min(count($vectors[$i]), count($vectors[$j]));
+                        for ($k = 0; $k < $length && $vectors[$i][$k] === $vectors[$j][$k]; $k++) {
                             $newVector[] = $vectors[$i][$k];
                         }
                         $vectors[$i] = $newVector;
@@ -191,10 +176,10 @@ class Item
     {
         $primaryKey = [
             'item_id'  => $id,
-            'language' => $language
+            'language' => $language,
         ];
-        $set = [
-            'name' => $name
+        $set        = [
+            'name' => $name,
         ];
 
         $row = $this->itemLanguageTable->select($primaryKey)->current();
@@ -209,8 +194,6 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
-     * @param int $id
-     * @return int
      */
     public function getUsedLanguagesCount(int $id): int
     {
@@ -218,19 +201,15 @@ class Item
         $select->columns(['count' => new Sql\Expression('count(1)')])
             ->where([
                 'item_id'       => $id,
-                'language != ?' => 'xx'
+                'language != ?' => 'xx',
             ]);
 
         $row = $this->itemLanguageTable->selectWith($select)->current();
-        return $row ? (int)$row['count'] : 0;
+        return $row ? (int) $row['count'] : 0;
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     *
-     * @param array $ids
-     * @param string $language
-     * @return array
      */
     public function getLanguageNamesOfItems(array $ids, string $language): array
     {
@@ -238,14 +217,14 @@ class Item
             return [];
         }
 
-        $rows = $this->itemLanguageTable->select([
+        $rows   = $this->itemLanguageTable->select([
             new Sql\Predicate\In('item_id', $ids),
             'language' => $language,
-            new Sql\Predicate\Expression('length(name) > 0')
+            new Sql\Predicate\Expression('length(name) > 0'),
         ]);
         $result = [];
         foreach ($rows as $row) {
-            $result[(int)$row['item_id']] = $row['name'];
+            $result[(int) $row['item_id']] = $row['name'];
         }
 
         return $result;
@@ -253,9 +232,6 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $id
-     * @param string $language
-     * @return array
      */
     public function getTextsOfItem(int $id, string $language): array
     {
@@ -267,7 +243,7 @@ class Item
 
         $rows = $this->itemLanguageTable->selectWith($select);
 
-        $textIds = [];
+        $textIds     = [];
         $fullTextIds = [];
         foreach ($rows as $row) {
             if ($row['text_id']) {
@@ -290,15 +266,12 @@ class Item
 
         return [
             'full_text' => $text,
-            'text'      => $description
+            'text'      => $description,
         ];
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param int $id
-     * @param string $language
-     * @return string
      */
     public function getTextOfItem(int $id, string $language): string
     {
@@ -310,7 +283,7 @@ class Item
             ->columns(['text_id'])
             ->where([
                 'item_id' => $id,
-                new Sql\Predicate\IsNotNull('text_id')
+                new Sql\Predicate\IsNotNull('text_id'),
             ])
             ->order([new Sql\Expression($orderBy)]);
 
@@ -331,14 +304,12 @@ class Item
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $id
-     * @return bool
      */
     public function hasFullText(int $id): bool
     {
         $rows = $this->itemLanguageTable->select([
             'item_id' => $id,
-            new Sql\Predicate\IsNotNull('full_text_id')
+            new Sql\Predicate\IsNotNull('full_text_id'),
         ]);
 
         $ids = [];
@@ -350,19 +321,17 @@ class Item
             return false;
         }
 
-        return (bool)$this->textStorage->getFirstText($ids);
+        return (bool) $this->textStorage->getFirstText($ids);
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $itemId
-     * @return array
      */
     public function getNames(int $itemId): array
     {
-        $rows = $this->itemLanguageTable->select([
+        $rows   = $this->itemLanguageTable->select([
             'item_id' => $itemId,
-            new Sql\Predicate\Expression('length(name) > 0')
+            new Sql\Predicate\Expression('length(name) > 0'),
         ]);
         $result = [];
         foreach ($rows as $row) {
@@ -374,9 +343,6 @@ class Item
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $itemId
-     * @param string $language
-     * @return string
      */
     public function getLanguageName(int $itemId, string $language): string
     {
@@ -384,7 +350,7 @@ class Item
         $select->columns(['name'])
             ->where([
                 'item_id'  => $itemId,
-                'language' => $language
+                'language' => $language,
             ]);
 
         $row = $this->itemLanguageTable->selectWith($select)->current();
@@ -394,11 +360,8 @@ class Item
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $itemId
-     * @param string $language
-     * @return string
      */
-    public function getName(int $itemId, string $language)
+    public function getName(int $itemId, string $language): string
     {
         $select = $this->getNameSelect($itemId, Sql\ExpressionInterface::TYPE_VALUE, $language);
 
@@ -407,42 +370,39 @@ class Item
         return $row ? $row['name'] : '';
     }
 
-    public function getNameData($row, string $language)
+    public function getNameData($row, string $language): array
     {
         $name = $this->getName($row['id'], $language);
 
-        $spec = null;
+        $spec     = null;
         $specFull = null;
         if ($row['spec_id']) {
-            $specRow = $this->specTable->select(['id' => (int)$row['spec_id']])->current();
+            $specRow = $this->specTable->select(['id' => (int) $row['spec_id']])->current();
             if ($specRow) {
-                $spec = $specRow['short_name'];
+                $spec     = $specRow['short_name'];
                 $specFull = $specRow['name'];
             }
         }
 
         return [
-            'begin_model_year' => $row['begin_model_year'],
-            'end_model_year'   => $row['end_model_year'],
+            'begin_model_year'          => $row['begin_model_year'],
+            'end_model_year'            => $row['end_model_year'],
             'begin_model_year_fraction' => $row['begin_model_year_fraction'],
             'end_model_year_fraction'   => $row['end_model_year_fraction'],
-            'spec'             => $spec,
-            'spec_full'        => $specFull,
-            'body'             => $row['body'],
-            'name'             => $name,
-            'begin_year'       => $row['begin_year'],
-            'end_year'         => $row['end_year'],
-            'today'            => $row['today'],
-            'begin_month'      => $row['begin_month'],
-            'end_month'        => $row['end_month'],
+            'spec'                      => $spec,
+            'spec_full'                 => $specFull,
+            'body'                      => $row['body'],
+            'name'                      => $name,
+            'begin_year'                => $row['begin_year'],
+            'end_year'                  => $row['end_year'],
+            'today'                     => $row['today'],
+            'begin_month'               => $row['begin_month'],
+            'end_month'                 => $row['end_month'],
         ];
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $itemId
-     * @param array $itemTypes
-     * @return array
      */
     private function getAncestorsId(int $itemId, array $itemTypes): array
     {
@@ -453,12 +413,12 @@ class Item
             ->where([
                 new Sql\Predicate\In('item.item_type_id', $itemTypes),
                 'item_parent_cache.item_id' => $itemId,
-                'item_parent_cache.item_id != item_parent_cache.parent_id'
+                'item_parent_cache.item_id != item_parent_cache.parent_id',
             ])
             ->order('item_parent_cache.diff desc');
         $parentIds = [];
         foreach ($this->itemParentCacheTable->selectWith($select) as $row) {
-            $parentIds[] = (int)$row['parent_id'];
+            $parentIds[] = (int) $row['parent_id'];
         }
 
         return $parentIds;
@@ -472,7 +432,7 @@ class Item
 
         $result = [];
         foreach ($this->itemParentTable->selectWith($select) as $row) {
-            $result[] = (int)$row['item_id'];
+            $result[] = (int) $row['item_id'];
         }
 
         return $result;
@@ -486,7 +446,7 @@ class Item
         foreach ($carIds as $carId) {
             $parentIds = $this->getAncestorsId($carId, [
                 self::VEHICLE,
-                self::ENGINE
+                self::ENGINE,
             ]);
 
             // remove parents
@@ -497,12 +457,12 @@ class Item
                 }
             }
 
-            $vector = $parentIds;
+            $vector   = $parentIds;
             $vector[] = $carId;
 
             $vectors[] = [
                 'parents' => $vector,
-                'childs'  => [$carId]
+                'childs'  => [$carId],
             ];
         }
 
@@ -512,17 +472,17 @@ class Item
             $matched = false;
             for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
                 for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
-                    if ($vectors[$i]['parents'][0] == $vectors[$j]['parents'][0]) {
+                    if ($vectors[$i]['parents'][0] === $vectors[$j]['parents'][0]) {
                         $matched = true;
                         // matched root
                         $newVector = [];
-                        $length = min(count($vectors[$i]['parents']), count($vectors[$j]['parents']));
-                        for ($k = 0; $k < $length && $vectors[$i]['parents'][$k] == $vectors[$j]['parents'][$k]; $k++) {
+                        $length    = min(count($vectors[$i]['parents']), count($vectors[$j]['parents']));
+                        for ($k = 0; $k < $length && $vectors[$i]['parents'][$k] === $vectors[$j]['parents'][$k]; $k++) {
                             $newVector[] = $vectors[$i]['parents'][$k];
                         }
                         $vectors[$i] = [
                             'parents' => $newVector,
-                            'childs'  => array_merge($vectors[$i]['childs'], $vectors[$j]['childs'])
+                            'childs'  => array_merge($vectors[$i]['childs'], $vectors[$j]['childs']),
                         ];
                         array_splice($vectors, $j, 1);
                     }
@@ -532,7 +492,7 @@ class Item
 
         $result = [];
         foreach ($vectors as $vector) {
-            $carId = $vector['parents'][count($vector['parents']) - 1];
+            $carId          = $vector['parents'][count($vector['parents']) - 1];
             $result[$carId] = $vector['childs'];
         }
 
@@ -547,7 +507,7 @@ class Item
         foreach ($carIds as $carId) {
             $parentIds = $this->getAncestorsId($carId, [
                 self::VEHICLE,
-                self::ENGINE
+                self::ENGINE,
             ]);
 
             // remove parents
@@ -558,7 +518,7 @@ class Item
                 }
             }
 
-            $vector = $parentIds;
+            $vector   = $parentIds;
             $vector[] = $carId;
 
             $vectors[] = $vector;
@@ -570,12 +530,12 @@ class Item
             $matched = false;
             for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
                 for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
-                    if ($vectors[$i][0] == $vectors[$j][0]) {
+                    if ($vectors[$i][0] === $vectors[$j][0]) {
                         $matched = true;
                         // matched root
                         $newVector = [];
-                        $length = min(count($vectors[$i]), count($vectors[$j]));
-                        for ($k = 0; $k < $length && $vectors[$i][$k] == $vectors[$j][$k]; $k++) {
+                        $length    = min(count($vectors[$i]), count($vectors[$j]));
+                        for ($k = 0; $k < $length && $vectors[$i][$k] === $vectors[$j][$k]; $k++) {
                             $newVector[] = $vectors[$i][$k];
                         }
                         $vectors[$i] = $newVector;
@@ -670,8 +630,6 @@ class Item
     /**
      * @suppress PhanPluginMixedKeyNoKey
      * @param $parentId
-     * @param array $whitelist
-     * @return array
      */
     private function getChildVehicleTypesByWhitelist($parentId, array $whitelist): array
     {
@@ -684,19 +642,18 @@ class Item
             ->where([
                 new Sql\Predicate\In('id', $whitelist),
                 'parent_id' => $parentId,
-                'id <> parent_id'
+                'id <> parent_id',
             ]);
 
         $result = [];
         foreach ($this->vehicleTypeParentTable->selectWith($select) as $row) {
-            $result[] = (int)$row['id'];
+            $result[] = (int) $row['id'];
         }
 
         return $result;
     }
 
     /**
-     * @param int $itemId
      * @throws Exception
      */
     public function updateInteritance(int $itemId)
@@ -716,7 +673,7 @@ class Item
     private function updateItemInteritance($car)
     {
         $parents = $this->getRows([
-            'child' => $car['id']
+            'child' => $car['id'],
         ]);
 
         $somethingChanged = false;
@@ -731,11 +688,11 @@ class Item
                 }
             }
 
-            $oldIsConcept = (bool)$car['is_concept'];
+            $oldIsConcept = (bool) $car['is_concept'];
 
             if ($oldIsConcept !== $isConcept) {
                 $set['is_concept'] = $isConcept ? 1 : 0;
-                $somethingChanged = true;
+                $somethingChanged  = true;
             }
         }
 
@@ -753,20 +710,20 @@ class Item
             }
 
             // select top
-            $maxCount = null;
+            $maxCount   = null;
             $selectedId = null;
             foreach ($map as $id => $count) {
-                if (is_null($maxCount) || ($count > $maxCount)) {
-                    $maxCount = $count;
-                    $selectedId = (int)$id;
+                if ($maxCount === null || ($count > $maxCount)) {
+                    $maxCount   = $count;
+                    $selectedId = (int) $id;
                 }
             }
 
-            $oldEngineId = isset($car['engine_item_id']) ? (int)$car['engine_item_id'] : null;
+            $oldEngineId = isset($car['engine_item_id']) ? (int) $car['engine_item_id'] : null;
 
             if ($oldEngineId !== $selectedId) {
                 $set['engine_item_id'] = $selectedId;
-                $somethingChanged = true;
+                $somethingChanged      = true;
             }
         }
 
@@ -798,20 +755,20 @@ class Item
             }
 
             // select top
-            $maxCount = null;
+            $maxCount   = null;
             $selectedId = null;
             foreach ($map as $id => $count) {
-                if (is_null($maxCount) || ($count > $maxCount)) {
-                    $maxCount = $count;
-                    $selectedId = (int)$id;
+                if ($maxCount === null || ($count > $maxCount)) {
+                    $maxCount   = $count;
+                    $selectedId = (int) $id;
                 }
             }
 
-            $oldCarTypeId = isset($car['car_type_id']) ? (int)$car['car_type_id'] : null;
+            $oldCarTypeId = isset($car['car_type_id']) ? (int) $car['car_type_id'] : null;
 
             if ($oldCarTypeId !== $selectedId) {
                 $set['car_type_id'] = $selectedId;
-                $somethingChanged = true;
+                $somethingChanged   = true;
             }
         }
 
@@ -829,19 +786,19 @@ class Item
             }
 
             // select top
-            $maxCount = null;
+            $maxCount   = null;
             $selectedId = null;
             foreach ($map as $id => $count) {
-                if (is_null($maxCount) || ($count > $maxCount)) {
-                    $maxCount = $count;
-                    $selectedId = (int)$id;
+                if ($maxCount === null || ($count > $maxCount)) {
+                    $maxCount   = $count;
+                    $selectedId = (int) $id;
                 }
             }
 
-            $oldSpecId = isset($car['spec_id']) ? (int)$car['spec_id'] : null;
+            $oldSpecId = isset($car['spec_id']) ? (int) $car['spec_id'] : null;
 
             if ($oldSpecId !== $selectedId) {
-                $set['spec_id'] = $selectedId;
+                $set['spec_id']   = $selectedId;
                 $somethingChanged = true;
             }
         }
@@ -849,12 +806,12 @@ class Item
         if ($somethingChanged || ! $car['car_type_inherit']) {
             if ($set) {
                 $this->itemTable->update($set, [
-                    'id' => $car['id']
+                    'id' => $car['id'],
                 ]);
             }
 
             $childItems = $this->getRows([
-                'parent' => $car['id']
+                'parent' => $car['id'],
             ]);
 
             foreach ($childItems as $child) {
@@ -864,8 +821,6 @@ class Item
     }
 
     /**
-     * @param int $parentId
-     * @return int
      * @throws Exception
      */
     public function getVehiclesAndEnginesCount(int $parentId): int
@@ -873,13 +828,12 @@ class Item
         return $this->getCount([
             'item_type_id' => [self::ENGINE, self::VEHICLE],
             'ancestor'     => $parentId,
-            'is_group'     => false
+            'is_group'     => false,
         ]);
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $itemId
      * @param $point
      */
     public function setPoint(int $itemId, $point)
@@ -892,7 +846,7 @@ class Item
         }
 
         $set = [
-            'point' => new Sql\Expression('ST_GeomFromText(?)', [$point->out('wkt')])
+            'point' => new Sql\Expression('ST_GeomFromText(?)', [$point->out('wkt')]),
         ];
 
         $row = $this->itemPointTable->select($primaryKey)->current();
@@ -904,14 +858,13 @@ class Item
     }
 
     /**
-     * @param int $itemId
      * @return array|bool|GeometryCollection|mixed|null
-     * @throws exception
+     * @throws Exception
      */
     public function getPoint(int $itemId)
     {
         $point = null;
-        $row = $this->itemPointTable->select(['item_id' => $itemId])->current();
+        $row   = $this->itemPointTable->select(['item_id' => $itemId])->current();
         if ($row && $row['point']) {
             geoPHP::version(); // for autoload classes
             $point = geoPHP::load(substr($row['point'], 4), 'wkb');
@@ -926,13 +879,9 @@ class Item
     }
 
     /**
-     * @param array $columns
-     * @param string $itemParentAlias
-     * @param $language
-     * @return array
      * @throws Exception
      */
-    private function applyColumns(array $columns, string $itemParentAlias, $language)
+    private function applyColumns(array $columns, string $itemParentAlias, string $language): array
     {
         $result = [];
 
@@ -980,19 +929,16 @@ class Item
     }
 
     /**
-     * @param Sql\Select $select
      * @param $options
      * @param $prefix
      * @param $language
-     * @param string $id
-     * @return array
      * @throws Exception
      */
     private function applyChildFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
     {
         if (! is_array($options)) {
             $options = [
-                'id' => $options
+                'id' => $options,
             ];
         }
 
@@ -1021,19 +967,16 @@ class Item
     }
 
     /**
-     * @param Sql\Select $select
      * @param $options
      * @param $prefix
      * @param $language
-     * @param string $id
-     * @return array
      * @throws Exception
      */
     private function applyParentFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
     {
         if (! is_array($options)) {
             $options = [
-                'id' => $options
+                'id' => $options,
             ];
         }
 
@@ -1052,7 +995,7 @@ class Item
                 new Sql\Predicate\Expression(
                     $alias . '.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)',
                     [$options['linked_in_days']]
-                )
+                ),
             ]);
         }
 
@@ -1079,45 +1022,42 @@ class Item
     }
 
     /**
-     * @param Sql\Select $select
      * @param $options
      * @param $prefix
      * @param $language
-     * @param string $id
-     * @return array
      * @throws Exception
      */
     private function applyDescendantFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
     {
         if (! is_array($options)) {
             $options = [
-                'id' => $options
+                'id' => $options,
             ];
         }
 
         $alias = $prefix . 'ipc1';
 
-        $group = [];
+        $group   = [];
         $columns = [];
         if (isset($options['columns'])) {
-            foreach ((array)$options['columns'] as $key => $column) {
+            foreach ((array) $options['columns'] as $key => $column) {
                 switch ($column) {
                     case 'id':
                         if (is_numeric($key)) {
                             $columns[] = 'item_id';
-                            $group[] = 'item_id';
+                            $group[]   = 'item_id';
                         } else {
                             $columns[$key] = 'item_id';
-                            $group[] = $key;
+                            $group[]       = $key;
                         }
                         break;
                     case 'diff':
                         if (is_numeric($key)) {
                             $columns[] = 'diff';
-                            $group[] = 'diff';
+                            $group[]   = 'diff';
                         } else {
                             $columns[$key] = 'diff';
-                            $group[] = $key;
+                            $group[]       = $key;
                         }
                         break;
                     default:
@@ -1135,7 +1075,7 @@ class Item
                     $select->where([
                         'not ' . $alias . '.sport',
                         'not ' . $alias . '.tuning',
-                        'not ' . $alias . '.design'
+                        'not ' . $alias . '.design',
                     ]);
                     break;
                 case ItemParent::TYPE_SPORT:
@@ -1156,14 +1096,12 @@ class Item
             ['language' => $language],
             $options
         ), $alias . '.item_id', $alias);
-        $group = array_merge($group, $subGroup);
+        $group    = array_merge($group, $subGroup);
 
         return $group;
     }
 
     /**
-     * @param Sql\Select $select
-     * @param string $alias
      * @param $value
      * @throws Exception
      */
@@ -1181,9 +1119,7 @@ class Item
     }
 
     /**
-     * @param Sql\Select $select
      * @param $value
-     * @param string $id
      * @throws Exception
      */
     private function applyIdFilter(Sql\Select $select, $value, string $id)
@@ -1191,7 +1127,7 @@ class Item
         if (is_array($value)) {
             $value = array_values($value);
 
-            if (count($value) == 1) {
+            if (count($value) === 1) {
                 $this->applyIdFilter($select, $value[0], $id);
                 return;
             }
@@ -1213,11 +1149,7 @@ class Item
     }
 
     /**
-     * @param Sql\Select $select
-     * @param array $options
      * @param $id
-     * @param string $prefix
-     * @return array
      * @throws Exception
      */
     private function applyFilters(Sql\Select $select, array $options, $id, string $prefix): array
@@ -1236,9 +1168,9 @@ class Item
             'catname'            => null,
             'language'           => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
-        $language = isset($options['language']) ? $options['language'] : null;
+        $language = $options['language'] ?? null;
 
         $group = [];
 
@@ -1264,29 +1196,29 @@ class Item
 
         if ($options['descendant_or_self']) {
             $group[] = 'item.id';
-            $alias = $prefix . 'ipc2';
+            $alias   = $prefix . 'ipc2';
 
             $columns = [];
             if (is_array($options['descendant_or_self'])) {
                 if (isset($options['descendant_or_self']['columns'])) {
-                    foreach ((array)$options['descendant_or_self']['columns'] as $key => $column) {
+                    foreach ((array) $options['descendant_or_self']['columns'] as $key => $column) {
                         switch ($column) {
                             case 'id':
                                 if (is_numeric($key)) {
                                     $columns[] = 'item_id';
-                                    $group[] = 'item_id';
+                                    $group[]   = 'item_id';
                                 } else {
                                     $columns[$key] = 'item_id';
-                                    $group[] = $key;
+                                    $group[]       = $key;
                                 }
                                 break;
                             case 'diff':
                                 if (is_numeric($key)) {
                                     $columns[] = 'diff';
-                                    $group[] = 'diff';
+                                    $group[]   = 'diff';
                                 } else {
                                     $columns[$key] = 'diff';
-                                    $group[] = $key;
+                                    $group[]       = $key;
                                 }
                                 break;
                             default:
@@ -1303,7 +1235,7 @@ class Item
                     ['language' => $language],
                     $options['descendant_or_self']
                 ), $alias . '.item_id', $alias);
-                $group = array_merge($group, $subGroup);
+                $group    = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.item_id' => $options['descendant_or_self']]);
             }
@@ -1311,7 +1243,7 @@ class Item
 
         if ($options['ancestor']) {
             $group[] = 'item.id';
-            $alias = $prefix . 'ipc3';
+            $alias   = $prefix . 'ipc3';
             $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.item_id', [])
                 ->where([$alias . '.item_id != ' . $alias . '.parent_id']);
 
@@ -1320,7 +1252,7 @@ class Item
                     ['language' => $language],
                     $options['ancestor']
                 ), $alias . '.parent_id', $alias);
-                $group = array_merge($group, $subGroup);
+                $group    = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.parent_id' => $options['ancestor']]);
             }
@@ -1328,7 +1260,7 @@ class Item
 
         if ($options['ancestor_or_self']) {
             $group[] = 'item.id';
-            $alias = $prefix . 'ipc4';
+            $alias   = $prefix . 'ipc4';
             $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.item_id', []);
 
             if (is_array($options['ancestor_or_self'])) {
@@ -1345,7 +1277,7 @@ class Item
                     ['language' => $language],
                     $options['ancestor_or_self']
                 ), $alias . '.parent_id', $alias);
-                $group = array_merge($group, $subGroup);
+                $group    = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.parent_id' => $options['ancestor_or_self']]);
             }
@@ -1353,12 +1285,12 @@ class Item
 
         if ($options['parent']) {
             $subGroup = $this->applyParentFilters($select, $options['parent'], $prefix, $language, $id);
-            $group = array_merge($group, $subGroup);
+            $group    = array_merge($group, $subGroup);
         }
 
         if ($options['child']) {
             $subGroup = $this->applyChildFilters($select, $options['child'], $prefix, $language, $id);
-            $group = array_merge($group, $subGroup);
+            $group    = array_merge($group, $subGroup);
         }
 
         if ($options['has_specs_of_user']) {
@@ -1384,7 +1316,7 @@ class Item
             'id'     => null,
             'type'   => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $select->join(['pi1' => 'picture_item'], $id . ' = pi1.item_id', [])
             ->join(['p1' => 'pictures'], 'pi1.picture_id = p1.id', []);
@@ -1409,9 +1341,6 @@ class Item
     /**
      * @suppress PhanDeprecatedFunction
      * @param $value
-     * @param string $valueType
-     * @param string $language
-     * @return Sql\Select
      */
     private function getNameSelect($value, string $valueType, string $language): Sql\Select
     {
@@ -1429,13 +1358,13 @@ class Item
         $select->columns(['name'])
             ->where([
                 $predicate,
-                new Sql\Predicate\Expression('length(item_language.name) > 0')
+                new Sql\Predicate\Expression('length(item_language.name) > 0'),
             ])
             ->order([
                 new Sql\Expression(
                     'FIELD(item_language.language' . str_repeat(', ?', count($languages)) . ')',
                     $languages
-                )
+                ),
             ])
             ->limit(1);
 
@@ -1444,9 +1373,6 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param string $itemParentAlias
-     * @param string $language
-     * @return Sql\Select
      */
     private function getItemParentNameSelect(string $itemParentAlias, string $language): Sql\Select
     {
@@ -1472,13 +1398,13 @@ class Item
             ->where([
                 $predicate1,
                 $predicate2,
-                new Sql\Predicate\Expression('length(item_parent_language.name) > 0')
+                new Sql\Predicate\Expression('length(item_parent_language.name) > 0'),
             ])
             ->order([
                 new Sql\Expression(
                     'FIELD(item_parent_language.language' . str_repeat(', ?', count($languages)) . ')',
                     $languages
-                )
+                ),
             ])
             ->limit(1);
 
@@ -1487,47 +1413,45 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param array $options
-     * @return Sql\Select
      * @throws Exception
      */
     public function getSelect(array $options): Sql\Select
     {
         $defaults = [
-            'id'              => null,
-            'columns'         => null,
-            'language'        => null,
-            'item_type_id'    => null,
+            'id'                   => null,
+            'columns'              => null,
+            'language'             => null,
+            'item_type_id'         => null,
             'item_type_id_exclude' => null,
-            'exclude_id'      => null,
-            'limit'           => null,
-            'order'           => null,
-            'created_in_days' => null,
-            'engine_id'       => null,
-            'dateless'        => null,
-            'dateful'         => null,
-            'is_group'        => null,
-            'is_concept'      => null,
-            'is_concept_inherit' => null,
-            'no_parents'      => null,
-            'catname'         => null,
-            'vehicle_type_id' => null,
-            'has_logo'        => null,
-            'has_begin_year'  => null,
-            'has_end_year'    => null,
-            'has_begin_month' => null,
-            'has_end_month'   => null,
-            'position'        => null,
+            'exclude_id'           => null,
+            'limit'                => null,
+            'order'                => null,
+            'created_in_days'      => null,
+            'engine_id'            => null,
+            'dateless'             => null,
+            'dateful'              => null,
+            'is_group'             => null,
+            'is_concept'           => null,
+            'is_concept_inherit'   => null,
+            'no_parents'           => null,
+            'catname'              => null,
+            'vehicle_type_id'      => null,
+            'has_logo'             => null,
+            'has_begin_year'       => null,
+            'has_end_year'         => null,
+            'has_begin_month'      => null,
+            'has_end_month'        => null,
+            'position'             => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $select = new Sql\Select($this->itemTable->getTable());
 
-        $language = isset($options['language']) ? $options['language'] : null;
+        $language = $options['language'] ?? null;
 
         if ($options['columns']) {
             $columns = [];
-            foreach ((array)$options['columns'] as $key => $column) {
+            foreach ((array) $options['columns'] as $key => $column) {
                 if ($column instanceof Sql\Expression) {
                     $columns[$key] = $column;
                     continue;
@@ -1562,16 +1486,20 @@ class Item
                         );
 
                         $columns = array_merge($columns, [
-                            'begin_year', 'end_year', 'today',
-                            'begin_model_year', 'end_model_year',
-                            'begin_model_year_fraction', 'end_model_year_fraction',
+                            'begin_year',
+                            'end_year',
+                            'today',
+                            'begin_model_year',
+                            'end_model_year',
+                            'begin_model_year_fraction',
+                            'end_model_year_fraction',
                             'body',
                             /*'name' => $this->getNameSelect(
                                 'item.id',
                                 Sql\ExpressionInterface::TYPE_IDENTIFIER,
                                 $language
                             )*/
-                            'name' => new Sql\Expression('(' . $subSelect . ')')
+                            'name' => new Sql\Expression('(' . $subSelect . ')'),
                         ]);
 
                         $select->join('spec', 'item.spec_id = spec.id', [
@@ -1585,7 +1513,6 @@ class Item
 
             $select->columns($columns);
         }
-
 
         $recursiveOptions = $options;
         unset($recursiveOptions['item_type_id']);
@@ -1655,7 +1582,7 @@ class Item
                 new Sql\Predicate\Expression(
                     'item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)',
                     [$options['created_in_days']]
-                )
+                ),
             ]);
         }
 
@@ -1666,13 +1593,13 @@ class Item
         if ($options['dateless']) {
             $select->where([
                 'item.begin_year is null',
-                'item.begin_model_year is null'
+                'item.begin_model_year is null',
             ]);
         }
 
         if ($options['dateful']) {
             $select->where([
-                '(item.begin_year is not null or item.begin_model_year is not null)'
+                '(item.begin_year is not null or item.begin_model_year is not null)',
             ]);
         }
 
@@ -1726,7 +1653,7 @@ class Item
         if ($group) {
             $joins = $select->getRawState($select::JOINS);
             foreach ($joins as $join) {
-                if ($join['type'] != $select::JOIN_LEFT) {
+                if ($join['type'] !== $select::JOIN_LEFT) {
                     foreach ($join['columns'] as $column) {
                         if (is_array($join['name'])) {
                             $column = key($join['name']) . '.' . $column;
@@ -1745,8 +1672,6 @@ class Item
     }
 
     /**
-     * @param array $options
-     * @return Paginator\Paginator
      * @throws Exception
      */
     public function getPaginator(array $options): Paginator\Paginator
@@ -1760,8 +1685,6 @@ class Item
     }
 
     /**
-     * @param array $options
-     * @return int
      * @throws Exception
      */
     public function getCount(array $options): int
@@ -1771,8 +1694,6 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param array $options
-     * @return int
      * @throws Exception
      */
     public function getCountDistinct(array $options): int
@@ -1793,15 +1714,13 @@ class Item
         $countSelect->from(['original_select' => $select]);
 
         $statement = $this->itemTable->getSql()->prepareStatementForSqlObject($countSelect);
-        $row = $statement->execute()->current();
+        $row       = $statement->execute()->current();
 
         return (int) $row['count'];
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param array $options
-     * @return array
      * @throws Exception
      */
     public function getCountPairs(array $options): array
@@ -1816,7 +1735,7 @@ class Item
 
         $result = [];
         foreach ($this->itemTable->selectWith($select) as $row) {
-            $result[(int)$row['id']] = (int)$row['count'];
+            $result[(int) $row['id']] = (int) $row['count'];
         }
 
         return $result;
@@ -1824,7 +1743,6 @@ class Item
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param array $options
      * @return array|ArrayObject|null
      * @throws Exception
      */
@@ -1838,8 +1756,6 @@ class Item
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param array $options
-     * @return bool
      * @throws Exception
      */
     public function isExists(array $options): bool
@@ -1851,12 +1767,10 @@ class Item
         $select->columns(['id']);
         $select->limit(1);
 
-        return (bool)$this->itemTable->selectWith($select)->current();
+        return (bool) $this->itemTable->selectWith($select)->current();
     }
 
     /**
-     * @param array $options
-     * @return array
      * @throws Exception
      */
     public function getRows(array $options): array
@@ -1871,8 +1785,6 @@ class Item
     }
 
     /**
-     * @param array $options
-     * @return array
      * @throws Exception
      */
     public function getIds(array $options): array
@@ -1883,85 +1795,82 @@ class Item
 
         $result = [];
         foreach ($this->itemTable->selectWith($select) as $row) {
-            $result[] = (int)$row['id'];
+            $result[] = (int) $row['id'];
         }
 
         return $result;
     }
 
     /**
-     * @param int $itemId
-     * @param string $language
-     * @return array|null
      * @throws Exception
      */
-    public function getDesignInfo(int $itemId, string $language)
+    public function getDesignInfo(int $itemId, string $language): ?array
     {
         $brand = $this->getRow([
             'language'     => $language,
             'columns'      => ['catname', 'name'],
-            'item_type_id' => Item::BRAND,
+            'item_type_id' => self::BRAND,
             'child'        => [
-                'id'         => $itemId,
-                'link_type'  => ItemParent::TYPE_DESIGN,
-                'columns'    => [
-                    'brand_item_catname' => 'link_catname'
-                ]
-            ]
-        ]);
-
-        if ($brand) {
-            return [
-                'name'  => $brand['name'], //TODO: formatter
-                'route' => ['/', $brand['catname'], $brand['brand_item_catname']]
-            ];
-        }
-
-        $brand = $this->getRow([
-            'language'     => $language,
-            'columns'      => ['catname', 'name'],
-            'item_type_id' => Item::BRAND,
-            'child'        => [
-                'columns'    => [
-                    'brand_item_catname' => 'link_catname'
-                ],
+                'id'        => $itemId,
                 'link_type' => ItemParent::TYPE_DESIGN,
-                'descendant' => [
-                    'id'        => $itemId,
-                    'columns'   => ['diff']
-                ]
+                'columns'   => [
+                    'brand_item_catname' => 'link_catname',
+                ],
             ],
-            'order'        => 'ip2ipc1.diff ASC'
         ]);
 
         if ($brand) {
             return [
                 'name'  => $brand['name'], //TODO: formatter
-                'route' => ['/', $brand['catname'], $brand['brand_item_catname']]
+                'route' => ['/', $brand['catname'], $brand['brand_item_catname']],
             ];
         }
 
         $brand = $this->getRow([
             'language'     => $language,
             'columns'      => ['catname', 'name'],
-            'item_type_id' => Item::BRAND,
+            'item_type_id' => self::BRAND,
             'child'        => [
                 'columns'    => [
-                    'brand_item_catname' => 'link_catname'
+                    'brand_item_catname' => 'link_catname',
+                ],
+                'link_type'  => ItemParent::TYPE_DESIGN,
+                'descendant' => [
+                    'id'      => $itemId,
+                    'columns' => ['diff'],
+                ],
+            ],
+            'order'        => 'ip2ipc1.diff ASC',
+        ]);
+
+        if ($brand) {
+            return [
+                'name'  => $brand['name'], //TODO: formatter
+                'route' => ['/', $brand['catname'], $brand['brand_item_catname']],
+            ];
+        }
+
+        $brand = $this->getRow([
+            'language'     => $language,
+            'columns'      => ['catname', 'name'],
+            'item_type_id' => self::BRAND,
+            'child'        => [
+                'columns'    => [
+                    'brand_item_catname' => 'link_catname',
                 ],
                 'descendant' => [
                     'link_type' => ItemParent::TYPE_DESIGN,
                     'id'        => $itemId,
-                    'columns'   => ['diff']
-                ]
+                    'columns'   => ['diff'],
+                ],
             ],
-            'order'        => 'ip2ipc1.diff ASC'
+            'order'        => 'ip2ipc1.diff ASC',
         ]);
 
         if ($brand) {
             return [
                 'name'  => $brand['name'], //TODO: formatter
-                'route' => ['/', $brand['catname'], $brand['brand_item_catname']]
+                'route' => ['/', $brand['catname'], $brand['brand_item_catname']],
             ];
         }
 

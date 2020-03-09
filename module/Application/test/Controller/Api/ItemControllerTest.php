@@ -2,11 +2,6 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Exception;
-use Zend\Http\Header\Cookie;
-use Zend\Http\Headers;
-use Zend\Http\Request;
-use Zend\Json\Json;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemLanguageController;
 use Application\Controller\Api\ItemLinkController;
@@ -15,6 +10,22 @@ use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureItemController;
 use Application\DuplicateFinder;
 use Application\Test\AbstractHttpControllerTestCase;
+use Exception;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Headers;
+use Laminas\Http\Request;
+use Laminas\Json\Json;
+
+use function array_pop;
+use function array_replace;
+use function copy;
+use function count;
+use function explode;
+use function microtime;
+use function sys_get_temp_dir;
+use function tempnam;
+
+use const UPLOAD_ERR_OK;
 
 class ItemControllerTest extends AbstractHttpControllerTestCase
 {
@@ -23,7 +34,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      * @param $params
-     * @return int
      * @throws Exception
      */
     private function createItem($params): int
@@ -40,8 +50,8 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
@@ -49,7 +59,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     {
         return $this->createItem(array_replace([
             'item_type_id' => 1,
-            'name'         => 'Some vehicle'
+            'name'         => 'Some vehicle',
         ], $params));
     }
 
@@ -57,7 +67,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     {
         return $this->createItem([
             'item_type_id' => 2,
-            'name'         => 'Some engine'
+            'name'         => 'Some engine',
         ]);
     }
 
@@ -76,7 +86,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/item/' . $vehicleId,
             Request::METHOD_PUT,
             [
-                'engine_id' => $engineId
+                'engine_id' => $engineId,
             ]
         );
 
@@ -98,7 +108,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
             'type_id' => 5,
             'order'   => 'id_desc',
-            'fields'  => 'catname,subscription'
+            'fields'  => 'catname,subscription',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -118,7 +128,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @param $itemId
      * @param $parentId
-     * @param array $params
      * @throws Exception
      */
     private function addItemParent($itemId, $parentId, array $params = [])
@@ -131,7 +140,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             Request::METHOD_POST,
             array_replace([
                 'item_id'   => $itemId,
-                'parent_id' => $parentId
+                'parent_id' => $parentId,
             ], $params)
         );
 
@@ -152,7 +161,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
-                $tables->get('df_distance')
+                $tables->get('df_distance'),
             ])
             ->getMock();
 
@@ -164,7 +173,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      * @param $vehicleId
-     * @return int
      * @throws Exception
      */
     private function addPictureToItem($vehicleId): int
@@ -180,7 +188,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
-        $file = tempnam(sys_get_temp_dir(), 'upl');
+        $file     = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
@@ -190,12 +198,12 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
                 'tmp_name' => $file,
                 'name'     => $filename,
                 'error'    => UPLOAD_ERR_OK,
-                'type'     => 'image/jpeg'
-            ]
+                'type'     => 'image/jpeg',
+            ],
         ]);
 
         $this->dispatch('https://www.autowp.ru/api/picture', Request::METHOD_POST, [
-            'item_id' => $vehicleId
+            'item_id' => $vehicleId,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -205,8 +213,8 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return $parts[count($parts) - 1];
     }
 
@@ -226,7 +234,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/1',
             Request::METHOD_PUT,
             [
-                'perspective_id' => $perspectiveId
+                'perspective_id' => $perspectiveId,
             ]
         );
 
@@ -262,12 +270,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $itemId
-     * @param $parentId
-     * @return mixed
      * @throws Exception
      */
-    private function getItemParent($itemId, $parentId)
+    private function getItemParent(int $itemId, int $parentId): array
     {
         $this->reset();
 
@@ -293,8 +298,8 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     public function testEngineUnderTheHoodPreviews()
     {
         $vehicleId = $this->createVehicle();
-        $engineId = $this->createEngine();
-        $brand = $this->getRandomBrand();
+        $engineId  = $this->createEngine();
+        $brand     = $this->getRandomBrand();
         $this->addItemParent($engineId, $brand['id']);
         $this->setEngineToVehicle($engineId, $vehicleId);
         $pictureId = $this->addPictureToItem($vehicleId);
@@ -312,7 +317,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item/' . $engineId, Request::METHOD_GET, [
-            'fields' => 'preview_pictures'
+            'fields' => 'preview_pictures',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -335,7 +340,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
             'item_type_id' => 1,
-            'name'         => 'Test car'
+            'name'         => 'Test car',
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -349,7 +354,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
          */
         $headers = $this->getResponse()->getHeaders();
 
-        $uri = $headers->get('Location')->uri();
+        $uri   = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
         $carId = $parts[count($parts) - 1];
 
@@ -363,7 +368,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             Request::METHOD_POST,
             [
                 'item_id'   => $carId,
-                'parent_id' => 205
+                'parent_id' => 205,
             ]
         );
 
@@ -403,7 +408,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'name'         => 'Test brand',
             'full_name'    => 'Test brand full name',
             'catname'      => $catname,
-            'begin_year'   => 1950
+            'begin_year'   => 1950,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -415,12 +420,12 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertHasResponseHeader('Location');
 
         $header = $this->getResponse()->getHeaders()->get('Location');
-        $path = $header->uri()->getPath();
+        $path   = $header->uri()->getPath();
 
         $this->assertStringStartsWith('/api/item/', $path);
 
-        $path = explode('/', $path);
-        $brandId = (int)array_pop($path);
+        $path    = explode('/', $path);
+        $brandId = (int) array_pop($path);
 
         $this->assertNotEmpty($brandId);
 
@@ -431,7 +436,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/item/' . $brandId . '/language/ru', Request::METHOD_PUT, [
             'name'      => 'Тест',
             'text'      => 'Краткое описание',
-            'full_text' => 'Полное описание'
+            'full_text' => 'Полное описание',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -440,7 +445,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/item/item/language/item/put');
         $this->assertActionName('put');
 
-
         $this->reset();
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -448,7 +452,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'item_id' => $brandId,
             'name'    => 'Тест',
             'url'     => 'http://example.com',
-            'type_id' => 'default'
+            'type_id' => 'default',
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -465,18 +469,17 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     public function testBlacklistedCatnameNotAllowedManually()
     {
         $parentVehicleId = $this->createVehicle([
-            'is_group' => true
+            'is_group' => true,
         ]);
-        $childVehicleId = $this->createVehicle();
+        $childVehicleId  = $this->createVehicle();
         $this->addItemParent($childVehicleId, $parentVehicleId, [
             'type_id' => 1, // tuning
-            'catname' => 'sport'
+            'catname' => 'sport',
         ]);
 
         $json = $this->getItemParent($childVehicleId, $parentVehicleId);
 
         $this->assertNotEquals('sport', $json['catname']);
-
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -484,7 +487,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/item-parent/' . $childVehicleId . '/' . $parentVehicleId,
             Request::METHOD_PUT,
             [
-                'catname' => 'sport'
+                'catname' => 'sport',
             ]
         );
 
@@ -493,7 +496,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(ItemParentController::class);
         $this->assertMatchedRouteName('api/item-parent/item/put');
         $this->assertActionName('put');
-
 
         $json = $this->getItemParent($childVehicleId, $parentVehicleId);
 
@@ -514,7 +516,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/item/' . $brand['id'],
             Request::METHOD_PUT,
             [
-                'subscription' => 1
+                'subscription' => 1,
             ]
         );
 
@@ -530,7 +532,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/item/' . $brand['id'],
             Request::METHOD_PUT,
             [
-                'subscription' => 0
+                'subscription' => 0,
             ]
         );
 
@@ -548,9 +550,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     {
         $parentId = $this->createVehicle([
             'name'     => 'Toyota Corolla',
-            'is_group' => true
+            'is_group' => true,
         ]);
-        $childId = $this->createVehicle(['name' => 'Toyota Corolla Sedan']);
+        $childId  = $this->createVehicle(['name' => 'Toyota Corolla Sedan']);
 
         $this->addItemParent($childId, $parentId);
 
@@ -569,13 +571,13 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'item_type_id' => 7,
             'name'         => 'Museum of something',
             'lat'          => 20.5,
-            'lng'          => -15
+            'lng'          => -15,
         ]);
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item/' . $itemId, Request::METHOD_GET, [
-            'fields' => 'lat,lng'
+            'fields' => 'lat,lng',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -622,7 +624,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item/' . $engineId, Request::METHOD_GET, [
-            'fields'  => 'engine_vehicles'
+            'fields' => 'engine_vehicles',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -647,11 +649,11 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
-            'fields' => 'childs_count,name_html,name_text,name_default,description,' .
-                'has_text,brands,spec_editor_url,specs_route,categories,' .
-                'twins_groups,url,preview_pictures,design,' .
-                'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
-            'limit'  => 100
+            'fields' => 'childs_count,name_html,name_text,name_default,description,'
+                . 'has_text,brands,spec_editor_url,specs_route,categories,'
+                . 'twins_groups,url,preview_pictures,design,'
+                . 'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
+            'limit'  => 100,
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -678,7 +680,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'name'         => 'Test category',
             'catname'      => $catname,
             'begin_year'   => 2000,
-            'end_year'     => 2000
+            'end_year'     => 2000,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -690,12 +692,12 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertHasResponseHeader('Location');
 
         $header = $this->getResponse()->getHeaders()->get('Location');
-        $path = $header->uri()->getPath();
+        $path   = $header->uri()->getPath();
 
         $this->assertStringStartsWith('/api/item/', $path);
 
-        $path = explode('/', $path);
-        $categoryId = (int)array_pop($path);
+        $path       = explode('/', $path);
+        $categoryId = (int) array_pop($path);
 
         $this->assertNotEmpty($categoryId);
 
@@ -708,7 +710,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             Request::METHOD_POST,
             [
                 'item_id'   => 1,
-                'parent_id' => $categoryId
+                'parent_id' => $categoryId,
             ]
         );
 

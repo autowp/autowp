@@ -2,48 +2,41 @@
 
 namespace Application\Controller\Api;
 
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Log;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function get_object_vars;
 
 /**
- * Class LogController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method string language()
  */
 class LogController extends AbstractActionController
 {
-    /**
-     * @var Log
-     */
-    private $log;
+    /** @var Log */
+    private Log $log;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    /** @var InputFilter */
+    private InputFilter $listInputFilter;
 
     public function __construct(
         Log $log,
         RestHydrator $hydrator,
         InputFilter $listInputFilter
     ) {
-        $this->log = $log;
-        $this->hydrator = $hydrator;
+        $this->log             = $log;
+        $this->hydrator        = $hydrator;
         $this->listInputFilter = $listInputFilter;
     }
 
@@ -69,13 +62,13 @@ class LogController extends AbstractActionController
             'picture_id' => $params['picture_id'],
             'user_id'    => $params['user_id'],
             'page'       => $params['page'],
-            'language'   => $this->language()
+            'language'   => $this->language(),
         ]);
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $params['fields'],
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
         ]);
 
         $items = [];
@@ -85,7 +78,7 @@ class LogController extends AbstractActionController
 
         return new JsonModel([
             'paginator' => get_object_vars($data['paginator']->getPages()),
-            'items'     => $items
+            'items'     => $items,
         ]);
     }
 }

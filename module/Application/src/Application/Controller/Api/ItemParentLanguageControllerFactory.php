@@ -5,22 +5,19 @@ namespace Application\Controller\Api;
 use Application\Hydrator\Api\ItemParentLanguageHydrator;
 use Application\Model\ItemParent;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemParentLanguageControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return ItemParentLanguageController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ItemParentLanguageController
     {
-        $tables = $container->get('TableManager');
+        $tables    = $container->get('TableManager');
         $hydrators = $container->get('HydratorManager');
-        $filters = $container->get('InputFilterManager');
+        $filters   = $container->get('InputFilterManager');
 
         return new ItemParentLanguageController(
             $tables->get('item_parent_language'),

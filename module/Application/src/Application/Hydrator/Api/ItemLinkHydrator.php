@@ -9,16 +9,15 @@ class ItemLinkHydrator extends RestHydrator
     public function extract($object)
     {
         return [
-            'id'      => (int)$object['id'],
+            'id'      => (int) $object['id'],
             'name'    => $object['name'],
             'url'     => $object['url'],
-            'type_id' => $object['type']
+            'type_id' => $object['type'],
         ];
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

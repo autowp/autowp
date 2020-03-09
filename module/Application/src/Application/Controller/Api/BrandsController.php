@@ -2,61 +2,43 @@
 
 namespace Application\Controller\Api;
 
-use Exception;
-use Zend\Cache\Storage\StorageInterface;
-use Zend\Db\Sql;
-use Zend\I18n\Translator\TranslatorInterface;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Router\Http\TreeRouteStack;
-use Zend\View\Model\JsonModel;
 use Application\Model\Brand;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
-use Zend\View\Model\ViewModel;
+use Exception;
+use Laminas\Cache\Storage\StorageInterface;
+use Laminas\Db\Sql;
+use Laminas\I18n\Translator\TranslatorInterface;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function array_merge;
+use function array_values;
+use function count;
+use function strnatcasecmp;
+use function usort;
 
 /**
- * Class BrandsController
- * @package Application\Controller\Api
- *
  * @method string language()
  */
 class BrandsController extends AbstractActionController
 {
-    /**
-     * @var StorageInterface
-     */
-    private $cache;
+    private StorageInterface $cache;
 
-    /**
-     * @var Brand
-     */
-    private $brand;
+    private Brand $brand;
 
-    /**
-     * @var VehicleType
-     */
-    private $vehicleType;
+    private VehicleType $vehicleType;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var TreeRouteStack
-     */
-    private $router;
+    private TreeRouteStack $router;
 
     public function __construct(
         StorageInterface $cache,
@@ -67,19 +49,19 @@ class BrandsController extends AbstractActionController
         TranslatorInterface $translator,
         TreeRouteStack $router
     ) {
-        $this->cache = $cache;
-        $this->brand = $brand;
+        $this->cache       = $cache;
+        $this->brand       = $brand;
         $this->vehicleType = $vehicleType;
-        $this->itemModel = $itemModel;
-        $this->picture = $picture;
-        $this->translator = $translator;
-        $this->router = $router;
+        $this->itemModel   = $itemModel;
+        $this->picture     = $picture;
+        $this->translator  = $translator;
+        $this->router      = $router;
     }
 
     public function indexAction()
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $isHttps = (bool)$this->getRequest()->getServer('HTTPS');
+        $isHttps = (bool) $this->getRequest()->getServer('HTTPS');
 
         $language = $this->language();
 
@@ -92,7 +74,7 @@ class BrandsController extends AbstractActionController
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
@@ -100,22 +82,21 @@ class BrandsController extends AbstractActionController
     {
         return new JsonModel([
             'image' => '/img/brands.png',
-            'css'   => '/img/brands.css'
+            'css'   => '/img/brands.css',
         ]);
     }
 
     /**
-     * @return ViewModel
      * @throws Exception
      */
-    public function sectionsAction()
+    public function sectionsAction(): ViewModel
     {
         $language = $this->language();
 
-        $rows = $this->itemModel->getRows([
+        $rows  = $this->itemModel->getRows([
             'id'           => (int) $this->params('id'),
             'item_type_id' => Item::BRAND,
-            'columns'      => ['id', 'catname']
+            'columns'      => ['id', 'catname'],
         ]);
         $brand = count($rows) ? $rows[0] : null;
         if (! $brand) {
@@ -126,17 +107,13 @@ class BrandsController extends AbstractActionController
     }
 
     /**
-     * @param string $language
-     * @param int $brandId
-     * @param string $brandCatname
-     * @return array
      * @throws Exception
      */
     private function brandSections(
         string $language,
         int $brandId,
         string $brandCatname
-    ) {
+    ): array {
         // create groups array
         $sections = $this->carSections($language, $brandId, $brandCatname, true);
 
@@ -146,12 +123,12 @@ class BrandsController extends AbstractActionController
                 [
                     'name'       => 'Other',
                     'routerLink' => null,
-                    'groups' => $this->otherGroups(
+                    'groups'     => $this->otherGroups(
                         $brandId,
                         $brandCatname,
                         true
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -159,25 +136,20 @@ class BrandsController extends AbstractActionController
     }
 
     /**
-     * @param int $brandId
-     * @param string $brandCatname
-     * @param bool $conceptsSeparately
-     * @return array
      * @throws Exception
      */
     private function otherGroups(
         int $brandId,
         string $brandCatname,
         bool $conceptsSeparately
-    ) {
-
+    ): array {
         $groups = [];
 
         if ($conceptsSeparately) {
             // concepts
             $hasConcepts = $this->itemModel->isExists([
                 'ancestor'   => $brandId,
-                'is_concept' => true
+                'is_concept' => true,
             ]);
 
             if ($hasConcepts) {
@@ -193,15 +165,15 @@ class BrandsController extends AbstractActionController
             'status' => Picture::STATUS_ACCEPTED,
             'item'   => [
                 'id'          => $brandId,
-                'perspective' => 22
+                'perspective' => 22,
             ],
         ]);
 
         if ($logoPicturesCount > 0) {
             $groups['logo'] = [
                 'routerLink' => ['/', $brandCatname, 'logotypes'],
-                'name'  => $this->translator->translate('logotypes'),
-                'count' => $logoPicturesCount
+                'name'       => $this->translator->translate('logotypes'),
+                'count'      => $logoPicturesCount,
             ];
         }
 
@@ -210,14 +182,14 @@ class BrandsController extends AbstractActionController
             'status' => Picture::STATUS_ACCEPTED,
             'item'   => [
                 'id'          => $brandId,
-                'perspective' => 25
+                'perspective' => 25,
             ],
         ]);
         if ($mixedPicturesCount > 0) {
             $groups['mixed'] = [
                 'routerLink' => ['/', $brandCatname, 'mixed'],
-                'name'  => $this->translator->translate('mixed'),
-                'count' => $mixedPicturesCount
+                'name'       => $this->translator->translate('mixed'),
+                'count'      => $mixedPicturesCount,
             ];
         }
 
@@ -226,14 +198,14 @@ class BrandsController extends AbstractActionController
             'status' => Picture::STATUS_ACCEPTED,
             'item'   => [
                 'id'                  => $brandId,
-                'perspective_exclude' => [22, 25]
+                'perspective_exclude' => [22, 25],
             ],
         ]);
         if ($unsortedPicturesCount > 0) {
             $groups['unsorted'] = [
                 'routerLink' => ['/', $brandCatname, 'other'],
-                'name'  => $this->translator->translate('unsorted'),
-                'count' => $unsortedPicturesCount
+                'name'       => $this->translator->translate('unsorted'),
+                'count'      => $unsortedPicturesCount,
             ];
         }
 
@@ -247,37 +219,37 @@ class BrandsController extends AbstractActionController
         bool $conceptsSeparatly
     ) {
         $sectionsPresets = [
-            'other' => [
+            'other'   => [
                 'name'         => null,
                 'car_type_id'  => null,
-                'item_type_id' => Item::VEHICLE
+                'item_type_id' => Item::VEHICLE,
             ],
-            'moto' => [
-                'name'        => 'catalogue/section/moto',
-                'car_type_id' => 43,
-                'item_type_id' => Item::VEHICLE
+            'moto'    => [
+                'name'         => 'catalogue/section/moto',
+                'car_type_id'  => 43,
+                'item_type_id' => Item::VEHICLE,
             ],
-            'bus' => [
-                'name' => 'catalogue/section/buses',
-                'car_type_id' => 19,
-                'item_type_id' => Item::VEHICLE
+            'bus'     => [
+                'name'         => 'catalogue/section/buses',
+                'car_type_id'  => 19,
+                'item_type_id' => Item::VEHICLE,
             ],
-            'truck' => [
-                'name' => 'catalogue/section/trucks',
-                'car_type_id' => 17,
-                'item_type_id' => Item::VEHICLE
+            'truck'   => [
+                'name'         => 'catalogue/section/trucks',
+                'car_type_id'  => 17,
+                'item_type_id' => Item::VEHICLE,
             ],
             'tractor' => [
-                'name'        => 'catalogue/section/tractors',
-                'car_type_id' => 44,
-                'item_type_id' => Item::VEHICLE
+                'name'         => 'catalogue/section/tractors',
+                'car_type_id'  => 44,
+                'item_type_id' => Item::VEHICLE,
             ],
-            'engine' => [
-                'name'        => 'catalogue/section/engines',
-                'car_type_id' => null,
+            'engine'  => [
+                'name'         => 'catalogue/section/engines',
+                'car_type_id'  => null,
                 'item_type_id' => Item::ENGINE,
-                'router_link'  => ['/', $brandCatname, 'engines']
-            ]
+                'router_link'  => ['/', $brandCatname, 'engines'],
+            ],
         ];
 
         $sections = [];
@@ -296,8 +268,8 @@ class BrandsController extends AbstractActionController
 
             $sections[] = [
                 'name'       => $sectionsPreset['name'],
-                'routerLink' => isset($sectionsPreset['router_link']) ? $sectionsPreset['router_link'] : null,
-                'groups'     => $sectionGroups
+                'routerLink' => $sectionsPreset['router_link'] ?? null,
+                'groups'     => $sectionGroups,
             ];
         }
 
@@ -319,9 +291,9 @@ class BrandsController extends AbstractActionController
                 null,
                 $conceptsSeparatly
             );
-            $rows = $this->itemModel->getTable()->selectWith($select);
+            $rows   = $this->itemModel->getTable()->selectWith($select);
         } else {
-            $rows = [];
+            $rows   = [];
             $select = $this->carSectionGroupsSelect(
                 $brandId,
                 $section['item_type_id'],
@@ -371,7 +343,7 @@ class BrandsController extends AbstractActionController
             ])
             ->join('item_parent', 'item.id = item_parent.item_id', [
                 'brand_item_catname' => 'catname',
-                'brand_id' => 'parent_id'
+                'brand_id'           => 'parent_id',
             ])
             ->where(['item_parent.parent_id' => $brandId])
             ->group('item.id');
@@ -380,14 +352,14 @@ class BrandsController extends AbstractActionController
             $select->where(['NOT item.is_concept']);
         }
 
-        if ($itemTypeId != Item::VEHICLE) {
+        if ($itemTypeId !== Item::VEHICLE) {
             $select->where(['item.item_type_id' => $itemTypeId]);
 
             return $select;
         }
 
         $select->where([
-            new Sql\Predicate\In('item.item_type_id', [Item::VEHICLE, Item::BRAND])
+            new Sql\Predicate\In('item.item_type_id', [Item::VEHICLE, Item::BRAND]),
         ]);
         if ($carTypeId) {
             $select
@@ -424,7 +396,7 @@ class BrandsController extends AbstractActionController
                 new Sql\Predicate\NotIn(
                     'vehicle_vehicle_type.vehicle_type_id',
                     $otherTypesIds
-                )
+                ),
             ]);
         }
 
@@ -432,14 +404,13 @@ class BrandsController extends AbstractActionController
     }
 
     /**
-     * @return ViewModel
      * @throws Exception
      */
-    public function newItemsAction()
+    public function newItemsAction(): ViewModel
     {
         $brand = $this->itemModel->getRow([
             'item_type_id' => Item::BRAND,
-            'id'           => (int)$this->params()->fromRoute('id')
+            'id'           => (int) $this->params()->fromRoute('id'),
         ]);
 
         if (! $brand) {
@@ -454,7 +425,7 @@ class BrandsController extends AbstractActionController
             'ancestor'        => $brand['id'],
             'created_in_days' => 7,
             'limit'           => 30,
-            'order'           => 'item.add_datetime DESC'
+            'order'           => 'item.add_datetime DESC',
         ]);
 
         $cars = [];
@@ -463,9 +434,9 @@ class BrandsController extends AbstractActionController
         }
 
         $viewModel = new ViewModel([
-            'brand'     => $brand,
-            'carList'   => $cars,
-            'name'      => $langName ? $langName : $brand['name']
+            'brand'   => $brand,
+            'carList' => $cars,
+            'name'    => $langName ? $langName : $brand['name'],
         ]);
         $viewModel->setTerminal(true);
 

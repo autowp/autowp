@@ -2,26 +2,22 @@
 
 namespace Application\View\Helper;
 
-use ArrayObject;
-use Zend\View\Helper\AbstractHtmlElement;
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
+use ArrayObject;
+use Laminas\View\Helper\AbstractHtmlElement;
+
+use function urlencode;
 
 class Pic extends AbstractHtmlElement
 {
-    /**
-     * @var array|ArrayObject
-     */
-    private $picture = null;
+    /** @var array|ArrayObject */
+    private $picture;
 
-    /**
-     * @var PictureNameFormatter
-     */
+    /** @var PictureNameFormatter */
     private $pictureNameFormatter;
 
-    /**
-     * @var Picture
-     */
+    /** @var Picture */
     private $pictureModel;
 
     public function __construct(
@@ -29,7 +25,7 @@ class Pic extends AbstractHtmlElement
         Picture $picture
     ) {
         $this->pictureNameFormatter = $pictureNameFormatter;
-        $this->pictureModel = $picture;
+        $this->pictureModel         = $picture;
     }
 
     public function __invoke($picture = null)
@@ -60,14 +56,14 @@ class Pic extends AbstractHtmlElement
     public function name($pictureRow, $language)
     {
         if ($pictureRow instanceof ArrayObject) {
-            $pictureRow = (array)$pictureRow;
+            $pictureRow = (array) $pictureRow;
         }
 
         $names = $this->pictureModel->getNameData([$pictureRow], [
             'language' => $language,
-            'large'    => true
+            'large'    => true,
         ]);
-        $name = $names[$pictureRow['id']];
+        $name  = $names[$pictureRow['id']];
 
         return $this->pictureNameFormatter->format($name, $language);
     }

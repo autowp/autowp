@@ -2,36 +2,27 @@
 
 namespace Application\Model;
 
-use Zend\Db\Sql;
+use ArrayAccess;
+use Laminas\Db\Sql;
+
+use function array_merge;
+use function array_shift;
+use function count;
+use function ucfirst;
 
 class PerspectivePictureFetcher
 {
-    /**
-     * @var Picture
-     */
-    protected $pictureModel;
+    protected Picture $pictureModel;
 
-    /**
-     * @var int|null
-     */
-    private $pictureItemTypeId;
+    private ?int $pictureItemTypeId;
 
-    /**
-     * @var int
-     */
-    private $perspectivePageId = 0;
+    private int $perspectivePageId = 0;
 
-    private $perspectiveCache = [];
+    private array $perspectiveCache = [];
 
-    /**
-     * @var bool
-     */
-    private $onlyExactlyPictures = false;
+    private bool $onlyExactlyPictures = false;
 
-    /**
-     * @var Perspective
-     */
-    private $perspective;
+    private Perspective $perspective;
 
     public function __construct(array $options)
     {
@@ -64,16 +55,26 @@ class PerspectivePictureFetcher
             'ids'                 => [],
             'acceptedSort'        => false,
             'onlyExactlyPictures' => false,
-            'limit'               => 1
+            'limit'               => 1,
         ];
-        $options = array_merge($defaults, $options);
+        $options  = array_merge($defaults, $options);
 
         $select = $this->pictureModel->getTable()->getSql()->select();
         $select
             ->columns([
-                'id', 'name',
-                'image_id', 'width', 'height', 'identity',
-                'status', 'owner_id', 'filesize', 'add_date', 'dpi_x', 'dpi_y', 'point'
+                'id',
+                'name',
+                'image_id',
+                'width',
+                'height',
+                'identity',
+                'status',
+                'owner_id',
+                'filesize',
+                'add_date',
+                'dpi_x',
+                'dpi_y',
+                'point',
             ])
             ->join(
                 'picture_item',
@@ -136,9 +137,6 @@ class PerspectivePictureFetcher
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $itemID
-     * @param bool $onlyExactly
-     * @return int
      */
     public function getTotalPictures(int $itemID, bool $onlyExactly): int
     {
@@ -200,29 +198,27 @@ class PerspectivePictureFetcher
 
     public function setOnlyExactlyPictures($value): void
     {
-        $this->onlyExactlyPictures = (bool)$value;
+        $this->onlyExactlyPictures = (bool) $value;
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $item
-     * @param array $options
-     * @return array
+     * @param array|ArrayAccess $item
      */
-    public function fetch($item, array $options = [])
+    public function fetch($item, array $options = []): array
     {
         $pictures = [];
-        $usedIds = [];
+        $usedIds  = [];
 
-        $totalPictures = isset($options['totalPictures']) ? (int)$options['totalPictures'] : null;
+        $totalPictures = isset($options['totalPictures']) ? (int) $options['totalPictures'] : null;
 
-        $pPageId = null;
+        $pPageId        = null;
         $useLargeFormat = false;
         if ($this->perspectivePageId) {
             $pPageId = $this->perspectivePageId;
         } else {
             $useLargeFormat = $totalPictures > 30;
-            $pPageId = $useLargeFormat ? 5 : 4;
+            $pPageId        = $useLargeFormat ? 5 : 4;
         }
 
         $perspectiveGroupIds = $this->getPerspectiveGroupIds($pPageId);
@@ -240,7 +236,7 @@ class PerspectivePictureFetcher
 
             if ($picture) {
                 $pictures[] = $picture;
-                $usedIds[] = (int)$picture['id'];
+                $usedIds[]  = (int) $picture['id'];
             } else {
                 $pictures[] = null;
             }
@@ -273,7 +269,7 @@ class PerspectivePictureFetcher
             }
         }
 
-        $result = [];
+        $result        = [];
         $emptyPictures = 0;
         foreach ($pictures as $idx => $picture) {
             if ($picture) {
@@ -286,16 +282,16 @@ class PerspectivePictureFetcher
             }
         }
 
-        if ($emptyPictures > 0 && ($item['item_type_id'] == Item::ENGINE)) {
+        if ($emptyPictures > 0 && ($item['item_type_id'] === Item::ENGINE)) {
             $pictureRows = $this->pictureModel->getRows([
                 'status' => Picture::STATUS_ACCEPTED,
                 'item'   => [
                     'perspective' => 17,
                     'engine'      => [
-                        'ancestor_or_self' => $item['id']
-                    ]
+                        'ancestor_or_self' => $item['id'],
+                    ],
                 ],
-                'limit'  => $emptyPictures
+                'limit'  => $emptyPictures,
             ]);
 
             $extraPicIdx = 0;
@@ -307,17 +303,17 @@ class PerspectivePictureFetcher
                 if (count($pictureRows) <= $extraPicIdx) {
                     break;
                 }
-                $pictureRow = $pictureRows[$extraPicIdx++];
+                $pictureRow   = $pictureRows[$extraPicIdx++];
                 $result[$idx] = [
                     'row'           => $pictureRow,
-                    'isVehicleHood' => true
+                    'isVehicleHood' => true,
                 ];
             }
         }
 
         return [
             'large_format' => $useLargeFormat,
-            'pictures'     => $result
+            'pictures'     => $result,
         ];
     }
 }

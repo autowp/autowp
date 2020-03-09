@@ -2,23 +2,17 @@
 
 namespace Application\Model;
 
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\TableGateway\TableGateway;
 
 class PictureVote
 {
-    /**
-     * @var TableGateway
-     */
-    private $voteTable;
+    private TableGateway $voteTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $summaryTable;
+    private TableGateway $summaryTable;
 
     public function __construct(TableGateway $voteTable, TableGateway $summaryTable)
     {
-        $this->voteTable = $voteTable;
+        $this->voteTable    = $voteTable;
         $this->summaryTable = $summaryTable;
     }
 
@@ -36,7 +30,7 @@ class PictureVote
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $statement = $this->voteTable->getAdapter()->query($sql);
-        $statement->execute([(int)$pictureId, (int)$userId, $value]);
+        $statement->execute([(int) $pictureId, (int) $userId, $value]);
 
         $this->updatePictureSummary($pictureId);
     }
@@ -46,25 +40,25 @@ class PictureVote
         $row = null;
         if ($userId) {
             $row = $this->voteTable->select([
-                'picture_id' => (int)$pictureId,
-                'user_id'    => (int)$userId,
+                'picture_id' => (int) $pictureId,
+                'user_id'    => (int) $userId,
             ])->current();
         }
 
         $summary = $this->summaryTable->select([
-            'picture_id' => (int)$pictureId
+            'picture_id' => (int) $pictureId,
         ])->current();
 
         return [
             'value'    => $row ? $row['value'] : null,
             'positive' => $summary ? $summary['positive'] : 0,
-            'negative' => $summary ? $summary['negative'] : 0
+            'negative' => $summary ? $summary['negative'] : 0,
         ];
     }
 
     private function updatePictureSummary($pictureId)
     {
-        $pictureId = (int)$pictureId;
+        $pictureId = (int) $pictureId;
 
         $sql = '
             insert into picture_vote_summary (picture_id, positive, negative)

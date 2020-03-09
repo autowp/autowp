@@ -3,7 +3,9 @@
 namespace Application\View\Helper;
 
 use Exception;
-use Zend\View\Helper\AbstractHtmlElement;
+use Laminas\View\Helper\AbstractHtmlElement;
+
+use function array_key_exists;
 
 class Img extends AbstractHtmlElement
 {
@@ -11,13 +13,11 @@ class Img extends AbstractHtmlElement
 
     /**
      * @param int $imageId
-     * @param array $attribs
-     * @return Img
      */
-    public function __invoke($imageId, array $attribs = [])
+    public function __invoke($imageId, array $attribs = []): self
     {
         $this->attribs = [];
-        $format = null;
+        $format        = null;
         if (array_key_exists('format', $attribs)) {
             $format = $attribs['format'];
             unset($attribs['format']);
@@ -37,7 +37,7 @@ class Img extends AbstractHtmlElement
 
         if ($imageInfo) {
             $attribs['src'] = $imageInfo->getSrc();
-            $this->attribs = $attribs;
+            $this->attribs  = $attribs;
         }
 
         return $this;
@@ -45,7 +45,7 @@ class Img extends AbstractHtmlElement
 
     public function src()
     {
-        return isset($this->attribs['src']) ? $this->attribs['src'] : '';
+        return $this->attribs['src'] ?? '';
     }
 
     public function __toString()

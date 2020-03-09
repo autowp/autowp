@@ -2,15 +2,14 @@
 
 namespace Application\Model;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+
+use function count;
 
 class PictureView
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     public function __construct(TableGateway $table)
     {
@@ -34,10 +33,10 @@ class PictureView
     public function get(int $pictureId): int
     {
         $row = $this->table->select([
-            'picture_id' => $pictureId
+            'picture_id' => $pictureId,
         ])->current();
 
-        return $row ? (int)$row['views'] : 0;
+        return $row ? (int) $row['views'] : 0;
     }
 
     public function getValues(array $ids): array
@@ -47,12 +46,12 @@ class PictureView
         }
 
         $rows = $this->table->select([
-            new Sql\Predicate\In('picture_id', $ids)
+            new Sql\Predicate\In('picture_id', $ids),
         ]);
 
         $result = [];
         foreach ($rows as $row) {
-            $result[(int)$row['picture_id']] = (int)$row['views'];
+            $result[(int) $row['picture_id']] = (int) $row['views'];
         }
 
         return $result;

@@ -3,20 +3,20 @@
 namespace Application\View\Helper;
 
 use Autowp\Comments\CommentsService;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
+
+use function array_replace;
 
 class Comments extends AbstractHelper
 {
-    /**
-     * @var CommentsService
-     */
+    /** @var CommentsService */
     private $comments;
 
     private $form;
 
     public function __construct($form, CommentsService $comments)
     {
-        $this->form = $form;
+        $this->form     = $form;
         $this->comments = $comments;
     }
 
@@ -24,12 +24,12 @@ class Comments extends AbstractHelper
     {
         $defaults = [
             'type'    => null,
-            'item_id' => null
+            'item_id' => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
-        $type = (int)$options['type'];
-        $item = (int)$options['item_id'];
+        $type = (int) $options['type'];
+        $item = (int) $options['item_id'];
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->view->user()->get();
@@ -40,7 +40,7 @@ class Comments extends AbstractHelper
             $this->comments->updateTopicView($type, $item, $user['id']);
         }
 
-        $canAddComments = (bool)$user;
+        $canAddComments = (bool) $user;
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canRemoveComments = $this->view->user()->isAllowed('comment', 'remove');
 
@@ -49,8 +49,8 @@ class Comments extends AbstractHelper
             $form = $this->form;
 
             $form->setAttribute('action', $this->view->url('comments/add', [
-                'type_id'    => $type,
-                'item_id'    => $item
+                'type_id' => $type,
+                'item_id' => $item,
             ]));
             // TODO: 'canModeratorAttention' => $this->view->user()->isAllowed('comment', 'moderator-attention'),
         }
@@ -66,7 +66,7 @@ class Comments extends AbstractHelper
             'type'              => $type,
             'canAddComments'    => $canAddComments,
             'canRemoveComments' => $canRemoveComments,
-            'form'              => $form
+            'form'              => $form,
         ]);
     }
 }

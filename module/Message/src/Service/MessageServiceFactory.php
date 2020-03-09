@@ -3,10 +3,10 @@
 namespace Autowp\Message\Service;
 
 use Application\Service\TelegramService;
+use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Autowp\Message\MessageService;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * @todo Unlink from Telegram
@@ -15,12 +15,9 @@ class MessageServiceFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return MessageService
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): MessageService
     {
         $tables = $container->get('TableManager');
         return new MessageService(

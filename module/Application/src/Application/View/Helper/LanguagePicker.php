@@ -2,14 +2,12 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHtmlElement;
 use Application\LanguagePicker as Model;
+use Laminas\View\Helper\AbstractHtmlElement;
 
 class LanguagePicker extends AbstractHtmlElement
 {
-    /**
-     * @var Model
-     */
+    /** @var Model */
     private $languagePicker;
 
     public function __construct(Model $languagePicker)

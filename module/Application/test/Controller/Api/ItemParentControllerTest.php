@@ -2,11 +2,11 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
-use Zend\Json\Json;
-use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\ItemParentController;
+use Application\Test\AbstractHttpControllerTestCase;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+use Laminas\Json\Json;
 
 class ItemParentControllerTest extends AbstractHttpControllerTestCase
 {
@@ -19,7 +19,7 @@ class ItemParentControllerTest extends AbstractHttpControllerTestCase
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_GET, [
-            'order' => 'categories_first'
+            'order' => 'categories_first',
         ]);
 
         $this->assertResponseStatusCode(200);

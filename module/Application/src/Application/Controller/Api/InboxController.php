@@ -2,52 +2,39 @@
 
 namespace Application\Controller\Api;
 
-use Exception;
-use Zend\Db\Sql;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\User\Controller\Plugin\User;
-use Application\Service\DayPictures;
 use Application\Model\Brand;
 use Application\Model\Item;
 use Application\Model\Picture;
+use Application\Service\DayPictures;
+use Autowp\User\Controller\Plugin\User;
+use Exception;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Sql;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
 
 /**
- * Class InboxController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
  * @method string language()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */
 class InboxController extends AbstractRestfulController
 {
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var Brand
-     */
-    private $brand;
+    private Brand $brand;
 
-    /**
-     * @var InputFilter
-     */
-    private $inputFilter;
+    private InputFilter $inputFilter;
 
     public function __construct(Picture $picture, Brand $brand, InputFilter $inputFilter)
     {
-        $this->picture = $picture;
-        $this->brand = $brand;
+        $this->picture     = $picture;
+        $this->brand       = $brand;
         $this->inputFilter = $inputFilter;
     }
 
     /**
-     * @return array
      * @throws Exception
      */
     private function getBrandControl(): array
@@ -55,7 +42,6 @@ class InboxController extends AbstractRestfulController
         $language = $this->language();
 
         $brands = $this->brand->getList($language, function (Sql\Select $select) {
-
             $subSelect = new Sql\Select('item');
             $subSelect->columns(['id'])
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
@@ -63,19 +49,19 @@ class InboxController extends AbstractRestfulController
                 ->join('pictures', 'picture_item.picture_id = pictures.id', [])
                 ->where([
                     'item.item_type_id' => Item::BRAND,
-                    'pictures.status'   => Picture::STATUS_INBOX
+                    'pictures.status'   => Picture::STATUS_INBOX,
                 ]);
 
             $select->where([
-                new Sql\Predicate\In('item.id', $subSelect)
+                new Sql\Predicate\In('item.id', $subSelect),
             ]);
         });
 
         $brandOptions = [];
         foreach ($brands as $iBrand) {
             $brandOptions[] = [
-                'id'      => (int)$iBrand['id'],
-                'name'    => $iBrand['name']
+                'id'   => (int) $iBrand['id'],
+                'name' => $iBrand['name'],
             ];
         }
 
@@ -114,12 +100,12 @@ class InboxController extends AbstractRestfulController
         }
 
         $service = new DayPictures([
-            'picture'      => $this->picture,
-            'timezone'     => $this->user()->timezone(), // @phan-suppress-current-line PhanUndeclaredMethod
-            'dbTimezone'   => MYSQL_TIMEZONE,
-            'select'       => $select,
-            'orderColumn'  => 'add_date',
-            'currentDate'  => $values['date']
+            'picture'     => $this->picture,
+            'timezone'    => $this->user()->timezone(), // @phan-suppress-current-line PhanUndeclaredMethod
+            'dbTimezone'  => MYSQL_TIMEZONE,
+            'select'      => $select,
+            'orderColumn' => 'add_date',
+            'currentDate' => $values['date'],
         ]);
 
         if (! $service->haveCurrentDate() || ! $service->haveCurrentDayPictures()) {
@@ -132,24 +118,24 @@ class InboxController extends AbstractRestfulController
             $service->setCurrentDate($lastDate);
         }
 
-        $prevDate = $service->getPrevDate();
+        $prevDate    = $service->getPrevDate();
         $currentDate = $service->getCurrentDate();
-        $nextDate = $service->getNextDate();
+        $nextDate    = $service->getNextDate();
 
         return new JsonModel([
-            'brands'    => $this->getBrandControl(),
-            'prev'      => [
+            'brands'  => $this->getBrandControl(),
+            'prev'    => [
                 'date'  => $prevDate ? $prevDate->format('Y-m-d') : null,
-                'count' => $service->getPrevDateCount()
+                'count' => $service->getPrevDateCount(),
             ],
-            'current'   => [
+            'current' => [
                 'date'  => $currentDate ? $currentDate->format('Y-m-d') : null,
                 'count' => $service->getCurrentDateCount(),
             ],
-            'next'      => [
+            'next'    => [
                 'date'  => $nextDate ? $nextDate->format('Y-m-d') : null,
-                'count' => $service->getNextDateCount()
-            ]
+                'count' => $service->getNextDateCount(),
+            ],
         ]);
     }
 }

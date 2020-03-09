@@ -3,7 +3,7 @@
 namespace Application\Most\Adapter;
 
 use Exception;
-use Zend\Db\Sql;
+use Laminas\Db\Sql;
 
 class Attr extends AbstractAdapter
 {
@@ -13,7 +13,7 @@ class Attr extends AbstractAdapter
 
     public function setAttribute($value)
     {
-        $this->attribute = (int)$value;
+        $this->attribute = (int) $value;
     }
 
     public function setOrder($value)
@@ -21,9 +21,9 @@ class Attr extends AbstractAdapter
         $this->order = $value;
     }
 
-    public function getCars(Sql\Select $select, $language)
+    public function getCars(Sql\Select $select, string $language): array
     {
-        $attribute = $this->attributeTable->select(['id' => (int)$this->attribute])->current();
+        $attribute = $this->attributeTable->select(['id' => (int) $this->attribute])->current();
         if (! $attribute) {
             throw new Exception("Attribute '{$this->attribute}' not found");
         }
@@ -31,12 +31,12 @@ class Attr extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         $valuesTable = $specService->getValueDataTable($attribute['type_id']);
-        $tableName = $valuesTable->getTable();
+        $tableName   = $valuesTable->getTable();
 
         $select
             ->where([
                 $tableName . '.attribute_id' => $attribute['id'],
-                $tableName . '.value IS NOT NULL'
+                $tableName . '.value IS NOT NULL',
             ])
             ->join($tableName, 'item.id = ' . $tableName . '.item_id', [])
             ->order($tableName . '.value ' . $this->order)

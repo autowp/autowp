@@ -2,89 +2,65 @@
 
 namespace Application\Service;
 
+use Application\Model\Contact;
+use Application\Model\Picture;
+use Application\Model\UserAccount;
+use Application\Model\UserItemSubscribe;
 use ArrayObject;
-use DateTime;
-use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Mail;
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
 use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
 use Autowp\User\Model\User;
-use Application\Model\Contact;
-use Application\Model\Picture;
-use Application\Model\UserAccount;
-use Application\Model\UserItemSubscribe;
+use DateTime;
+use Exception;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\I18n\Translator\TranslatorInterface;
+use Laminas\Mail;
+
+use function headers_sent;
+use function md5;
+use function microtime;
+use function round;
+use function setcookie;
+use function sprintf;
+use function strlen;
+use function time;
+
+use const PHP_EOL;
 
 class UsersService
 {
-    /**
-     * @var string
-     */
-    private $salt = null;
+    private string $salt;
 
-    private $emailSalt = null;
+    private string $emailSalt;
 
-    /**
-     * @var array
-     */
-    private $hosts = [];
+    private array $hosts = [];
 
-    private $translator;
+    private TranslatorInterface $translator;
 
-    private $transport;
+    private Mail\Transport\TransportInterface $transport;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specsService = null;
+    private SpecificationsService $specsService;
 
-    /**
-     * @var Image\Storage
-     */
-    private $imageStorage;
+    private Image\Storage $imageStorage;
 
-    /**
-     * @var Comments\CommentsService
-     */
-    private $comments;
+    private Comments\CommentsService $comments;
 
-    /**
-     * @var UserItemSubscribe
-     */
-    private $userItemSubscribe;
+    private UserItemSubscribe $userItemSubscribe;
 
-    /**
-     * @var Contact
-     */
-    private $contact;
+    private Contact $contact;
 
-    /**
-     * @var UserAccount
-     */
-    private $userAccount;
+    private UserAccount $userAccount;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var TableGateway
-     */
-    private $telegramChatTable;
+    private TableGateway $telegramChatTable;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var TableGateway
-     */
-    private $logEventUserTable;
+    private TableGateway $logEventUserTable;
 
     public function __construct(
         array $options,
@@ -102,31 +78,28 @@ class UsersService
         User $userModel,
         TableGateway $logEventUserTable
     ) {
-
-        $this->salt = $options['salt'];
+        $this->salt      = $options['salt'];
         $this->emailSalt = $options['emailSalt'];
 
-        $this->hosts = $hosts;
-        $this->translator = $translator;
-        $this->transport = $transport;
+        $this->hosts        = $hosts;
+        $this->translator   = $translator;
+        $this->transport    = $transport;
         $this->specsService = $specsService;
         $this->imageStorage = $imageStorage;
 
         $this->comments = $comments;
 
         $this->userItemSubscribe = $userItemSubscribe;
-        $this->contact = $contact;
-        $this->userAccount = $userAccount;
-        $this->picture = $picture;
+        $this->contact           = $contact;
+        $this->userAccount       = $userAccount;
+        $this->picture           = $picture;
         $this->telegramChatTable = $telegramChatTable;
-        $this->userModel = $userModel;
+        $this->userModel         = $userModel;
         $this->logEventUserTable = $logEventUserTable;
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param string $password
-     * @return Sql\Expression
      * @throws Exception
      */
     public function getPasswordHashExpr(string $password): Sql\Expression
@@ -138,21 +111,15 @@ class UsersService
         return new Sql\Expression('MD5(CONCAT(?, ?))', [$this->salt, $password]);
     }
 
-    /**
-     * @param string $email
-     * @return string
-     */
-    private function emailCheckCode($email)
+    private function emailCheckCode(string $email): string
     {
         return md5($this->emailSalt . $email . microtime());
     }
 
     /**
-     * @param string $language
      * @throws Exception
-     * @return array
      */
-    private function getHostOptions($language)
+    private function getHostOptions(string $language): array
     {
         if (! isset($this->hosts[$language])) {
             throw new Exception("Host with language `$language` is not supported");
@@ -163,13 +130,10 @@ class UsersService
 
     /**
      * @suppress PhanDeprecatedFunction
-     *
-     * @param array $values
-     * @param string $language
      * @return ArrayObject|array
      * @throws Exception
      */
-    public function addUser(array $values, $language)
+    public function addUser(array $values, string $language)
     {
         $host = $this->getHostOptions($language);
 
@@ -190,7 +154,7 @@ class UsersService
             'language'         => $language,
         ]);
         $userId = $this->userModel->getTable()->getLastInsertValue();
-        $user = $this->userModel->getRow($userId);
+        $user   = $this->userModel->getRow($userId);
 
         $this->specsService->refreshUserConflicts($userId);
 
@@ -199,9 +163,9 @@ class UsersService
         $this->updateUserVoteLimit($userId);
 
         $this->userModel->getTable()->update([
-            'votes_left' => new Sql\Expression('votes_per_day')
+            'votes_left' => new Sql\Expression('votes_per_day'),
         ], [
-            'id' => $userId
+            'id' => $userId,
         ]);
 
         return $user;
@@ -209,8 +173,8 @@ class UsersService
 
     /**
      * @param array|ArrayObject $user
-     * @param string $email
-     * @param string $language
+     * @param string            $email
+     * @param string            $language
      * @throws Exception
      */
     public function changeEmailStart($user, $email, $language)
@@ -221,9 +185,9 @@ class UsersService
 
         $this->userModel->getTable()->update([
             'email_to_check'   => $email,
-            'email_check_code' => $emailCheckCode
+            'email_check_code' => $emailCheckCode,
         ], [
-            'id' => $user['id']
+            'id' => $user['id'],
         ]);
 
         $user = $this->userModel->getRow($user['id']);
@@ -233,33 +197,31 @@ class UsersService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     *
-     * @param string $code
-     * @return boolean|array|ArrayObject
+     * @return null|array|ArrayObject
      */
     public function emailChangeFinish(string $code)
     {
         if (! $code) {
-            return false;
+            return null;
         }
 
         $user = $this->userModel->getTable()->select([
             'not deleted',
-            'email_check_code' => (string)$code,
+            'email_check_code' => (string) $code,
             new Sql\Predicate\Expression('LENGTH(email_check_code)'),
-            new Sql\Predicate\Expression('LENGTH(email_to_check)')
+            new Sql\Predicate\Expression('LENGTH(email_to_check)'),
         ])->current();
 
         if (! $user) {
-            return false;
+            return null;
         }
 
         $this->userModel->getTable()->update([
             'e_mail'           => $user['email_to_check'],
             'email_check_code' => null,
-            'email_to_check'   => null
+            'email_to_check'   => null,
         ], [
-            'id' => $user['id']
+            'id' => $user['id'],
         ]);
 
         return $user;
@@ -267,7 +229,7 @@ class UsersService
 
     /**
      * @param array|ArrayObject $user
-     * @param string $hostname
+     * @param string            $hostname
      */
     public function sendRegistrationConfirmEmail($user, $hostname)
     {
@@ -275,7 +237,7 @@ class UsersService
             $values = [
                 'email' => $user['email_to_check'],
                 'name'  => $user['name'],
-                'url'   => 'https://' . $hostname . '/account/emailcheck/' . $user['email_check_code']
+                'url'   => 'https://' . $hostname . '/account/emailcheck/' . $user['email_check_code'],
             ];
 
             $subject = $this->translator->translate('users/registration/email-confirm-subject');
@@ -304,7 +266,7 @@ class UsersService
 
     /**
      * @param array|ArrayObject $user
-     * @param string $hostname
+     * @param string            $hostname
      */
     public function sendChangeConfirmEmail($user, $hostname)
     {
@@ -312,7 +274,7 @@ class UsersService
             $values = [
                 'email' => $user['email_to_check'],
                 'name'  => $user['name'],
-                'url'   => 'https://' . $hostname . '/account/emailcheck/' . $user['email_check_code']
+                'url'   => 'https://' . $hostname . '/account/emailcheck/' . $user['email_check_code'],
             ];
 
             $subject = $this->translator->translate('users/change-email/confirm-subject');
@@ -339,12 +301,9 @@ class UsersService
     }
 
     /**
-     * @param string $login
-     * @param string $password
-     * @return LoginAuthAdapter
      * @throws Exception
      */
-    public function getAuthAdapterLogin($login, $password)
+    public function getAuthAdapterLogin(string $login, string $password): LoginAuthAdapter
     {
         return new LoginAuthAdapter(
             $this->userModel,
@@ -353,13 +312,13 @@ class UsersService
         );
     }
 
-    public function updateUsersVoteLimits()
+    public function updateUsersVoteLimits(): int
     {
         $select = $this->userModel->getTable()->getSql()->select()
             ->columns(['id'])
             ->where([
                 'not deleted',
-                new Sql\Predicate\Expression('last_online > DATE_SUB(NOW(), INTERVAL 3 MONTH)')
+                new Sql\Predicate\Expression('last_online > DATE_SUB(NOW(), INTERVAL 3 MONTH)'),
             ]);
 
         $affected = 0;
@@ -382,17 +341,17 @@ class UsersService
 
         $avgVote = $this->comments->getUserAvgVote($userId);
 
-        $age = 0;
+        $age     = 0;
         $regDate = Row::getDateTimeByColumnType('timestamp', $userRow['reg_date']);
         if ($regDate) {
-            $now = new DateTime();
+            $now  = new DateTime();
             $diff = $now->getTimestamp() - $regDate->getTimestamp();
-            $age = ((($diff / 60) / 60) / 24) / 365;
+            $age  = ((($diff / 60) / 60) / 24) / 365;
         }
 
         $picturesExists = $this->picture->isExists([
             'user'   => $userId,
-            'status' => Picture::STATUS_ACCEPTED
+            'status' => Picture::STATUS_ACCEPTED,
         ]);
 
         $value = round($default + $avgVote + $age + $picturesExists / 100);
@@ -401,9 +360,9 @@ class UsersService
         }
 
         $this->userModel->getTable()->update([
-            'votes_per_day' => $value
+            'votes_per_day' => $value,
         ], [
-            'id' => $userId
+            'id' => $userId,
         ]);
 
         return true;
@@ -415,27 +374,27 @@ class UsersService
     public function restoreVotes()
     {
         $this->userModel->getTable()->update([
-            'votes_left' => new Sql\Expression('votes_per_day')
+            'votes_left' => new Sql\Expression('votes_per_day'),
         ], [
             'votes_left < votes_per_day',
-            'not deleted'
+            'not deleted',
         ]);
     }
 
     public function setPassword($user, $password)
     {
         $this->userModel->getTable()->update([
-            'password' => $this->getPasswordHashExpr($password)
+            'password' => $this->getPasswordHashExpr($password),
         ], [
-            'id' => $user['id']
+            'id' => $user['id'],
         ]);
     }
 
     public function checkPassword($userId, $password)
     {
-        return (bool)$this->userModel->getTable()->select([
-            'id'       => (int)$userId,
-            'password' => $this->getPasswordHashExpr($password)
+        return (bool) $this->userModel->getTable()->select([
+            'id'       => (int) $userId,
+            'password' => $this->getPasswordHashExpr($password),
         ])->current();
     }
 
@@ -466,7 +425,7 @@ class UsersService
                     'voting_variant_vote.user_id is null',
                     'pmf.from_user_id is null',
                     'pmt.to_user_id is null',
-                    'log_events.user_id is null'
+                    'log_events.user_id is null',
                 ])
                 ->order('users.id')
                 ->limit(1000)
@@ -492,11 +451,11 @@ class UsersService
         }
 
         $this->logEventUserTable->delete([
-            'user_id = ?' => $userId
+            'user_id = ?' => $userId,
         ]);
 
         $this->userModel->getTable()->delete([
-            'id' => $userId
+            'id' => $userId,
         ]);
 
         if ($imageId) {
@@ -537,9 +496,9 @@ class UsersService
 
         $this->userModel->getTable()->update([
             'deleted' => 1,
-            'img'     => null
+            'img'     => null,
         ], [
-            'id' => $userId
+            'id' => $userId,
         ]);
 
         if ($oldImageId) {
@@ -551,12 +510,11 @@ class UsersService
 
         // unsubscribe from telegram
         $this->telegramChatTable->delete([
-            'user_id = ?' => $userId
+            'user_id = ?' => $userId,
         ]);
 
         // delete linked profiles
         $this->userAccount->removeUserAccounts($userId);
-
 
         // unsubscribe from items
         $this->userItemSubscribe->unsubscribeAll($userId);

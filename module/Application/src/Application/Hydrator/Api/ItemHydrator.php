@@ -4,163 +4,99 @@ namespace Application\Hydrator\Api;
 
 use Application\Comments;
 use Application\Controller\Plugin\Pic;
-use Application\Model\PerspectivePictureFetcher;
-use Autowp\Comments\Attention;
-use Exception;
-use Traversable;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Permissions\Acl\Acl;
-use Zend\Router\Http\TreeRouteStack;
-use Zend\Stdlib\ArrayUtils;
-use Autowp\Image\StorageInterface;
-use Autowp\TextStorage;
-use Autowp\User\Model\User;
 use Application\ItemNameFormatter;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
-use Application\Model\ItemParent;
 use Application\Model\Item;
+use Application\Model\ItemParent;
 use Application\Model\Perspective;
+use Application\Model\PerspectivePictureFetcher;
 use Application\Model\Picture;
 use Application\Model\UserItemSubscribe;
-use Application\Service\SpecificationsService;
 use Application\Model\VehicleType;
+use Application\Service\SpecificationsService;
+use ArrayAccess;
+use Autowp\Comments\Attention;
+use Autowp\Image\StorageInterface;
+use Autowp\TextStorage;
+use Autowp\User\Model\User;
+use Exception;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function array_keys;
+use function array_merge;
+use function count;
+use function in_array;
+use function is_array;
+use function is_string;
+use function strcmp;
 
 class ItemHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    private $userRole = null;
+    private ?string $userRole;
 
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var TreeRouteStack
-     */
-    private $router;
+    private TreeRouteStack $router;
 
-    /**
-     * @var TableGateway
-     */
-    private $specTable;
+    private TableGateway $specTable;
 
-    /**
-     * @var Catalogue
-     */
-    private $catalogue;
+    private Catalogue $catalogue;
 
-    /**
-     * @var Pic
-     */
-    private $picHelper;
+    private Pic $picHelper;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specsService = null;
+    private SpecificationsService $specsService;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
-    /**
-     * @var TextStorage\Service
-     */
-    private $textStorage;
+    private TextStorage\Service $textStorage;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var TableGateway
-     */
-    private $linkTable;
+    private TableGateway $linkTable;
 
-    /**
-     * @var SpecificationsService
-     */
-    private $specificationsService;
+    private SpecificationsService $specificationsService;
 
-    /**
-     * @var UserItemSubscribe
-     */
-    private $userItemSubscribe;
+    private UserItemSubscribe $userItemSubscribe;
 
-    /**
-     * @var Perspective
-     */
-    private $perspective;
+    private Perspective $perspective;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    private ItemParent $itemParent;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var CarOfDay
-     */
-    private $carOfDay;
+    private CarOfDay $carOfDay;
 
-    /**
-     * @var StorageInterface
-     */
-    private $imageStorage;
+    private StorageInterface $imageStorage;
 
-    /**
-     * @var Acl
-     */
-    private $acl;
+    private Acl $acl;
 
-    /**
-     * @var VehicleType
-     */
-    private $vehicleType;
+    private VehicleType $vehicleType;
 
-    /**
-     * @var array
-     */
-    private $previewPictures = [];
+    private array $previewPictures = [];
 
-    /**
-     * @var Comments
-     */
-    private $comments;
+    private Comments $comments;
 
-    /**
-     * @var int
-     */
-    private $mostsMinCarsCount = 1;
+    private int $mostsMinCarsCount = 1;
 
-    /**
-     * @var int
-     */
-    private $routeBrandID;
+    private int $routeBrandID;
 
-    private $cataloguePaths = [];
+    private array $cataloguePaths = [];
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
 
-        $tables = $serviceManager->get('TableManager');
-        $this->picture = $serviceManager->get(Picture::class);
+        $tables          = $serviceManager->get('TableManager');
+        $this->picture   = $serviceManager->get(Picture::class);
         $this->linkTable = $tables->get('links');
         $this->specTable = $tables->get('spec');
 
@@ -168,18 +104,18 @@ class ItemHydrator extends RestHydrator
 
         $this->userModel = $serviceManager->get(User::class);
 
-        $this->perspective = $serviceManager->get(Perspective::class);
+        $this->perspective       = $serviceManager->get(Perspective::class);
         $this->userItemSubscribe = $serviceManager->get(UserItemSubscribe::class);
 
         $this->specificationsService = $serviceManager->get(SpecificationsService::class);
 
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
-        $this->router = $serviceManager->get('HttpRouter');
+        $this->router            = $serviceManager->get('HttpRouter');
 
-        $this->itemModel = $serviceManager->get(Item::class);
+        $this->itemModel  = $serviceManager->get(Item::class);
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
-        $this->acl = $serviceManager->get(Acl::class);
+        $this->acl         = $serviceManager->get(Acl::class);
         $this->textStorage = $serviceManager->get(TextStorage\Service::class);
 
         $this->catalogue = $serviceManager->get(Catalogue::class);
@@ -194,7 +130,7 @@ class ItemHydrator extends RestHydrator
 
         $this->vehicleType = $serviceManager->get(VehicleType::class);
 
-        $config = $serviceManager->get('Config');
+        $config                  = $serviceManager->get('Config');
         $this->mostsMinCarsCount = $config['mosts_min_vehicles_count'];
 
         $strategy = new Strategy\Items($serviceManager);
@@ -230,10 +166,9 @@ class ItemHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -254,13 +189,13 @@ class ItemHydrator extends RestHydrator
         }
 
         if (isset($options['route_brand_id'])) {
-            $this->routeBrandID = (int)$options['route_brand_id'];
+            $this->routeBrandID = (int) $options['route_brand_id'];
         }
 
         return $this;
     }
 
-    public function setPreviewPictures(array $options)
+    public function setPreviewPictures(array $options): self
     {
         $this->previewPictures = $options;
 
@@ -269,9 +204,8 @@ class ItemHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return ItemHydrator
      */
-    public function setUserId($userId = null)
+    public function setUserId($userId = null): self
     {
         $this->userId = $userId;
 
@@ -283,8 +217,6 @@ class ItemHydrator extends RestHydrator
 
     /**
      * @param $object
-     * @param string $language
-     * @return array
      * @throws Exception
      */
     private function getNameData($object, string $language = 'en'): array
@@ -295,44 +227,41 @@ class ItemHydrator extends RestHydrator
 
         $name = $this->itemModel->getName($object['id'], $language);
 
-        $spec = null;
+        $spec     = null;
         $specFull = null;
         if ($object['spec_id']) {
-            $specRow = $this->specTable->select(['id' => (int)$object['spec_id']])->current();
+            $specRow = $this->specTable->select(['id' => (int) $object['spec_id']])->current();
             if ($specRow) {
-                $spec = $specRow['short_name'];
+                $spec     = $specRow['short_name'];
                 $specFull = $specRow['name'];
             }
         }
 
         return [
-            'begin_model_year' => $object['begin_model_year'],
-            'end_model_year'   => $object['end_model_year'],
+            'begin_model_year'          => $object['begin_model_year'],
+            'end_model_year'            => $object['end_model_year'],
             'begin_model_year_fraction' => $object['begin_model_year_fraction'],
             'end_model_year_fraction'   => $object['end_model_year_fraction'],
-            'spec'             => $spec,
-            'spec_full'        => $specFull,
-            'body'             => $object['body'],
-            'name'             => $name,
-            'begin_year'       => $object['begin_year'],
-            'end_year'         => $object['end_year'],
-            'today'            => $object['today'],
-            'begin_month'      => $object['begin_month'],
-            'end_month'        => $object['end_month']
+            'spec'                      => $spec,
+            'spec_full'                 => $specFull,
+            'body'                      => $object['body'],
+            'name'                      => $name,
+            'begin_year'                => $object['begin_year'],
+            'end_year'                  => $object['end_year'],
+            'today'                     => $object['today'],
+            'begin_month'               => $object['begin_month'],
+            'end_month'                 => $object['end_month'],
         ];
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
-     * @param Sql\Select $select
-     * @param TableGateway $table
-     * @return int
      */
     private function getCountBySelect(Sql\Select $select, TableGateway $table): int
     {
         $select->columns(['count' => new Sql\Expression('count(1)')]);
         $row = $table->selectWith($select)->current();
-        return $row ? (int)$row['count'] : 0;
+        return $row ? (int) $row['count'] : 0;
     }
 
     private function getCataloguePath(int $id, array $options): array
@@ -345,8 +274,6 @@ class ItemHydrator extends RestHydrator
     }
 
     /**
-     * @param int $itemID
-     * @param array $options
      * @return string[]|null
      */
     public function getDetailsRoute(int $itemID, array $options): ?array
@@ -361,7 +288,6 @@ class ItemHydrator extends RestHydrator
     }
 
     /**
-     * @param int $itemID
      * @return string[]|null
      */
     public function getSpecificationsRoute(int $itemID): ?array
@@ -374,7 +300,7 @@ class ItemHydrator extends RestHydrator
 
         $cataloguePaths = $this->getCataloguePath($itemID, [
             'toBrand'      => true,
-            'breakOnFirst' => true
+            'breakOnFirst' => true,
         ]);
         foreach ($cataloguePaths as $path) {
             return array_merge(['/', $path['brand_catname'], $path['car_catname']], $path['path']);
@@ -385,36 +311,35 @@ class ItemHydrator extends RestHydrator
 
     /**
      * @param object $object
-     * @return array
      * @throws Exception
      */
-    public function extract($object)
+    public function extract($object): array
     {
         $nameData = $this->getNameData($object, $this->language);
 
         $isModer = false;
-        $role = $this->getUserRole();
+        $role    = $this->getUserRole();
         if ($role) {
             $isModer = $this->acl->inheritsRole($role, 'moder');
         }
 
         $result = [
-            'id'           => (int)$object['id'],
-            'item_type_id' => (int)$object['item_type_id'],
+            'id'           => (int) $object['id'],
+            'item_type_id' => (int) $object['item_type_id'],
             'catname'      => $object['catname'],
-            'is_group'     => (bool)$object['is_group']
+            'is_group'     => (bool) $object['is_group'],
         ];
 
         if ($this->filterComposite->filter('alt_names')) {
             // alt names
-            $altNames = [];
+            $altNames  = [];
             $altNames2 = [];
 
             $langNames = $this->itemModel->getNames($object['id']);
 
             $currentLangName = null;
             foreach ($langNames as $lang => $langName) {
-                if ($lang == 'xx') {
+                if ($lang === 'xx') {
                     continue;
                 }
                 $name = $langName;
@@ -423,13 +348,13 @@ class ItemHydrator extends RestHydrator
                 }
                 $altNames[$name][] = $lang;
 
-                if ($this->language == $lang) {
+                if ($this->language === $lang) {
                     $currentLangName = $name;
                 }
             }
 
             foreach ($altNames as $name => $codes) {
-                if (strcmp($name, $currentLangName) != 0) {
+                if (strcmp($name, $currentLangName) !== 0) {
                     $altNames2[$name] = $codes;
                 }
             }
@@ -442,7 +367,7 @@ class ItemHydrator extends RestHydrator
             foreach ($altNames2 as $name => $languages) {
                 $a[] = [
                     'languages' => $languages,
-                    'name'      => $name
+                    'name'      => $name,
                 ];
             }
 
@@ -453,25 +378,22 @@ class ItemHydrator extends RestHydrator
             $pairs = $this->itemParent->getChildItemLinkTypesCount($object['id']);
 
             $result['childs_counts'] = [
-                'stock'  => isset($pairs[ItemParent::TYPE_DEFAULT])
-                    ? $pairs[ItemParent::TYPE_DEFAULT] : 0,
-                'tuning' => isset($pairs[ItemParent::TYPE_TUNING])
-                    ? $pairs[ItemParent::TYPE_TUNING] : 0,
-                'sport'  => isset($pairs[ItemParent::TYPE_SPORT])
-                    ? $pairs[ItemParent::TYPE_SPORT] : 0
+                'stock'  => $pairs[ItemParent::TYPE_DEFAULT] ?? 0,
+                'tuning' => $pairs[ItemParent::TYPE_TUNING] ?? 0,
+                'sport'  => $pairs[ItemParent::TYPE_SPORT] ?? 0,
             ];
         }
 
         if ($this->filterComposite->filter('mosts_active')) {
             $carsCount = $this->itemModel->getCount([
-                'ancestor' => $object['id']
+                'ancestor' => $object['id'],
             ]);
 
             $result['mosts_active'] = $carsCount >= $this->mostsMinCarsCount;
         }
 
         if ($this->filterComposite->filter('engine_id')) {
-            $result['engine_id'] = $object['engine_item_id'] ? (int) $object['engine_item_id'] : null;
+            $result['engine_id']      = $object['engine_item_id'] ? (int) $object['engine_item_id'] : null;
             $result['engine_inherit'] = (bool) $object['engine_inherit'];
         }
 
@@ -480,7 +402,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('can_edit_specs')) {
-            $isSpecsAvailabe = in_array($object['item_type_id'], [Item::ENGINE, Item::TWINS, Item::VEHICLE]);
+            $isSpecsAvailabe          = in_array($object['item_type_id'], [Item::ENGINE, Item::TWINS, Item::VEHICLE]);
             $result['can_edit_specs'] = $isSpecsAvailabe && $this->isAllowed('specifications', 'edit');
         }
 
@@ -538,7 +460,7 @@ class ItemHydrator extends RestHydrator
         if ($this->filterComposite->filter('other_names')) {
             $otherNames = [];
             foreach ($this->itemModel->getNames($object['id']) as $name) {
-                if ($object['name'] != $name) {
+                if ($object['name'] !== $name) {
                     if (! in_array($name, $otherNames)) {
                         $otherNames[] = $name;
                     }
@@ -550,7 +472,7 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('current_pictures_count')) {
             $result['current_pictures_count'] = isset($object['current_pictures_count'])
-                ? (int)$object['current_pictures_count']
+                ? (int) $object['current_pictures_count']
                 : null;
         }
 
@@ -560,7 +482,7 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('childs_count')) {
             if (isset($object['childs_count'])) {
-                $result['childs_count'] = (int)$object['childs_count'];
+                $result['childs_count'] = (int) $object['childs_count'];
             } else {
                 $result['childs_count'] = $this->itemParent->getChildItemsCount($object['id']);
             }
@@ -568,7 +490,7 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('descendants_count')) {
             $result['descendants_count'] = $this->itemModel->getCount([
-                'ancestor' => $object['id']
+                'ancestor' => $object['id'],
             ]);
         }
 
@@ -597,28 +519,28 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('front_picture')) {
-            $picture = $this->picture->getRow([
-               'status' => Picture::STATUS_ACCEPTED,
-               'item' => [
-                   'ancestor_or_self' => (int)$object['id']
-               ],
-               'order' => 'front_angle'
+            $picture                 = $this->picture->getRow([
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'ancestor_or_self' => (int) $object['id'],
+                ],
+                'order'  => 'front_angle',
             ]);
             $result['front_picture'] = $picture ? $this->extractValue('front_picture', $picture) : null;
         }
 
         if ($this->filterComposite->filter('exact_picture')) {
-            $picture = $this->picture->getRow([
+            $picture                 = $this->picture->getRow([
                 'status' => Picture::STATUS_ACCEPTED,
-                'item'   => (int)$object['id'],
-                'order'  => 'likes'
+                'item'   => (int) $object['id'],
+                'order'  => 'likes',
             ]);
             $result['exact_picture'] = $picture ? $this->extractValue('exact_picture', $picture) : null;
         }
 
-        $totalPictures = null;
-        $cFetcher = null;
-        $showTotalPictures = $this->filterComposite->filter('total_pictures');
+        $totalPictures       = null;
+        $cFetcher            = null;
+        $showTotalPictures   = $this->filterComposite->filter('total_pictures');
         $showPreviewPictures = $this->filterComposite->filter('preview_pictures');
         $onlyExactlyPictures = false;
 
@@ -634,11 +556,11 @@ class ItemHydrator extends RestHydrator
             }
 
             $cFetcher = new PerspectivePictureFetcher([
-                'pictureModel'         => $this->picture,
-                'perspective'          => $this->perspective,
-                'onlyExactlyPictures'  => $onlyExactlyPictures,
-                'perspectivePageId'    => $perspectivePageId,
-                'pictureItemTypeId'    => $pictureItemTypeId
+                'pictureModel'        => $this->picture,
+                'perspective'         => $this->perspective,
+                'onlyExactlyPictures' => $onlyExactlyPictures,
+                'perspectivePageId'   => $perspectivePageId,
+                'pictureItemTypeId'   => $pictureItemTypeId,
             ]);
 
             $totalPictures = $cFetcher->getTotalPictures($object['id'], $onlyExactlyPictures);
@@ -646,7 +568,7 @@ class ItemHydrator extends RestHydrator
 
         if ($showPreviewPictures) {
             $pictures = $cFetcher->fetch($object, [
-                'totalPictures' => $totalPictures
+                'totalPictures' => $totalPictures,
             ]);
 
             $extractRoute = isset($this->fields['preview_pictures']['route']);
@@ -664,14 +586,14 @@ class ItemHydrator extends RestHydrator
                 'large_format' => $pictures['large_format'],
                 'pictures'     => $this->extractValue('preview_pictures', $pictures['pictures'], [
                     'large_format' => $pictures['large_format'],
-                ])
+                ]),
             ];
         }
 
         if ($this->filterComposite->filter('brands')) {
             $rows = $this->itemModel->getRows([
                 'item_type_id'       => Item::BRAND,
-                'descendant_or_self' => $object['id']
+                'descendant_or_self' => $object['id'],
             ]);
 
             $result['brands'] = $this->extractValue('brands', $rows);
@@ -679,7 +601,7 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('childs')) {
             $rows = $this->itemModel->getRows([
-                'parent' => $object['id']
+                'parent' => $object['id'],
             ]);
 
             $result['childs'] = $this->extractValue('childs', $rows);
@@ -691,10 +613,10 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('descendant_twins_groups_count')) {
             $count = $this->itemModel->getCount([
-                'item_type_id' => Item::TWINS,
+                'item_type_id'       => Item::TWINS,
                 'descendant_or_self' => [
-                    'ancestor_or_self' => $object['id']
-                ]
+                    'ancestor_or_self' => $object['id'],
+                ],
             ]);
 
             $result['descendant_twins_groups_count'] = $this->extractValue('descendant_twins_groups_count', $count);
@@ -703,7 +625,7 @@ class ItemHydrator extends RestHydrator
         if ($this->filterComposite->filter('twins_groups')) {
             $rows = $this->itemModel->getRows([
                 'item_type_id' => Item::TWINS,
-                'descendant'   => $object['id']
+                'descendant'   => $object['id'],
             ]);
 
             $result['twins_groups'] = $this->extractValue('twins_groups', $rows);
@@ -715,8 +637,8 @@ class ItemHydrator extends RestHydrator
                 'item_type_id' => Item::CATEGORY,
                 'child'        => [
                     'item_type_id'       => [Item::VEHICLE, Item::ENGINE],
-                    'descendant_or_self' => $object['id']
-                ]
+                    'descendant_or_self' => $object['id'],
+                ],
             ]);
 
             $result['categories'] = $this->extractValue('categories', $rows);
@@ -725,12 +647,12 @@ class ItemHydrator extends RestHydrator
         if ($this->filterComposite->filter('logo120')) {
             $result['logo120'] = $this->extractValue('logo120', [
                 'image'  => $object['logo_id'],
-                'format' => 'logo'
+                'format' => 'logo',
             ]);
         }
 
         if ($isModer) {
-            $result['body'] = (string)$object['body'];
+            $result['body'] = (string) $object['body'];
 
             if ($this->filterComposite->filter('comments_attentions_count')) {
                 $result['comments_attentions_count'] = $this->comments->service()->getTotalMessagesCount([
@@ -742,7 +664,7 @@ class ItemHydrator extends RestHydrator
                             ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
                             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
                             ->where(['item_parent_cache.parent_id' => $object['id']]);
-                    }
+                    },
                 ]);
             }
 
@@ -759,7 +681,7 @@ class ItemHydrator extends RestHydrator
                 if ($object['is_concept_inherit']) {
                     $result['is_concept'] = 'inherited';
                 } else {
-                    $result['is_concept'] = (bool)$object['is_concept'];
+                    $result['is_concept'] = (bool) $object['is_concept'];
                 }
             }
 
@@ -767,53 +689,53 @@ class ItemHydrator extends RestHydrator
                 if ($object['spec_inherit']) {
                     $result['spec_id'] = 'inherited';
                 } else {
-                    $value = (int)$object['spec_id'];
+                    $value             = (int) $object['spec_id'];
                     $result['spec_id'] = $value > 0 ? $value : null;
                 }
             }
 
             if ($this->filterComposite->filter('begin_model_year')) {
-                $value = (int)$object['begin_model_year'];
-                $result['begin_model_year'] = $value > 0 ? $value : null;
-                $value = $object['begin_model_year_fraction'];
+                $value                               = (int) $object['begin_model_year'];
+                $result['begin_model_year']          = $value > 0 ? $value : null;
+                $value                               = $object['begin_model_year_fraction'];
                 $result['begin_model_year_fraction'] = $value ? $value : null;
             }
 
             if ($this->filterComposite->filter('end_model_year')) {
-                $value = (int)$object['end_model_year'];
-                $result['end_model_year'] = $value > 0 ? $value : null;
-                $value = $object['end_model_year_fraction'];
+                $value                             = (int) $object['end_model_year'];
+                $result['end_model_year']          = $value > 0 ? $value : null;
+                $value                             = $object['end_model_year_fraction'];
                 $result['end_model_year_fraction'] = $value ? $value : null;
             }
 
             if ($this->filterComposite->filter('begin_year')) {
-                $value = (int)$object['begin_year'];
+                $value                = (int) $object['begin_year'];
                 $result['begin_year'] = $value > 0 ? $value : null;
             }
 
             if ($this->filterComposite->filter('begin_month')) {
-                $value = (int)$object['begin_month'];
+                $value                 = (int) $object['begin_month'];
                 $result['begin_month'] = $value > 0 ? $value : null;
             }
 
             if ($this->filterComposite->filter('end_year')) {
-                $value = (int)$object['end_year'];
+                $value              = (int) $object['end_year'];
                 $result['end_year'] = $value > 0 ? $value : null;
             }
 
             if ($this->filterComposite->filter('end_month')) {
-                $value = (int)$object['end_month'];
+                $value               = (int) $object['end_month'];
                 $result['end_month'] = $value > 0 ? $value : null;
             }
 
             if ($this->filterComposite->filter('today')) {
-                $result['today'] = $object['today'] === null ? null : (bool)$object['today'];
+                $result['today'] = $object['today'] === null ? null : (bool) $object['today'];
             }
 
             if ($this->filterComposite->filter('subscription') && $this->userId) {
                 $result['subscription'] = $this->userItemSubscribe->isSubscribed(
-                    (int)$this->userId,
-                    (int)$object['id']
+                    (int) $this->userId,
+                    (int) $object['id']
                 );
             }
 
@@ -823,11 +745,11 @@ class ItemHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('related_group_pictures')) {
                 $carPictures = [];
-                $groups = $this->itemModel->getRelatedCarGroups($object['id']);
+                $groups      = $this->itemModel->getRelatedCarGroups($object['id']);
                 if (count($groups) > 0) {
                     $cars = $this->itemModel->getRows([
                         'id'    => array_keys($groups),
-                        'order' => $this->catalogue->itemOrdering()
+                        'order' => $this->catalogue->itemOrdering(),
                     ]);
 
                     foreach ($cars as $car) {
@@ -839,10 +761,10 @@ class ItemHydrator extends RestHydrator
                             'status' => Picture::STATUS_ACCEPTED,
                             'item'   => [
                                 'ancestor_or_self' => [
-                                    'id' => $ancestor
-                                ]
+                                    'id' => $ancestor,
+                                ],
                             ],
-                            'order'  => 'ancestor_stock_front_first'
+                            'order'  => 'ancestor_stock_front_first',
                         ]);
 
                         $src = null;
@@ -851,11 +773,11 @@ class ItemHydrator extends RestHydrator
                                 $pictureRow['image_id'],
                                 'picture-thumb'
                             );
-                            $src = $imagesInfo->getSrc();
+                            $src        = $imagesInfo->getSrc();
                         }
 
                         $cataloguePaths = $this->catalogue->getCataloguePaths($car['id'], [
-                            'breakOnFirst' => true
+                            'breakOnFirst' => true,
                         ]);
 
                         $route = null;
@@ -863,15 +785,15 @@ class ItemHydrator extends RestHydrator
                             $route = array_merge([
                                 '/',
                                 $cataloguePath['brand_catname'],
-                                $cataloguePath['car_catname']
+                                $cataloguePath['car_catname'],
                             ], $cataloguePath['path']);
                             break;
                         }
 
                         $carPictures[] = [
-                            'name'   => $this->itemNameFormatter->format($car, $this->language),
-                            'src'    => $src,
-                            'route'  => $route
+                            'name'  => $this->itemNameFormatter->format($car, $this->language),
+                            'src'   => $src,
+                            'route' => $route,
                         ];
                     }
                 }
@@ -885,7 +807,7 @@ class ItemHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('pictures_count')) {
                 $result['pictures_count'] = $this->picture->getCount([
-                    'item' => $object['id']
+                    'item' => $object['id'],
                 ]);
             }
 
@@ -918,8 +840,8 @@ class ItemHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('name_default')) {
-                $name = $this->itemModel->getLanguageName($object['id'], 'xx');
-                $result['name_default'] = $nameData['name'] == $name ? null : $name;
+                $name                   = $this->itemModel->getLanguageName($object['id'], 'xx');
+                $result['name_default'] = $nameData['name'] === $name ? null : $name;
             }
 
             if ($this->filterComposite->filter('route')) {
@@ -929,7 +851,7 @@ class ItemHydrator extends RestHydrator
                         $route = ['/category', $object['catname']];
                         break;
                     case Item::TWINS:
-                        $route = ['/twins/group/', (string)$object['id']];
+                        $route = ['/twins/group/', (string) $object['id']];
                         break;
 
                     case Item::ENGINE:
@@ -937,7 +859,7 @@ class ItemHydrator extends RestHydrator
                         $route = $this->getDetailsRoute($object['id'], [
                             'breakOnFirst' => true,
                             'toBrand'      => $this->routeBrandID,
-                            'stockFirst'   => true
+                            'stockFirst'   => true,
                         ]);
                         break;
                 }
@@ -946,9 +868,9 @@ class ItemHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('produced')) {
-                $value = (int)$object['produced'];
-                $result['produced'] = $value > 0 ? $value : null;
-                $result['produced_exactly'] = (bool)$object['produced_exactly'];
+                $value                      = (int) $object['produced'];
+                $result['produced']         = $value > 0 ? $value : null;
+                $result['produced_exactly'] = (bool) $object['produced_exactly'];
             }
 
             if ($this->filterComposite->filter('design')) {
@@ -956,7 +878,7 @@ class ItemHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('engine_vehicles')) {
-                if ($object['item_type_id'] == Item::ENGINE) {
+                if ($object['item_type_id'] === Item::ENGINE) {
                     $result['engine_vehicles'] = $this->getVehiclesOnEngine($object);
                 }
             }
@@ -967,14 +889,14 @@ class ItemHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('logo')) {
                 $result['logo'] = $this->extractValue('logo', [
-                    'image' => $object['logo_id']
+                    'image' => $object['logo_id'],
                 ]);
             }
 
             if ($this->filterComposite->filter('brandicon')) {
                 $result['brandicon'] = $this->extractValue('brandicon', [
                     'image'  => $object['logo_id'],
-                    'format' => 'brandicon2'
+                    'format' => 'brandicon2',
                 ]);
             }
 
@@ -983,7 +905,7 @@ class ItemHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('attr_zone_id')) {
-                $vehicleTypeIds = $this->vehicleType->getVehicleTypes($object['id']);
+                $vehicleTypeIds         = $this->vehicleType->getVehicleTypes($object['id']);
                 $result['attr_zone_id'] = $this->specificationsService->getZoneIdByCarTypeId(
                     $object['item_type_id'],
                     $vehicleTypeIds
@@ -996,7 +918,6 @@ class ItemHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */
@@ -1028,22 +949,21 @@ class ItemHydrator extends RestHydrator
     }
 
     /**
-     * @param $engine
-     * @return array
+     * @param array|ArrayAccess $engine
      * @throws Exception
      */
-    private function getVehiclesOnEngine($engine)
+    private function getVehiclesOnEngine($engine): array
     {
         $result = [];
 
         $ids = $this->itemModel->getEngineVehiclesGroups($engine['id'], [
-            'groupJoinLimit' => 3
+            'groupJoinLimit' => 3,
         ]);
 
         if ($ids) {
             $rows = $this->itemModel->getRows([
                 'id'    => $ids,
-                'order' => $this->catalogue->itemOrdering()
+                'order' => $this->catalogue->itemOrdering(),
             ]);
             foreach ($rows as $row) {
                 $cataloguePaths = $this->catalogue->getCataloguePaths($row['id']);
@@ -1053,7 +973,7 @@ class ItemHydrator extends RestHydrator
                             $this->itemModel->getNameData($row, $this->language),
                             $this->language
                         ),
-                        'route'  => array_merge(['/', $cPath['brand_catname'], $cPath['car_catname']], $cPath['path'])
+                        'route'     => ['/', $cPath['brand_catname'], $cPath['car_catname'], ...$cPath['path']],
                     ];
                     break;
                 }
@@ -1064,43 +984,39 @@ class ItemHydrator extends RestHydrator
     }
 
     /**
-     * @param $item
-     * @return array
+     * @param array|ArrayAccess $item
      * @throws Exception
      */
-    private function getItemPublicRoutes($item)
+    private function getItemPublicRoutes($item): array
     {
-        if ($item['item_type_id'] == Item::FACTORY) {
+        if ($item['item_type_id'] === Item::FACTORY) {
             return [
-                ['/factories', (string)$item['id']]
+                ['/factories', (string) $item['id']],
             ];
         }
 
-        if ($item['item_type_id'] == Item::CATEGORY) {
+        if ($item['item_type_id'] === Item::CATEGORY) {
             return [
-                ['/category', $item['catname']]
+                ['/category', $item['catname']],
             ];
         }
 
-        if ($item['item_type_id'] == Item::TWINS) {
+        if ($item['item_type_id'] === Item::TWINS) {
             return [
-                ['/twins', 'group', $item['id']]
+                ['/twins', 'group', $item['id']],
             ];
         }
 
-        if ($item['item_type_id'] == Item::BRAND) {
+        if ($item['item_type_id'] === Item::BRAND) {
             return [
-                ['/' . $item['catname']]
+                ['/' . $item['catname']],
             ];
         }
 
-        return $this->walkUpUntilBrand((int)$item['id'], []);
+        return $this->walkUpUntilBrand((int) $item['id'], []);
     }
 
     /**
-     * @param int $id
-     * @param array $path
-     * @return array
      * @throws Exception
      */
     private function walkUpUntilBrand(int $id, array $path): array
@@ -1112,7 +1028,7 @@ class ItemHydrator extends RestHydrator
         foreach ($parentRows as $parentRow) {
             $brand = $this->itemModel->getRow([
                 'item_type_id' => Item::BRAND,
-                'id'           => $parentRow['parent_id']
+                'id'           => $parentRow['parent_id'],
             ]);
 
             if ($brand) {
@@ -1121,7 +1037,7 @@ class ItemHydrator extends RestHydrator
 
             $routes = array_merge(
                 $routes,
-                $this->walkUpUntilBrand((int)$parentRow['parent_id'], array_merge([$parentRow['catname']], $path))
+                $this->walkUpUntilBrand((int) $parentRow['parent_id'], array_merge([$parentRow['catname']], $path))
             );
         }
 

@@ -2,47 +2,34 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Cache\Storage\StorageInterface;
-use Zend\Db\Sql;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Autowp\User\Model\User;
 use Application\Comments;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
+use Autowp\User\Model\User;
+use Laminas\Cache\Storage\StorageInterface;
+use Laminas\Db\Sql;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+
+use function array_slice;
+use function arsort;
+
+use const SORT_NUMERIC;
 
 class RatingController extends AbstractActionController
 {
-    /**
-     * @var StorageInterface
-     */
-    private $cache;
+    private StorageInterface $cache;
 
-    /**
-     * @var Comments
-     */
-    private $comments;
+    private Comments $comments;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var RestHydrator
-     */
-    private $userHydrator;
+    private RestHydrator $userHydrator;
 
     public function __construct(
         StorageInterface $cache,
@@ -52,11 +39,11 @@ class RatingController extends AbstractActionController
         User $userModel,
         RestHydrator $userHydrator
     ) {
-        $this->cache = $cache;
-        $this->comments = $comments;
-        $this->picture = $picture;
-        $this->item = $item;
-        $this->userModel = $userModel;
+        $this->cache        = $cache;
+        $this->comments     = $comments;
+        $this->picture      = $picture;
+        $this->item         = $item;
+        $this->userModel    = $userModel;
         $this->userHydrator = $userHydrator;
     }
 
@@ -66,14 +53,14 @@ class RatingController extends AbstractActionController
             'not_deleted' => true,
             'has_specs'   => true,
             'limit'       => 30,
-            'order'       => 'specs_volume desc'
+            'order'       => 'specs_volume desc',
         ]);
 
         $precisionLimit = 50;
 
         $this->userHydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => []
+            'fields'   => [],
         ]);
 
         $users = [];
@@ -81,28 +68,28 @@ class RatingController extends AbstractActionController
             $brands = [];
             if ($idx < 5) {
                 $cacheKey = 'RATING_USER_BRAND_5_' . $precisionLimit . '_' . $user['id'];
-                $brands = $this->cache->getItem($cacheKey, $success);
+                $brands   = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
                     $data = $this->item->getCountPairs([
                         'item_type_id' => Item::BRAND,
-                        'descendant' => [
-                            'has_specs_of_user' => $user['id']
+                        'descendant'   => [
+                            'has_specs_of_user' => $user['id'],
                         ],
-                        'limit'        => $precisionLimit
+                        'limit'        => $precisionLimit,
                     ]);
 
                     arsort($data, SORT_NUMERIC);
                     $data = array_slice($data, 0, 3, true);
 
                     foreach ($data as $brandId => $value) {
-                        $row = $this->item->getRow([
+                        $row      = $this->item->getRow([
                             'id'           => $brandId,
-                            'item_type_id' => Item::BRAND
+                            'item_type_id' => Item::BRAND,
                         ]);
                         $brands[] = [
                             'name'  => $row['name'],
                             'route' => ['/', $row['catname']],
-                            'value' => $value
+                            'value' => $value,
                         ];
                     }
                 }
@@ -114,12 +101,12 @@ class RatingController extends AbstractActionController
                 'user'   => $this->userHydrator->extract($user),
                 'volume' => (float) $user['specs_volume'],
                 'brands' => $brands,
-                'weight' => (float) $user['specs_weight']
+                'weight' => (float) $user['specs_weight'],
             ];
         }
 
         return new JsonModel([
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
@@ -132,12 +119,12 @@ class RatingController extends AbstractActionController
             'not_deleted'  => true,
             'limit'        => 30,
             'order'        => 'pictures_total desc',
-            'has_pictures' => true
+            'has_pictures' => true,
         ]);
 
         $this->userHydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => []
+            'fields'   => [],
         ]);
 
         $users = [];
@@ -145,18 +132,18 @@ class RatingController extends AbstractActionController
             $brands = [];
             if ($idx < 10) {
                 $cacheKey = 'RATING_USER_PICTURES_BRAND_6_' . $user['id'];
-                $brands = $this->cache->getItem($cacheKey, $success);
+                $brands   = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
                     $rows = $this->item->getRows([
                         'item_type_id' => Item::BRAND,
-                        'descendant' => [
+                        'descendant'   => [
                             'pictures' => [
                                 'user'   => $user['id'],
-                                'status' => Picture::STATUS_ACCEPTED
-                            ]
+                                'status' => Picture::STATUS_ACCEPTED,
+                            ],
                         ],
-                        'order' => new Sql\Expression('count(distinct p1.id) desc'),
-                        'limit' => 3
+                        'order'        => new Sql\Expression('count(distinct p1.id) desc'),
+                        'limit'        => 3,
                     ]);
 
                     foreach ($rows as $brand) {
@@ -172,13 +159,13 @@ class RatingController extends AbstractActionController
 
             $users[] = [
                 'user'   => $this->userHydrator->extract($user),
-                'volume' => (int)$user['pictures_total'],
-                'brands' => $brands
+                'volume' => (int) $user['pictures_total'],
+                'brands' => $brands,
             ];
         }
 
         return new JsonModel([
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
@@ -186,7 +173,7 @@ class RatingController extends AbstractActionController
     {
         $this->userHydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => []
+            'fields'   => [],
         ]);
 
         $users = [];
@@ -194,7 +181,7 @@ class RatingController extends AbstractActionController
             $users[] = [
                 'user'   => $this->userHydrator->extract($this->userModel->getRow($id)),
                 'volume' => $volume,
-                'brands' => []
+                'brands' => [],
             ];
         }
 
@@ -207,18 +194,18 @@ class RatingController extends AbstractActionController
     {
         $this->userHydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => []
+            'fields'   => [],
         ]);
 
         $users = [];
-        $idx = 0;
+        $idx   = 0;
         foreach ($this->picture->getTopLikes(30) as $ownerId => $volume) {
             $fans = [];
             if ($idx++ < 10) {
                 foreach ($this->picture->getTopOwnerFans($ownerId, 2) as $fanId => $fanVolume) {
                     $fans[] = [
                         'user'   => $this->userHydrator->extract($this->userModel->getRow($fanId)),
-                        'volume' => $fanVolume
+                        'volume' => $fanVolume,
                     ];
                 }
             }
@@ -227,12 +214,12 @@ class RatingController extends AbstractActionController
                 'user'   => $this->userHydrator->extract($this->userModel->getRow($ownerId)),
                 'volume' => $volume,
                 'brands' => [],
-                'fans'   => $fans
+                'fans'   => $fans,
             ];
         }
 
         return new JsonModel([
-            'users' => $users
+            'users' => $users,
         ]);
     }
 }

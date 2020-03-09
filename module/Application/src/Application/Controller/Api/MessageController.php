@@ -2,50 +2,39 @@
 
 namespace Application\Controller\Api;
 
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
+use Application\Hydrator\Api\RestHydrator;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
-use Application\Controller\Plugin\ForbiddenAction;
-use Application\Hydrator\Api\RestHydrator;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function get_object_vars;
 
 /**
- * Class MessageController
- * @package Application\Controller\Api
- *
  * @method \Autowp\User\Controller\Plugin\User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  */
 class MessageController extends AbstractRestfulController
 {
-    /**
-     * @var MessageService
-     */
-    private $message;
+    /** @var MessageService */
+    private MessageService $message;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    /** @var InputFilter */
+    private InputFilter $listInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $postInputFilter;
+    /** @var InputFilter */
+    private InputFilter $postInputFilter;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    /** @var User */
+    private User $userModel;
 
     public function __construct(
         RestHydrator $hydrator,
@@ -54,11 +43,11 @@ class MessageController extends AbstractRestfulController
         InputFilter $postInputFilter,
         User $userModel
     ) {
-        $this->message = $message;
-        $this->hydrator = $hydrator;
+        $this->message         = $message;
+        $this->hydrator        = $hydrator;
         $this->listInputFilter = $listInputFilter;
         $this->postInputFilter = $postInputFilter;
-        $this->userModel = $userModel;
+        $this->userModel       = $userModel;
     }
 
     public function postAction()
@@ -84,12 +73,12 @@ class MessageController extends AbstractRestfulController
 
         $data = $this->postInputFilter->getValues();
 
-        $user = $this->userModel->getRow((int)$data['user_id']);
+        $user = $this->userModel->getRow((int) $data['user_id']);
         if (! $user) {
             return $this->notFoundAction();
         }
 
-        if ($currentUser['id'] == $user['id']) {
+        if ($currentUser['id'] === $user['id']) {
             return $this->forbiddenAction();
         }
 
@@ -118,19 +107,19 @@ class MessageController extends AbstractRestfulController
         $messages = [];
         switch ($params['folder']) {
             case 'inbox':
-                $messages = $this->message->getInbox($user['id'], (int)$params['page']);
+                $messages = $this->message->getInbox($user['id'], (int) $params['page']);
                 break;
             case 'sent':
-                $messages = $this->message->getSentbox($user['id'], (int)$params['page']);
+                $messages = $this->message->getSentbox($user['id'], (int) $params['page']);
                 break;
             case 'system':
-                $messages = $this->message->getSystembox($user['id'], (int)$params['page']);
+                $messages = $this->message->getSystembox($user['id'], (int) $params['page']);
                 break;
             case 'dialog':
                 $messages = $this->message->getDialogbox(
                     $user['id'],
-                    (int)$params['user_id'],
-                    (int)$params['page']
+                    (int) $params['user_id'],
+                    (int) $params['page']
                 );
                 break;
         }
@@ -138,7 +127,7 @@ class MessageController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $params['fields'],
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
         ]);
 
         $items = [];
@@ -148,7 +137,7 @@ class MessageController extends AbstractRestfulController
 
         return new JsonModel([
             'paginator' => get_object_vars($messages['paginator']->getPages()),
-            'items'     => $items
+            'items'     => $items,
         ]);
     }
 
@@ -191,7 +180,7 @@ class MessageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $this->message->delete($user['id'], (int)$this->params('id'));
+        $this->message->delete($user['id'], (int) $this->params('id'));
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
@@ -208,15 +197,15 @@ class MessageController extends AbstractRestfulController
         return new JsonModel([
             'inbox'  => [
                 'count'     => $this->message->getInboxCount($user['id']),
-                'new_count' => $this->message->getInboxNewCount($user['id'])
+                'new_count' => $this->message->getInboxNewCount($user['id']),
             ],
             'sent'   => [
-                'count'     => $this->message->getSentCount($user['id'])
+                'count' => $this->message->getSentCount($user['id']),
             ],
             'system' => [
                 'count'     => $this->message->getSystemCount($user['id']),
-                'new_count' => $this->message->getNewSystemCount($user['id'])
-            ]
+                'new_count' => $this->message->getNewSystemCount($user['id']),
+            ],
         ]);
     }
 
@@ -229,7 +218,7 @@ class MessageController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'count' => $this->message->getNewCount($user['id'])
+            'count' => $this->message->getNewCount($user['id']),
         ]);
     }
 }

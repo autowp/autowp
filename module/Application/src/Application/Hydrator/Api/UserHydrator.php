@@ -2,63 +2,56 @@
 
 namespace Application\Hydrator\Api;
 
-use DateTime;
-use DateInterval;
-use Exception;
-use Traversable;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Permissions\Acl\Acl;
-use Zend\Stdlib\ArrayUtils;
+use Application\Model\Picture;
+use Application\Model\UserAccount;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
-use Application\Model\Picture;
-use Application\Model\UserAccount;
+use DateInterval;
+use DateTime;
+use Exception;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function inet_ntop;
+use function is_array;
+use function md5;
+use function sprintf;
+use function urlencode;
 
 class UserHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    protected $userId = null;
+    protected int $userId;
 
-    private $userRole = null;
+    private ?string $userRole;
 
-    private $acl;
+    private Acl $acl;
 
-    private $router;
+    private TreeRouteStack $router;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var UserRename
-     */
-    private $userRename;
+    private UserRename $userRename;
 
-    /**
-     * @var UserAccount
-     */
-    private $userAccount;
+    private UserAccount $userAccount;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->router = $serviceManager->get('HttpRouter');
-        $this->acl = $serviceManager->get(Acl::class);
-        $this->userModel = $serviceManager->get(User::class);
-        $this->userRename = $serviceManager->get(UserRename::class);
+        $this->router      = $serviceManager->get('HttpRouter');
+        $this->acl         = $serviceManager->get(Acl::class);
+        $this->userModel   = $serviceManager->get(User::class);
+        $this->userRename  = $serviceManager->get(UserRename::class);
         $this->userAccount = $serviceManager->get(UserAccount::class);
-        $this->picture = $serviceManager->get(Picture::class);
+        $this->picture     = $serviceManager->get(Picture::class);
 
         $strategy = new DateTimeFormatterStrategy();
         $this->addStrategy('last_online', $strategy);
@@ -77,10 +70,9 @@ class UserHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -101,9 +93,9 @@ class UserHydrator extends RestHydrator
 
     public function extract($object)
     {
-        $deleted = (bool)$object['deleted'];
+        $deleted = (bool) $object['deleted'];
 
-        $isMe = $object['id'] == $this->userId;
+        $isMe = $object['id'] === $this->userId;
 
         if ($deleted) {
             $user = [
@@ -112,10 +104,10 @@ class UserHydrator extends RestHydrator
                 'deleted'  => $deleted,
                 'url'      => null,
                 'longAway' => false,
-                'green'    => false
+                'green'    => false,
             ];
         } else {
-            $longAway = false;
+            $longAway   = false;
             $lastOnline = Row::getDateTimeByColumnType('timestamp', $object['last_online']);
             if ($lastOnline) {
                 $date = new DateTime();
@@ -130,28 +122,28 @@ class UserHydrator extends RestHydrator
             $isGreen = $object['role'] && $this->acl->isAllowed($object['role'], 'status', 'be-green');
 
             $user = [
-                'id'        => (int)$object['id'],
+                'id'        => (int) $object['id'],
                 'name'      => $object['name'],
                 'deleted'   => $deleted,
-                'route'     => ['/users', ($object['identity'] ? $object['identity'] : 'user' . $object['id'])],
+                'route'     => ['/users', $object['identity'] ? $object['identity'] : 'user' . $object['id']],
                 'long_away' => $longAway,
                 'green'     => $isGreen,
-                'identity'  => $object['identity']
+                'identity'  => $object['identity'],
             ];
 
             if ($this->filterComposite->filter('last_online')) {
-                $lastOnline = Row::getDateTimeByColumnType('timestamp', $object['last_online']);
+                $lastOnline          = Row::getDateTimeByColumnType('timestamp', $object['last_online']);
                 $user['last_online'] = $this->extractValue('last_online', $lastOnline);
             }
 
             if ($this->filterComposite->filter('reg_date')) {
-                $regDate = Row::getDateTimeByColumnType('timestamp', $object['reg_date']);
+                $regDate          = Row::getDateTimeByColumnType('timestamp', $object['reg_date']);
                 $user['reg_date'] = $this->extractValue('reg_date', $regDate);
             }
 
             if ($this->filterComposite->filter('image')) {
                 $user['image'] = $this->extractValue('image', [
-                    'image'  => $object['img']
+                    'image' => $object['img'],
                 ]);
             }
 
@@ -175,21 +167,21 @@ class UserHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('img')) {
                 $user['img'] = $this->extractValue('img', [
-                    'image' => $object['img']
+                    'image' => $object['img'],
                 ]);
             }
 
             if ($this->filterComposite->filter('avatar')) {
                 $user['avatar'] = $this->extractValue('image', [
                     'image'  => $object['img'],
-                    'format' => 'avatar'
+                    'format' => 'avatar',
                 ]);
             }
 
             if ($this->filterComposite->filter('photo')) {
                 $user['photo'] = $this->extractValue('image', [
                     'image'  => $object['img'],
-                    'format' => 'photo'
+                    'format' => 'photo',
                 ]);
             }
 
@@ -214,15 +206,15 @@ class UserHydrator extends RestHydrator
             }
 
             if ($isMe && $this->filterComposite->filter('votes_left')) {
-                $user['votes_left'] = (int)$object['votes_left'];
+                $user['votes_left'] = (int) $object['votes_left'];
             }
 
             if ($isMe && $this->filterComposite->filter('votes_per_day')) {
-                $user['votes_per_day'] = (int)$object['votes_per_day'];
+                $user['votes_per_day'] = (int) $object['votes_per_day'];
             }
 
             if ($isMe && $this->filterComposite->filter('specs_weight')) {
-                $user['specs_weight'] = (float)$object['specs_weight'];
+                $user['specs_weight'] = (float) $object['specs_weight'];
             }
 
             if ($this->filterComposite->filter('renames')) {
@@ -230,7 +222,7 @@ class UserHydrator extends RestHydrator
                 foreach ($this->userRename->getRenames($user['id']) as $rename) {
                     $user['renames'][] = [
                         'old_name' => $rename['old_name'],
-                        'date'     => $this->extractValue('rename_date', $rename['date'])
+                        'date'     => $this->extractValue('rename_date', $rename['date']),
                     ];
                 }
             }
@@ -244,19 +236,19 @@ class UserHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('pictures_added')) {
-                $user['pictures_added'] = (int)$object['pictures_added'];
+                $user['pictures_added'] = (int) $object['pictures_added'];
             }
 
             if ($this->filterComposite->filter('pictures_accepted_count')) {
                 $user['pictures_accepted_count'] = $this->picture->getCount([
                     'user'   => $user['id'],
-                    'status' => Picture::STATUS_ACCEPTED
+                    'status' => Picture::STATUS_ACCEPTED,
                 ]);
             }
 
             if ($this->filterComposite->filter('last_ip')) {
                 $canViewIp = false;
-                $role = $this->getUserRole();
+                $role      = $this->getUserRole();
                 if ($role) {
                     $canViewIp = $this->acl->isAllowed($role, 'user', 'ip');
                 }
@@ -282,7 +274,6 @@ class UserHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */
@@ -293,8 +284,8 @@ class UserHydrator extends RestHydrator
 
     public function setUserId($userId)
     {
-        if ($this->userId != $userId) {
-            $this->userId = $userId;
+        if ($this->userId !== $userId) {
+            $this->userId   = $userId;
             $this->userRole = null;
         }
 

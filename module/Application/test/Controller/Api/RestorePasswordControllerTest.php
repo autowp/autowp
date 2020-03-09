@@ -2,13 +2,18 @@
 
 namespace ApplicationTest\Api\Controller;
 
-use Exception;
-use Zend\Http\Request;
 use Application\Controller\Api\LoginController;
 use Application\Controller\Api\RestorePasswordController;
 use Application\Controller\Api\UserController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Zend\Mail\Transport\TransportInterface;
+use Exception;
+use Laminas\Http\Request;
+use Laminas\Mail\Transport\TransportInterface;
+
+use function count;
+use function explode;
+use function microtime;
+use function preg_match;
 
 class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 {
@@ -16,10 +21,6 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param string $email
-     * @param string $password
-     * @param string $name
-     * @return int
      * @throws Exception
      */
     private function createUser(string $email, string $password, string $name): int
@@ -30,7 +31,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
             'email'            => $email,
             'name'             => $name,
             'password'         => $password,
-            'password_confirm' => $password
+            'password_confirm' => $password,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -41,21 +42,21 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
         // get id
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
     private function activateUser()
     {
         $mailTransport = $this->getApplicationServiceLocator()->get(TransportInterface::class);
-        $message = $mailTransport->getLastMessage();
+        $message       = $mailTransport->getLastMessage();
 
         preg_match('|https://en.localhost/account/emailcheck/([0-9a-f]+)|u', $message->getBody(), $match);
 
         $this->reset();
         $this->dispatch('http://en.localhost/api/user/emailcheck', Request::METHOD_POST, [
-            'code' => $match[1]
+            'code' => $match[1],
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -67,10 +68,10 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
     public function testRestorePassword()
     {
-        $email = 'test' . microtime(true) . '@example.com';
-        $password = 'password';
+        $email       = 'test' . microtime(true) . '@example.com';
+        $password    = 'password';
         $newPassword = 'password2';
-        $name = 'User, who restore password';
+        $name        = 'User, who restore password';
 
         $this->createUser($email, $password, $name);
         $this->activateUser();
@@ -78,7 +79,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         // request email message
         $this->reset();
         $this->dispatch('https://www.autowp.ru/api/restore-password/request', Request::METHOD_POST, [
-            'email' => $email
+            'email' => $email,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -89,7 +90,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
         // parse message for url with token
         $mailTransport = $this->getApplicationServiceLocator()->get(TransportInterface::class);
-        $message = $mailTransport->getLastMessage();
+        $message       = $mailTransport->getLastMessage();
 
         preg_match('|https?://en.localhost/restore-password/new\?code=([0-9a-f]+)|u', $message->getBody(), $match);
         $token = $match[1];
@@ -111,7 +112,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/restore-password/new', Request::METHOD_POST, [
             'code'             => $token,
             'password'         => $newPassword,
-            'password_confirm' => $newPassword
+            'password_confirm' => $newPassword,
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -125,7 +126,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => $email,
-            'password' => $newPassword
+            'password' => $newPassword,
         ]);
 
         $this->assertResponseStatusCode(201);

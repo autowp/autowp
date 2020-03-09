@@ -2,16 +2,16 @@
 
 namespace Application\Form\Moder;
 
-use Zend\Form\Element;
-use Zend\Form\ElementInterface;
-use Zend\Form\Exception;
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilterProviderInterface;
+use Laminas\Form\Element;
+use Laminas\Form\ElementInterface;
+use Laminas\Form\Exception;
+use Laminas\Form\Form;
+use Laminas\InputFilter\InputFilterProviderInterface;
 use Traversable;
 
 class ItemLanguages extends Form implements InputFilterProviderInterface
 {
-    private $languages = [];
+    private array $languages = [];
 
     public function __construct($name = null, $options = [])
     {
@@ -24,8 +24,8 @@ class ItemLanguages extends Form implements InputFilterProviderInterface
                 'name'    => $language,
                 'type'    => ItemLanguage::class,
                 'options' => [
-                    'label' => $language
-                ]
+                    'label' => $language,
+                ],
             ]);
             $this->get($language)->setWrapElements(true)->prepare();
         }
@@ -55,11 +55,9 @@ class ItemLanguages extends Form implements InputFilterProviderInterface
 
     /**
      * Should return an array specification compatible with
-     * {@link Zend\InputFilter\Factory::createInputFilter()}.
-     *
-     * @return array
+     * {@link Laminas\InputFilter\Factory::createInputFilter()}.
      */
-    public function getInputFilterSpecification()
+    public function getInputFilterSpecification(): array
     {
         return [];
     }

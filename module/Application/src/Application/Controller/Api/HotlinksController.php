@@ -2,27 +2,22 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\Referer;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
- * Class HotlinksController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  */
 class HotlinksController extends AbstractRestfulController
 {
-    /**
-     * @var Referer
-     */
-    private $referer;
+    /** @var Referer */
+    private Referer $referer;
 
     public function __construct(Referer $referer)
     {
@@ -36,7 +31,7 @@ class HotlinksController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $this->referer->getData()
+            'items' => $this->referer->getData(),
         ]);
     }
 
@@ -58,7 +53,7 @@ class HotlinksController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        $this->referer->flushHost((string)$this->params('host'));
+        $this->referer->flushHost((string) $this->params('host'));
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
@@ -72,7 +67,7 @@ class HotlinksController extends AbstractRestfulController
 
         $data = $this->processBodyContent($this->getRequest());
 
-        $host = isset($data['host']) ? (string)$data['host'] : null;
+        $host = isset($data['host']) ? (string) $data['host'] : null;
 
         if (! $host) {
             return new ApiProblemResponse(new ApiProblem(400, 'Validation error'));
@@ -92,7 +87,7 @@ class HotlinksController extends AbstractRestfulController
 
         $data = $this->processBodyContent($this->getRequest());
 
-        $host = isset($data['host']) ? (string)$data['host'] : null;
+        $host = isset($data['host']) ? (string) $data['host'] : null;
 
         if (! $host) {
             return new ApiProblemResponse(new ApiProblem(400, 'Validation error'));

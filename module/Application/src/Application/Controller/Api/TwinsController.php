@@ -2,28 +2,19 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Cache\Storage\StorageInterface;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
 use Application\Model\Twins;
+use Laminas\Cache\Storage\StorageInterface;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
 
 /**
- * Class TwinsController
- * @package Application\Controller\Api
- *
  * @method string language()
  */
 class TwinsController extends AbstractRestfulController
 {
-    /**
-     * @var Twins
-     */
-    private $twins;
+    private Twins $twins;
 
-    /**
-     * @var StorageInterface
-     */
-    private $cache;
+    private StorageInterface $cache;
 
     public function __construct(Twins $twins, StorageInterface $cache)
     {
@@ -40,7 +31,7 @@ class TwinsController extends AbstractRestfulController
         $result = $this->cache->getItem($key, $success);
         if (! $success) {
             $arr = $this->twins->getBrands([
-                'language' => $language
+                'language' => $language,
             ]);
 
             $result = [];
@@ -58,7 +49,7 @@ class TwinsController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $result
+            'items' => $result,
         ]);
     }
 }

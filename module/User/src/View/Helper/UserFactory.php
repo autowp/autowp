@@ -3,19 +3,16 @@
 namespace Autowp\User\View\Helper;
 
 use Interop\Container\ContainerInterface;
-use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class UserFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return User
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): User
     {
         return new User(
             $container->get(Acl::class),

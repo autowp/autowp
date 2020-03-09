@@ -2,56 +2,44 @@
 
 namespace Application\Controller\Api;
 
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mail;
+use Laminas\Mail\Transport\TransportInterface;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Session\Container;
 use ReCaptcha\ReCaptcha;
-use Zend\InputFilter\InputFilter;
-use Zend\Mail;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Session\Container;
-use ZF\ApiProblem\ApiProblemResponse;
-use ZF\ApiProblem\ApiProblem;
+
+use function sprintf;
 
 /**
- * Class FeedbackController
- * @package Application\Controller\Api
- *
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */
 class FeedbackController extends AbstractRestfulController
 {
-    /**
-     * @var InputFilter
-     */
-    private $postInputFilter;
+    private InputFilter $postInputFilter;
 
-    private $transport;
+    private TransportInterface $transport;
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
-    /**
-     * @var array
-     */
-    private $recaptcha;
+    private array $recaptcha;
 
-    /**
-     * @var bool
-     */
-    private $captchaEnabled;
+    private bool $captchaEnabled;
 
     public function __construct(
         InputFilter $postInputFilter,
-        $transport,
+        TransportInterface $transport,
         array $options,
         array $recaptcha,
         bool $captchaEnabled
     ) {
         $this->postInputFilter = $postInputFilter;
-        $this->transport = $transport;
-        $this->options = $options;
-        $this->recaptcha = $recaptcha;
-        $this->captchaEnabled = $captchaEnabled;
+        $this->transport       = $transport;
+        $this->options         = $options;
+        $this->recaptcha       = $recaptcha;
+        $this->captchaEnabled  = $captchaEnabled;
     }
 
     public function postAction()
@@ -66,14 +54,14 @@ class FeedbackController extends AbstractRestfulController
 
         if ($this->captchaEnabled) {
             $namespace = new Container('Captcha');
-            $verified = isset($namespace->success) && $namespace->success;
+            $verified  = isset($namespace->success) && $namespace->success;
 
             if (! $verified) {
                 $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
 
                 $captchaResponse = null;
                 if (isset($data['captcha'])) {
-                    $captchaResponse = (string)$data['captcha'];
+                    $captchaResponse = (string) $data['captcha'];
                 }
 
                 /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -84,9 +72,9 @@ class FeedbackController extends AbstractRestfulController
                         new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                             'invalid_params' => [
                                 'captcha' => [
-                                    'invalid' => 'Captcha is invalid'
-                                ]
-                            ]
+                                    'invalid' => 'Captcha is invalid',
+                                ],
+                            ],
                         ])
                     );
                 }
@@ -95,7 +83,6 @@ class FeedbackController extends AbstractRestfulController
             }
         }
 
-
         $this->postInputFilter->setData($data);
 
         if (! $this->postInputFilter->isValid()) {
@@ -103,7 +90,6 @@ class FeedbackController extends AbstractRestfulController
         }
 
         $data = $this->postInputFilter->getValues();
-
 
         $message = sprintf(
             "Имя: %s\nE-mail: %s\nСообщение:\n%s",

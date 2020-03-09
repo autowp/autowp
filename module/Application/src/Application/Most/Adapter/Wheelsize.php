@@ -2,9 +2,12 @@
 
 namespace Application\Most\Adapter;
 
-use Exception;
-use Zend\Db\Sql;
 use Application\WheelSize as WheelsizeObject;
+use Exception;
+use Laminas\Db\Sql;
+
+use function array_keys;
+use function implode;
 
 class Wheelsize extends AbstractAdapter
 {
@@ -30,24 +33,21 @@ class Wheelsize extends AbstractAdapter
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param Sql\Select $select
-     * @param $language
-     * @return array
      * @throws Exception
      */
-    public function getCars(Sql\Select $select, $language)
+    public function getCars(Sql\Select $select, string $language): array
     {
         $wheel = $this->attributes['rear'];
 
         $specService = $this->most->getSpecs();
 
-        $tyrewidth  = $this->attributeTable->select(['id' => $wheel['tyrewidth']])->current();
+        $tyrewidth            = $this->attributeTable->select(['id' => $wheel['tyrewidth']])->current();
         $tyrewidthValuesTable = $specService->getValueDataTable($tyrewidth['type_id'])->getTable();
 
-        $tyreseries = $this->attributeTable->select(['id' => $wheel['tyreseries']])->current();
+        $tyreseries            = $this->attributeTable->select(['id' => $wheel['tyreseries']])->current();
         $tyreseriesValuesTable = $specService->getValueDataTable($tyreseries['type_id'])->getTable();
 
-        $radius     = $this->attributeTable->select(['id' => $wheel['radius']])->current();
+        $radius            = $this->attributeTable->select(['id' => $wheel['radius']])->current();
         $radiusValuesTable = $specService->getValueDataTable($radius['type_id'])->getTable();
 
         $select
@@ -60,7 +60,7 @@ class Wheelsize extends AbstractAdapter
                 'tyreseries.attribute_id' => $tyreseries['id'],
                 'tyreseries.value > 0',
                 'radius.attribute_id' => $radius['id'],
-                'radius.value > 0'
+                'radius.value > 0',
             ])
             ->group(['item.id', 'tyrewidth.value', 'tyreseries.value', 'radius.value'])
             ->order(new Sql\Expression('2*tyrewidth.value*tyreseries.value/100+radius.value*25.4 ' . $this->order));
@@ -95,7 +95,7 @@ class Wheelsize extends AbstractAdapter
                 $specService->getActualValue($wheel['radius'], $car['id']),
                 null
             );
-            $value = $wheelObj->getTyreName();
+            $value    = $wheelObj->getTyreName();
             if ($value) {
                 $text[$value] = 0;
             }

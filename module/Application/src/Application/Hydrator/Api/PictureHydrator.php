@@ -2,23 +2,10 @@
 
 namespace Application\Hydrator\Api;
 
-use Application\Model\ItemParent;
-use Exception;
-use geoPHP;
-use Traversable;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Permissions\Acl\Acl;
-use Zend\Stdlib\ArrayUtils;
-use Autowp\Commons\Db\Table\Row;
-use Autowp\Image;
-use Autowp\TextStorage;
-use Autowp\User\Model\User;
 use Application\Comments;
 use Application\DuplicateFinder;
 use Application\Model\Item;
+use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
@@ -26,136 +13,98 @@ use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
 use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
+use Autowp\Commons\Db\Table\Row;
+use Autowp\Image;
+use Autowp\TextStorage;
+use Autowp\User\Model\User;
+use Exception;
+use geoPHP;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Hydrator\Exception\InvalidArgumentException;
+use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Traversable;
+
+use function array_search;
+use function array_values;
+use function count;
+use function explode;
+use function htmlspecialchars;
+use function implode;
+use function in_array;
+use function inet_ntop;
+use function is_array;
+use function substr;
+use function urlencode;
 
 class PictureHydrator extends RestHydrator
 {
-    /**
-     * @var Comments
-     */
-    private $comments;
+    private Comments $comments;
 
-    /**
-     * @var Acl
-     */
-    private $acl;
+    private Acl $acl;
 
-    /**
-     * @var PictureVote
-     */
-    private $pictureVote;
+    private PictureVote $pictureVote;
 
-    /**
-     * @var int|null
-     */
-    private $userId = null;
+    private int $userId;
 
-    private $userRole = null;
+    private ?string $userRole;
 
-    /**
-     * @var int
-     */
-    private $itemID = 0;
+    private int $itemID = 0;
 
-    /**
-     * @var array
-     */
-    private $paginator;
+    private array $paginator;
 
-    /**
-     * @var PictureNameFormatter
-     */
-    private $pictureNameFormatter;
+    private PictureNameFormatter $pictureNameFormatter;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    /**
-     * @var DuplicateFinder
-     */
-    private $duplicateFinder;
+    private DuplicateFinder $duplicateFinder;
 
-    /**
-     * @var PictureItem
-     */
-    private $pictureItem;
+    private PictureItem $pictureItem;
 
-    /**
-     * @var Image\Storage
-     */
-    private $imageStorage;
+    private Image\Storage $imageStorage;
 
-    /**
-     * @var TextStorage\Service
-     */
-    private $textStorage;
+    private TextStorage\Service $textStorage;
 
-    /**
-     * @var PictureView
-     */
-    private $pictureView;
+    private PictureView $pictureView;
 
-    /**
-     * @var Perspective
-     */
-    private $perspective;
+    private Perspective $perspective;
 
-    /**
-     * @var PictureModerVote
-     */
-    private $pictureModerVote;
+    private PictureModerVote $pictureModerVote;
 
-    /**
-     * @var array
-     */
-    private $itemsOptions = [];
+    private array $itemsOptions = [];
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
-    /**
-     * @var TableGateway
-     */
-    private $linksTable;
+    private TableGateway $linksTable;
 
-    private $router;
+    private ItemParent $itemParentModel;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParentModel;
-
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
 
-        $this->picture = $serviceManager->get(Picture::class);
-        $this->userModel = $serviceManager->get(User::class);
-        $this->itemModel = $serviceManager->get(Item::class);
+        $this->picture         = $serviceManager->get(Picture::class);
+        $this->userModel       = $serviceManager->get(User::class);
+        $this->itemModel       = $serviceManager->get(Item::class);
         $this->itemParentModel = $serviceManager->get(ItemParent::class);
 
-        $this->pictureView = $serviceManager->get(PictureView::class);
+        $this->pictureView      = $serviceManager->get(PictureView::class);
         $this->pictureModerVote = $serviceManager->get(PictureModerVote::class);
 
-        $this->router = $serviceManager->get('HttpRouter');
-        $this->acl = $serviceManager->get(Acl::class);
-        $this->pictureVote = $serviceManager->get(PictureVote::class);
-        $this->comments = $serviceManager->get(Comments::class);
+        $this->acl                  = $serviceManager->get(Acl::class);
+        $this->pictureVote          = $serviceManager->get(PictureVote::class);
+        $this->comments             = $serviceManager->get(Comments::class);
         $this->pictureNameFormatter = $serviceManager->get(PictureNameFormatter::class);
-        $this->duplicateFinder = $serviceManager->get(DuplicateFinder::class);
-        $this->pictureItem = $serviceManager->get(PictureItem::class);
-        $this->imageStorage = $serviceManager->get(Image\Storage::class);
-        $this->textStorage = $serviceManager->get(TextStorage\Service::class);
-        $this->perspective = $serviceManager->get(Perspective::class);
+        $this->duplicateFinder      = $serviceManager->get(DuplicateFinder::class);
+        $this->pictureItem          = $serviceManager->get(PictureItem::class);
+        $this->imageStorage         = $serviceManager->get(Image\Storage::class);
+        $this->textStorage          = $serviceManager->get(TextStorage\Service::class);
+        $this->perspective          = $serviceManager->get(Perspective::class);
 
         $this->linksTable = $serviceManager->get('TableManager')->get('links');
 
@@ -202,10 +151,9 @@ class PictureHydrator extends RestHydrator
 
     /**
      * @param  array|Traversable $options
-     * @return RestHydrator
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         parent::setOptions($options);
 
@@ -238,8 +186,8 @@ class PictureHydrator extends RestHydrator
 
     public function setUserId($userId)
     {
-        if ($this->userId != $userId) {
-            $this->userId = $userId;
+        if ($this->userId !== $userId) {
+            $this->userId   = $userId;
             $this->userRole = null;
         }
 
@@ -250,9 +198,6 @@ class PictureHydrator extends RestHydrator
     }
 
     /**
-     * @param int $pictureID
-     * @param int $targetItemID
-     * @return array
      * @throws Exception
      */
     private function getPath(int $pictureID, int $targetItemID): array
@@ -262,8 +207,8 @@ class PictureHydrator extends RestHydrator
         foreach ($piRows as $piRow) {
             $result[] = [
                 'type'           => (int) $piRow['type'],
-                'perspective_id' => $piRow['perspective_id'] ? (int)$piRow['perspective_id'] : null,
-                'item'           => $this->getItemRoute($piRow['item_id'], $targetItemID)
+                'perspective_id' => $piRow['perspective_id'] ? (int) $piRow['perspective_id'] : null,
+                'item'           => $this->getItemRoute($piRow['item_id'], $targetItemID),
             ];
             //exit;
         }
@@ -271,15 +216,12 @@ class PictureHydrator extends RestHydrator
     }
 
     /**
-     * @param int $itemID
-     * @param int $targetItemID
-     * @return array|null
      * @throws Exception
      */
     private function getItemRoute(int $itemID, int $targetItemID): ?array
     {
         $row = $this->itemModel->getRow([
-            'id' => $itemID
+            'id' => $itemID,
         ]);
         if (! $row) {
             return null;
@@ -290,22 +232,19 @@ class PictureHydrator extends RestHydrator
             $parents = $this->getItemParentRoute($row['id'], $targetItemID);
         }
 
-        $isMatched = ! $targetItemID || $parents || $itemID == $targetItemID;
+        $isMatched = ! $targetItemID || $parents || $itemID === $targetItemID;
         if (! $isMatched) {
             return null;
         }
 
         return [
-            'item_type_id' => (int)$row['item_type_id'],
+            'item_type_id' => (int) $row['item_type_id'],
             'catname'      => $row['catname'],
             'parents'      => $parents,
         ];
     }
 
     /**
-     * @param int $itemID
-     * @param int $targetItemID
-     * @return array
      * @throws Exception
      */
     private function getItemParentRoute(int $itemID, int $targetItemID): array
@@ -316,7 +255,7 @@ class PictureHydrator extends RestHydrator
             if ($item) {
                 $result[] = [
                     'catname' => $row['catname'],
-                    'item'    => $item
+                    'item'    => $item,
                 ];
             }
         }
@@ -326,11 +265,10 @@ class PictureHydrator extends RestHydrator
 
     /**
      * @param object $object
-     * @return array|null
      * @throws Image\Storage\Exception
      * @throws Exception
      */
-    public function extract($object)
+    public function extract($object): ?array
     {
         if ($object === null || $object === false) {
             return null;
@@ -341,7 +279,7 @@ class PictureHydrator extends RestHydrator
         }
 
         $isModer = false;
-        $role = $this->getUserRole();
+        $role    = $this->getUserRole();
         if ($role) {
             $isModer = $this->acl->inheritsRole($role, 'moder');
         }
@@ -349,15 +287,15 @@ class PictureHydrator extends RestHydrator
         $addDate = Row::getDateTimeByColumnType('timestamp', $object['add_date']);
 
         $picture = [
-            'id'         => (int)$object['id'],
-            'identity'   => (string)$object['identity'],
+            'id'         => (int) $object['id'],
+            'identity'   => (string) $object['identity'],
             'url'        => '/picture/' . urlencode($object['identity']),
-            'resolution' => (int)$object['width'] . '×' . (int)$object['height'],
+            'resolution' => (int) $object['width'] . '×' . (int) $object['height'],
             'status'     => $object['status'],
-            'owner_id'   => $object['owner_id'] ? (int)$object['owner_id'] : null,
-            'width'      => (int)$object['width'],
-            'height'     => (int)$object['height'],
-            'filesize'   => (int)$object['filesize'],
+            'owner_id'   => $object['owner_id'] ? (int) $object['owner_id'] : null,
+            'width'      => (int) $object['width'],
+            'height'     => (int) $object['height'],
+            'filesize'   => (int) $object['filesize'],
             'add_date'   => $this->extractValue('add_date', $addDate),
             'dpi_x'      => $object['dpi_x'],
             'dpi_y'      => $object['dpi_y'],
@@ -369,15 +307,15 @@ class PictureHydrator extends RestHydrator
             if ($point) {
                 $picture['point'] = [
                     'lng' => $point->x(),
-                    'lat' => $point->y()
+                    'lat' => $point->y(),
                 ];
             }
         }
 
         if ($this->filterComposite->filter('taken')) {
-            $picture['taken_year'] = $object['taken_year'] ? (int)$object['taken_year'] : null;
-            $picture['taken_month'] = $object['taken_month'] ? (int)$object['taken_month'] : null;
-            $picture['taken_day'] = $object['taken_day'] ? (int)$object['taken_day'] : null;
+            $picture['taken_year']  = $object['taken_year'] ? (int) $object['taken_year'] : null;
+            $picture['taken_month'] = $object['taken_month'] ? (int) $object['taken_month'] : null;
+            $picture['taken_day']   = $object['taken_day'] ? (int) $object['taken_day'] : null;
         }
 
         if ($this->filterComposite->filter('path')) {
@@ -410,7 +348,7 @@ class PictureHydrator extends RestHydrator
                 $parts = explode(',', $this->paginator['perspective_exclude_id']);
                 $value = [];
                 foreach ($parts as $part) {
-                    $part = (int)$part;
+                    $part = (int) $part;
                     if ($part) {
                         $value[] = $part;
                     }
@@ -424,14 +362,14 @@ class PictureHydrator extends RestHydrator
             $total = $paginator->getTotalItemCount();
 
             if ($total < 500) {
-                $paginatorPicturesFilter = $filter;
+                $paginatorPicturesFilter            = $filter;
                 $paginatorPicturesFilter['columns'] = ['id', 'identity'];
 
                 $paginatorPictures = $this->picture->getRows($paginatorPicturesFilter);
 
                 $pageNumber = 0;
                 foreach ($paginatorPictures as $n => $p) {
-                    if ($p['id'] == $object['id']) {
+                    if ($p['id'] === $object['id']) {
                         $pageNumber = $n + 1;
                         break;
                     }
@@ -463,7 +401,7 @@ class PictureHydrator extends RestHydrator
                 foreach ($pages->pagesInRange as $i) {
                     $pagesInRange[] = [
                         'page'     => $i,
-                        'identity' => $paginatorPictures[$i - 1]['identity']
+                        'identity' => $paginatorPictures[$i - 1]['identity'],
                     ];
                 }
                 $pages->pagesInRange = $pagesInRange;
@@ -489,10 +427,10 @@ class PictureHydrator extends RestHydrator
             $rows = $this->itemModel->getRows([
                 'language'     => $this->language,
                 'item_type_id' => Item::COPYRIGHT,
-                'pictures' => [
-                    'id'   => $picture['id']
+                'pictures'     => [
+                    'id' => $picture['id'],
                 ],
-                'limit' => 3
+                'limit'        => 3,
             ]);
 
             $blocks = [];
@@ -505,13 +443,13 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('factories')) {
             $rows = $this->itemModel->getRows([
-                'language'     => $this->language,
-                'item_type_id' => Item::FACTORY,
+                'language'           => $this->language,
+                'item_type_id'       => Item::FACTORY,
                 'descendant_or_self' => [
                     'pictures' => [
-                        'id' => $object['id']
-                    ]
-                ]
+                        'id' => $object['id'],
+                    ],
+                ],
             ]);
 
             $factories = [];
@@ -524,13 +462,13 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('twins')) {
             $rows = $this->itemModel->getRows([
-                'language'     => $this->language,
-                'item_type_id' => Item::TWINS,
+                'language'           => $this->language,
+                'item_type_id'       => Item::TWINS,
                 'descendant_or_self' => [
                     'pictures' => [
-                        'id' => $object['id']
-                    ]
-                ]
+                        'id' => $object['id'],
+                    ],
+                ],
             ]);
 
             $twins = [];
@@ -546,13 +484,13 @@ class PictureHydrator extends RestHydrator
                 'language'     => $this->language,
                 'item_type_id' => Item::CATEGORY,
                 'child'        => [
-                    'item_type_id' => [Item::VEHICLE, Item::ENGINE],
+                    'item_type_id'       => [Item::VEHICLE, Item::ENGINE],
                     'descendant_or_self' => [
                         'pictures' => [
-                            'id' => $object['id']
-                        ]
-                    ]
-                ]
+                            'id' => $object['id'],
+                        ],
+                    ],
+                ],
             ]);
 
             $categories = [];
@@ -564,18 +502,18 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('authors')) {
-            $authors = [];
+            $authors        = [];
             $pictureAuthors = $this->pictureItem->getPictureItemsData($object['id'], PictureItem::PICTURE_AUTHOR);
             foreach ($pictureAuthors as $pictureAuthor) {
                 $item = $this->itemModel->getRow([
                     'id'       => $pictureAuthor['item_id'],
                     'language' => $this->language,
-                    'columns'  => ['name']
+                    'columns'  => ['name'],
                 ]);
 
                 $authors[] = [
                     'id'   => $pictureAuthor['item_id'],
-                    'name' => $item['name']
+                    'name' => $item['name'],
                 ];
             }
 
@@ -583,8 +521,8 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($isModer) {
-            $crop = $this->imageStorage->getImageCrop($object['image_id']);
-            $picture['cropped']         = (bool)$crop;
+            $crop                       = $this->imageStorage->getImageCrop($object['image_id']);
+            $picture['cropped']         = (bool) $crop;
             $picture['crop_resolution'] = $crop ? $crop['width'] . '×' . $crop['height'] : null;
         }
 
@@ -598,9 +536,9 @@ class PictureHydrator extends RestHydrator
         $nameData = null;
         if ($showNameHtml || $showNameText) {
             $nameDatas = $this->picture->getNameData([$object], [
-                'language' => $this->language
+                'language' => $this->language,
             ]);
-            $nameData = $nameDatas[$object['id']];
+            $nameData  = $nameDatas[$object['id']];
         }
 
         if ($showNameHtml) {
@@ -614,7 +552,7 @@ class PictureHydrator extends RestHydrator
         if ($this->filterComposite->filter('owner')) {
             $owner = null;
             if ($object['owner_id']) {
-                $owner = $this->userModel->getRow((int)$object['owner_id']);
+                $owner = $this->userModel->getRow((int) $object['owner_id']);
             }
 
             $picture['owner'] = $owner ? $this->extractValue('owner', $owner) : null;
@@ -623,14 +561,14 @@ class PictureHydrator extends RestHydrator
         if ($this->filterComposite->filter('thumb')) {
             $picture['thumb'] = $this->extractValue('thumb', [
                 'image'  => $object['image_id'],
-                'format' => 'picture-thumb'
+                'format' => 'picture-thumb',
             ]);
         }
 
         if ($this->filterComposite->filter('thumb_medium')) {
             $picture['thumb_medium'] = $this->extractValue('thumb_medium', [
                 'image'  => $object['image_id'],
-                'format' => 'picture-thumb-medium'
+                'format' => 'picture-thumb-medium',
             ]);
         }
 
@@ -644,28 +582,28 @@ class PictureHydrator extends RestHydrator
                 $object['id']
             );
 
-            $newMessages = $this->comments->service()->getNewMessages(
+            $newMessages               = $this->comments->service()->getNewMessages(
                 Comments::PICTURES_TYPE_ID,
                 $object['id'],
                 (int) $this->userId
             );
             $picture['comments_count'] = [
                 'total' => $msgCount,
-                'new'   => $newMessages
+                'new'   => $newMessages,
             ];
         }
 
         if ($this->filterComposite->filter('image_gallery_full')) {
             $picture['image_gallery_full'] = $this->extractValue('image_gallery_full', [
                 'image'  => $object['image_id'],
-                'format' => 'picture-gallery-full'
+                'format' => 'picture-gallery-full',
             ]);
         }
 
         if ($this->filterComposite->filter('preview_large')) {
             $picture['preview_large'] = $this->extractValue('preview_large', [
                 'image'  => $object['image_id'],
-                'format' => 'picture-preview-large'
+                'format' => 'picture-preview-large',
             ]);
         }
 
@@ -675,10 +613,10 @@ class PictureHydrator extends RestHydrator
             $crop = $this->imageStorage->getImageCrop($object['image_id']);
             if ($crop) {
                 $picture['crop'] = [
-                    'left'   => (int)$crop['left'],
-                    'top'    => (int)$crop['top'],
-                    'width'  => (int)$crop['width'],
-                    'height' => (int)$crop['height'],
+                    'left'   => (int) $crop['left'],
+                    'top'    => (int) $crop['top'],
+                    'width'  => (int) $crop['width'],
+                    'height' => (int) $crop['height'],
                 ];
             }
         }
@@ -691,15 +629,15 @@ class PictureHydrator extends RestHydrator
 
             $picture['perspective_item'] = null;
 
-            if (count($itemIds) == 1) {
+            if (count($itemIds) === 1) {
                 $item = $itemIds[0];
 
                 $perspective = $this->pictureItem->getPerspective($object['id'], $item['item_id']);
 
                 $picture['perspective_item'] = [
-                    'item_id'        => (int)$item['item_id'],
-                    'type'           => (int)$item['type'],
-                    'perspective_id' => $perspective ? (int)$perspective : null,
+                    'item_id'        => (int) $item['item_id'],
+                    'type'           => (int) $item['type'],
+                    'perspective_id' => $perspective ? (int) $perspective : null,
                 ];
             }
         }
@@ -710,7 +648,7 @@ class PictureHydrator extends RestHydrator
                 $typeId = (int) $this->itemsOptions['type_id'];
             }
 
-            $rows = $this->pictureItem->getPictureItemsData($object['id'], $typeId);
+            $rows             = $this->pictureItem->getPictureItemsData($object['id'], $typeId);
             $picture['items'] = $this->extractValue('items', $rows);
         }
 
@@ -721,11 +659,11 @@ class PictureHydrator extends RestHydrator
         if ($this->filterComposite->filter('moder_votes')) {
             $moderVotes = [];
             foreach ($this->pictureModerVote->getVotes($object['id']) as $row) {
-                $user = $this->userModel->getRow((int)$row['user_id']);
+                $user         = $this->userModel->getRow((int) $row['user_id']);
                 $moderVotes[] = [
                     'reason' => $row['reason'],
-                    'vote'   => (int)$row['vote'],
-                    'user'   => $user ? $this->extractValue('moder_vote_user', $user) : null
+                    'vote'   => (int) $row['vote'],
+                    'user'   => $user ? $this->extractValue('moder_vote_user', $user) : null,
                 ];
             }
             $picture['moder_votes'] = $moderVotes;
@@ -733,7 +671,7 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('image')) {
             $picture['image'] = $this->extractValue('image', [
-                'image' => $object['image_id']
+                'image' => $object['image_id'],
             ]);
         }
 
@@ -742,16 +680,16 @@ class PictureHydrator extends RestHydrator
                 'item_type_id'       => Item::BRAND,
                 'descendant_or_self' => [
                     'pictures' => [
-                        'id' => $object['id']
-                    ]
-                ]
+                        'id' => $object['id'],
+                    ],
+                ],
             ]);
 
             $ofLinks = [];
             if (count($brandIds)) {
                 $links = $this->linksTable->select([
                     new Sql\Predicate\In('item_id', $brandIds),
-                    'type' => 'official'
+                    'type' => 'official',
                 ]);
                 foreach ($links as $link) {
                     $ofLinks[$link['id']] = $link;
@@ -764,8 +702,8 @@ class PictureHydrator extends RestHydrator
         if ($this->filterComposite->filter('copyrights')) {
             $picture['copyrights'] = null;
             if ($object['copyrights_text_id']) {
-                $text = $this->textStorage->getText($object['copyrights_text_id']);
-                $picture['copyrights'] = $text;
+                $text                          = $this->textStorage->getText($object['copyrights_text_id']);
+                $picture['copyrights']         = $text;
                 $picture['copyrights_text_id'] = (int) $object['copyrights_text_id'];
             }
         }
@@ -778,8 +716,8 @@ class PictureHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('exif')) {
-                $exif = $this->imageStorage->getImageEXIF($object['image_id']);
-                $exifStr = '';
+                $exif        = $this->imageStorage->getImageEXIF($object['image_id']);
+                $exifStr     = '';
                 $notSections = ['FILE', 'COMPUTED'];
                 if ($exif) {
                     foreach ($exif as $key => $section) {
@@ -810,14 +748,14 @@ class PictureHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('similar')) {
                 $picture['similar'] = null;
-                $similar = $this->duplicateFinder->findSimilar($object['id']);
+                $similar            = $this->duplicateFinder->findSimilar($object['id']);
                 if ($similar) {
                     $picture['similar'] = $this->extractValue('similar', $similar);
                 }
             }
 
             if ($this->filterComposite->filter('change_status_user')) {
-                $user = $this->userModel->getRow((int)$object['change_status_user_id']);
+                $user                          = $this->userModel->getRow((int) $object['change_status_user_id']);
                 $picture['change_status_user'] = $user ? $this->extractValue('change_status_user', $user) : null;
             }
 
@@ -830,38 +768,38 @@ class PictureHydrator extends RestHydrator
                     'normalize' => false,
                     'flop'      => false,
                     'crop'      => false,
-                    'delete'    => false
+                    'delete'    => false,
                 ];
 
                 $role = $this->getUserRole();
                 if ($role) {
                     $picture['rights'] = [
                         'move'      => $this->acl->isAllowed($role, 'picture', 'move'),
-                        'unaccept'  => ($object['status'] == Picture::STATUS_ACCEPTED)
+                        'unaccept'  => ($object['status'] === Picture::STATUS_ACCEPTED)
                                     && $this->acl->isAllowed($role, 'picture', 'unaccept'),
                         'accept'    => $this->picture->canAccept($object)
                                     && $this->acl->isAllowed($role, 'picture', 'accept'),
-                        'restore'   => ($object['status'] == Picture::STATUS_REMOVING)
+                        'restore'   => ($object['status'] === Picture::STATUS_REMOVING)
                                     && $this->acl->isAllowed($role, 'picture', 'restore'),
-                        'normalize' => ($object['status'] == Picture::STATUS_INBOX)
+                        'normalize' => ($object['status'] === Picture::STATUS_INBOX)
                                     && $this->acl->isAllowed($role, 'picture', 'normalize'),
-                        'flop'      => ($object['status'] == Picture::STATUS_INBOX)
+                        'flop'      => ($object['status'] === Picture::STATUS_INBOX)
                                     && $this->acl->isAllowed($role, 'picture', 'flop'),
                         'crop'      => $this->acl->isAllowed($role, 'picture', 'crop'),
-                        'delete'    => $this->canDelete($object)
+                        'delete'    => $this->canDelete($object),
                     ];
                 }
             }
 
             if ($this->filterComposite->filter('is_last')) {
                 $isLastPicture = null;
-                if ($object['status'] == Picture::STATUS_ACCEPTED) {
+                if ($object['status'] === Picture::STATUS_ACCEPTED) {
                     $isLastPicture = ! $this->picture->isExists([
                         'id_exclude' => $object['id'],
                         'status'     => Picture::STATUS_ACCEPTED,
                         'item'       => [
-                            'contains_picture' => $object['id']
-                        ]
+                            'contains_picture' => $object['id'],
+                        ],
                     ]);
                 }
 
@@ -872,15 +810,15 @@ class PictureHydrator extends RestHydrator
                 $picture['accepted_count'] = $this->picture->getCount([
                     'status' => Picture::STATUS_ACCEPTED,
                     'item'   => [
-                        'contains_picture' => $object['id']
-                    ]
+                        'contains_picture' => $object['id'],
+                    ],
                 ]);
             }
 
             if ($this->filterComposite->filter('replaceable')) {
                 $picture['replaceable'] = null;
                 if ($object['replace_picture_id']) {
-                    $row = $this->picture->getRow(['id' => (int)$object['replace_picture_id']]);
+                    $row = $this->picture->getRow(['id' => (int) $object['replace_picture_id']]);
                     if ($row) {
                         $picture['replaceable'] = $this->extractValue('replaceable', $row);
                     }
@@ -889,15 +827,15 @@ class PictureHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('siblings')) {
                 $picture['siblings'] = [
-                    'prev' => null,
-                    'next' => null,
+                    'prev'     => null,
+                    'next'     => null,
                     'prev_new' => null,
-                    'next_new' => null
+                    'next_new' => null,
                 ];
 
                 $prevPicture = $this->picture->getRow([
                     'id_lt' => $object['id'],
-                    'order' => 'id_desc'
+                    'order' => 'id_desc',
                 ]);
                 if ($prevPicture) {
                     $picture['siblings']['prev'] = $this->extractValue('siblings', $prevPicture);
@@ -905,7 +843,7 @@ class PictureHydrator extends RestHydrator
 
                 $nextPicture = $this->picture->getRow([
                     'id_gt' => $object['id'],
-                    'order' => 'id_asc'
+                    'order' => 'id_asc',
                 ]);
                 if ($nextPicture) {
                     $picture['siblings']['next'] = $this->extractValue('siblings', $nextPicture);
@@ -914,7 +852,7 @@ class PictureHydrator extends RestHydrator
                 $prevNewPicture = $this->picture->getRow([
                     'id_lt'  => $object['id'],
                     'status' => Picture::STATUS_INBOX,
-                    'order'  => 'id_desc'
+                    'order'  => 'id_desc',
                 ]);
                 if ($prevNewPicture) {
                     $picture['siblings']['prev_new'] = $this->extractValue('siblings', $prevNewPicture);
@@ -923,7 +861,7 @@ class PictureHydrator extends RestHydrator
                 $nextNewPicture = $this->picture->getRow([
                     'id_gt'  => $object['id'],
                     'status' => Picture::STATUS_INBOX,
-                    'order'  => 'id_asc'
+                    'order'  => 'id_asc',
                 ]);
                 if ($nextNewPicture) {
                     $picture['siblings']['next_new'] = $this->extractValue('siblings', $nextNewPicture);
@@ -940,7 +878,6 @@ class PictureHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

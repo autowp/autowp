@@ -2,34 +2,33 @@
 
 namespace Application\Model;
 
+use Application\Service\RabbitMQ;
 use DateTime;
 use Exception;
 use GuzzleHttp\Client;
-use Zend\Json\Json;
-use Application\Service\RabbitMQ;
+use Laminas\Json\Json;
+
+use function explode;
+use function in_array;
+use function parse_url;
+use function trim;
+use function urlencode;
+
+use const PHP_URL_HOST;
 
 class Referer
 {
-    /**
-     * @var RabbitMQ
-     */
-    private $rabbitmq;
+    private RabbitMQ $rabbitmq;
 
-    /**
-     * @var string
-     */
-    private $url;
+    private string $url;
 
-    /**
-     * @var Client
-     */
-    private $client;
+    private Client $client;
 
     public function __construct(
         string $url,
         RabbitMQ $rabbitmq
     ) {
-        $this->url = $url;
+        $this->url      = $url;
         $this->rabbitmq = $rabbitmq;
     }
 
@@ -50,7 +49,7 @@ class Referer
         $this->rabbitmq->send('hotlink', Json::encode([
             'url'       => $url,
             'accept'    => $accept,
-            'timestamp' => (new DateTime())->format(DateTime::RFC3339)
+            'timestamp' => (new DateTime())->format(DateTime::RFC3339),
         ]));
     }
 
@@ -75,16 +74,16 @@ class Referer
     public function isHostWhitelisted(string $host): bool
     {
         $response = $this->getClient()->request('GET', '/hotlink/whitelist/' . urlencode($host), [
-            'http_errors' => false
+            'http_errors' => false,
         ]);
 
         $code = $response->getStatusCode();
 
-        if ($code == 404) {
+        if ($code === 404) {
             return false;
         }
 
-        if ($code != 200) {
+        if ($code !== 200) {
             throw new Exception("Unexpected response code `$code`");
         }
 
@@ -94,16 +93,16 @@ class Referer
     public function isHostBlacklisted(string $host): bool
     {
         $response = $this->getClient()->request('GET', '/hotlink/blacklist/' . urlencode($host), [
-            'http_errors' => false
+            'http_errors' => false,
         ]);
 
         $code = $response->getStatusCode();
 
-        if ($code == 404) {
+        if ($code === 404) {
             return false;
         }
 
-        if ($code != 200) {
+        if ($code !== 200) {
             throw new Exception("Unexpected response code `$code`");
         }
 
@@ -124,13 +123,13 @@ class Referer
     {
         $response = $this->getClient()->request('POST', '/hotlink/whitelist', [
             'http_errors' => false,
-            'json' => [
-                'host' => $host
-            ]
+            'json'        => [
+                'host' => $host,
+            ],
         ]);
 
         $code = $response->getStatusCode();
-        if ($code != 201) {
+        if ($code !== 201) {
             throw new Exception("Unexpected status code `$code`");
         }
     }
@@ -139,13 +138,13 @@ class Referer
     {
         $response = $this->getClient()->request('POST', '/hotlink/blacklist', [
             'http_errors' => false,
-            'json' => [
-                'host' => $host
-            ]
+            'json'        => [
+                'host' => $host,
+            ],
         ]);
 
         $code = $response->getStatusCode();
-        if ($code != 201) {
+        if ($code !== 201) {
             throw new Exception("Unexpected status code `$code`");
         }
     }
@@ -154,11 +153,11 @@ class Referer
     {
         $response = $this->getClient()->request('DELETE', '/hotlink/monitoring', [
             'http_errors' => false,
-            'query'       => ['host' => $host]
+            'query'       => ['host' => $host],
         ]);
 
         $code = $response->getStatusCode();
-        if ($code != 204) {
+        if ($code !== 204) {
             throw new Exception("Unexpected status code `$code`");
         }
     }
@@ -166,11 +165,11 @@ class Referer
     public function flush(): void
     {
         $response = $this->getClient()->request('DELETE', '/hotlink/monitoring', [
-            'http_errors' => false
+            'http_errors' => false,
         ]);
 
         $code = $response->getStatusCode();
-        if ($code != 204) {
+        if ($code !== 204) {
             throw new Exception("Unexpected status code `$code`");
         }
     }
@@ -178,16 +177,16 @@ class Referer
     public function getData(): array
     {
         $response = $this->getClient()->request('GET', '/hotlink/monitoring', [
-            'http_errors' => false
+            'http_errors' => false,
         ]);
 
         $code = $response->getStatusCode();
 
-        if ($code == 404) {
+        if ($code === 404) {
             return null;
         }
 
-        if ($code != 200) {
+        if ($code !== 200) {
             throw new Exception("Unexpected response code `$code`");
         }
 

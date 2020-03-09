@@ -2,28 +2,32 @@
 
 namespace Application\Controller\Api;
 
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Paginator;
-use Zend\Session\Container;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\Image\Storage;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Controller\Plugin\Pic;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
+use Autowp\Image\Storage;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Paginator;
+use Laminas\Session\Container;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function get_object_vars;
+use function htmlspecialchars;
+use function max;
+use function min;
+use function round;
+use function sprintf;
 
 /**
- * Class PictureItemController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  * @method void log(string $message, array $objects)
@@ -32,40 +36,26 @@ use Application\Model\PictureItem;
  */
 class PictureItemController extends AbstractRestfulController
 {
-    /**
-     * @var PictureItem
-     */
-    private $pictureItem;
+    /** @var PictureItem */
+    private PictureItem $pictureItem;
 
-    /**
-     * @var Log
-     */
-    private $log;
+    /** @var Log */
+    private Log $log;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var InputFilter
-     */
-    private $itemInputFilter;
+    /** @var InputFilter */
+    private InputFilter $itemInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    /** @var InputFilter */
+    private InputFilter $listInputFilter;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    /** @var Item */
+    private Item $item;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    /** @var Picture */
+    private Picture $picture;
 
     public function __construct(
         PictureItem $pictureItem,
@@ -76,13 +66,13 @@ class PictureItemController extends AbstractRestfulController
         Item $item,
         Picture $picture
     ) {
-        $this->pictureItem = $pictureItem;
-        $this->log = $log;
-        $this->hydrator = $hydrator;
+        $this->pictureItem     = $pictureItem;
+        $this->log             = $log;
+        $this->hydrator        = $hydrator;
         $this->listInputFilter = $listInputFilter;
         $this->itemInputFilter = $itemInputFilter;
-        $this->item = $item;
-        $this->picture = $picture;
+        $this->item            = $item;
+        $this->picture         = $picture;
     }
 
     private function canChangePerspective($picture)
@@ -96,8 +86,8 @@ class PictureItemController extends AbstractRestfulController
             return false;
         }
 
-        if ($picture['owner_id'] == $currentUser['id']) {
-            if ($picture['status'] == Picture::STATUS_INBOX) {
+        if ($picture['owner_id'] === $currentUser['id']) {
+            if ($picture['status'] === Picture::STATUS_INBOX) {
                 return true;
             }
         }
@@ -157,7 +147,7 @@ class PictureItemController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
         ]);
 
         $items = [];
@@ -167,7 +157,7 @@ class PictureItemController extends AbstractRestfulController
 
         return new JsonModel([
             'paginator' => get_object_vars($paginator->getPages()),
-            'items'     => $items
+            'items'     => $items,
         ]);
     }
 
@@ -179,17 +169,17 @@ class PictureItemController extends AbstractRestfulController
 
         $userId = $this->user()->get()['id'];
 
-        $picture = $this->picture->getRow(['id' => (int)$this->params('picture_id')]);
+        $picture = $this->picture->getRow(['id' => (int) $this->params('picture_id')]);
         if (! $picture) {
             return $this->notFoundAction();
         }
 
-        $item = $this->item->getRow(['id' => (int)$this->params('item_id')]);
+        $item = $this->item->getRow(['id' => (int) $this->params('item_id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
-        $type = (int)$this->params('type');
+        $type = (int) $this->params('type');
 
         $this->itemInputFilter->setData($this->params()->fromQuery());
 
@@ -202,7 +192,7 @@ class PictureItemController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            'user_id'  => $userId
+            'user_id'  => $userId,
         ]);
 
         $row = $this->pictureItem->getPictureItemData($picture['id'], $item['id'], $type);
@@ -220,17 +210,17 @@ class PictureItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->picture->getRow(['id' => (int)$this->params('picture_id')]);
+        $picture = $this->picture->getRow(['id' => (int) $this->params('picture_id')]);
         if (! $picture) {
             return $this->notFoundAction();
         }
 
-        $item = $this->item->getRow(['id' => (int)$this->params('item_id')]);
+        $item = $this->item->getRow(['id' => (int) $this->params('item_id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
-        $type = (int)$this->params('type');
+        $type = (int) $this->params('type');
 
         if ($this->pictureItem->isExists($picture['id'], $item['id'], $type)) {
             $this->pictureItem->remove($picture['id'], $item['id'], $type);
@@ -241,12 +231,12 @@ class PictureItemController extends AbstractRestfulController
                 htmlspecialchars('#' . $item['id'])
             ), [
                 'items'    => $item['id'],
-                'pictures' => $picture['id']
+                'pictures' => $picture['id'],
             ]);
 
             if ($picture['image_id']) {
                 $this->imageStorage()->changeImageName($picture['image_id'], [
-                    'pattern' => $this->picture->getFileNamePattern($picture['id'])
+                    'pattern' => $this->picture->getFileNamePattern($picture['id']),
                 ]);
             }
         }
@@ -264,9 +254,9 @@ class PictureItemController extends AbstractRestfulController
 
         $userId = $this->user()->get()['id'];
 
-        $pictureId = (int)$this->params('picture_id');
-        $itemId    = (int)$this->params('item_id');
-        $type      = (int)$this->params('type');
+        $pictureId = (int) $this->params('picture_id');
+        $itemId    = (int) $this->params('item_id');
+        $type      = (int) $this->params('type');
 
         $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
@@ -282,19 +272,19 @@ class PictureItemController extends AbstractRestfulController
 
         $this->pictureItem->add($picture['id'], $item['id'], $type);
 
-        $perspectiveId = isset($data['perspective_id']) ? (int)$data['perspective_id'] : null;
+        $perspectiveId = isset($data['perspective_id']) ? (int) $data['perspective_id'] : null;
 
         $this->pictureItem->setProperties($picture['id'], $item['id'], PictureItem::PICTURE_CONTENT, [
-            'perspective' => $perspectiveId ? $perspectiveId : null
+            'perspective' => $perspectiveId ? $perspectiveId : null,
         ]);
 
         if ($picture['image_id']) {
             $this->imageStorage()->changeImageName($picture['image_id'], [
-                'pattern' => $this->picture->getFileNamePattern($picture['id'])
+                'pattern' => $this->picture->getFileNamePattern($picture['id']),
             ]);
         }
 
-        $namespace = new Container('Moder_Car');
+        $namespace            = new Container('Moder_Car');
         $namespace->lastCarId = $item['id'];
 
         $this->log->addEvent($userId, sprintf(
@@ -303,13 +293,13 @@ class PictureItemController extends AbstractRestfulController
             htmlspecialchars('#' . $item['id'])
         ), [
             'items'    => $item['id'],
-            'pictures' => $picture['id']
+            'pictures' => $picture['id'],
         ]);
 
         $url = $this->url()->fromRoute('api/picture-item/item/create', [
             'picture_id' => $picture['id'],
             'item_id'    => $item['id'],
-            'type'       => $type
+            'type'       => $type,
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -319,9 +309,9 @@ class PictureItemController extends AbstractRestfulController
 
     public function updateAction()
     {
-        $pictureId = (int)$this->params('picture_id');
-        $itemId    = (int)$this->params('item_id');
-        $type      = (int)$this->params('type');
+        $pictureId = (int) $this->params('picture_id');
+        $itemId    = (int) $this->params('item_id');
+        $type      = (int) $this->params('type');
 
         $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
@@ -335,17 +325,17 @@ class PictureItemController extends AbstractRestfulController
         $data = $this->processBodyContent($this->getRequest());
 
         if (isset($data['perspective_id'])) {
-            $perspectiveId = (int)$data['perspective_id'];
+            $perspectiveId = (int) $data['perspective_id'];
 
             $this->pictureItem->setProperties($picture['id'], $itemId, $type, [
-                'perspective' => $perspectiveId ? $perspectiveId : null
+                'perspective' => $perspectiveId ? $perspectiveId : null,
             ]);
 
             $this->log(sprintf(
                 'Установка ракурса картинки %s',
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
-                'pictures' => $picture['id']
+                'pictures' => $picture['id'],
             ]);
         }
 
@@ -359,18 +349,18 @@ class PictureItemController extends AbstractRestfulController
                 return $this->notFoundAction();
             }
 
-            $left = round($data['area']['left']);
-            $top = round($data['area']['top']);
-            $width = round($data['area']['width']);
+            $left   = round($data['area']['left']);
+            $top    = round($data['area']['top']);
+            $width  = round($data['area']['width']);
             $height = round($data['area']['height']);
 
-            $left = max(0, $left);
-            $left = min($picture['width'], $left);
+            $left  = max(0, $left);
+            $left  = min($picture['width'], $left);
             $width = max(1, $width);
             $width = min($picture['width'], $width);
 
-            $top = max(0, $top);
-            $top = min($picture['height'], $top);
+            $top    = max(0, $top);
+            $top    = min($picture['height'], $top);
             $height = max(1, $height);
             $height = min($picture['height'], $height);
 
@@ -379,18 +369,18 @@ class PictureItemController extends AbstractRestfulController
                     'left'   => $left,
                     'top'    => $top,
                     'width'  => $width,
-                    'height' => $height
+                    'height' => $height,
                 ];
             } else {
                 $area = [
                     'left'   => null,
                     'top'    => null,
                     'width'  => null,
-                    'height' => null
+                    'height' => null,
                 ];
             }
             $this->pictureItem->setProperties($picture['id'], $item['id'], $type, [
-                'area' => $area
+                'area' => $area,
             ]);
 
             $this->log(sprintf(
@@ -398,7 +388,7 @@ class PictureItemController extends AbstractRestfulController
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
                 'pictures' => $picture['id'],
-                'items'    => $item['id']
+                'items'    => $item['id'],
             ]);
         }
 
@@ -412,7 +402,7 @@ class PictureItemController extends AbstractRestfulController
             if (! $srcItem) {
                 return $this->notFoundAction();
             }
-            $dstItem = $this->item->getRow(['id' => (int)$data['item_id']]);
+            $dstItem = $this->item->getRow(['id' => (int) $data['item_id']]);
             if (! $dstItem) {
                 return $this->notFoundAction();
             }
@@ -428,10 +418,10 @@ class PictureItemController extends AbstractRestfulController
                 htmlspecialchars('#' . $dstItem['id'])
             ), [
                 'items'    => [$srcItem['id'], $dstItem['id']],
-                'pictures' => $picture['id']
+                'pictures' => $picture['id'],
             ]);
 
-            $namespace = new Container('Moder_Car');
+            $namespace            = new Container('Moder_Car');
             $namespace->lastCarId = $dstItem['id'];
         }
 

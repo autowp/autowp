@@ -2,32 +2,27 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\VehicleType;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
- * Class VehicleTypesController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  */
 class VehicleTypesController extends AbstractRestfulController
 {
-    /**
-     * @var VehicleType
-     */
-    private $vehicleType;
+    /** @var VehicleType */
+    private VehicleType $vehicleType;
 
     public function __construct(VehicleType $vehicleType)
     {
         $this->vehicleType = $vehicleType;
     }
 
-    public function indexAction()
+    public function indexAction(): ViewModel
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();

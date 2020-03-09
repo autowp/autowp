@@ -2,36 +2,31 @@
 
 namespace Autowp\Traffic;
 
+use Application\Service\RabbitMQ;
 use DateTime;
 use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
-use Zend\Json\Json;
-use Application\Service\RabbitMQ;
+use Laminas\Json\Json;
+
+use function trim;
 
 class TrafficControl
 {
-    /**
-     * @var RabbitMQ
-     */
+    /** @var RabbitMQ */
     private $rabbitmq;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $url;
 
-    /**
-     * @var Client
-     */
+    /** @var Client */
     private $client;
 
     public function __construct(
         string $url,
         RabbitMQ $rabbitmq
     ) {
-        $this->url = $url;
+        $this->url      = $url;
         $this->rabbitmq = $rabbitmq;
     }
 
@@ -55,16 +50,16 @@ class TrafficControl
 
         $response = $this->getClient()->request('POST', '/ban', [
             'http_errors' => false,
-            'json' => [
+            'json'        => [
                 'ip'         => $ip,
                 'duration'   => 1000000000 * $seconds,
                 'by_user_id' => $byUserId,
-                'reason'     => trim($reason)
-            ]
+                'reason'     => trim($reason),
+            ],
         ]);
 
         $code = $response->getStatusCode();
-        if ($code != 201) {
+        if ($code !== 201) {
             throw new Exception("Unexpected status code `$code`");
         }
     }
@@ -72,11 +67,11 @@ class TrafficControl
     public function unban(string $ip): void
     {
         $response = $this->getClient()->request('DELETE', '/ban/' . $ip, [
-            'http_errors' => false
+            'http_errors' => false,
         ]);
 
         $code = $response->getStatusCode();
-        if ($code != 204) {
+        if ($code !== 204) {
             throw new Exception("Unexpected status code `$code`");
         }
     }
@@ -84,16 +79,16 @@ class TrafficControl
     public function getTopData(): ?array
     {
         $response = $this->getClient()->request('GET', '/top', [
-            'http_errors' => false
+            'http_errors' => false,
         ]);
 
         $code = $response->getStatusCode();
 
-        if ($code == 404) {
+        if ($code === 404) {
             return null;
         }
 
-        if ($code != 200) {
+        if ($code !== 200) {
             throw new Exception("Unexpected response code `$code`");
         }
 
@@ -103,16 +98,16 @@ class TrafficControl
     public function getWhitelistData(): ?array
     {
         $response = $this->getClient()->request('GET', '/whitelist', [
-            'http_errors' => false
+            'http_errors' => false,
         ]);
 
         $code = $response->getStatusCode();
 
-        if ($code == 404) {
+        if ($code === 404) {
             return null;
         }
 
-        if ($code != 200) {
+        if ($code !== 200) {
             throw new Exception("Unexpected response code `$code`");
         }
 
@@ -122,11 +117,11 @@ class TrafficControl
     public function deleteFromWhitelist(string $ip): void
     {
         $response = $this->getClient()->request('DELETE', '/whitelist/' . $ip, [
-            'http_errors' => false
+            'http_errors' => false,
         ]);
 
         $code = $response->getStatusCode();
-        if ($code != 204) {
+        if ($code !== 204) {
             throw new Exception("Unexpected status code `$code`");
         }
     }
@@ -135,36 +130,34 @@ class TrafficControl
     {
         $response = $this->getClient()->request('POST', '/whitelist', [
             'http_errors' => false,
-            'json' => [
+            'json'        => [
                 'ip'          => $ip,
-                'description' => trim($description)
-            ]
+                'description' => trim($description),
+            ],
         ]);
 
         $code = $response->getStatusCode();
-        if ($code != 201) {
+        if ($code !== 201) {
             throw new Exception("Unexpected status code `$code`");
         }
     }
 
     /**
-     * @param string $ip
-     * @return boolean|array
-     * @throws GuzzleException
+     * @throws Exception
      */
-    public function getBanInfo(string $ip)
+    public function getBanInfo(string $ip): ?array
     {
         $response = $this->getClient()->request('GET', '/ban/' . $ip, [
-            'http_errors' => false
+            'http_errors' => false,
         ]);
 
         $code = $response->getStatusCode();
 
-        if ($code == 404) {
-            return false;
+        if ($code === 404) {
+            return null;
         }
 
-        if ($code != 200) {
+        if ($code !== 200) {
             throw new Exception("Unexpected response code `$code`");
         }
 
@@ -175,7 +168,7 @@ class TrafficControl
     {
         $this->rabbitmq->send('input', Json::encode([
             'ip'        => $ip,
-            'timestamp' => (new DateTime())->format(DateTime::RFC3339)
+            'timestamp' => (new DateTime())->format(DateTime::RFC3339),
         ]));
     }
 }

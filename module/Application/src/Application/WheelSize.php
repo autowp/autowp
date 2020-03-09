@@ -4,21 +4,21 @@ namespace Application;
 
 class WheelSize
 {
-    protected $width = null;
-    protected $series = null;
-    protected $radius = null;
-    protected $rimWidth = null;
+    protected $width;
+    protected $series;
+    protected $radius;
+    protected $rimWidth;
 
     public function __construct($width = null, $series = null, $radius = null, $rimWidth = null)
     {
-        $width = (int)$width;
-        $series = (int)$series;
-        $radius = (float)$radius;
-        $rimWidth = (float)$rimWidth;
+        $width    = (int) $width;
+        $series   = (int) $series;
+        $radius   = (float) $radius;
+        $rimWidth = (float) $rimWidth;
 
-        $this->width = $width ? $width : null;
-        $this->series = $series ? $series : null;
-        $this->radius = $radius ? $radius : null;
+        $this->width    = $width ? $width : null;
+        $this->series   = $series ? $series : null;
+        $this->radius   = $radius ? $radius : null;
         $this->rimWidth = $rimWidth ? $rimWidth : null;
     }
 
@@ -45,7 +45,7 @@ class WheelSize
     public function getTyreName()
     {
         if ($this->width || $this->series || $this->radius) {
-            $width = $this->width ? $this->width : '???';
+            $width  = $this->width ? $this->width : '???';
             $series = $this->series ? $this->series : '??';
             $radius = $this->radius ? $this->radius : '??';
 
@@ -59,7 +59,7 @@ class WheelSize
     {
         if ($this->rimWidth || $this->radius) {
             $rimWidth = $this->rimWidth ? $this->rimWidth : '?';
-            $radius = $this->radius ? $this->radius : '??';
+            $radius   = $this->radius ? $this->radius : '??';
 
             return $rimWidth . 'J × ' . $radius;
         }

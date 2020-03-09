@@ -2,15 +2,13 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
 use Application\Language as AppLanguage;
+use Laminas\View\Helper\AbstractHelper;
 
 class Language extends AbstractHelper
 {
-    /**
-     * @var AppLanguage
-     */
-    private $language = null;
+    /** @var AppLanguage */
+    private $language;
 
     public function __construct(AppLanguage $language)
     {

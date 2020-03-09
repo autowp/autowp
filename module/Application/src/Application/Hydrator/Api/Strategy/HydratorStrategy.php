@@ -2,48 +2,35 @@
 
 namespace Application\Hydrator\Api\Strategy;
 
-use Interop\Container\ContainerInterface;
-use Zend\Hydrator\Strategy\StrategyInterface;
 use Application\Hydrator\Api\RestHydrator;
+use ArrayAccess;
+use Interop\Container\ContainerInterface;
+use Laminas\Hydrator\Strategy\StrategyInterface;
 
 /**
  * @SuppressWarnings(PHPMD.NumberOfChildren)
- * @author dmitry
- *
  */
 abstract class HydratorStrategy implements StrategyInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $serviceManager;
+    protected ContainerInterface $serviceManager;
 
-    /**
-     * @var RestHydrator
-     */
-    protected $hydrator;
+    protected RestHydrator $hydrator;
 
-    /**
-     * @var array
-     */
-    protected $fields = [];
+    protected array $fields = [];
 
-    /**
-     * @var string
-     */
-    protected $language;
+    protected string $language;
 
     public function __construct(ContainerInterface $serviceManager)
     {
         $this->serviceManager = $serviceManager;
     }
 
-    /**
-     * @return RestHydrator
-     */
-    abstract protected function getHydrator();
+    abstract protected function getHydrator(): RestHydrator;
 
-    public function extract($value)
+    /**
+     * @param array|ArrayAccess $value
+     */
+    public function extract($value): array
     {
         $hydrator = $this->getHydrator();
 
@@ -55,30 +42,22 @@ abstract class HydratorStrategy implements StrategyInterface
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $value
-     * @return null
+     * @param mixed $value
+     * @return ?mixed
      */
     public function hydrate($value)
     {
         return null;
     }
 
-    /**
-     * @param array $fields
-     * @return HydratorStrategy
-     */
-    public function setFields(array $fields)
+    public function setFields(array $fields): self
     {
         $this->fields = $fields;
 
         return $this;
     }
 
-    /**
-     * @param string $language
-     * @return HydratorStrategy
-     */
-    public function setLanguage($language)
+    public function setLanguage(string $language): self
     {
         $this->language = $language;
 

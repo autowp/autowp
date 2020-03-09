@@ -2,15 +2,12 @@
 
 namespace Application\Controller\Plugin;
 
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Application\Language as AppLanguage;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class Language extends AbstractPlugin
 {
-    /**
-     * @var AppLanguage
-     */
-    private $language = null;
+    private AppLanguage $language;
 
     public function __construct(AppLanguage $language)
     {

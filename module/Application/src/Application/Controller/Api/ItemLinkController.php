@@ -2,50 +2,40 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function array_key_exists;
+use function array_keys;
 
 /**
- * Class ItemLinkController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  */
 class ItemLinkController extends AbstractRestfulController
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    /** @var TableGateway */
+    private TableGateway $table;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var InputFilter
-     */
-    private $putInputFilter;
+    /** @var InputFilter */
+    private InputFilter $putInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $postInputFilter;
+    /** @var InputFilter */
+    private InputFilter $postInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $listInputFilter;
+    /** @var InputFilter */
+    private InputFilter $listInputFilter;
 
     public function __construct(
         TableGateway $table,
@@ -54,10 +44,10 @@ class ItemLinkController extends AbstractRestfulController
         InputFilter $putInputFilter,
         InputFilter $postInputFilter
     ) {
-        $this->table = $table;
-        $this->hydrator = $hydrator;
+        $this->table           = $table;
+        $this->hydrator        = $hydrator;
         $this->listInputFilter = $listInputFilter;
-        $this->putInputFilter = $putInputFilter;
+        $this->putInputFilter  = $putInputFilter;
         $this->postInputFilter = $postInputFilter;
     }
 
@@ -72,7 +62,7 @@ class ItemLinkController extends AbstractRestfulController
         $data = $this->listInputFilter->getValues();
 
         $rows = $this->table->select([
-            'item_id' => $data['item_id']
+            'item_id' => $data['item_id'],
         ]);
 
         $items = [];
@@ -81,7 +71,7 @@ class ItemLinkController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
@@ -92,7 +82,7 @@ class ItemLinkController extends AbstractRestfulController
         }
 
         $row = $this->table->select([
-            'id' => (int)$this->params('id')
+            'id' => (int) $this->params('id'),
         ])->current();
 
         if (! $row) {
@@ -132,7 +122,7 @@ class ItemLinkController extends AbstractRestfulController
         $data = $this->putInputFilter->getValues();
 
         $row = $this->table->select([
-            'id' => (int)$this->params('id')
+            'id' => (int) $this->params('id'),
         ])->current();
 
         if (! $row) {
@@ -191,7 +181,7 @@ class ItemLinkController extends AbstractRestfulController
         ]);
 
         $url = $this->url()->fromRoute('api/item-link/item/get', [
-            'id' => $this->table->getLastInsertValue()
+            'id' => $this->table->getLastInsertValue(),
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -206,7 +196,7 @@ class ItemLinkController extends AbstractRestfulController
         }
 
         $row = $this->table->select([
-            'id' => (int)$this->params('id')
+            'id' => (int) $this->params('id'),
         ])->current();
 
         if (! $row) {

@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace Application;
 
-use Zend\Db\Sql\Select;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Json\Json;
 use Application\Service\RabbitMQ;
+use Laminas\Db\Sql\Select;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Json\Json;
 
 class DuplicateFinder
 {
-    /**
-     * @var RabbitMQ
-     */
-    private $rabbitmq;
+    private RabbitMQ $rabbitmq;
 
-    /**
-     * @var TableGateway
-     */
-    private $distanceTable;
+    private TableGateway $distanceTable;
 
     public function __construct(RabbitMQ $rabbitmq, TableGateway $distanceTable)
     {
-        $this->rabbitmq = $rabbitmq;
+        $this->rabbitmq      = $rabbitmq;
         $this->distanceTable = $distanceTable;
     }
 
@@ -31,7 +25,7 @@ class DuplicateFinder
     {
         $this->rabbitmq->send('duplicate_finder', Json::encode([
             'picture_id' => $id,
-            'url'        => $url
+            'url'        => $url,
         ]));
     }
 
@@ -45,12 +39,12 @@ class DuplicateFinder
                 $select
                     ->columns([
                         'dst_picture_id',
-                        'distance'
+                        'distance',
                     ])
                     ->where([
                         'src_picture_id' => $id,
                         'src_picture_id <> dst_picture_id',
-                        'not hide'
+                        'not hide',
                     ])
                     ->order('distance ASC')
                     ->limit(1);
@@ -63,23 +57,23 @@ class DuplicateFinder
 
         return [
             'picture_id' => $row['dst_picture_id'],
-            'distance'   => $row['distance']
+            'distance'   => $row['distance'],
         ];
     }
 
     public function hideSimilar($srcId, $dstId)
     {
         $this->distanceTable->update([
-            'hide' => 1
+            'hide' => 1,
         ], [
             'src_picture_id' => $srcId,
-            'dst_picture_id' => $dstId
+            'dst_picture_id' => $dstId,
         ]);
         $this->distanceTable->update([
-            'hide' => 1
+            'hide' => 1,
         ], [
             'src_picture_id' => $dstId,
-            'dst_picture_id' => $srcId
+            'dst_picture_id' => $srcId,
         ]);
     }
 }

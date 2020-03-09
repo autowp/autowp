@@ -2,7 +2,7 @@
 
 namespace Application;
 
-use Zend\Form\ElementFactory;
+use Laminas\Form\ElementFactory;
 
 return [
     'form_elements' => [

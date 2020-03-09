@@ -2,13 +2,15 @@
 
 namespace Application\Controller\Plugin;
 
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use Zend\View\Model\ViewModel;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\MvcEvent;
+use Laminas\View\Model\ViewModel;
 
 class ForbiddenAction extends AbstractPlugin
 {
-    public function __invoke()
+    public function __invoke(): ViewModel
     {
+        /** @var MvcEvent $event */
         $event      = $this->getController()->getEvent();
         $routeMatch = $event->getRouteMatch();
         $routeMatch->setParam('action', 'forbidden');

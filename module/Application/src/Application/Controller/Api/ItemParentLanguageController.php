@@ -2,46 +2,38 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use ZF\ApiProblem\ApiProblem;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\ItemParent;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+
+use function array_key_exists;
+use function array_keys;
 
 /**
- * Class ItemParentLanguageController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */
 class ItemParentLanguageController extends AbstractRestfulController
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    /** @var TableGateway */
+    private TableGateway $table;
 
-    /**
-     * @var RestHydrator
-     */
-    private $hydrator;
+    /** @var RestHydrator */
+    private RestHydrator $hydrator;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    /** @var ItemParent */
+    private ItemParent $itemParent;
 
-    /**
-     * @var InputFilter
-     */
-    private $putInputFilter;
+    /** @var InputFilter */
+    private InputFilter $putInputFilter;
 
     public function __construct(
         TableGateway $table,
@@ -49,9 +41,9 @@ class ItemParentLanguageController extends AbstractRestfulController
         ItemParent $itemParent,
         InputFilter $putInputFilter
     ) {
-        $this->table = $table;
-        $this->hydrator = $hydrator;
-        $this->itemParent = $itemParent;
+        $this->table          = $table;
+        $this->hydrator       = $hydrator;
+        $this->itemParent     = $itemParent;
         $this->putInputFilter = $putInputFilter;
     }
 
@@ -62,8 +54,8 @@ class ItemParentLanguageController extends AbstractRestfulController
         }
 
         $rows = $this->table->select([
-            'item_id'       => (int)$this->params('item_id'),
-            'parent_id'     => (int)$this->params('parent_id')
+            'item_id'   => (int) $this->params('item_id'),
+            'parent_id' => (int) $this->params('parent_id'),
         ]);
 
         $items = [];
@@ -72,7 +64,7 @@ class ItemParentLanguageController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
@@ -83,9 +75,9 @@ class ItemParentLanguageController extends AbstractRestfulController
         }
 
         $row = $this->table->select([
-            'item_id'   => (int)$this->params('item_id'),
-            'parent_id' => (int)$this->params('parent_id'),
-            'language'  => (string)$this->params('language')
+            'item_id'   => (int) $this->params('item_id'),
+            'parent_id' => (int) $this->params('parent_id'),
+            'language'  => (string) $this->params('language'),
         ])->current();
 
         if (! $row) {
@@ -124,14 +116,14 @@ class ItemParentLanguageController extends AbstractRestfulController
 
         $data = $this->putInputFilter->getValues();
 
-        $language = (string)$this->params('language');
+        $language = (string) $this->params('language');
 
-        $itemId = (int)$this->params('item_id');
-        $parentId = (int)$this->params('parent_id');
+        $itemId   = (int) $this->params('item_id');
+        $parentId = (int) $this->params('parent_id');
 
         if (array_key_exists('name', $data)) {
             $this->itemParent->setItemParentLanguage($parentId, $itemId, $language, [
-                'name' => $data['name']
+                'name' => $data['name'],
             ], false);
         }
 

@@ -2,22 +2,20 @@
 
 namespace Application\Validator\Item;
 
-use Zend\Validator\AbstractValidator;
 use Application\Model\Item;
+use Laminas\Validator\AbstractValidator;
 
 class CatnameNotExists extends AbstractValidator
 {
     private const EXISTS = 'itemCatnameAlreadyExists';
 
-    protected $messageTemplates = [
-        self::EXISTS => "Catname '%value%' already exists"
+    protected array $messageTemplates = [
+        self::EXISTS => "Catname '%value%' already exists",
     ];
 
     private $exclude;
 
-    /**
-     * @var Item
-     */
+    /** @var Item */
     private $item;
 
     public function setItem(Item $item)
@@ -29,7 +27,7 @@ class CatnameNotExists extends AbstractValidator
 
     public function setExclude($exclude)
     {
-        $this->exclude = (int)$exclude;
+        $this->exclude = (int) $exclude;
 
         return $this;
     }
@@ -39,8 +37,8 @@ class CatnameNotExists extends AbstractValidator
         $this->setValue($value);
 
         $row = $this->item->getRow([
-            'catname'    => (string)$value,
-            'exclude_id' => (int)$this->exclude
+            'catname'    => (string) $value,
+            'exclude_id' => (int) $this->exclude,
         ]);
 
         if ($row) {

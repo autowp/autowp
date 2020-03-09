@@ -2,26 +2,23 @@
 
 namespace Application\Most\Adapter;
 
-use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 use Application\Most;
+use Exception;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+
+use function method_exists;
+use function ucfirst;
 
 abstract class AbstractAdapter
 {
-    /**
-     * @var Most
-     */
+    /** @var Most */
     protected $most;
 
-    /**
-     * @var TableGateway
-     */
+    /** @var TableGateway */
     protected $attributeTable;
 
-    /**
-     * @var TableGateway
-     */
+    /** @var TableGateway */
     protected $itemTable;
 
     public function __construct(array $options)
@@ -38,7 +35,6 @@ abstract class AbstractAdapter
     {
         $this->itemTable = $itemTable;
     }
-
 
     public function setMost(Most $most)
     {
@@ -63,5 +59,5 @@ abstract class AbstractAdapter
         return $this;
     }
 
-    abstract public function getCars(Sql\Select $select, $language);
+    abstract public function getCars(Sql\Select $select, string $language): array;
 }

@@ -2,55 +2,44 @@
 
 namespace Application;
 
-use Locale;
-use Zend\Authentication\AuthenticationService;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Mvc\MvcEvent;
 use Autowp\User\Model\User;
-use Zend\Stdlib\ResponseInterface;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
+use Laminas\Mvc\MvcEvent;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ResponseInterface;
+use Locale;
+
+use function array_keys;
+use function in_array;
 
 class LanguageRouteListener extends AbstractListenerAggregate
 {
-    /**
-     * @var array
-     */
-    private $userDetectable = [
-        'wheelsage.org'
+    private array $userDetectable = [
+        'wheelsage.org',
     ];
 
-    /**
-     * @var array
-     */
-    private $skipHostname = [];
+    private array $skipHostname = [];
 
-    /**
-     * @var string
-     */
-    private $defaultLanguage = 'en';
+    private string $defaultLanguage = 'en';
 
     public function __construct(array $skipHostname)
     {
         $this->skipHostname = $skipHostname;
     }
 
-
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param EventManagerInterface $events
-     * @param int                   $priority
+     * @param int $priority
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
         $this->listeners[] = $events->attach(MvcEvent::EVENT_ROUTE, [$this, 'onRoute'], -625);
     }
 
-    /**
-     * @param MvcEvent $e
-     * @return void
-     */
     public function onRoute(MvcEvent $e): void
     {
         $request = $e->getRequest();
@@ -76,8 +65,8 @@ class LanguageRouteListener extends AbstractListenerAggregate
 
                 if (isset($hosts[$userLanguage])) {
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
-                    $redirectUrl = $request->getUri()->getScheme() . '://' .
-                        $hosts[$userLanguage]['hostname'] . $request->getRequestUri();
+                    $redirectUrl = $request->getUri()->getScheme() . '://'
+                        . $hosts[$userLanguage]['hostname'] . $request->getRequestUri();
 
                     $this->redirect($e, $redirectUrl);
                     return;
@@ -87,8 +76,8 @@ class LanguageRouteListener extends AbstractListenerAggregate
             foreach ($hosts as $host) {
                 if (in_array($hostname, $host['aliases'])) {
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
-                    $redirectUrl = $request->getUri()->getScheme() . '://' .
-                        $host['hostname'] . $request->getRequestUri();
+                    $redirectUrl = $request->getUri()->getScheme() . '://'
+                        . $host['hostname'] . $request->getRequestUri();
 
                     $this->redirect($e, $redirectUrl);
                     return;
@@ -96,7 +85,7 @@ class LanguageRouteListener extends AbstractListenerAggregate
             }
 
             foreach ($hosts as $hostLanguage => $host) {
-                if ($host['hostname'] == $hostname) {
+                if ($host['hostname'] === $hostname) {
                     $language = $hostLanguage;
                     break;
                 }
@@ -107,11 +96,15 @@ class LanguageRouteListener extends AbstractListenerAggregate
         }
     }
 
-    private function detectUserLanguage($serviceManager, $request, $whitelist)
-    {
+    private function detectUserLanguage(
+        ServiceLocatorInterface $serviceManager,
+        Request $request,
+        array $whitelist
+    ): ?string {
         $auth = new AuthenticationService();
 
         if ($auth->hasIdentity()) {
+            /** @var User $userModel */
             $userModel = $serviceManager->get(User::class);
 
             $userLanguage = $userModel->getUserLanguage($auth->getIdentity());
@@ -120,7 +113,7 @@ class LanguageRouteListener extends AbstractListenerAggregate
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
+        /** @var Request $acceptLanguage */
         $acceptLanguage = $request->getServer('HTTP_ACCEPT_LANGUAGE');
         if ($acceptLanguage) {
             $locale = Locale::acceptFromHttp($acceptLanguage);
@@ -137,12 +130,10 @@ class LanguageRouteListener extends AbstractListenerAggregate
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param MvcEvent $e
-     * @param $url
-     * @return ResponseInterface
      */
-    private function redirect(MvcEvent $e, $url)
+    private function redirect(MvcEvent $e, string $url): ResponseInterface
     {
+        /** @var Response $response */
         $response = $e->getResponse();
         $response->getHeaders()->addHeaderLine('Location', $url);
         /* @phan-suppress-next-line PhanUndeclaredMethod */

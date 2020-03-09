@@ -2,11 +2,13 @@
 
 namespace Application\Hydrator\Api\Filter;
 
-use Zend\Hydrator\Filter\FilterInterface;
+use Laminas\Hydrator\Filter\FilterInterface;
+
+use function in_array;
 
 class PropertyFilter implements FilterInterface
 {
-    private $properties = [];
+    private array $properties = [];
 
     public function __construct(array $properties)
     {

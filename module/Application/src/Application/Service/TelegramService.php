@@ -2,100 +2,85 @@
 
 namespace Application\Service;
 
-use Autowp\Message\MessageService;
-use Exception;
-use Telegram\Bot\Api;
-use Telegram\Bot\Exceptions\TelegramSDKException;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Router\Http\TreeRouteStack;
-use Autowp\User\Model\User;
 use Application\HostManager;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Telegram\Command\InboxCommand;
 use Application\Telegram\Command\MeCommand;
+use Application\Telegram\Command\MessagesCommand;
 use Application\Telegram\Command\NewCommand;
 use Application\Telegram\Command\StartCommand;
-use Application\Telegram\Command\MessagesCommand;
-use Zend\Uri\UriFactory;
+use ArrayAccess;
+use Autowp\Message\MessageService;
+use Autowp\User\Model\User;
+use Exception;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Router\Http\TreeRouteStack;
+use Laminas\Uri\UriFactory;
+use Psr\Container\ContainerInterface;
+use Telegram\Bot\Api;
+use Telegram\Bot\Exceptions\TelegramSDKException;
+use Telegram\Bot\Objects\Update;
+
+use function count;
+use function sprintf;
+use function strpos;
+use function urlencode;
 
 class TelegramService
 {
-    private $accessToken;
+    private string $accessToken;
 
-    private $webhook;
+    private string $webhook;
 
-    private $token;
+    private string $token;
 
-    /**
-     * @var TreeRouteStack
-     */
-    private $router;
+    private TreeRouteStack $router;
 
-    /**
-     * @var HostManager
-     */
-    private $hostManager;
+    private HostManager $hostManager;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var TableGateway
-     */
-    private $telegramItemTable;
+    private TableGateway $telegramItemTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $telegramChatTable;
+    private TableGateway $telegramChatTable;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
-    private $serviceManager;
+    private ContainerInterface $serviceManager;
 
     public function __construct(
         array $options,
         TreeRouteStack $router,
         HostManager $hostManager,
-        $serviceManager,
+        ContainerInterface $serviceManager,
         Picture $picture,
         Item $item,
         TableGateway $telegramItemTable,
         TableGateway $telegramChatTable,
         User $userModel
     ) {
+        $this->accessToken = $options['accessToken'] ?? null;
+        $this->webhook     = $options['webhook'] ?? null;
+        $this->token       = $options['token'] ?? null;
 
-        $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
-        $this->webhook = isset($options['webhook']) ? $options['webhook'] : null;
-        $this->token = isset($options['token']) ? $options['token'] : null;
-
-        $this->router = $router;
-        $this->hostManager = $hostManager;
-        $this->serviceManager = $serviceManager;
-        $this->picture = $picture;
-        $this->item = $item;
+        $this->router            = $router;
+        $this->hostManager       = $hostManager;
+        $this->serviceManager    = $serviceManager;
+        $this->picture           = $picture;
+        $this->item              = $item;
         $this->telegramItemTable = $telegramItemTable;
         $this->telegramChatTable = $telegramChatTable;
-        $this->userModel = $userModel;
+        $this->userModel         = $userModel;
     }
 
     /**
-     * @return Api
      * @throws TelegramSDKException
      */
-    private function getApi()
+    private function getApi(): Api
     {
         $api = new Api($this->accessToken);
 
@@ -108,21 +93,21 @@ class TelegramService
             ),
             new NewCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),
             new InboxCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),
-            new MessagesCommand($this->telegramChatTable)
+            new MessagesCommand($this->telegramChatTable),
         ]);
 
         return $api;
     }
 
-    public function checkTokenMatch($token)
+    public function checkTokenMatch(string $token): bool
     {
-        return $this->token == (string)$token;
+        return $this->token === $token;
     }
 
-    public function registerWebhook()
+    public function registerWebhook(): void
     {
         $this->getApi()->setWebhook([
-            'url'         => $this->webhook,
+            'url' => $this->webhook,
             //'certificate' => ''
         ]);
     }
@@ -132,7 +117,10 @@ class TelegramService
         return $this->getApi()->getWebhookUpdates();
     }
 
-    public function sendMessage(array $params)
+    /**
+     * @throws Exception
+     */
+    public function sendMessage(array $params): void
     {
         if (! isset($params['chat_id'])) {
             throw new Exception("`chat_id` not provided");
@@ -157,7 +145,7 @@ class TelegramService
         }
     }
 
-    private function unsubscribeChat($chatId)
+    private function unsubscribeChat($chatId): void
     {
         $chatId = (int) $chatId;
         if (! $chatId) {
@@ -165,25 +153,28 @@ class TelegramService
         }
 
         $this->telegramItemTable->delete([
-            'chat_id = ?' => (int)$chatId
+            'chat_id = ?' => (int) $chatId,
         ]);
 
         $this->telegramChatTable->delete([
-            'chat_id = ?' => (int)$chatId
+            'chat_id = ?' => (int) $chatId,
         ]);
     }
 
-    public function commandsHandler($webhook = false)
+    /**
+     * @return Update|Update[]
+     * @throws TelegramSDKException
+     */
+    public function commandsHandler(bool $webhook = false)
     {
         return $this->getApi()->commandsHandler($webhook);
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $pictureId
      * @throws Exception
      */
-    public function notifyInbox(int $pictureId)
+    public function notifyInbox(int $pictureId): void
     {
         $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
@@ -198,8 +189,8 @@ class TelegramService
                 ->where([
                     new Sql\Predicate\In('telegram_brand.item_id', $brandIds),
                     'telegram_brand.inbox',
-                    'users.id <> ?' => (int)$picture['owner_id'],
-                    'not users.deleted'
+                    'users.id <> ?' => (int) $picture['owner_id'],
+                    'not users.deleted',
                 ])
                 ->join('telegram_chat', 'telegram_brand.chat_id = telegram_chat.chat_id', [])
                 ->join('users', 'telegram_chat.user_id = users.id', []);
@@ -209,7 +200,7 @@ class TelegramService
 
                 $this->sendMessage([
                     'text'    => $url,
-                    'chat_id' => $row['chat_id']
+                    'chat_id' => $row['chat_id'],
                 ]);
             }
         }
@@ -217,10 +208,9 @@ class TelegramService
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $pictureId
      * @throws Exception
      */
-    public function notifyPicture(int $pictureId)
+    public function notifyPicture(int $pictureId): void
     {
         $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
@@ -232,7 +222,7 @@ class TelegramService
         if (count($brandIds)) {
             $select = new Sql\Select($this->telegramChatTable->getTable());
             $select->columns(['chat_id'])
-                ->where(['user_id' => (int)$picture['owner_id']]);
+                ->where(['user_id' => (int) $picture['owner_id']]);
 
             $row = $this->telegramChatTable->selectWith($select)->current();
 
@@ -243,7 +233,7 @@ class TelegramService
                 ->quantifier($select::QUANTIFIER_DISTINCT)
                 ->where([
                     new Sql\Predicate\In('telegram_brand.item_id', $brandIds),
-                    'telegram_brand.new'
+                    'telegram_brand.new',
                 ]);
 
             if ($authorChatId) {
@@ -257,21 +247,25 @@ class TelegramService
 
                 $this->sendMessage([
                     'text'    => $url,
-                    'chat_id' => $row['chat_id']
+                    'chat_id' => $row['chat_id'],
                 ]);
             }
         }
     }
 
-    private function getPictureBrandIds($picture)
+    /**
+     * @param array|ArrayAccess $picture
+     * @throws Exception
+     */
+    private function getPictureBrandIds($picture): array
     {
         return $this->item->getIds([
-            'item_type_id' => Item::BRAND,
+            'item_type_id'       => Item::BRAND,
             'descendant_or_self' => [
                 'pictures' => [
-                    'id' => $picture['id']
-                ]
-            ]
+                    'id' => $picture['id'],
+                ],
+            ],
         ]);
     }
 
@@ -286,7 +280,7 @@ class TelegramService
     private function getUriByChatId($chatId)
     {
         $chat = $this->telegramChatTable->select([
-            'chat_id' => $chatId
+            'chat_id' => $chatId,
         ])->current();
 
         if ($chat && $chat['user_id']) {
@@ -302,17 +296,14 @@ class TelegramService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param $fromId
-     * @param int $userId
-     * @param $text
      * @throws Exception
      */
-    public function notifyMessage($fromId, int $userId, $text)
+    public function notifyMessage(?int $fromId, int $userId, string $text): void
     {
         $fromName = "New personal message";
 
         if ($fromId) {
-            $userRow = $this->userModel->getRow((int)$fromId);
+            $userRow = $this->userModel->getRow($fromId);
             if ($userRow) {
                 $fromName = $userRow['name'];
             }
@@ -320,7 +311,7 @@ class TelegramService
 
         $chatRows = $this->telegramChatTable->select([
             'user_id' => $userId,
-            'messages'
+            'messages',
         ]);
 
         foreach ($chatRows as $chatRow) {
@@ -339,7 +330,7 @@ class TelegramService
 
             $this->sendMessage([
                 'text'    => $telegramMessage,
-                'chat_id' => $chatRow['chat_id']
+                'chat_id' => $chatRow['chat_id'],
             ]);
         }
     }

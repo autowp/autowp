@@ -2,15 +2,12 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Mvc\Controller\AbstractActionController;
 use Application\Service\TelegramService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class TelegramController extends AbstractActionController
 {
-    /**
-     * @var TelegramService
-     */
-    private $telegram;
+    private TelegramService $telegram;
 
     public function __construct(TelegramService $telegram)
     {

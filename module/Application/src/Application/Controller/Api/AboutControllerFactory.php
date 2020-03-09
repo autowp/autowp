@@ -7,19 +7,16 @@ use Application\Model\Picture;
 use Autowp\Comments\CommentsService;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
-use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class AboutControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return AboutController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): AboutController
     {
         return new AboutController(
             $container->get(Acl::class),

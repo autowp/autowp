@@ -2,8 +2,8 @@
 
 namespace AutowpTest\Comments\Controller;
 
-use Autowp\Comments\Controller\ConsoleController;
 use Application\Test\AbstractConsoleControllerTestCase;
+use Autowp\Comments\Controller\ConsoleController;
 
 class ConsoleControllerTest extends AbstractConsoleControllerTestCase
 {

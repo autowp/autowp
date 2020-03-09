@@ -5,7 +5,7 @@ namespace Application;
 return [
     'forms' => [
         'ModerPictureVoteForm2' => [
-            'type'     => 'Zend\Form\Form',
+            'type'     => 'Laminas\Form\Form',
             'attributes'  => [
                 'method' => 'post'
             ],

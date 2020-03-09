@@ -2,50 +2,40 @@
 
 namespace Application\Controller\Plugin;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use Autowp\User\Model\User;
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
+use Autowp\User\Model\User;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+
+use function array_replace;
 
 class PictureVote extends AbstractPlugin
 {
-    /**
-     * @var TableGateway
-     */
-    private $voteTemplateTable;
+    private TableGateway $voteTemplateTable;
 
-    /**
-     * @var PictureModerVote
-     */
-    private $pictureModerVote;
+    private PictureModerVote $pictureModerVote;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(
         PictureModerVote $pictureModerVote,
-        TableGateway $voteTemplateTeable,
+        TableGateway $voteTemplateTable,
         Picture $picture,
         User $userModel
     ) {
-        $this->voteTemplateTable = $voteTemplateTeable;
-        $this->pictureModerVote = $pictureModerVote;
-        $this->picture = $picture;
-        $this->userModel = $userModel;
+        $this->voteTemplateTable = $voteTemplateTable;
+        $this->pictureModerVote  = $pictureModerVote;
+        $this->picture           = $picture;
+        $this->userModel         = $userModel;
     }
 
     private function isLastPicture($picture)
     {
-        if ($picture['status'] != Picture::STATUS_ACCEPTED) {
+        if ($picture['status'] !== Picture::STATUS_ACCEPTED) {
             return null;
         }
 
@@ -53,8 +43,8 @@ class PictureVote extends AbstractPlugin
             'id_exclude' => $picture['id'],
             'status'     => Picture::STATUS_ACCEPTED,
             'item'       => [
-                'contains_picture' => $picture['id']
-            ]
+                'contains_picture' => $picture['id'],
+            ],
         ]);
     }
 
@@ -63,8 +53,8 @@ class PictureVote extends AbstractPlugin
         return $this->picture->getCount([
             'status' => Picture::STATUS_ACCEPTED,
             'item'   => [
-                'contains_picture' => $pictureId
-            ]
+                'contains_picture' => $pictureId,
+            ],
         ]);
     }
 
@@ -72,7 +62,7 @@ class PictureVote extends AbstractPlugin
     {
         $result = [
             'positive' => [],
-            'negative' => []
+            'negative' => [],
         ];
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -96,7 +86,7 @@ class PictureVote extends AbstractPlugin
     public function __invoke(int $pictureId, $options)
     {
         $options = array_replace([
-            'hideVote' => false
+            'hideVote' => false,
         ], $options);
 
         $picture = $this->picture->getRow(['id' => $pictureId]);
@@ -112,7 +102,7 @@ class PictureVote extends AbstractPlugin
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $user = $controller->user()->get();
+        $user       = $controller->user()->get();
         $voteExists = $this->pictureModerVote->hasVote($picture['id'], $user['id']);
 
         $moderVotes = null;
@@ -122,25 +112,25 @@ class PictureVote extends AbstractPlugin
                 $moderVotes[] = [
                     'vote'   => $vote['vote'],
                     'reason' => $vote['reason'],
-                    'user'   => $this->userModel->getRow((int)$vote['user_id'])
+                    'user'   => $this->userModel->getRow((int) $vote['user_id']),
                 ];
             }
         }
 
         return [
-            'isLastPicture'     => $this->isLastPicture($picture),
-            'acceptedCount'     => $this->getAcceptedCount($picture['id']),
-            'canDelete'         => $this->pictureCanDelete($picture),
-            'apiUrl'            => $controller->url()->fromRoute('api/picture/picture/update', [
-                'id' => $picture['id']
+            'isLastPicture' => $this->isLastPicture($picture),
+            'acceptedCount' => $this->getAcceptedCount($picture['id']),
+            'canDelete'     => $this->pictureCanDelete($picture),
+            'apiUrl'        => $controller->url()->fromRoute('api/picture/picture/update', [
+                'id' => $picture['id'],
             ]),
             /* @phan-suppress-next-line PhanUndeclaredMethod */
-            'canVote'           => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
-            'voteExists'        => $voteExists,
-            'moderVotes'        => $moderVotes,
+            'canVote'     => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
+            'voteExists'  => $voteExists,
+            'moderVotes'  => $moderVotes,
             'voteOptions' => $this->getVoteOptions2(),
-            'voteUrl' => $controller->url()->fromRoute('api/picture-moder-vote', [
-                'id' => $picture['id']
+            'voteUrl'     => $controller->url()->fromRoute('api/picture-moder-vote', [
+                'id' => $picture['id'],
             ]),
         ];
     }
@@ -165,7 +155,7 @@ class PictureVote extends AbstractPlugin
                 $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
                 $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
 
-                $canDelete = ($deleteVotes > $acceptVotes);
+                $canDelete = $deleteVotes > $acceptVotes;
             }
         }
 

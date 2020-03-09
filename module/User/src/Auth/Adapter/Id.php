@@ -2,10 +2,10 @@
 
 namespace Autowp\User\Auth\Adapter;
 
-use Zend\Authentication\Adapter\AdapterInterface;
-use Zend\Authentication\Result;
-use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
 use Autowp\User\Model\User;
+use Laminas\Authentication\Adapter\AdapterInterface;
+use Laminas\Authentication\Adapter\Exception\InvalidArgumentException;
+use Laminas\Authentication\Result;
 
 class Id implements AdapterInterface
 {
@@ -14,18 +14,16 @@ class Id implements AdapterInterface
      *
      * @var int
      */
-    private $identity = null;
+    private $identity;
 
     /**
      * $authenticateResultInfo
      *
      * @var array
      */
-    private $authenticateResultInfo = null;
+    private $authenticateResultInfo;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     private $userModel;
 
     public function __construct(User $userModel)
@@ -39,15 +37,15 @@ class Id implements AdapterInterface
 
         $userRow = $this->userModel->getRow([
             'not_deleted' => true,
-            'id'          => (int)$this->identity
+            'id'          => (int) $this->identity,
         ]);
 
         if (! $userRow) {
-            $this->authenticateResultInfo['code'] = Result::FAILURE_IDENTITY_NOT_FOUND;
+            $this->authenticateResultInfo['code']       = Result::FAILURE_IDENTITY_NOT_FOUND;
             $this->authenticateResultInfo['messages'][] = 'A record with the supplied identity could not be found.';
         } else {
-            $this->authenticateResultInfo['code'] = Result::SUCCESS;
-            $this->authenticateResultInfo['identity'] = (int)$userRow['id'];
+            $this->authenticateResultInfo['code']       = Result::SUCCESS;
+            $this->authenticateResultInfo['identity']   = (int) $userRow['id'];
             $this->authenticateResultInfo['messages'][] = 'Authentication successful.';
         }
 
@@ -64,9 +62,8 @@ class Id implements AdapterInterface
      * required pieces of information.
      *
      * @throws InvalidArgumentException - in the event that setup was not done properly
-     * @return true
      */
-    private function authenticateSetup()
+    private function authenticateSetup(): bool
     {
         if (! $this->identity) {
             $exception = 'A value for the identity was not provided prior to authentication.';
@@ -76,7 +73,7 @@ class Id implements AdapterInterface
         $this->authenticateResultInfo = [
             'code'     => Result::FAILURE,
             'identity' => null,
-            'messages' => []
+            'messages' => [],
         ];
 
         return true;
@@ -86,9 +83,8 @@ class Id implements AdapterInterface
      * setIdentity() - set the value to be used as the identity
      *
      * @param  int $value
-     * @return Id Provides a fluent interface
      */
-    public function setIdentity($value)
+    public function setIdentity($value): self
     {
         $this->identity = (int) $value;
         return $this;

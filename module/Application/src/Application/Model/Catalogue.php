@@ -3,75 +3,67 @@
 namespace Application\Model;
 
 use InvalidArgumentException;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+
+use function array_merge;
+use function array_replace;
+use function count;
+use function is_bool;
+use function usort;
 
 class Catalogue
 {
-    private $picturesPerPage = 20;
+    private int $picturesPerPage = 20;
 
-    private $carsPerPage = 7;
+    private int $carsPerPage = 7;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemTable;
+    private TableGateway $itemTable;
 
-    /**
-     * @var ItemParent
-     */
-    private $itemParent;
+    private ItemParent $itemParent;
 
     public function __construct(ItemParent $itemParent, TableGateway $itemTable)
     {
-        $this->itemTable = $itemTable;
+        $this->itemTable  = $itemTable;
         $this->itemParent = $itemParent;
     }
 
-    /**
-     * @return array
-     */
-    public function itemOrdering()
+    public function itemOrdering(): array
     {
         return [
             'item.begin_order_cache',
             'item.end_order_cache',
             'item.name',
             'item.body',
-            'item.spec_id'
+            'item.spec_id',
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function picturesOrdering()
+    public function picturesOrdering(): array
     {
         return [
-            'pictures.width DESC', 'pictures.height DESC',
-            'pictures.add_date DESC', 'pictures.id DESC'
+            'pictures.width DESC',
+            'pictures.height DESC',
+            'pictures.add_date DESC',
+            'pictures.id DESC',
         ];
     }
 
-    public function getCarsPerPage()
+    public function getCarsPerPage(): int
     {
         return $this->carsPerPage;
     }
 
-    public function getPicturesPerPage()
+    public function getPicturesPerPage(): int
     {
         return $this->picturesPerPage;
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $id
-     * @param array $options
-     * @return array
      */
-    public function getCataloguePaths($id, array $options = [])
+    public function getCataloguePaths(int $id, array $options = []): array
     {
-        $id = (int)$id;
         if (! $id) {
             throw new InvalidArgumentException("Unexpected `id`");
         }
@@ -79,29 +71,29 @@ class Catalogue
         $defaults = [
             'breakOnFirst' => false,
             'toBrand'      => null,
-            'stockFirst'   => false
+            'stockFirst'   => false,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
-        $breakOnFirst = (bool)$options['breakOnFirst'];
-        $stockFirst = (bool)$options['stockFirst'];
+        $breakOnFirst = (bool) $options['breakOnFirst'];
+        $stockFirst   = (bool) $options['stockFirst'];
         if (isset($options['toBrand'])) {
-            $toBrand = is_bool($options['toBrand']) ? $options['toBrand'] : true;
-            $toBrandId = is_bool($options['toBrand']) ? null : (int)$options['toBrand'];
+            $toBrand   = is_bool($options['toBrand']) ? $options['toBrand'] : true;
+            $toBrandId = is_bool($options['toBrand']) ? null : (int) $options['toBrand'];
         } else {
-            $toBrand = true;
+            $toBrand   = true;
             $toBrandId = null;
         }
 
         $result = [];
 
-        if (! $toBrandId || $id == $toBrandId) {
+        if (! $toBrandId || $id === $toBrandId) {
             $select = new Sql\Select($this->itemTable->getTable());
             $select
                 ->columns(['catname'])
                 ->where([
                     'id'           => $id,
-                    'item_type_id' => Item::BRAND
+                    'item_type_id' => Item::BRAND,
                 ]);
 
             $brand = $this->itemTable->selectWith($select)->current();
@@ -112,7 +104,7 @@ class Catalogue
                     'brand_catname' => $brand['catname'],
                     'car_catname'   => null,
                     'path'          => [],
-                    'stock'         => true
+                    'stock'         => true,
                 ];
 
                 if ($breakOnFirst && count($result)) {
@@ -126,8 +118,8 @@ class Catalogue
             $select
                 ->columns(['id', 'catname', 'item_type_id'])
                 ->where([
-                    'id'           => $id,
-                    new Sql\Predicate\In('item_type_id', [Item::CATEGORY, Item::PERSON])
+                    'id' => $id,
+                    new Sql\Predicate\In('item_type_id', [Item::CATEGORY, Item::PERSON]),
                 ]);
 
             $category = $this->itemTable->selectWith($select)->current();
@@ -137,7 +129,7 @@ class Catalogue
                     case Item::CATEGORY:
                         $result[] = [
                             'type'             => 'category',
-                            'category_catname' => $category['catname']
+                            'category_catname' => $category['catname'],
                         ];
 
                         if ($breakOnFirst && count($result)) {
@@ -148,7 +140,7 @@ class Catalogue
                     case Item::PERSON:
                         $result[] = [
                             'type' => 'person',
-                            'id'   => $category['id']
+                            'id'   => $category['id'],
                         ];
 
                         if ($breakOnFirst && count($result)) {
@@ -171,7 +163,7 @@ class Catalogue
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $parentRow['catname'],
                             'path'          => [],
-                            'stock'         => $parentRow['type'] == ItemParent::TYPE_DEFAULT
+                            'stock'         => $parentRow['type'] === ItemParent::TYPE_DEFAULT,
                         ];
                         break;
                     case 'brand-item':
@@ -180,7 +172,7 @@ class Catalogue
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => array_merge($path['path'], [$parentRow['catname']]),
-                            'stock'         => $path['stock'] && ($parentRow['type'] == ItemParent::TYPE_DEFAULT)
+                            'stock'         => $path['stock'] && ($parentRow['type'] === ItemParent::TYPE_DEFAULT),
                         ];
                         break;
                 }

@@ -2,48 +2,39 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\Feature\RowGatewayFeature;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
 use Autowp\User\Controller\Plugin\User;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\Feature\RowGatewayFeature;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+
+use function array_key_exists;
+use function array_keys;
 
 /**
- * Class PageController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */
 class PageController extends AbstractRestfulController
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var InputFilter
-     */
-    private $putInputFilter;
+    private InputFilter $putInputFilter;
 
-    /**
-     * @var InputFilter
-     */
-    private $postInputFilter;
+    private InputFilter $postInputFilter;
 
     public function __construct(
         Adapter $adapter,
         InputFilter $putInputFilter,
         InputFilter $postInputFilter
     ) {
-        $this->table = new TableGateway('pages', $adapter, new RowGatewayFeature('id'));
-        $this->putInputFilter = $putInputFilter;
+        $this->table           = new TableGateway('pages', $adapter, new RowGatewayFeature('id'));
+        $this->putInputFilter  = $putInputFilter;
         $this->postInputFilter = $postInputFilter;
     }
 
@@ -54,7 +45,7 @@ class PageController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $this->getPagesList(null)
+            'items' => $this->getPagesList(null),
         ]);
     }
 
@@ -73,10 +64,10 @@ class PageController extends AbstractRestfulController
         $rows = $this->table->selectWith($select);
         foreach ($rows as $page) {
             $result[] = [
-                'id'            => (int)$page['id'],
+                'id' => (int) $page['id'],
                 //'name'          => $page['name'],
                 //'breadcrumbs'   => $page['breadcrumbs'],
-                'is_group_node' => (bool)$page['is_group_node'],
+                'is_group_node' => (bool) $page['is_group_node'],
                 'childs'        => $this->getPagesList($page['id']),
                 'url'           => $page['url'],
             ];
@@ -85,28 +76,27 @@ class PageController extends AbstractRestfulController
         return $result;
     }
 
-
     public function itemAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        $page = $this->table->select(['id' => (int)$this->params('id')])->current();
+        $page = $this->table->select(['id' => (int) $this->params('id')])->current();
         if (! $page) {
             return new ApiProblemResponse(new ApiProblem(404, 'Not found'));
         }
 
         return new JsonModel([
-            'id'              => (int)$page['id'],
+            'id'              => (int) $page['id'],
             'parent_id'       => $page['parent_id'],
             'name'            => $page['name'],
             'title'           => $page['title'],
             'url'             => $page['url'],
             'breadcrumbs'     => $page['breadcrumbs'],
-            'is_group_node'   => (bool)$page['is_group_node'],
-            'registered_only' => (bool)$page['registered_only'],
-            'guest_only'      => (bool)$page['guest_only'],
+            'is_group_node'   => (bool) $page['is_group_node'],
+            'registered_only' => (bool) $page['registered_only'],
+            'guest_only'      => (bool) $page['guest_only'],
             'class'           => $page['class'],
         ]);
     }
@@ -117,7 +107,7 @@ class PageController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        $page = $this->table->select(['id' => (int)$this->params('id')])->current();
+        $page = $this->table->select(['id' => (int) $this->params('id')])->current();
         if (! $page) {
             return new ApiProblemResponse(new ApiProblem(404, 'Not found'));
         }
@@ -141,7 +131,7 @@ class PageController extends AbstractRestfulController
 
         $data = $this->putInputFilter->getValues();
 
-        $position = isset($data['position']) ? (string)$data['position'] : null;
+        $position = isset($data['position']) ? (string) $data['position'] : null;
 
         switch ($position) {
             case 'up':
@@ -149,7 +139,7 @@ class PageController extends AbstractRestfulController
                 $select
                     ->where([
                         'parent_id'    => $page['parent_id'],
-                        'position < ?' => $page['position']
+                        'position < ?' => $page['position'],
                     ])
                     ->order('position DESC')
                     ->limit(1);
@@ -161,7 +151,7 @@ class PageController extends AbstractRestfulController
                     $prevPage['position'] = 10000;
                     $prevPage->save();
 
-                    $pagePos = $page['position'];
+                    $pagePos          = $page['position'];
                     $page['position'] = $prevPagePos;
                     $page->save();
 
@@ -174,7 +164,7 @@ class PageController extends AbstractRestfulController
                 $select
                     ->where([
                         'parent_id'    => $page['parent_id'],
-                        'position > ?' => $page['position']
+                        'position > ?' => $page['position'],
                     ])
                     ->order('position ASC')
                     ->limit(1);
@@ -186,7 +176,7 @@ class PageController extends AbstractRestfulController
                     $nextPage['position'] = 10000;
                     $nextPage->save();
 
-                    $pagePos = $page['position'];
+                    $pagePos          = $page['position'];
                     $page['position'] = $nextPagePos;
                     $page->save();
 
@@ -199,7 +189,7 @@ class PageController extends AbstractRestfulController
         $update = [];
 
         if (array_key_exists('parent_id', $data)) {
-            $update['parent_id'] = $data['parent_id'] ? (int)$data['parent_id'] : null;
+            $update['parent_id'] = $data['parent_id'] ? (int) $data['parent_id'] : null;
         }
 
         if (array_key_exists('name', $data)) {
@@ -236,7 +226,7 @@ class PageController extends AbstractRestfulController
 
         if ($update) {
             $this->table->update($update, [
-                'id' => $page['id']
+                'id' => $page['id'],
             ]);
         }
 
@@ -272,14 +262,14 @@ class PageController extends AbstractRestfulController
             $select->where(['parent_id IS NULL']);
         }
 
-        $sql = new Sql\Sql($this->table->getAdapter());
+        $sql       = new Sql\Sql($this->table->getAdapter());
         $statement = $sql->prepareStatementForSqlObject($select);
-        $result = $statement->execute();
-        $row = $result->current();
-        $position = 1 + $row['position'];
+        $result    = $statement->execute();
+        $row       = $result->current();
+        $position  = 1 + $row['position'];
 
         $insert = [
-            'parent_id'       => $data['parent_id'] ? (int)$data['parent_id'] : null,
+            'parent_id'       => $data['parent_id'] ? (int) $data['parent_id'] : null,
             'name'            => $data['name'],
             'title'           => $data['title'],
             'breadcrumbs'     => $data['breadcrumbs'],
@@ -288,7 +278,7 @@ class PageController extends AbstractRestfulController
             'is_group_node'   => $data['is_group_node'] ? 1 : 0,
             'registered_only' => $data['registered_only'] ? 1 : 0,
             'guest_only'      => $data['guest_only'] ? 1 : 0,
-            'position'        => $position
+            'position'        => $position,
         ];
 
         $this->table->insert($insert);
@@ -296,7 +286,7 @@ class PageController extends AbstractRestfulController
         $id = $this->table->getLastInsertValue();
 
         $url = $this->url()->fromRoute('api/page/item/get', [
-            'id' => $id
+            'id' => $id,
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -310,7 +300,7 @@ class PageController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        $page = $this->table->select(['id' => (int)$this->params('id')])->current();
+        $page = $this->table->select(['id' => (int) $this->params('id')])->current();
         if (! $page) {
             return new ApiProblemResponse(new ApiProblem(404, 'Not found'));
         }
@@ -325,21 +315,21 @@ class PageController extends AbstractRestfulController
     {
         $result = [];
 
-        $pageId = (int)$this->params()->fromQuery('id');
+        $pageId = (int) $this->params()->fromQuery('id');
 
         do {
             $row = $this->table->select([
-                'id' => $pageId
+                'id' => $pageId,
             ])->current();
 
             if ($row) {
                 $result[] = [
-                    'id'            => (int)$row['id'],
-                    'parent_id'     => (int)$row['parent_id'],
+                    'id'        => (int) $row['id'],
+                    'parent_id' => (int) $row['parent_id'],
                     //'name'          => $row['name'],
                     //'breadcrumbs'   => $row['breadcrumbs'],
                     //'title'         => $row['title'],
-                    'is_group_node' => (bool)$row['is_group_node'],
+                    'is_group_node' => (bool) $row['is_group_node'],
                     'url'           => $row['url'],
                 ];
             }
@@ -348,7 +338,7 @@ class PageController extends AbstractRestfulController
         } while ($pageId);
 
         return new JsonModel([
-            'items' => $result
+            'items' => $result,
         ]);
     }
 }

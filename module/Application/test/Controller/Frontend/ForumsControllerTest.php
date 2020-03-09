@@ -2,11 +2,14 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
+use Application\Controller\Api\CommentController;
 use Application\Controller\Api\ForumController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Application\Controller\Api\CommentController;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+
+use function count;
+use function explode;
 
 class ForumsControllerTest extends AbstractHttpControllerTestCase
 {
@@ -40,7 +43,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
             'name'                => 'Test topic',
             'text'                => 'Test topic text',
             'moderator_attention' => 0,
-            'subscribe'           => 1
+            'subscribe'           => 1,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -49,8 +52,8 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post-topic');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         $topicId = $parts[count($parts) - 1];
 
         $this->assertNotEmpty($topicId);
@@ -59,7 +62,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
-            'subscription' => 0
+            'subscription' => 0,
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -71,7 +74,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
-            'subscription' => 1
+            'subscription' => 1,
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -83,7 +86,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
-            'status' => 'closed'
+            'status' => 'closed',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -95,7 +98,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
-            'status' => 'normal'
+            'status' => 'normal',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -107,7 +110,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_GET, [
-            'subscription' => 1
+            'subscription' => 1,
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -123,7 +126,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
             'type_id'             => 5,
             'message'             => 'Test message',
             'moderator_attention' => 0,
-            'parent_id'           => null
+            'parent_id'           => null,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -135,7 +138,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
-            'status' => 'deleted'
+            'status' => 'deleted',
         ]);
 
         $this->assertResponseStatusCode(200);

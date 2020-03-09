@@ -2,15 +2,14 @@
 
 namespace Application\Model;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+
+use function array_merge;
 
 class Contact
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     public function __construct(TableGateway $table)
     {
@@ -19,20 +18,18 @@ class Contact
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $userId
-     * @param int $contactUserId
      */
     public function create(int $userId, int $contactUserId)
     {
         $primaryKey = [
             'user_id'         => $userId,
-            'contact_user_id' => $contactUserId
+            'contact_user_id' => $contactUserId,
         ];
 
         $row = $this->table->select($primaryKey)->current();
         if (! $row) {
             $this->table->insert(array_merge([
-                'timestamp' => new Sql\Expression('now()')
+                'timestamp' => new Sql\Expression('now()'),
             ], $primaryKey));
         }
     }
@@ -41,7 +38,7 @@ class Contact
     {
         $this->table->delete([
             'user_id'         => $userId,
-            'contact_user_id' => $contactUserId
+            'contact_user_id' => $contactUserId,
         ]);
     }
 
@@ -49,19 +46,19 @@ class Contact
     {
         $row = $this->table->select([
             'user_id'         => $userId,
-            'contact_user_id' => $contactUserId
+            'contact_user_id' => $contactUserId,
         ])->current();
-        return (bool)$row;
+        return (bool) $row;
     }
 
     public function deleteUserEverywhere(int $userId)
     {
         $this->table->delete([
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
 
         $this->table->delete([
-            'contact_user_id' => $userId
+            'contact_user_id' => $userId,
         ]);
     }
 }

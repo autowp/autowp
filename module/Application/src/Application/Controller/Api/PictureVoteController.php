@@ -2,25 +2,20 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use Autowp\User\Controller\Plugin\User;
-use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\PictureVote;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
- * Class PictureVoteController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
- * @method ForbiddenAction forbiddenAction()
+ * @method ViewModel forbiddenAction()
  */
 class PictureVoteController extends AbstractRestfulController
 {
-    /**
-     * @var PictureVote
-     */
-    private $model;
+    /** @var PictureVote */
+    private PictureVote $model;
 
     public function __construct(PictureVote $model)
     {
@@ -32,7 +27,7 @@ class PictureVoteController extends AbstractRestfulController
      *
      * @param  mixed $id
      * @param  mixed $data
-     * @return mixed
+     * @return ViewModel
      */
     public function update($id, $data)
     {
@@ -41,7 +36,7 @@ class PictureVoteController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $value = isset($data['value']) ? $data['value'] : null;
+        $value = $data['value'] ?? null;
 
         $this->model->vote($id, $currentUser['id'], $value);
 

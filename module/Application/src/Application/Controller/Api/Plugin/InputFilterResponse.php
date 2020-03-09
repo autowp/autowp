@@ -2,10 +2,10 @@
 
 namespace Application\Controller\Api\Plugin;
 
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class InputFilterResponse extends AbstractPlugin
 {
@@ -13,7 +13,7 @@ class InputFilterResponse extends AbstractPlugin
     {
         return new ApiProblemResponse(
             new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                'invalid_params' => $inputFilter->getMessages()
+                'invalid_params' => $inputFilter->getMessages(),
             ])
         );
     }

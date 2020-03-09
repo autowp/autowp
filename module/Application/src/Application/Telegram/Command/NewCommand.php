@@ -2,36 +2,23 @@
 
 namespace Application\Telegram\Command;
 
-use Telegram\Bot\Commands\Command;
-use Zend\Db\TableGateway\TableGateway;
 use Application\Model\Item;
+use Laminas\Db\TableGateway\TableGateway;
+use Telegram\Bot\Commands\Command;
+
+use function array_replace;
 
 class NewCommand extends Command
 {
-    /**
-     * @var string Command Name
-     */
-    protected $name = "new";
+    protected string $name = "new";
 
-    /**
-     * @var string Command Description
-     */
-    protected $description = "Subscribe to new pictures";
+    protected string $description = "Subscribe to new pictures";
 
-    /**
-     * @var TableGateway
-     */
-    private $telegramItemTable;
+    private TableGateway $telegramItemTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $telegramChatTable;
+    private TableGateway $telegramChatTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemTable;
+    private TableGateway $itemTable;
 
     public function __construct(
         TableGateway $telegramItemTable,
@@ -40,34 +27,34 @@ class NewCommand extends Command
     ) {
         $this->telegramItemTable = $telegramItemTable;
         $this->telegramChatTable = $telegramChatTable;
-        $this->itemTable = $itemTable;
+        $this->itemTable         = $itemTable;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function handle($arguments)
     {
         if (! $arguments) {
             $this->replyWithMessage([
-                'text' => "Plase, type brand name. For Example /new BMW"
+                'text' => "Plase, type brand name. For Example /new BMW",
             ]);
             return;
         }
 
         $brandRow = $this->itemTable->select([
-            'name'         => (string)$arguments,
-            'item_type_id' => Item::BRAND
+            'name'         => (string) $arguments,
+            'item_type_id' => Item::BRAND,
         ])->current();
 
         if (! $brandRow) {
             $this->replyWithMessage([
-                'text' => 'Brand "' . $arguments . '" not found'
+                'text' => 'Brand "' . $arguments . '" not found',
             ]);
             return;
         }
 
-        $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
+        $chatId = (int) $this->getUpdate()->getMessage()->getChat()->getId();
 
         $primaryKey = [
             'item_id' => $brandRow['id'],
@@ -79,7 +66,7 @@ class NewCommand extends Command
         if ($telegramBrandRow && $telegramBrandRow['new']) {
             $this->telegramItemTable->update(['new' => 0], $primaryKey);
             $this->replyWithMessage([
-                'text' => 'Successful unsubscribed from ' . $brandRow['name']
+                'text' => 'Successful unsubscribed from ' . $brandRow['name'],
             ]);
             return;
         }
@@ -92,7 +79,7 @@ class NewCommand extends Command
         }
 
         $this->replyWithMessage([
-            'text' => 'Successful subscribed to ' . $brandRow['name']
+            'text' => 'Successful subscribed to ' . $brandRow['name'],
         ]);
     }
 }

@@ -2,19 +2,13 @@
 
 namespace Application;
 
-use Zend\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Request;
 
 class Language
 {
-    /**
-     * @var string
-     */
-    private $defaultLanguage = 'en';
+    private string $defaultLanguage = 'en';
 
-    /**
-     * @var string
-     */
-    private $language;
+    private string $language;
 
     public function __construct($request, array $hosts)
     {
@@ -37,18 +31,12 @@ class Language
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->language;
     }
 
-    /**
-     * @param string $language
-     */
-    public function setLanguage($language)
+    public function setLanguage(string $language): void
     {
         $this->language = $language;
     }

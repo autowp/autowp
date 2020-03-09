@@ -2,21 +2,13 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
 use Application\Model\Brand;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
 
-/**
- * Class ContactsController
- * @package Application\Controller\Api
- *
- */
 class ConfigController extends AbstractRestfulController
 {
-    /**
-     * @var Brand
-     */
-    private $brand;
+    private Brand $brand;
 
     public function __construct(Brand $brand)
     {
@@ -26,7 +18,7 @@ class ConfigController extends AbstractRestfulController
     public function indexAction()
     {
         return new JsonModel([
-            'brands' => $this->brand->getCatnames()
+            'brands' => $this->brand->getCatnames(),
         ]);
     }
 }

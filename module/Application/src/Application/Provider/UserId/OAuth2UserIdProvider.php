@@ -2,16 +2,13 @@
 
 namespace Application\Provider\UserId;
 
-use Zend\Authentication\AuthenticationService;
-use Zend\Stdlib\RequestInterface;
-use ZF\OAuth2\Provider\UserId\UserIdProviderInterface;
+use Laminas\ApiTools\OAuth2\Provider\UserId\UserIdProviderInterface;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\Stdlib\RequestInterface;
 
 class OAuth2UserIdProvider implements UserIdProviderInterface
 {
-    /**
-     * @var string
-     */
-    private $userId = 'id';
+    private string $userId = 'id';
 
     /**
      *  Set authentication service
@@ -27,8 +24,6 @@ class OAuth2UserIdProvider implements UserIdProviderInterface
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param  RequestInterface $request
      * @return mixed
      */
     public function __invoke(RequestInterface $request)

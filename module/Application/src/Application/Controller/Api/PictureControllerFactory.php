@@ -20,21 +20,18 @@ use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PictureControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return PictureController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): PictureController
     {
         $hydrators = $container->get('HydratorManager');
-        $filters = $container->get('InputFilterManager');
+        $filters   = $container->get('InputFilterManager');
         return new PictureController(
             $hydrators->get(PictureHydrator::class),
             $container->get(PictureItem::class),

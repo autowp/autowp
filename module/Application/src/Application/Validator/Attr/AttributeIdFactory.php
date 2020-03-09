@@ -3,21 +3,21 @@
 namespace Application\Validator\Attr;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+
+use function array_replace;
+use function is_array;
 
 class AttributeIdFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return AttributeId
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): AttributeId
     {
         return new AttributeId(array_replace(is_array($options) ? $options : [], [
-            'table' => $container->get('TableManager')->get('attrs_attributes')
+            'table' => $container->get('TableManager')->get('attrs_attributes'),
         ]));
     }
 }

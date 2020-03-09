@@ -2,15 +2,15 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Mvc\Controller\AbstractActionController;
 use Application\Model\Brand;
+use Laminas\Mvc\Controller\AbstractActionController;
+
+use function is_dir;
+use function mkdir;
 
 class BuildController extends AbstractActionController
 {
-    /**
-     * @var Brand
-     */
-    private $brand;
+    private Brand $brand;
 
     public function __construct(Brand $brand)
     {
@@ -24,7 +24,7 @@ class BuildController extends AbstractActionController
             mkdir($dir, 0777, true);
         }
         $destSprite = $dir . '/brands.png';
-        $destCss = $dir . '/brands.css';
+        $destCss    = $dir . '/brands.css';
 
         $imageStorage = $this->imageStorage();
 

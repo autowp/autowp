@@ -2,20 +2,18 @@
 
 namespace Application\Validator\User;
 
-use Zend\Validator\AbstractValidator;
 use Autowp\User\Model\User;
+use Laminas\Validator\AbstractValidator;
 
 class EmailNotExists extends AbstractValidator
 {
     private const EXISTS = 'userEmailExists';
 
     protected $messageTemplates = [
-        self::EXISTS => "E-mail '%value%' already registered"
+        self::EXISTS => "E-mail '%value%' already registered",
     ];
 
-    /**
-     * @var User
-     */
+    /** @var User */
     private $userModel;
 
     public function setUserModel(User $userModel)
@@ -30,7 +28,7 @@ class EmailNotExists extends AbstractValidator
         $this->setValue($value);
 
         $exists = $this->userModel->isExists([
-            'email' => (string)$value
+            'email' => (string) $value,
         ]);
 
         if ($exists) {

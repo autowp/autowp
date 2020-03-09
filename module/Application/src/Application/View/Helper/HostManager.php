@@ -2,15 +2,13 @@
 
 namespace Application\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
 use Application\HostManager as AppHostManager;
+use Laminas\View\Helper\AbstractHelper;
 
 class HostManager extends AbstractHelper
 {
-    /**
-     * @var AppHostManager
-     */
-    private $hostManager = null;
+    /** @var AppHostManager */
+    private $hostManager;
 
     public function __construct(AppHostManager $hostManager)
     {

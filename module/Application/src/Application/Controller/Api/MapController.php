@@ -2,34 +2,30 @@
 
 namespace Application\Controller\Api;
 
-use geoPHP;
-use LineString;
-use Point;
-use Polygon;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\Picture;
+use geoPHP;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use LineString;
+use Point;
+use Polygon;
+
+use function array_replace;
+use function count;
+use function explode;
+use function substr;
 
 class MapController extends AbstractActionController
 {
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
+    private ItemNameFormatter $itemNameFormatter;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemTable;
+    private TableGateway $itemTable;
 
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
@@ -37,8 +33,8 @@ class MapController extends AbstractActionController
         TableGateway $itemTable
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
-        $this->picture = $picture;
-        $this->itemTable = $itemTable;
+        $this->picture           = $picture;
+        $this->itemTable         = $itemTable;
     }
 
     public function dataAction()
@@ -46,18 +42,18 @@ class MapController extends AbstractActionController
         geoPHP::version(); // for autoload classes
 
         $bounds = $this->params()->fromQuery('bounds');
-        $bounds = explode(',', (string)$bounds);
+        $bounds = explode(',', (string) $bounds);
 
         if (count($bounds) < 4) {
             return $this->notfoundAction();
         }
 
-        $lngLo = (float)$bounds[0];
-        $latLo = (float)$bounds[1];
-        $lngHi = (float)$bounds[2];
-        $latHi = (float)$bounds[3];
+        $lngLo = (float) $bounds[0];
+        $latLo = (float) $bounds[1];
+        $lngHi = (float) $bounds[2];
+        $latHi = (float) $bounds[3];
 
-        $line = new LineString([
+        $line    = new LineString([
             new Point($lngLo, $latLo),
             new Point($lngLo, $latHi),
             new Point($lngHi, $latHi),
@@ -66,7 +62,7 @@ class MapController extends AbstractActionController
         ]);
         $polygon = new Polygon([$line]);
 
-        $pointsOnly = (bool)$this->params()->fromQuery('points-only', 14);
+        $pointsOnly = (bool) $this->params()->fromQuery('points-only', 14);
 
         $language = $this->language();
 
@@ -93,8 +89,8 @@ class MapController extends AbstractActionController
 
             $row = [
                 'location' => [
-                    'lat'  => $point ? $point->y() : null,
-                    'lng'  => $point ? $point->x() : null,
+                    'lat' => $point ? $point->y() : null,
+                    'lng' => $point ? $point->x() : null,
                 ],
             ];
 
@@ -110,7 +106,6 @@ class MapController extends AbstractActionController
                         break;
                 }
 
-
                 $row = array_replace($row, [
                     'id'   => 'factory' . $item['id'],
                     'name' => $this->itemNameFormatter->format(
@@ -122,7 +117,7 @@ class MapController extends AbstractActionController
 
                 $picture = $this->picture->getRow([
                     'status' => Picture::STATUS_ACCEPTED,
-                    'item'   => $item['id']
+                    'item'   => $item['id'],
                 ]);
 
                 if ($picture) {

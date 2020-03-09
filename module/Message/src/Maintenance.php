@@ -3,16 +3,14 @@
 namespace Autowp\Message;
 
 use Autowp\Cron;
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\EventManager\EventManagerInterface;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
 
 class Maintenance extends AbstractListenerAggregate
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param EventManagerInterface $events
-     * @param int                   $priority
+     * @param int $priority
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
@@ -21,7 +19,6 @@ class Maintenance extends AbstractListenerAggregate
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param Cron\CronEvent $event
      */
     public function dailyMaintenance(Cron\CronEvent $event)
     {

@@ -3,25 +3,18 @@
 namespace Application\Model;
 
 use Exception;
-use Zend\Db\Sql;
-use Zend\Paginator\Paginator;
+use Laminas\Db\Sql;
+use Laminas\Paginator\Paginator;
+
+use function array_replace;
 
 class Twins
 {
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var Item
-     */
-    private $item;
+    private Item $item;
 
-    /**
-     * @var Brand
-     */
-    private $brand;
+    private Brand $brand;
 
     public function __construct(
         Picture $picture,
@@ -29,23 +22,20 @@ class Twins
         Brand $brand
     ) {
         $this->picture = $picture;
-        $this->item = $item;
-        $this->brand = $brand;
+        $this->item    = $item;
+        $this->brand   = $brand;
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     *
-     * @param array $options
-     * @return array
      */
-    public function getBrands(array $options)
+    public function getBrands(array $options): array
     {
         $defaults = [
             'language' => 'en',
-            'limit'    => null
+            'limit'    => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $limit = $options['limit'];
 
@@ -56,7 +46,7 @@ class Twins
                 'new_count' => new Sql\Expression(
                     'count(distinct if(twins.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), twins.id, null))'
                 ),
-            ]
+            ],
         ], function (Sql\Select $select) use ($limit) {
             $select
                 ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', [])
@@ -75,9 +65,6 @@ class Twins
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     *
-     * @param array $groupIds
-     * @return array
      */
     public function getGroupsPicturesCount(array $groupIds): array
     {
@@ -92,13 +79,13 @@ class Twins
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', ['parent_id'])
             ->where([
                 'pictures.status' => Picture::STATUS_ACCEPTED,
-                new Sql\Predicate\In('item_parent_cache.parent_id', $groupIds)
+                new Sql\Predicate\In('item_parent_cache.parent_id', $groupIds),
             ])
             ->group('item_parent_cache.parent_id');
 
         $result = [];
         foreach ($this->picture->getTable()->selectWith($select) as $row) {
-            $result[(int)$row['parent_id']] = (int)$row['count'];
+            $result[(int) $row['parent_id']] = (int) $row['count'];
         }
 
         return $result;
@@ -107,45 +94,41 @@ class Twins
     public function getGroupBrandIds(int $groupId): array
     {
         return $this->item->getIds([
-            'item_type_id' => Item::BRAND,
+            'item_type_id'       => Item::BRAND,
             'descendant_or_self' => [
                 'parent' => [
                     'id'           => $groupId,
-                    'item_type_id' => Item::TWINS
-                ]
-            ]
+                    'item_type_id' => Item::TWINS,
+                ],
+            ],
         ]);
     }
 
     public function getTotalBrandsCount(): int
     {
         return $this->item->getCountDistinct([
-            'item_type_id'    => Item::BRAND,
+            'item_type_id'       => Item::BRAND,
             'descendant_or_self' => [
                 'parent' => [
-                    'item_type_id' => Item::TWINS
-                ]
-            ]
+                    'item_type_id' => Item::TWINS,
+                ],
+            ],
         ]);
     }
 
-    /**
-     * @param int $brandId
-     * @return Paginator
-     */
-    public function getGroupsPaginator(int $brandId = 0)
+    public function getGroupsPaginator(int $brandId = 0): Paginator
     {
         $filter = [
             'item_type_id' => Item::TWINS,
-            'order'        => 'item.add_datetime desc'
+            'order'        => 'item.add_datetime desc',
         ];
 
         if ($brandId) {
             $filter['child'] = [
                 'ancestor_or_self' => [
                     'item_type_id' => Item::BRAND,
-                    'id'           => $brandId
-                ]
+                    'id'           => $brandId,
+                ],
             ];
         }
 
@@ -156,20 +139,18 @@ class Twins
     {
         return $this->item->getRows([
             'parent' => $groupId,
-            'order'  => 'name'
+            'order'  => 'name',
         ]);
     }
 
     /**
-     * @param int $groupId
-     * @return NULL|array
      * @throws Exception
      */
-    public function getGroup(int $groupId)
+    public function getGroup(int $groupId): ?array
     {
         $row = $this->item->getRow([
             'id'           => $groupId,
-            'item_type_id' => Item::TWINS
+            'item_type_id' => Item::TWINS,
         ]);
         if (! $row) {
             return null;
@@ -180,26 +161,22 @@ class Twins
             'name'       => $row['name'],
             'begin_year' => $row['begin_year'],
             'end_year'   => $row['end_year'],
-            'today'      => $row['today']
+            'today'      => $row['today'],
         ];
     }
 
-    /**
-     * @param int $itemId
-     * @return array
-     */
-    public function getCarGroups(int $itemId)
+    public function getCarGroups(int $itemId): array
     {
         $rows = $this->item->getRows([
             'item_type_id'       => Item::TWINS,
-            'descendant_or_self' => $itemId
+            'descendant_or_self' => $itemId,
         ]);
 
         $result = [];
         foreach ($rows as $row) {
             $result[] = [
-                'id'   => (int)$row['id'],
-                'name' => $row['name']
+                'id'   => (int) $row['id'],
+                'name' => $row['name'],
             ];
         }
 
@@ -218,20 +195,19 @@ class Twins
             'item_type_id'       => Item::TWINS,
             'descendant_or_self' => [
                 'id'      => $itemIds,
-                'columns' => ['item_id' => 'id']
-            ]
+                'columns' => ['item_id' => 'id'],
+            ],
         ]);
-
 
         $result = [];
         foreach ($itemIds as $itemId) {
-            $result[(int)$itemId] = [];
+            $result[(int) $itemId] = [];
         }
         foreach ($rows as $row) {
-            $itemId = (int)$row['item_id'];
+            $itemId            = (int) $row['item_id'];
             $result[$itemId][] = [
-                'id'   => (int)$row['id'],
-                'name' => $row['name']
+                'id'   => (int) $row['id'],
+                'name' => $row['name'],
             ];
         }
 

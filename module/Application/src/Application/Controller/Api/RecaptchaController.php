@@ -2,16 +2,14 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Session\Container;
-use Zend\View\Model\JsonModel;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Session\Container;
+use Laminas\View\Model\JsonModel;
 
 class RecaptchaController extends AbstractRestfulController
 {
-    /**
-     * @var string
-     */
-    private $publicKey;
+    /** @var string */
+    private string $publicKey;
 
     public function __construct(string $publicKey)
     {
@@ -20,16 +18,14 @@ class RecaptchaController extends AbstractRestfulController
 
     /**
      * Update an existing resource
-     *
-     * @return mixed
      */
-    public function getAction()
+    public function getAction(): JsonModel
     {
         $namespace = new Container('Captcha');
 
         return new JsonModel([
             'publicKey' => $this->publicKey,
-            'success'   => isset($namespace->success) && $namespace->success
+            'success'   => isset($namespace->success) && $namespace->success,
         ]);
     }
 }

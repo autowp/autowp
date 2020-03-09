@@ -3,14 +3,12 @@
 namespace Autowp\User\Model;
 
 use Autowp\Commons\Db\Table\Row;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
 
 class UserRename
 {
-    /**
-     * @var TableGateway
-     */
+    /** @var TableGateway */
     private $table;
 
     public function __construct(TableGateway $table)
@@ -20,16 +18,13 @@ class UserRename
 
     public function garbageCollect()
     {
-        return (int)$this->table->delete([
-            'date < DATE_SUB(NOW(), INTERVAL 3 MONTH)'
+        return (int) $this->table->delete([
+            'date < DATE_SUB(NOW(), INTERVAL 3 MONTH)',
         ]);
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $userId
-     * @param string $oldName
-     * @param string $newName
      */
     public function add(int $userId, string $oldName, string $newName): void
     {
@@ -37,7 +32,7 @@ class UserRename
             'user_id'  => $userId,
             'old_name' => $oldName,
             'new_name' => $newName,
-            'date'     => new Sql\Expression('NOW()')
+            'date'     => new Sql\Expression('NOW()'),
         ]);
     }
 
@@ -52,7 +47,7 @@ class UserRename
             $result[] = [
                 'old_name' => $row['old_name'],
                 'new_name' => $row['new_name'],
-                'date'     => Row::getDateTimeByColumnType('timestamp', $row['date'])
+                'date'     => Row::getDateTimeByColumnType('timestamp', $row['date']),
             ];
         }
 

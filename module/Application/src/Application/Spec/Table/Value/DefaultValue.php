@@ -2,19 +2,17 @@
 
 namespace Application\Spec\Table\Value;
 
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
 
 class DefaultValue
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param PhpRenderer $view
      * @param $attribute
      * @param $value
      * @param $values
-     * @return mixed|string
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values)
+    public function render(PhpRenderer $view, $attribute, $value, $values): string
     {
         if ($value === null) {
             return '';
@@ -26,10 +24,10 @@ class DefaultValue
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             $title = $view->escapeHtmlAttr($view->translate($attribute['unit']['name']));
             $html .=
-                ' <span class="unit" title="' . $title . '">' .
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
-                    $view->escapeHtml($view->translate($attribute['unit']['abbr'])) .
-                '</span>';
+                ' <span class="unit" title="' . $title . '">'
+                    . /* @phan-suppress-next-line PhanUndeclaredMethod */
+                    $view->escapeHtml($view->translate($attribute['unit']['abbr']))
+                . '</span>';
         }
 
         return $html;

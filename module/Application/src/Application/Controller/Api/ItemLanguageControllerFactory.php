@@ -10,22 +10,19 @@ use Application\Model\UserItemSubscribe;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemLanguageControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return ItemLanguageController
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ItemLanguageController
     {
-        $tables = $container->get('TableManager');
+        $tables    = $container->get('TableManager');
         $hydrators = $container->get('HydratorManager');
-        $filters = $container->get('InputFilterManager');
+        $filters   = $container->get('InputFilterManager');
 
         return new ItemLanguageController(
             $tables->get('item_language'),

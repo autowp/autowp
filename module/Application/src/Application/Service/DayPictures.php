@@ -2,94 +2,55 @@
 
 namespace Application\Service;
 
+use Application\Model\Picture;
+use Autowp\Commons\Db\Table\Row;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Zend\Db\Sql;
-use Zend\Paginator;
-use Autowp\Commons\Db\Table\Row;
-use Application\Model\Picture;
+use Laminas\Db\Sql;
+use Laminas\Paginator;
+
+use function is_string;
+use function method_exists;
+use function ucfirst;
 
 class DayPictures
 {
     private const DEFAULT_TIMEZONE = 'UTC';
 
-    /**
-     * @var DateTimeZone
-     */
-    private $timezone = 'UTC';
+    private DateTimeZone $timezone;
 
-    /**
-     * @var DateTimeZone
-     */
-    private $dbTimezone = 'UTC';
+    private DateTimeZone $dbTimezone;
 
-    /**
-     * @var Sql\Select
-     */
-    private $select = null;
+    private Sql\Select $select;
 
-    /**
-     * @var string
-     */
-    private $orderColumn = null;
+    private string $orderColumn;
 
-    /**
-     * @var string
-     */
-    private $externalDateFormat = 'Y-m-d';
+    private string $externalDateFormat = 'Y-m-d';
 
-    /**
-     * @var string
-     */
-    private $dbDateTimeFormat = MYSQL_DATETIME_FORMAT;
+    private string $dbDateTimeFormat = MYSQL_DATETIME_FORMAT;
 
-    /**
-     * @var DateTime
-     */
-    private $currentDate = null;
+    private DateTime $currentDate;
 
-    /**
-     * @var DateTime
-     */
-    private $prevDate = null;
+    private DateTime $prevDate;
 
-    /**
-     * @var DateTime
-     */
-    private $nextDate = null;
+    private DateTime $nextDate;
 
-    /**
-     * @var DateTime
-     */
-    private $minDate = null;
+    private DateTime $minDate;
 
-    /**
-     * @var Paginator\Paginator
-     */
-    private $paginator;
+    private Paginator\Paginator $paginator;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @param array $options
-     */
     public function __construct(array $options = [])
     {
-        $this->timezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
+        $this->timezone   = new DateTimeZone(self::DEFAULT_TIMEZONE);
         $this->dbTimezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
 
         $this->setOptions($options);
     }
 
-    /**
-     * @param array $options
-     * @return DayPictures
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): self
     {
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
@@ -113,9 +74,8 @@ class DayPictures
 
     /**
      * @param string $timezone
-     * @return DayPictures
      */
-    public function setTimeZone($timezone)
+    public function setTimeZone($timezone): self
     {
         $this->timezone = new DateTimeZone($timezone);
 
@@ -124,31 +84,22 @@ class DayPictures
 
     /**
      * @param string $timezone
-     * @return DayPictures
      */
-    public function setDbTimeZone($timezone)
+    public function setDbTimeZone($timezone): self
     {
         $this->dbTimezone = new DateTimeZone($timezone);
 
         return $this->reset();
     }
 
-    /**
-     * @param Sql\Select $select
-     * @return DayPictures
-     */
-    public function setSelect(Sql\Select $select)
+    public function setSelect(Sql\Select $select): self
     {
         $this->select = $select;
 
         return $this->reset();
     }
 
-    /**
-     * @param DateTime $date
-     * @return DayPictures
-     */
-    public function setMinDate(DateTime $date)
+    public function setMinDate(DateTime $date): self
     {
         $this->minDate = $date;
 
@@ -157,45 +108,32 @@ class DayPictures
 
     /**
      * @param string $column
-     * @return DayPictures
      */
-    public function setOrderColumn($column)
+    public function setOrderColumn($column): self
     {
         $this->orderColumn = $column;
 
         return $this->reset();
     }
 
-    /**
-     * @return bool
-     */
-    public function haveCurrentDate()
+    public function haveCurrentDate(): bool
     {
-        return (bool)$this->currentDate;
+        return (bool) $this->currentDate;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getCurrentDate()
+    public function getCurrentDate(): DateTime
     {
         return $this->currentDate;
     }
 
-    /**
-     * @return string
-     */
-    public function getCurrentDateStr()
+    public function getCurrentDateStr(): ?string
     {
         return $this->currentDate
             ? $this->currentDate->format($this->externalDateFormat)
-            : false;
+            : null;
     }
 
-    /**
-     * @return int
-     */
-    public function getCurrentDateCount()
+    public function getCurrentDateCount(): int
     {
         return $this->currentDate ? $this->dateCount($this->currentDate) : 0;
     }
@@ -203,9 +141,8 @@ class DayPictures
     /**
      * @param string|DateTime $date
      * @throws Exception
-     * @return DayPictures
      */
-    public function setCurrentDate($date)
+    public function setCurrentDate($date): self
     {
         $dateObj = null;
 
@@ -225,28 +162,23 @@ class DayPictures
         return $this->reset();
     }
 
-    /**
-     * @return boolean
-     */
-    public function haveCurrentDayPictures()
+    public function haveCurrentDayPictures(): bool
     {
         if (! $this->currentDate) {
             return false;
         }
 
         $paginator = $this->getPaginator();
-        $count = $paginator ? $paginator->getTotalItemCount() : 0;
+        $count     = $paginator ? $paginator->getTotalItemCount() : 0;
 
         return $count > 0;
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     *
-     * @return string|null
      * @throws Exception
      */
-    public function getLastDateStr()
+    public function getLastDateStr(): ?string
     {
         $select = $this->selectClone()
             ->order($this->orderColumn . ' desc')
@@ -269,11 +201,9 @@ class DayPictures
 
     /**
      * @suppress PhanUndeclaredMethod
-     *
-     * @return DayPictures
      * @throws Exception
      */
-    private function calcPrevDate()
+    private function calcPrevDate(): self
     {
         if (! $this->currentDate) {
             return $this;
@@ -286,7 +216,7 @@ class DayPictures
                         $this->orderColumn,
                         Sql\Predicate\Operator::OP_LT,
                         $this->startOfDayDbValue($this->currentDate)
-                    )
+                    ),
                 ])
                 ->order($this->orderColumn . ' DESC')
                 ->limit(1);
@@ -297,7 +227,7 @@ class DayPictures
                         $this->orderColumn,
                         Sql\Predicate\Operator::OP_GTE,
                         $this->startOfDayDbValue($this->minDate)
-                    )
+                    ),
                 ]);
             }
 
@@ -333,23 +263,21 @@ class DayPictures
     }
 
     /**
-     * @return string
      * @throws Exception
      */
-    public function getPrevDateStr()
+    public function getPrevDateStr(): ?string
     {
         $this->calcPrevDate();
 
         return $this->prevDate
             ? $this->prevDate->format($this->externalDateFormat)
-            : false;
+            : null;
     }
 
     /**
-     * @return int
      * @throws Exception
      */
-    public function getPrevDateCount()
+    public function getPrevDateCount(): int
     {
         $this->calcPrevDate();
 
@@ -358,11 +286,9 @@ class DayPictures
 
     /**
      * @suppress PhanUndeclaredMethod
-     *
-     * @return DayPictures
      * @throws Exception
      */
-    private function calcNextDate()
+    private function calcNextDate(): self
     {
         if (! $this->currentDate) {
             return $this;
@@ -375,7 +301,7 @@ class DayPictures
                         $this->orderColumn,
                         Sql\Predicate\Operator::OP_GT,
                         $this->endOfDayDbValue($this->currentDate)
-                    )
+                    ),
                 ])
                 ->order($this->orderColumn)
                 ->limit(1);
@@ -412,23 +338,21 @@ class DayPictures
     }
 
     /**
-     * @return string
      * @throws Exception
      */
-    public function getNextDateStr()
+    public function getNextDateStr(): ?string
     {
         $this->calcNextDate();
 
         return $this->nextDate
             ? $this->nextDate->format($this->externalDateFormat)
-            : false;
+            : null;
     }
 
     /**
-     * @return int
      * @throws Exception
      */
-    public function getNextDateCount()
+    public function getNextDateCount(): int
     {
         $this->calcNextDate();
 
@@ -455,11 +379,7 @@ class DayPictures
         return $this->paginator;
     }
 
-    /**
-     * @param DateTime $date
-     * @return int
-     */
-    private function dateCount(DateTime $date)
+    private function dateCount(DateTime $date): int
     {
         $select = $this->selectClone()->where([
             new Sql\Predicate\Between(
@@ -476,70 +396,45 @@ class DayPictures
         return $paginator->getTotalItemCount();
     }
 
-    /**
-     * @return DayPictures
-     */
-    private function reset()
+    private function reset(): self
     {
-        $this->nextDate = null;
-        $this->prevDate = null;
+        $this->nextDate  = null;
+        $this->prevDate  = null;
         $this->paginator = null;
 
         return $this;
     }
 
-    /**
-     * @param DateTime $date
-     * @return DateTime
-     */
-    private function endOfDay(DateTime $date)
+    private function endOfDay(DateTime $date): DateTime
     {
         $d = clone $date;
         return $d->setTime(23, 59, 59);
     }
 
-    /**
-     * @param DateTime $date
-     * @return DateTime
-     */
-    private function startOfDay(DateTime $date)
+    private function startOfDay(DateTime $date): DateTime
     {
         $d = clone $date;
         return $d->setTime(0, 0, 0);
     }
 
-    /**
-     * @param DateTime $date
-     * @return string
-     */
-    private function startOfDayDbValue(DateTime $date)
+    private function startOfDayDbValue(DateTime $date): string
     {
         $d = $this->startOfDay($date)->setTimezone($this->dbTimezone);
         return $d->format($this->dbDateTimeFormat);
     }
 
-    /**
-     * @param DateTime $date
-     * @return string
-     */
-    private function endOfDayDbValue(DateTime $date)
+    private function endOfDayDbValue(DateTime $date): string
     {
         $d = $this->endOfDay($date)->setTimezone($this->dbTimezone);
         return $d->format($this->dbDateTimeFormat);
     }
 
-    /**
-     * @return Sql\Select
-     */
-    private function selectClone()
+    private function selectClone(): Sql\Select
     {
         return clone $this->select;
     }
 
-    /**
-     * @return Sql\Select
-     */
-    public function getCurrentDateSelect()
+    public function getCurrentDateSelect(): Sql\Select
     {
         $select = $this->selectClone()
             ->where([
@@ -547,7 +442,7 @@ class DayPictures
                     $this->orderColumn,
                     $this->startOfDayDbValue($this->currentDate),
                     $this->endOfDayDbValue($this->currentDate)
-                )
+                ),
             ])
             ->order($this->orderColumn . ' DESC');
 
@@ -557,7 +452,7 @@ class DayPictures
                     $this->orderColumn,
                     Sql\Predicate\Operator::OP_GTE,
                     $this->startOfDayDbValue($this->minDate)
-                )
+                ),
             ]);
         }
 

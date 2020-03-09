@@ -2,37 +2,30 @@
 
 namespace Application\Controller\Console;
 
-use Autowp\Image\StorageInterface;
-use geoPHP;
-use Point;
-use Zend\Db\Sql;
-use Zend\Console\Console;
-use Zend\Mvc\Controller\AbstractActionController;
 use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Model\Picture;
+use Autowp\Image\StorageInterface;
+use geoPHP;
+use Laminas\Console\Console;
+use Laminas\Db\Sql;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Point;
+
+use const PHP_EOL;
 
 class PicturesController extends AbstractActionController
 {
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var DuplicateFinder
-     */
-    private $df;
+    private DuplicateFinder $df;
 
-    /**
-     * @var StorageInterface
-     */
-    private $imageStorage;
+    private StorageInterface $imageStorage;
 
     public function __construct(Picture $picture, DuplicateFinder $df, StorageInterface $storage)
     {
-        $this->picture = $picture;
-        $this->df = $df;
+        $this->picture      = $picture;
+        $this->df           = $df;
         $this->imageStorage = $storage;
     }
 
@@ -41,12 +34,12 @@ class PicturesController extends AbstractActionController
      */
     public function fillPointAction()
     {
-        $console = Console::getInstance();
+        $console      = Console::getInstance();
         $imageStorage = $this->imageStorage();
 
         $rows = $this->picture->getRows([
             'has_point' => false,
-            'order'     => 'id'
+            'order'     => 'id',
         ]);
 
         $extractor = new ExifGPSExtractor();
@@ -56,16 +49,16 @@ class PicturesController extends AbstractActionController
         foreach ($rows as $row) {
             $console->writeLine($row['id']);
             $exif = $imageStorage->getImageEXIF($row['image_id']);
-            $gps = $extractor->extract($exif);
+            $gps  = $extractor->extract($exif);
             if ($gps !== false) {
                 $console->writeLine("Picture " . $row['id']);
 
                 $point = new Point($gps['lng'], $gps['lat']);
 
                 $this->picture->getTable()->update([
-                    'point' => new Sql\Expression('ST_GeomFromWKB(?)', [$point->out('wkb')])
+                    'point' => new Sql\Expression('ST_GeomFromWKB(?)', [$point->out('wkb')]),
                 ], [
-                    'id' => $row['id']
+                    'id' => $row['id'],
                 ]);
             }
         }
@@ -75,7 +68,7 @@ class PicturesController extends AbstractActionController
 
     public function dfIndexAction()
     {
-        $table = $this->picture->getTable();
+        $table  = $this->picture->getTable();
         $select = $table->getSql()->select()
             ->columns(['id', 'image_id'])
             ->join('df_hash', 'pictures.id = df_hash.picture_id', [], Sql\Select::JOIN_LEFT)

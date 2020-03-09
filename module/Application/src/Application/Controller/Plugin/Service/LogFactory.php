@@ -2,21 +2,18 @@
 
 namespace Application\Controller\Plugin\Service;
 
+use Application\Controller\Plugin\Log as Plugin;
 use Application\Model\Log;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Controller\Plugin\Log as Plugin;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class LogFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param ContainerInterface $container
-     * @param $requestedName
-     * @param array|null $options
-     * @return Plugin
+     * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Plugin
     {
         return new Plugin(
             $container->get(Log::class)

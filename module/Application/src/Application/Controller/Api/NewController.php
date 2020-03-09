@@ -2,21 +2,20 @@
 
 namespace Application\Controller\Api;
 
-use Zend\InputFilter\InputFilter;
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use Autowp\User\Controller\Plugin\User;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Service\DayPictures;
+use Autowp\User\Controller\Plugin\User;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\InputFilter\InputFilter;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+
+use function count;
 
 /**
- * Class NewController
- * @package Application\Controller\Api
- *
  * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
@@ -25,40 +24,19 @@ class NewController extends AbstractRestfulController
 {
     private const PER_PAGE = 30;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var InputFilter
-     */
-    private $inputFilter;
+    private InputFilter $inputFilter;
 
-    /**
-     * @var PictureItem
-     */
-    private $pictureItem;
+    private PictureItem $pictureItem;
 
-    /**
-     * @var RestHydrator
-     */
-    private $pictureHydrator;
+    private RestHydrator $pictureHydrator;
 
-    /**
-     * @var RestHydrator
-     */
-    private $pictureThumbnailHydrator;
+    private RestHydrator $pictureThumbnailHydrator;
 
-    /**
-     * @var Item
-     */
-    private $itemModel;
+    private Item $itemModel;
 
-    /**
-     * @var RestHydrator
-     */
-    private $itemHydrator;
+    private RestHydrator $itemHydrator;
 
     public function __construct(
         Picture $picture,
@@ -69,13 +47,13 @@ class NewController extends AbstractRestfulController
         RestHydrator $pictureThumbnailHydrator,
         RestHydrator $itemHydrator
     ) {
-        $this->picture = $picture;
-        $this->inputFilter = $inputFilter;
-        $this->pictureItem = $pictureItem;
-        $this->pictureHydrator = $pictureHydrator;
+        $this->picture                  = $picture;
+        $this->inputFilter              = $inputFilter;
+        $this->pictureItem              = $pictureItem;
+        $this->pictureHydrator          = $pictureHydrator;
         $this->pictureThumbnailHydrator = $pictureThumbnailHydrator;
-        $this->itemModel = $itemModel;
-        $this->itemHydrator = $itemHydrator;
+        $this->itemModel                = $itemModel;
+        $this->itemHydrator             = $itemHydrator;
     }
 
     public function indexAction()
@@ -94,12 +72,12 @@ class NewController extends AbstractRestfulController
             ->where(['pictures.status' => Picture::STATUS_ACCEPTED]);
 
         $service = new DayPictures([
-            'picture'      => $this->picture,
-            'timezone'     => $this->user()->timezone(),
-            'dbTimezone'   => MYSQL_TIMEZONE,
-            'select'       => $select,
-            'orderColumn'  => 'accept_datetime',
-            'currentDate'  => $values['date']
+            'picture'     => $this->picture,
+            'timezone'    => $this->user()->timezone(),
+            'dbTimezone'  => MYSQL_TIMEZONE,
+            'select'      => $select,
+            'orderColumn' => 'accept_datetime',
+            'currentDate' => $values['date'],
         ]);
 
         if (! $service->haveCurrentDate() || ! $service->haveCurrentDayPictures()) {
@@ -116,37 +94,37 @@ class NewController extends AbstractRestfulController
             ->setItemCountPerPage(self::PER_PAGE)
             ->setCurrentPageNumber($values['page']);
 
-        $prevDate = $service->getPrevDate();
+        $prevDate    = $service->getPrevDate();
         $currentDate = $service->getCurrentDate();
-        $nextDate = $service->getNextDate();
+        $nextDate    = $service->getNextDate();
 
         $groupsData = $this->splitPictures($paginator->getCurrentItems());
 
         $this->pictureHydrator->setOptions([
             'language' => $this->language(),
             'user_id'  => $user ? $user['id'] : null,
-            'fields'   => isset($values['fields']['pictures']) ? $values['fields']['pictures'] : []
+            'fields'   => $values['fields']['pictures'] ?? [],
         ]);
 
         $this->pictureThumbnailHydrator->setOptions([
             'language' => $this->language(),
             'user_id'  => $user ? $user['id'] : null,
-            'fields'   => isset($values['fields']['item_pictures']) ? $values['fields']['item_pictures'] : []
+            'fields'   => $values['fields']['item_pictures'] ?? [],
         ]);
 
         $this->itemHydrator->setOptions([
             'language' => $this->language(),
             'user_id'  => $user ? $user['id'] : null,
-            'fields'   => isset($values['fields']['item']) ? $values['fields']['item'] : []
+            'fields'   => $values['fields']['item'] ?? [],
         ]);
 
         $groups = [];
         foreach ($groupsData as $groupData) {
             $group = [
-                'type' => $groupData['type']
+                'type' => $groupData['type'],
             ];
-            if ($groupData['type'] == 'item') {
-                $itemRow = $this->itemModel->getRow(['id' => $groupData['item_id']]);
+            if ($groupData['type'] === 'item') {
+                $itemRow       = $this->itemModel->getRow(['id' => $groupData['item_id']]);
                 $group['item'] = $this->itemHydrator->extract($itemRow);
 
                 $ids = [];
@@ -157,10 +135,10 @@ class NewController extends AbstractRestfulController
                 $pictureRows = $this->picture->getRows([
                     'id'    => $ids,
                     'item'  => [
-                        'id' => $groupData['item_id']
+                        'id' => $groupData['item_id'],
                     ],
                     'limit' => 6,
-                    'order' => 'accept_datetime_desc'
+                    'order' => 'accept_datetime_desc',
                 ]);
 
                 $group['pictures'] = [];
@@ -171,10 +149,10 @@ class NewController extends AbstractRestfulController
                 $group['total_pictures'] = $this->picture->getCount([
                     'status'      => Picture::STATUS_ACCEPTED,
                     'item'        => [
-                        'id' => $groupData['item_id']
+                        'id' => $groupData['item_id'],
                     ],
                     'accept_date' => $values['date'],
-                    'timezone'    => $this->user()->timezone()
+                    'timezone'    => $this->user()->timezone(),
                 ]);
             } else {
                 $group['pictures'] = [];
@@ -191,7 +169,7 @@ class NewController extends AbstractRestfulController
             'paginator' => $paginator->getPages(),
             'prev'      => [
                 'date'  => $prevDate ? $prevDate->format('Y-m-d') : null,
-                'count' => $service->getPrevDateCount()
+                'count' => $service->getPrevDateCount(),
             ],
             'current'   => [
                 'date'  => $currentDate ? $currentDate->format('Y-m-d') : null,
@@ -199,8 +177,8 @@ class NewController extends AbstractRestfulController
             ],
             'next'      => [
                 'date'  => $nextDate ? $nextDate->format('Y-m-d') : null,
-                'count' => $service->getNextDateCount()
-            ]
+                'count' => $service->getNextDateCount(),
+            ],
         ]);
     }
 
@@ -209,19 +187,19 @@ class NewController extends AbstractRestfulController
         $items = [];
         foreach ($pictures as $pictureRow) {
             $itemIds = $this->pictureItem->getPictureItems($pictureRow['id'], PictureItem::PICTURE_CONTENT);
-            if (count($itemIds) != 1) {
+            if (count($itemIds) !== 1) {
                 $items[] = [
                     'type'    => 'picture',
-                    'picture' => $pictureRow
+                    'picture' => $pictureRow,
                 ];
             } else {
                 $itemId = $itemIds[0];
 
                 $found = false;
                 foreach ($items as &$item) {
-                    if ($item['type'] == 'item' && $item['item_id'] == $itemId) {
+                    if ($item['type'] === 'item' && $item['item_id'] === $itemId) {
                         $item['pictures'][] = $pictureRow;
-                        $found = true;
+                        $found              = true;
                         break;
                     }
                 }
@@ -231,7 +209,7 @@ class NewController extends AbstractRestfulController
                     $items[] = [
                         'item_id'  => $itemId,
                         'type'     => 'item',
-                        'pictures' => [$pictureRow]
+                        'pictures' => [$pictureRow],
                     ];
                 }
             }
@@ -239,9 +217,9 @@ class NewController extends AbstractRestfulController
 
         // convert single picture items to picture record
         $tempItems = $items;
-        $items = [];
+        $items     = [];
         foreach ($tempItems as $item) {
-            if ($item['type'] != 'item') {
+            if ($item['type'] !== 'item') {
                 $items[] = $item;
                 continue;
             }
@@ -250,7 +228,7 @@ class NewController extends AbstractRestfulController
                 foreach ($item['pictures'] as $picture) {
                     $items[] = [
                         'type'    => 'picture',
-                        'picture' => $picture
+                        'picture' => $picture,
                     ];
                 }
             } else {
@@ -259,15 +237,15 @@ class NewController extends AbstractRestfulController
         }
 
         // merge sibling single items
-        $tmpItems = $items;
-        $items = [];
+        $tmpItems       = $items;
+        $items          = [];
         $picturesBuffer = [];
         foreach ($tmpItems as $itemId => $item) {
-            if ($item['type'] == 'item') {
+            if ($item['type'] === 'item') {
                 if (count($picturesBuffer) > 0) {
-                    $items[] = [
+                    $items[]        = [
                         'type'     => 'pictures',
-                        'pictures' => $picturesBuffer
+                        'pictures' => $picturesBuffer,
                     ];
                     $picturesBuffer = [];
                 }
@@ -281,7 +259,7 @@ class NewController extends AbstractRestfulController
         if (count($picturesBuffer) > 0) {
             $items[] = [
                 'type'     => 'pictures',
-                'pictures' => $picturesBuffer
+                'pictures' => $picturesBuffer,
             ];
         }
 

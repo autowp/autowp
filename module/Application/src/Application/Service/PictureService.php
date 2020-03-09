@@ -3,65 +3,53 @@
 namespace Application\Service;
 
 use Application\Comments;
-use ArrayObject;
-use Autowp\Comments\Attention;
-use Autowp\TextStorage;
-use Exception;
-use geoPHP;
-use ImagickException;
-use Point;
-use Zend\Db\Sql;
-use Autowp\Comments\CommentsService;
-use Autowp\Image;
 use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\UserPicture;
+use ArrayObject;
+use Autowp\Comments\Attention;
+use Autowp\Comments\CommentsService;
+use Autowp\Image;
+use Autowp\TextStorage;
+use Exception;
+use geoPHP;
+use ImagickException;
+use Laminas\Db\Sql;
+use Point;
+
+use function count;
+use function getimagesize;
+use function image_type_to_extension;
+use function inet_pton;
+use function rand;
+use function sprintf;
+use function strip_tags;
+use function trim;
+
+use const IMAGETYPE_JPEG;
+use const IMAGETYPE_PNG;
 
 class PictureService
 {
     public const QUEUE_LIFETIME = 7; // days
 
-    /**
-     * @var Picture
-     */
-    private $picture;
+    private Picture $picture;
 
-    /**
-     * @var CommentsService
-     */
-    private $comments;
+    private CommentsService $comments;
 
-    /**
-     * @var Image\Storage
-     */
-    private $imageStorage;
+    private Image\Storage $imageStorage;
 
-    /**
-     * @var TelegramService
-     */
-    private $telegram;
+    private TelegramService $telegram;
 
-    /**
-     * @var DuplicateFinder
-     */
-    private $duplicateFinder;
+    private DuplicateFinder $duplicateFinder;
 
-    /**
-     * @var PictureItem
-     */
-    private $pictureItem;
+    private PictureItem $pictureItem;
 
-    /**
-     * @var UserPicture
-     */
-    private $userPicture;
+    private UserPicture $userPicture;
 
-    /**
-     * @var TextStorage\Service
-     */
-    private $textStorage;
+    private TextStorage\Service $textStorage;
 
     public function __construct(
         Picture $picture,
@@ -73,14 +61,14 @@ class PictureService
         UserPicture $userPicture,
         TextStorage\Service $textStorage
     ) {
-        $this->picture = $picture;
-        $this->comments = $comments;
-        $this->imageStorage = $imageStorage;
-        $this->telegram = $telegram;
+        $this->picture         = $picture;
+        $this->comments        = $comments;
+        $this->imageStorage    = $imageStorage;
+        $this->telegram        = $telegram;
         $this->duplicateFinder = $duplicateFinder;
-        $this->pictureItem = $pictureItem;
-        $this->userPicture = $userPicture;
-        $this->textStorage = $textStorage;
+        $this->pictureItem     = $pictureItem;
+        $this->userPicture     = $userPicture;
+        $this->textStorage     = $textStorage;
     }
 
     /**
@@ -118,7 +106,7 @@ class PictureService
                 $imageId = $picture['image_id'];
                 if ($imageId) {
                     $this->picture->getTable()->delete([
-                        'id = ?' => $picture['id']
+                        'id = ?' => $picture['id'],
                     ]);
 
                     $this->imageStorage->removeImage($imageId);
@@ -133,13 +121,6 @@ class PictureService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param string $path
-     * @param int $userId
-     * @param string $remoteAddr
-     * @param int $itemId
-     * @param int $perspectiveId
-     * @param int $replacePictureId
-     * @param string $note
      * @return array|ArrayObject|null
      * @throws Image\Storage\Exception
      * @throws ImagickException
@@ -154,9 +135,9 @@ class PictureService
         int $replacePictureId,
         string $note
     ) {
-        list ($width, $height, $imageType) = getimagesize($path);
-        $width = (int)$width;
-        $height = (int)$height;
+        [$width, $height, $imageType] = getimagesize($path);
+        $width                        = (int) $width;
+        $height                       = (int) $height;
         if ($width <= 0) {
             throw new Exception("Width <= 0");
         }
@@ -178,34 +159,34 @@ class PictureService
         $imageId = $this->imageStorage->addImageFromFile($path, 'picture', [
             'extension' => $ext,
             'pattern'   => 'autowp_' . rand(),
-            's3'        => true
+            's3'        => true,
         ]);
 
-        $image = $this->imageStorage->getImage($imageId);
+        $image    = $this->imageStorage->getImage($imageId);
         $fileSize = $image->getFileSize();
 
         $resolution = $this->imageStorage->getImageResolution($imageId);
 
         // add record to db
         $this->picture->getTable()->insert([
-            'image_id'      => $imageId,
-            'width'         => $width,
-            'height'        => $height,
-            'dpi_x'         => $resolution ? $resolution['x'] : null,
-            'dpi_y'         => $resolution ? $resolution['y'] : null,
-            'owner_id'      => $userId,
-            'add_date'      => new Sql\Expression('NOW()'),
-            'filesize'      => $fileSize,
-            'status'        => Picture::STATUS_INBOX,
-            'removing_date' => null,
-            'ip'            => inet_pton($remoteAddr),
-            'identity'      => $this->picture->generateIdentity(),
+            'image_id'           => $imageId,
+            'width'              => $width,
+            'height'             => $height,
+            'dpi_x'              => $resolution ? $resolution['x'] : null,
+            'dpi_y'              => $resolution ? $resolution['y'] : null,
+            'owner_id'           => $userId,
+            'add_date'           => new Sql\Expression('NOW()'),
+            'filesize'           => $fileSize,
+            'status'             => Picture::STATUS_INBOX,
+            'removing_date'      => null,
+            'ip'                 => inet_pton($remoteAddr),
+            'identity'           => $this->picture->generateIdentity(),
             'replace_picture_id' => $replacePictureId ? $replacePictureId : null,
         ]);
 
         $pictureId = (int) $this->picture->getTable()->getLastInsertValue();
 
-        $picture = $this->picture->getRow(['id' => (int)$pictureId]);
+        $picture = $this->picture->getRow(['id' => (int) $pictureId]);
         if (! $picture) {
             throw new Exception("Picture `$pictureId` not found");
         }
@@ -213,7 +194,7 @@ class PictureService
         if ($itemId) {
             $this->pictureItem->setPictureItems($pictureId, PictureItem::PICTURE_CONTENT, [$itemId]);
             $this->pictureItem->setProperties($pictureId, $itemId, PictureItem::PICTURE_CONTENT, [
-                'perspective' => $perspectiveId
+                'perspective' => $perspectiveId,
             ]);
         } elseif ($replacePictureId) {
             $itemsData = $this->pictureItem->getPictureItemsData($replacePictureId);
@@ -221,7 +202,7 @@ class PictureService
                 $this->pictureItem->add($pictureId, $item['item_id'], $item['type']);
                 if ($item['perspective_id']) {
                     $this->pictureItem->setProperties($pictureId, $item['item_id'], $item['type'], [
-                        'perspective' => $item['perspective_id']
+                        'perspective' => $item['perspective_id'],
                     ]);
                 }
             }
@@ -232,7 +213,7 @@ class PictureService
 
         // rename file to new
         $this->imageStorage->changeImageName($imageId, [
-            'pattern' => $this->picture->getFileNamePattern($picture['id'])
+            'pattern' => $this->picture->getFileNamePattern($picture['id']),
         ]);
 
         $exif = $this->imageStorage->getImageEXIF($imageId);
@@ -242,9 +223,9 @@ class PictureService
             if ($copyrights) {
                 $textId = $this->textStorage->createText($copyrights, $userId);
                 $this->picture->getTable()->update([
-                    'copyrights_text_id' => $textId
+                    'copyrights_text_id' => $textId,
                 ], [
-                    'id' => $pictureId
+                    'id' => $pictureId,
                 ]);
             }
         }
@@ -258,7 +239,7 @@ class PictureService
                 'authorId'           => $userId,
                 'message'            => $note,
                 'ip'                 => $remoteAddr,
-                'moderatorAttention' => Attention::NONE
+                'moderatorAttention' => Attention::NONE,
             ]);
         }
 
@@ -269,17 +250,17 @@ class PictureService
         );
 
         // read gps
-        $exif = $this->imageStorage->getImageEXIF($imageId);
+        $exif      = $this->imageStorage->getImageEXIF($imageId);
         $extractor = new ExifGPSExtractor();
-        $gps = $extractor->extract($exif);
+        $gps       = $extractor->extract($exif);
         if ($gps !== false) {
             geoPHP::version();
             $point = new Point($gps['lng'], $gps['lat']);
 
             $this->picture->getTable()->update([
-                'point' => new Sql\Expression('ST_GeomFromWKB(?)', [$point->out('wkb')])
+                'point' => new Sql\Expression('ST_GeomFromWKB(?)', [$point->out('wkb')]),
             ], [
-                'id' => $pictureId
+                'id' => $pictureId,
             ]);
         }
 

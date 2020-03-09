@@ -6,9 +6,16 @@ use ArrayObject;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Paginator;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Paginator;
+
+use function array_replace;
+use function ceil;
+use function count;
+use function inet_ntop;
+use function is_array;
+use function reset;
 
 class CommentsService
 {
@@ -16,35 +23,23 @@ class CommentsService
 
     public const MAX_MESSAGE_LENGTH = 16 * 1024;
 
-    /**
-     * @var TableGateway
-     */
-    private $voteTable;
+    /** @var TableGateway */
+    private TableGateway $voteTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $topicTable;
+    /** @var TableGateway */
+    private TableGateway $topicTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $topicViewTable;
+    /** @var TableGateway */
+    private TableGateway $topicViewTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $messageTable;
+    /** @var TableGateway */
+    private TableGateway $messageTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $topicSubscribeTable;
+    /** @var TableGateway */
+    private TableGateway $topicSubscribeTable;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    /** @var User */
+    private User $userModel;
 
     public function __construct(
         TableGateway $voteTable,
@@ -54,33 +49,30 @@ class CommentsService
         TableGateway $topicSubscribeTable,
         User $userModel
     ) {
-        $this->voteTable = $voteTable;
-        $this->topicTable = $topicTable;
-        $this->messageTable = $messageTable;
-        $this->topicViewTable = $topicViewTable;
+        $this->voteTable           = $voteTable;
+        $this->topicTable          = $topicTable;
+        $this->messageTable        = $messageTable;
+        $this->topicViewTable      = $topicViewTable;
         $this->topicSubscribeTable = $topicSubscribeTable;
-        $this->userModel = $userModel;
+        $this->userModel           = $userModel;
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     *
-     * @param array $data
-     * @return int
      */
     public function add(array $data): int
     {
-        $typeId = (int)$data['typeId'];
-        $itemId = (int)$data['itemId'];
-        $authorId = (int)$data['authorId'];
-        $parentId = isset($data['parentId']) && $data['parentId'] ? (int)$data['parentId'] : null;
+        $typeId   = (int) $data['typeId'];
+        $itemId   = (int) $data['itemId'];
+        $authorId = (int) $data['authorId'];
+        $parentId = isset($data['parentId']) && $data['parentId'] ? (int) $data['parentId'] : null;
 
         $parentMessage = null;
         if ($parentId) {
             $parentMessage = $this->messageTable->select([
                 'type_id = ?' => $typeId,
                 'item_id = ?' => $itemId,
-                'id = ?'      => $parentId
+                'id = ?'      => $parentId,
             ])->current();
             if (! $parentMessage) {
                 return 0;
@@ -97,11 +89,11 @@ class CommentsService
             'item_id'             => $itemId,
             'parent_id'           => $parentMessage ? $parentMessage['id'] : null,
             'author_id'           => $authorId,
-            'message'             => (string)$data['message'],
+            'message'             => (string) $data['message'],
             'ip'                  => new Sql\Expression('INET6_ATON(?)', [$data['ip']]),
             'moderator_attention' => $data['moderatorAttention']
                 ? Attention::REQUIRED
-                : Attention::NONE
+                : Attention::NONE,
         ];
 
         $this->messageTable->insert($data);
@@ -119,7 +111,6 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $messageId
      */
     private function updateMessageRepliesCount(int $messageId): void
     {
@@ -130,9 +121,9 @@ class CommentsService
         })->current();
 
         $this->messageTable->update([
-            'replies_count' => $row['count']
+            'replies_count' => $row['count'],
         ], [
-            'id' => $messageId
+            'id' => $messageId,
         ]);
     }
 
@@ -144,13 +135,6 @@ class CommentsService
     }
 
     /**
-     * @param int $type
-     * @param int $item
-     * @param int $parentId
-     * @param int $userId
-     * @param int $perPage
-     * @param int $page
-     * @return array
      * @throws Exception
      */
     private function getRecursive(
@@ -180,20 +164,20 @@ class CommentsService
 
         $comments = [];
         foreach ($rows as $row) {
-            $author = $this->userModel->getRow(['id' => (int)$row['author_id']]);
+            $author = $this->userModel->getRow(['id' => (int) $row['author_id']]);
 
             $vote = null;
             if ($userId) {
                 $voteRow = $this->voteTable->select([
                     'comment_id = ?' => $row['id'],
-                    'user_id = ?'    => (int)$userId
+                    'user_id = ?'    => (int) $userId,
                 ])->current();
-                $vote = $voteRow ? $voteRow['vote'] : null;
+                $vote    = $voteRow ? $voteRow['vote'] : null;
             }
 
             $deletedBy = null;
             if ($row['deleted']) {
-                $deletedBy = $this->userModel->getRow(['id' => (int)$row['deleted_by']]);
+                $deletedBy = $this->userModel->getRow(['id' => (int) $row['deleted_by']]);
             }
 
             if ($row['replies_count'] > 0) {
@@ -213,7 +197,7 @@ class CommentsService
                 'userVote'            => $vote,
                 'deleted'             => $row['deleted'],
                 'deletedBy'           => $deletedBy,
-                'messages'            => $submessages
+                'messages'            => $submessages,
             ];
         }
 
@@ -221,24 +205,13 @@ class CommentsService
     }
 
     /**
-     * @param int $type
-     * @param int $item
-     * @param int $userId
-     * @param int $perPage
-     * @param int $page
-     * @return array
      * @throws Exception
      */
-    public function get($type, $item, int $userId, int $perPage = 0, int $page = 0)
+    public function get(int $type, int $item, int $userId, int $perPage = 0, int $page = 0): array
     {
         return $this->getRecursive($type, $item, 0, $userId, $perPage, $page);
     }
 
-    /**
-     * @param int $typeId
-     * @param int $itemId
-     * @param int $userId
-     */
     public function updateTopicView(int $typeId, int $itemId, int $userId): void
     {
         $sql = '
@@ -253,15 +226,12 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $id
-     * @param int $userId
-     * @return bool
      */
     public function queueDeleteMessage(int $id, int $userId): bool
     {
         $comment = $this->getMessageRow($id);
 
-        if ($comment['moderator_attention'] == Attention::REQUIRED) {
+        if ($comment['moderator_attention'] === Attention::REQUIRED) {
             return false;
         }
 
@@ -272,40 +242,34 @@ class CommentsService
         $this->messageTable->update([
             'deleted'     => 1,
             'deleted_by'  => $userId,
-            'delete_date' => new Sql\Expression('NOW()')
+            'delete_date' => new Sql\Expression('NOW()'),
         ], [
-            'id = ?' => $comment['id']
+            'id = ?' => $comment['id'],
         ]);
 
         return true;
     }
 
-    /**
-     * @param int $id
-     */
     public function restoreMessage(int $id): void
     {
         $comment = $this->getMessageRow($id);
         if ($comment) {
             $this->messageTable->update([
                 'deleted'     => 0,
-                'delete_date' => null
+                'delete_date' => null,
             ], [
-                'id = ?' => $comment['id']
+                'id = ?' => $comment['id'],
             ]);
         }
     }
 
-    /**
-     * @param int $id
-     */
     public function completeMessage(int $id): void
     {
         $this->messageTable->update([
-            'moderator_attention' => Attention::COMPLETED
+            'moderator_attention' => Attention::COMPLETED,
         ], [
             'id = ?'                  => $id,
-            'moderator_attention = ?' => Attention::REQUIRED
+            'moderator_attention = ?' => Attention::REQUIRED,
         ]);
     }
 
@@ -315,11 +279,11 @@ class CommentsService
         if (! $message) {
             return [
                 'success' => false,
-                'error'   => 'Message not found'
+                'error'   => 'Message not found',
             ];
         }
 
-        if ($message['author_id'] == $userId) {
+        if ($message['author_id'] === $userId) {
             return [
                 'success' => false,
                 'error'   => 'Self-vote forbidden',
@@ -331,15 +295,15 @@ class CommentsService
             VALUES (:comment_id, :user_id, :vote)
             ON DUPLICATE KEY UPDATE vote = VALUES(vote)
         ', [
-            'comment_id' => $message['id'],
-            'user_id'    => $userId,
-            'vote'       => $vote > 0 ? 1 : -1,
+        'comment_id' => $message['id'],
+        'user_id'    => $userId,
+        'vote'       => $vote > 0 ? 1 : -1,
         ]);
 
-        if ($result->getAffectedRows() == 0) {
+        if ($result->getAffectedRows() === 0) {
             return [
                 'success' => false,
-                'error'   => 'Already voted'
+                'error'   => 'Already voted',
             ];
         }
 
@@ -347,15 +311,12 @@ class CommentsService
 
         return [
             'success' => true,
-            'vote'    => $newVote
+            'vote'    => $newVote,
         ];
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     *
-     * @param int $messageId
-     * @return int
      */
     private function updateVote(int $messageId): int
     {
@@ -366,18 +327,14 @@ class CommentsService
         })->current();
 
         $this->messageTable->update([
-            'vote' => $row['count']
+            'vote' => $row['count'],
         ], [
-            'id = ?' => $messageId
+            'id = ?' => $messageId,
         ]);
 
         return (int) $row['count'];
     }
 
-    /**
-     * @param int $id
-     * @return array|null
-     */
     public function getVotes(int $id): ?array
     {
         $message = $this->getMessageRow($id);
@@ -386,12 +343,12 @@ class CommentsService
         }
 
         $voteRows = $this->voteTable->select([
-            'comment_id' => $message['id']
+            'comment_id' => $message['id'],
         ]);
 
         $positiveVotes = $negativeVotes = [];
         foreach ($voteRows as $voteRow) {
-            $user = $this->userModel->getRow(['id' => (int)$voteRow['user_id']]);
+            $user = $this->userModel->getRow(['id' => (int) $voteRow['user_id']]);
             if ($voteRow['vote'] > 0) {
                 $positiveVotes[] = $user;
             } elseif ($voteRow['vote'] < 0) {
@@ -401,24 +358,18 @@ class CommentsService
 
         return [
             'positiveVotes' => $positiveVotes,
-            'negativeVotes' => $negativeVotes
+            'negativeVotes' => $negativeVotes,
         ];
     }
 
-    /**
-     * @param int $srcTypeId
-     * @param int $srcItemId
-     * @param int $dstTypeId
-     * @param int $dstItemId
-     */
     public function moveMessages(int $srcTypeId, int $srcItemId, int $dstTypeId, int $dstItemId): void
     {
         $this->messageTable->update([
             'type_id' => $dstTypeId,
-            'item_id' => $dstItemId
+            'item_id' => $dstItemId,
         ], [
             'type_id' => $srcTypeId,
-            'item_id' => $srcItemId
+            'item_id' => $srcItemId,
         ]);
 
         $this->updateTopicStat($srcTypeId, $srcItemId);
@@ -426,8 +377,6 @@ class CommentsService
     }
 
     /**
-     * @param int $type
-     * @param int $item
      * @return array|ArrayObject|null
      */
     public function getLastMessageRow(int $type, int $item)
@@ -436,40 +385,34 @@ class CommentsService
             $select
                 ->where([
                     'type_id' => $type,
-                    'item_id' => $item
+                    'item_id' => $item,
                 ])
                 ->order('datetime DESC')
                 ->limit(1);
         })->current();
     }
 
-    /**
-     * @param int $type
-     * @param int $item
-     * @return bool
-     */
     public function topicHaveModeratorAttention(int $type, int $item): bool
     {
-        return (bool)$this->messageTable->select([
+        return (bool) $this->messageTable->select([
             'item_id'             => $item,
             'type_id'             => $type,
-            'moderator_attention' => Attention::REQUIRED
+            'moderator_attention' => Attention::REQUIRED,
         ])->current();
     }
 
     /**
-     * @param int $id
      * @return array|ArrayObject
      */
     public function getMessageRow(int $id)
     {
         return $this->messageTable->select([
-            'id = ?' => (int)$id
+            'id = ?' => (int) $id,
         ])->current();
     }
 
     /**
-     * @param array $message
+     * @param array|ArrayObject $message
      * @return array|ArrayObject|null
      */
     private function getMessageRoot($message)
@@ -480,7 +423,7 @@ class CommentsService
             $root = $this->messageTable->select([
                 'item_id = ?' => $root['item_id'],
                 'type_id = ?' => $root['type_id'],
-                'id = ?'      => $root['parent_id']
+                'id = ?'      => $root['parent_id'],
             ])->current();
         }
 
@@ -489,10 +432,7 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     *
      * @param array $message
-     * @param int $perPage
-     * @return int
      */
     public function getMessagePage($message, int $perPage): int
     {
@@ -509,7 +449,7 @@ class CommentsService
                         'item_id = ?'  => $root['item_id'],
                         'type_id = ?'  => $root['type_id'],
                         'datetime < ?' => $root['datetime'],
-                        'parent_id is null'
+                        'parent_id is null',
                     ]);
             }
         )->current();
@@ -517,10 +457,6 @@ class CommentsService
         return ceil(($row['count'] + 1) / $perPage);
     }
 
-    /**
-     * @param int $messageId
-     * @return int|null
-     */
     public function getMessageAuthorId(int $messageId): ?int
     {
         $row = $this->getMessageRow($messageId);
@@ -551,7 +487,7 @@ class CommentsService
                 using(type_id, item_id, id)
             set comment_message.replies_count = __cms.count
         ');
-        $result = $statement->execute();
+        $result    = $statement->execute();
 
         return $result->getAffectedRows();
     }
@@ -560,13 +496,13 @@ class CommentsService
     {
         $this->messageTable->update([
             'item_id' => $newItemId,
-            'type_id' => $newTypeId
+            'type_id' => $newTypeId,
         ], [
-            'parent_id' => $parentId
+            'parent_id' => $parentId,
         ]);
 
         $rows = $this->messageTable->select([
-            'parent_id' => $parentId
+            'parent_id' => $parentId,
         ]);
 
         foreach ($rows as $row) {
@@ -584,16 +520,16 @@ class CommentsService
         $oldTypeId = $messageRow['type_id'];
         $oldItemId = $messageRow['item_id'];
 
-        if ($oldItemId == $newItemId && $oldTypeId == $newTypeId) {
+        if ($oldItemId === $newItemId && $oldTypeId === $newTypeId) {
             return false;
         }
 
         $this->messageTable->update([
             'item_id'   => $newItemId,
             'type_id'   => $newTypeId,
-            'parent_id' => null
+            'parent_id' => null,
         ], [
-            'id = ?' => $messageRow['id']
+            'id = ?' => $messageRow['id'],
         ]);
 
         $this->moveMessageRecursive($messageRow['id'], $newTypeId, $newItemId);
@@ -604,6 +540,9 @@ class CommentsService
         return true;
     }
 
+    /**
+     * @param ArrayObject|array $messageRow
+     */
     public function isNewMessage($messageRow, int $userId): bool
     {
         $row = $this->topicViewTable->select(function (Sql\Select $select) use ($messageRow, $userId) {
@@ -612,7 +551,7 @@ class CommentsService
                 ->where([
                     'item_id' => $messageRow['item_id'],
                     'type_id' => $messageRow['type_id'],
-                    'user_id' => $userId
+                    'user_id' => $userId,
                 ]);
         })->current();
 
@@ -620,16 +559,13 @@ class CommentsService
     }
 
     /**
-     * @param int $typeId
      * @param int|array $itemId
-     * @param int $userId
-     * @return array
      */
-    public function getTopicStatForUser(int $typeId, $itemId, int $userId)
+    public function getTopicStatForUser(int $typeId, $itemId, int $userId): array
     {
         $isArrayRequest = is_array($itemId);
 
-        $itemId = (array)$itemId;
+        $itemId = (array) $itemId;
 
         $rows = [];
         if (count($itemId) > 0) {
@@ -642,7 +578,7 @@ class CommentsService
                         ->columns(['item_id', 'messages'])
                         ->where([
                             'comment_topic.type_id' => $typeId,
-                            new Sql\Predicate\In('comment_topic.item_id', $itemId)
+                            new Sql\Predicate\In('comment_topic.item_id', $itemId),
                         ])
                         ->join(
                             'comment_topic_view',
@@ -653,7 +589,7 @@ class CommentsService
                                     'comment_topic_view.user_id',
                                     Sql\Predicate\Operator::OP_EQ,
                                     $userId
-                                )
+                                ),
                             ]),
                             ['timestamp'],
                             $select::JOIN_LEFT
@@ -664,9 +600,9 @@ class CommentsService
 
         $result = [];
         foreach ($rows as $row) {
-            $id = $row['item_id'];
+            $id       = $row['item_id'];
             $viewTime = $row['timestamp'];
-            $messages = (int)$row['messages'];
+            $messages = (int) $row['messages'];
 
             if (! $viewTime) {
                 $newMessages = $messages;
@@ -676,7 +612,7 @@ class CommentsService
 
             $result[$id] = [
                 'messages'    => $messages,
-                'newMessages' => $newMessages
+                'newMessages' => $newMessages,
             ];
         }
 
@@ -687,7 +623,7 @@ class CommentsService
         if (count($result) <= 0) {
             return [
                 'messages'    => 0,
-                'newMessages' => 0
+                'newMessages' => 0,
             ];
         }
 
@@ -695,14 +631,12 @@ class CommentsService
     }
 
     /**
-     * @param int $typeId
      * @param int|array $itemId
-     * @return array
      */
-    public function getTopicStat(int $typeId, $itemId)
+    public function getTopicStat(int $typeId, $itemId): array
     {
         $isArrayRequest = is_array($itemId);
-        $itemId = (array)$itemId;
+        $itemId         = (array) $itemId;
 
         $result = [];
 
@@ -716,14 +650,14 @@ class CommentsService
                         ->columns(['item_id', 'messages'])
                         ->where([
                             'comment_topic.type_id' => $typeId,
-                            new Sql\Predicate\In('comment_topic.item_id', $itemId)
+                            new Sql\Predicate\In('comment_topic.item_id', $itemId),
                         ]);
                 }
             );
 
             foreach ($rows as $row) {
                 $result[$row['item_id']] = [
-                    'messages' => (int)$row['messages']
+                    'messages' => (int) $row['messages'],
                 ];
             }
         }
@@ -734,25 +668,21 @@ class CommentsService
 
         if (count($result) <= 0) {
             return [
-                'messages' => 0
+                'messages' => 0,
             ];
         }
 
         return reset($result);
     }
 
-    /**
-     * @param int $typeId
-     * @param int $itemId
-     */
-    private function updateTopicStat($typeId, $itemId): void
+    private function updateTopicStat(int $typeId, int $itemId): void
     {
         $messagesCount = $this->countMessages($typeId, $itemId);
 
         if ($messagesCount <= 0) {
             $this->topicTable->delete([
                 'item_id = ?' => $itemId,
-                'type_id = ?' => $typeId
+                'type_id = ?' => $typeId,
             ]);
             return;
         }
@@ -771,10 +701,6 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $typeId
-     * @param int $itemId
-     * @param string $timestamp
-     * @return int
      */
     private function getMessagesCountFromTimestamp(int $typeId, int $itemId, string $timestamp): int
     {
@@ -784,23 +710,21 @@ class CommentsService
                 ->where([
                     'item_id = ?'  => $itemId,
                     'type_id = ?'  => $typeId,
-                    'datetime > ?' => $timestamp
+                    'datetime > ?' => $timestamp,
                 ]);
         })->current();
 
-        return (int)$countRow['count'];
+        return (int) $countRow['count'];
     }
 
     /**
-     * @param int $typeId
      * @param int|array $itemId
-     * @param int $userId
      * @return array|int
      */
     public function getNewMessages(int $typeId, $itemId, int $userId)
     {
         $isArrayRequest = is_array($itemId);
-        $itemId = (array)$itemId;
+        $itemId         = (array) $itemId;
 
         $rows = [];
         if (count($itemId) > 0) {
@@ -814,7 +738,7 @@ class CommentsService
                         ->where([
                             'type_id' => $typeId,
                             'user_id' => $userId,
-                            new Sql\Predicate\In('item_id', $itemId)
+                            new Sql\Predicate\In('item_id', $itemId),
                         ]);
                 }
             );
@@ -823,7 +747,7 @@ class CommentsService
         $result = [];
         foreach ($rows as $row) {
             if ($row['timestamp']) {
-                $id = $row['item_id'];
+                $id          = $row['item_id'];
                 $result[$id] = $this->getMessagesCountFromTimestamp($typeId, $id, $row['timestamp']);
             }
         }
@@ -841,9 +765,6 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $typeId
-     * @param int $itemId
-     * @return int
      */
     private function countMessages(int $typeId, int $itemId): int
     {
@@ -852,7 +773,7 @@ class CommentsService
                 ->columns(['count' => new Sql\Expression('count(1)')])
                 ->where([
                     'item_id' => $itemId,
-                    'type_id' => $typeId
+                    'type_id' => $typeId,
                 ]);
         })->current();
 
@@ -866,11 +787,11 @@ class CommentsService
                 ->columns(['messages'])
                 ->where([
                     'type_id' => $typeId,
-                    'item_id' => $itemId
+                    'item_id' => $itemId,
                 ]);
         })->current();
 
-        return $row ? (int)$row['messages'] : 0;
+        return $row ? (int) $row['messages'] : 0;
     }
 
     public function getMessagesCounts(int $typeId, array $itemIds): array
@@ -884,7 +805,7 @@ class CommentsService
                     ->columns(['item_id', 'messages'])
                     ->where([
                         'type_id' => $typeId,
-                        new Sql\Predicate\In('item_id', $itemIds)
+                        new Sql\Predicate\In('item_id', $itemIds),
                     ]);
             }
         );
@@ -897,14 +818,14 @@ class CommentsService
         return $result;
     }
 
-    private function getLastUpdate(int $typeId, int $itemId)
+    private function getLastUpdate(int $typeId, int $itemId): ?string
     {
         $row = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId) {
             $select
                 ->columns(['datetime'])
                 ->where([
                     'item_id' => $itemId,
-                    'type_id' => $typeId
+                    'type_id' => $typeId,
                 ])
                 ->order('datetime desc')
                 ->limit(1);
@@ -913,10 +834,6 @@ class CommentsService
         return $row ? $row['datetime'] : null;
     }
 
-    /**
-     * @param array $options
-     * @return Paginator\Paginator
-     */
     public function getMessagesPaginator(array $options = []): Paginator\Paginator
     {
         $select = $this->getMessagesSelect($options);
@@ -931,10 +848,6 @@ class CommentsService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     *
-     * @param int $type
-     * @param int $item
-     * @return Paginator\Paginator
      */
     public function getMessagePaginator(int $type, int $item): Paginator\Paginator
     {
@@ -944,7 +857,7 @@ class CommentsService
             ->where([
                 'item_id' => $item,
                 'type_id' => $type,
-                'parent_id is null'
+                'parent_id is null',
             ])
             ->order('datetime');
 
@@ -956,10 +869,6 @@ class CommentsService
         );
     }
 
-    /**
-     * @param array $options
-     * @return Sql\Select
-     */
     public function getMessagesSelect(array $options = []): Sql\Select
     {
         $defaults = [
@@ -974,37 +883,37 @@ class CommentsService
             'parent_id'       => null,
             'no_parents'      => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $select = new Sql\Select($this->messageTable->getTable());
 
         if (isset($options['attention'])) {
             $select->where([
-                'comment_message.moderator_attention = ?' => $options['attention']
+                'comment_message.moderator_attention = ?' => $options['attention'],
             ]);
         }
 
         if (isset($options['item_id'])) {
             $select->where([
-                'comment_message.item_id = ?' => $options['item_id']
+                'comment_message.item_id = ?' => $options['item_id'],
             ]);
         }
 
         if (isset($options['type'])) {
             $select->where([
-                'comment_message.type_id = ?' => $options['type']
+                'comment_message.type_id = ?' => $options['type'],
             ]);
         }
 
         if ($options['user']) {
             $select->where([
-                'comment_message.author_id = ?' => (int)$options['user']
+                'comment_message.author_id = ?' => (int) $options['user'],
             ]);
         }
 
         if (isset($options['exclude_type'])) {
             $select->where([
-                'comment_message.type_id <> ?' => $options['exclude_type']
+                'comment_message.type_id <> ?' => $options['exclude_type'],
             ]);
         }
 
@@ -1038,11 +947,11 @@ class CommentsService
         return $paginator->getTotalItemCount();
     }
 
-    private function deleteRecursive($typeId, $itemId, $parentId): void
+    private function deleteRecursive(int $typeId, int $itemId, int $parentId): void
     {
         $filter = [
-            'type_id = ?' => (int)$typeId,
-            'item_id = ?' => (int)$itemId
+            'type_id = ?' => $typeId,
+            'item_id = ?' => $itemId,
         ];
 
         if ($parentId) {
@@ -1061,32 +970,30 @@ class CommentsService
         }
     }
 
-    public function deleteTopic($typeId, $itemId): void
+    public function deleteTopic(int $typeId, int $itemId): void
     {
         $this->deleteRecursive($typeId, $itemId, null);
 
         $this->topicTable->delete([
-            'type_id = ?' => (int)$typeId,
-            'item_id = ?' => (int)$itemId
+            'type_id = ?' => $typeId,
+            'item_id = ?' => $itemId,
         ]);
 
         $this->topicViewTable->delete([
-            'type_id = ?' => (int)$typeId,
-            'item_id = ?' => (int)$itemId
+            'type_id = ?' => $typeId,
+            'item_id = ?' => $itemId,
         ]);
 
         $this->topicSubscribeTable->delete([
-            'type_id = ?' => (int)$typeId,
-            'item_id = ?' => (int)$itemId
+            'type_id = ?' => $typeId,
+            'item_id = ?' => $itemId,
         ]);
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $userId
-     * @return int|mixed
      */
-    public function getUserAvgVote(int $userId)
+    public function getUserAvgVote(int $userId): float
     {
         $row = $this->messageTable->select(
             /**
@@ -1096,13 +1003,13 @@ class CommentsService
                 $select
                     ->columns(['avg_vote' => new Sql\Expression('avg(vote)')])
                     ->where([
-                        'author_id = ?' => (int)$userId,
-                        'vote <> 0'
+                        'author_id = ?' => (int) $userId,
+                        'vote <> 0',
                     ]);
             }
         )->current();
 
-        return $row ? $row['avg_vote'] : 0;
+        return $row ? (float) $row['avg_vote'] : 0.0;
     }
 
     public function cleanupDeleted(): int
@@ -1116,9 +1023,9 @@ class CommentsService
         $select = new Sql\Select($this->messageTable->getTable());
         $select->columns(['id', 'type_id', 'item_id'])
             ->where([
-            new Sql\Predicate\NotIn('id', $subSelect),
-            'deleted',
-            new Sql\Predicate\Expression('delete_date < DATE_SUB(NOW(), INTERVAL ? DAY)', [self::DELETE_TTL_DAYS])
+                new Sql\Predicate\NotIn('id', $subSelect),
+                'deleted',
+                new Sql\Predicate\Expression('delete_date < DATE_SUB(NOW(), INTERVAL ? DAY)', [self::DELETE_TTL_DAYS]),
             ]);
 
         $rows = $this->messageTable->selectWith($select);
@@ -1141,16 +1048,16 @@ class CommentsService
     {
         $defaults = [
             'type'     => null,
-            'callback' => null
+            'callback' => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $select = new Sql\Select($this->messageTable->getTable());
 
         $select->order('datetime');
 
         if ($options['type']) {
-            $select->where(['type_id = ?' => (int)$options['type']]);
+            $select->where(['type_id = ?' => (int) $options['type']]);
         }
 
         if ($options['callback']) {
@@ -1163,19 +1070,19 @@ class CommentsService
             $items[] = [
                 'id'      => $row['id'],
                 'item_id' => $row['item_id'],
-                'type_id' => $row['type_id']
+                'type_id' => $row['type_id'],
             ];
         }
 
         return $items;
     }
 
-    public function deleteMessage($id): int
+    public function deleteMessage(int $id): int
     {
         $message = $this->getMessageRow($id);
 
         $affected = $this->messageTable->delete([
-            'id' => $message['id']
+            'id' => $message['id'],
         ]);
 
         $this->updateTopicStat($message['type_id'], $message['item_id']);
@@ -1207,17 +1114,15 @@ class CommentsService
             WHERE comment_message.type_id is null
         ', $adapter::QUERY_MODE_EXECUTE);
 
-        $affected += $result->getAffectedRows();
-
-        return $affected;
+        return $affected + $result->getAffectedRows();
     }
 
     public function userSubscribed(int $typeId, int $itemId, int $userId): bool
     {
-        return (bool)$this->topicSubscribeTable->select([
+        return (bool) $this->topicSubscribeTable->select([
             'type_id' => $typeId,
             'item_id' => $itemId,
-            'user_id' => $userId
+            'user_id' => $userId,
         ])->current();
     }
 
@@ -1241,7 +1146,7 @@ class CommentsService
             'type_id' => $typeId,
             'item_id' => $itemId,
             'user_id' => $userId,
-            'sent'    => 0
+            'sent'    => 0,
         ]);
     }
 
@@ -1258,11 +1163,11 @@ class CommentsService
         ]);
     }
 
-    public function getSubscribersIds($typeId, $itemId, $onlyAwaiting = false): array
+    public function getSubscribersIds(int $typeId, int $itemId, bool $onlyAwaiting = false): array
     {
         $where = [
-            'type_id' => (int)$typeId,
-            'item_id' => (int)$itemId
+            'type_id' => $typeId,
+            'item_id' => $itemId,
         ];
 
         if ($onlyAwaiting) {
@@ -1285,7 +1190,7 @@ class CommentsService
     public function markSubscriptionSent(int $typeId, int $itemId, int $userId): void
     {
         $this->topicSubscribeTable->update([
-            'sent' => 1
+            'sent' => 1,
         ], [
             'type_id' => $typeId,
             'item_id' => $itemId,
@@ -1296,7 +1201,7 @@ class CommentsService
     public function markSubscriptionAwaiting(int $typeId, int $itemId, int $userId): void
     {
         $this->topicSubscribeTable->update([
-            'sent' => 0
+            'sent' => 0,
         ], [
             'type_id' => $typeId,
             'item_id' => $itemId,
@@ -1306,8 +1211,6 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param int $limit
-     * @return array
      */
     public function getTopAuthors(int $limit): array
     {
@@ -1319,7 +1222,7 @@ class CommentsService
 
         $result = [];
         foreach ($this->messageTable->selectWith($select) as $row) {
-            $result[(int)$row['author_id']] = (int)$row['volume'];
+            $result[(int) $row['author_id']] = (int) $row['volume'];
         }
 
         return $result;

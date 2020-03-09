@@ -2,19 +2,17 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 use Application\Hydrator\Api\Strategy\PerspectiveGroups as HydratorPerspectiveGroupsStrategy;
+use Exception;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class PerspectivePageHydrator extends RestHydrator
 {
-    /**
-     * @var TableGateway
-     */
-    private $groupTable;
+    private TableGateway $groupTable;
 
-    public function __construct($serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
@@ -29,8 +27,8 @@ class PerspectivePageHydrator extends RestHydrator
     public function extract($object)
     {
         $result = [
-            'id'   => (int)$object['id'],
-            'name' => $object['name']
+            'id'   => (int) $object['id'],
+            'name' => $object['name'],
         ];
 
         if ($this->filterComposite->filter('groups')) {
@@ -49,7 +47,6 @@ class PerspectivePageHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param array $data
      * @param $object
      * @throws Exception
      */

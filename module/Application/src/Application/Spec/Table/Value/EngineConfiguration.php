@@ -2,7 +2,7 @@
 
 namespace Application\Spec\Table\Value;
 
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
 
 class EngineConfiguration
 {
@@ -12,24 +12,22 @@ class EngineConfiguration
 
     public function __construct(array $options)
     {
-        $this->cylindersCount = $options['cylindersCount'];
+        $this->cylindersCount  = $options['cylindersCount'];
         $this->cylindersLayout = $options['cylindersLayout'];
-        $this->valvesCount = $options['valvesCount'];
+        $this->valvesCount     = $options['valvesCount'];
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param PhpRenderer $view
      * @param $attribute
      * @param $value
      * @param $values
-     * @return mixed|string|null
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values)
+    public function render(PhpRenderer $view, $attribute, $value, $values): string
     {
-        $cylinders = isset($values[$this->cylindersCount]) ? $values[$this->cylindersCount] : null;
-        $layout = isset($values[$this->cylindersLayout]) ? $values[$this->cylindersLayout] : null;
-        $valves = isset($values[$this->valvesCount]) ? $values[$this->valvesCount] : null;
+        $cylinders = $values[$this->cylindersCount] ?? null;
+        $layout    = $values[$this->cylindersLayout] ?? null;
+        $valves    = $values[$this->valvesCount] ?? null;
 
         if ($layout) {
             if ($cylinders) {

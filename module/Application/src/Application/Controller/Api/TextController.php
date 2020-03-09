@@ -2,16 +2,13 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
 use Autowp\TextStorage;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
 
 class TextController extends AbstractRestfulController
 {
-    /**
-     * @var TextStorage\Service
-     */
-    private $textStorage;
+    private TextStorage\Service $textStorage;
 
     public function __construct(TextStorage\Service $textStorage)
     {
@@ -20,8 +17,8 @@ class TextController extends AbstractRestfulController
 
     public function itemAction()
     {
-        $textId = (int)$this->params('id');
-        $revision = (int)$this->params()->fromQuery('revision');
+        $textId   = (int) $this->params('id');
+        $revision = (int) $this->params()->fromQuery('revision');
 
         $text = $this->textStorage->getTextInfo($textId);
         if ($text === null) {
@@ -52,17 +49,17 @@ class TextController extends AbstractRestfulController
         return new JsonModel([
             'current' => [
                 'text'     => $current['text'],
-                'revision' => (int)$current['revision'],
-                'user_id'  => (int)$current['user_id']
+                'revision' => (int) $current['revision'],
+                'user_id'  => (int) $current['user_id'],
             ],
-            'prev' => [
+            'prev'    => [
                 'text'     => $prevText['text'],
                 'revision' => $prevRevision,
-                'user_id'  => (int)$prevText['user_id']
+                'user_id'  => (int) $prevText['user_id'],
             ],
-            'next' => [
-                'revision' => $nextRevision
-            ]
+            'next'    => [
+                'revision' => $nextRevision,
+            ],
         ]);
     }
 }
