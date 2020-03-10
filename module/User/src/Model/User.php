@@ -28,8 +28,7 @@ class User
     public const MIN_PASSWORD = 6;
     public const MAX_PASSWORD = 50;
 
-    /** @var TableGateway */
-    private $table;
+    private TableGateway $table;
 
     public function __construct(TableGateway $table)
     {

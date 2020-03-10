@@ -11,14 +11,14 @@ use function implode;
 
 class Breadcrumbs extends AbstractHelper
 {
-    private $data = [];
+    private array $data = [];
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }
 
-    public function __invoke($url = null, $name = null, $placement = 'append')
+    public function __invoke($url = null, $name = null, $placement = 'append'): self
     {
         if ($url || $name) {
             $node = ['url' => $url, 'name' => $name];
@@ -35,7 +35,7 @@ class Breadcrumbs extends AbstractHelper
         return $this;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         try {
             $items = [];

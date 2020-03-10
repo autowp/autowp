@@ -10,11 +10,9 @@ use function uniqid;
 
 class UserPasswordRemind
 {
-    /** @var TableGateway */
-    private $table;
+    private TableGateway $table;
 
-    /** @var string */
-    private $salt;
+    private string $salt;
 
     public function __construct(TableGateway $table, string $salt)
     {
@@ -29,7 +27,7 @@ class UserPasswordRemind
         ]);
     }
 
-    public function deleteToken(string $token)
+    public function deleteToken(string $token): void
     {
         $this->table->delete([
             'hash = ?' => $token,

@@ -13,14 +13,11 @@ use function is_array;
 
 class User extends AbstractPlugin
 {
-    /** @var Acl */
-    private $acl;
+    private Acl $acl;
 
-    /** @var UserModel */
-    private $userModel;
+    private UserModel $userModel;
 
-    /** @var array */
-    private $users = [];
+    private array $users = [];
 
     /** @var array|ArrayObject */
     private $user;
@@ -32,7 +29,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return array|ArrayObject
+     * @return array|ArrayObject|null
      */
     private function user(int $id)
     {

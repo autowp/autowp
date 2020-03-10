@@ -12,38 +12,35 @@ use function ucfirst;
 
 abstract class AbstractAdapter
 {
-    /** @var Most */
-    protected $most;
+    protected Most $most;
 
-    /** @var TableGateway */
-    protected $attributeTable;
+    protected TableGateway $attributeTable;
 
-    /** @var TableGateway */
-    protected $itemTable;
+    protected TableGateway $itemTable;
 
     public function __construct(array $options)
     {
         $this->setOptions($options);
     }
 
-    public function setAttributeTable(TableGateway $table)
+    public function setAttributeTable(TableGateway $table): void
     {
         $this->attributeTable = $table;
     }
 
-    public function setItemTable(TableGateway $itemTable)
+    public function setItemTable(TableGateway $itemTable): void
     {
         $this->itemTable = $itemTable;
     }
 
-    public function setMost(Most $most)
+    public function setMost(Most $most): self
     {
         $this->most = $most;
 
         return $this;
     }
 
-    public function setOptions(array $options)
+    public function setOptions(array $options): self
     {
         foreach ($options as $key => $value) {
             $normalized = ucfirst($key);

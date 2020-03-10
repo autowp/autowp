@@ -10,7 +10,7 @@ use Laminas\Db\Sql;
 
 class PictureServiceTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
 
     /**
      * @suppress PhanDeprecatedFunction

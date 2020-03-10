@@ -10,8 +10,7 @@ use Laminas\View\Helper\AbstractHtmlElement;
 
 class PastTimeIndicator extends AbstractHtmlElement
 {
-    /** @var DateTime */
-    private $pastLimit;
+    private DateTime $pastLimit;
 
     public function __construct()
     {

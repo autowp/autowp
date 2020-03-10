@@ -11,20 +11,22 @@ use function is_numeric;
 
 class Page extends AbstractHelper
 {
-    /** @var TableGateway */
-    private $pageTable;
+    private TableGateway $pageTable;
 
+    /** @var array|ArrayObject */
     private $doc;
 
-    /** @var array */
-    private $pages = [];
+    private array $pages = [];
 
     public function __construct(TableGateway $pageTable)
     {
         $this->pageTable = $pageTable;
     }
 
-    public function __invoke($value)
+    /**
+     * @param array|ArrayObject|int $value
+     */
+    public function __invoke($value): self
     {
         if ($value) {
             $doc = null;
@@ -41,7 +43,7 @@ class Page extends AbstractHelper
         return $this;
     }
 
-    public function __get($name)
+    public function __get(string $name): string
     {
         if (! $this->doc) {
             return '';
@@ -72,9 +74,11 @@ class Page extends AbstractHelper
         return '';
     }
 
-    private function getPageById($id)
+    /**
+     * @return array|ArrayObject
+     */
+    private function getPageById(int $id)
     {
-        $id = (int) $id;
         if (isset($this->pages[$id])) {
             return $this->pages[$id];
         }

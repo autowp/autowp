@@ -2,6 +2,8 @@
 
 namespace Application\Most\Adapter;
 
+use ArrayAccess;
+use Exception;
 use Laminas\Db\Sql;
 
 use function htmlspecialchars;
@@ -11,22 +13,26 @@ use function strlen;
 
 class Power extends AbstractAdapter
 {
+    /** @var array|ArrayAccess */
     protected $attribute;
 
-    protected $order;
+    protected string $order;
 
     private array $attributes;
 
-    public function setAttributes(array $value)
+    public function setAttributes(array $value): void
     {
         $this->attributes = $value;
     }
 
-    public function setOrder($value)
+    public function setOrder(string $value): void
     {
         $this->order = $value;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getCars(Sql\Select $select, string $language): array
     {
         $powerAttr = $this->attributeTable->select(['id' => (int) $this->attributes['power']])->current();
@@ -108,7 +114,7 @@ class Power extends AbstractAdapter
         ];
     }
 
-    protected function cylinders($layout, $cylinders, $valvePerCylinder = null)
+    protected function cylinders(string $layout, int $cylinders, ?int $valvePerCylinder): string
     {
         if ($layout) {
             if ($cylinders) {

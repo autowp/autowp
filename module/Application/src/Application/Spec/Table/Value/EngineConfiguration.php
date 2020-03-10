@@ -2,13 +2,14 @@
 
 namespace Application\Spec\Table\Value;
 
+use ArrayAccess;
 use Laminas\View\Renderer\PhpRenderer;
 
 class EngineConfiguration
 {
-    protected $cylindersCount;
-    protected $cylindersLayout;
-    protected $valvesCount;
+    protected ?int $cylindersCount;
+    protected ?int $cylindersLayout;
+    protected ?int $valvesCount;
 
     public function __construct(array $options)
     {
@@ -19,9 +20,9 @@ class EngineConfiguration
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $attribute
-     * @param $value
-     * @param $values
+     * @param array|ArrayAccess $attribute
+     * @param mixed             $value
+     * @param mixed             $values
      */
     public function render(PhpRenderer $view, $attribute, $value, $values): string
     {

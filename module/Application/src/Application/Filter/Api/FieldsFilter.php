@@ -12,7 +12,7 @@ use function substr;
 
 class FieldsFilter extends AbstractFilter
 {
-    protected $fields = [];
+    protected array $fields = [];
 
     public function setFields(array $fields)
     {
@@ -21,7 +21,7 @@ class FieldsFilter extends AbstractFilter
         return $this;
     }
 
-    private function parseValue($value)
+    private function parseValue(string $value): array
     {
         $dotPos = strpos($value, '.');
         if ($dotPos !== false) {
@@ -37,7 +37,10 @@ class FieldsFilter extends AbstractFilter
         ];
     }
 
-    public function filter($value)
+    /**
+     * @param mixed $value
+     */
+    public function filter($value): array
     {
         $value = is_string($value) ? $value : '';
 

@@ -2,19 +2,22 @@
 
 namespace Application\View\Helper;
 
+use Autowp\Image\Storage;
 use Exception;
+use ImagickException;
 use Laminas\View\Helper\AbstractHtmlElement;
 
 use function array_key_exists;
 
 class Img extends AbstractHtmlElement
 {
-    private $attribs;
+    private array $attribs;
 
     /**
-     * @param int $imageId
+     * @throws Storage\Exception
+     * @throws ImagickException
      */
-    public function __invoke($imageId, array $attribs = []): self
+    public function __invoke(int $imageId, array $attribs = []): self
     {
         $this->attribs = [];
         $format        = null;
@@ -27,6 +30,7 @@ class Img extends AbstractHtmlElement
             return $this;
         }
 
+        /** @var Storage $storage */
         $storage = $this->view->imageStorage();
 
         if ($format) {
@@ -43,12 +47,12 @@ class Img extends AbstractHtmlElement
         return $this;
     }
 
-    public function src()
+    public function src(): string
     {
         return $this->attribs['src'] ?? '';
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         try {
             if (isset($this->attribs['src'])) {
@@ -61,7 +65,7 @@ class Img extends AbstractHtmlElement
         return '';
     }
 
-    public function exists()
+    public function exists(): bool
     {
         return isset($this->attribs['src']) && $this->attribs['src'];
     }

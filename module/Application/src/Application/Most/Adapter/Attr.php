@@ -2,25 +2,30 @@
 
 namespace Application\Most\Adapter;
 
+use ArrayAccess;
 use Exception;
 use Laminas\Db\Sql;
 
 class Attr extends AbstractAdapter
 {
+    /** @var array|ArrayAccess */
     protected $attribute;
 
-    protected $order;
+    protected string $order;
 
-    public function setAttribute($value)
+    public function setAttribute(int $value): void
     {
-        $this->attribute = (int) $value;
+        $this->attribute = $value;
     }
 
-    public function setOrder($value)
+    public function setOrder(string $value): void
     {
         $this->order = $value;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getCars(Sql\Select $select, string $language): array
     {
         $attribute = $this->attributeTable->select(['id' => (int) $this->attribute])->current();

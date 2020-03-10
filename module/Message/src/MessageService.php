@@ -21,18 +21,15 @@ use function trim;
  */
 class MessageService
 {
-    /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var User */
     private User $userModel;
 
     private const MESSAGES_PER_PAGE = 20;
 
     public const MAX_TEXT = 2000;
 
-    /** @var TelegramService */
-    private $telegram;
+    private TelegramService $telegram;
 
     public function __construct(TelegramService $telegram, TableGateway $table, User $userModel)
     {

@@ -13,14 +13,11 @@ use function trim;
 
 class TrafficControl
 {
-    /** @var RabbitMQ */
-    private $rabbitmq;
+    private RabbitMQ $rabbitmq;
 
-    /** @var string */
-    private $url;
+    private string $url;
 
-    /** @var Client */
-    private $client;
+    private Client $client;
 
     public function __construct(
         string $url,

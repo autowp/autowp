@@ -7,8 +7,8 @@ use Laminas\View\Renderer\PhpRenderer;
 
 class BootVolume
 {
-    protected $min;
-    protected $max;
+    protected ?int $min;
+    protected ?int $max;
 
     public function __construct(array $options)
     {
@@ -19,7 +19,7 @@ class BootVolume
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param array|ArrayAccess $attribute
-     * @param $value
+     * @param mixed             $value
      */
     public function render(PhpRenderer $view, $attribute, $value, array $values): string
     {

@@ -20,8 +20,7 @@ use function strlen;
 
 class UserText extends AbstractHtmlElement
 {
-    /** @var array */
-    private $parseUrlHosts = [
+    private array $parseUrlHosts = [
         'www.autowp.ru',
         'en.autowp.ru',
         'ru.autowp.ru',
@@ -35,14 +34,11 @@ class UserText extends AbstractHtmlElement
         'wheelsage.org',
     ];
 
-    /** @var TreeRouteStack */
-    private $router;
+    private TreeRouteStack $router;
 
-    /** @var Picture */
-    private $picture;
+    private Picture $picture;
 
-    /** @var UserModel */
-    private $userModel;
+    private UserModel $userModel;
 
     public function __construct($router, Picture $picture, UserModel $userModel)
     {

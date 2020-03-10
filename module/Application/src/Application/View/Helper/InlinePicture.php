@@ -7,15 +7,14 @@ use Laminas\View\Helper\AbstractHelper;
 
 class InlinePicture extends AbstractHelper
 {
-    /** @var Picture */
-    private $picture;
+    private Picture $picture;
 
     public function __construct(Picture $picture)
     {
         $this->picture = $picture;
     }
 
-    public function __invoke($picture)
+    public function __invoke($picture): string
     {
         $view = $this->view;
 

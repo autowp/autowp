@@ -2,15 +2,16 @@
 
 namespace Application\Spec\Table;
 
+use ArrayAccess;
 use Laminas\View\Renderer\PhpRenderer;
 
 use function ucfirst;
 
 abstract class AbstractTable
 {
-    protected $attributes = [];
+    protected array $attributes = [];
 
-    protected $renderMap = [
+    protected array $renderMap = [
         85 => [
             'name'    => 'wheel',
             'options' => [
@@ -68,23 +69,31 @@ abstract class AbstractTable
         ],
     ];
 
-    public function preventedRenderSubAttributes($attrId)
+    public function preventedRenderSubAttributes(int $attrId): bool
     {
         return isset($this->renderMap[$attrId]);
     }
 
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
 
-    protected function getRenderer($name, $options)
+    /**
+     * @return object
+     */
+    protected function getRenderer(string $name, array $options)
     {
         $className = 'Application\\Spec\\Table\\Value\\' . ucfirst($name);
         return new $className($options);
     }
 
-    public function renderValue(PhpRenderer $view, $attribute, $values, $itemTypeId, $itemId)
+    /**
+     * @param array|ArrayAccess $attribute
+     * @param mixed             $values
+     * @return mixed
+     */
+    public function renderValue(PhpRenderer $view, $attribute, $values, int $itemTypeId, int $itemId): string
     {
         $attrId = $attribute['id'];
 

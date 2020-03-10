@@ -10,7 +10,7 @@ use Laminas\Json\Json;
 
 class PictureItemControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
      * @suppress PhanUndeclaredMethod

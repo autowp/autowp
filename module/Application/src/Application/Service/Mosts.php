@@ -22,17 +22,17 @@ class Mosts
         [
             'catName' => 'fastest',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 47,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         [
             'catName' => 'slowest',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 47,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         /*[
@@ -58,189 +58,189 @@ class Mosts
         [
             'catName' => 'mighty',
             'adapter' => [
-                'name' => 'power',
+                'name'       => 'power',
                 'attributes' => [
-                    'power' => 33,
-                    'cylindersLayout' => 26,
-                    'cylindersCount' => 25,
+                    'power'            => 33,
+                    'cylindersLayout'  => 26,
+                    'cylindersCount'   => 25,
                     'valvePerCylinder' => 27,
                     'powerOnFrequency' => 34,
-                    'turbo' => 99,
-                    'volume' => 31,
+                    'turbo'            => 99,
+                    'volume'           => 31,
                 ],
-                'order' => 'DESC',
+                'order'      => 'DESC',
             ],
         ],
         [
             'catName' => 'weak',
             'adapter' => [
-                'name' => 'power',
+                'name'       => 'power',
                 'attributes' => [
-                    'power' => 33,
-                    'cylindersLayout' => 26,
-                    'cylindersCount' => 25,
+                    'power'            => 33,
+                    'cylindersLayout'  => 26,
+                    'cylindersCount'   => 25,
                     'valvePerCylinder' => 27,
                     'powerOnFrequency' => 34,
-                    'turbo' => 99,
-                    'volume' => 31,
+                    'turbo'            => 99,
+                    'volume'           => 31,
                 ],
-                'order' => 'ASC',
+                'order'      => 'ASC',
             ],
         ],
         [
             'catName' => 'big-engine',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 31,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         [
             'catName' => 'small-engine',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 31,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         [
             'catName' => 'nimblest',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 11,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         [
             'catName' => 'economical',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 81,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         [
             'catName' => 'gluttonous',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 81,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         [
             'catName' => 'clenaly',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 82,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         [
             'catName' => 'dirty',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 82,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         [
             'catName' => 'heavy',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 72,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         [
             'catName' => 'lightest',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 72,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         [
             'catName' => 'longest',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 1,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         [
             'catName' => 'shortest',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 1,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         [
             'catName' => 'widest',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 2,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         [
             'catName' => 'narrow',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 2,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         [
             'catName' => 'highest',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 3,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         [
             'catName' => 'lowest',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 3,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         [
             'catName' => 'air',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 64,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
         [
             'catName' => 'antiair',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 64,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         //equipes.backaxis_tyrewidth*equipes.backaxis_tyreseries/100+equipes.backaxis_radius*25.4
         [
             'catName' => 'bigwheel',
             'adapter' => [
-                'name' => 'wheelsize',
-                'order' => 'DESC',
+                'name'       => 'wheelsize',
+                'order'      => 'DESC',
                 'attributes' => [
-                    'rear' => [
-                        'tyrewidth' => 91,
+                    'rear'  => [
+                        'tyrewidth'  => 91,
                         'tyreseries' => 94,
-                        'radius' => 92,
-                        'rimwidth' => 93,
+                        'radius'     => 92,
+                        'rimwidth'   => 93,
                     ],
                     'front' => [
-                        'tyrewidth' => 87,
+                        'tyrewidth'  => 87,
                         'tyreseries' => 90,
-                        'radius' => 88,
-                        'rimwidth' => 89,
+                        'radius'     => 88,
+                        'rimwidth'   => 89,
                     ],
                 ],
             ],
@@ -248,20 +248,20 @@ class Mosts
         [
             'catName' => 'smallwheel',
             'adapter' => [
-                'name' => 'wheelsize',
-                'order' => 'ASC',
+                'name'       => 'wheelsize',
+                'order'      => 'ASC',
                 'attributes' => [
-                    'rear' => [
-                        'tyrewidth' => 91,
+                    'rear'  => [
+                        'tyrewidth'  => 91,
                         'tyreseries' => 94,
-                        'radius' => 92,
-                        'rimwidth' => 93,
+                        'radius'     => 92,
+                        'rimwidth'   => 93,
                     ],
                     'front' => [
-                        'tyrewidth' => 87,
+                        'tyrewidth'  => 87,
                         'tyreseries' => 90,
-                        'radius' => 88,
-                        'rimwidth' => 89,
+                        'radius'     => 88,
+                        'rimwidth'   => 89,
                     ],
                 ],
             ],
@@ -303,17 +303,17 @@ class Mosts
         [
             'catName' => 'bigclearance',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 7,
-                'order' => 'DESC',
+                'order'     => 'DESC',
             ],
         ],
         [
             'catName' => 'smallclearance',
             'adapter' => [
-                'name' => 'attr',
+                'name'      => 'attr',
                 'attribute' => 7,
-                'order' => 'ASC',
+                'order'     => 'ASC',
             ],
         ],
     ];

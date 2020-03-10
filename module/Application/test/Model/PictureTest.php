@@ -22,7 +22,7 @@ use const UPLOAD_ERR_OK;
 
 class PictureTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     public function testPattern()
     {

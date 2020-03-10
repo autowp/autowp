@@ -8,7 +8,7 @@ use Laminas\Http\Request;
 
 class MostsControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     public function testIndex()
     {

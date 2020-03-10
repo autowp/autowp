@@ -31,12 +31,16 @@ class ItemNameFormatter
         $this->renderer   = $renderer;
     }
 
-    private function translate($string, $language)
+    private function translate(string $string, string $language)
     {
         return $this->translator->translate($string, 'default', $language);
     }
 
-    public function formatHtml($item, $language)
+    /**
+     * @param array|ArrayAccess $item
+     * @throws Exception
+     */
+    public function formatHtml($item, string $language)
     {
         if (! $item instanceof ArrayAccess && ! is_array($item)) {
             throw new Exception("`item` must be array or ArrayAccess");

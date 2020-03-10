@@ -14,11 +14,9 @@ class Pic extends AbstractHtmlElement
     /** @var array|ArrayObject */
     private $picture;
 
-    /** @var PictureNameFormatter */
-    private $pictureNameFormatter;
+    private PictureNameFormatter $pictureNameFormatter;
 
-    /** @var Picture */
-    private $pictureModel;
+    private Picture $pictureModel;
 
     public function __construct(
         PictureNameFormatter $pictureNameFormatter,
@@ -28,32 +26,38 @@ class Pic extends AbstractHtmlElement
         $this->pictureModel         = $picture;
     }
 
-    public function __invoke($picture = null)
+    /**
+     * @param array|ArrayObject $picture
+     */
+    public function __invoke($picture = null): self
     {
         $this->picture = $picture;
 
         return $this;
     }
 
-    public function url()
+    public function url(): ?string
     {
         if ($this->picture) {
             return '/picture/' . urlencode($this->picture['identity']);
         }
-        return false;
+        return null;
     }
 
-    public function htmlTitle(array $picture)
+    public function htmlTitle(array $picture): string
     {
         return $this->pictureNameFormatter->formatHtml($picture, $this->view->language());
     }
 
-    public function textTitle(array $picture)
+    public function textTitle(array $picture): string
     {
         return $this->pictureNameFormatter->format($picture, $this->view->language());
     }
 
-    public function name($pictureRow, $language)
+    /**
+     * @param array|ArrayObject $pictureRow
+     */
+    public function name($pictureRow, string $language): string
     {
         if ($pictureRow instanceof ArrayObject) {
             $pictureRow = (array) $pictureRow;

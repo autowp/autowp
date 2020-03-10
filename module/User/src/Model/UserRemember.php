@@ -10,11 +10,9 @@ use function microtime;
 
 class UserRemember
 {
-    /** @var TableGateway */
-    private $table;
+    private TableGateway $table;
 
-    /** @var string */
-    private $salt;
+    private string $salt;
 
     public function __construct(TableGateway $table, string $salt)
     {

@@ -2,12 +2,13 @@
 
 namespace Application\Spec\Table\Value;
 
+use ArrayAccess;
 use Laminas\View\Renderer\PhpRenderer;
 
 class FuelTank
 {
-    protected $primary;
-    protected $secondary;
+    protected int $primary;
+    protected int $secondary;
 
     public function __construct(array $options)
     {
@@ -17,9 +18,9 @@ class FuelTank
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $attribute
-     * @param $value
-     * @param $values
+     * @param array|ArrayAccess $attribute
+     * @param mixed             $value
+     * @param mixed             $values
      */
     public function render(PhpRenderer $view, $attribute, $value, $values): string
     {

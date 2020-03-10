@@ -8,11 +8,9 @@ use Laminas\View\Helper\AbstractHelper;
 
 class ApiData extends AbstractHelper
 {
-    /** @var RestHydrator */
-    private $userHydrator;
+    private RestHydrator $userHydrator;
 
-    /** @var MainMenu */
-    private $mainMenu;
+    private MainMenu $mainMenu;
 
     public function __construct(RestHydrator $userHydrator, MainMenu $mainMenu)
     {
@@ -20,7 +18,7 @@ class ApiData extends AbstractHelper
         $this->mainMenu     = $mainMenu;
     }
 
-    public function __invoke()
+    public function __invoke(): array
     {
         $language = $this->view->language();
 

@@ -2,6 +2,7 @@
 
 namespace Application\Most\Adapter;
 
+use ArrayAccess;
 use ArrayObject;
 use Exception;
 use Laminas\Db\Sql;
@@ -10,9 +11,9 @@ use function implode;
 
 class Acceleration extends AbstractAdapter
 {
-    protected $attributes;
+    protected array $attributes;
 
-    protected $order;
+    protected string $order;
 
     private const MPH60_TO_KMH100 = 0.98964381346271110050637609692728;
 
@@ -22,7 +23,7 @@ class Acceleration extends AbstractAdapter
     /** @var array|ArrayObject|null */
     private $mphAttribute;
 
-    public function setAttributes(array $value)
+    public function setAttributes(array $value): void
     {
         $this->attributes = $value;
 
@@ -30,7 +31,7 @@ class Acceleration extends AbstractAdapter
         $this->mphAttribute = $this->attributeTable->select(['id' => $this->attributes['to60mph']])->current();
     }
 
-    public function setOrder($value)
+    public function setOrder(string $value): void
     {
         $this->order = $value;
     }
@@ -124,7 +125,11 @@ class Acceleration extends AbstractAdapter
         ];
     }
 
-    protected function getText($car, $language)
+    /**
+     * @param array|ArrayAccess $car
+     * @throws Exception
+     */
+    protected function getText($car, string $language): string
     {
         $text = [];
 

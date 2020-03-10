@@ -2,13 +2,14 @@
 
 namespace Application\Spec\Table\Value;
 
+use ArrayAccess;
 use Laminas\View\Renderer\PhpRenderer;
 
 class Gearbox
 {
-    protected $type;
-    protected $gears;
-    protected $name;
+    protected int $type;
+    protected int $gears;
+    protected int $name;
 
     public function __construct(array $options)
     {
@@ -19,9 +20,9 @@ class Gearbox
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $attribute
-     * @param $value
-     * @param $values
+     * @param array|ArrayAccess $attribute
+     * @param mixed             $value
+     * @param mixed             $values
      */
     public function render(PhpRenderer $view, $attribute, $value, $values): string
     {

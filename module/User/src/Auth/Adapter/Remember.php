@@ -11,16 +11,12 @@ class Remember implements AdapterInterface
 {
     /**
      * Credential values
-     *
-     * @var string
      */
-    private $credential;
+    private string $credential;
 
-    /** @var array */
-    private $authenticateResultInfo;
+    private array $authenticateResultInfo;
 
-    /** @var User */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(User $userModel)
     {

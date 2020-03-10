@@ -11,7 +11,7 @@ use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase as LaminasTes
  */
 abstract class AbstractHttpControllerTestCase extends LaminasTestCase
 {
-    protected $applicationConfigPath;
+    protected string $applicationConfigPath;
 
     protected function setUp(): void
     {

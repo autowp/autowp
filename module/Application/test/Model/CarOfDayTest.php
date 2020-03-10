@@ -21,7 +21,7 @@ use const UPLOAD_ERR_OK;
 
 class CarOfDayTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     private function mockDuplicateFinder()
     {

@@ -20,7 +20,7 @@ use Laminas\Permissions\Acl\Acl;
 
 class ServicesTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
 
     /**
      * @dataProvider servicesProvider

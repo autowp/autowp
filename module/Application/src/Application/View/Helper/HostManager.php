@@ -7,15 +7,14 @@ use Laminas\View\Helper\AbstractHelper;
 
 class HostManager extends AbstractHelper
 {
-    /** @var AppHostManager */
-    private $hostManager;
+    private AppHostManager $hostManager;
 
     public function __construct(AppHostManager $hostManager)
     {
         $this->hostManager = $hostManager;
     }
 
-    public function __invoke()
+    public function __invoke(): AppHostManager
     {
         return $this->hostManager;
     }

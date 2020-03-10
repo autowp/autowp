@@ -9,7 +9,7 @@ use Laminas\Authentication\AuthenticationService;
 
 class PluginTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     private function getPlugin(): User
     {

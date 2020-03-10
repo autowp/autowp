@@ -18,21 +18,17 @@ use function sprintf;
 
 class Oauth2 extends AbstractPlugin
 {
-    /** @var OAuth2Server */
-    protected $server;
+    protected OAuth2Server $server;
 
     /** @var callable Factory for generating an OAuth2Server instance. */
     protected $serverFactory;
 
-    /** @var UserIdProviderInterface */
-    protected $userIdProvider;
+    protected UserIdProviderInterface $userIdProvider;
 
     /**
      * Constructor
-     *
-     * @param OAuth2Server $serverFactory
      */
-    public function __construct($serverFactory, UserIdProviderInterface $userIdProvider)
+    public function __construct(OAuth2Server $serverFactory, UserIdProviderInterface $userIdProvider)
     {
         if (! is_callable($serverFactory)) {
             throw new InvalidArgumentException(sprintf(

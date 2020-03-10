@@ -15,14 +15,11 @@ use function urlencode;
 
 class PageEnv extends AbstractHelper
 {
-    /** @var TableGateway */
-    private $pageTable;
+    private TableGateway $pageTable;
 
-    /** @var array */
-    private $onPath = [];
+    private array $onPath = [];
 
-    /** @var int */
-    private $language = 'en';
+    private string $language = 'en';
 
     public function __construct(AppLanguage $language, TableGateway $pageTable)
     {
@@ -130,7 +127,7 @@ class PageEnv extends AbstractHelper
         return $this;
     }
 
-    private function replaceArgs($str, $args)
+    private function replaceArgs(string $str, array $args): string
     {
         foreach ($args as $key => $value) {
             $str = str_replace($key, $value, $str);
@@ -138,7 +135,7 @@ class PageEnv extends AbstractHelper
         return $str;
     }
 
-    public function isOnPath($id)
+    public function isOnPath(int $id): bool
     {
         return in_array($id, $this->onPath);
     }

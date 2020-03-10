@@ -7,15 +7,14 @@ use Laminas\View\Helper\AbstractHelper;
 
 class Language extends AbstractHelper
 {
-    /** @var AppLanguage */
-    private $language;
+    private AppLanguage $language;
 
     public function __construct(AppLanguage $language)
     {
         $this->language = $language;
     }
 
-    public function __invoke()
+    public function __invoke(): string
     {
         return $this->language->getLanguage();
     }

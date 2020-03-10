@@ -10,21 +10,23 @@ class Login extends AbstractValidator
 {
     private const USER_NOT_FOUND = 'userNotFound';
 
-    protected $messageTemplates = [
+    protected array $messageTemplates = [
         self::USER_NOT_FOUND => "login/user-%value%-not-found",
     ];
 
-    /** @var User */
-    private $userModel;
+    private User $userModel;
 
-    public function setUserModel(User $userModel)
+    public function setUserModel(User $userModel): self
     {
         $this->userModel = $userModel;
 
         return $this;
     }
 
-    public function isValid($value)
+    /**
+     * @param mixed $value
+     */
+    public function isValid($value): bool
     {
         $this->setValue($value);
 

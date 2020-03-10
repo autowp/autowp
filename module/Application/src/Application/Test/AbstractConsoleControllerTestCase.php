@@ -8,7 +8,7 @@ use Laminas\Test\PHPUnit\Controller\AbstractConsoleControllerTestCase as Laminas
 
 abstract class AbstractConsoleControllerTestCase extends LaminasTestCase
 {
-    protected $applicationConfigPath;
+    protected string $applicationConfigPath;
 
     protected function setUp(): void
     {

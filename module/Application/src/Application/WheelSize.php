@@ -4,12 +4,12 @@ namespace Application;
 
 class WheelSize
 {
-    protected $width;
-    protected $series;
-    protected $radius;
-    protected $rimWidth;
+    protected ?int $width;
+    protected ?int $series;
+    protected ?float $radius;
+    protected ?float $rimWidth;
 
-    public function __construct($width = null, $series = null, $radius = null, $rimWidth = null)
+    public function __construct(?int $width, ?int $series, ?float $radius, ?float $rimWidth)
     {
         $width    = (int) $width;
         $series   = (int) $series;
@@ -22,27 +22,27 @@ class WheelSize
         $this->rimWidth = $rimWidth ? $rimWidth : null;
     }
 
-    public function getWidth()
+    public function getWidth(): ?int
     {
         return $this->width;
     }
 
-    public function getSeries()
+    public function getSeries(): ?int
     {
         return $this->series;
     }
 
-    public function getRadius()
+    public function getRadius(): ?float
     {
         return $this->radius;
     }
 
-    public function getRimWidth()
+    public function getRimWidth(): ?float
     {
         return $this->rimWidth;
     }
 
-    public function getTyreName()
+    public function getTyreName(): ?string
     {
         if ($this->width || $this->series || $this->radius) {
             $width  = $this->width ? $this->width : '???';
@@ -55,7 +55,7 @@ class WheelSize
         return null;
     }
 
-    public function getDiskName()
+    public function getDiskName(): ?string
     {
         if ($this->rimWidth || $this->radius) {
             $rimWidth = $this->rimWidth ? $this->rimWidth : '?';

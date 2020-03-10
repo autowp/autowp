@@ -9,39 +9,41 @@ class CatnameNotExists extends AbstractValidator
 {
     private const EXISTS = 'itemParentCatnameAlreadyExists';
 
-    protected $messageTemplates = [
+    protected array $messageTemplates = [
         self::EXISTS => "Item parent catname '%value%' already exists",
     ];
 
-    private $parentId;
+    private int $parentId;
 
-    private $ignoreItemId;
+    private int $ignoreItemId;
 
-    /** @var ItemParent */
-    private $itemParent;
+    private ItemParent $itemParent;
 
-    public function setItemParent(ItemParent $itemParent)
+    public function setItemParent(ItemParent $itemParent): self
     {
         $this->itemParent = $itemParent;
 
         return $this;
     }
 
-    public function setParentId($parentId)
+    public function setParentId(int $parentId): self
     {
         $this->parentId = $parentId;
 
         return $this;
     }
 
-    public function setIgnoreItemId($ignoreItemId)
+    public function setIgnoreItemId(int $ignoreItemId): self
     {
         $this->ignoreItemId = $ignoreItemId;
 
         return $this;
     }
 
-    public function isValid($value)
+    /**
+     * @param mixed $value
+     */
+    public function isValid($value): bool
     {
         $this->setValue($value);
 

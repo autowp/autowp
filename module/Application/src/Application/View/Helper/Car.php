@@ -7,25 +7,32 @@ use Laminas\View\Helper\AbstractHelper;
 
 class Car extends AbstractHelper
 {
-    /** @var ItemNameFormatter */
-    private $itemNameFormatter;
+    private ItemNameFormatter $itemNameFormatter;
 
     public function __construct(ItemNameFormatter $itemNameFormatter)
     {
         $this->itemNameFormatter = $itemNameFormatter;
     }
 
-    public function __invoke()
+    public function __invoke(): self
     {
         return $this;
     }
 
-    public function htmlTitle($item)
+    /**
+     * @param array|ArrayAccess $item
+     * @throws \Exception
+     */
+    public function htmlTitle($item): string
     {
         return $this->itemNameFormatter->formatHtml($item, $this->view->language());
     }
 
-    public function textTitle($item)
+    /**
+     * @param array|ArrayAccess $item
+     * @throws \Exception
+     */
+    public function textTitle($item): string
     {
         return $this->itemNameFormatter->format($item, $this->view->language());
     }

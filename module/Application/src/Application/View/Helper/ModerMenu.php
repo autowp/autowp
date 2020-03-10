@@ -8,11 +8,9 @@ use Laminas\View\Helper\AbstractHtmlElement;
 
 class ModerMenu extends AbstractHtmlElement
 {
-    /** @var Comments\CommentsService */
-    private $comments;
+    private Comments\CommentsService $comments;
 
-    /** @var Picture */
-    private $picture;
+    private Picture $picture;
 
     public function __construct(Comments\CommentsService $comments, Picture $picture)
     {
@@ -20,7 +18,7 @@ class ModerMenu extends AbstractHtmlElement
         $this->picture  = $picture;
     }
 
-    public function __invoke()
+    public function __invoke(): array
     {
         $items = [];
 

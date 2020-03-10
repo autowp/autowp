@@ -4,15 +4,15 @@ namespace Application\Spec\Table;
 
 class Car extends AbstractTable
 {
-    protected $cars;
+    protected array $cars;
 
-    public function __construct($cars, $attributes)
+    public function __construct(array $cars, array $attributes)
     {
         $this->cars       = $cars;
         $this->attributes = $attributes;
     }
 
-    public function getCars()
+    public function getCars(): array
     {
         return $this->cars;
     }

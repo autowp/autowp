@@ -2,16 +2,17 @@
 
 namespace Application\Spec\Table\Value;
 
+use ArrayAccess;
 use Laminas\View\Renderer\PhpRenderer;
 
 use function sprintf;
 
 class Wheel
 {
-    protected $tyrewidth;
-    protected $tyreseries;
-    protected $radius;
-    protected $rimwidth;
+    protected int $tyrewidth;
+    protected int $tyreseries;
+    protected int $radius;
+    protected int $rimwidth;
 
     public function __construct(array $options)
     {
@@ -23,9 +24,9 @@ class Wheel
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $attribute
-     * @param $value
-     * @param $values
+     * @param array|ArrayAccess $attribute
+     * @param mixed             $value
+     * @param mixed             $values
      */
     public function render(PhpRenderer $view, $attribute, $value, $values): string
     {

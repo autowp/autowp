@@ -7,15 +7,14 @@ use Laminas\View\Helper\AbstractHtmlElement;
 
 class LanguagePicker extends AbstractHtmlElement
 {
-    /** @var Model */
-    private $languagePicker;
+    private Model $languagePicker;
 
     public function __construct(Model $languagePicker)
     {
         $this->languagePicker = $languagePicker;
     }
 
-    public function __invoke()
+    public function __invoke(): array
     {
         return $this->languagePicker->getItems();
     }

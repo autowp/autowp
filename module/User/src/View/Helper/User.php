@@ -19,16 +19,13 @@ use function is_array;
 
 class User extends AbstractHelper
 {
-    /** @var UserModel */
     private UserModel $userModel;
 
-    /** @var array */
     private array $users = [];
 
     /** @var array|ArrayObject|null */
     private $user;
 
-    /** @var Acl */
     private Acl $acl;
 
     public function __construct(Acl $acl, UserModel $userModel)

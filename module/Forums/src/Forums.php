@@ -24,17 +24,13 @@ class Forums
     public const STATUS_CLOSED  = 'closed';
     public const STATUS_DELETED = 'deleted';
 
-    /** @var TableGateway */
-    private $themeTable;
+    private TableGateway $themeTable;
 
-    /** @var TableGateway */
-    private $topicTable;
+    private TableGateway $topicTable;
 
-    /** @var Comments\CommentsService */
-    private $comments;
+    private Comments\CommentsService $comments;
 
-    /** @var User */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(
         Comments\CommentsService $comments,
@@ -51,17 +47,17 @@ class Forums
 
     public function userSubscribed(int $topicId, int $userId): bool
     {
-        return $this->comments->userSubscribed(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
+        return $this->comments->userSubscribed(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     public function canSubscribe(int $topicId, int $userId): bool
     {
-        return $this->comments->canSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
+        return $this->comments->canSubscribe(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     public function canUnSubscribe(int $topicId, int $userId): bool
     {
-        return $this->comments->canUnSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
+        return $this->comments->canUnSubscribe(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     /**
@@ -69,7 +65,7 @@ class Forums
      */
     public function subscribe(int $topicId, int $userId): void
     {
-        $this->comments->subscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
+        $this->comments->subscribe(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     /**
@@ -77,7 +73,7 @@ class Forums
      */
     public function unsubscribe(int $topicId, int $userId): void
     {
-        $this->comments->unSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
+        $this->comments->unSubscribe(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     public function open(int $topicId): void
@@ -106,7 +102,7 @@ class Forums
         }
 
         $needAttention = $this->comments->topicHaveModeratorAttention(
-            \Application\Comments::FORUMS_TYPE_ID,
+            AppComments::FORUMS_TYPE_ID,
             $topic['id']
         );
 
@@ -148,7 +144,7 @@ class Forums
         $topics = $this->topicTable->selectWith($select)->current();
 
         $messages = $this->comments->getTotalMessagesCount([
-            'type' => \Application\Comments::FORUMS_TYPE_ID,
+            'type' => AppComments::FORUMS_TYPE_ID,
             'callback'
                 /**
                  * @suppress PhanPluginMixedKeyNoKey
@@ -182,7 +178,7 @@ class Forums
             ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
             ->where([
                 new Sql\Predicate\In('forums_topics.status', [self::STATUS_CLOSED, self::STATUS_NORMAL]),
-                'comment_topic.type_id = ?' => \Application\Comments::FORUMS_TYPE_ID,
+                'comment_topic.type_id = ?' => AppComments::FORUMS_TYPE_ID,
             ])
             ->order('comment_topic.last_update DESC');
 
@@ -205,7 +201,7 @@ class Forums
         foreach ($paginator->getCurrentItems() as $topicRow) {
             if ($userId) {
                 $stat        = $this->comments->getTopicStatForUser(
-                    \Application\Comments::FORUMS_TYPE_ID,
+                    AppComments::FORUMS_TYPE_ID,
                     $topicRow['id'],
                     $userId
                 );
@@ -213,7 +209,7 @@ class Forums
                 $newMessages = $stat['newMessages'];
             } else {
                 $stat        = $this->comments->getTopicStat(
-                    \Application\Comments::FORUMS_TYPE_ID,
+                    AppComments::FORUMS_TYPE_ID,
                     $topicRow['id']
                 );
                 $messages    = $stat['messages'];
@@ -225,7 +221,7 @@ class Forums
             $lastMessage = false;
             if ($messages > 0) {
                 $lastMessageRow = $this->comments->getLastMessageRow(
-                    \Application\Comments::FORUMS_TYPE_ID,
+                    AppComments::FORUMS_TYPE_ID,
                     $topicRow['id']
                 );
                 if ($lastMessageRow) {
@@ -329,7 +325,7 @@ class Forums
         $id = $this->topicTable->getLastInsertValue();
 
         $this->comments->add([
-            'typeId'             => \Application\Comments::FORUMS_TYPE_ID,
+            'typeId'             => AppComments::FORUMS_TYPE_ID,
             'itemId'             => $id,
             'authorId'           => $userId,
             'datetime'           => new Sql\Expression('NOW()'),
@@ -394,7 +390,7 @@ class Forums
                 'comment_topic',
                 new Sql\Expression(
                     'forums_topics.id = comment_topic.item_id and comment_topic.type_id = ?',
-                    \Application\Comments::FORUMS_TYPE_ID
+                    AppComments::FORUMS_TYPE_ID
                 ),
                 [],
                 $select::JOIN_LEFT
@@ -427,7 +423,7 @@ class Forums
             return false;
         }
 
-        $this->comments->moveMessage($messageId, \Application\Comments::FORUMS_TYPE_ID, $topic['id']);
+        $this->comments->moveMessage($messageId, AppComments::FORUMS_TYPE_ID, $topic['id']);
 
         return true;
     }
@@ -508,7 +504,7 @@ class Forums
             return null;
         }
 
-        if ($message['type_id'] !== \Application\Comments::FORUMS_TYPE_ID) {
+        if ($message['type_id'] !== AppComments::FORUMS_TYPE_ID) {
             return null;
         }
 
@@ -540,7 +536,7 @@ class Forums
 
         if ($userId) {
             $this->comments->updateTopicView(
-                \Application\Comments::FORUMS_TYPE_ID,
+                AppComments::FORUMS_TYPE_ID,
                 $topicId,
                 $userId
             );
@@ -568,7 +564,7 @@ class Forums
         $this->registerTopicView($topic['id'], $userId);
 
         $messages = $this->comments->get(
-            \Application\Comments::FORUMS_TYPE_ID,
+            AppComments::FORUMS_TYPE_ID,
             $topic['id'],
             $userId ? $userId : 0,
             self::TOPICS_PER_PAGE,
@@ -576,7 +572,7 @@ class Forums
         );
 
         $paginator = $this->comments->getPaginator(
-            \Application\Comments::FORUMS_TYPE_ID,
+            AppComments::FORUMS_TYPE_ID,
             $topic['id'],
             self::TOPICS_PER_PAGE,
             $page
@@ -606,7 +602,7 @@ class Forums
         }
 
         $messageId = (int) $this->comments->add([
-            'typeId'             => \Application\Comments::FORUMS_TYPE_ID,
+            'typeId'             => AppComments::FORUMS_TYPE_ID,
             'itemId'             => $values['topic_id'],
             'parentId'           => $values['parent_id'] ? $values['parent_id'] : null,
             'authorId'           => $values['user_id'],
@@ -628,7 +624,7 @@ class Forums
 
     public function getSubscribersIds(int $topicId): array
     {
-        return $this->comments->getSubscribersIds(\Application\Comments::FORUMS_TYPE_ID, $topicId);
+        return $this->comments->getSubscribersIds(AppComments::FORUMS_TYPE_ID, $topicId);
     }
 
     public function getSubscribedTopics(int $userId): array
@@ -643,8 +639,8 @@ class Forums
             ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
             ->where([
                 'comment_topic_subscribe.user_id' => $userId,
-                'comment_topic.type_id'           => \Application\Comments::FORUMS_TYPE_ID,
-                'comment_topic_subscribe.type_id' => \Application\Comments::FORUMS_TYPE_ID,
+                'comment_topic.type_id'           => AppComments::FORUMS_TYPE_ID,
+                'comment_topic_subscribe.type_id' => AppComments::FORUMS_TYPE_ID,
             ])
             ->order('comment_topic.last_update DESC');
         $rows = $this->topicTable->selectWith($select);
@@ -652,7 +648,7 @@ class Forums
         $topics = [];
         foreach ($rows as $row) {
             $stat        = $this->comments->getTopicStatForUser(
-                \Application\Comments::FORUMS_TYPE_ID,
+                AppComments::FORUMS_TYPE_ID,
                 $row['id'],
                 $userId
             );
@@ -666,7 +662,7 @@ class Forums
             $lastMessage = false;
             if ($messages > 0) {
                 $lastMessageRow = $this->comments->getLastMessageRow(
-                    \Application\Comments::FORUMS_TYPE_ID,
+                    AppComments::FORUMS_TYPE_ID,
                     $row['id']
                 );
                 if ($lastMessageRow) {
@@ -708,8 +704,8 @@ class Forums
             ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
             ->where([
                 'comment_topic_subscribe.user_id' => $userId,
-                'comment_topic.type_id'           => \Application\Comments::FORUMS_TYPE_ID,
-                'comment_topic_subscribe.type_id' => \Application\Comments::FORUMS_TYPE_ID,
+                'comment_topic.type_id'           => AppComments::FORUMS_TYPE_ID,
+                'comment_topic_subscribe.type_id' => AppComments::FORUMS_TYPE_ID,
             ]);
         $row = $this->topicTable->selectWith($select)->current();
 

@@ -3,23 +3,29 @@
 namespace Application\View\Helper;
 
 use Autowp\Comments\CommentsService;
+use Exception;
+use Laminas\Form\Form;
 use Laminas\View\Helper\AbstractHelper;
+use Laminas\View\Helper\Partial;
 
 use function array_replace;
 
 class Comments extends AbstractHelper
 {
-    /** @var CommentsService */
-    private $comments;
+    private CommentsService $comments;
 
-    private $form;
+    private Form $form;
 
-    public function __construct($form, CommentsService $comments)
+    public function __construct(Form $form, CommentsService $comments)
     {
         $this->form     = $form;
         $this->comments = $comments;
     }
 
+    /**
+     * @return string|Partial
+     * @throws Exception
+     */
     public function __invoke(array $options)
     {
         $defaults = [

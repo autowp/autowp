@@ -25,13 +25,13 @@ class MainMenu
 
     /** @var array */
     private array $icons = [
-        29 => 'fa fa-fw fa-upload',
-        89 => 'fa fa-fw fa-comment',
+        29  => 'fa fa-fw fa-upload',
+        89  => 'fa fa-fw fa-comment',
         136 => 'fa fa-fw fa-info',
-        48 => 'fa fa-fw fa-user',
-        90 => 'fa fa-fw fa-sign-out',
+        48  => 'fa fa-fw fa-user',
+        90  => 'fa fa-fw fa-sign-out',
         124 => 'fa fa-fw fa fa-users',
-        91 => 'fa fa-fw fa fa-pencil',
+        91  => 'fa fa-fw fa fa-pencil',
         211 => 'fa fa-fw fa-address-book',
     ];
 

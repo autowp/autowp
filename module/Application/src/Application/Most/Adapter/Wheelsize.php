@@ -3,6 +3,7 @@
 namespace Application\Most\Adapter;
 
 use Application\WheelSize as WheelsizeObject;
+use ArrayAccess;
 use Exception;
 use Laminas\Db\Sql;
 
@@ -11,11 +12,11 @@ use function implode;
 
 class Wheelsize extends AbstractAdapter
 {
-    protected $attributes;
+    protected array $attributes;
 
-    protected $order;
+    protected string $order;
 
-    public function setAttributes(array $value)
+    public function setAttributes(array $value): void
     {
         /*$defaults = [
             'tyrewidth'  => null,
@@ -26,7 +27,7 @@ class Wheelsize extends AbstractAdapter
         $this->attributes = $value;
     }
 
-    public function setOrder($value)
+    public function setOrder(string $value): void
     {
         $this->order = $value;
     }
@@ -82,7 +83,11 @@ class Wheelsize extends AbstractAdapter
         ];
     }
 
-    protected function getWheelSizeText($car)
+    /**
+     * @param array|ArrayAccess $car
+     * @throws Exception
+     */
+    protected function getWheelSizeText($car): string
     {
         $text = [];
 

@@ -4,18 +4,21 @@ namespace Application\View\Helper;
 
 use Autowp\Message\MessageService;
 use Laminas\View\Helper\AbstractHtmlElement;
+use Laminas\View\Helper\Partial;
 
 class Sidebar extends AbstractHtmlElement
 {
-    /** @var MessageService */
-    private $message;
+    private MessageService $message;
 
     public function __construct(MessageService $message)
     {
         $this->message = $message;
     }
 
-    public function __invoke($data = false)
+    /**
+     * @return string|Partial|array
+     */
+    public function __invoke(bool $data = false)
     {
         $newPersonalMessages = null;
         /* @phan-suppress-next-line PhanUndeclaredMethod */

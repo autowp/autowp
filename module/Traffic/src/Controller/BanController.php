@@ -7,8 +7,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
 
 class BanController extends AbstractActionController
 {
-    /** @var TrafficControl */
-    private $service;
+    private TrafficControl $service;
 
     public function __construct(TrafficControl $service)
     {

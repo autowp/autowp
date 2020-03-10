@@ -5,6 +5,7 @@ namespace Application\View\Helper;
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
+use ArrayAccess;
 use ArrayObject;
 use Autowp\Comments;
 use Laminas\View\Helper\AbstractHelper;
@@ -13,17 +14,13 @@ use function implode;
 
 class Pictures extends AbstractHelper
 {
-    /** @var PictureView */
-    private $pictureView;
+    private PictureView $pictureView;
 
-    /** @var Comments\CommentsService */
-    private $comments;
+    private Comments\CommentsService $comments;
 
-    /** @var PictureModerVote */
-    private $pictureModerVote;
+    private PictureModerVote $pictureModerVote;
 
-    /** @var Picture */
-    private $picture;
+    private Picture $picture;
 
     public function __construct(
         Comments\CommentsService $comments,
@@ -37,13 +34,16 @@ class Pictures extends AbstractHelper
         $this->picture          = $picture;
     }
 
-    private function isPictureModer()
+    private function isPictureModer(): bool
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->view->user()->inheritsRole('pictures-moder');
     }
 
-    public function behaviour($picture)
+    /**
+     * @param array|ArrayAccess $picture
+     */
+    public function behaviour($picture): string
     {
         return $this->userBehaviour($picture, $this->isPictureModer());
     }
@@ -69,7 +69,10 @@ class Pictures extends AbstractHelper
         return $this->view->partial('application/picture-behaviour', $data);
     }
 
-    private function userBehaviour($picture, bool $isModer)
+    /**
+     * @param array|ArrayAccess $picture
+     */
+    private function userBehaviour($picture, bool $isModer): string
     {
         if ($picture instanceof ArrayObject) {
             $picture = (array) $picture;
@@ -116,7 +119,7 @@ class Pictures extends AbstractHelper
         return $this->renderBehaviour($data, $isModer);
     }
 
-    private function getModerVote(int $pictureId)
+    private function getModerVote(int $pictureId): ?int
     {
         $row = $this->pictureModerVote->getVoteCount($pictureId);
 
@@ -127,7 +130,10 @@ class Pictures extends AbstractHelper
         return null;
     }
 
-    public function picture($picture)
+    /**
+     * @param array|ArrayAccess $picture
+     */
+    public function picture($picture): string
     {
         $view = $this->view;
 

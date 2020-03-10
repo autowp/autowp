@@ -8,8 +8,7 @@ use Laminas\Db\TableGateway\TableGateway;
 
 class UserRename
 {
-    /** @var TableGateway */
-    private $table;
+    private TableGateway $table;
 
     public function __construct(TableGateway $table)
     {

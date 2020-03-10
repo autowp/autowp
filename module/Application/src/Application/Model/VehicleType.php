@@ -109,10 +109,10 @@ class VehicleType
             VALUES (:vehicle_id, :vehicle_type_id, :inherited)
             ON DUPLICATE KEY UPDATE inherited = VALUES(inherited)
         ', [
-        'vehicle_id'      => $vehicleId,
-        'vehicle_type_id' => $type,
-        'inherited'       => $inherited ? 1 : 0,
-        ]);
+    'vehicle_id'      => $vehicleId,
+    'vehicle_type_id' => $type,
+    'inherited'       => $inherited ? 1 : 0,
+]);
 
         return $result->getAffectedRows() > 0;
     }

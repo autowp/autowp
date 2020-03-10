@@ -3,27 +3,31 @@
 namespace Application\Validator\User;
 
 use Autowp\User\Model\User;
+use Exception;
 use Laminas\Validator\AbstractValidator;
 
 class EmailNotExists extends AbstractValidator
 {
     private const EXISTS = 'userEmailExists';
 
-    protected $messageTemplates = [
+    protected array $messageTemplates = [
         self::EXISTS => "E-mail '%value%' already registered",
     ];
 
-    /** @var User */
-    private $userModel;
+    private User $userModel;
 
-    public function setUserModel(User $userModel)
+    public function setUserModel(User $userModel): self
     {
         $this->userModel = $userModel;
 
         return $this;
     }
 
-    public function isValid($value)
+    /**
+     * @param mixed $value
+     * @throws Exception
+     */
+    public function isValid($value): bool
     {
         $this->setValue($value);
 

@@ -17,7 +17,7 @@ use function strncasecmp;
 
 class TrafficRouteListener extends AbstractListenerAggregate
 {
-    private $whitelist = [
+    private array $whitelist = [
         '/api/forum',
         '/api/user',
         '/api/account',

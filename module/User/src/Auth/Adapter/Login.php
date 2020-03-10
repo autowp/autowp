@@ -14,23 +14,17 @@ class Login implements AdapterInterface
 {
     /**
      * Identity value
-     *
-     * @var string
      */
-    private $identity;
+    private string $identity;
 
     /**
      * $_credential - Credential values
-     *
-     * @var Sql\Expression
      */
-    private $credentialExpr;
+    private Sql\Expression $credentialExpr;
 
-    /** @var array */
-    private $authenticateResultInfo;
+    private array $authenticateResultInfo;
 
-    /** @var User */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(User $userModel, $identity, Sql\Expression $credentialExpr)
     {
