@@ -16,7 +16,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testLoginByEmail()
+    public function testLoginByEmail(): void
     {
         $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => 'test@example.com',
@@ -30,7 +30,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('login');
     }
 
-    public function testLoginByLogin()
+    public function testLoginByLogin(): void
     {
         $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => 'test',
@@ -44,14 +44,14 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('login');
     }
 
-    private function mockExternalLoginFactory($photoUrl)
+    private function mockExternalLoginFactory(string $photoUrl): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
         $config = $serviceManager->get('config');
 
         $serviceMock = $this->getMockBuilder(Facebook::class)
-            ->setMethods(['getData', 'callback'])
+            ->onlyMethods(['getData', 'callback'])
             ->setConstructorArgs([
                 $config['external_login_services'][Facebook::class],
             ])
@@ -76,7 +76,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         });
 
         $mock = $this->getMockBuilder(PluginManager::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->setConstructorArgs([$serviceManager])
             ->getMock();
 
@@ -85,7 +85,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService('ExternalLoginServiceManager', $mock);
     }
 
-    public function testAuthorizeBySerevice()
+    public function testAuthorizeByService(): void
     {
         $this->mockExternalLoginFactory(null);
 

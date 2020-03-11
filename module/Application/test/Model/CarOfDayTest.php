@@ -23,14 +23,14 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
-    private function mockDuplicateFinder()
+    private function mockDuplicateFinder(): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
         $tables = $serviceManager->get('TableManager');
 
         $mock = $this->getMockBuilder(DuplicateFinder::class)
-            ->setMethods(['indexImage'])
+            ->onlyMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance'),
@@ -44,10 +44,9 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $params
      * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -138,7 +137,7 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
     /**
      * @throws Exception
      */
-    private function createCandidate()
+    private function createCandidate(): void
     {
         $vehicleID = $this->createItem([
             'item_type_id' => 1,
@@ -156,7 +155,7 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
     /**
      * @throws Exception
      */
-    public function testCarOfDay()
+    public function testCarOfDay(): void
     {
         $this->createCandidate();
 

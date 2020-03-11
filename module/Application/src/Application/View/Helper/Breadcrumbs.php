@@ -18,7 +18,7 @@ class Breadcrumbs extends AbstractHelper
         $this->data = [];
     }
 
-    public function __invoke($url = null, $name = null, $placement = 'append'): self
+    public function __invoke(?string $url = null, ?string $name = null, string $placement = 'append'): self
     {
         if ($url || $name) {
             $node = ['url' => $url, 'name' => $name];

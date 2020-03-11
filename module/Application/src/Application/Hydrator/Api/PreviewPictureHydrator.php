@@ -16,7 +16,8 @@ class PreviewPictureHydrator extends RestHydrator
 
     private ?string $userRole;
 
-    public function __construct(ServiceLocatorInterface $serviceManager) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
         $strategy = new Strategy\Picture($serviceManager);
         $this->addStrategy('picture', $strategy);

@@ -6,7 +6,7 @@ use Exception;
 
 class ItemParentLanguageHydrator extends RestHydrator
 {
-    public function extract($object)
+    public function extract($object): ?array
     {
         return [
             'language' => $object['language'],

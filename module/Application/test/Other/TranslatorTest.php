@@ -10,11 +10,8 @@ class TranslatorTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider translationsProvider
-     * @param $text
-     * @param $expected
-     * @param $language
      */
-    public function testTranslatorWorks($text, $expected, $language)
+    public function testTranslatorWorks(string $text, string $expected, string $language)
     {
         $serviceManager = $this->getApplicationServiceLocator();
         $translator     = $serviceManager->get('MvcTranslator');
@@ -24,7 +21,7 @@ class TranslatorTest extends AbstractHttpControllerTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public static function translationsProvider()
+    public static function translationsProvider(): array
     {
         return [
             ['test', 'test is ok', 'en'],

@@ -33,10 +33,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $params
      * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -55,7 +54,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return (int) $parts[count($parts) - 1];
     }
 
-    private function createVehicle(array $params = [])
+    private function createVehicle(array $params = []): int
     {
         return $this->createItem(array_replace([
             'item_type_id' => 1,
@@ -63,7 +62,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         ], $params));
     }
 
-    private function createEngine()
+    private function createEngine(): int
     {
         return $this->createItem([
             'item_type_id' => 2,
@@ -73,11 +72,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $engineId
-     * @param $vehicleId
      * @throws Exception
      */
-    private function setEngineToVehicle($engineId, $vehicleId)
+    private function setEngineToVehicle(int $engineId, int $vehicleId): void
     {
         $this->reset();
 
@@ -101,7 +98,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function getRandomBrand()
+    private function getRandomBrand(): array
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -126,11 +123,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $itemId
-     * @param $parentId
      * @throws Exception
      */
-    private function addItemParent($itemId, $parentId, array $params = [])
+    private function addItemParent(int $itemId, int $parentId, array $params = []): void
     {
         $this->reset();
 
@@ -151,14 +146,14 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
-    private function mockDuplicateFinder()
+    private function mockDuplicateFinder(): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
         $tables = $serviceManager->get('TableManager');
 
         $mock = $this->getMockBuilder(DuplicateFinder::class)
-            ->setMethods(['indexImage'])
+            ->onlyMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance'),
@@ -172,10 +167,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $vehicleId
      * @throws Exception
      */
-    private function addPictureToItem($vehicleId): int
+    private function addPictureToItem(int $vehicleId): int
     {
         $this->reset();
 
@@ -220,12 +214,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $pictureId
-     * @param $itemId
-     * @param $perspectiveId
      * @throws Exception
      */
-    private function setPerspective($pictureId, $itemId, $perspectiveId)
+    private function setPerspective(int $pictureId, int $itemId, int $perspectiveId): void
     {
         $this->reset();
 
@@ -247,10 +238,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $pictureId
      * @throws Exception
      */
-    private function acceptPicture($pictureId)
+    private function acceptPicture(int $pictureId)
     {
         $this->reset();
 
@@ -295,7 +285,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testEngineUnderTheHoodPreviews()
+    public function testEngineUnderTheHoodPreviews(): void
     {
         $vehicleId = $this->createVehicle();
         $engineId  = $this->createEngine();
@@ -335,7 +325,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testCreateCarAndAddToBrand()
+    public function testCreateCarAndAddToBrand(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
@@ -382,7 +372,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testTree()
+    public function testTree(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item/1/tree', Request::METHOD_GET);
@@ -398,7 +388,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testCreateBrand()
+    public function testCreateBrand(): void
     {
         $catname = 'test-brand-' . (10000 * microtime(true));
 
@@ -466,7 +456,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testBlacklistedCatnameNotAllowedManually()
+    public function testBlacklistedCatnameNotAllowedManually(): void
     {
         $parentVehicleId = $this->createVehicle([
             'is_group' => true,
@@ -506,7 +496,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testSubscription()
+    public function testSubscription(): void
     {
         $brand = $this->getRandomBrand();
 
@@ -546,7 +536,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @throws Exception
      */
-    public function testItemParentAutoCatnameIsNotEmpty()
+    public function testItemParentAutoCatnameIsNotEmpty(): void
     {
         $parentId = $this->createVehicle([
             'name'     => 'Toyota Corolla',
@@ -565,7 +555,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testItemPoint()
+    public function testItemPoint(): void
     {
         $itemId = $this->createItem([
             'item_type_id' => 7,
@@ -596,7 +586,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testEngineVehicles()
+    public function testEngineVehicles(): void
     {
         $engineId = $this->createItem([
             'item_type_id' => 2,
@@ -645,7 +635,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testFields()
+    public function testFields(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
@@ -670,7 +660,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testCreateCategoryAddItemAndGet()
+    public function testCreateCategoryAddItemAndGet(): void
     {
         $catname = 'catname-' . (10000 * microtime(true));
 

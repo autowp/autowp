@@ -75,7 +75,7 @@ class AttrConflictHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'item_id'   => (int) $object['item_id'],

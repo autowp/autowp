@@ -6,7 +6,7 @@ use Application\Controller\Api\RatingController;
 use Application\Test\AbstractHttpControllerTestCase;
 use Laminas\Http\Request;
 
-class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
+class RatingControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 

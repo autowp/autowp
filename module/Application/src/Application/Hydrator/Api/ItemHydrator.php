@@ -92,7 +92,8 @@ class ItemHydrator extends RestHydrator
 
     private array $cataloguePaths = [];
 
-    public function __construct(ServiceLocatorInterface $serviceManager) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
 
         $tables          = $serviceManager->get('TableManager');
@@ -313,7 +314,7 @@ class ItemHydrator extends RestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function extract($object): array
+    public function extract($object): ?array
     {
         $nameData = $this->getNameData($object, $this->language);
 

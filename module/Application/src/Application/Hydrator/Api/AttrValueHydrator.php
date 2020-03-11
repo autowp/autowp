@@ -21,7 +21,7 @@ class AttrValueHydrator extends RestHydrator
         $this->specService = $serviceManager->get(SpecificationsService::class);
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'attribute_id' => (int) $object['attribute_id'],

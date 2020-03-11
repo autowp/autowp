@@ -115,7 +115,7 @@ class ForumThemeHydrator extends RestHydrator
      * @param $object
      * @return array
      */
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'id'             => (int) $object['id'],

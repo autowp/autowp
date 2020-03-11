@@ -2,6 +2,7 @@
 
 namespace Autowp\User\Model;
 
+use ArrayAccess;
 use ArrayObject;
 use Autowp\Commons\Db\Table\Row;
 use DateInterval;
@@ -66,7 +67,7 @@ class User
     }
 
     /**
-     * @param $row
+     * @param array|ArrayAccess $row
      * @throws Exception
      */
     private function getMessagingInterval($row): int
@@ -116,7 +117,7 @@ class User
     }
 
     /**
-     * @param $value
+     * @param array|int $value
      * @throws Exception
      */
     private function applyIdFilter(Sql\Select $select, $value, string $id): void

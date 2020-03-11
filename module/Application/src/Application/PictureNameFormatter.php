@@ -3,6 +3,8 @@
 namespace Application;
 
 use Application\Model\Picture;
+use ArrayAccess;
+use Exception;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
 
@@ -33,17 +35,21 @@ class PictureNameFormatter
         $this->picture           = $picture;
     }
 
-    private static function mbUcfirst($str)
+    private static function mbUcfirst(string$str): string
     {
         return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
     }
 
-    private function translate($string, $language)
+    private function translate(string $string, string $language): string
     {
         return $this->translator->translate($string, 'default', $language);
     }
 
-    public function format($picture, $language)
+    /**
+     * @param array|ArrayAccess $picture
+     * @throws Exception
+     */
+    public function format($picture, string $language): string
     {
         if (isset($picture['name']) && $picture['name']) {
             return $picture['name'];
@@ -73,7 +79,7 @@ class PictureNameFormatter
         return 'Picture';
     }
 
-    public function formatHtml(array $picture, $language)
+    public function formatHtml(array $picture, string $language): string
     {
         if (isset($picture['name']) && $picture['name']) {
             /* @phan-suppress-next-line PhanUndeclaredMethod */

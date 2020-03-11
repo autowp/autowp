@@ -7,7 +7,10 @@ use Laminas\I18n\Validator\IsInt;
 
 class IsIntOrNull extends IsInt
 {
-    public function isValid($value)
+    /**
+     * @param mixed $value
+     */
+    public function isValid($value): bool
     {
         if ($value === SpecificationsService::NULL_VALUE_STR) {
             return true;

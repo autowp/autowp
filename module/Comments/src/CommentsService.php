@@ -295,10 +295,10 @@ class CommentsService
             VALUES (:comment_id, :user_id, :vote)
             ON DUPLICATE KEY UPDATE vote = VALUES(vote)
         ', [
-        'comment_id' => $message['id'],
-        'user_id'    => $userId,
-        'vote'       => $vote > 0 ? 1 : -1,
-        ]);
+    'comment_id' => $message['id'],
+    'user_id'    => $userId,
+    'vote'       => $vote > 0 ? 1 : -1,
+]);
 
         if ($result->getAffectedRows() === 0) {
             return [

@@ -40,7 +40,7 @@ class UserText extends AbstractHtmlElement
 
     private UserModel $userModel;
 
-    public function __construct($router, Picture $picture, UserModel $userModel)
+    public function __construct(TreeRouteStack $router, Picture $picture, UserModel $userModel)
     {
         $this->router    = $router;
         $this->picture   = $picture;
@@ -95,11 +95,10 @@ class UserText extends AbstractHtmlElement
     }
 
     /**
-     * @param $url
      * @throws Exception
      * @SuppressWarnings(PHPMD.EmptyCatchBlock)
      */
-    private function processHref($url): string
+    private function processHref(string $url): string
     {
         try {
             $uri = Uri\UriFactory::factory($url);
@@ -139,7 +138,7 @@ class UserText extends AbstractHtmlElement
         return '<a href="' . $this->view->escapeHtmlAttr($url) . '">' . $this->view->escapeHtml($url) . '</a>';
     }
 
-    private function tryUserLink(Uri\Uri $uri)
+    private function tryUserLink(Uri\Uri $uri): bool
     {
         $match = preg_match('|^/users/([^/]+)$|isu', $uri->getPath(), $matches);
 

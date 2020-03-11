@@ -13,7 +13,7 @@ use const PHP_EOL;
 
 class Favicons extends AbstractHelper
 {
-    public function __invoke()
+    public function __invoke(): string
     {
         $file = 'public_html/dist/iconstats.json';
         if (file_exists($file)) {

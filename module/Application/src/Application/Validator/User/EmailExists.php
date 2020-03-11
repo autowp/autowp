@@ -16,7 +16,7 @@ class EmailExists extends AbstractValidator
 
     private User $userModel;
 
-    public function setUserModel(User $userModel)
+    public function setUserModel(User $userModel): self
     {
         $this->userModel = $userModel;
 

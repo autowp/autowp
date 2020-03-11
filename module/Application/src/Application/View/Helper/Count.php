@@ -6,7 +6,7 @@ use Laminas\View\Helper\AbstractHelper;
 
 class Count extends AbstractHelper
 {
-    public function __invoke(int $count, $new = null)
+    public function __invoke(int $count, ?int $new = null): string
     {
         if ($count === 0) {
             $result = $this->view->translate('count 0');

@@ -45,7 +45,7 @@ class ArticleHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $previewUrl = null;
         if ($object['preview_filename']) {

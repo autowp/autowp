@@ -2,6 +2,7 @@
 
 namespace Application\View\Helper;
 
+use Application\Comments as AppComments;
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
@@ -81,7 +82,7 @@ class Pictures extends AbstractHelper
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->view->user()->logedIn()) {
             $commentsStat = $this->comments->getTopicStatForUser(
-                \Application\Comments::PICTURES_TYPE_ID,
+                AppComments::PICTURES_TYPE_ID,
                 $picture['id'],
                 /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $this->view->user()->get()['id']
@@ -90,7 +91,7 @@ class Pictures extends AbstractHelper
             $newMsgCount = $commentsStat['newMessages'];
         } else {
             $commentsStat = $this->comments->getTopicStat(
-                \Application\Comments::PICTURES_TYPE_ID,
+                AppComments::PICTURES_TYPE_ID,
                 $picture['id']
             );
             $msgCount     = $commentsStat['messages'];

@@ -44,7 +44,7 @@ class PictureTest extends AbstractHttpControllerTestCase
         $tables = $serviceManager->get('TableManager');
 
         $mock = $this->getMockBuilder(DuplicateFinder::class)
-            ->setMethods(['indexImage'])
+            ->onlyMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance'),

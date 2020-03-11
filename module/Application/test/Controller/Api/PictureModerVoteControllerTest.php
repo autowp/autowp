@@ -23,14 +23,14 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    private function mockDuplicateFinder()
+    private function mockDuplicateFinder(): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
         $tables = $serviceManager->get('TableManager');
 
         $mock = $this->getMockBuilder(DuplicateFinder::class)
-            ->setMethods(['indexImage'])
+            ->onlyMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance'),
@@ -91,10 +91,9 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $params
      * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -116,7 +115,7 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testVote()
+    public function testVote(): void
     {
         $itemId    = $this->createItem([
             'item_type_id' => 1,

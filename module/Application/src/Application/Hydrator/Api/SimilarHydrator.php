@@ -21,7 +21,7 @@ class SimilarHydrator extends RestHydrator
         $this->addStrategy('picture', $strategy);
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'picture_id' => (int) $object['picture_id'],

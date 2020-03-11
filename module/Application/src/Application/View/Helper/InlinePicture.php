@@ -3,6 +3,7 @@
 namespace Application\View\Helper;
 
 use Application\Model\Picture;
+use ArrayAccess;
 use Laminas\View\Helper\AbstractHelper;
 
 class InlinePicture extends AbstractHelper
@@ -14,6 +15,9 @@ class InlinePicture extends AbstractHelper
         $this->picture = $picture;
     }
 
+    /**
+     * @param array|ArrayAccess $picture
+     */
     public function __invoke($picture): string
     {
         $view = $this->view;

@@ -15,7 +15,8 @@ class LogHydrator extends RestHydrator
 {
     private int $userId;
 
-    public function __construct(ServiceLocatorInterface $serviceManager) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
 
         $strategy = new Strategy\User($serviceManager);
@@ -68,7 +69,7 @@ class LogHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'date' => $this->extractValue('date', $object['date']),

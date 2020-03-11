@@ -19,10 +19,9 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $params
      * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -43,11 +42,9 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $itemId
-     * @param $parentId
      * @throws Exception
      */
-    private function addItemParent($itemId, $parentId, array $params = [])
+    private function addItemParent(int $itemId, int $parentId, array $params = []): void
     {
         $this->reset();
 
@@ -68,7 +65,7 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $factoryId = $this->createItem([
             'item_type_id' => 6,

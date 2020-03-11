@@ -26,17 +26,17 @@ class Login implements AdapterInterface
 
     private User $userModel;
 
-    public function __construct(User $userModel, $identity, Sql\Expression $credentialExpr)
+    public function __construct(User $userModel, string $identity, Sql\Expression $credentialExpr)
     {
         $this->userModel      = $userModel;
-        $this->identity       = (string) $identity;
+        $this->identity       = $identity;
         $this->credentialExpr = $credentialExpr;
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
      */
-    public function authenticate()
+    public function authenticate(): Result
     {
         $this->authenticateSetup();
 
@@ -69,7 +69,7 @@ class Login implements AdapterInterface
      * making sure that this adapter was indeed setup properly with all
      * required pieces of information.
      *
-     * @throws InvalidArgumentException - in the event that setup was not done properly
+     * @throws InvalidArgumentException - in the event that setup was not done properly.
      */
     private function authenticateSetup(): bool
     {
@@ -97,10 +97,8 @@ class Login implements AdapterInterface
     /**
      * authenticateCreateAuthResult() - Creates a Result object from
      * the information that has been collected during the authenticate() attempt.
-     *
-     * @return Result
      */
-    private function authenticateCreateAuthResult()
+    private function authenticateCreateAuthResult(): Result
     {
         return new Result(
             $this->authenticateResultInfo['code'],

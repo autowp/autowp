@@ -10,13 +10,14 @@ class ItemLanguageHydrator extends RestHydrator
 {
     private TextStorage\Service $textStorage;
 
-    public function __construct(ServiceLocatorInterface $serviceManager) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
 
         $this->textStorage = $serviceManager->get(TextStorage\Service::class);
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $text = null;
         if ($object['text_id']) {

@@ -59,7 +59,7 @@ class TrafficHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         /*$row['users'] = $users->fetchAll([
             'last_ip = inet_aton(inet6_ntoa(?))' => $row['ip']

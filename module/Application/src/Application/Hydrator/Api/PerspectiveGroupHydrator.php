@@ -21,7 +21,7 @@ class PerspectiveGroupHydrator extends RestHydrator
         $this->addStrategy('perspectives', $strategy);
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'id'   => (int) $object['id'],

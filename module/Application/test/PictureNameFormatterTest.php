@@ -13,11 +13,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider dataProvider
-     * @param $data
-     * @param $textExpected
-     * @param $htmlExpected
      */
-    public function testFormat($data, $textExpected, $htmlExpected)
+    public function testFormat(array $data, string $textExpected, string $htmlExpected): void
     {
         $services = $this->getApplicationServiceLocator();
 
@@ -30,10 +27,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider escapeDataProvider
-     * @param $data
-     * @param $expected
      */
-    public function testEscape($data, $expected)
+    public function testEscape(array $data, string $expected): void
     {
         $services = $this->getApplicationServiceLocator();
 
@@ -44,7 +39,7 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
         $this->assertEquals($expected, $html);
     }
 
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             [
@@ -450,7 +445,7 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
         ];
     }
 
-    public function escapeDataProvider()
+    public function escapeDataProvider(): array
     {
         return [
             [

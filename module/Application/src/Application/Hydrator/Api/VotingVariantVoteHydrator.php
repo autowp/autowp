@@ -12,7 +12,8 @@ class VotingVariantVoteHydrator extends RestHydrator
 {
     private User $userModel;
 
-    public function __construct(ServiceLocatorInterface $serviceManager) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
 
         $this->userModel = $serviceManager->get(User::class);
@@ -32,7 +33,7 @@ class VotingVariantVoteHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'user_id' => (int) $object['user_id'],

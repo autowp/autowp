@@ -114,7 +114,7 @@ class CommentHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $canRemove = false;
         $isModer   = false;
@@ -250,7 +250,7 @@ class CommentHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)
@@ -258,7 +258,7 @@ class CommentHydrator extends RestHydrator
         throw new Exception("Not supported");
     }
 
-    public function setFields(array $fields)
+    public function setFields(array $fields): self
     {
         $this->getFilter()->addFilter('fields', new PropertyFilter(array_keys($fields)));
 
@@ -289,7 +289,7 @@ class CommentHydrator extends RestHydrator
         return $this;
     }
 
-    private function getUserRole()
+    private function getUserRole(): ?string
     {
         if (! $this->userId) {
             return null;

@@ -18,10 +18,9 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $params
      * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -43,7 +42,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testSelectCarEngine()
+    public function testSelectCarEngine(): void
     {
         // create engine
         $engineId = $this->createItem([
@@ -95,7 +94,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testCarsSpecificationsEditor()
+    public function testCarsSpecificationsEditor(): void
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

@@ -15,14 +15,17 @@ class UnitId extends AbstractValidator
 
     private TableGateway $table;
 
-    public function setTable(TableGateway $table)
+    public function setTable(TableGateway $table): self
     {
         $this->table = $table;
 
         return $this;
     }
 
-    public function isValid($value)
+    /**
+     * @param mixed $value
+     */
+    public function isValid($value): bool
     {
         $this->setValue($value);
 

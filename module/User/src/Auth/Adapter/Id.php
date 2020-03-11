@@ -26,7 +26,7 @@ class Id implements AdapterInterface
         $this->userModel = $userModel;
     }
 
-    public function authenticate()
+    public function authenticate(): Result
     {
         $this->authenticateSetup();
 
@@ -56,7 +56,7 @@ class Id implements AdapterInterface
      * making sure that this adapter was indeed setup properly with all
      * required pieces of information.
      *
-     * @throws InvalidArgumentException - in the event that setup was not done properly
+     * @throws InvalidArgumentException - in the event that setup was not done properly.
      */
     private function authenticateSetup(): bool
     {
@@ -76,10 +76,8 @@ class Id implements AdapterInterface
 
     /**
      * setIdentity() - set the value to be used as the identity
-     *
-     * @param  int $value
      */
-    public function setIdentity($value): self
+    public function setIdentity(int $value): self
     {
         $this->identity = (int) $value;
         return $this;

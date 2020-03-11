@@ -15,7 +15,7 @@ class UserRename
         $this->table = $table;
     }
 
-    public function garbageCollect()
+    public function garbageCollect(): int
     {
         return (int) $this->table->delete([
             'date < DATE_SUB(NOW(), INTERVAL 3 MONTH)',

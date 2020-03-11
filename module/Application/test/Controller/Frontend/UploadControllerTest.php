@@ -22,10 +22,10 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testUploadVehicle()
+    public function testUploadVehicle(): void
     {
         /**
-         * @var \Laminas\Http\PhpEnvironment\Request $request
+         * @var Request $request
          */
         $request = $this->getRequest();
         $request->getHeaders()
@@ -61,6 +61,8 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri     = $headers->get('Location')->uri();
         $parts   = explode('/', $uri->getPath());
-        return $parts[count($parts) - 1];
+        $id = $parts[count($parts) - 1];
+
+        $this->assertNotEmpty($id);
     }
 }

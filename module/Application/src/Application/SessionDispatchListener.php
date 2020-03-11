@@ -23,7 +23,7 @@ class SessionDispatchListener extends AbstractListenerAggregate
     /**
      * @param int $priority
      */
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(MvcEvent::EVENT_BOOTSTRAP, [$this, 'onBootstrap'], $priority);
     }
@@ -70,7 +70,7 @@ class SessionDispatchListener extends AbstractListenerAggregate
         }
     }
 
-    private function getHostCookieDomain(Request $request, $hosts): ?string
+    private function getHostCookieDomain(Request $request, array $hosts): ?string
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $hostname = $request->getUri()->getHost();

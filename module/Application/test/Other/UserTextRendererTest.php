@@ -10,10 +10,8 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider hyperlinksProvider
-     * @param $text
-     * @param $expected
      */
-    public function testHyperlinks($text, $expected)
+    public function testHyperlinks(string $text, string $expected)
     {
         $serviceManager    = $this->getApplicationServiceLocator();
         $viewHelperManager = $serviceManager->get('ViewHelperManager');
@@ -23,22 +21,7 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @dataProvider usersProvider
-     * @param $text
-     * @param $expected
-     */
-    public function testUsers($text, $expected)
-    {
-        $serviceManager    = $this->getApplicationServiceLocator();
-        $viewHelperManager = $serviceManager->get('ViewHelperManager');
-        $helper            = $viewHelperManager->get('userText');
-
-        $result = $helper($text);
-        $this->assertStringContainsString($expected, $result);
-    }
-
-    public static function usersProvider()
+    public static function usersProvider(): array
     {
         return [
             [
@@ -67,7 +50,20 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
         ];
     }
 
-    public static function hyperlinksProvider()
+    /**
+     * @dataProvider usersProvider
+     */
+    public function testUsers(string $text, string $expected)
+    {
+        $serviceManager    = $this->getApplicationServiceLocator();
+        $viewHelperManager = $serviceManager->get('ViewHelperManager');
+        $helper            = $viewHelperManager->get('userText');
+
+        $result = $helper($text);
+        $this->assertStringContainsString($expected, $result);
+    }
+
+    public static function hyperlinksProvider(): array
     {
         return [
             ['just.test', 'just.test'],

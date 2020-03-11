@@ -74,7 +74,7 @@ class AttrAttributeHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'id'          => $object['id'],

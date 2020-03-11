@@ -6,7 +6,7 @@ use Exception;
 
 class ItemLinkHydrator extends RestHydrator
 {
-    public function extract($object)
+    public function extract($object): ?array
     {
         return [
             'id'      => (int) $object['id'],

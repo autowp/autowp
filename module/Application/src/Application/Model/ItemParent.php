@@ -473,9 +473,9 @@ class ItemParent
             VALUES (:item_id, :parent_id, :language, :name, :is_auto)
             ON DUPLICATE KEY UPDATE name = VALUES(name), is_auto = VALUES(is_auto)
         ', array_replace([
-        'name'        => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
-    'is_auto' => $isAuto ? 1 : 0,
-], $primaryKey));
+    'name' => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
+        'is_auto'  => $isAuto ? 1 : 0,
+        ], $primaryKey));
     }
 
     /**

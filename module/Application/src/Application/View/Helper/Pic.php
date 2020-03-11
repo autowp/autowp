@@ -27,7 +27,7 @@ class Pic extends AbstractHtmlElement
     }
 
     /**
-     * @param array|ArrayObject $picture
+     * @param null|array|ArrayObject $picture
      */
     public function __invoke($picture = null): self
     {

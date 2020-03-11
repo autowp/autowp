@@ -31,7 +31,8 @@ class ItemParentHydrator extends RestHydrator
 
     private User $userModel;
 
-    public function __construct(ServiceLocatorInterface $serviceManager) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
 
         $this->router     = $serviceManager->get('HttpRouter');
@@ -97,7 +98,7 @@ class ItemParentHydrator extends RestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function extract($object): array
+    public function extract($object): ?array
     {
         $result = [
             'item_id'   => (int) $object['item_id'],

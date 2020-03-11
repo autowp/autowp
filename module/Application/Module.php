@@ -8,6 +8,7 @@ use Laminas\Loader\StandardAutoloader;
 use Laminas\Mail;
 use Laminas\ModuleManager\Feature;
 use Laminas\Mvc\MvcEvent;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\View\Helper\PaginationControl;
 use Throwable;
@@ -37,7 +38,7 @@ class Module implements
 {
     public const VERSION = '1.0dev';
 
-    public function getConfig()
+    public function getConfig(): array
     {
         $config = [];
 
@@ -78,7 +79,7 @@ class Module implements
         ];
     }
 
-    public function onBootstrap(Event $e)
+    public function onBootstrap(Event $e): void
     {
         error_reporting(E_ALL);
         ini_set('display_errors', true);
@@ -128,7 +129,7 @@ class Module implements
         $maintenance->attach($serviceManager->get('CronEventManager'));
     }
 
-    public function handleError(MvcEvent $e)
+    public function handleError(MvcEvent $e): void
     {
         $exception = $e->getParam('exception');
         if ($exception) {
@@ -149,7 +150,7 @@ class Module implements
         }
     }
 
-    private function sendErrorEmail(Throwable $exception, $serviceManager)
+    private function sendErrorEmail(Throwable $exception, ServiceLocatorInterface $serviceManager): void
     {
         $message = get_class($exception) . PHP_EOL
             . 'File: ' . $exception->getFile() . ' (' . $exception->getLine() . ')' . PHP_EOL

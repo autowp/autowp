@@ -3,6 +3,7 @@
 namespace Application\View\Helper;
 
 use Application\ItemNameFormatter;
+use Exception;
 use Laminas\View\Helper\AbstractHelper;
 
 class Car extends AbstractHelper
@@ -21,7 +22,7 @@ class Car extends AbstractHelper
 
     /**
      * @param array|ArrayAccess $item
-     * @throws \Exception
+     * @throws Exception
      */
     public function htmlTitle($item): string
     {
@@ -30,7 +31,7 @@ class Car extends AbstractHelper
 
     /**
      * @param array|ArrayAccess $item
-     * @throws \Exception
+     * @throws Exception
      */
     public function textTitle($item): string
     {

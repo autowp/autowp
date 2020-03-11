@@ -24,7 +24,8 @@ class MessageHydrator extends RestHydrator
 
     private TreeRouteStack $router;
 
-    public function __construct(ServiceLocatorInterface $serviceManager) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
 
         $this->userModel = $serviceManager->get(User::class);
@@ -81,7 +82,7 @@ class MessageHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'id'                  => (int) $object['id'],

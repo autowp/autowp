@@ -24,9 +24,8 @@ class ServicesTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider servicesProvider
-     * @param $serviceName
      */
-    public function testServiceRegistered($serviceName)
+    public function testServiceRegistered(string $serviceName)
     {
         $services = $this->getApplicationServiceLocator();
 
@@ -35,7 +34,7 @@ class ServicesTest extends AbstractHttpControllerTestCase
         $this->assertInstanceOf($serviceName, $service);
     }
 
-    public static function servicesProvider()
+    public static function servicesProvider(): array
     {
         return [
             [MessageService::class],

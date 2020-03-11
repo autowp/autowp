@@ -87,7 +87,7 @@ class AttrUserValueHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $updateDate = null;
         if ($object['update_date']) {

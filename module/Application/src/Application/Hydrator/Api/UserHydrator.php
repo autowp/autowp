@@ -91,7 +91,7 @@ class UserHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $deleted = (bool) $object['deleted'];
 

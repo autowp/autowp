@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <ruleset name="Laminas coding standard">
-    <rule ref="./vendor/laminas/laminas-coding-standard/src/LaminasCodingStandard/ruleset.xml"/>
+    <rule ref="./vendor/laminas/laminas-coding-standard/src/LaminasCodingStandard/ruleset.xml">
+        <exclude name="Generic.PHP.RequireStrictTypes.MissingDeclaration"/>
+    </rule>
 
     <!-- Paths to check -->
     <file>module/Application/src</file>

@@ -83,7 +83,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
     }
 
     /**
-     * @return null
+     * @return mixed|null
      */
     public function onRoute(MvcEvent $e)
     {

@@ -26,7 +26,7 @@ class Remember implements AdapterInterface
     /**
      * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      */
-    public function authenticate()
+    public function authenticate(): Result
     {
         $this->authenticateSetup();
 
@@ -58,7 +58,7 @@ class Remember implements AdapterInterface
      * making sure that this adapter was indeed setup properly with all
      * required pieces of information.
      *
-     * @throws InvalidArgumentException - in the event that setup was not done properly
+     * @throws InvalidArgumentException - in the event that setup was not done properly.
      */
     private function authenticateSetup(): bool
     {

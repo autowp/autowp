@@ -14,7 +14,7 @@ class FieldsFilter extends AbstractFilter
 {
     protected array $fields = [];
 
-    public function setFields(array $fields)
+    public function setFields(array $fields): self
     {
         $this->fields = $fields;
 

@@ -107,7 +107,7 @@ class ForumTopicHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $date = Row::getDateTimeByColumnType('timestamp', $object['add_datetime']);
 

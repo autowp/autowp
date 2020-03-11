@@ -28,7 +28,8 @@ class PictureItemHydrator extends RestHydrator
 
     private User $userModel;
 
-    public function __construct(ServiceLocatorInterface $serviceManager) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
 
         $this->item      = $serviceManager->get(Item::class);
@@ -82,7 +83,7 @@ class PictureItemHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object)
+    public function extract($object): ?array
     {
         $result = [
             'picture_id'     => (int) $object['picture_id'],

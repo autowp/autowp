@@ -5,6 +5,7 @@ namespace AutowpTest\User\Controller;
 use Application\Test\AbstractHttpControllerTestCase;
 use Autowp\User\Auth\Adapter\Id;
 use Autowp\User\Controller\Plugin\User;
+use Autowp\User\Model\User as UserModel;
 use Laminas\Authentication\AuthenticationService;
 
 class PluginTest extends AbstractHttpControllerTestCase
@@ -23,7 +24,7 @@ class PluginTest extends AbstractHttpControllerTestCase
         $this->assertFalse($this->getPlugin()->__invoke()->logedIn());
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(UserModel::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
@@ -41,7 +42,7 @@ class PluginTest extends AbstractHttpControllerTestCase
         $this->assertNull($this->getPlugin()->get());
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(UserModel::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
@@ -59,7 +60,7 @@ class PluginTest extends AbstractHttpControllerTestCase
         $this->assertFalse($this->getPlugin()->__invoke()->isAllowed('car', 'edit_meta'));
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(UserModel::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(3);
@@ -77,7 +78,7 @@ class PluginTest extends AbstractHttpControllerTestCase
         $this->assertFalse($this->getPlugin()->__invoke()->inheritsRole('moder'));
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(UserModel::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(3);
@@ -95,7 +96,7 @@ class PluginTest extends AbstractHttpControllerTestCase
         $this->assertEquals('UTC', $this->getPlugin()->__invoke()->timezone());
 
         $serviceManager = $this->getApplicationServiceLocator();
-        $userModel      = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel      = $serviceManager->get(UserModel::class);
 
         $adapter = new Id($userModel);
         $adapter->setIdentity(1);
