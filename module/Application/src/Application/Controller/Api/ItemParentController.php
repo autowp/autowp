@@ -4,7 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Controller\Plugin\Car;
 use Application\HostManager;
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
@@ -20,6 +20,7 @@ use Laminas\Db\Sql;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -42,7 +43,7 @@ use function strlen;
  */
 class ItemParentController extends AbstractRestfulController
 {
-    private RestHydrator $hydrator;
+    private AbstractRestHydrator $hydrator;
 
     private ItemParent $itemParent;
 
@@ -67,7 +68,7 @@ class ItemParentController extends AbstractRestfulController
     private InputFilter $putInputFilter;
 
     public function __construct(
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         InputFilter $listInputFilter,
         InputFilter $itemInputFilter,
         InputFilter $postInputFilter,
@@ -97,6 +98,7 @@ class ItemParentController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function indexAction()
     {
@@ -237,6 +239,9 @@ class ItemParentController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemAction()
     {
         $user = $this->user()->get();
@@ -271,6 +276,7 @@ class ItemParentController extends AbstractRestfulController
 
     /**
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function postAction()
     {
@@ -378,6 +384,7 @@ class ItemParentController extends AbstractRestfulController
 
     /**
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function putAction()
     {
@@ -478,6 +485,7 @@ class ItemParentController extends AbstractRestfulController
     /**
      * @suppress PhanPluginMixedKeyNoKey
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function deleteAction()
     {

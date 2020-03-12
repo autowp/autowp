@@ -12,6 +12,7 @@ use Laminas\Db\Sql;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Router\Http\TreeRouteStack;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -58,6 +59,9 @@ class BrandsController extends AbstractActionController
         $this->router      = $router;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -78,6 +82,9 @@ class BrandsController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function iconsAction()
     {
         return new JsonModel([
@@ -88,8 +95,9 @@ class BrandsController extends AbstractActionController
 
     /**
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
-    public function sectionsAction(): ViewModel
+    public function sectionsAction()
     {
         $language = $this->language();
 

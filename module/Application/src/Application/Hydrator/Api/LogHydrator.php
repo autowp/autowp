@@ -2,6 +2,7 @@
 
 namespace Application\Hydrator\Api;
 
+use ArrayAccess;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
@@ -11,7 +12,7 @@ use Traversable;
 
 use function is_array;
 
-class LogHydrator extends RestHydrator
+class LogHydrator extends AbstractRestHydrator
 {
     private int $userId;
 
@@ -69,6 +70,9 @@ class LogHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $result = [
@@ -93,7 +97,7 @@ class LogHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

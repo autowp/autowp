@@ -4,7 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Controller\Plugin\Car;
 use Application\HostManager;
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
@@ -16,6 +16,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -43,8 +44,8 @@ class ItemLanguageController extends AbstractRestfulController
     /** @var TextStorage */
     private TextStorage $textStorage;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     /** @var ItemParent */
     private ItemParent $itemParent;
@@ -67,7 +68,7 @@ class ItemLanguageController extends AbstractRestfulController
     public function __construct(
         TableGateway $table,
         TextStorage $textStorage,
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         ItemParent $itemParent,
         HostManager $hostManager,
         InputFilter $putInputFilter,
@@ -86,6 +87,9 @@ class ItemLanguageController extends AbstractRestfulController
         $this->item              = $item;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -107,6 +111,9 @@ class ItemLanguageController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -125,6 +132,9 @@ class ItemLanguageController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function putAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

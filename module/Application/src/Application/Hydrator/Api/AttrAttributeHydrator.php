@@ -3,9 +3,10 @@
 namespace Application\Hydrator\Api;
 
 use Application\Hydrator\Api\Filter\PropertyFilter;
-use Application\Hydrator\Api\Strategy\HydratorStrategy;
+use Application\Hydrator\Api\Strategy\AbstractHydratorStrategy;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
+use ArrayAccess;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
@@ -17,7 +18,7 @@ use function array_keys;
 use function in_array;
 use function is_array;
 
-class AttrAttributeHydrator extends RestHydrator
+class AttrAttributeHydrator extends AbstractRestHydrator
 {
     private int $userId;
 
@@ -74,6 +75,9 @@ class AttrAttributeHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $result = [
@@ -105,7 +109,7 @@ class AttrAttributeHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)
@@ -113,7 +117,7 @@ class AttrAttributeHydrator extends RestHydrator
         throw new Exception("Not supported");
     }
 
-    public function setFields(array $fields)
+    public function setFields(array $fields): self
     {
         $this->getFilter()->addFilter('fields', new PropertyFilter(array_keys($fields)));
 
@@ -128,7 +132,7 @@ class AttrAttributeHydrator extends RestHydrator
 
             $strategy = $this->strategies[$name];
 
-            if ($strategy instanceof HydratorStrategy) {
+            if ($strategy instanceof AbstractHydratorStrategy) {
                 $strategy->setFields($value);
             }
         }
@@ -136,7 +140,7 @@ class AttrAttributeHydrator extends RestHydrator
         if (isset($fields['childs'])) {
             $strategy = $this->strategies['childs'];
 
-            if ($strategy instanceof HydratorStrategy) {
+            if ($strategy instanceof AbstractHydratorStrategy) {
                 $strategy->setFields($fields);
             }
         }

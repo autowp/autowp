@@ -61,8 +61,8 @@ class Image implements StrategyInterface
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $value
-     * @return null
+     * @param object $value
+     * @return mixed|null
      */
     public function hydrate($value)
     {

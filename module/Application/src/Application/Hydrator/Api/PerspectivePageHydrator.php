@@ -3,12 +3,13 @@
 namespace Application\Hydrator\Api;
 
 use Application\Hydrator\Api\Strategy\PerspectiveGroups as HydratorPerspectiveGroupsStrategy;
+use ArrayAccess;
 use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
-class PerspectivePageHydrator extends RestHydrator
+class PerspectivePageHydrator extends AbstractRestHydrator
 {
     private TableGateway $groupTable;
 
@@ -24,6 +25,9 @@ class PerspectivePageHydrator extends RestHydrator
         $this->addStrategy('groups', $strategy);
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $result = [
@@ -47,7 +51,7 @@ class PerspectivePageHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

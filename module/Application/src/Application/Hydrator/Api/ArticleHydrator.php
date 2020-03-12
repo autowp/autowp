@@ -3,23 +3,23 @@
 namespace Application\Hydrator\Api;
 
 use Application\Controller\Api\ArticleController;
+use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use Traversable;
 
-class ArticleHydrator extends RestHydrator
+class ArticleHydrator extends AbstractRestHydrator
 {
     private User $userModel;
 
     private TableGateway $htmlTable;
 
-    public function __construct(
-        $serviceManager
-    ) {
+    public function __construct(ServiceLocatorInterface $serviceManager) {
         parent::__construct();
 
         $this->userModel = $serviceManager->get(User::class);
@@ -45,6 +45,9 @@ class ArticleHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $previewUrl = null;
@@ -85,7 +88,7 @@ class ArticleHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

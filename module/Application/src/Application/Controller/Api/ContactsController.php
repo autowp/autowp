@@ -2,13 +2,14 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Contact;
 use Autowp\User\Model\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -32,15 +33,15 @@ class ContactsController extends AbstractRestfulController
     /** @var InputFilter */
     private InputFilter $listInputFilter;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     public function __construct(
         Contact $contact,
         TableGateway $userTable,
         User $userModel,
         InputFilter $listInputFilter,
-        RestHydrator $hydrator
+        AbstractRestHydrator $hydrator
     ) {
         $this->contact         = $contact;
         $this->userTable       = $userTable;
@@ -49,6 +50,9 @@ class ContactsController extends AbstractRestfulController
         $this->hydrator        = $hydrator;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $user = $this->user()->get();
@@ -86,6 +90,9 @@ class ContactsController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getAction()
     {
         $id = (int) $this->params('id');
@@ -113,6 +120,7 @@ class ContactsController extends AbstractRestfulController
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @return ViewModel|ResponseInterface|array
      */
     public function putAction()
     {
@@ -146,6 +154,9 @@ class ContactsController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function deleteAction()
     {
         $id = (int) $this->params('id');

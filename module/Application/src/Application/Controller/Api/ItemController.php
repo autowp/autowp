@@ -4,7 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Controller\Plugin\Car;
 use Application\HostManager;
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Hydrator\Api\Strategy\Image;
 use Application\ItemNameFormatter;
 use Application\Model\Brand;
@@ -16,6 +16,7 @@ use Application\Model\Picture;
 use Application\Model\UserItemSubscribe;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
+use ArrayAccess;
 use ArrayObject;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
@@ -38,6 +39,7 @@ use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator\Adapter\DbSelect;
 use Laminas\Paginator\Paginator;
 use Laminas\Session\Container;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -77,49 +79,34 @@ use function usort;
  */
 class ItemController extends AbstractRestfulController
 {
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    private AbstractRestHydrator $hydrator;
 
-    /** @var StrategyInterface */
     private StrategyInterface $logoHydrator;
 
-    /** @var ItemNameFormatter */
     private ItemNameFormatter $itemNameFormatter;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $itemInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $itemLogoPutFilter;
 
-    /** @var SpecificationsService */
     private SpecificationsService $specificationsService;
 
-    /** @var HostManager */
     private HostManager $hostManager;
 
-    /** @var MessageService */
     private MessageService $message;
 
-    /** @var UserItemSubscribe */
     private UserItemSubscribe $userItemSubscribe;
 
-    /** @var TableGateway */
     private TableGateway $specTable;
 
-    /** @var ItemParent */
     private ItemParent $itemParent;
 
-    /** @var Item */
     private Item $itemModel;
 
-    /** @var VehicleType */
     private VehicleType $vehicleType;
 
-    /** @var InputFilterPluginManager */
     private InputFilterPluginManager $inputFilterManager;
 
     private array $collators = [];
@@ -128,7 +115,7 @@ class ItemController extends AbstractRestfulController
     private SpecificationsService $specsService;
 
     public function __construct(
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         Image $logoHydrator,
         ItemNameFormatter $itemNameFormatter,
         InputFilter $listInputFilter,
@@ -163,7 +150,7 @@ class ItemController extends AbstractRestfulController
         $this->specsService          = $specsService;
     }
 
-    private function getCollator($language)
+    private function getCollator($language): Collator
     {
         if (! isset($this->collators[$language])) {
             $this->collators[$language] = new Collator($language);
@@ -172,7 +159,10 @@ class ItemController extends AbstractRestfulController
         return $this->collators[$language];
     }
 
-    private function compareName($a, $b, $language)
+    /**
+     * @return int|bool
+     */
+    private function compareName(string $a, string $b, string $language)
     {
         $coll = $this->getCollator($language);
         switch ($language) {
@@ -189,14 +179,15 @@ class ItemController extends AbstractRestfulController
                 }
 
                 return $coll->compare($a, $b);
-                break;
 
             default:
                 return $coll->compare($a, $b);
-                break;
         }
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function pathAction()
     {
         $currentCategory = $this->itemModel->getRow([
@@ -294,6 +285,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @return ViewModel|ResponseInterface|array
      */
     public function indexAction()
     {
@@ -864,6 +856,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function alphaAction()
     {
@@ -902,6 +895,9 @@ class ItemController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemAction()
     {
         $user = $this->user()->get();
@@ -1218,6 +1214,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function postAction()
     {
@@ -1442,6 +1439,9 @@ class ItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function putAction()
     {
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
@@ -1868,7 +1868,7 @@ class ItemController extends AbstractRestfulController
         return $u->toString();
     }
 
-    private function buildChangesMessage($oldData, $newData, $language)
+    private function buildChangesMessage(array $oldData, array $newData, string $language): array
     {
         $fields = [
             'name'                      => ['str', 'moder/vehicle/changes/name-%s-%s'],
@@ -1943,6 +1943,9 @@ class ItemController extends AbstractRestfulController
         return $changes;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getLogoAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -1963,6 +1966,9 @@ class ItemController extends AbstractRestfulController
         ]));
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function postLogoAction()
     {
         if (! $this->user()->isAllowed('brand', 'logo')) {
@@ -2012,7 +2018,11 @@ class ItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
-    private function carTreeWalk($car, int $parentType = 0)
+    /**
+     * @param array|ArrayAccess $car
+     * @throws Exception
+     */
+    private function carTreeWalk($car, int $parentType = 0): array
     {
         $data = [
             'id'     => (int) $car['id'],
@@ -2040,6 +2050,9 @@ class ItemController extends AbstractRestfulController
         return $data;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function treeAction()
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -2057,6 +2070,9 @@ class ItemController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function refreshInheritanceAction()
     {
         if (! $this->user()->isAllowed('specifications', 'admin')) {
@@ -2076,6 +2092,9 @@ class ItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function specificationsAction()
     {
         if (! $this->user()->isAllowed('specifications', 'edit')) {
@@ -2098,6 +2117,9 @@ class ItemController extends AbstractRestfulController
         return $viewModel->setTerminal(true);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function childSpecificationsAction()
     {
         $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
@@ -2121,7 +2143,7 @@ class ItemController extends AbstractRestfulController
         return $viewModel->setTerminal(true);
     }
 
-    public function vehicleTypeAction()
+    public function vehicleTypeAction(): JsonModel
     {
         $brandID = (int) $this->params()->fromQuery('brand_id');
 
@@ -2132,6 +2154,9 @@ class ItemController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function newItemsAction()
     {
         $category = $this->itemModel->getRow([

@@ -7,7 +7,7 @@ use ArrayAccess;
 
 use function is_array;
 
-class PreviewPictures extends HydratorStrategy
+class PreviewPictures extends AbstractHydratorStrategy
 {
     protected function getHydrator(): Hydrator
     {

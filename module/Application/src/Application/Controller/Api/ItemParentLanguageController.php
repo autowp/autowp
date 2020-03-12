@@ -2,7 +2,7 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\ItemParent;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
@@ -10,6 +10,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -26,8 +27,8 @@ class ItemParentLanguageController extends AbstractRestfulController
     /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     /** @var ItemParent */
     private ItemParent $itemParent;
@@ -37,7 +38,7 @@ class ItemParentLanguageController extends AbstractRestfulController
 
     public function __construct(
         TableGateway $table,
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         ItemParent $itemParent,
         InputFilter $putInputFilter
     ) {
@@ -47,6 +48,9 @@ class ItemParentLanguageController extends AbstractRestfulController
         $this->putInputFilter = $putInputFilter;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -68,6 +72,9 @@ class ItemParentLanguageController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -87,6 +94,9 @@ class ItemParentLanguageController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function putAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

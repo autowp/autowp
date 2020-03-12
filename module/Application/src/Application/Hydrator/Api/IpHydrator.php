@@ -15,7 +15,7 @@ use Traversable;
 use function gethostbyaddr;
 use function is_array;
 
-class IpHydrator extends RestHydrator
+class IpHydrator extends AbstractRestHydrator
 {
     private int $userId;
 
@@ -78,7 +78,11 @@ class IpHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($ip)
+    /**
+     * @param mixed $ip
+     * @throws Exception
+     */
+    public function extract($ip): array
     {
         $result = [
             'address' => $ip,
@@ -135,7 +139,7 @@ class IpHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

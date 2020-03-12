@@ -11,8 +11,10 @@ use Laminas\Db\TableGateway\Feature\RowGatewayFeature;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function array_key_exists;
 use function array_keys;
 
@@ -38,6 +40,9 @@ class PageController extends AbstractRestfulController
         $this->postInputFilter = $postInputFilter;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -76,6 +81,9 @@ class PageController extends AbstractRestfulController
         return $result;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -101,6 +109,9 @@ class PageController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemPutAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -236,6 +247,7 @@ class PageController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function postAction()
     {
@@ -294,6 +306,9 @@ class PageController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemDeleteAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -311,6 +326,9 @@ class PageController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function parentsAction()
     {
         $result = [];

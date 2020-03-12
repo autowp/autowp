@@ -6,6 +6,7 @@ use Application\Model\Contact;
 use Application\Model\Picture;
 use Application\Model\UserAccount;
 use Application\Model\UserItemSubscribe;
+use ArrayAccess;
 use ArrayObject;
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
@@ -173,11 +174,9 @@ class UsersService
 
     /**
      * @param array|ArrayObject $user
-     * @param string            $email
-     * @param string            $language
      * @throws Exception
      */
-    public function changeEmailStart($user, $email, $language)
+    public function changeEmailStart($user, string $email, string $language): void
     {
         $host = $this->getHostOptions($language);
 
@@ -229,9 +228,8 @@ class UsersService
 
     /**
      * @param array|ArrayObject $user
-     * @param string            $hostname
      */
-    public function sendRegistrationConfirmEmail($user, $hostname)
+    public function sendRegistrationConfirmEmail($user, string $hostname): void
     {
         if ($user['email_to_check'] && $user['email_check_code']) {
             $values = [
@@ -266,9 +264,8 @@ class UsersService
 
     /**
      * @param array|ArrayObject $user
-     * @param string            $hostname
      */
-    public function sendChangeConfirmEmail($user, $hostname)
+    public function sendChangeConfirmEmail($user, string $hostname): void
     {
         if ($user['email_to_check'] && $user['email_check_code']) {
             $values = [
@@ -371,7 +368,7 @@ class UsersService
     /**
      * @suppress PhanDeprecatedFunction
      */
-    public function restoreVotes()
+    public function restoreVotes(): void
     {
         $this->userModel->getTable()->update([
             'votes_left' => new Sql\Expression('votes_per_day'),
@@ -381,7 +378,11 @@ class UsersService
         ]);
     }
 
-    public function setPassword($user, $password)
+    /**
+     * @param array|ArrayAccess $user
+     * @throws Exception
+     */
+    public function setPassword($user, string $password): void
     {
         $this->userModel->getTable()->update([
             'password' => $this->getPasswordHashExpr($password),
@@ -390,10 +391,10 @@ class UsersService
         ]);
     }
 
-    public function checkPassword($userId, $password)
+    public function checkPassword(int $userId, string $password): bool
     {
         return (bool) $this->userModel->getTable()->select([
-            'id'       => (int) $userId,
+            'id'       => $userId,
             'password' => $this->getPasswordHashExpr($password),
         ])->current();
     }
@@ -401,7 +402,7 @@ class UsersService
     /**
      * @suppress PhanPluginMixedKeyNoKey
      */
-    public function deleteUnused()
+    public function deleteUnused(): void
     {
         $table = $this->userModel->getTable();
 
@@ -438,7 +439,7 @@ class UsersService
         }
     }
 
-    private function delete(int $userId)
+    private function delete(int $userId): void
     {
         $row = $this->userModel->getRow($userId);
         if (! $row) {
@@ -463,7 +464,7 @@ class UsersService
         }
     }
 
-    public function clearRememberCookie($language)
+    public function clearRememberCookie(string $language): void
     {
         if (! isset($this->hosts[$language])) {
             throw new Exception("Host `$language` not found");
@@ -474,7 +475,7 @@ class UsersService
         }
     }
 
-    public function setRememberCookie($hash, $language)
+    public function setRememberCookie(string $hash, string $language): void
     {
         if (! isset($this->hosts[$language])) {
             throw new Exception("Host `$language` not found");
@@ -485,7 +486,7 @@ class UsersService
         }
     }
 
-    public function markDeleted(int $userId)
+    public function markDeleted(int $userId): bool
     {
         $row = $this->userModel->getRow($userId);
         if (! $row) {

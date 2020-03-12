@@ -115,7 +115,7 @@ class SpecificationsService
     private TableGateway $valueStringTable;
 
     public function __construct(
-        $translator,
+        TranslatorInterface $translator,
         ItemNameFormatter $itemNameFormatter,
         Item $itemModel,
         ItemParent $itemParent,
@@ -163,7 +163,7 @@ class SpecificationsService
         $this->valueStringTable     = $valueStringTable;
     }
 
-    private function loadUnits()
+    private function loadUnits(): void
     {
         if ($this->units === null) {
             $units = [];
@@ -180,23 +180,21 @@ class SpecificationsService
         }
     }
 
-    public function getUnits()
+    public function getUnits(): array
     {
         $this->loadUnits();
 
         return $this->units;
     }
 
-    public function getUnit($id)
+    public function getUnit(int $id): ?array
     {
         $this->loadUnits();
-
-        $id = (int) $id;
 
         return $this->units[$id] ?? null;
     }
 
-    public function getZoneIdByCarTypeId(int $itemTypeId, array $vehicleTypeIds)
+    public function getZoneIdByCarTypeId(int $itemTypeId, array $vehicleTypeIds): int
     {
         if ($itemTypeId === Item::ENGINE) {
             return self::ENGINE_ZONE_ID;
@@ -211,7 +209,7 @@ class SpecificationsService
         return $zoneId;
     }
 
-    private function loadListOptions(array $attributeIds)
+    private function loadListOptions(array $attributeIds): void
     {
         $ids = array_diff($attributeIds, array_keys($this->listOptions));
 
@@ -250,7 +248,7 @@ class SpecificationsService
         return $this->getListOptionsArrayRecursive($attributeId, 0);
     }
 
-    private function getListOptionsArrayRecursive(int $aid, int $parentId)
+    private function getListOptionsArrayRecursive(int $aid, int $parentId): array
     {
         $result = [];
         if (isset($this->listOptionsChilds[$aid][$parentId])) {
@@ -270,7 +268,7 @@ class SpecificationsService
         return $result;
     }
 
-    private function getListsOptions(array $attributeIds)
+    private function getListsOptions(array $attributeIds): array
     {
         $this->loadListOptions($attributeIds);
 
@@ -284,7 +282,7 @@ class SpecificationsService
         return $result;
     }
 
-    private function getListOptions(int $aid, int $parentId)
+    private function getListOptions(int $aid, int $parentId): array
     {
         $result = [];
         if (isset($this->listOptionsChilds[$aid][$parentId])) {
@@ -301,7 +299,7 @@ class SpecificationsService
         return $result;
     }
 
-    private function getListOptionsText(int $attributeId, int $id)
+    private function getListOptionsText(int $attributeId, int $id): string
     {
         $this->loadListOptions([$attributeId]);
 
@@ -312,7 +310,7 @@ class SpecificationsService
         return $this->translator->translate($this->listOptions[$attributeId][$id], 'default');
     }
 
-    public function getFilterSpec(int $attributeId)
+    public function getFilterSpec(int $attributeId): ?array
     {
         $filters    = [];
         $validators = [];
@@ -427,7 +425,7 @@ class SpecificationsService
         ];
     }
 
-    private function loadZone(int $id)
+    private function loadZone(int $id): array
     {
         if (isset($this->zoneAttrs[$id])) {
             return $this->zoneAttrs[$id];
@@ -496,10 +494,10 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param $value
+     * @param mixed $value
      * @throws Exception
      */
-    public function setUserValue2(int $uid, int $attributeId, int $itemId, $value, bool $empty)
+    public function setUserValue2(int $uid, int $attributeId, int $itemId, $value, bool $empty): void
     {
         $attribute = $this->getAttribute($attributeId);
         if (! $attribute) {
@@ -553,9 +551,9 @@ class SpecificationsService
                             VALUES (:attribute_id, :item_id, :user_id, :ordering, :value)
                             ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
                         ', array_replace($userValuePrimaryKey, [
-    'ordering' => $ordering,
-    'value'    => $oneValue,
-]));
+                        'ordering' => $ordering,
+                        'value'    => $oneValue,
+                        ]));
                         $ordering++;
                     }
                 }
@@ -594,8 +592,8 @@ class SpecificationsService
                         VALUES (:attribute_id, :item_id, :user_id, :value)
                         ON DUPLICATE KEY UPDATE value = VALUES(value)
                     ', array_replace($userValuePrimaryKey, [
-    'value' => $value,
-]));
+                    'value' => $value,
+                    ]));
 
                     $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
                 }
@@ -622,10 +620,10 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param $value
+     * @param mixed $value
      * @throws Exception
      */
-    public function setUserValue(int $uid, int $attributeId, int $itemId, $value)
+    public function setUserValue(int $uid, int $attributeId, int $itemId, $value): void
     {
         $attribute = $this->getAttribute($attributeId);
         if (! $attribute) {
@@ -773,10 +771,7 @@ class SpecificationsService
         return $result;
     }
 
-    /**
-     * @param array $attribute
-     */
-    private function propageteEngine($attribute, int $itemId)
+    private function propageteEngine(array $attribute, int $itemId): void
     {
         if (! $this->isEngineAttributeId($attribute['id'])) {
             return;
@@ -795,6 +790,10 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @param int $parentId
+     * @return array|ArrayAccess
+     */
     private function getChildCarIds(int $parentId)
     {
         if (! isset($this->carChildsCache[$parentId])) {
@@ -812,7 +811,7 @@ class SpecificationsService
         ])->current();
     }
 
-    private function propagateInheritance($attribute, int $itemId)
+    private function propagateInheritance(array $attribute, int $itemId): void
     {
         $childIds = $this->getChildCarIds($itemId);
 
@@ -833,12 +832,11 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param $car
-     * @param $perspectives
+     * @param array|ArrayAccess $car
      * @return array|ArrayObject|null
      * @throws Exception
      */
-    private function specPicture($car, $perspectives)
+    private function specPicture($car, ?array $perspectives)
     {
         $order = [];
         if ($perspectives) {
@@ -859,7 +857,7 @@ class SpecificationsService
         ]);
     }
 
-    public function getAttributes(array $options = [])
+    public function getAttributes(array $options = []): array
     {
         $defaults = [
             'zone'      => null,
@@ -982,7 +980,7 @@ class SpecificationsService
     /**
      * @throws Exception
      */
-    public function deleteUserValue(int $attributeId, int $itemId, int $userId)
+    public function deleteUserValue(int $attributeId, int $itemId, int $userId): void
     {
         if (! $itemId) {
             throw new Exception("item_id not set");
@@ -1010,7 +1008,8 @@ class SpecificationsService
         $this->updateActualValue($attribute['id'], $itemId);
     }
 
-    /*private function loadValues($attributes, int $itemId, string $language)
+    /*
+    private function loadValues($attributes, int $itemId, string $language)
     {
         $values = [];
         foreach ($attributes as $attribute) {
@@ -1027,9 +1026,10 @@ class SpecificationsService
             }
         }
         return $values;
-    }*/
+    }
+    */
 
-    public function specifications($cars, array $options)
+    public function specifications(array $cars, array $options): CarSpecTable
     {
         $options = array_merge([
             'contextCarId' => null,
@@ -1156,7 +1156,7 @@ class SpecificationsService
         return new CarSpecTable($result, $attributes);
     }
 
-    private function addUnitsToAttributes(&$attributes)
+    private function addUnitsToAttributes(array &$attributes): void
     {
         foreach ($attributes as &$attribute) {
             if ($attribute['unitId']) {
@@ -1167,7 +1167,7 @@ class SpecificationsService
         }
     }
 
-    private function removeEmpty(&$attributes, $cars)
+    private function removeEmpty(array &$attributes, array $cars): void
     {
         foreach ($attributes as $idx => &$attribute) {
             $this->removeEmpty($attribute['childs'], $cars);
@@ -1233,7 +1233,12 @@ class SpecificationsService
         throw new Exception("Unexpected type `$type`");
     }
 
-    private function valueToText($attribute, $value, string $language)
+    /**
+     * @param mixed $value
+     * @return mixed|null
+     * @throws Exception
+     */
+    private function valueToText(array $attribute, $value, string $language)
     {
         if ($value === null) {
             return null;
@@ -1285,7 +1290,7 @@ class SpecificationsService
         return null;
     }
 
-    private function calcAvgUserValue($attribute, int $itemId)
+    private function calcAvgUserValue(array $attribute, int $itemId): array
     {
         $userValuesDataTable = $this->getUserValueDataTable($attribute['typeId']);
 
@@ -1529,9 +1534,8 @@ class SpecificationsService
                         'value' => $registry[$maxValueIdx],
                     ];
                 }
-            } else {
-                //TODO: multiple attr inheritance
             }
+            // TODO: multiple attr inheritance
         }
 
         return $actualValue;
@@ -1539,10 +1543,9 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param $attribute
      * @throws Exception
      */
-    private function setActualValue($attribute, int $itemId, array $actualValue): bool
+    private function setActualValue(array $attribute, int $itemId, array $actualValue): bool
     {
         $valueDataTable = $this->getValueDataTable($attribute['typeId']);
 
@@ -1604,10 +1607,10 @@ class SpecificationsService
                     VALUES (:attribute_id, :item_id, :value)
                     ON DUPLICATE KEY UPDATE value = VALUES(value)
                 ', [
-    'value'        => $actualValue['value'],
-    'attribute_id' => $attribute['id'],
-    'item_id'      => $itemId,
-]);
+                'value'        => $actualValue['value'],
+                'attribute_id' => $attribute['id'],
+                'item_id'      => $itemId,
+                ]);
 
                 if ($result->getAffectedRows() > 0) {
                     $somethingChanges = true;
@@ -1624,7 +1627,7 @@ class SpecificationsService
         return $somethingChanges;
     }
 
-    public function updateActualValue(int $attributeId, int $itemId)
+    public function updateActualValue(int $attributeId, int $itemId): bool
     {
         $attribute = $this->getAttribute($attributeId);
         if (! $attribute) {
@@ -1634,7 +1637,10 @@ class SpecificationsService
         return $this->updateAttributeActualValue($attribute, $itemId);
     }
 
-    private function updateAttributeActualValue($attribute, int $itemId)
+    /**
+     * @throws Exception
+     */
+    private function updateAttributeActualValue(array $attribute, int $itemId): bool
     {
         $actualValue = $this->calcAvgUserValue($attribute, $itemId);
 
@@ -1736,7 +1742,7 @@ class SpecificationsService
         return (bool) $this->valueTable->selectWith($select)->current();
     }
 
-    public function updateAllActualValues()
+    public function updateAllActualValues(): void
     {
         $attributes = $this->getAttributes();
 
@@ -1753,7 +1759,7 @@ class SpecificationsService
         }
     }
 
-    public function updateActualValues(int $itemId)
+    public function updateActualValues(int $itemId): void
     {
         foreach ($this->getAttributes() as $attribute) {
             if ($attribute['typeId']) {
@@ -1762,7 +1768,7 @@ class SpecificationsService
         }
     }
 
-    public function updateInheritedValues(int $itemId)
+    public function updateInheritedValues(int $itemId): void
     {
         foreach ($this->getAttributes() as $attribute) {
             if ($attribute['typeId']) {
@@ -1797,6 +1803,10 @@ class SpecificationsService
         return $result;
     }
 
+    /**
+     * @param mixed $value
+     * @return mixed|null
+     */
     private function prepareValue(int $typeId, $value)
     {
         switch ($typeId) {
@@ -1818,11 +1828,14 @@ class SpecificationsService
             case 6: // select
             case 7: // tree select
                 return $value === null ? null : (int) $value;
-                break;
         }
         return null;
     }
 
+    /**
+     * @return array|mixed|null
+     * @throws Exception
+     */
     public function getUserValue(int $attributeId, int $itemId, int $userId)
     {
         if (! $itemId) {
@@ -1911,10 +1924,9 @@ class SpecificationsService
     }
 
     /**
-     * @return mixed|string|null
      * @throws Exception
      */
-    public function getUserValueText(int $attributeId, int $itemId, int $userId, string $language)
+    public function getUserValueText(int $attributeId, int $itemId, int $userId, string $language): ?string
     {
         if (! $itemId) {
             throw new Exception("item_id not set");
@@ -1958,7 +1970,7 @@ class SpecificationsService
         return null;
     }
 
-    public function getActualValueText(int $attributeId, int $itemId, string $language)
+    public function getActualValueText(int $attributeId, int $itemId, string $language): string
     {
         if (! $itemId) {
             throw new Exception("item_id not set");
@@ -2125,7 +2137,7 @@ class SpecificationsService
         return $this->types[$typeId];
     }
 
-    public function refreshConflictFlag(int $attributeId, int $itemId)
+    public function refreshConflictFlag(int $attributeId, int $itemId): void
     {
         if (! $attributeId) {
             throw new Exception("attributeId not provided");
@@ -2148,7 +2160,9 @@ class SpecificationsService
         $userValues   = [];
         $uniqueValues = [];
         foreach ($userValueRows as $userValueRow) {
-            $v                                    = $this->getUserValue($attribute['id'], $itemId, $userValueRow['user_id']);
+            $v                                    = $this->getUserValue(
+                $attribute['id'], $itemId, $userValueRow['user_id']
+            );
             $serializedValue                      = serialize($v);
             $uniqueValues[]                       = $serializedValue;
             $userValues[$userValueRow['user_id']] = [
@@ -2200,7 +2214,8 @@ class SpecificationsService
                 if ($actualValueVoters > 1) {
                     if ($matchActual) {
                         $isFirstMatchActual = $userValue['date'] === $minDate;
-                        $weight             = $isFirstMatchActual ? self::WEIGHT_FIRST_ACTUAL : self::WEIGHT_SECOND_ACTUAL;
+                        $weight             = $isFirstMatchActual
+                            ? self::WEIGHT_FIRST_ACTUAL : self::WEIGHT_SECOND_ACTUAL;
                     } else {
                         $weight = self::WEIGHT_WRONG;
                     }
@@ -2240,9 +2255,9 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param $userId
+     * @param int|int[] $userId
      */
-    public function refreshUserConflicts($userId)
+    public function refreshUserConflicts($userId): void
     {
         $userId = (array) $userId;
 
@@ -2263,7 +2278,7 @@ class SpecificationsService
         }
     }
 
-    public function refreshConflictFlags()
+    public function refreshConflictFlags(): void
     {
         $select = new Sql\Select($this->valueTable->getTable());
         $select
@@ -2281,14 +2296,18 @@ class SpecificationsService
         }
     }
 
-    public function refreshItemConflictFlags(int $itemId)
+    public function refreshItemConflictFlags(int $itemId): void
     {
         foreach ($this->userValueTable->select(['item_id' => $itemId]) as $valueRow) {
             $this->refreshConflictFlag($valueRow['attribute_id'], $valueRow['item_id']);
         }
     }
 
-    public function getConflicts(int $userId, $filter, int $page, int $perPage)
+    /**
+     * @param mixed $filter
+     * @throws Exception
+     */
+    public function getConflicts(int $userId, $filter, int $page, int $perPage): array
     {
         $userId = (int) $userId;
 
@@ -2354,7 +2373,7 @@ class SpecificationsService
         ];
     }
 
-    public function refreshUserConflictsStat()
+    public function refreshUserConflictsStat(): void
     {
         $select = new Sql\Select($this->userValueTable->getTable());
         $select->columns(['user_id']);
@@ -2370,7 +2389,7 @@ class SpecificationsService
     /**
      * @suppress PhanDeprecatedFunction
      */
-    public function refreshUsersConflictsStat()
+    public function refreshUsersConflictsStat(): void
     {
         $pSelect = 'SELECT sum(weight) FROM attrs_user_values WHERE user_id = users.id AND weight > 0';
 
@@ -2385,7 +2404,7 @@ class SpecificationsService
         ], []);
     }
 
-    private function getUserValueWeight(int $userId)
+    private function getUserValueWeight(int $userId): float
     {
         if (! array_key_exists($userId, $this->valueWeights)) {
             $userRow = $this->userModel->getRow($userId);

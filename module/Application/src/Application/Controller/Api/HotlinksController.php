@@ -7,6 +7,7 @@ use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -24,6 +25,9 @@ class HotlinksController extends AbstractRestfulController
         $this->referer = $referer;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function hostsAction()
     {
         if (! $this->user()->isAllowed('hotlinks', 'view')) {
@@ -35,6 +39,9 @@ class HotlinksController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function hostsDeleteAction()
     {
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
@@ -47,6 +54,9 @@ class HotlinksController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function hostDeleteAction()
     {
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
@@ -59,6 +69,9 @@ class HotlinksController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function whitelistPostAction()
     {
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
@@ -79,6 +92,9 @@ class HotlinksController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function blacklistPostAction()
     {
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {

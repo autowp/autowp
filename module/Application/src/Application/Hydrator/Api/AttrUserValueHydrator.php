@@ -5,6 +5,7 @@ namespace Application\Hydrator\Api;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
+use ArrayAccess;
 use Autowp\User\Model\User;
 use DateTime;
 use DateTimeZone;
@@ -18,7 +19,7 @@ use Traversable;
 use function array_reverse;
 use function is_array;
 
-class AttrUserValueHydrator extends RestHydrator
+class AttrUserValueHydrator extends AbstractRestHydrator
 {
     private int $userId;
 
@@ -87,6 +88,9 @@ class AttrUserValueHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $updateDate = null;
@@ -175,7 +179,7 @@ class AttrUserValueHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

@@ -2,7 +2,7 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\User\Controller\Plugin\User;
 use Autowp\Votings;
 use Exception;
@@ -10,6 +10,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -27,13 +28,13 @@ class VotingController extends AbstractRestfulController
     /** @var InputFilter */
     private InputFilter $variantVoteInputFilter;
 
-    /** @var RestHydrator */
-    private RestHydrator $variantVoteHydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $variantVoteHydrator;
 
     public function __construct(
         Votings\Votings $service,
         InputFilter $variantVoteInputFilter,
-        RestHydrator $variantVoteHydrator
+        AbstractRestHydrator $variantVoteHydrator
     ) {
         $this->service                = $service;
         $this->variantVoteInputFilter = $variantVoteInputFilter;
@@ -65,6 +66,9 @@ class VotingController extends AbstractRestfulController
         return new JsonModel($data);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getVoteListAction()
     {
         $this->variantVoteInputFilter->setData($this->params()->fromQuery());
@@ -92,6 +96,9 @@ class VotingController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function patchItemAction()
     {
         $user = $this->user()->get();

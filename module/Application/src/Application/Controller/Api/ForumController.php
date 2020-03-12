@@ -3,7 +3,7 @@
 namespace Application\Controller\Api;
 
 use Application\Comments;
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
 use DateTime;
@@ -13,6 +13,7 @@ use Laminas\Db\Sql;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -34,11 +35,11 @@ class ForumController extends AbstractRestfulController
     /** @var User */
     private User $userModel;
 
-    /** @var RestHydrator */
-    private RestHydrator $themeHydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $themeHydrator;
 
-    /** @var RestHydrator */
-    private RestHydrator $topicHydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $topicHydrator;
 
     /** @var InputFilter */
     private InputFilter $themeListInputFilter;
@@ -61,8 +62,8 @@ class ForumController extends AbstractRestfulController
     public function __construct(
         Forums $forums,
         User $userModel,
-        RestHydrator $themeHydrator,
-        RestHydrator $topicHydrator,
+        AbstractRestHydrator $themeHydrator,
+        AbstractRestHydrator $topicHydrator,
         InputFilter $themeListInputFilter,
         InputFilter $themeInputFilter,
         InputFilter $topicListInputFilter,
@@ -82,6 +83,9 @@ class ForumController extends AbstractRestfulController
         $this->topicPostInputFilter = $topicPostInputFilter;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function userSummaryAction()
     {
         $user = $this->user()->get();
@@ -95,6 +99,9 @@ class ForumController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getThemesAction()
     {
         $user   = $this->user()->get();
@@ -139,6 +146,9 @@ class ForumController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getThemeAction()
     {
         $isModerator = $this->user()->inheritsRole('moder');
@@ -176,6 +186,9 @@ class ForumController extends AbstractRestfulController
         return new JsonModel($this->themeHydrator->extract($row));
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getTopicsAction()
     {
         $user   = $this->user()->get();
@@ -250,6 +263,9 @@ class ForumController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function putTopicAction()
     {
         $user = $this->user()->get();
@@ -343,6 +359,7 @@ class ForumController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function postTopicAction()
     {
@@ -417,6 +434,9 @@ class ForumController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getTopicAction()
     {
         $this->topicGetInputFilter->setData($this->params()->fromQuery());

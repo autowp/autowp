@@ -8,6 +8,7 @@ use Application\HostManager;
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
+use ArrayAccess;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Exception;
@@ -77,12 +78,10 @@ class PictureModerVoteController extends AbstractRestfulController
     }
 
     /**
-     * @param $picture
-     * @param $vote
-     * @param $reason
+     * @param array|ArrayAccess $picture
      * @throws Exception
      */
-    private function notifyVote($picture, $vote, $reason)
+    private function notifyVote($picture, bool $vote, string $reason)
     {
         $owner        = $this->userModel->getRow((int) $picture['owner_id']);
         $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
@@ -109,10 +108,10 @@ class PictureModerVoteController extends AbstractRestfulController
     }
 
     /**
-     * @param $picture
+     * @param array|ArrayAccess $picture
      * @throws Exception
      */
-    private function unaccept($picture)
+    private function unaccept($picture): void
     {
         $previousStatusUserId = $picture['change_status_user_id'];
 

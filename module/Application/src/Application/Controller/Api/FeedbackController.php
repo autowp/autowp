@@ -9,6 +9,8 @@ use Laminas\Mail;
 use Laminas\Mail\Transport\TransportInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Session\Container;
+use Laminas\Stdlib\ResponseInterface;
+use Laminas\View\Model\ViewModel;
 use ReCaptcha\ReCaptcha;
 
 use function sprintf;
@@ -42,6 +44,9 @@ class FeedbackController extends AbstractRestfulController
         $this->captchaEnabled  = $captchaEnabled;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function postAction()
     {
         $request = $this->getRequest();

@@ -38,7 +38,7 @@ use function is_array;
 use function is_string;
 use function strcmp;
 
-class ItemHydrator extends RestHydrator
+class ItemHydrator extends AbstractRestHydrator
 {
     private int $userId;
 
@@ -217,7 +217,7 @@ class ItemHydrator extends RestHydrator
     }
 
     /**
-     * @param $object
+     * @param array|ArrayAccess $object
      * @throws Exception
      */
     private function getNameData($object, string $language = 'en'): array
@@ -311,7 +311,7 @@ class ItemHydrator extends RestHydrator
     }
 
     /**
-     * @param object $object
+     * @param array|ArrayAccess $object
      * @throws Exception
      */
     public function extract($object): ?array
@@ -919,7 +919,7 @@ class ItemHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)
@@ -927,7 +927,7 @@ class ItemHydrator extends RestHydrator
         throw new Exception("Not supported");
     }
 
-    private function getUserRole()
+    private function getUserRole(): ?string
     {
         if (! $this->userId) {
             return null;

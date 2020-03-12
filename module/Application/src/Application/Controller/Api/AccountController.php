@@ -10,6 +10,7 @@ use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -60,6 +61,9 @@ class AccountController extends AbstractRestfulController
         return false;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $user = $this->user()->get();
@@ -95,6 +99,7 @@ class AccountController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function startAction()
     {
@@ -132,6 +137,9 @@ class AccountController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function deleteAction()
     {
         $user = $this->user()->get();

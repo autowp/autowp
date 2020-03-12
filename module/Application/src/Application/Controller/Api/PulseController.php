@@ -2,15 +2,17 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\User\Model\User;
 use DateInterval;
 use DateTime;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function count;
 
 class PulseController extends AbstractActionController
@@ -36,12 +38,12 @@ class PulseController extends AbstractActionController
 
     private User $userModel;
 
-    private RestHydrator $userHydrator;
+    private AbstractRestHydrator $userHydrator;
 
     public function __construct(
         TableGateway $logTable,
         User $userModel,
-        RestHydrator $userHydrator
+        AbstractRestHydrator $userHydrator
     ) {
         $this->logTable     = $logTable;
         $this->userModel    = $userModel;
@@ -55,6 +57,7 @@ class PulseController extends AbstractActionController
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @return ViewModel|ResponseInterface|array
      */
     public function indexAction()
     {

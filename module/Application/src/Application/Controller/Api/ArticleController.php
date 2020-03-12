@@ -2,13 +2,15 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Paginator;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function get_object_vars;
 
 class ArticleController extends AbstractActionController
@@ -17,20 +19,23 @@ class ArticleController extends AbstractActionController
 
     private InputFilter $listInputFilter;
 
-    private RestHydrator $hydrator;
+    private AbstractRestHydrator $hydrator;
 
     private TableGateway $table;
 
     public function __construct(
         TableGateway $table,
         InputFilter $listInputFilter,
-        RestHydrator $hydrator
+        AbstractRestHydrator $hydrator
     ) {
         $this->table           = $table;
         $this->listInputFilter = $listInputFilter;
         $this->hydrator        = $hydrator;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $this->listInputFilter->setData($this->params()->fromQuery());

@@ -13,6 +13,7 @@ use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
 use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
+use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
 use Autowp\TextStorage;
@@ -40,7 +41,7 @@ use function is_array;
 use function substr;
 use function urlencode;
 
-class PictureHydrator extends RestHydrator
+class PictureHydrator extends AbstractRestHydrator
 {
     private Comments $comments;
 
@@ -184,7 +185,7 @@ class PictureHydrator extends RestHydrator
         return $this;
     }
 
-    public function setUserId($userId)
+    public function setUserId(int $userId): self
     {
         if ($this->userId !== $userId) {
             $this->userId   = $userId;
@@ -264,7 +265,7 @@ class PictureHydrator extends RestHydrator
     }
 
     /**
-     * @param object $object
+     * @param array|ArrayAccess $object
      * @throws Image\Storage\Exception
      * @throws Exception
      */
@@ -878,7 +879,7 @@ class PictureHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)
@@ -886,7 +887,7 @@ class PictureHydrator extends RestHydrator
         throw new Exception("Not supported");
     }
 
-    private function getUserRole()
+    private function getUserRole(): ?string
     {
         if (! $this->userId) {
             return null;
@@ -899,7 +900,11 @@ class PictureHydrator extends RestHydrator
         return $this->userRole;
     }
 
-    private function canDelete($picture)
+    /**
+     * @param array|ArrayAccess $picture
+     * @return bool
+     */
+    private function canDelete($picture): bool
     {
         if (! $this->picture->canDelete($picture)) {
             return false;

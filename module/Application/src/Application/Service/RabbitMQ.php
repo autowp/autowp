@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use ErrorException;
 use Exception;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -26,7 +27,7 @@ class RabbitMQ
         $this->config = $config;
     }
 
-    public function connect()
+    public function connect(): void
     {
         if ($this->connection) {
             return;
@@ -56,7 +57,7 @@ class RabbitMQ
         $this->connection = $connection;
     }
 
-    public function disconnect()
+    public function disconnect(): void
     {
         $this->channels = [];
 
@@ -66,7 +67,7 @@ class RabbitMQ
         }
     }
 
-    private function getChannel(string $queue)
+    private function getChannel(string $queue): AMQPChannel
     {
         if (isset($this->channels[$queue])) {
             return $this->channels[$queue];
@@ -84,7 +85,7 @@ class RabbitMQ
         return $channel;
     }
 
-    public function send(string $queue, string $body)
+    public function send(string $queue, string $body): void
     {
         $message = new AMQPMessage($body, [
             'content_type'  => 'application/json',
@@ -93,7 +94,11 @@ class RabbitMQ
         $this->getChannel($queue)->basic_publish($message, $queue);
     }
 
-    public function consume(string $queue, int $timeout, $callback)
+    /**
+     * @param Callable $callback
+     * @throws ErrorException
+     */
+    public function consume(string $queue, int $timeout, $callback): void
     {
         $channel = $this->getChannel($queue);
 

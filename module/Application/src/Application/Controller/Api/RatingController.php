@@ -3,15 +3,17 @@
 namespace Application\Controller\Api;
 
 use Application\Comments;
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\User\Model\User;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function array_slice;
 use function arsort;
 
@@ -29,7 +31,7 @@ class RatingController extends AbstractActionController
 
     private User $userModel;
 
-    private RestHydrator $userHydrator;
+    private AbstractRestHydrator $userHydrator;
 
     public function __construct(
         StorageInterface $cache,
@@ -37,7 +39,7 @@ class RatingController extends AbstractActionController
         Picture $picture,
         Item $item,
         User $userModel,
-        RestHydrator $userHydrator
+        AbstractRestHydrator $userHydrator
     ) {
         $this->cache        = $cache;
         $this->comments     = $comments;
@@ -47,6 +49,9 @@ class RatingController extends AbstractActionController
         $this->userHydrator = $userHydrator;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function specsAction()
     {
         $rows = $this->userModel->getRows([
@@ -112,6 +117,7 @@ class RatingController extends AbstractActionController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function picturesAction()
     {
@@ -169,6 +175,9 @@ class RatingController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function likesAction()
     {
         $this->userHydrator->setOptions([
@@ -190,6 +199,9 @@ class RatingController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function pictureLikesAction()
     {
         $this->userHydrator->setOptions([

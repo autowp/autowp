@@ -3,11 +3,12 @@
 namespace Application\Controller\Api;
 
 use Application\Controller\Plugin\Pic;
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
+use ArrayAccess;
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
@@ -15,6 +16,7 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
 use Laminas\Session\Container;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -42,8 +44,8 @@ class PictureItemController extends AbstractRestfulController
     /** @var Log */
     private Log $log;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     /** @var InputFilter */
     private InputFilter $itemInputFilter;
@@ -60,7 +62,7 @@ class PictureItemController extends AbstractRestfulController
     public function __construct(
         PictureItem $pictureItem,
         Log $log,
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         InputFilter $listInputFilter,
         InputFilter $itemInputFilter,
         Item $item,
@@ -75,7 +77,10 @@ class PictureItemController extends AbstractRestfulController
         $this->picture         = $picture;
     }
 
-    private function canChangePerspective($picture)
+    /**
+     * @param array|ArrayAccess $picture
+     */
+    private function canChangePerspective($picture): bool
     {
         if ($this->user()->inheritsRole('moder')) {
             return true;
@@ -95,6 +100,9 @@ class PictureItemController extends AbstractRestfulController
         return false;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -161,6 +169,9 @@ class PictureItemController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -203,6 +214,9 @@ class PictureItemController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function deleteAction()
     {
         $canMove = $this->user()->isAllowed('picture', 'move');
@@ -245,6 +259,9 @@ class PictureItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function createAction()
     {
         $canMove = $this->user()->isAllowed('picture', 'move');
@@ -307,6 +324,9 @@ class PictureItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function updateAction()
     {
         $pictureId = (int) $this->params('picture_id');

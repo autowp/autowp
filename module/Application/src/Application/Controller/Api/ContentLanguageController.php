@@ -4,7 +4,9 @@ namespace Application\Controller\Api;
 
 use Autowp\User\Controller\Plugin\User;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
  * @method User user($user = null)
@@ -18,6 +20,9 @@ class ContentLanguageController extends AbstractRestfulController
         $this->languages = $languages;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

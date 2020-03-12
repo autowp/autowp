@@ -7,6 +7,7 @@ use Application\Model\VehicleType;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -30,6 +31,9 @@ class ItemVehicleTypeController extends AbstractRestfulController
         $this->item        = $item;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -66,6 +70,9 @@ class ItemVehicleTypeController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -84,6 +91,9 @@ class ItemVehicleTypeController extends AbstractRestfulController
         return new JsonModel($row);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function deleteAction()
     {
         $canMove = $this->user()->isAllowed('car', 'move');
@@ -100,6 +110,9 @@ class ItemVehicleTypeController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function createAction()
     {
         $canMove = $this->user()->isAllowed('car', 'move');

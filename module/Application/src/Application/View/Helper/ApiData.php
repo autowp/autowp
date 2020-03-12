@@ -2,17 +2,17 @@
 
 namespace Application\View\Helper;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\MainMenu;
 use Laminas\View\Helper\AbstractHelper;
 
 class ApiData extends AbstractHelper
 {
-    private RestHydrator $userHydrator;
+    private AbstractRestHydrator $userHydrator;
 
     private MainMenu $mainMenu;
 
-    public function __construct(RestHydrator $userHydrator, MainMenu $mainMenu)
+    public function __construct(AbstractRestHydrator $userHydrator, MainMenu $mainMenu)
     {
         $this->userHydrator = $userHydrator;
         $this->mainMenu     = $mainMenu;

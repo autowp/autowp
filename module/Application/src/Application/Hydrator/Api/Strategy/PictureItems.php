@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api\Strategy;
 use Application\Hydrator\Api\PictureItemHydrator as Hydrator;
 use ArrayAccess;
 
-class PictureItems extends HydratorStrategy
+class PictureItems extends AbstractHydratorStrategy
 {
     private int $userId;
 

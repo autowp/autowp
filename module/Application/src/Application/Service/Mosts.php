@@ -350,14 +350,14 @@ class Mosts
         $this->itemTable      = $itemTable;
     }
 
-    private function betweenYearsExpr($from, $to)
+    private function betweenYearsExpr(string $from, string $to): string
     {
         return '(item.begin_order_cache between "' . $from . '-01-01" and "' . $to . '-12-31" or '
                . 'item.end_order_cache between "' . $from . '-01-01" and "' . $to . '-12-31" or '
                . '(item.begin_order_cache < "' . $from . '-01-01" and item.end_order_cache > "' . $to . '-12-31"))';
     }
 
-    public function getYears()
+    public function getYears(): array
     {
         if ($this->years === null) {
             $cy = (int) date('Y');
@@ -438,7 +438,7 @@ class Mosts
         return $this->ratings;
     }
 
-    public function getPrespectiveGroups()
+    public function getPrespectiveGroups(): array
     {
         if ($this->perspectiveGroups === null) {
             $ids = $this->perspective->getPageGroupIds(1);
@@ -474,7 +474,7 @@ class Mosts
         return $carTypes;
     }
 
-    private function getCarTypeData($carType): array
+    private function getCarTypeData(array $carType): array
     {
         return [
             'id'      => (int) $carType['id'],
@@ -485,10 +485,9 @@ class Mosts
     }
 
     /**
-     * @param $carId
      * @throws Exception
      */
-    private function getOrientedPictureList($carId, array $perspectiveGroupIds): array
+    private function getOrientedPictureList(int $carId, array $perspectiveGroupIds): array
     {
         $pictures = [];
 
@@ -544,10 +543,9 @@ class Mosts
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param $cYear
      * @throws Exception
      */
-    private function getCarsData(array $cMost, int $carTypeId, $cYear, int $brandId, string $language): array
+    private function getCarsData(array $cMost, int $carTypeId, ?array $cYear, int $brandId, string $language): array
     {
         $select = new Sql\Select($this->itemTable->getTable());
 

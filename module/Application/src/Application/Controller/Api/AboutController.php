@@ -9,8 +9,10 @@ use Autowp\User\Model\User;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Permissions\Acl\Acl;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function array_values;
 use function ksort;
 use function round;
@@ -43,6 +45,9 @@ class AboutController extends AbstractRestfulController
         $this->userModel = $userModel;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $totalUsers = $this->userModel->getCount([]);

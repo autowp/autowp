@@ -4,7 +4,9 @@ namespace Application\Controller\Api;
 
 use Autowp\TextStorage;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 class TextController extends AbstractRestfulController
 {
@@ -15,6 +17,9 @@ class TextController extends AbstractRestfulController
         $this->textStorage = $textStorage;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemAction()
     {
         $textId   = (int) $this->params('id');

@@ -4,7 +4,7 @@ namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\PictureHydrator as Hydrator;
 
-class Picture extends HydratorStrategy
+class Picture extends AbstractHydratorStrategy
 {
     protected function getHydrator(): Hydrator
     {

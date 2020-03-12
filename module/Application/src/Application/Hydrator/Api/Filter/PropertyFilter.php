@@ -20,7 +20,10 @@ class PropertyFilter implements FilterInterface
         $this->properties = $properties;
     }
 
-    public function filter($property)
+    /**
+     * @param string $property
+     */
+    public function filter($property): bool
     {
         return in_array($property, $this->properties);
     }

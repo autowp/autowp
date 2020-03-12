@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api\Strategy;
 use Application\Hydrator\Api\PerspectiveGroupHydrator as Hydrator;
 use ArrayAccess;
 
-class PerspectiveGroups extends HydratorStrategy
+class PerspectiveGroups extends AbstractHydratorStrategy
 {
     protected function getHydrator(): Hydrator
     {

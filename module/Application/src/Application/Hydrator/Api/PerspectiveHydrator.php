@@ -2,10 +2,14 @@
 
 namespace Application\Hydrator\Api;
 
+use ArrayAccess;
 use Exception;
 
-class PerspectiveHydrator extends RestHydrator
+class PerspectiveHydrator extends AbstractRestHydrator
 {
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         return [
@@ -16,7 +20,7 @@ class PerspectiveHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

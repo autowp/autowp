@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api\Strategy;
 use Application\Hydrator\Api\CommentHydrator as Hydrator;
 use ArrayAccess;
 
-class Comment extends HydratorStrategy
+class Comment extends AbstractHydratorStrategy
 {
     protected int $userId;
 

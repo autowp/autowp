@@ -2,10 +2,11 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -20,15 +21,18 @@ class TrafficController extends AbstractRestfulController
     /** @var TrafficControl */
     private TrafficControl $service;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
-    public function __construct(TrafficControl $service, RestHydrator $hydrator)
+    public function __construct(TrafficControl $service, AbstractRestHydrator $hydrator)
     {
         $this->service  = $service;
         $this->hydrator = $hydrator;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function listAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -53,6 +57,9 @@ class TrafficController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function whitelistListAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -74,6 +81,9 @@ class TrafficController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function whitelistCreateAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -101,6 +111,9 @@ class TrafficController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function whitelistItemDeleteAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -113,6 +126,9 @@ class TrafficController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function blacklistCreateAction()
     {
         $canBan = $this->user()->isAllowed('user', 'ban');
@@ -139,6 +155,9 @@ class TrafficController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function blacklistItemDeleteAction()
     {
         $canBan = $this->user()->isAllowed('user', 'ban');

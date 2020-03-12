@@ -2,12 +2,13 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Log;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -24,15 +25,15 @@ class LogController extends AbstractActionController
     /** @var Log */
     private Log $log;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     /** @var InputFilter */
     private InputFilter $listInputFilter;
 
     public function __construct(
         Log $log,
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         InputFilter $listInputFilter
     ) {
         $this->log             = $log;
@@ -40,6 +41,9 @@ class LogController extends AbstractActionController
         $this->listInputFilter = $listInputFilter;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

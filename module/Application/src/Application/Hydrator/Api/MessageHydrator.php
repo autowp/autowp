@@ -3,6 +3,7 @@
 namespace Application\Hydrator\Api;
 
 use Application\View\Helper\UserText;
+use ArrayAccess;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
@@ -14,7 +15,7 @@ use Traversable;
 
 use function is_array;
 
-class MessageHydrator extends RestHydrator
+class MessageHydrator extends AbstractRestHydrator
 {
     private int $userId;
 
@@ -82,6 +83,9 @@ class MessageHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $result = [
@@ -117,7 +121,7 @@ class MessageHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

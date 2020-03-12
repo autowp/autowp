@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api\Strategy;
 use Application\Hydrator\Api\UserHydrator as Hydrator;
 use ArrayAccess;
 
-class User extends HydratorStrategy
+class User extends AbstractHydratorStrategy
 {
     protected int $userId;
 
@@ -32,7 +32,7 @@ class User extends HydratorStrategy
     }
 
     /**
-     * @param mixed $value
+     * @param object $value
      * @return mixed|null
      */
     public function hydrate($value)

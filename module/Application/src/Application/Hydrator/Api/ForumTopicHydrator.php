@@ -3,6 +3,7 @@
 namespace Application\Hydrator\Api;
 
 use Application\Comments;
+use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
@@ -17,7 +18,7 @@ use Traversable;
 
 use function is_array;
 
-class ForumTopicHydrator extends RestHydrator
+class ForumTopicHydrator extends AbstractRestHydrator
 {
     private Comments $comments;
 
@@ -107,6 +108,9 @@ class ForumTopicHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $date = Row::getDateTimeByColumnType('timestamp', $object['add_datetime']);
@@ -185,7 +189,7 @@ class ForumTopicHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

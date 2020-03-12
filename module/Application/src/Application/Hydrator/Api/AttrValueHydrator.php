@@ -4,10 +4,11 @@ namespace Application\Hydrator\Api;
 
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
+use ArrayAccess;
 use Exception;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
-class AttrValueHydrator extends RestHydrator
+class AttrValueHydrator extends AbstractRestHydrator
 {
     private Item $item;
 
@@ -21,6 +22,9 @@ class AttrValueHydrator extends RestHydrator
         $this->specService = $serviceManager->get(SpecificationsService::class);
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $result = [
@@ -45,7 +49,7 @@ class AttrValueHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

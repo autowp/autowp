@@ -6,6 +6,7 @@ use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -27,6 +28,9 @@ class StatController extends AbstractActionController
         $this->picture = $picture;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function globalSummaryAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

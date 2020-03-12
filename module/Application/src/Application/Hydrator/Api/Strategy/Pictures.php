@@ -6,7 +6,7 @@ use Application\Hydrator\Api\PictureHydrator as Hydrator;
 use ArrayAccess;
 use Autowp\Image\Storage\Exception;
 
-class Pictures extends HydratorStrategy
+class Pictures extends AbstractHydratorStrategy
 {
     protected int $userId;
 

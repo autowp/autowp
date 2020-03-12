@@ -2,7 +2,7 @@
 
 namespace Application\Hydrator\Api\Strategy;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use ArrayAccess;
 use Interop\Container\ContainerInterface;
 use Laminas\Hydrator\Strategy\StrategyInterface;
@@ -10,11 +10,11 @@ use Laminas\Hydrator\Strategy\StrategyInterface;
 /**
  * @SuppressWarnings(PHPMD.NumberOfChildren)
  */
-abstract class HydratorStrategy implements StrategyInterface
+abstract class AbstractHydratorStrategy implements StrategyInterface
 {
     protected ContainerInterface $serviceManager;
 
-    protected RestHydrator $hydrator;
+    protected AbstractRestHydrator $hydrator;
 
     protected array $fields = [];
 
@@ -25,7 +25,7 @@ abstract class HydratorStrategy implements StrategyInterface
         $this->serviceManager = $serviceManager;
     }
 
-    abstract protected function getHydrator(): RestHydrator;
+    abstract protected function getHydrator(): AbstractRestHydrator;
 
     /**
      * @param array|ArrayAccess $value
@@ -43,7 +43,7 @@ abstract class HydratorStrategy implements StrategyInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param mixed $value
-     * @return ?mixed
+     * @return mixed|null
      */
     public function hydrate($value)
     {

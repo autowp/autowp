@@ -4,7 +4,9 @@ namespace Application\Controller\Api;
 
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Session\Container;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 class RecaptchaController extends AbstractRestfulController
 {
@@ -18,6 +20,7 @@ class RecaptchaController extends AbstractRestfulController
 
     /**
      * Update an existing resource
+     * @return ViewModel|ResponseInterface|array
      */
     public function getAction(): JsonModel
     {

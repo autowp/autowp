@@ -55,7 +55,7 @@ class GalleryController extends AbstractRestfulController
         $this->itemNameFormatter    = $itemNameFormatter;
     }
 
-    private function getPicturePage(array $filter, $identity): int
+    private function getPicturePage(array $filter, string $identity): int
     {
         unset($filter['identity']);
         $filter['columns'] = ['identity'];

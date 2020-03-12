@@ -4,10 +4,11 @@ namespace Application\Hydrator\Api;
 
 use Application\Hydrator\Api\Strategy\Perspectives as HydratorPerspectivesStrategy;
 use Application\Model\Perspective;
+use ArrayAccess;
 use Exception;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
-class PerspectiveGroupHydrator extends RestHydrator
+class PerspectiveGroupHydrator extends AbstractRestHydrator
 {
     private Perspective $perspective;
 
@@ -21,6 +22,9 @@ class PerspectiveGroupHydrator extends RestHydrator
         $this->addStrategy('perspectives', $strategy);
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $result = [
@@ -40,7 +44,7 @@ class PerspectiveGroupHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

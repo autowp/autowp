@@ -2,7 +2,7 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\InputFilter\InputFilter;
@@ -19,14 +19,14 @@ use Laminas\View\Model\ViewModel;
  */
 class IpController extends AbstractRestfulController
 {
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     /** @var InputFilter */
     private InputFilter $itemInputFilter;
 
     public function __construct(
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         InputFilter $itemInputFilter
     ) {
         $this->hydrator        = $hydrator;

@@ -4,7 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Comments;
 use Application\HostManager;
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\Forums\Forums;
@@ -20,6 +20,7 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\Request;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -42,8 +43,8 @@ class CommentController extends AbstractRestfulController
     /** @var Comments */
     private Comments $comments;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     /** @var TableGateway */
     private TableGateway $userTable;
@@ -89,7 +90,7 @@ class CommentController extends AbstractRestfulController
 
     public function __construct(
         Comments $comments,
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         TableGateway $userTable,
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
@@ -123,6 +124,9 @@ class CommentController extends AbstractRestfulController
         $this->forums                = $forums;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function subscribeAction()
     {
         $user = $this->user()->get();
@@ -141,7 +145,6 @@ class CommentController extends AbstractRestfulController
                 return new JsonModel([
                     'status' => true,
                 ]);
-                break;
 
             case Request::METHOD_DELETE:
                 $this->comments->service()->unSubscribe($typeId, $itemId, $user['id']);
@@ -149,12 +152,14 @@ class CommentController extends AbstractRestfulController
                 return new JsonModel([
                     'status' => true,
                 ]);
-                break;
         }
 
         return $this->notFoundAction();
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $user = $this->user()->get();
@@ -301,7 +306,7 @@ class CommentController extends AbstractRestfulController
         return new JsonModel($result);
     }
 
-    private function nextMessageTime()
+    private function nextMessageTime(): ?DateTime
     {
         $user = $this->user()->get();
         if (! $user) {
@@ -311,7 +316,7 @@ class CommentController extends AbstractRestfulController
         return $this->userModel->getNextMessageTime($user['id']);
     }
 
-    private function needWait()
+    private function needWait(): bool
     {
         $nextMessageTime = $this->nextMessageTime();
         if ($nextMessageTime) {
@@ -323,6 +328,7 @@ class CommentController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function postAction()
     {
@@ -480,6 +486,9 @@ class CommentController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function putAction()
     {
         $user = $this->user()->get();
@@ -582,6 +591,9 @@ class CommentController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getAction()
     {
         $user = $this->user()->get();

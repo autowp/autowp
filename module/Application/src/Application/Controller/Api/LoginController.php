@@ -19,9 +19,11 @@ use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Http as HttpUri;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function file_get_contents;
 use function trim;
 use function uniqid;
@@ -84,6 +86,9 @@ class LoginController extends AbstractRestfulController
         return $service;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function loginAction()
     {
         $request = $this->getRequest();
@@ -131,6 +136,9 @@ class LoginController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function deleteAction()
     {
         $auth = new AuthenticationService();
@@ -141,6 +149,9 @@ class LoginController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function servicesAction()
     {
         $services = [
@@ -183,6 +194,7 @@ class LoginController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function startAction()
     {
@@ -210,6 +222,9 @@ class LoginController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function callbackAction()
     {
         $state = (string) $this->params()->fromQuery('state');

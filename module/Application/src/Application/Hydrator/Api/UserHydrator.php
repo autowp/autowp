@@ -4,6 +4,7 @@ namespace Application\Hydrator\Api;
 
 use Application\Model\Picture;
 use Application\Model\UserAccount;
+use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
@@ -24,7 +25,7 @@ use function md5;
 use function sprintf;
 use function urlencode;
 
-class UserHydrator extends RestHydrator
+class UserHydrator extends AbstractRestHydrator
 {
     protected int $userId;
 
@@ -91,6 +92,10 @@ class UserHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     * @throws Exception
+     */
     public function extract($object): ?array
     {
         $deleted = (bool) $object['deleted'];
@@ -262,7 +267,7 @@ class UserHydrator extends RestHydrator
         return $user;
     }
 
-    private function isModer()
+    private function isModer(): bool
     {
         $role = $this->getUserRole();
         if (! $role) {
@@ -274,7 +279,7 @@ class UserHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)
@@ -282,7 +287,7 @@ class UserHydrator extends RestHydrator
         throw new Exception("Not supported");
     }
 
-    public function setUserId($userId)
+    public function setUserId(int $userId): self
     {
         if ($this->userId !== $userId) {
             $this->userId   = $userId;
@@ -292,7 +297,7 @@ class UserHydrator extends RestHydrator
         return $this;
     }
 
-    private function getUserRole()
+    private function getUserRole(): ?string
     {
         if (! $this->userId) {
             return null;

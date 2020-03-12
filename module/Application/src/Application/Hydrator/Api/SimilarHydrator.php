@@ -4,10 +4,11 @@ namespace Application\Hydrator\Api;
 
 use Application\Hydrator\Api\Strategy\Picture as HydratorPictureStrategy;
 use Application\Model\Picture;
+use ArrayAccess;
 use Exception;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
-class SimilarHydrator extends RestHydrator
+class SimilarHydrator extends AbstractRestHydrator
 {
     private Picture $picture;
 
@@ -21,6 +22,9 @@ class SimilarHydrator extends RestHydrator
         $this->addStrategy('picture', $strategy);
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $result = [
@@ -42,7 +46,7 @@ class SimilarHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

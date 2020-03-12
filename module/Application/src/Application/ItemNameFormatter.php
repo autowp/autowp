@@ -31,7 +31,7 @@ class ItemNameFormatter
         $this->renderer   = $renderer;
     }
 
-    private function translate(string $string, string $language)
+    private function translate(string $string, string $language): string
     {
         return $this->translator->translate($string, 'default', $language);
     }
@@ -40,7 +40,7 @@ class ItemNameFormatter
      * @param array|ArrayAccess $item
      * @throws Exception
      */
-    public function formatHtml($item, string $language)
+    public function formatHtml($item, string $language): string
     {
         if (! $item instanceof ArrayAccess && ! is_array($item)) {
             throw new Exception("`item` must be array or ArrayAccess");
@@ -241,8 +241,14 @@ class ItemNameFormatter
         return $result;
     }
 
-    private function getModelYearsPrefix($begin, $beginFraction, $end, $endFraction, $today, $language)
-    {
+    private function getModelYearsPrefix(
+        int $begin,
+        int $beginFraction,
+        int $end,
+        int $endFraction,
+        bool $today,
+        string $language
+    ): string {
         $bms = (int) ($begin / 100);
         $ems = (int) ($end / 100);
 
@@ -275,14 +281,14 @@ class ItemNameFormatter
         return $begin . $beginFraction . '–' . $this->translate('present-time-abbr', $language);
     }
 
-    private function monthsRange($from, $to)
+    private function monthsRange(int $from, int $to): string
     {
         return ($from ? sprintf('%02d', $from) : '??')
                . '–'
                . ($to ? sprintf('%02d', $to) : '??');
     }
 
-    private function missedEndYearYearsSuffix($today, $by, $language)
+    private function missedEndYearYearsSuffix(bool $today, int $by, string $language): string
     {
         $cy = (int) date('Y');
 
@@ -293,8 +299,17 @@ class ItemNameFormatter
         return '–' . ($today ? $this->translate('present-time-abbr', $language) : '????');
     }
 
-    private function renderYears($today, $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language)
-    {
+    private function renderYears(
+        bool $today,
+        int $by,
+        int $bm,
+        int $ey,
+        int $em,
+        bool $equalS,
+        bool $equalY,
+        bool $equalM,
+        string $language
+    ): string {
         if ($equalM) {
             return sprintf($this->textMonthFormat, $bm) . $by;
         }
@@ -321,8 +336,17 @@ class ItemNameFormatter
                 );
     }
 
-    private function renderYearsHtml($today, $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language)
-    {
+    private function renderYearsHtml(
+        bool $today,
+        int $by,
+        int $bm,
+        int $ey,
+        int $em,
+        bool $equalS,
+        bool $equalY,
+        bool $equalM,
+        string $language
+    ): string {
         if ($equalM) {
             return sprintf($this->monthFormat, $bm) . $by;
         }

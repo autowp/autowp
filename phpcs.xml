@@ -2,6 +2,7 @@
 <ruleset name="Laminas coding standard">
     <rule ref="./vendor/laminas/laminas-coding-standard/src/LaminasCodingStandard/ruleset.xml">
         <exclude name="Generic.PHP.RequireStrictTypes.MissingDeclaration"/>
+        <exclude name="SlevomatCodingStandard.Operators.DisallowEqualOperators" phpcbf-only="true"/>
     </rule>
 
     <!-- Paths to check -->

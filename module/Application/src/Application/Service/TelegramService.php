@@ -17,6 +17,7 @@ use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Router\Http\TreeRouteStack;
+use Laminas\Uri\Uri;
 use Laminas\Uri\UriFactory;
 use Psr\Container\ContainerInterface;
 use Telegram\Bot\Api;
@@ -112,7 +113,7 @@ class TelegramService
         ]);
     }
 
-    public function getWebhookUpdates()
+    public function getWebhookUpdates(): Update
     {
         return $this->getApi()->getWebhookUpdates();
     }
@@ -145,19 +146,18 @@ class TelegramService
         }
     }
 
-    private function unsubscribeChat($chatId): void
+    private function unsubscribeChat(int $chatId): void
     {
-        $chatId = (int) $chatId;
         if (! $chatId) {
             throw new Exception("`chat_id` is invalid");
         }
 
         $this->telegramItemTable->delete([
-            'chat_id = ?' => (int) $chatId,
+            'chat_id' => $chatId,
         ]);
 
         $this->telegramChatTable->delete([
-            'chat_id = ?' => (int) $chatId,
+            'chat_id' => $chatId,
         ]);
     }
 
@@ -269,7 +269,10 @@ class TelegramService
         ]);
     }
 
-    private function getPictureUrl($chatId, $picture)
+    /**
+     * @param array|ArrayAccess $picture
+     */
+    private function getPictureUrl(int $chatId, $picture): string
     {
         $uri = $this->getUriByChatId($chatId);
         $uri->setPath('/picture/' . urlencode($picture['identity']));
@@ -277,7 +280,7 @@ class TelegramService
         return $uri->toString();
     }
 
-    private function getUriByChatId($chatId)
+    private function getUriByChatId(int $chatId): Uri
     {
         $chat = $this->telegramChatTable->select([
             'chat_id' => $chatId,

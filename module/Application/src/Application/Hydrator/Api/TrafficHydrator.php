@@ -2,6 +2,7 @@
 
 namespace Application\Hydrator\Api;
 
+use ArrayAccess;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
@@ -14,7 +15,7 @@ use Traversable;
 use function is_array;
 use function urlencode;
 
-class TrafficHydrator extends RestHydrator
+class TrafficHydrator extends AbstractRestHydrator
 {
     protected int $userId;
 
@@ -59,6 +60,9 @@ class TrafficHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         /*$row['users'] = $users->fetchAll([
@@ -83,7 +87,7 @@ class TrafficHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)
@@ -91,7 +95,7 @@ class TrafficHydrator extends RestHydrator
         throw new Exception("Not supported");
     }
 
-    public function setUserId($userId)
+    public function setUserId(int $userId): self
     {
         if ($this->userId !== $userId) {
             $this->userId = $userId;

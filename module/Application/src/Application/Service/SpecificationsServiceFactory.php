@@ -17,8 +17,11 @@ class SpecificationsServiceFactory implements FactoryInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): SpecificationsService
-    {
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        ?array $options = null
+    ): SpecificationsService {
         $tables = $container->get('TableManager');
         return new SpecificationsService(
             $container->get('MvcTranslator'),

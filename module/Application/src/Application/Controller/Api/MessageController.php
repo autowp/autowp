@@ -2,19 +2,21 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Message\MessageService;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
 use function get_object_vars;
 
 /**
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
+ * @method UserPlugin user($user = null)
  * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
@@ -24,8 +26,8 @@ class MessageController extends AbstractRestfulController
     /** @var MessageService */
     private MessageService $message;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     /** @var InputFilter */
     private InputFilter $listInputFilter;
@@ -37,7 +39,7 @@ class MessageController extends AbstractRestfulController
     private User $userModel;
 
     public function __construct(
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         MessageService $message,
         InputFilter $listInputFilter,
         InputFilter $postInputFilter,
@@ -50,6 +52,9 @@ class MessageController extends AbstractRestfulController
         $this->userModel       = $userModel;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function postAction()
     {
         $currentUser = $this->user()->get();
@@ -88,6 +93,9 @@ class MessageController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $user = $this->user()->get();
@@ -141,6 +149,9 @@ class MessageController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function deleteListAction()
     {
         $user = $this->user()->get();
@@ -172,6 +183,9 @@ class MessageController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface
+     */
     public function deleteAction()
     {
         $user = $this->user()->get();
@@ -186,7 +200,7 @@ class MessageController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
-    public function summaryAction()
+    public function summaryAction(): ViewModel
     {
         $user = $this->user()->get();
 
@@ -209,7 +223,7 @@ class MessageController extends AbstractRestfulController
         ]);
     }
 
-    public function newAction()
+    public function newAction(): ViewModel
     {
         $user = $this->user()->get();
 

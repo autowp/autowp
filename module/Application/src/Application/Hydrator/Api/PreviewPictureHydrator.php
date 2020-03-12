@@ -2,6 +2,7 @@
 
 namespace Application\Hydrator\Api;
 
+use ArrayAccess;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\ServiceManager\ServiceLocatorInterface;
@@ -10,7 +11,7 @@ use Traversable;
 
 use function is_array;
 
-class PreviewPictureHydrator extends RestHydrator
+class PreviewPictureHydrator extends AbstractRestHydrator
 {
     private int $userId;
 
@@ -49,7 +50,7 @@ class PreviewPictureHydrator extends RestHydrator
         return $this;
     }
 
-    public function setUserId($userId)
+    public function setUserId(int $userId): self
     {
         if ($this->userId !== $userId) {
             $this->userId   = $userId;
@@ -61,7 +62,11 @@ class PreviewPictureHydrator extends RestHydrator
         return $this;
     }
 
-    public function extract($object, $context = null)
+    /**
+     * @param array|ArrayAccess $object
+     * @param mixed|null $context
+     */
+    public function extract($object, $context = null): array
     {
         $result = [];
 
@@ -87,7 +92,7 @@ class PreviewPictureHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

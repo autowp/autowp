@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api\Strategy;
 use Application\Hydrator\Api\IpHydrator as Hydrator;
 use ArrayAccess;
 
-class Ip extends HydratorStrategy
+class Ip extends AbstractHydratorStrategy
 {
     private int $userId;
 

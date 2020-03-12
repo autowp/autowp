@@ -3,8 +3,9 @@
 namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\AttrAttributeHydrator as Hydrator;
+use ArrayAccess;
 
-class AttrAttributes extends HydratorStrategy
+class AttrAttributes extends AbstractHydratorStrategy
 {
     private int $userId;
 
@@ -17,6 +18,9 @@ class AttrAttributes extends HydratorStrategy
         return $this->hydrator;
     }
 
+    /**
+     * @param array|ArrayAccess $value
+     */
     public function extract($value): array
     {
         $hydrator = $this->getHydrator();

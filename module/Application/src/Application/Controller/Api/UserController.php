@@ -2,9 +2,10 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Service\UsersService;
 use Autowp\Commons\Db\Table\Row;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\Image\Storage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
@@ -21,6 +22,7 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Permissions\Acl\Acl;
 use Laminas\Session\Container;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use ReCaptcha\ReCaptcha;
@@ -33,7 +35,7 @@ use function is_array;
 use function sprintf;
 
 /**
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
+ * @method UserPlugin user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method ViewModel forbiddenAction()
  * @method string language()
@@ -43,48 +45,35 @@ use function sprintf;
  */
 class UserController extends AbstractRestfulController
 {
-    /** @var Acl */
     private Acl $acl;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    private AbstractRestHydrator $hydrator;
 
-    /** @var InputFilter */
     private InputFilter $itemInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $putInputFilter;
 
-    /** @var UsersService */
     private UsersService $userService;
 
-    /** @var User */
     private User $userModel;
 
-    /** @var InputFilter */
     private InputFilter $postInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $postPhotoInputFilter;
 
-    /** @var array */
     private array $recaptcha;
 
-    /** @var bool */
     private bool $captchaEnabled;
 
-    /** @var UserRename */
     private UserRename $userRename;
 
-    /** @var array */
     private array $hosts;
 
     public function __construct(
         Acl $acl,
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         InputFilter $itemInputFilter,
         InputFilter $listInputFilter,
         InputFilter $postInputFilter,
@@ -112,6 +101,9 @@ class UserController extends AbstractRestfulController
         $this->hosts                = $hosts;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $user = $this->user()->get();
@@ -166,6 +158,9 @@ class UserController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemAction()
     {
         $this->itemInputFilter->setData($this->params()->fromQuery());
@@ -201,6 +196,9 @@ class UserController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function putAction()
     {
         $user = $this->user()->get();
@@ -419,6 +417,9 @@ class UserController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function deletePhotoAction()
     {
         $user = $this->user()->get();
@@ -463,6 +464,9 @@ class UserController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function postAction()
     {
         $request = $this->getRequest();
@@ -533,6 +537,9 @@ class UserController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function onlineAction()
     {
         $rows = $this->userModel->getRows([
@@ -584,6 +591,9 @@ class UserController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function postPhotoAction()
     {
         $user = $this->user()->get();
@@ -643,6 +653,9 @@ class UserController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function emailcheckAction()
     {
         $request = $this->getRequest();

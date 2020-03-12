@@ -5,7 +5,9 @@ namespace Application\Controller\Api;
 use Application\Model\Twins;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
  * @method string language()
@@ -22,6 +24,9 @@ class TwinsController extends AbstractRestfulController
         $this->cache = $cache;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getBrandsAction()
     {
         $language = $this->language();

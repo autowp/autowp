@@ -65,7 +65,7 @@ class DayPictures
         return $this;
     }
 
-    public function setPicture(Picture $picture)
+    public function setPicture(Picture $picture): self
     {
         $this->picture = $picture;
 

@@ -3,6 +3,7 @@
 namespace Application\Hydrator\Api;
 
 use Application\Comments;
+use ArrayAccess;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
 use Exception;
@@ -17,7 +18,7 @@ use Traversable;
 
 use function is_array;
 
-class ForumThemeHydrator extends RestHydrator
+class ForumThemeHydrator extends AbstractRestHydrator
 {
     private Comments $comments;
 
@@ -112,8 +113,7 @@ class ForumThemeHydrator extends RestHydrator
 
     /**
      * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
-     * @param $object
-     * @return array
+     * @param array|ArrayAccess $object
      */
     public function extract($object): ?array
     {
@@ -227,7 +227,7 @@ class ForumThemeHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)
@@ -235,7 +235,7 @@ class ForumThemeHydrator extends RestHydrator
         throw new Exception("Not supported");
     }
 
-    private function getUserRole()
+    private function getUserRole(): ?string
     {
         if (! $this->userId) {
             return null;

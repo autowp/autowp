@@ -6,8 +6,10 @@ use Application\Service\SpecificationsService;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function array_keys;
 use function array_merge;
 use function array_unique;
@@ -51,6 +53,9 @@ class ChartController extends AbstractRestfulController
         $this->attributeTable = $attributeTable;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function parametersAction()
     {
         $rows = $this->attributeTable->select([new Sql\Predicate\In('id', $this->parameters)]);
@@ -89,6 +94,7 @@ class ChartController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @return ViewModel|ResponseInterface|array
      */
     public function dataAction()
     {

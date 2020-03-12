@@ -6,7 +6,7 @@ use Application\Comments;
 use Application\Controller\Plugin\Pic;
 use Application\DuplicateFinder;
 use Application\HostManager;
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
 use Application\Model\Item;
@@ -32,6 +32,7 @@ use Laminas\Db\Sql;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -69,8 +70,8 @@ class PictureController extends AbstractRestfulController
     /** @var CarOfDay */
     private CarOfDay $carOfDay;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     /** @var PictureItem */
     private PictureItem $pictureItem;
@@ -133,7 +134,7 @@ class PictureController extends AbstractRestfulController
     private Catalogue $catalogue;
 
     public function __construct(
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         PictureItem $pictureItem,
         DuplicateFinder $duplicateFinder,
         UserPicture $userPicture,
@@ -264,6 +265,7 @@ class PictureController extends AbstractRestfulController
     /**
      * @throws Storage\Exception
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function randomPictureAction(): JsonModel
     {
@@ -296,6 +298,7 @@ class PictureController extends AbstractRestfulController
     /**
      * @throws Storage\Exception
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function newPictureAction(): JsonModel
     {
@@ -328,6 +331,7 @@ class PictureController extends AbstractRestfulController
     /**
      * @throws Storage\Exception
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function carOfDayPictureAction(): JsonModel
     {
@@ -383,6 +387,9 @@ class PictureController extends AbstractRestfulController
         return new JsonModel($result);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $isModer = $this->user()->inheritsRole('moder');
@@ -650,6 +657,7 @@ class PictureController extends AbstractRestfulController
     /**
      * @throws Storage\Exception
      * @throws ImagickException
+     * @return ViewModel|ResponseInterface|array
      */
     public function postAction()
     {
@@ -708,6 +716,7 @@ class PictureController extends AbstractRestfulController
     /**
      * @suppress PhanDeprecatedFunction
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function updateAction()
     {
@@ -1060,6 +1069,7 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function itemAction()
     {
@@ -1117,6 +1127,7 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @throws Storage\Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function normalizeAction()
     {
@@ -1153,6 +1164,7 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @throws Storage\Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function flopAction()
     {
@@ -1190,6 +1202,7 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function repairAction()
     {
@@ -1214,6 +1227,7 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @throws Storage\Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function correctFileNamesAction()
     {
@@ -1239,6 +1253,7 @@ class PictureController extends AbstractRestfulController
     /**
      * @return Response|array
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function deleteSimilarAction()
     {
@@ -1295,6 +1310,7 @@ class PictureController extends AbstractRestfulController
     /**
      * @suppress PhanDeprecatedFunction
      * @throws Exception
+     * @return ViewModel|ResponseInterface|array
      */
     public function acceptReplaceAction()
     {
@@ -1406,6 +1422,9 @@ class PictureController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function userSummaryAction()
     {
         $user = $this->user()->get();

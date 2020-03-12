@@ -6,7 +6,7 @@ use Application\Hydrator\Api\ItemHydrator as Hydrator;
 use ArrayAccess;
 use Exception;
 
-class Item extends HydratorStrategy
+class Item extends AbstractHydratorStrategy
 {
     protected int $userId;
 

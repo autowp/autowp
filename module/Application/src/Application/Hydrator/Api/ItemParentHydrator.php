@@ -4,6 +4,7 @@ namespace Application\Hydrator\Api;
 
 use Application\Model\Item;
 use Application\Model\ItemParent;
+use ArrayAccess;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
@@ -15,7 +16,7 @@ use Traversable;
 
 use function is_array;
 
-class ItemParentHydrator extends RestHydrator
+class ItemParentHydrator extends AbstractRestHydrator
 {
     private int $userId;
 
@@ -95,7 +96,7 @@ class ItemParentHydrator extends RestHydrator
     }
 
     /**
-     * @param object $object
+     * @param array|ArrayAccess $object
      * @throws Exception
      */
     public function extract($object): ?array
@@ -169,7 +170,7 @@ class ItemParentHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)
@@ -177,7 +178,7 @@ class ItemParentHydrator extends RestHydrator
         throw new Exception("Not supported");
     }
 
-    private function getUserRole()
+    private function getUserRole(): ?string
     {
         if (! $this->userId) {
             return null;

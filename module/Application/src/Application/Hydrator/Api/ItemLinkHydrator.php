@@ -2,10 +2,14 @@
 
 namespace Application\Hydrator\Api;
 
+use ArrayAccess;
 use Exception;
 
-class ItemLinkHydrator extends RestHydrator
+class ItemLinkHydrator extends AbstractRestHydrator
 {
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         return [
@@ -18,7 +22,7 @@ class ItemLinkHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

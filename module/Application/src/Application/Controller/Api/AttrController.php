@@ -2,7 +2,8 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
 use Autowp\User\Model\User;
@@ -14,6 +15,7 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -23,96 +25,71 @@ use function implode;
 use function strlen;
 
 /**
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
+ * @method UserPlugin user($user = null)
  * @method ViewModel forbiddenAction()
  * @method string language()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */
 class AttrController extends AbstractRestfulController
 {
-    /** @var Item */
     private Item $item;
 
-    /** @var SpecificationsService */
     private SpecificationsService $specsService;
 
-    /** @var User */
     private User $userModel;
 
-    /** @var RestHydrator */
-    private RestHydrator $conflictHydrator;
+    private AbstractRestHydrator $conflictHydrator;
 
-    /** @var RestHydrator */
-    private RestHydrator $userValueHydrator;
+    private AbstractRestHydrator $userValueHydrator;
 
-    /** @var RestHydrator */
-    private RestHydrator $valueHydrator;
+    private AbstractRestHydrator $valueHydrator;
 
-    /** @var InputFilter */
     private InputFilter $conflictListInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $userValueListInputFilter;
 
-    /** @var TableGateway */
     private TableGateway $userValueTable;
 
-    /** @var InputFilter */
     private InputFilter $userValuePatchQueryFilter;
 
-    /** @var InputFilter */
     private InputFilter $userValuePatchDataFilter;
 
-    /** @var InputFilter */
     private InputFilter $attributeListInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $attributePostInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $attributeItemGetInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $attributeHydrator;
 
-    /** @var InputFilter */
     private InputFilter $valueListInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $attributeItemPatchInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $zoneAttributeListInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $zoneAttributePostInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $listOptionIndexInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $listOptionPostInputFilter;
 
-    /** @var TableGateway */
     private TableGateway $zoneTable;
 
-    /** @var TableGateway */
     private TableGateway $zoneAttributeTable;
 
-    /** @var TableGateway */
     private TableGateway $typeTable;
 
-    /** @var TableGateway */
     private TableGateway $listOptionTable;
 
     public function __construct(
         Item $item,
         SpecificationsService $specsService,
         User $userModel,
-        RestHydrator $conflictHydrator,
-        RestHydrator $userValueHydrator,
-        RestHydrator $attributeHydrator,
-        RestHydrator $valueHydrator,
+        AbstractRestHydrator $conflictHydrator,
+        AbstractRestHydrator $userValueHydrator,
+        AbstractRestHydrator $attributeHydrator,
+        AbstractRestHydrator $valueHydrator,
         InputFilter $conflictListInputFilter,
         InputFilter $userValueListInputFilter,
         InputFilter $userValuePatchQueryFilter,
@@ -158,6 +135,9 @@ class AttrController extends AbstractRestfulController
         $this->listOptionTable               = $listOptionTable;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function conflictIndexAction()
     {
         $user = $this->user()->get();
@@ -193,6 +173,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function userValueIndexAction()
     {
         $user = $this->user()->get();
@@ -271,6 +254,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function userValueItemDeleteAction()
     {
         if (! $this->user()->isAllowed('specifications', 'admin')) {
@@ -287,6 +273,9 @@ class AttrController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function userValuePatchAction()
     {
         $user = $this->user()->get();
@@ -424,6 +413,7 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function attributePostAction()
     {
@@ -483,6 +473,9 @@ class AttrController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function attributeItemGetAction()
     {
         $user = $this->user()->get();
@@ -518,6 +511,9 @@ class AttrController extends AbstractRestfulController
         return new JsonModel($this->attributeHydrator->extract($attribute));
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function attributeIndexAction()
     {
         $user = $this->user()->get();
@@ -560,6 +556,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function valueIndexAction()
     {
         $user = $this->user()->get();
@@ -630,6 +629,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function zoneIndexAction()
     {
         $zones = [];
@@ -645,6 +647,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function attributeItemPatchAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -770,6 +775,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function zoneAttributeIndexAction()
     {
         $this->zoneAttributeListInputFilter->setData($this->params()->fromQuery());
@@ -799,6 +807,7 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function zoneAttributePostAction()
     {
@@ -840,6 +849,9 @@ class AttrController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function zoneAttributeItemDeleteAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -858,6 +870,9 @@ class AttrController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function attributeTypeIndexAction()
     {
         $user = $this->user()->get();
@@ -883,6 +898,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function unitIndexAction()
     {
         $user = $this->user()->get();
@@ -900,6 +918,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function listOptionIndexAction()
     {
         $user = $this->user()->get();
@@ -929,6 +950,7 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @return ViewModel|ResponseInterface|array
      */
     public function listOptionPostAction()
     {

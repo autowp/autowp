@@ -2,15 +2,16 @@
 
 namespace Application\Spec\Table\Value;
 
+use ArrayAccess;
 use Laminas\View\Renderer\PhpRenderer;
 
 class DefaultValue
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $attribute
-     * @param $value
-     * @param $values
+     * @param array|ArrayAccess $attribute
+     * @param mixed|null $value
+     * @param mixed|null $values
      */
     public function render(PhpRenderer $view, $attribute, $value, $values): string
     {

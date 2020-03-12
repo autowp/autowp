@@ -2,7 +2,7 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
@@ -11,8 +11,10 @@ use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function count;
 
 /**
@@ -30,22 +32,22 @@ class NewController extends AbstractRestfulController
 
     private PictureItem $pictureItem;
 
-    private RestHydrator $pictureHydrator;
+    private AbstractRestHydrator $pictureHydrator;
 
-    private RestHydrator $pictureThumbnailHydrator;
+    private AbstractRestHydrator $pictureThumbnailHydrator;
 
     private Item $itemModel;
 
-    private RestHydrator $itemHydrator;
+    private AbstractRestHydrator $itemHydrator;
 
     public function __construct(
         Picture $picture,
         Item $itemModel,
         PictureItem $pictureItem,
         InputFilter $inputFilter,
-        RestHydrator $pictureHydrator,
-        RestHydrator $pictureThumbnailHydrator,
-        RestHydrator $itemHydrator
+        AbstractRestHydrator $pictureHydrator,
+        AbstractRestHydrator $pictureThumbnailHydrator,
+        AbstractRestHydrator $itemHydrator
     ) {
         $this->picture                  = $picture;
         $this->inputFilter              = $inputFilter;
@@ -56,6 +58,9 @@ class NewController extends AbstractRestfulController
         $this->itemHydrator             = $itemHydrator;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $user = $this->user()->get();
@@ -182,7 +187,7 @@ class NewController extends AbstractRestfulController
         ]);
     }
 
-    private function splitPictures($pictures)
+    private function splitPictures(array $pictures): array
     {
         $items = [];
         foreach ($pictures as $pictureRow) {

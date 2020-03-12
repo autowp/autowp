@@ -2,11 +2,12 @@
 
 namespace Application\Hydrator\Api;
 
+use ArrayAccess;
 use Autowp\TextStorage;
 use Exception;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
-class ItemLanguageHydrator extends RestHydrator
+class ItemLanguageHydrator extends AbstractRestHydrator
 {
     private TextStorage\Service $textStorage;
 
@@ -17,6 +18,9 @@ class ItemLanguageHydrator extends RestHydrator
         $this->textStorage = $serviceManager->get(TextStorage\Service::class);
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $text = null;
@@ -29,7 +33,7 @@ class ItemLanguageHydrator extends RestHydrator
             $fullText = $this->textStorage->getText($object['full_text_id']);
         }
 
-        $result = [
+        return [
             'language'     => $object['language'],
             'name'         => $object['name'],
             'text_id'      => $object['text_id'],
@@ -37,13 +41,11 @@ class ItemLanguageHydrator extends RestHydrator
             'full_text_id' => $object['full_text_id'],
             'full_text'    => $fullText,
         ];
-
-        return $result;
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

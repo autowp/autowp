@@ -2,13 +2,14 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -25,8 +26,8 @@ class ItemLinkController extends AbstractRestfulController
     /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
     /** @var InputFilter */
     private InputFilter $putInputFilter;
@@ -39,7 +40,7 @@ class ItemLinkController extends AbstractRestfulController
 
     public function __construct(
         TableGateway $table,
-        RestHydrator $hydrator,
+        AbstractRestHydrator $hydrator,
         InputFilter $listInputFilter,
         InputFilter $putInputFilter,
         InputFilter $postInputFilter
@@ -51,6 +52,9 @@ class ItemLinkController extends AbstractRestfulController
         $this->postInputFilter = $postInputFilter;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         $this->listInputFilter->setData($this->params()->fromQuery());
@@ -75,6 +79,9 @@ class ItemLinkController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -92,6 +99,9 @@ class ItemLinkController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function putAction()
     {
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
@@ -151,6 +161,9 @@ class ItemLinkController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function postAction()
     {
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
@@ -189,6 +202,9 @@ class ItemLinkController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function deleteAction()
     {
         if (! $this->user()->isAllowed('car', 'edit_meta')) {

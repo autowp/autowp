@@ -4,7 +4,7 @@ namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\SimilarHydrator as Hydrator;
 
-class Similar extends HydratorStrategy
+class Similar extends AbstractHydratorStrategy
 {
     protected function getHydrator(): Hydrator
     {

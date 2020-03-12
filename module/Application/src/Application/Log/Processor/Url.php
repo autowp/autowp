@@ -6,7 +6,7 @@ use Laminas\Log\Processor\ProcessorInterface;
 
 class Url implements ProcessorInterface
 {
-    public function process(array $event)
+    public function process(array $event): array
     {
         if (isset($event['extra']['url'])) {
             return $event;

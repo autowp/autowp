@@ -2,8 +2,8 @@
 
 namespace Application\Controller\Api;
 
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Hydrator\Api\ItemHydrator;
-use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Brand;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
@@ -18,8 +18,10 @@ use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Router\Http\TreeRouteStack;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function array_keys;
 use function array_merge;
 
@@ -45,7 +47,7 @@ class IndexController extends AbstractRestfulController
 
     private ItemHydrator $itemHydrator;
 
-    private RestHydrator $userHydrator;
+    private AbstractRestHydrator $userHydrator;
 
     private CarOfDay $itemOfDay;
 
@@ -64,7 +66,7 @@ class IndexController extends AbstractRestfulController
         CarOfDay $itemOfDay,
         Catalogue $catalogue,
         ItemHydrator $itemHydrator,
-        RestHydrator $userHydrator,
+        AbstractRestHydrator $userHydrator,
         TreeRouteStack $router
     ) {
         $this->cache        = $cache;
@@ -81,6 +83,9 @@ class IndexController extends AbstractRestfulController
         $this->router       = $router;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function brandsAction()
     {
         $language = $this->language();
@@ -103,6 +108,9 @@ class IndexController extends AbstractRestfulController
         return new JsonModel($brands);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function personsContentAction()
     {
         $language = $this->language();
@@ -131,6 +139,9 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function personsAuthorAction()
     {
         $language = $this->language();
@@ -159,6 +170,9 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function categoriesAction()
     {
         $language = $this->language();
@@ -180,6 +194,7 @@ class IndexController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @return ViewModel|ResponseInterface|array
      */
     public function factoriesAction()
     {
@@ -231,6 +246,9 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function twinsAction()
     {
         $language = $this->language();
@@ -255,6 +273,9 @@ class IndexController extends AbstractRestfulController
         return new JsonModel($twinsBlock);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function specItemsAction()
     {
         $language = $this->language();
@@ -342,6 +363,9 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function itemOfDayAction()
     {
         $language = $this->language();

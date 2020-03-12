@@ -2,13 +2,14 @@
 
 namespace Application\Hydrator\Api;
 
+use ArrayAccess;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Traversable;
 
-class VotingVariantVoteHydrator extends RestHydrator
+class VotingVariantVoteHydrator extends AbstractRestHydrator
 {
     private User $userModel;
 
@@ -33,6 +34,10 @@ class VotingVariantVoteHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     * @throws Exception
+     */
     public function extract($object): ?array
     {
         $result = [
@@ -50,7 +55,7 @@ class VotingVariantVoteHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param $object
+     * @param object $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)

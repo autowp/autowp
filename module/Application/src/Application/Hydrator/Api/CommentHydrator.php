@@ -4,9 +4,10 @@ namespace Application\Hydrator\Api;
 
 use Application\Comments;
 use Application\Hydrator\Api\Filter\PropertyFilter;
-use Application\Hydrator\Api\Strategy\HydratorStrategy;
+use Application\Hydrator\Api\Strategy\AbstractHydratorStrategy;
 use Application\Model\Picture;
 use Application\View\Helper\UserText;
+use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Exception;
@@ -23,7 +24,7 @@ use function array_keys;
 use function inet_ntop;
 use function is_array;
 
-class CommentHydrator extends RestHydrator
+class CommentHydrator extends AbstractRestHydrator
 {
     private Comments $comments;
 
@@ -114,6 +115,9 @@ class CommentHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @param array|ArrayAccess $object
+     */
     public function extract($object): ?array
     {
         $canRemove = false;
@@ -250,7 +254,7 @@ class CommentHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param object $object
+     * @param array|ArrayAccess $object
      * @throws Exception
      */
     public function hydrate(array $data, $object)
@@ -273,7 +277,7 @@ class CommentHydrator extends RestHydrator
 
             $strategy = $this->strategies[$name];
 
-            if ($strategy instanceof HydratorStrategy) {
+            if ($strategy instanceof AbstractHydratorStrategy) {
                 $strategy->setFields($value);
             }
         }
@@ -281,7 +285,7 @@ class CommentHydrator extends RestHydrator
         if (isset($fields['replies'])) {
             $strategy = $this->strategies['replies'];
 
-            if ($strategy instanceof HydratorStrategy) {
+            if ($strategy instanceof AbstractHydratorStrategy) {
                 $strategy->setFields($fields);
             }
         }

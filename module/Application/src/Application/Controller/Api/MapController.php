@@ -9,7 +9,9 @@ use geoPHP;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 use LineString;
 use Point;
 use Polygon;
@@ -37,6 +39,9 @@ class MapController extends AbstractActionController
         $this->itemTable         = $itemTable;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function dataAction()
     {
         geoPHP::version(); // for autoload classes

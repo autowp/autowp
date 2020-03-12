@@ -2,11 +2,12 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -20,15 +21,18 @@ class PerspectiveController extends AbstractRestfulController
     /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var RestHydrator */
-    private RestHydrator $hydrator;
+    /** @var AbstractRestHydrator */
+    private AbstractRestHydrator $hydrator;
 
-    public function __construct(RestHydrator $hydrator, TableGateway $table)
+    public function __construct(AbstractRestHydrator $hydrator, TableGateway $table)
     {
         $this->hydrator = $hydrator;
         $this->table    = $table;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

@@ -29,7 +29,7 @@ class DuplicateFinder
         ]));
     }
 
-    public function findSimilar($id)
+    public function findSimilar(int $id): ?array
     {
         $row = $this->distanceTable->select(
             /**
@@ -61,7 +61,7 @@ class DuplicateFinder
         ];
     }
 
-    public function hideSimilar($srcId, $dstId)
+    public function hideSimilar(int $srcId, int $dstId)
     {
         $this->distanceTable->update([
             'hide' => 1,

@@ -14,7 +14,9 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\Mail;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Session\Container;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 use ReCaptcha\ReCaptcha;
 
 use function sprintf;
@@ -65,6 +67,9 @@ class RestorePasswordController extends AbstractRestfulController
         $this->captchaEnabled         = $captchaEnabled;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function requestAction()
     {
         $request = $this->getRequest();
@@ -158,6 +163,9 @@ class RestorePasswordController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function newGetAction()
     {
         $code = (string) $this->params()->fromQuery('code');
@@ -177,6 +185,9 @@ class RestorePasswordController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function newPostAction()
     {
         $request = $this->getRequest();

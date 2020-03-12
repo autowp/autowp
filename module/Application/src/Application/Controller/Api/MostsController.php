@@ -2,7 +2,7 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Model\Perspective;
@@ -15,8 +15,10 @@ use Autowp\User\Controller\Plugin\User;
 use Exception;
 use ImagickException;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function array_merge;
 
 /**
@@ -35,7 +37,7 @@ class MostsController extends AbstractActionController
 
     private Picture $picture;
 
-    private RestHydrator $itemHydrator;
+    private AbstractRestHydrator $itemHydrator;
 
     private PictureNameFormatter $pictureNameFormatter;
 
@@ -47,7 +49,7 @@ class MostsController extends AbstractActionController
         Perspective $perspective,
         Mosts $mosts,
         Picture $picture,
-        RestHydrator $itemHydrator,
+        AbstractRestHydrator $itemHydrator,
         PictureNameFormatter $pictureNameFormatter
     ) {
         $this->itemHydrator         = $itemHydrator;
@@ -166,6 +168,9 @@ class MostsController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function getMenuAction()
     {
         $brandID = (int) $this->params()->fromQuery('brand_id');

@@ -10,9 +10,11 @@ use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\Stdlib\ResponseInterface;
 use Laminas\Validator;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function explode;
 
 /**
@@ -75,6 +77,9 @@ class AclController extends AbstractRestfulController
         $this->rulesPostFilter       = $rulesPostFilter;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function isAllowedAction()
     {
         $user = $this->user()->get();
@@ -90,6 +95,9 @@ class AclController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function inheritRolesAction()
     {
         $user = $this->user()->get();
@@ -112,7 +120,7 @@ class AclController extends AbstractRestfulController
         return new JsonModel($result);
     }
 
-    private function getRoles($parentId)
+    private function getRoles(?int $parentId): array
     {
         $select = new Sql\Select($this->roleTable->getTable());
 
@@ -137,6 +145,9 @@ class AclController extends AbstractRestfulController
         return $roles;
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function rolesAction()
     {
         $this->rolesInputFilter->setData($this->params()->fromQuery());
@@ -163,6 +174,9 @@ class AclController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function rolesPostAction()
     {
         if (! $this->user()->isAllowed('rights', 'edit')) {
@@ -188,7 +202,7 @@ class AclController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
-    public function resourcesAction()
+    public function resourcesAction(): JsonModel
     {
         $resources = [];
         foreach ($this->resourceTable->select([]) as $resource) {
@@ -215,7 +229,7 @@ class AclController extends AbstractRestfulController
         ]);
     }
 
-    public function rulesAction()
+    public function rulesAction(): JsonModel
     {
         $rules = [];
 
@@ -278,6 +292,9 @@ class AclController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function rulesPostAction()
     {
         if (! $this->user()->isAllowed('rights', 'edit')) {
@@ -361,6 +378,9 @@ class AclController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function roleAction()
     {
         $role = $this->roleTable->select([
@@ -376,6 +396,9 @@ class AclController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function roleParentsAction()
     {
         $role = $this->roleTable->select([
@@ -404,6 +427,9 @@ class AclController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @return ViewModel|ResponseInterface|array
+     */
     public function roleParentsPostAction()
     {
         if (! $this->user()->isAllowed('rights', 'edit')) {

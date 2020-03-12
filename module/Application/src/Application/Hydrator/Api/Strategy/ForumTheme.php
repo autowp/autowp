@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api\Strategy;
 use Application\Hydrator\Api\ForumThemeHydrator as Hydrator;
 use ArrayAccess;
 
-class ForumTheme extends HydratorStrategy
+class ForumTheme extends AbstractHydratorStrategy
 {
     private int $userId;
 
