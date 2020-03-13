@@ -8,7 +8,6 @@ use Laminas\View\Model\JsonModel;
 
 class RecaptchaController extends AbstractRestfulController
 {
-    /** @var string */
     private string $publicKey;
 
     public function __construct(string $publicKey)

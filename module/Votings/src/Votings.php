@@ -15,13 +15,10 @@ use function round;
 
 class Votings
 {
-    /** @var TableGateway */
     private TableGateway $votingTable;
 
-    /** @var TableGateway */
     private TableGateway $variantTable;
 
-    /** @var TableGateway */
     private TableGateway $voteTable;
 
     public function __construct(

@@ -18,10 +18,8 @@ use function trim;
  */
 class TrafficController extends AbstractRestfulController
 {
-    /** @var TrafficControl */
     private TrafficControl $service;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
     public function __construct(TrafficControl $service, AbstractRestHydrator $hydrator)

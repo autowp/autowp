@@ -17,7 +17,6 @@ use Laminas\View\Model\ViewModel;
  */
 class HotlinksController extends AbstractRestfulController
 {
-    /** @var Referer */
     private Referer $referer;
 
     public function __construct(Referer $referer)

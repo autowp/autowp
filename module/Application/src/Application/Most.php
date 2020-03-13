@@ -20,19 +20,14 @@ class Most
 {
     private int $carsCount = 10;
 
-    /** @var Sql\Select */
     private Sql\Select $carsSelect;
 
-    /** @var AbstractAdapter */
     private AbstractAdapter $adapter;
 
-    /** @var SpecificationsService */
     private SpecificationsService $specs;
 
-    /** @var TableGateway */
     private TableGateway $attributeTable;
 
-    /** @var TableGateway */
     private TableGateway $itemTable;
 
     /**

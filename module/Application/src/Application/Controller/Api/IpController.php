@@ -19,10 +19,8 @@ use Laminas\View\Model\ViewModel;
  */
 class IpController extends AbstractRestfulController
 {
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var InputFilter */
     private InputFilter $itemInputFilter;
 
     public function __construct(

@@ -22,13 +22,10 @@ use Laminas\View\Model\ViewModel;
  */
 class VotingController extends AbstractRestfulController
 {
-    /** @var Votings\Votings */
     private Votings\Votings $service;
 
-    /** @var InputFilter */
     private InputFilter $variantVoteInputFilter;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $variantVoteHydrator;
 
     public function __construct(

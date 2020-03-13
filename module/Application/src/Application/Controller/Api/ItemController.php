@@ -111,7 +111,6 @@ class ItemController extends AbstractRestfulController
 
     private array $collators = [];
 
-    /** @var SpecificationsService */
     private SpecificationsService $specsService;
 
     public function __construct(

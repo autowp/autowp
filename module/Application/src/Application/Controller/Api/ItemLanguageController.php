@@ -38,31 +38,22 @@ use function sprintf;
  */
 class ItemLanguageController extends AbstractRestfulController
 {
-    /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var TextStorage */
     private TextStorage $textStorage;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var ItemParent */
     private ItemParent $itemParent;
 
-    /** @var HostManager */
     private HostManager $hostManager;
 
-    /** @var InputFilter */
     private InputFilter $putInputFilter;
 
-    /** @var UserItemSubscribe */
     private UserItemSubscribe $userItemSubscribe;
 
-    /** @var Item */
     private Item $item;
 
-    /** @var MessageService */
     private MessageService $message;
 
     public function __construct(

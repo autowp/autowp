@@ -14,7 +14,6 @@ use Laminas\View\Model\ViewModel;
  */
 class PictureVoteController extends AbstractRestfulController
 {
-    /** @var PictureVote */
     private PictureVote $model;
 
     public function __construct(PictureVote $model)

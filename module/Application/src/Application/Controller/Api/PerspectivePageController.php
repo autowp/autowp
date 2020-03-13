@@ -21,13 +21,10 @@ use Laminas\View\Model\ViewModel;
  */
 class PerspectivePageController extends AbstractRestfulController
 {
-    /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
     public function __construct(AbstractRestHydrator $hydrator, InputFilter $listInputFilter, TableGateway $table)

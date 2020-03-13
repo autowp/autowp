@@ -41,52 +41,36 @@ use function strlen;
  */
 class CommentController extends AbstractRestfulController
 {
-    /** @var Comments */
     private Comments $comments;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var TableGateway */
     private TableGateway $userTable;
 
-    /** @var InputFilter */
     private InputFilter $postInputFilter;
 
-    /** @var User */
     private User $userModel;
 
-    /** @var HostManager */
     private HostManager $hostManager;
 
-    /** @var MessageService */
     private MessageService $message;
 
-    /** @var Picture */
     private Picture $picture;
 
-    /** @var Item */
     private Item $item;
 
-    /** @var Votings */
     private Votings $votings;
 
-    /** @var TableGateway */
     private TableGateway $articleTable;
 
-    /** @var Forums */
     private Forums $forums;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $publicListInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $putInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $getInputFilter;
 
     public function __construct(

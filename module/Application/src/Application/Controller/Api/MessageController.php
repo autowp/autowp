@@ -23,19 +23,14 @@ use function get_object_vars;
  */
 class MessageController extends AbstractRestfulController
 {
-    /** @var MessageService */
     private MessageService $message;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $postInputFilter;
 
-    /** @var User */
     private User $userModel;
 
     public function __construct(

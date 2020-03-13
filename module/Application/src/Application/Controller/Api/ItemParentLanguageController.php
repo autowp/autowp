@@ -24,16 +24,12 @@ use function array_keys;
  */
 class ItemParentLanguageController extends AbstractRestfulController
 {
-    /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var ItemParent */
     private ItemParent $itemParent;
 
-    /** @var InputFilter */
     private InputFilter $putInputFilter;
 
     public function __construct(

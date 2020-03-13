@@ -34,28 +34,20 @@ use function urlencode;
  */
 class PictureModerVoteController extends AbstractRestfulController
 {
-    /** @var Form */
     private Form $voteForm;
 
-    /** @var HostManager */
     private HostManager $hostManager;
 
-    /** @var MessageService */
     private MessageService $message;
 
-    /** @var UserPicture */
     private UserPicture $userPicture;
 
-    /** @var PictureModerVote */
     private PictureModerVote $pictureModerVote;
 
-    /** @var Picture */
     private Picture $picture;
 
-    /** @var User */
     private User $userModel;
 
-    /** @var TableGateway */
     private TableGateway $templateTable;
 
     public function __construct(

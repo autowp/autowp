@@ -23,7 +23,6 @@ class MainMenu
 
     private Categories $categories;
 
-    /** @var array */
     private array $icons = [
         29  => 'fa fa-fw fa-upload',
         89  => 'fa fa-fw fa-comment',

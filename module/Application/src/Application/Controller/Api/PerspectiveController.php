@@ -18,10 +18,8 @@ use Laminas\View\Model\ViewModel;
  */
 class PerspectiveController extends AbstractRestfulController
 {
-    /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
     public function __construct(AbstractRestHydrator $hydrator, TableGateway $table)

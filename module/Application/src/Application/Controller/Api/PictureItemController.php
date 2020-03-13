@@ -38,25 +38,18 @@ use function sprintf;
  */
 class PictureItemController extends AbstractRestfulController
 {
-    /** @var PictureItem */
     private PictureItem $pictureItem;
 
-    /** @var Log */
     private Log $log;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var InputFilter */
     private InputFilter $itemInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
-    /** @var Item */
     private Item $item;
 
-    /** @var Picture */
     private Picture $picture;
 
     public function __construct(

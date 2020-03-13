@@ -8,7 +8,6 @@ use Laminas\Uri\UriFactory;
 
 class HostManager
 {
-    /** @var array */
     private array $hosts;
 
     public function __construct(array $hosts)

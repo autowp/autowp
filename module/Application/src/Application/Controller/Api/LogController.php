@@ -22,13 +22,10 @@ use function get_object_vars;
  */
 class LogController extends AbstractActionController
 {
-    /** @var Log */
     private Log $log;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
     public function __construct(

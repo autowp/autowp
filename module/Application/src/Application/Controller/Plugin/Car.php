@@ -10,10 +10,8 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class Car extends AbstractPlugin
 {
-    /** @var ItemNameFormatter */
     private ItemNameFormatter $itemNameFormatter;
 
-    /** @var Item */
     private Item $itemModel;
 
     public function __construct(

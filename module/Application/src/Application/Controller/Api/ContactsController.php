@@ -22,19 +22,14 @@ use Laminas\View\Model\ViewModel;
  */
 class ContactsController extends AbstractRestfulController
 {
-    /** @var Contact */
     private Contact $contact;
 
-    /** @var TableGateway */
     private TableGateway $userTable;
 
-    /** @var User */
     private User $userModel;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
     public function __construct(

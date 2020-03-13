@@ -7,7 +7,6 @@ use Laminas\Mvc\Controller\AbstractActionController;
 
 class ConsoleController extends AbstractActionController
 {
-    /** @var CommentsService */
     private CommentsService $service;
 
     public function __construct(CommentsService $message)

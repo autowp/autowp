@@ -16,10 +16,8 @@ use Laminas\View\Model\ViewModel;
  */
 class StatController extends AbstractActionController
 {
-    /** @var Item */
     private Item $item;
 
-    /** @var Picture */
     private Picture $picture;
 
     public function __construct(Item $item, Picture $picture)

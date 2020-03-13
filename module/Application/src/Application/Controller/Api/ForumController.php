@@ -30,34 +30,24 @@ use function array_keys;
  */
 class ForumController extends AbstractRestfulController
 {
-    /** @var Forums */
     private Forums $forums;
 
-    /** @var User */
     private User $userModel;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $themeHydrator;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $topicHydrator;
 
-    /** @var InputFilter */
     private InputFilter $themeListInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $themeInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $topicListInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $topicGetInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $topicPutInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $topicPostInputFilter;
 
     public function __construct(

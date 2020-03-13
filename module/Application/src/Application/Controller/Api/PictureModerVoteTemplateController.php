@@ -19,10 +19,8 @@ use Laminas\View\Model\ViewModel;
  */
 class PictureModerVoteTemplateController extends AbstractRestfulController
 {
-    /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var InputFilter */
     private InputFilter $createInputFilter;
 
     public function __construct(InputFilter $createInputFilter, TableGateway $table)

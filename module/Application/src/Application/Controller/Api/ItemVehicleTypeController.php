@@ -17,10 +17,8 @@ use Laminas\View\Model\ViewModel;
  */
 class ItemVehicleTypeController extends AbstractRestfulController
 {
-    /** @var VehicleType */
     private VehicleType $vehicleType;
 
-    /** @var Item */
     private Item $item;
 
     public function __construct(

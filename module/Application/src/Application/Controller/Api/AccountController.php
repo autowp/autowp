@@ -23,13 +23,10 @@ use function array_replace;
  */
 class AccountController extends AbstractRestfulController
 {
-    /** @var UserAccount */
     private UserAccount $userAccount;
 
-    /** @var ExternalLoginServices */
     private ExternalLoginServices $externalLoginServices;
 
-    /** @var TableGateway */
     private TableGateway $loginStateTable;
 
     public function __construct(

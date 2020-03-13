@@ -23,19 +23,14 @@ use function array_keys;
  */
 class ItemLinkController extends AbstractRestfulController
 {
-    /** @var TableGateway */
     private TableGateway $table;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var InputFilter */
     private InputFilter $putInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $postInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
     public function __construct(
