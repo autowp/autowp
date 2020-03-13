@@ -902,7 +902,6 @@ class PictureHydrator extends AbstractRestHydrator
 
     /**
      * @param array|ArrayAccess $picture
-     * @return bool
      */
     private function canDelete($picture): bool
     {

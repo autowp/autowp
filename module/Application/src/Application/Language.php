@@ -11,7 +11,6 @@ class Language
     private string $language;
 
     /**
-     * Language constructor.
      * @param mixed $request
      */
     public function __construct($request, array $hosts)

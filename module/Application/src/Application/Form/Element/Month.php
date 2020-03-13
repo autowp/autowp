@@ -6,7 +6,6 @@ use DateTime;
 use Exception;
 use IntlDateFormatter;
 use Laminas\Form\Element\Select;
-use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\InputFilter\InputProviderInterface;
 use Traversable;
@@ -24,11 +23,10 @@ class Month extends Select implements InputProviderInterface
 
     /**
      * @param array|Traversable $options
-     * @return Month|ElementInterface
      * @throws InvalidArgumentException
      * @throws Exception
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         if (isset($options['language'])) {
             $this->language = $options['language'];

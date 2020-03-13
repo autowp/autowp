@@ -69,7 +69,7 @@ class UserAccount
         ])->current();
     }
 
-    public function removeAccount(int $id)
+    public function removeAccount(int $id): bool
     {
         $affected = $this->table->delete([
             'id' => $id,
@@ -78,7 +78,7 @@ class UserAccount
         return $affected > 0;
     }
 
-    public function removeUserAccounts(int $userId)
+    public function removeUserAccounts(int $userId): void
     {
         $this->table->delete([
             'user_id = ?' => $userId,

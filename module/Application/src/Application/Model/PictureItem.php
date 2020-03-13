@@ -70,10 +70,10 @@ class PictureItem
             INSERT IGNORE INTO picture_item (picture_id, item_id, type)
             VALUES (:picture_id, :item_id, :type)
         ', [
-        'picture_id' => $pictureId,
-        'item_id'    => $itemId,
-        'type'       => $type,
-        ]);
+    'picture_id' => $pictureId,
+    'item_id'    => $itemId,
+    'type'       => $type,
+]);
 
         if ($result->getAffectedRows() > 0) {
             $this->updateContentCount($pictureId);
@@ -99,7 +99,7 @@ class PictureItem
         $this->updateContentCount($pictureId);
     }
 
-    public function isExists(int $pictureId, int $itemId, int $type)
+    public function isExists(int $pictureId, int $itemId, int $type): bool
     {
         return (bool) $this->getRow($pictureId, $itemId, $type);
     }
@@ -187,6 +187,9 @@ class PictureItem
         return $result;
     }
 
+    /**
+     * @return array|ArrayObject|null
+     */
     public function getPictureItemData(int $pictureId, int $itemId, int $type)
     {
         return $this->table->select([
@@ -196,7 +199,7 @@ class PictureItem
         ])->current();
     }
 
-    public function getPictureItemsData(int $pictureId, int $type = 0)
+    public function getPictureItemsData(int $pictureId, int $type = 0): array
     {
         $filter = [
             'picture_id' => $pictureId,
@@ -218,9 +221,8 @@ class PictureItem
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param $itemType
      */
-    public function getPictureItemsByItemType(int $pictureId, $itemType): array
+    public function getPictureItemsByItemType(int $pictureId, array $itemType): array
     {
         $select = $this->table->getSql()->select();
         $select->columns(['item_id', 'type'])
@@ -350,17 +352,17 @@ class PictureItem
         }
     }
 
-    public function getPerspective(int $pictureId, int $itemId)
+    public function getPerspective(int $pictureId, int $itemId): ?int
     {
         $row = $this->getRow($pictureId, $itemId, self::PICTURE_CONTENT);
         if (! $row) {
             return null;
         }
 
-        return $row['perspective_id'];
+        return (int) $row['perspective_id'];
     }
 
-    public function getArea(int $pictureId, int $itemId)
+    public function getArea(int $pictureId, int $itemId): ?array
     {
         $row = $this->getRow($pictureId, $itemId, self::PICTURE_CONTENT);
         if (! $row) {

@@ -8,8 +8,8 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
-
 use Laminas\View\Model\ViewModel;
+
 use function array_keys;
 use function array_merge;
 use function array_unique;
@@ -53,10 +53,7 @@ class ChartController extends AbstractRestfulController
         $this->attributeTable = $attributeTable;
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function parametersAction()
+    public function parametersAction(): JsonModel
     {
         $rows = $this->attributeTable->select([new Sql\Predicate\In('id', $this->parameters)]);
 
@@ -73,7 +70,7 @@ class ChartController extends AbstractRestfulController
         ]);
     }
 
-    private function specIds(int $id)
+    private function specIds(int $id): array
     {
         $select = new Sql\Select($this->specTable->getTable());
         $select->columns(['id'])

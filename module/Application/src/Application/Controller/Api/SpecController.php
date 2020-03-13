@@ -5,9 +5,7 @@ namespace Application\Controller\Api;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
-use Laminas\View\Model\ViewModel;
 
 class SpecController extends AbstractRestfulController
 {
@@ -45,10 +43,7 @@ class SpecController extends AbstractRestfulController
         return $result;
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function indexAction()
+    public function indexAction(): JsonModel
     {
         return new JsonModel([
             'items' => $this->getSpecOptions(0),

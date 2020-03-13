@@ -15,10 +15,8 @@ use Autowp\User\Controller\Plugin\User;
 use Exception;
 use ImagickException;
 use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
-use Laminas\View\Model\ViewModel;
 use function array_merge;
 
 /**
@@ -168,10 +166,7 @@ class MostsController extends AbstractActionController
         ]);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function getMenuAction()
+    public function getMenuAction(): JsonModel
     {
         $brandID = (int) $this->params()->fromQuery('brand_id');
 

@@ -40,6 +40,9 @@ class Oauth2 extends AbstractPlugin
         $this->userIdProvider = $userIdProvider;
     }
 
+    /**
+     * @return mixed|null
+     */
     public function __invoke()
     {
         $token = $this->getOAuth2Server()->getAccessTokenData(OAuth2Request::createFromGlobals());

@@ -149,7 +149,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
     {
         $serviceManager = $this->getApplicationServiceLocator();
         /** @var VehicleType $vehicleType */
-        $vehicleType    = $serviceManager->get(VehicleType::class);
+        $vehicleType = $serviceManager->get(VehicleType::class);
 
         return $vehicleType->getVehicleTypes($itemId, true);
     }

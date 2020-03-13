@@ -9,6 +9,7 @@ use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Autowp\Votings\Votings;
 use DateTime;
@@ -32,7 +33,7 @@ use function sprintf;
 use function strlen;
 
 /**
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
+ * @method UserPlugin user($user = null)
  * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
@@ -293,10 +294,11 @@ class CommentController extends AbstractRestfulController
             }
 
             if ($user && $values['item_id'] && $values['type_id']) {
-                $this->comments->service()->markSubscriptionAwaiting(
+                $this->comments->service()->setSubscriptionSent(
                     $values['type_id'],
                     $values['item_id'],
-                    $user['id']
+                    $user['id'],
+                    false
                 );
             }
 

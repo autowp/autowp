@@ -59,10 +59,7 @@ class BrandsController extends AbstractActionController
         $this->router      = $router;
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function indexAction()
+    public function indexAction(): JsonModel
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isHttps = (bool) $this->getRequest()->getServer('HTTPS');
@@ -82,10 +79,7 @@ class BrandsController extends AbstractActionController
         ]);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function iconsAction()
+    public function iconsAction(): JsonModel
     {
         return new JsonModel([
             'image' => '/img/brands.png',
@@ -225,7 +219,7 @@ class BrandsController extends AbstractActionController
         int $brandId,
         string $brandCatname,
         bool $conceptsSeparatly
-    ) {
+    ): array {
         $sectionsPresets = [
             'other'   => [
                 'name'         => null,
@@ -290,7 +284,7 @@ class BrandsController extends AbstractActionController
         string $brandCatname,
         array $section,
         bool $conceptsSeparatly
-    ) {
+    ): array {
         if ($section['car_type_id']) {
             $select = $this->carSectionGroupsSelect(
                 $brandId,
@@ -340,8 +334,8 @@ class BrandsController extends AbstractActionController
         int $brandId,
         int $itemTypeId,
         int $carTypeId,
-        $nullType,
-        bool $conceptsSeparatly
+        ?bool $nullType,
+        bool $conceptsSeparately
     ): Sql\Select {
         $select = new Sql\Select($this->itemModel->getTable()->getTable());
         $select
@@ -356,7 +350,7 @@ class BrandsController extends AbstractActionController
             ->where(['item_parent.parent_id' => $brandId])
             ->group('item.id');
 
-        if ($conceptsSeparatly) {
+        if ($conceptsSeparately) {
             $select->where(['NOT item.is_concept']);
         }
 

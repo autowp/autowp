@@ -14,14 +14,14 @@ class TelegramController extends AbstractActionController
         $this->telegram = $telegram;
     }
 
-    public function registerAction()
+    public function registerAction(): string
     {
         $this->telegram->registerWebhook();
 
         return "done\n";
     }
 
-    public function notifyInboxAction()
+    public function notifyInboxAction(): string
     {
         $this->telegram->notifyInbox($this->params('picture_id'));
 

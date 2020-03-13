@@ -109,10 +109,10 @@ class VehicleType
             VALUES (:vehicle_id, :vehicle_type_id, :inherited)
             ON DUPLICATE KEY UPDATE inherited = VALUES(inherited)
         ', [
-        'vehicle_id'      => $vehicleId,
-        'vehicle_type_id' => $type,
-        'inherited'       => $inherited ? 1 : 0,
-        ]);
+    'vehicle_id'      => $vehicleId,
+    'vehicle_type_id' => $type,
+    'inherited'       => $inherited ? 1 : 0,
+]);
 
         return $result->getAffectedRows() > 0;
     }
@@ -192,7 +192,7 @@ class VehicleType
         return $result;
     }
 
-    public function getItemRow(int $vehicleId, int $typeId)
+    public function getItemRow(int $vehicleId, int $typeId): ?array
     {
         $row = $this->itemVehicleTypeTable->select([
             'vehicle_id'      => $vehicleId,
@@ -209,7 +209,7 @@ class VehicleType
         ];
     }
 
-    public function getItemSelect(int $vehicleId, int $typeId)
+    public function getItemSelect(int $vehicleId, int $typeId): Sql\Select
     {
         $select = new Sql\Select($this->itemVehicleTypeTable->getTable());
         if ($vehicleId) {
@@ -277,6 +277,9 @@ class VehicleType
         ])->current();
     }
 
+    /**
+     * @param array|int $parentId
+     */
     public function getDescendantsAndSelfIds($parentId): array
     {
         $select = new Sql\Select($this->vehicleTypeParentTable->getTable());

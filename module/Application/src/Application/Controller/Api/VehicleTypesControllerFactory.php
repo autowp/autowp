@@ -12,8 +12,11 @@ class VehicleTypesControllerFactory implements FactoryInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): VehicleTypesController
-    {
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        ?array $options = null
+    ): VehicleTypesController {
         return new VehicleTypesController(
             $container->get(VehicleType::class)
         );

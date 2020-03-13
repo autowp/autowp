@@ -4,10 +4,8 @@ namespace Application\Controller\Api;
 
 use DateTimeZone;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
-use Laminas\View\Model\ViewModel;
 use function array_unique;
 use function sort;
 
@@ -15,10 +13,7 @@ use const SORT_STRING;
 
 class TimezoneController extends AbstractRestfulController
 {
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function listAction()
+    public function listAction(): JsonModel
     {
         $list = [];
         foreach (DateTimeZone::listAbbreviations() as $group) {

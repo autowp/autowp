@@ -13,8 +13,8 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
-
 use Laminas\View\Model\ViewModel;
+
 use function count;
 
 /**

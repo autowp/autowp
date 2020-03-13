@@ -95,7 +95,7 @@ class RabbitMQ
     }
 
     /**
-     * @param Callable $callback
+     * @param callable $callback
      * @throws ErrorException
      */
     public function consume(string $queue, int $timeout, $callback): void

@@ -24,7 +24,7 @@ class Maintenance extends AbstractListenerAggregate
         $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_MIDNIGHT, [$this, 'midnight']);
     }
 
-    public function dailyMaintenance(Cron\CronEvent $event)
+    public function dailyMaintenance(Cron\CronEvent $event): void
     {
         print "Daily maintenance\n";
 
@@ -51,7 +51,7 @@ class Maintenance extends AbstractListenerAggregate
         print "Daily maintenance done\n";
     }
 
-    public function midnight(Cron\CronEvent $event)
+    public function midnight(Cron\CronEvent $event): void
     {
         print "Midnight\n";
 
@@ -81,7 +81,7 @@ class Maintenance extends AbstractListenerAggregate
         print "Midnight done\n";
     }
 
-    private function clearSessions($sessionManager)
+    private function clearSessions(SessionManager $sessionManager): string
     {
         $gcMaxLifetime = $sessionManager->getConfig()->getOptions('options')['gc_maxlifetime'];
         if (! $gcMaxLifetime) {

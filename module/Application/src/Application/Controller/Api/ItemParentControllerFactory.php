@@ -19,8 +19,11 @@ class ItemParentControllerFactory implements FactoryInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ItemParentController
-    {
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        ?array $options = null
+    ): ItemParentController {
         $hydrators = $container->get('HydratorManager');
         $filters   = $container->get('InputFilterManager');
         return new ItemParentController(

@@ -5,6 +5,7 @@ namespace Application\Model;
 use Application\ItemNameFormatter;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
+use ArrayObject;
 use Autowp\Image;
 use DateInterval;
 use DateTime;
@@ -63,8 +64,8 @@ class CarOfDay
         ItemNameFormatter $itemNameFormatter,
         Image\Storage $imageStorage,
         Catalogue $catalogue,
-        $router,
-        $translator,
+        TreeRouteStack $router,
+        TranslatorInterface $translator,
         SpecificationsService $specsService,
         Item $itemModel,
         Perspective $perspective,
@@ -113,7 +114,7 @@ class CarOfDay
         return $row ? (int) $row['id'] : 0;
     }
 
-    public function pick()
+    public function pick(): bool
     {
         $itemId = $this->getCarOfDayCandidate();
         if ($itemId) {
@@ -131,7 +132,7 @@ class CarOfDay
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function getCurrent()
+    public function getCurrent(): ?array
     {
         $select = $this->table->getSql()->select();
         $select->where(['day_date <= CURDATE()'])
@@ -146,7 +147,11 @@ class CarOfDay
         ] : null;
     }
 
-    private function pictureByPerspective(int $itemId, $perspective)
+    /**
+     * @return array|ArrayObject|null
+     * @throws Exception
+     */
+    private function pictureByPerspective(int $itemId, ?int $perspective)
     {
         return $this->picture->getRow([
             'status' => Picture::STATUS_ACCEPTED,
@@ -158,13 +163,13 @@ class CarOfDay
         ]);
     }
 
-    private static function ucfirst($str)
+    private static function ucfirst(string $str): string
     {
         $fc = mb_strtoupper(mb_substr($str, 0, 1));
         return $fc . mb_substr($str, 1);
     }
 
-    public function putCurrentToTwitter(array $twOptions)
+    public function putCurrentToTwitter(array $twOptions): void
     {
         $dayRow = $this->table->select([
             'day_date = CURDATE()',
@@ -259,7 +264,7 @@ class CarOfDay
         print 'ok' . PHP_EOL;
     }
 
-    public function putCurrentToFacebook(array $fbOptions)
+    public function putCurrentToFacebook(array $fbOptions): void
     {
         $dayRow = $this->table->select([
             'day_date = CURDATE()',
@@ -340,7 +345,7 @@ class CarOfDay
         print 'ok' . PHP_EOL;
     }
 
-    public function putCurrentToVk(array $vkOptions)
+    public function putCurrentToVk(array $vkOptions): void
     {
         $language = 'ru';
 
@@ -430,7 +435,7 @@ class CarOfDay
     /**
      * @suppress PhanPluginMixedKeyNoKey
      */
-    public function getNextDates()
+    public function getNextDates(): array
     {
         $now      = new DateTime();
         $interval = new DateInterval('P1D');
@@ -652,11 +657,8 @@ class CarOfDay
         return (bool) $row;
     }
 
-    public function setItemOfDay(DateTime $dateTime, $itemId, $userId)
+    public function setItemOfDay(DateTime $dateTime, int $itemId, int $userId): bool
     {
-        $itemId = (int) $itemId;
-        $userId = (int) $userId;
-
         if (! $this->isComplies($itemId)) {
             return false;
         }

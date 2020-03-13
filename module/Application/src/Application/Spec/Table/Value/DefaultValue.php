@@ -10,8 +10,8 @@ class DefaultValue
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param array|ArrayAccess $attribute
-     * @param mixed|null $value
-     * @param mixed|null $values
+     * @param mixed|null        $value
+     * @param mixed|null        $values
      */
     public function render(PhpRenderer $view, $attribute, $value, $values): string
     {

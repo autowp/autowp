@@ -147,7 +147,7 @@ class IpHydrator extends AbstractRestHydrator
         throw new Exception("Not supported");
     }
 
-    private function getUserRole()
+    private function getUserRole(): ?string
     {
         if (! $this->userId) {
             return null;

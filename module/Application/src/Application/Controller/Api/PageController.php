@@ -13,8 +13,8 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
-
 use Laminas\View\Model\ViewModel;
+
 use function array_key_exists;
 use function array_keys;
 
@@ -50,11 +50,11 @@ class PageController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $this->getPagesList(null),
+            'items' => $this->getPagesList(0),
         ]);
     }
 
-    private function getPagesList($parentId)
+    private function getPagesList(int $parentId): array
     {
         $result = [];
 
@@ -326,10 +326,7 @@ class PageController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function parentsAction()
+    public function parentsAction(): JsonModel
     {
         $result = [];
 

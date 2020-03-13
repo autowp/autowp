@@ -4,7 +4,9 @@ namespace Application\Controller\Plugin;
 
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
+use ArrayAccess;
 use ArrayObject;
+use Exception;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class Pic extends AbstractPlugin
@@ -21,7 +23,11 @@ class Pic extends AbstractPlugin
         $this->picture              = $picture;
     }
 
-    public function name($pictureRow, $language)
+    /**
+     * @param array|ArrayAccess $pictureRow
+     * @throws Exception
+     */
+    public function name($pictureRow, string $language): string
     {
         if ($pictureRow instanceof ArrayObject) {
             $pictureRow = (array) $pictureRow;

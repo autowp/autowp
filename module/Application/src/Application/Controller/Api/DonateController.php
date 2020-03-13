@@ -5,9 +5,7 @@ namespace Application\Controller\Api;
 use Application\Model\CarOfDay;
 use IntlDateFormatter;
 use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
-use Laminas\View\Model\ViewModel;
 
 class DonateController extends AbstractActionController
 {

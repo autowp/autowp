@@ -9,10 +9,8 @@ use DateTime;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
-use Laminas\View\Model\ViewModel;
 use function count;
 
 class PulseController extends AbstractActionController
@@ -50,16 +48,15 @@ class PulseController extends AbstractActionController
         $this->userHydrator = $userHydrator;
     }
 
-    private function randomColor()
+    private function randomColor(): string
     {
         return $this->colors[$this->lastColor++ % count($this->colors)];
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @return ViewModel|ResponseInterface|array
      */
-    public function indexAction()
+    public function indexAction(): JsonModel
     {
         $now = new DateTime();
 

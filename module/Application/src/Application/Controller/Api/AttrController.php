@@ -3,9 +3,9 @@
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
-use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
@@ -629,10 +629,7 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function zoneIndexAction()
+    public function zoneIndexAction(): JsonModel
     {
         $zones = [];
         foreach ($this->zoneTable->select([]) as $row) {

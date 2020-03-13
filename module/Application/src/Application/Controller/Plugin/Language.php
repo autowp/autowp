@@ -14,7 +14,7 @@ class Language extends AbstractPlugin
         $this->language = $language;
     }
 
-    public function __invoke()
+    public function __invoke(): string
     {
         return $this->language->getLanguage();
     }

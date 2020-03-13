@@ -2,6 +2,7 @@
 
 namespace Application\Form\Moder;
 
+use Application\Model\ItemParent as ItemParentModel;
 use Application\Validator\ItemParent\CatnameNotExists;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 use Autowp\ZFComponents\Filter\SingleSpaces;
@@ -20,7 +21,7 @@ class ItemParent extends Form implements InputFilterProviderInterface
 
     private int $itemId;
 
-    public function __construct($name = null, $options = [])
+    public function __construct(?string $name = null, array $options = [])
     {
         parent::__construct($name, $options);
 
@@ -32,7 +33,7 @@ class ItemParent extends Form implements InputFilterProviderInterface
                 'type'    => 'Text',
                 'options' => [
                     'label'     => 'Catname',
-                    'maxlength' => \Application\Model\ItemParent::MAX_CATNAME,
+                    'maxlength' => ItemParentModel::MAX_CATNAME,
                 ],
             ],
             [
@@ -41,10 +42,10 @@ class ItemParent extends Form implements InputFilterProviderInterface
                 'options' => [
                     'label'   => 'Type',
                     'options' => [
-                        \Application\Model\ItemParent::TYPE_DEFAULT => 'catalogue/stock-model',
-                        \Application\Model\ItemParent::TYPE_TUNING  => 'catalogue/related',
-                        \Application\Model\ItemParent::TYPE_SPORT   => 'catalogue/sport',
-                        \Application\Model\ItemParent::TYPE_DESIGN  => 'catalogue/design',
+                        ItemParentModel::TYPE_DEFAULT => 'catalogue/stock-model',
+                        ItemParentModel::TYPE_TUNING  => 'catalogue/related',
+                        ItemParentModel::TYPE_SPORT   => 'catalogue/sport',
+                        ItemParentModel::TYPE_DESIGN  => 'catalogue/design',
                     ],
                 ],
             ],
@@ -98,14 +99,14 @@ class ItemParent extends Form implements InputFilterProviderInterface
         return $this;
     }
 
-    public function setParentId($parentId)
+    public function setParentId(int $parentId): self
     {
         $this->parentId = $parentId;
 
         return $this;
     }
 
-    public function setItemId($itemId): self
+    public function setItemId(int $itemId): self
     {
         $this->itemId = $itemId;
 
@@ -131,7 +132,7 @@ class ItemParent extends Form implements InputFilterProviderInterface
                         'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => \Application\Model\ItemParent::MAX_CATNAME,
+                            'max' => ItemParentModel::MAX_CATNAME,
                         ],
                     ],
                     [

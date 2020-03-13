@@ -35,37 +35,26 @@ use const PHP_EOL;
  */
 class CatalogueController extends AbstractActionController
 {
-    /** @var ItemParent */
     private ItemParent $itemParent;
 
-    /** @var PictureItem */
     private PictureItem $pictureItem;
 
-    /** @var TextStorage\Service */
     private TextStorage\Service $textStorage;
 
-    /** @var MessageService */
     private MessageService $message;
 
-    /** @var Item */
     private Item $itemModel;
 
-    /** @var Picture */
     private Picture $picture;
 
-    /** @var User */
     private User $userModel;
 
-    /** @var SpecificationsService */
     private SpecificationsService $specService;
 
-    /** @var HostManager */
     private HostManager $hostManager;
 
-    /** @var TelegramService */
     private TelegramService $telegram;
 
-    /** @var DuplicateFinder */
     private DuplicateFinder $duplicateFinder;
 
     public function __construct(
@@ -94,7 +83,7 @@ class CatalogueController extends AbstractActionController
         $this->userModel       = $userModel;
     }
 
-    public function refreshBrandVehicleAction()
+    public function refreshBrandVehicleAction(): string
     {
         $this->itemParent->refreshAllAuto();
 
@@ -104,7 +93,7 @@ class CatalogueController extends AbstractActionController
     /**
      * @suppress PhanPluginMixedKeyNoKey
      */
-    public function acceptOldUnsortedAction()
+    public function acceptOldUnsortedAction(): string
     {
         $select = $this->picture->getTable()->getSql()->select();
         $select
@@ -140,7 +129,8 @@ class CatalogueController extends AbstractActionController
 
             $previousStatusUserId = $picture['change_status_user_id'];
 
-            $success = $this->picture->accept($picture['id'], $userId, $isFirstTimeAccepted);
+            $isFirstTimeAccepted = false;
+            $success             = $this->picture->accept($picture['id'], $userId, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $this->userModel->getRow((int) $picture['owner_id']);
                 if ($owner && ($owner['id'] !== $userId)) {
@@ -191,7 +181,7 @@ class CatalogueController extends AbstractActionController
         return "done\n";
     }
 
-    public function rebuildCarOrderCacheAction()
+    public function rebuildCarOrderCacheAction(): string
     {
         $paginator = $this->itemModel->getPaginator([
             'columns' => ['id'],

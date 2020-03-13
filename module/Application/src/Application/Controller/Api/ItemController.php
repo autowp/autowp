@@ -150,7 +150,7 @@ class ItemController extends AbstractRestfulController
         $this->specsService          = $specsService;
     }
 
-    private function getCollator($language): Collator
+    private function getCollator(string $language): Collator
     {
         if (! isset($this->collators[$language])) {
             $this->collators[$language] = new Collator($language);

@@ -14,14 +14,14 @@ class SpecsController extends AbstractActionController
         $this->specsService = $specsService;
     }
 
-    public function refreshConflictFlagsAction()
+    public function refreshConflictFlagsAction(): string
     {
         $this->specsService->refreshConflictFlags();
 
         return "done\n";
     }
 
-    public function refreshItemConflictFlagsAction()
+    public function refreshItemConflictFlagsAction(): string
     {
         $itemId = $this->params('item_id');
 
@@ -30,14 +30,14 @@ class SpecsController extends AbstractActionController
         return "done\n";
     }
 
-    public function refreshUsersStatAction()
+    public function refreshUsersStatAction(): string
     {
         $this->specsService->refreshUsersConflictsStat();
 
         return "done\n";
     }
 
-    public function refreshUserStatAction()
+    public function refreshUserStatAction(): string
     {
         $userId = $this->params('user_id');
 
@@ -46,7 +46,7 @@ class SpecsController extends AbstractActionController
         return "done\n";
     }
 
-    public function refreshActualValuesAction()
+    public function refreshActualValuesAction(): string
     {
         $this->specsService->updateAllActualValues();
 

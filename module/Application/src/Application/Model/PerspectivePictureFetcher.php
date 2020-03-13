@@ -42,12 +42,12 @@ class PerspectivePictureFetcher
         $this->pictureModel = $model;
     }
 
-    public function setPictureItemTypeId($value): void
+    public function setPictureItemTypeId(int $value): void
     {
         $this->pictureItemTypeId = $value;
     }
 
-    protected function getPictureSelect($itemId, array $options)
+    protected function getPictureSelect(int $itemId, array $options): Sql\Select
     {
         $defaults = [
             'perspectiveGroup'    => false,
@@ -196,9 +196,9 @@ class PerspectivePictureFetcher
         $this->perspectivePageId = $id;
     }
 
-    public function setOnlyExactlyPictures($value): void
+    public function setOnlyExactlyPictures(bool $value): void
     {
-        $this->onlyExactlyPictures = (bool) $value;
+        $this->onlyExactlyPictures = $value;
     }
 
     /**

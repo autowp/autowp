@@ -2,11 +2,12 @@
 
 namespace Application\Controller;
 
+use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 
 class IndexController extends AbstractActionController
 {
-    public function indexAction()
+    public function indexAction(): Response
     {
         $path = $this->params('path');
 

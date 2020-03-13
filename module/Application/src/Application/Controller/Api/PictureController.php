@@ -17,11 +17,13 @@ use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
 use Application\Service\PictureService;
 use Application\Service\TelegramService;
+use ArrayAccess;
 use ArrayObject;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Exception;
 use geoPHP;
@@ -29,7 +31,6 @@ use ImagickException;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
-use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -59,7 +60,7 @@ use function urlencode;
  * @method Pic pic()
  * @method string language()
  * @method Storage imageStorage()
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
+ * @method UserPlugin user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method ViewModel forbiddenAction()
  * @method void log(string $message, array $objects)
@@ -67,70 +68,48 @@ use function urlencode;
  */
 class PictureController extends AbstractRestfulController
 {
-    /** @var CarOfDay */
     private CarOfDay $carOfDay;
 
-    /** @var AbstractRestHydrator */
     private AbstractRestHydrator $hydrator;
 
-    /** @var PictureItem */
     private PictureItem $pictureItem;
 
-    /** @var DuplicateFinder */
     private DuplicateFinder $duplicateFinder;
 
-    /** @var UserPicture */
     private UserPicture $userPicture;
 
-    /** @var Log */
     private Log $log;
 
-    /** @var HostManager */
     private HostManager $hostManager;
 
-    /** @var InputFilter */
     private InputFilter $itemInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $postInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $listInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $publicListInputFilter;
 
-    /** @var InputFilter */
     private InputFilter $editInputFilter;
 
-    /** @var TextStorage\Service */
     private TextStorage\Service $textStorage;
 
-    /** @var CommentsService */
     private CommentsService $comments;
 
-    /** @var PictureModerVote */
     private PictureModerVote $pictureModerVote;
 
-    /** @var Item */
     private Item $item;
 
-    /** @var Picture */
     private Picture $picture;
 
-    /** @var User */
     private User $userModel;
 
-    /** @var PictureService */
     private PictureService $pictureService;
 
-    /** @var TelegramService */
     private TelegramService $telegram;
 
-    /** @var MessageService */
     private MessageService $message;
 
-    /** @var Catalogue */
     private Catalogue $catalogue;
 
     public function __construct(
@@ -265,7 +244,6 @@ class PictureController extends AbstractRestfulController
     /**
      * @throws Storage\Exception
      * @throws Exception
-     * @return ViewModel|ResponseInterface|array
      */
     public function randomPictureAction(): JsonModel
     {
@@ -298,7 +276,6 @@ class PictureController extends AbstractRestfulController
     /**
      * @throws Storage\Exception
      * @throws Exception
-     * @return ViewModel|ResponseInterface|array
      */
     public function newPictureAction(): JsonModel
     {
@@ -331,7 +308,6 @@ class PictureController extends AbstractRestfulController
     /**
      * @throws Storage\Exception
      * @throws Exception
-     * @return ViewModel|ResponseInterface|array
      */
     public function carOfDayPictureAction(): JsonModel
     {
@@ -637,7 +613,10 @@ class PictureController extends AbstractRestfulController
         return new JsonModel($result);
     }
 
-    private function canAccept($picture)
+    /**
+     * @param array|ArrayAccess $picture
+     */
+    private function canAccept($picture): bool
     {
         return $this->picture->canAccept($picture)
             && $this->user()->isAllowed('picture', 'accept');
@@ -891,7 +870,8 @@ class PictureController extends AbstractRestfulController
                         return $this->forbiddenAction();
                     }
 
-                    $success = $this->picture->accept($picture['id'], $user['id'], $isFirstTimeAccepted);
+                    $isFirstTimeAccepted = false;
+                    $success             = $this->picture->accept($picture['id'], $user['id'], $isFirstTimeAccepted);
                     if ($success) {
                         $owner = $this->userModel->getRow((int) $picture['owner_id']);
 
@@ -1101,7 +1081,10 @@ class PictureController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
-    private function pictureCanDelete($picture)
+    /**
+     * @param array|ArrayAccess $picture
+     */
+    private function pictureCanDelete($picture): bool
     {
         if (! $this->picture->canDelete($picture)) {
             return false;
@@ -1251,7 +1234,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return Response|array
      * @throws Exception
      * @return ViewModel|ResponseInterface|array
      */
@@ -1274,7 +1256,11 @@ class PictureController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
-    private function canReplace($picture, $replacedPicture)
+    /**
+     * @param array|ArrayAccess $picture
+     * @param array|ArrayAccess $replacedPicture
+     */
+    private function canReplace($picture, $replacedPicture): bool
     {
         $can1 = false;
         switch ($picture['status']) {

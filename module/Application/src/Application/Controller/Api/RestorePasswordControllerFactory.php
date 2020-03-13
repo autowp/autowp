@@ -18,8 +18,11 @@ class RestorePasswordControllerFactory implements FactoryInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): RestorePasswordController
-    {
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        ?array $options = null
+    ): RestorePasswordController {
         $filters = $container->get('InputFilterManager');
         $config  = $container->get('Config');
 

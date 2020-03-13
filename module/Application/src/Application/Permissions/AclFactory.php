@@ -24,10 +24,11 @@ class AclFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Acl
     {
+        /** @var ServiceLocatorInterface $services */
         $services = $container->get('ServiceManager');
 
         /**
-         * @var StorageInterface
+         * @var StorageInterface $cache
          */
         $cache = $services->get('longCache');
 
@@ -135,7 +136,7 @@ class AclFactory implements FactoryInterface
         }
     }
 
-    private function addRole(Acl $acl, TableGateway $roleTable, $role, array &$loaded, $deep): void
+    private function addRole(Acl $acl, TableGateway $roleTable, array $role, array &$loaded, int $deep): void
     {
         if ($deep > 10) {
             throw new Exception('Roles deep overflow');

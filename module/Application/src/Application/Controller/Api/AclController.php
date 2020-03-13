@@ -13,8 +13,8 @@ use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\Validator;
 use Laminas\View\Model\JsonModel;
-
 use Laminas\View\Model\ViewModel;
+
 use function explode;
 
 /**

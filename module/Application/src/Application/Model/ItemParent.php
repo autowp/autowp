@@ -2,6 +2,8 @@
 
 namespace Application\Model;
 
+use ArrayAccess;
+use ArrayObject;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 use Exception;
 use Laminas\Db\Sql;
@@ -101,13 +103,10 @@ class ItemParent
         $this->itemAlias               = $itemAlias;
     }
 
-    public function delete($parentId, $itemId)
+    public function delete(int $parentId, int $itemId): bool
     {
-        $parentId = (int) $parentId;
-        $itemId   = (int) $itemId;
-
         $brandRow = $this->itemTable->select([
-            'id' => (int) $parentId,
+            'id' => $parentId,
         ])->current();
         if (! $brandRow) {
             return false;
@@ -126,7 +125,7 @@ class ItemParent
         return true;
     }
 
-    private function getYearsPrefix($begin, $end)
+    private function getYearsPrefix(int $begin, int $end): string
     {
         $bms = (int) ($begin / 100);
         $ems = (int) ($end / 100);
@@ -150,7 +149,11 @@ class ItemParent
         return $begin . '–xx';
     }
 
-    private function extractName($parentRow, $vehicleRow, $language)
+    /**
+     * @param array|ArrayAccess $parentRow
+     * @param array|ArrayAccess $vehicleRow
+     */
+    private function extractName($parentRow, $vehicleRow, string $language): string
     {
         $langName = $this->itemModel->getName($vehicleRow['id'], $language);
 
@@ -230,7 +233,11 @@ class ItemParent
         ])->current();
     }
 
-    private function extractCatname($brandRow, $vehicleRow)
+    /**
+     * @param array|ArrayAccess $brandRow
+     * @param array|ArrayAccess $vehicleRow
+     */
+    private function extractCatname($brandRow, $vehicleRow): string
     {
         $diffName = $this->getNamePreferLanguage($brandRow['id'], $vehicleRow['id'], 'en');
         if (! $diffName) {
@@ -252,7 +259,7 @@ class ItemParent
         return $catname;
     }
 
-    public function isAllowedCombination($itemTypeId, $parentItemTypeId)
+    public function isAllowedCombination(int $itemTypeId, int $parentItemTypeId): bool
     {
         return isset($this->allowedCombinations[$parentItemTypeId][$itemTypeId]);
     }
@@ -348,7 +355,7 @@ class ItemParent
         return true;
     }
 
-    public function move(int $itemId, int $fromParentId, int $toParentId)
+    public function move(int $itemId, int $fromParentId, int $toParentId): bool
     {
         $oldParentRow = $this->itemTable->select(['id' => $fromParentId])->current();
         $newParentRow = $this->itemTable->select(['id' => $toParentId])->current();
@@ -406,7 +413,7 @@ class ItemParent
         return true;
     }
 
-    public function remove(int $parentId, int $itemId)
+    public function remove(int $parentId, int $itemId): void
     {
         $parentRow = $this->itemTable->select(['id' => $parentId])->current();
         $itemRow   = $this->itemTable->select(['id' => $itemId])->current();
@@ -473,8 +480,8 @@ class ItemParent
             VALUES (:item_id, :parent_id, :language, :name, :is_auto)
             ON DUPLICATE KEY UPDATE name = VALUES(name), is_auto = VALUES(is_auto)
         ', array_replace([
-    'name' => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
-        'is_auto'  => $isAuto ? 1 : 0,
+            'name'        => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
+            'is_auto' => $isAuto ? 1 : 0,
         ], $primaryKey));
     }
 
@@ -494,7 +501,7 @@ class ItemParent
         }
     }
 
-    public function setItemParent(int $parentId, int $itemId, array $values, $forceIsAuto)
+    public function setItemParent(int $parentId, int $itemId, array $values, bool $forceIsAuto): bool
     {
         $itemParentRow = $this->itemParentTable->select([
             'parent_id' => $parentId,
@@ -546,7 +553,7 @@ class ItemParent
         return true;
     }
 
-    public function refreshAuto(int $parentId, int $itemId)
+    public function refreshAuto(int $parentId, int $itemId): bool
     {
         $bvlRows = $this->itemParentLanguageTable->select([
             'item_id'   => $itemId,
@@ -590,7 +597,7 @@ class ItemParent
         return true;
     }
 
-    public function refreshAutoByVehicle(int $itemId)
+    public function refreshAutoByVehicle(int $itemId): bool
     {
         foreach ($this->getParentRows($itemId) as $itemParentRow) {
             $this->refreshAuto($itemParentRow['parent_id'], $itemId);
@@ -599,7 +606,7 @@ class ItemParent
         return true;
     }
 
-    public function refreshAllAuto()
+    public function refreshAllAuto(): bool
     {
         $itemParentRows = $this->itemParentTable->select([
             'not manual_catname',
@@ -652,6 +659,9 @@ class ItemParent
         return $result;
     }
 
+    /**
+     * @return array|ArrayObject|null
+     */
     public function getRow(int $parentId, int $itemId)
     {
         return $this->itemParentTable->select([
@@ -660,6 +670,9 @@ class ItemParent
         ])->current();
     }
 
+    /**
+     * @return array|ArrayObject|null
+     */
     public function getRowByCatname(int $parentId, string $catname)
     {
         return $this->itemParentTable->select([
@@ -668,7 +681,7 @@ class ItemParent
         ])->current();
     }
 
-    public function getName(int $parentId, int $itemId, string $language)
+    public function getName(int $parentId, int $itemId, string $language): ?string
     {
         $bvlRow = $this->itemParentLanguageTable->select([
             'parent_id' => $parentId,
@@ -773,7 +786,7 @@ class ItemParent
         return $result;
     }
 
-    public function rebuildCache(int $itemId)
+    public function rebuildCache(int $itemId): int
     {
         $parentInfo          = $this->collectParentInfo($itemId);
         $parentInfo[$itemId] = [

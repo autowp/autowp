@@ -10,6 +10,7 @@ use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
 use ArrayAccess;
 use Autowp\Message\MessageService;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\Db\TableGateway\TableGateway;
@@ -24,7 +25,7 @@ use function sprintf;
 use function urlencode;
 
 /**
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
+ * @method UserPlugin user($user = null)
  * @method Pic pic()
  * @method string language()
  * @method ViewModel forbiddenAction()

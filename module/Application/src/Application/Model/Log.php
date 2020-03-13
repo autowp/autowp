@@ -55,7 +55,7 @@ class Log
     /**
      * @suppress PhanDeprecatedFunction
      */
-    public function addEvent(int $userId, string $message, array $objects)
+    public function addEvent(int $userId, string $message, array $objects): void
     {
         $this->eventTable->insert([
             'description'  => $message,
@@ -67,7 +67,7 @@ class Log
         $this->assign($id, $objects);
     }
 
-    private function assign($id, array $items)
+    private function assign(int $id, array $items): void
     {
         $defaults = [
             'items'    => [],
@@ -130,7 +130,7 @@ class Log
         }
     }
 
-    public function getList(array $options)
+    public function getList(array $options): array
     {
         $defaults = [
             'article_id' => null,

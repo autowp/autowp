@@ -13,20 +13,19 @@ use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Router\Http\TreeRouteStack;
-use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
-use Laminas\View\Model\ViewModel;
 use function array_keys;
 use function array_merge;
 
 /**
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
+ * @method UserPlugin user($user = null)
  * @method string language()
  */
 class IndexController extends AbstractRestfulController
@@ -83,10 +82,7 @@ class IndexController extends AbstractRestfulController
         $this->router       = $router;
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function brandsAction()
+    public function brandsAction(): JsonModel
     {
         $language = $this->language();
 
@@ -108,10 +104,7 @@ class IndexController extends AbstractRestfulController
         return new JsonModel($brands);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function personsContentAction()
+    public function personsContentAction(): JsonModel
     {
         $language = $this->language();
 
@@ -139,10 +132,7 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function personsAuthorAction()
+    public function personsAuthorAction(): JsonModel
     {
         $language = $this->language();
 
@@ -170,10 +160,7 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function categoriesAction()
+    public function categoriesAction(): JsonModel
     {
         $language = $this->language();
 
@@ -192,11 +179,7 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function factoriesAction()
+    public function factoriesAction(): JsonModel
     {
         $cacheKey  = 'API_INDEX_FACTORIES_2';
         $success   = true;
@@ -246,10 +229,7 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function twinsAction()
+    public function twinsAction(): JsonModel
     {
         $language = $this->language();
 
@@ -273,10 +253,7 @@ class IndexController extends AbstractRestfulController
         return new JsonModel($twinsBlock);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function specItemsAction()
+    public function specItemsAction(): JsonModel
     {
         $language = $this->language();
 
@@ -363,10 +340,7 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function itemOfDayAction()
+    public function itemOfDayAction(): JsonModel
     {
         $language = $this->language();
         /* @phan-suppress-next-line PhanUndeclaredMethod */

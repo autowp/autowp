@@ -174,7 +174,7 @@ class Referer
         }
     }
 
-    public function getData(): array
+    public function getData(): ?array
     {
         $response = $this->getClient()->request('GET', '/hotlink/monitoring', [
             'http_errors' => false,

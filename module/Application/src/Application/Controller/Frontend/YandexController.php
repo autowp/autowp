@@ -23,7 +23,6 @@ class YandexController extends AbstractActionController
 
     private int $price;
 
-    /** @var CarOfDay */
     private CarOfDay $itemOfDay;
 
     public function __construct(array $config, CarOfDay $itemOfDay)
@@ -33,9 +32,9 @@ class YandexController extends AbstractActionController
         $this->itemOfDay = $itemOfDay;
     }
 
-    private function isAvailableDate(DateTime $date)
+    private function isAvailableDate(DateTime $date): ?DateTime
     {
-        $result = false;
+        $result = null;
 
         $dateStr = $date->format(self::DATE_FORMAT);
 
@@ -50,7 +49,7 @@ class YandexController extends AbstractActionController
         return $result;
     }
 
-    public function informingAction()
+    public function informingAction(): ViewModel
     {
         $request = $this->getRequest();
 

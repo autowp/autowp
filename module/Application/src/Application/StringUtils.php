@@ -13,7 +13,7 @@ use function trim;
 
 class StringUtils
 {
-    public static function getTextPreview($text, array $options)
+    public static function getTextPreview(string $text, array $options): string
     {
         $defaults = [
             'maxlength' => null,

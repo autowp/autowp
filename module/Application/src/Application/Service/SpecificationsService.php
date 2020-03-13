@@ -551,9 +551,9 @@ class SpecificationsService
                             VALUES (:attribute_id, :item_id, :user_id, :ordering, :value)
                             ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
                         ', array_replace($userValuePrimaryKey, [
-                        'ordering' => $ordering,
-                        'value'    => $oneValue,
-                        ]));
+    'ordering' => $ordering,
+    'value'    => $oneValue,
+]));
                         $ordering++;
                     }
                 }
@@ -592,8 +592,8 @@ class SpecificationsService
                         VALUES (:attribute_id, :item_id, :user_id, :value)
                         ON DUPLICATE KEY UPDATE value = VALUES(value)
                     ', array_replace($userValuePrimaryKey, [
-                    'value' => $value,
-                    ]));
+    'value' => $value,
+]));
 
                     $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
                 }
@@ -791,7 +791,6 @@ class SpecificationsService
     }
 
     /**
-     * @param int $parentId
      * @return array|ArrayAccess
      */
     private function getChildCarIds(int $parentId)
@@ -1607,10 +1606,10 @@ class SpecificationsService
                     VALUES (:attribute_id, :item_id, :value)
                     ON DUPLICATE KEY UPDATE value = VALUES(value)
                 ', [
-                'value'        => $actualValue['value'],
-                'attribute_id' => $attribute['id'],
-                'item_id'      => $itemId,
-                ]);
+    'value'        => $actualValue['value'],
+    'attribute_id' => $attribute['id'],
+    'item_id'      => $itemId,
+]);
 
                 if ($result->getAffectedRows() > 0) {
                     $somethingChanges = true;
@@ -1833,7 +1832,7 @@ class SpecificationsService
     }
 
     /**
-     * @return array|mixed|null
+     * @return mixed|null
      * @throws Exception
      */
     public function getUserValue(int $attributeId, int $itemId, int $userId)
@@ -2161,7 +2160,9 @@ class SpecificationsService
         $uniqueValues = [];
         foreach ($userValueRows as $userValueRow) {
             $v                                    = $this->getUserValue(
-                $attribute['id'], $itemId, $userValueRow['user_id']
+                $attribute['id'],
+                $itemId,
+                $userValueRow['user_id']
             );
             $serializedValue                      = serialize($v);
             $uniqueValues[]                       = $serializedValue;

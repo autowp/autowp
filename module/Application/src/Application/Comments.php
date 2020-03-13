@@ -4,6 +4,7 @@ namespace Application;
 
 use Application\Model\Item;
 use Application\Model\Picture;
+use ArrayAccess;
 use Autowp\Comments\CommentsService;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
@@ -94,7 +95,7 @@ class Comments
     }
 
     /**
-     * @param $message
+     * @param array|ArrayAccess $message
      * @throws Exception
      */
     public function getMessageRowRoute($message): array
@@ -155,7 +156,7 @@ class Comments
         return $url;
     }
 
-    public function getMessagePreview($message)
+    public function getMessagePreview(string $message): string
     {
         return StringUtils::getTextPreview($message, [
             'maxlines'  => 1,
@@ -163,12 +164,12 @@ class Comments
         ]);
     }
 
-    public function service()
+    public function service(): CommentsService
     {
         return $this->service;
     }
 
-    public function cleanBrokenMessages()
+    public function cleanBrokenMessages(): int
     {
         $affected = 0;
 
@@ -240,7 +241,7 @@ class Comments
         return $affected;
     }
 
-    public function notifySubscribers($messageId): void
+    public function notifySubscribers(int $messageId): void
     {
         $comment = $this->service->getMessageRow($messageId);
 
@@ -275,7 +276,7 @@ class Comments
             );
             $this->message->send(null, $subscriber['id'], $message);
 
-            $this->service->markSubscriptionSent($comment['type_id'], $comment['item_id'], $subscriber['id']);
+            $this->service->setSubscriptionSent($comment['type_id'], $comment['item_id'], $subscriber['id'], true);
         }
     }
 }

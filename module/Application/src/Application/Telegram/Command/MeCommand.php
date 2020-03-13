@@ -39,6 +39,7 @@ class MeCommand extends Command
     /**
      * @inheritDoc
      * @throws Exception
+     * @param mixed $arguments
      */
     public function handle($arguments)
     {

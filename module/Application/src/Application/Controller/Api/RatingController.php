@@ -10,10 +10,8 @@ use Autowp\User\Model\User;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 
-use Laminas\View\Model\ViewModel;
 use function array_slice;
 use function arsort;
 
@@ -49,10 +47,7 @@ class RatingController extends AbstractActionController
         $this->userHydrator = $userHydrator;
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function specsAction()
+    public function specsAction(): JsonModel
     {
         $rows = $this->userModel->getRows([
             'not_deleted' => true,
@@ -117,9 +112,8 @@ class RatingController extends AbstractActionController
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @return ViewModel|ResponseInterface|array
      */
-    public function picturesAction()
+    public function picturesAction(): JsonModel
     {
         $rows = $this->userModel->getRows([
             'not_deleted'  => true,
@@ -175,10 +169,7 @@ class RatingController extends AbstractActionController
         ]);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function likesAction()
+    public function likesAction(): JsonModel
     {
         $this->userHydrator->setOptions([
             'language' => $this->language(),
@@ -199,10 +190,7 @@ class RatingController extends AbstractActionController
         ]);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function pictureLikesAction()
+    public function pictureLikesAction(): JsonModel
     {
         $this->userHydrator->setOptions([
             'language' => $this->language(),

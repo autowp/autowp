@@ -4,7 +4,9 @@ namespace Application\Controller\Plugin;
 
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
+use ArrayAccess;
 use Autowp\User\Model\User;
+use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
@@ -33,7 +35,11 @@ class PictureVote extends AbstractPlugin
         $this->userModel         = $userModel;
     }
 
-    private function isLastPicture($picture)
+    /**
+     * @param array|ArrayAccess $picture
+     * @throws Exception
+     */
+    private function isLastPicture($picture): ?bool
     {
         if ($picture['status'] !== Picture::STATUS_ACCEPTED) {
             return null;
@@ -48,7 +54,7 @@ class PictureVote extends AbstractPlugin
         ]);
     }
 
-    private function getAcceptedCount(int $pictureId)
+    private function getAcceptedCount(int $pictureId): int
     {
         return $this->picture->getCount([
             'status' => Picture::STATUS_ACCEPTED,
@@ -58,7 +64,7 @@ class PictureVote extends AbstractPlugin
         ]);
     }
 
-    private function getVoteOptions2()
+    private function getVoteOptions2(): array
     {
         $result = [
             'positive' => [],
@@ -83,7 +89,7 @@ class PictureVote extends AbstractPlugin
         return $result;
     }
 
-    public function __invoke(int $pictureId, $options)
+    public function __invoke(int $pictureId, array $options): ?array
     {
         $options = array_replace([
             'hideVote' => false,
@@ -91,14 +97,14 @@ class PictureVote extends AbstractPlugin
 
         $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
-            return false;
+            return null;
         }
 
         $controller = $this->getController();
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $controller->user()->inheritsRole('moder')) {
-            return false;
+            return null;
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -135,7 +141,10 @@ class PictureVote extends AbstractPlugin
         ];
     }
 
-    private function pictureCanDelete($picture)
+    /**
+     * @param array|ArrayAccess $picture
+     */
+    private function pictureCanDelete($picture): bool
     {
         if (! $this->picture->canDelete($picture)) {
             return false;

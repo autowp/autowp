@@ -9,7 +9,7 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class InputFilterResponse extends AbstractPlugin
 {
-    public function __invoke(InputFilter $inputFilter)
+    public function __invoke(InputFilter $inputFilter): ApiProblemResponse
     {
         return new ApiProblemResponse(
             new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [

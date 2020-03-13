@@ -2,8 +2,6 @@
 
 namespace Application\Form\Moder;
 
-use Laminas\Form\Element;
-use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Form\Form;
 use Laminas\InputFilter\InputFilterProviderInterface;
@@ -13,7 +11,7 @@ class ItemLanguages extends Form implements InputFilterProviderInterface
 {
     private array $languages = [];
 
-    public function __construct($name = null, $options = [])
+    public function __construct(?string $name = null, array $options = [])
     {
         parent::__construct($name, $options);
 
@@ -38,10 +36,9 @@ class ItemLanguages extends Form implements InputFilterProviderInterface
      * - use_as_base_fieldset: is this fieldset use as the base fieldset?
      *
      * @param  array|Traversable $options
-     * @return Element|ElementInterface
      * @throws Exception\InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions($options): self
     {
         if (isset($options['languages'])) {
             $this->languages = $options['languages'];

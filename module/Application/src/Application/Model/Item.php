@@ -2,11 +2,12 @@
 
 namespace Application\Model;
 
+use ArrayAccess;
 use ArrayObject;
 use Autowp\TextStorage\Service as TextStorage;
 use DateTime;
 use Exception;
-use GeometryCollection;
+use Geometry;
 use geoPHP;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
@@ -172,7 +173,7 @@ class Item
         return $resultIds;
     }
 
-    public function setLanguageName(int $id, string $language, string $name)
+    public function setLanguageName(int $id, string $language, string $name): void
     {
         $primaryKey = [
             'item_id'  => $id,
@@ -370,6 +371,9 @@ class Item
         return $row ? $row['name'] : '';
     }
 
+    /**
+     * @param array|ArrayAccess $row
+     */
     public function getNameData($row, string $language): array
     {
         $name = $this->getName($row['id'], $language);
@@ -477,7 +481,11 @@ class Item
                         // matched root
                         $newVector = [];
                         $length    = min(count($vectors[$i]['parents']), count($vectors[$j]['parents']));
-                        for ($k = 0; $k < $length && $vectors[$i]['parents'][$k] === $vectors[$j]['parents'][$k]; $k++) {
+                        for (
+                            $k = 0;
+                            $k < $length && $vectors[$i]['parents'][$k] === $vectors[$j]['parents'][$k];
+                            $k++
+                        ) {
                             $newVector[] = $vectors[$i]['parents'][$k];
                         }
                         $vectors[$i] = [
@@ -553,7 +561,7 @@ class Item
         return $resultIds;
     }
 
-    private function fractionToMonth($fraction)
+    private function fractionToMonth(string $fraction): int
     {
         switch ($fraction) {
             case '¼':
@@ -629,9 +637,8 @@ class Item
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param $parentId
      */
-    private function getChildVehicleTypesByWhitelist($parentId, array $whitelist): array
+    private function getChildVehicleTypesByWhitelist(int $parentId, array $whitelist): array
     {
         if (count($whitelist) <= 0) {
             return [];
@@ -656,7 +663,7 @@ class Item
     /**
      * @throws Exception
      */
-    public function updateInteritance(int $itemId)
+    public function updateInteritance(int $itemId): void
     {
         $item = $this->itemTable->select(['id' => $itemId])->current();
         if (! $item) {
@@ -667,7 +674,7 @@ class Item
     }
 
     /**
-     * @param $car
+     * @param array|ArrayAccess $car
      * @throws Exception
      */
     private function updateItemInteritance($car)
@@ -834,9 +841,8 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param $point
      */
-    public function setPoint(int $itemId, $point)
+    public function setPoint(int $itemId, Geometry $point): void
     {
         $primaryKey = ['item_id' => $itemId];
 
@@ -858,7 +864,7 @@ class Item
     }
 
     /**
-     * @return array|bool|GeometryCollection|mixed|null
+     * @return mixed|null
      * @throws Exception
      */
     public function getPoint(int $itemId)
@@ -929,13 +935,16 @@ class Item
     }
 
     /**
-     * @param $options
-     * @param $prefix
-     * @param $language
+     * @param array|int $options
      * @throws Exception
      */
-    private function applyChildFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
-    {
+    private function applyChildFilters(
+        Sql\Select $select,
+        $options,
+        string $prefix,
+        string $language,
+        string $id
+    ): array {
         if (! is_array($options)) {
             $options = [
                 'id' => $options,
@@ -967,13 +976,16 @@ class Item
     }
 
     /**
-     * @param $options
-     * @param $prefix
-     * @param $language
+     * @param array|string $options
      * @throws Exception
      */
-    private function applyParentFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
-    {
+    private function applyParentFilters(
+        Sql\Select $select,
+        $options,
+        string $prefix,
+        string $language,
+        string $id
+    ): array {
         if (! is_array($options)) {
             $options = [
                 'id' => $options,
@@ -1007,12 +1019,14 @@ class Item
             $this->applyLinkTypeFilter($select, $alias, $options['link_type']);
         }
 
-        $group = $this->applyFilters($select, array_replace(
+        $this->applyFilters($select, array_replace(
             ['language' => $language],
             $options
         ), $alias . '.parent_id', $alias);
 
-        /*if ($group) {
+        /*
+        $group =
+        if ($group) {
             foreach ($columns as $column) {
                 $group[] = $column;
             }
@@ -1022,13 +1036,16 @@ class Item
     }
 
     /**
-     * @param $options
-     * @param $prefix
-     * @param $language
+     * @param array|int $options
      * @throws Exception
      */
-    private function applyDescendantFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
-    {
+    private function applyDescendantFilters(
+        Sql\Select $select,
+        $options,
+        string $prefix,
+        string $language,
+        string $id
+    ): array {
         if (! is_array($options)) {
             $options = [
                 'id' => $options,
@@ -1102,7 +1119,7 @@ class Item
     }
 
     /**
-     * @param $value
+     * @param array|int $value
      * @throws Exception
      */
     private function applyLinkTypeFilter(Sql\Select $select, string $alias, $value)
@@ -1119,10 +1136,10 @@ class Item
     }
 
     /**
-     * @param $value
+     * @param array|int $value
      * @throws Exception
      */
-    private function applyIdFilter(Sql\Select $select, $value, string $id)
+    private function applyIdFilter(Sql\Select $select, $value, string $id): void
     {
         if (is_array($value)) {
             $value = array_values($value);
@@ -1149,10 +1166,9 @@ class Item
     }
 
     /**
-     * @param $id
      * @throws Exception
      */
-    private function applyFilters(Sql\Select $select, array $options, $id, string $prefix): array
+    private function applyFilters(Sql\Select $select, array $options, string $id, string $prefix): array
     {
         $defaults = [
             'id'                 => null,
@@ -1308,7 +1324,7 @@ class Item
         return $group;
     }
 
-    private function applyPicturesFilter(Sql\Select $select, $id, array $options)
+    private function applyPicturesFilter(Sql\Select $select, string $id, array $options): void
     {
         $defaults = [
             'user'   => null,
@@ -1340,9 +1356,8 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param $value
      */
-    private function getNameSelect($value, string $valueType, string $language): Sql\Select
+    private function getNameSelect(int $value, string $valueType, string $language): Sql\Select
     {
         $predicate = new Sql\Predicate\Operator(
             'item_id',

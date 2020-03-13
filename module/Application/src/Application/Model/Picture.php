@@ -78,7 +78,11 @@ class Picture
         $this->languagePriority = new LanguagePriority();
     }
 
-    private function applyIdFilter(Sql\Select $select, $value, string $id)
+    /**
+     * @param array|int $value
+     * @throws Exception
+     */
+    private function applyIdFilter(Sql\Select $select, $value, string $id): void
     {
         if (is_array($value)) {
             $value = array_values($value);
@@ -104,7 +108,10 @@ class Picture
         $select->where([$id => $value]);
     }
 
-    private function applyPerspectiveFilter(Sql\Select $select, $options)
+    /**
+     * @param array|int $options
+     */
+    private function applyPerspectiveFilter(Sql\Select $select, $options): void
     {
         if (! is_array($options)) {
             $options = [
@@ -133,7 +140,10 @@ class Picture
         }
     }
 
-    private function applyAncestorFilter(Sql\Select $select, $options, $idColumn)
+    /**
+     * @param array|int $options
+     */
+    private function applyAncestorFilter(Sql\Select $select, $options, string $idColumn): void
     {
         if (! is_array($options)) {
             $options = ['id' => $options];
@@ -162,7 +172,10 @@ class Picture
         }
     }
 
-    private function applyExcludeAncestorFilter(Sql\Select $select, $options, $idColumn)
+    /**
+     * @param array|int $options
+     */
+    private function applyExcludeAncestorFilter(Sql\Select $select, $options, string $idColumn): void
     {
         if (! is_array($options)) {
             $options = ['id' => $options];
@@ -189,7 +202,7 @@ class Picture
         }
     }
 
-    private function applyEngineFilter(Sql\Select $select, $options)
+    private function applyEngineFilter(Sql\Select $select, array $options): void
     {
         $defaults = [
             'ancestor_or_self' => null,
@@ -1042,6 +1055,9 @@ class Picture
         return $result;
     }
 
+    /**
+     * @param array|ArrayAccess $row
+     */
     public function canAccept($row): bool
     {
         if (! in_array($row['status'], [self::STATUS_INBOX])) {
@@ -1053,6 +1069,9 @@ class Picture
         return $votes <= 0;
     }
 
+    /**
+     * @param array|ArrayAccess $row
+     */
     public function canDelete($row): bool
     {
         if (! in_array($row['status'], [self::STATUS_INBOX])) {
@@ -1066,10 +1085,9 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param $isFirstTimeAccepted
      * @throws Exception
      */
-    public function accept(int $pictureId, int $userId, &$isFirstTimeAccepted): bool
+    public function accept(int $pictureId, int $userId, bool &$isFirstTimeAccepted): bool
     {
         $primaryKey = ['id' => $pictureId];
 
@@ -1095,7 +1113,7 @@ class Picture
         return true;
     }
 
-    public function generateIdentity()
+    public function generateIdentity(): string
     {
         do {
             $identity = $this->randomIdentity();
@@ -1108,7 +1126,7 @@ class Picture
         return $identity;
     }
 
-    private function randomIdentity()
+    private function randomIdentity(): string
     {
         $alpha  = "abcdefghijklmnopqrstuvwxyz";
         $number = "0123456789";

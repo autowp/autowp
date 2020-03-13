@@ -34,15 +34,15 @@ class FilePath implements RouteInterface
         return new self($options);
     }
 
-    public function __construct($options = [])
+    public function __construct(array $options = [])
     {
         $this->defaults = $options['defaults'];
     }
 
-    public function match(Request $request)
+    public function match(Request $request): ?RouteMatch
     {
         if (! method_exists($request, 'getUri')) {
-            return false;
+            return null;
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -58,7 +58,7 @@ class FilePath implements RouteInterface
         }
 
         if (! count($path)) {
-            return false;
+            return null;
         }
 
         $variables = [

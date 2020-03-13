@@ -62,7 +62,7 @@ class Comments extends AbstractHelper
         }
 
         if ($user) {
-            $this->comments->markSubscriptionAwaiting($type, $item, $user['id']);
+            $this->comments->setSubscriptionSent($type, $item, $user['id'], false);
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */

@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Laminas\Db\ResultSet\ResultSetInterface;
 use Laminas\Db\TableGateway\TableGateway;
 use Autowp\User\Model\User;
 
@@ -28,7 +29,7 @@ class UserItemSubscribe
         ]);
     }
 
-    public function unsubscribe(int $userId, int $itemId)
+    public function unsubscribe(int $userId, int $itemId): void
     {
         $this->table->delete([
             'user_id' => $userId,
@@ -36,7 +37,7 @@ class UserItemSubscribe
         ]);
     }
 
-    public function getItemSubscribers(int $itemId)
+    public function getItemSubscribers(int $itemId): ResultSetInterface
     {
         $table = $this->userModel->getTable();
 
@@ -47,7 +48,7 @@ class UserItemSubscribe
         );
     }
 
-    public function unsubscribeAll(int $userId)
+    public function unsubscribeAll(int $userId): void
     {
         $this->table->delete([
             'user_id' => $userId

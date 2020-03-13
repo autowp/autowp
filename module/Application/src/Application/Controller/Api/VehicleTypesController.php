@@ -5,7 +5,6 @@ namespace Application\Controller\Api;
 use Application\Model\VehicleType;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 

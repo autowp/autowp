@@ -9,8 +9,8 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Paginator;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
-
 use Laminas\View\Model\ViewModel;
+
 use function get_object_vars;
 
 class ArticleController extends AbstractActionController

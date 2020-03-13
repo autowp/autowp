@@ -20,7 +20,6 @@ use function file_put_contents;
 use function floor;
 use function implode;
 use function is_numeric;
-use function is_string;
 use function mb_strtoupper;
 use function mb_substr;
 use function ord;
@@ -52,7 +51,7 @@ class Brand
         $this->item = $item;
     }
 
-    private function getCollator($language)
+    private function getCollator(string $language): Collator
     {
         if (! isset($this->collators[$language])) {
             $this->collators[$language] = new Collator($language);
@@ -61,7 +60,7 @@ class Brand
         return $this->collators[$language];
     }
 
-    private function compareName($a, $b, $language)
+    private function compareName(string $a, string $b, string $language): int
     {
         $coll = $this->getCollator($language);
         switch ($language) {
@@ -78,11 +77,9 @@ class Brand
                 }
 
                 return $coll->compare($a, $b);
-                break;
 
             default:
                 return $coll->compare($a, $b);
-                break;
         }
     }
 
@@ -143,7 +140,7 @@ class Brand
         return $items;
     }
 
-    private function utfCharToNumber($char)
+    private function utfCharToNumber(string $char): int
     {
         $i      = 0;
         $number = '';
@@ -279,7 +276,7 @@ class Brand
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $callback
+     * @param callable $callback
      * @throws Exception
      */
     private function fetchBrand(string $language, $callback): ?array
@@ -328,17 +325,10 @@ class Brand
     }
 
     /**
-     * @param $options
      * @throws Exception
      */
-    public function getList($options, ?callable $callback = null): array
+    public function getList(array $options, ?callable $callback = null): array
     {
-        if (is_string($options)) {
-            $options = [
-                'language' => $options,
-            ];
-        }
-
         $defaults = [
             'language' => 'en',
             'columns'  => [],

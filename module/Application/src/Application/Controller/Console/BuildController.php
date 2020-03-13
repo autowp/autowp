@@ -17,7 +17,7 @@ class BuildController extends AbstractActionController
         $this->brand = $brand;
     }
 
-    public function brandsSpriteAction()
+    public function brandsSpriteAction(): string
     {
         $dir = 'public_html/img';
         if (! is_dir($dir)) {

@@ -5,9 +5,9 @@ namespace Application\Controller\Api;
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Service\UsersService;
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\Image\Storage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
 use DateInterval;
@@ -537,10 +537,7 @@ class UserController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function onlineAction()
+    public function onlineAction(): JsonModel
     {
         $rows = $this->userModel->getRows([
             'online' => true,

@@ -19,7 +19,8 @@ class ArticleHydrator extends AbstractRestHydrator
 
     private TableGateway $htmlTable;
 
-    public function __construct(ServiceLocatorInterface $serviceManager) {
+    public function __construct(ServiceLocatorInterface $serviceManager)
+    {
         parent::__construct();
 
         $this->userModel = $serviceManager->get(User::class);

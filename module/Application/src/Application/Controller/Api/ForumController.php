@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Application\Comments;
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Forums\Forums;
+use Autowp\User\Controller\Plugin\User as UserModel;
 use Autowp\User\Model\User;
 use DateTime;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
@@ -21,7 +22,7 @@ use function array_key_exists;
 use function array_keys;
 
 /**
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
+ * @method UserModel user($user = null)
  * @method ViewModel forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
@@ -344,7 +345,7 @@ class ForumController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
-    private function needWait()
+    private function needWait(): bool
     {
         $user = $this->user()->get();
         if ($user) {

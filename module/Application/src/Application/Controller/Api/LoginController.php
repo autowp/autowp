@@ -8,6 +8,7 @@ use Autowp\ExternalLoginService\AbstractService;
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\Image\Storage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
+use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRemember;
 use Exception;
@@ -22,14 +23,14 @@ use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Http as HttpUri;
 use Laminas\View\Model\JsonModel;
-
 use Laminas\View\Model\ViewModel;
+
 use function file_get_contents;
 use function trim;
 use function uniqid;
 
 /**
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
+ * @method UserPlugin user($user = null)
  * @method Storage imageStorage()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
@@ -149,10 +150,7 @@ class LoginController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function servicesAction()
+    public function servicesAction(): JsonModel
     {
         $services = [
             'facebook'    => [

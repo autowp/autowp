@@ -61,7 +61,7 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri     = $headers->get('Location')->uri();
         $parts   = explode('/', $uri->getPath());
-        $id = $parts[count($parts) - 1];
+        $id      = $parts[count($parts) - 1];
 
         $this->assertNotEmpty($id);
     }

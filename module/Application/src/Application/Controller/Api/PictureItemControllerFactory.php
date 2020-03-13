@@ -16,8 +16,11 @@ class PictureItemControllerFactory implements FactoryInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): PictureItemController
-    {
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        ?array $options = null
+    ): PictureItemController {
         $hydrators = $container->get('HydratorManager');
         $filters   = $container->get('InputFilterManager');
 

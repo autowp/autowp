@@ -24,6 +24,7 @@ class MessagesCommand extends Command
     /**
      * @suppress PhanUndeclaredMethod
      * @inheritDoc
+     * @param mixed $arguments
      */
     public function handle($arguments)
     {

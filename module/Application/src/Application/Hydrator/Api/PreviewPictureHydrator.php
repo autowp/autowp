@@ -64,7 +64,7 @@ class PreviewPictureHydrator extends AbstractRestHydrator
 
     /**
      * @param array|ArrayAccess $object
-     * @param mixed|null $context
+     * @param mixed|null        $context
      */
     public function extract($object, $context = null): array
     {

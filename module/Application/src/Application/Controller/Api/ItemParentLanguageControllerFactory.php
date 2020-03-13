@@ -13,8 +13,11 @@ class ItemParentLanguageControllerFactory implements FactoryInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string $requestedName
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ItemParentLanguageController
-    {
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        ?array $options = null
+    ): ItemParentLanguageController {
         $tables    = $container->get('TableManager');
         $hydrators = $container->get('HydratorManager');
         $filters   = $container->get('InputFilterManager');

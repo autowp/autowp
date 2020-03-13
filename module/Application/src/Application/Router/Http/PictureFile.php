@@ -2,6 +2,7 @@
 
 namespace Application\Router\Http;
 
+use ArrayAccess;
 use Exception;
 use Laminas\Router\Http\RouteInterface;
 use Laminas\Router\Http\RouteMatch;
@@ -34,6 +35,9 @@ class PictureFile implements RouteInterface
         return new self($options);
     }
 
+    /**
+     * @param array|ArrayAccess $options
+     */
     public function __construct($options = [])
     {
         $this->defaults = $options['defaults'];
@@ -72,7 +76,7 @@ class PictureFile implements RouteInterface
         return new RouteMatch(array_replace($this->defaults, $variables), $length);
     }
 
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string
     {
         $data = array_replace($this->defaults, $params);
 

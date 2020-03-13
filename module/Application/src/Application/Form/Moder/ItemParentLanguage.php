@@ -2,6 +2,7 @@
 
 namespace Application\Form\Moder;
 
+use Application\Model\ItemParent as ItemParentModel;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Laminas\Form\Element;
 use Laminas\Form\ElementInterface;
@@ -30,7 +31,7 @@ class ItemParentLanguage extends Form implements InputFilterProviderInterface
         return $this;
     }
 
-    public function __construct($name = null, $options = [])
+    public function __construct(?string $name = null, array $options = [])
     {
         parent::__construct($name, $options);
 
@@ -42,7 +43,7 @@ class ItemParentLanguage extends Form implements InputFilterProviderInterface
                     'label' => 'Name',
                 ],
                 'attributes' => [
-                    'maxlength' => \Application\Model\ItemParent::MAX_LANGUAGE_NAME,
+                    'maxlength' => ItemParentModel::MAX_LANGUAGE_NAME,
                 ],
             ],
         ];
@@ -70,7 +71,7 @@ class ItemParentLanguage extends Form implements InputFilterProviderInterface
                         'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => \Application\Model\ItemParent::MAX_LANGUAGE_NAME,
+                            'max' => ItemParentModel::MAX_LANGUAGE_NAME,
                         ],
                     ],
                 ],

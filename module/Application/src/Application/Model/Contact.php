@@ -19,7 +19,7 @@ class Contact
     /**
      * @suppress PhanDeprecatedFunction
      */
-    public function create(int $userId, int $contactUserId)
+    public function create(int $userId, int $contactUserId): void
     {
         $primaryKey = [
             'user_id'         => $userId,
@@ -34,7 +34,7 @@ class Contact
         }
     }
 
-    public function delete(int $userId, int $contactUserId)
+    public function delete(int $userId, int $contactUserId): void
     {
         $this->table->delete([
             'user_id'         => $userId,
@@ -42,7 +42,7 @@ class Contact
         ]);
     }
 
-    public function exists(int $userId, int $contactUserId)
+    public function exists(int $userId, int $contactUserId): bool
     {
         $row = $this->table->select([
             'user_id'         => $userId,
@@ -51,7 +51,7 @@ class Contact
         return (bool) $row;
     }
 
-    public function deleteUserEverywhere(int $userId)
+    public function deleteUserEverywhere(int $userId): void
     {
         $this->table->delete([
             'user_id' => $userId,

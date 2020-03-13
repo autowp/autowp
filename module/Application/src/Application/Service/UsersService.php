@@ -66,8 +66,8 @@ class UsersService
     public function __construct(
         array $options,
         array $hosts,
-        $translator,
-        $transport,
+        TranslatorInterface $translator,
+        Mail\Transport\TransportInterface $transport,
         SpecificationsService $specsService,
         Image\Storage $imageStorage,
         Comments\CommentsService $comments,

@@ -17,6 +17,7 @@ class StartCommand extends Command
 
     /**
      * @inheritDoc
+     * @param mixed $arguments
      */
     public function handle($arguments)
     {

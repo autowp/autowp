@@ -16,7 +16,7 @@ class PictureVote
         $this->summaryTable = $summaryTable;
     }
 
-    public function vote($pictureId, $userId, $value)
+    public function vote(int $pictureId, int $userId, int $value): void
     {
         $value = $value > 0 ? 1 : -1;
 
@@ -35,18 +35,18 @@ class PictureVote
         $this->updatePictureSummary($pictureId);
     }
 
-    public function getVote($pictureId, $userId)
+    public function getVote(int $pictureId, int $userId): array
     {
         $row = null;
         if ($userId) {
             $row = $this->voteTable->select([
-                'picture_id' => (int) $pictureId,
-                'user_id'    => (int) $userId,
+                'picture_id' => $pictureId,
+                'user_id'    => $userId,
             ])->current();
         }
 
         $summary = $this->summaryTable->select([
-            'picture_id' => (int) $pictureId,
+            'picture_id' => $pictureId,
         ])->current();
 
         return [
@@ -56,10 +56,8 @@ class PictureVote
         ];
     }
 
-    private function updatePictureSummary($pictureId)
+    private function updatePictureSummary(int $pictureId): void
     {
-        $pictureId = (int) $pictureId;
-
         $sql = '
             insert into picture_vote_summary (picture_id, positive, negative)
             values (

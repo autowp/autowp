@@ -32,6 +32,7 @@ class NewCommand extends Command
 
     /**
      * @inheritDoc
+     * @param mixed $arguments
      */
     public function handle($arguments)
     {
