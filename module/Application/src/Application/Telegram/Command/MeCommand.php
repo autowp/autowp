@@ -19,9 +19,11 @@ use const PHP_EOL;
 
 class MeCommand extends Command
 {
-    protected string $name = "me";
+    /** @var string */
+    protected $name = "me";
 
-    protected string $description = "Command to identify you as autowp.ru user";
+    /** @var string */
+    protected $description = "Command to identify you as autowp.ru user";
 
     private MessageService $message;
 

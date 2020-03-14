@@ -10,9 +10,11 @@ use function array_replace;
 
 class NewCommand extends Command
 {
-    protected string $name = "new";
+    /** @var string */
+    protected $name = "new";
 
-    protected string $description = "Subscribe to new pictures";
+    /** @var string */
+    protected $description = "Subscribe to new pictures";
 
     private TableGateway $telegramItemTable;
 

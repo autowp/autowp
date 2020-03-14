@@ -21,7 +21,7 @@
 		"ext-gd" : "*",
         "ext-fileinfo" : "*",
         "ext-bcmath": "*",
-		"irazasyed/telegram-bot-sdk" : "dev-patch-3",
+		"irazasyed/telegram-bot-sdk" : "2.0.x-dev",
 		"phayes/geophp" : "^1.2",
 		"michelf/php-markdown" : "^1.8.0",
 		"autowp/external-login-service" : "^2.0.0",
@@ -88,7 +88,7 @@
 	"repositories" : [
         {
             "type" : "git",
-            "url" : "https://github.com/autowp/telegram-bot-sdk"
+            "url" : "https://github.com/irazasyed/telegram-bot-sdk"
         },
         {
 			"type" : "git",

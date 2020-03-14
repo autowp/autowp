@@ -10,9 +10,11 @@ use function array_replace;
 
 class MessagesCommand extends Command
 {
-    protected string $name = "messages";
+    /** @var string */
+    protected $name = "messages";
 
-    protected string $description = "Enable/disable personal messages";
+    /** @var string */
+    protected $description = "Enable/disable personal messages";
 
     private TableGateway $telegramChatTable;
 

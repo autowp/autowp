@@ -11,9 +11,11 @@ use const PHP_EOL;
 
 class StartCommand extends Command
 {
-    protected string $name = "start";
+    /** @var string */
+    protected $name = "start";
 
-    protected string $description = "Start Command to get you started";
+    /** @var string */
+    protected $description = "Start Command to get you started";
 
     /**
      * @inheritDoc

@@ -11,9 +11,11 @@ use function array_replace;
 
 class InboxCommand extends Command
 {
-    protected string $name = "inbox";
+    /** @var string */
+    protected $name = "inbox";
 
-    protected string $description = "Subscribe to inbox pictures";
+    /** @var string */
+    protected $description = "Subscribe to inbox pictures";
 
     private TableGateway $telegramItemTable;
 
