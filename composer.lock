@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4bfc25af0b591d9adf04950fae142654",
+    "content-hash": "aa535e6e7a152ca8a2056ef28434e111",
     "packages": [
         {
             "name": "autowp/cron",
@@ -208,16 +208,16 @@
         },
         {
             "name": "autowp/zf-components",
-            "version": "v3.0.2",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/autowp/zf-components.git",
-                "reference": "1c9983a0655062dc7c0c24f4ee062c7488644b6b"
+                "reference": "8b7951b65d60812a94a66422126eb967f915a350"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/autowp/zf-components/zipball/1c9983a0655062dc7c0c24f4ee062c7488644b6b",
-                "reference": "1c9983a0655062dc7c0c24f4ee062c7488644b6b",
+                "url": "https://api.github.com/repos/autowp/zf-components/zipball/8b7951b65d60812a94a66422126eb967f915a350",
+                "reference": "8b7951b65d60812a94a66422126eb967f915a350",
                 "shasum": ""
             },
             "require": {
@@ -231,6 +231,7 @@
             },
             "require-dev": {
                 "ext-intl": "*",
+                "ext-pdo": "*",
                 "laminas/laminas-coding-standard": "^2.0.0rc1",
                 "laminas/laminas-db": "^2.8",
                 "laminas/laminas-i18n": ">=2.7",
@@ -261,7 +262,7 @@
                 }
             ],
             "description": "ZF Components",
-            "time": "2020-03-14T20:54:55+00:00"
+            "time": "2020-03-14T22:28:42+00:00"
         },
         {
             "name": "aws/aws-sdk-php",
