@@ -12,4 +12,3 @@ curl -Ls https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-s
 unzip sonar-scanner.zip
 rm sonar-scanner.zip
 mv sonar-scanner-* sonar-scanner
-ls -lah sonar-scanner

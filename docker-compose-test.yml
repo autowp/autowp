@@ -1,5 +1,5 @@
 backend:
-  image: autowp/autowp
+  image: autowp/autowp:v2
   container_name: autowp_test_backend
   restart: always
   environment:
