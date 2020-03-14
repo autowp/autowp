@@ -933,7 +933,7 @@ class SpecificationsService
     /**
      * @suppress PhanUndeclaredMethod
      * @throws Exception
-     * @return mixed
+     * @return null|mixed
      */
     public function getActualValue(int $attribute, int $itemId)
     {
