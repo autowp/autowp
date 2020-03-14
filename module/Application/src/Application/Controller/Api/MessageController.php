@@ -6,6 +6,7 @@ use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Message\MessageService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
+use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -49,7 +50,7 @@ class MessageController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
-     * @throws \Exception
+     * @throws Exception
      */
     public function postAction()
     {
@@ -91,7 +92,7 @@ class MessageController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
-     * @throws \Exception
+     * @throws Exception
      */
     public function indexAction()
     {

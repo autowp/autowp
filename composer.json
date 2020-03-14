@@ -104,7 +104,7 @@
 			"@test"
 		],
 		"cs-check" : "phpcs --encoding=utf-8",
-		"cs-fix" : "phpcbf --encoding=utf-8",
+		"cs-fix" : "phpcbf --encoding=utf-8 --parallel=`nproc`",
 		"test" : "phpunit --colors=always",
 		"phpmd" : "phpmd config,module,public_html text ruleset.xml --suffixes php,phtml"
     },
