@@ -76,6 +76,7 @@ class UserText extends AbstractHtmlElement
 
             $text = mb_substr($text, $linkPos + $matchLength);
         }
+
         if (strlen($text) > 0) {
             $out[] = $this->preparePlainText($text);
         }
@@ -113,7 +114,7 @@ class UserText extends AbstractHtmlElement
 
         if ($hostAllowed) {
             $result = $this->tryUserLink($uri);
-            if ($result !== false) {
+            if ($result !== null) {
                 return $result;
             }
 
@@ -138,12 +139,12 @@ class UserText extends AbstractHtmlElement
         return '<a href="' . $this->view->escapeHtmlAttr($url) . '">' . $this->view->escapeHtml($url) . '</a>';
     }
 
-    private function tryUserLink(Uri\Uri $uri): bool
+    private function tryUserLink(Uri\Uri $uri): ?string
     {
         $match = preg_match('|^/users/([^/]+)$|isu', $uri->getPath(), $matches);
 
         if (! $match) {
-            return false;
+            return null;
         }
 
         $userId       = null;
@@ -175,7 +176,7 @@ class UserText extends AbstractHtmlElement
             }
         }
 
-        return false;
+        return null;
     }
 
     /**

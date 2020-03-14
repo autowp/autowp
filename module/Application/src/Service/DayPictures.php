@@ -323,7 +323,7 @@ class DayPictures
             if ($nextDate) {
                 $this->nextDate = $nextDate->setTimezone($this->timezone);
             } else {
-                $this->nextDate = false;
+                $this->nextDate = null;
             }
         }
 

@@ -2098,7 +2098,7 @@ class SpecificationsService
      */
     public function getType(int $typeId): array
     {
-        if ($this->types === null) {
+        if (! isset($this->types)) {
             $this->types = [];
             foreach ($this->typeTable->select() as $row) {
                 $this->types[(int) $row['id']] = [
