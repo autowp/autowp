@@ -2,6 +2,7 @@
 
 namespace Application\Permissions;
 
+use ArrayAccess;
 use Exception;
 use Interop\Container\ContainerInterface;
 use Laminas\Cache\Storage\StorageInterface;
@@ -136,7 +137,11 @@ class AclFactory implements FactoryInterface
         }
     }
 
-    private function addRole(Acl $acl, TableGateway $roleTable, array $role, array &$loaded, int $deep): void
+    /**
+     * @param array|ArrayAccess $role
+     * @throws Exception
+     */
+    private function addRole(Acl $acl, TableGateway $roleTable, $role, array &$loaded, int $deep): void
     {
         if ($deep > 10) {
             throw new Exception('Roles deep overflow');

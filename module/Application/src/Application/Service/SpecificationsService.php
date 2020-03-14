@@ -448,7 +448,7 @@ class SpecificationsService
 
     private function loadAttributes(): self
     {
-        if ($this->attributes === null) {
+        if (! isset($this->attributes)) {
             $array  = [];
             $childs = [];
 

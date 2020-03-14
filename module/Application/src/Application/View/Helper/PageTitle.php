@@ -125,9 +125,9 @@ class PageTitle extends AbstractStandalone
     /**
      * Get the default attach order, if any.
      */
-    public function getDefaultAttachOrder(): string
+    public function getDefaultAttachOrder(): ?string
     {
-        return $this->defaultAttachOrder;
+        return $this->defaultAttachOrder ?? null;
     }
 
     /**

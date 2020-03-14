@@ -242,11 +242,11 @@ class ItemNameFormatter
     }
 
     private function getModelYearsPrefix(
-        int $begin,
-        int $beginFraction,
-        int $end,
-        int $endFraction,
-        bool $today,
+        ?int $begin,
+        ?int $beginFraction,
+        ?int $end,
+        ?int $endFraction,
+        ?bool $today,
         string $language
     ): string {
         $bms = (int) ($begin / 100);
@@ -300,7 +300,7 @@ class ItemNameFormatter
     }
 
     private function renderYears(
-        bool $today,
+        ?bool $today,
         int $by,
         int $bm,
         int $ey,
