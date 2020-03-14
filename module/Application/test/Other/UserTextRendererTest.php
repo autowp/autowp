@@ -3,7 +3,7 @@
 namespace ApplicationTest\Other;
 
 use Application\Test\AbstractHttpControllerTestCase;
-use Autowp\User\View\Helper\User;
+use Application\View\Helper\UserText;
 use Exception;
 use Laminas\View\HelperPluginManager;
 
@@ -20,11 +20,11 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
         $serviceManager = $this->getApplicationServiceLocator();
         /** @var HelperPluginManager $viewHelperManager */
         $viewHelperManager = $serviceManager->get('ViewHelperManager');
-        /** @var User $helper */
+        /** @var UserText $helper */
         $helper = $viewHelperManager->get('userText');
 
         $result = $helper($text);
-        $this->assertEquals($expected, $result->__toString());
+        $this->assertEquals($expected, $result);
     }
 
     public static function usersProvider(): array
@@ -65,11 +65,11 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
         $serviceManager = $this->getApplicationServiceLocator();
         /** @var HelperPluginManager $viewHelperManager */
         $viewHelperManager = $serviceManager->get('ViewHelperManager');
-        /** @var User $helper */
+        /** @var UserText $helper */
         $helper = $viewHelperManager->get('userText');
 
         $result = $helper($text);
-        $this->assertStringContainsString($expected, $result->__toString());
+        $this->assertStringContainsString($expected, $result);
     }
 
     public static function hyperlinksProvider(): array

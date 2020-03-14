@@ -2,6 +2,7 @@
 
 namespace Autowp\Forums;
 
+use Application\Comments as AppComments;
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;

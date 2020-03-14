@@ -38,7 +38,7 @@ class DayPictures
 
     private ?DateTime $minDate;
 
-    private Paginator\Paginator $paginator;
+    private ?Paginator\Paginator $paginator;
 
     private Picture $picture;
 
@@ -363,16 +363,13 @@ class DayPictures
         return $this->nextDate ? $this->dateCount($this->nextDate) : 0;
     }
 
-    /**
-     * @return Paginator\Paginator|false
-     */
-    public function getPaginator()
+    public function getPaginator(): ?Paginator\Paginator
     {
         if (! $this->currentDate) {
-            return false;
+            return null;
         }
 
-        if ($this->paginator === null) {
+        if (! isset($this->paginator)) {
             $select = $this->getCurrentDateSelect();
 
             $this->paginator = new Paginator\Paginator(

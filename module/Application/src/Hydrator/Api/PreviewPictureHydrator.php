@@ -9,6 +9,7 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
+use function gettype;
 use function is_array;
 
 class PreviewPictureHydrator extends AbstractRestHydrator
@@ -65,9 +66,14 @@ class PreviewPictureHydrator extends AbstractRestHydrator
     /**
      * @param array|ArrayAccess $object
      * @param mixed|null        $context
+     * @throws Exception
      */
     public function extract($object, $context = null): array
     {
+        if (! is_array($object) && ! $object instanceof ArrayAccess) {
+            throw new Exception("Array expected. Given: " . gettype($object));
+        }
+
         $result = [];
 
         if (isset($object['url'])) {

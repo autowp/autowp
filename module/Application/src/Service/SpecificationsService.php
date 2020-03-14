@@ -165,7 +165,7 @@ class SpecificationsService
 
     private function loadUnits(): void
     {
-        if ($this->units === null) {
+        if (! isset($this->units)) {
             $units = [];
             foreach ($this->unitTable->select([]) as $unit) {
                 $id         = (int) $unit['id'];
@@ -754,7 +754,7 @@ class SpecificationsService
 
     private function getEngineAttributeIds(): array
     {
-        if ($this->engineAttributes) {
+        if (isset($this->engineAttributes)) {
             return $this->engineAttributes;
         }
 
