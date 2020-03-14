@@ -545,15 +545,16 @@ class SpecificationsService
                     $ordering = 1;
 
                     foreach ($value as $oneValue) {
+                        $params = array_replace($userValuePrimaryKey, [
+                            'ordering' => $ordering,
+                            'value'    => $oneValue,
+                        ]);
                         $userValueDataTable->getAdapter()->query('
                             INSERT INTO `' . $userValueDataTable->getTable() . '`
                                 (attribute_id, item_id, user_id, ordering, value)
                             VALUES (:attribute_id, :item_id, :user_id, :ordering, :value)
                             ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
-                        ', array_replace($userValuePrimaryKey, [
-    'ordering' => $ordering,
-    'value'    => $oneValue,
-]));
+                        ', $params);
                         $ordering++;
                     }
                 }
@@ -587,13 +588,14 @@ class SpecificationsService
                         ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
                     ', $userValuePrimaryKey);
 
+                    $params = array_replace($userValuePrimaryKey, [
+                        'value' => $value,
+                    ]);
                     $userValueDataTable->getAdapter()->query('
                         INSERT INTO `' . $userValueDataTable->getTable() . '` (attribute_id, item_id, user_id, value)
                         VALUES (:attribute_id, :item_id, :user_id, :value)
                         ON DUPLICATE KEY UPDATE value = VALUES(value)
-                    ', array_replace($userValuePrimaryKey, [
-    'value' => $value,
-]));
+                    ', $params);
 
                     $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
                 }
@@ -993,40 +995,19 @@ class SpecificationsService
         $valueDataTable = $this->getUserValueDataTable($attribute['typeId']);
 
         $valueDataTable->delete([
-            'attribute_id = ?' => (int) $attribute['id'],
-            'item_id = ?'      => $itemId,
-            'user_id = ?'      => $userId,
+            'attribute_id' => $attributeId,
+            'item_id'      => $itemId,
+            'user_id'      => $userId,
         ]);
 
         $this->userValueTable->delete([
-            'attribute_id = ?' => (int) $attribute['id'],
-            'item_id = ?'      => $itemId,
-            'user_id = ?'      => $userId,
+            'attribute_id' => $attributeId,
+            'item_id'      => $itemId,
+            'user_id'      => $userId,
         ]);
 
         $this->updateActualValue($attribute['id'], $itemId);
     }
-
-    /*
-    private function loadValues($attributes, int $itemId, string $language)
-    {
-        $values = [];
-        foreach ($attributes as $attribute) {
-            $value = $this->getActualValue($attribute['id'], $itemId);
-            $valueText = $this->valueToText($attribute, $value, $language);
-            $values[$attribute['id']] = $valueText;
-
-            //if ($valueText === null) {
-                // load child values
-            //}
-
-            foreach ($this->loadValues($attribute['childs'], $itemId, $language) as $id => $value) {
-                $values[$id] = $value;
-            }
-        }
-        return $values;
-    }
-    */
 
     public function specifications(array $cars, array $options): CarSpecTable
     {
@@ -1601,15 +1582,16 @@ class SpecificationsService
                     }
                 }
             } else {
+                $params = [
+                    'value'        => $actualValue['value'],
+                    'attribute_id' => $attribute['id'],
+                    'item_id'      => $itemId,
+                ];
                 $result = $valueDataTable->getAdapter()->query('
                     INSERT INTO `' . $valueDataTable->getTable() . '` (attribute_id, item_id, value)
                     VALUES (:attribute_id, :item_id, :value)
                     ON DUPLICATE KEY UPDATE value = VALUES(value)
-                ', [
-    'value'        => $actualValue['value'],
-    'attribute_id' => $attribute['id'],
-    'item_id'      => $itemId,
-]);
+                ', $params);
 
                 if ($result->getAffectedRows() > 0) {
                     $somethingChanges = true;

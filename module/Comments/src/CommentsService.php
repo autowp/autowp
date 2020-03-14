@@ -284,15 +284,16 @@ class CommentsService
             ];
         }
 
+        $params = [
+            'comment_id' => $message['id'],
+            'user_id'    => $userId,
+            'vote'       => $vote > 0 ? 1 : -1,
+        ];
         $result = $this->voteTable->getAdapter()->query('
             INSERT INTO comment_vote (comment_id, user_id, vote)
             VALUES (:comment_id, :user_id, :vote)
             ON DUPLICATE KEY UPDATE vote = VALUES(vote)
-        ', [
-            'comment_id' => $message['id'],
-            'user_id'    => $userId,
-            'vote'       => $vote > 0 ? 1 : -1,
-        ]);
+        ', $params);
 
         if ($result->getAffectedRows() === 0) {
             return [
@@ -408,8 +409,8 @@ class CommentsService
         $select = $this->messageTable->getSql()->select()
             ->columns(['count' => new Sql\Expression('COUNT(1)')])
             ->where([
-                'item_id'  => $root['item_id'],
-                'type_id'  => $root['type_id'],
+                'item_id'      => $root['item_id'],
+                'type_id'      => $root['type_id'],
                 'datetime < ?' => $root['datetime'],
                 'parent_id is null',
             ]);
@@ -531,7 +532,6 @@ class CommentsService
 
         $rows = [];
         if (count($itemId) > 0) {
-
             $select = $this->topicTable->getSql()->select()
                 ->columns(['item_id', 'messages'])
                 ->where([
@@ -605,7 +605,7 @@ class CommentsService
                     'comment_topic.type_id' => $typeId,
                     new Sql\Predicate\In('comment_topic.item_id', $itemId),
                 ]);
-            $rows = $this->topicTable->selectWith($select);
+            $rows   = $this->topicTable->selectWith($select);
 
             foreach ($rows as $row) {
                 $result[$row['item_id']] = [
@@ -659,8 +659,8 @@ class CommentsService
         $select = $this->messageTable->getSql()->select()
             ->columns(['count' => new Sql\Expression('count(1)')])
             ->where([
-                'item_id'  => $itemId,
-                'type_id'  => $typeId,
+                'item_id'      => $itemId,
+                'type_id'      => $typeId,
                 'datetime > ?' => $timestamp,
             ]);
 
@@ -687,7 +687,7 @@ class CommentsService
                     'user_id' => $userId,
                     new Sql\Predicate\In('item_id', $itemId),
                 ]);
-            $rows = $this->topicViewTable->selectWith($select);
+            $rows   = $this->topicViewTable->selectWith($select);
         }
 
         $result = [];
@@ -714,7 +714,7 @@ class CommentsService
      */
     private function countMessages(int $typeId, int $itemId): int
     {
-        $select = $this->messageTable->getSql()->select()
+        $select   = $this->messageTable->getSql()->select()
             ->columns(['count' => new Sql\Expression('count(1)')])
             ->where([
                 'item_id' => $itemId,
@@ -749,7 +749,7 @@ class CommentsService
             ])
             ->order('datetime desc')
             ->limit(1);
-        $row = $this->messageTable->selectWith($select)->current();
+        $row    = $this->messageTable->selectWith($select)->current();
 
         return $row ? $row['datetime'] : null;
     }

@@ -132,7 +132,7 @@ class Votings
             if ($maxVotes === null || $votes > $maxVotes) {
                 $maxVotes = $votes;
             }
-            if ($minVotes === nulll || $votes < $minVotes) {
+            if ($minVotes === null || $votes < $minVotes) {
                 $minVotes = $votes;
             }
         }

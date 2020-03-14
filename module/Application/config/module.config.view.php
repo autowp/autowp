@@ -45,7 +45,6 @@ return [
             'languagePicker' => View\Helper\Service\LanguagePickerFactory::class,
             'moderMenu'      => View\Helper\Service\ModerMenuFactory::class,
             'page'           => View\Helper\Service\PageFactory::class,
-            'pageEnv'        => View\Helper\Service\PageEnvFactory::class,
             'pic'            => View\Helper\Service\PicFactory::class,
             'pictures'       => View\Helper\Service\PicturesFactory::class,
             'sidebar'        => View\Helper\Service\SidebarFactory::class,

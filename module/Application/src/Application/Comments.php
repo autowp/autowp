@@ -241,6 +241,9 @@ class Comments
         return $affected;
     }
 
+    /**
+     * @throws Exception
+     */
     public function notifySubscribers(int $messageId): void
     {
         $comment = $this->service->getMessageRow($messageId);

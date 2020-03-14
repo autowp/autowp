@@ -3,6 +3,7 @@
 namespace Application\Model;
 
 use ArrayObject;
+use Laminas\Db\Adapter\Driver\ResultInterface;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
@@ -103,16 +104,17 @@ class VehicleType
 
     private function setRow(int $vehicleId, int $type, bool $inherited): bool
     {
-        /** @var ResultInterface $result */
-        $result = $this->itemVehicleTypeTable->getAdapter()->query('
+        $sql = '
             INSERT INTO vehicle_vehicle_type (vehicle_id, vehicle_type_id, inherited)
             VALUES (:vehicle_id, :vehicle_type_id, :inherited)
             ON DUPLICATE KEY UPDATE inherited = VALUES(inherited)
-        ', [
-    'vehicle_id'      => $vehicleId,
-    'vehicle_type_id' => $type,
-    'inherited'       => $inherited ? 1 : 0,
-]);
+        ';
+        /** @var ResultInterface $result */
+        $result = $this->itemVehicleTypeTable->getAdapter()->query($sql, [
+            'vehicle_id'      => $vehicleId,
+            'vehicle_type_id' => $type,
+            'inherited'       => $inherited ? 1 : 0,
+        ]);
 
         return $result->getAffectedRows() > 0;
     }

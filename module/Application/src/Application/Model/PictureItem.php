@@ -66,14 +66,15 @@ class PictureItem
             throw new InvalidArgumentException("Combination not allowed");
         }
 
+        $params = [
+            'picture_id' => $pictureId,
+            'item_id'    => $itemId,
+            'type'       => $type,
+        ];
         $result = $this->table->getAdapter()->query('
             INSERT IGNORE INTO picture_item (picture_id, item_id, type)
             VALUES (:picture_id, :item_id, :type)
-        ', [
-    'picture_id' => $pictureId,
-    'item_id'    => $itemId,
-    'type'       => $type,
-]);
+        ', $params);
 
         if ($result->getAffectedRows() > 0) {
             $this->updateContentCount($pictureId);

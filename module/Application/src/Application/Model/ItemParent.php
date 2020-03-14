@@ -475,14 +475,15 @@ class ItemParent
             $isAuto         = true;
         }
 
+        $params = array_replace([
+            'name'    => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
+            'is_auto' => $isAuto ? 1 : 0,
+        ], $primaryKey);
         $this->itemParentLanguageTable->getAdapter()->query('
             INSERT INTO item_parent_language (item_id, parent_id, language, name, is_auto)
             VALUES (:item_id, :parent_id, :language, :name, :is_auto)
             ON DUPLICATE KEY UPDATE name = VALUES(name), is_auto = VALUES(is_auto)
-        ', array_replace([
-            'name'        => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
-            'is_auto' => $isAuto ? 1 : 0,
-        ], $primaryKey));
+        ', $params);
     }
 
     /**

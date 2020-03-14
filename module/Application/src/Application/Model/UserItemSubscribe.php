@@ -2,9 +2,9 @@
 
 namespace Application\Model;
 
+use Autowp\User\Model\User;
 use Laminas\Db\ResultSet\ResultSetInterface;
 use Laminas\Db\TableGateway\TableGateway;
-use Autowp\User\Model\User;
 
 class UserItemSubscribe
 {
@@ -14,18 +14,19 @@ class UserItemSubscribe
 
     public function __construct(TableGateway $table, User $userModel)
     {
-        $this->table = $table;
+        $this->table     = $table;
         $this->userModel = $userModel;
     }
 
     public function subscribe(int $userId, int $itemId)
     {
-        $this->table->getAdapter()->query('
+        $sql = '
             INSERT IGNORE INTO user_item_subscribe (user_id, item_id)
             VALUES (:user_id, :item_id)
-        ', [
+        ';
+        $this->table->getAdapter()->query($sql, [
             'user_id' => $userId,
-            'item_id' => $itemId
+            'item_id' => $itemId,
         ]);
     }
 
@@ -33,7 +34,7 @@ class UserItemSubscribe
     {
         $this->table->delete([
             'user_id' => $userId,
-            'item_id' => $itemId
+            'item_id' => $itemId,
         ]);
     }
 
@@ -51,7 +52,7 @@ class UserItemSubscribe
     public function unsubscribeAll(int $userId): void
     {
         $this->table->delete([
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
     }
 
@@ -59,7 +60,7 @@ class UserItemSubscribe
     {
         return (bool) $this->table->select([
             'user_id' => $userId,
-            'item_id' => $itemId
+            'item_id' => $itemId,
         ])->current();
     }
 }
