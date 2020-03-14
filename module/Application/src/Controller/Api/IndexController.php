@@ -381,7 +381,7 @@ class IndexController extends AbstractRestfulController
 
                     $item = $this->itemHydrator->extract($item);
 
-                    if ($item['accepted_pictures_count'] > 6 && $item['item_type_id'] !== Item::CATEGORY) {
+                    if ($item['accepted_pictures_count'] > 6 && (int) $item['item_type_id'] !== Item::CATEGORY) {
                         $cataloguePaths = $this->catalogue->getCataloguePaths($item['id'], [
                             'breakOnFirst' => true,
                         ]);

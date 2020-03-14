@@ -879,7 +879,7 @@ class ItemHydrator extends AbstractRestHydrator
             }
 
             if ($this->filterComposite->filter('engine_vehicles')) {
-                if ($object['item_type_id'] === Item::ENGINE) {
+                if ((int) $object['item_type_id'] === Item::ENGINE) {
                     $result['engine_vehicles'] = $this->getVehiclesOnEngine($object);
                 }
             }
@@ -990,25 +990,25 @@ class ItemHydrator extends AbstractRestHydrator
      */
     private function getItemPublicRoutes($item): array
     {
-        if ($item['item_type_id'] === Item::FACTORY) {
+        if ((int) $item['item_type_id'] === Item::FACTORY) {
             return [
                 ['/factories', (string) $item['id']],
             ];
         }
 
-        if ($item['item_type_id'] === Item::CATEGORY) {
+        if ((int) $item['item_type_id'] === Item::CATEGORY) {
             return [
                 ['/category', $item['catname']],
             ];
         }
 
-        if ($item['item_type_id'] === Item::TWINS) {
+        if ((int) $item['item_type_id'] === Item::TWINS) {
             return [
                 ['/twins', 'group', $item['id']],
             ];
         }
 
-        if ($item['item_type_id'] === Item::BRAND) {
+        if ((int) $item['item_type_id'] === Item::BRAND) {
             return [
                 ['/' . $item['catname']],
             ];

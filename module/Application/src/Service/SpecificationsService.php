@@ -933,8 +933,9 @@ class SpecificationsService
     /**
      * @suppress PhanUndeclaredMethod
      * @throws Exception
+     * @return mixed
      */
-    public function getActualValue(int $attribute, int $itemId): ?array
+    public function getActualValue(int $attribute, int $itemId)
     {
         if (! $itemId) {
             throw new Exception("item_id not set");

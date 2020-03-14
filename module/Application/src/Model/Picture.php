@@ -942,7 +942,7 @@ class Picture
 
         $primaryItems = [];
         foreach ($items as $item) {
-            if ($item['type'] === PictureItem::PICTURE_CONTENT) {
+            if ((int) $item['type'] === PictureItem::PICTURE_CONTENT) {
                 $primaryItems[] = $item;
             }
         }

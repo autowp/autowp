@@ -7,6 +7,7 @@ use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Service\DayPictures;
+use ArrayAccess;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\InputFilter\InputFilter;
@@ -187,7 +188,10 @@ class NewController extends AbstractRestfulController
         ]);
     }
 
-    private function splitPictures(array $pictures): array
+    /**
+     * @param array|ArrayAccess $pictures
+     */
+    private function splitPictures($pictures): array
     {
         $items = [];
         foreach ($pictures as $pictureRow) {

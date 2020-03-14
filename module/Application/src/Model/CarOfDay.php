@@ -212,7 +212,7 @@ class CarOfDay
 
         $url = 'https://wheelsage.org/picture/' . $picture['identity'];
 
-        if ($car['item_type_id'] === Item::VEHICLE) {
+        if ((int) $car['item_type_id'] === Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
@@ -307,7 +307,7 @@ class CarOfDay
 
         $url = 'https://wheelsage.org/picture/' . $picture['identity'];
 
-        if ($car['item_type_id'] === Item::VEHICLE) {
+        if ((int) $car['item_type_id'] === Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
@@ -390,7 +390,7 @@ class CarOfDay
 
         $url = 'https://autowp.ru/picture/' . $picture['identity'];
 
-        if ($car['item_type_id'] === Item::VEHICLE) {
+        if ((int) $car['item_type_id'] === Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'ru');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'ru');
