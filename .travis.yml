@@ -3,12 +3,6 @@ language: generic
 services:
   - docker
 
-addons:
-  sonarcloud:
-    organization: "autowp-github"
-    token:
-      secure: $SONARCLOUD_TOKEN
-
 before_install:
   - docker pull autowp/autowp:v2 || true
   - docker build --build-arg COMMIT=$TRAVIS_COMMIT --cache-from autowp/autowp:v2 -t autowp/autowp:v2 . || travis_terminate 1;
@@ -25,12 +19,10 @@ script:
   - docker exec -it autowp_test_backend sh -c "./vendor/bin/phpcf module" || travis_terminate 1;
   - docker exec -it autowp_test_backend sh -c "composer phpmd" || travis_terminate 1;
   - docker exec -it autowp_test_backend sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./clover.xml" || travis_terminate 1;
-  - docker cp autowp_test_backend:/app/logs/junit.xml junit.xml || travis_terminate 1;
-  - docker cp autowp_test_backend:/app/clover.xml clover.xml || travis_terminate 1;
-  - sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true
 
 after_success:
   - docker exec -it autowp_test_backend bash -c "./vendor/bin/php-coveralls -v"
+  - docker exec -it autowp_test_backend bash -c "./sonar-scanner/bin/sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true"
   - docker exec -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" -it autowp_test_backend bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
   - if [ "$TRAVIS_BRANCH" == "feature/ng-catalogue" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
