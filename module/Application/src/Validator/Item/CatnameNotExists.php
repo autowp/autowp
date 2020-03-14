@@ -25,9 +25,9 @@ class CatnameNotExists extends AbstractValidator
         return $this;
     }
 
-    public function setExclude(int $exclude): self
+    public function setExclude(?int $exclude): self
     {
-        $this->exclude = $exclude;
+        $this->exclude = (int) $exclude;
 
         return $this;
     }
@@ -42,7 +42,7 @@ class CatnameNotExists extends AbstractValidator
 
         $row = $this->item->getRow([
             'catname'    => (string) $value,
-            'exclude_id' => (int) $this->exclude,
+            'exclude_id' => $this->exclude,
         ]);
 
         if ($row) {

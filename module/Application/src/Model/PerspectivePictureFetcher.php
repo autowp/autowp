@@ -42,7 +42,7 @@ class PerspectivePictureFetcher
         $this->pictureModel = $model;
     }
 
-    public function setPictureItemTypeId(int $value): void
+    public function setPictureItemTypeId(?int $value): void
     {
         $this->pictureItemTypeId = $value;
     }

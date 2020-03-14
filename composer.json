@@ -66,7 +66,7 @@
 			"Autowp\\Traffic\\" : "module/Traffic/src",
 			"Autowp\\User\\" : "module/User/src",
 			"Autowp\\Votings\\" : "module/Votings/src",
-			"Application\\" : "module/Application/src/Application"
+			"Application\\" : "module/Application/src"
 		}
 	},
 	"require-dev" : {

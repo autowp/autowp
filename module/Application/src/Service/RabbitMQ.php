@@ -29,7 +29,7 @@ class RabbitMQ
 
     public function connect(): void
     {
-        if ($this->connection) {
+        if (isset($this->connection)) {
             return;
         }
 
@@ -61,7 +61,7 @@ class RabbitMQ
     {
         $this->channels = [];
 
-        if ($this->connection) {
+        if (isset($this->connection)) {
             $this->connection->close();
             $this->connection = null;
         }

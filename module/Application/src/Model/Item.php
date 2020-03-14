@@ -942,7 +942,7 @@ class Item
         Sql\Select $select,
         $options,
         string $prefix,
-        string $language,
+        ?string $language,
         string $id
     ): array {
         if (! is_array($options)) {
@@ -983,7 +983,7 @@ class Item
         Sql\Select $select,
         $options,
         string $prefix,
-        string $language,
+        ?string $language,
         string $id
     ): array {
         if (! is_array($options)) {
@@ -1043,7 +1043,7 @@ class Item
         Sql\Select $select,
         $options,
         string $prefix,
-        string $language,
+        ?string $language,
         string $id
     ): array {
         if (! is_array($options)) {

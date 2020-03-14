@@ -45,7 +45,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @param null|array|ArrayObject $user
+     * @param null|array|ArrayObject|int $user
      */
     public function __invoke($user = null): self
     {
@@ -54,7 +54,7 @@ class User extends AbstractPlugin
         }
 
         if (! (is_array($user) || $user instanceof ArrayObject)) {
-            $user = $this->user($user);
+            $user = $this->user((int) $user);
         }
 
         $this->user = $user;
@@ -86,19 +86,19 @@ class User extends AbstractPlugin
      */
     public function get()
     {
-        return $this->user;
+        return $this->user ?? null;
     }
 
     public function isAllowed(string $resource, string $privilege): bool
     {
-        return $this->user
+        return isset($this->user)
             && $this->user['role']
             && $this->acl->isAllowed($this->user['role'], $resource, $privilege);
     }
 
     public function inheritsRole(string $inherit): bool
     {
-        return $this->user
+        return isset($this->user)
             && $this->user['role']
             && $this->acl->hasRole($inherit)
             && $this->acl->inheritsRole($this->user['role'], $inherit);
@@ -106,7 +106,7 @@ class User extends AbstractPlugin
 
     public function timezone(): string
     {
-        return $this->user && $this->user['timezone']
+        return isset($this->user) && $this->user['timezone']
             ? $this->user['timezone']
             : 'UTC';
     }

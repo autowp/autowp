@@ -3,6 +3,9 @@
 namespace ApplicationTest\Other;
 
 use Application\Test\AbstractHttpControllerTestCase;
+use Autowp\User\View\Helper\User;
+use Exception;
+use Laminas\View\HelperPluginManager;
 
 class UserTextRendererTest extends AbstractHttpControllerTestCase
 {
@@ -10,15 +13,18 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider hyperlinksProvider
+     * @throws Exception
      */
     public function testHyperlinks(string $text, string $expected)
     {
-        $serviceManager    = $this->getApplicationServiceLocator();
+        $serviceManager = $this->getApplicationServiceLocator();
+        /** @var HelperPluginManager $viewHelperManager */
         $viewHelperManager = $serviceManager->get('ViewHelperManager');
-        $helper            = $viewHelperManager->get('userText');
+        /** @var User $helper */
+        $helper = $viewHelperManager->get('userText');
 
         $result = $helper($text);
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result->__toString());
     }
 
     public static function usersProvider(): array
@@ -52,15 +58,18 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider usersProvider
+     * @throws Exception
      */
     public function testUsers(string $text, string $expected)
     {
-        $serviceManager    = $this->getApplicationServiceLocator();
+        $serviceManager = $this->getApplicationServiceLocator();
+        /** @var HelperPluginManager $viewHelperManager */
         $viewHelperManager = $serviceManager->get('ViewHelperManager');
-        $helper            = $viewHelperManager->get('userText');
+        /** @var User $helper */
+        $helper = $viewHelperManager->get('userText');
 
         $result = $helper($text);
-        $this->assertStringContainsString($expected, $result);
+        $this->assertStringContainsString($expected, $result->__toString());
     }
 
     public static function hyperlinksProvider(): array

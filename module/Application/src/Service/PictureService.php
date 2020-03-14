@@ -253,7 +253,7 @@ class PictureService
         $exif      = $this->imageStorage->getImageEXIF($imageId);
         $extractor = new ExifGPSExtractor();
         $gps       = $extractor->extract($exif);
-        if ($gps !== false) {
+        if ($gps) {
             geoPHP::version();
             $point = new Point($gps['lng'], $gps['lat']);
 
