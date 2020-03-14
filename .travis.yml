@@ -27,7 +27,7 @@ script:
   - docker exec -it autowp_test_backend sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./clover.xml" || travis_terminate 1;
   - docker cp autowp_test_backend:/app/logs/junit.xml junit.xml || travis_terminate 1;
   - docker cp autowp_test_backend:/app/clover.xml clover.xml || travis_terminate 1;
-  - sonar-scanner || true
+  - sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true
 
 after_success:
   - docker exec -it autowp_test_backend bash -c "./vendor/bin/php-coveralls -v"
