@@ -21,7 +21,7 @@ class Image implements StrategyInterface
 
     private function getImageStorage(): Storage
     {
-        if (! $this->imageStorage) {
+        if (! isset($this->imageStorage)) {
             $this->imageStorage = $this->serviceManager->get(Storage::class);
         }
 

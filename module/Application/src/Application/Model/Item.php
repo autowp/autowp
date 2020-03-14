@@ -1019,20 +1019,20 @@ class Item
             $this->applyLinkTypeFilter($select, $alias, $options['link_type']);
         }
 
-        $this->applyFilters($select, array_replace(
+        return $this->applyFilters($select, array_replace(
             ['language' => $language],
             $options
         ), $alias . '.parent_id', $alias);
 
         /*
-        $group =
+
         if ($group) {
             foreach ($columns as $column) {
                 $group[] = $column;
             }
-        }*/
+        }
 
-        return $group;
+        return $group;*/
     }
 
     /**

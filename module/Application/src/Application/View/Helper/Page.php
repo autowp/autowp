@@ -13,13 +13,14 @@ class Page extends AbstractHelper
 {
     private TableGateway $pageTable;
 
-    /** @var array|ArrayObject */
+    /** @var null|array|ArrayObject */
     private $doc;
 
     private array $pages = [];
 
     public function __construct(TableGateway $pageTable)
     {
+        $this->doc       = null;
         $this->pageTable = $pageTable;
     }
 
@@ -84,7 +85,7 @@ class Page extends AbstractHelper
         }
 
         $row = $this->pageTable->select([
-            'id' => (int) $id,
+            'id' => $id,
         ])->current();
 
         $this->pages[$id] = $row;

@@ -12,7 +12,7 @@ class Item extends AbstractHydratorStrategy
 
     protected function getHydrator(): Hydrator
     {
-        if (! $this->hydrator) {
+        if (! isset($this->hydrator)) {
             $this->hydrator = new Hydrator($this->serviceManager);
         }
 

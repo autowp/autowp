@@ -30,13 +30,13 @@ class DayPictures
 
     private string $dbDateTimeFormat = MYSQL_DATETIME_FORMAT;
 
-    private DateTime $currentDate;
+    private ?DateTime $currentDate;
 
-    private DateTime $prevDate;
+    private ?DateTime $prevDate;
 
-    private DateTime $nextDate;
+    private ?DateTime $nextDate;
 
-    private DateTime $minDate;
+    private ?DateTime $minDate;
 
     private Paginator\Paginator $paginator;
 
@@ -44,8 +44,12 @@ class DayPictures
 
     public function __construct(array $options = [])
     {
-        $this->timezone   = new DateTimeZone(self::DEFAULT_TIMEZONE);
-        $this->dbTimezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
+        $this->currentDate = null;
+        $this->prevDate    = null;
+        $this->nextDate    = null;
+        $this->minDate     = null;
+        $this->timezone    = new DateTimeZone(self::DEFAULT_TIMEZONE);
+        $this->dbTimezone  = new DateTimeZone(self::DEFAULT_TIMEZONE);
 
         $this->setOptions($options);
     }

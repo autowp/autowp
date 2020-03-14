@@ -4,6 +4,7 @@ namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\UserHydrator as Hydrator;
 use ArrayAccess;
+use Exception;
 
 class User extends AbstractHydratorStrategy
 {
@@ -11,7 +12,7 @@ class User extends AbstractHydratorStrategy
 
     protected function getHydrator(): Hydrator
     {
-        if (! $this->hydrator) {
+        if (! isset($this->hydrator)) {
             $this->hydrator = new Hydrator($this->serviceManager);
         }
 
@@ -20,6 +21,7 @@ class User extends AbstractHydratorStrategy
 
     /**
      * @param array|ArrayAccess $value
+     * @throws Exception
      */
     public function extract($value): array
     {

@@ -106,7 +106,7 @@ class Most
         $adapterName  = $adapterNamespace . '\\';
         $adapterName .= str_replace(' ', '_', ucwords(str_replace('_', ' ', strtolower($adapter))));
 
-        if (! $this->attributeTable) {
+        if (! isset($this->attributeTable)) {
             throw new Exception("attributeTable not provided");
         }
 
