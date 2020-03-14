@@ -169,7 +169,7 @@ class IndexController extends AbstractRestfulController
         $success    = false;
         $categories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $categories = $this->categories->getCategoriesList(null, $language, 15, 'name');
+            $categories = $this->categories->getCategoriesList(0, $language, 15, 'name');
 
             $this->cache->setItem($cacheKey, $categories);
         }

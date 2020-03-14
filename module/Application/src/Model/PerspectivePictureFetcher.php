@@ -277,7 +277,7 @@ class PerspectivePictureFetcher
                     'row' => $picture,
                 ];
             } else {
-                $result[] = false;
+                $result[] = null;
                 $emptyPictures++;
             }
         }

@@ -125,16 +125,16 @@ class Brand
             $newCarsCount = $row ? (int) $row['count'] : 0;
 
             $items[] = [
-                'id'             => $brandRow['id'],
+                'id'             => (int) $brandRow['id'],
                 'catname'        => $brandRow['catname'],
                 'name'           => $brandRow['name'],
-                'cars_count'     => $brandRow['cars_count'],
-                'new_cars_count' => $newCarsCount,
+                'cars_count'     => (int) $brandRow['cars_count'],
+                'new_cars_count' => (int) $newCarsCount,
             ];
         }
 
         usort($items, function ($a, $b) use ($language) {
-            return $this->compareName($a['name'], $b['name'], $language);
+            return $this->compareName((string) $a['name'], (string) $b['name'], $language);
         });
 
         return $items;

@@ -33,9 +33,13 @@ class PreviewPictures extends AbstractHydratorStrategy
 
         $result = [];
         foreach ($value as $row) {
-            $result[] = $hydrator->extract($row, [
-                'large_format' => $largeFormat,
-            ]);
+            if ($row) {
+                $result[] = $hydrator->extract($row, [
+                    'large_format' => $largeFormat,
+                ]);
+            } else {
+                $result[] = null;
+            }
 
             $largeFormat = false;
         }

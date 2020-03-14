@@ -111,7 +111,7 @@ class MainMenu
 
         $categories = $this->cache->getItem($key, $success);
         if (! $success) {
-            $categories = $this->categories->getCategoriesList(null, $language, null, 'name');
+            $categories = $this->categories->getCategoriesList(0, $language, null, 'name');
 
             $this->cache->setItem($key, $categories);
         }
