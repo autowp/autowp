@@ -49,6 +49,7 @@ class MessageController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws \Exception
      */
     public function postAction()
     {
@@ -78,7 +79,7 @@ class MessageController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if ($currentUser['id'] === $user['id']) {
+        if ((int) $currentUser['id'] === (int) $user['id']) {
             return $this->forbiddenAction();
         }
 
@@ -90,6 +91,7 @@ class MessageController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws \Exception
      */
     public function indexAction()
     {

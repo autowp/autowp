@@ -262,7 +262,7 @@ class Comments
         $subscribers = $this->userModel->getRows(['id' => $ids]);
 
         foreach ($subscribers as $subscriber) {
-            if ($subscriber['id'] === $author['id']) {
+            if ((int) $subscriber['id'] === (int) $author['id']) {
                 continue;
             }
 

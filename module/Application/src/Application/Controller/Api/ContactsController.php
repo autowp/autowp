@@ -98,7 +98,7 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if ($currentUser['id'] === $id) {
+        if ((int) $currentUser['id'] === $id) {
             return $this->notFoundAction();
         }
 
@@ -127,7 +127,7 @@ class ContactsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if ($currentUser['id'] === $id) {
+        if ((int) $currentUser['id'] === $id) {
             return $this->notFoundAction();
         }
 
@@ -162,7 +162,7 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if ($currentUser['id'] === $id) {
+        if ((int) $currentUser['id'] === $id) {
             return $this->notFoundAction();
         }
 

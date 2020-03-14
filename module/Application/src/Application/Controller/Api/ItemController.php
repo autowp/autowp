@@ -186,6 +186,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function pathAction()
     {
@@ -264,7 +265,7 @@ class ItemController extends AbstractRestfulController
 
         $parentID = null;
         foreach ($breadcrumbs as $idx => $item) {
-            if ($idx === count($breadcrumbs) - 1) {
+            if ((int) $idx === count($breadcrumbs) - 1) {
                 $fields['description'] = true;
                 $this->hydrator->setFields($fields);
             }

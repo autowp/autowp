@@ -315,6 +315,7 @@ class CommentController extends AbstractRestfulController
     /**
      * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function postAction()
     {
@@ -567,7 +568,7 @@ class CommentController extends AbstractRestfulController
         }
 
         if (array_key_exists('item_id', $values)) {
-            $isForum = $row['type_id'] === Comments::FORUMS_TYPE_ID;
+            $isForum = (int) $row['type_id'] === Comments::FORUMS_TYPE_ID;
             if ($isForum && $this->user()->isAllowed('forums', 'moderate')) {
                 $this->comments->service()->moveMessage($row['id'], $row['type_id'], $values['item_id']);
             }
