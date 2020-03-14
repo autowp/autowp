@@ -60,7 +60,7 @@ class AttrController extends AbstractRestfulController
 
     private InputFilter $attributeItemGetInputFilter;
 
-    private InputFilter $attributeHydrator;
+    private AbstractRestHydrator $attributeHydrator;
 
     private InputFilter $valueListInputFilter;
 

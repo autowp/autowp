@@ -248,7 +248,7 @@ class DayPictures
             if ($prevDate) {
                 $this->prevDate = $prevDate->setTimezone($this->timezone);
             } else {
-                $this->prevDate = false;
+                $this->prevDate = null;
             }
         }
 

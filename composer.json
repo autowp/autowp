@@ -26,7 +26,7 @@
 		"michelf/php-markdown" : "^1.8.0",
 		"autowp/external-login-service" : "^2.0.0",
 		"autowp/textstorage" : "^3.0",
-		"autowp/zf-components" : "^3.0",
+		"autowp/zf-components" : "^3.0.2",
 		"laminas/laminas-authentication" : "^2.6.0",
 		"laminas/laminas-cache" : ">=2.8.2",
 		"laminas/laminas-captcha" : "^2.8.0",

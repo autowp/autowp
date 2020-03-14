@@ -177,7 +177,10 @@ class PictureTest extends AbstractHttpControllerTestCase
         return $image['filepath'];
     }
 
-    public function testPersonPictureFilenamePattern()
+    /**
+     * @throws Exception
+     */
+    public function testPersonPictureFilenamePattern(): void
     {
         $personID  = $this->createItem([
             'item_type_id' => 8,
@@ -190,7 +193,7 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
-    public function testPersonAndCopyrightPictureFilenamePattern()
+    public function testPersonAndCopyrightPictureFilenamePattern(): void
     {
         $personID  = $this->createItem([
             'item_type_id' => 8,
@@ -209,7 +212,7 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
-    public function testAuthorAndVehiclePictureFilenamePattern()
+    public function testAuthorAndVehiclePictureFilenamePattern(): void
     {
         $vehicleID = $this->createItem([
             'item_type_id' => 1,
@@ -228,7 +231,7 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertRegExp('/^t\/toyota_corolla\/toyota_corolla(_[0-9]+)?\.jpeg$/', $filename);
     }
 
-    public function testPersonAndVehiclePictureFilenamePattern()
+    public function testPersonAndVehiclePictureFilenamePattern(): void
     {
         $vehicleID = $this->createItem([
             'item_type_id' => 1,
