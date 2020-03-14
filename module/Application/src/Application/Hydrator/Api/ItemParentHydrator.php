@@ -18,7 +18,7 @@ use function is_array;
 
 class ItemParentHydrator extends AbstractRestHydrator
 {
-    private int $userId;
+    private int $userId = 0;
 
     private ?string $userRole;
 
@@ -184,7 +184,7 @@ class ItemParentHydrator extends AbstractRestHydrator
             return null;
         }
 
-        if (! $this->userRole) {
+        if (! isset($this->userRole)) {
             $this->userRole = $this->userModel->getUserRole($this->userId);
         }
 

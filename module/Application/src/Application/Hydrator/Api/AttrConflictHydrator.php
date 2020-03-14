@@ -18,7 +18,7 @@ use function is_array;
 
 class AttrConflictHydrator extends AbstractRestHydrator
 {
-    private int $userId;
+    private int $userId = 0;
 
     private Item $item;
 

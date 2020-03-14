@@ -8,7 +8,7 @@ use Autowp\Image\Storage\Exception;
 
 class Pictures extends AbstractHydratorStrategy
 {
-    protected int $userId;
+    protected int $userId = 0;
 
     protected function getHydrator(): Hydrator
     {

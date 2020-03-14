@@ -52,6 +52,8 @@ class PictureServiceTest extends AbstractHttpControllerTestCase
             ''
         );
 
+        $this->assertNotEmpty($picture);
+
         $service->clearQueue();
 
         $pictureModel = $services->get(Picture::class);

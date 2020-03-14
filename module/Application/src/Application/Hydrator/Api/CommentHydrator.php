@@ -30,7 +30,7 @@ class CommentHydrator extends AbstractRestHydrator
 
     private Picture $picture;
 
-    private int $userId;
+    private int $userId = 0;
 
     private ?string $userRole;
 
@@ -299,7 +299,7 @@ class CommentHydrator extends AbstractRestHydrator
             return null;
         }
 
-        if (! $this->userRole) {
+        if (! isset($this->userRole)) {
             $this->userRole = $this->userModel->getUserRole($this->userId);
         }
 

@@ -22,7 +22,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
 {
     private Comments $comments;
 
-    private int $userId;
+    private int $userId = 0;
 
     private ?string $userRole;
 
@@ -241,7 +241,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
             return null;
         }
 
-        if (! $this->userRole) {
+        if (! isset($this->userRole)) {
             $this->userRole = $this->userModel->getUserRole($this->userId);
         }
 

@@ -8,7 +8,7 @@ use Exception;
 
 class User extends AbstractHydratorStrategy
 {
-    protected int $userId;
+    protected int $userId = 0;
 
     protected function getHydrator(): Hydrator
     {

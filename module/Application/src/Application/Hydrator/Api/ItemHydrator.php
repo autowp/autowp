@@ -40,7 +40,7 @@ use function strcmp;
 
 class ItemHydrator extends AbstractRestHydrator
 {
-    private int $userId;
+    private int $userId = 0;
 
     private ?string $userRole;
 
@@ -933,7 +933,7 @@ class ItemHydrator extends AbstractRestHydrator
             return null;
         }
 
-        if (! $this->userRole) {
+        if (! isset($this->userRole)) {
             $this->userRole = $this->userModel->getUserRole($this->userId);
         }
 

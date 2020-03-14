@@ -925,7 +925,7 @@ class ItemController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
-    private function getInputFilter(int $itemTypeId, bool $post, int $itemId): InputFilterInterface
+    private function getInputFilter(int $itemTypeId, bool $post, ?int $itemId): InputFilterInterface
     {
         $select = new Sql\Select($this->specTable->getTable());
         $select->columns(['id']);

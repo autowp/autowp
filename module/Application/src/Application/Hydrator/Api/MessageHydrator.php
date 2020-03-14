@@ -17,7 +17,7 @@ use function is_array;
 
 class MessageHydrator extends AbstractRestHydrator
 {
-    private int $userId;
+    private int $userId = 0;
 
     private User $userModel;
 

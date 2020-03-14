@@ -17,7 +17,7 @@ use function urlencode;
 
 class TrafficHydrator extends AbstractRestHydrator
 {
-    protected int $userId;
+    protected int $userId = 0;
 
     private Acl $acl;
 

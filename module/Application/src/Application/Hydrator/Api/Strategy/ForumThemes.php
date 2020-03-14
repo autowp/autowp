@@ -7,7 +7,7 @@ use ArrayAccess;
 
 class ForumThemes extends AbstractHydratorStrategy
 {
-    private int $userId;
+    private int $userId = 0;
 
     protected function getHydrator(): Hydrator
     {

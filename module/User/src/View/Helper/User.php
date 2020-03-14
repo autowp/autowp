@@ -52,7 +52,8 @@ class User extends AbstractHelper
     }
 
     /**
-     * @param array|ArrayObject|null $user
+     * @param array|ArrayObject|int|null $user
+     * @throws Exception
      */
     public function __invoke($user = null): self
     {
@@ -61,7 +62,7 @@ class User extends AbstractHelper
         }
 
         if (! ($user instanceof ArrayObject || is_array($user))) {
-            $user = $this->user($user);
+            $user = $this->user((int) $user);
         }
 
         $this->user = $user;
@@ -71,6 +72,7 @@ class User extends AbstractHelper
 
     /**
      * @return array|ArrayObject|null
+     * @throws Exception
      */
     private function getLogedInUser()
     {
@@ -80,7 +82,7 @@ class User extends AbstractHelper
             return null;
         }
 
-        return $this->user($auth->getIdentity());
+        return $this->user((int) $auth->getIdentity());
     }
 
     public function logedIn(): bool

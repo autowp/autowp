@@ -44,7 +44,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('login');
     }
 
-    private function mockExternalLoginFactory(string $photoUrl): void
+    private function mockExternalLoginFactory(?string $photoUrl): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 

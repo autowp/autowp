@@ -27,7 +27,7 @@ use function urlencode;
 
 class UserHydrator extends AbstractRestHydrator
 {
-    protected int $userId;
+    protected int $userId = 0;
 
     private ?string $userRole;
 
@@ -303,7 +303,7 @@ class UserHydrator extends AbstractRestHydrator
             return null;
         }
 
-        if (! $this->userRole) {
+        if (! isset($this->userRole)) {
             $this->userRole = $this->userModel->getUserRole($this->userId);
         }
 

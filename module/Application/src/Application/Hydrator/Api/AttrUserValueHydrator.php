@@ -21,7 +21,7 @@ use function is_array;
 
 class AttrUserValueHydrator extends AbstractRestHydrator
 {
-    private int $userId;
+    private int $userId = 0;
 
     private Item $item;
 

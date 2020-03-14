@@ -243,9 +243,9 @@ class ItemNameFormatter
 
     private function getModelYearsPrefix(
         ?int $begin,
-        ?int $beginFraction,
+        ?string $beginFraction,
         ?int $end,
-        ?int $endFraction,
+        ?string $endFraction,
         ?bool $today,
         string $language
     ): string {
@@ -288,7 +288,7 @@ class ItemNameFormatter
                . ($to ? sprintf('%02d', $to) : '??');
     }
 
-    private function missedEndYearYearsSuffix(bool $today, int $by, string $language): string
+    private function missedEndYearYearsSuffix(?bool $today, int $by, string $language): string
     {
         $cy = (int) date('Y');
 
@@ -337,7 +337,7 @@ class ItemNameFormatter
     }
 
     private function renderYearsHtml(
-        bool $today,
+        ?bool $today,
         int $by,
         int $bm,
         int $ey,
