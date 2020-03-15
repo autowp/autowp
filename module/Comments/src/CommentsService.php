@@ -330,6 +330,36 @@ class CommentsService
         return (int) $row['count'];
     }
 
+    /**
+     * @throws Exception
+     */
+    public function getVotes(int $id): ?array
+    {
+        $message = $this->getMessageRow($id);
+        if (! $message) {
+            return null;
+        }
+
+        $voteRows = $this->voteTable->select([
+            'comment_id' => $message['id'],
+        ]);
+
+        $positiveVotes = $negativeVotes = [];
+        foreach ($voteRows as $voteRow) {
+            $user = $this->userModel->getRow(['id' => (int) $voteRow['user_id']]);
+            if ($voteRow['vote'] > 0) {
+                $positiveVotes[] = $user;
+            } elseif ($voteRow['vote'] < 0) {
+                $negativeVotes[] = $user;
+            }
+        }
+
+        return [
+            'positiveVotes' => $positiveVotes,
+            'negativeVotes' => $negativeVotes,
+        ];
+    }
+
     public function moveMessages(int $srcTypeId, int $srcItemId, int $dstTypeId, int $dstItemId): void
     {
         $this->messageTable->update([

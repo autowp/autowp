@@ -608,4 +608,21 @@ class CommentController extends AbstractRestfulController
 
         return new JsonModel($this->hydrator->extract($row));
     }
+
+    /**
+     * @return array|ViewModel
+     * @throws Exception
+     */
+    public function votesAction()
+    {
+        $result = $this->comments->service()->getVotes($this->params()->fromQuery('id'));
+        if (! $result) {
+            return $this->notFoundAction();
+        }
+
+        $viewModel = new ViewModel($result);
+        $viewModel->setTerminal(true);
+
+        return $viewModel;
+    }
 }

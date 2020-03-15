@@ -730,6 +730,15 @@ return [
                                     ],
                                 ],
                             ],
+                            'votes' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/votes',
+                                    'defaults' => [
+                                        'action' => 'votes'
+                                    ],
+                                ],
+                            ],
                             'get' => [
                                 'type' => 'Method',
                                 'options' => [
