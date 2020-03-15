@@ -107,7 +107,7 @@ class Comments
                     throw new Exception("Picture `{$message['item_id']}` not found");
                 }
 
-                $url = ['picture', $picture['identity']];
+                $url = ['/picture', $picture['identity']];
                 break;
 
             case self::ITEM_TYPE_ID:
@@ -117,10 +117,10 @@ class Comments
                 }
                 switch ($item['item_type_id']) {
                     case Item::TWINS:
-                        $url = ['twins', 'group', $item['id']];
+                        $url = ['/twins', 'group', $item['id']];
                         break;
                     case Item::MUSEUM:
-                        $url = ['museums', $item['id']];
+                        $url = ['/museums', $item['id']];
                         break;
                     default:
                         throw new Exception(sprintf(
@@ -132,7 +132,7 @@ class Comments
                 break;
 
             case self::VOTINGS_TYPE_ID:
-                $url = ['voting', $message['item_id']];
+                $url = ['/voting', $message['item_id']];
                 break;
 
             case self::ARTICLES_TYPE_ID:
@@ -142,11 +142,11 @@ class Comments
                 if (! $article) {
                     throw new Exception("Article `{$message['item_id']}` not found");
                 }
-                $url = ['articles', $article['catname']];
+                $url = ['/articles', $article['catname']];
                 break;
 
             case self::FORUMS_TYPE_ID:
-                $url = ['forums', 'message', $message['id']];
+                $url = ['/forums', 'message', $message['id']];
                 break;
 
             default:
