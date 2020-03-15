@@ -6,8 +6,6 @@ WORKDIR /app
 
 EXPOSE 80
 
-ARG COMMIT
-
 ENV COMPOSER_ALLOW_SUPERUSER="1" \
     WAITFORIT_VERSION="v2.4.1"
 
@@ -84,4 +82,5 @@ RUN chmod +x zf && \
     chmod +x start.sh && \
     crontab ./crontab
 
+ARG COMMIT
 ENV SENTRY_RELEASE=$COMMIT
