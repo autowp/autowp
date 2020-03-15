@@ -199,7 +199,8 @@ class GalleryController extends AbstractRestfulController
         ]);
 
         // comments
-        $userId      = $this->user()->get()['id'];
+        $user        = $this->user()->get();
+        $userId      = $user ? $user['id'] : null;
         $newMessages = [];
         if ($userId) {
             $newMessages = $this->comments->getNewMessages(

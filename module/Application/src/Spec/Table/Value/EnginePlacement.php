@@ -24,7 +24,7 @@ class EnginePlacement
      * @param mixed             $value
      * @param mixed             $values
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values): string
+    public function render(PhpRenderer $view, $attribute, $value, $values): ?string
     {
         $placement   = $values[$this->placement] ?? null;
         $orientation = $values[$this->orientation] ?? null;

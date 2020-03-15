@@ -289,7 +289,7 @@ class PictureItem
         $result = [];
         foreach ($this->table->selectWith($select) as $row) {
             $area = null;
-            if ($row['crop_left'] && $row['crop_top'] && $row['crop_width'] && $row['crop_height']) {
+            if ($row['crop_width'] && $row['crop_height']) {
                 $area = [
                     (int) $row['crop_left'],
                     (int) $row['crop_top'],

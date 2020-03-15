@@ -28,7 +28,7 @@ class Wheel
      * @param mixed             $value
      * @param mixed             $values
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values): string
+    public function render(PhpRenderer $view, $attribute, $value, $values): ?string
     {
         $tyreWidth  = $values[$this->tyrewidth] ?? null;
         $tyreSeries = $values[$this->tyreseries] ?? null;

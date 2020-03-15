@@ -4,15 +4,15 @@ namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
 use ArrayAccess;
-use Interop\Container\ContainerInterface;
 use Laminas\Hydrator\Strategy\StrategyInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.NumberOfChildren)
  */
 abstract class AbstractHydratorStrategy implements StrategyInterface
 {
-    protected ContainerInterface $serviceManager;
+    protected ServiceLocatorInterface $serviceManager;
 
     protected AbstractRestHydrator $hydrator;
 
@@ -20,7 +20,7 @@ abstract class AbstractHydratorStrategy implements StrategyInterface
 
     protected string $language;
 
-    public function __construct(ContainerInterface $serviceManager)
+    public function __construct(ServiceLocatorInterface $serviceManager)
     {
         $this->serviceManager = $serviceManager;
     }

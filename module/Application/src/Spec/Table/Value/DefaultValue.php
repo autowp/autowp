@@ -13,7 +13,7 @@ class DefaultValue
      * @param mixed|null        $value
      * @param mixed|null        $values
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values): string
+    public function render(PhpRenderer $view, $attribute, $value, $values): ?string
     {
         if ($value === null) {
             return '';

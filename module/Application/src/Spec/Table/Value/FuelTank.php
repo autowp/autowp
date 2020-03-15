@@ -22,7 +22,7 @@ class FuelTank
      * @param mixed             $value
      * @param mixed             $values
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values): string
+    public function render(PhpRenderer $view, $attribute, $value, $values): ?string
     {
         $primary   = $values[$this->primary] ?? null;
         $secondary = $values[$this->secondary] ?? null;

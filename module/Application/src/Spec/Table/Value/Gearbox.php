@@ -24,7 +24,7 @@ class Gearbox
      * @param mixed             $value
      * @param mixed             $values
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values): string
+    public function render(PhpRenderer $view, $attribute, $value, $values): ?string
     {
         $type  = $values[$this->type] ?? null;
         $gears = $values[$this->gears] ?? null;

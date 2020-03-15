@@ -4,6 +4,7 @@ namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\PreviewPictureHydrator as Hydrator;
 use ArrayAccess;
+use Exception;
 
 use function is_array;
 
@@ -21,6 +22,7 @@ class PreviewPictures extends AbstractHydratorStrategy
     /**
      * @param array|ArrayAccess $value
      * @param null|mixed        $context
+     * @throws Exception
      */
     public function extract($value, $context = null): array
     {

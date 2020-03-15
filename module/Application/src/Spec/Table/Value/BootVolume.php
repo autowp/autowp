@@ -21,7 +21,7 @@ class BootVolume
      * @param array|ArrayAccess $attribute
      * @param mixed             $value
      */
-    public function render(PhpRenderer $view, $attribute, $value, array $values): string
+    public function render(PhpRenderer $view, $attribute, $value, array $values): ?string
     {
         $min = $values[$this->min] ?? null;
         $max = $values[$this->max] ?? null;

@@ -24,7 +24,7 @@ class EngineConfiguration
      * @param mixed             $value
      * @param mixed             $values
      */
-    public function render(PhpRenderer $view, $attribute, $value, $values): string
+    public function render(PhpRenderer $view, $attribute, $value, $values): ?string
     {
         $cylinders = $values[$this->cylindersCount] ?? null;
         $layout    = $values[$this->cylindersLayout] ?? null;
