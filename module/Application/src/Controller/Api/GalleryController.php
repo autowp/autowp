@@ -261,14 +261,18 @@ class GalleryController extends AbstractRestfulController
 
             $areas = [];
             foreach ($itemsData as $pictureItem) {
-                $item    = $this->itemModel->getRow(['id' => $pictureItem['item_id']]);
-                $areas[] = [
-                    'area' => [
+                $item = $this->itemModel->getRow(['id' => $pictureItem['item_id']]);
+                $area = null;
+                if ($pictureItem['area']) {
+                    $area = [
                         'left'   => $pictureItem['area'][0] / $image->getWidth(),
                         'top'    => $pictureItem['area'][1] / $image->getHeight(),
                         'width'  => $pictureItem['area'][2] / $image->getWidth(),
                         'height' => $pictureItem['area'][3] / $image->getHeight(),
-                    ],
+                    ];
+                }
+                $areas[] = [
+                    'area' => $area,
                     'name' => $this->itemNameFormatter->formatHtml(
                         $this->itemModel->getNameData($item, $language),
                         $language
