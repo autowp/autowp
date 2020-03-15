@@ -18,7 +18,7 @@
 
 The following versions of PHP are supported.
 
-* PHP 7.2
+* PHP 7.4
 
 ## Credits
 

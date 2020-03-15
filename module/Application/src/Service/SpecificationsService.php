@@ -40,7 +40,16 @@ use function strlen;
 
 class SpecificationsService
 {
-    private const ENGINE_ZONE_ID = 5;
+    private const
+        DEFAULT_ZONE_ID = 1,
+        ENGINE_ZONE_ID  = 5,
+        BUS_ZONE_ID     = 3;
+
+    private const BUS_VEHICLE_TYPES = [19, 39, 28, 32];
+
+    private const
+        TOP_PERSPECTIVES    = [10, 1, 7, 8, 11, 12, 2, 4, 13, 5],
+        BOTTOM_PERSPECTIVES = [13, 2, 9, 6, 5];
 
     public const NULL_VALUE_STR = '-';
 
@@ -200,10 +209,10 @@ class SpecificationsService
             return self::ENGINE_ZONE_ID;
         }
 
-        $zoneId = 1;
+        $zoneId = self::DEFAULT_ZONE_ID;
 
-        if (array_intersect($vehicleTypeIds, [19, 39, 28, 32])) {
-            $zoneId = 3;
+        if (array_intersect($vehicleTypeIds, self::BUS_VEHICLE_TYPES)) {
+            $zoneId = self::BUS_ZONE_ID;
         }
 
         return $zoneId;
@@ -299,6 +308,9 @@ class SpecificationsService
         return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getListOptionsText(int $attributeId, int $id): string
     {
         $this->loadListOptions([$attributeId]);
@@ -310,6 +322,9 @@ class SpecificationsService
         return $this->translator->translate($this->listOptions[$attributeId][$id], 'default');
     }
 
+    /**
+     * @throws Exception
+     */
     public function getFilterSpec(int $attributeId): ?array
     {
         $filters    = [];
@@ -773,6 +788,9 @@ class SpecificationsService
         return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     private function propageteEngine(array $attribute, int $itemId): void
     {
         if (! $this->isEngineAttributeId($attribute['id'])) {
@@ -812,6 +830,9 @@ class SpecificationsService
         ])->current();
     }
 
+    /**
+     * @throws Exception
+     */
     private function propagateInheritance(array $attribute, int $itemId): void
     {
         $childIds = $this->getChildCarIds($itemId);
@@ -1010,6 +1031,9 @@ class SpecificationsService
         $this->updateActualValue($attribute['id'], $itemId);
     }
 
+    /**
+     * @throws Exception
+     */
     public function specifications(array $cars, array $options): CarSpecTable
     {
         $options = array_merge([
@@ -1019,9 +1043,6 @@ class SpecificationsService
 
         $language     = $options['language'];
         $contextCarId = (int) $options['contextCarId'];
-
-        $topPerspectives    = [10, 1, 7, 8, 11, 12, 2, 4, 13, 5];
-        $bottomPerspectives = [13, 2, 9, 6, 5];
 
         $ids = [];
         foreach ($cars as $car) {
@@ -1101,12 +1122,12 @@ class SpecificationsService
                 $name = $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language);
             }
 
-            $topPicture        = $this->specPicture($car, $topPerspectives);
+            $topPicture        = $this->specPicture($car, self::TOP_PERSPECTIVES);
             $topPictureRequest = null;
             if ($topPicture) {
                 $topPictureRequest = $topPicture['image_id'];
             }
-            $bottomPicture        = $this->specPicture($car, $bottomPerspectives);
+            $bottomPicture        = $this->specPicture($car, self::BOTTOM_PERSPECTIVES);
             $bottomPictureRequest = null;
             if ($bottomPicture) {
                 $bottomPictureRequest = $bottomPicture['image_id'];
@@ -1177,6 +1198,9 @@ class SpecificationsService
         return $this->valueTable;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getValueDataTable(int $type): TableGateway
     {
         switch ($type) {
@@ -1197,6 +1221,9 @@ class SpecificationsService
         throw new Exception("Unexpected type `$type`");
     }
 
+    /**
+     * @throws Exception
+     */
     public function getUserValueDataTable(int $type): TableGateway
     {
         switch ($type) {
@@ -1271,6 +1298,9 @@ class SpecificationsService
         return null;
     }
 
+    /**
+     * @throws Exception
+     */
     private function calcAvgUserValue(array $attribute, int $itemId): array
     {
         $userValuesDataTable = $this->getUserValueDataTable($attribute['typeId']);
@@ -1501,10 +1531,7 @@ class SpecificationsService
                 $maxValueRatio = 0;
                 $maxValueIdx   = null;
                 foreach ($ratios as $idx => $ratio) {
-                    if ($maxValueIdx === null) {
-                        $maxValueIdx   = $idx;
-                        $maxValueRatio = $ratio;
-                    } elseif ($maxValueRatio <= $ratio) {
+                    if ($maxValueIdx === null || $maxValueRatio <= $ratio) {
                         $maxValueIdx   = $idx;
                         $maxValueRatio = $ratio;
                     }
@@ -1609,6 +1636,9 @@ class SpecificationsService
         return $somethingChanges;
     }
 
+    /**
+     * @throws Exception
+     */
     public function updateActualValue(int $attributeId, int $itemId): bool
     {
         $attribute = $this->getAttribute($attributeId);
@@ -1724,6 +1754,9 @@ class SpecificationsService
         return (bool) $this->valueTable->selectWith($select)->current();
     }
 
+    /**
+     * @throws Exception
+     */
     public function updateAllActualValues(): void
     {
         $attributes = $this->getAttributes();
@@ -1741,6 +1774,9 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function updateActualValues(int $itemId): void
     {
         foreach ($this->getAttributes() as $attribute) {
@@ -1750,6 +1786,9 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function updateInheritedValues(int $itemId): void
     {
         foreach ($this->getAttributes() as $attribute) {
@@ -1855,6 +1894,9 @@ class SpecificationsService
         return $attribute['isMultiple'] ? $values : $values[0];
     }
 
+    /**
+     * @throws Exception
+     */
     public function getUserValue2(int $attributeId, int $itemId, int $userId): array
     {
         if (! $itemId) {
@@ -1952,6 +1994,9 @@ class SpecificationsService
         return null;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getActualValueText(int $attributeId, int $itemId, string $language): string
     {
         if (! $itemId) {
@@ -2031,6 +2076,9 @@ class SpecificationsService
         return $values;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getZoneItemsActualValues(int $zoneId, array $itemIds): array
     {
         if (count($itemIds) <= 0) {
@@ -2119,6 +2167,9 @@ class SpecificationsService
         return $this->types[$typeId];
     }
 
+    /**
+     * @throws Exception
+     */
     public function refreshConflictFlag(int $attributeId, int $itemId): void
     {
         if (! $attributeId) {
@@ -2262,6 +2313,9 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function refreshConflictFlags(): void
     {
         $select = new Sql\Select($this->valueTable->getTable());
@@ -2280,6 +2334,9 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function refreshItemConflictFlags(int $itemId): void
     {
         foreach ($this->userValueTable->select(['item_id' => $itemId]) as $valueRow) {
@@ -2388,6 +2445,9 @@ class SpecificationsService
         ], []);
     }
 
+    /**
+     * @throws Exception
+     */
     private function getUserValueWeight(int $userId): float
     {
         if (! array_key_exists($userId, $this->valueWeights)) {
