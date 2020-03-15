@@ -639,7 +639,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
-            'fields' => 'childs_count,name_html,name_text,name_default,description,'
+            'fields' => 'childs_count,name_html,name_text,name_default,description,attr_zone_id,'
                 . 'has_text,brands,spec_editor_url,specs_route,categories,'
                 . 'twins_groups,url,preview_pictures,design,'
                 . 'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
