@@ -4,9 +4,11 @@ namespace Application;
 
 use Laminas\Console\Adapter\AdapterInterface as Console;
 use Laminas\EventManager\EventInterface as Event;
+use Laminas\EventManager\EventManagerInterface;
 use Laminas\Loader\StandardAutoloader;
 use Laminas\Mail;
 use Laminas\ModuleManager\Feature;
+use Laminas\Mvc\Application;
 use Laminas\Mvc\MvcEvent;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
@@ -91,10 +93,12 @@ class Module implements
 
         PaginationControl::setDefaultViewPartial('paginator');
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $application    = $e->getApplication();
+        /** @var Application $application */
+        $application = $e->getApplication();
+        /** @var ServiceLocatorInterface $serviceManager */
         $serviceManager = $application->getServiceManager();
-        $eventManager   = $application->getEventManager();
+        /** @var EventManagerInterface $eventManager */
+        $eventManager = $application->getEventManager();
 
         //handle the dispatch error (exception)
         $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'handleError']);
@@ -110,7 +114,9 @@ class Module implements
         $urlCorrectionListener = new UrlCorrectionRouteListener();
         $urlCorrectionListener->attach($eventManager);
 
-        $serviceManager->get(HostnameCheckRouteListener::class)->attach($eventManager);
+        /** @var HostnameCheckRouteListener $hostnameListener */
+        $hostnameListener = $serviceManager->get(HostnameCheckRouteListener::class);
+        $hostnameListener->attach($eventManager);
 
         $config = $serviceManager->get('Config');
 
