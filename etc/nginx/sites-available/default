@@ -24,6 +24,14 @@ server {
     add_header X-Xss-Protection "1; mode=block" always;
     add_header X-Content-Type-Options "nosniff" always;
 
+    location = /ng {
+        rewrite .* $scheme://$host/ permanent;
+    }
+
+    location /ng/ {
+        rewrite ^/ng/(.*)$ $scheme://$host/$1 permanent;
+    }
+
     location = /_.gif {
         empty_gif;
     }
