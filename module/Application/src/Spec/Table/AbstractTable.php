@@ -92,7 +92,7 @@ abstract class AbstractTable
      * @param array|ArrayAccess $attribute
      * @param mixed             $values
      */
-    public function renderValue(PhpRenderer $view, $attribute, $values, int $itemTypeId, int $itemId): string
+    public function renderValue(PhpRenderer $view, $attribute, $values, int $itemTypeId, int $itemId): ?string
     {
         $attrId = $attribute['id'];
 
