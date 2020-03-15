@@ -1997,7 +1997,7 @@ class SpecificationsService
     /**
      * @throws Exception
      */
-    public function getActualValueText(int $attributeId, int $itemId, string $language): string
+    public function getActualValueText(int $attributeId, int $itemId, string $language): ?string
     {
         if (! $itemId) {
             throw new Exception("item_id not set");
