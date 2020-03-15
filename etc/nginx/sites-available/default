@@ -2,7 +2,7 @@ server {
     listen 80;
     listen [::]:80;
 
-    charset     utf-8;
+    charset utf-8;
 
     gzip_static on;
 
@@ -43,7 +43,6 @@ server {
     }
 
     location ~* ^.+\.(jpg|jpeg|gif|css|js|ico|png|txt|woff|woff2|ttf|svg)$ {
-        root /app/public_html;
         expires 7d;
         access_log off;
         error_log off;

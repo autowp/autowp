@@ -721,24 +721,6 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes' => [
-                            'subscribe' => [
-                                'type' => 'Segment',
-                                'options' => [
-                                    'route' => '/subscribe/:type_id/:item_id',
-                                    'defaults' => [
-                                        'action' => 'subscribe'
-                                    ],
-                                ],
-                            ],
-                            'votes' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/votes',
-                                    'defaults' => [
-                                        'action' => 'votes'
-                                    ],
-                                ],
-                            ],
                             'get' => [
                                 'type' => 'Method',
                                 'options' => [
@@ -783,6 +765,24 @@ return [
                                         ],
                                     ],
                                 ]
+                            ],
+                            'votes' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/votes',
+                                    'defaults' => [
+                                        'action' => 'votes'
+                                    ],
+                                ],
+                            ],
+                            'subscribe' => [
+                                'type' => 'Segment',
+                                'options' => [
+                                    'route' => '/subscribe/:type_id/:item_id',
+                                    'defaults' => [
+                                        'action' => 'subscribe'
+                                    ],
+                                ],
                             ],
                         ]
                     ],
