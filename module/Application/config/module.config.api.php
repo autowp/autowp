@@ -775,14 +775,65 @@ return [
                                     ],
                                 ],
                             ],
-                            'subscribe' => [
+                            'topic' => [
                                 'type' => 'Segment',
                                 'options' => [
-                                    'route' => '/subscribe/:type_id/:item_id',
+                                    'route' => '/topic/:type_id/:item_id',
                                     'defaults' => [
                                         'action' => 'subscribe'
                                     ],
                                 ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'subscribe' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/subscribe',
+                                            'defaults' => [
+                                                'action' => 'subscribe'
+                                            ],
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'post' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'post',
+                                                    'defaults' => [
+                                                        'action' => 'subscribe'
+                                                    ],
+                                                ],
+                                            ],
+                                            'delete' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'post',
+                                                    'defaults' => [
+                                                        'action' => 'subscribe'
+                                                    ],
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                    'view' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/view',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'post' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'post',
+                                                    'defaults' => [
+                                                        'action' => 'post-view'
+                                                    ],
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ]
                             ],
                         ]
                     ],

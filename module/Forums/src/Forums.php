@@ -532,7 +532,7 @@ class Forums
         $this->topicTable->update([
             'views' => new Sql\Expression('views+1'),
         ], [
-            'id = ?' => (int) $topicId,
+            'id' => $topicId,
         ]);
 
         if ($userId) {

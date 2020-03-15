@@ -625,4 +625,22 @@ class CommentController extends AbstractRestfulController
 
         return $viewModel;
     }
+
+    /**
+     * @return array|ViewModel
+     */
+    public function postViewAction()
+    {
+        $user = $this->user()->get();
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        $itemId = (int) $this->params('item_id');
+        $typeId = (int) $this->params('type_id');
+
+        $this->comments->service()->updateTopicView($typeId, $itemId, $user['id']);
+
+        return $this->getResponse()->setStatusCode(201);
+    }
 }
