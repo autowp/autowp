@@ -286,6 +286,7 @@ class ItemController extends AbstractRestfulController
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function indexAction()
     {

@@ -9,6 +9,7 @@ use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureItemController;
 use Application\DuplicateFinder;
+use Application\Model\Item;
 use Application\Test\AbstractHttpControllerTestCase;
 use Exception;
 use Laminas\Http\Header\Cookie;
@@ -709,5 +710,76 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(ItemParentController::class);
         $this->assertMatchedRouteName('api/item-parent/post');
         $this->assertActionName('post');
+    }
+
+    /**
+     * @suppress PhanUndeclaredMethod
+     * @throws Exception
+     */
+    public function testNatSort(): void
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
+            'limit' => 100,
+            'order' => 'name_nat',
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/list');
+        $this->assertActionName('index');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertNotEmpty($json['items']);
+    }
+
+    /**
+     * @suppress PhanUndeclaredMethod
+     * @throws Exception
+     */
+    public function testPath(): void
+    {
+        $topCatname = 'top' . microtime(true);
+        $categoryID = $this->createItem([
+            'item_type_id' => Item::CATEGORY,
+            'name'         => 'top level',
+            'catname'      => $topCatname,
+        ]);
+
+        $lvl2Catname    = 'lvl2' . microtime(true);
+        $lvl2CategoryID = $this->createItem([
+            'item_type_id' => Item::CATEGORY,
+            'name'         => 'sub level',
+            'catname'      => $lvl2Catname,
+        ]);
+
+        $lvl3Catname    = 'lvl3' . microtime(true);
+        $lvl3CategoryID = $this->createItem([
+            'item_type_id' => Item::CATEGORY,
+            'name'         => 'sub level',
+            'catname'      => $lvl3Catname,
+        ]);
+
+        $this->addItemParent($lvl2CategoryID, $categoryID);
+        $this->addItemParent($lvl3CategoryID, $lvl2CategoryID);
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item/path', Request::METHOD_GET, [
+            'catname' => $lvl3Catname,
+            'path'    => '',
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/path/get');
+        $this->assertActionName('path');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertNotEmpty($json['path']);
     }
 }
