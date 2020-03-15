@@ -138,7 +138,10 @@ class UsersService
     {
         $host = $this->getHostOptions($language);
 
-        $emailCheckCode = $this->emailCheckCode($values['email']);
+        $emailCheckCode = null;
+        if ($values['email']) {
+            $emailCheckCode = $this->emailCheckCode($values['email']);
+        }
 
         $this->userModel->getTable()->insert([
             'login'            => null,

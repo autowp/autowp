@@ -11,6 +11,7 @@ use DateTime;
 use Laminas\Http\Request;
 use Laminas\Json\Json;
 use Laminas\Uri\UriFactory;
+use League\OAuth2\Client\Token\AccessToken;
 
 class LoginControllerTest extends AbstractHttpControllerTestCase
 {
@@ -65,14 +66,16 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
                 'photoUrl'   => $photoUrl, //'http://example.com/photo.jpg',
                 'birthday'   => new DateTime(),
                 'email'      => 'test@example.com',
-                'gender'     => 1,
+                'gender'     => 'male',
                 'location'   => 'London',
                 'language'   => 'en',
             ]);
         });
 
         $serviceMock->method('callback')->willReturnCallback(function () {
-            return true;
+            return new AccessToken([
+                'access_token' => 'access_token',
+            ]);
         });
 
         $mock = $this->getMockBuilder(PluginManager::class)
