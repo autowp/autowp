@@ -15,8 +15,8 @@ use Exception;
 use ImagickException;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
-
 use Laminas\View\Model\ViewModel;
+
 use function floor;
 
 /**
