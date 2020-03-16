@@ -178,11 +178,6 @@ class LoginController extends AbstractRestfulController
                 'icon'  => 'fa-github',
                 'color' => '#000000',
             ],
-            'linkedin'    => [
-                'name'  => 'LinkedIn',
-                'icon'  => 'fa-linkedin',
-                'color' => '#046293',
-            ],
         ];
 
         return new JsonModel([

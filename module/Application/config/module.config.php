@@ -5,7 +5,6 @@ namespace Application;
 use Autowp\ExternalLoginService\Facebook;
 use Autowp\ExternalLoginService\Github;
 use Autowp\ExternalLoginService\GooglePlus;
-use Autowp\ExternalLoginService\Linkedin;
 use Autowp\ExternalLoginService\Twitter;
 use Autowp\ExternalLoginService\Vk;
 use Autowp\ZFComponents\Resources;
@@ -311,11 +310,6 @@ return [
         Github::class => [
             'clientId'     => getenv('AUTOWP_ELS_GITHUB_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GITHUB_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
-        ],
-        Linkedin::class => [
-            'clientId'     => getenv('AUTOWP_ELS_LINKEDIN_CLIENTID'),
-            'clientSecret' => getenv('AUTOWP_ELS_LINKEDIN_SECRET'),
             'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ]
     ],
