@@ -58,7 +58,7 @@ class Attr extends AbstractAdapter
         }
 
         return [
-            'unit' => $specService->getUnit($attribute['unit_id']),
+            'unit' => $attribute['unit_id'] ? $specService->getUnit($attribute['unit_id']) : null,
             'cars' => $result,
         ];
     }
