@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa535e6e7a152ca8a2056ef28434e111",
+    "content-hash": "00a74c9da6412df65c5b35e4791f0df7",
     "packages": [
         {
             "name": "autowp/cron",
@@ -109,16 +109,16 @@
         },
         {
             "name": "autowp/image",
-            "version": "v5.0.1",
+            "version": "v5.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/autowp/image.git",
-                "reference": "43a655d7b9b270ddc631f5e8398f582ca1b1c3ec"
+                "reference": "906918b0e55318dd77d48c0c33aa8d6978ec379d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/autowp/image/zipball/43a655d7b9b270ddc631f5e8398f582ca1b1c3ec",
-                "reference": "43a655d7b9b270ddc631f5e8398f582ca1b1c3ec",
+                "url": "https://api.github.com/repos/autowp/image/zipball/906918b0e55318dd77d48c0c33aa8d6978ec379d",
+                "reference": "906918b0e55318dd77d48c0c33aa8d6978ec379d",
                 "shasum": ""
             },
             "require": {
@@ -159,7 +159,7 @@
                 }
             ],
             "description": "Image services for autowp.ru",
-            "time": "2020-03-14T13:28:43+00:00"
+            "time": "2020-03-16T19:59:28+00:00"
         },
         {
             "name": "autowp/textstorage",
@@ -266,16 +266,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.133.36",
+            "version": "3.133.37",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "59e824e235220730a8e1d276d036a9f085486512"
+                "reference": "94ced25e191a2a951edd5d9195820bbd2c1d8567"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/59e824e235220730a8e1d276d036a9f085486512",
-                "reference": "59e824e235220730a8e1d276d036a9f085486512",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/94ced25e191a2a951edd5d9195820bbd2c1d8567",
+                "reference": "94ced25e191a2a951edd5d9195820bbd2c1d8567",
                 "shasum": ""
             },
             "require": {
@@ -346,7 +346,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2020-03-13T18:09:32+00:00"
+            "time": "2020-03-16T18:10:35+00:00"
         },
         {
             "name": "bshaffer/oauth2-server-php",
@@ -3793,16 +3793,16 @@
         },
         {
             "name": "laminas/laminas-validator",
-            "version": "2.13.1",
+            "version": "2.13.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-validator.git",
-                "reference": "36702f033486bf1953e254f5299aad205302e79d"
+                "reference": "e7bf6a2eedc0508ebde0ebc66662efeb0abbcb2c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-validator/zipball/36702f033486bf1953e254f5299aad205302e79d",
-                "reference": "36702f033486bf1953e254f5299aad205302e79d",
+                "url": "https://api.github.com/repos/laminas/laminas-validator/zipball/e7bf6a2eedc0508ebde0ebc66662efeb0abbcb2c",
+                "reference": "e7bf6a2eedc0508ebde0ebc66662efeb0abbcb2c",
                 "shasum": ""
             },
             "require": {
@@ -3868,7 +3868,7 @@
                 "laminas",
                 "validator"
             ],
-            "time": "2020-01-15T09:59:30+00:00"
+            "time": "2020-03-16T11:38:27+00:00"
         },
         {
             "name": "laminas/laminas-view",

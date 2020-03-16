@@ -16,12 +16,14 @@ use ImagickException;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
 
+use Laminas\View\Model\ViewModel;
 use function floor;
 
 /**
  * @method User user($user = null)
  * @method Storage imageStorage()
  * @method string language()
+ * @method ViewModel forbiddenAction()
  */
 class GalleryController extends AbstractRestfulController
 {
@@ -55,6 +57,9 @@ class GalleryController extends AbstractRestfulController
         $this->itemNameFormatter    = $itemNameFormatter;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getPicturePage(array $filter, string $identity): int
     {
         unset($filter['identity']);
@@ -70,7 +75,7 @@ class GalleryController extends AbstractRestfulController
     }
 
     /**
-     * @return array|JsonModel
+     * @return array|ViewModel
      * @throws Storage\Exception
      * @throws ImagickException
      * @throws Exception
@@ -107,7 +112,7 @@ class GalleryController extends AbstractRestfulController
         $page            = $this->params()->fromQuery('page');
         $pictureIdentity = $this->params()->fromQuery('picture_identity');
 
-        if (! $itemID && ! $pictureIdentity) {
+        if (! $itemID && ! $pictureIdentity && ! $exactItemID) {
             return $this->forbiddenAction();
         }
 
