@@ -28,7 +28,7 @@ The following versions of PHP are supported.
 
 ## License
 
-The MIT License (MIT). Please see [License File](https://github.com/thephpleague/oauth2-facebook/blob/master/LICENSE) for more information.
+The MIT License (MIT). Please see [License File](https://github.com/autowp/autowp/blob/master/LICENSE) for more information.
 
 ## Tools
 
