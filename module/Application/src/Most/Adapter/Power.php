@@ -114,7 +114,7 @@ class Power extends AbstractAdapter
         ];
     }
 
-    protected function cylinders(string $layout, int $cylinders, ?int $valvePerCylinder): string
+    protected function cylinders(?string $layout, ?int $cylinders, ?int $valvePerCylinder): string
     {
         if ($layout) {
             if ($cylinders) {
