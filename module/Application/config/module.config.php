@@ -289,34 +289,34 @@ return [
         Vk::class => [
             'clientId'     => getenv('AUTOWP_ELS_VK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_VK_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ],
         GooglePlus::class => [
             'clientId'     => getenv('AUTOWP_ELS_GOOGLEPLUS_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GOOGLEPLUS_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ],
         Twitter::class => [
             'consumerKey'    => getenv('AUTOWP_ELS_TWITTER_CLIENTID'),
             'consumerSecret' => getenv('AUTOWP_ELS_TWITTER_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ],
         Facebook::class => [
             'clientId'     => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_FACEBOOK_SECRET'),
             'scope'        => ['public_profile'],
             'graphApiVersion' => 'v3.2',
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ],
         Github::class => [
             'clientId'     => getenv('AUTOWP_ELS_GITHUB_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GITHUB_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ],
         Linkedin::class => [
             'clientId'     => getenv('AUTOWP_ELS_LINKEDIN_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_LINKEDIN_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ]
     ],
 
