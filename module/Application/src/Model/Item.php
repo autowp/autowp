@@ -561,7 +561,7 @@ class Item
         return $resultIds;
     }
 
-    private function fractionToMonth(string $fraction): int
+    private function fractionToMonth(?string $fraction): int
     {
         switch ($fraction) {
             case '¼':
