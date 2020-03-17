@@ -295,7 +295,7 @@ class MessageService
     {
         $ids = [];
         foreach ($rows as $message) {
-            if ((! $message['readen']) && ($message['to_user_id'] === $userId)) {
+            if ((! $message['readen']) && ((int) $message['to_user_id'] === $userId)) {
                 $ids[] = (int) $message['id'];
             }
         }
@@ -420,15 +420,16 @@ class MessageService
         foreach ($rows as $message) {
             $author = $this->userModel->getRow(['id' => (int) $message['from_user_id']]);
 
-            $isNew      = $message['to_user_id'] === $userId && ! $message['readen'];
-            $canDelete  = $message['from_user_id'] === $userId || $message['to_user_id'] === $userId;
-            $authorIsMe = $author && ($author['id'] === $userId);
+            $isNew      = (int) $message['to_user_id'] === $userId && ! $message['readen'];
+            $canDelete  = (int) $message['from_user_id'] === $userId || (int) $message['to_user_id'] === $userId;
+            $authorIsMe = $author && ((int) $author['id'] === $userId);
             $canReply   = $author && ! $author['deleted'] && ! $authorIsMe;
 
             $dialogCount = 0;
 
             if ($options['allMessagesLink'] && $author) {
-                $dialogWith = $message['from_user_id'] === $userId ? $message['to_user_id'] : $message['from_user_id'];
+                $dialogWith = (int) $message['from_user_id'] === $userId
+                    ? $message['to_user_id'] : $message['from_user_id'];
 
                 if (isset($cache[$dialogWith])) {
                     $dialogCount = $cache[$dialogWith];
@@ -450,7 +451,7 @@ class MessageService
                 'dialogCount'         => $dialogCount,
                 'allMessagesLink'     => $options['allMessagesLink'],
                 'to_user_id'          => (int) $message['to_user_id'],
-                'dialog_with_user_id' => $message['from_user_id'] && $message['from_user_id'] === $userId
+                'dialog_with_user_id' => $message['from_user_id'] && (int) $message['from_user_id'] === $userId
                     ? (int) $message['to_user_id']
                     : (int) $message['from_user_id'],
             ];
