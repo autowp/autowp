@@ -657,7 +657,7 @@ class CarOfDay
         return (bool) $row;
     }
 
-    public function setItemOfDay(DateTime $dateTime, int $itemId, int $userId): bool
+    public function setItemOfDay(DateTime $dateTime, int $itemId, ?int $userId): bool
     {
         if (! $this->isComplies($itemId)) {
             return false;
@@ -677,7 +677,7 @@ class CarOfDay
 
         $set = [
             'item_id' => $itemId,
-            'user_id' => $userId ? $userId : null,
+            'user_id' => $userId,
         ];
 
         if ($dayRow) {
