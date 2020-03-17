@@ -26,6 +26,7 @@ use Autowp\ZFComponents\Filter\SingleSpaces;
 use Collator;
 use Exception;
 use geoPHP;
+use Illuminate\Support\Arr;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
@@ -1869,7 +1870,11 @@ class ItemController extends AbstractRestfulController
         return $u->toString();
     }
 
-    private function buildChangesMessage(array $oldData, array $newData, string $language): array
+    /**
+     * @param array|ArrayAccess $oldData
+     * @param array|ArrayAccess $newData
+     */
+    private function buildChangesMessage($oldData, $newData, string $language): array
     {
         $fields = [
             'name'                      => ['str', 'moder/vehicle/changes/name-%s-%s'],
