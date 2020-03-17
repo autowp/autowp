@@ -26,7 +26,6 @@ use Autowp\ZFComponents\Filter\SingleSpaces;
 use Collator;
 use Exception;
 use geoPHP;
-use Illuminate\Support\Arr;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
