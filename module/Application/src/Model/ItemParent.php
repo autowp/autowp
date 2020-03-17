@@ -125,7 +125,7 @@ class ItemParent
         return true;
     }
 
-    private function getYearsPrefix(int $begin, int $end): string
+    private function getYearsPrefix(?int $begin, ?int $end): string
     {
         $bms = (int) ($begin / 100);
         $ems = (int) ($end / 100);
