@@ -206,12 +206,14 @@ class PictureHydrator extends AbstractRestHydrator
         $piRows = $this->pictureItem->getPictureItemsData($pictureID, PictureItem::PICTURE_CONTENT);
         $result = [];
         foreach ($piRows as $piRow) {
-            $result[] = [
-                'type'           => (int) $piRow['type'],
-                'perspective_id' => $piRow['perspective_id'] ? (int) $piRow['perspective_id'] : null,
-                'item'           => $this->getItemRoute($piRow['item_id'], $targetItemID),
-            ];
-            //exit;
+            $item = $this->getItemRoute($piRow['item_id'], $targetItemID);
+            if ($item) {
+                $result[] = [
+                    'type'           => (int) $piRow['type'],
+                    'perspective_id' => $piRow['perspective_id'] ? (int) $piRow['perspective_id'] : null,
+                    'item'           => $item,
+                ];
+            }
         }
         return $result;
     }
@@ -370,7 +372,7 @@ class PictureHydrator extends AbstractRestHydrator
 
                 $pageNumber = 0;
                 foreach ($paginatorPictures as $n => $p) {
-                    if ($p['id'] === $object['id']) {
+                    if ((int) $p['id'] === (int) $object['id']) {
                         $pageNumber = $n + 1;
                         break;
                     }
