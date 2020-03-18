@@ -807,7 +807,7 @@ return [
                                             'delete' => [
                                                 'type' => 'Method',
                                                 'options' => [
-                                                    'verb' => 'post',
+                                                    'verb' => 'delete',
                                                     'defaults' => [
                                                         'action' => 'subscribe'
                                                     ],

@@ -18,6 +18,7 @@ use Laminas\Uri\Uri;
 
 use function array_walk;
 use function implode;
+use function ltrim;
 use function sprintf;
 use function urlencode;
 
@@ -83,6 +84,10 @@ class Comments
         }
 
         $route = $this->getMessageRowRoute($message);
+
+        if ($route) {
+            $route[0] = ltrim($route[0], '/');
+        }
 
         array_walk($route, function (&$item) {
             $item = urlencode($item);

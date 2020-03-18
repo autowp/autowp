@@ -414,7 +414,7 @@ class PictureHydrator extends AbstractRestHydrator
         if ($this->filterComposite->filter('subscribed')) {
             $subscribed = false;
             if ($this->userId) {
-                $subscribed = $this->comments->userSubscribed(
+                $subscribed = $this->comments->service()->userSubscribed(
                     Comments::PICTURES_TYPE_ID,
                     $object['id'],
                     $this->userId
