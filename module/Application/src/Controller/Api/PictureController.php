@@ -392,18 +392,18 @@ class PictureController extends AbstractRestfulController
             );
         }
 
-        if (! $isModer) {
-            if (! $data['exact_item_id'] && ! $data['item_id'] && ! $data['owner_id'] && ! $data['status'] && ! $data['identity']) {
-                return new ApiProblemResponse(
-                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                        'invalid_params' => [
-                            'item_id' => [
-                                'invalid' => 'item_id or owner_id is required',
-                            ],
+        $restricted = ! $isModer && ! $data['exact_item_id'] && ! $data['item_id'] && ! $data['owner_id'] &&
+            ! $data['status'] && ! $data['identity'];
+        if ($restricted) {
+            return new ApiProblemResponse(
+                new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                    'invalid_params' => [
+                        'item_id' => [
+                            'invalid' => 'item_id or owner_id is required',
                         ],
-                    ])
-                );
-            }
+                    ],
+                ])
+            );
         }
 
         $filter = [
