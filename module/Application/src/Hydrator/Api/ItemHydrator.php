@@ -710,6 +710,29 @@ class ItemHydrator extends AbstractRestHydrator
             $result['related_group_pictures'] = $carPictures;
         }
 
+        if ($this->filterComposite->filter('route')) {
+            $route = null;
+            switch ($object['item_type_id']) {
+                case Item::CATEGORY:
+                    $route = ['/category', $object['catname']];
+                    break;
+                case Item::TWINS:
+                    $route = ['/twins/group/', (string) $object['id']];
+                    break;
+
+                case Item::ENGINE:
+                case Item::VEHICLE:
+                    $route = $this->getDetailsRoute($object['id'], [
+                        'breakOnFirst' => true,
+                        'toBrand'      => $this->routeBrandID,
+                        'stockFirst'   => true,
+                    ]);
+                    break;
+            }
+
+            $result['route'] = $route;
+        }
+
         if ($isModer) {
             $result['body'] = (string) $object['body'];
 
@@ -843,29 +866,6 @@ class ItemHydrator extends AbstractRestHydrator
             if ($this->filterComposite->filter('name_default')) {
                 $name                   = $this->itemModel->getLanguageName($object['id'], 'xx');
                 $result['name_default'] = $nameData['name'] === $name ? null : $name;
-            }
-
-            if ($this->filterComposite->filter('route')) {
-                $route = null;
-                switch ($object['item_type_id']) {
-                    case Item::CATEGORY:
-                        $route = ['/category', $object['catname']];
-                        break;
-                    case Item::TWINS:
-                        $route = ['/twins/group/', (string) $object['id']];
-                        break;
-
-                    case Item::ENGINE:
-                    case Item::VEHICLE:
-                        $route = $this->getDetailsRoute($object['id'], [
-                            'breakOnFirst' => true,
-                            'toBrand'      => $this->routeBrandID,
-                            'stockFirst'   => true,
-                        ]);
-                        break;
-                }
-
-                $result['route'] = $route;
             }
 
             if ($this->filterComposite->filter('produced')) {
