@@ -652,6 +652,64 @@ class ItemHydrator extends AbstractRestHydrator
             ]);
         }
 
+        if ($this->filterComposite->filter('related_group_pictures')) {
+            $carPictures = [];
+            $groups      = $this->itemModel->getRelatedCarGroups($object['id']);
+            if (count($groups) > 0) {
+                $cars = $this->itemModel->getRows([
+                    'id'    => array_keys($groups),
+                    'order' => $this->catalogue->itemOrdering(),
+                ]);
+
+                foreach ($cars as $car) {
+                    $ancestor = count($groups[$car['id']]) > 1
+                        ? $groups[$car['id']]
+                        : $car['id'];
+
+                    $pictureRow = $this->picture->getRow([
+                        'status' => Picture::STATUS_ACCEPTED,
+                        'item'   => [
+                            'ancestor_or_self' => [
+                                'id' => $ancestor,
+                            ],
+                        ],
+                        'order'  => 'ancestor_stock_front_first',
+                    ]);
+
+                    $src = null;
+                    if ($pictureRow) {
+                        $imagesInfo = $this->imageStorage->getFormatedImage(
+                            $pictureRow['image_id'],
+                            'picture-thumb'
+                        );
+                        $src        = $imagesInfo->getSrc();
+                    }
+
+                    $cataloguePaths = $this->catalogue->getCataloguePaths($car['id'], [
+                        'breakOnFirst' => true,
+                    ]);
+
+                    $route = null;
+                    foreach ($cataloguePaths as $cataloguePath) {
+                        $route = array_merge([
+                            '/',
+                            $cataloguePath['brand_catname'],
+                            $cataloguePath['car_catname'],
+                        ], $cataloguePath['path']);
+                        break;
+                    }
+
+                    $carPictures[] = [
+                        'name'  => $this->itemNameFormatter->format($car, $this->language),
+                        'src'   => $src,
+                        'route' => $route,
+                    ];
+                }
+            }
+
+            $result['related_group_pictures'] = $carPictures;
+        }
+
         if ($isModer) {
             $result['body'] = (string) $object['body'];
 
@@ -742,64 +800,6 @@ class ItemHydrator extends AbstractRestHydrator
 
             if ($this->filterComposite->filter('full_name')) {
                 $result['full_name'] = $object['full_name'];
-            }
-
-            if ($this->filterComposite->filter('related_group_pictures')) {
-                $carPictures = [];
-                $groups      = $this->itemModel->getRelatedCarGroups($object['id']);
-                if (count($groups) > 0) {
-                    $cars = $this->itemModel->getRows([
-                        'id'    => array_keys($groups),
-                        'order' => $this->catalogue->itemOrdering(),
-                    ]);
-
-                    foreach ($cars as $car) {
-                        $ancestor = count($groups[$car['id']]) > 1
-                            ? $groups[$car['id']]
-                            : $car['id'];
-
-                        $pictureRow = $this->picture->getRow([
-                            'status' => Picture::STATUS_ACCEPTED,
-                            'item'   => [
-                                'ancestor_or_self' => [
-                                    'id' => $ancestor,
-                                ],
-                            ],
-                            'order'  => 'ancestor_stock_front_first',
-                        ]);
-
-                        $src = null;
-                        if ($pictureRow) {
-                            $imagesInfo = $this->imageStorage->getFormatedImage(
-                                $pictureRow['image_id'],
-                                'picture-thumb'
-                            );
-                            $src        = $imagesInfo->getSrc();
-                        }
-
-                        $cataloguePaths = $this->catalogue->getCataloguePaths($car['id'], [
-                            'breakOnFirst' => true,
-                        ]);
-
-                        $route = null;
-                        foreach ($cataloguePaths as $cataloguePath) {
-                            $route = array_merge([
-                                '/',
-                                $cataloguePath['brand_catname'],
-                                $cataloguePath['car_catname'],
-                            ], $cataloguePath['path']);
-                            break;
-                        }
-
-                        $carPictures[] = [
-                            'name'  => $this->itemNameFormatter->format($car, $this->language),
-                            'src'   => $src,
-                            'route' => $route,
-                        ];
-                    }
-                }
-
-                $result['related_group_pictures'] = $carPictures;
             }
 
             if ($showTotalPictures) {
