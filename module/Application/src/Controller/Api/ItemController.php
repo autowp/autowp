@@ -493,6 +493,15 @@ class ItemController extends AbstractRestfulController
             $group['item.id'] = true;
         }
 
+        if ($data['ancestor_id']) {
+            $select
+                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
+                ->where([
+                    'item_parent_cache.parent_id' => $data['ancestor_id'],
+                    'item_parent_cache.item_id <> item_parent_cache.parent_id',
+                ]);
+        }
+
         if ($isModer) {
             if ($data['last_item']) {
                 $namespace = new Container('Moder_Car');
@@ -553,15 +562,6 @@ class ItemController extends AbstractRestfulController
 
             if ($data['spec']) {
                 $select->where(['item.spec_id' => $data['spec']]);
-            }
-
-            if ($data['ancestor_id']) {
-                $select
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
-                    ->where([
-                        'item_parent_cache.parent_id' => $data['ancestor_id'],
-                        'item_parent_cache.item_id <> item_parent_cache.parent_id',
-                    ]);
             }
 
             if ($data['from_year']) {
