@@ -2099,13 +2099,10 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function specificationsAction()
     {
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
         $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
@@ -2124,6 +2121,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function childSpecificationsAction()
     {
