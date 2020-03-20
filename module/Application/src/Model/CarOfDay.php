@@ -471,7 +471,7 @@ class CarOfDay
         $formatRequests = [];
         foreach ($carOfDayPictures as $idx => $picture) {
             if ($picture) {
-                $format                        = $idx === 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
+                $format                        = (int) $idx === 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
                 $formatRequests[$format][$idx] = $picture['image_id'];
             }
         }
@@ -522,7 +522,7 @@ class CarOfDay
                     }
                 }
 
-                $format = $idx === 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
+                $format = (int) $idx === 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
                 $thumb  = $imagesInfo[$format][$idx] ?? null;
 
                 $result[] = [

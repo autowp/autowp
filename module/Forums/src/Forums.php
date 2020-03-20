@@ -505,7 +505,7 @@ class Forums
             return null;
         }
 
-        if ($message['type_id'] !== AppComments::FORUMS_TYPE_ID) {
+        if ((int) $message['type_id'] !== AppComments::FORUMS_TYPE_ID) {
             return null;
         }
 
@@ -520,7 +520,7 @@ class Forums
 
         return [
             'page'     => $page,
-            'topic_id' => $topic['id'],
+            'topic_id' => (int) $topic['id'],
         ];
     }
 

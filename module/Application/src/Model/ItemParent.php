@@ -364,7 +364,7 @@ class ItemParent
             return false;
         }
 
-        if ($oldParentRow['id'] === $newParentRow['id']) {
+        if ((int) $oldParentRow['id'] === (int) $newParentRow['id']) {
             return false;
         }
 
@@ -764,9 +764,9 @@ class ItemParent
         $result = [];
         foreach ($rows as $row) {
             $parentId          = $row['parent_id'];
-            $isTuning          = $row['type'] === self::TYPE_TUNING;
-            $isSport           = $row['type'] === self::TYPE_SPORT;
-            $isDesign          = $row['type'] === self::TYPE_DESIGN;
+            $isTuning          = (int) $row['type'] === self::TYPE_TUNING;
+            $isSport           = (int) $row['type'] === self::TYPE_SPORT;
+            $isDesign          = (int) $row['type'] === self::TYPE_DESIGN;
             $result[$parentId] = [
                 'diff'   => $diff,
                 'tuning' => $isTuning,

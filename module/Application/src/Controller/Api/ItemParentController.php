@@ -352,7 +352,7 @@ class ItemParentController extends AbstractRestfulController
         }
 
         foreach ($subscribers as $subscriber) {
-            if ($subscriber['id'] !== $user['id']) {
+            if ((int) $subscriber['id'] !== (int) $user['id']) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                 $message = sprintf(
@@ -547,7 +547,7 @@ class ItemParentController extends AbstractRestfulController
         }
 
         foreach ($subscribers as $subscriber) {
-            if ($subscriber['id'] !== $user['id']) {
+            if ((int) $subscriber['id'] !== (int) $user['id']) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                 $message = sprintf(

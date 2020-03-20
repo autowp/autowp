@@ -135,7 +135,7 @@ class Item
             }
 
             $vector   = $parentIds;
-            $vector[] = $vehicleId;
+            $vector[] = (int) $vehicleId;
 
             $vectors[] = $vector;
         }

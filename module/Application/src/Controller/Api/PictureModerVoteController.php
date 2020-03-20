@@ -79,7 +79,7 @@ class PictureModerVoteController extends AbstractRestfulController
         $owner        = $this->userModel->getRow((int) $picture['owner_id']);
         $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
         if ($ownerIsModer) {
-            if ($owner['id'] !== $this->user()->get()['id']) {
+            if ((int) $owner['id'] !== (int) $this->user()->get()['id']) {
                 $uri = $this->hostManager->getUriByLanguage($owner['language']);
                 $uri->setPath('/moder/pictures/' . $picture['id']);
 
@@ -106,7 +106,7 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     private function unaccept($picture): void
     {
-        $previousStatusUserId = $picture['change_status_user_id'];
+        $previousStatusUserId = (int) $picture['change_status_user_id'];
 
         $user = $this->user()->get();
 
@@ -128,7 +128,7 @@ class PictureModerVoteController extends AbstractRestfulController
             'pictures' => $picture['id'],
         ]);
 
-        if ($previousStatusUserId !== $user['id']) {
+        if ($previousStatusUserId !== (int) $user['id']) {
             $prevUser = $this->userModel->getRow((int) $previousStatusUserId);
             if ($prevUser) {
                 $uri = $this->hostManager->getUriByLanguage($prevUser['language']);

@@ -69,11 +69,9 @@ class PictureItemHydrator extends AbstractRestHydrator
         return $this;
     }
 
-    /**
-     * @param int|null $userId
-     */
-    public function setUserId($userId = null): self
+    public function setUserId(?int $userId): self
     {
+        $userId = (int) $userId;
         if ($this->userId !== $userId) {
             $this->userId   = $userId;
             $this->userRole = null;

@@ -225,7 +225,7 @@ class CommentsService
     {
         $comment = $this->getMessageRow($id);
 
-        if ($comment['moderator_attention'] === Attention::REQUIRED) {
+        if ((int) $comment['moderator_attention'] === Attention::REQUIRED) {
             return false;
         }
 
@@ -277,7 +277,7 @@ class CommentsService
             ];
         }
 
-        if ($message['author_id'] === $userId) {
+        if ((int) $message['author_id'] === $userId) {
             return [
                 'success' => false,
                 'error'   => 'Self-vote forbidden',

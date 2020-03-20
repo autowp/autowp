@@ -249,7 +249,7 @@ class ItemLanguageController extends AbstractRestfulController
             $language = $this->language();
 
             foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                if ($subscriber && ($subscriber['id'] !== $user['id'])) {
+                if ($subscriber && ((int) $subscriber['id'] !== (int) $user['id'])) {
                     $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                     $changesStr = [];

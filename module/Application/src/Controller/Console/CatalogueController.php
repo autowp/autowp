@@ -127,13 +127,13 @@ class CatalogueController extends AbstractActionController
         foreach ($rows as $picture) {
             print $picture['id'] . PHP_EOL;
 
-            $previousStatusUserId = $picture['change_status_user_id'];
+            $previousStatusUserId = (int) $picture['change_status_user_id'];
 
             $isFirstTimeAccepted = false;
             $success             = $this->picture->accept($picture['id'], $userId, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $this->userModel->getRow((int) $picture['owner_id']);
-                if ($owner && ($owner['id'] !== $userId)) {
+                if ($owner && ((int) $owner['id'] !== $userId)) {
                     $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                     if (! $uri) {

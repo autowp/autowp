@@ -314,7 +314,7 @@ class UserController extends AbstractRestfulController
                 ]);
             }
 
-            if ($user['id'] === $row['id']) { // self-delete
+            if ((int) $user['id'] === (int) $row['id']) { // self-delete
                 $auth = new AuthenticationService();
                 $auth->clearIdentity();
                 $this->userService->clearRememberCookie($this->language());
@@ -322,7 +322,7 @@ class UserController extends AbstractRestfulController
         }
 
         if (array_key_exists('name', $values)) {
-            if ($user['id'] !== $row['id']) {
+            if ((int) $user['id'] !== (int) $row['id']) {
                 return $this->forbiddenAction();
             }
 
@@ -342,7 +342,7 @@ class UserController extends AbstractRestfulController
         }
 
         if (array_key_exists('language', $values)) {
-            if ($user['id'] !== $row['id']) {
+            if ((int) $user['id'] !== (int) $row['id']) {
                 return $this->forbiddenAction();
             }
 
@@ -354,7 +354,7 @@ class UserController extends AbstractRestfulController
         }
 
         if (array_key_exists('timezone', $values)) {
-            if ($user['id'] !== $row['id']) {
+            if ((int) $user['id'] !== (int) $row['id']) {
                 return $this->forbiddenAction();
             }
 

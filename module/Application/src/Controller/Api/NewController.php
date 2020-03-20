@@ -206,7 +206,7 @@ class NewController extends AbstractRestfulController
 
                 $found = false;
                 foreach ($items as &$item) {
-                    if ($item['type'] === 'item' && $item['item_id'] === $itemId) {
+                    if ((int) $item['type'] === 'item' && $item['item_id'] === $itemId) {
                         $item['pictures'][] = $pictureRow;
                         $found              = true;
                         break;

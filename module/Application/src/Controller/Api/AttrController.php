@@ -393,7 +393,7 @@ class AttrController extends AbstractRestfulController
 
         if ($data['items']) {
             foreach ($data['items'] as $item) {
-                if ($item['user_id'] !== $user['id']) {
+                if ((int) $item['user_id'] !== (int) $user['id']) {
                     return $this->forbiddenAction();
                 }
 

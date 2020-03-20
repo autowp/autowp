@@ -439,7 +439,7 @@ class CommentController extends AbstractRestfulController
 
         if ($data['parent_id']) {
             $authorId = $this->comments->service()->getMessageAuthorId($data['parent_id']);
-            if ($authorId && ($authorId !== $currentUser['id'])) {
+            if ($authorId && ($authorId !== (int) $currentUser['id'])) {
                 $parentMessageAuthor = $this->userModel->getTable()->select(['id' => (int) $authorId])->current();
                 if ($parentMessageAuthor && ! $parentMessageAuthor['deleted']) {
                     $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor['language']);

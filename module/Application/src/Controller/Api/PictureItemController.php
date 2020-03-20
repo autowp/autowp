@@ -84,7 +84,7 @@ class PictureItemController extends AbstractRestfulController
             return false;
         }
 
-        if ($picture['owner_id'] === $currentUser['id']) {
+        if ((int) $picture['owner_id'] === (int) $currentUser['id']) {
             if ($picture['status'] === Picture::STATUS_INBOX) {
                 return true;
             }

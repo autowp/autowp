@@ -254,7 +254,7 @@ class VehicleType
                 'level'     => $level,
             ]);
 
-            $this->rebuildStep(array_merge([$row['id']], $id), $level + 1);
+            $this->rebuildStep(array_merge([(int) $row['id']], $id), $level + 1);
         }
 
         --$level;

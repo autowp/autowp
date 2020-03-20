@@ -173,6 +173,9 @@ class PictureItem
         $this->updateContentCount($pictureId);
     }
 
+    /**
+     * @return int[]
+     */
     public function getPictureItems(int $pictureId, int $type): array
     {
         $rows = $this->table->select([

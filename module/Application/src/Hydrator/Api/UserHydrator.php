@@ -100,7 +100,7 @@ class UserHydrator extends AbstractRestHydrator
     {
         $deleted = (bool) $object['deleted'];
 
-        $isMe = $object['id'] === $this->userId;
+        $isMe = (int) $object['id'] === $this->userId;
 
         if ($deleted) {
             $user = [

@@ -861,7 +861,7 @@ class PictureController extends AbstractRestfulController
 
             if (isset($data['status'])) {
                 $user                 = $this->user()->get();
-                $previousStatusUserId = $picture['change_status_user_id'];
+                $previousStatusUserId = (int) $picture['change_status_user_id'];
 
                 if ($data['status'] === Picture::STATUS_ACCEPTED) {
                     $canAccept = $this->canAccept($picture);
@@ -880,7 +880,7 @@ class PictureController extends AbstractRestfulController
                         }
 
                         if ($isFirstTimeAccepted) {
-                            if ($owner && ($owner['id'] !== $user['id'])) {
+                            if ($owner && ((int) $owner['id'] !== (int) $user['id'])) {
                                 $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                                 $uri->setPath('/picture/' . urlencode($picture['identity']));
@@ -897,8 +897,8 @@ class PictureController extends AbstractRestfulController
                         }
                     }
 
-                    if ($previousStatusUserId !== $user['id']) {
-                        $prevUser = $this->userModel->getRow((int) $previousStatusUserId);
+                    if ($previousStatusUserId !== (int) $user['id']) {
+                        $prevUser = $this->userModel->getRow($previousStatusUserId);
                         if ($prevUser) {
                             $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
 
@@ -962,8 +962,8 @@ class PictureController extends AbstractRestfulController
                             'pictures' => $picture['id'],
                         ]);
 
-                        if ($previousStatusUserId !== $user['id']) {
-                            $prevUser = $this->userModel->getRow((int) $previousStatusUserId);
+                        if ($previousStatusUserId !== (int) $user['id']) {
+                            $prevUser = $this->userModel->getRow($previousStatusUserId);
                             if ($prevUser) {
                                 $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
 
@@ -993,7 +993,7 @@ class PictureController extends AbstractRestfulController
                     ]);
 
                     $owner = $this->userModel->getRow((int) $picture['owner_id']);
-                    if ($owner && $owner['id'] !== $user['id']) {
+                    if ($owner && (int) $owner['id'] !== (int) $user['id']) {
                         $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                         $deleteRequests = $this->pictureModerVote->getNegativeVotes($picture['id']);

@@ -205,7 +205,7 @@ class CommentHydrator extends AbstractRestHydrator
         if ($this->filterComposite->filter('status')) {
             if ($isModer) {
                 $status = null;
-                if ($object['type_id'] === Comments::PICTURES_TYPE_ID) {
+                if ((int) $object['type_id'] === Comments::PICTURES_TYPE_ID) {
                     $picture = $this->picture->getRow(['id' => (int) $object['item_id']]);
                     if ($picture) {
                         switch ($picture['status']) {

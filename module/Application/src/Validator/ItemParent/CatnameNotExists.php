@@ -49,7 +49,7 @@ class CatnameNotExists extends AbstractValidator
 
         $row = $this->itemParent->getRowByCatname($this->parentId, $value);
 
-        if ($this->ignoreItemId && $row['item_id'] === $this->ignoreItemId) {
+        if ($this->ignoreItemId && (int) $row['item_id'] === $this->ignoreItemId) {
             $row = null;
         }
 
