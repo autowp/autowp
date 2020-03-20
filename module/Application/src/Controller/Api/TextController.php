@@ -58,9 +58,9 @@ class TextController extends AbstractRestfulController
                 'user_id'  => (int) $current['user_id'],
             ],
             'prev'    => [
-                'text'     => $prevText['text'],
+                'text'     => $prevText ? $prevText['text'] : null,
                 'revision' => $prevRevision,
-                'user_id'  => (int) $prevText['user_id'],
+                'user_id'  => $prevText ? (int) $prevText['user_id'] : null,
             ],
             'next'    => [
                 'revision' => $nextRevision,

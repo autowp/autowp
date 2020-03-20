@@ -761,7 +761,7 @@ class PictureController extends AbstractRestfulController
                 ];
             }
 
-            $this->imageStorage()->setImageCrop($picture['image_id'], $crop);
+            $this->imageStorage()->setImageCrop((int) $picture['image_id'], $crop);
 
             $this->log(sprintf(
                 'Выделение области на картинке %s',
