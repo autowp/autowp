@@ -167,12 +167,13 @@ class Catalogue
                         ];
                         break;
                     case 'brand-item':
+                        $isStock  = $path['stock'] && ((int) $parentRow['type'] === ItemParent::TYPE_DEFAULT);
                         $result[] = [
                             'type'          => $path['type'],
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => array_merge($path['path'], [$parentRow['catname']]),
-                            'stock'         => $path['stock'] && ((int) $parentRow['type'] === ItemParent::TYPE_DEFAULT),
+                            'stock'         => $isStock,
                         ];
                         break;
                 }
