@@ -163,7 +163,7 @@ class Catalogue
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $parentRow['catname'],
                             'path'          => [],
-                            'stock'         => $parentRow['type'] === ItemParent::TYPE_DEFAULT,
+                            'stock'         => (int) $parentRow['type'] === ItemParent::TYPE_DEFAULT,
                         ];
                         break;
                     case 'brand-item':
@@ -172,7 +172,7 @@ class Catalogue
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => array_merge($path['path'], [$parentRow['catname']]),
-                            'stock'         => $path['stock'] && ($parentRow['type'] === ItemParent::TYPE_DEFAULT),
+                            'stock'         => $path['stock'] && ((int) $parentRow['type'] === ItemParent::TYPE_DEFAULT),
                         ];
                         break;
                 }

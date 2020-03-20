@@ -88,7 +88,7 @@ class ItemHydrator extends AbstractRestHydrator
 
     private int $mostsMinCarsCount = 1;
 
-    private int $routeBrandID;
+    private int $routeBrandID = 0;
 
     private array $cataloguePaths = [];
 
