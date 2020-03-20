@@ -422,10 +422,8 @@ class CommentController extends AbstractRestfulController
             'id' => $currentUser['id'],
         ]);
 
-        if ($this->user()->inheritsRole('moder')) {
-            if ($data['parent_id'] && $data['resolve']) {
-                $this->comments->service()->completeMessage($data['parent_id']);
-            }
+        if ($this->user()->inheritsRole('moder') && $data['parent_id'] && $data['resolve']) {
+            $this->comments->service()->completeMessage($data['parent_id']);
         }
 
         if ($typeId === Comments::FORUMS_TYPE_ID) {

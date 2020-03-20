@@ -181,13 +181,13 @@ class CommentsService
             }
 
             $comments[] = [
-                'id'                  => $row['id'],
+                'id'                  => (int) $row['id'],
                 'author'              => $author,
                 'message'             => $row['message'],
                 'datetime'            => Row::getDateTimeByColumnType('timestamp', $row['datetime']),
                 'ip'                  => $row['ip'] ? inet_ntop($row['ip']) : null,
                 'vote'                => $row['vote'],
-                'moderator_attention' => $row['moderator_attention'],
+                'moderator_attention' => (int) $row['moderator_attention'],
                 'userVote'            => $vote,
                 'deleted'             => $row['deleted'],
                 'deletedBy'           => $deletedBy,

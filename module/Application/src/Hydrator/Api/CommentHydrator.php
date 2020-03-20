@@ -130,20 +130,19 @@ class CommentHydrator extends AbstractRestHydrator
             $canViewIP = $this->acl->isAllowed($role, 'user', 'ip');
         }
 
+        $addDate = Row::getDateTimeByColumnType('timestamp', $object['datetime']);
+
         $result = [
-            'id'      => (int) $object['id'],
-            'deleted' => (bool) $object['deleted'],
-            'item_id' => (int) $object['item_id'],
-            'type_id' => (int) $object['type_id'],
+            'id'                  => (int) $object['id'],
+            'deleted'             => (bool) $object['deleted'],
+            'item_id'             => (int) $object['item_id'],
+            'type_id'             => (int) $object['type_id'],
+            'moderator_attention' => (int) $object['moderator_attention'],
+            'datetime'            => $this->extractValue('datetime', $addDate),
         ];
 
         if ($this->filterComposite->filter('is_new')) {
             $result['is_new'] = $this->comments->service()->isNewMessage($object, $this->userId);
-        }
-
-        if ($this->filterComposite->filter('datetime')) {
-            $addDate            = Row::getDateTimeByColumnType('timestamp', $object['datetime']);
-            $result['datetime'] = $this->extractValue('datetime', $addDate);
         }
 
         if ($this->filterComposite->filter('user')) {
