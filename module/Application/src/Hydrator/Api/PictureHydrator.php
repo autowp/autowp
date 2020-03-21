@@ -18,6 +18,7 @@ use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
 use Autowp\TextStorage;
 use Autowp\User\Model\User;
+use DateTime;
 use Exception;
 use geoPHP;
 use Laminas\Db\Sql;
@@ -709,6 +710,25 @@ class PictureHydrator extends AbstractRestHydrator
                 $picture['copyrights']         = $text;
                 $picture['copyrights_text_id'] = (int) $object['copyrights_text_id'];
             }
+        }
+
+        if ($this->filterComposite->filter('taken_date')) {
+            $takenDate = null;
+            if ($object['taken_year']) {
+                $date = new DateTime();
+                $date->setDate($object['taken_year'], 1, 1);
+                $format = 'Y';
+                if ($object['taken_month']) {
+                    $date->setDate($object['taken_year'], $object['taken_month'], 1);
+                    $format = 'm.Y';
+                    if ($object['taken_day']) {
+                        $date->setDate($object['taken_year'], $object['taken_month'], $object['taken_day']);
+                        $format = 'd.m.Y';
+                    }
+                }
+                $takenDate = $date->format($format);
+            }
+            $picture['taken_date'] = $takenDate;
         }
 
         if ($isModer) {
