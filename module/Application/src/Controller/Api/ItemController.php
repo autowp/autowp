@@ -2159,12 +2159,13 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function newItemsAction()
     {
         $category = $this->itemModel->getRow([
             'item_type_id' => Item::CATEGORY,
-            'id'           => (int) $this->params('item_id'),
+            'id'           => (int) $this->params('id'),
         ]);
         if (! $category) {
             return $this->notFoundAction();
