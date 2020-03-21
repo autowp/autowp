@@ -337,7 +337,7 @@ class PictureItemController extends AbstractRestfulController
 
         $data = $this->processBodyContent($this->getRequest());
 
-        if (isset($data['perspective_id'])) {
+        if (array_key_exists('perspective_id', $data)) {
             $perspectiveId = (int) $data['perspective_id'];
 
             $this->pictureItem->setProperties($picture['id'], $itemId, $type, [
