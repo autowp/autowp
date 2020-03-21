@@ -20,6 +20,7 @@ use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
+use function array_key_exists;
 use function get_object_vars;
 use function htmlspecialchars;
 use function max;

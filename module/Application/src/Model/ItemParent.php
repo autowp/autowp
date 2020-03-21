@@ -957,6 +957,7 @@ class ItemParent
             $typeId          = (int) $row['type'];
             $result[$typeId] = (int) $row['count'];
         }
+
         return $result;
     }
 }
