@@ -720,6 +720,10 @@ class ItemHydrator extends AbstractRestHydrator
                     $route = ['/twins/group/', (string) $object['id']];
                     break;
 
+                case Item::BRAND:
+                    $route = ['/', (string) $object['catname']];
+                    break;
+
                 case Item::ENGINE:
                 case Item::VEHICLE:
                     $route = $this->getDetailsRoute($object['id'], [
