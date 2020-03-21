@@ -1648,6 +1648,24 @@ return [
                                                 ]
                                             ]
                                         ]
+                                    ],
+                                    'new-items' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route'  => '/new-items',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes'  => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'new-items',
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
                                     ]
                                 ]
                             ]
