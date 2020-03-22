@@ -2377,7 +2377,7 @@ return [
                                         ],
                                         'may_terminate' => false,
                                         'child_routes' => [
-                                            'delete' => [
+                                            'get' => [
                                                 'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'get',
@@ -2405,7 +2405,25 @@ return [
                                                 'action' => 'update'
                                             ]
                                         ]
-                                    ]
+                                    ],
+                                    'view' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/view'
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'post' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'post',
+                                                    'defaults' => [
+                                                        'action' => 'view'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ],
                                 ]
                             ],
                             'random_picture' => [

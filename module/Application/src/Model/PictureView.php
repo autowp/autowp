@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Laminas\Db\Adapter\Driver\StatementInterface;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
@@ -16,7 +17,7 @@ class PictureView
         $this->table = $table;
     }
 
-    public function inc(int $pictureId)
+    public function inc(int $pictureId): void
     {
         $sql = '
             INSERT INTO picture_view (picture_id, views)
@@ -25,7 +26,7 @@ class PictureView
         ';
 
         $adapter = $this->table->getAdapter();
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
+        /** @var StatementInterface $stmt */
         $stmt = $adapter->query($sql);
         $stmt->execute([$pictureId]);
     }
@@ -39,6 +40,10 @@ class PictureView
         return $row ? (int) $row['views'] : 0;
     }
 
+    /**
+     * @param int[] $ids
+     * @return int[]
+     */
     public function getValues(array $ids): array
     {
         if (count($ids) <= 0) {

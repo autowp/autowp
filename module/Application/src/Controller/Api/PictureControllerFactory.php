@@ -12,6 +12,7 @@ use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
+use Application\Model\PictureView;
 use Application\Model\UserPicture;
 use Application\Service\PictureService;
 use Application\Service\TelegramService;
@@ -54,7 +55,8 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(Picture::class),
             $container->get(User::class),
             $container->get(PictureService::class),
-            $container->get(Catalogue::class)
+            $container->get(Catalogue::class),
+            $container->get(PictureView::class)
         );
     }
 }

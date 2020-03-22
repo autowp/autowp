@@ -97,7 +97,7 @@ class Forums
 
     public function delete(int $topicId): bool
     {
-        $topic = $this->topicTable->select(['id = ?' => $topicId])->current();
+        $topic = $this->topicTable->select(['id' => $topicId])->current();
         if (! $topic) {
             return false;
         }

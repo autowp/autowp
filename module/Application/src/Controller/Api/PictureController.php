@@ -14,6 +14,7 @@ use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
+use Application\Model\PictureView;
 use Application\Model\UserPicture;
 use Application\Service\PictureService;
 use Application\Service\TelegramService;
@@ -112,6 +113,8 @@ class PictureController extends AbstractRestfulController
 
     private Catalogue $catalogue;
 
+    private PictureView $pictureView;
+
     public function __construct(
         AbstractRestHydrator $hydrator,
         PictureItem $pictureItem,
@@ -134,7 +137,8 @@ class PictureController extends AbstractRestfulController
         Picture $picture,
         User $userModel,
         PictureService $pictureService,
-        Catalogue $catalogue
+        Catalogue $catalogue,
+        PictureView $pictureView
     ) {
         $this->carOfDay = $carOfDay;
 
@@ -159,6 +163,7 @@ class PictureController extends AbstractRestfulController
         $this->userModel             = $userModel;
         $this->pictureService        = $pictureService;
         $this->catalogue             = $catalogue;
+        $this->pictureView           = $pictureView;
     }
 
     /**
@@ -1433,5 +1438,22 @@ class PictureController extends AbstractRestfulController
             'inboxCount'    => $inboxCount,
             'acceptedCount' => $acceptedCount,
         ]);
+    }
+
+    /**
+     * @suppress PhanDeprecatedFunction
+     * @throws Exception
+     * @return ViewModel|ResponseInterface|array
+     */
+    public function viewAction()
+    {
+        $picture = $this->picture->getRow(['id' => (int) $this->params('id')]);
+        if (! $picture) {
+            return $this->notFoundAction();
+        }
+
+        $this->pictureView->inc($picture['id']);
+
+        return $this->getResponse()->setStatusCode(201);
     }
 }
