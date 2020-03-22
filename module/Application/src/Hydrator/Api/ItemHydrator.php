@@ -304,7 +304,7 @@ class ItemHydrator extends AbstractRestHydrator
             'breakOnFirst' => true,
         ]);
         foreach ($cataloguePaths as $path) {
-            return array_merge(['/', $path['brand_catname'], $path['car_catname']], $path['path']);
+            return ['/', $path['brand_catname'], $path['car_catname'], ...$path['path'], 'specifications'];
         }
 
         return null;

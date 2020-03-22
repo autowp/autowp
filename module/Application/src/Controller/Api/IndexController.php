@@ -291,16 +291,16 @@ class IndexController extends AbstractRestfulController
                 'produced'         => true,
                 'design'           => true,
                 'engine_vehicles'  => true,
-                'url'              => true,
                 'can_edit_specs'   => true,
                 'specs_route'      => true,
+                'route'            => true,
                 'categories'       => [
                     'catname'   => true,
                     'name_html' => true,
                 ],
                 'twins_groups'     => true,
                 'preview_pictures' => [
-                    'picture' => ['thumb_medium' => true],
+                    'picture' => ['thumb_medium' => true, 'name_text' => true],
                     'url'     => true,
                 ],
                 'childs_count'     => true,
