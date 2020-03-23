@@ -840,7 +840,7 @@ class PictureController extends AbstractRestfulController
                     $userIds = $this->textStorage->getTextUserIds($picture['copyrights_text_id']);
 
                     foreach ($userIds as $userId) {
-                        if ($userId !== $user['id']) {
+                        if ($userId !== (int) $user['id']) {
                             $userRow = $this->userModel->getRow((int) $userId);
                             if ($userRow) {
                                 $uri = $this->hostManager->getUriByLanguage($userRow['language']);
