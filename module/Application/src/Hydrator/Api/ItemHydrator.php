@@ -737,6 +737,22 @@ class ItemHydrator extends AbstractRestHydrator
             $result['route'] = $route;
         }
 
+        if ($this->filterComposite->filter('produced')) {
+            $value                      = (int) $object['produced'];
+            $result['produced']         = $value > 0 ? $value : null;
+            $result['produced_exactly'] = (bool) $object['produced_exactly'];
+        }
+
+        if ($this->filterComposite->filter('design')) {
+            $result['design'] = $this->itemModel->getDesignInfo($object['id'], $this->language);
+        }
+
+        if ($this->filterComposite->filter('engine_vehicles')) {
+            if ((int) $object['item_type_id'] === Item::ENGINE) {
+                $result['engine_vehicles'] = $this->getVehiclesOnEngine($object);
+            }
+        }
+
         if ($isModer) {
             $result['body'] = (string) $object['body'];
 
@@ -870,22 +886,6 @@ class ItemHydrator extends AbstractRestHydrator
             if ($this->filterComposite->filter('name_default')) {
                 $name                   = $this->itemModel->getLanguageName($object['id'], 'xx');
                 $result['name_default'] = $nameData['name'] === $name ? null : $name;
-            }
-
-            if ($this->filterComposite->filter('produced')) {
-                $value                      = (int) $object['produced'];
-                $result['produced']         = $value > 0 ? $value : null;
-                $result['produced_exactly'] = (bool) $object['produced_exactly'];
-            }
-
-            if ($this->filterComposite->filter('design')) {
-                $result['design'] = $this->itemModel->getDesignInfo($object['id'], $this->language);
-            }
-
-            if ($this->filterComposite->filter('engine_vehicles')) {
-                if ((int) $object['item_type_id'] === Item::ENGINE) {
-                    $result['engine_vehicles'] = $this->getVehiclesOnEngine($object);
-                }
             }
 
             if ($this->filterComposite->filter('public_routes')) {
