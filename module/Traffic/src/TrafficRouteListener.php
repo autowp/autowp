@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Autowp\Traffic;
 
 use Autowp\User\Model\User;
+use Exception;
 use Laminas\Authentication\AuthenticationService;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
@@ -18,24 +19,24 @@ use function strncasecmp;
 class TrafficRouteListener extends AbstractListenerAggregate
 {
     private array $whitelist = [
-        '/api/forum',
-        '/api/user',
         '/api/account',
         '/api/acl',
         '/api/article',
         '/api/attr',
+        '/api/brands',
         '/api/chart',
         '/api/comment',
         '/api/contacts',
         '/api/donate',
         '/api/feedback',
+        '/api/forum',
         '/api/hotlinks',
         '/api/ip',
+        '/api/index',
         '/api/item-link',
         '/api/language',
         '/api/log',
         '/api/login',
-        '/api/signin',
         '/api/map',
         '/api/message',
         '/api/mosts',
@@ -45,15 +46,17 @@ class TrafficRouteListener extends AbstractListenerAggregate
         '/api/rating',
         '/api/recaptcha',
         '/api/restore-password',
+        '/api/signin',
+        '/api/spec',
         '/api/text',
         '/api/timezone',
         '/api/traffic',
-        '/api/spec',
         '/api/stat',
         '/api/vehicle-types',
         '/api/perspective',
         '/api/perspective-page',
         '/api/picture-moder-vote-template',
+        '/api/user',
         '/api/voting',
         '/comments',
         '/donate',
@@ -84,6 +87,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
 
     /**
      * @return mixed|null
+     * @throws Exception
      */
     public function onRoute(MvcEvent $e)
     {
@@ -110,10 +114,11 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 }
             }
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
+            /** @var string $ip */
             $ip = $request->getServer('REMOTE_ADDR');
 
             if ($ip) {
+                /** @var TrafficControl $service */
                 $service = $serviceManager->get(TrafficControl::class);
 
                 $banInfo = $service->getBanInfo($ip);
