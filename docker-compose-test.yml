@@ -134,14 +134,10 @@ traffic:
   - TRAFFIC_RABBITMQ_PORT=5672
   - TRAFFIC_MONITORING_QUEUE=input
   - TRAFFIC_HOTLINK_QUEUE=hotlink
-  - TRAFFIC_MYSQL_HOST=autowp_test_traffic_mysql
-  - TRAFFIC_MYSQL_PORT=3306
-  - TRAFFIC_MYSQL_USERNAME=root
-  - TRAFFIC_MYSQL_PASSWORD=password
-  - TRAFFIC_MYSQL_DBNAME=traffic
-  - TRAFFIC_ROLLBAR_TOKEN=
-  - TRAFFIC_ROLLBAR_ENVIRONMENT=development
-  - TRAFFIC_ROLLBAR_PERIOD=1m
+  - TRAFFIC_MYSQL_DSN=root:password@tcp(autowp_test_traffic_mysql:3306)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
+  - TRAFFIC_MIGRATIONS_DSN=mysql://root:password@tcp(autowp_test_traffic_mysql)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
+  - TRAFFIC_SENTRY_DSN=
+  - TRAFFIC_SENTRY_ENVIRONMENT=development
 
 traffic-mysql:
   image: mysql:8
@@ -164,13 +160,9 @@ goautowp:
   - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
   - AUTOWP_RABBITMQ_PORT=5672
   - AUTOWP_DUPLICATE_FINDER_QUEUE=duplicate_finder
-  - AUTOWP_MYSQL_HOST=autowp_test_mysql
-  - AUTOWP_MYSQL_PORT=3306
-  - AUTOWP_MYSQL_USERNAME=autowp_test
-  - AUTOWP_MYSQL_PASSWORD=test
-  - AUTOWP_MYSQL_DBNAME=autowp_test
-  - AUTOWP_ROLLBAR_TOKEN=
-  - AUTOWP_ROLLBAR_ENVIRONMENT=development
-  - AUTOWP_ROLLBAR_PERIOD=1m
+  - AUTOWP_MYSQL_DSN=autowp_test:test@tcp(autowp_test_mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
+  - AUTOWP_MIGRATIONS_DSN=mysql://autowp_test:test@tcp(autowp_test_mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
+  - AUTOWP_SENTRY_DSN=
+  - AUTOWP_SENTRY_ENVIRONMENT=development
   - AUTOWP_IMAGES_DIR=/app/pictures
   - AUTOWP_MIGRATIONS_DIR=/app/migrations
