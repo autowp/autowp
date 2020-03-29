@@ -3,17 +3,10 @@
 namespace ApplicationTest\Controller\Frontend;
 
 use Application\Controller\Api\AttrController;
-use Application\Controller\Api\UserController;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
 use Exception;
 use Laminas\Http\Request;
-use Laminas\Json\Json;
-use Laminas\Mail\Transport\TransportInterface;
-
-use function count;
-use function explode;
-use function preg_match;
 
 class AccountControllerTest extends AbstractHttpControllerTestCase
 {
@@ -23,7 +16,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function createUser(string $email, string $password, string $name): int
+    /*private function createUser(string $email, string $password, string $name): int
     {
         $this->reset();
 
@@ -64,13 +57,13 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(UserController::class);
         $this->assertMatchedRouteName('api/user/emailcheck');
         $this->assertActionName('emailcheck');
-    }
+    }*/
 
     /**
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function getUser(int $userId): array
+    /*private function getUser(int $userId): array
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
@@ -83,7 +76,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('item');
 
         return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-    }
+    }*/
 
     /**
      * @suppress PhanUndeclaredMethod
