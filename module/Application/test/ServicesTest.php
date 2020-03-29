@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Controller;
+namespace ApplicationTest;
 
 use Application\FileSize;
 use Application\HostManager;

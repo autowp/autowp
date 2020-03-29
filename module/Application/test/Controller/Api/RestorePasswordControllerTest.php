@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Api\Controller;
+namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\RestorePasswordController;
 use Application\Controller\Api\UserController;

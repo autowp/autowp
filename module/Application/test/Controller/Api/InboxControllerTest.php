@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Frontend\Controller\Api;
+namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\InboxController;
 use Application\Controller\Api\ItemController;

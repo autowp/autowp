@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Api\Controller;
+namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\PictureController;

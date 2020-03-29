@@ -4,6 +4,7 @@ namespace ApplicationTest\Frontend\Controller;
 
 use Application\Controller\Api\VotingController;
 use Application\Test\AbstractHttpControllerTestCase;
+use ApplicationTest\Data;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\Request;

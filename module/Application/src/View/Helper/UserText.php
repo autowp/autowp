@@ -2,10 +2,13 @@
 
 namespace Application\View\Helper;
 
-use Application\Model\Picture;
+use ArrayAccess;
+use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User as UserModel;
+use DateInterval;
+use DateTime;
 use Exception;
-use Laminas\Router\Http\TreeRouteStack;
+use Laminas\Permissions\Acl\Acl;
 use Laminas\Uri;
 use Laminas\View\Helper\AbstractHtmlElement;
 
@@ -34,17 +37,14 @@ class UserText extends AbstractHtmlElement
         'wheelsage.org',
     ];
 
-    private TreeRouteStack $router;
-
-    private Picture $picture;
-
     private UserModel $userModel;
 
-    public function __construct(TreeRouteStack $router, Picture $picture, UserModel $userModel)
+    private Acl $acl;
+
+    public function __construct(UserModel $userModel, Acl $acl)
     {
-        $this->router    = $router;
-        $this->picture   = $picture;
         $this->userModel = $userModel;
+        $this->acl       = $acl;
     }
 
     /**
@@ -161,7 +161,7 @@ class UserText extends AbstractHtmlElement
 
             if ($user) {
                 /* @phan-suppress-next-line PhanUndeclaredMethod */
-                return $this->view->user($user)->__toString();
+                return $this->renderUser($user);
             }
         }
 
@@ -172,7 +172,7 @@ class UserText extends AbstractHtmlElement
 
             if ($user) {
                 /* @phan-suppress-next-line PhanUndeclaredMethod */
-                return $this->view->user($user)->__toString();
+                return $this->renderUser($user);
             }
         }
 
@@ -180,7 +180,49 @@ class UserText extends AbstractHtmlElement
     }
 
     /**
-     * @throws Exception
+     * @suppress PhanUndeclaredMethod
+     * @param array|ArrayAccess $user
+     */
+    private function renderUser($user): string
+    {
+        if (! $user) {
+            return '';
+        }
+
+        if ($user['deleted']) {
+            return '<span class="muted"><i class="fa fa-user" aria-hidden="true"></i> '
+                        . /* @phan-suppress-next-line PhanUndeclaredMethod */
+                        $this->view->escapeHtml($this->view->translate('deleted-user'))
+                    . '</span>';
+        }
+
+        $url = '/users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
+
+        $classes    = ['user'];
+        $lastOnline = Row::getDateTimeByColumnType('timestamp', $user['last_online']);
+        if ($lastOnline) {
+            $date = new DateTime();
+            $date->sub(new DateInterval('P6M'));
+            if ($date > $lastOnline) {
+                $classes[] = 'long-away';
+            }
+        } else {
+            $classes[] = 'long-away';
+        }
+
+        if ($user['role'] && $this->acl->isAllowed($user['role'], 'status', 'be-green')) {
+            $classes[] = 'green-man';
+        }
+
+        return '<span class="' . implode(' ', $classes) . '">'
+            . '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;'
+            . /* @phan-suppress-next-line PhanUndeclaredMethod */
+            $this->view->htmlA($url, $user['name'])
+        . '</span>';
+    }
+
+    /*
+       @throws Exception
 
     private function tryPictureLinkParams(array $params): bool
     {
