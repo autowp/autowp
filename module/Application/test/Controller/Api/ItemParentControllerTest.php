@@ -4,7 +4,7 @@ namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\ItemParentController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Laminas\Http\Header\Cookie;
+use ApplicationTest\Data;
 use Laminas\Http\Request;
 use Laminas\Json\Json;
 
@@ -17,7 +17,7 @@ class ItemParentControllerTest extends AbstractHttpControllerTestCase
      */
     public function testCategoriesFirstOrder()
     {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_GET, [
             'order' => 'categories_first',
         ]);

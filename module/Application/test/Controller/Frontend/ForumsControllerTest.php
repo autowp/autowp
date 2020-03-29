@@ -5,7 +5,7 @@ namespace ApplicationTest\Controller\Frontend;
 use Application\Controller\Api\CommentController;
 use Application\Controller\Api\ForumController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Laminas\Http\Header\Cookie;
+use ApplicationTest\Data;
 use Laminas\Http\Request;
 
 use function count;
@@ -37,7 +37,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
      */
     public function testCreateTopic()
     {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_POST, [
             'theme_id'            => 2,
             'name'                => 'Test topic',
@@ -60,7 +60,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 
         // unsubscribe
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'subscription' => 0,
         ]);
@@ -72,7 +72,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 
         // subscribe
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'subscription' => 1,
         ]);
@@ -84,7 +84,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 
         // close
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'status' => 'closed',
         ]);
@@ -96,7 +96,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 
         // open
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'status' => 'normal',
         ]);
@@ -108,7 +108,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 
         // subscribes
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_GET, [
             'subscription' => 1,
         ]);
@@ -120,7 +120,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 
         // post message
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/comment', Request::METHOD_POST, [
             'item_id'             => $topicId,
             'type_id'             => 5,
@@ -136,7 +136,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 
         // delete topic
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'status' => 'deleted',
         ]);

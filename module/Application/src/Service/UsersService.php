@@ -20,14 +20,11 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Mail;
 
-use function headers_sent;
 use function md5;
 use function microtime;
 use function round;
-use function setcookie;
 use function sprintf;
 use function strlen;
-use function time;
 
 use const PHP_EOL;
 
@@ -464,28 +461,6 @@ class UsersService
 
         if ($imageId) {
             $this->imageStorage->removeImage($imageId);
-        }
-    }
-
-    public function clearRememberCookie(string $language): void
-    {
-        if (! isset($this->hosts[$language])) {
-            throw new Exception("Host `$language` not found");
-        }
-        if (! headers_sent()) {
-            $domain = $this->hosts[$language]['cookie'];
-            setcookie('remember', '', time() - 3600 * 24 * 30, '/', $domain);
-        }
-    }
-
-    public function setRememberCookie(string $hash, string $language): void
-    {
-        if (! isset($this->hosts[$language])) {
-            throw new Exception("Host `$language` not found");
-        }
-        if (! headers_sent()) {
-            $domain = $this->hosts[$language]['cookie'];
-            setcookie('remember', $hash, time() + 3600 * 24 * 30, '/', $domain);
         }
     }
 

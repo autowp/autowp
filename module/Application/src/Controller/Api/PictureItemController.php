@@ -15,7 +15,6 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
-use Laminas\Session\Container;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -295,9 +294,6 @@ class PictureItemController extends AbstractRestfulController
             ]);
         }
 
-        $namespace            = new Container('Moder_Car');
-        $namespace->lastCarId = $item['id'];
-
         $this->log->addEvent($userId, sprintf(
             'Картинка %s связана с %s',
             htmlspecialchars('#' . $picture['id']),
@@ -434,9 +430,6 @@ class PictureItemController extends AbstractRestfulController
                 'items'    => [$srcItem['id'], $dstItem['id']],
                 'pictures' => $picture['id'],
             ]);
-
-            $namespace            = new Container('Moder_Car');
-            $namespace->lastCarId = $dstItem['id'];
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */

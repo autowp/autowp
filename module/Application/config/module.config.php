@@ -16,11 +16,10 @@ use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
 $host = getenv('AUTOWP_HOST');
-$hostCookie = ($host == 'localhost' ? '' : '.' . $host);
 
 $mailTypes = [
     'in-memory' => [
-        'type' => 'in-memory'
+        'type' => 'in-memory',
     ],
     'smtp' => [
         'type'    => 'smtp',
@@ -30,7 +29,7 @@ $mailTypes = [
             'connection_config' => [
                 'username' => getenv('AUTOWP_MAIL_SMTP_USERNAME'),
                 'password' => getenv('AUTOWP_MAIL_SMTP_PASSWORD'),
-                'ssl'      => 'tls'
+                'ssl'      => 'tls',
             ],
         ],
     ]
@@ -56,7 +55,7 @@ return [
         'invokables' => [
             'forbiddenAction'     => Controller\Plugin\ForbiddenAction::class,
             'inputFilterResponse' => Controller\Api\Plugin\InputFilterResponse::class,
-            'inputResponse'       => Controller\Api\Plugin\InputResponse::class
+            'inputResponse'       => Controller\Api\Plugin\InputResponse::class,
         ],
         'factories' => [
             'car'         => Controller\Plugin\Service\CarFactory::class,
@@ -64,11 +63,10 @@ return [
             'fileSize'    => Controller\Plugin\Service\FileSizeFactory::class,
             'language'    => Controller\Plugin\Service\LanguageFactory::class,
             'log'         => Controller\Plugin\Service\LogFactory::class,
-            'oauth2'      => Factory\OAuth2PluginFactory::class,
             'pic'         => Controller\Plugin\Service\PicFactory::class,
             'pictureVote' => Controller\Plugin\Service\PictureVoteFactory::class,
             'translate'   => Controller\Plugin\Service\TranslateFactory::class,
-        ]
+        ],
     ],
     'translator' => [
         'locale' => 'ru',
@@ -77,27 +75,27 @@ return [
             [
                 'type'     => PhpArray::class,
                 'base_dir' => __DIR__ . '/../language',
-                'pattern'  => '%s.php'
+                'pattern'  => '%s.php',
             ],
             [
                 'type'     => PhpArray::class,
                 'base_dir' => __DIR__ . '/../language/plural',
-                'pattern'  => '%s.php'
+                'pattern'  => '%s.php',
             ],
             [
                 'type'     => PhpArray::class,
                 'base_dir' => \Laminas\I18n\Translator\Resources::getBasePath(),
-                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForValidator()
+                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForValidator(),
             ],
             [
                 'type'     => PhpArray::class,
                 'base_dir' => \Laminas\I18n\Translator\Resources::getBasePath(),
-                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForCaptcha()
+                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForCaptcha(),
             ],
             [
                 'type'     => PhpArray::class,
                 'base_dir' => Resources::getBasePath(),
-                'pattern'  => Resources::getPatternForViewHelpers()
+                'pattern'  => Resources::getPatternForViewHelpers(),
             ]
         ],
     ],
@@ -142,31 +140,27 @@ return [
             Service\UsersService::class          => Service\UsersServiceFactory::class,
             ItemNameFormatter::class             => Service\ItemNameFormatterFactory::class,
             'translator'                         => TranslatorFactory::class,
-            Provider\UserId\OAuth2UserIdProvider::class => Provider\UserId\OAuth2UserIdProviderFactory::class,
-        ],
-        'aliases' => [
-            'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
         ],
         'abstract_factories' => [
-            'Laminas\Cache\Service\StorageCacheAbstractServiceFactory'
+            'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
         ]
     ],
 
     'telegram' => [
         'accessToken' => getenv('AUTOWP_TELEGRAM_ACCESS_TOKEN'),
         'token'       => getenv('AUTOWP_TELEGRAM_TOKEN'),
-        'webhook'     => 'https://www.autowp.ru/telegram/webhook/token/' . getenv('AUTOWP_TELEGRAM_TOKEN')
+        'webhook'     => 'https://www.autowp.ru/telegram/webhook/token/' . getenv('AUTOWP_TELEGRAM_TOKEN'),
     ],
 
     'twitter' => [
         'username' => getenv('AUTOWP_TWITTER_USERNAME'),
         'oauthOptions' => [
             'consumerKey'    => getenv('AUTOWP_TWITTER_OAUTH_KEY'),
-            'consumerSecret' => getenv('AUTOWP_TWITTER_OAUTH_SECRET')
+            'consumerSecret' => getenv('AUTOWP_TWITTER_OAUTH_SECRET'),
         ],
         'token' => [
             'oauth_token'        => getenv('AUTOWP_TWITTER_TOKEN_OAUTH'),
-            'oauth_token_secret' => getenv('AUTOWP_TWITTER_TOKEN_OAUTH_SECRET')
+            'oauth_token_secret' => getenv('AUTOWP_TWITTER_TOKEN_OAUTH_SECRET'),
         ]
     ],
 
@@ -182,62 +176,55 @@ return [
             'timezone' => 'Europe/London',
             'name'     => 'English',
             'flag'     => 'flag-icon flag-icon-gb',
-            'cookie'   => $hostCookie,
             'aliases'  => [
                 'en.autowp.ru',
                 $host,
                 'www' . $host
-            ]
+            ],
         ],
         'zh' => [
             'hostname' => 'zh.' . $host,
             'timezone' => 'Asia/Shanghai',
             'name'     => '中文 (beta)',
             'flag'     => 'flag-icon flag-icon-cn',
-            'cookie'   => $hostCookie,
-            'aliases'  => []
+            'aliases'  => [],
         ],
         'ru' => [
             'hostname' => getenv('AUTOWP_HOST_RU'),
             'timezone' => 'Europe/Moscow',
             'name'     => 'Русский',
             'flag'     => 'flag-icon flag-icon-ru',
-            'cookie'   => getenv('AUTOWP_HOST_COOKIE_RU'),
             'aliases'  => [
                 'ru.autowp.ru'
-            ]
+            ],
         ],
         'pt-br' => [
             'hostname' => 'br.' . $host,
             'timezone' => 'Brazil/West',
             'name'     => 'Português brasileiro',
             'flag'     => 'flag-icon flag-icon-br',
-            'cookie'   => $hostCookie,
-            'aliases'  => []
+            'aliases'  => [],
         ],
         'fr' => [
             'hostname' => 'fr.' . $host,
             'timezone' => 'Europe/Paris',
             'name'     => 'Français (beta)',
             'flag'     => 'flag-icon flag-icon-fr',
-            'cookie'   => $hostCookie,
-            'aliases'  => []
+            'aliases'  => [],
         ],
         'be' => [
             'hostname' => 'be.' . $host,
             'timezone' => 'Europe/Minsk',
             'name'     => 'Беларуская',
             'flag'     => 'flag-icon flag-icon-by',
-            'cookie'   => $hostCookie,
-            'aliases'  => []
+            'aliases'  => [],
         ],
         'uk' => [
             'hostname' => 'uk.' . $host,
             'timezone' => 'Europe/Kiev',
             'name'     => 'Українська (beta)',
             'flag'     => 'flag-icon flag-icon-ua',
-            'cookie'   => $hostCookie,
-            'aliases'  => []
+            'aliases'  => [],
         ],
     ],
 
@@ -264,7 +251,7 @@ return [
         'from'     => 'no-reply@autowp.ru',
         'fromname' => 'robot autowp.ru',
         'to'       => 'autowp@gmail.com',
-        'subject'  => 'AutoWP Feedback'
+        'subject'  => 'AutoWP Feedback',
     ],
 
     'validators' => [
@@ -280,7 +267,7 @@ return [
             Validator\User\EmailExists::class            => Validator\User\EmailExistsFactory::class,
             Validator\User\EmailNotExists::class         => Validator\User\EmailNotExistsFactory::class,
             Validator\User\Login::class                  => Validator\User\LoginFactory::class,
-            Validator\DateString::class                  => InvokableFactory::class
+            Validator\DateString::class                  => InvokableFactory::class,
         ],
     ],
 
@@ -362,5 +349,7 @@ return [
 
     'traffic' => [
         'url' => getenv('TRAFFIC_URL')
-    ]
+    ],
+
+    'authSecret' => getenv('AUTOWP_AUTH_SECRET'),
 ];

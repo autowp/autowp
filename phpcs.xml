@@ -12,7 +12,6 @@
     <file>module/Traffic/src</file>
     <file>module/Traffic/test</file>
     <file>module/User/src</file>
-    <file>module/User/test</file>
     <file>module/Comments/src</file>
     <file>module/Comments/test</file>
     <file>module/Message/src</file>

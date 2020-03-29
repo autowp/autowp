@@ -5,8 +5,8 @@ namespace ApplicationTest\Frontend\Controller;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
 use Application\Test\AbstractHttpControllerTestCase;
+use ApplicationTest\Data;
 use Exception;
-use Laminas\Http\Header\Cookie;
 use Laminas\Http\Request;
 
 use function array_replace;
@@ -25,7 +25,7 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -48,7 +48,7 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
             'https://www.autowp.ru/api/item-parent',
             Request::METHOD_POST,

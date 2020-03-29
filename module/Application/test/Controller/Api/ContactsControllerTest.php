@@ -4,7 +4,7 @@ namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\ContactsController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Laminas\Http\Header\Cookie;
+use ApplicationTest\Data;
 use Laminas\Http\Request;
 use Laminas\Json\Json;
 
@@ -17,7 +17,7 @@ class ContactsControllerTest extends AbstractHttpControllerTestCase
      */
     public function testCreateDeleteContact()
     {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/contacts/1', Request::METHOD_PUT);
 
         $this->assertResponseStatusCode(200);
@@ -32,7 +32,7 @@ class ContactsControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/contacts/1', Request::METHOD_DELETE);
 
         $this->assertResponseStatusCode(204);

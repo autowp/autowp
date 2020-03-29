@@ -3,19 +3,13 @@
 namespace Application\Controller\Console;
 
 use Application\Controller\Plugin\Pic;
-use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Picture;
-use Application\Model\PictureItem;
-use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
 use Autowp\Message\MessageService;
-use Autowp\TextStorage;
-use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
-use Laminas\Authentication\AuthenticationService;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Uri\UriFactory;
 
@@ -23,7 +17,6 @@ use function htmlspecialchars;
 use function sleep;
 use function sprintf;
 use function urlencode;
-use function var_dump;
 
 use const PHP_EOL;
 
@@ -37,10 +30,6 @@ class CatalogueController extends AbstractActionController
 {
     private ItemParent $itemParent;
 
-    private PictureItem $pictureItem;
-
-    private TextStorage\Service $textStorage;
-
     private MessageService $message;
 
     private Item $itemModel;
@@ -49,38 +38,26 @@ class CatalogueController extends AbstractActionController
 
     private User $userModel;
 
-    private SpecificationsService $specService;
-
     private HostManager $hostManager;
 
     private TelegramService $telegram;
 
-    private DuplicateFinder $duplicateFinder;
-
     public function __construct(
         ItemParent $itemParent,
-        PictureItem $pictureItem,
-        SpecificationsService $specService,
         HostManager $hostManager,
         TelegramService $telegram,
         MessageService $message,
-        TextStorage\Service $textStorage,
-        DuplicateFinder $duplicateFinder,
         Item $itemModel,
         Picture $picture,
         User $userModel
     ) {
-        $this->itemParent      = $itemParent;
-        $this->pictureItem     = $pictureItem;
-        $this->specService     = $specService;
-        $this->hostManager     = $hostManager;
-        $this->telegram        = $telegram;
-        $this->message         = $message;
-        $this->textStorage     = $textStorage;
-        $this->duplicateFinder = $duplicateFinder;
-        $this->itemModel       = $itemModel;
-        $this->picture         = $picture;
-        $this->userModel       = $userModel;
+        $this->itemParent  = $itemParent;
+        $this->hostManager = $hostManager;
+        $this->telegram    = $telegram;
+        $this->message     = $message;
+        $this->itemModel   = $itemModel;
+        $this->picture     = $picture;
+        $this->userModel   = $userModel;
     }
 
     public function refreshBrandVehicleAction(): string
@@ -98,7 +75,7 @@ class CatalogueController extends AbstractActionController
         $select = $this->picture->getTable()->getSql()->select();
         $select
             ->where([
-                'type = ?'   => Picture::UNSORTED_TYPE_ID,
+                // 'type = ?'   => Picture::UNSORTED_TYPE_ID,
                 'status = ?' => Picture::STATUS_INBOX,
                 'add_date < DATE_SUB(NOW(), INTERVAL 2 YEAR)',
             ])
@@ -107,22 +84,6 @@ class CatalogueController extends AbstractActionController
         $rows = $this->picture->getTable()->selectWith($select);
 
         $userId = 9;
-
-        $adapter = new IdAuthAdapter($this->userModel);
-        $adapter->setIdentity($userId);
-
-        $auth   = new AuthenticationService();
-        $result = $auth->authenticate($adapter);
-
-        if (! $result->isValid()) {
-            var_dump('fail 1');
-            return '';
-        }
-
-        if (! $auth->hasIdentity()) {
-            var_dump('fail 2');
-            return '';
-        }
 
         foreach ($rows as $picture) {
             print $picture['id'] . PHP_EOL;

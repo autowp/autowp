@@ -4,7 +4,7 @@ namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\SpecController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Laminas\Http\Header\Cookie;
+use ApplicationTest\Data;
 use Laminas\Http\Request;
 use Laminas\Json\Json;
 
@@ -17,7 +17,7 @@ class SpecControllerTest extends AbstractHttpControllerTestCase
      */
     public function testDelete()
     {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/spec', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);

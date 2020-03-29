@@ -5,8 +5,8 @@ namespace ApplicationTest\Controller\Frontend;
 use Application\Controller\Api\AttrController;
 use Application\Controller\Api\ItemController;
 use Application\Test\AbstractHttpControllerTestCase;
+use ApplicationTest\Data;
 use Exception;
-use Laminas\Http\Header\Cookie;
 use Laminas\Http\Request;
 
 use function count;
@@ -24,7 +24,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -52,7 +52,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
         // select engine
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
             'engine_id' => $engineId,
         ]);
@@ -65,7 +65,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
         // cancel engine
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
             'engine_id' => '',
             'foo'       => 'bar', // workaround for zf bug
@@ -79,7 +79,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
         // inherit engine
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
             'engine_id' => 'inherited',
         ]);
@@ -97,7 +97,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testCarsSpecificationsEditor(): void
     {
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $url = 'https://www.autowp.ru/api/attr/user-value';
         $this->dispatch($url, Request::METHOD_PATCH, [
             'items' => [

@@ -18,7 +18,6 @@ class Module implements
             'controller_plugins' => $provider->getControllerPluginConfig(),
             'service_manager'    => $provider->getDependencyConfig(),
             'tables'             => $provider->getTablesConfig(),
-            'view_helpers'       => $provider->getViewHelperConfig(),
         ];
     }
 
@@ -39,11 +38,7 @@ class Module implements
     public function onBootstrap(Event $e): array
     {
         $application    = $e->getApplication();
-        $eventManager   = $application->getEventManager();
         $serviceManager = $application->getServiceManager();
-
-        $authRememberListener = new Auth\RememberDispatchListener();
-        $authRememberListener->attach($eventManager);
 
         $maintenance = new Maintenance();
         $maintenance->attach($serviceManager->get('CronEventManager')); // TODO: move CronEventManager to zf-components

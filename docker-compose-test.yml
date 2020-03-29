@@ -77,6 +77,7 @@ backend:
     AUTOWP_IMAGE_BRAND_BUCKET: autowp-travis-brand
     AUTOWP_IMAGE_PICTURE_BUCKET: autowp-travis-picture
     SONARCLOUD_TOKEN: ${SONARCLOUD_TOKEN}
+    AUTOWP_AUTH_SECRET: example_secret
   volumes:
   - ./config/autoload/local.php:/app/config/autoload/local.php:ro
   - ./module/Application/test/_files/image:/app/public_html/image
@@ -110,14 +111,6 @@ mysql:
   expose:
   - "3306"
 
-frontend:
-  image: autowp/autowp-frontend
-  container_name: autowp_test_frontend
-  restart: always
-  links:
-  - backend
-  - goautowp
-
 rabbitmq:
   image: rabbitmq
   container_name: autowp_test_rabbitmq
@@ -146,23 +139,3 @@ traffic-mysql:
   environment:
   - MYSQL_ROOT_PASSWORD=password
   - MYSQL_DATABASE=traffic
-
-goautowp:
-  image: autowp/goautowp
-  container_name: autowp_test_goautowp
-  restart: always
-  links:
-  - rabbitmq
-  - mysql
-  volumes:
-  - ./public_html/pictures:/app/pictures:ro
-  environment:
-  - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
-  - AUTOWP_RABBITMQ_PORT=5672
-  - AUTOWP_DUPLICATE_FINDER_QUEUE=duplicate_finder
-  - AUTOWP_MYSQL_DSN=autowp_test:test@tcp(autowp_test_mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
-  - AUTOWP_MIGRATIONS_DSN=mysql://autowp_test:test@tcp(autowp_test_mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
-  - AUTOWP_SENTRY_DSN=
-  - AUTOWP_SENTRY_ENVIRONMENT=development
-  - AUTOWP_IMAGES_DIR=/app/pictures
-  - AUTOWP_MIGRATIONS_DIR=/app/migrations

@@ -1201,12 +1201,6 @@ return [
                     ['name' => 'StringTrim']
                 ]
             ],
-            'last_item' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
-            ],
             'descendant' => [
                 'required' => false,
                 'filters'  => [
@@ -2147,10 +2141,6 @@ return [
             'password' => [
                 'required' => true
             ],
-            'remember' => [
-                'required'    => false,
-                'allow_empty' => true
-            ]
         ],
         'api_message_list' => [
             'user_id' => [

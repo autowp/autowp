@@ -2,8 +2,6 @@
 
 namespace Application;
 
-use Autowp\User\Model\User;
-use Laminas\Authentication\AuthenticationService;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Http\PhpEnvironment\Request;
@@ -101,18 +99,6 @@ class LanguageRouteListener extends AbstractListenerAggregate
         Request $request,
         array $whitelist
     ): ?string {
-        $auth = new AuthenticationService();
-
-        if ($auth->hasIdentity()) {
-            /** @var User $userModel */
-            $userModel = $serviceManager->get(User::class);
-
-            $userLanguage = $userModel->getUserLanguage($auth->getIdentity());
-            if (in_array($userLanguage, $whitelist)) {
-                return $userLanguage;
-            }
-        }
-
         /** @var Request $acceptLanguage */
         $acceptLanguage = $request->getServer('HTTP_ACCEPT_LANGUAGE');
         if ($acceptLanguage) {

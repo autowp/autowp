@@ -4,7 +4,7 @@ namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\BrandsController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Laminas\Http\Header\Cookie;
+use ApplicationTest\Data;
 use Laminas\Http\Request;
 
 use function count;
@@ -32,7 +32,7 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
     {
         $brandId = 204;
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
             'name'         => 'Car for testNewcars',
             'item_type_id' => 1,
@@ -47,7 +47,7 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
 
         // add to brand
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_POST, [
             'parent_id' => $brandId,
             'item_id'   => $carId,

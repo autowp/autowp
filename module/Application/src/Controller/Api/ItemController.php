@@ -38,7 +38,6 @@ use Laminas\InputFilter\InputFilterPluginManager;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator\Adapter\DbSelect;
 use Laminas\Paginator\Paginator;
-use Laminas\Session\Container;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
@@ -503,12 +502,6 @@ class ItemController extends AbstractRestfulController
         }
 
         if ($isModer) {
-            if ($data['last_item']) {
-                $namespace = new Container('Moder_Car');
-                $itemId    = isset($namespace->lastCarId) ? (int) $namespace->lastCarId : 0;
-                $select->where(['item.id' => $itemId]);
-            }
-
             if ($data['name_exclude']) {
                 $select
                     ->join(['ile' => 'item_language'], 'item.id = ile.item_id', [])
@@ -1414,9 +1407,6 @@ class ItemController extends AbstractRestfulController
 
         $this->vehicleType->refreshInheritanceFromParents($itemId);
 
-        $namespace            = new Container('Moder_Car');
-        $namespace->lastCarId = $itemId;
-
         $this->userItemSubscribe->subscribe($user['id'], $itemId);
 
         $this->itemModel->updateInteritance($itemId);
@@ -1690,7 +1680,7 @@ class ItemController extends AbstractRestfulController
                             ),
                             $this->userUrl($user, $uri),
                             $this->car()->formatName($item, $subscriber['language']),
-                            $this->itemModerUrl($item, $uri)
+                            $this->itemModerUrl($item['id'], $uri)
                         );
 
                         $this->message->send(null, $subscriber['id'], $message);
@@ -1727,7 +1717,7 @@ class ItemController extends AbstractRestfulController
                                 $this->userUrl($user, $uri),
                                 $engine['name'],
                                 $this->car()->formatName($item, $subscriber['language']),
-                                $this->itemModerUrl($item, $uri)
+                                $this->itemModerUrl($item['id'], $uri)
                             );
 
                             $this->message->send(null, $subscriber['id'], $message);
@@ -1768,7 +1758,7 @@ class ItemController extends AbstractRestfulController
                             $this->userUrl($user, $uri),
                             $engine['name'],
                             $this->car()->formatName($item, $subscriber['language']),
-                            $this->itemModerUrl($item, $uri)
+                            $this->itemModerUrl($item['id'], $uri)
                         );
 
                         $this->message->send(null, $subscriber['id'], $message);

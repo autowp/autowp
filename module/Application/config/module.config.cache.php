@@ -68,26 +68,5 @@ return [
                 ]
             ],
         ],
-        'sessionCache' => [
-            'adapter' => [
-                'name'     =>'memcached',
-                'options'  => [
-                    'ttl' => 864000,
-                    'servers'   => [
-                        'main' => [
-                            'host' => $host,
-                            'port' => 11211
-                        ]
-                    ],
-                    'namespace'  => 'LONG',
-                    'liboptions' => [
-                        'COMPRESSION'     => false,
-                        'binary_protocol' => true,
-                        'no_block'        => true,
-                        'connect_timeout' => 100
-                    ]
-                ]
-            ],
-        ],
     ]
 ];
