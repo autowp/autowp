@@ -2,9 +2,11 @@
 
 namespace Autowp\User;
 
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\EventManager\EventManagerInterface;
 use Autowp\Cron;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
+
+use function sprintf;
 
  //TODO: extract to zf-components
 
@@ -12,8 +14,7 @@ class Maintenance extends AbstractListenerAggregate
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param EventManagerInterface $events
-     * @param int                   $priority
+     * @param int $priority
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
@@ -22,23 +23,22 @@ class Maintenance extends AbstractListenerAggregate
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param Cron\CronEvent $event
      */
     public function dailyMaintenance(Cron\CronEvent $event)
     {
-        $application = $event->getApplication();
+        $application    = $event->getApplication();
         $serviceManager = $application->getServiceManager();
 
         $userRemember = $serviceManager->get(Model\UserRemember::class);
-        $count = $userRemember->garbageCollect();
+        $count        = $userRemember->garbageCollect();
         print sprintf("%d user remember rows was deleted\ndone\n", $count);
 
         $userPasswordRemind = $serviceManager->get(Model\UserPasswordRemind::class);
-        $count = $userPasswordRemind->garbageCollect();
+        $count              = $userPasswordRemind->garbageCollect();
         print sprintf("%d password remind rows was deleted\ndone\n", $count);
 
         $userRename = $serviceManager->get(Model\UserRename::class);
-        $count = $userRename->garbageCollect();
+        $count      = $userRename->garbageCollect();
         print sprintf("%d user rename rows was deleted\ndone\n", $count);
     }
 }

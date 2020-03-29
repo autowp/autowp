@@ -2,27 +2,27 @@
 
 namespace ApplicationTest\Controller;
 
-use Zend\Db\Sql;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Service\PictureService;
 use Application\Test\AbstractHttpControllerTestCase;
+use Laminas\Db\Sql;
 
 class PictureServiceTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
 
     /**
      * @suppress PhanDeprecatedFunction
      */
     private function getRandomVehicleId(): int
     {
-        $services = $this->getApplicationServiceLocator();
+        $services  = $this->getApplicationServiceLocator();
         $itemModel = $services->get(Item::class);
 
         $item = $itemModel->getRow([
             'item_type_id' => Item::VEHICLE,
-            'order'        => new Sql\Expression('RAND()')
+            'order'        => new Sql\Expression('RAND()'),
         ]);
 
         $this->assertNotEmpty($item);
@@ -36,7 +36,7 @@ class PictureServiceTest extends AbstractHttpControllerTestCase
     public function testClearQueue()
     {
         $services = $this->getApplicationServiceLocator();
-        $service = $services->get(PictureService::class);
+        $service  = $services->get(PictureService::class);
 
         $service->clearQueue();
 
@@ -52,6 +52,8 @@ class PictureServiceTest extends AbstractHttpControllerTestCase
             ''
         );
 
+        $this->assertNotEmpty($picture);
+
         $service->clearQueue();
 
         $pictureModel = $services->get(Picture::class);
@@ -65,9 +67,9 @@ class PictureServiceTest extends AbstractHttpControllerTestCase
             'removing_date' => new Sql\Expression(
                 'DATE_SUB(NOW(), INTERVAL ? DAY)',
                 [PictureService::QUEUE_LIFETIME + 1]
-            )
+            ),
         ], [
-            'id' => $picture['id']
+            'id' => $picture['id'],
         ]);
 
         $service->clearQueue();

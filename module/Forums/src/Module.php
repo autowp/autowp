@@ -2,16 +2,14 @@
 
 namespace Autowp\Forums;
 
-use Zend\ModuleManager\Feature;
+use Laminas\Loader\StandardAutoloader;
+use Laminas\ModuleManager\Feature;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\ConfigProviderInterface
 {
-    /**
-     * @return array
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         $provider = new ConfigProvider();
         return [
@@ -20,10 +18,10 @@ class Module implements
         ];
     }
 
-    public function getAutoloaderConfig()
+    public function getAutoloaderConfig(): array
     {
         return [
-            'Zend\Loader\StandardAutoloader' => [
+            StandardAutoloader::class => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src',
                 ],

@@ -2,37 +2,34 @@
 
 namespace Autowp\Message;
 
-use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Paginator;
+use Application\Service\TelegramService;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
-use Application\Service\TelegramService;
+use Exception;
+use Laminas\Db\ResultSet\ResultSet;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Paginator;
+
+use function array_replace;
+use function count;
+use function mb_strlen;
+use function trim;
 
 /**
  * @todo Unlink from Telegram
  */
 class MessageService
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
     private const MESSAGES_PER_PAGE = 20;
 
     public const MAX_TEXT = 2000;
 
-    /**
-     * @var TelegramService
-     */
-    private $telegram;
+    private TelegramService $telegram;
 
     public function __construct(TelegramService $telegram, TableGateway $table, User $userModel)
     {
@@ -44,14 +41,11 @@ class MessageService
     }
 
     /**
-     * @param $fromId
-     * @param int $toId
-     * @param string $message
      * @throws Exception
      */
-    public function send($fromId, int $toId, string $message): void
+    public function send(?int $fromId, int $toId, string $message): void
     {
-        $message = trim($message);
+        $message   = trim($message);
         $msgLength = mb_strlen($message);
 
         if ($msgLength <= 0) {
@@ -63,11 +57,11 @@ class MessageService
         }
 
         $this->table->insert([
-            'from_user_id' => $fromId ? (int)$fromId : null,
+            'from_user_id' => $fromId ? $fromId : null,
             'to_user_id'   => $toId,
             'contents'     => $message,
             'add_datetime' => new Sql\Expression('NOW()'),
-            'readen'       => 0
+            'readen'       => 0,
         ]);
 
         if ($this->telegram) {
@@ -77,8 +71,6 @@ class MessageService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $userId
-     * @return int
      */
     public function getNewCount(int $userId): int
     {
@@ -91,132 +83,125 @@ class MessageService
                     ->columns(['count' => new Sql\Expression('COUNT(1)')])
                     ->where([
                         'to_user_id = ?' => $userId,
-                        'NOT readen'
+                        'NOT readen',
                     ]);
             }
         )->current();
 
-        return $row ? (int)$row['count'] : 0;
+        return $row ? (int) $row['count'] : 0;
     }
 
     public function delete(int $userId, int $messageId)
     {
         $this->table->update([
-            'deleted_by_from'  => 1
+            'deleted_by_from' => 1,
         ], [
             'from_user_id = ?' => $userId,
-            'id = ?'           => $messageId
+            'id = ?'           => $messageId,
         ]);
 
         $this->table->update([
-            'deleted_by_to'  => 1
+            'deleted_by_to' => 1,
         ], [
             'to_user_id = ?' => $userId,
-            'id = ?'         => $messageId
+            'id = ?'         => $messageId,
         ]);
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $userId
      */
     public function deleteAllSystem(int $userId): void
     {
         $this->table->delete([
             'to_user_id = ?' => $userId,
-            'from_user_id IS NULL'
+            'from_user_id IS NULL',
         ]);
     }
 
     public function deleteAllSent(int $userId): void
     {
         $this->table->update([
-            'deleted_by_from' => 1
+            'deleted_by_from' => 1,
         ], [
             'from_user_id = ?' => $userId,
         ]);
     }
 
-    public function recycle()
+    public function recycle(): int
     {
         return $this->table->delete([
             'deleted_by_to',
-            'deleted_by_from OR from_user_id IS NULL'
+            'deleted_by_from OR from_user_id IS NULL',
         ]);
     }
 
-    public function recycleSystem()
+    public function recycleSystem(): int
     {
         return $this->table->delete([
             'from_user_id is null',
-            'add_datetime < date_sub(now(), interval 6 month)'
+            'add_datetime < date_sub(now(), interval 6 month)',
         ]);
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $userId
-     * @return Sql\Select
      */
-    private function getSystemSelect(int $userId)
+    private function getSystemSelect(int $userId): Sql\Select
     {
         return $this->table->getSql()->select()
             ->where([
-                'to_user_id = ?' => (int)$userId,
+                'to_user_id = ?' => (int) $userId,
                 'from_user_id IS NULL',
-                'NOT deleted_by_to'
+                'NOT deleted_by_to',
             ])
             ->order('add_datetime DESC');
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $userId
-     * @return Sql\Select
      */
-    private function getInboxSelect(int $userId)
+    private function getInboxSelect(int $userId): Sql\Select
     {
         return $this->table->getSql()->select()
             ->where([
-                'to_user_id = ?' => (int)$userId,
+                'to_user_id = ?' => (int) $userId,
                 'from_user_id',
-                'NOT deleted_by_to'
+                'NOT deleted_by_to',
             ])
             ->order('add_datetime DESC');
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
-     * @param int $userId
-     * @return Sql\Select
      */
-    private function getSentSelect(int $userId)
+    private function getSentSelect(int $userId): Sql\Select
     {
         return $this->table->getSql()->select()
             ->where([
-                'from_user_id = ?' => (int)$userId,
-                'NOT deleted_by_from'
+                'from_user_id = ?' => (int) $userId,
+                'NOT deleted_by_from',
             ])
             ->order('add_datetime DESC');
     }
 
-    private function getDialogSelect($userId, $withUserId)
+    private function getDialogSelect(int $userId, int $withUserId): Sql\Select
     {
         $predicate1 = new Sql\Predicate\Predicate();
         $predicate1->expression(
             'from_user_id = ? and to_user_id = ? and NOT deleted_by_from',
-            [(int)$userId, (int)$withUserId]
+            [(int) $userId, (int) $withUserId]
         );
 
         $predicate2 = new Sql\Predicate\Predicate();
         $predicate2->expression(
             'from_user_id = ? and to_user_id = ? and NOT deleted_by_to',
-            [(int)$withUserId, (int)$userId]
+            [(int) $withUserId, (int) $userId]
         );
 
         $predicate = new Sql\Predicate\PredicateSet([
             $predicate1,
-            $predicate2
+            $predicate2,
         ], Sql\Predicate\PredicateSet::COMBINED_BY_OR);
 
         return $this->table->getSql()->select()
@@ -224,7 +209,7 @@ class MessageService
             ->order('add_datetime DESC');
     }
 
-    public function getSystemCount($userId): int
+    public function getSystemCount(int $userId): int
     {
         $select = $this->getSystemSelect($userId);
 
@@ -235,7 +220,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getNewSystemCount($userId): int
+    public function getNewSystemCount(int $userId): int
     {
         $select = $this->getSystemSelect($userId)
             ->where('NOT readen');
@@ -247,7 +232,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getInboxCount($userId): int
+    public function getInboxCount(int $userId): int
     {
         $select = $this->getInboxSelect($userId);
 
@@ -258,7 +243,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getInboxNewCount($userId): int
+    public function getInboxNewCount(int $userId): int
     {
         $select = $this->getInboxSelect($userId)
             ->where('NOT readen');
@@ -270,7 +255,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getDialogCount($userId, $withUserId): int
+    public function getDialogCount(int $userId, int $withUserId): int
     {
         $select = $this->getDialogSelect($userId, $withUserId);
 
@@ -281,7 +266,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getSentCount($userId): int
+    public function getSentCount(int $userId): int
     {
         $select = $this->getSentSelect($userId);
 
@@ -292,30 +277,36 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function markReaden($ids)
+    public function markReaden(array $ids): void
     {
         if (count($ids)) {
             $this->table->update([
-                'readen' => 1
+                'readen' => 1,
             ], [
-                new Sql\Predicate\In('id', $ids)
+                new Sql\Predicate\In('id', $ids),
             ]);
         }
     }
 
-    private function markReadenRows($rows, int $userId)
+    /**
+     * @param ResultSet|array $rows
+     */
+    private function markReadenRows($rows, int $userId): void
     {
         $ids = [];
         foreach ($rows as $message) {
-            if ((! $message['readen']) && ($message['to_user_id'] == $userId)) {
-                $ids[] = (int)$message['id'];
+            if ((! $message['readen']) && ((int) $message['to_user_id'] === $userId)) {
+                $ids[] = (int) $message['id'];
             }
         }
 
         $this->markReaden($ids);
     }
 
-    public function getInbox(int $userId, int $page)
+    /**
+     * @throws Exception
+     */
+    public function getInbox(int $userId, int $page): array
     {
         $select = $this->getInboxSelect($userId);
 
@@ -333,11 +324,14 @@ class MessageService
 
         return [
             'messages'  => $this->prepareList($userId, $rows),
-            'paginator' => $paginator
+            'paginator' => $paginator,
         ];
     }
 
-    public function getSentbox(int $userId, int $page)
+    /**
+     * @throws Exception
+     */
+    public function getSentbox(int $userId, int $page): array
     {
         $select = $this->getSentSelect($userId);
 
@@ -353,11 +347,14 @@ class MessageService
 
         return [
             'messages'  => $this->prepareList($userId, $rows),
-            'paginator' => $paginator
+            'paginator' => $paginator,
         ];
     }
 
-    public function getSystembox(int $userId, int $page)
+    /**
+     * @throws Exception
+     */
+    public function getSystembox(int $userId, int $page): array
     {
         $select = $this->getSystemSelect($userId);
 
@@ -375,11 +372,14 @@ class MessageService
 
         return [
             'messages'  => $this->prepareList($userId, $rows),
-            'paginator' => $paginator
+            'paginator' => $paginator,
         ];
     }
 
-    public function getDialogbox(int $userId, int $withUserId, int $page)
+    /**
+     * @throws Exception
+     */
+    public function getDialogbox(int $userId, int $withUserId, int $page): array
     {
         $select = $this->getDialogSelect($userId, $withUserId);
 
@@ -397,63 +397,61 @@ class MessageService
 
         return [
             'messages'  => $this->prepareList($userId, $rows, [
-                'allMessagesLink' => false
+                'allMessagesLink' => false,
             ]),
-            'paginator' => $paginator
+            'paginator' => $paginator,
         ];
     }
 
     /**
-     * @param int $userId
-     * @param $rows
-     * @param array $options
-     * @return array
+     * @param ResultSet|array $rows
      * @throws Exception
      */
-    private function prepareList(int $userId, $rows, array $options = [])
+    private function prepareList(int $userId, $rows, array $options = []): array
     {
         $defaults = [
-            'allMessagesLink' => true
+            'allMessagesLink' => true,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $cache = [];
 
         $messages = [];
         foreach ($rows as $message) {
-            $author = $this->userModel->getRow(['id' => (int)$message['from_user_id']]);
+            $author = $this->userModel->getRow(['id' => (int) $message['from_user_id']]);
 
-            $isNew = $message['to_user_id'] == $userId && ! $message['readen'];
-            $canDelete = $message['from_user_id'] == $userId || $message['to_user_id'] == $userId;
-            $authorIsMe = $author && ($author['id'] == $userId);
-            $canReply = $author && ! $author['deleted'] && ! $authorIsMe;
+            $isNew      = (int) $message['to_user_id'] === $userId && ! $message['readen'];
+            $canDelete  = (int) $message['from_user_id'] === $userId || (int) $message['to_user_id'] === $userId;
+            $authorIsMe = $author && ((int) $author['id'] === $userId);
+            $canReply   = $author && ! $author['deleted'] && ! $authorIsMe;
 
             $dialogCount = 0;
 
             if ($options['allMessagesLink'] && $author) {
-                $dialogWith = $message['from_user_id'] == $userId ? $message['to_user_id'] : $message['from_user_id'];
+                $dialogWith = (int) $message['from_user_id'] === $userId
+                    ? $message['to_user_id'] : $message['from_user_id'];
 
                 if (isset($cache[$dialogWith])) {
                     $dialogCount = $cache[$dialogWith];
                 } else {
-                    $dialogCount = $this->getDialogCount($userId, $dialogWith);
+                    $dialogCount        = $this->getDialogCount($userId, $dialogWith);
                     $cache[$dialogWith] = $dialogCount;
                 }
             }
 
             $messages[] = [
-                'id'              => $message['id'],
-                'author_id'       => $message['from_user_id'] ? (int)$message['from_user_id'] : null,
-                'author'          => $author, //TODO: remove, not need in API
-                'contents'        => $message['contents'],
-                'isNew'           => $isNew,
-                'canDelete'       => $canDelete,
-                'date'            => Row::getDateTimeByColumnType('timestamp', $message['add_datetime']),
-                'canReply'        => $canReply,
-                'dialogCount'     => $dialogCount,
-                'allMessagesLink' => $options['allMessagesLink'],
-                'to_user_id'      => (int) $message['to_user_id'],
-                'dialog_with_user_id' => ($message['from_user_id'] && $message['from_user_id'] == $userId)
+                'id'                  => $message['id'],
+                'author_id'           => $message['from_user_id'] ? (int) $message['from_user_id'] : null,
+                'author'              => $author, //TODO: remove, not need in API
+                'contents'            => $message['contents'],
+                'isNew'               => $isNew,
+                'canDelete'           => $canDelete,
+                'date'                => Row::getDateTimeByColumnType('timestamp', $message['add_datetime']),
+                'canReply'            => $canReply,
+                'dialogCount'         => $dialogCount,
+                'allMessagesLink'     => $options['allMessagesLink'],
+                'to_user_id'          => (int) $message['to_user_id'],
+                'dialog_with_user_id' => $message['from_user_id'] && (int) $message['from_user_id'] === $userId
                     ? (int) $message['to_user_id']
                     : (int) $message['from_user_id'],
             ];

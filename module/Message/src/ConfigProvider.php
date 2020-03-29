@@ -8,7 +8,7 @@ class ConfigProvider
     {
         return [
             'dependencies' => $this->getDependencyConfig(),
-            'tables'       => $this->getTablesConfig()
+            'tables'       => $this->getTablesConfig(),
         ];
     }
 
@@ -19,8 +19,8 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                MessageService::class => Service\MessageServiceFactory::class
-            ]
+                MessageService::class => Service\MessageServiceFactory::class,
+            ],
         ];
     }
 

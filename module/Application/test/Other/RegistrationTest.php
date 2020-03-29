@@ -7,18 +7,18 @@ use Application\Test\AbstractHttpControllerTestCase;
 
 class RegistrationTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     public function testRegistration()
     {
         $serviceManager = $this->getApplicationServiceLocator();
-        $usersService = $serviceManager->get(UsersService::class);
+        $usersService   = $serviceManager->get(UsersService::class);
 
         $user = $usersService->addUser([
             'email'    => 'reg-test@autowp.ru',
             'password' => '123567894',
             'name'     => "TestRegistrationUser",
-            'ip'       => '127.0.0.1'
+            'ip'       => '127.0.0.1',
         ], 'en');
 
         $this->assertNotEmpty($user['id']);

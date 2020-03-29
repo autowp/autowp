@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
-<ruleset name="Zend Framework coding standard">
-    <rule ref="./vendor/squizlabs/php_codesniffer/src/Standards/PSR12/ruleset.xml"/>
-    <config name="installed_paths" value="vendor/phpcompatibility/php-compatibility" />
+<ruleset name="Laminas coding standard">
+    <rule ref="./vendor/laminas/laminas-coding-standard/src/LaminasCodingStandard/ruleset.xml">
+        <exclude name="Generic.PHP.RequireStrictTypes.MissingDeclaration"/>
+        <exclude name="SlevomatCodingStandard.Operators.DisallowEqualOperators" phpcbf-only="true"/>
+    </rule>
 
     <!-- Paths to check -->
     <file>module/Application/src</file>

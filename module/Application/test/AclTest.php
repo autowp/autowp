@@ -3,13 +3,13 @@
 namespace ApplicationTest\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
-use Zend\Permissions\Acl\Acl;
-use Zend\View\Renderer\PhpRenderer;
-use Zend\Mvc\Controller\PluginManager;
+use Laminas\Mvc\Controller\PluginManager;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\View\Renderer\PhpRenderer;
 
 class AclTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
 
     public function testAclServiceRegisters()
     {
@@ -40,7 +40,7 @@ class AclTest extends AbstractHttpControllerTestCase
         $services = $this->getApplicationServiceLocator();
 
         $manager = $services->get(PluginManager::class);
-        $plugin = $manager->get('user');
+        $plugin  = $manager->get('user');
 
         $result = $plugin()->inheritsRole('moder');
         $this->assertIsBool($result);

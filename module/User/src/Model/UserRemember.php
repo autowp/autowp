@@ -2,52 +2,47 @@
 
 namespace Autowp\User\Model;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+
+use function md5;
+use function microtime;
 
 class UserRemember
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var string
-     */
-    private $salt;
+    private string $salt;
 
     public function __construct(TableGateway $table, string $salt)
     {
         $this->table = $table;
-        $this->salt = $salt;
+        $this->salt  = $salt;
     }
 
     public function garbageCollect(): int
     {
-        return (int)$this->table->delete([
-            'date < DATE_SUB(NOW(), INTERVAL 60 DAY)'
+        return (int) $this->table->delete([
+            'date < DATE_SUB(NOW(), INTERVAL 60 DAY)',
         ]);
     }
 
     /**
      * @suppress PhanUndeclaredMethod, PhanDeprecatedFunction
-     * @param int $userId
-     * @return string
      */
     public function createToken(int $userId): string
     {
         do {
             $token = md5($this->salt . microtime());
-            $row = $this->table->select([
-                'token' => $token
+            $row   = $this->table->select([
+                'token' => $token,
             ])->current();
         } while ($row);
 
         $this->table->insert([
             'user_id' => $userId,
             'token'   => $token,
-            'date'    => new Sql\Expression('NOW()')
+            'date'    => new Sql\Expression('NOW()'),
         ]);
 
         return $token;
@@ -55,8 +50,6 @@ class UserRemember
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $userId
-     * @return string
      */
     public function getUserToken(int $userId): string
     {

@@ -2,27 +2,28 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
-use Exception;
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
-use Zend\Json\Json;
-use Zend\Mail\Transport\TransportInterface;
-use Autowp\User\Model\UserRemember;
 use Application\Controller\Api\AttrController;
 use Application\Controller\Api\LoginController;
 use Application\Controller\Api\UserController;
 use Application\Test\AbstractHttpControllerTestCase;
+use Autowp\User\Model\UserRemember;
+use Exception;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+use Laminas\Json\Json;
+use Laminas\Mail\Transport\TransportInterface;
+
+use function count;
+use function explode;
+use function microtime;
+use function preg_match;
 
 class AccountControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param string $email
-     * @param string $password
-     * @param string $name
-     * @return int
      * @throws Exception
      */
     private function createUser(string $email, string $password, string $name): int
@@ -33,7 +34,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
             'email'            => $email,
             'name'             => $name,
             'password'         => $password,
-            'password_confirm' => $password
+            'password_confirm' => $password,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -44,21 +45,21 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 
         // get id
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
     private function activateUser()
     {
         $mailTransport = $this->getApplicationServiceLocator()->get(TransportInterface::class);
-        $message = $mailTransport->getLastMessage();
+        $message       = $mailTransport->getLastMessage();
 
-        preg_match('|https://en.localhost/ng/account/emailcheck/([0-9a-f]+)|u', $message->getBody(), $match);
+        preg_match('|https://en.localhost/account/emailcheck/([0-9a-f]+)|u', $message->getBody(), $match);
 
         $this->reset();
         $this->dispatch('http://en.localhost/api/user/emailcheck', Request::METHOD_POST, [
-            'code' => $match[1]
+            'code' => $match[1],
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -70,11 +71,9 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $userId
-     * @return mixed
      * @throws Exception
      */
-    private function getUser(int $userId)
+    private function getUser(int $userId): array
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -109,10 +108,10 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
      */
     public function testProfileRename()
     {
-        $email = 'test' . microtime(true) . '@example.com';
+        $email    = 'test' . microtime(true) . '@example.com';
         $password = 'password';
-        $name1 = 'First name';
-        $name2 = 'Second name';
+        $name1    = 'First name';
+        $name2    = 'Second name';
 
         $userId = $this->createUser($email, $password, $name1);
         $this->activateUser();
@@ -125,7 +124,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => $email,
             'password' => $password,
-            'remember' => 1
+            'remember' => 1,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -143,7 +142,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/api/user/me', Request::METHOD_PUT, [
-            'name' => $name2
+            'name' => $name2,
         ]);
 
         $this->assertResponseStatusCode(200);

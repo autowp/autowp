@@ -17,7 +17,7 @@ class ConfigProvider
     public function getControllerPluginConfig(): array
     {
         return [
-            'aliases' => [
+            'aliases'   => [
                 'user' => Controller\Plugin\User::class,
                 'User' => Controller\Plugin\User::class,
             ],
@@ -37,8 +37,8 @@ class ConfigProvider
                 Model\User::class               => Model\UserFactory::class,
                 Model\UserPasswordRemind::class => Model\UserPasswordRemindFactory::class,
                 Model\UserRename::class         => Model\UserRenameFactory::class,
-                Model\UserRemember::class       => Model\UserRememberFactory::class
-            ]
+                Model\UserRemember::class       => Model\UserRememberFactory::class,
+            ],
         ];
     }
 
@@ -52,7 +52,7 @@ class ConfigProvider
     public function getViewHelperConfig(): array
     {
         return [
-            'aliases' => [
+            'aliases'   => [
                 'user' => View\Helper\User::class,
                 'User' => View\Helper\User::class,
             ],

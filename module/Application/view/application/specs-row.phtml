@@ -3,27 +3,27 @@
         <?=$this->escapeHtml($this->translate($this->attribute['name']))?>
     </td>
     <?php
-        $cells = [];
+    $cells = [];
 
-        foreach ($this->table->getCars() as $car) {
-            $value = $this->table->renderValue($this, $this->attribute, $car['values'], 1, $car['id']);
-            $lastColIdx = count($cells)-1;
-            if ($lastColIdx >= 0) {
-                $lastCol = $cells[$lastColIdx];
-                $isSame = $lastCol['value'] === $value;
-            } else {
-                $isSame = false;
-            }
-            if ($isSame) {
-                $cells[$lastColIdx]['colspan']++;
-            } else {
-                $cells[] = [
-                    'carId'   => $car['id'],
-                    'value'   => $value,
-                    'colspan' => 1
-                ];
-            }
+    foreach ($this->table->getCars() as $car) {
+        $value = $this->table->renderValue($this, $this->attribute, $car['values'], 1, $car['id']);
+        $lastColIdx = count($cells)-1;
+        if ($lastColIdx >= 0) {
+            $lastCol = $cells[$lastColIdx];
+            $isSame = $lastCol['value'] === $value;
+        } else {
+            $isSame = false;
         }
+        if ($isSame) {
+            $cells[$lastColIdx]['colspan']++;
+        } else {
+            $cells[] = [
+                'carId'   => $car['id'],
+                'value'   => $value,
+                'colspan' => 1
+            ];
+        }
+    }
     ?>
     <?php foreach ($cells as $cell) { ?>
         <td data-specs-attr="<?=$this->attribute['id']?>" data-specs-item="<?=$cell['carId']?>" class="text-center" <?=$cell['colspan'] > 1 ? ' colspan="'.$cell['colspan'].'"' : ''?>>

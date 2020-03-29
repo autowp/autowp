@@ -2,29 +2,26 @@
 
 namespace Autowp\Comments\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
 use Autowp\Comments\CommentsService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class ConsoleController extends AbstractActionController
 {
-    /**
-     * @var CommentsService
-     */
-    private $service;
+    private CommentsService $service;
 
     public function __construct(CommentsService $message)
     {
         $this->service = $message;
     }
 
-    public function refreshRepliesCountAction()
+    public function refreshRepliesCountAction(): string
     {
         $affected = $this->service->updateRepliesCount();
 
         return "ok. Affected: $affected\n";
     }
 
-    public function cleanupDeletedAction()
+    public function cleanupDeletedAction(): string
     {
         $affected = $this->service->cleanupDeleted();
 

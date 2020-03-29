@@ -2,31 +2,39 @@
 
 namespace ApplicationTest\Api\Controller;
 
-use Application\DuplicateFinder;
-use Application\Model\CarOfDay;
-use Exception;
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
-use Zend\Json\Json;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\PictureController;
+use Application\DuplicateFinder;
+use Application\Model\CarOfDay;
 use Application\Test\AbstractHttpControllerTestCase;
+use Exception;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+use Laminas\Json\Json;
+
+use function copy;
+use function count;
+use function explode;
+use function sys_get_temp_dir;
+use function tempnam;
+
+use const UPLOAD_ERR_OK;
 
 class PictureControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    private function mockDuplicateFinder()
+    private function mockDuplicateFinder(): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
         $tables = $serviceManager->get('TableManager');
 
         $mock = $this->getMockBuilder(DuplicateFinder::class)
-            ->setMethods(['indexImage'])
+            ->onlyMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
-                $tables->get('df_distance')
+                $tables->get('df_distance'),
             ])
             ->getMock();
 
@@ -37,8 +45,6 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $vehicleId
-     * @return int
      * @throws Exception
      */
     private function addPictureToItem(int $vehicleId): int
@@ -54,7 +60,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
-        $file = tempnam(sys_get_temp_dir(), 'upl');
+        $file     = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
@@ -64,12 +70,12 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
                 'tmp_name' => $file,
                 'name'     => $filename,
                 'error'    => UPLOAD_ERR_OK,
-                'type'     => 'image/jpeg'
-            ]
+                'type'     => 'image/jpeg',
+            ],
         ]);
 
         $this->dispatch('https://www.autowp.ru/api/picture', Request::METHOD_POST, [
-            'item_id' => $vehicleId
+            'item_id' => $vehicleId,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -79,20 +85,16 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
-        $pictureId = $parts[count($parts) - 1];
-
-        return $pictureId;
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
+        return $parts[count($parts) - 1];
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $params
-     * @return int
      * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -106,23 +108,21 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $itemId
-     * @return mixed
      * @throws Exception
      */
-    private function getItemById(int $itemId)
+    private function getItemById(int $itemId): array
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item/' . $itemId, Request::METHOD_GET, [
-            'fields' => 'total_pictures,begin_year,end_year'
+            'fields' => 'total_pictures,begin_year,end_year',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -131,14 +131,11 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/item/item/get');
         $this->assertActionName('item');
 
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        return $json;
+        return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $pictureId
      * @throws Exception
      */
     private function acceptPicture(int $pictureId)
@@ -166,12 +163,12 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('http://www.autowp.ru/api/picture', Request::METHOD_GET, [
-            'fields' => 'owner,thumb_medium,add_date,exif,image,items.item.name_html,' .
-                        'items.item.brands.name_html,special_name,copyrights,' .
-                        'change_status_user,rights,moder_votes,moder_voted,' .
-                        'is_last,views,accepted_count,similar.picture.thumb_medium,' .
-                        'replaceable,siblings.name_text,ip.rights,ip.blacklist',
-            'limit'  => 100
+            'fields' => 'owner,thumb_medium,add_date,exif,image,items.item.name_html,'
+                        . 'items.item.brands.name_html,special_name,copyrights,'
+                        . 'change_status_user,rights,moder_votes,moder_voted,'
+                        . 'is_last,views,accepted_count,similar.picture.thumb_medium,'
+                        . 'replaceable,siblings.name_text,ip.rights,ip.blacklist',
+            'limit'  => 100,
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -227,15 +224,15 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
     public function testCarOfDayPicture()
     {
         $itemOfDay = $this->getApplicationServiceLocator()->get(CarOfDay::class);
-        $row = $itemOfDay->getCurrent();
-        $itemId = $row ? $row['item_id'] : null;
+        $row       = $itemOfDay->getCurrent();
+        $itemId    = $row ? $row['item_id'] : null;
 
         if (! $itemId) {
             $itemId = $this->createItem([
                 'item_type_id' => 1,
                 'name'         => 'Peugeot 407 Coupe "Car of the day"',
                 'begin_year'   => 2006,
-                'end_year'     => 2012
+                'end_year'     => 2012,
             ]);
         }
         $item = $this->getItemById($itemId);
@@ -244,7 +241,6 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
             $pictureId = $this->addPictureToItem($item['id']);
             $this->acceptPicture($pictureId);
         }
-
 
         $this->reset();
         $this->dispatch('http://www.autowp.ru/api/picture/car-of-day-picture', 'GET');

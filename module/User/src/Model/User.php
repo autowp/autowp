@@ -2,28 +2,34 @@
 
 namespace Autowp\User\Model;
 
+use ArrayAccess;
 use ArrayObject;
+use Autowp\Commons\Db\Table\Row;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Paginator;
-use Autowp\Commons\Db\Table\Row;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Paginator;
+
+use function array_replace;
+use function array_values;
+use function count;
+use function inet_pton;
+use function is_array;
+use function is_scalar;
+use function max;
 
 class User
 {
-    public const MIN_NAME = 2;
-    public const MAX_NAME = 50;
+    public const MIN_NAME     = 2;
+    public const MAX_NAME     = 50;
     public const MIN_PASSWORD = 6;
     public const MAX_PASSWORD = 50;
 
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     public function __construct(TableGateway $table)
     {
@@ -44,9 +50,9 @@ class User
         foreach ($this->table->selectWith($select) as $row) {
             $this->table->update([
                 'specs_volume'       => $row['count'],
-                'specs_volume_valid' => 1
+                'specs_volume_valid' => 1,
             ], [
-                'id = ?' => $row['id']
+                'id = ?' => $row['id'],
             ]);
         }
     }
@@ -54,15 +60,14 @@ class User
     public function invalidateSpecsVolume(int $userId)
     {
         $this->table->update([
-            'specs_volume_valid' => 0
+            'specs_volume_valid' => 0,
         ], [
-            'id = ?' => $userId
+            'id = ?' => $userId,
         ]);
     }
 
     /**
-     * @param $row
-     * @return int
+     * @param array|ArrayAccess $row
      * @throws Exception
      */
     private function getMessagingInterval($row): int
@@ -84,8 +89,6 @@ class User
     }
 
     /**
-     * @param int $userId
-     * @return DateTime|null
      * @throws Exception
      */
     public function getNextMessageTime(int $userId): ?DateTime
@@ -114,9 +117,7 @@ class User
     }
 
     /**
-     * @param Sql\Select $select
-     * @param $value
-     * @param string $id
+     * @param array|int $value
      * @throws Exception
      */
     private function applyIdFilter(Sql\Select $select, $value, string $id): void
@@ -124,7 +125,7 @@ class User
         if (is_array($value)) {
             $value = array_values($value);
 
-            if (count($value) == 1) {
+            if (count($value) === 1) {
                 $this->applyIdFilter($select, $value[0], $id);
                 return;
             }
@@ -146,8 +147,7 @@ class User
     }
 
     /**
-     * @param $options
-     * @return Sql\Select
+     * @param int|array $options
      * @throws Exception
      */
     private function getSelect($options): Sql\Select
@@ -157,10 +157,10 @@ class User
         }
 
         $defaults = [
-            'id'          => null,
-            'identity'    => null,
-            'not_deleted' => null,
-            'search'      => null,
+            'id'               => null,
+            'identity'         => null,
+            'not_deleted'      => null,
+            'search'           => null,
             'identity_is_null' => null,
             'online'           => null,
             'limit'            => null,
@@ -170,7 +170,7 @@ class User
             'in_contacts'      => null,
             'email'            => null,
         ];
-        $options = array_replace($defaults, $options);
+        $options  = array_replace($defaults, $options);
 
         $select = $this->table->getSql()->select();
 
@@ -220,11 +220,11 @@ class User
 
         if ($options['in_contacts']) {
             $select->join('contact', 'users.id = contact.contact_user_id', [])
-                ->where(['contact.user_id' => (int)$options['in_contacts']]);
+                ->where(['contact.user_id' => (int) $options['in_contacts']]);
         }
 
         if ($options['email']) {
-            $select->where(['e_mail = ?' => (string)$options['email']]);
+            $select->where(['e_mail = ?' => (string) $options['email']]);
         }
 
         return $select;
@@ -232,7 +232,7 @@ class User
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $options
+     * @param int|array $options
      * @return array|ArrayObject|null
      * @throws Exception
      */
@@ -244,8 +244,7 @@ class User
     }
 
     /**
-     * @param $options
-     * @return array
+     * @param int|array $options
      * @throws Exception
      */
     public function getRows($options): array
@@ -261,8 +260,6 @@ class User
     }
 
     /**
-     * @param array $options
-     * @return Paginator\Paginator
      * @throws Exception
      */
     public function getPaginator(array $options): Paginator\Paginator
@@ -276,8 +273,6 @@ class User
     }
 
     /**
-     * @param array $options
-     * @return int
      * @throws Exception
      */
     public function getCount(array $options): int
@@ -287,8 +282,6 @@ class User
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param array $options
-     * @return bool
      * @throws Exception
      */
     public function isExists(array $options): bool
@@ -300,13 +293,11 @@ class User
         $select->columns(['id']);
         $select->limit(1);
 
-        return (bool)$this->table->selectWith($select)->current();
+        return (bool) $this->table->selectWith($select)->current();
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $userId
-     * @param Request $request
      * @throws Exception
      */
     public function registerVisit(int $userId, Request $request)
@@ -316,9 +307,9 @@ class User
             return;
         }
 
-        $set = [];
+        $set            = [];
         $nowExpiresDate = (new DateTime())->sub(new DateInterval('PT1S'));
-        $lastOnline = Row::getDateTimeByColumnType('timestamp', $user['last_online']);
+        $lastOnline     = Row::getDateTimeByColumnType('timestamp', $user['last_online']);
         if (! $lastOnline || ($lastOnline < $nowExpiresDate)) {
             $set['last_online'] = new Sql\Expression('NOW()');
         }
@@ -327,7 +318,7 @@ class User
         $remoteAddr = $request->getServer('REMOTE_ADDR');
         if ($remoteAddr) {
             $ip = inet_pton($remoteAddr);
-            if ($ip != $user['last_ip']) {
+            if ($ip !== $user['last_ip']) {
                 $set['last_ip'] = $ip;
             }
         }
@@ -339,8 +330,6 @@ class User
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $userId
-     * @return string
      */
     public function getUserLanguage(int $userId): string
     {
@@ -354,13 +343,11 @@ class User
             return '';
         }
 
-        return (string)$user['language'];
+        return (string) $user['language'];
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $userId
-     * @return string
      */
     public function getUserRole(int $userId): string
     {
@@ -374,19 +361,18 @@ class User
             return '';
         }
 
-        return (string)$user['role'];
+        return (string) $user['role'];
     }
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @param int $userId
      */
     public function decVotes(int $userId)
     {
         $this->table->update([
-            'votes_left' => new Sql\Expression('votes_left - 1')
+            'votes_left' => new Sql\Expression('votes_left - 1'),
         ], [
-            'id' => $userId
+            'id' => $userId,
         ]);
     }
 }

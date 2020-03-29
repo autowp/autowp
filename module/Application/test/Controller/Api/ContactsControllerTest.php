@@ -2,15 +2,15 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
-use Zend\Json\Json;
 use Application\Controller\Api\ContactsController;
 use Application\Test\AbstractHttpControllerTestCase;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+use Laminas\Json\Json;
 
 class ContactsControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
      * @suppress PhanUndeclaredMethod

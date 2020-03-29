@@ -1,4 +1,4 @@
-/.idea
+.idea
 /mysql
 /composer.phar
 /node_modules
@@ -11,3 +11,4 @@
 /frontend
 /goautowp/logs
 /cc-test-reporter
+/sonar-scanner

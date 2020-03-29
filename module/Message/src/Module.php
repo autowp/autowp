@@ -2,8 +2,9 @@
 
 namespace Autowp\Message;
 
-use Zend\EventManager\EventInterface;
-use Zend\ModuleManager\Feature;
+use Laminas\EventManager\EventInterface;
+use Laminas\Loader\StandardAutoloader;
+use Laminas\ModuleManager\Feature;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
@@ -12,29 +13,26 @@ class Module implements
 {
     public function onBootstrap(EventInterface $e)
     {
-        $application = $e->getApplication();
+        $application    = $e->getApplication();
         $serviceManager = $application->getServiceManager();
 
         $maintenance = new Maintenance();
         $maintenance->attach($serviceManager->get('CronEventManager')); // TODO: move CronEventManager to zf-components
     }
 
-    /**
-     * @return array
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         $provider = new ConfigProvider();
         return [
             'service_manager' => $provider->getDependencyConfig(),
-            'tables'          => $provider->getTablesConfig()
+            'tables'          => $provider->getTablesConfig(),
         ];
     }
 
-    public function getAutoloaderConfig()
+    public function getAutoloaderConfig(): array
     {
         return [
-            'Zend\Loader\StandardAutoloader' => [
+            StandardAutoloader::class => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src',
                 ],

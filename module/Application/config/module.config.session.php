@@ -2,8 +2,8 @@
 
 namespace Application;
 
-use Zend\Session\SaveHandler\SaveHandlerInterface;
-use Zend\Session\Storage\SessionArrayStorage;
+use Laminas\Session\SaveHandler\SaveHandlerInterface;
+use Laminas\Session\Storage\SessionArrayStorage;
 
 return [
     'service_manager' => [

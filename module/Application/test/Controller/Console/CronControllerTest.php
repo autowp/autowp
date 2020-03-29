@@ -2,12 +2,12 @@
 
 namespace ApplicationTest\Controller\Console;
 
-use Autowp\Cron\CronController;
 use Application\Test\AbstractConsoleControllerTestCase;
+use Autowp\Cron\CronController;
 
 class CronControllerTest extends AbstractConsoleControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     public function testDailyMaintenance()
     {

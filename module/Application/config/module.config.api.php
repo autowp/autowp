@@ -2,36 +2,38 @@
 
 namespace Application;
 
-use Zend\ServiceManager\Factory\InvokableFactory;
+use Application\Controller\Api\CommentController;
+use Application\Controller\Api\CommentControllerFactory;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
     'hydrators' => [
         'factories' => [
-            Hydrator\Api\ArticleHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\AttrAttributeHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\AttrValueHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\CommentHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ForumThemeHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ForumTopicHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\IpHydrator::class                 => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemLanguageHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemLinkHydrator::class           => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemParentHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemParentLanguageHydrator::class => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\LogHydrator::class                => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\MessageHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PerspectiveHydrator::class        => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PerspectiveGroupHydrator::class   => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PerspectivePageHydrator::class    => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PictureHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PictureItemHydrator::class        => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\TrafficHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\SimilarHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\UserHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\VotingVariantVoteHydrator::class  => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ArticleHydrator::class            => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\AttrAttributeHydrator::class      => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\AttrValueHydrator::class          => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\CommentHydrator::class            => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ForumThemeHydrator::class         => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ForumTopicHydrator::class         => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\IpHydrator::class                 => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ItemLanguageHydrator::class       => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ItemLinkHydrator::class           => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ItemParentHydrator::class         => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ItemParentLanguageHydrator::class => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\LogHydrator::class                => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\MessageHydrator::class            => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\PerspectiveHydrator::class        => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\PerspectiveGroupHydrator::class   => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\PerspectivePageHydrator::class    => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\PictureHydrator::class            => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\PictureItemHydrator::class        => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\TrafficHydrator::class            => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\SimilarHydrator::class            => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\UserHydrator::class               => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\VotingVariantVoteHydrator::class  => Hydrator\Api\RestHydrator::class,
         ]
     ],
     'controllers' => [
@@ -44,6 +46,7 @@ return [
             Controller\Api\BrandsController::class          => Controller\Api\BrandsControllerFactory::class,
             Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
             Controller\Api\CommentController::class         => Controller\Api\CommentControllerFactory::class,
+            Controller\Api\ConfigController::class          => Controller\Api\ConfigControllerFactory::class,
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
             Controller\Api\DonateController::class          => Controller\Api\DonateControllerFactory::class,
@@ -54,7 +57,7 @@ return [
             Controller\Api\IndexController::class           => Controller\Api\IndexControllerFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
-            Controller\Api\ItemGalleryController::class     => Controller\Api\ItemGalleryControllerFactory::class,
+            Controller\Api\GalleryController::class         => Controller\Api\GalleryControllerFactory::class,
             Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
             Controller\Api\ItemLinkController::class        => Controller\Api\ItemLinkControllerFactory::class,
             Controller\Api\ItemParentController::class      => Controller\Api\ItemParentControllerFactory::class,
@@ -81,6 +84,7 @@ return [
             Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
             Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
             Controller\Api\StatController::class            => Controller\Api\StatControllerFactory::class,
+            Controller\Api\TelegramController::class        => Controller\Api\TelegramControllerFactory::class,
             Controller\Api\TextController::class            => Controller\Api\TextControllerFactory::class,
             Controller\Api\TimezoneController::class        => InvokableFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
@@ -626,10 +630,54 @@ return [
                                 'options' => [
                                     'route'    => '/icons',
                                     'defaults' => [
-                                        'controller' => Controller\Api\BrandsController::class,
                                         'action'     => 'icons'
                                     ],
                                 ],
+                            ],
+                            'item' => [
+                                'type' => 'Segment',
+                                'options' => [
+                                    'route' => '/:id',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'sections' => [
+                                        'type' => 'Literal',
+                                        'options' => [
+                                            'route' => '/sections',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes'  => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'sections'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ],
+                                    'new-items' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route'  => '/new-items',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes'  => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'new-items',
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ],
@@ -673,15 +721,6 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes' => [
-                            'subscribe' => [
-                                'type' => 'Segment',
-                                'options' => [
-                                    'route' => '/subscribe/:type_id/:item_id',
-                                    'defaults' => [
-                                        'action' => 'subscribe'
-                                    ],
-                                ],
-                            ],
                             'get' => [
                                 'type' => 'Method',
                                 'options' => [
@@ -727,7 +766,86 @@ return [
                                     ],
                                 ]
                             ],
+                            'votes' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/votes',
+                                    'defaults' => [
+                                        'action' => 'votes'
+                                    ],
+                                ],
+                            ],
+                            'topic' => [
+                                'type' => 'Segment',
+                                'options' => [
+                                    'route' => '/topic/:type_id/:item_id',
+                                    'defaults' => [
+                                        'action' => 'subscribe'
+                                    ],
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'subscribe' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/subscribe',
+                                            'defaults' => [
+                                                'action' => 'subscribe'
+                                            ],
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'post' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'post',
+                                                    'defaults' => [
+                                                        'action' => 'subscribe'
+                                                    ],
+                                                ],
+                                            ],
+                                            'delete' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'delete',
+                                                    'defaults' => [
+                                                        'action' => 'subscribe'
+                                                    ],
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                    'view' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/view',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'post' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'post',
+                                                    'defaults' => [
+                                                        'action' => 'post-view'
+                                                    ],
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ]
+                            ],
                         ]
+                    ],
+                    'config' => [
+                        'type'    => 'Literal',
+                        'options' => [
+                            'route'    => '/config',
+                            'defaults' => [
+                                'controller' => Controller\Api\ConfigController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
                     ],
                     'contacts' => [
                         'type'    => 'Literal',
@@ -968,6 +1086,25 @@ return [
                                                 ],
                                             ],
                                         ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'gallery' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route' => '/gallery',
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'get' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'controller' => Controller\Api\GalleryController::class,
+                                        'action'     => 'gallery'
                                     ]
                                 ]
                             ]
@@ -1304,6 +1441,15 @@ return [
                                     ]
                                 ]
                             ],
+                            'vehicle-type' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/vehicle-type',
+                                    'defaults' => [
+                                        'action' => 'vehicle-type'
+                                    ]
+                                ]
+                            ],
                             'path' => [
                                 'type' => 'Literal',
                                 'options' => [
@@ -1503,23 +1649,22 @@ return [
                                             ]
                                         ]
                                     ],
-                                    'gallery' => [
-                                        'type' => 'Literal',
+                                    'new-items' => [
+                                        'type' => 'Segment',
                                         'options' => [
-                                            'route' => '/gallery',
+                                            'route'  => '/new-items',
                                         ],
                                         'may_terminate' => false,
-                                        'child_routes' => [
+                                        'child_routes'  => [
                                             'get' => [
                                                 'type' => 'Method',
                                                 'options' => [
-                                                    'verb' => 'get',
+                                                    'verb'    => 'get',
                                                     'defaults' => [
-                                                        'controller' => Controller\Api\ItemGalleryController::class,
-                                                        'action'     => 'gallery'
+                                                        'action' => 'new-items',
                                                     ]
                                                 ]
-                                            ]
+                                            ],
                                         ]
                                     ]
                                 ]
@@ -2225,6 +2370,24 @@ return [
                                             ],
                                         ]
                                     ],
+                                    'canonical-route' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/canonical-route'
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'canonical-route'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ],
                                     'item' => [
                                         'type' => 'Method',
                                         'options' => [
@@ -2242,7 +2405,25 @@ return [
                                                 'action' => 'update'
                                             ]
                                         ]
-                                    ]
+                                    ],
+                                    'view' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/view'
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'post' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'post',
+                                                    'defaults' => [
+                                                        'action' => 'view'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ],
                                 ]
                             ],
                             'random_picture' => [
@@ -2509,6 +2690,16 @@ return [
                                 ]
                             ]
                         ]
+                    ],
+                    'telegram-webhook' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            'route'    => '/telegram/webhook/token/:token',
+                            'defaults' => [
+                                'controller' => Controller\Api\TelegramController::class,
+                                'action'     => 'webhook',
+                            ],
+                        ],
                     ],
                     'text' => [
                         'type' => 'Literal',

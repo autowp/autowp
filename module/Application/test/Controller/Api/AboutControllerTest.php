@@ -2,13 +2,13 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Zend\Http\Request;
-use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\AboutController;
+use Application\Test\AbstractHttpControllerTestCase;
+use Laminas\Http\Request;
 
 class AboutControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     public function testIndex()
     {

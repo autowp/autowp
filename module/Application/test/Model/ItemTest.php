@@ -9,7 +9,7 @@ use stdClass;
 
 class ItemTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     public function testInvalidRequestsHandled()
     {
@@ -43,23 +43,30 @@ class ItemTest extends AbstractHttpControllerTestCase
             $this->assertTrue(true);
         }
 
-        $result = $model->getRow(['id' => [
-            'test' => ''
-        ]]);
+        $result = $model->getRow([
+            'id' => [
+                'test' => '',
+            ],
+        ]);
         $this->assertEmpty($result);
 
         try {
-            $result = $model->getRow(['id' => [
-                'test' => null
-            ]]);
+            $result = $model->getRow([
+                'id' => [
+                    'test' => null,
+                ],
+            ]);
             $this->assertEmpty($result);
         } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
-        $result = $model->getRow(['id' => [
-            null, false
-        ]]);
+        $result = $model->getRow([
+            'id' => [
+                null,
+                false,
+            ],
+        ]);
         $this->assertEmpty($result);
     }
 }

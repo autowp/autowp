@@ -2,12 +2,12 @@
 
 namespace AutowpTest\Comments\Controller;
 
-use Autowp\Comments\Controller\ConsoleController;
 use Application\Test\AbstractConsoleControllerTestCase;
+use Autowp\Comments\Controller\ConsoleController;
 
 class ConsoleControllerTest extends AbstractConsoleControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     public function testRefreshRepliesCount()
     {

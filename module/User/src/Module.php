@@ -2,18 +2,16 @@
 
 namespace Autowp\User;
 
-use Zend\EventManager\EventInterface as Event;
-use Zend\ModuleManager\Feature;
+use Laminas\EventManager\EventInterface as Event;
+use Laminas\Loader\StandardAutoloader;
+use Laminas\ModuleManager\Feature;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\BootstrapListenerInterface,
     Feature\ConfigProviderInterface
 {
-    /**
-     * @return array
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         $provider = new ConfigProvider();
         return [
@@ -24,10 +22,10 @@ class Module implements
         ];
     }
 
-    public function getAutoloaderConfig()
+    public function getAutoloaderConfig(): array
     {
         return [
-            'Zend\Loader\StandardAutoloader' => [
+            StandardAutoloader::class => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src',
                 ],
@@ -37,13 +35,11 @@ class Module implements
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param Event $e
-     * @return array
      */
-    public function onBootstrap(Event $e)
+    public function onBootstrap(Event $e): array
     {
-        $application = $e->getApplication();
-        $eventManager = $application->getEventManager();
+        $application    = $e->getApplication();
+        $eventManager   = $application->getEventManager();
         $serviceManager = $application->getServiceManager();
 
         $authRememberListener = new Auth\RememberDispatchListener();

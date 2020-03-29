@@ -2,22 +2,30 @@
 
 namespace ApplicationTest\Frontend\Controller;
 
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
-use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\PictureController;
+use Application\Test\AbstractHttpControllerTestCase;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+
+use function copy;
+use function count;
+use function explode;
+use function sys_get_temp_dir;
+use function tempnam;
+
+use const UPLOAD_ERR_OK;
 
 class UploadControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testUploadVehicle()
+    public function testUploadVehicle(): void
     {
         /**
-         * @var \Zend\Http\PhpEnvironment\Request $request
+         * @var Request $request
          */
         $request = $this->getRequest();
         $request->getHeaders()
@@ -26,7 +34,7 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
-        $file = tempnam(sys_get_temp_dir(), 'upl');
+        $file     = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
@@ -36,12 +44,12 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
                 'tmp_name' => $file,
                 'name'     => $filename,
                 'error'    => UPLOAD_ERR_OK,
-                'type'     => 'image/jpeg'
-            ]
+                'type'     => 'image/jpeg',
+            ],
         ]);
 
         $this->dispatch('https://www.autowp.ru/api/picture', Request::METHOD_POST, [
-            'item_id' => 1
+            'item_id' => 1,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -51,10 +59,10 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
-        $pictureId = $parts[count($parts) - 1];
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
+        $id      = $parts[count($parts) - 1];
 
-        return $pictureId;
+        $this->assertNotEmpty($id);
     }
 }

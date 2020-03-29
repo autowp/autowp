@@ -1,4 +1,4 @@
-FROM ubuntu:eoan
+FROM ubuntu:focal
 
 LABEL maintainer="dmitry@pereslegin.ru"
 
@@ -6,11 +6,8 @@ WORKDIR /app
 
 EXPOSE 80
 
-ARG COMMIT
-
 ENV COMPOSER_ALLOW_SUPERUSER="1" \
-    WAITFORIT_VERSION="v2.4.1" \
-    SENTRY_RELEASE=$COMMIT
+    WAITFORIT_VERSION="v2.4.1"
 
 CMD ["./start.sh"]
 
@@ -39,31 +36,22 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         nginx \
         openssh-client \
         optipng \
-        php \
-        php-bcmath \
-        php-ctype \
-        php-curl \
-        php-dom \
-        php-exif \
-        php-fileinfo \
-        php-fpm \
-        php-ftp \
-        php-iconv \
-        php-imagick \
-        php-intl \
-        php-json \
-        php-gd \
-        php-mbstring \
-        php-memcached \
-        php-mysql \
-        php-opcache \
-        php-pdo \
-        php-phar \
-        php-simplexml \
-        php-tokenizer \
-        php-xml \
-        php-xmlwriter \
-        php-zip \
+        php7.4 \
+        php7.4-bcmath \
+        php7.4-common \
+        php7.4-curl \
+        php7.4-fpm \
+        php7.4-imagick \
+        php7.4-intl \
+        php7.4-json \
+        php7.4-gd \
+        php7.4-mbstring \
+        php7.4-memcached \
+        php7.4-mysql \
+        php7.4-opcache \
+        php7.4-tokenizer \
+        php7.4-xml \
+        php7.4-zip \
         pngquant \
         rsyslog \
         ssmtp \
@@ -72,8 +60,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         unzip \
         xmlstarlet \
     && \
-    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -qq -y nodejs && \
     DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y && \
     \
     cat /etc/ImageMagick-6/policy.xml | \
@@ -90,15 +76,11 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
     composer clearcache
 
-COPY package.json package-lock.json ./
-
-RUN npm install -y -qq --production && \
-    npm cache clean --force
-
 COPY . /app
 
 RUN chmod +x zf && \
     chmod +x start.sh && \
-    crontab ./crontab && \
-    ./node_modules/.bin/webpack -p && \
-    rm -rf ./node_modules/
+    crontab ./crontab
+
+ARG COMMIT
+ENV SENTRY_RELEASE=$COMMIT

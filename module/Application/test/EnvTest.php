@@ -3,12 +3,12 @@
 namespace ApplicationTest\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Adapter\AdapterInterface;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Adapter\AdapterInterface;
 
 class EnvTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
 
     public function testDbTimezone()
     {

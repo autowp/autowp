@@ -2,29 +2,21 @@
 
 namespace Autowp\User\Auth\Adapter;
 
-use Zend\Authentication\Adapter\AdapterInterface;
-use Zend\Authentication\Result;
-use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
 use Autowp\User\Model\User;
+use Laminas\Authentication\Adapter\AdapterInterface;
+use Laminas\Authentication\Adapter\Exception\InvalidArgumentException;
+use Laminas\Authentication\Result;
 
 class Remember implements AdapterInterface
 {
     /**
      * Credential values
-     *
-     * @var string
      */
-    private $credential = null;
+    private string $credential;
 
-    /**
-     * @var array
-     */
-    private $authenticateResultInfo = null;
+    private array $authenticateResultInfo;
 
-    /**
-     * @var User
-     */
-    private $userModel;
+    private User $userModel;
 
     public function __construct(User $userModel)
     {
@@ -34,7 +26,7 @@ class Remember implements AdapterInterface
     /**
      * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      */
-    public function authenticate()
+    public function authenticate(): Result
     {
         $this->authenticateSetup();
 
@@ -44,17 +36,17 @@ class Remember implements AdapterInterface
             $select
                 ->join('user_remember', 'users.id = user_remember.user_id', [])
                 ->where([
-                    'user_remember.token' => (string)$this->credential,
-                    'not users.deleted'
+                    'user_remember.token' => (string) $this->credential,
+                    'not users.deleted',
                 ])
         )->current();
 
         if (! $userRow) {
-            $this->authenticateResultInfo['code'] = Result::FAILURE_IDENTITY_NOT_FOUND;
+            $this->authenticateResultInfo['code']       = Result::FAILURE_IDENTITY_NOT_FOUND;
             $this->authenticateResultInfo['messages'][] = 'A record with the supplied identity could not be found.';
         } else {
-            $this->authenticateResultInfo['code'] = Result::SUCCESS;
-            $this->authenticateResultInfo['identity'] = (int)$userRow['id'];
+            $this->authenticateResultInfo['code']       = Result::SUCCESS;
+            $this->authenticateResultInfo['identity']   = (int) $userRow['id'];
             $this->authenticateResultInfo['messages'][] = 'Authentication successful.';
         }
 
@@ -66,10 +58,9 @@ class Remember implements AdapterInterface
      * making sure that this adapter was indeed setup properly with all
      * required pieces of information.
      *
-     * @throws InvalidArgumentException - in the event that setup was not done properly
-     * @return true
+     * @throws InvalidArgumentException - in the event that setup was not done properly.
      */
-    private function authenticateSetup()
+    private function authenticateSetup(): bool
     {
         $exception = null;
 
@@ -84,7 +75,7 @@ class Remember implements AdapterInterface
         $this->authenticateResultInfo = [
             'code'     => Result::FAILURE,
             'identity' => null,
-            'messages' => []
+            'messages' => [],
         ];
 
         return true;
@@ -93,10 +84,8 @@ class Remember implements AdapterInterface
     /**
      * authenticateCreateAuthResult() - Creates a Result object from
      * the information that has been collected during the authenticate() attempt.
-     *
-     * @return Result
      */
-    private function authenticateCreateAuthResult()
+    private function authenticateCreateAuthResult(): Result
     {
         return new Result(
             $this->authenticateResultInfo['code'],
@@ -107,11 +96,8 @@ class Remember implements AdapterInterface
 
     /**
      * setCredential() - set the credential value to be used
-     *
-     * @param  string $credential
-     * @return Remember Provides a fluent interface
      */
-    public function setCredential($credential)
+    public function setCredential(string $credential): self
     {
         $this->credential = $credential;
         return $this;

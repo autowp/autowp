@@ -16,17 +16,16 @@ use Application\Test\AbstractHttpControllerTestCase;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service;
-use Zend\Permissions\Acl\Acl;
+use Laminas\Permissions\Acl\Acl;
 
 class ServicesTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
 
     /**
      * @dataProvider servicesProvider
-     * @param $serviceName
      */
-    public function testServiceRegistered($serviceName)
+    public function testServiceRegistered(string $serviceName)
     {
         $services = $this->getApplicationServiceLocator();
 
@@ -35,7 +34,7 @@ class ServicesTest extends AbstractHttpControllerTestCase
         $this->assertInstanceOf($serviceName, $service);
     }
 
-    public static function servicesProvider()
+    public static function servicesProvider(): array
     {
         return [
             [MessageService::class],

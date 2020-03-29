@@ -20,7 +20,7 @@ class ConfigProvider
         return [
             'factories' => [
                 Forums::class => ForumsFactory::class,
-            ]
+            ],
         ];
     }
 

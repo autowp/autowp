@@ -4,35 +4,39 @@ declare(strict_types=1);
 
 namespace Autowp\Traffic;
 
-use Zend\Authentication\AuthenticationService;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Mvc\MvcEvent;
 use Autowp\User\Model\User;
-use Zend\Permissions\Acl\Acl;
+use Exception;
+use Laminas\Authentication\AuthenticationService;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Permissions\Acl\Acl;
+
+use function strlen;
+use function strncasecmp;
 
 class TrafficRouteListener extends AbstractListenerAggregate
 {
-    private $whitelist = [
-        '/api/forum',
-        '/api/user',
+    private array $whitelist = [
         '/api/account',
         '/api/acl',
         '/api/article',
         '/api/attr',
+        '/api/brands',
         '/api/chart',
         '/api/comment',
         '/api/contacts',
         '/api/donate',
         '/api/feedback',
+        '/api/forum',
         '/api/hotlinks',
         '/api/ip',
+        '/api/index',
         '/api/item-link',
         '/api/language',
         '/api/log',
         '/api/login',
-        '/api/signin',
         '/api/map',
         '/api/message',
         '/api/mosts',
@@ -42,29 +46,28 @@ class TrafficRouteListener extends AbstractListenerAggregate
         '/api/rating',
         '/api/recaptcha',
         '/api/restore-password',
+        '/api/signin',
+        '/api/spec',
         '/api/text',
         '/api/timezone',
         '/api/traffic',
-        '/api/spec',
         '/api/stat',
         '/api/vehicle-types',
         '/api/perspective',
         '/api/perspective-page',
         '/api/picture-moder-vote-template',
+        '/api/user',
         '/api/voting',
-        '/ng/',
         '/comments',
         '/donate',
         '/factory',
         '/login',
-        '/telegram'
+        '/telegram',
     ];
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param EventManagerInterface $events
-     * @param int                   $priority
+     * @param int $priority
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
@@ -83,8 +86,8 @@ class TrafficRouteListener extends AbstractListenerAggregate
     }
 
     /**
-     * @param  MvcEvent $e
-     * @return null
+     * @return mixed|null
+     * @throws Exception
      */
     public function onRoute(MvcEvent $e)
     {
@@ -103,18 +106,19 @@ class TrafficRouteListener extends AbstractListenerAggregate
             $unlimitedTraffic = false;
             if ($auth->hasIdentity()) {
                 $userModel = $serviceManager->get(User::class);
-                $user = $userModel->getRow(['id' => (int)$auth->getIdentity()]);
+                $user      = $userModel->getRow(['id' => (int) $auth->getIdentity()]);
 
                 if ($user) {
-                    $acl = $serviceManager->get(Acl::class);
+                    $acl              = $serviceManager->get(Acl::class);
                     $unlimitedTraffic = $acl->isAllowed($user['role'], 'website', 'unlimited-traffic');
                 }
             }
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
+            /** @var string $ip */
             $ip = $request->getServer('REMOTE_ADDR');
 
             if ($ip) {
+                /** @var TrafficControl $service */
                 $service = $serviceManager->get(TrafficControl::class);
 
                 $banInfo = $service->getBanInfo($ip);

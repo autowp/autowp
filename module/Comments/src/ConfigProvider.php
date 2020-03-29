@@ -2,7 +2,7 @@
 
 namespace Autowp\Comments;
 
-use Zend\Form\Form;
+use Laminas\Form\Form;
 
 class ConfigProvider
 {
@@ -13,7 +13,7 @@ class ConfigProvider
             'controllers'  => $this->getControllersConfig(),
             'dependencies' => $this->getDependencyConfig(),
             'forms'        => $this->getFormsConfig(),
-            'tables'       => $this->getTablesConfig()
+            'tables'       => $this->getTablesConfig(),
         ];
     }
 
@@ -27,11 +27,11 @@ class ConfigProvider
                             'route'    => 'comments (refresh-replies-count|cleanup-deleted):action',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -39,8 +39,8 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                Controller\ConsoleController::class => Controller\ConsoleControllerFactory::class
-            ]
+                Controller\ConsoleController::class => Controller\ConsoleControllerFactory::class,
+            ],
         ];
     }
 
@@ -51,8 +51,8 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                CommentsService::class => CommentsServiceFactory::class
-            ]
+                CommentsService::class => CommentsServiceFactory::class,
+            ],
         ];
     }
 
@@ -60,34 +60,34 @@ class ConfigProvider
     {
         return [
             'CommentForm' => [
-                'type'     => Form::class,
-                'attributes'  => [
+                'type'         => Form::class,
+                'attributes'   => [
                     'method' => 'post',
                     'legend' => 'comments/form-title',
-                    'id'     => 'form-add-comment'
+                    'id'     => 'form-add-comment',
                 ],
-                'elements' => [
+                'elements'     => [
                     [
                         'spec' => [
-                            'type' => 'Textarea',
-                            'name' => 'message',
-                            'options' => [
-                                'label'     => 'forums/topic/text',
+                            'type'       => 'Textarea',
+                            'name'       => 'message',
+                            'options'    => [
+                                'label' => 'forums/topic/text',
                             ],
                             'attributes' => [
                                 'cols'      => 80,
                                 'rows'      => 5,
-                                'maxlength' => CommentsService::MAX_MESSAGE_LENGTH
-                            ]
+                                'maxlength' => CommentsService::MAX_MESSAGE_LENGTH,
+                            ],
                         ],
                     ],
                     [
                         'spec' => [
-                            'type' => 'Checkbox',
-                            'name' => 'moderator_attention',
+                            'type'    => 'Checkbox',
+                            'name'    => 'moderator_attention',
                             'options' => [
                                 'label' => 'comments/it-requires-attention-of-moderators',
-                            ]
+                            ],
                         ],
                     ],
                     [
@@ -101,26 +101,26 @@ class ConfigProvider
                             'type' => 'Hidden',
                             'name' => 'resolve',
                         ],
-                    ]
+                    ],
                 ],
                 'input_filter' => [
                     'message' => [
                         'required'   => true,
-                        'filters'  => [
-                            ['name' => 'StringTrim']
+                        'filters'    => [
+                            ['name' => 'StringTrim'],
                         ],
                         'validators' => [
                             [
-                                'name' => 'StringLength',
+                                'name'    => 'StringLength',
                                 'options' => [
                                     'min' => 0,
-                                    'max' => CommentsService::MAX_MESSAGE_LENGTH
-                                ]
-                            ]
-                        ]
+                                    'max' => CommentsService::MAX_MESSAGE_LENGTH,
+                                ],
+                            ],
+                        ],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 

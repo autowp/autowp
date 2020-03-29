@@ -6,25 +6,22 @@ use Application\Test\AbstractHttpControllerTestCase;
 
 class TranslatorTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     /**
      * @dataProvider translationsProvider
-     * @param $text
-     * @param $expected
-     * @param $language
      */
-    public function testTranslatorWorks($text, $expected, $language)
+    public function testTranslatorWorks(string $text, string $expected, string $language)
     {
         $serviceManager = $this->getApplicationServiceLocator();
-        $translator = $serviceManager->get('MvcTranslator');
+        $translator     = $serviceManager->get('MvcTranslator');
 
         $result = $translator->translate($text, 'default', $language);
 
         $this->assertEquals($expected, $result);
     }
 
-    public static function translationsProvider()
+    public static function translationsProvider(): array
     {
         return [
             ['test', 'test is ok', 'en'],

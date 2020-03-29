@@ -2,19 +2,27 @@
 
 namespace ApplicationTest\Model;
 
-use Application\DuplicateFinder;
-use Exception;
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureItemController;
+use Application\DuplicateFinder;
 use Application\Model\Picture;
 use Application\Test\AbstractHttpControllerTestCase;
+use Exception;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+
+use function copy;
+use function count;
+use function explode;
+use function sys_get_temp_dir;
+use function tempnam;
+
+use const UPLOAD_ERR_OK;
 
 class PictureTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     public function testPattern()
     {
@@ -23,6 +31,8 @@ class PictureTest extends AbstractHttpControllerTestCase
         $table = $serviceManager->get(Picture::class);
 
         $row = $table->getRow([]);
+
+        $this->assertNotEmpty($row);
 
         $pattern = $table->getFileNamePattern($row['id']);
 
@@ -36,10 +46,10 @@ class PictureTest extends AbstractHttpControllerTestCase
         $tables = $serviceManager->get('TableManager');
 
         $mock = $this->getMockBuilder(DuplicateFinder::class)
-            ->setMethods(['indexImage'])
+            ->onlyMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
-                $tables->get('df_distance')
+                $tables->get('df_distance'),
             ])
             ->getMock();
 
@@ -50,8 +60,6 @@ class PictureTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param array $params
-     * @return int
      * @throws Exception
      */
     private function createItem(array $params): int
@@ -68,17 +76,15 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
-        $itemId = $parts[count($parts) - 1];
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
+        $itemId  = $parts[count($parts) - 1];
 
         return (int) $itemId;
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $itemID
-     * @return int
      * @throws Exception
      */
     private function addPictureToItem(int $itemID): int
@@ -94,7 +100,7 @@ class PictureTest extends AbstractHttpControllerTestCase
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
-        $file = tempnam(sys_get_temp_dir(), 'upl');
+        $file     = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../_files/' . $filename, $file);
 
@@ -104,12 +110,12 @@ class PictureTest extends AbstractHttpControllerTestCase
                 'tmp_name' => $file,
                 'name'     => $filename,
                 'error'    => UPLOAD_ERR_OK,
-                'type'     => 'image/jpeg'
-            ]
+                'type'     => 'image/jpeg',
+            ],
         ]);
 
         $this->dispatch('https://www.autowp.ru/api/picture', Request::METHOD_POST, [
-            'item_id' => $itemID
+            'item_id' => $itemID,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -118,9 +124,9 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/picture/post');
         $this->assertActionName('post');
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $headers   = $this->getResponse()->getHeaders();
+        $uri       = $headers->get('Location')->uri();
+        $parts     = explode('/', $uri->getPath());
         $pictureID = $parts[count($parts) - 1];
 
         return (int) $pictureID;
@@ -128,9 +134,6 @@ class PictureTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $pictureID
-     * @param int $itemID
-     * @param int $typeID
      * @throws Exception
      */
     private function addPictureItem(int $pictureID, int $itemID, int $typeID)
@@ -153,10 +156,10 @@ class PictureTest extends AbstractHttpControllerTestCase
     private function getPictureFilename(int $pictureID): string
     {
         $serviceManager = $this->getApplicationServiceLocator();
-        $tableManager = $serviceManager->get('TableManager');
+        $tableManager   = $serviceManager->get('TableManager');
 
         $picture = $tableManager->get('pictures')->select([
-            'id' => $pictureID
+            'id' => $pictureID,
         ])->current();
 
         if (! $picture) {
@@ -164,7 +167,7 @@ class PictureTest extends AbstractHttpControllerTestCase
         }
 
         $image = $tableManager->get('image')->select([
-            'id' => $picture['image_id']
+            'id' => $picture['image_id'],
         ])->current();
 
         if (! $image) {
@@ -174,11 +177,14 @@ class PictureTest extends AbstractHttpControllerTestCase
         return $image['filepath'];
     }
 
-    public function testPersonPictureFilenamePattern()
+    /**
+     * @throws Exception
+     */
+    public function testPersonPictureFilenamePattern(): void
     {
-        $personID = $this->createItem([
+        $personID  = $this->createItem([
             'item_type_id' => 8,
-            'name'         => 'A.S. Pushkin'
+            'name'         => 'A.S. Pushkin',
         ]);
         $pictureID = $this->addPictureToItem($personID);
 
@@ -187,17 +193,17 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
-    public function testPersonAndCopyrightPictureFilenamePattern()
+    public function testPersonAndCopyrightPictureFilenamePattern(): void
     {
-        $personID = $this->createItem([
+        $personID  = $this->createItem([
             'item_type_id' => 8,
-            'name'         => 'A.S. Pushkin'
+            'name'         => 'A.S. Pushkin',
         ]);
         $pictureID = $this->addPictureToItem($personID);
 
         $copyrightID = $this->createItem([
             'item_type_id' => 9,
-            'name'         => 'Copyrights'
+            'name'         => 'Copyrights',
         ]);
         $this->addPictureItem($pictureID, $copyrightID, 3);
 
@@ -206,17 +212,17 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
-    public function testAuthorAndVehiclePictureFilenamePattern()
+    public function testAuthorAndVehiclePictureFilenamePattern(): void
     {
         $vehicleID = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'Toyota Corolla'
+            'name'         => 'Toyota Corolla',
         ]);
         $pictureID = $this->addPictureToItem($vehicleID);
 
         $personID = $this->createItem([
             'item_type_id' => 8,
-            'name'         => 'A.S. Pushkin'
+            'name'         => 'A.S. Pushkin',
         ]);
         $this->addPictureItem($pictureID, $personID, 2);
 
@@ -225,17 +231,17 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertRegExp('/^t\/toyota_corolla\/toyota_corolla(_[0-9]+)?\.jpeg$/', $filename);
     }
 
-    public function testPersonAndVehiclePictureFilenamePattern()
+    public function testPersonAndVehiclePictureFilenamePattern(): void
     {
         $vehicleID = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'Toyota Corolla'
+            'name'         => 'Toyota Corolla',
         ]);
         $pictureID = $this->addPictureToItem($vehicleID);
 
         $personID = $this->createItem([
             'item_type_id' => 8,
-            'name'         => 'A.S. Pushkin'
+            'name'         => 'A.S. Pushkin',
         ]);
 
         $this->addPictureItem($pictureID, $personID, 1);

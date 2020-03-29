@@ -7,8 +7,6 @@ engines:
       - javascript
       - python
       - php
-  eslint:
-    enabled: true
   fixme:
     enabled: true
   phpmd:

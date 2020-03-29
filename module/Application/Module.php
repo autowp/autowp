@@ -2,16 +2,34 @@
 
 namespace Application;
 
+use Laminas\Console\Adapter\AdapterInterface as Console;
+use Laminas\EventManager\EventInterface as Event;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Loader\StandardAutoloader;
+use Laminas\Mail;
+use Laminas\ModuleManager\Feature;
+use Laminas\Mvc\Application;
+use Laminas\Mvc\MvcEvent;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\ArrayUtils;
+use Laminas\View\Helper\PaginationControl;
 use Throwable;
-use Zend\Console\Adapter\AdapterInterface as Console;
-use Zend\EventManager\EventInterface as Event;
-use Zend\Mail;
-use Zend\ModuleManager\Feature;
-use Zend\Mvc\MvcEvent;
-use Zend\Stdlib\ArrayUtils;
-use Zend\View\Helper\PaginationControl;
 
+use function define;
+use function defined;
+use function error_reporting;
+use function file_exists;
+use function filemtime;
+use function get_class;
+use function ini_set;
+use function realpath;
 use function Sentry\captureException;
+use function Sentry\init;
+use function time;
+use function touch;
+
+use const E_ALL;
+use const PHP_EOL;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
@@ -22,7 +40,7 @@ class Module implements
 {
     public const VERSION = '1.0dev';
 
-    public function getConfig()
+    public function getConfig(): array
     {
         $config = [];
 
@@ -52,10 +70,10 @@ class Module implements
         return $config;
     }
 
-    public function getAutoloaderConfig()
+    public function getAutoloaderConfig(): array
     {
         return [
-            'Zend\Loader\StandardAutoloader' => [
+            StandardAutoloader::class => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ],
@@ -63,7 +81,7 @@ class Module implements
         ];
     }
 
-    public function onBootstrap(Event $e)
+    public function onBootstrap(Event $e): void
     {
         error_reporting(E_ALL);
         ini_set('display_errors', true);
@@ -75,9 +93,11 @@ class Module implements
 
         PaginationControl::setDefaultViewPartial('paginator');
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
+        /** @var Application $application */
         $application = $e->getApplication();
+        /** @var ServiceLocatorInterface $serviceManager */
         $serviceManager = $application->getServiceManager();
+        /** @var EventManagerInterface $eventManager */
         $eventManager = $application->getEventManager();
 
         //handle the dispatch error (exception)
@@ -94,12 +114,14 @@ class Module implements
         $urlCorrectionListener = new UrlCorrectionRouteListener();
         $urlCorrectionListener->attach($eventManager);
 
-        $serviceManager->get(HostnameCheckRouteListener::class)->attach($eventManager);
+        /** @var HostnameCheckRouteListener $hostnameListener */
+        $hostnameListener = $serviceManager->get(HostnameCheckRouteListener::class);
+        $hostnameListener->attach($eventManager);
 
         $config = $serviceManager->get('Config');
 
         if (isset($config['sentry']['dsn']) && $config['sentry']['dsn']) {
-            \Sentry\init([
+            init([
                 'dsn'         => $config['sentry']['dsn'],
                 'environment' => $config['sentry']['environment'],
                 'release'     => $config['sentry']['release'],
@@ -113,7 +135,7 @@ class Module implements
         $maintenance->attach($serviceManager->get('CronEventManager'));
     }
 
-    public function handleError(MvcEvent $e)
+    public function handleError(MvcEvent $e): void
     {
         $exception = $e->getParam('exception');
         if ($exception) {
@@ -125,7 +147,7 @@ class Module implements
             $filePath = __DIR__ . '/../../data/email-error';
             if (file_exists($filePath)) {
                 $mtime = filemtime($filePath);
-                $diff = time() - $mtime;
+                $diff  = time() - $mtime;
                 if ($diff > 60) {
                     touch($filePath);
                     $this->sendErrorEmail($exception, $serviceManager);
@@ -134,12 +156,12 @@ class Module implements
         }
     }
 
-    private function sendErrorEmail(Throwable $exception, $serviceManager)
+    private function sendErrorEmail(Throwable $exception, ServiceLocatorInterface $serviceManager): void
     {
-        $message = get_class($exception) . PHP_EOL .
-            'File: ' . $exception->getFile() . ' (' . $exception->getLine() . ')' . PHP_EOL .
-            'Message: ' . $exception->getMessage() . PHP_EOL .
-            'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
+        $message = get_class($exception) . PHP_EOL
+            . 'File: ' . $exception->getFile() . ' (' . $exception->getLine() . ')' . PHP_EOL
+            . 'Message: ' . $exception->getMessage() . PHP_EOL
+            . 'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
 
         $mail = new Mail\Message();
         $mail
@@ -155,26 +177,22 @@ class Module implements
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param Console $console
-     * @return string
      */
-    public function getConsoleBanner(Console $console)
+    public function getConsoleBanner(Console $console): string
     {
         return 'WheelsAge Module';
     }
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param Console $console
-     * @return array
      */
-    public function getConsoleUsage(Console $console)
+    public function getConsoleUsage(Console $console): array
     {
         //description command
         return [
             'db_migrations_version'             => 'Get current migration version',
             'db_migrations_migrate [<version>]' => 'Execute migrate',
-            'db_migrations_generate'            => 'Generate new migration class'
+            'db_migrations_generate'            => 'Generate new migration class',
         ];
     }
 }

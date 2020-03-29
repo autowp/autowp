@@ -5,16 +5,15 @@ namespace Application;
 use Autowp\ExternalLoginService\Facebook;
 use Autowp\ExternalLoginService\Github;
 use Autowp\ExternalLoginService\GooglePlus;
-use Autowp\ExternalLoginService\Linkedin;
 use Autowp\ExternalLoginService\Twitter;
 use Autowp\ExternalLoginService\Vk;
 use Autowp\ZFComponents\Resources;
 use Exception;
-use Zend\I18n\Translator\Loader\PhpArray;
-use Zend\InputFilter\InputFilterAbstractServiceFactory;
-use Zend\Mvc\I18n\TranslatorFactory;
-use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Factory\InvokableFactory;
+use Laminas\I18n\Translator\Loader\PhpArray;
+use Laminas\InputFilter\InputFilterAbstractServiceFactory;
+use Laminas\Mvc\I18n\TranslatorFactory;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 $host = getenv('AUTOWP_HOST');
 $hostCookie = ($host == 'localhost' ? '' : '.' . $host);
@@ -49,17 +48,7 @@ $mailTransport = $mailTypes[$mailType];
 return [
     'controllers' => [
         'factories' => [
-            Controller\BrandsController::class          => Controller\Frontend\Service\BrandsControllerFactory::class,
-            Controller\CatalogueController::class       => Controller\Frontend\Service\CatalogueControllerFactory::class,
-            Controller\CategoryController::class        => Controller\Frontend\Service\CategoryControllerFactory::class,
-            Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
-            Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,
-            Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,
-            Controller\IndexController::class           => Controller\Frontend\Service\IndexControllerFactory::class,
-            Controller\InboxController::class           => InvokableFactory::class,
-            Controller\PictureController::class         => Controller\Frontend\PictureControllerFactory::class,
-            Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
-            Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,
+            Controller\IndexController::class           => InvokableFactory::class,
             Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,
         ],
     ],
@@ -78,7 +67,6 @@ return [
             'oauth2'      => Factory\OAuth2PluginFactory::class,
             'pic'         => Controller\Plugin\Service\PicFactory::class,
             'pictureVote' => Controller\Plugin\Service\PictureVoteFactory::class,
-            'sidebar'     => Controller\Plugin\Service\SidebarFactory::class,
             'translate'   => Controller\Plugin\Service\TranslateFactory::class,
         ]
     ],
@@ -98,13 +86,13 @@ return [
             ],
             [
                 'type'     => PhpArray::class,
-                'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
-                'pattern'  => \Zend\I18n\Translator\Resources::getPatternForValidator()
+                'base_dir' => \Laminas\I18n\Translator\Resources::getBasePath(),
+                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForValidator()
             ],
             [
                 'type'     => PhpArray::class,
-                'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
-                'pattern'  => \Zend\I18n\Translator\Resources::getPatternForCaptcha()
+                'base_dir' => \Laminas\I18n\Translator\Resources::getBasePath(),
+                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForCaptcha()
             ],
             [
                 'type'     => PhpArray::class,
@@ -126,7 +114,6 @@ return [
             LanguagePicker::class                => Service\LanguagePickerFactory::class,
             MainMenu::class                      => Service\MainMenuFactory::class,
             Model\Brand::class                   => Model\BrandFactory::class,
-            Model\BrandNav::class                => Model\Service\BrandNavFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\Catalogue::class               => Model\Service\CatalogueFactory::class,
             Model\Categories::class              => Model\Service\CategoriesFactory::class,
@@ -161,7 +148,7 @@ return [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
         ],
         'abstract_factories' => [
-            'Zend\Cache\Service\StorageCacheAbstractServiceFactory'
+            'Laminas\Cache\Service\StorageCacheAbstractServiceFactory'
         ]
     ],
 
@@ -301,34 +288,29 @@ return [
         Vk::class => [
             'clientId'     => getenv('AUTOWP_ELS_VK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_VK_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ],
         GooglePlus::class => [
             'clientId'     => getenv('AUTOWP_ELS_GOOGLEPLUS_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GOOGLEPLUS_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ],
         Twitter::class => [
             'consumerKey'    => getenv('AUTOWP_ELS_TWITTER_CLIENTID'),
             'consumerSecret' => getenv('AUTOWP_ELS_TWITTER_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ],
         Facebook::class => [
             'clientId'     => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_FACEBOOK_SECRET'),
             'scope'        => ['public_profile'],
             'graphApiVersion' => 'v3.2',
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ],
         Github::class => [
             'clientId'     => getenv('AUTOWP_ELS_GITHUB_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GITHUB_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
-        ],
-        Linkedin::class => [
-            'clientId'     => getenv('AUTOWP_ELS_LINKEDIN_CLIENTID'),
-            'clientSecret' => getenv('AUTOWP_ELS_LINKEDIN_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
         ]
     ],
 

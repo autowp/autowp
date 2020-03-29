@@ -3,7 +3,7 @@
 namespace Application;
 
 use Application\InputFilter\AttrUserValueCollectionInputFilter;
-use Zend\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilter;
 
 use Autowp\Comments\Attention;
 use Autowp\Comments\CommentsService;
@@ -1258,6 +1258,18 @@ return [
                     ]
                 ]
             ],
+            'concept' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
+            'concept_inherit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
             'vehicle_type_id' => [
                 'required' => false,
                 'filters'  => [
@@ -1316,19 +1328,21 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['childs_count', 'name_html',
-                            'name_text', 'name_default', 'name_only', 'description',
+                        'options' => ['fields' => ['childs_count', 'childs_counts', 'name_html',
+                            'name_text', 'name_default', 'name_only', 'other_names', 'description', 'text',
                             'has_text', 'brands',
                             'spec_editor_url', 'specs_url', 'categories',
-                            'twins_groups', 'url', 'more_pictures_url',
+                            'twins_groups', 'url',
                             'preview_pictures', 'design', 'engine_vehicles',
                             'catname', 'is_concept', 'spec_id', 'begin_year',
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
                             'related_group_pictures', 'engine_id', 'attr_zone_id',
-                            'descendants_count', 'has_child_specs', 'accepted_pictures_count',
-                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names']]
+                            'descendants_count', 'has_child_specs', 'accepted_pictures_count', 'inbox_pictures_count',
+                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names',
+                            'descendant_twins_groups_count', 'comments_attentions_count', 'mosts_active',
+                            'exact_picture']]
                     ]
                 ]
             ],
@@ -1409,6 +1423,15 @@ return [
                 ]
             ],
             'engine_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'factories_of_brand' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
@@ -1539,6 +1562,24 @@ return [
                 'validators' => [
                     ['name' => 'Digits']
                 ]
+            ],
+            'dateful' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'route_brand_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
             ]
         ],
         'api_item_item' => [
@@ -1547,19 +1588,21 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['childs_count', 'name_html',
-                            'name_text', 'name_default', 'name_only', 'description',
+                        'options' => ['fields' => ['childs_count', 'childs_counts', 'name_html',
+                            'name_text', 'name_default', 'name_only', 'other_names', 'description', 'text',
                             'has_text', 'brands',
-                            'spec_editor_url', 'specs_url', 'categories',
-                            'twins_groups', 'url', 'more_pictures_url',
+                            'spec_editor_url', 'specs_route', 'categories',
+                            'twins_groups', 'url',
                             'preview_pictures', 'design', 'engine_vehicles',
                             'catname', 'is_concept', 'spec_id', 'begin_year',
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
                             'related_group_pictures', 'engine_id', 'attr_zone_id',
-                            'descendants_count', 'has_child_specs', 'accepted_pictures_count',
-                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names']]
+                            'descendants_count', 'has_child_specs', 'accepted_pictures_count', 'inbox_pictures_count',
+                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names',
+                            'descendant_twins_groups_count', 'comments_attentions_count', 'mosts_active',
+                            'exact_picture']]
                     ]
                 ]
             ],
@@ -1787,11 +1830,26 @@ return [
                     ['name' => 'StringTrim']
                 ],
             ],
+            'concept_inherit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
             'exclude_concept' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
                 ],
+            ],
+            'type_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
             ],
             'item_type_id' => [
                 'required' => false,
@@ -1818,6 +1876,12 @@ return [
                 ],
                 'validators' => [
                     ['name' => 'Digits']
+                ]
+            ],
+            'catname' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
                 ]
             ],
             'limit' => [
@@ -2473,7 +2537,7 @@ return [
                             'name_html', 'name_text', 'image_gallery_full',
                             'preview_large', 'dpi', 'point', 'authors',
                             'categories', 'twins', 'factories', 'of_links',
-                            'copyright_blocks'
+                            'copyright_blocks', 'path'
                         ]]
                     ]
                 ]
@@ -2485,6 +2549,9 @@ return [
                 'required' => false
             ],
             'perspective_id' => [
+                'required' => false
+            ],
+            'perspective_exclude_id' => [
                 'required' => false
             ],
             'exact_item_id' => [
@@ -2615,6 +2682,36 @@ return [
                         ['name' => 'Digits'],
                     ]
                 ],
+                'exact_item_link_type' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'exact_item_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'perspective_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'perspective_exclude_id' => [
+                    'required' => false
+                ],
             ],
             'accepted_in_days' => [
                 'required' => false,
@@ -2683,7 +2780,7 @@ return [
                             'owner', 'thumbnail', 'votes',
                             'comments_count', 'name_html', 'name_text', 'image_gallery_full',
                             'preview_large', 'dpi', 'point', 'authors', 'categories', 'twins',
-                            'factories', 'of_links', 'copyright_blocks'
+                            'factories', 'of_links', 'copyright_blocks', 'path'
                         ]]
                     ]
                 ]
@@ -2746,6 +2843,9 @@ return [
             'perspective_id' => [
                 'required' => false
             ],
+            'perspective_exclude_id' => [
+                'required' => false
+            ],
             'exact_item_id' => [
                 'required' => false,
                 'filters' => [
@@ -2774,6 +2874,36 @@ return [
                     'validators' => [
                         ['name' => 'Digits'],
                     ]
+                ],
+                'exact_item_link_type' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'exact_item_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'perspective_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'perspective_exclude_id' => [
+                    'required' => false
                 ],
             ],
             'accepted_in_days' => [
@@ -3038,7 +3168,7 @@ return [
                             'name_html', 'name_text', 'image_gallery_full',
                             'preview_large', 'dpi', 'point', 'authors',
                             'categories', 'twins', 'factories', 'of_links',
-                            'copyright_blocks'
+                            'copyright_blocks', 'path'
                         ]]
                     ]
                 ]

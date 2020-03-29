@@ -2,25 +2,26 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
+use Application\Controller\Api\LoginController;
+use Application\Test\AbstractHttpControllerTestCase;
 use Autowp\ExternalLoginService\Facebook;
 use Autowp\ExternalLoginService\PluginManager;
 use Autowp\ExternalLoginService\Result;
 use DateTime;
-use Zend\Http\Request;
-use Zend\Json\Json;
-use Zend\Uri\UriFactory;
-use Application\Controller\Api\LoginController;
-use Application\Test\AbstractHttpControllerTestCase;
+use Laminas\Http\Request;
+use Laminas\Json\Json;
+use Laminas\Uri\UriFactory;
+use League\OAuth2\Client\Token\AccessToken;
 
 class LoginControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testLoginByEmail()
+    public function testLoginByEmail(): void
     {
         $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => 'test@example.com',
-            'password' => '123456'
+            'password' => '123456',
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -30,11 +31,11 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('login');
     }
 
-    public function testLoginByLogin()
+    public function testLoginByLogin(): void
     {
         $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => 'test',
-            'password' => '123456'
+            'password' => '123456',
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -44,20 +45,20 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('login');
     }
 
-    private function mockExternalLoginFactory($photoUrl)
+    private function mockExternalLoginFactory(?string $photoUrl): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
         $config = $serviceManager->get('config');
 
         $serviceMock = $this->getMockBuilder(Facebook::class)
-            ->setMethods(['getData', 'callback'])
+            ->onlyMethods(['getData', 'callback'])
             ->setConstructorArgs([
-                $config['external_login_services'][Facebook::class]
+                $config['external_login_services'][Facebook::class],
             ])
             ->getMock();
 
-        $serviceMock->method('getData')->willReturnCallback(function () use ($serviceMock, $photoUrl) {
+        $serviceMock->method('getData')->willReturnCallback(function () use ($photoUrl) {
             return new Result([
                 'externalId' => 'test-external-id',
                 'name'       => 'test-name',
@@ -65,18 +66,20 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
                 'photoUrl'   => $photoUrl, //'http://example.com/photo.jpg',
                 'birthday'   => new DateTime(),
                 'email'      => 'test@example.com',
-                'gender'     => 1,
+                'gender'     => 'male',
                 'location'   => 'London',
-                'language'   => 'en'
+                'language'   => 'en',
             ]);
         });
 
         $serviceMock->method('callback')->willReturnCallback(function () {
-            return true;
+            return new AccessToken([
+                'access_token' => 'access_token',
+            ]);
         });
 
         $mock = $this->getMockBuilder(PluginManager::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->setConstructorArgs([$serviceManager])
             ->getMock();
 
@@ -85,12 +88,12 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService('ExternalLoginServiceManager', $mock);
     }
 
-    public function testAuthorizeBySerevice()
+    public function testAuthorizeByService(): void
     {
         $this->mockExternalLoginFactory(null);
 
         $this->dispatch('https://www.autowp.ru/api/login/start', Request::METHOD_GET, [
-            'type' => 'facebook'
+            'type' => 'facebook',
         ]);
 
         $this->assertModuleName('application');
@@ -106,11 +109,11 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $uri = UriFactory::factory($json['url']);
 
         $this->assertRegExp(
-            '|^https://www\.facebook\.com/v[0-9.]+/dialog/oauth' .
-                '\?scope=public_profile&state=[0-9a-z]+' .
-                '&response_type=code&approval_prompt=auto' .
-                '&redirect_uri=https%3A%2F%2Fen\.localhost%2Flogin%2Fcallback' .
-                '&client_id=facebook_test_clientid$|iu',
+            '|^https://www\.facebook\.com/v[0-9.]+/dialog/oauth'
+                . '\?scope=public_profile&state=[0-9a-z]+'
+                . '&response_type=code&approval_prompt=auto'
+                . '&redirect_uri=https%3A%2F%2Fen\.localhost%2Fapi%2Flogin%2Fcallback'
+                . '&client_id=facebook_test_clientid$|iu',
             $uri->toString()
         );
 
@@ -132,7 +135,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
 
         $this->dispatch('https://www.autowp.ru/login/callback', Request::METHOD_GET, [
             'state' => $state,
-            'code'  => 'zzzz'
+            'code'  => 'zzzz',
         ]);
 
         $this->assertResponseStatusCode(302);

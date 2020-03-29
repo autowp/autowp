@@ -2,27 +2,31 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Exception;
-use Zend\Http\Header\Cookie;
-use Zend\Http\Request;
-use Zend\Json\Json;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\ItemVehicleTypeController;
-use Application\Test\AbstractHttpControllerTestCase;
 use Application\Model\VehicleType;
+use Application\Test\AbstractHttpControllerTestCase;
+use Exception;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+use Laminas\Json\Json;
+
+use function array_replace;
+use function count;
+use function explode;
+use function in_array;
+use function sprintf;
 
 class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $params
-     * @return int
      * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -36,20 +40,17 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
 
         return (int) $parts[count($parts) - 1];
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $itemId
-     * @param int $parentId
-     * @param array $params
      * @throws Exception
      */
-    private function addItemParent(int $itemId, int $parentId, array $params = [])
+    private function addItemParent(int $itemId, int $parentId, array $params = []): void
     {
         $this->reset();
 
@@ -59,7 +60,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
             Request::METHOD_POST,
             array_replace([
                 'item_id'   => $itemId,
-                'parent_id' => $parentId
+                'parent_id' => $parentId,
             ], $params)
         );
 
@@ -72,11 +73,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $itemId
-     * @param array $vehicleTypeIds
      * @throws Exception
      */
-    private function setItemVehicleTypes(int $itemId, array $vehicleTypeIds)
+    private function setItemVehicleTypes(int $itemId, array $vehicleTypeIds): void
     {
         $this->reset();
 
@@ -119,16 +118,14 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param int $itemId
-     * @return array
      * @throws Exception
      */
-    private function getItemVehicleTypeIds(int $itemId)
+    private function getItemVehicleTypeIds(int $itemId): array
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item-vehicle-type', Request::METHOD_GET, [
-            'item_id' => $itemId
+            'item_id' => $itemId,
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -148,15 +145,16 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         return $result;
     }
 
-    private function getItemInheritedVehicleTypeIds(int $itemId)
+    private function getItemInheritedVehicleTypeIds(int $itemId): array
     {
         $serviceManager = $this->getApplicationServiceLocator();
+        /** @var VehicleType $vehicleType */
         $vehicleType = $serviceManager->get(VehicleType::class);
 
         return $vehicleType->getVehicleTypes($itemId, true);
     }
 
-    private function assertVehicleTypes(int $itemId, array $expected, array $inheritedExpected)
+    private function assertVehicleTypes(int $itemId, array $expected, array $inheritedExpected): void
     {
         $this->assertEquals($expected, $this->getItemVehicleTypeIds($itemId));
         $this->assertEquals($inheritedExpected, $this->getItemInheritedVehicleTypeIds($itemId));
@@ -165,7 +163,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testList()
+    public function testList(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item-vehicle-type', Request::METHOD_GET);
@@ -181,11 +179,11 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($json);
     }
 
-    public function testCreateVehicleAndSetVehicleTypeAndChange()
+    public function testCreateVehicleAndSetVehicleTypeAndChange(): void
     {
         $itemId = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'Toyota CoroVa'
+            'name'         => 'Toyota CoroVa',
         ]);
         $this->setItemVehicleTypes($itemId, [1]);
 
@@ -196,19 +194,19 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertVehicleTypes($itemId, [2, 3], []);
     }
 
-    public function testVehicleTypePresistsAfterAddParentWithoutVehicleType()
+    public function testVehicleTypePresistsAfterAddParentWithoutVehicleType(): void
     {
         $itemId = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Toyota Camry',
-            'body'         => 'gen.3'
+            'body'         => 'gen.3',
         ]);
         $this->setItemVehicleTypes($itemId, [2, 3]);
 
         $parentId = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Toyota Camry',
-            'is_group'     => true
+            'is_group'     => true,
         ]);
 
         $this->addItemParent($itemId, $parentId);
@@ -216,12 +214,12 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->setItemVehicleTypes($itemId, [2, 3]);
     }
 
-    public function testInheritedWhenChildCreated()
+    public function testInheritedWhenChildCreated(): void
     {
         $parentId = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Parent vehicle',
-            'is_group'     => true
+            'is_group'     => true,
         ]);
 
         $this->setItemVehicleTypes($parentId, [1]);
@@ -229,7 +227,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 
         $childId = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'Child vehicle'
+            'name'         => 'Child vehicle',
         ]);
         $this->assertVehicleTypes($childId, [], []);
 
@@ -237,18 +235,18 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertVehicleTypes($childId, [], [1]);
     }
 
-    public function testInheritedWhenParentVehicleTypeChanged()
+    public function testInheritedWhenParentVehicleTypeChanged(): void
     {
         $parentId = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Parent vehicle',
-            'is_group'     => true
+            'is_group'     => true,
         ]);
         $this->assertVehicleTypes($parentId, [], []);
 
         $childId = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'Child vehicle'
+            'name'         => 'Child vehicle',
         ]);
         $this->assertVehicleTypes($childId, [], []);
 
@@ -261,17 +259,17 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertVehicleTypes($childId, [], [1]);
     }
 
-    public function testNotInheritedWhenHaveOwnValue()
+    public function testNotInheritedWhenHaveOwnValue(): void
     {
         $parentId = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Parent vehicle',
-            'is_group'     => true
+            'is_group'     => true,
         ]);
 
         $childId = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'Child vehicle'
+            'name'         => 'Child vehicle',
         ]);
 
         $this->addItemParent($childId, $parentId);
@@ -282,18 +280,18 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertVehicleTypes($childId, [2], []);
     }
 
-    public function testInheritWhenClearOwnValue()
+    public function testInheritWhenClearOwnValue(): void
     {
         $childId = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'Child vehicle'
+            'name'         => 'Child vehicle',
         ]);
         $this->setItemVehicleTypes($childId, [2]);
 
         $parentId = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Parent vehicle',
-            'is_group'     => true
+            'is_group'     => true,
         ]);
         $this->setItemVehicleTypes($parentId, [2, 3]);
 

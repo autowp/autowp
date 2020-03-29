@@ -2,24 +2,26 @@
 
 namespace ApplicationTest\Frontend\Controller;
 
-use Exception;
-use Zend\Http\Request;
-use Zend\Http\Header\Cookie;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
 use Application\Test\AbstractHttpControllerTestCase;
+use Exception;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Request;
+
+use function array_replace;
+use function count;
+use function explode;
 
 class FactoryControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $params
-     * @return int
      * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -33,19 +35,16 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $itemId
-     * @param $parentId
-     * @param array $params
      * @throws Exception
      */
-    private function addItemParent($itemId, $parentId, array $params = [])
+    private function addItemParent(int $itemId, int $parentId, array $params = []): void
     {
         $this->reset();
 
@@ -55,7 +54,7 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
             Request::METHOD_POST,
             array_replace([
                 'item_id'   => $itemId,
-                'parent_id' => $parentId
+                'parent_id' => $parentId,
             ], $params)
         );
 
@@ -66,23 +65,23 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $factoryId = $this->createItem([
             'item_type_id' => 6,
-            'name'         => 'Factory'
+            'name'         => 'Factory',
         ]);
 
         $vehcileId = $this->createItem([
             'item_type_id' => 1,
-            'name'         => 'Vehicle on factory'
+            'name'         => 'Vehicle on factory',
         ]);
 
         $this->addItemParent($vehcileId, $factoryId);
 
         $this->reset();
         $this->dispatch('https://www.autowp.ru/api/item/' . $factoryId, Request::METHOD_GET, [
-            'fields' => 'related_group_pictures'
+            'fields' => 'related_group_pictures',
         ]);
 
         $this->assertResponseStatusCode(200);

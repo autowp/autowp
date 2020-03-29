@@ -2,12 +2,12 @@
 
 namespace ApplicationTest\Frontend\Controller;
 
-use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\NewController;
+use Application\Test\AbstractHttpControllerTestCase;
 
 class NewControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     public function testIndex()
     {

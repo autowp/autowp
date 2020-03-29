@@ -2,11 +2,6 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Exception;
-use Zend\Http\Header\Cookie;
-use Zend\Http\Headers;
-use Zend\Http\Request;
-use Zend\Json\Json;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemLanguageController;
 use Application\Controller\Api\ItemLinkController;
@@ -14,19 +9,34 @@ use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureItemController;
 use Application\DuplicateFinder;
+use Application\Model\Item;
 use Application\Test\AbstractHttpControllerTestCase;
+use Exception;
+use Laminas\Http\Header\Cookie;
+use Laminas\Http\Headers;
+use Laminas\Http\Request;
+use Laminas\Json\Json;
+
+use function array_pop;
+use function array_replace;
+use function copy;
+use function count;
+use function explode;
+use function microtime;
+use function sys_get_temp_dir;
+use function tempnam;
+
+use const UPLOAD_ERR_OK;
 
 class ItemControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+    protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $params
-     * @return int
      * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -40,34 +50,32 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
-    private function createVehicle(array $params = [])
+    private function createVehicle(array $params = []): int
     {
         return $this->createItem(array_replace([
             'item_type_id' => 1,
-            'name'         => 'Some vehicle'
+            'name'         => 'Some vehicle',
         ], $params));
     }
 
-    private function createEngine()
+    private function createEngine(): int
     {
         return $this->createItem([
             'item_type_id' => 2,
-            'name'         => 'Some engine'
+            'name'         => 'Some engine',
         ]);
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $engineId
-     * @param $vehicleId
      * @throws Exception
      */
-    private function setEngineToVehicle($engineId, $vehicleId)
+    private function setEngineToVehicle(int $engineId, int $vehicleId): void
     {
         $this->reset();
 
@@ -76,7 +84,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/item/' . $vehicleId,
             Request::METHOD_PUT,
             [
-                'engine_id' => $engineId
+                'engine_id' => $engineId,
             ]
         );
 
@@ -91,14 +99,14 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function getRandomBrand()
+    private function getRandomBrand(): array
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
             'type_id' => 5,
             'order'   => 'id_desc',
-            'fields'  => 'catname,subscription'
+            'fields'  => 'catname,subscription',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -116,12 +124,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $itemId
-     * @param $parentId
-     * @param array $params
      * @throws Exception
      */
-    private function addItemParent($itemId, $parentId, array $params = [])
+    private function addItemParent(int $itemId, int $parentId, array $params = []): void
     {
         $this->reset();
 
@@ -131,7 +136,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             Request::METHOD_POST,
             array_replace([
                 'item_id'   => $itemId,
-                'parent_id' => $parentId
+                'parent_id' => $parentId,
             ], $params)
         );
 
@@ -142,17 +147,17 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
-    private function mockDuplicateFinder()
+    private function mockDuplicateFinder(): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
         $tables = $serviceManager->get('TableManager');
 
         $mock = $this->getMockBuilder(DuplicateFinder::class)
-            ->setMethods(['indexImage'])
+            ->onlyMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
-                $tables->get('df_distance')
+                $tables->get('df_distance'),
             ])
             ->getMock();
 
@@ -163,11 +168,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $vehicleId
-     * @return int
      * @throws Exception
      */
-    private function addPictureToItem($vehicleId): int
+    private function addPictureToItem(int $vehicleId): int
     {
         $this->reset();
 
@@ -180,7 +183,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
-        $file = tempnam(sys_get_temp_dir(), 'upl');
+        $file     = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
@@ -190,12 +193,12 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
                 'tmp_name' => $file,
                 'name'     => $filename,
                 'error'    => UPLOAD_ERR_OK,
-                'type'     => 'image/jpeg'
-            ]
+                'type'     => 'image/jpeg',
+            ],
         ]);
 
         $this->dispatch('https://www.autowp.ru/api/picture', Request::METHOD_POST, [
-            'item_id' => $vehicleId
+            'item_id' => $vehicleId,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -205,19 +208,16 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
-        $parts = explode('/', $uri->getPath());
+        $uri     = $headers->get('Location')->uri();
+        $parts   = explode('/', $uri->getPath());
         return $parts[count($parts) - 1];
     }
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $pictureId
-     * @param $itemId
-     * @param $perspectiveId
      * @throws Exception
      */
-    private function setPerspective($pictureId, $itemId, $perspectiveId)
+    private function setPerspective(int $pictureId, int $itemId, int $perspectiveId): void
     {
         $this->reset();
 
@@ -226,7 +226,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/1',
             Request::METHOD_PUT,
             [
-                'perspective_id' => $perspectiveId
+                'perspective_id' => $perspectiveId,
             ]
         );
 
@@ -239,10 +239,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $pictureId
      * @throws Exception
      */
-    private function acceptPicture($pictureId)
+    private function acceptPicture(int $pictureId)
     {
         $this->reset();
 
@@ -262,12 +261,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param $itemId
-     * @param $parentId
-     * @return mixed
      * @throws Exception
      */
-    private function getItemParent($itemId, $parentId)
+    private function getItemParent(int $itemId, int $parentId): array
     {
         $this->reset();
 
@@ -290,11 +286,11 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testEngineUnderTheHoodPreviews()
+    public function testEngineUnderTheHoodPreviews(): void
     {
         $vehicleId = $this->createVehicle();
-        $engineId = $this->createEngine();
-        $brand = $this->getRandomBrand();
+        $engineId  = $this->createEngine();
+        $brand     = $this->getRandomBrand();
         $this->addItemParent($engineId, $brand['id']);
         $this->setEngineToVehicle($engineId, $vehicleId);
         $pictureId = $this->addPictureToItem($vehicleId);
@@ -312,7 +308,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item/' . $engineId, Request::METHOD_GET, [
-            'fields' => 'preview_pictures'
+            'fields' => 'preview_pictures',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -330,12 +326,12 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testCreateCarAndAddToBrand()
+    public function testCreateCarAndAddToBrand(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
             'item_type_id' => 1,
-            'name'         => 'Test car'
+            'name'         => 'Test car',
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -349,7 +345,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
          */
         $headers = $this->getResponse()->getHeaders();
 
-        $uri = $headers->get('Location')->uri();
+        $uri   = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
         $carId = $parts[count($parts) - 1];
 
@@ -363,7 +359,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             Request::METHOD_POST,
             [
                 'item_id'   => $carId,
-                'parent_id' => 205
+                'parent_id' => 205,
             ]
         );
 
@@ -377,7 +373,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testTree()
+    public function testTree(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item/1/tree', Request::METHOD_GET);
@@ -393,7 +389,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testCreateBrand()
+    public function testCreateBrand(): void
     {
         $catname = 'test-brand-' . (10000 * microtime(true));
 
@@ -403,7 +399,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'name'         => 'Test brand',
             'full_name'    => 'Test brand full name',
             'catname'      => $catname,
-            'begin_year'   => 1950
+            'begin_year'   => 1950,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -415,12 +411,12 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertHasResponseHeader('Location');
 
         $header = $this->getResponse()->getHeaders()->get('Location');
-        $path = $header->uri()->getPath();
+        $path   = $header->uri()->getPath();
 
         $this->assertStringStartsWith('/api/item/', $path);
 
-        $path = explode('/', $path);
-        $brandId = (int)array_pop($path);
+        $path    = explode('/', $path);
+        $brandId = (int) array_pop($path);
 
         $this->assertNotEmpty($brandId);
 
@@ -431,7 +427,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/item/' . $brandId . '/language/ru', Request::METHOD_PUT, [
             'name'      => 'Тест',
             'text'      => 'Краткое описание',
-            'full_text' => 'Полное описание'
+            'full_text' => 'Полное описание',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -440,7 +436,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/item/item/language/item/put');
         $this->assertActionName('put');
 
-
         $this->reset();
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -448,7 +443,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'item_id' => $brandId,
             'name'    => 'Тест',
             'url'     => 'http://example.com',
-            'type_id' => 'default'
+            'type_id' => 'default',
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -462,21 +457,20 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testBlacklistedCatnameNotAllowedManually()
+    public function testBlacklistedCatnameNotAllowedManually(): void
     {
         $parentVehicleId = $this->createVehicle([
-            'is_group' => true
+            'is_group' => true,
         ]);
-        $childVehicleId = $this->createVehicle();
+        $childVehicleId  = $this->createVehicle();
         $this->addItemParent($childVehicleId, $parentVehicleId, [
             'type_id' => 1, // tuning
-            'catname' => 'sport'
+            'catname' => 'sport',
         ]);
 
         $json = $this->getItemParent($childVehicleId, $parentVehicleId);
 
         $this->assertNotEquals('sport', $json['catname']);
-
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -484,7 +478,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/item-parent/' . $childVehicleId . '/' . $parentVehicleId,
             Request::METHOD_PUT,
             [
-                'catname' => 'sport'
+                'catname' => 'sport',
             ]
         );
 
@@ -493,7 +487,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(ItemParentController::class);
         $this->assertMatchedRouteName('api/item-parent/item/put');
         $this->assertActionName('put');
-
 
         $json = $this->getItemParent($childVehicleId, $parentVehicleId);
 
@@ -504,7 +497,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testSubscription()
+    public function testSubscription(): void
     {
         $brand = $this->getRandomBrand();
 
@@ -514,7 +507,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/item/' . $brand['id'],
             Request::METHOD_PUT,
             [
-                'subscription' => 1
+                'subscription' => 1,
             ]
         );
 
@@ -530,7 +523,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/api/item/' . $brand['id'],
             Request::METHOD_PUT,
             [
-                'subscription' => 0
+                'subscription' => 0,
             ]
         );
 
@@ -544,13 +537,13 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @throws Exception
      */
-    public function testItemParentAutoCatnameIsNotEmpty()
+    public function testItemParentAutoCatnameIsNotEmpty(): void
     {
         $parentId = $this->createVehicle([
             'name'     => 'Toyota Corolla',
-            'is_group' => true
+            'is_group' => true,
         ]);
-        $childId = $this->createVehicle(['name' => 'Toyota Corolla Sedan']);
+        $childId  = $this->createVehicle(['name' => 'Toyota Corolla Sedan']);
 
         $this->addItemParent($childId, $parentId);
 
@@ -563,19 +556,19 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testItemPoint()
+    public function testItemPoint(): void
     {
         $itemId = $this->createItem([
             'item_type_id' => 7,
             'name'         => 'Museum of something',
             'lat'          => 20.5,
-            'lng'          => -15
+            'lng'          => -15,
         ]);
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item/' . $itemId, Request::METHOD_GET, [
-            'fields' => 'lat,lng'
+            'fields' => 'lat,lng',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -594,7 +587,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testEngineVehicles()
+    public function testEngineVehicles(): void
     {
         $engineId = $this->createItem([
             'item_type_id' => 2,
@@ -622,7 +615,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item/' . $engineId, Request::METHOD_GET, [
-            'fields'  => 'engine_vehicles'
+            'fields' => 'engine_vehicles',
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -636,7 +629,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertArrayHasKey('engine_vehicles', $json);
         foreach ($json['engine_vehicles'] as $item) {
             $this->assertNotEmpty($item['name_html']);
-            $this->assertNotEmpty($item['url']);
         }
     }
 
@@ -644,15 +636,15 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    public function testFields()
+    public function testFields(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
-            'fields' => 'childs_count,name_html,name_text,name_default,description,' .
-                'has_text,brands,spec_editor_url,specs_url,categories,' .
-                'twins_groups,url,more_pictures_url,preview_pictures,design,' .
-                'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
-            'limit'  => 100
+            'fields' => 'childs_count,name_html,name_text,name_default,description,attr_zone_id,'
+                . 'has_text,brands,spec_editor_url,specs_route,categories,'
+                . 'twins_groups,url,preview_pictures,design,'
+                . 'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
+            'limit'  => 100,
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -664,5 +656,130 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
 
         $this->assertNotEmpty($json['items']);
+    }
+
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
+    public function testCreateCategoryAddItemAndGet(): void
+    {
+        $catname = 'catname-' . (10000 * microtime(true));
+
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
+            'item_type_id' => 3,
+            'name'         => 'Test category',
+            'catname'      => $catname,
+            'begin_year'   => 2000,
+            'end_year'     => 2000,
+        ]);
+
+        $this->assertResponseStatusCode(201);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/post');
+        $this->assertActionName('post');
+
+        $this->assertHasResponseHeader('Location');
+
+        $header = $this->getResponse()->getHeaders()->get('Location');
+        $path   = $header->uri()->getPath();
+
+        $this->assertStringStartsWith('/api/item/', $path);
+
+        $path       = explode('/', $path);
+        $categoryId = (int) array_pop($path);
+
+        $this->assertNotEmpty($categoryId);
+
+        // add item to category
+        $this->reset();
+
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch(
+            'https://www.autowp.ru/api/item-parent',
+            Request::METHOD_POST,
+            [
+                'item_id'   => 1,
+                'parent_id' => $categoryId,
+            ]
+        );
+
+        $this->assertResponseStatusCode(201);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemParentController::class);
+        $this->assertMatchedRouteName('api/item-parent/post');
+        $this->assertActionName('post');
+    }
+
+    /**
+     * @suppress PhanUndeclaredMethod
+     * @throws Exception
+     */
+    public function testNatSort(): void
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
+            'limit' => 100,
+            'order' => 'name_nat',
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/list');
+        $this->assertActionName('index');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertNotEmpty($json['items']);
+    }
+
+    /**
+     * @suppress PhanUndeclaredMethod
+     * @throws Exception
+     */
+    public function testPath(): void
+    {
+        $topCatname = 'top' . microtime(true);
+        $categoryID = $this->createItem([
+            'item_type_id' => Item::CATEGORY,
+            'name'         => 'top level',
+            'catname'      => $topCatname,
+        ]);
+
+        $lvl2Catname    = 'lvl2' . microtime(true);
+        $lvl2CategoryID = $this->createItem([
+            'item_type_id' => Item::CATEGORY,
+            'name'         => 'sub level',
+            'catname'      => $lvl2Catname,
+        ]);
+
+        $lvl3Catname    = 'lvl3' . microtime(true);
+        $lvl3CategoryID = $this->createItem([
+            'item_type_id' => Item::CATEGORY,
+            'name'         => 'sub level',
+            'catname'      => $lvl3Catname,
+        ]);
+
+        $this->addItemParent($lvl2CategoryID, $categoryID);
+        $this->addItemParent($lvl3CategoryID, $lvl2CategoryID);
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item/path', Request::METHOD_GET, [
+            'catname' => $lvl3Catname,
+            'path'    => '',
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/path/get');
+        $this->assertActionName('path');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertNotEmpty($json['path']);
     }
 }

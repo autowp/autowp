@@ -2,8 +2,9 @@
 
 namespace Autowp\Traffic;
 
-use Zend\EventManager\EventInterface as Event;
-use Zend\ModuleManager\Feature;
+use Laminas\EventManager\EventInterface as Event;
+use Laminas\Loader\StandardAutoloader;
+use Laminas\ModuleManager\Feature;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
@@ -11,10 +12,7 @@ class Module implements
     //Feature\ControllerProviderInterface,
     Feature\ConfigProviderInterface
 {
-    /**
-     * @return array
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         $provider = new ConfigProvider();
         return [
@@ -24,10 +22,10 @@ class Module implements
         ];
     }
 
-    public function getAutoloaderConfig()
+    public function getAutoloaderConfig(): array
     {
         return [
-            'Zend\Loader\StandardAutoloader' => [
+            StandardAutoloader::class => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src',
                 ],
