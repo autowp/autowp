@@ -81,7 +81,8 @@
     },
 	"autoload-dev" : {
 		"psr-4" : {
-			"AutowpTest\\" : "test/"
+			"AutowpTest\\" : "test/",
+			"ApplicationTest\\" : "module/Application/test"
 		}
 	},
 	"repositories" : [
