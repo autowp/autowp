@@ -5,8 +5,8 @@ namespace Application;
 return [
     'router' => [
         'routes' => [
-            'index' => [
-                'type' => 'Literal',
+            'index'  => [
+                'type'    => 'Literal',
                 'options' => [
                     'route'    => '/',
                     'defaults' => [
@@ -15,9 +15,9 @@ return [
                     ],
                 ],
             ],
-            'login' => [
-                'type' => 'Literal',
-                'options' => [
+            'login'  => [
+                'type'          => 'Literal',
+                'options'       => [
                     'route'    => '/login',
                     'defaults' => [
                         'controller' => Controller\Api\LoginController::class,
@@ -26,20 +26,20 @@ return [
                 'may_terminate' => false,
                 'child_routes'  => [
                     'callback' => [
-                        'type' => 'Literal',
+                        'type'    => 'Literal',
                         'options' => [
-                            'route' => '/callback',
+                            'route'    => '/callback',
                             'defaults' => [
                                 'action' => 'callback',
                             ],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             'yandex' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route' => '/yandex',
+                'type'          => 'Literal',
+                'options'       => [
+                    'route'    => '/yandex',
                     'defaults' => [
                         'controller' => Controller\Frontend\YandexController::class,
                     ],
@@ -49,14 +49,14 @@ return [
                     'informing' => [
                         'type'    => 'Literal',
                         'options' => [
-                            'route' => '/informing',
+                            'route'    => '/informing',
                             'defaults' => [
-                                'action' => 'informing'
-                            ]
-                        ]
-                    ]
-                ]
+                                'action' => 'informing',
+                            ],
+                        ],
+                    ],
+                ],
             ],
-        ]
-    ]
+        ],
+    ],
 ];

@@ -2,27 +2,29 @@
 
 namespace Application;
 
+use Laminas\Form\Form;
+
 return [
     'forms' => [
         'ModerPictureVoteForm2' => [
-            'type'     => 'Laminas\Form\Form',
-            'attributes'  => [
-                'method' => 'post'
+            'type'         => Form::class,
+            'attributes'   => [
+                'method' => 'post',
             ],
-            'elements' => [
+            'elements'     => [
                 [
                     'spec' => [
-                        'type' => 'Text',
-                        'name' => 'reason',
-                        'options' => [
+                        'type'       => 'Text',
+                        'name'       => 'reason',
+                        'options'    => [
                             'label' => 'moder/picture/acceptance/reason',
                         ],
                         'attributes' => [
                             'size'      => Model\PictureModerVote::MAX_LENGTH,
                             'maxlength' => Model\PictureModerVote::MAX_LENGTH,
                             'class'     => 'form-control',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 [
                     'spec' => [
@@ -30,11 +32,11 @@ return [
                         'name'    => 'vote',
                         'options' => [
                             'options' => [
-                                 '1' => 'moder/picture/acceptance/want-accept',
-                                '-1' => 'moder/picture/acceptance/want-delete'
-                            ]
-                        ]
-                    ]
+                                '1'  => 'moder/picture/acceptance/want-accept',
+                                '-1' => 'moder/picture/acceptance/want-delete',
+                            ],
+                        ],
+                    ],
                 ],
                 [
                     'spec' => [
@@ -43,23 +45,23 @@ return [
                         'options' => [
                             'label' => 'Save as template?',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             'input_filter' => [
                 'reason' => [
                     'required' => true,
                     'filters'  => [
-                        ['name' => 'StringTrim']
-                    ]
+                        ['name' => 'StringTrim'],
+                    ],
                 ],
-                'vote' => [
-                    'required' => true
+                'vote'   => [
+                    'required' => true,
                 ],
-                'save' => [
-                    'required' => false
-                ]
-            ]
-        ]
-    ]
+                'save'   => [
+                    'required' => false,
+                ],
+            ],
+        ],
+    ],
 ];

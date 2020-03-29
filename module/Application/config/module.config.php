@@ -9,11 +9,15 @@ use Autowp\ExternalLoginService\Twitter;
 use Autowp\ExternalLoginService\Vk;
 use Autowp\ZFComponents\Resources;
 use Exception;
+use Laminas\Cache\Service\StorageCacheAbstractServiceFactory;
 use Laminas\I18n\Translator\Loader\PhpArray;
+use Laminas\I18n\Translator\Resources as TranslatorResources;
 use Laminas\InputFilter\InputFilterAbstractServiceFactory;
 use Laminas\Mvc\I18n\TranslatorFactory;
 use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\InvokableFactory;
+
+use function getenv;
 
 $host = getenv('AUTOWP_HOST');
 
@@ -21,7 +25,7 @@ $mailTypes = [
     'in-memory' => [
         'type' => 'in-memory',
     ],
-    'smtp' => [
+    'smtp'      => [
         'type'    => 'smtp',
         'options' => [
             'host'              => getenv('AUTOWP_MAIL_SMTP_HOST'),
@@ -32,7 +36,7 @@ $mailTypes = [
                 'ssl'      => 'tls',
             ],
         ],
-    ]
+    ],
 ];
 
 $mailType = getenv('AUTOWP_MAIL_TYPE');
@@ -45,7 +49,7 @@ if (! isset($mailTypes[$mailType])) {
 $mailTransport = $mailTypes[$mailType];
 
 return [
-    'controllers' => [
+    'controllers'        => [
         'factories' => [
             Controller\IndexController::class           => InvokableFactory::class,
             Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,
@@ -57,7 +61,7 @@ return [
             'inputFilterResponse' => Controller\Api\Plugin\InputFilterResponse::class,
             'inputResponse'       => Controller\Api\Plugin\InputResponse::class,
         ],
-        'factories' => [
+        'factories'  => [
             'car'         => Controller\Plugin\Service\CarFactory::class,
             'catalogue'   => Controller\Plugin\Service\CatalogueFactory::class,
             'fileSize'    => Controller\Plugin\Service\FileSizeFactory::class,
@@ -68,9 +72,9 @@ return [
             'translate'   => Controller\Plugin\Service\TranslateFactory::class,
         ],
     ],
-    'translator' => [
-        'locale' => 'ru',
-        'fallbackLocale' => 'en',
+    'translator'         => [
+        'locale'                    => 'ru',
+        'fallbackLocale'            => 'en',
         'translation_file_patterns' => [
             [
                 'type'     => PhpArray::class,
@@ -84,24 +88,24 @@ return [
             ],
             [
                 'type'     => PhpArray::class,
-                'base_dir' => \Laminas\I18n\Translator\Resources::getBasePath(),
-                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForValidator(),
+                'base_dir' => TranslatorResources::getBasePath(),
+                'pattern'  => TranslatorResources::getPatternForValidator(),
             ],
             [
                 'type'     => PhpArray::class,
-                'base_dir' => \Laminas\I18n\Translator\Resources::getBasePath(),
-                'pattern'  => \Laminas\I18n\Translator\Resources::getPatternForCaptcha(),
+                'base_dir' => TranslatorResources::getBasePath(),
+                'pattern'  => TranslatorResources::getPatternForCaptcha(),
             ],
             [
                 'type'     => PhpArray::class,
                 'base_dir' => Resources::getBasePath(),
                 'pattern'  => Resources::getPatternForViewHelpers(),
-            ]
+            ],
         ],
     ],
 
     'service_manager' => [
-        'factories' => [
+        'factories'          => [
             Acl::class                           => Permissions\AclFactory::class,
             Comments::class                      => Service\CommentsFactory::class,
             DuplicateFinder::class               => Service\DuplicateFinderFactory::class,
@@ -140,8 +144,8 @@ return [
             'translator'                         => TranslatorFactory::class,
         ],
         'abstract_factories' => [
-            'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
-        ]
+            StorageCacheAbstractServiceFactory::class,
+        ],
     ],
 
     'telegram' => [
@@ -151,25 +155,25 @@ return [
     ],
 
     'twitter' => [
-        'username' => getenv('AUTOWP_TWITTER_USERNAME'),
+        'username'     => getenv('AUTOWP_TWITTER_USERNAME'),
         'oauthOptions' => [
             'consumerKey'    => getenv('AUTOWP_TWITTER_OAUTH_KEY'),
             'consumerSecret' => getenv('AUTOWP_TWITTER_OAUTH_SECRET'),
         ],
-        'token' => [
+        'token'        => [
             'oauth_token'        => getenv('AUTOWP_TWITTER_TOKEN_OAUTH'),
             'oauth_token_secret' => getenv('AUTOWP_TWITTER_TOKEN_OAUTH_SECRET'),
-        ]
+        ],
     ],
 
     'facebook' => [
-        'app_id' => getenv('AUTOWP_FACEBOOK_APP_ID'),
-        'app_secret' => getenv('AUTOWP_FACEBOOK_APP_SECRET'),
+        'app_id'            => getenv('AUTOWP_FACEBOOK_APP_ID'),
+        'app_secret'        => getenv('AUTOWP_FACEBOOK_APP_SECRET'),
         'page_access_token' => getenv('AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN'),
     ],
 
     'hosts' => [
-        'en' => [
+        'en'    => [
             'hostname' => 'en.' . $host,
             'timezone' => 'Europe/London',
             'name'     => 'English',
@@ -177,23 +181,23 @@ return [
             'aliases'  => [
                 'en.autowp.ru',
                 $host,
-                'www' . $host
+                'www' . $host,
             ],
         ],
-        'zh' => [
+        'zh'    => [
             'hostname' => 'zh.' . $host,
             'timezone' => 'Asia/Shanghai',
             'name'     => '中文 (beta)',
             'flag'     => 'flag-icon flag-icon-cn',
             'aliases'  => [],
         ],
-        'ru' => [
+        'ru'    => [
             'hostname' => getenv('AUTOWP_HOST_RU'),
             'timezone' => 'Europe/Moscow',
             'name'     => 'Русский',
             'flag'     => 'flag-icon flag-icon-ru',
             'aliases'  => [
-                'ru.autowp.ru'
+                'ru.autowp.ru',
             ],
         ],
         'pt-br' => [
@@ -203,21 +207,21 @@ return [
             'flag'     => 'flag-icon flag-icon-br',
             'aliases'  => [],
         ],
-        'fr' => [
+        'fr'    => [
             'hostname' => 'fr.' . $host,
             'timezone' => 'Europe/Paris',
             'name'     => 'Français (beta)',
             'flag'     => 'flag-icon flag-icon-fr',
             'aliases'  => [],
         ],
-        'be' => [
+        'be'    => [
             'hostname' => 'be.' . $host,
             'timezone' => 'Europe/Minsk',
             'name'     => 'Беларуская',
             'flag'     => 'flag-icon flag-icon-by',
             'aliases'  => [],
         ],
-        'uk' => [
+        'uk'    => [
             'hostname' => 'uk.' . $host,
             'timezone' => 'Europe/Kiev',
             'name'     => 'Українська (beta)',
@@ -226,10 +230,22 @@ return [
         ],
     ],
 
-    'hostname_whitelist' => ['www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
-        'i.' . $host, 'en.' . $host, 'fr.' . $host, 'ru.' . $host,
-        'zh.' . $host, 'be.' . $host, 'br.' . $host, 'uk.' . $host, 'www.' . $host, $host],
-    'force_https' => (bool) getenv('AUTOWP_FORCE_HTTPS'),
+    'hostname_whitelist' => [
+        'www.autowp.ru',
+        'ru.autowp.ru',
+        'en.autowp.ru',
+        'i.' . $host,
+        'en.' . $host,
+        'fr.' . $host,
+        'ru.' . $host,
+        'zh.' . $host,
+        'be.' . $host,
+        'br.' . $host,
+        'uk.' . $host,
+        'www.' . $host,
+        $host,
+    ],
+    'force_https'        => (bool) getenv('AUTOWP_FORCE_HTTPS'),
 
     'pictures_hostname' => getenv('AUTOWP_PICTURES_HOST'),
 
@@ -253,7 +269,7 @@ return [
     ],
 
     'validators' => [
-        'aliases' => [
+        'aliases'   => [
             'ItemCatnameNotExists' => Validator\Item\CatnameNotExists::class,
         ],
         'factories' => [
@@ -270,73 +286,74 @@ return [
     ],
 
     'external_login_services' => [
-        Vk::class => [
+        Vk::class         => [
             'clientId'     => getenv('AUTOWP_ELS_VK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_VK_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
+            'redirectUri'  => 'https://en.' . $host . '/api/login/callback',
         ],
         GooglePlus::class => [
             'clientId'     => getenv('AUTOWP_ELS_GOOGLEPLUS_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GOOGLEPLUS_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
+            'redirectUri'  => 'https://en.' . $host . '/api/login/callback',
         ],
-        Twitter::class => [
+        Twitter::class    => [
             'consumerKey'    => getenv('AUTOWP_ELS_TWITTER_CLIENTID'),
             'consumerSecret' => getenv('AUTOWP_ELS_TWITTER_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
+            'redirectUri'    => 'https://en.' . $host . '/api/login/callback',
         ],
-        Facebook::class => [
-            'clientId'     => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
-            'clientSecret' => getenv('AUTOWP_ELS_FACEBOOK_SECRET'),
-            'scope'        => ['public_profile'],
+        Facebook::class   => [
+            'clientId'        => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
+            'clientSecret'    => getenv('AUTOWP_ELS_FACEBOOK_SECRET'),
+            'scope'           => ['public_profile'],
             'graphApiVersion' => 'v3.2',
-            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
+            'redirectUri'     => 'https://en.' . $host . '/api/login/callback',
         ],
-        Github::class => [
+        Github::class     => [
             'clientId'     => getenv('AUTOWP_ELS_GITHUB_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GITHUB_SECRET'),
-            'redirectUri'  => 'https://en.'.$host.'/api/login/callback'
-        ]
+            'redirectUri'  => 'https://en.' . $host . '/api/login/callback',
+        ],
     ],
 
     'gulp-rev' => [
         'manifest' => __DIR__ . '/../../../public_html/dist/manifest.json',
-        'prefix'   => ''
+        'prefix'   => '',
     ],
 
-    'mosts_min_vehicles_count' => (int)getenv('AUTOWP_MOSTS_MIN_VEHICLES_COUNT'),
+    'mosts_min_vehicles_count' => (int) getenv('AUTOWP_MOSTS_MIN_VEHICLES_COUNT'),
 
     'yandex' => [
         'secret' => getenv('AUTOWP_YANDEX_SECRET'),
-        'price'  => (int)getenv('AUTOWP_YANDEX_PRICE')
+        'price'  => (int) getenv('AUTOWP_YANDEX_PRICE'),
     ],
 
     'vk' => [
         'token'    => getenv('AUTOWP_VK_TOKEN'),
-        'owner_id' => getenv('AUTOWP_VK_OWNER_ID')
+        'owner_id' => getenv('AUTOWP_VK_OWNER_ID'),
     ],
 
     'input_filters' => [
-        'factories' => [
-            InputFilter\AttrUserValueCollectionInputFilter::class => InputFilter\AttrUserValueCollectionInputFilterFactory::class
+        'factories'          => [
+            InputFilter\AttrUserValueCollectionInputFilter::class
+                => InputFilter\AttrUserValueCollectionInputFilterFactory::class,
         ],
         'abstract_factories' => [
-            InputFilterAbstractServiceFactory::class
-        ]
+            InputFilterAbstractServiceFactory::class,
+        ],
     ],
 
     'users' => [
         'salt'      => getenv('AUTOWP_USERS_SALT'),
-        'emailSalt' => getenv('AUTOWP_EMAIL_SALT')
+        'emailSalt' => getenv('AUTOWP_EMAIL_SALT'),
     ],
 
     'mail' => [
-        'transport' => $mailTransport
+        'transport' => $mailTransport,
     ],
 
     'recaptcha' => [
         'publicKey'  => getenv('AUTOWP_RECAPTCHA_PUBLICKEY'),
-        'privateKey' => getenv('AUTOWP_RECAPTCHA_PRIVATEKEY')
+        'privateKey' => getenv('AUTOWP_RECAPTCHA_PRIVATEKEY'),
     ],
 
     'sentry' => [
@@ -346,7 +363,7 @@ return [
     ],
 
     'traffic' => [
-        'url' => getenv('TRAFFIC_URL')
+        'url' => getenv('TRAFFIC_URL'),
     ],
 
     'authSecret' => getenv('AUTOWP_AUTH_SECRET'),

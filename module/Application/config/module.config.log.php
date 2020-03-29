@@ -9,15 +9,15 @@ return [
         'ErrorLog' => [
             'writers' => [
                 [
-                    'name' => 'stream',
+                    'name'     => 'stream',
                     'priority' => Logger::ERR,
-                    'options' => [
-                        'stream' => __DIR__ . '/../../../logs/zf-error.log',
+                    'options'  => [
+                        'stream'     => __DIR__ . '/../../../logs/zf-error.log',
                         'processors' => [
                             [
-                                'name' => Log\Processor\Url::class
-                            ]
-                        ]
+                                'name' => Log\Processor\Url::class,
+                            ],
+                        ],
                     ],
                 ],
             ],

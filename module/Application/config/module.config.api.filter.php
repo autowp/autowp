@@ -3,81 +3,82 @@
 namespace Application;
 
 use Application\InputFilter\AttrUserValueCollectionInputFilter;
-use Laminas\InputFilter\InputFilter;
-
 use Autowp\Comments\Attention;
 use Autowp\Comments\CommentsService;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Autowp\ZFComponents\Filter\SingleSpaces;
+use Laminas\InputFilter\InputFilter;
+
+use function range;
 
 return [
     'input_filter_specs' => [
-        'api_acl_roles_list' => [
+        'api_acl_roles_list'                   => [
             'recursive' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
         ],
-        'api_acl_roles_post' => [
+        'api_acl_roles_post'                   => [
             'name' => [
                 'required' => true,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
         ],
-        'api_acl_roles_role_parents_post' => [
+        'api_acl_roles_role_parents_post'      => [
             'role' => [
                 'required' => true,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
         ],
-        'api_acl_rules_post' => [
-            'role' => [
+        'api_acl_rules_post'                   => [
+            'role'      => [
                 'required' => true,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'resource' => [
+            'resource'  => [
                 'required' => true,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
             'privilege' => [
                 'required' => true,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'allowed' => [
+            'allowed'   => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ]
+                    ['name' => 'Digits'],
+                ],
+            ],
         ],
-        'api_article_list' => [
+        'api_article_list'                     => [
             'catname' => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'limit'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -85,15 +86,15 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 1,
-                            'max' => 500
-                        ]
-                    ]
-                ]
+                            'max' => 500,
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -101,94 +102,94 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'fields' => [
+            'fields'  => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['author', 'description']]
-                    ]
-                ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['author', 'description']],
+                    ],
+                ],
             ],
         ],
-        'api_attr_list_options_get' => [
+        'api_attr_list_options_get'            => [
             'attribute_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ]
-            ]
-        ],
-        'api_attr_list_options_post' => [
-            'attribute_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ]
-            ],
-            'parent_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ]
-            ],
-            'name' => [
-                'required' => true,
-                'filters'  => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => 'SingleSpaces']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+        ],
+        'api_attr_list_options_post'           => [
+            'attribute_id' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'parent_id'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'name'         => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'SingleSpaces'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => 255
-                        ]
-                    ]
-                ]
+                            'max' => 255,
+                        ],
+                    ],
+                ],
             ],
         ],
-        'api_attr_attribute_get' => [
-            'zone_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        'api_attr_attribute_get'               => [
+            'zone_id'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                ]
+                ],
             ],
             'parent_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                ]
+                ],
             ],
             'recursive' => [
-                'required' => false
-            ],
-            'page' => [
                 'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            ],
+            'page'      => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -196,178 +197,178 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
+            'fields'    => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['unit', 'childs', 'options']],
+                    ],
+                ],
+            ],
+        ],
+        'api_attr_attribute_post'              => [
+            'parent_id'   => [
+                'required'   => false,
+                'validators' => [
+                    ['name' => 'Digits'],
+                    ['name' => Validator\Attr\AttributeId::class],
+                ],
+            ],
+            'name'        => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'SingleSpaces'],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'min' => 0,
+                            'max' => 255,
+                        ],
+                    ],
+                ],
+            ],
+            'type_id'     => [
+                'required'   => true,
+                'validators' => [
+                    ['name' => 'Digits'],
+                    ['name' => Validator\Attr\TypeId::class],
+                ],
+            ],
+            'precision'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'unit_id'     => [
+                'required'   => false,
+                'validators' => [
+                    ['name' => 'Digits'],
+                    ['name' => Validator\Attr\UnitId::class],
+                ],
+            ],
+            'description' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'SingleSpaces'],
+                ],
+            ],
+            'move'        => [
+                'required'   => false,
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => ['up', 'down'],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'api_attr_attribute_item_get'          => [
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['unit', 'childs', 'options']]
-                    ]
-                ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['unit', 'childs', 'options']],
+                    ],
+                ],
             ],
         ],
-        'api_attr_attribute_post' => [
-            'parent_id' => [
-                'required' => false,
-                'validators' => [
-                    ['name' => 'Digits'],
-                    ['name' => Validator\Attr\AttributeId::class]
-                ]
-            ],
-            'name' => [
-                'required' => true,
-                'filters'  => [
+        'api_attr_attribute_item_patch'        => [
+            'name'        => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => 'SingleSpaces']
+                    ['name' => 'SingleSpaces'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => 255
-                        ]
-                    ]
-                ]
+                            'max' => 255,
+                        ],
+                    ],
+                ],
             ],
-            'type_id' => [
-                'required' => true,
+            'type_id'     => [
+                'required'   => false,
                 'validators' => [
                     ['name' => 'Digits'],
-                    ['name' => Validator\Attr\TypeId::class]
-                ]
+                    ['name' => Validator\Attr\TypeId::class],
+                ],
             ],
-            'precision' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
+            'precision'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'unit_id' => [
-                'required' => false,
+            'unit_id'     => [
+                'required'   => false,
                 'validators' => [
                     ['name' => 'Digits'],
-                    ['name' => Validator\Attr\UnitId::class]
-                ]
+                    ['name' => Validator\Attr\UnitId::class],
+                ],
             ],
             'description' => [
                 'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim'],
-                    ['name' => 'SingleSpaces']
-                ]
-            ],
-            'move' => [
-                'required' => false,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => ['up', 'down']
-                        ]
-                    ]
-                ]
-            ]
-        ],
-        'api_attr_attribute_item_get' => [
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['unit', 'childs', 'options']]
-                    ]
-                ]
-            ],
-        ],
-        'api_attr_attribute_item_patch' => [
-            'name' => [
-                'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
-                    ['name' => 'SingleSpaces']
+                    ['name' => 'SingleSpaces'],
                 ],
+            ],
+            'move'        => [
+                'required'   => false,
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'InArray',
                         'options' => [
-                            'min' => 0,
-                            'max' => 255
-                        ]
-                    ]
-                ]
-            ],
-            'type_id' => [
-                'required' => false,
-                'validators' => [
-                    ['name' => 'Digits'],
-                    ['name' => Validator\Attr\TypeId::class]
-                ]
-            ],
-            'precision' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
+                            'haystack' => ['up', 'down'],
+                        ],
+                    ],
                 ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
             ],
-            'unit_id' => [
-                'required' => false,
-                'validators' => [
-                    ['name' => 'Digits'],
-                    ['name' => Validator\Attr\UnitId::class]
-                ]
-            ],
-            'description' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim'],
-                    ['name' => 'SingleSpaces']
-                ]
-            ],
-            'move' => [
-                'required' => false,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => ['up', 'down']
-                        ]
-                    ]
-                ]
-            ]
         ],
-        'api_attr_conflict_get' => [
+        'api_attr_conflict_get'                => [
             'filter' => [
-                'required' => true,
+                'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 '0',
                                 '1',
                                 '-1',
-                                'minus-weight'
-                            ]
-                        ]
-                    ]
-                ]
+                                'minus-weight',
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -375,320 +376,62 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
-            ],
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['values']]
-                    ]
-                ]
-            ],
-        ],
-        'api_attr_user_value_get' => [
-            'zone_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                            'inclusive' => true,
+                        ],
+                    ],
                 ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'user_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'exclude_user_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'GreaterThan',
-                        'options' => [
-                            'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
-            ],
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'Between',
-                        'options' => [
-                            'min' => 1,
-                            'max' => 500
-                        ]
-                    ]
-                ]
-            ],
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['user', 'item', 'path']]
-                    ]
-                ]
-            ],
-        ],
-        'api_attr_user_value_patch_query' => [
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ]
-        ],
-        'api_attr_user_value_patch_data' => [
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'items' => [
-                'type' => AttrUserValueCollectionInputFilter::class
-            ]
-        ],
-        'api_attr_value_get' => [
-            'zone_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'GreaterThan',
-                        'options' => [
-                            'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
-            ],
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'Between',
-                        'options' => [
-                            'min' => 1,
-                            'max' => 500
-                        ]
-                    ]
-                ]
             ],
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
                         'name'    => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['value', 'value_text']]
-                    ]
-                ]
+                        'options' => ['fields' => ['values']],
+                    ],
+                ],
             ],
         ],
-        'api_attr_zone_attribute_get' => [
-            'zone_id' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ]
-        ],
-        'api_attr_zone_attribute_post' => [
-            'zone_id' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'attribute_id' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ]
-        ],
-        'api_comments_get' => [
-            'user_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'user' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
-            ],
-            'moderator_attention' => [
-                'required' => false,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => [
-                                Attention::NONE,
-                                Attention::REQUIRED,
-                                Attention::COMPLETED
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            'pictures_of_item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'type_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'parent_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'no_parents' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['preview', 'text_html', 'user', 'url', 'replies', 'datetime', 'vote', 'user_vote', 'is_new', 'status']]
-                    ]
-                ]
-            ],
-            'order' => [
-                'required' => false,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => [
-                                'date_desc',
-                                'date_asc',
-                                'vote_desc',
-                                'vote_asc'
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        'api_attr_user_value_get'              => [
+            'zone_id'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                    [
-                        'name'    => 'Between',
-                        'options' => [
-                            'min' => 0,
-                            'max' => 500
-                        ]
-                    ]
-                ]
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'user_id'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'exclude_user_id' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'item_id'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'page'            => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -696,202 +439,15 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
-            ],
-        ],
-        'api_comments_get_public' => [
-            'user_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'moderator_attention' => [
-                'required' => false,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => [
-                                Attention::NONE,
-                                Attention::REQUIRED,
-                                Attention::COMPLETED
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            'pictures_of_item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'type_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'parent_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'no_parents' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['text_html', 'user', 'url', 'replies', 'datetime', 'vote', 'user_vote', 'is_new']]
-                    ]
-                ]
-            ],
-            'order' => [
-                'required' => false,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => [
-                                'date_desc',
-                                'date_asc',
-                                'vote_desc',
-                                'vote_asc'
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'Between',
-                        'options' => [
-                            'min' => 0,
-                            'max' => 500
-                        ]
-                    ]
-                ]
-            ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'GreaterThan',
-                        'options' => [
-                            'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
-            ],
-        ],
-        'api_comments_post' => [
-            'item_id' => [
-                'required'   => true,
-                'filters'  => [
-                    ['name' => 'Digits']
+                            'inclusive' => true,
+                        ],
+                    ],
                 ],
             ],
-            'type_id' => [
-                'required'   => true,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ],
-            ],
-            'message' => [
-                'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'min' => 0,
-                            'max' => CommentsService::MAX_MESSAGE_LENGTH
-                        ]
-                    ]
-                ]
-            ],
-            'moderator_attention' => [
+            'limit'           => [
                 'required'   => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ],
-            ],
-            'parent_id' => [
-                'required'   => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ],
-            ],
-            'resolve' => [
-                'required'   => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ],
-            ]
-        ],
-        'api_comments_put' => [
-            'user_vote' => [
-                'required' => false,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => [
-                                '-1',
-                                '1'
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            'deleted' => [
-                'required'   => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ],
-            ],
-            'item_id' => [
-                'required'   => false,
-                'filters'  => [
-                    ['name' => 'Digits']
-                ],
-            ]
-        ],
-        'api_comments_item_get' => [
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -899,121 +455,69 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 1,
-                            'max' => 500
-                        ]
-                    ]
-                ]
-            ],
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['preview', 'text_html', 'user', 'url', 'replies', 'datetime', 'vote', 'user_vote', 'is_new', 'status', 'page']]
-                    ]
-                ]
-            ],
-        ],
-        'api_contacts_list' => [
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['avatar', 'gravatar']]
-                    ]
-                ]
-            ],
-        ],
-        'api_feedback' => [
-            'name' => [
-                'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
-            ],
-            'email' => [
-                'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'EmailAddress']
-                ]
-            ],
-            'message' => [
-                'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
-            ]
-        ],
-        'api_forum_theme_list' => [
-            'theme_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['description', 'themes', 'last_topic', 'last_message', 'topics']]
-                    ]
-                ]
-            ],
-        ],
-        'api_forum_theme_get' => [
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['description', 'themes', 'last_topic', 'last_message', 'topics']]
-                    ]
-                ]
-            ],
-            'topics' => [
-                'type' => InputFilter::class,
-                'page' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
+                            'max' => 500,
+                        ],
                     ],
-                    'validators' => [
-                        ['name' => 'Digits']
-                    ]
-                ]
-            ]
-        ],
-        'api_forum_topic_list' => [
-            'fields' => [
+                ],
+            ],
+            'fields'          => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_message', 'author', 'messages', 'theme', 'subscription']]
-                    ]
-                ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['user', 'item', 'path']],
+                    ],
+                ],
             ],
-            'subscription' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        ],
+        'api_attr_user_value_patch_query'      => [
+            'item_id' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        ],
+        'api_attr_user_value_patch_data'       => [
+            'item_id' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'items'   => [
+                'type' => AttrUserValueCollectionInputFilter::class,
+            ],
+        ],
+        'api_attr_value_get'                   => [
+            'zone_id' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'item_id' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'page'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -1021,155 +525,690 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'theme_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'limit'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500,
+                        ],
+                    ],
+                ],
+            ],
+            'fields'  => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['value', 'value_text']],
+                    ],
+                ],
             ],
         ],
-        'api_forum_topic_get' => [
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_message', 'author', 'messages', 'theme', 'subscription']]
-                    ]
-                ]
-            ]
+        'api_attr_zone_attribute_get'          => [
+            'zone_id' => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
         ],
-        'api_forum_topic_post' => [
-            'theme_id' => [
+        'api_attr_zone_attribute_post'         => [
+            'zone_id'      => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'attribute_id' => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+        ],
+        'api_comments_get'                     => [
+            'user_id'             => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'user'                => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                ],
+            ],
+            'moderator_attention' => [
+                'required'   => false,
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                Attention::NONE,
+                                Attention::REQUIRED,
+                                Attention::COMPLETED,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'pictures_of_item_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'item_id'             => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'type_id'             => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'parent_id'           => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'no_parents'          => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'fields'              => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'preview',
+                                'text_html',
+                                'user',
+                                'url',
+                                'replies',
+                                'datetime',
+                                'vote',
+                                'user_vote',
+                                'is_new',
+                                'status',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'order'               => [
+                'required'   => false,
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'date_desc',
+                                'date_asc',
+                                'vote_desc',
+                                'vote_asc',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'limit'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 0,
+                            'max' => 500,
+                        ],
+                    ],
+                ],
             ],
-            'name' => [
-                'required'   => true,
+            'page'                => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'api_comments_get_public'              => [
+            'user_id'             => [
+                'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'moderator_attention' => [
+                'required'   => false,
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                Attention::NONE,
+                                Attention::REQUIRED,
+                                Attention::COMPLETED,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'pictures_of_item_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'item_id'             => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'type_id'             => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'parent_id'           => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'no_parents'          => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'fields'              => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'text_html',
+                                'user',
+                                'url',
+                                'replies',
+                                'datetime',
+                                'vote',
+                                'user_vote',
+                                'is_new',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'order'               => [
+                'required'   => false,
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'date_desc',
+                                'date_asc',
+                                'vote_desc',
+                                'vote_asc',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'limit'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 0,
+                            'max' => 500,
+                        ],
+                    ],
+                ],
+            ],
+            'page'                => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'api_comments_post'                    => [
+            'item_id'             => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'type_id'             => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'message'             => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => 100
-                        ]
-                    ]
-                ]
-            ],
-            'text' => [
-                'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                            'max' => CommentsService::MAX_MESSAGE_LENGTH,
+                        ],
+                    ],
                 ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'min' => 0,
-                            'max' => 1024 * 4
-                        ]
-                    ]
-                ]
             ],
             'moderator_attention' => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'parent_id'           => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'resolve'             => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+        ],
+        'api_comments_put'                     => [
+            'user_vote' => [
+                'required'   => false,
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                '-1',
+                                '1',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'deleted'   => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'item_id'   => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+        ],
+        'api_comments_item_get'                => [
+            'limit'  => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500,
+                        ],
+                    ],
+                ],
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'preview',
+                                'text_html',
+                                'user',
+                                'url',
+                                'replies',
+                                'datetime',
+                                'vote',
+                                'user_vote',
+                                'is_new',
+                                'status',
+                                'page',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'api_contacts_list'                    => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['avatar', 'gravatar']],
+                    ],
+                ],
+            ],
+        ],
+        'api_feedback'                         => [
+            'name'    => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                ],
+            ],
+            'email'   => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'EmailAddress'],
+                ],
+            ],
+            'message' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                ],
+            ],
+        ],
+        'api_forum_theme_list'                 => [
+            'theme_id' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'fields'   => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['description', 'themes', 'last_topic', 'last_message', 'topics']],
+                    ],
+                ],
+            ],
+        ],
+        'api_forum_theme_get'                  => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['description', 'themes', 'last_topic', 'last_message', 'topics']],
+                    ],
+                ],
+            ],
+            'topics' => [
+                'type' => InputFilter::class,
+                'page' => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits'],
+                    ],
+                ],
+            ],
+        ],
+        'api_forum_topic_list'                 => [
+            'fields'       => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['last_message', 'author', 'messages', 'theme', 'subscription']],
+                    ],
+                ],
             ],
             'subscription' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ]
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'page'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
+            ],
+            'theme_id'     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
         ],
-        'api_forum_topic_put' => [
-            'status' => [
+        'api_forum_topic_get'                  => [
+            'fields' => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    [
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['last_message', 'author', 'messages', 'theme', 'subscription']],
+                    ],
+                ],
+            ],
+        ],
+        'api_forum_topic_post'                 => [
+            'theme_id'            => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'name'                => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'min' => 0,
+                            'max' => 100,
+                        ],
+                    ],
+                ],
+            ],
+            'text'                => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'min' => 0,
+                            'max' => 1024 * 4,
+                        ],
+                    ],
+                ],
+            ],
+            'moderator_attention' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'subscription'        => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+        ],
+        'api_forum_topic_put'                  => [
+            'status'       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 Forums::STATUS_NORMAL,
                                 Forums::STATUS_CLOSED,
-                                Forums::STATUS_DELETED
-                            ]
-                        ]
-                    ]
-                ]
+                                Forums::STATUS_DELETED,
+                            ],
+                        ],
+                    ],
+                ],
             ],
             'subscription' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'theme_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'theme_id'     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
         ],
-        'api_inbox_get' => [
+        'api_inbox_get'                        => [
             'brand_id' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'date' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'date'     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => Validator\DateString::class,
                         'options' => [
-                            'format' => 'Y-m-d'
-                        ]
-                    ]
-                ]
+                            'format' => 'Y-m-d',
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -1177,65 +1216,65 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
         ],
-        'api_ip_item' => [
+        'api_ip_item'                          => [
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['hostname', 'rights', 'blacklist']]
-                    ]
-                ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['hostname', 'rights', 'blacklist']],
+                    ],
+                ],
             ],
         ],
-        'api_item_list' => [
-            'catname' => [
+        'api_item_list'                        => [
+            'catname'                         => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'descendant' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'descendant'                      => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'ancestor_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'ancestor_id'                     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'parent_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'parent_id'                       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'type_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'type_id'                         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 Model\Item::VEHICLE,
@@ -1247,48 +1286,48 @@ return [
                                 Model\Item::MUSEUM,
                                 Model\Item::PERSON,
                                 Model\Item::COPYRIGHT,
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            'concept' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                            ],
+                        ],
+                    ],
                 ],
             ],
-            'concept_inherit' => [
+            'concept'                         => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'StringTrim'],
                 ],
             ],
-            'vehicle_type_id' => [
+            'concept_inherit'                 => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'vehicle_childs_type_id' => [
+            'vehicle_type_id'                 => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'StringTrim'],
+                ],
+            ],
+            'vehicle_childs_type_id'          => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                ]
-            ],
-            'spec' => [
-                'required'   => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
                 ],
             ],
-            'limit' => [
+            'spec'                            => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'StringTrim'],
+                ],
+            ],
+            'limit'                           => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'], // Order matters in ItemController
@@ -1296,15 +1335,15 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 1,
-                            'max' => 500
-                        ]
-                    ]
-                ]
+                            'max' => 500,
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'                            => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -1312,39 +1351,74 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'fields' => [
+            'fields'                          => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['childs_count', 'childs_counts', 'name_html',
-                            'name_text', 'name_default', 'name_only', 'other_names', 'description', 'text',
-                            'has_text', 'brands',
-                            'spec_editor_url', 'specs_url', 'categories',
-                            'twins_groups', 'url',
-                            'preview_pictures', 'design', 'engine_vehicles',
-                            'catname', 'is_concept', 'spec_id', 'begin_year',
-                            'end_year', 'body', 'lat', 'lng',
-                            'pictures_count', 'current_pictures_count',
-                            'is_compiles_item_of_day', 'item_of_day_pictures',
-                            'related_group_pictures', 'engine_id', 'attr_zone_id',
-                            'descendants_count', 'has_child_specs', 'accepted_pictures_count', 'inbox_pictures_count',
-                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names',
-                            'descendant_twins_groups_count', 'comments_attentions_count', 'mosts_active',
-                            'exact_picture']]
-                    ]
-                ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'childs_count',
+                                'childs_counts',
+                                'name_html',
+                                'name_text',
+                                'name_default',
+                                'name_only',
+                                'other_names',
+                                'description',
+                                'text',
+                                'has_text',
+                                'brands',
+                                'spec_editor_url',
+                                'specs_url',
+                                'categories',
+                                'twins_groups',
+                                'url',
+                                'preview_pictures',
+                                'design',
+                                'engine_vehicles',
+                                'catname',
+                                'is_concept',
+                                'spec_id',
+                                'begin_year',
+                                'end_year',
+                                'body',
+                                'lat',
+                                'lng',
+                                'pictures_count',
+                                'current_pictures_count',
+                                'is_compiles_item_of_day',
+                                'item_of_day_pictures',
+                                'related_group_pictures',
+                                'engine_id',
+                                'attr_zone_id',
+                                'descendants_count',
+                                'has_child_specs',
+                                'accepted_pictures_count',
+                                'inbox_pictures_count',
+                                'comments_topic_stat',
+                                'front_picture',
+                                'has_specs',
+                                'alt_names',
+                                'descendant_twins_groups_count',
+                                'comments_attentions_count',
+                                'mosts_active',
+                                'exact_picture',
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'order' => [
+            'order'                           => [
                 'required'   => false,
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 'name',
@@ -1353,535 +1427,570 @@ return [
                                 'id_asc',
                                 'age',
                                 'name_nat',
-                                'categories_first'
-                            ]
-                        ]
-                    ]
-                ]
+                                'categories_first',
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'name' => [
+            'name'                            => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'name_exclude' => [
+            'name_exclude'                    => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'no_parent' => [
+            'no_parent'                       => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'is_group' => [
+            'is_group'                        => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'text' => [
+            'text'                            => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'from_year' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'from_year'                       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'to_year' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'to_year'                         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'suggestions_to' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'suggestions_to'                  => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'engine_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'engine_id'                       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'factories_of_brand' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'factories_of_brand'              => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'have_childs_of_type' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'have_childs_of_type'             => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'have_common_childs_with' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'have_common_childs_with'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
             'have_childs_with_parent_of_type' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'autocomplete' => [
+            'autocomplete'                    => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'exclude_self_and_childs' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'exclude_self_and_childs'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'parent_types_of' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'parent_types_of'                 => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'descendant_pictures' => [
-                'type' => InputFilter::class,
-                'status' => [
-                    'required' => false
+                    ['name' => 'Digits'],
                 ],
-                'type_id' => [
+            ],
+            'descendant_pictures'             => [
+                'type'     => InputFilter::class,
+                'status'   => [
                     'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
+                ],
+                'type_id'  => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
                         [
-                            'name' => 'InArray',
+                            'name'    => 'InArray',
                             'options' => [
                                 'haystack' => [
                                     Model\PictureItem::PICTURE_AUTHOR,
                                     Model\PictureItem::PICTURE_CONTENT,
-                                    Model\PictureItem::PICTURE_COPYRIGHTS
-                                ]
-                            ]
-                        ]
-                    ]
+                                    Model\PictureItem::PICTURE_COPYRIGHTS,
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'owner_id' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
-                        ['name' => 'Digits']
-                    ]
+                        ['name' => 'Digits'],
+                    ],
                 ],
             ],
-            'preview_pictures' => [
-                'type' => InputFilter::class,
+            'preview_pictures'                => [
+                'type'    => InputFilter::class,
                 'type_id' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
                         [
-                            'name' => 'InArray',
+                            'name'    => 'InArray',
                             'options' => [
                                 'haystack' => [
                                     Model\PictureItem::PICTURE_AUTHOR,
                                     Model\PictureItem::PICTURE_CONTENT,
-                                    Model\PictureItem::PICTURE_COPYRIGHTS
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+                                    Model\PictureItem::PICTURE_COPYRIGHTS,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'related_groups_of' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'related_groups_of'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'dateless' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'dateless'                        => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'dateful' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'dateful'                         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'route_brand_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'route_brand_id'                  => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ]
+                    ['name' => 'Digits'],
+                ],
+            ],
         ],
-        'api_item_item' => [
+        'api_item_item'                        => [
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['childs_count', 'childs_counts', 'name_html',
-                            'name_text', 'name_default', 'name_only', 'other_names', 'description', 'text',
-                            'has_text', 'brands',
-                            'spec_editor_url', 'specs_route', 'categories',
-                            'twins_groups', 'url',
-                            'preview_pictures', 'design', 'engine_vehicles',
-                            'catname', 'is_concept', 'spec_id', 'begin_year',
-                            'end_year', 'body', 'lat', 'lng',
-                            'pictures_count', 'current_pictures_count',
-                            'is_compiles_item_of_day', 'item_of_day_pictures',
-                            'related_group_pictures', 'engine_id', 'attr_zone_id',
-                            'descendants_count', 'has_child_specs', 'accepted_pictures_count', 'inbox_pictures_count',
-                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names',
-                            'descendant_twins_groups_count', 'comments_attentions_count', 'mosts_active',
-                            'exact_picture']]
-                    ]
-                ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'childs_count',
+                                'childs_counts',
+                                'name_html',
+                                'name_text',
+                                'name_default',
+                                'name_only',
+                                'other_names',
+                                'description',
+                                'text',
+                                'has_text',
+                                'brands',
+                                'spec_editor_url',
+                                'specs_route',
+                                'categories',
+                                'twins_groups',
+                                'url',
+                                'preview_pictures',
+                                'design',
+                                'engine_vehicles',
+                                'catname',
+                                'is_concept',
+                                'spec_id',
+                                'begin_year',
+                                'end_year',
+                                'body',
+                                'lat',
+                                'lng',
+                                'pictures_count',
+                                'current_pictures_count',
+                                'is_compiles_item_of_day',
+                                'item_of_day_pictures',
+                                'related_group_pictures',
+                                'engine_id',
+                                'attr_zone_id',
+                                'descendants_count',
+                                'has_child_specs',
+                                'accepted_pictures_count',
+                                'inbox_pictures_count',
+                                'comments_topic_stat',
+                                'front_picture',
+                                'has_specs',
+                                'alt_names',
+                                'descendant_twins_groups_count',
+                                'comments_attentions_count',
+                                'mosts_active',
+                                'exact_picture',
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ],
-        'api_item_language_put' => [
-            'name' => [
-                'required' => false,
-                'filters'  => [
+        'api_item_language_put'                => [
+            'name'      => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => 255
-                        ]
-                    ]
-                ]
+                            'max' => 255,
+                        ],
+                    ],
+                ],
             ],
-            'text' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'text'      => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => 4096
-                        ]
-                    ]
-                ]
+                            'max' => 4096,
+                        ],
+                    ],
+                ],
             ],
             'full_text' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'max' => 65536
-                        ]
-                    ]
-                ]
-            ],
-        ],
-        'api_item_link_index' => [
-            'item_id' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-        ],
-        'api_item_link_post' => [
-            'item_id' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'name' => [
-                'required' => false,
-                'filters'  => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => 255
-                        ]
-                    ]
-                ]
+                            'max' => 65536,
+                        ],
+                    ],
+                ],
             ],
-            'url' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        ],
+        'api_item_link_index'                  => [
+            'item_id' => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+        ],
+        'api_item_link_post'                   => [
+            'item_id' => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'name'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => 255
-                        ]
-                    ]
-                ]
+                            'max' => 255,
+                        ],
+                    ],
+                ],
+            ],
+            'url'     => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'max' => 255,
+                        ],
+                    ],
+                ],
             ],
             'type_id' => [
                 'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 'default',
                                 'official',
-                                'club'
-                            ]
-                        ]
-                    ]
-                ]
+                                'club',
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ],
-        'api_item_link_put' => [
-            'name' => [
-                'required' => false,
-                'filters'  => [
+        'api_item_link_put'                    => [
+            'name'    => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => 255
-                        ]
-                    ]
-                ]
+                            'max' => 255,
+                        ],
+                    ],
+                ],
             ],
-            'url' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'url'     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => 255
-                        ]
-                    ]
-                ]
+                            'max' => 255,
+                        ],
+                    ],
+                ],
             ],
             'type_id' => [
                 'required'   => false,
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 'default',
                                 'official',
-                                'club'
-                            ]
-                        ]
-                    ]
-                ]
+                                'club',
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ],
-        'api_item_logo_put' => [
+        'api_item_logo_put'                    => [
             'file' => [
                 'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'FileSize',
+                        'name'                   => 'FileSize',
                         'break_chain_on_failure' => true,
-                        'options' => [
-                            'max' => 10 * 1024 * 1024
-                        ]
+                        'options'                => [
+                            'max' => 10 * 1024 * 1024,
+                        ],
                     ],
                     [
-                        'name' => 'FileIsImage',
+                        'name'                   => 'FileIsImage',
                         'break_chain_on_failure' => true,
                     ],
                     [
-                        'name' => 'FileMimeType',
+                        'name'                   => 'FileMimeType',
                         'break_chain_on_failure' => true,
-                        'options' => [
-                            'mimeType' => 'image/png'
-                        ]
+                        'options'                => [
+                            'mimeType' => 'image/png',
+                        ],
                     ],
                     [
-                        'name' => 'FileImageSize',
+                        'name'                   => 'FileImageSize',
                         'break_chain_on_failure' => true,
-                        'options' => [
+                        'options'                => [
                             'minWidth'  => 50,
-                            'minHeight' => 50
-                        ]
+                            'minHeight' => 50,
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ],
-        'api_item_parent_language_put' => [
+        'api_item_parent_language_put'         => [
             'name' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'max' => Model\ItemParent::MAX_LANGUAGE_NAME,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'api_item_parent_list'                 => [
+            'ancestor_id'     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'concept'         => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'max' => Model\ItemParent::MAX_LANGUAGE_NAME
-                        ]
-                    ]
-                ]
-            ]
-        ],
-        'api_item_parent_list' => [
-            'ancestor_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'concept' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
                 ],
             ],
             'concept_inherit' => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'StringTrim'],
                 ],
             ],
             'exclude_concept' => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'StringTrim'],
                 ],
             ],
-            'type_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'item_type_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'type_id'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'item_type_id'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'parent_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'item_id'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'catname' => [
+            'parent_id'       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'catname'         => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'limit'           => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -1889,15 +1998,15 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 1,
-                            'max' => 500
-                        ]
-                    ]
-                ]
+                            'max' => 500,
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'            => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -1905,200 +2014,200 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'fields' => [
+            'fields'          => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['item']]
-                    ]
-                ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['item']],
+                    ],
+                ],
             ],
-            'is_group' => [
+            'is_group'        => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'order' => [
+            'order'           => [
                 'required'   => false,
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 'name',
                                 'childs_count',
                                 'type_auto',
-                                'categories_first'
-                            ]
-                        ]
-                    ]
-                ]
+                                'categories_first',
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ],
-        'api_item_parent_item' => [
+        'api_item_parent_item'                 => [
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['item']]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['item']],
+                    ],
+                ],
+            ],
         ],
-        'api_item_parent_post' => [
-            'item_id' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        'api_item_parent_post'                 => [
+            'item_id'   => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
             'parent_id' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'type_id' => [
+            'type_id'   => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 Model\ItemParent::TYPE_DEFAULT,
                                 Model\ItemParent::TYPE_TUNING,
                                 Model\ItemParent::TYPE_SPORT,
-                                Model\ItemParent::TYPE_DESIGN
-                            ]
-                        ]
-                    ]
-                ]
+                                Model\ItemParent::TYPE_DESIGN,
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'catname' => [
-                'required' => false,
-                'filters'  => [
+            'catname'   => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
                     ['name' => 'SingleSpaces'],
                     ['name' => 'StringToLower'],
-                    ['name' => 'FilenameSafe']
+                    ['name' => 'FilenameSafe'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => Model\ItemParent::MAX_CATNAME
-                        ]
-                    ]
-                ]
-            ]
+                            'max' => Model\ItemParent::MAX_CATNAME,
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'api_item_parent_put' => [
-            'type_id' => [
+        'api_item_parent_put'                  => [
+            'type_id'   => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 Model\ItemParent::TYPE_DEFAULT,
                                 Model\ItemParent::TYPE_TUNING,
                                 Model\ItemParent::TYPE_SPORT,
-                                Model\ItemParent::TYPE_DESIGN
-                            ]
-                        ]
-                    ]
-                ]
+                                Model\ItemParent::TYPE_DESIGN,
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'catname' => [
-                'required' => true,
-                'filters'  => [
+            'catname'   => [
+                'required'   => true,
+                'filters'    => [
                     ['name' => 'StringTrim'],
                     ['name' => 'SingleSpaces'],
                     ['name' => 'StringToLower'],
-                    ['name' => 'FilenameSafe']
+                    ['name' => 'FilenameSafe'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => Model\ItemParent::MAX_CATNAME
-                        ]
-                    ]
-                ]
+                            'max' => Model\ItemParent::MAX_CATNAME,
+                        ],
+                    ],
+                ],
             ],
             'parent_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
         ],
-        'api_log_list' => [
+        'api_log_list'                         => [
             'article_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'item_id'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
             'picture_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'user_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'user_id'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -2106,72 +2215,72 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'fields' => [
+            'fields'     => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['user', 'pictures', 'items']]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['user', 'pictures', 'items']],
+                    ],
+                ],
+            ],
         ],
-        'api_login' => [
-            'login' => [
-                'required' => true,
-                'filters' => [
-                    ['name' => 'StringTrim']
+        'api_login'                            => [
+            'login'    => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => 'StringLength',
                         'options' => [
                             'min' => null,
-                            'max' => 50
-                        ]
+                            'max' => 50,
+                        ],
                     ],
-                    ['name' => Validator\User\Login::class]
-                ]
+                    ['name' => Validator\User\Login::class],
+                ],
             ],
             'password' => [
-                'required' => true
+                'required' => true,
             ],
         ],
-        'api_message_list' => [
+        'api_message_list'                     => [
             'user_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'folder' => [
-                'required' => false,
+            'folder'  => [
+                'required'   => false,
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 'inbox',
                                 'sent',
                                 'system',
-                                'dialog'
-                            ]
-                        ]
-                    ]
-                ]
+                                'dialog',
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -2179,65 +2288,65 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'fields' => [
+            'fields'  => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['author']]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['author']],
+                    ],
+                ],
+            ],
         ],
-        'api_message_post' => [
+        'api_message_post'                     => [
             'user_id' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'text' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'text'    => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => MessageService::MAX_TEXT
-                        ]
-                    ]
-                ]
-            ]
+                            'max' => MessageService::MAX_TEXT,
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'api_new_get' => [
-            'date' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        'api_new_get'                          => [
+            'date'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => Validator\DateString::class,
                         'options' => [
-                            'format' => 'Y-m-d'
-                        ]
-                    ]
-                ]
+                            'format' => 'Y-m-d',
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -2245,244 +2354,244 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['pictures', 'item', 'item_pictures']]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['pictures', 'item', 'item_pictures']],
+                    ],
+                ],
+            ],
         ],
-        'api_page_post' => [
-            'parent_id' => [
-                'required' => false
-            ],
-            'name' => [
-                'required' => true,
-                'filters' => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'max' => Model\Page::MAX_NAME
-                        ]
-                    ]
-                ]
-            ],
-            'title' => [
+        'api_page_post'                        => [
+            'parent_id'       => [
                 'required' => false,
-                'filters' => [
+            ],
+            'name'            => [
+                'required'   => true,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => Model\Page::MAX_TITLE
-                        ]
-                    ]
-                ]
+                            'max' => Model\Page::MAX_NAME,
+                        ],
+                    ],
+                ],
             ],
-            'breadcrumbs' => [
+            'title'           => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_TITLE,
+                        ],
+                    ],
+                ],
+            ],
+            'breadcrumbs'     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_BREADCRUMBS,
+                        ],
+                    ],
+                ],
+            ],
+            'url'             => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_URL,
+                        ],
+                    ],
+                ],
+            ],
+            'is_group_node'   => [
                 'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'max' => Model\Page::MAX_BREADCRUMBS
-                        ]
-                    ]
-                ]
-            ],
-            'url' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'max' => Model\Page::MAX_URL
-                        ]
-                    ]
-                ]
-            ],
-            'is_group_node' => [
-                'required' => false
             ],
             'registered_only' => [
-                'required' => false
-            ],
-            'guest_only' => [
-                'required' => false
-            ],
-            'class' => [
                 'required' => false,
-                'filters' => [
+            ],
+            'guest_only'      => [
+                'required' => false,
+            ],
+            'class'           => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => Model\Page::MAX_CLASS
-                        ]
-                    ]
-                ]
-            ]
+                            'max' => Model\Page::MAX_CLASS,
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'api_page_put' => [
-            'parent_id' => [
-                'required' => false
-            ],
-            'name' => [
+        'api_page_put'                         => [
+            'parent_id'       => [
                 'required' => false,
-                'filters' => [
+            ],
+            'name'            => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => Model\Page::MAX_NAME
-                        ]
-                    ]
-                ]
+                            'max' => Model\Page::MAX_NAME,
+                        ],
+                    ],
+                ],
             ],
-            'title' => [
-                'required' => false,
-                'filters' => [
+            'title'           => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => Model\Page::MAX_TITLE
-                        ]
-                    ]
-                ]
+                            'max' => Model\Page::MAX_TITLE,
+                        ],
+                    ],
+                ],
             ],
-            'breadcrumbs' => [
-                'required' => false,
-                'filters' => [
+            'breadcrumbs'     => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => Model\Page::MAX_BREADCRUMBS
-                        ]
-                    ]
-                ]
+                            'max' => Model\Page::MAX_BREADCRUMBS,
+                        ],
+                    ],
+                ],
             ],
-            'url' => [
-                'required' => false,
-                'filters' => [
+            'url'             => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => Model\Page::MAX_URL
-                        ]
-                    ]
-                ]
+                            'max' => Model\Page::MAX_URL,
+                        ],
+                    ],
+                ],
             ],
-            'is_group_node' => [
-                'required' => false
+            'is_group_node'   => [
+                'required' => false,
             ],
             'registered_only' => [
-                'required' => false
-            ],
-            'guest_only' => [
-                'required' => false
-            ],
-            'class' => [
                 'required' => false,
-                'filters' => [
+            ],
+            'guest_only'      => [
+                'required' => false,
+            ],
+            'class'           => [
+                'required'   => false,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
-                            'max' => Model\Page::MAX_CLASS
-                        ]
-                    ]
-                ]
+                            'max' => Model\Page::MAX_CLASS,
+                        ],
+                    ],
+                ],
             ],
-            'position' => [
-                'required' => false,
+            'position'        => [
+                'required'   => false,
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 'up',
-                                'down'
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'down',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'api_perspective_page_list' => [
+        'api_perspective_page_list'            => [
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['groups']]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['groups']],
+                    ],
+                ],
+            ],
         ],
-        'api_picture_list' => [
-            'identity' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        'api_picture_list'                     => [
+            'identity'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => 20
-                        ]
-                    ]
-                ]
+                            'max' => 20,
+                        ],
+                    ],
+                ],
             ],
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'limit'                  => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -2490,15 +2599,15 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 0,
-                            'max' => 500
-                        ]
-                    ]
-                ]
+                            'max' => 500,
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'                   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -2506,233 +2615,261 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'fields' => [
+            'fields'                 => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => [
-                            'owner', 'thumbnail', 'moder_vote', 'votes',
-                            'similar', 'comments_count', 'add_date', 'iptc',
-                            'exif', 'image', 'items', 'special_name',
-                            'copyrights', 'change_status_user', 'rights',
-                            'moder_votes', 'moder_voted', 'is_last',
-                            'accepted_count', 'crop', 'replaceable',
-                            'perspective_item', 'siblings', 'ip',
-                            'name_html', 'name_text', 'image_gallery_full',
-                            'preview_large', 'dpi', 'point', 'authors',
-                            'categories', 'twins', 'factories', 'of_links',
-                            'copyright_blocks', 'path'
-                        ]]
-                    ]
-                ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'owner',
+                                'thumbnail',
+                                'moder_vote',
+                                'votes',
+                                'similar',
+                                'comments_count',
+                                'add_date',
+                                'iptc',
+                                'exif',
+                                'image',
+                                'items',
+                                'special_name',
+                                'copyrights',
+                                'change_status_user',
+                                'rights',
+                                'moder_votes',
+                                'moder_voted',
+                                'is_last',
+                                'accepted_count',
+                                'crop',
+                                'replaceable',
+                                'perspective_item',
+                                'siblings',
+                                'ip',
+                                'name_html',
+                                'name_text',
+                                'image_gallery_full',
+                                'preview_large',
+                                'dpi',
+                                'point',
+                                'authors',
+                                'categories',
+                                'twins',
+                                'factories',
+                                'of_links',
+                                'copyright_blocks',
+                                'path',
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'status' => [
-                'required' => false
+            'status'                 => [
+                'required' => false,
             ],
-            'car_type_id' => [
-                'required' => false
+            'car_type_id'            => [
+                'required' => false,
             ],
-            'perspective_id' => [
-                'required' => false
+            'perspective_id'         => [
+                'required' => false,
             ],
             'perspective_exclude_id' => [
-                'required' => false
-            ],
-            'exact_item_id' => [
                 'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
+            ],
+            'exact_item_id'          => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'exact_item_link_type' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
+            'exact_item_link_type'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'item_id' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
+            'item_id'                => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'exclude_item_id' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
+            'exclude_item_id'        => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'type_id' => [
-                'required' => false
-            ],
-            'comments' => [
-                'required' => false
-            ],
-            'owner_id' => [
+            'type_id'                => [
                 'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
+            ],
+            'comments'               => [
+                'required' => false,
+            ],
+            'owner_id'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'replace' => [
-                'required' => false
-            ],
-            'requests' => [
-                'required' => false
-            ],
-            'special_name' => [
-                'required' => false
-            ],
-            'lost' => [
-                'required' => false
-            ],
-            'gps' => [
-                'required' => false
-            ],
-            'order' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'Digits']
+                    ['name' => 'Digits'],
                 ],
             ],
-            'similar' => [
-                'required' => false
+            'replace'                => [
+                'required' => false,
             ],
-            'add_date' => [
+            'requests'               => [
+                'required' => false,
+            ],
+            'special_name'           => [
+                'required' => false,
+            ],
+            'lost'                   => [
+                'required' => false,
+            ],
+            'gps'                    => [
+                'required' => false,
+            ],
+            'order'                  => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'similar'                => [
+                'required' => false,
+            ],
+            'add_date'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => Validator\DateString::class,
                         'options' => [
-                            'format' => 'Y-m-d'
-                        ]
-                    ]
-                ]
+                            'format' => 'Y-m-d',
+                        ],
+                    ],
+                ],
             ],
-            'accept_date' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'accept_date'            => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => Validator\DateString::class,
                         'options' => [
-                            'format' => 'Y-m-d'
-                        ]
-                    ]
-                ]
+                            'format' => 'Y-m-d',
+                        ],
+                    ],
+                ],
             ],
-            'added_from' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'added_from'             => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => 'Date',
                         'options' => [
-                            'format' => 'Y-m-d'
-                        ]
-                    ]
-                ]
+                            'format' => 'Y-m-d',
+                        ],
+                    ],
+                ],
             ],
-            'paginator' => [
-                'type'    => InputFilter::class,
-                'item_id' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
+            'paginator'              => [
+                'type'                   => InputFilter::class,
+                'item_id'                => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
                         ['name' => 'Digits'],
-                    ]
+                    ],
                 ],
-                'exact_item_link_type' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
+                'exact_item_link_type'   => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
-                        ['name' => 'Digits']
-                    ]
+                        ['name' => 'Digits'],
+                    ],
                 ],
-                'exact_item_id' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
+                'exact_item_id'          => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
-                        ['name' => 'Digits']
-                    ]
+                        ['name' => 'Digits'],
+                    ],
                 ],
-                'perspective_id' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
+                'perspective_id'         => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
-                        ['name' => 'Digits']
-                    ]
+                        ['name' => 'Digits'],
+                    ],
                 ],
                 'perspective_exclude_id' => [
-                    'required' => false
+                    'required' => false,
                 ],
             ],
-            'accepted_in_days' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'accepted_in_days'       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                ]
-            ]
+                ],
+            ],
         ],
-        'api_picture_list_public' => [
-            'identity' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        'api_picture_list_public'              => [
+            'identity'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => 20
-                        ]
-                    ]
-                ]
+                            'max' => 20,
+                        ],
+                    ],
+                ],
             ],
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'limit'                  => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -2740,15 +2877,15 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 0,
-                            'max' => 32
-                        ]
-                    ]
-                ]
+                            'max' => 32,
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'                   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -2756,471 +2893,514 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'fields' => [
+            'fields'                 => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => [
-                            'owner', 'thumbnail', 'votes',
-                            'comments_count', 'name_html', 'name_text', 'image_gallery_full',
-                            'preview_large', 'dpi', 'point', 'authors', 'categories', 'twins',
-                            'factories', 'of_links', 'copyright_blocks', 'path'
-                        ]]
-                    ]
-                ]
-            ],
-            'status' => [
-                'required' => false
-            ],
-            'item_id' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'owner_id' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'order' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'Digits']
-                ],
-            ],
-            'add_date' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    [
-                        'name'    => Validator\DateString::class,
+                        'name'    => Filter\Api\FieldsFilter::class,
                         'options' => [
-                            'format' => 'Y-m-d'
-                        ]
-                    ]
-                ]
-            ],
-            'accept_date' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    [
-                        'name'    => Validator\DateString::class,
-                        'options' => [
-                            'format' => 'Y-m-d'
-                        ]
-                    ]
-                ]
-            ],
-            'perspective_id' => [
-                'required' => false
-            ],
-            'perspective_exclude_id' => [
-                'required' => false
-            ],
-            'exact_item_id' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'exact_item_link_type' => [
-                'required' => false,
-                'filters' => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'paginator' => [
-                'type'    => InputFilter::class,
-                'item_id' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
+                            'fields' => [
+                                'owner',
+                                'thumbnail',
+                                'votes',
+                                'comments_count',
+                                'name_html',
+                                'name_text',
+                                'image_gallery_full',
+                                'preview_large',
+                                'dpi',
+                                'point',
+                                'authors',
+                                'categories',
+                                'twins',
+                                'factories',
+                                'of_links',
+                                'copyright_blocks',
+                                'path',
+                            ],
+                        ],
                     ],
-                    'validators' => [
-                        ['name' => 'Digits'],
-                    ]
-                ],
-                'exact_item_link_type' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        ['name' => 'Digits']
-                    ]
-                ],
-                'exact_item_id' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        ['name' => 'Digits']
-                    ]
-                ],
-                'perspective_id' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        ['name' => 'Digits']
-                    ]
-                ],
-                'perspective_exclude_id' => [
-                    'required' => false
                 ],
             ],
-            'accepted_in_days' => [
+            'status'                 => [
                 'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            ],
+            'item_id'                => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                ]
-            ]
+                ],
+            ],
+            'owner_id'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'order'                  => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'add_date'               => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\DateString::class,
+                        'options' => [
+                            'format' => 'Y-m-d',
+                        ],
+                    ],
+                ],
+            ],
+            'accept_date'            => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\DateString::class,
+                        'options' => [
+                            'format' => 'Y-m-d',
+                        ],
+                    ],
+                ],
+            ],
+            'perspective_id'         => [
+                'required' => false,
+            ],
+            'perspective_exclude_id' => [
+                'required' => false,
+            ],
+            'exact_item_id'          => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'exact_item_link_type'   => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
+            'paginator'              => [
+                'type'                   => InputFilter::class,
+                'item_id'                => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits'],
+                    ],
+                ],
+                'exact_item_link_type'   => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits'],
+                    ],
+                ],
+                'exact_item_id'          => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits'],
+                    ],
+                ],
+                'perspective_id'         => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits'],
+                    ],
+                ],
+                'perspective_exclude_id' => [
+                    'required' => false,
+                ],
+            ],
+            'accepted_in_days'       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ],
+            ],
         ],
-        'api_picture_post' => [
-            'file' => [
-                'required' => true,
+        'api_picture_post'                     => [
+            'file'               => [
+                'required'   => true,
                 'validators' => [
                     [
                         'name'    => 'FileSize',
                         'options' => [
                             'max'           => 1024 * 1024 * 100,
-                            'useByteString' => false
-                        ]
+                            'useByteString' => false,
+                        ],
                     ],
                     ['name' => 'FileIsImage'],
                     [
-                        'name' => 'FileExtension',
+                        'name'    => 'FileExtension',
                         'options' => [
-                            'extension' => 'jpg,jpeg,jpe,png'
-                        ]
+                            'extension' => 'jpg,jpeg,jpe,png',
+                        ],
                     ],
                     [
-                        'name' => 'FileImageSize',
+                        'name'    => 'FileImageSize',
                         'options' => [
                             'minWidth'  => 640,
                             'minHeight' => 360,
                             'maxWidth'  => 10000,
-                            'maxHeight' => 10000
-                        ]
-                    ]
-                ]
+                            'maxHeight' => 10000,
+                        ],
+                    ],
+                ],
             ],
-            'comment' => [
+            'comment'            => [
                 'required'   => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => CommentsService::MAX_MESSAGE_LENGTH
-                        ]
-                    ]
-                ]
+                            'max' => CommentsService::MAX_MESSAGE_LENGTH,
+                        ],
+                    ],
+                ],
             ],
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'item_id'            => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                ]
+                ],
             ],
             'replace_picture_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
+                    ['name' => 'Digits'],
+                ],
             ],
-            'perspective_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'perspective_id'     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ]
+                    ['name' => 'Digits'],
+                ],
+            ],
         ],
-        'api_picture_edit' => [
-            'taken_year' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        'api_picture_edit'                     => [
+            'taken_year'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1800,
-                            'inclusive' => true
-                        ]
+                            'inclusive' => true,
+                        ],
                     ],
                     [
                         'name'    => 'LessThan',
                         'options' => [
                             'max'       => 2030,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'taken_month' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'taken_month'        => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => 'InArray',
                         'options' => [
-                            'haystack' => range(1, 12)
-                        ]
-                    ]
-                ]
+                            'haystack' => range(1, 12),
+                        ],
+                    ],
+                ],
             ],
-            'taken_day' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'taken_day'          => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => 'InArray',
                         'options' => [
-                            'haystack' => range(1, 31)
-                        ]
-                    ]
-                ]
+                            'haystack' => range(1, 31),
+                        ],
+                    ],
+                ],
             ],
-            'status' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'status'             => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 Model\Picture::STATUS_INBOX,
                                 Model\Picture::STATUS_ACCEPTED,
                                 Model\Picture::STATUS_REMOVING,
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'special_name' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'special_name'       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
                             'max' => Model\Picture::MAX_NAME,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
-            'copyrights' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'copyrights'         => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 0,
                             'max' => 65536,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
-            'crop' => [
+            'crop'               => [
                 'required' => false,
-                'left' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
+                'left'     => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
-                        ['name' => 'Digits']
-                    ]
+                        ['name' => 'Digits'],
+                    ],
                 ],
-                'top' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
+                'top'      => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
-                        ['name' => 'Digits']
-                    ]
+                        ['name' => 'Digits'],
+                    ],
                 ],
-                'width' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
+                'width'    => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
-                        ['name' => 'Digits']
-                    ]
+                        ['name' => 'Digits'],
+                    ],
                 ],
-                'height' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
+                'height'   => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
                     ],
                     'validators' => [
-                        ['name' => 'Digits']
-                    ]
-                ]
+                        ['name' => 'Digits'],
+                    ],
+                ],
             ],
             'replace_picture_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
-                    ['name' => 'Digits']
-                ]
-            ],
-            'point' => [
-                'required' => false,
-                'lat' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ]
+                    ['name' => 'Digits'],
                 ],
-                'lng' => [
+            ],
+            'point'              => [
+                'required' => false,
+                'lat'      => [
                     'required' => false,
                     'filters'  => [
-                        ['name' => 'StringTrim']
-                    ]
-                ]
+                        ['name' => 'StringTrim'],
+                    ],
+                ],
+                'lng'      => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim'],
+                    ],
+                ],
             ],
         ],
-        'api_picture_item' => [
+        'api_picture_item'                     => [
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => [
-                            'owner', 'thumbnail', 'moder_vote', 'votes',
-                            'similar', 'comments_count', 'add_date', 'iptc',
-                            'exif', 'image', 'items', 'special_name',
-                            'copyrights', 'change_status_user', 'rights',
-                            'moder_votes', 'moder_voted', 'is_last',
-                            'accepted_count', 'crop', 'replaceable',
-                            'perspective_item', 'siblings', 'ip',
-                            'name_html', 'name_text', 'image_gallery_full',
-                            'preview_large', 'dpi', 'point', 'authors',
-                            'categories', 'twins', 'factories', 'of_links',
-                            'copyright_blocks', 'path'
-                        ]]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'owner',
+                                'thumbnail',
+                                'moder_vote',
+                                'votes',
+                                'similar',
+                                'comments_count',
+                                'add_date',
+                                'iptc',
+                                'exif',
+                                'image',
+                                'items',
+                                'special_name',
+                                'copyrights',
+                                'change_status_user',
+                                'rights',
+                                'moder_votes',
+                                'moder_voted',
+                                'is_last',
+                                'accepted_count',
+                                'crop',
+                                'replaceable',
+                                'perspective_item',
+                                'siblings',
+                                'ip',
+                                'name_html',
+                                'name_text',
+                                'image_gallery_full',
+                                'preview_large',
+                                'dpi',
+                                'point',
+                                'authors',
+                                'categories',
+                                'twins',
+                                'factories',
+                                'of_links',
+                                'copyright_blocks',
+                                'path',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'api_picture_item_list' => [
-            'item_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        'api_picture_item_list'                => [
+            'item_id'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                ]
+                ],
             ],
             'picture_id' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                ]
+                ],
             ],
-            'type' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'type'       => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
                                 Model\PictureItem::PICTURE_CONTENT,
-                                Model\PictureItem::PICTURE_AUTHOR
-                            ]
-                        ]
-                    ]
-                ]
+                                Model\PictureItem::PICTURE_AUTHOR,
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'order' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'order'      => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
-                                'status'
-                            ]
-                        ]
-                    ]
-                ]
+                                'status',
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'limit'      => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -3228,142 +3408,175 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 1,
-                            'max' => 500
-                        ]
-                    ]
-                ]
+                            'max' => 500,
+                        ],
+                    ],
+                ],
             ],
-            'fields' => [
+            'fields'     => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => [
-                            'area', 'item', 'picture'
-                        ]]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'area',
+                                'item',
+                                'picture',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'api_picture_item_item' => [
+        'api_picture_item_item'                => [
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => [
-                            'area', 'item', 'picture'
-                        ]]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'area',
+                                'item',
+                                'picture',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
         'api_picture_moder_vote_template_list' => [
             'name' => [
                 'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => Model\PictureModerVote::MAX_LENGTH
-                        ]
-                    ]
-                ]
+                            'max' => Model\PictureModerVote::MAX_LENGTH,
+                        ],
+                    ],
+                ],
             ],
             'vote' => [
                 'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'InArray',
+                        'name'    => 'InArray',
                         'options' => [
-                            'haystack' => [-1, 1]
-                        ]
-                    ]
-                ]
-            ]
+                            'haystack' => [-1, 1],
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'api_restore_password_request' => [
+        'api_restore_password_request'         => [
             'email' => [
                 'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'                   => 'EmailAddress',
-                        'break_chain_on_failure' => true
+                        'break_chain_on_failure' => true,
                     ],
-                    ['name' => Validator\User\EmailExists::class]
-                ]
+                    ['name' => Validator\User\EmailExists::class],
+                ],
             ],
         ],
-        'api_restore_password_new' => [
-            'code' => [
+        'api_restore_password_new'             => [
+            'code'             => [
                 'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => 'StringLength',
                         'options' => [
                             'min' => null,
-                            'max' => 500
-                        ]
+                            'max' => 500,
+                        ],
                     ],
-                ]
+                ],
             ],
-            'password' => [
+            'password'         => [
                 'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD
-                        ]
-                    ]
-                ]
+                            'max' => User::MAX_PASSWORD,
+                        ],
+                    ],
+                ],
             ],
             'password_confirm' => [
                 'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD
-                        ]
+                            'max' => User::MAX_PASSWORD,
+                        ],
                     ],
                     [
-                        'name' => 'Identical',
+                        'name'    => 'Identical',
                         'options' => [
                             'token' => 'password',
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ],
-        'api_user_item' => [
+        'api_user_item'                        => [
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'photo', 'gravatar', 'renames', 'is_moder', 'accounts', 'pictures_added', 'pictures_accepted_count', 'last_ip', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight', 'identity', 'gravatar_hash']]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'last_online',
+                                'reg_date',
+                                'image',
+                                'email',
+                                'login',
+                                'avatar',
+                                'photo',
+                                'gravatar',
+                                'renames',
+                                'is_moder',
+                                'accounts',
+                                'pictures_added',
+                                'pictures_accepted_count',
+                                'last_ip',
+                                'timezone',
+                                'language',
+                                'votes_per_day',
+                                'votes_left',
+                                'img',
+                                'specs_weight',
+                                'identity',
+                                'gravatar_hash',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'api_user_list' => [
-            'limit' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+        'api_user_list'                        => [
+            'limit'    => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -3371,15 +3584,15 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 1,
-                            'max' => 500
-                        ]
-                    ]
-                ]
+                            'max' => 500,
+                        ],
+                    ],
+                ],
             ],
-            'page' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+            'page'     => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
@@ -3387,202 +3600,227 @@ return [
                         'name'    => 'GreaterThan',
                         'options' => [
                             'min'       => 1,
-                            'inclusive' => true
-                        ]
-                    ]
-                ]
+                            'inclusive' => true,
+                        ],
+                    ],
+                ],
             ],
-            'search' => [
+            'search'   => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'id' => [
+            'id'       => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
             'identity' => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
+                    ['name' => 'StringTrim'],
+                ],
             ],
-            'fields' => [
+            'fields'   => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'photo', 'gravatar', 'renames', 'is_moder' ,'accounts', 'pictures_added', 'pictures_accepted_count', 'last_ip', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight', 'identity', 'gravatar_hash']]
-                    ]
-                ]
-            ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => [
+                            'fields' => [
+                                'last_online',
+                                'reg_date',
+                                'image',
+                                'email',
+                                'login',
+                                'avatar',
+                                'photo',
+                                'gravatar',
+                                'renames',
+                                'is_moder',
+                                'accounts',
+                                'pictures_added',
+                                'pictures_accepted_count',
+                                'last_ip',
+                                'timezone',
+                                'language',
+                                'votes_per_day',
+                                'votes_left',
+                                'img',
+                                'specs_weight',
+                                'identity',
+                                'gravatar_hash',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'api_user_put' => [
-            'deleted' => [
+        'api_user_put'                         => [
+            'deleted'          => [
                 'required' => false,
                 'filters'  => [
-                    ['name' => 'StringTrim']
-                ]
-            ],
-            'name' => [
-                'required' => true,
-                'filters'  => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                ],
+            ],
+            'name'             => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => User::MIN_NAME,
-                            'max' => User::MAX_NAME
-                        ]
-                    ]
-                ]
+                            'max' => User::MAX_NAME,
+                        ],
+                    ],
+                ],
             ],
-            'language' => [
-                'required' => true,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => []
-                        ]
-                    ]
-                ]
-            ],
-            'timezone' => [
-                'required' => true,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => []
-                        ]
-                    ]
-                ]
-            ],
-            'email' => [
+            'language'         => [
                 'required'   => true,
-                'filters'  => [
-                    ['name' => 'StringTrim']
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => [],
+                        ],
+                    ],
+                ],
+            ],
+            'timezone'         => [
+                'required'   => true,
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => [],
+                        ],
+                    ],
+                ],
+            ],
+            'email'            => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'                   => 'EmailAddress',
-                        'break_chain_on_failure' => true
+                        'break_chain_on_failure' => true,
                     ],
-                    ['name' => Validator\User\EmailNotExists::class]
-                ]
+                    ['name' => Validator\User\EmailNotExists::class],
+                ],
             ],
-            'password_old' => [
+            'password_old'     => [
                 'required' => true,
             ],
-            'password' => [
-                'required' => true,
+            'password'         => [
+                'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD
-                        ]
-                    ]
-                ]
+                            'max' => User::MAX_PASSWORD,
+                        ],
+                    ],
+                ],
             ],
             'password_confirm' => [
                 'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD
-                        ]
+                            'max' => User::MAX_PASSWORD,
+                        ],
                     ],
                     [
-                        'name' => 'Identical',
+                        'name'    => 'Identical',
                         'options' => [
                             'token' => 'password',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ],
-        'api_user_post' => [
-            'email' => [
-                'required' => true,
-                'filters' => [
-                    ['name' => 'StringTrim']
+        'api_user_post'                        => [
+            'email'            => [
+                'required'   => true,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
                 ],
                 'validators' => [
                     [
                         'name'    => 'StringLength',
                         'options' => [
                             'min' => null,
-                            'max' => 50
-                        ]
+                            'max' => 50,
+                        ],
                     ],
                     [
                         'name'                   => 'EmailAddress',
-                        'break_chain_on_failure' => true
+                        'break_chain_on_failure' => true,
                     ],
-                    ['name' => Validator\User\EmailNotExists::class]
-                ]
+                    ['name' => Validator\User\EmailNotExists::class],
+                ],
             ],
-            'name' => [
-                'required' => true,
-                'filters'  => [
+            'name'             => [
+                'required'   => true,
+                'filters'    => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => SingleSpaces::class],
                 ],
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => User::MIN_NAME,
-                            'max' => User::MAX_NAME
-                        ]
-                    ]
-                ]
+                            'max' => User::MAX_NAME,
+                        ],
+                    ],
+                ],
             ],
-            'password' => [
+            'password'         => [
                 'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD
-                        ]
-                    ]
-                ]
+                            'max' => User::MAX_PASSWORD,
+                        ],
+                    ],
+                ],
             ],
             'password_confirm' => [
                 'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'StringLength',
+                        'name'    => 'StringLength',
                         'options' => [
                             'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD
-                        ]
+                            'max' => User::MAX_PASSWORD,
+                        ],
                     ],
                     [
-                        'name' => 'Identical',
+                        'name'    => 'Identical',
                         'options' => [
                             'token' => 'password',
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ],
-        'api_user_photo_post' => [
+        'api_user_photo_post'                  => [
             'file' => [
-                'required' => true,
+                'required'   => true,
                 'validators' => [
                     /*[
                      'name' => 'FileCount',
@@ -3593,44 +3831,44 @@ return [
                      ]
                      ],*/
                     [
-                        'name' => 'FileSize',
+                        'name'                   => 'FileSize',
                         'break_chain_on_failure' => true,
-                        'options' => [
-                            'max' => 4194304
-                        ]
+                        'options'                => [
+                            'max' => 4194304,
+                        ],
                     ],
                     [
-                        'name' => 'FileIsImage',
+                        'name'                   => 'FileIsImage',
                         'break_chain_on_failure' => true,
                     ],
                     [
-                        'name' => 'FileExtension',
+                        'name'                   => 'FileExtension',
                         'break_chain_on_failure' => true,
-                        'options' => [
-                            'extension' => 'jpg,jpeg,jpe,png,gif,bmp'
-                        ]
+                        'options'                => [
+                            'extension' => 'jpg,jpeg,jpe,png,gif,bmp',
+                        ],
                     ],
                     [
-                        'name' => 'FileImageSize',
+                        'name'                   => 'FileImageSize',
                         'break_chain_on_failure' => true,
-                        'options' => [
+                        'options'                => [
                             'minWidth'  => 100,
-                            'minHeight' => 100
-                        ]
+                            'minHeight' => 100,
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ],
-        'api_voting_variant_vote_get' => [
+        'api_voting_variant_vote_get'          => [
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
-                        'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['user']]
-                    ]
-                ]
+                        'name'    => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['user']],
+                    ],
+                ],
             ],
-        ]
-    ]
+        ],
+    ],
 ];

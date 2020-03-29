@@ -4,6 +4,8 @@ namespace Application;
 
 use PDO;
 
+use function getenv;
+
 return [
     'db' => [
         'driver'         => 'Pdo',
@@ -14,7 +16,7 @@ return [
         'username'       => getenv('AUTOWP_DB_USERNAME'),
         'password'       => getenv('AUTOWP_DB_PASSWORD'),
         'driver_options' => [
-            PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'"
+            PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'",
         ],
-    ]
+    ],
 ];
