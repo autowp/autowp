@@ -6,8 +6,6 @@ use Application\FileSize;
 use Application\HostManager;
 use Application\ItemNameFormatter;
 use Application\Language;
-use Application\LanguagePicker;
-use Application\MainMenu;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
@@ -44,8 +42,6 @@ class ServicesTest extends AbstractHttpControllerTestCase
             [HostManager::class],
             [UsersService::class],
             [TelegramService::class],
-            [LanguagePicker::class],
-            [MainMenu::class],
             [Language::class],
             [Service::class],
             [Acl::class],

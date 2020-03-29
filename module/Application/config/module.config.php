@@ -109,8 +109,6 @@ return [
             HostManager::class                   => Service\HostManagerFactory::class,
             HostnameCheckRouteListener::class    => HostnameCheckRouteListenerFactory::class,
             Language::class                      => Service\LanguageFactory::class,
-            LanguagePicker::class                => Service\LanguagePickerFactory::class,
-            MainMenu::class                      => Service\MainMenuFactory::class,
             Model\Brand::class                   => Model\BrandFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\Catalogue::class               => Model\Service\CatalogueFactory::class,

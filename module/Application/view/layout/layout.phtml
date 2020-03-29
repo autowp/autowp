@@ -1,7 +1,6 @@
 <?php
     $blankPage = isset($this->layout()->blankPage) ? $this->layout()->blankPage : $this->blankPage;
     $needLeft  = isset($this->sidebar);
-    $needRight = isset($this->layout()->needRight) ? $this->layout()->needRight : $this->needRight;
     $isAdminPage = isset($this->layout()->isAdminPage) ? $this->layout()->isAdminPage : $this->isAdminPage;
 
     $this->gulpRev([
@@ -49,15 +48,13 @@ use Laminas\Json\Json; ?>
     <body>
         <?php
             $spanLeft = $needLeft ? 4 : 0;
-            $spanRight = $needRight ? 4 : 0;
-            $spanCenter = 12 - $spanLeft - $spanRight;
+            $spanCenter = 12 - $spanLeft;
         ?>
 
         <div class="container">
 
             <div class="row">
                 <div class="col-sm-<?=$spanCenter?> order-2">
-                    <?=$this->breadcrumbs() ?>
                     <?=$this->pageTitle() ?>
 
                     <?=$this->layout()->content ?>
@@ -67,11 +64,6 @@ use Laminas\Json\Json; ?>
                         <?php if (isset($this->sidebar)) { ?>
                             <?=$this->sidebar ?>
                         <?php } ?>
-                    </div>
-                <?php } ?>
-                <?php if ($needRight) { ?>
-                    <div class="col-sm-<?=$spanRight?> order-3">
-                        <?=$this->sidebar()?>
                     </div>
                 <?php } ?>
             </div>
@@ -106,14 +98,6 @@ use Laminas\Json\Json; ?>
                         </div>
                     </div>
                     <p class="language-picker">
-                        <?php foreach ($this->languagePicker() as $item) { ?>
-                            <?php if ($item['language'] != $this->language()) { ?>
-                                <a href="<?=$this->escapeHtmlAttr($item['url'])?>">
-                                    <i class="<?=$this->escapeHtmlAttr($item['flag'])?>" aria-hidden="true"></i>
-                                    <?=$this->escapeHtml($item['name'])?>
-                                </a>
-                            <?php } ?>
-                        <?php } ?>
                         <?=$this->htmlA(
                             'https://github.com/autowp/autowp/tree/master/module/Application/language',
                             $this->translate('layout/language-contributing')
