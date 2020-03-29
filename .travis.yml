@@ -24,7 +24,7 @@ after_success:
   - docker exec -it autowp_test_backend bash -c "./vendor/bin/php-coveralls -v"
   - docker exec -it autowp_test_backend bash -c "./sonar-scanner/bin/sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true"
   - docker exec -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" -it autowp_test_backend bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
-  - if [ "$TRAVIS_BRANCH" == "feature/ng-catalogue" ]; then
+  - if [ "$TRAVIS_BRANCH" == "feature/master" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
     docker push autowp/autowp:v2;
     fi
