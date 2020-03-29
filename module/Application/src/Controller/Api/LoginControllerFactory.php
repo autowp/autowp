@@ -16,8 +16,7 @@ class LoginControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): LoginController
     {
-        $filters = $container->get('InputFilterManager');
-        $tables  = $container->get('TableManager');
+        $tables = $container->get('TableManager');
         return new LoginController(
             $container->get(UsersService::class),
             $container->get('ExternalLoginServiceManager'),
