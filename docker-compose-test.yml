@@ -88,7 +88,6 @@ backend:
   - mysql
   - rabbitmq
   - traffic
-  - goautowp
 
 memcached:
   image: memcached
