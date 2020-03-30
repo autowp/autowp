@@ -328,7 +328,7 @@ class PictureHydrator extends AbstractRestHydrator
 
         if ($this->filterComposite->filter('paginator') && $this->paginator) {
             $filter = [
-                'order'  => 'resolution_desc',
+                'order'  => 'perspectives',
                 'status' => $object['status'],
             ];
 
