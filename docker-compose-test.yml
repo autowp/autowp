@@ -28,7 +28,6 @@ backend:
     AUTOWP_HOST: "localhost"
     AUTOWP_HOST_RU: "localhost"
     AUTOWP_PICTURES_HOST: "i.localhost"
-    AUTOWP_HOST_COOKIE_RU: ""
     AUTOWP_MOSTS_MIN_VEHICLES_COUNT: 1
     AUTOWP_MAIL_TYPE: "in-memory"
     AUTOWP_MAIL_SMTP_HOST: ""
