@@ -128,7 +128,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 if ($banInfo) {
                     $response = $e->getResponse();
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
-                    $response->setStatusCode(403);
+                    $response->setStatusCode(429);
                     $response->setContent('Access denied: ' . $banInfo['reason']);
 
                     return $response;
