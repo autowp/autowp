@@ -255,14 +255,14 @@ class CommentController extends AbstractRestfulController
 
         $paginator = $this->comments->service()->getMessagesPaginator($options);
 
-        $limit = 0;
+        $limit = null;
         if (strlen($values['limit']) > 0) {
             $limit = (int) $values['limit'];
             $limit = $limit >= 0 ? $limit : 0;
         }
 
         $paginator
-            ->setItemCountPerPage($limit)
+            ->setItemCountPerPage($limit ?? 50000)
             ->setCurrentPageNumber($values['page']);
 
         $result = [
