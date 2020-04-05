@@ -3,16 +3,16 @@
 namespace Application;
 
 return [
-    'rabbitmq' => [
+    'rabbitmq'        => [
         'host'     => 'rabbitmq',
         'port'     => 5672,
         'user'     => 'guest',
         'password' => 'guest',
-        'vhost'    => '/'
+        'vhost'    => '/',
     ],
     'service_manager' => [
         'factories' => [
-            'RabbitMQ' => Service\RabbitMQFactory::class
-        ]
-    ]
+            'RabbitMQ' => Service\RabbitMQFactory::class,
+        ],
+    ],
 ];

@@ -28,7 +28,6 @@ backend:
     AUTOWP_HOST: "localhost"
     AUTOWP_HOST_RU: "localhost"
     AUTOWP_PICTURES_HOST: "i.localhost"
-    AUTOWP_HOST_COOKIE_RU: ""
     AUTOWP_MOSTS_MIN_VEHICLES_COUNT: 1
     AUTOWP_MAIL_TYPE: "in-memory"
     AUTOWP_MAIL_SMTP_HOST: ""
@@ -77,6 +76,7 @@ backend:
     AUTOWP_IMAGE_BRAND_BUCKET: autowp-travis-brand
     AUTOWP_IMAGE_PICTURE_BUCKET: autowp-travis-picture
     SONARCLOUD_TOKEN: ${SONARCLOUD_TOKEN}
+    AUTOWP_AUTH_SECRET: example_secret
   volumes:
   - ./config/autoload/local.php:/app/config/autoload/local.php:ro
   - ./module/Application/test/_files/image:/app/public_html/image
@@ -109,14 +109,6 @@ mysql:
   - "./mysql.conf.d:/etc/mysql/conf.d"
   expose:
   - "3306"
-
-frontend:
-  image: autowp/autowp-frontend
-  container_name: autowp_test_frontend
-  restart: always
-  links:
-  - backend
-  - goautowp
 
 rabbitmq:
   image: rabbitmq

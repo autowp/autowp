@@ -4,7 +4,7 @@ namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\UserController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Laminas\Http\Header\Cookie;
+use ApplicationTest\Data;
 use Laminas\Http\Request;
 
 use function count;
@@ -44,7 +44,7 @@ class UserControllerTest extends AbstractHttpControllerTestCase
 
         // delete user
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
             'https://www.autowp.ru/api/user/' . $userId,
             Request::METHOD_PUT,

@@ -4,9 +4,9 @@ namespace ApplicationTest\Frontend\Controller;
 
 use Application\Controller\Api\VotingController;
 use Application\Test\AbstractHttpControllerTestCase;
+use ApplicationTest\Data;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
-use Laminas\Http\Header\Cookie;
 use Laminas\Http\Request;
 
 class VotingControllerTest extends AbstractHttpControllerTestCase
@@ -60,7 +60,7 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
         $variantId = $table->getLastInsertValue();
 
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/voting/' . $id, Request::METHOD_PATCH, [
             'vote' => $variantId,
         ]);

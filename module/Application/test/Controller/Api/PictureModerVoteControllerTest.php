@@ -1,14 +1,14 @@
 <?php
 
-namespace ApplicationTest\Api\Controller;
+namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureModerVoteController;
 use Application\DuplicateFinder;
 use Application\Test\AbstractHttpControllerTestCase;
+use ApplicationTest\Data;
 use Exception;
-use Laminas\Http\Header\Cookie;
 use Laminas\Http\Request;
 
 use function copy;
@@ -54,7 +54,7 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
 
         $request = $this->getRequest();
         $request->getHeaders()
-            ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
+            ->addHeader(Data::getAdminAuthHeader())
             ->addHeaderLine('Content-Type', 'multipart/form-data');
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
@@ -97,7 +97,7 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -126,7 +126,7 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
         $pictureId = $this->addPictureToItem($itemId);
 
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('http://www.autowp.ru/api/picture-moder-vote/' . $pictureId, Request::METHOD_PUT, [
             'vote'   => 1,
             'reason' => 'Good pic',
@@ -139,7 +139,7 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/picture-moder-vote');
 
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('http://www.autowp.ru/api/picture-moder-vote/' . $pictureId, Request::METHOD_DELETE);
 
         $this->assertResponseStatusCode(204);
@@ -148,7 +148,7 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/picture-moder-vote');
 
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('http://www.autowp.ru/api/picture-moder-vote/' . $pictureId, Request::METHOD_PUT, [
             'vote'   => -1,
             'reason' => 'Poor pic',

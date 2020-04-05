@@ -8,8 +8,8 @@ use Application\Controller\Api\PictureItemController;
 use Application\DuplicateFinder;
 use Application\Model\Picture;
 use Application\Test\AbstractHttpControllerTestCase;
+use ApplicationTest\Data;
 use Exception;
-use Laminas\Http\Header\Cookie;
 use Laminas\Http\Request;
 
 use function copy;
@@ -66,7 +66,7 @@ class PictureTest extends AbstractHttpControllerTestCase
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -95,7 +95,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $request = $this->getRequest();
         $request->getHeaders()
-            ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
+            ->addHeader(Data::getAdminAuthHeader())
             ->addHeaderLine('Content-Type', 'multipart/form-data');
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
@@ -140,7 +140,7 @@ class PictureTest extends AbstractHttpControllerTestCase
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
             'https://www.autowp.ru/api/picture-item/' . $pictureID . '/' . $itemID . '/' . $typeID,
             Request::METHOD_POST

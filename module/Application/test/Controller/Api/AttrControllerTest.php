@@ -4,7 +4,7 @@ namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\AttrController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Laminas\Http\Header\Cookie;
+use ApplicationTest\Data;
 use Laminas\Http\Request;
 use Laminas\Json\Json;
 
@@ -14,7 +14,7 @@ class AttrControllerTest extends AbstractHttpControllerTestCase
 
     public function testUnitIndex()
     {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/attr/unit', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -26,7 +26,7 @@ class AttrControllerTest extends AbstractHttpControllerTestCase
 
     public function testListOptionsIndex()
     {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/attr/list-option', Request::METHOD_GET, [
             'attribute_id' => 20,
         ]);

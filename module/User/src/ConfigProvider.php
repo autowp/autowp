@@ -10,7 +10,6 @@ class ConfigProvider
             'controller_plugins' => $this->getControllerPluginConfig(),
             'dependencies'       => $this->getDependencyConfig(),
             'tables'             => $this->getTablesConfig(),
-            'view_helpers'       => $this->getViewHelperConfig(),
         ];
     }
 
@@ -37,7 +36,7 @@ class ConfigProvider
                 Model\User::class               => Model\UserFactory::class,
                 Model\UserPasswordRemind::class => Model\UserPasswordRemindFactory::class,
                 Model\UserRename::class         => Model\UserRenameFactory::class,
-                Model\UserRemember::class       => Model\UserRememberFactory::class,
+                Service\OAuth::class            => Service\OAuthFactory::class,
             ],
         ];
     }
@@ -46,19 +45,6 @@ class ConfigProvider
     {
         return [
             'users' => [], //TODO: rename to user
-        ];
-    }
-
-    public function getViewHelperConfig(): array
-    {
-        return [
-            'aliases'   => [
-                'user' => View\Helper\User::class,
-                'User' => View\Helper\User::class,
-            ],
-            'factories' => [
-                View\Helper\User::class => View\Helper\UserFactory::class,
-            ],
         ];
     }
 }

@@ -13,7 +13,6 @@ return [
         'Laminas\\Mvc\\I18n',
         'Laminas\\Mvc\\Console',
         'Laminas\\Router',
-        'Laminas\\Session',
         'Laminas\\Validator',
         'Autowp\\User',
         'Autowp\\Comments',

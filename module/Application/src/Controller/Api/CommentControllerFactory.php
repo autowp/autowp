@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Application\Comments;
 use Application\HostManager;
 use Application\Hydrator\Api\CommentHydrator;
+use Application\Hydrator\Api\UserHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\Forums\Forums;
@@ -28,6 +29,7 @@ class CommentControllerFactory implements FactoryInterface
         return new CommentController(
             $container->get(Comments::class),
             $hydrators->get(CommentHydrator::class),
+            $hydrators->get(UserHydrator::class),
             $tables->get('users'),
             $filters->get('api_comments_get'),
             $filters->get('api_comments_get_public'),

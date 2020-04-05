@@ -7,8 +7,8 @@ use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\ItemVehicleTypeController;
 use Application\Model\VehicleType;
 use Application\Test\AbstractHttpControllerTestCase;
+use ApplicationTest\Data;
 use Exception;
-use Laminas\Http\Header\Cookie;
 use Laminas\Http\Request;
 use Laminas\Json\Json;
 
@@ -30,7 +30,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -54,7 +54,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
             'https://www.autowp.ru/api/item-parent',
             Request::METHOD_POST,
@@ -84,7 +84,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         foreach ($ids as $id) {
             if (! in_array($id, $vehicleTypeIds)) {
                 $this->reset();
-                $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+                $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
                 $url = 'https://www.autowp.ru/api/item-vehicle-type/' . $itemId . '/' . $id;
                 $this->dispatch($url, Request::METHOD_DELETE);
 
@@ -99,7 +99,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         foreach ($vehicleTypeIds as $id) {
             if (! in_array($id, $ids)) {
                 $this->reset();
-                $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+                $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
                 $url = sprintf(
                     'https://www.autowp.ru/api/item-vehicle-type/%s/%s',
                     $itemId,
@@ -123,7 +123,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
     private function getItemVehicleTypeIds(int $itemId): array
     {
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-vehicle-type', Request::METHOD_GET, [
             'item_id' => $itemId,
         ]);
@@ -165,7 +165,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
      */
     public function testList(): void
     {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-vehicle-type', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);

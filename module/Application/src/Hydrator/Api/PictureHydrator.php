@@ -334,10 +334,12 @@ class PictureHydrator extends AbstractRestHydrator
 
             if ($this->paginator['item_id']) {
                 $filter['item']['ancestor_or_self'] = $this->paginator['item_id'];
+                $filter['order']                    = 'perspectives';
             }
 
             if ($this->paginator['exact_item_id']) {
                 $filter['item']['id'] = $this->paginator['exact_item_id'];
+                $filter['order']      = 'perspectives';
             }
 
             if ($this->paginator['exact_item_link_type']) {

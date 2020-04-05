@@ -78,15 +78,5 @@
             </td>
         <?php } ?>
     </tr>
-    <?php if ($this->user()->isAllowed('specifications', 'edit')) { ?>
-        <tr>
-            <td></td>
-            <?php foreach ($this->table->getCars() as $car) { ?>
-                <td>
-                    <?=$this->htmlA('/ng/cars/specifications-editor?item_id=' . $car['id'], $this->translate('carlist/edit-specs'))?>
-                </td>
-            <?php } ?>
-        </tr>
-    <?php } ?>
     </tbody>
 </table>

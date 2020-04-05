@@ -6,7 +6,6 @@ use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Service\UsersService;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image\Storage;
-use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
@@ -17,11 +16,9 @@ use Exception;
 use Imagick;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
-use Laminas\Authentication\AuthenticationService;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Permissions\Acl\Acl;
-use Laminas\Session\Container;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -313,12 +310,6 @@ class UserController extends AbstractRestfulController
                     'users' => $row['id'],
                 ]);
             }
-
-            if ((int) $user['id'] === (int) $row['id']) { // self-delete
-                $auth = new AuthenticationService();
-                $auth->clearIdentity();
-                $this->userService->clearRememberCookie($this->language());
-            }
         }
 
         if (array_key_exists('name', $values)) {
@@ -478,33 +469,26 @@ class UserController extends AbstractRestfulController
         }
 
         if ($this->captchaEnabled) {
-            $namespace = new Container('Captcha');
-            $verified  = isset($namespace->success) && $namespace->success;
+            $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
 
-            if (! $verified) {
-                $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
+            $captchaResponse = null;
+            if (isset($data['captcha'])) {
+                $captchaResponse = (string) $data['captcha'];
+            }
 
-                $captchaResponse = null;
-                if (isset($data['captcha'])) {
-                    $captchaResponse = (string) $data['captcha'];
-                }
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
+            $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
 
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
-                $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
-
-                if (! $result->isSuccess()) {
-                    return new ApiProblemResponse(
-                        new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                            'invalid_params' => [
-                                'captcha' => [
-                                    'invalid' => 'Captcha is invalid',
-                                ],
+            if (! $result->isSuccess()) {
+                return new ApiProblemResponse(
+                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                        'invalid_params' => [
+                            'captcha' => [
+                                'invalid' => 'Captcha is invalid',
                             ],
-                        ])
-                    );
-                }
-
-                $namespace->success = true;
+                        ],
+                    ])
+                );
             }
         }
 
@@ -668,13 +652,6 @@ class UserController extends AbstractRestfulController
 
         if (! $user) {
             return new ApiProblemResponse(new ApiProblem(400, 'Code is invalid'));
-        }
-
-        if (! $this->user()->logedIn()) {
-            $adapter = new IdAuthAdapter($this->userModel);
-            $adapter->setIdentity($user['id']);
-            $auth = new AuthenticationService();
-            $auth->authenticate($adapter);
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */

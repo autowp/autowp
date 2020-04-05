@@ -4,7 +4,7 @@ namespace ApplicationTest\Frontend\Controller;
 
 use Application\Controller\Api\PictureController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Laminas\Http\Header\Cookie;
+use ApplicationTest\Data;
 use Laminas\Http\Request;
 
 use function copy;
@@ -29,7 +29,7 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
          */
         $request = $this->getRequest();
         $request->getHeaders()
-            ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
+            ->addHeader(Data::getAdminAuthHeader())
             ->addHeaderLine('Content-Type', 'multipart/form-data');
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');

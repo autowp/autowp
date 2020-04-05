@@ -110,6 +110,7 @@ class Picture
 
     /**
      * @param array|int $options
+     * @throws Exception
      */
     private function applyPerspectiveFilter(Sql\Select $select, $options): void
     {
@@ -419,6 +420,7 @@ class Picture
         $select = $this->table->getSql()->select();
         $group  = $options['group'];
 
+        $pictureItemJoined    = false;
         $joinPdr              = false;
         $joinLeftComments     = false;
         $joinComments         = false;
@@ -501,8 +503,9 @@ class Picture
         }
 
         if ($options['item']) {
-            $subGroup = $this->applyItemFilters($select, $options['item'], $forceJoinItem);
-            $group    = array_merge($group, $subGroup);
+            $subGroup          = $this->applyItemFilters($select, $options['item'], $forceJoinItem);
+            $group             = array_merge($group, $subGroup);
+            $pictureItemJoined = true;
         }
 
         if ($options['has_comments'] !== null) {
@@ -713,6 +716,9 @@ class Picture
                     break;
 
                 case 'perspectives':
+                    if (! $pictureItemJoined) {
+                        throw new Exception("Can't sort by perspective. Specify item");
+                    }
                     $group[] = 'perspectives.position';
                     $select
                         ->join('perspectives', 'picture_item.perspective_id = perspectives.id', [], $select::JOIN_LEFT)
@@ -783,6 +789,9 @@ class Picture
         return $select;
     }
 
+    /**
+     * @throws Exception
+     */
     private function setDateFilter(Sql\Select $select, string $column, string $date, string $timezone)
     {
         $timezone   = new DateTimeZone($timezone);
@@ -811,6 +820,9 @@ class Picture
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function getPaginator(array $options): Paginator\Paginator
     {
         return new Paginator\Paginator(
@@ -821,6 +833,9 @@ class Picture
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function getCount(array $options): int
     {
         return $this->getPaginator($options)->getTotalItemCount();
@@ -1113,6 +1128,9 @@ class Picture
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
     public function generateIdentity(): string
     {
         do {

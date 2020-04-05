@@ -14,7 +14,6 @@ backend:
     AUTOWP_HOST: "localhost"
     AUTOWP_HOST_RU: "ru.localhost"
     AUTOWP_PICTURES_HOST: "i.localhost"
-    AUTOWP_HOST_COOKIE_RU: ""
     AUTOWP_MOSTS_MIN_VEHICLES_COUNT: 1
     AUTOWP_MAIL_TYPE: "in-memory"
     AUTOWP_MAIL_SMTP_HOST: ""
@@ -57,12 +56,13 @@ backend:
     AUTOWP_FORCE_HTTPS: ""
     AUTOWP_S3_KEY: 040JJYSRWKEG8FP4DCQE
     AUTOWP_S3_SECRET: CC2secCLdW49LReoOXmhhXwBeZsbSIL3N0b5kWLp
-    AUTOWP_S3_ENDPOINT: http://amd:7480
+    AUTOWP_S3_ENDPOINT: "http://amd:7480;http://amd:7480"
     AUTOWP_IMAGE_FORMAT_BUCKET: dev-format
     AUTOWP_IMAGE_MUSEUM_BUCKET: dev-museum
     AUTOWP_IMAGE_USER_BUCKET: dev-user
     AUTOWP_IMAGE_BRAND_BUCKET: dev-brand
     AUTOWP_IMAGE_PICTURE_BUCKET: dev-picture
+    AUTOWP_AUTH_SECRET: example_secret
   volumes:
   - ./config:/app/config
   - ./data:/app/data
@@ -76,6 +76,7 @@ backend:
   - ./etc/nginx/sites-available:/etc/nginx/sites-available
   - ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
   - ./composer.json:/app/composer.json
+  - ./composer.lock:/app/composer.lock
   - ./install-dev-db.sh:/app/install-dev-db.sh
   #- ./goautowp:/app/goautowp
   - ./start.sh:/app/start.sh
@@ -121,6 +122,7 @@ frontend:
   links:
   - backend
   - goautowp
+  - auth
   ports:
   - "80:80"
 
@@ -164,7 +166,7 @@ goautowp:
   restart: always
   links:
   - rabbitmq
-  - mysql:5.7
+  - mysql
   volumes:
   - ./goautowp/logs:/var/log
   - ./public_html/pictures:/app/pictures:ro
@@ -178,3 +180,27 @@ goautowp:
   - AUTOWP_SENTRY_ENVIRONMENT=development
   - AUTOWP_IMAGES_DIR=/app/pictures
   - AUTOWP_MIGRATIONS_DIR=/app/migrations
+
+auth:
+  image: autowp/auth
+  container_name: autowp_test_auth
+  restart: always
+  volumes:
+  - "./auth-config.yaml:/config.yaml:ro"
+  links:
+  - auth-postgres
+  - mysql
+  expose:
+  - "8080"
+  ports:
+  - "8080:8080"
+
+auth-postgres:
+  image: postgres:12
+  container_name: autowp_test_auth_postgres
+  environment:
+    - POSTGRES_PASSWORD=password
+    - POSTGRES_USER=auth
+    - POSTGRES_DB=auth
+  ports:
+    - "5432:5432"

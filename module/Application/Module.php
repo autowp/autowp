@@ -49,7 +49,6 @@ class Module implements
             __DIR__ . '/config/module.config.db.php',
             __DIR__ . '/config/module.config.api.php',
             __DIR__ . '/config/module.config.api.filter.php',
-            __DIR__ . '/config/module.config.session.php',
             __DIR__ . '/config/module.config.cache.php',
             __DIR__ . '/config/module.config.console.php',
             __DIR__ . '/config/module.config.forms.php',
@@ -104,9 +103,6 @@ class Module implements
         $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'handleError']);
         //handle the view render error (exception)
         $eventManager->attach(MvcEvent::EVENT_RENDER_ERROR, [$this, 'handleError']);
-
-        $sessionListener = new SessionDispatchListener();
-        $sessionListener->onBootstrap($e);
 
         $lastOnlineListener = new UserLastOnlineDispatchListener();
         $lastOnlineListener->attach($eventManager);

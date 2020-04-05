@@ -1,11 +1,10 @@
 <?php
 
-namespace ApplicationTest\Controller;
+namespace ApplicationTest;
 
 use Application\Test\AbstractHttpControllerTestCase;
 use Laminas\Mvc\Controller\PluginManager;
 use Laminas\Permissions\Acl\Acl;
-use Laminas\View\Renderer\PhpRenderer;
 
 class AclTest extends AbstractHttpControllerTestCase
 {
@@ -18,21 +17,6 @@ class AclTest extends AbstractHttpControllerTestCase
         $acl = $services->get(Acl::class);
 
         $this->assertInstanceOf(Acl::class, $acl);
-    }
-
-    public function testAclViewHelperRegisters()
-    {
-        $services = $this->getApplicationServiceLocator();
-
-        $view = $services->get(PhpRenderer::class);
-
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $result = $view->user()->inheritsRole('moder');
-        $this->assertIsBool($result);
-
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $result = $view->user()->isAllowed('pictures', 'edit');
-        $this->assertIsBool($result);
     }
 
     public function testAclControllerPluginRegisters()

@@ -4,7 +4,7 @@ namespace Autowp\User\Controller\Plugin;
 
 use ArrayObject;
 use Autowp\User\Model\User as UserModel;
-use Laminas\Authentication\AuthenticationService;
+use Autowp\User\Service\OAuth;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Laminas\Permissions\Acl\Acl;
 
@@ -22,10 +22,13 @@ class User extends AbstractPlugin
     /** @var array|ArrayObject */
     private $user;
 
-    public function __construct(Acl $acl, UserModel $userModel)
+    private OAuth $oauth;
+
+    public function __construct(Acl $acl, UserModel $userModel, OAuth $oauth)
     {
         $this->acl       = $acl;
         $this->userModel = $userModel;
+        $this->oauth     = $oauth;
     }
 
     /**
@@ -67,13 +70,12 @@ class User extends AbstractPlugin
      */
     private function getLogedInUser()
     {
-        $auth = new AuthenticationService();
-
-        if (! $auth->hasIdentity()) {
+        $userID = $this->oauth->getUserID();
+        if (! $userID) {
             return null;
         }
 
-        return $this->user($auth->getIdentity());
+        return $this->user($userID);
     }
 
     public function logedIn(): bool

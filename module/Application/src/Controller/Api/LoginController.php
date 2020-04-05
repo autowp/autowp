@@ -7,15 +7,11 @@ use Application\Service\UsersService;
 use Autowp\ExternalLoginService\AbstractService;
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\Image\Storage;
-use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
-use Autowp\User\Model\UserRemember;
 use Exception;
 use Imagick;
-use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
-use Laminas\Authentication\AuthenticationService;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
@@ -42,11 +38,7 @@ class LoginController extends AbstractRestfulController
 
     private ExternalLoginServices $externalLoginServices;
 
-    private InputFilter $loginInputFilter;
-
     private array $hosts = [];
-
-    private UserRemember $userRemember;
 
     private UserAccount $userAccount;
 
@@ -57,18 +49,14 @@ class LoginController extends AbstractRestfulController
     public function __construct(
         UsersService $service,
         ExternalLoginServices $externalLoginServices,
-        InputFilter $loginInputFilter,
         array $hosts,
-        UserRemember $userRemember,
         UserAccount $userAccount,
         TableGateway $loginStateTable,
         User $userModel
     ) {
         $this->service               = $service;
         $this->externalLoginServices = $externalLoginServices;
-        $this->loginInputFilter      = $loginInputFilter;
         $this->hosts                 = $hosts;
-        $this->userRemember          = $userRemember;
         $this->userAccount           = $userAccount;
         $this->loginStateTable       = $loginStateTable;
         $this->userModel             = $userModel;
@@ -85,69 +73,6 @@ class LoginController extends AbstractRestfulController
             throw new Exception("Service `$serviceId` not found");
         }
         return $service;
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function loginAction()
-    {
-        $request = $this->getRequest();
-        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
-            $data = $this->jsonDecode($request->getContent());
-        } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-            $data = $request->getPost()->toArray();
-        }
-
-        $this->loginInputFilter->setData($data);
-
-        if (! $this->loginInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->loginInputFilter);
-        }
-
-        $values = $this->loginInputFilter->getValues();
-
-        $adapter = $this->service->getAuthAdapterLogin($values['login'], $values['password']);
-
-        $auth   = new AuthenticationService();
-        $result = $auth->authenticate($adapter);
-
-        if (! $result->isValid()) {
-            return new ApiProblemResponse(
-                new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                    'invalid_params' => [
-                        'login' => [
-                            'invalid' => $this->translate('login/login-or-password-is-incorrect'),
-                        ],
-                    ],
-                ])
-            );
-        }
-
-        if ($values['remember']) {
-            $token = $this->userRemember->createToken($this->user()->get()['id']);
-
-            $this->service->setRememberCookie($token, $this->language());
-        } else {
-            $this->service->clearRememberCookie($this->language());
-        }
-
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function deleteAction()
-    {
-        $auth = new AuthenticationService();
-        $auth->clearIdentity();
-        $this->service->clearRememberCookie($this->language());
-
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
     }
 
     public function servicesAction(): JsonModel
@@ -188,6 +113,7 @@ class LoginController extends AbstractRestfulController
     /**
      * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function startAction()
     {
@@ -217,6 +143,7 @@ class LoginController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function callbackAction()
     {
@@ -354,13 +281,13 @@ class LoginController extends AbstractRestfulController
             );
         }
 
-        $url = $stateRow['url'];
+        //$url = $stateRow['url'];
 
         $this->loginStateTable->delete([
             'state' => $stateRow['state'],
         ]);
 
-        $adapter = new IdAuthAdapter($this->userModel);
+        /*$adapter = new IdAuthAdapter($this->userModel);
         $adapter->setIdentity($uRow['id']);
         $auth       = new AuthenticationService();
         $authResult = $auth->authenticate($adapter);
@@ -369,6 +296,6 @@ class LoginController extends AbstractRestfulController
         } else {
             // Invalid credentials
             throw new Exception('Error during login');
-        }
+        }*/
     }
 }

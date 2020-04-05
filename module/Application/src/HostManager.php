@@ -28,13 +28,4 @@ class HostManager
 
         return UriFactory::factory('https://' . $hostname);
     }
-
-    public function getCookieDomain(string $language): string
-    {
-        if (! isset($this->hosts[$language])) {
-            throw new Exception("Host for language `$language` not found");
-        }
-
-        return $this->hosts[$language]['cookie'];
-    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Controller;
+namespace ApplicationTest;
 
 use Application\Model\Item;
 use Application\Model\Picture;

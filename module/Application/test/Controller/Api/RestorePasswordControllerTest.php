@@ -1,8 +1,7 @@
 <?php
 
-namespace ApplicationTest\Api\Controller;
+namespace ApplicationTest\Controller\Api;
 
-use Application\Controller\Api\LoginController;
 use Application\Controller\Api\RestorePasswordController;
 use Application\Controller\Api\UserController;
 use Application\Test\AbstractHttpControllerTestCase;
@@ -120,19 +119,5 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(RestorePasswordController::class);
         $this->assertMatchedRouteName('api/restore-password/new/post');
         $this->assertActionName('new-post');
-
-        // check new password
-        // login
-        $this->reset();
-        $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
-            'login'    => $email,
-            'password' => $newPassword,
-        ]);
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(LoginController::class);
-        $this->assertMatchedRouteName('api/login/login');
-        $this->assertActionName('login');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Controller;
+namespace ApplicationTest;
 
 use Application\Test\AbstractHttpControllerTestCase;
 use Laminas\Db\Adapter\Adapter;

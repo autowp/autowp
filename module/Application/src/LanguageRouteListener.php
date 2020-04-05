@@ -2,14 +2,11 @@
 
 namespace Application;
 
-use Autowp\User\Model\User;
-use Laminas\Authentication\AuthenticationService;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\MvcEvent;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ResponseInterface;
 use Locale;
 
@@ -61,7 +58,7 @@ class LanguageRouteListener extends AbstractListenerAggregate
             if (in_array($hostname, $this->userDetectable)) {
                 $languageWhitelist = array_keys($hosts);
 
-                $userLanguage = $this->detectUserLanguage($serviceManager, $request, $languageWhitelist);
+                $userLanguage = $this->detectUserLanguage($request, $languageWhitelist);
 
                 if (isset($hosts[$userLanguage])) {
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -97,22 +94,9 @@ class LanguageRouteListener extends AbstractListenerAggregate
     }
 
     private function detectUserLanguage(
-        ServiceLocatorInterface $serviceManager,
         Request $request,
         array $whitelist
     ): ?string {
-        $auth = new AuthenticationService();
-
-        if ($auth->hasIdentity()) {
-            /** @var User $userModel */
-            $userModel = $serviceManager->get(User::class);
-
-            $userLanguage = $userModel->getUserLanguage($auth->getIdentity());
-            if (in_array($userLanguage, $whitelist)) {
-                return $userLanguage;
-            }
-        }
-
         /** @var Request $acceptLanguage */
         $acceptLanguage = $request->getServer('HTTP_ACCEPT_LANGUAGE');
         if ($acceptLanguage) {

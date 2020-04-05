@@ -6,13 +6,13 @@
     </rule>
 
     <!-- Paths to check -->
+    <file>module/Application/config</file>
     <file>module/Application/src</file>
     <file>module/Application/Module.php</file>
     <file>module/Application/test</file>
     <file>module/Traffic/src</file>
     <file>module/Traffic/test</file>
     <file>module/User/src</file>
-    <file>module/User/test</file>
     <file>module/Comments/src</file>
     <file>module/Comments/test</file>
     <file>module/Message/src</file>

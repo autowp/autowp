@@ -467,9 +467,6 @@ VALUES (1,1,0,0,0,0),(2,2,0,0,0,0),(3,3,0,0,0,0),(4,4,0,0,0,0),(5,5,0,0,0,0),(6,
 
 INSERT INTO `of_day` (`day_date`, `picture_id`, `item_id`, `twitter_sent`) VALUES ('2016-11-25',NULL,1,0);
 
-INSERT INTO `user_remember` (`user_id`, `token`, `date`)
-VALUES (3,'admin-token','2026-11-25 18:31:51'), (1,'token','2026-11-25 18:31:51');
-
 /*!40000 ALTER TABLE `voting` DISABLE KEYS */;
 insert into voting (id, name, multivariant, begin_date, end_date, votes, text)
 values (1, "Test vote", 0, CURDATE(), "2020-01-01", 0, "Voting text");

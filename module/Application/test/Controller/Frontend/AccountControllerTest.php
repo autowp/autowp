@@ -3,20 +3,10 @@
 namespace ApplicationTest\Controller\Frontend;
 
 use Application\Controller\Api\AttrController;
-use Application\Controller\Api\LoginController;
-use Application\Controller\Api\UserController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Autowp\User\Model\UserRemember;
+use ApplicationTest\Data;
 use Exception;
-use Laminas\Http\Header\Cookie;
 use Laminas\Http\Request;
-use Laminas\Json\Json;
-use Laminas\Mail\Transport\TransportInterface;
-
-use function count;
-use function explode;
-use function microtime;
-use function preg_match;
 
 class AccountControllerTest extends AbstractHttpControllerTestCase
 {
@@ -26,7 +16,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function createUser(string $email, string $password, string $name): int
+    /*private function createUser(string $email, string $password, string $name): int
     {
         $this->reset();
 
@@ -67,16 +57,16 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(UserController::class);
         $this->assertMatchedRouteName('api/user/emailcheck');
         $this->assertActionName('emailcheck');
-    }
+    }*/
 
     /**
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function getUser(int $userId): array
+    /*private function getUser(int $userId): array
     {
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/user/' . $userId, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -86,14 +76,14 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('item');
 
         return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-    }
+    }*/
 
     /**
      * @suppress PhanUndeclaredMethod
      */
     public function testSpecsConflicts()
     {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/attr/conflict?filter=0', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -106,7 +96,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testProfileRename()
+    /*public function testProfileRename()
     {
         $email    = 'test' . microtime(true) . '@example.com';
         $password = 'password';
@@ -124,7 +114,6 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => $email,
             'password' => $password,
-            'remember' => 1,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -162,5 +151,5 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertModuleName('application');
         $this->assertControllerName(UserController::class);
         $this->assertMatchedRouteName('api/user/user/item');
-    }
+    }*/
 }

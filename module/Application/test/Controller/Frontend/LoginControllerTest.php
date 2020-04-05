@@ -17,34 +17,6 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testLoginByEmail(): void
-    {
-        $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
-            'login'    => 'test@example.com',
-            'password' => '123456',
-        ]);
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(LoginController::class);
-        $this->assertMatchedRouteName('api/login/login');
-        $this->assertActionName('login');
-    }
-
-    public function testLoginByLogin(): void
-    {
-        $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
-            'login'    => 'test',
-            'password' => '123456',
-        ]);
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(LoginController::class);
-        $this->assertMatchedRouteName('api/login/login');
-        $this->assertActionName('login');
-    }
-
     private function mockExternalLoginFactory(?string $photoUrl): void
     {
         $serviceManager = $this->getApplicationServiceLocator();

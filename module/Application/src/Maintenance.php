@@ -5,10 +5,8 @@ namespace Application;
 use Application\Service\PictureService;
 use Autowp\Cron;
 use Autowp\User\Model\User;
-use Exception;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
-use Laminas\Session\SessionManager;
 
 use function sprintf;
 
@@ -38,9 +36,6 @@ class Maintenance extends AbstractListenerAggregate
 
         $pictureService = $serviceManager->get(PictureService::class);
         $pictureService->clearQueue();
-
-        $sessionManager = $serviceManager->get(SessionManager::class);
-        $this->clearSessions($sessionManager);
 
         $userModel = $serviceManager->get(User::class);
         $userModel->updateSpecsVolumes();
@@ -79,17 +74,5 @@ class Maintenance extends AbstractListenerAggregate
         $carOfDay->putCurrentToVk($vkConfig);
 
         print "Midnight done\n";
-    }
-
-    private function clearSessions(SessionManager $sessionManager): string
-    {
-        $gcMaxLifetime = $sessionManager->getConfig()->getOptions('options')['gc_maxlifetime'];
-        if (! $gcMaxLifetime) {
-            throw new Exception('Option session.gc_maxlifetime not found');
-        }
-
-        $sessionManager->getSaveHandler()->gc($gcMaxLifetime);
-
-        return "Garabage collected\n";
     }
 }

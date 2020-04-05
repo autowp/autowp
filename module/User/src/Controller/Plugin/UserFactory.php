@@ -3,6 +3,7 @@
 namespace Autowp\User\Controller\Plugin;
 
 use Autowp\User\Model\User as UserModel;
+use Autowp\User\Service\OAuth;
 use Interop\Container\ContainerInterface;
 use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -17,7 +18,8 @@ class UserFactory implements FactoryInterface
     {
         return new User(
             $container->get(Acl::class),
-            $container->get(UserModel::class)
+            $container->get(UserModel::class),
+            $container->get(OAuth::class)
         );
     }
 }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Autowp\Traffic;
 
 use Autowp\User\Model\User;
+use Autowp\User\Service\OAuth;
 use Exception;
-use Laminas\Authentication\AuthenticationService;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Http\PhpEnvironment\Request;
@@ -101,12 +101,15 @@ class TrafficRouteListener extends AbstractListenerAggregate
 
             $serviceManager = $e->getApplication()->getServiceManager();
 
-            $auth = new AuthenticationService();
+            /** @var OAuth $oauth */
+            $oauth = $serviceManager->get(OAuth::class);
+
+            $userID = $oauth->getUserID();
 
             $unlimitedTraffic = false;
-            if ($auth->hasIdentity()) {
+            if ($userID) {
                 $userModel = $serviceManager->get(User::class);
-                $user      = $userModel->getRow(['id' => (int) $auth->getIdentity()]);
+                $user      = $userModel->getRow(['id' => $userID]);
 
                 if ($user) {
                     $acl              = $serviceManager->get(Acl::class);
@@ -125,7 +128,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 if ($banInfo) {
                     $response = $e->getResponse();
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
-                    $response->setStatusCode(403);
+                    $response->setStatusCode(429);
                     $response->setContent('Access denied: ' . $banInfo['reason']);
 
                     return $response;

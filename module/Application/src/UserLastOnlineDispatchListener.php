@@ -3,7 +3,7 @@
 namespace Application;
 
 use Autowp\User\Model\User;
-use Laminas\Authentication\AuthenticationService;
+use Autowp\User\Service\OAuth;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Http\PhpEnvironment\Request;
@@ -28,11 +28,16 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
         $request = $e->getRequest();
 
         if ($request instanceof Request) {
-            $auth = new AuthenticationService();
-            if ($auth->hasIdentity()) {
-                $serviceManager = $e->getApplication()->getServiceManager();
-                $userModel      = $serviceManager->get(User::class);
-                $userModel->registerVisit($auth->getIdentity(), $request);
+            $serviceManager = $e->getApplication()->getServiceManager();
+
+            /** @var OAuth $oauth */
+            $oauth  = $serviceManager->get(OAuth::class);
+            $userID = $oauth->getUserID();
+            
+            if ($userID) {
+                /** @var User $userModel */
+                $userModel = $serviceManager->get(User::class);
+                $userModel->registerVisit($userID, $request);
             }
         }
     }

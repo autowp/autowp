@@ -45,6 +45,8 @@ class CommentController extends AbstractRestfulController
 
     private AbstractRestHydrator $hydrator;
 
+    private AbstractRestHydrator $userHydrator;
+
     private TableGateway $userTable;
 
     private InputFilter $postInputFilter;
@@ -76,6 +78,7 @@ class CommentController extends AbstractRestfulController
     public function __construct(
         Comments $comments,
         AbstractRestHydrator $hydrator,
+        AbstractRestHydrator $userHydrator,
         TableGateway $userTable,
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
@@ -93,6 +96,7 @@ class CommentController extends AbstractRestfulController
     ) {
         $this->comments              = $comments;
         $this->hydrator              = $hydrator;
+        $this->userHydrator          = $userHydrator;
         $this->userTable             = $userTable;
         $this->listInputFilter       = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
@@ -258,7 +262,7 @@ class CommentController extends AbstractRestfulController
         }
 
         $paginator
-            ->setItemCountPerPage($limit ? $limit : 50000)
+            ->setItemCountPerPage($limit ?? 50000)
             ->setCurrentPageNumber($values['page']);
 
         $result = [
@@ -613,15 +617,25 @@ class CommentController extends AbstractRestfulController
      */
     public function votesAction()
     {
-        $result = $this->comments->service()->getVotes($this->params()->fromQuery('id'));
-        if (! $result) {
+        $votes = $this->comments->service()->getVotes($this->params()->fromQuery('id'));
+        if (! $votes) {
             return $this->notFoundAction();
         }
 
-        $viewModel = new ViewModel($result);
-        $viewModel->setTerminal(true);
+        $this->userHydrator->setFields([]);
 
-        return $viewModel;
+        $result = [
+            'positive' => [],
+            'negative' => [],
+        ];
+        foreach ($votes['positiveVotes'] as $user) {
+            $result['positive'][] = $this->userHydrator->extract($user);
+        }
+        foreach ($votes['negativeVotes'] as $user) {
+            $result['negative'][] = $this->userHydrator->extract($user);
+        }
+
+        return new JsonModel($result);
     }
 
     /**
