@@ -44,7 +44,7 @@
 		"laminas/laminas-uri" : ">=2.6.1",
 		"laminas/laminas-view" : ">=2.10.0",
 		"laminas-api-tools/api-tools-oauth2" : "^1.4.0",
-		"autowp/image" : "^5.0.3",
+		"autowp/image" : "^5.0.4",
 		"facebook/graph-sdk" : "^5.4",
 		"laminas/laminas-hydrator" : "^2.4.0",
 		"autowp/cron" : "^1.0.0",

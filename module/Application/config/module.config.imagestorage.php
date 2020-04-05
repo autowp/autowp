@@ -2,6 +2,7 @@
 
 namespace Application;
 
+use function explode;
 use function getenv;
 
 $imageDir = __DIR__ . '/../../../public_html/image/';
@@ -176,7 +177,7 @@ return [
         's3'         => [
             'region'                  => '',
             'version'                 => 'latest',
-            'endpoint'                => getenv('AUTOWP_S3_ENDPOINT'),
+            'endpoint'                => explode(';', getenv('AUTOWP_S3_ENDPOINT')),
             'credentials'             => [
                 'key'    => getenv('AUTOWP_S3_KEY'),
                 'secret' => getenv('AUTOWP_S3_SECRET'),
