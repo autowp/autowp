@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "94170f25e44e9810777ece5c512fd4eb",
+    "content-hash": "576367e11fa4ec64d1e415966de6ac98",
     "packages": [
         {
             "name": "autowp/cron",
@@ -109,16 +109,16 @@
         },
         {
             "name": "autowp/image",
-            "version": "v5.0.4",
+            "version": "v5.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/autowp/image.git",
-                "reference": "dab28006ecd6c64ebbdfb15e528a7968d2451d76"
+                "reference": "d3e2d9930dd88e2b9762c549834323071e5f9c1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/autowp/image/zipball/dab28006ecd6c64ebbdfb15e528a7968d2451d76",
-                "reference": "dab28006ecd6c64ebbdfb15e528a7968d2451d76",
+                "url": "https://api.github.com/repos/autowp/image/zipball/d3e2d9930dd88e2b9762c549834323071e5f9c1a",
+                "reference": "d3e2d9930dd88e2b9762c549834323071e5f9c1a",
                 "shasum": ""
             },
             "require": {
@@ -159,7 +159,7 @@
                 }
             ],
             "description": "Image services for autowp.ru",
-            "time": "2020-04-05T20:54:19+00:00"
+            "time": "2020-04-05T21:26:24+00:00"
         },
         {
             "name": "autowp/textstorage",
