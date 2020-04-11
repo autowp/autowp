@@ -249,7 +249,7 @@ return [
 
     'pictures_hostname' => getenv('AUTOWP_PICTURES_HOST'),
 
-    'content_languages' => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es'],
+    'content_languages' => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp'],
 
     /*'acl' => [
         'cache'         => 'long',
