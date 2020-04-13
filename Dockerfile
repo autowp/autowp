@@ -12,7 +12,7 @@ ENV COMPOSER_ALLOW_SUPERUSER="1" \
 CMD ["./start.sh"]
 
 HEALTHCHECK --interval=5m --timeout=3s \
-  CMD curl -f http://localhost/ || exit 1
+  CMD curl -f http://localhost/api/brands --silent --output /dev/null --show-error --fail || exit 1
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
     DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && \
