@@ -104,6 +104,10 @@ class GalleryController extends AbstractRestfulController
             $filter['item']['id'] = $exactItemID;
         }
 
+        if ($itemID || $exactItemID) {
+            $filter['order'] = 'perspectives';
+        }
+
         $exactItemLinkType = (int) $this->params()->fromQuery('exact_item_link_type');
         if ($exactItemLinkType) {
             $filter['item']['link_type'] = $exactItemLinkType;
