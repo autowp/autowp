@@ -17,6 +17,7 @@ use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
+use function explode;
 use function floor;
 
 /**
@@ -106,6 +107,25 @@ class GalleryController extends AbstractRestfulController
 
         if ($itemID || $exactItemID) {
             $filter['order'] = 'perspectives';
+
+            $perspectiveID = (int) $this->params()->fromQuery('perspective_id');
+            if ($perspectiveID) {
+                $filter['item']['perspective'] = $perspectiveID;
+            }
+
+            $perspectiveExcludeID = $this->params()->fromQuery('perspective_exclude');
+            if ($perspectiveExcludeID) {
+                $parts = explode(',', $perspectiveExcludeID);
+                $value = [];
+                foreach ($parts as $part) {
+                    $part = (int) $part;
+                    if ($part) {
+                        $value[] = $part;
+                    }
+                }
+
+                $filter['item']['perspective_exclude'] = $value;
+            }
         }
 
         $exactItemLinkType = (int) $this->params()->fromQuery('exact_item_link_type');
@@ -155,7 +175,10 @@ class GalleryController extends AbstractRestfulController
             }
 
             $filter['status'] = $row['status'];
-            $page             = $this->getPicturePage($filter, $pictureIdentity);
+            $page             = 0;
+            if ($itemID || $exactItemID) {
+                $page = $this->getPicturePage($filter, $pictureIdentity);
+            }
         }
 
         $filter['columns'] = [
