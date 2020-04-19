@@ -1,206 +1,222 @@
-backend:
-  image: autowp/autowp
-  container_name: autowp_test_backend
-  restart: always
-  environment:
-    AUTOWP_DB_HOST: "autowp_test_mysql"
-    AUTOWP_DB_PORT: "3306"
-    AUTOWP_DB_USERNAME: "autowp_test"
-    AUTOWP_DB_PASSWORD: "test"
-    AUTOWP_DB_DBNAME: "autowp_test"
-    AUTOWP_USERS_SALT: "users-salt"
-    AUTOWP_EMAIL_SALT: "email-salt"
-    AUTOWP_MEMCACHED_HOST: "autowp_test_memcached"
-    AUTOWP_HOST: "localhost"
-    AUTOWP_HOST_RU: "ru.localhost"
-    AUTOWP_PICTURES_HOST: "i.localhost"
-    AUTOWP_MOSTS_MIN_VEHICLES_COUNT: 1
-    AUTOWP_MAIL_TYPE: "in-memory"
-    AUTOWP_MAIL_SMTP_HOST: ""
-    AUTOWP_MAIL_SMTP_USERNAME: ""
-    AUTOWP_MAIL_SMTP_PASSWORD: ""
-    AUTOWP_TELEGRAM_ACCESS_TOKEN: ""
-    AUTOWP_TELEGRAM_TOKEN: ""
-    AUTOWP_TWITTER_USERNAME: ""
-    AUTOWP_TWITTER_OAUTH_KEY: ""
-    AUTOWP_TWITTER_OAUTH_SECRET: ""
-    AUTOWP_TWITTER_TOKEN_OAUTH: ""
-    AUTOWP_TWITTER_TOKEN_OAUTH_SECRET: ""
-    AUTOWP_FACEBOOK_APP_ID: ""
-    AUTOWP_FACEBOOK_APP_SECRET: ""
-    AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN: ""
-    AUTOWP_YANDEX_SECRET: ""
-    AUTOWP_YANDEX_PRICE: "1"
-    AUTOWP_VK_TOKEN: ""
-    AUTOWP_VK_OWNER_ID: ""
-    AUTOWP_ELS_VK_CLIENTID: "vk_test_clientid"
-    AUTOWP_ELS_VK_SECRET: "vk_test_secret"
-    AUTOWP_ELS_GOOGLEPLUS_CLIENTID: "google_test_clientid"
-    AUTOWP_ELS_GOOGLEPLUS_SECRET: "google_test_secret"
-    AUTOWP_ELS_TWITTER_CLIENTID: "twitter_test_clientid"
-    AUTOWP_ELS_TWITTER_SECRET: "twitter_test_secret"
-    AUTOWP_ELS_FACEBOOK_CLIENTID: "facebook_test_clientid"
-    AUTOWP_ELS_FACEBOOK_SECRET: "facebook_test_secret"
-    AUTOWP_ELS_GITHUB_CLIENTID: "github_test_clientid"
-    AUTOWP_ELS_GITHUB_SECRET: "github_test_secret"
-    AUTOWP_ELS_LINKEDIN_CLIENTID: "linkedin_test_clientid"
-    AUTOWP_ELS_LINKEDIN_SECRET: "linkedin_test_secret"
-    AUTOWP_CAPTCHA: 0
-    AUTOWP_RECAPTCHA_PUBLICKEY: "public"
-    AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
-    AUTOWP_GO_LISTEN: ":81"
-    SENTRY_DSN: ""
-    SENTRY_ENVIRONMENT: "development"
-    SENTRY_RELEASE: "dev"
-    TRAFFIC_URL: http://traffic
-    AUTOWP_FORCE_HTTPS: ""
-    AUTOWP_S3_KEY: 040JJYSRWKEG8FP4DCQE
-    AUTOWP_S3_SECRET: CC2secCLdW49LReoOXmhhXwBeZsbSIL3N0b5kWLp
-    AUTOWP_S3_ENDPOINT: "http://amd:7480;http://amd:7480"
-    AUTOWP_IMAGE_FORMAT_BUCKET: dev-format
-    AUTOWP_IMAGE_MUSEUM_BUCKET: dev-museum
-    AUTOWP_IMAGE_USER_BUCKET: dev-user
-    AUTOWP_IMAGE_BRAND_BUCKET: dev-brand
-    AUTOWP_IMAGE_PICTURE_BUCKET: dev-picture
-    AUTOWP_AUTH_SECRET: example_secret
-  volumes:
-  - ./config:/app/config
-  - ./data:/app/data
-  - ./cache:/app/cache
-  - ./module:/app/module
-  - ./public_html:/app/public_html
-  - ./vendor:/app/vendor
-  - ./etc/nginx/conf.d:/etc/nginx/conf.d
-  #- ./etc/php/7.3/fpm/php-fpm.conf:/etc/php/7.3/fpm/php-fpm.conf
-  #- ./etc/php/7.3/fpm/pool.d/www.conf:/etc/php/7.3/fpm/pool.d/www.conf
-  - ./etc/nginx/sites-available:/etc/nginx/sites-available
-  - ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
-  - ./composer.json:/app/composer.json
-  - ./composer.lock:/app/composer.lock
-  - ./install-dev-db.sh:/app/install-dev-db.sh
-  #- ./goautowp:/app/goautowp
-  - ./start.sh:/app/start.sh
-  links:
-  - memcached
-  - mysql:5.7
-  - rabbitmq
-  - traffic
+version: "3.8"
+services:
+  router:
+    image: nginx:1-alpine
+    container_name: autowp_test_router
+    restart: always
+    volumes:
+    - ./router.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+    - backend
+    - frontend
+    - goautowp
+    - auth
+    ports:
+    - "80:80"
 
-memcached:
-  image: memcached
-  container_name: autowp_test_memcached
-  restart: always
-  expose:
-  - "11211"
+  backend:
+    image: autowp/autowp
+    container_name: autowp_test_backend
+    restart: always
+    environment:
+      AUTOWP_DB_HOST: "autowp_test_mysql"
+      AUTOWP_DB_PORT: "3306"
+      AUTOWP_DB_USERNAME: "autowp_test"
+      AUTOWP_DB_PASSWORD: "test"
+      AUTOWP_DB_DBNAME: "autowp_test"
+      AUTOWP_USERS_SALT: "users-salt"
+      AUTOWP_EMAIL_SALT: "email-salt"
+      AUTOWP_MEMCACHED_HOST: "autowp_test_memcached"
+      AUTOWP_HOST: "localhost"
+      AUTOWP_HOST_RU: "ru.localhost"
+      AUTOWP_PICTURES_HOST: "i.localhost"
+      AUTOWP_MOSTS_MIN_VEHICLES_COUNT: 1
+      AUTOWP_MAIL_TYPE: "in-memory"
+      AUTOWP_MAIL_SMTP_HOST: ""
+      AUTOWP_MAIL_SMTP_USERNAME: ""
+      AUTOWP_MAIL_SMTP_PASSWORD: ""
+      AUTOWP_TELEGRAM_ACCESS_TOKEN: ""
+      AUTOWP_TELEGRAM_TOKEN: ""
+      AUTOWP_TWITTER_USERNAME: ""
+      AUTOWP_TWITTER_OAUTH_KEY: ""
+      AUTOWP_TWITTER_OAUTH_SECRET: ""
+      AUTOWP_TWITTER_TOKEN_OAUTH: ""
+      AUTOWP_TWITTER_TOKEN_OAUTH_SECRET: ""
+      AUTOWP_FACEBOOK_APP_ID: ""
+      AUTOWP_FACEBOOK_APP_SECRET: ""
+      AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN: ""
+      AUTOWP_YANDEX_SECRET: ""
+      AUTOWP_YANDEX_PRICE: "1"
+      AUTOWP_VK_TOKEN: ""
+      AUTOWP_VK_OWNER_ID: ""
+      AUTOWP_ELS_VK_CLIENTID: "vk_test_clientid"
+      AUTOWP_ELS_VK_SECRET: "vk_test_secret"
+      AUTOWP_ELS_GOOGLEPLUS_CLIENTID: "google_test_clientid"
+      AUTOWP_ELS_GOOGLEPLUS_SECRET: "google_test_secret"
+      AUTOWP_ELS_TWITTER_CLIENTID: "twitter_test_clientid"
+      AUTOWP_ELS_TWITTER_SECRET: "twitter_test_secret"
+      AUTOWP_ELS_FACEBOOK_CLIENTID: "facebook_test_clientid"
+      AUTOWP_ELS_FACEBOOK_SECRET: "facebook_test_secret"
+      AUTOWP_ELS_GITHUB_CLIENTID: "github_test_clientid"
+      AUTOWP_ELS_GITHUB_SECRET: "github_test_secret"
+      AUTOWP_ELS_LINKEDIN_CLIENTID: "linkedin_test_clientid"
+      AUTOWP_ELS_LINKEDIN_SECRET: "linkedin_test_secret"
+      AUTOWP_CAPTCHA: 0
+      AUTOWP_RECAPTCHA_PUBLICKEY: "public"
+      AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
+      AUTOWP_GO_LISTEN: ":81"
+      SENTRY_DSN: ""
+      SENTRY_ENVIRONMENT: "development"
+      SENTRY_RELEASE: "dev"
+      TRAFFIC_URL: http://traffic
+      AUTOWP_FORCE_HTTPS: ""
+      AUTOWP_S3_KEY: 040JJYSRWKEG8FP4DCQE
+      AUTOWP_S3_SECRET: CC2secCLdW49LReoOXmhhXwBeZsbSIL3N0b5kWLp
+      AUTOWP_S3_ENDPOINT: "http://amd:7480;http://amd:7480"
+      AUTOWP_IMAGE_FORMAT_BUCKET: dev-format
+      AUTOWP_IMAGE_MUSEUM_BUCKET: dev-museum
+      AUTOWP_IMAGE_USER_BUCKET: dev-user
+      AUTOWP_IMAGE_BRAND_BUCKET: dev-brand
+      AUTOWP_IMAGE_PICTURE_BUCKET: dev-picture
+      AUTOWP_AUTH_SECRET: example_secret
+    volumes:
+    - ./config:/app/config
+    - ./data:/app/data
+    - ./cache:/app/cache
+    - ./module:/app/module
+    - ./public_html:/app/public_html
+    - ./vendor:/app/vendor
+    - ./etc/nginx/conf.d:/etc/nginx/conf.d
+    #- ./etc/php/7.3/fpm/php-fpm.conf:/etc/php/7.3/fpm/php-fpm.conf
+    #- ./etc/php/7.3/fpm/pool.d/www.conf:/etc/php/7.3/fpm/pool.d/www.conf
+    - ./etc/nginx/sites-available:/etc/nginx/sites-available
+    - ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    - ./composer.json:/app/composer.json
+    - ./composer.lock:/app/composer.lock
+    - ./install-dev-db.sh:/app/install-dev-db.sh
+    #- ./goautowp:/app/goautowp
+    - ./start.sh:/app/start.sh
+    depends_on:
+    - memcached
+    - mysql
+    - rabbitmq
+    - traffic
 
-mysql:
-  image: mysql:8
-  container_name: autowp_test_mysql
-  restart: always
-  environment:
-  - MYSQL_ROOT_PASSWORD=password
-  - MYSQL_DATABASE=autowp_test
-  - MYSQL_USER=autowp_test
-  - MYSQL_PASSWORD=test
-  volumes:
-  - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
-  - "./mysql:/var/lib/mysql"
-  - "./mysql.conf.d:/etc/mysql/conf.d"
-  expose:
-  - "3306"
-  ports:
-  - "3306:3306"
+  memcached:
+    image: memcached
+    container_name: autowp_test_memcached
+    restart: always
+    expose:
+    - "11211"
 
-frontend:
-  image: autowp/autowp-frontend
-  container_name: autowp_test_frontend
-  restart: always
-  volumes:
-  - "./frontend:/usr/share/nginx/html"
-  - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
-  - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
-  links:
-  - backend
-  - goautowp
-  - auth
-  ports:
-  - "80:80"
+  mysql:
+    image: mysql:8
+    container_name: autowp_test_mysql
+    restart: always
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_DATABASE=autowp_test
+    - MYSQL_USER=autowp_test
+    - MYSQL_PASSWORD=test
+    volumes:
+    - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+    - "./mysql:/var/lib/mysql"
+    - "./mysql.conf.d:/etc/mysql/conf.d"
+    expose:
+    - "3306"
+    ports:
+    - "3306:3306"
 
-rabbitmq:
-  image: rabbitmq:management
-  container_name: autowp_test_rabbitmq
-  ports:
-  - "5672:5672"
-  - "15672:15672"
+  frontend:
+    image: autowp/autowp-frontend
+    container_name: autowp_test_frontend
+    restart: always
+    volumes:
+    - "./frontend/be-BY:/usr/share/nginx/html/be-BY"
+    - "./frontend/en-GB:/usr/share/nginx/html/en-GB"
+    - "./frontend/fr:/usr/share/nginx/html/fr"
+    - "./frontend/pt-BR:/usr/share/nginx/html/pt-BR"
+    - "./frontend/ru:/usr/share/nginx/html/ru"
+    - "./frontend/uk:/usr/share/nginx/html/uk"
+    - "./frontend/zh-CN:/usr/share/nginx/html/zh-CN"
+    - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
+    - "./hostmap:/etc/nginx/hostmap:ro"
 
-traffic:
-  image: autowp/traffic
-  container_name: autowp_test_traffic
-  restart: always
-  links:
-  - rabbitmq
-  - traffic-mysql
-  volumes:
-  - "./traffic/logs:/var/log"
-  environment:
-  - TRAFFIC_RABBITMQ_HOST=autowp_test_rabbitmq
-  - TRAFFIC_RABBITMQ_PORT=5672
-  - TRAFFIC_MONITORING_QUEUE=input
-  - TRAFFIC_HOTLINK_QUEUE=hotlink
-  - TRAFFIC_MYSQL_DSN=root:password@tcp(autowp_test_traffic_mysql:3306)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
-  - TRAFFIC_MIGRATIONS_DSN=mysql://root:password@tcp(autowp_test_traffic_mysql)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
-  - TRAFFIC_SENTRY_DSN=
-  - TRAFFIC_SENTRY_ENVIRONMENT=development
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: autowp_test_rabbitmq
+    ports:
+    - "5672:5672"
+    - "15672:15672"
 
-traffic-mysql:
-  image: mysql:8
-  container_name: autowp_test_traffic_mysql
-  restart: always
-  environment:
-  - MYSQL_ROOT_PASSWORD=password
-  - MYSQL_DATABASE=traffic
+  traffic:
+    image: autowp/traffic
+    container_name: autowp_test_traffic
+    restart: always
+    depends_on:
+    - rabbitmq
+    - traffic-mysql
+    volumes:
+    - "./traffic/logs:/var/log"
+    environment:
+    - TRAFFIC_RABBITMQ_HOST=autowp_test_rabbitmq
+    - TRAFFIC_RABBITMQ_PORT=5672
+    - TRAFFIC_MONITORING_QUEUE=input
+    - TRAFFIC_HOTLINK_QUEUE=hotlink
+    - TRAFFIC_MYSQL_DSN=root:password@tcp(autowp_test_traffic_mysql:3306)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
+    - TRAFFIC_MIGRATIONS_DSN=mysql://root:password@tcp(autowp_test_traffic_mysql)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
+    - TRAFFIC_SENTRY_DSN=
+    - TRAFFIC_SENTRY_ENVIRONMENT=development
 
-goautowp:
-  image: autowp/goautowp
-  container_name: autowp_test_goautowp
-  restart: always
-  links:
-  - rabbitmq
-  - mysql
-  volumes:
-  - ./goautowp/logs:/var/log
-  - ./public_html/pictures:/app/pictures:ro
-  environment:
-  - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
-  - AUTOWP_RABBITMQ_PORT=5672
-  - AUTOWP_DUPLICATE_FINDER_QUEUE=duplicate_finder
-  - AUTOWP_MYSQL_DSN=autowp_test:test@tcp(autowp_test_mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
-  - AUTOWP_MIGRATIONS_DSN=mysql://autowp_test:test@tcp(autowp_test_mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
-  - AUTOWP_SENTRY_DSN=
-  - AUTOWP_SENTRY_ENVIRONMENT=development
-  - AUTOWP_IMAGES_DIR=/app/pictures
-  - AUTOWP_MIGRATIONS_DIR=/app/migrations
+  traffic-mysql:
+    image: mysql:8
+    container_name: autowp_test_traffic_mysql
+    restart: always
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_DATABASE=traffic
 
-auth:
-  image: autowp/auth
-  container_name: autowp_test_auth
-  restart: always
-  volumes:
-  - "./auth-config.yaml:/config.yaml:ro"
-  links:
-  - auth-postgres
-  - mysql
-  expose:
-  - "8080"
-  ports:
-  - "8080:8080"
+  goautowp:
+    image: autowp/goautowp
+    container_name: autowp_test_goautowp
+    restart: always
+    depends_on:
+    - rabbitmq
+    - mysql
+    volumes:
+    - ./goautowp/logs:/var/log
+    - ./public_html/pictures:/app/pictures:ro
+    environment:
+    - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
+    - AUTOWP_RABBITMQ_PORT=5672
+    - AUTOWP_DUPLICATE_FINDER_QUEUE=duplicate_finder
+    - AUTOWP_MYSQL_DSN=autowp_test:test@tcp(autowp_test_mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
+    - AUTOWP_MIGRATIONS_DSN=mysql://autowp_test:test@tcp(autowp_test_mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
+    - AUTOWP_SENTRY_DSN=
+    - AUTOWP_SENTRY_ENVIRONMENT=development
+    - AUTOWP_IMAGES_DIR=/app/pictures
+    - AUTOWP_MIGRATIONS_DIR=/app/migrations
 
-auth-postgres:
-  image: postgres:12
-  container_name: autowp_test_auth_postgres
-  environment:
-    - POSTGRES_PASSWORD=password
-    - POSTGRES_USER=auth
-    - POSTGRES_DB=auth
-  ports:
-    - "5432:5432"
+  auth:
+    image: autowp/auth
+    container_name: autowp_test_auth
+    restart: always
+    volumes:
+    - "./auth-config.yaml:/config.yaml:ro"
+    depends_on:
+    - auth-postgres
+    - mysql
+    expose:
+    - "8080"
+    ports:
+    - "8080:8080"
+
+  auth-postgres:
+    image: postgres:12
+    container_name: autowp_test_auth_postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=auth
+      - POSTGRES_DB=auth
+    ports:
+      - "5432:5432"
