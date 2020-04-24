@@ -399,7 +399,9 @@ class ItemHydrator extends AbstractRestHydrator
         }
 
         if ($this->filterComposite->filter('specs_route')) {
-            $result['specs_route'] = $this->getSpecificationsRoute($object['id']);
+            if (in_array($object['item_type_id'], [Item::CATEGORY, Item::ENGINE, Item::TWINS, Item::VEHICLE])) {
+                $result['specs_route'] = $this->getSpecificationsRoute($object['id']);
+            }
         }
 
         if ($this->filterComposite->filter('can_edit_specs')) {
