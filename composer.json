@@ -19,12 +19,11 @@
 		"ext-json" : "*",
 		"ext-intl" : "*",
 		"ext-gd" : "*",
-        "ext-fileinfo" : "*",
-        "ext-bcmath": "*",
+    "ext-fileinfo" : "*",
+    "ext-bcmath": "*",
 		"irazasyed/telegram-bot-sdk" : "2.0.x-dev",
 		"phayes/geophp" : "^1.2",
 		"michelf/php-markdown" : "^1.8.0",
-		"autowp/external-login-service" : "^2.0.0",
 		"autowp/textstorage" : "^3.0.1",
 		"autowp/zf-components" : "^3.0.3",
 		"laminas/laminas-cache" : ">=2.8.2",
@@ -69,7 +68,7 @@
 		}
 	},
 	"require-dev" : {
-        "phpunit/phpunit": "^9.0",
+    "phpunit/phpunit": "^9.0",
 		"laminas/laminas-test" : "^3.3",
 		"php-coveralls/php-coveralls" : "^2.2",
 		"phpmd/phpmd" : "^2.7",
@@ -77,8 +76,8 @@
 		"wapmorgan/php-code-fixer": "^2.0",
 		"phan/phan": "^2.4.5",
 		"sensiolabs/security-checker": "^6.0",
-        "laminas/laminas-coding-standard": "^2.0.0rc1"
-    },
+    "laminas/laminas-coding-standard": "^2.0.0rc1"
+  },
 	"autoload-dev" : {
 		"psr-4" : {
 			"AutowpTest\\" : "test/",

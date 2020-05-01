@@ -17,7 +17,6 @@ return [
         'Autowp\\User',
         'Autowp\\Comments',
         'Autowp\\Cron',
-        'Autowp\\ExternalLoginService',
         'Autowp\\Forums',
         'Autowp\\Image',
         'Autowp\\Message',

@@ -2,11 +2,6 @@
 
 namespace Application;
 
-use Autowp\ExternalLoginService\Facebook;
-use Autowp\ExternalLoginService\Github;
-use Autowp\ExternalLoginService\GooglePlus;
-use Autowp\ExternalLoginService\Twitter;
-use Autowp\ExternalLoginService\Vk;
 use Autowp\ZFComponents\Resources;
 use Exception;
 use Laminas\Cache\Service\StorageCacheAbstractServiceFactory;
@@ -282,36 +277,6 @@ return [
             Validator\User\EmailNotExists::class         => Validator\User\EmailNotExistsFactory::class,
             Validator\User\Login::class                  => Validator\User\LoginFactory::class,
             Validator\DateString::class                  => InvokableFactory::class,
-        ],
-    ],
-
-    'external_login_services' => [
-        Vk::class         => [
-            'clientId'     => getenv('AUTOWP_ELS_VK_CLIENTID'),
-            'clientSecret' => getenv('AUTOWP_ELS_VK_SECRET'),
-            'redirectUri'  => 'https://en.' . $host . '/api/login/callback',
-        ],
-        GooglePlus::class => [
-            'clientId'     => getenv('AUTOWP_ELS_GOOGLEPLUS_CLIENTID'),
-            'clientSecret' => getenv('AUTOWP_ELS_GOOGLEPLUS_SECRET'),
-            'redirectUri'  => 'https://en.' . $host . '/api/login/callback',
-        ],
-        Twitter::class    => [
-            'consumerKey'    => getenv('AUTOWP_ELS_TWITTER_CLIENTID'),
-            'consumerSecret' => getenv('AUTOWP_ELS_TWITTER_SECRET'),
-            'redirectUri'    => 'https://en.' . $host . '/api/login/callback',
-        ],
-        Facebook::class   => [
-            'clientId'        => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
-            'clientSecret'    => getenv('AUTOWP_ELS_FACEBOOK_SECRET'),
-            'scope'           => ['public_profile'],
-            'graphApiVersion' => 'v3.2',
-            'redirectUri'     => 'https://en.' . $host . '/api/login/callback',
-        ],
-        Github::class     => [
-            'clientId'     => getenv('AUTOWP_ELS_GITHUB_CLIENTID'),
-            'clientSecret' => getenv('AUTOWP_ELS_GITHUB_SECRET'),
-            'redirectUri'  => 'https://en.' . $host . '/api/login/callback',
         ],
     ],
 

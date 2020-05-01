@@ -14,11 +14,8 @@ class AccountControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): AccountController
     {
-        $tables = $container->get('TableManager');
         return new AccountController(
-            $container->get(UserAccount::class),
-            $container->get('ExternalLoginServiceManager'),
-            $tables->get('login_state')
+            $container->get(UserAccount::class)
         );
     }
 }

@@ -73,7 +73,6 @@ return [
                 => Controller\Api\Service\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LanguageController::class => Controller\Api\LanguageControllerFactory::class,
             Controller\Api\LogController::class      => Controller\Api\Service\LogControllerFactory::class,
-            Controller\Api\LoginController::class    => Controller\Api\LoginControllerFactory::class,
             Controller\Api\MapController::class      => Controller\Api\MapControllerFactory::class,
             Controller\Api\MessageController::class  => Controller\Api\MessageControllerFactory::class,
             Controller\Api\MostsController::class    => Controller\Api\MostsControllerFactory::class,
@@ -1964,72 +1963,6 @@ return [
                                     'verb'     => 'get',
                                     'defaults' => [
                                         'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'login'                       => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/login',
-                            'defaults' => [
-                                'controller' => Controller\Api\LoginController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'services' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/services',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'services',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'login'    => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'login',
-                                    ],
-                                ],
-                            ],
-                            'logout'   => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'delete',
-                                    'defaults' => [
-                                        'action' => 'delete',
-                                    ],
-                                ],
-                            ],
-                            'start'    => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/start',
-                                    'defaults' => [
-                                        'action' => 'start',
-                                    ],
-                                ],
-                            ],
-                            'callback' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/callback',
-                                    'defaults' => [
-                                        'action' => 'callback',
                                     ],
                                 ],
                             ],

@@ -15,27 +15,6 @@ return [
                     ],
                 ],
             ],
-            'login'  => [
-                'type'          => 'Literal',
-                'options'       => [
-                    'route'    => '/login',
-                    'defaults' => [
-                        'controller' => Controller\Api\LoginController::class,
-                    ],
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'callback' => [
-                        'type'    => 'Literal',
-                        'options' => [
-                            'route'    => '/callback',
-                            'defaults' => [
-                                'action' => 'callback',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
             'yandex' => [
                 'type'          => 'Literal',
                 'options'       => [

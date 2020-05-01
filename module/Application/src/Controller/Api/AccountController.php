@@ -3,12 +3,7 @@
 namespace Application\Controller\Api;
 
 use Application\Model\UserAccount;
-use Autowp\ExternalLoginService\AbstractService;
-use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\User\Controller\Plugin\User;
-use Exception;
-use Laminas\Db\Sql;
-use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
@@ -25,18 +20,9 @@ class AccountController extends AbstractRestfulController
 {
     private UserAccount $userAccount;
 
-    private ExternalLoginServices $externalLoginServices;
-
-    private TableGateway $loginStateTable;
-
-    public function __construct(
-        UserAccount $userAccount,
-        ExternalLoginServices $externalLoginServices,
-        TableGateway $loginStateTable
-    ) {
-        $this->userAccount           = $userAccount;
-        $this->externalLoginServices = $externalLoginServices;
-        $this->loginStateTable       = $loginStateTable;
+    public function __construct(UserAccount $userAccount)
+    {
+        $this->userAccount = $userAccount;
     }
 
     private function canRemoveAccount(int $id): bool
@@ -78,59 +64,6 @@ class AccountController extends AbstractRestfulController
 
         return new JsonModel([
             'items' => $accounts,
-        ]);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getExternalLoginService(string $serviceId): AbstractService
-    {
-        $service = $this->externalLoginServices->get($serviceId);
-
-        if (! $service) {
-            throw new Exception("Service `$serviceId` not found");
-        }
-        return $service;
-    }
-
-    /**
-     * @suppress PhanDeprecatedFunction
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function startAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        $request = $this->getRequest();
-
-        $params = $this->processBodyContent($request);
-
-        $serviceId = $params['service'] ?? null;
-
-        if (! $serviceId) {
-            return $this->notFoundAction();
-        }
-
-        $service = $this->getExternalLoginService($serviceId);
-
-        $loginUrl = $service->getLoginUrl();
-
-        $this->loginStateTable->insert([
-            'state'    => $service->getState(),
-            'time'     => new Sql\Expression('now()'),
-            'user_id'  => $user['id'],
-            'language' => $this->language(),
-            'service'  => $serviceId,
-            'url'      => '/account/accounts',
-        ]);
-
-        return new JsonModel([
-            'url' => $loginUrl,
         ]);
     }
 
