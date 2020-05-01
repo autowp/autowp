@@ -1,4 +1,4 @@
-<?php
+createIconsSprite<?php
 
 namespace Application\Model;
 
@@ -407,16 +407,25 @@ class Brand
 
         $background = $format->getBackground();
 
+        $tmpDir = sys_get_temp_dir() . '/brands-sprite/';
+        mkdir($tmpDir, 0777, true);
+
         foreach ($list as $brand) {
             $img = false;
             if ($brand['logo_id']) {
-                $img = $imageStorage->getFormatedImagePath($brand['logo_id'], self::ICON_FORMAT);
+                $img = $imageStorage->getFormatedImage($brand['logo_id'], self::ICON_FORMAT);
             }
 
             if ($img) {
-                $img              = str_replace('http://i.wheelsage.org/', PUBLIC_DIR . '/', $img);
                 $catname          = str_replace('.', '_', $brand['catname']);
-                $images[$catname] = escapeshellarg($img);
+                $path             = $tmpDir . $catname . '.png';
+                $images[$catname] = escapeshellarg($path);
+
+                echo "Download `{$img->getSrc()}` ...\n";
+                $success = file_put_contents($path, fopen($img->getSrc(), 'r'));
+                if ($success === false) {
+                    throw new \Exception("Failed to download `$img`");
+                }
             }
         }
 
