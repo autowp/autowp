@@ -1990,7 +1990,9 @@ class ItemController extends AbstractRestfulController
 
         $oldImageId = $item['logo_id'];
 
-        $imageId = $this->imageStorage()->addImageFromFile($values['file']['tmp_name'], 'brand');
+        $imageId = $this->imageStorage()->addImageFromFile($values['file']['tmp_name'], 'brand', [
+          's3' => true,
+        ]);
 
         $this->itemModel->getTable()->update([
             'logo_id' => $imageId,
