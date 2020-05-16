@@ -3,8 +3,6 @@
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\ItemHydrator;
-use Application\Model\Item;
-use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use Application\Service\Mosts;
@@ -23,8 +21,6 @@ class MostsControllerFactory implements FactoryInterface
         $hydrators = $container->get('HydratorManager');
         return new MostsController(
             $container->get(Service::class),
-            $container->get(Item::class),
-            $container->get(Perspective::class),
             $container->get(Mosts::class),
             $container->get(Picture::class),
             $hydrators->get(ItemHydrator::class),

@@ -32,12 +32,12 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
 
             /** @var OAuth $oauth */
             $oauth  = $serviceManager->get(OAuth::class);
-            $userID = $oauth->getUserID();
-            
-            if ($userID) {
+            $userId = $oauth->getUserID();
+
+            if ($userId) {
                 /** @var User $userModel */
                 $userModel = $serviceManager->get(User::class);
-                $userModel->registerVisit($userID, $request);
+                $userModel->registerVisit($userId, $request);
             }
         }
     }

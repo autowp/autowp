@@ -2,7 +2,6 @@
 
 namespace Application\Hydrator\Api;
 
-use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
 use ArrayAccess;
@@ -11,7 +10,6 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -21,29 +19,19 @@ use function is_array;
 
 class AttrUserValueHydrator extends AbstractRestHydrator
 {
-    private int $userId = 0;
-
     private Item $item;
 
     private User $userModel;
 
     private SpecificationsService $specService;
 
-    private ItemNameFormatter $itemNameFormatter;
-
-    private TreeRouteStack $router;
-
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->userId = 0;
-
-        $this->item              = $serviceManager->get(Item::class);
-        $this->userModel         = $serviceManager->get(User::class);
-        $this->specService       = $serviceManager->get(SpecificationsService::class);
-        $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
-        $this->router            = $serviceManager->get('HttpRouter');
+        $this->item        = $serviceManager->get(Item::class);
+        $this->userModel   = $serviceManager->get(User::class);
+        $this->specService = $serviceManager->get(SpecificationsService::class);
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('user', $strategy);
@@ -80,8 +68,6 @@ class AttrUserValueHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->userId = $userId;
-
         $this->getStrategy('user')->setUserId($userId);
         $this->getStrategy('item')->setUserId($userId);
 

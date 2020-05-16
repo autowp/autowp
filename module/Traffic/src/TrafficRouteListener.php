@@ -104,12 +104,12 @@ class TrafficRouteListener extends AbstractListenerAggregate
             /** @var OAuth $oauth */
             $oauth = $serviceManager->get(OAuth::class);
 
-            $userID = $oauth->getUserID();
+            $userId = $oauth->getUserID();
 
             $unlimitedTraffic = false;
-            if ($userID) {
+            if ($userId) {
                 $userModel = $serviceManager->get(User::class);
-                $user      = $userModel->getRow(['id' => $userID]);
+                $user      = $userModel->getRow(['id' => $userId]);
 
                 if ($user) {
                     $acl              = $serviceManager->get(Acl::class);

@@ -6,7 +6,6 @@ use Application\Comments;
 use Application\DuplicateFinder;
 use Application\Model\Item;
 use Application\Model\ItemParent;
-use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
@@ -54,7 +53,7 @@ class PictureHydrator extends AbstractRestHydrator
 
     private ?string $userRole;
 
-    private int $itemID = 0;
+    private int $itemId = 0;
 
     private array $paginator;
 
@@ -73,8 +72,6 @@ class PictureHydrator extends AbstractRestHydrator
     private TextStorage\Service $textStorage;
 
     private PictureView $pictureView;
-
-    private Perspective $perspective;
 
     private PictureModerVote $pictureModerVote;
 
@@ -106,7 +103,6 @@ class PictureHydrator extends AbstractRestHydrator
         $this->pictureItem          = $serviceManager->get(PictureItem::class);
         $this->imageStorage         = $serviceManager->get(Image\Storage::class);
         $this->textStorage          = $serviceManager->get(TextStorage\Service::class);
-        $this->perspective          = $serviceManager->get(Perspective::class);
 
         $this->linksTable = $serviceManager->get('TableManager')->get('links');
 
@@ -176,7 +172,7 @@ class PictureHydrator extends AbstractRestHydrator
         }
 
         if (isset($options['item_id'])) {
-            $this->itemID = (int) $options['item_id'];
+            $this->itemId = (int) $options['item_id'];
         }
 
         if (isset($options['paginator'])) {
@@ -202,12 +198,12 @@ class PictureHydrator extends AbstractRestHydrator
     /**
      * @throws Exception
      */
-    private function getPath(int $pictureID, int $targetItemID): array
+    private function getPath(int $pictureId, int $targetItemId): array
     {
-        $piRows = $this->pictureItem->getPictureItemsData($pictureID, PictureItem::PICTURE_CONTENT);
+        $piRows = $this->pictureItem->getPictureItemsData($pictureId, PictureItem::PICTURE_CONTENT);
         $result = [];
         foreach ($piRows as $piRow) {
-            $item = $this->getItemRoute($piRow['item_id'], $targetItemID);
+            $item = $this->getItemRoute($piRow['item_id'], $targetItemId);
             if ($item) {
                 $result[] = [
                     'type'           => (int) $piRow['type'],
@@ -222,10 +218,10 @@ class PictureHydrator extends AbstractRestHydrator
     /**
      * @throws Exception
      */
-    private function getItemRoute(int $itemID, int $targetItemID): ?array
+    private function getItemRoute(int $itemId, int $targetItemId): ?array
     {
         $row = $this->itemModel->getRow([
-            'id' => $itemID,
+            'id' => $itemId,
         ]);
         if (! $row) {
             return null;
@@ -233,10 +229,10 @@ class PictureHydrator extends AbstractRestHydrator
 
         $parents = [];
         if (in_array($row['item_type_id'], [Item::CATEGORY, Item::ENGINE, Item::VEHICLE])) {
-            $parents = $this->getItemParentRoute($row['id'], $targetItemID);
+            $parents = $this->getItemParentRoute($row['id'], $targetItemId);
         }
 
-        $isMatched = ! $targetItemID || $parents || $itemID === $targetItemID;
+        $isMatched = ! $targetItemId || $parents || $itemId === $targetItemId;
         if (! $isMatched) {
             return null;
         }
@@ -251,11 +247,11 @@ class PictureHydrator extends AbstractRestHydrator
     /**
      * @throws Exception
      */
-    private function getItemParentRoute(int $itemID, int $targetItemID): array
+    private function getItemParentRoute(int $itemId, int $targetItemId): array
     {
         $result = [];
-        foreach ($this->itemParentModel->getParentRows($itemID) as $row) {
-            $item = $this->getItemRoute($row['parent_id'], $targetItemID);
+        foreach ($this->itemParentModel->getParentRows($itemId) as $row) {
+            $item = $this->getItemRoute($row['parent_id'], $targetItemId);
             if ($item) {
                 $result[] = [
                     'catname' => $row['catname'],
@@ -323,7 +319,7 @@ class PictureHydrator extends AbstractRestHydrator
         }
 
         if ($this->filterComposite->filter('path')) {
-            $picture['path'] = $this->getPath($object['id'], $this->itemID);
+            $picture['path'] = $this->getPath($object['id'], $this->itemId);
         }
 
         if ($this->filterComposite->filter('paginator') && $this->paginator) {

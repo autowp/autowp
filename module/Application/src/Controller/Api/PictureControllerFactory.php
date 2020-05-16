@@ -8,7 +8,6 @@ use Application\Hydrator\Api\PictureHydrator;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
 use Application\Model\Item;
-use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
@@ -38,7 +37,6 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(PictureItem::class),
             $container->get(DuplicateFinder::class),
             $container->get(UserPicture::class),
-            $container->get(Log::class),
             $container->get(HostManager::class),
             $container->get(TelegramService::class),
             $container->get(MessageService::class),

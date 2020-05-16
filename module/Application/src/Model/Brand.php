@@ -1,4 +1,4 @@
-createIconsSprite<?php
+<?php
 
 namespace Application\Model;
 
@@ -18,10 +18,12 @@ use function escapeshellarg;
 use function exec;
 use function file_put_contents;
 use function floor;
+use function fopen;
 use function implode;
 use function is_numeric;
 use function mb_strtoupper;
 use function mb_substr;
+use function mkdir;
 use function ord;
 use function preg_match;
 use function sprintf;
@@ -424,7 +426,7 @@ class Brand
                 echo "Download `{$img->getSrc()}` ...\n";
                 $success = file_put_contents($path, fopen($img->getSrc(), 'r'));
                 if ($success === false) {
-                    throw new \Exception("Failed to download `$img`");
+                    throw new Exception("Failed to download `$img`");
                 }
             }
         }

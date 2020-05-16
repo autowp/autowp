@@ -14,8 +14,6 @@ use function is_array;
 
 class LogHydrator extends AbstractRestHydrator
 {
-    private int $userId = 0;
-
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
@@ -61,8 +59,6 @@ class LogHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->userId = $userId;
-
         $this->getStrategy('user')->setUserId($userId);
         $this->getStrategy('pictures')->setUserId($userId);
         $this->getStrategy('items')->setUserId($userId);

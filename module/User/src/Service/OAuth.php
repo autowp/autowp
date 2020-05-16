@@ -15,7 +15,7 @@ class OAuth
 
     private string $key;
 
-    private int $userID;
+    private int $userId;
 
     public function __construct(Request $request, string $key)
     {
@@ -25,7 +25,7 @@ class OAuth
 
     public function getUserID(): int
     {
-        if (! isset($this->userID)) {
+        if (! isset($this->userId)) {
             $header = $this->request->getHeader('Authorization');
             if (! $header) {
                 return 0;
@@ -38,17 +38,17 @@ class OAuth
             if ($parts[0] !== 'Bearer') {
                 return 0;
             }
-            
+
             try {
                 $decoded = JWT::decode($parts[1], $this->key, ['HS512']);
-                $userID  = (int) ($decoded->sub ?? 0);
+                $userId  = (int) ($decoded->sub ?? 0);
             } catch (UnexpectedValueException $e) {
-                $userID = 0;
+                $userId = 0;
             }
 
-            $this->userID = $userID;
+            $this->userId = $userId;
         }
 
-        return $this->userID;
+        return $this->userId;
     }
 }

@@ -4,8 +4,6 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Catalogue;
-use Application\Model\Item;
-use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use Application\Service\Mosts;
@@ -29,8 +27,6 @@ class MostsController extends AbstractActionController
 {
     private TextStorage\Service $textStorage;
 
-    private Perspective $perspective;
-
     private Mosts $mosts;
 
     private Picture $picture;
@@ -39,12 +35,8 @@ class MostsController extends AbstractActionController
 
     private PictureNameFormatter $pictureNameFormatter;
 
-    private Item $itemModel;
-
     public function __construct(
         TextStorage\Service $textStorage,
-        Item $itemModel,
-        Perspective $perspective,
         Mosts $mosts,
         Picture $picture,
         AbstractRestHydrator $itemHydrator,
@@ -52,8 +44,6 @@ class MostsController extends AbstractActionController
     ) {
         $this->itemHydrator         = $itemHydrator;
         $this->textStorage          = $textStorage;
-        $this->itemModel            = $itemModel;
-        $this->perspective          = $perspective;
         $this->mosts                = $mosts;
         $this->picture              = $picture;
         $this->pictureNameFormatter = $pictureNameFormatter;
@@ -72,14 +62,14 @@ class MostsController extends AbstractActionController
         $yearsCatname   = (string) $this->params()->fromQuery('years_catname');
         $carTypeCatname = (string) $this->params()->fromQuery('type_catname');
         $mostCatname    = (string) $this->params()->fromQuery('rating_catname');
-        $brandID        = (int) $this->params()->fromQuery('brand_id');
+        $brandId        = (int) $this->params()->fromQuery('brand_id');
 
         $list = $this->mosts->getItems([
             'language' => $language,
             'most'     => $mostCatname,
             'years'    => $yearsCatname,
             'carType'  => $carTypeCatname,
-            'brandId'  => $brandID,
+            'brandId'  => $brandId,
         ]);
 
         // images
@@ -168,12 +158,12 @@ class MostsController extends AbstractActionController
 
     public function getMenuAction(): JsonModel
     {
-        $brandID = (int) $this->params()->fromQuery('brand_id');
+        $brandId = (int) $this->params()->fromQuery('brand_id');
 
         return new JsonModel([
             'years'         => $this->mosts->getYearsMenu(),
             'ratings'       => $this->mosts->getRatingsMenu(),
-            'vehilce_types' => $this->mosts->getCarTypes($brandID),
+            'vehilce_types' => $this->mosts->getCarTypes($brandId),
         ]);
     }
 }

@@ -22,7 +22,6 @@ class CommentsFactory implements FactoryInterface
         $tables = $container->get('TableManager');
         return new Comments(
             $container->get(CommentsService::class),
-            $container->get('HttpRouter'),
             $container->get(HostManager::class),
             $container->get(MessageService::class),
             $container->get('MvcTranslator'),

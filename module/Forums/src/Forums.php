@@ -146,10 +146,10 @@ class Forums
 
         $messages = $this->comments->getTotalMessagesCount([
             'type' => AppComments::FORUMS_TYPE_ID,
-            'callback'
-                /**
+            /**
                  * @suppress PhanPluginMixedKeyNoKey
                  */
+            'callback'
                 => function (Sql\Select $select) use ($theme) {
                     $select
                         ->join('forums_topics', 'comment_message.item_id = forums_topics.id', [])

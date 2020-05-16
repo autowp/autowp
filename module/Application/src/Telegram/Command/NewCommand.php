@@ -18,17 +18,13 @@ class NewCommand extends Command
 
     private TableGateway $telegramItemTable;
 
-    private TableGateway $telegramChatTable;
-
     private TableGateway $itemTable;
 
     public function __construct(
         TableGateway $telegramItemTable,
-        TableGateway $telegramChatTable,
         TableGateway $itemTable
     ) {
         $this->telegramItemTable = $telegramItemTable;
-        $this->telegramChatTable = $telegramChatTable;
         $this->itemTable         = $itemTable;
     }
 

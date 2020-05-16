@@ -35,8 +35,7 @@ class IndexControllerFactory implements FactoryInterface
             $container->get(CarOfDay::class),
             $container->get(Catalogue::class),
             $hydrators->get(ItemHydrator::class),
-            $hydrators->get(UserHydrator::class),
-            $container->get('HttpRouter')
+            $hydrators->get(UserHydrator::class)
         );
     }
 }

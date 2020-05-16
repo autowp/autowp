@@ -6,74 +6,24 @@ use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
 use ArrayAccess;
-use Autowp\User\Model\User;
 use Exception;
-use Laminas\Hydrator\Exception\InvalidArgumentException;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use Laminas\Stdlib\ArrayUtils;
-use Traversable;
-
-use function is_array;
 
 class AttrConflictHydrator extends AbstractRestHydrator
 {
-    private int $userId = 0;
-
     private Item $item;
-
-    private User $userModel;
 
     private SpecificationsService $specService;
 
     private ItemNameFormatter $itemNameFormatter;
 
-    private TreeRouteStack $router;
-
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->userId = 0;
-
         $this->item              = $serviceManager->get(Item::class);
-        $this->userModel         = $serviceManager->get(User::class);
         $this->specService       = $serviceManager->get(SpecificationsService::class);
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
-        $this->router            = $serviceManager->get('HttpRouter');
-    }
-
-    /**
-     * @param  array|Traversable $options
-     * @throws InvalidArgumentException
-     */
-    public function setOptions($options): self
-    {
-        parent::setOptions($options);
-
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new InvalidArgumentException(
-                'The options parameter must be an array or a Traversable'
-            );
-        }
-
-        if (isset($options['user_id'])) {
-            $this->setUserId($options['user_id']);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param int|null $userId
-     */
-    public function setUserId($userId = null): self
-    {
-        $this->userId = $userId;
-
-        return $this;
     }
 
     /**

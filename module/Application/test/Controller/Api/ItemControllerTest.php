@@ -742,28 +742,28 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     public function testPath(): void
     {
         $topCatname = 'top' . microtime(true);
-        $categoryID = $this->createItem([
+        $categoryId = $this->createItem([
             'item_type_id' => Item::CATEGORY,
             'name'         => 'top level',
             'catname'      => $topCatname,
         ]);
 
         $lvl2Catname    = 'lvl2' . microtime(true);
-        $lvl2CategoryID = $this->createItem([
+        $lvl2CategoryId = $this->createItem([
             'item_type_id' => Item::CATEGORY,
             'name'         => 'sub level',
             'catname'      => $lvl2Catname,
         ]);
 
         $lvl3Catname    = 'lvl3' . microtime(true);
-        $lvl3CategoryID = $this->createItem([
+        $lvl3CategoryId = $this->createItem([
             'item_type_id' => Item::CATEGORY,
             'name'         => 'sub level',
             'catname'      => $lvl3Catname,
         ]);
 
-        $this->addItemParent($lvl2CategoryID, $categoryID);
-        $this->addItemParent($lvl3CategoryID, $lvl2CategoryID);
+        $this->addItemParent($lvl2CategoryId, $categoryId);
+        $this->addItemParent($lvl3CategoryId, $lvl2CategoryId);
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());

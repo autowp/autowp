@@ -2,7 +2,6 @@
 
 namespace Application;
 
-use Application\Model\Picture;
 use ArrayAccess;
 use Exception;
 use Laminas\I18n\Translator\TranslatorInterface;
@@ -21,18 +20,14 @@ class PictureNameFormatter
 
     private PhpRenderer $renderer;
 
-    private Picture $picture;
-
     public function __construct(
         TranslatorInterface $translator,
         PhpRenderer $renderer,
-        ItemNameFormatter $itemNameFormatter,
-        Picture $picture
+        ItemNameFormatter $itemNameFormatter
     ) {
         $this->translator        = $translator;
         $this->renderer          = $renderer;
         $this->itemNameFormatter = $itemNameFormatter;
-        $this->picture           = $picture;
     }
 
     private static function mbUcfirst(string $str): string

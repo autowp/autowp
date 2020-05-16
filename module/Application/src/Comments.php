@@ -13,7 +13,6 @@ use InvalidArgumentException;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\I18n\Translator\TranslatorInterface;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\Uri\Uri;
 
 use function array_walk;
@@ -34,8 +33,6 @@ class Comments
 
     private CommentsService $service;
 
-    private TreeRouteStack $router;
-
     private HostManager $hostManager;
 
     private MessageService $message;
@@ -52,7 +49,6 @@ class Comments
 
     public function __construct(
         CommentsService $service,
-        TreeRouteStack $router,
         HostManager $hostManager,
         MessageService $message,
         TranslatorInterface $translator,
@@ -62,7 +58,6 @@ class Comments
         User $userModel
     ) {
         $this->service      = $service;
-        $this->router       = $router;
         $this->hostManager  = $hostManager;
         $this->message      = $message;
         $this->translator   = $translator;

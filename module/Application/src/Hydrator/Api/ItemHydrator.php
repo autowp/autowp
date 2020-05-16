@@ -3,7 +3,6 @@
 namespace Application\Hydrator\Api;
 
 use Application\Comments;
-use Application\Controller\Plugin\Pic;
 use Application\ItemNameFormatter;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
@@ -25,7 +24,6 @@ use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Permissions\Acl\Acl;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -46,13 +44,9 @@ class ItemHydrator extends AbstractRestHydrator
 
     private ItemNameFormatter $itemNameFormatter;
 
-    private TreeRouteStack $router;
-
     private TableGateway $specTable;
 
     private Catalogue $catalogue;
-
-    private Pic $picHelper;
 
     private SpecificationsService $specsService;
 
@@ -88,7 +82,7 @@ class ItemHydrator extends AbstractRestHydrator
 
     private int $mostsMinCarsCount = 1;
 
-    private int $routeBrandID = 0;
+    private int $routeBrandId = 0;
 
     private array $cataloguePaths = [];
 
@@ -111,7 +105,6 @@ class ItemHydrator extends AbstractRestHydrator
         $this->specificationsService = $serviceManager->get(SpecificationsService::class);
 
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
-        $this->router            = $serviceManager->get('HttpRouter');
 
         $this->itemModel  = $serviceManager->get(Item::class);
         $this->itemParent = $serviceManager->get(ItemParent::class);
@@ -120,8 +113,6 @@ class ItemHydrator extends AbstractRestHydrator
         $this->textStorage = $serviceManager->get(TextStorage\Service::class);
 
         $this->catalogue = $serviceManager->get(Catalogue::class);
-
-        $this->picHelper = $serviceManager->get('ControllerPluginManager')->get('pic');
 
         $this->specsService = $serviceManager->get(SpecificationsService::class);
 
@@ -190,7 +181,7 @@ class ItemHydrator extends AbstractRestHydrator
         }
 
         if (isset($options['route_brand_id'])) {
-            $this->routeBrandID = (int) $options['route_brand_id'];
+            $this->routeBrandId = (int) $options['route_brand_id'];
         }
 
         return $this;
@@ -277,9 +268,9 @@ class ItemHydrator extends AbstractRestHydrator
     /**
      * @return string[]|null
      */
-    public function getDetailsRoute(int $itemID, array $options): ?array
+    public function getDetailsRoute(int $itemId, array $options): ?array
     {
-        $cataloguePaths = $this->getCataloguePath($itemID, $options);
+        $cataloguePaths = $this->getCataloguePath($itemId, $options);
 
         foreach ($cataloguePaths as $cPath) {
             return array_merge(['/', $cPath['brand_catname'], $cPath['car_catname']], $cPath['path']);
@@ -291,15 +282,15 @@ class ItemHydrator extends AbstractRestHydrator
     /**
      * @return string[]|null
      */
-    public function getSpecificationsRoute(int $itemID): ?array
+    public function getSpecificationsRoute(int $itemId): ?array
     {
-        $hasSpecs = $this->specsService->hasSpecs($itemID);
+        $hasSpecs = $this->specsService->hasSpecs($itemId);
 
         if (! $hasSpecs) {
             return null;
         }
 
-        $cataloguePaths = $this->getCataloguePath($itemID, [
+        $cataloguePaths = $this->getCataloguePath($itemId, [
             'toBrand'      => true,
             'breakOnFirst' => true,
         ]);
@@ -730,7 +721,7 @@ class ItemHydrator extends AbstractRestHydrator
                 case Item::VEHICLE:
                     $route = $this->getDetailsRoute($object['id'], [
                         'breakOnFirst' => true,
-                        'toBrand'      => $this->routeBrandID,
+                        'toBrand'      => $this->routeBrandId,
                         'stockFirst'   => true,
                     ]);
                     break;

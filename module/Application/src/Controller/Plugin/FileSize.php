@@ -3,18 +3,14 @@
 namespace Application\Controller\Plugin;
 
 use Application\FileSize as AppFileSize;
-use Application\Language;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class FileSize extends AbstractPlugin
 {
     private AppFileSize $filesize;
 
-    private Language $language;
-
-    public function __construct(Language $language, AppFileSize $filesize)
+    public function __construct(AppFileSize $filesize)
     {
-        $this->language = $language;
         $this->filesize = $filesize;
     }
 

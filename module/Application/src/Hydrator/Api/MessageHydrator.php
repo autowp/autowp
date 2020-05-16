@@ -8,7 +8,6 @@ use Autowp\User\Model\User;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -17,13 +16,9 @@ use function is_array;
 
 class MessageHydrator extends AbstractRestHydrator
 {
-    private int $userId = 0;
-
     private User $userModel;
 
     private UserText $userText;
-
-    private TreeRouteStack $router;
 
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
@@ -44,8 +39,6 @@ class MessageHydrator extends AbstractRestHydrator
 
         $strategy = new Strategy\Items($serviceManager);
         $this->addStrategy('items', $strategy);
-
-        $this->router = $serviceManager->get('HttpRouter');
     }
 
     /**
@@ -76,8 +69,6 @@ class MessageHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->userId = $userId;
-
         $this->getStrategy('author')->setUserId($userId);
 
         return $this;

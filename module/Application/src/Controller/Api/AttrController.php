@@ -3,10 +3,8 @@
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
-use Application\Model\Item;
 use Application\Service\SpecificationsService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
-use Autowp\User\Model\User;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
@@ -32,11 +30,7 @@ use function strlen;
  */
 class AttrController extends AbstractRestfulController
 {
-    private Item $item;
-
     private SpecificationsService $specsService;
-
-    private User $userModel;
 
     private AbstractRestHydrator $conflictHydrator;
 
@@ -83,9 +77,7 @@ class AttrController extends AbstractRestfulController
     private TableGateway $listOptionTable;
 
     public function __construct(
-        Item $item,
         SpecificationsService $specsService,
-        User $userModel,
         AbstractRestHydrator $conflictHydrator,
         AbstractRestHydrator $userValueHydrator,
         AbstractRestHydrator $attributeHydrator,
@@ -108,9 +100,7 @@ class AttrController extends AbstractRestfulController
         TableGateway $typeTable,
         TableGateway $listOptionTable
     ) {
-        $this->item                          = $item;
         $this->specsService                  = $specsService;
-        $this->userModel                     = $userModel;
         $this->conflictHydrator              = $conflictHydrator;
         $this->conflictListInputFilter       = $conflictListInputFilter;
         $this->userValueTable                = $specsService->getUserValueTable();

@@ -474,10 +474,10 @@ class ItemParentController extends AbstractRestfulController
         return $u->toString();
     }
 
-    private function itemModerUrl(int $itemID, Uri $uri): string
+    private function itemModerUrl(int $itemId, Uri $uri): string
     {
         $u = clone $uri;
-        $u->setPath('/moder/items/item/' . $itemID);
+        $u->setPath('/moder/items/item/' . $itemId);
 
         return $u->toString();
     }

@@ -98,8 +98,7 @@ return [
             ],
         ],
     ],
-
-    'service_manager' => [
+    'service_manager'    => [
         'factories'          => [
             Acl::class                           => Permissions\AclFactory::class,
             Comments::class                      => Service\CommentsFactory::class,
@@ -142,14 +141,12 @@ return [
             StorageCacheAbstractServiceFactory::class,
         ],
     ],
-
-    'telegram' => [
+    'telegram'           => [
         'accessToken' => getenv('AUTOWP_TELEGRAM_ACCESS_TOKEN'),
         'token'       => getenv('AUTOWP_TELEGRAM_TOKEN'),
         'webhook'     => 'https://www.autowp.ru/telegram/webhook/token/' . getenv('AUTOWP_TELEGRAM_TOKEN'),
     ],
-
-    'twitter' => [
+    'twitter'            => [
         'username'     => getenv('AUTOWP_TWITTER_USERNAME'),
         'oauthOptions' => [
             'consumerKey'    => getenv('AUTOWP_TWITTER_OAUTH_KEY'),
@@ -160,14 +157,12 @@ return [
             'oauth_token_secret' => getenv('AUTOWP_TWITTER_TOKEN_OAUTH_SECRET'),
         ],
     ],
-
-    'facebook' => [
+    'facebook'           => [
         'app_id'            => getenv('AUTOWP_FACEBOOK_APP_ID'),
         'app_secret'        => getenv('AUTOWP_FACEBOOK_APP_SECRET'),
         'page_access_token' => getenv('AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN'),
     ],
-
-    'hosts' => [
+    'hosts'              => [
         'en'    => [
             'hostname' => 'en.' . $host,
             'timezone' => 'Europe/London',
@@ -224,7 +219,6 @@ return [
             'aliases'  => [],
         ],
     ],
-
     'hostname_whitelist' => [
         'www.autowp.ru',
         'ru.autowp.ru',
@@ -241,29 +235,24 @@ return [
         $host,
     ],
     'force_https'        => (bool) getenv('AUTOWP_FORCE_HTTPS'),
-
-    'pictures_hostname' => getenv('AUTOWP_PICTURES_HOST'),
-
-    'content_languages' => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp'],
+    'pictures_hostname'  => getenv('AUTOWP_PICTURES_HOST'),
+    'content_languages'  => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp'],
 
     /*'acl' => [
         'cache'         => 'long',
         'cacheLifetime' => 3600
     ],*/
-
-    'textstorage' => [
+    'textstorage'              => [
         'textTableName'     => 'textstorage_text',
         'revisionTableName' => 'textstorage_revision',
     ],
-
-    'feedback' => [
+    'feedback'                 => [
         'from'     => 'no-reply@autowp.ru',
         'fromname' => 'robot autowp.ru',
         'to'       => 'autowp@gmail.com',
         'subject'  => 'AutoWP Feedback',
     ],
-
-    'validators' => [
+    'validators'               => [
         'aliases'   => [
             'ItemCatnameNotExists' => Validator\Item\CatnameNotExists::class,
         ],
@@ -279,25 +268,20 @@ return [
             Validator\DateString::class                  => InvokableFactory::class,
         ],
     ],
-
-    'gulp-rev' => [
+    'gulp-rev'                 => [
         'manifest' => __DIR__ . '/../../../public_html/dist/manifest.json',
         'prefix'   => '',
     ],
-
     'mosts_min_vehicles_count' => (int) getenv('AUTOWP_MOSTS_MIN_VEHICLES_COUNT'),
-
-    'yandex' => [
+    'yandex'                   => [
         'secret' => getenv('AUTOWP_YANDEX_SECRET'),
         'price'  => (int) getenv('AUTOWP_YANDEX_PRICE'),
     ],
-
-    'vk' => [
+    'vk'                       => [
         'token'    => getenv('AUTOWP_VK_TOKEN'),
         'owner_id' => getenv('AUTOWP_VK_OWNER_ID'),
     ],
-
-    'input_filters' => [
+    'input_filters'            => [
         'factories'          => [
             InputFilter\AttrUserValueCollectionInputFilter::class
                 => InputFilter\AttrUserValueCollectionInputFilterFactory::class,
@@ -306,30 +290,24 @@ return [
             InputFilterAbstractServiceFactory::class,
         ],
     ],
-
-    'users' => [
+    'users'                    => [
         'salt'      => getenv('AUTOWP_USERS_SALT'),
         'emailSalt' => getenv('AUTOWP_EMAIL_SALT'),
     ],
-
-    'mail' => [
+    'mail'                     => [
         'transport' => $mailTransport,
     ],
-
-    'recaptcha' => [
+    'recaptcha'                => [
         'publicKey'  => getenv('AUTOWP_RECAPTCHA_PUBLICKEY'),
         'privateKey' => getenv('AUTOWP_RECAPTCHA_PRIVATEKEY'),
     ],
-
-    'sentry' => [
+    'sentry'                   => [
         'dsn'         => getenv('SENTRY_DSN'),
         'environment' => getenv('SENTRY_ENVIRONMENT'),
         'release'     => getenv('SENTRY_RELEASE'),
     ],
-
-    'traffic' => [
+    'traffic'                  => [
         'url' => getenv('TRAFFIC_URL'),
     ],
-
-    'authSecret' => getenv('AUTOWP_AUTH_SECRET'),
+    'authSecret'               => getenv('AUTOWP_AUTH_SECRET'),
 ];

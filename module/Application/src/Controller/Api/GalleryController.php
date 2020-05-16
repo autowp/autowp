@@ -83,7 +83,7 @@ class GalleryController extends AbstractRestfulController
      */
     public function galleryAction()
     {
-        $itemID = (int) $this->params()->fromQuery('item_id');
+        $itemId = (int) $this->params()->fromQuery('item_id');
 
         $filter = [
             'order'  => 'resolution_desc',
@@ -92,30 +92,30 @@ class GalleryController extends AbstractRestfulController
 
         $exact = (bool) $this->params()->fromQuery('exact');
 
-        if ($itemID) {
+        if ($itemId) {
             if ($exact) {
-                $filter['item']['id'] = $itemID;
+                $filter['item']['id'] = $itemId;
             } else {
-                $filter['item']['ancestor_or_self'] = $itemID;
+                $filter['item']['ancestor_or_self'] = $itemId;
             }
         }
 
-        $exactItemID = (int) $this->params()->fromQuery('exact_item_id');
-        if ($exactItemID) {
-            $filter['item']['id'] = $exactItemID;
+        $exactItemId = (int) $this->params()->fromQuery('exact_item_id');
+        if ($exactItemId) {
+            $filter['item']['id'] = $exactItemId;
         }
 
-        if ($itemID || $exactItemID) {
+        if ($itemId || $exactItemId) {
             $filter['order'] = 'perspectives';
 
-            $perspectiveID = (int) $this->params()->fromQuery('perspective_id');
-            if ($perspectiveID) {
-                $filter['item']['perspective'] = $perspectiveID;
+            $perspectiveId = (int) $this->params()->fromQuery('perspective_id');
+            if ($perspectiveId) {
+                $filter['item']['perspective'] = $perspectiveId;
             }
 
-            $perspectiveExcludeID = $this->params()->fromQuery('perspective_exclude');
-            if ($perspectiveExcludeID) {
-                $parts = explode(',', $perspectiveExcludeID);
+            $perspectiveExcludeId = $this->params()->fromQuery('perspective_exclude');
+            if ($perspectiveExcludeId) {
+                $parts = explode(',', $perspectiveExcludeId);
                 $value = [];
                 foreach ($parts as $part) {
                     $part = (int) $part;
@@ -136,7 +136,7 @@ class GalleryController extends AbstractRestfulController
         $page            = $this->params()->fromQuery('page');
         $pictureIdentity = $this->params()->fromQuery('picture_identity');
 
-        if (! $itemID && ! $pictureIdentity && ! $exactItemID) {
+        if (! $itemId && ! $pictureIdentity && ! $exactItemId) {
             return $this->forbiddenAction();
         }
 
@@ -158,7 +158,7 @@ class GalleryController extends AbstractRestfulController
         $language = $this->language();
 
         if ($pictureIdentity) {
-            if (! $itemID && ! $exactItemID) {
+            if (! $itemId && ! $exactItemId) {
                 $filter['identity'] = $pictureIdentity;
             }
 
@@ -176,7 +176,7 @@ class GalleryController extends AbstractRestfulController
 
             $filter['status'] = $row['status'];
             $page             = 0;
-            if ($itemID || $exactItemID) {
+            if ($itemId || $exactItemId) {
                 $page = $this->getPicturePage($filter, $pictureIdentity);
             }
         }
@@ -255,7 +255,7 @@ class GalleryController extends AbstractRestfulController
                 continue;
             }
 
-            $itemID = (int) $row['id'];
+            $itemId = (int) $row['id'];
 
             $sUrl = $image->getSrc();
 
@@ -280,10 +280,10 @@ class GalleryController extends AbstractRestfulController
             $msgCount    = $row['messages'];
             $newMsgCount = 0;
             if ($userId) {
-                $newMsgCount = $newMessages[$itemID] ?? $msgCount;
+                $newMsgCount = $newMessages[$itemId] ?? $msgCount;
             }
 
-            $name = $names[$itemID] ?? null;
+            $name = $names[$itemId] ?? null;
             $name = $this->pictureNameFormatter->format($name, $language);
 
             $itemsData = $this->pictureItem->getData([
@@ -313,7 +313,7 @@ class GalleryController extends AbstractRestfulController
             }
 
             $gallery[] = [
-                'id'          => $itemID,
+                'id'          => $itemId,
                 'identity'    => $row['identity'],
                 'sourceUrl'   => $sUrl,
                 'crop'        => $crop,

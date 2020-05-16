@@ -4,25 +4,19 @@ namespace Application\Model;
 
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
-use Laminas\Router\Http\TreeRouteStack;
 
 class Categories
 {
     public const NEW_DAYS = 7;
-
-    private TreeRouteStack $router;
 
     private TableGateway $itemTable;
 
     private Item $itemModel;
 
     public function __construct(
-        TreeRouteStack $router,
         TableGateway $itemTable,
         Item $itemModel
     ) {
-        $this->router = $router;
-
         $this->itemTable = $itemTable;
 
         $this->itemModel = $itemModel;
@@ -64,7 +58,7 @@ class Categories
                     'item.id = category_item_parent.item_id',
                     []
                 )
-                ->where(['category_item_parent.parent_id = ?' => parentId]);
+                ->where(['category_item_parent.parent_id = ?' => $parentId]);
         } else {
             $select
                 ->join(

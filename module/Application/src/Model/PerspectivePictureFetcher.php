@@ -138,9 +138,9 @@ class PerspectivePictureFetcher
     /**
      * @suppress PhanDeprecatedFunction
      */
-    public function getTotalPictures(int $itemID, bool $onlyExactly): int
+    public function getTotalPictures(int $itemId, bool $onlyExactly): int
     {
-        if (! $itemID) {
+        if (! $itemId) {
             return 0;
         }
 
@@ -152,7 +152,7 @@ class PerspectivePictureFetcher
             $select
                 ->columns(['count' => new Sql\Expression('COUNT(1)')])
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', ['id' => 'item_id'])
-                ->where(['picture_item.item_id' => $itemID]);
+                ->where(['picture_item.item_id' => $itemId]);
         } else {
             $select
                 ->columns(['count' => new Sql\Expression('COUNT(1)')])
@@ -162,7 +162,7 @@ class PerspectivePictureFetcher
                     'picture_item.item_id = item_parent_cache.item_id',
                     ['id' => 'parent_id']
                 )
-                ->where(['item_parent_cache.parent_id' => $itemID]);
+                ->where(['item_parent_cache.parent_id' => $itemId]);
         }
 
         $row = $this->pictureModel->getTable()->selectWith($select)->current();

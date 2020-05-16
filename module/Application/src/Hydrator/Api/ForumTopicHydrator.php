@@ -11,7 +11,6 @@ use Exception;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -26,11 +25,7 @@ class ForumTopicHydrator extends AbstractRestHydrator
 
     private User $userModel;
 
-    private Acl $acl;
-
     private TableGateway $themeTable;
-
-    private TableGateway $topicTable;
 
     private Forums $forums;
 
@@ -44,11 +39,8 @@ class ForumTopicHydrator extends AbstractRestHydrator
 
         $this->userId = 0;
 
-        $this->acl = $serviceManager->get(Acl::class);
-
         $tables           = $serviceManager->get('TableManager');
         $this->themeTable = $tables->get('forums_themes');
-        $this->topicTable = $tables->get('forums_topics');
 
         $this->forums = $serviceManager->get(Forums::class);
 

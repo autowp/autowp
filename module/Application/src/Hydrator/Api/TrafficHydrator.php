@@ -6,8 +6,6 @@ use ArrayAccess;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
-use Laminas\Permissions\Acl\Acl;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -19,18 +17,12 @@ class TrafficHydrator extends AbstractRestHydrator
 {
     protected int $userId = 0;
 
-    private Acl $acl;
-
-    private TreeRouteStack $router;
-
     private User $userModel;
 
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->router    = $serviceManager->get('HttpRouter');
-        $this->acl       = $serviceManager->get(Acl::class);
         $this->userModel = $serviceManager->get(User::class);
 
         $strategy = new Strategy\User($serviceManager);

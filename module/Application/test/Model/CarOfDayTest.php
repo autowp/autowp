@@ -7,6 +7,7 @@ use Application\Controller\Api\PictureController;
 use Application\DuplicateFinder;
 use Application\Model\CarOfDay;
 use Application\Test\AbstractHttpControllerTestCase;
+use ApplicationTest\Data;
 use Exception;
 use Laminas\Http\Request;
 
@@ -115,13 +116,13 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function acceptPicture(int $pictureID): void
+    private function acceptPicture(int $pictureId): void
     {
         $this->reset();
 
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
-            'https://www.autowp.ru/api/picture/' . $pictureID,
+            'https://www.autowp.ru/api/picture/' . $pictureId,
             Request::METHOD_PUT,
             ['status' => 'accepted']
         );
@@ -138,7 +139,7 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
      */
     private function createCandidate(): void
     {
-        $vehicleID = $this->createItem([
+        $vehicleId = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Some vehicle',
             'begin_year'   => 2001,
@@ -146,8 +147,8 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
         ]);
 
         for ($i = 0; $i < 5; $i++) {
-            $pictureID = $this->addPictureToItem($vehicleID);
-            $this->acceptPicture($pictureID);
+            $pictureId = $this->addPictureToItem($vehicleId);
+            $this->acceptPicture($pictureId);
         }
     }
 

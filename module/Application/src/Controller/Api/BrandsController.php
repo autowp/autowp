@@ -11,7 +11,6 @@ use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -39,16 +38,13 @@ class BrandsController extends AbstractActionController
 
     private TranslatorInterface $translator;
 
-    private TreeRouteStack $router;
-
     public function __construct(
         StorageInterface $cache,
         Brand $brand,
         VehicleType $vehicleType,
         Item $itemModel,
         Picture $picture,
-        TranslatorInterface $translator,
-        TreeRouteStack $router
+        TranslatorInterface $translator
     ) {
         $this->cache       = $cache;
         $this->brand       = $brand;
@@ -56,7 +52,6 @@ class BrandsController extends AbstractActionController
         $this->itemModel   = $itemModel;
         $this->picture     = $picture;
         $this->translator  = $translator;
-        $this->router      = $router;
     }
 
     public function indexAction(): JsonModel

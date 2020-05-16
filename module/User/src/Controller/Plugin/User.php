@@ -70,12 +70,12 @@ class User extends AbstractPlugin
      */
     private function getLogedInUser()
     {
-        $userID = $this->oauth->getUserID();
-        if (! $userID) {
+        $userId = $this->oauth->getUserID();
+        if (! $userId) {
             return null;
         }
 
-        return $this->user($userID);
+        return $this->user($userId);
     }
 
     public function logedIn(): bool

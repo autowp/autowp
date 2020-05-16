@@ -16,8 +16,6 @@ class PreviewPictureHydrator extends AbstractRestHydrator
 {
     private int $userId = 0;
 
-    private ?string $userRole;
-
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
@@ -54,8 +52,7 @@ class PreviewPictureHydrator extends AbstractRestHydrator
     public function setUserId(int $userId): self
     {
         if ($this->userId !== $userId) {
-            $this->userId   = $userId;
-            $this->userRole = null;
+            $this->userId = $userId;
         }
 
         $this->getStrategy('picture')->setUserId($this->userId);

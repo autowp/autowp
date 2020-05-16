@@ -4,10 +4,8 @@ namespace Application\Hydrator\Api;
 
 use Application\Hydrator\Api\Filter\PropertyFilter;
 use Application\Hydrator\Api\Strategy\AbstractHydratorStrategy;
-use Application\Model\Item;
 use Application\Service\SpecificationsService;
 use ArrayAccess;
-use Autowp\User\Model\User;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\ServiceManager\ServiceLocatorInterface;
@@ -20,22 +18,12 @@ use function is_array;
 
 class AttrAttributeHydrator extends AbstractRestHydrator
 {
-    private int $userId = 0;
-
-    private Item $item;
-
-    private User $userModel;
-
     private SpecificationsService $specService;
 
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->userId = 0;
-
-        $this->item        = $serviceManager->get(Item::class);
-        $this->userModel   = $serviceManager->get(User::class);
         $this->specService = $serviceManager->get(SpecificationsService::class);
 
         $strategy = new Strategy\AttrAttributes($serviceManager);

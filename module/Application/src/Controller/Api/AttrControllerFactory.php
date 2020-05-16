@@ -6,9 +6,7 @@ use Application\Hydrator\Api\AttrAttributeHydrator;
 use Application\Hydrator\Api\AttrConflictHydrator;
 use Application\Hydrator\Api\AttrUserValueHydrator;
 use Application\Hydrator\Api\AttrValueHydrator;
-use Application\Model\Item;
 use Application\Service\SpecificationsService;
-use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -24,9 +22,7 @@ class AttrControllerFactory implements FactoryInterface
         $filters   = $container->get('InputFilterManager');
         $tables    = $container->get('TableManager');
         return new AttrController(
-            $container->get(Item::class),
             $container->get(SpecificationsService::class),
-            $container->get(User::class),
             $hydrators->get(AttrConflictHydrator::class),
             $hydrators->get(AttrUserValueHydrator::class),
             $hydrators->get(AttrAttributeHydrator::class),

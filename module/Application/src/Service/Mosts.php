@@ -54,7 +54,6 @@ class Mosts
                 'order'     => 'DESC'
             ]
         ],*/
-
         [
             'catName' => 'mighty',
             'adapter' => [

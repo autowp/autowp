@@ -16,7 +16,6 @@ use Autowp\User\Model\User;
 use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\Uri\Uri;
 use Laminas\Uri\UriFactory;
 use Psr\Container\ContainerInterface;
@@ -37,8 +36,6 @@ class TelegramService
 
     private string $token;
 
-    private TreeRouteStack $router;
-
     private HostManager $hostManager;
 
     private Picture $picture;
@@ -55,7 +52,6 @@ class TelegramService
 
     public function __construct(
         array $options,
-        TreeRouteStack $router,
         HostManager $hostManager,
         ContainerInterface $serviceManager,
         Picture $picture,
@@ -68,7 +64,6 @@ class TelegramService
         $this->webhook     = $options['webhook'] ?? null;
         $this->token       = $options['token'] ?? null;
 
-        $this->router            = $router;
         $this->hostManager       = $hostManager;
         $this->serviceManager    = $serviceManager;
         $this->picture           = $picture;
@@ -92,7 +87,7 @@ class TelegramService
                 $this->telegramChatTable,
                 $this->serviceManager->get(User::class)
             ),
-            new NewCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),
+            new NewCommand($this->telegramItemTable, $this->item->getTable()),
             new InboxCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),
             new MessagesCommand($this->telegramChatTable),
         ]);

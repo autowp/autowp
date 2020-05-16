@@ -110,8 +110,7 @@ return [
             Controller\Api\VotingController::class       => Controller\Api\VotingControllerFactory::class,
         ],
     ],
-
-    'router' => [
+    'router'      => [
         'routes' => [
             'api' => [
                 'type'          => 'Literal',

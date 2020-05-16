@@ -17,7 +17,6 @@ class CategoriesFactory implements FactoryInterface
     {
         $tables = $container->get('TableManager');
         return new Categories(
-            $container->get('HttpRouter'),
             $tables->get('item'),
             $container->get(Item::class)
         );

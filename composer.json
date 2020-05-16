@@ -43,7 +43,7 @@
 		"laminas/laminas-uri" : ">=2.6.1",
 		"laminas/laminas-view" : ">=2.10.0",
 		"laminas-api-tools/api-tools-oauth2" : "^1.4.0",
-		"autowp/image" : "^5.0.5",
+		"autowp/image" : "^6.0.1",
 		"facebook/graph-sdk" : "^5.4",
 		"laminas/laminas-hydrator" : "^2.4.0",
 		"autowp/cron" : "^1.0.0",
@@ -80,7 +80,6 @@
   },
 	"autoload-dev" : {
 		"psr-4" : {
-			"AutowpTest\\" : "test/",
 			"ApplicationTest\\" : "module/Application/test"
 		}
 	},
@@ -112,5 +111,5 @@
 		"email" : "dmitry@pereslegin.ru",
 		"source" : "https://github.com/autowp/autowp"
 	},
-	"minimum-stability" : "RC"
+	"minimum-stability" : "stable"
 }

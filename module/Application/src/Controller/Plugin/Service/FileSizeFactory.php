@@ -4,7 +4,6 @@ namespace Application\Controller\Plugin\Service;
 
 use Application\Controller\Plugin\FileSize as Plugin;
 use Application\FileSize;
-use Application\Language;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -16,9 +15,6 @@ class FileSizeFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Plugin
     {
-        return new Plugin(
-            $container->get(Language::class),
-            $container->get(FileSize::class)
-        );
+        return new Plugin($container->get(FileSize::class));
     }
 }

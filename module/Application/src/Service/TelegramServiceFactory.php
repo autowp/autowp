@@ -21,7 +21,6 @@ class TelegramServiceFactory implements FactoryInterface
         $tables = $container->get('TableManager');
         return new TelegramService(
             $config['telegram'],
-            $container->get('HttpRouter'),
             $container->get(HostManager::class),
             $container,
             $container->get(Picture::class),

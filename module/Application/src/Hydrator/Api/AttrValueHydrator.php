@@ -2,7 +2,6 @@
 
 namespace Application\Hydrator\Api;
 
-use Application\Model\Item;
 use Application\Service\SpecificationsService;
 use ArrayAccess;
 use Exception;
@@ -10,15 +9,12 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class AttrValueHydrator extends AbstractRestHydrator
 {
-    private Item $item;
-
     private SpecificationsService $specService;
 
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
-        $this->item        = $serviceManager->get(Item::class);
         $this->specService = $serviceManager->get(SpecificationsService::class);
     }
 

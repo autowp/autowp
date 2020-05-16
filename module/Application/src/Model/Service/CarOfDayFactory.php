@@ -6,12 +6,9 @@ use Application\ItemNameFormatter;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
 use Application\Model\Item;
-use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\Picture;
-use Application\Model\Twins;
 use Application\PictureNameFormatter;
-use Application\Service\SpecificationsService;
 use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -30,14 +27,10 @@ class CarOfDayFactory implements FactoryInterface
             $container->get(ItemNameFormatter::class),
             $container->get(Storage::class),
             $container->get(Catalogue::class),
-            $container->get('HttpRouter'),
             $container->get('MvcTranslator'),
-            $container->get(SpecificationsService::class),
             $container->get(Item::class),
             $container->get(Perspective::class),
-            $container->get(ItemParent::class),
             $container->get(Picture::class),
-            $container->get(Twins::class),
             $container->get(PictureNameFormatter::class)
         );
     }

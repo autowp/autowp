@@ -14,7 +14,6 @@ use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Laminas\Permissions\Acl\Acl;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -33,8 +32,6 @@ class UserHydrator extends AbstractRestHydrator
 
     private Acl $acl;
 
-    private TreeRouteStack $router;
-
     private User $userModel;
 
     private UserRename $userRename;
@@ -47,7 +44,6 @@ class UserHydrator extends AbstractRestHydrator
     {
         parent::__construct();
 
-        $this->router      = $serviceManager->get('HttpRouter');
         $this->acl         = $serviceManager->get(Acl::class);
         $this->userModel   = $serviceManager->get(User::class);
         $this->userRename  = $serviceManager->get(UserRename::class);

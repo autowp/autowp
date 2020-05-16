@@ -2,17 +2,13 @@
 
 namespace Application\View\Helper;
 
-use Application\Model\Picture;
 use ArrayAccess;
 use Laminas\View\Helper\AbstractHelper;
 
 class InlinePicture extends AbstractHelper
 {
-    private Picture $picture;
-
-    public function __construct(Picture $picture)
+    public function __construct()
     {
-        $this->picture = $picture;
     }
 
     /**

@@ -5,29 +5,18 @@ namespace Application;
 use function explode;
 use function getenv;
 
-$imageDir = __DIR__ . '/../../../public_html/image/';
-
-$host = getenv('AUTOWP_HOST');
-
 return [
     'imageStorage' => [
         'imageTableName'         => 'image',
         'formatedImageTableName' => 'formated_image',
-        'fileMode'               => 0644,
-        'dirMode'                => 0755,
-
-        'dirs' => [
+        'dirs'                   => [
             'format'  => [
-                'path'           => $imageDir . "format",
-                'url'            => 'http://i.' . $host . '/image/format/',
                 'namingStrategy' => [
                     'strategy' => 'pattern',
                 ],
                 'bucket'         => getenv('AUTOWP_IMAGE_FORMAT_BUCKET'),
             ],
             'museum'  => [
-                'path'           => $imageDir . "museum",
-                'url'            => 'http://i.' . $host . '/image/museum/',
                 'namingStrategy' => [
                     'strategy' => 'serial',
                     'options'  => [
@@ -37,8 +26,6 @@ return [
                 'bucket'         => getenv('AUTOWP_IMAGE_MUSEUM_BUCKET'),
             ],
             'user'    => [
-                'path'           => $imageDir . "user",
-                'url'            => 'http://i.' . $host . '/image/user/',
                 'namingStrategy' => [
                     'strategy' => 'serial',
                     'options'  => [
@@ -48,26 +35,20 @@ return [
                 'bucket'         => getenv('AUTOWP_IMAGE_USER_BUCKET'),
             ],
             'brand'   => [
-                'path'           => $imageDir . "brand",
-                'url'            => 'http://i.' . $host . '/image/brand/',
                 'namingStrategy' => [
                     'strategy' => 'pattern',
                 ],
                 'bucket'         => getenv('AUTOWP_IMAGE_BRAND_BUCKET'),
             ],
             'picture' => [
-                'path'           => __DIR__ . '/../../../public_html/pictures/',
-                'url'            => 'http://i.' . $host . '/pictures/',
                 'namingStrategy' => [
                     'strategy' => 'pattern',
                 ],
                 'bucket'         => getenv('AUTOWP_IMAGE_PICTURE_BUCKET'),
             ],
         ],
-
-        'formatedImageDirName' => 'format',
-
-        'formats'    => [
+        'formatedImageDirName'   => 'format',
+        'formats'                => [
             'format9'               => [
                 'fitType'    => 0,
                 'width'      => 160,
@@ -173,8 +154,7 @@ return [
                 'format'     => 'jpeg',
             ],
         ],
-        'formatToS3' => true,
-        's3'         => [
+        's3'                     => [
             'region'                  => '',
             'version'                 => 'latest',
             'endpoint'                => explode(';', getenv('AUTOWP_S3_ENDPOINT')),

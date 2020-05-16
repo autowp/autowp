@@ -87,7 +87,7 @@ class PictureTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function addPictureToItem(int $itemID): int
+    private function addPictureToItem(int $itemId): int
     {
         $this->reset();
 
@@ -115,7 +115,7 @@ class PictureTest extends AbstractHttpControllerTestCase
         ]);
 
         $this->dispatch('https://www.autowp.ru/api/picture', Request::METHOD_POST, [
-            'item_id' => $itemID,
+            'item_id' => $itemId,
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -127,22 +127,22 @@ class PictureTest extends AbstractHttpControllerTestCase
         $headers   = $this->getResponse()->getHeaders();
         $uri       = $headers->get('Location')->uri();
         $parts     = explode('/', $uri->getPath());
-        $pictureID = $parts[count($parts) - 1];
+        $pictureId = $parts[count($parts) - 1];
 
-        return (int) $pictureID;
+        return (int) $pictureId;
     }
 
     /**
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function addPictureItem(int $pictureID, int $itemID, int $typeID)
+    private function addPictureItem(int $pictureId, int $itemId, int $typeId)
     {
         $this->reset();
 
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
-            'https://www.autowp.ru/api/picture-item/' . $pictureID . '/' . $itemID . '/' . $typeID,
+            'https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/' . $typeId,
             Request::METHOD_POST
         );
 
@@ -153,13 +153,13 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertActionName('create');
     }
 
-    private function getPictureFilename(int $pictureID): string
+    private function getPictureFilename(int $pictureId): string
     {
         $serviceManager = $this->getApplicationServiceLocator();
         $tableManager   = $serviceManager->get('TableManager');
 
         $picture = $tableManager->get('pictures')->select([
-            'id' => $pictureID,
+            'id' => $pictureId,
         ])->current();
 
         if (! $picture) {
@@ -182,71 +182,71 @@ class PictureTest extends AbstractHttpControllerTestCase
      */
     public function testPersonPictureFilenamePattern(): void
     {
-        $personID  = $this->createItem([
+        $personId  = $this->createItem([
             'item_type_id' => 8,
             'name'         => 'A.S. Pushkin',
         ]);
-        $pictureID = $this->addPictureToItem($personID);
+        $pictureId = $this->addPictureToItem($personId);
 
-        $filename = $this->getPictureFilename($pictureID);
+        $filename = $this->getPictureFilename($pictureId);
 
         $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
     public function testPersonAndCopyrightPictureFilenamePattern(): void
     {
-        $personID  = $this->createItem([
+        $personId  = $this->createItem([
             'item_type_id' => 8,
             'name'         => 'A.S. Pushkin',
         ]);
-        $pictureID = $this->addPictureToItem($personID);
+        $pictureId = $this->addPictureToItem($personId);
 
-        $copyrightID = $this->createItem([
+        $copyrightId = $this->createItem([
             'item_type_id' => 9,
             'name'         => 'Copyrights',
         ]);
-        $this->addPictureItem($pictureID, $copyrightID, 3);
+        $this->addPictureItem($pictureId, $copyrightId, 3);
 
-        $filename = $this->getPictureFilename($pictureID);
+        $filename = $this->getPictureFilename($pictureId);
 
         $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
     public function testAuthorAndVehiclePictureFilenamePattern(): void
     {
-        $vehicleID = $this->createItem([
+        $vehicleId = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Toyota Corolla',
         ]);
-        $pictureID = $this->addPictureToItem($vehicleID);
+        $pictureId = $this->addPictureToItem($vehicleId);
 
-        $personID = $this->createItem([
+        $personId = $this->createItem([
             'item_type_id' => 8,
             'name'         => 'A.S. Pushkin',
         ]);
-        $this->addPictureItem($pictureID, $personID, 2);
+        $this->addPictureItem($pictureId, $personId, 2);
 
-        $filename = $this->getPictureFilename($pictureID);
+        $filename = $this->getPictureFilename($pictureId);
 
         $this->assertRegExp('/^t\/toyota_corolla\/toyota_corolla(_[0-9]+)?\.jpeg$/', $filename);
     }
 
     public function testPersonAndVehiclePictureFilenamePattern(): void
     {
-        $vehicleID = $this->createItem([
+        $vehicleId = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Toyota Corolla',
         ]);
-        $pictureID = $this->addPictureToItem($vehicleID);
+        $pictureId = $this->addPictureToItem($vehicleId);
 
-        $personID = $this->createItem([
+        $personId = $this->createItem([
             'item_type_id' => 8,
             'name'         => 'A.S. Pushkin',
         ]);
 
-        $this->addPictureItem($pictureID, $personID, 1);
+        $this->addPictureItem($pictureId, $personId, 1);
 
-        $filename = $this->getPictureFilename($pictureID);
+        $filename = $this->getPictureFilename($pictureId);
 
         $this->assertRegExp(
             '/^t\/toyota_corolla\/a\.s\._pushkin\/toyota_corolla_a\.s\._pushkin(_[0-9]+)?\.jpeg$/',

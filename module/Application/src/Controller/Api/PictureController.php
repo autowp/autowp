@@ -10,7 +10,6 @@ use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
 use Application\Model\Item;
-use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
@@ -79,8 +78,6 @@ class PictureController extends AbstractRestfulController
 
     private UserPicture $userPicture;
 
-    private Log $log;
-
     private HostManager $hostManager;
 
     private InputFilter $itemInputFilter;
@@ -120,7 +117,6 @@ class PictureController extends AbstractRestfulController
         PictureItem $pictureItem,
         DuplicateFinder $duplicateFinder,
         UserPicture $userPicture,
-        Log $log,
         HostManager $hostManager,
         TelegramService $telegram,
         MessageService $message,
@@ -146,7 +142,6 @@ class PictureController extends AbstractRestfulController
         $this->pictureItem           = $pictureItem;
         $this->duplicateFinder       = $duplicateFinder;
         $this->userPicture           = $userPicture;
-        $this->log                   = $log;
         $this->hostManager           = $hostManager;
         $this->telegram              = $telegram;
         $this->message               = $message;

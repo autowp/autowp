@@ -23,8 +23,7 @@ class BrandsControllerFactory implements FactoryInterface
             $container->get(VehicleType::class),
             $container->get(Item::class),
             $container->get(Picture::class),
-            $container->get('MvcTranslator'),
-            $container->get('HttpRouter')
+            $container->get('MvcTranslator')
         );
     }
 }

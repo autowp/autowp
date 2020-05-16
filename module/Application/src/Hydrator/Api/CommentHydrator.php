@@ -15,7 +15,6 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Laminas\Permissions\Acl\Acl;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -44,14 +43,11 @@ class CommentHydrator extends AbstractRestHydrator
 
     private int $limit;
 
-    private TreeRouteStack $router;
-
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
         $this->comments = $serviceManager->get(Comments::class);
-        $this->router   = $serviceManager->get('HttpRouter');
 
         $this->picture   = $serviceManager->get(Picture::class);
         $this->userModel = $serviceManager->get(User::class);
@@ -122,12 +118,12 @@ class CommentHydrator extends AbstractRestHydrator
     {
         $canRemove = false;
         $isModer   = false;
-        $canViewIP = false;
+        $canViewIp = false;
         $role      = $this->getUserRole();
         if ($role) {
             $canRemove = $this->acl->isAllowed($role, 'comment', 'remove');
             $isModer   = $this->acl->inheritsRole($role, 'moder');
-            $canViewIP = $this->acl->isAllowed($role, 'user', 'ip');
+            $canViewIp = $this->acl->isAllowed($role, 'user', 'ip');
         }
 
         $addDate = Row::getDateTimeByColumnType('timestamp', $object['datetime']);
@@ -244,7 +240,7 @@ class CommentHydrator extends AbstractRestHydrator
             $result['page'] = $this->comments->service()->getMessagePage($object, $this->limit);
         }
 
-        if ($canViewIP) {
+        if ($canViewIp) {
             $result['ip'] = $object['ip'] ? inet_ntop($object['ip']) : null;
         }
 

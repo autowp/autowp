@@ -4,7 +4,6 @@ namespace Application\Model;
 
 use Application\ItemNameFormatter;
 use Application\PictureNameFormatter;
-use Application\Service\SpecificationsService;
 use ArrayObject;
 use Autowp\Image;
 use DateInterval;
@@ -17,7 +16,6 @@ use Laminas\Http\Client;
 use Laminas\Http\Request;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Json\Json;
-use Laminas\Router\Http\TreeRouteStack;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Twitter;
 
@@ -41,21 +39,13 @@ class CarOfDay
 
     private Catalogue $catalogue;
 
-    private TreeRouteStack $router;
-
     private TranslatorInterface $translator;
-
-    private SpecificationsService $specsService;
 
     private Item $itemModel;
 
     private Perspective $perspective;
 
-    private ItemParent $itemParent;
-
     private Picture $picture;
-
-    private Twins $twins;
 
     private PictureNameFormatter $pictureNameFormatter;
 
@@ -64,27 +54,19 @@ class CarOfDay
         ItemNameFormatter $itemNameFormatter,
         Image\Storage $imageStorage,
         Catalogue $catalogue,
-        TreeRouteStack $router,
         TranslatorInterface $translator,
-        SpecificationsService $specsService,
         Item $itemModel,
         Perspective $perspective,
-        ItemParent $itemParent,
         Picture $picture,
-        Twins $twins,
         PictureNameFormatter $pictureNameFormatter
     ) {
         $this->itemNameFormatter    = $itemNameFormatter;
         $this->imageStorage         = $imageStorage;
         $this->catalogue            = $catalogue;
-        $this->router               = $router;
         $this->translator           = $translator;
-        $this->specsService         = $specsService;
         $this->itemModel            = $itemModel;
         $this->perspective          = $perspective;
-        $this->itemParent           = $itemParent;
         $this->picture              = $picture;
-        $this->twins                = $twins;
         $this->pictureNameFormatter = $pictureNameFormatter;
 
         $this->table = $table;

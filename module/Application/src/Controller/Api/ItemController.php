@@ -6,7 +6,6 @@ use Application\Controller\Plugin\Car;
 use Application\HostManager;
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Hydrator\Api\Strategy\Image;
-use Application\ItemNameFormatter;
 use Application\Model\Brand;
 use Application\Model\Catalogue;
 use Application\Model\Categories;
@@ -82,8 +81,6 @@ class ItemController extends AbstractRestfulController
 
     private StrategyInterface $logoHydrator;
 
-    private ItemNameFormatter $itemNameFormatter;
-
     private InputFilter $listInputFilter;
 
     private InputFilter $itemInputFilter;
@@ -115,7 +112,6 @@ class ItemController extends AbstractRestfulController
     public function __construct(
         AbstractRestHydrator $hydrator,
         Image $logoHydrator,
-        ItemNameFormatter $itemNameFormatter,
         InputFilter $listInputFilter,
         InputFilter $itemInputFilter,
         InputFilter $itemLogoPutFilter,
@@ -132,7 +128,6 @@ class ItemController extends AbstractRestfulController
     ) {
         $this->hydrator              = $hydrator;
         $this->logoHydrator          = $logoHydrator;
-        $this->itemNameFormatter     = $itemNameFormatter;
         $this->listInputFilter       = $listInputFilter;
         $this->itemInputFilter       = $itemInputFilter;
         $this->itemLogoPutFilter     = $itemLogoPutFilter;
@@ -262,7 +257,7 @@ class ItemController extends AbstractRestfulController
 
         $items = [];
 
-        $parentID = null;
+        $parentId = null;
         foreach ($breadcrumbs as $idx => $item) {
             if ((int) $idx === count($breadcrumbs) - 1) {
                 $fields['description'] = true;
@@ -271,10 +266,10 @@ class ItemController extends AbstractRestfulController
 
             $items[]  = [
                 'catname'   => $item['catname'],
-                'parent_id' => $parentID,
+                'parent_id' => $parentId,
                 'item'      => $this->hydrator->extract($item['item']),
             ];
-            $parentID = (int) $item['item']['id'];
+            $parentId = (int) $item['item']['id'];
         }
 
         return new JsonModel([
@@ -296,8 +291,8 @@ class ItemController extends AbstractRestfulController
         $params = $this->params()->fromQuery();
 
         if (isset($params['type_id'])) {
-            $typeID = (int) $params['type_id'];
-            if ($typeID === Item::BRAND) {
+            $typeId = (int) $params['type_id'];
+            if ($typeId === Item::BRAND) {
                 $this->listInputFilter->get('limit')->getValidatorChain()->getValidators()[1]['instance']->setMax(5000);
             }
         }
@@ -1851,10 +1846,10 @@ class ItemController extends AbstractRestfulController
         return $u->toString();
     }
 
-    private function itemModerUrl(int $itemID, Uri $uri): string
+    private function itemModerUrl(int $itemId, Uri $uri): string
     {
         $u = clone $uri;
-        $u->setPath('/moder/items/item/' . $itemID);
+        $u->setPath('/moder/items/item/' . $itemId);
 
         return $u->toString();
     }
@@ -1991,7 +1986,7 @@ class ItemController extends AbstractRestfulController
         $oldImageId = $item['logo_id'];
 
         $imageId = $this->imageStorage()->addImageFromFile($values['file']['tmp_name'], 'brand', [
-          's3' => true,
+            's3' => true,
         ]);
 
         $this->itemModel->getTable()->update([
@@ -2140,9 +2135,9 @@ class ItemController extends AbstractRestfulController
 
     public function vehicleTypeAction(): JsonModel
     {
-        $brandID = (int) $this->params()->fromQuery('brand_id');
+        $brandId = (int) $this->params()->fromQuery('brand_id');
 
-        $list = $this->vehicleType->getBrandVehicleTypes($brandID);
+        $list = $this->vehicleType->getBrandVehicleTypes($brandId);
 
         return new JsonModel([
             'items' => $list,

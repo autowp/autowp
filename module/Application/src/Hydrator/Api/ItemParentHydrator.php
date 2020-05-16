@@ -9,7 +9,6 @@ use Autowp\User\Model\User;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Permissions\Acl\Acl;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -21,8 +20,6 @@ class ItemParentHydrator extends AbstractRestHydrator
     private int $userId = 0;
 
     private ?string $userRole;
-
-    private TreeRouteStack $router;
 
     private Item $item;
 
@@ -36,7 +33,6 @@ class ItemParentHydrator extends AbstractRestHydrator
     {
         parent::__construct();
 
-        $this->router     = $serviceManager->get('HttpRouter');
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
         $this->item = $serviceManager->get(Item::class);

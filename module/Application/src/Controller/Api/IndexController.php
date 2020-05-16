@@ -18,7 +18,6 @@ use Autowp\User\Model\User;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\Router\Http\TreeRouteStack;
 use Laminas\View\Model\JsonModel;
 
 use function array_keys;
@@ -52,8 +51,6 @@ class IndexController extends AbstractRestfulController
 
     private Catalogue $catalogue;
 
-    private TreeRouteStack $router;
-
     public function __construct(
         StorageInterface $cache,
         Brand $brand,
@@ -65,8 +62,7 @@ class IndexController extends AbstractRestfulController
         CarOfDay $itemOfDay,
         Catalogue $catalogue,
         ItemHydrator $itemHydrator,
-        AbstractRestHydrator $userHydrator,
-        TreeRouteStack $router
+        AbstractRestHydrator $userHydrator
     ) {
         $this->cache        = $cache;
         $this->brand        = $brand;
@@ -79,7 +75,6 @@ class IndexController extends AbstractRestfulController
         $this->catalogue    = $catalogue;
         $this->itemHydrator = $itemHydrator;
         $this->userHydrator = $userHydrator;
-        $this->router       = $router;
     }
 
     public function brandsAction(): JsonModel
