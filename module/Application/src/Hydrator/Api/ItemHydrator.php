@@ -746,6 +746,11 @@ class ItemHydrator extends AbstractRestHydrator
             }
         }
 
+        if ($this->filterComposite->filter('name_default')) {
+            $name                   = $this->itemModel->getLanguageName($object['id'], 'xx');
+            $result['name_default'] = $nameData['name'] === $name ? null : $name;
+        }
+
         if ($isModer) {
             $result['body'] = (string) $object['body'];
 
@@ -874,11 +879,6 @@ class ItemHydrator extends AbstractRestHydrator
 
             if ($this->filterComposite->filter('name')) {
                 $result['name'] = $this->itemModel->getLanguageName($object['id'], 'xx');
-            }
-
-            if ($this->filterComposite->filter('name_default')) {
-                $name                   = $this->itemModel->getLanguageName($object['id'], 'xx');
-                $result['name_default'] = $nameData['name'] === $name ? null : $name;
             }
 
             if ($this->filterComposite->filter('public_routes')) {
