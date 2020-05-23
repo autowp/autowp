@@ -85,6 +85,15 @@ return [
                         ],
                     ],
                 ],
+                'pictures-fix-filename'             => [
+                    'options' => [
+                        'route'    => 'pictures fix filename',
+                        'defaults' => [
+                            'controller' => Controller\Console\PicturesController::class,
+                            'action'     => 'fix-filenames',
+                        ],
+                    ],
+                ],
             ],
         ],
     ],

@@ -12,6 +12,8 @@ use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Point;
 
+use function strpos;
+
 use const PHP_EOL;
 
 class PicturesController extends AbstractActionController
@@ -79,6 +81,46 @@ class PicturesController extends AbstractActionController
             $image = $this->imageStorage->getImage($row['image_id']);
             if ($image) {
                 $this->df->indexImage($row['id'], $image->getSrc());
+            }
+        }
+    }
+
+    public function fixFilenamesAction()
+    {
+        $table   = $this->picture->getTable();
+        $perPage = 100;
+
+        for ($i = 0;; $i++) {
+            print "Page $i\n";
+
+            $select = $table->getSql()->select()
+                ->columns(['id', 'image_id'])
+                ->join('image', 'pictures.image_id = image.id', ['filepath'])
+                ->order(['id'])
+                ->offset($i * $perPage)
+                ->limit($perPage);
+
+            $rows = $table->selectWith($select);
+
+            if ($rows->count() <= 0) {
+                break;
+            }
+
+            foreach ($rows as $row) {
+                $pattern = $this->picture->getFileNamePattern($row['id']);
+
+                $match = strpos($row['filepath'], $pattern) !== false;
+                if (! $match) {
+                    print "{$row['id']}# {$row['filepath']} not match pattern $pattern\n";
+                } else {
+                    print "{$row['id']}# {$row['filepath']} is ok\n";
+                }
+
+                if (! $match) {
+                    $this->imageStorage->changeImageName($row['image_id'], [
+                        'pattern' => $pattern,
+                    ]);
+                }
             }
         }
     }
