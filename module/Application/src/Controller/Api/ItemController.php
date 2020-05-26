@@ -398,7 +398,7 @@ class ItemController extends AbstractRestfulController
             $select
                 ->join(['fab_ipc1' => 'item_parent_cache'], 'fab_ipc1.parent_id = item.id', [])
                 ->join(['fab_ipc2' => 'item_parent_cache'], 'fab_ipc1.item_id = fab_ipc2.item_id', [])
-                ->where('not fab_ipc2.tuning')
+                ->where('not fab_ipc1.tuning')
                 ->join(['fab_pi' => 'picture_item'], 'item.id = fab_pi.item_id', [])
                 ->join(['fab_p' => 'pictures'], 'fab_pi.picture_id = fab_p.id', [])
                 ->where([
