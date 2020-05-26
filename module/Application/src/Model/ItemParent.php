@@ -513,10 +513,12 @@ class ItemParent
             return false;
         }
 
-        $set = [];
+        $set          = [];
+        $rebuildCache = false;
 
         if (array_key_exists('type', $values)) {
-            $set['type'] = $values['type'];
+            $set['type']  = $values['type'];
+            $rebuildCache = true;
         }
 
         if (array_key_exists('catname', $values)) {
@@ -549,6 +551,10 @@ class ItemParent
                 'parent_id = ?' => $parentId,
                 'item_id = ?'   => $itemId,
             ]);
+        }
+
+        if ($rebuildCache) {
+            $this->rebuildCache($itemId);
         }
 
         return true;
