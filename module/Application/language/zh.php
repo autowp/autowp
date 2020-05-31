@@ -1,4 +1,20 @@
 <?php return array (
+  'specs/attrs/22/24/26/options/x' => 'X',
+  'car-type/singleseater' => 'Single-seater',
+  'car-type-rp/singleseater' => 'Single-seater',
+  'page/36/ng-name' => '的技术参数',
+  'catalogue/all-pictures-of' => '的所有图片',
+  'catalogue/sport-of' => '赛事',
+  'catalogue/related-with' => '个相关目录',
+  'catalogue/other-pictures-of' => '的其它图片',
+  'page/34/ng-name' => '{item}的所有图片',
+  'page/138/ng-name' => '{brand} {vehicle_type}按车型及推出时间排序',
+  'page/14/ng-name' => '{brand}按推出时间排序',
+  'page/208/ng-name' => '{brand} Engines',
+  'page/37/ng-name' => '{brand}的概念车或原型车',
+  'page/40/ng-name' => '{brand}的其它图片',
+  'page/39/ng-name' => '{brand}的商标',
+  'page/15/ng-name' => '{brand}的最新图片',
   'perspective/chassis' => '机箱',
   'brands/more-{count}-companies' => '全部{count}个品牌',
   'perspective/mockup' => 'mockup',
@@ -10,14 +26,14 @@
   'page/102/ng-name' => '{item_name}性能参数编辑器',
   'page/27/ng-name' => '{group_name}技术参数',
   'page/136/name' => '关于我们',
-  'page/136/title' => 'About us',
-  '{count} vehicles' => '{count, plural, one {{count} vehicle} other {{count} vehicles}}',
+  'page/136/title' => '关于我们',
+  '{count} vehicles' => '{count}辆',
   'select' => 'select',
   'picture/text' => '任何图片都有权益人。
 
 如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。
 
-前往[论坛](/ng/forums/)可以讨论任何车型的任何话题。',
+前往[论坛](/forums/)可以讨论任何车型的任何话题。',
   'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',
@@ -33,16 +49,16 @@
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'page/214/name' => '人',
   'persons/content-persons' => 'Persons on photo',
-  'persons/author-persons' => 'Authors',
   'mosts/most' => '各项之最',
+  'persons/author-persons' => 'Authors',
   'mosts/among' => '类别',
   'upload/select-files' => 'Select files',
   'upload/select-file' => 'Select file',
   'page/42/name' => '论坛',
-  'page/51/name' => '最新添加',
   'page/213/name' => '%PERSON_NAME%',
-  'inbox/all-brands' => 'All brands',
+  'page/51/name' => '最新添加',
   'forums/theme/all-other/description' => 'Other topics not included in the above sections',
+  'inbox/all-brands' => 'All brands',
   'forums/theme/german-cars/description' => 'Audi, BMW, Mercedes-Benz, Opel, Volkswagen, ...',
   'forums/theme/italian-cars/description' => 'Alfa Romeo, Ferrari, Fiat, Lamborghini, Lancia, ...',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroën, Delahaye ...',
@@ -52,40 +68,6 @@
   'forums/theme/russian-cars/description' => 'VAZ, GAZ, UAZ, ...',
   'forums/theme/american-cars/description' => 'Cadillac, Chrysler, Chevrolet, Dodge, Ford, Hummer, Pontiac, ...',
   'forums/theme/british-cars/description' => 'Aston Martin, Bentley, MG, Rover, ...',
-  'rules' => '1.  ## Common
-
-    1.  При размещении любых материалов или их фрагментов обязательно указывать источник
-    2.  Запрещено одновременное использование нескольких аккаунтов одним пользователем.
-    3.  На всём сайте в любой форме запрещён мат, нецензурные выражения и т.д.
-    4.  Запрещено оскорбление посетителей сайта
-    5.  Запрещено поднятие вопросов: политики, религии, сексуальных предпочтений и прочего, если это напрямую не связано с предметом обсуждения или не оговорено особым образом
-    6.  Запрещено обсуждение действий модераторов где либо, кроме как в специально обозначенных местах или личной переписке с ними
-    7.  Запрещена публикация личной переписки или любой иной информации, дискредитирующей других участников сайта
-    8.  Запрещено использование в качестве аватаров или фотографий нецензурных изображений
-2.  ## Комментарии
-
-    1.  Запрещено обсуждение чего либо, кроме предмета комментирования
-    2.  Запрещено написание бессмысленных сообщений, содержащих только "смайлик" или другой способ уведомления о настроении
-    3.  Неккоректные сообщения будут удаляться без уведомления
-3.  ## Форум
-
-    1.  Запрещено использование написания заглавными буквами, воспринимаемого как крик
-    2.  Запрещен "оффтопик" в любом виде
-    3.  Запрещено создание одинаковых тем в нескольких ветках
-    4.  Запрещено поднятие вопроса о "лучшем автомобиле", без уточнения сферы использования
-4.  ## Правила ведения каталога
-
-    ### Именование автомобилей
-
-    1.  Названия автомобилям присваиваются в соответствии с их оригинальным названием, доступным на кузове или в официальных изданиях компании
-    2.  Название автомобиля пишется с заглавной буквы, но допускается написание только строчными или только заглавными буквами, если это соответсвует официальному наименованию автомобиля
-    3.  Желательно указание кода кузова/серии/модели
-    4.  Допутимо использование кириллицы, латиницы, отдельных символов греческого алфавита
-    5.  Допустимо использование цифр
-    6.  Допустимо использование специальных символов, если таковые применялись производителем
-    7.  Для разделения автомобилей по типу кузова, допустимо добавлять его к названию
-    8.  Допустимо добавления к названию информации, идентифицирующей рынок сбыта, для разделения автомобилей по этому признаку. Например, UK-spec, North America, ZA-spec
-    9.  Адаптированные к языковой версии сайта названия автомобилей следуют тем же правилам, но не имеют ограничения на используемый алфавит',
   'page/18/name' => '%PICTURE_NAME%',
   'page/23/name' => '%CATEGORY_NAME%',
   'page/26/name' => '%TWINS_GROUP_NAME%',
@@ -101,10 +83,10 @@
   'page/101/name' => '%ATTR_NAME%',
   'page/142/name' => '%ZONE_NAME%',
   'page/157/name' => '%VOTING_NAME%',
-  'page/159/name' => '%MUSEUM_NAME%',
   'page/163/name' => '%NEW_ITEM_OF_TYPE%',
-  'page/165/name' => '最顶级的%MOST_NAME% %BRAND_NAME%',
+  'page/159/name' => '%MUSEUM_NAME%',
   'page/181/name' => '%FACTORY_NAME%',
+  'page/165/name' => '最顶级的%MOST_NAME% %BRAND_NAME%',
   'page/183/name' => '%PICTURE_NAME%',
   'page/184/name' => '%PICTURE_NAME%',
   'page/185/name' => '%CAR_NAME%',
@@ -118,8 +100,8 @@
   'page/18/title' => '%PICTURE_NAME%',
   'page/23/title' => '%CATEGORY_NAME%',
   'page/24/title' => '',
-  'page/26/title' => '%TWINS_GROUP_NAME%',
   'page/33/title' => '%CAR_NAME%',
+  'page/26/title' => '%TWINS_GROUP_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/61/title' => '',
@@ -185,8 +167,8 @@
   'page/192/breadcrumbs' => '%PICTURE_NAME%',
   'page/193/breadcrumbs' => '%PICTURE_NAME%',
   'page/194/breadcrumbs' => '%PICTURE_NAME%',
-  'page/209/name' => '%DATE%',
   'page/209/title' => '%DATE%',
+  'page/209/name' => '%DATE%',
   'page/209/breadcrumbs' => '%DATE%',
   'page/210/name' => '%ITEM_NAME%',
   'test' => '测试是确定',
@@ -197,15 +179,15 @@
   '{count} messages' => '{count} 个站内信',
   '{topics} topics and {messages} messages' => '{topics} 个主题, {messages} 个站内信',
   'year' => '年',
-  'month' => '月',
   'contributor' => '贡献者',
+  'month' => '月',
   'contributors' => '贡献者',
   'deleted-user' => '用户已注销',
   'submit' => '上传',
   'layout/meta/description' => '汽车图片的百科全书，WheelsAge.org',
   'layout/meta/keywords' => '汽车',
-  'layout/brand' => 'WheelsAge.org',
   'layout/personal-messages' => '站内信',
+  'layout/brand' => 'WheelsAge.org',
   'ng-layout/you-have-new-messages' => '你有-{messages}-条未读站内信',
   'layout/search' => '搜索',
   'layout/footer' => '请知悉，autowp服务器中全部素材都是由浏览者添加的。
@@ -234,7 +216,7 @@
   'index/brands' => '品牌',
   'index/factories' => '工厂',
   'index/specifications' => '性能参数',
-  'index/twins/description' => '你或许早就知道大宇曼蒂兹有了6个[克隆车](/ng/twins/group/118812)? 可是你知道 [莲花和起亚的姊妹车型](/ng/twins/group/118750)吗? 我们相信这是一个很有趣的版块。',
+  'index/twins/description' => '你或许早就知道大宇曼蒂兹有了6个[克隆车](/twins/group/118812)? 可是你知道 [莲花和起亚的姊妹车型](/twins/group/118750)吗? 我们相信这是一个很有趣的版块。',
   'index/categories/description' => '你知道在不同时期是哪种技术帮助了全世界的城市街道遵守法律和秩序的吗？教皇乘坐哪些车？不知道？那么你应该阅读这一版块。',
   'index/categories/mosts' => '想知道哪款车是最快的？想知道最强大的矿用卡车有多重？快来了解一下。',
   'mosts/fastest/roadster' => '最快的敞篷跑车',
@@ -244,14 +226,14 @@
   'back' => '倒退',
   'forward' => '前进',
   'Picture of the day' => '今日最佳',
-  'car-of-day' => '今日之车',
   'theme-of-day' => 'theme of the day',
+  'car-of-day' => '今日之车',
   'day ahead' => '后一天',
   'day ago' => '前一天',
   'Cars by destination' => '按用途分类',
   'All new pictures' => '全部新图片',
-  'all-link' => '查看全部',
   'brands/new-cars-of-brand' => '新品牌{brand}',
+  'all-link' => '查看全部',
   'brands/pictures:' => '图片: ',
   'item/type/1/name' => '车辆',
   'item/type/1/name-plural' => '车辆',
@@ -264,8 +246,8 @@
   'item/type/3/name' => '分类',
   'item/type/3/name-plural' => '分类',
   'item/type/3/new-item' => '新增分类',
-  'item/type/3/add-sub-item' => 'Add sub-category',
   'item/type/4/name' => '姊妹车型',
+  'item/type/3/add-sub-item' => 'Add sub-category',
   'item/type/4/name-plural' => '姊妹车型',
   'item/type/4/new-item' => '新增姊妹车型',
   'item/type/4/add-sub-item' => 'Add sub-twins',
@@ -300,8 +282,8 @@
   'ng/carlist/produced/%1$s' => '总产量{count}辆',
   'ng/carlist/produced-about/%1$s' => '总产量约{count}辆',
   'carlist/specifications' => '性能参数',
-  'carlist/designed by %s' => '设计师%s',
   'ng/carlist/designed by' => '设计师',
+  'carlist/designed by %s' => '设计师%s',
   'carlist/edit-specs' => '编辑性能参数',
   'carlist/years' => '生产年份',
   'carlist/model-years' => '年款',
@@ -311,11 +293,11 @@
   'present-time-abbr' => '至今',
   'most/fastest' => '极速最高',
   'most/fastest/param' => '最高时速',
-  'most/slowest' => '极速最低',
   'most/slowest/param' => '最高时速',
+  'most/slowest' => '极速最低',
   'most/dynamic' => '加速最快',
-  'most/dynamic/param' => '加速时间',
   'most/static' => '加速最慢',
+  'most/dynamic/param' => '加速时间',
   'most/static/param' => '加速时间',
   'most/mighty' => '动力最强',
   'most/mighty/param' => '发动机功率',
@@ -415,7 +397,7 @@
 请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。',
   'upload/only-registered' => '只有注册用户才能上传图片
 
-[注册](/ng/login)或[登录](/ng/signup)',
+[注册](/login)或[登录](/signup)',
   'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
   'catalogue/all-pictures-of-%1$s' => '%1$s的所有图片',
   'catalogue/brand/logo-of-%s' => '%s 商标',
@@ -456,7 +438,7 @@
   'factories/factory/pictures' => '图片',
   'comments/title' => '评论',
   'comments/reply' => '回复',
-  'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要[注册账号或用社交网站账号登陆](/ng/login)',
+  'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要[注册账号或用社交网站账号登陆](/login)',
   'comments/it-requires-attention-of-moderators' => '向管理员发送提示',
   'comments/form-title' => '添加评论',
   'comments/message' => '站内信',
@@ -509,8 +491,8 @@
   'login/forgot-password?' => '忘记密码?',
   'login/success-text' => '欢迎来到我们的网站',
   'login/remember' => '保持登录状态',
-  'login/if-you-lose-password' => '如果您忘记了密码,您可以填写表格 [重设电子邮件](/ng/restore-password)</a>',
-  'login/if-you-not-registered' => '如果您尚未注册[现在就可注册](/ng/signup)</a>!',
+  'login/if-you-lose-password' => '如果您忘记了密码,您可以填写表格 [重设电子邮件](/restore-password)</a>',
+  'login/if-you-not-registered' => '如果您尚未注册[现在就可注册](/signup)</a>!',
   'login/sign-in-using-account' => '使用已有账号登录',
   'login/login-or-password-is-incorrect' => '您已登录或密码错误',
   'login/user-%value%-not-found' => '用户名或注册邮箱 "%value%" 不存在',
@@ -577,7 +559,7 @@
   'feedback/title' => '反馈',
   'feedback/name' => '标题',
   'feedback/message' => '内容',
-  'feedback/donate-text' => '如果您希望表达自己的支持，您可以通过[捐款支持](/ng/donate)',
+  'feedback/donate-text' => '如果您希望表达自己的支持，您可以通过[捐款支持](/donate)',
   'feedback/sent' => '您的信息已发送',
   'map/museums-and-factories' => '工厂及博物馆',
   'picture/image-specifications' => '图像参数',
@@ -680,13 +662,13 @@
 
 原则上我们进行不记名捐助，但如果您要求，我们会标记您的贡献。
 
-我们还可以让您[钦定今日之车](/ng/donate/vod)做为回报',
+我们还可以让您[钦定今日之车](/donate/vod)做为回报',
   'donate/target' => '为了维持网站运营',
   'donate/project' => 'WheelsAge.org',
   'donate/comment-hint' => '您的建议',
   'donate/success-text' => '感谢您的支持。 
 我们尽己所能让您满意。',
-  'donate/vod/text' => '我们可以做出一点微小的工作作为回报-您有机会钦定下一个“今日之车”，无论您做出任意数额的[无条件捐助](/ng/donate) 我们都会很高兴。',
+  'donate/vod/text' => '我们可以做出一点微小的工作作为回报-您有机会钦定下一个“今日之车”，无论您做出任意数额的[无条件捐助](/donate) 我们都会很高兴。',
   'donate/vod/select-date' => '1. 选择日期',
   'donate/vod/date-busy' => '日期已有安排',
   'donate/vod/select-item' => '2. 选择车型',
@@ -811,7 +793,7 @@
 
 ### 意见反馈
 
-如果您有任何意见、建议或其他的想法，可以到[论坛](/ng/forums/)联系他们, 选择通过站内信或写“[意见反馈](/ng/feedback)”为网站管理提建议。
+如果您有任何意见、建议或其他的想法，可以到[论坛](/forums/)联系他们, 选择通过站内信或写“[意见反馈](/feedback)”为网站管理提建议。
 
 如果您有关于广告、交换链接或推广产品的问题，很抱歉：我们不设置广告。
 
@@ -846,7 +828,7 @@ Brazilian portuguese site translation: %pt-br-translator%
 
 ### 支持我们
 
-您可以通过[捐助](/donate) 或[反馈意见](/ng/feedback)支持我们网站
+您可以通过[捐助](/donate) 或[反馈意见](/feedback)支持我们网站
 欲添加更多语言请参与 [翻译网站](https://github.com/autowp/autowp/tree/master/module/Application/language) 。',
   'page/1/name' => '主页',
   'page/2/name' => '主目录',
@@ -908,7 +890,6 @@ Brazilian portuguese site translation: %pt-br-translator%
   'page/103/name' => '历史记录',
   'page/104/name' => '用户统计',
   'page/105/name' => '添加评论',
-  'page/106/name' => '规定',
   'page/107/name' => '规定',
   'page/109/name' => '剖视',
   'page/110/name' => '意见反馈',
@@ -1003,8 +984,8 @@ Brazilian portuguese site translation: %pt-br-translator%
   'page/164/breadcrumbs' => 'Mosts',
   'page/180/breadcrumbs' => '工厂',
   'page/186/breadcrumbs' => '图片',
-  'page/189/breadcrumbs' => 'Low weight',
   'page/201/name' => '立标',
+  'page/189/breadcrumbs' => 'Low weight',
   'page/202/name' => '剖视',
   'page/203/name' => '用户',
   'page/204/name' => 'Telegram',
@@ -1417,7 +1398,7 @@ Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*',
 请进入[专用接口](/account/specs-conflicts/conflict/minus-weight)，这里收集了其它用户提出的争议。',
   'specifications-editor/errors-alert' => '**注意!** 您输入的数据已经积累了大量误差。
 
-您可以到[这里](/ng/account/specs-conflicts)查看其它用户的数据',
+您可以到[这里](/account/specs-conflicts)查看其它用户的数据',
   'specifications-editor/admin/date' => '日期',
   'specifications-editor/admin/user' => '用户',
   'specifications-editor/admin/parameter' => '参数',
@@ -1766,8 +1747,8 @@ Transmission is not considered',
   'specs/attrs/15/217/218/options/168' => 'on the longitudinal ¼-elliptic leaf springs',
   'specs/attrs/15/217/218/options/169' => 'on longitudinal semi-elliptic leaf springs',
   'specs/attrs/15/217/218/options/170' => 'on longitudinal cantilever leaf springs',
-  'specs/attrs/15/217/218/options/171' => 'on the longitudinal balancing leaf springs',
   'specs/attrs/15/217/218/options/175' => 'torsion bar with the push rod',
+  'specs/attrs/15/217/218/options/171' => 'on the longitudinal balancing leaf springs',
   'specs/attrs/15/217/218/options/176' => 'torsion bar with the pull rod',
   'specs/attrs/15/217/219' => 'type guide vanes',
   'specs/attrs/15/217/219/options/180' => 'dependent',
@@ -1844,8 +1825,8 @@ Transmission is not considered',
   'specs/attrs/46/47' => 'max speed',
   'specs/attrs/46/180' => 'acceleration to 60 km/h',
   'specs/attrs/46/48' => 'acceleration to 100 km/h',
-  'specs/attrs/46/175' => 'acceleration to 60 mph',
   'specs/attrs/46/49' => 'acceleration to 200 km/h',
+  'specs/attrs/46/175' => 'acceleration to 60 mph',
   'specs/attrs/46/50' => 'acceleration to 300 km/h',
   'specs/attrs/46/51' => '400m run time',
   'specs/attrs/46/52' => '1000m run time',
@@ -2029,11 +2010,11 @@ Send `/me 123456789` to recevice confirmation code.
 
 Where 123456789 - is your account number, which you can find on your profile page. For example, [Juliano Scotini](/users/juliano-scotini) has number 17322
 
-Confirmation code will be sent to you via [the private messaging system](/ng/account/messages?folder=system)
+Confirmation code will be sent to you via [the private messaging system](/account/messages?folder=system)
 
 Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish the process of association your telegram account without website user.
 
-Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/ng/account/messages?folder=system)',
+Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/account/messages?folder=system)',
   'personal-message-dialog/title' => 'Send personal message',
   'personal-message-dialog/send' => 'send',
   'personal-message-dialog/sending' => 'sending ...',
@@ -2095,10 +2076,10 @@ Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [th
   'forums/theme/moderators' => '管理员',
   'forums/theme/cars' => '车型版块',
   'forums/topic-closed-text' => '主题已被管理员关闭',
-  'forums/register-to-post' => '为了能够创建和回复主题，您必须[注册](/ng/signup)。',
+  'forums/register-to-post' => '为了能够创建和回复主题，您必须[注册](/signup)。',
   'forums/register-to-create-topic' => '只有注册用户才能添加主题。
 
 如果您已经注册，您必须登录才能进行操作。
 
-如果您还未注册，现在就可以到[注册页面](/ng/signup)注册。',
+如果您还未注册，现在就可以到[注册页面](/signup)注册。',
 );

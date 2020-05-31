@@ -1,5 +1,21 @@
 <?php return array (
-  'perspective/chassis' => 'Le châssis',
+  'specs/attrs/22/24/26/options/x' => 'X',
+  'car-type/singleseater' => 'Single-seater',
+  'car-type-rp/singleseater' => 'Single-seater',
+  'page/36/ng-name' => 'Caractéristiques de',
+  'catalogue/all-pictures-of' => 'Toutes les images de',
+  'catalogue/sport-of' => 'Sport',
+  'catalogue/related-with' => 'Associé à',
+  'catalogue/other-pictures-of' => 'Autres photos de',
+  'page/34/ng-name' => 'Toutes les images de {item}',
+  'page/138/ng-name' => '{brand} {vehicle_type} dans l\'ordre chronologique',
+  'page/14/ng-name' => '{brand} dans l\'ordre chronologique',
+  'page/208/ng-name' => 'Moteurs {brand}',
+  'page/37/ng-name' => 'Concepts et prototypes de {brand}',
+  'page/40/ng-name' => '{brand} varié',
+  'page/39/ng-name' => 'Logotypes de {brand}',
+  'page/15/ng-name' => 'Les dernières photos de {brand}',
+  'perspective/chassis' => 'le châssis',
   'brands/more-{count}-companies' => 'plus {count, plural, one {d\'{count} marque} other {de {count} marques}}',
   'perspective/mockup' => 'mockup',
   'catalogue/specifications-of-{name}' => 'Caractéristiques de {name}',
@@ -17,7 +33,7 @@
 
 Si vous pensez que les utilisateurs du site se sont trompés en affichant cette image dans cette section, ce serait bien si vous en parliez dans les commentaires et si vous indiquiez où se trouve l\'erreur.
 
-Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le faire sur [notre forum](/ng/forums/).',
+Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le faire sur [notre forum](/forums/).',
   'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',
@@ -33,16 +49,16 @@ Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le fai
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'page/214/name' => 'Personnes',
   'persons/content-persons' => 'Personnes sur la photo',
-  'persons/author-persons' => 'Auteurs',
   'mosts/most' => 'Le plus',
+  'persons/author-persons' => 'Auteurs',
   'mosts/among' => 'parmi',
   'upload/select-files' => 'Sélectionner des fichiers',
   'upload/select-file' => 'Sélectionner un fichier',
   'page/42/name' => 'Forums',
-  'page/51/name' => 'Nouvelles photos',
   'page/213/name' => '%PERSON_NAME%',
-  'inbox/all-brands' => 'Toutes les marques',
+  'page/51/name' => 'Nouvelles photos',
   'forums/theme/all-other/description' => 'Autres sujets non-compris dans les sections ci-dessus',
+  'inbox/all-brands' => 'Toutes les marques',
   'forums/theme/german-cars/description' => 'Audi, BMW, Mercedes-Benz, Opel, Volkswagen, ...',
   'forums/theme/italian-cars/description' => 'Alfa Romeo, Ferrari, Fiat, Lamborghini, Lancia, ...',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroën, Delahaye, …',
@@ -52,40 +68,6 @@ Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le fai
   'forums/theme/russian-cars/description' => 'VAZ, GAZ, UAZ, …',
   'forums/theme/american-cars/description' => 'Cadillac, Chrysler, Chevrolet, Dodge, Ford, Hummer, Pontiac, ...',
   'forums/theme/british-cars/description' => 'Aston Martin, Bentley, MG, Rover, ...',
-  'rules' => '1.  ## Common
-
-    1.  При размещении любых материалов или их фрагментов обязательно указывать источник
-    2.  Запрещено одновременное использование нескольких аккаунтов одним пользователем.
-    3.  На всём сайте в любой форме запрещён мат, нецензурные выражения и т.д.
-    4.  Запрещено оскорбление посетителей сайта
-    5.  Запрещено поднятие вопросов: политики, религии, сексуальных предпочтений и прочего, если это напрямую не связано с предметом обсуждения или не оговорено особым образом
-    6.  Запрещено обсуждение действий модераторов где либо, кроме как в специально обозначенных местах или личной переписке с ними
-    7.  Запрещена публикация личной переписки или любой иной информации, дискредитирующей других участников сайта
-    8.  Запрещено использование в качестве аватаров или фотографий нецензурных изображений
-2.  ## Комментарии
-
-    1.  Запрещено обсуждение чего либо, кроме предмета комментирования
-    2.  Запрещено написание бессмысленных сообщений, содержащих только "смайлик" или другой способ уведомления о настроении
-    3.  Неккоректные сообщения будут удаляться без уведомления
-3.  ## Форум
-
-    1.  Запрещено использование написания заглавными буквами, воспринимаемого как крик
-    2.  Запрещен "оффтопик" в любом виде
-    3.  Запрещено создание одинаковых тем в нескольких ветках
-    4.  Запрещено поднятие вопроса о "лучшем автомобиле", без уточнения сферы использования
-4.  ## Правила ведения каталога
-
-    ### Именование автомобилей
-
-    1.  Названия автомобилям присваиваются в соответствии с их оригинальным названием, доступным на кузове или в официальных изданиях компании
-    2.  Название автомобиля пишется с заглавной буквы, но допускается написание только строчными или только заглавными буквами, если это соответсвует официальному наименованию автомобиля
-    3.  Желательно указание кода кузова/серии/модели
-    4.  Допутимо использование кириллицы, латиницы, отдельных символов греческого алфавита
-    5.  Допустимо использование цифр
-    6.  Допустимо использование специальных символов, если таковые применялись производителем
-    7.  Для разделения автомобилей по типу кузова, допустимо добавлять его к названию
-    8.  Допустимо добавления к названию информации, идентифицирующей рынок сбыта, для разделения автомобилей по этому признаку. Например, UK-spec, North America, ZA-spec
-    9.  Адаптированные к языковой версии сайта названия автомобилей следуют тем же правилам, но не имеют ограничения на используемый алфавит',
   'page/18/name' => '%PICTURE_NAME%',
   'page/23/name' => '%CATEGORY_NAME%',
   'page/26/name' => '%TWINS_GROUP_NAME%',
@@ -101,10 +83,10 @@ Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le fai
   'page/101/name' => '%ATTR_NAME%',
   'page/142/name' => '%ZONE_NAME%',
   'page/157/name' => '%VOTING_NAME%',
-  'page/159/name' => '%MUSEUM_NAME%',
   'page/163/name' => '%NEW_ITEM_OF_TYPE%',
-  'page/165/name' => 'La plupart %MOST_NAME% de %BRAND_NAME%',
+  'page/159/name' => '%MUSEUM_NAME%',
   'page/181/name' => '%FACTORY_NAME%',
+  'page/165/name' => 'La plupart %MOST_NAME% de %BRAND_NAME%',
   'page/183/name' => '%PICTURE_NAME%',
   'page/184/name' => '%PICTURE_NAME%',
   'page/185/name' => '%CAR_NAME%',
@@ -118,8 +100,8 @@ Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le fai
   'page/18/title' => '%PICTURE_NAME%',
   'page/23/title' => '%CATEGORY_NAME%',
   'page/24/title' => '',
-  'page/26/title' => '%TWINS_GROUP_NAME%',
   'page/33/title' => '%CAR_NAME%',
+  'page/26/title' => '%TWINS_GROUP_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/61/title' => '',
@@ -185,8 +167,8 @@ Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le fai
   'page/192/breadcrumbs' => '%PICTURE_NAME%',
   'page/193/breadcrumbs' => '%PICTURE_NAME%',
   'page/194/breadcrumbs' => '%PICTURE_NAME%',
-  'page/209/name' => '%DATE%',
   'page/209/title' => '%DATE%',
+  'page/209/name' => '%DATE%',
   'page/209/breadcrumbs' => '%DATE%',
   'page/210/name' => '%ITEM_NAME%',
   'test' => 'test est ok',
@@ -197,15 +179,15 @@ Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le fai
   '{count} messages' => '{count, plural, one {{count} message} other {{count} messages}}',
   '{topics} topics and {messages} messages' => '{topics, plural, one {{topics} sujet} other {{topics} sujets}} et {messages, plural, one {{messages} message} other {{messages} messages}}',
   'year' => 'Année',
-  'month' => 'Mois',
   'contributor' => 'contributeur',
+  'month' => 'Mois',
   'contributors' => 'contributeurs',
   'deleted-user' => 'utilisateur supprimé',
   'submit' => 'Envoyer',
   'layout/meta/description' => 'L\'encyclopédie des voitures en images. WheelsAge.org',
   'layout/meta/keywords' => 'car, vehicle, auto, avto, voiture',
-  'layout/brand' => 'WheelsAge.org',
   'layout/personal-messages' => 'Messages personnels',
+  'layout/brand' => 'WheelsAge.org',
   'ng-layout/you-have-new-messages' => '{messages, plural, one {Vous avez {messages} nouveau message} other {Vous avez {messages} nouveaux messages}}',
   'layout/search' => 'Rechercher',
   'layout/footer' => 'Veuillez noter que tous les documents sur autowp.ru (wheelsage.org), sont ajoutés par les visiteurs.
@@ -234,7 +216,7 @@ Toutes les images sont postées à des fins éducatives.
   'index/brands' => 'Marques',
   'index/factories' => 'Usines',
   'index/specifications' => 'Caractéristiques',
-  'index/twins/description' => 'Savez-vous que la Daewoo Matiz a [six clones](/ng/twins/group/118812)? Savez-vous quel est le point commun entre [Lotus et Kia](/ng/twins/group/118750)? Cette section va sûrement vous intéresser!',
+  'index/twins/description' => 'Savez-vous que la Daewoo Matiz a [six clones](/twins/group/118812)? Savez-vous quel est le point commun entre [Lotus et Kia](/twins/group/118750)? Cette section va sûrement vous intéresser!',
   'index/categories/description' => 'Savez-vous quelle technique a permis d\'observer la loi et l\'ordre dans les rues de villes du monde à des moments différents? Et pas de voitures voyagé Pape? Non? Ensuite, vous êtes exactement dans cette section.',
   'index/categories/mosts' => 'Vous voulez savoir quelle voiture est la plus rapide? Ou combien pèse le plus puissant camion d\'exploitation minière? C\'est ici que vous trouverez les réponses!',
   'mosts/fastest/roadster' => 'Les roadsters les plus rapides',
@@ -244,14 +226,14 @@ Toutes les images sont postées à des fins éducatives.
   'back' => 'arrière',
   'forward' => 'vers l\'avant',
   'Picture of the day' => 'Image du jour',
-  'car-of-day' => 'Voiture du jour',
   'theme-of-day' => 'thème du jour',
+  'car-of-day' => 'Voiture du jour',
   'day ahead' => 'journée à l\'avance',
   'day ago' => 'il y a jour',
   'Cars by destination' => 'Voitures par destination',
   'All new pictures' => 'Toutes les nouvelles images',
-  'all-link' => 'tous',
   'brands/new-cars-of-brand' => 'Nouveaux modèles {brand}',
+  'all-link' => 'tous',
   'brands/pictures:' => 'images: ',
   'item/type/1/name' => 'Véhicule',
   'item/type/1/name-plural' => 'Véhicules',
@@ -264,8 +246,8 @@ Toutes les images sont postées à des fins éducatives.
   'item/type/3/name' => 'Catégorie',
   'item/type/3/name-plural' => 'Catégories',
   'item/type/3/new-item' => 'Nouvelle catégorie',
-  'item/type/3/add-sub-item' => 'Ajouter une sous-catégorie',
   'item/type/4/name' => 'Jumeaux',
+  'item/type/3/add-sub-item' => 'Ajouter une sous-catégorie',
   'item/type/4/name-plural' => 'Jumeaux',
   'item/type/4/new-item' => 'Nouveau groupe de jumeaux',
   'item/type/4/add-sub-item' => 'Nouveau sous-groupe de jumeaux',
@@ -300,8 +282,8 @@ Toutes les images sont postées à des fins éducatives.
   'ng/carlist/produced/%1$s' => '{count, plural, one {Produit en  {count} exemplaire} other {Produit à {count} exemplaires}}',
   'ng/carlist/produced-about/%1$s' => '{count, plural, one {Produit à environ {count} exemplaire} other {Produit à environ {count} exemplaires}}',
   'carlist/specifications' => 'caractéristiques',
-  'carlist/designed by %s' => 'dessinée par %s',
   'ng/carlist/designed by' => 'dessinée par ',
+  'carlist/designed by %s' => 'dessinée par %s',
   'carlist/edit-specs' => 'modifier les caractéristiques',
   'carlist/years' => 'années de production',
   'carlist/model-years' => 'années-modèles',
@@ -311,11 +293,11 @@ Toutes les images sont postées à des fins éducatives.
   'present-time-abbr' => 'pr.',
   'most/fastest' => 'le plus rapide',
   'most/fastest/param' => 'vitesse maximale',
-  'most/slowest' => 'le plus lent',
   'most/slowest/param' => 'vitesse maximale',
+  'most/slowest' => 'le plus lent',
   'most/dynamic' => 'dynamique',
-  'most/dynamic/param' => 'accélération',
   'most/static' => 'statique',
+  'most/dynamic/param' => 'accélération',
   'most/static/param' => 'accélération',
   'most/mighty' => 'puissant',
   'most/mighty/param' => 'puissance du moteur',
@@ -416,7 +398,7 @@ Exigences pour les images ajoutées:
 S\'il vous plaît noter que l\'ajout d\'images modérés. c\'est-à-dire toutes les photos avant d\'ajouter au catalogue seront testés par moderateurs.',
   'upload/only-registered' => 'Seuls les utilisateurs inscrits peuvent téléverser des images
 
-[Se connecter](/ng/login) ou [s\'inscrire](/ng/signup)',
+[Se connecter](/login) ou [s\'inscrire](/signup)',
   'catalogue/other-pictures-of-%1$s' => 'Autres photos de %1$s',
   'catalogue/all-pictures-of-%1$s' => 'Toutes les images de %1$s',
   'catalogue/brand/logo-of-%s' => '%s logotype',
@@ -457,7 +439,7 @@ S\'il vous plaît noter que l\'ajout d\'images modérés. c\'est-à-dire toutes 
   'factories/factory/pictures' => 'Images',
   'comments/title' => 'Commentaires',
   'comments/reply' => 'répondre',
-  'comments/what-to-do-for-write-comments' => 'Pour pouvoir poster un commentaire, vous devez [créer un compte ou de vous connecter en utilisant le compte des réseaux sociaux](/ng/login)',
+  'comments/what-to-do-for-write-comments' => 'Pour pouvoir poster un commentaire, vous devez [créer un compte ou de vous connecter en utilisant le compte des réseaux sociaux](/login)',
   'comments/it-requires-attention-of-moderators' => 'Nécessite l\'attention des modérateurs',
   'comments/form-title' => 'Ajouter un commentaire',
   'comments/message' => 'Message',
@@ -503,15 +485,15 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
   'perspective/mixed' => 'mixed',
   'perspective/exterior-details' => 'détails extérieurs',
   'login/sign-in' => 'Connexion',
-  'login/sign-out' => 'Sortie',
+  'login/sign-out' => 'Se déconnecter',
   'login/login-or-email' => 'login ou e-mail',
   'login/captcha' => 'entrez le code de sécurité',
   'login/registration' => 'Inscription',
   'login/forgot-password?' => 'Mot de passe oublié?',
   'login/success-text' => 'Nous sommes heureux de vous revoir sur notre site',
   'login/remember' => 'se souvenir',
-  'login/if-you-lose-password' => 'Si vous avez oublié votre login ou mot de passe, vous pouvez utiliser [le formulaire de récupération par e-mail](/ng/restore-password)',
-  'login/if-you-not-registered' => 'Si vous n\'êtes pas enregistré sur le site, vous [pouvez le faire maintenant](/ng/signup)!',
+  'login/if-you-lose-password' => 'Si vous avez oublié votre login ou mot de passe, vous pouvez utiliser [le formulaire de récupération par e-mail](/restore-password)',
+  'login/if-you-not-registered' => 'Si vous n\'êtes pas enregistré sur le site, vous [pouvez le faire maintenant](/signup)!',
   'login/sign-in-using-account' => 'Connectez-vous en utilisant un compte existant',
   'login/login-or-password-is-incorrect' => 'Login ou mot de passe est incorrect',
   'login/user-%value%-not-found' => 'Utilisateur avec login ou e-mail "%value%" non trouvé',
@@ -584,7 +566,7 @@ Bonne chance.',
   'feedback/title' => 'Retour d\'information',
   'feedback/name' => 'Votre nom',
   'feedback/message' => 'Message',
-  'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/ng/donate)',
+  'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/donate)',
   'feedback/sent' => 'Votre message a été envoyé',
   'map/museums-and-factories' => 'Les musées et les usines',
   'picture/image-specifications' => 'Caractéristiques de l\'image',
@@ -613,7 +595,7 @@ Bonne chance.',
   'users/user/type:' => 'Type de compte: ',
   'users/user/type/moderator' => 'Modérateur',
   'users/user/type/visitor' => 'Visiteur',
-  'users/user/upload-pictures:' => 'Images téléchargées: ',
+  'users/user/upload-pictures:' => 'Images publiées: ',
   'users/user/pictures-left-on-site:' => 'laissés sur le site: ',
   'users/comments/order/new' => 'New',
   'users/comments/order/old' => 'Old',
@@ -643,7 +625,7 @@ Bonne chance.',
   'users/user/last-visited' => 'Dernière visite',
   'users/user/send-personal-message' => 'Envoyer un message personnel',
   'users/user/log' => 'Journal de l\'utilisateur',
-  'users/user/uploaded-pictures' => 'Images téléchargées',
+  'users/user/uploaded-pictures' => 'Images publiées',
   'users/user/not-upload-pictures' => 'Pas télécharger des images',
   'users/rating/specifications' => 'Caractéristiques',
   'users/rating/pictures' => 'Images',
@@ -687,7 +669,7 @@ Avec votre don, vous pouvez nous faire part des améliorations que vous souhaite
 
 Nous ne recueillons pas d\'informations sur les donateurs mais, si vous le souhaitez, nous pouvons noter votre contribution.
 
-Avec votre don, vous aurez en plus la possibilité de [choisir le prochain véhicule du jour](/ng/donate/vod).',
+Avec votre don, vous aurez en plus la possibilité de [choisir le prochain véhicule du jour](/donate/vod).',
   'donate/target' => 'Sur le site',
   'donate/project' => 'WheelsAge.org',
   'donate/comment-hint' => 'Votre souhait',
@@ -698,7 +680,7 @@ Allons essayer de ne pas vous décevoir.',
 
 Suivez les instructions ci-dessous.
 
-Nous serions heureux si vous souhaitiez [faire une donation désintéressée](/ng/donate) d\'un montant arbitraire.',
+Nous serions heureux si vous souhaitiez [faire une donation désintéressée](/donate) d\'un montant arbitraire.',
   'donate/vod/select-date' => '1. Choisissez une date',
   'donate/vod/date-busy' => 'busy',
   'donate/vod/select-item' => '2. Choisissez un véhicule',
@@ -825,7 +807,7 @@ Une partie des "verts" sont les modérateurs.
 
 ### Dialogue et retour d\'information.
 
-Si vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/ng/forums/), demander personnellement via la messagerie, ou écrire dans le "[Retour d\'information](/ng/feedback)" de l\'administration du site.
+Si vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/forums/), demander personnellement via la messagerie, ou écrire dans le "[Retour d\'information](/feedback)" de l\'administration du site.
 
 Si vous avez des questions concernant la publicité, échange de lien ou de promouvoir votre produit par d\'autres moyens, ils ont tous une réponse: on ne place pas la publicité.
 
@@ -860,7 +842,7 @@ Une partie du code source du site est ouverte et un cours de communication suppl
 
 ### Soutenir le projet
 
-Vous pouvez soutenir notre projet [financièrement](/ng/donate) ou [moralement](/ng/feedback).
+Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.',
   'page/1/name' => 'Page d\'accueil',
   'page/2/name' => 'Main menu',
@@ -885,7 +867,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/41/name' => 'Non triée',
   'page/45/name' => 'Nouveau sujet',
   'page/48/name' => 'Page personnelle',
-  'page/49/name' => 'Messages personnels',
+  'page/49/name' => 'Messages privés',
   'page/52/name' => 'Inscription',
   'page/53/name' => 'Inscription réussie',
   'page/54/name' => 'Confirmez l\'adresse e-mail',
@@ -894,7 +876,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/57/name' => 'Abonnement aux forums',
   'page/60/name' => 'Récupération de mot de passe',
   'page/61/name' => 'Toutes les marques',
-  'page/63/name' => 'Utilisateurs images',
+  'page/63/name' => 'Images de l\'utilisateur',
   'page/66/name' => 'Toutes les images de %BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/67/name' => 'Page Modérateur',
   'page/68/name' => 'Pages',
@@ -912,7 +894,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/83/name' => 'Déplacer',
   'page/87/name' => 'Plus',
   'page/89/name' => 'Retour d\'information',
-  'page/90/name' => 'Sortie',
+  'page/90/name' => 'Se déconnecter',
   'page/91/name' => 'Inscription',
   'page/93/name' => 'Message envoyé',
   'page/94/name' => 'En attente de modération',
@@ -922,7 +904,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/103/name' => 'Historique',
   'page/104/name' => 'Personnalisée statistiques',
   'page/105/name' => 'Ajouter un commentaire',
-  'page/106/name' => 'Règlement',
   'page/107/name' => 'Les demandes de retrait',
   'page/109/name' => 'Cutaway',
   'page/110/name' => 'Les comments',
@@ -1017,8 +998,8 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/164/breadcrumbs' => 'Les meilleurs',
   'page/180/breadcrumbs' => 'Des usines',
   'page/186/breadcrumbs' => 'Toutes les images',
-  'page/189/breadcrumbs' => 'Faible poids',
   'page/201/name' => 'Mascottes',
+  'page/189/breadcrumbs' => 'Faible poids',
   'page/202/name' => 'Perspectives',
   'page/203/name' => 'Utilisateurs',
   'page/204/name' => 'Telegram',
@@ -1365,7 +1346,7 @@ Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*',
   'votings/who-voted' => 'Qui a voté?',
   'votings/voting/duration' => 'Vote au cours de {from} à {to}',
   'votings/voting/voters/show-all' => 'montre tout',
-  'votings/voting/voters/show-contributors' => 'montrer à partir de 100 images téléchargées',
+  'votings/voting/voters/show-contributors' => 'montrer à partir de 100 images publiées',
   'museums/museum/address:' => 'Adresse:',
   'museums/museum/on-the-map' => 'Sur la carte',
   'museums/museum/website:' => 'site Web: ',
@@ -1430,7 +1411,7 @@ La saisie des données est temporairement suspendu. S\'il vous plaît corriger l
 Réaliser cela aidera à [une interface spéciale](/account/specs-conflicts/conflict/minus-weight), qui contient au moins les erreurs qui ont trouvé les visiteurs.',
   'specifications-editor/errors-alert' => '**Attention!** Probablement, vous avez accumulé un grand nombre d\'erreurs.
 
-Certains d\'entre eux, trouvés par d\'autres utilisateurs, vous pouvez trouver [ici](/ng/account/specs-conflicts)',
+Certains d\'entre eux, trouvés par d\'autres utilisateurs, vous pouvez trouver [ici](/account/specs-conflicts)',
   'specifications-editor/admin/date' => 'Date',
   'specifications-editor/admin/user' => 'Utilisateur',
   'specifications-editor/admin/parameter' => 'Paramètre',
@@ -1779,8 +1760,8 @@ La transmission n\'est pas pris en compte.',
   'specs/attrs/15/217/218/options/168' => 'ressorts à lames ¼-elliptiques longitudinales',
   'specs/attrs/15/217/218/options/169' => 'ressorts à lames semi-elliptiques longitudinaux',
   'specs/attrs/15/217/218/options/170' => 'ressorts à lames cantilever longitudinaux',
-  'specs/attrs/15/217/218/options/171' => 'ressorts à lames équilibrage longitudinales',
   'specs/attrs/15/217/218/options/175' => 'barre de torsion avec tige de poussée (Push-Rod)',
+  'specs/attrs/15/217/218/options/171' => 'ressorts à lames équilibrage longitudinales',
   'specs/attrs/15/217/218/options/176' => 'barre de torsion avec tige de traction (Pull-Rod)',
   'specs/attrs/15/217/219' => 'types de suspension',
   'specs/attrs/15/217/219/options/180' => 'dépendant',
@@ -1857,8 +1838,8 @@ La transmission n\'est pas pris en compte.',
   'specs/attrs/46/47' => 'vitesse maximale',
   'specs/attrs/46/180' => 'accélération de 0 à 60 km/h',
   'specs/attrs/46/48' => 'accélération de 0 à 100 km/h',
-  'specs/attrs/46/175' => 'accélération de 0 à 60 mph',
   'specs/attrs/46/49' => 'accélération de 0 à 200 km/h',
+  'specs/attrs/46/175' => 'accélération de 0 à 60 mph',
   'specs/attrs/46/50' => 'accélération de 0 à 300 km/h',
   'specs/attrs/46/51' => '400m run time',
   'specs/attrs/46/52' => 'kilomètre départ arrêté',
@@ -2042,11 +2023,11 @@ Send `/me 123456789` to recevice confirmation code.
 
 Where 123456789 - is your account number, which you can find on your profile page. For example, [Juliano Scotini](/users/juliano-scotini) has number 17322
 
-Confirmation code will be sent to you via [the private messaging system](/ng/account/messages?folder=system)
+Confirmation code will be sent to you via [the private messaging system](/account/messages?folder=system)
 
 Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish the process of association your telegram account without website user.
 
-Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/ng/account/messages?folder=system)',
+Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/account/messages?folder=system)',
   'personal-message-dialog/title' => 'Envoyer un message personnel',
   'personal-message-dialog/send' => 'envoyer',
   'personal-message-dialog/sending' => 'envoi …',
@@ -2113,5 +2094,5 @@ Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [th
 
 Si vous êtes déjà inscrit sur le site, il vous suffit de vous connecter.
 
-Si vous n\'êtes pas encore inscrit sur le site, vous [pouvez le faire](/ng/signup) maintenant.',
+Si vous n\'êtes pas encore inscrit sur le site, vous [pouvez le faire](/signup) maintenant.',
 );

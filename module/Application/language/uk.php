@@ -1,5 +1,21 @@
 <?php return array (
-  'perspective/chassis' => 'Шасі',
+  'specs/attrs/22/24/26/options/x' => 'X',
+  'car-type/singleseater' => 'Single-seater',
+  'car-type-rp/singleseater' => 'Single-seater',
+  'page/36/ng-name' => 'Технічні характеристики',
+  'catalogue/all-pictures-of' => 'Всі зображення',
+  'catalogue/sport-of' => 'Спорт',
+  'catalogue/related-with' => 'Пов\'язані з',
+  'catalogue/other-pictures-of' => 'Інші зображення',
+  'page/34/ng-name' => 'Всі зображення {item}',
+  'page/138/ng-name' => '{brand} {vehicle_type} в хронологічному порядку',
+  'page/14/ng-name' => '{brand} в хронологічному порядку',
+  'page/208/ng-name' => 'Двигуни {brand}',
+  'page/37/ng-name' => 'Концепти і прототипи {brand}',
+  'page/40/ng-name' => '{brand} різне',
+  'page/39/ng-name' => 'Логотипи {brand}',
+  'page/15/ng-name' => 'Останні зображення {brand}',
+  'perspective/chassis' => 'шасі',
   'brands/more-{count}-companies' => 'ще {count, plural, one {{count} компанія} few {{count} компанії} many {{count} компаній} other {{count} компаній}}',
   'perspective/mockup' => 'макет',
   'catalogue/specifications-of-{name}' => 'Технічні характеристики {name}',
@@ -17,7 +33,7 @@
 
 Якщо ви вважаєте, що користувачі сайту помилились, розмістивши дану картинку в цьому розділі, то було б чудово, якби ви написали про це в коментарях і вказали на помилку.
 
-Поділитися своєю радістю, обговорити наболіле і просто потеревенити про автомобілі і не тільки ви можете на нашому [форумі](/ng/forums/).',
+Поділитися своєю радістю, обговорити наболіле і просто потеревенити про автомобілі і не тільки ви можете на нашому [форумі](/forums/).',
   'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',
@@ -33,16 +49,16 @@
   'specs/attrs/wheels/auto-pumping-tires' => 'Автопідкачка шин',
   'page/214/name' => 'Персони',
   'persons/content-persons' => 'Персони на фото',
-  'persons/author-persons' => 'Автори',
   'mosts/most' => 'Самі',
+  'persons/author-persons' => 'Автори',
   'mosts/among' => 'серед',
   'upload/select-files' => 'Вибрати файли',
   'upload/select-file' => 'Вибрати файл',
   'page/42/name' => 'Форуми',
-  'page/51/name' => 'Нові фотографії',
   'page/213/name' => '%PERSON_NAME%',
-  'inbox/all-brands' => 'Всі марки',
+  'page/51/name' => 'Нові фотографії',
   'forums/theme/all-other/description' => 'Інші теми, які не ввійшли до перелічених вище розділів',
+  'inbox/all-brands' => 'Всі марки',
   'forums/theme/german-cars/description' => 'Audi, BMW, Mercedes-Benz, Opel, Volkswagen, ...',
   'forums/theme/italian-cars/description' => 'Alfa Romeo, Ferrari, Fiat, Lamborghini, Lancia, ...',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroën, Delahaye ...',
@@ -52,40 +68,6 @@
   'forums/theme/russian-cars/description' => 'ВАЗ, ГАЗ, УАЗ, ...',
   'forums/theme/american-cars/description' => 'Cadillac, Chrysler, Chevrolet, Dodge, Ford, Hummer, Pontiac, ...',
   'forums/theme/british-cars/description' => 'Aston Martin, Bentley, MG, Rover, ...',
-  'rules' => '1.  ## Загальне
-
-    1.  При розміщенні будь-яких матеріалів або їх фрагментів обов\'язково вказувати джерело
-    2.  Заборонено одночасне використання декількох акаунтів одним користувачем.
-    3.  На всьому сайті в будь-якій формі заборонений мат, нецензурні вираження і т.д.
-    4.  Заборонена образа відвідувачів сайту
-    5.  Заборонено підняття питань: політики, релігії, сексуальних вподобань та іншого, якщо це на пряму не пов\'язано з предметом обговорення або не зумовлено особливим чином
-    6.  Заборонено  обговорення дій модераторів де завгодно, крім як в спеціально призначених місцях або особистій переписці з ними
-    7.  Заборонена публікація особистої переписки або будь-якої іншої інформації, дискредитуючої інших участників сайту
-    8.  Заборонено використання в якості аватарів або фотографій нецензурних зображень
-2.  ## Коментарі
-
-    1.  Заборонено обговорення будь-чого, крім предмета коментування
-    2.  Заборонено написання безглуздих повідомлень, які містять тільки "смайлик" або інший спосіб повідомлення про настрій
-    3.  Некоректні повідомлення будуть видалятися без попередження
-3.  ## Форум
-
-    1.  Заборонено використання написання великими літерами, сприйманого як крик
-    2. Заборонено "оффтопік" в будь-якому вигляді
-    3. Заборонено створення однакових тем в декількох гілках
-    4. Заборонено порушення питання про "кращий автомобіль", без уточнення сфери використання
-4. ## Правила ведення каталогу
-
-    ### Іменування автомобілів
-
-    1. Назви автомобілів присвоюються відповідно до їх оригінальної назви, доступної на кузові або в офіційних виданнях компанії
-    2. Назва автомобіля пишеться з великої літери, але допускається написання тільки малими або тільки великими літерами, якщо це відповідає офіційному найменуванню автомобіля
-    3. Бажано вказівку коду кузова / серії / моделі
-    4. Допустимо використання кирилиці, латиниці, окремих символів грецького алфавіту
-    5.  Допустимо использование цифр
-    6. Можливе використання спеціальних символів, якщо такі застосовувалися виробником
-    7. Для поділу автомобілів за типом кузова, допустимо додавати його до назви
-    8. Допустимо додавання до назви інформації, що ідентифікує ринок збуту, для поділу автомобілів за цією ознакою. Наприклад, UK-spec, North America, ZA-spec
-    9. Адаптовані до мовної версії сайту назви автомобілів слідують тим же правилам, але не мають обмеження на використовуваний алфавіт',
   'page/18/name' => '%PICTURE_NAME%',
   'page/23/name' => '%CATEGORY_NAME%',
   'page/26/name' => '%TWINS_GROUP_NAME%',
@@ -101,10 +83,10 @@
   'page/101/name' => '%ATTR_NAME%',
   'page/142/name' => '%ZONE_NAME%',
   'page/157/name' => '%VOTING_NAME%',
-  'page/159/name' => '%MUSEUM_NAME%',
   'page/163/name' => '%NEW_ITEM_OF_TYPE%',
-  'page/165/name' => '%MOST_NAME% %BRAND_NAME%',
+  'page/159/name' => '%MUSEUM_NAME%',
   'page/181/name' => '%FACTORY_NAME%',
+  'page/165/name' => '%MOST_NAME% %BRAND_NAME%',
   'page/183/name' => '%PICTURE_NAME%',
   'page/184/name' => '%PICTURE_NAME%',
   'page/185/name' => '%CAR_NAME%',
@@ -118,8 +100,8 @@
   'page/18/title' => '%PICTURE_NAME%',
   'page/23/title' => '%CATEGORY_NAME%',
   'page/24/title' => '',
-  'page/26/title' => '%TWINS_GROUP_NAME%',
   'page/33/title' => '%CAR_NAME%',
+  'page/26/title' => '%TWINS_GROUP_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/61/title' => '',
@@ -185,8 +167,8 @@
   'page/192/breadcrumbs' => '%PICTURE_NAME%',
   'page/193/breadcrumbs' => '%PICTURE_NAME%',
   'page/194/breadcrumbs' => '%PICTURE_NAME%',
-  'page/209/name' => '%DATE%',
   'page/209/title' => '%DATE%',
+  'page/209/name' => '%DATE%',
   'page/209/breadcrumbs' => '%DATE%',
   'page/210/name' => '%ITEM_NAME%',
   'test' => 'тест пройшов успішно',
@@ -197,15 +179,15 @@
   '{count} messages' => '{count, plural, one {{count} повідомлення} other {{count} повідомлень}}',
   '{topics} topics and {messages} messages' => '{topics, plural, one {{topics} тема} few {{topics} теми} many {{topics} тем} other {{topics} тем}} и {messages, plural, one {{messages} повідомлення} few {{messages} повідомлень} many {{messages} повідомлень} other {{messages} повідомлень}}',
   'year' => 'Рік',
-  'month' => 'Місяць',
   'contributor' => 'упорядник',
+  'month' => 'Місяць',
   'contributors' => 'упорядники',
   'deleted-user' => 'видалений користувач',
   'submit' => 'Надіслати',
   'layout/meta/description' => 'Енциклопедія автомобілів в зображеннях. WheelsAge.org',
   'layout/meta/keywords' => 'автомобіль, автомобіль, авто, авто',
-  'layout/brand' => 'WheelsAge.org',
   'layout/personal-messages' => 'Приватні повідомлення',
+  'layout/brand' => 'WheelsAge.org',
   'ng-layout/you-have-new-messages' => '{messages, plural,
         one {У вас {messages} нове повідомлення}
         few {У вас {messages} нових повідомлень}
@@ -239,7 +221,7 @@
   'index/brands' => 'Компанії',
   'index/factories' => 'Заводи',
   'index/specifications' => 'Характеристики',
-  'index/twins/description' => 'Ви знаєте, що Daewoo Matiz має аж цілих [шість клонів](/ng/twins/group/118812)? А знаєте, що [спільного у Lotus і Kia](/ng/twins/group/118750)? Впевнені, що вам здасться цікавим цей розділ.',
+  'index/twins/description' => 'Ви знаєте, що Daewoo Matiz має аж цілих [шість клонів](/twins/group/118812)? А знаєте, що [спільного у Lotus і Kia](/twins/group/118750)? Впевнені, що вам здасться цікавим цей розділ.',
   'index/categories/description' => 'А чи знаєте ви, яка техніка допомагала дотримуватися правопорядку на вулицях світових міст в різний час? А на яких автомобілях їздив Папа Римський? Ні? Тоді вам точно в цей розділ.',
   'index/categories/mosts' => 'Бажаєте знати, який автомобіль був найшвидшим? Бажаєте знати, скільки важить наймогутніший кар\'єрний самоскид? Заходьте і дізнаєтесь!',
   'mosts/fastest/roadster' => 'Найшвидші родстери',
@@ -249,14 +231,14 @@
   'back' => 'назад',
   'forward' => 'вперед',
   'Picture of the day' => 'Зображення дня',
-  'car-of-day' => 'автомобіль дня',
   'theme-of-day' => 'тема дня',
+  'car-of-day' => 'автомобіль дня',
   'day ahead' => 'день вперед',
   'day ago' => 'день тому',
   'Cars by destination' => 'Автомобілі за призначенням',
   'All new pictures' => 'Всі нові зображення.',
-  'all-link' => 'всі',
   'brands/new-cars-of-brand' => 'Нові автомобілі {brand}',
+  'all-link' => 'всі',
   'brands/pictures:' => 'зображень:',
   'item/type/1/name' => 'ТЗ',
   'item/type/1/name-plural' => 'ТЗ',
@@ -269,8 +251,8 @@
   'item/type/3/name' => 'Категорія',
   'item/type/3/name-plural' => 'Категорії',
   'item/type/3/new-item' => 'Нова категорія',
-  'item/type/3/add-sub-item' => 'Додати підкатегорію',
   'item/type/4/name' => 'Близнюки',
+  'item/type/3/add-sub-item' => 'Додати підкатегорію',
   'item/type/4/name-plural' => 'Близнюки',
   'item/type/4/new-item' => 'Нова група близнят',
   'item/type/4/add-sub-item' => 'Додати підкатегорію близнят',
@@ -305,8 +287,8 @@
   'ng/carlist/produced/%1$s' => '{count, plural, one {Виготовлена {count} одиниця} few {Виготовлено {count} одиниць} many {Виготовлені {count} одиниці} other {Виготовлені {count} одиниці}}',
   'ng/carlist/produced-about/%1$s' => '{count, plural, one {Виготовлена приблизно {count} одиниця} few {Виготовлено приблизно {count} одиниць} many {Виготовлені приблизно {count} одиниць} other {Виготовлені приблизно {count} одиниць}}',
   'carlist/specifications' => 'технічні характеристики',
-  'carlist/designed by %s' => 'дизайн %s',
   'ng/carlist/designed by' => 'проект',
+  'carlist/designed by %s' => 'дизайн %s',
   'carlist/edit-specs' => 'редагувати технічні характеристики',
   'carlist/years' => 'роки виробництва',
   'carlist/model-years' => 'модельний рік',
@@ -316,11 +298,11 @@
   'present-time-abbr' => 'н.ч.',
   'most/fastest' => 'найшвидший',
   'most/fastest/param' => 'максимальна швидкість',
-  'most/slowest' => 'найповільніший',
   'most/slowest/param' => 'максимальна швидкість',
+  'most/slowest' => 'найповільніший',
   'most/dynamic' => 'динамічні',
-  'most/dynamic/param' => 'розгін',
   'most/static' => 'інертні',
+  'most/dynamic/param' => 'розгін',
   'most/static/param' => 'розгін',
   'most/mighty' => 'потужні',
   'most/mighty/param' => 'потужність двигуна',
@@ -420,7 +402,7 @@
 Звертаємо вашу увагу на те, що додавання картинок модерується. Тобто всі картинки перед додаванням в каталог будуть перевірені ведучими сайту.',
   'upload/only-registered' => 'Тільки зареєстрований користувач може завантажувати зображення
 
-[Авторизуйтесь](/ng/login) або [зареєструйтесь](/ng/signup)',
+[Авторизуйтесь](/login) або [зареєструйтесь](/signup)',
   'catalogue/other-pictures-of-%1$s' => 'Інші зображення %1$s',
   'catalogue/all-pictures-of-%1$s' => 'Всі зображення %1$s',
   'catalogue/brand/logo-of-%s' => 'логотип %s',
@@ -461,7 +443,7 @@
   'factories/factory/pictures' => 'Зображення',
   'comments/title' => 'Коментарі',
   'comments/reply' => 'відповісти',
-  'comments/what-to-do-for-write-comments' => 'Щоб мати можливість залишати коментарі, необхідно [зареєструватися або ввійти на сайт з допомогою облікового запису в одній з соціальних мереж](/ng/login)',
+  'comments/what-to-do-for-write-comments' => 'Щоб мати можливість залишати коментарі, необхідно [зареєструватися або ввійти на сайт з допомогою облікового запису в одній з соціальних мереж](/login)',
   'comments/it-requires-attention-of-moderators' => 'Потрібна увага модераторів',
   'comments/form-title' => 'Додати коментар',
   'comments/message' => 'Повідомлення',
@@ -514,8 +496,8 @@
   'login/forgot-password?' => 'Забули свій пароль?',
   'login/success-text' => 'Раді знову вас вітати на нашому сайті',
   'login/remember' => 'запам\'ятати',
-  'login/if-you-lose-password' => 'Якщо Ви забули свій логін чи пароль, Ви можете скористатися [формою відновлення по e-mail](/ng/restore-password)',
-  'login/if-you-not-registered' => 'Якщо Ви ще не зареєстровані на сайті, то зможете [зробити це зараз](/ng/signup)',
+  'login/if-you-lose-password' => 'Якщо Ви забули свій логін чи пароль, Ви можете скористатися [формою відновлення по e-mail](/restore-password)',
+  'login/if-you-not-registered' => 'Якщо Ви ще не зареєстровані на сайті, то зможете [зробити це зараз](/signup)',
   'login/sign-in-using-account' => 'Ввійти, використовуючи акаунт',
   'login/login-or-password-is-incorrect' => 'Логін або пароль неправильний',
   'login/user-%value%-not-found' => 'Користувач з іменем або e-mail "%value%" не знайдений',
@@ -582,7 +564,7 @@
   'feedback/title' => 'Зворотній зв\'язок',
   'feedback/name' => 'Ваше ім\'я',
   'feedback/message' => 'Повідомлення',
-  'feedback/donate-text' => 'Якщо ви прийшли сюди, щоб виразити слова підтримки, є можливість [виразити її в твердій валюті](/ng/donate)',
+  'feedback/donate-text' => 'Якщо ви прийшли сюди, щоб виразити слова підтримки, є можливість [виразити її в твердій валюті](/donate)',
   'feedback/sent' => 'Ваше повідомлення відправлено',
   'map/museums-and-factories' => 'Музеї і заводи',
   'picture/image-specifications' => 'Характеристики зображення',
@@ -684,7 +666,7 @@ E-mail: %2$s
 
 Ми не збираємо інформацію про пожертвувачах, але, якщо ви наполягаєте, ми можемо відмітити ваш внесок.
 
-В знак вдячності ми даємо можливість [вибрати наступний автомобіль дня](/ng/donate/vod)',
+В знак вдячності ми даємо можливість [вибрати наступний автомобіль дня](/donate/vod)',
   'donate/target' => 'На роботу сайту',
   'donate/project' => 'WheelsAge.org',
   'donate/comment-hint' => 'Ваші побажання',
@@ -695,7 +677,7 @@ E-mail: %2$s
 
 Для цього слідуйте інструкціям нижче.
 
-Ми будемо раді, якщо ви захочете [здійснити безкорисну пожертву](/ng/donate) на вільну суму.',
+Ми будемо раді, якщо ви захочете [здійснити безкорисну пожертву](/donate) на вільну суму.',
   'donate/vod/select-date' => '1. Виберіть дату',
   'donate/vod/date-busy' => 'зайнято',
   'donate/vod/select-item' => '2. Виберіть автомобіль',
@@ -822,7 +804,7 @@ E-mail: %2$s
 
 ### Діалог і зворотній зв\'язок
 
-Якщо у вас є якісь зауваження, пропозиції або інші думки, ви можете озвучити їх на [форумі](/ng/forums/), задати особисто через систему обміну повідомленнями або написати в "[зворотній зв\'язок](/ng/feedback)" адміністрації сайту.
+Якщо у вас є якісь зауваження, пропозиції або інші думки, ви можете озвучити їх на [форумі](/forums/), задати особисто через систему обміну повідомленнями або написати в "[зворотній зв\'язок](/feedback)" адміністрації сайту.
 
 Якщо у вас є питання про розміщення реклами, обміну посиланнями або просуванні вашого продукту іншими способами, всі вони мають єдину відповідь: ми не розміщуємо рекламу.
 
@@ -859,7 +841,7 @@ E-mail: %2$s
 
 ### Підтримати проект
 
-Ви можете підтримати наш проект [фінансово](/ng/donate) або [морально](/ng/feedback).
+Ви можете підтримати наш проект [фінансово](/donate) або [морально](/feedback).
 Прийняти участь в [перекладі сайту](https://github.com/autowp/autowp/tree/master/module/Application/language) на інші мови.',
   'page/1/name' => 'Головна сторінка',
   'page/2/name' => 'Головне меню',
@@ -921,7 +903,6 @@ E-mail: %2$s
   'page/103/name' => 'Історія змін',
   'page/104/name' => 'Статистика користувачів',
   'page/105/name' => 'Додати коментар',
-  'page/106/name' => 'Правила',
   'page/107/name' => 'Заявки на видалення',
   'page/109/name' => 'Cutaway',
   'page/110/name' => 'Коментарі',
@@ -1016,8 +997,8 @@ E-mail: %2$s
   'page/164/breadcrumbs' => 'Най-най',
   'page/180/breadcrumbs' => 'Заводи',
   'page/186/breadcrumbs' => 'Всі зображення',
-  'page/189/breadcrumbs' => 'Надто багато конфліктів',
   'page/201/name' => 'Маскоти',
+  'page/189/breadcrumbs' => 'Надто багато конфліктів',
   'page/202/name' => 'Довідка по ракурсам',
   'page/203/name' => 'Користувачі',
   'page/204/name' => 'Telegram',
@@ -1432,7 +1413,7 @@ E-mail: %2$s
 Здійснити це допоможе [спеціальний інтерфейс](/account/specs-conflicts/conflict/minus-weight), в якому зібрані як мінімум ті помилки, які помітили користувачі сайту.',
   'specifications-editor/errors-alert' => '**Увага!** Імовірно, у вас накопичилася велика кількість помилок.
 
-Деякі з них, помічені іншими користувачами, ви можете знайти [тут](/ng/account/specs-conflicts)',
+Деякі з них, помічені іншими користувачами, ви можете знайти [тут](/account/specs-conflicts)',
   'specifications-editor/admin/date' => 'Дата',
   'specifications-editor/admin/user' => 'Користувач',
   'specifications-editor/admin/parameter' => 'Характеристика',
@@ -1784,8 +1765,8 @@ E-mail: %2$s
   'specs/attrs/15/217/218/options/168' => 'ресорна на поздовжніх ¼-еліптичних ресорах',
   'specs/attrs/15/217/218/options/169' => 'ресорна на поздовжніх напівеліптичних ресорах',
   'specs/attrs/15/217/218/options/170' => 'ресорна на поздовжніх кантилеверних ресорах',
-  'specs/attrs/15/217/218/options/171' => 'ресорна на поздовжніх балансуючих ресорах',
   'specs/attrs/15/217/218/options/175' => 'торсіонна з штовхаючою штангою (Push-Rod)',
+  'specs/attrs/15/217/218/options/171' => 'ресорна на поздовжніх балансуючих ресорах',
   'specs/attrs/15/217/218/options/176' => 'торсіонна з тягнучою штангою (Pull-Rod)',
   'specs/attrs/15/217/219' => 'тип направляючого приладу',
   'specs/attrs/15/217/219/options/180' => 'залежна',
@@ -1862,8 +1843,8 @@ E-mail: %2$s
   'specs/attrs/46/47' => 'максимальна швидкість',
   'specs/attrs/46/180' => 'розгін до 60 км/год',
   'specs/attrs/46/48' => 'розгін до 100 км/год',
-  'specs/attrs/46/175' => 'розгін до 60 миль/год',
   'specs/attrs/46/49' => 'розгін до 200 км/год',
+  'specs/attrs/46/175' => 'розгін до 60 миль/год',
   'specs/attrs/46/50' => 'розгін до 300 км/год',
   'specs/attrs/46/51' => 'час пробігу 400 м',
   'specs/attrs/46/52' => 'час пробігу 1000 м',
@@ -2047,11 +2028,11 @@ E-mail: %2$s
 
 Тут 123456789 - номер вашого облікового запису на нашому сайті, який ви можете знайти на сторінці свого профілю. Наприклад, номер [Juliano Scotini](/users/juliano-scotini): 17322
 
-Код підтвердження буде відправлений вам через [систему особистих повідомлень](/ng/account/messages?folder=system)
+Код підтвердження буде відправлений вам через [систему особистих повідомлень](/account/messages?folder=system)
 
 Відправте `/me 123456789 ХХХХХХХХХХХХХХХХ`, щоб завершити процес асоціації вашого облікового запису telegram з користувачем нашого сайту.
 
-Тут `ХХХХХХХХХХХХХХХХ` - код, який буде відправлений вам через [систему особистих повідомлень](/ng/account/messages?folder=system)',
+Тут `ХХХХХХХХХХХХХХХХ` - код, який буде відправлений вам через [систему особистих повідомлень](/account/messages?folder=system)',
   'personal-message-dialog/title' => 'Відправити особисте повідомлення',
   'personal-message-dialog/send' => 'відправити',
   'personal-message-dialog/sending' => 'відправляється ...',
@@ -2113,10 +2094,10 @@ E-mail: %2$s
   'forums/theme/moderators' => 'Модераторський форум',
   'forums/theme/cars' => 'Автомобілі',
   'forums/topic-closed-text' => 'Обговорення закрито адміністрацією форуму',
-  'forums/register-to-post' => 'Щоб мати можливість створювати теми і відповідати в них, Вам необхідно [зареєструватися](/ng/signup).',
+  'forums/register-to-post' => 'Щоб мати можливість створювати теми і відповідати в них, Вам необхідно [зареєструватися](/signup).',
   'forums/register-to-create-topic' => 'Додавати топіки можуть тільки зареєстровані користувачі.
 
 Якщо ви вже зареєстровані на сайті, то вам необхідно здійснити вхід на сайт.
 
-Якщо ви ще не зареєстровані, зробіть це зараз [на сторінці реєстрації](/ng/signup).',
+Якщо ви ще не зареєстровані, зробіть це зараз [на сторінці реєстрації](/signup).',
 );
