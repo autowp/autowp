@@ -751,6 +751,10 @@ class ItemHydrator extends AbstractRestHydrator
             $result['name_default'] = $nameData['name'] === $name ? null : $name;
         }
 
+        if ($this->filterComposite->filter('has_text')) {
+            $result['has_text'] = $this->itemModel->hasFullText($object['id']);
+        }
+
         if ($isModer) {
             $result['body'] = (string) $object['body'];
 
@@ -896,10 +900,6 @@ class ItemHydrator extends AbstractRestHydrator
                     'image'  => $object['logo_id'],
                     'format' => 'brandicon2',
                 ]);
-            }
-
-            if ($this->filterComposite->filter('has_text')) {
-                $result['has_text'] = $this->itemModel->hasFullText($object['id']);
             }
 
             if ($this->filterComposite->filter('attr_zone_id')) {
