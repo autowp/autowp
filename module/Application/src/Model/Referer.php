@@ -34,7 +34,7 @@ class Referer
 
     private function getClient(): Client
     {
-        if (! $this->client) {
+        if (! isset($this->client)) {
             $this->client = new Client([
                 'base_uri' => $this->url,
                 'timeout'  => 5.0,
