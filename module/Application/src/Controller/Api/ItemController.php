@@ -496,6 +496,23 @@ class ItemController extends AbstractRestfulController
                 ]);
         }
 
+        if ($data['vehicle_type_id']) {
+            if ($data['vehicle_type_id'] === 'empty') {
+                $select
+                    ->join(
+                        'vehicle_vehicle_type',
+                        'item.id = vehicle_vehicle_type.vehicle_id',
+                        [],
+                        $select::JOIN_LEFT
+                    )
+                    ->where(['vehicle_vehicle_type.vehicle_id is null']);
+            } else {
+                $select
+                    ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
+                    ->where(['vehicle_vehicle_type.vehicle_type_id' => $data['vehicle_type_id']]);
+            }
+        }
+
         if ($isModer) {
             if ($data['name_exclude']) {
                 $select
@@ -512,23 +529,6 @@ class ItemController extends AbstractRestfulController
                 $group['item.id'] = true;
                 $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
                     ->where(['item_parent_cache.item_id' => $data['descendant']]);
-            }
-
-            if ($data['vehicle_type_id']) {
-                if ($data['vehicle_type_id'] === 'empty') {
-                    $select
-                        ->join(
-                            'vehicle_vehicle_type',
-                            'item.id = vehicle_vehicle_type.vehicle_id',
-                            [],
-                            $select::JOIN_LEFT
-                        )
-                        ->where(['vehicle_vehicle_type.vehicle_id is null']);
-                } else {
-                    $select
-                        ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
-                        ->where(['vehicle_vehicle_type.vehicle_type_id' => $data['vehicle_type_id']]);
-                }
             }
 
             if ($data['vehicle_childs_type_id']) {
