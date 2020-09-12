@@ -4,32 +4,23 @@ namespace Application;
 
 use Laminas\Console\Adapter\AdapterInterface as Console;
 use Laminas\EventManager\EventInterface as Event;
-use Laminas\EventManager\EventManagerInterface;
 use Laminas\Loader\StandardAutoloader;
-use Laminas\Mail;
 use Laminas\ModuleManager\Feature;
 use Laminas\Mvc\Application;
 use Laminas\Mvc\MvcEvent;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\View\Helper\PaginationControl;
-use Throwable;
 
 use function define;
 use function defined;
 use function error_reporting;
-use function file_exists;
-use function filemtime;
-use function get_class;
 use function ini_set;
 use function realpath;
 use function Sentry\captureException;
 use function Sentry\init;
-use function time;
-use function touch;
 
 use const E_ALL;
-use const PHP_EOL;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
@@ -96,7 +87,6 @@ class Module implements
         $application = $e->getApplication();
         /** @var ServiceLocatorInterface $serviceManager */
         $serviceManager = $application->getServiceManager();
-        /** @var EventManagerInterface $eventManager */
         $eventManager = $application->getEventManager();
 
         //handle the dispatch error (exception)
@@ -136,39 +126,7 @@ class Module implements
         $exception = $e->getParam('exception');
         if ($exception) {
             captureException($exception);
-
-            $serviceManager = $e->getApplication()->getServiceManager();
-            $serviceManager->get('ErrorLog')->crit($exception);
-
-            $filePath = __DIR__ . '/../../data/email-error';
-            if (file_exists($filePath)) {
-                $mtime = filemtime($filePath);
-                $diff  = time() - $mtime;
-                if ($diff > 60) {
-                    touch($filePath);
-                    $this->sendErrorEmail($exception, $serviceManager);
-                }
-            }
         }
-    }
-
-    private function sendErrorEmail(Throwable $exception, ServiceLocatorInterface $serviceManager): void
-    {
-        $message = get_class($exception) . PHP_EOL
-            . 'File: ' . $exception->getFile() . ' (' . $exception->getLine() . ')' . PHP_EOL
-            . 'Message: ' . $exception->getMessage() . PHP_EOL
-            . 'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
-
-        $mail = new Mail\Message();
-        $mail
-            ->setEncoding('utf-8')
-            ->setBody($message)
-            ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
-            ->addTo('dvp@autowp.ru')
-            ->setSubject('autowp exception: ' . get_class($exception));
-
-        $transport = $serviceManager->get(Mail\Transport\TransportInterface::class);
-        $transport->send($mail);
     }
 
     /**
