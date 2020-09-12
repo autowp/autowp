@@ -47,7 +47,6 @@ class Module implements
             __DIR__ . '/config/module.config.routes.php',
             __DIR__ . '/config/module.config.tables.php',
             __DIR__ . '/config/module.config.moder.php',
-            __DIR__ . '/config/module.config.log.php',
             __DIR__ . '/config/module.config.view.php',
             __DIR__ . '/config/module.config.rabbitmq.php',
         ];
