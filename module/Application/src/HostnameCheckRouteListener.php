@@ -52,14 +52,6 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
                 $this->redirect($e, $redirectUrl);
                 return;
             }
-
-            if ($this->forceHttps && $request->getUri()->getScheme() !== 'https') {
-                $redirectUrl = 'https://'
-                    . $request->getUri()->getHost() . $request->getRequestUri();
-
-                $this->redirect($e, $redirectUrl);
-                return;
-            }
         }
     }
 
