@@ -79,8 +79,7 @@ RUN composer install --no-dev --no-progress --no-interaction --no-suggest --opti
 COPY . /app
 
 RUN chmod +x zf && \
-    chmod +x start.sh && \
-    crontab ./crontab
+    chmod +x start.sh
 
 ARG COMMIT
 ENV SENTRY_RELEASE=$COMMIT

@@ -1,2 +1,0 @@
- 0  0 * * * cd /app && ./zf cron midnight
-27  4 * * * cd /app && ./zf cron daily-maintenance
