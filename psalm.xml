@@ -19,4 +19,8 @@
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <UndefinedConstant errorLevel="suppress" />
+    </issueHandlers>
 </psalm>
