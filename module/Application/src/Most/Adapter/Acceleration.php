@@ -93,7 +93,7 @@ class Acceleration extends AbstractAdapter
                 ->order('size_value ' . $this->order)
                 ->limit($limit);
 
-            $selects[] = $axisSelect->assemble();
+            $selects[] = $axisSelect->getSqlString($this->itemTable->getAdapter()->getPlatform());
         }
 
         $select

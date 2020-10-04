@@ -361,6 +361,9 @@ class Picture
                             Sql\Predicate\Operator::TYPE_IDENTIFIER
                         ),
                     ]);
+                    /**
+                     * @psalm-suppress InvalidArgument
+                     */
                     $select->join(
                         ['ct' => 'comment_topic'],
                         $predicate,

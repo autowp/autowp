@@ -46,7 +46,6 @@ $mailTransport = $mailTypes[$mailType];
 return [
     'controllers'        => [
         'factories' => [
-            Controller\IndexController::class           => InvokableFactory::class,
             Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,
         ],
     ],

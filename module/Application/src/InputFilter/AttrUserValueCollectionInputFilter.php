@@ -100,6 +100,8 @@ class AttrUserValueCollectionInputFilter extends InputFilter
             ));
         }
 
+        $data = (array) $data;
+
         foreach ($data as $item) {
             if (is_array($item) || $item instanceof Traversable) {
                 continue;
@@ -120,6 +122,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
     /**
      * {@inheritdoc}
      *
+     * @psalm-suppress InvalidPropertyAssignmentValue
      * @param null|mixed $context Ignored, but present to retain signature compatibility.
      * @throws Exception
      */

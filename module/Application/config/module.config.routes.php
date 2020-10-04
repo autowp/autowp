@@ -5,16 +5,6 @@ namespace Application;
 return [
     'router' => [
         'routes' => [
-            'index'  => [
-                'type'    => 'Literal',
-                'options' => [
-                    'route'    => '/',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-            ],
             'yandex' => [
                 'type'          => 'Literal',
                 'options'       => [

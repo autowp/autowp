@@ -9,7 +9,10 @@ use const Application\MYSQL_TIMEZONE;
 
 class Row
 {
-    public static function getDateTimeByColumnType($type, $value)
+    /**
+     * @throws Exception
+     */
+    public static function getDateTimeByColumnType(string $type, $value): ?DateTime
     {
         switch ($type) {
             case 'date':

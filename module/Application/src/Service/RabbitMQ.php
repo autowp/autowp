@@ -50,8 +50,11 @@ class RabbitMQ
             }
         }
 
-        if ($exception && ! $connection) {
-            throw $exception;
+        if (! $connection) {
+            if ($exception) {
+                throw $exception;
+            }
+            throw new Exception('Failed to connect wihtout exception');
         }
 
         $this->connection = $connection;
@@ -106,7 +109,7 @@ class RabbitMQ
 
         try {
             while (count($channel->callbacks)) {
-                $channel->wait($timeout);
+                $channel->wait(null, false, $timeout);
             }
         } finally {
             $channel->basic_cancel($this->consumerTag);

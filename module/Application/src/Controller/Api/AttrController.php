@@ -3,6 +3,7 @@
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
+use Application\Hydrator\Api\AttrAttributeHydrator;
 use Application\Service\SpecificationsService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Exception;
@@ -54,7 +55,7 @@ class AttrController extends AbstractRestfulController
 
     private InputFilter $attributeItemGetInputFilter;
 
-    private AbstractRestHydrator $attributeHydrator;
+    private AttrAttributeHydrator $attributeHydrator;
 
     private InputFilter $valueListInputFilter;
 
@@ -80,7 +81,7 @@ class AttrController extends AbstractRestfulController
         SpecificationsService $specsService,
         AbstractRestHydrator $conflictHydrator,
         AbstractRestHydrator $userValueHydrator,
-        AbstractRestHydrator $attributeHydrator,
+        AttrAttributeHydrator $attributeHydrator,
         AbstractRestHydrator $valueHydrator,
         InputFilter $conflictListInputFilter,
         InputFilter $userValueListInputFilter,

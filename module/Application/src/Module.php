@@ -12,11 +12,8 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\View\Helper\PaginationControl;
 
-use function define;
-use function defined;
 use function error_reporting;
 use function ini_set;
-use function realpath;
 use function Sentry\captureException;
 use function Sentry\init;
 
@@ -77,8 +74,6 @@ class Module implements
     {
         error_reporting(E_ALL);
         ini_set('display_errors', true);
-
-        defined('PUBLIC_DIR') || define('PUBLIC_DIR', realpath(__DIR__ . '/../../public_html'));
 
         PaginationControl::setDefaultViewPartial('paginator');
 

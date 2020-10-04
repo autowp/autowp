@@ -20,6 +20,7 @@ class StartCommand extends Command
     /**
      * @inheritDoc
      * @param mixed $arguments
+     * @return mixed
      */
     public function handle($arguments)
     {
@@ -50,5 +51,7 @@ class StartCommand extends Command
         // The method supports second parameter arguments which you can optionally pass, By default
         // it'll pass the same arguments that are received for this command originally.
         //$this->triggerCommand('subscribe');
+
+        return 'Ok';
     }
 }

@@ -84,7 +84,7 @@ class Brakes extends AbstractAdapter
                 ->order('size_value ' . $this->order)
                 ->limit($limit);
 
-            $selects[] = $axisSelect->assemble();
+            $selects[] = $axisSelect;
         }
 
         $selects[0]->combine($selects[1]);
