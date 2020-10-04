@@ -19,8 +19,8 @@
 		"ext-json" : "*",
 		"ext-intl" : "*",
 		"ext-gd" : "*",
-    "ext-fileinfo" : "*",
-    "ext-bcmath": "*",
+        "ext-fileinfo" : "*",
+        "ext-bcmath": "*",
 		"irazasyed/telegram-bot-sdk" : "2.0.x-dev",
 		"phayes/geophp" : "^1.2",
 		"michelf/php-markdown" : "^1.8.0",
@@ -68,15 +68,15 @@
 		}
 	},
 	"require-dev" : {
-    "phpunit/phpunit": "^9.0",
+        "phpunit/phpunit": "^9.0",
 		"laminas/laminas-test" : "^3.3",
 		"php-coveralls/php-coveralls" : "^2.2",
-		"phpmd/phpmd" : "^2.7",
+		"phpmd/phpmd" : "^2.9.1",
 		"onesky/api-library-php5" : "^1.0",
 		"wapmorgan/php-code-fixer": "^2.0",
 		"phan/phan": "^3.2.2",
 		"sensiolabs/security-checker": "^6.0",
-        "laminas/laminas-coding-standard": "^2.0.0rc1",
+        "laminas/laminas-coding-standard": "^2.1.0",
 		"vimeo/psalm": "^3.16"
     },
 	"autoload-dev" : {

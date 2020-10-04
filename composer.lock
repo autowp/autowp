@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "87491c59a30e7cb9780fb08dc0fb8b90",
+    "content-hash": "9987234950317dd3740a038ac3a9d0be",
     "packages": [
         {
             "name": "autowp/cron",
@@ -10879,8 +10879,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "irazasyed/telegram-bot-sdk": 20,
-        "laminas/laminas-coding-standard": 5
+        "irazasyed/telegram-bot-sdk": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
