@@ -74,11 +74,11 @@
 		"phpmd/phpmd" : "^2.7",
 		"onesky/api-library-php5" : "^1.0",
 		"wapmorgan/php-code-fixer": "^2.0",
-		"phan/phan": "^2.4.5",
+		"phan/phan": "^3.2.2",
 		"sensiolabs/security-checker": "^6.0",
-    "laminas/laminas-coding-standard": "^2.0.0rc1",
+        "laminas/laminas-coding-standard": "^2.0.0rc1",
 		"vimeo/psalm": "^3.16"
-  },
+    },
 	"autoload-dev" : {
 		"psr-4" : {
 			"ApplicationTest\\" : "module/Application/test"
