@@ -127,11 +127,15 @@ class ItemParent
 
     private function getYearsPrefix(?int $begin, ?int $end): string
     {
+        if (! $begin && ! $end) {
+            return '';
+        }
+
         $bms = (int) ($begin / 100);
         $ems = (int) ($end / 100);
 
         if ($end === $begin) {
-            return $begin;
+            return (string) $begin;
         }
 
         if ($bms === $ems) {

@@ -11,7 +11,6 @@ use ArrayObject;
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
-use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
 use Autowp\User\Model\User;
 use DateTime;
 use Exception;
@@ -295,18 +294,6 @@ class UsersService
 
             $this->transport->send($mail);
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getAuthAdapterLogin(string $login, string $password): LoginAuthAdapter
-    {
-        return new LoginAuthAdapter(
-            $this->userModel,
-            $login,
-            $this->getPasswordHashExpr($password)
-        );
     }
 
     public function updateUsersVoteLimits(): int

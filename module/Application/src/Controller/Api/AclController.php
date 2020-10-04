@@ -107,7 +107,7 @@ class AclController extends AbstractRestfulController
 
         $user   = $this->user()->get();
         $result = [
-            $user->role => true,
+            $user['role'] => true,
         ];
 
         $roles = $this->params()->fromQuery('roles');

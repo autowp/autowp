@@ -3,6 +3,7 @@
 namespace Application\View\Helper;
 
 use Application\ItemNameFormatter;
+use ArrayAccess;
 use Exception;
 use Laminas\View\Helper\AbstractHelper;
 

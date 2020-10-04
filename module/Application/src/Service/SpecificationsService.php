@@ -1272,7 +1272,7 @@ class SpecificationsService
                 return $value;
 
             case 5: // checkbox
-                return $value === null ? null : ($value ? 'да' : 'нет');
+                return $value ? 'да' : 'нет';
 
             case 6: // select
             case 7: // select
@@ -1700,11 +1700,6 @@ class SpecificationsService
             ->limit(1);
 
         return (bool) $this->valueTable->selectWith($select)->current();
-    }
-
-    public function twinsGroupsHasSpecs(array $groupIds): array
-    {
-        return $this->hasChildSpecs($groupIds);
     }
 
     /**

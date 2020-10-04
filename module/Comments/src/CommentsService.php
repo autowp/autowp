@@ -447,7 +447,7 @@ class CommentsService
 
         $row = $this->messageTable->selectWith($select)->current();
 
-        return ceil(($row['count'] + 1) / $perPage);
+        return (int) ceil(($row['count'] + 1) / $perPage);
     }
 
     public function getMessageAuthorId(int $messageId): ?int

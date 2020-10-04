@@ -22,6 +22,9 @@ use function Sentry\init;
 
 use const E_ALL;
 
+const MYSQL_DATETIME_FORMAT = 'Y-m-d H:i:s';
+const MYSQL_TIMEZONE        = 'UTC';
+
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\BootstrapListenerInterface,
@@ -77,16 +80,13 @@ class Module implements
 
         defined('PUBLIC_DIR') || define('PUBLIC_DIR', realpath(__DIR__ . '/../../public_html'));
 
-        defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
-        defined('MYSQL_DATETIME_FORMAT') || define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
-
         PaginationControl::setDefaultViewPartial('paginator');
 
         /** @var Application $application */
         $application = $e->getApplication();
         /** @var ServiceLocatorInterface $serviceManager */
         $serviceManager = $application->getServiceManager();
-        $eventManager = $application->getEventManager();
+        $eventManager   = $application->getEventManager();
 
         //handle the dispatch error (exception)
         $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'handleError']);

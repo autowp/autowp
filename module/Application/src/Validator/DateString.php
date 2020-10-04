@@ -15,7 +15,7 @@ class DateString extends Date
      *
      * @param  string|int|array $param
      * @param  bool             $addErrors
-     * @return bool|DateTime
+     * @return bool|DateTime|DateTimeImmutable
      */
     protected function convertToDateTime($param, $addErrors = true)
     {

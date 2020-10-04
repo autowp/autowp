@@ -14,6 +14,8 @@ use function is_string;
 use function method_exists;
 use function ucfirst;
 
+use const Application\MYSQL_DATETIME_FORMAT;
+
 class DayPictures
 {
     private const DEFAULT_TIMEZONE = 'UTC';

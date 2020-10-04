@@ -124,7 +124,7 @@ class Power extends AbstractAdapter
             }
         } else {
             if ($cylinders) {
-                $result = $cylinders;
+                $result = (string) $cylinders;
             } else {
                 $result = '';
             }

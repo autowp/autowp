@@ -61,7 +61,7 @@ class ExifGPSExtractor
         }
 
         if (count($parts) === 1) {
-            return $parts[0];
+            return (float) $parts[0];
         }
 
         return floatval($parts[0]) / floatval($parts[1]);

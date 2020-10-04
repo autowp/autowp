@@ -2,14 +2,12 @@
 
 namespace Application\Most\Adapter;
 
-use ArrayAccess;
 use Exception;
 use Laminas\Db\Sql;
 
 class Attr extends AbstractAdapter
 {
-    /** @var array|ArrayAccess */
-    protected $attribute;
+    protected int $attribute;
 
     protected string $order;
 
@@ -28,7 +26,7 @@ class Attr extends AbstractAdapter
      */
     public function getCars(Sql\Select $select, string $language): array
     {
-        $attribute = $this->attributeTable->select(['id' => (int) $this->attribute])->current();
+        $attribute = $this->attributeTable->select(['id' => $this->attribute])->current();
         if (! $attribute) {
             throw new Exception("Attribute '{$this->attribute}' not found");
         }

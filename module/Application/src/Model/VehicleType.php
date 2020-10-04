@@ -231,7 +231,7 @@ class VehicleType
 
     public function rebuildParents(): void
     {
-        $this->delete([]);
+        $this->vehicleTypeParentTable->delete([]);
 
         $this->rebuildStep([0], 0);
     }

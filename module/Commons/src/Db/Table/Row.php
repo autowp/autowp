@@ -5,6 +5,7 @@ namespace Autowp\Commons\Db\Table;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use const Application\MYSQL_TIMEZONE;
 
 class Row
 {

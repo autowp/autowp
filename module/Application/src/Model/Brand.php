@@ -142,7 +142,7 @@ class Brand
         return $items;
     }
 
-    private function utfCharToNumber(string $char): int
+    private function utfCharToNumber(string $char): string
     {
         $i      = 0;
         $number = '';
@@ -423,10 +423,11 @@ class Brand
                 $path             = $tmpDir . $catname . '.png';
                 $images[$catname] = escapeshellarg($path);
 
-                echo "Download `{$img->getSrc()}` ...\n";
-                $success = file_put_contents($path, fopen($img->getSrc(), 'r'));
+                $src = $img->getSrc();
+                echo "Download `$src` ...\n";
+                $success = file_put_contents($path, fopen($src, 'r'));
                 if ($success === false) {
-                    throw new Exception("Failed to download `$img`");
+                    throw new Exception("Failed to download `$src`");
                 }
             }
         }

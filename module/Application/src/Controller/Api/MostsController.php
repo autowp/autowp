@@ -8,7 +8,6 @@ use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use Application\Service\Mosts;
 use Autowp\Image\Storage;
-use Autowp\TextStorage;
 use Autowp\User\Controller\Plugin\User;
 use Exception;
 use ImagickException;
@@ -25,8 +24,6 @@ use function array_merge;
  */
 class MostsController extends AbstractActionController
 {
-    private TextStorage\Service $textStorage;
-
     private Mosts $mosts;
 
     private Picture $picture;
@@ -36,14 +33,12 @@ class MostsController extends AbstractActionController
     private PictureNameFormatter $pictureNameFormatter;
 
     public function __construct(
-        TextStorage\Service $textStorage,
         Mosts $mosts,
         Picture $picture,
         AbstractRestHydrator $itemHydrator,
         PictureNameFormatter $pictureNameFormatter
     ) {
         $this->itemHydrator         = $itemHydrator;
-        $this->textStorage          = $textStorage;
         $this->mosts                = $mosts;
         $this->picture              = $picture;
         $this->pictureNameFormatter = $pictureNameFormatter;

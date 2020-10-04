@@ -319,7 +319,7 @@ class ItemNameFormatter
                 return $this->monthsRange($bm, $em) . '.' . $by;
             }
 
-            return $by;
+            return (string) $by;
         }
 
         if ($equalS) {
@@ -356,7 +356,7 @@ class ItemNameFormatter
                 return '<small class="month">' . $this->monthsRange($bm, $em) . '.</small>' . $by;
             }
 
-            return $by;
+            return (string) $by;
         }
 
         if ($equalS) {

@@ -13,6 +13,8 @@ use Laminas\View\Model\JsonModel;
 
 use function count;
 
+use const Application\MYSQL_DATETIME_FORMAT;
+
 class PulseController extends AbstractActionController
 {
     private TableGateway $logTable;

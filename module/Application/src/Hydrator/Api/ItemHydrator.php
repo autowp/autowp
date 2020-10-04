@@ -17,7 +17,6 @@ use Application\Service\SpecificationsService;
 use ArrayAccess;
 use Autowp\Comments\Attention;
 use Autowp\Image\StorageInterface;
-use Autowp\TextStorage;
 use Autowp\User\Model\User;
 use Exception;
 use Laminas\Db\Sql;
@@ -51,8 +50,6 @@ class ItemHydrator extends AbstractRestHydrator
     private SpecificationsService $specsService;
 
     private Item $itemModel;
-
-    private TextStorage\Service $textStorage;
 
     private Picture $picture;
 
@@ -109,8 +106,7 @@ class ItemHydrator extends AbstractRestHydrator
         $this->itemModel  = $serviceManager->get(Item::class);
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
-        $this->acl         = $serviceManager->get(Acl::class);
-        $this->textStorage = $serviceManager->get(TextStorage\Service::class);
+        $this->acl = $serviceManager->get(Acl::class);
 
         $this->catalogue = $serviceManager->get(Catalogue::class);
 

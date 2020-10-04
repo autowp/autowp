@@ -14,6 +14,7 @@ use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Math\Rand;
 use Laminas\Paginator;
+use Traversable;
 
 use function array_keys;
 use function array_merge;
@@ -34,6 +35,8 @@ use function strlen;
 use function trim;
 use function usort;
 
+use const Application\MYSQL_DATETIME_FORMAT;
+use const Application\MYSQL_TIMEZONE;
 use const SORT_STRING;
 
 class Picture
@@ -1165,7 +1168,7 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     * @param array|ArrayAccess $rows
+     * @param array|ArrayAccess|Traversable $rows
      */
     public function getNameData($rows, array $options = []): array
     {

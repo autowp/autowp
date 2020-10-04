@@ -22,6 +22,9 @@ use function is_array;
 use function is_scalar;
 use function max;
 
+use const Application\MYSQL_DATETIME_FORMAT;
+use const Application\MYSQL_TIMEZONE;
+
 class User
 {
     public const MIN_NAME     = 2;

@@ -15,8 +15,11 @@ use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use Traversable;
 
 use function count;
+
+use const Application\MYSQL_TIMEZONE;
 
 /**
  * @method User user($user = null)
@@ -189,7 +192,7 @@ class NewController extends AbstractRestfulController
     }
 
     /**
-     * @param array|ArrayAccess $pictures
+     * @param array|ArrayAccess|Traversable $pictures
      */
     private function splitPictures($pictures): array
     {

@@ -25,7 +25,7 @@ class FieldsFilter extends AbstractFilter
     {
         $dotPos = strpos($value, '.');
         if ($dotPos !== false) {
-            $fieldName  = substr($value, 0, $dotPos);
+            $fieldName  = (string) substr($value, 0, $dotPos);
             $fieldValue = $this->parseValue(substr($value, $dotPos + 1));
         } else {
             $fieldName  = $value;
