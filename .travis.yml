@@ -15,7 +15,7 @@ script:
   - docker exec -it autowp_test_backend sh -c "./install-dev.sh" || travis_terminate 1;
   - docker exec -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" -it autowp_test_backend sh -c "./cc-test-reporter before-build" || travis_terminate 1;
   - docker exec -it autowp_test_backend sh -c "./vendor/bin/security-checker security:check composer.lock"
-  - docker exec -it autowp_test_backend sh -c "./vendor/bin/psalm"
+  #- docker exec -it autowp_test_backend sh -c "./vendor/bin/psalm"
   - docker exec -it autowp_test_backend sh -c "./vendor/bin/phpcs --encoding=utf-8" || travis_terminate 1;
   - docker exec -it autowp_test_backend sh -c "./vendor/bin/phpcf module" || travis_terminate 1;
   - docker exec -it autowp_test_backend sh -c "composer phpmd" || travis_terminate 1;
