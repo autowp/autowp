@@ -36,19 +36,19 @@ class Module implements
         $config = [];
 
         $configFiles = [
-            __DIR__ . '/config/module.config.php',
-            __DIR__ . '/config/module.config.db.php',
-            __DIR__ . '/config/module.config.api.php',
-            __DIR__ . '/config/module.config.api.filter.php',
-            __DIR__ . '/config/module.config.cache.php',
-            __DIR__ . '/config/module.config.console.php',
-            __DIR__ . '/config/module.config.forms.php',
-            __DIR__ . '/config/module.config.imagestorage.php',
-            __DIR__ . '/config/module.config.routes.php',
-            __DIR__ . '/config/module.config.tables.php',
-            __DIR__ . '/config/module.config.moder.php',
-            __DIR__ . '/config/module.config.view.php',
-            __DIR__ . '/config/module.config.rabbitmq.php',
+            __DIR__ . '/../config/module.config.php',
+            __DIR__ . '/../config/module.config.db.php',
+            __DIR__ . '/../config/module.config.api.php',
+            __DIR__ . '/../config/module.config.api.filter.php',
+            __DIR__ . '/../config/module.config.cache.php',
+            __DIR__ . '/../config/module.config.console.php',
+            __DIR__ . '/../config/module.config.forms.php',
+            __DIR__ . '/../config/module.config.imagestorage.php',
+            __DIR__ . '/../config/module.config.routes.php',
+            __DIR__ . '/../config/module.config.tables.php',
+            __DIR__ . '/../config/module.config.moder.php',
+            __DIR__ . '/../config/module.config.view.php',
+            __DIR__ . '/../config/module.config.rabbitmq.php',
         ];
 
         // Merge all module config options
