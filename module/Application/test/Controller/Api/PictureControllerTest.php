@@ -237,6 +237,8 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         }
         $item = $this->getItemById($itemId);
 
+        $this->assertArrayHasKey('total_pictures', $item);
+
         for ($i = $item['total_pictures']; $i < 5; $i++) {
             $pictureId = $this->addPictureToItem($item['id']);
             $this->acceptPicture($pictureId);
