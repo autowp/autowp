@@ -1,173 +1,175 @@
-backend:
-  image: autowp/autowp:v2
-  container_name: autowp_test_backend
-  restart: always
-  environment:
-    CODECLIMATE_REPO_TOKEN: ${CODECLIMATE_REPO_TOKEN}
-    TRAVIS: ${TRAVIS}
-    TRAVIS_JOB_ID: ${TRAVIS_JOB_ID}
-    TRAVIS_JOB_NUMBER: ${TRAVIS_JOB_NUMBER}
-    TRAVIS_BRANCH: ${TRAVIS_BRANCH}
-    TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}
-    TRAVIS_PULL_REQUEST_BRANCH: ${TRAVIS_PULL_REQUEST_BRANCH}
-    TRAVIS_PULL_REQUEST_SHA: ${TRAVIS_PULL_REQUEST_SHA}
-    TRAVIS_BUILD_NUMBER: ${TRAVIS_BUILD_NUMBER}
-    TRAVIS_COMMIT: ${TRAVIS_COMMIT}
-    TRAVIS_COMMIT_MESSAGE: ${TRAVIS_COMMIT_MESSAGE}
-    TRAVIS_COMMIT_RANGE: ${TRAVIS_COMMIT_RANGE}
-    TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}
-    TRAVIS_TAG: ${TRAVIS_TAG}
-    AUTOWP_DB_HOST: "autowp_test_mysql"
-    AUTOWP_DB_PORT: "3306"
-    AUTOWP_DB_USERNAME: "autowp_test"
-    AUTOWP_DB_PASSWORD: "test"
-    AUTOWP_DB_DBNAME: "autowp_test"
-    AUTOWP_USERS_SALT: "users-salt"
-    AUTOWP_EMAIL_SALT: "email-salt"
-    AUTOWP_MEMCACHED_HOST: "autowp_test_memcached"
-    AUTOWP_HOST: "localhost"
-    AUTOWP_HOST_RU: "localhost"
-    AUTOWP_PICTURES_HOST: "i.localhost"
-    AUTOWP_MAIL_TYPE: "in-memory"
-    AUTOWP_MAIL_SMTP_HOST: ""
-    AUTOWP_MAIL_SMTP_USERNAME: ""
-    AUTOWP_MAIL_SMTP_PASSWORD: ""
-    AUTOWP_TELEGRAM_ACCESS_TOKEN: ""
-    AUTOWP_TELEGRAM_TOKEN: ""
-    AUTOWP_TWITTER_USERNAME: ""
-    AUTOWP_TWITTER_OAUTH_KEY: ""
-    AUTOWP_TWITTER_OAUTH_SECRET: ""
-    AUTOWP_TWITTER_TOKEN_OAUTH: ""
-    AUTOWP_TWITTER_TOKEN_OAUTH_SECRET: ""
-    AUTOWP_FACEBOOK_APP_ID: ""
-    AUTOWP_FACEBOOK_APP_SECRET: ""
-    AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN: ""
-    AUTOWP_YANDEX_SECRET: ""
-    AUTOWP_YANDEX_PRICE: "1"
-    AUTOWP_VK_TOKEN: ""
-    AUTOWP_VK_OWNER_ID: ""
-    AUTOWP_CAPTCHA: 0
-    AUTOWP_RECAPTCHA_PUBLICKEY: "public"
-    AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
-    SENTRY_DSN: ""
-    SENTRY_ENVIRONMENT: "testing"
-    SENTRY_RELEASE: ${TRAVIS_COMMIT}
-    SONARCLOUD_TOKEN: ${SONARCLOUD_TOKEN}
-    AUTOWP_AUTH_SECRET: example_secret
-  volumes:
-  - ./config/autoload/local.php:/app/config/autoload/local.php:ro
-  - ./module/Application/test/_files/image:/app/public_html/image
-  - ./module/Application/test/_files/pictures:/app/public_html/pictures
-  - ./sonar-project.properties:/app/sonar-project.properties:ro
-  depends_on:
-  - memcached
-  - mysql
-  - rabbitmq
-  - traffic
-  - goautowp
-  - minio
-  - createbuckets
-
-memcached:
-  image: memcached
-  container_name: autowp_test_memcached
-  restart: always
-  expose:
-  - "11211"
-
-mysql:
-  image: mysql:8
-  container_name: autowp_test_mysql
-  restart: always
-  environment:
-    MYSQL_ROOT_PASSWORD: password
-    MYSQL_DATABASE: autowp_test
-    MYSQL_USER: autowp_test
-    MYSQL_PASSWORD: test
-  volumes:
-  - "./mysql.conf.d:/etc/mysql/conf.d"
-  expose:
-  - "3306"
-
-rabbitmq:
-  image: rabbitmq
-  container_name: autowp_test_rabbitmq
-
-traffic:
-  image: autowp/traffic
-  container_name: autowp_test_traffic
-  restart: always
-  depends_on:
-  - rabbitmq
-  - traffic-mysql
-  environment:
-  - TRAFFIC_RABBITMQ_HOST=autowp_test_rabbitmq
-  - TRAFFIC_RABBITMQ_PORT=5672
-  - TRAFFIC_MONITORING_QUEUE=input
-  - TRAFFIC_HOTLINK_QUEUE=hotlink
-  - TRAFFIC_MYSQL_DSN=root:password@tcp(autowp_test_traffic_mysql:3306)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
-  - TRAFFIC_MIGRATIONS_DSN=mysql://root:password@tcp(autowp_test_traffic_mysql)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
-  - TRAFFIC_SENTRY_DSN=
-  - TRAFFIC_SENTRY_ENVIRONMENT=development
-
-traffic-mysql:
-  image: mysql:8
-  container_name: autowp_test_traffic_mysql
-  restart: always
-  environment:
-  - MYSQL_ROOT_PASSWORD=password
-  - MYSQL_DATABASE=traffic
-
-goautowp:
-  image: autowp/goautowp
-  container_name: autowp_test_goautowp
-  restart: always
-  depends_on:
-  - rabbitmq
-  - mysql
-  volumes:
-  - ./public_html/pictures:/app/pictures:ro
-  environment:
-  - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
-  - AUTOWP_RABBITMQ_PORT=5672
-  - AUTOWP_DUPLICATE_FINDER_QUEUE=duplicate_finder
-  - AUTOWP_MYSQL_DSN=autowp_test:test@tcp(autowp_test_mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
-  - AUTOWP_MIGRATIONS_DSN=mysql://autowp_test:test@tcp(autowp_test_mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
-  - AUTOWP_SENTRY_DSN=
-  - AUTOWP_SENTRY_ENVIRONMENT=development
-  - AUTOWP_IMAGES_DIR=/app/pictures
-  - AUTOWP_MIGRATIONS_DIR=/app/migrations
-
-minio:
-  image: minio/minio
-  container_name: autowp_test_minio
-  restart: always
-  environment:
-    - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
-    - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-  ports:
-    - "9000:9000"
-  volumes:
-    - "./minio/data:/data"
-  command: server /data
-
-createbuckets:
-  image: minio/mc
-  container_name: autowp_test_createbuckets
-  depends_on:
+version: "3.8"
+  services:
+  backend:
+    image: autowp/autowp:v2
+    container_name: autowp_test_backend
+    restart: always
+    environment:
+      CODECLIMATE_REPO_TOKEN: ${CODECLIMATE_REPO_TOKEN}
+      TRAVIS: ${TRAVIS}
+      TRAVIS_JOB_ID: ${TRAVIS_JOB_ID}
+      TRAVIS_JOB_NUMBER: ${TRAVIS_JOB_NUMBER}
+      TRAVIS_BRANCH: ${TRAVIS_BRANCH}
+      TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}
+      TRAVIS_PULL_REQUEST_BRANCH: ${TRAVIS_PULL_REQUEST_BRANCH}
+      TRAVIS_PULL_REQUEST_SHA: ${TRAVIS_PULL_REQUEST_SHA}
+      TRAVIS_BUILD_NUMBER: ${TRAVIS_BUILD_NUMBER}
+      TRAVIS_COMMIT: ${TRAVIS_COMMIT}
+      TRAVIS_COMMIT_MESSAGE: ${TRAVIS_COMMIT_MESSAGE}
+      TRAVIS_COMMIT_RANGE: ${TRAVIS_COMMIT_RANGE}
+      TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}
+      TRAVIS_TAG: ${TRAVIS_TAG}
+      AUTOWP_DB_HOST: "autowp_test_mysql"
+      AUTOWP_DB_PORT: "3306"
+      AUTOWP_DB_USERNAME: "autowp_test"
+      AUTOWP_DB_PASSWORD: "test"
+      AUTOWP_DB_DBNAME: "autowp_test"
+      AUTOWP_USERS_SALT: "users-salt"
+      AUTOWP_EMAIL_SALT: "email-salt"
+      AUTOWP_MEMCACHED_HOST: "autowp_test_memcached"
+      AUTOWP_HOST: "localhost"
+      AUTOWP_HOST_RU: "localhost"
+      AUTOWP_PICTURES_HOST: "i.localhost"
+      AUTOWP_MAIL_TYPE: "in-memory"
+      AUTOWP_MAIL_SMTP_HOST: ""
+      AUTOWP_MAIL_SMTP_USERNAME: ""
+      AUTOWP_MAIL_SMTP_PASSWORD: ""
+      AUTOWP_TELEGRAM_ACCESS_TOKEN: ""
+      AUTOWP_TELEGRAM_TOKEN: ""
+      AUTOWP_TWITTER_USERNAME: ""
+      AUTOWP_TWITTER_OAUTH_KEY: ""
+      AUTOWP_TWITTER_OAUTH_SECRET: ""
+      AUTOWP_TWITTER_TOKEN_OAUTH: ""
+      AUTOWP_TWITTER_TOKEN_OAUTH_SECRET: ""
+      AUTOWP_FACEBOOK_APP_ID: ""
+      AUTOWP_FACEBOOK_APP_SECRET: ""
+      AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN: ""
+      AUTOWP_YANDEX_SECRET: ""
+      AUTOWP_YANDEX_PRICE: "1"
+      AUTOWP_VK_TOKEN: ""
+      AUTOWP_VK_OWNER_ID: ""
+      AUTOWP_CAPTCHA: 0
+      AUTOWP_RECAPTCHA_PUBLICKEY: "public"
+      AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
+      SENTRY_DSN: ""
+      SENTRY_ENVIRONMENT: "testing"
+      SENTRY_RELEASE: ${TRAVIS_COMMIT}
+      SONARCLOUD_TOKEN: ${SONARCLOUD_TOKEN}
+      AUTOWP_AUTH_SECRET: example_secret
+    volumes:
+    - ./config/autoload/local.php:/app/config/autoload/local.php:ro
+    - ./module/Application/test/_files/image:/app/public_html/image
+    - ./module/Application/test/_files/pictures:/app/public_html/pictures
+    - ./sonar-project.properties:/app/sonar-project.properties:ro
+    depends_on:
+    - memcached
+    - mysql
+    - rabbitmq
+    - traffic
+    - goautowp
     - minio
-  entrypoint: >
-    /bin/sh -c "
-    /usr/bin/mc config host add autowp http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
-    /usr/bin/mc mb autowp/format;
-    /usr/bin/mc policy set download autowp/format;
-    /usr/bin/mc mb autowp/user;
-    /usr/bin/mc policy set download autowp/user;
-    /usr/bin/mc mb autowp/brand;
-    /usr/bin/mc policy set download autowp/brand;
-    /usr/bin/mc mb autowp/picture;
-    /usr/bin/mc policy set download autowp/picture;
-    /usr/bin/mc mb autowp/files;
-    /usr/bin/mc policy set download autowp/files;
-    exit 0;
-    "
+    - createbuckets
+
+  memcached:
+    image: memcached
+    container_name: autowp_test_memcached
+    restart: always
+    expose:
+    - "11211"
+
+  mysql:
+    image: mysql:8
+    container_name: autowp_test_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: autowp_test
+      MYSQL_USER: autowp_test
+      MYSQL_PASSWORD: test
+    volumes:
+    - "./mysql.conf.d:/etc/mysql/conf.d"
+    expose:
+    - "3306"
+
+  rabbitmq:
+    image: rabbitmq
+    container_name: autowp_test_rabbitmq
+
+  traffic:
+    image: autowp/traffic
+    container_name: autowp_test_traffic
+    restart: always
+    depends_on:
+    - rabbitmq
+    - traffic-mysql
+    environment:
+    - TRAFFIC_RABBITMQ_HOST=autowp_test_rabbitmq
+    - TRAFFIC_RABBITMQ_PORT=5672
+    - TRAFFIC_MONITORING_QUEUE=input
+    - TRAFFIC_HOTLINK_QUEUE=hotlink
+    - TRAFFIC_MYSQL_DSN=root:password@tcp(autowp_test_traffic_mysql:3306)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
+    - TRAFFIC_MIGRATIONS_DSN=mysql://root:password@tcp(autowp_test_traffic_mysql)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
+    - TRAFFIC_SENTRY_DSN=
+    - TRAFFIC_SENTRY_ENVIRONMENT=development
+
+  traffic-mysql:
+    image: mysql:8
+    container_name: autowp_test_traffic_mysql
+    restart: always
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_DATABASE=traffic
+
+  goautowp:
+    image: autowp/goautowp
+    container_name: autowp_test_goautowp
+    restart: always
+    depends_on:
+    - rabbitmq
+    - mysql
+    volumes:
+    - ./public_html/pictures:/app/pictures:ro
+    environment:
+    - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
+    - AUTOWP_RABBITMQ_PORT=5672
+    - AUTOWP_DUPLICATE_FINDER_QUEUE=duplicate_finder
+    - AUTOWP_MYSQL_DSN=autowp_test:test@tcp(autowp_test_mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
+    - AUTOWP_MIGRATIONS_DSN=mysql://autowp_test:test@tcp(autowp_test_mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
+    - AUTOWP_SENTRY_DSN=
+    - AUTOWP_SENTRY_ENVIRONMENT=development
+    - AUTOWP_IMAGES_DIR=/app/pictures
+    - AUTOWP_MIGRATIONS_DIR=/app/migrations
+
+  minio:
+    image: minio/minio
+    container_name: autowp_test_minio
+    restart: always
+    environment:
+      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    ports:
+      - "9000:9000"
+    volumes:
+      - "./minio/data:/data"
+    command: server /data
+
+  createbuckets:
+    image: minio/mc
+    container_name: autowp_test_createbuckets
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add autowp http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
+      /usr/bin/mc mb autowp/format;
+      /usr/bin/mc policy set download autowp/format;
+      /usr/bin/mc mb autowp/user;
+      /usr/bin/mc policy set download autowp/user;
+      /usr/bin/mc mb autowp/brand;
+      /usr/bin/mc policy set download autowp/brand;
+      /usr/bin/mc mb autowp/picture;
+      /usr/bin/mc policy set download autowp/picture;
+      /usr/bin/mc mb autowp/files;
+      /usr/bin/mc policy set download autowp/files;
+      exit 0;
+      "
