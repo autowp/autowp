@@ -3,6 +3,7 @@
 namespace Application\Hydrator\Api;
 
 use Application\Model\Item;
+use Application\Module;
 use Application\Service\SpecificationsService;
 use ArrayAccess;
 use Autowp\User\Model\User;
@@ -16,9 +17,6 @@ use Traversable;
 
 use function array_reverse;
 use function is_array;
-
-use const Application\MYSQL_DATETIME_FORMAT;
-use const Application\MYSQL_TIMEZONE;
 
 class AttrUserValueHydrator extends AbstractRestHydrator
 {
@@ -84,8 +82,8 @@ class AttrUserValueHydrator extends AbstractRestHydrator
     {
         $updateDate = null;
         if ($object['update_date']) {
-            $timezone   = new DateTimeZone(MYSQL_TIMEZONE);
-            $updateDate = DateTime::createFromFormat(MYSQL_DATETIME_FORMAT, $object['update_date'], $timezone);
+            $timezone   = new DateTimeZone(Module::MYSQL_TIMEZONE);
+            $updateDate = DateTime::createFromFormat(Module::MYSQL_DATETIME_FORMAT, $object['update_date'], $timezone);
         }
 
         $result = [

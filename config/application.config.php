@@ -63,5 +63,8 @@ return [
         // Enabled by default, prevents usage of modules that depend on other modules
         // that weren't loaded.
         // 'check_dependencies' => true,
-    ]
+        'config_glob_paths' => [
+            realpath(__DIR__) . '/autoload/local.php',
+        ],
+    ],
 ];

@@ -2,6 +2,7 @@
 
 namespace Autowp\User\Model;
 
+use Application\Module;
 use ArrayAccess;
 use ArrayObject;
 use Autowp\Commons\Db\Table\Row;
@@ -21,9 +22,6 @@ use function inet_pton;
 use function is_array;
 use function is_scalar;
 use function max;
-
-use const Application\MYSQL_DATETIME_FORMAT;
-use const Application\MYSQL_TIMEZONE;
 
 class User
 {
@@ -199,10 +197,10 @@ class User
 
         if ($options['online']) {
             $now = new DateTime();
-            $now->setTimezone(new DateTimeZone(MYSQL_TIMEZONE));
+            $now->setTimezone(new DateTimeZone(Module::MYSQL_TIMEZONE));
             $now->sub(new DateInterval('PT5M'));
 
-            $select->where(['users.last_online >= ?' => $now->format(MYSQL_DATETIME_FORMAT)]);
+            $select->where(['users.last_online >= ?' => $now->format(Module::MYSQL_DATETIME_FORMAT)]);
         }
 
         if ($options['limit']) {

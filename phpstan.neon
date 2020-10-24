@@ -1,0 +1,6 @@
+parameters:
+    level: 5
+    parallel:
+        processTimeout: 300.0
+    paths:
+        - module

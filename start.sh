@@ -17,8 +17,8 @@ mkdir -p /app/public_html/img
 
 echo "Waiting for mysql"
 
-waitforit -host=$AUTOWP_DB_HOST -port=$AUTOWP_DB_PORT -timeout=60
-waitforit -address=$TRAFFIC_URL -timeout=60
+waitforit -host=mysql -port=3306 -timeout=60
+waitforit -address=http://traffic -timeout=60
 
 echo "Starting supervisor"
 

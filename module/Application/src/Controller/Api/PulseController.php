@@ -3,6 +3,7 @@
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
+use Application\Module;
 use Autowp\User\Model\User;
 use DateInterval;
 use DateTime;
@@ -12,8 +13,6 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 
 use function count;
-
-use const Application\MYSQL_DATETIME_FORMAT;
 
 class PulseController extends AbstractActionController
 {
@@ -109,8 +108,8 @@ class PulseController extends AbstractActionController
             ->where([
                 new Sql\Predicate\Between(
                     'add_datetime',
-                    $from->format(MYSQL_DATETIME_FORMAT),
-                    $now->format(MYSQL_DATETIME_FORMAT)
+                    $from->format(Module::MYSQL_DATETIME_FORMAT),
+                    $now->format(Module::MYSQL_DATETIME_FORMAT)
                 ),
             ])
             ->group($group);

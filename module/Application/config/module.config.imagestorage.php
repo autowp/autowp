@@ -2,9 +2,6 @@
 
 namespace Application;
 
-use function explode;
-use function getenv;
-
 return [
     'imageStorage' => [
         'imageTableName'         => 'image',
@@ -14,16 +11,7 @@ return [
                 'namingStrategy' => [
                     'strategy' => 'pattern',
                 ],
-                'bucket'         => getenv('AUTOWP_IMAGE_FORMAT_BUCKET'),
-            ],
-            'museum'  => [
-                'namingStrategy' => [
-                    'strategy' => 'serial',
-                    'options'  => [
-                        'deep' => 2,
-                    ],
-                ],
-                'bucket'         => getenv('AUTOWP_IMAGE_MUSEUM_BUCKET'),
+                'bucket'         => 'format',
             ],
             'user'    => [
                 'namingStrategy' => [
@@ -32,19 +20,19 @@ return [
                         'deep' => 2,
                     ],
                 ],
-                'bucket'         => getenv('AUTOWP_IMAGE_USER_BUCKET'),
+                'bucket'         => 'user',
             ],
             'brand'   => [
                 'namingStrategy' => [
                     'strategy' => 'pattern',
                 ],
-                'bucket'         => getenv('AUTOWP_IMAGE_BRAND_BUCKET'),
+                'bucket'         => 'brand',
             ],
             'picture' => [
                 'namingStrategy' => [
                     'strategy' => 'pattern',
                 ],
-                'bucket'         => getenv('AUTOWP_IMAGE_PICTURE_BUCKET'),
+                'bucket'         => 'picture',
             ],
         ],
         'formatedImageDirName'   => 'format',
@@ -157,12 +145,13 @@ return [
         's3'                     => [
             'region'                  => '',
             'version'                 => 'latest',
-            'endpoint'                => explode(';', getenv('AUTOWP_S3_ENDPOINT')),
+            'endpoint'                => 'http://minio:9000',
             'credentials'             => [
-                'key'    => getenv('AUTOWP_S3_KEY'),
-                'secret' => getenv('AUTOWP_S3_SECRET'),
+                'key'    => 'key',
+                'secret' => 'secret',
             ],
             'use_path_style_endpoint' => true,
         ],
+        'srcOverride'            => [],
     ],
 ];

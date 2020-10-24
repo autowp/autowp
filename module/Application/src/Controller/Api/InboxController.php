@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Application\Model\Brand;
 use Application\Model\Item;
 use Application\Model\Picture;
+use Application\Module;
 use Application\Service\DayPictures;
 use Autowp\User\Controller\Plugin\User;
 use Exception;
@@ -13,8 +14,6 @@ use Laminas\Db\Sql;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
-
-use const Application\MYSQL_TIMEZONE;
 
 /**
  * @method User user($user = null)
@@ -106,7 +105,7 @@ class InboxController extends AbstractRestfulController
         $service = new DayPictures([
             'picture'     => $this->picture,
             'timezone'    => $this->user()->timezone(), // @phan-suppress-current-line PhanUndeclaredMethod
-            'dbTimezone'  => MYSQL_TIMEZONE,
+            'dbTimezone'  => Module::MYSQL_TIMEZONE,
             'select'      => $select,
             'orderColumn' => 'add_date',
             'currentDate' => $values['date'],

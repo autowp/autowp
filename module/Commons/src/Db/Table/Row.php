@@ -2,10 +2,10 @@
 
 namespace Autowp\Commons\Db\Table;
 
+use Application\Module;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use const Application\MYSQL_TIMEZONE;
 
 class Row
 {
@@ -34,7 +34,7 @@ class Row
         }
 
         //TODO: extract constant
-        $timezone = new DateTimeZone(MYSQL_TIMEZONE);
+        $timezone = new DateTimeZone(Module::MYSQL_TIMEZONE);
 
         return DateTime::createFromFormat($format, $value, $timezone);
     }

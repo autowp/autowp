@@ -3,6 +3,7 @@
 namespace Application\Model;
 
 use Autowp\Image;
+use Aws\S3\S3Client;
 use Collator;
 use Exception;
 use ImagickException;
@@ -16,6 +17,8 @@ use function chmod;
 use function count;
 use function escapeshellarg;
 use function exec;
+use function fclose;
+use function file_exists;
 use function file_put_contents;
 use function floor;
 use function fopen;
@@ -392,7 +395,7 @@ class Brand
      * @throws ImagickException
      * @throws Exception
      */
-    public function createIconsSprite(Image\Storage $imageStorage, string $destImg, string $destCss)
+    public function createIconsSprite(Image\Storage $imageStorage, S3Client $s3, string $bucket)
     {
         $list = $this->getList([
             'language' => 'en',
@@ -410,24 +413,25 @@ class Brand
         $background = $format->getBackground();
 
         $tmpDir = sys_get_temp_dir() . '/brands-sprite/';
-        mkdir($tmpDir, 0777, true);
+        if (! file_exists($tmpDir)) {
+            mkdir($tmpDir, 0777, true);
+        }
 
         foreach ($list as $brand) {
-            $img = false;
+            $stream = false;
             if ($brand['logo_id']) {
-                $img = $imageStorage->getFormatedImage($brand['logo_id'], self::ICON_FORMAT);
+                $img    = $imageStorage->getFormatedImage($brand['logo_id'], self::ICON_FORMAT);
+                $stream = $imageStorage->getImageBlobStream($img->getId());
             }
 
-            if ($img) {
+            if ($stream) {
                 $catname          = str_replace('.', '_', $brand['catname']);
                 $path             = $tmpDir . $catname . '.png';
                 $images[$catname] = escapeshellarg($path);
 
-                $src = $img->getSrc();
-                echo "Download `$src` ...\n";
-                $success = file_put_contents($path, fopen($src, 'r'));
-                if ($success === false) {
-                    throw new Exception("Failed to download `$src`");
+                $success = file_put_contents($path, $stream);
+                if ($success === 0) {
+                    throw new Exception("Failed to download");
                 }
             }
         }
@@ -437,6 +441,9 @@ class Brand
         if ($width <= 0) {
             $width = 1;
         }
+
+        $destImg = $tmpDir . 'brands.png';
+        $destCss = $tmpDir . 'brands.css';
 
         $cmd = sprintf(
             'montage ' . implode(' ', $images) . ' -background %s -geometry +1+1 -tile %dx %s',
@@ -465,6 +472,29 @@ class Brand
         }
 
         file_put_contents($destCss, implode(' ', $css));
+
+        $files = [
+            $destCss => [
+                'path' => 'brands.css',
+                'mime' => 'text/css',
+            ],
+            $destImg => [
+                'path' => 'brands.png',
+                'mime' => 'image/png',
+            ],
+        ];
+
+        foreach ($files as $src => $dst) {
+            $handle = fopen($src, 'r');
+            $s3->putObject([
+                'Key'         => $dst['path'],
+                'Body'        => $handle,
+                'Bucket'      => $bucket,
+                'ACL'         => 'public-read',
+                'ContentType' => $dst['mime'],
+            ]);
+            fclose($handle);
+        }
     }
 
     /**

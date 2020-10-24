@@ -3,7 +3,6 @@
 namespace Application\Service;
 
 use Application\ItemNameFormatter;
-use Application\Model\Picture;
 use Application\PictureNameFormatter as Model;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -19,8 +18,7 @@ class PictureNameFormatterFactory implements FactoryInterface
         return new Model(
             $container->get('MvcTranslator'),
             $container->get('ViewRenderer'),
-            $container->get(ItemNameFormatter::class),
-            $container->get(Picture::class)
+            $container->get(ItemNameFormatter::class)
         );
     }
 }

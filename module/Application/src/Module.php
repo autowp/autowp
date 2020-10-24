@@ -19,9 +19,6 @@ use function Sentry\init;
 
 use const E_ALL;
 
-const MYSQL_DATETIME_FORMAT = 'Y-m-d H:i:s';
-const MYSQL_TIMEZONE        = 'UTC';
-
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\BootstrapListenerInterface,
@@ -29,7 +26,9 @@ class Module implements
     Feature\ConsoleBannerProviderInterface,
     Feature\ConfigProviderInterface
 {
-    public const VERSION = '1.0dev';
+    public const VERSION               = '1.0dev';
+    public const MYSQL_DATETIME_FORMAT = 'Y-m-d H:i:s';
+    public const MYSQL_TIMEZONE        = 'UTC';
 
     public function getConfig(): array
     {
@@ -108,7 +107,7 @@ class Module implements
             ]);
         }
 
-        $languageListener = new LanguageRouteListener([$config['pictures_hostname']]);
+        $languageListener = new LanguageRouteListener();
         $languageListener->attach($eventManager);
 
         $maintenance = new Maintenance();

@@ -46,20 +46,6 @@ class AttrAttributeHydrator extends AbstractRestHydrator
             );
         }
 
-        if (isset($options['user_id'])) {
-            $this->setUserId($options['user_id']);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param int|null $userId
-     */
-    public function setUserId($userId = null): self
-    {
-        $this->userId = $userId;
-
         return $this;
     }
 

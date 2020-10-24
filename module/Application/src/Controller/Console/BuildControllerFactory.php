@@ -14,8 +14,10 @@ class BuildControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): BuildController
     {
+        $config = $container->get('Config')['fileStorage'];
         return new BuildController(
-            $container->get(Brand::class)
+            $container->get(Brand::class),
+            $config
         );
     }
 }

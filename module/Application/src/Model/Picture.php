@@ -4,6 +4,7 @@ namespace Application\Model;
 
 use Application\Comments;
 use Application\Model\Item as ItemModel;
+use Application\Module;
 use ArrayAccess;
 use ArrayObject;
 use Autowp\ZFComponents\Filter\FilenameSafe;
@@ -35,8 +36,6 @@ use function strlen;
 use function trim;
 use function usort;
 
-use const Application\MYSQL_DATETIME_FORMAT;
-use const Application\MYSQL_TIMEZONE;
 use const SORT_STRING;
 
 class Picture
@@ -486,7 +485,7 @@ class Picture
             }
 
             $timezone   = new DateTimeZone($options['timezone']);
-            $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
+            $dbTimezine = new DateTimeZone(Module::MYSQL_TIMEZONE);
 
             $date = DateTime::createFromFormat('Y-m-d', $options['added_from'], $timezone);
 
@@ -495,7 +494,7 @@ class Picture
             $start->setTimezone($dbTimezine);
 
             $select->where([
-                'pictures.add_date > ?' => $start->format(MYSQL_DATETIME_FORMAT),
+                'pictures.add_date > ?' => $start->format(Module::MYSQL_DATETIME_FORMAT),
             ]);
         }
 
@@ -801,7 +800,7 @@ class Picture
     private function setDateFilter(Sql\Select $select, string $column, string $date, string $timezone)
     {
         $timezone   = new DateTimeZone($timezone);
-        $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
+        $dbTimezine = new DateTimeZone(Module::MYSQL_TIMEZONE);
 
         $dateObj = DateTime::createFromFormat('Y-m-d', $date, $timezone);
 
@@ -820,8 +819,8 @@ class Picture
         $select->where([
             new Sql\Predicate\Between(
                 $column,
-                $start->format(MYSQL_DATETIME_FORMAT),
-                $end->format(MYSQL_DATETIME_FORMAT)
+                $start->format(Module::MYSQL_DATETIME_FORMAT),
+                $end->format(Module::MYSQL_DATETIME_FORMAT)
             ),
         ]);
     }

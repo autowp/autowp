@@ -956,15 +956,15 @@ class SpecificationsService
      * @throws Exception
      * @return null|mixed
      */
-    public function getActualValue(int $attribute, int $itemId)
+    public function getActualValue(int $attributeId, int $itemId)
     {
         if (! $itemId) {
             throw new Exception("item_id not set");
         }
 
-        $attribute = $this->getAttribute($attribute);
+        $attribute = $this->getAttribute($attributeId);
         if (! $attribute) {
-            throw new Exception("attribute `$attribute` not found");
+            throw new Exception("attribute `$attributeId` not found");
         }
 
         $valuesTable = $this->getValueDataTable($attribute['typeId']);

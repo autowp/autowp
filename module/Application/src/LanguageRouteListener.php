@@ -19,13 +19,10 @@ class LanguageRouteListener extends AbstractListenerAggregate
         'wheelsage.org',
     ];
 
-    private array $skipHostname = [];
-
     private string $defaultLanguage = 'en';
 
-    public function __construct(array $skipHostname)
+    public function __construct()
     {
-        $this->skipHostname = $skipHostname;
     }
 
     /**
@@ -50,10 +47,6 @@ class LanguageRouteListener extends AbstractListenerAggregate
 
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             $hostname = $request->getUri()->getHost();
-
-            if (in_array($hostname, $this->skipHostname)) {
-                return;
-            }
 
             if (in_array($hostname, $this->userDetectable)) {
                 $languageWhitelist = array_keys($hosts);

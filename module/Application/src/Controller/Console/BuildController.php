@@ -3,32 +3,38 @@
 namespace Application\Controller\Console;
 
 use Application\Model\Brand;
+use Aws\S3\S3Client;
 use Laminas\Mvc\Controller\AbstractActionController;
 
-use function is_dir;
-use function mkdir;
+use function array_rand;
+use function is_array;
 
 class BuildController extends AbstractActionController
 {
     private Brand $brand;
 
-    public function __construct(Brand $brand)
+    private array $fileStorageConfig;
+
+    public function __construct(Brand $brand, array $fileStorageConfig)
     {
-        $this->brand = $brand;
+        $this->brand             = $brand;
+        $this->fileStorageConfig = $fileStorageConfig;
     }
 
     public function brandsSpriteAction(): string
     {
-        $dir = 'public_html/img';
-        if (! is_dir($dir)) {
-            mkdir($dir, 0777, true);
+        // pick random endpoint
+        $s3Config = $this->fileStorageConfig['s3'];
+        if (isset($s3Config['endpoint']) && is_array($s3Config['endpoint'])) {
+            $s3endpoints          = $s3Config['endpoint'];
+            $s3Config['endpoint'] = $s3endpoints[array_rand($s3endpoints)];
         }
-        $destSprite = $dir . '/brands.png';
-        $destCss    = $dir . '/brands.css';
 
-        $imageStorage = $this->imageStorage();
-
-        $this->brand->createIconsSprite($imageStorage, $destSprite, $destCss);
+        $this->brand->createIconsSprite(
+            $this->imageStorage(),
+            new S3Client($s3Config),
+            $this->fileStorageConfig['bucket']
+        );
 
         return "done\n";
     }

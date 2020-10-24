@@ -631,7 +631,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'get'   => [
+                            'get'  => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
@@ -640,16 +640,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'icons' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/icons',
-                                    'defaults' => [
-                                        'action' => 'icons',
-                                    ],
-                                ],
-                            ],
-                            'item'  => [
+                            'item' => [
                                 'type'          => 'Segment',
                                 'options'       => [
                                     'route' => '/:id',

@@ -220,8 +220,6 @@ return [
     ],
     'hostname_whitelist' => [
         'www.autowp.ru',
-        'ru.autowp.ru',
-        'en.autowp.ru',
         'i.' . $host,
         'en.' . $host,
         'fr.' . $host,
@@ -233,8 +231,7 @@ return [
         'www.' . $host,
         $host,
     ],
-    'force_https'        => (bool) getenv('AUTOWP_FORCE_HTTPS'),
-    'pictures_hostname'  => getenv('AUTOWP_PICTURES_HOST'),
+    'force_https'        => true,
     'content_languages'  => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp'],
 
     /*'acl' => [
@@ -271,7 +268,7 @@ return [
         'manifest' => __DIR__ . '/../../../public_html/dist/manifest.json',
         'prefix'   => '',
     ],
-    'mosts_min_vehicles_count' => (int) getenv('AUTOWP_MOSTS_MIN_VEHICLES_COUNT'),
+    'mosts_min_vehicles_count' => 200,
     'yandex'                   => [
         'secret' => getenv('AUTOWP_YANDEX_SECRET'),
         'price'  => (int) getenv('AUTOWP_YANDEX_PRICE'),
@@ -306,7 +303,21 @@ return [
         'release'     => getenv('SENTRY_RELEASE'),
     ],
     'traffic'                  => [
-        'url' => getenv('TRAFFIC_URL'),
+        'url' => 'http://traffic',
     ],
     'authSecret'               => getenv('AUTOWP_AUTH_SECRET'),
+    'fileStorage'              => [
+        's3'          => [
+            'region'                  => '',
+            'version'                 => 'latest',
+            'endpoint'                => 'http://minio:9000',
+            'credentials'             => [
+                'key'    => 'key',
+                'secret' => 'secret',
+            ],
+            'use_path_style_endpoint' => true,
+        ],
+        'bucket'      => 'files',
+        'srcOverride' => [],
+    ],
 ];

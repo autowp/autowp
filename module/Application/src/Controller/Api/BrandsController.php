@@ -74,14 +74,6 @@ class BrandsController extends AbstractActionController
         ]);
     }
 
-    public function iconsAction(): JsonModel
-    {
-        return new JsonModel([
-            'image' => '/img/brands.png',
-            'css'   => '/img/brands.css',
-        ]);
-    }
-
     /**
      * @throws Exception
      * @return ViewModel|ResponseInterface|array

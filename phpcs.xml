@@ -6,6 +6,7 @@
     </rule>
 
     <!-- Paths to check -->
+    <file>config</file>
     <file>module/Application/config</file>
     <file>module/Application/src</file>
     <file>module/Application/test</file>

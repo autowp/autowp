@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Application\Module;
 use ArrayAccess;
 use ArrayObject;
 use Autowp\TextStorage\Service as TextStorage;
@@ -30,7 +31,6 @@ use function min;
 use function str_repeat;
 use function substr;
 
-use const Application\MYSQL_DATETIME_FORMAT;
 use const SORT_STRING;
 
 class Item
@@ -629,8 +629,8 @@ class Item
         }
 
         $this->itemTable->update([
-            'begin_order_cache' => $begin ? $begin->format(MYSQL_DATETIME_FORMAT) : null,
-            'end_order_cache'   => $end ? $end->format(MYSQL_DATETIME_FORMAT) : null,
+            'begin_order_cache' => $begin->format(Module::MYSQL_DATETIME_FORMAT),
+            'end_order_cache'   => $end->format(Module::MYSQL_DATETIME_FORMAT),
         ], $primaryKey);
 
         return true;

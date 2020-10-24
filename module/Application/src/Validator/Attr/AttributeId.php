@@ -31,7 +31,7 @@ class AttributeId extends AbstractValidator
 
         $row = $this->table->select([
             'id' => (int) $value,
-        ]);
+        ])->current();
 
         if (! $row) {
             $this->error(self::INVALID);

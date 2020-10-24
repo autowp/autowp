@@ -30,7 +30,6 @@ services:
       AUTOWP_HOST: "localhost"
       AUTOWP_HOST_RU: "ru.localhost"
       AUTOWP_PICTURES_HOST: "i.localhost"
-      AUTOWP_MOSTS_MIN_VEHICLES_COUNT: 1
       AUTOWP_MAIL_TYPE: "in-memory"
       AUTOWP_MAIL_SMTP_HOST: ""
       AUTOWP_MAIL_SMTP_USERNAME: ""
@@ -49,35 +48,12 @@ services:
       AUTOWP_YANDEX_PRICE: "1"
       AUTOWP_VK_TOKEN: ""
       AUTOWP_VK_OWNER_ID: ""
-      AUTOWP_ELS_VK_CLIENTID: "vk_test_clientid"
-      AUTOWP_ELS_VK_SECRET: "vk_test_secret"
-      AUTOWP_ELS_GOOGLEPLUS_CLIENTID: "google_test_clientid"
-      AUTOWP_ELS_GOOGLEPLUS_SECRET: "google_test_secret"
-      AUTOWP_ELS_TWITTER_CLIENTID: "twitter_test_clientid"
-      AUTOWP_ELS_TWITTER_SECRET: "twitter_test_secret"
-      AUTOWP_ELS_FACEBOOK_CLIENTID: "facebook_test_clientid"
-      AUTOWP_ELS_FACEBOOK_SECRET: "facebook_test_secret"
-      AUTOWP_ELS_GITHUB_CLIENTID: "github_test_clientid"
-      AUTOWP_ELS_GITHUB_SECRET: "github_test_secret"
-      AUTOWP_ELS_LINKEDIN_CLIENTID: "linkedin_test_clientid"
-      AUTOWP_ELS_LINKEDIN_SECRET: "linkedin_test_secret"
       AUTOWP_CAPTCHA: 0
       AUTOWP_RECAPTCHA_PUBLICKEY: "public"
       AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
-      AUTOWP_GO_LISTEN: ":81"
       SENTRY_DSN: ""
       SENTRY_ENVIRONMENT: "development"
       SENTRY_RELEASE: "dev"
-      TRAFFIC_URL: http://traffic
-      AUTOWP_FORCE_HTTPS: ""
-      AUTOWP_S3_KEY: 040JJYSRWKEG8FP4DCQE
-      AUTOWP_S3_SECRET: CC2secCLdW49LReoOXmhhXwBeZsbSIL3N0b5kWLp
-      AUTOWP_S3_ENDPOINT: "http://amd:7480;http://amd:7480"
-      AUTOWP_IMAGE_FORMAT_BUCKET: dev-format
-      AUTOWP_IMAGE_MUSEUM_BUCKET: dev-museum
-      AUTOWP_IMAGE_USER_BUCKET: dev-user
-      AUTOWP_IMAGE_BRAND_BUCKET: dev-brand
-      AUTOWP_IMAGE_PICTURE_BUCKET: dev-picture
       AUTOWP_AUTH_SECRET: example_secret
     volumes:
     - ./config:/app/config
@@ -101,6 +77,8 @@ services:
     - mysql
     - rabbitmq
     - traffic
+    - minio
+    - createbuckets
 
   memcached:
     image: memcached
@@ -141,6 +119,7 @@ services:
     - "./frontend/zh-CN:/usr/share/nginx/html/zh-CN"
     - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
     - "./hostmap:/etc/nginx/hostmap:ro"
+    user: "101:101"
 
   rabbitmq:
     image: rabbitmq:management
@@ -214,9 +193,44 @@ services:
   auth-postgres:
     image: postgres:12
     container_name: autowp_test_auth_postgres
+    restart: always
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=auth
       - POSTGRES_DB=auth
     ports:
       - "5432:5432"
+
+  minio:
+    image: minio/minio
+    container_name: autowp_test_minio
+    restart: always
+    environment:
+      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    ports:
+      - "9000:9000"
+    volumes:
+      - "./minio/data:/data"
+    command: server /data
+
+  createbuckets:
+    image: minio/mc
+    container_name: autowp_test_createbuckets
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add autowp http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
+      /usr/bin/mc mb autowp/format;
+      /usr/bin/mc policy set download autowp/format;
+      /usr/bin/mc mb autowp/user;
+      /usr/bin/mc policy set download autowp/user;
+      /usr/bin/mc mb autowp/brand;
+      /usr/bin/mc policy set download autowp/brand;
+      /usr/bin/mc mb autowp/picture;
+      /usr/bin/mc policy set download autowp/picture;
+      /usr/bin/mc mb autowp/files;
+      /usr/bin/mc policy set download autowp/files;
+      exit 0;
+      "

@@ -6,6 +6,7 @@ use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
+use Application\Module;
 use Application\Service\DayPictures;
 use ArrayAccess;
 use Autowp\User\Controller\Plugin\User;
@@ -18,8 +19,6 @@ use Laminas\View\Model\ViewModel;
 use Traversable;
 
 use function count;
-
-use const Application\MYSQL_TIMEZONE;
 
 /**
  * @method User user($user = null)
@@ -83,7 +82,7 @@ class NewController extends AbstractRestfulController
         $service = new DayPictures([
             'picture'     => $this->picture,
             'timezone'    => $this->user()->timezone(),
-            'dbTimezone'  => MYSQL_TIMEZONE,
+            'dbTimezone'  => Module::MYSQL_TIMEZONE,
             'select'      => $select,
             'orderColumn' => 'accept_datetime',
             'currentDate' => $values['date'],

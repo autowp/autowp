@@ -28,7 +28,6 @@ backend:
     AUTOWP_HOST: "localhost"
     AUTOWP_HOST_RU: "localhost"
     AUTOWP_PICTURES_HOST: "i.localhost"
-    AUTOWP_MOSTS_MIN_VEHICLES_COUNT: 1
     AUTOWP_MAIL_TYPE: "in-memory"
     AUTOWP_MAIL_SMTP_HOST: ""
     AUTOWP_MAIL_SMTP_USERNAME: ""
@@ -47,34 +46,12 @@ backend:
     AUTOWP_YANDEX_PRICE: "1"
     AUTOWP_VK_TOKEN: ""
     AUTOWP_VK_OWNER_ID: ""
-    AUTOWP_ELS_VK_CLIENTID: "vk_test_clientid"
-    AUTOWP_ELS_VK_SECRET: "vk_test_secret"
-    AUTOWP_ELS_GOOGLEPLUS_CLIENTID: "google_test_clientid"
-    AUTOWP_ELS_GOOGLEPLUS_SECRET: "google_test_secret"
-    AUTOWP_ELS_TWITTER_CLIENTID: "twitter_test_clientid"
-    AUTOWP_ELS_TWITTER_SECRET: "twitter_test_secret"
-    AUTOWP_ELS_FACEBOOK_CLIENTID: "facebook_test_clientid"
-    AUTOWP_ELS_FACEBOOK_SECRET: "facebook_test_secret"
-    AUTOWP_ELS_GITHUB_CLIENTID: "github_test_clientid"
-    AUTOWP_ELS_GITHUB_SECRET: "github_test_secret"
-    AUTOWP_ELS_LINKEDIN_CLIENTID: "linkedin_test_clientid"
-    AUTOWP_ELS_LINKEDIN_SECRET: "linkedin_test_secret"
     AUTOWP_CAPTCHA: 0
     AUTOWP_RECAPTCHA_PUBLICKEY: "public"
     AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
-    AUTOWP_GO_LISTEN: ":81"
     SENTRY_DSN: ""
     SENTRY_ENVIRONMENT: "testing"
     SENTRY_RELEASE: ${TRAVIS_COMMIT}
-    TRAFFIC_URL: http://traffic
-    AUTOWP_S3_KEY: ${AUTOWP_S3_KEY}
-    AUTOWP_S3_SECRET: ${AUTOWP_S3_SECRET}
-    AUTOWP_S3_ENDPOINT: ${AUTOWP_S3_ENDPOINT}
-    AUTOWP_IMAGE_FORMAT_BUCKET: autowp-travis-format
-    AUTOWP_IMAGE_MUSEUM_BUCKET: autowp-travis-museum
-    AUTOWP_IMAGE_USER_BUCKET: autowp-travis-user
-    AUTOWP_IMAGE_BRAND_BUCKET: autowp-travis-brand
-    AUTOWP_IMAGE_PICTURE_BUCKET: autowp-travis-picture
     SONARCLOUD_TOKEN: ${SONARCLOUD_TOKEN}
     AUTOWP_AUTH_SECRET: example_secret
   volumes:
@@ -82,12 +59,14 @@ backend:
   - ./module/Application/test/_files/image:/app/public_html/image
   - ./module/Application/test/_files/pictures:/app/public_html/pictures
   - ./sonar-project.properties:/app/sonar-project.properties:ro
-  links:
+  depends_on:
   - memcached
   - mysql
   - rabbitmq
   - traffic
   - goautowp
+  - minio
+  - createbuckets
 
 memcached:
   image: memcached
@@ -118,7 +97,7 @@ traffic:
   image: autowp/traffic
   container_name: autowp_test_traffic
   restart: always
-  links:
+  depends_on:
   - rabbitmq
   - traffic-mysql
   environment:
@@ -143,7 +122,7 @@ goautowp:
   image: autowp/goautowp
   container_name: autowp_test_goautowp
   restart: always
-  links:
+  depends_on:
   - rabbitmq
   - mysql
   volumes:
@@ -158,3 +137,37 @@ goautowp:
   - AUTOWP_SENTRY_ENVIRONMENT=development
   - AUTOWP_IMAGES_DIR=/app/pictures
   - AUTOWP_MIGRATIONS_DIR=/app/migrations
+
+minio:
+  image: minio/minio
+  container_name: autowp_test_minio
+  restart: always
+  environment:
+    - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+    - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  ports:
+    - "9000:9000"
+  volumes:
+    - "./minio/data:/data"
+  command: server /data
+
+createbuckets:
+  image: minio/mc
+  container_name: autowp_test_createbuckets
+  depends_on:
+    - minio
+  entrypoint: >
+    /bin/sh -c "
+    /usr/bin/mc config host add autowp http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
+    /usr/bin/mc mb autowp/format;
+    /usr/bin/mc policy set download autowp/format;
+    /usr/bin/mc mb autowp/user;
+    /usr/bin/mc policy set download autowp/user;
+    /usr/bin/mc mb autowp/brand;
+    /usr/bin/mc policy set download autowp/brand;
+    /usr/bin/mc mb autowp/picture;
+    /usr/bin/mc policy set download autowp/picture;
+    /usr/bin/mc mb autowp/files;
+    /usr/bin/mc policy set download autowp/files;
+    exit 0;
+    "

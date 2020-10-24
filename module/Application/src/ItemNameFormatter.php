@@ -37,10 +37,9 @@ class ItemNameFormatter
     }
 
     /**
-     * @param array|ArrayAccess $item
      * @throws Exception
      */
-    public function formatHtml($item, string $language): string
+    public function formatHtml(iterable $item, string $language): string
     {
         if (! $item instanceof ArrayAccess && ! is_array($item)) {
             throw new Exception("`item` must be array or ArrayAccess");

@@ -3,6 +3,7 @@
 namespace Application\Service;
 
 use Application\Model\Picture;
+use Application\Module;
 use Autowp\Commons\Db\Table\Row;
 use DateTime;
 use DateTimeZone;
@@ -13,8 +14,6 @@ use Laminas\Paginator;
 use function is_string;
 use function method_exists;
 use function ucfirst;
-
-use const Application\MYSQL_DATETIME_FORMAT;
 
 class DayPictures
 {
@@ -30,7 +29,7 @@ class DayPictures
 
     private string $externalDateFormat = 'Y-m-d';
 
-    private string $dbDateTimeFormat = MYSQL_DATETIME_FORMAT;
+    private string $dbDateTimeFormat = Module::MYSQL_DATETIME_FORMAT;
 
     private ?DateTime $currentDate;
 
@@ -64,7 +63,7 @@ class DayPictures
             if (method_exists($this, $method)) {
                 $this->$method($value);
             } else {
-                $this->_raise("Unexpected option '$key'");
+                throw new Exception("Unexpected option '$key'");
             }
         }
 
