@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   backend:
-    image: autowp/autowp:v2
+    image: autowp/autowp
     container_name: autowp_test_backend
     restart: always
     environment:
@@ -26,7 +26,6 @@ services:
       AUTOWP_DB_DBNAME: "autowp_test"
       AUTOWP_USERS_SALT: "users-salt"
       AUTOWP_EMAIL_SALT: "email-salt"
-      AUTOWP_MEMCACHED_HOST: "autowp_test_memcached"
       AUTOWP_HOST: "localhost"
       AUTOWP_HOST_RU: "localhost"
       AUTOWP_MAIL_TYPE: "in-memory"
