@@ -57,8 +57,8 @@ services:
       AUTOWP_AUTH_SECRET: example_secret
     volumes:
     - ./config/autoload/local.php:/app/config/autoload/local.php:ro
-    #- ./module/Application/test/_files/image:/app/public_html/image
-    #- ./module/Application/test/_files/pictures:/app/public_html/pictures
+    - ./module/Application/test/_files/image:/app/public_html/image
+    - ./module/Application/test/_files/pictures:/app/public_html/pictures
     - ./sonar-project.properties:/app/sonar-project.properties:ro
     depends_on:
     - memcached
@@ -126,8 +126,6 @@ services:
     depends_on:
     - rabbitmq
     - mysql
-    volumes:
-    - ./public_html/pictures:/app/pictures:ro
     environment:
     - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
     - AUTOWP_RABBITMQ_PORT=5672
@@ -136,7 +134,6 @@ services:
     - AUTOWP_MIGRATIONS_DSN=mysql://autowp_test:test@tcp(autowp_test_mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
     - AUTOWP_SENTRY_DSN=
     - AUTOWP_SENTRY_ENVIRONMENT=development
-    - AUTOWP_IMAGES_DIR=/app/pictures
     - AUTOWP_MIGRATIONS_DIR=/app/migrations
 
   minio:
