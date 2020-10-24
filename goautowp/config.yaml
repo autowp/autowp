@@ -1,9 +1,9 @@
 migrations:
-  dsn: mysql://root:password@tcp(mysql)/autowp?charset=utf8mb4&parseTime=true&loc=UTC
+  dsn: mysql://root:password@tcp(mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
 duplicate_finder:
   rabbitmq: amqp://guest:guest@rabbitmq:5672/
   queue: duplicate_finder
-dsn: root:password@tcp(mysql:3306)/autowp?charset=utf8mb4&parseTime=true&loc=UTC
+dsn: root:password@tcp(mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
 file_storage:
   s3:
     endpoints:
