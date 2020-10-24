@@ -1,5 +1,5 @@
 version: "3.8"
-  services:
+services:
   backend:
     image: autowp/autowp:v2
     container_name: autowp_test_backend
