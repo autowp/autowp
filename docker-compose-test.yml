@@ -122,18 +122,11 @@ services:
     image: autowp/goautowp
     container_name: autowp_test_goautowp
     restart: always
+    volumes:
+    - "./goautowp/config.yaml:/config.yaml:ro"
     depends_on:
     - rabbitmq
     - mysql
-    environment:
-    - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
-    - AUTOWP_RABBITMQ_PORT=5672
-    - AUTOWP_DUPLICATE_FINDER_QUEUE=duplicate_finder
-    - AUTOWP_MYSQL_DSN=autowp_test:test@tcp(autowp_test_mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
-    - AUTOWP_MIGRATIONS_DSN=mysql://autowp_test:test@tcp(autowp_test_mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
-    - AUTOWP_SENTRY_DSN=
-    - AUTOWP_SENTRY_ENVIRONMENT=development
-    - AUTOWP_MIGRATIONS_DIR=/app/migrations
 
   minio:
     image: minio/minio
