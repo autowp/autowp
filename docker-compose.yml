@@ -29,7 +29,6 @@ services:
       AUTOWP_MEMCACHED_HOST: "autowp_test_memcached"
       AUTOWP_HOST: "localhost"
       AUTOWP_HOST_RU: "ru.localhost"
-      AUTOWP_PICTURES_HOST: "i.localhost"
       AUTOWP_MAIL_TYPE: "in-memory"
       AUTOWP_MAIL_SMTP_HOST: ""
       AUTOWP_MAIL_SMTP_USERNAME: ""
