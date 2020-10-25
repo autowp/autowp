@@ -10,7 +10,7 @@ class MostsControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->dispatch('https://www.autowp.ru/api/mosts/menu', Request::METHOD_GET);
 
@@ -21,7 +21,7 @@ class MostsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('get-menu');
     }
 
-    public function testVehicleType()
+    public function testVehicleType(): void
     {
         $this->dispatch('https://www.autowp.ru/api/mosts/items', Request::METHOD_GET, [
             'rating_catname' => 'fastest',

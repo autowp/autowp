@@ -2,7 +2,7 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\AbstractRestHydrator;
+use Application\Hydrator\Api\VotingVariantVoteHydrator;
 use Autowp\User\Controller\Plugin\User;
 use Autowp\Votings;
 use Exception;
@@ -26,12 +26,12 @@ class VotingController extends AbstractRestfulController
 
     private InputFilter $variantVoteInputFilter;
 
-    private AbstractRestHydrator $variantVoteHydrator;
+    private VotingVariantVoteHydrator $variantVoteHydrator;
 
     public function __construct(
         Votings\Votings $service,
         InputFilter $variantVoteInputFilter,
-        AbstractRestHydrator $variantVoteHydrator
+        VotingVariantVoteHydrator $variantVoteHydrator
     ) {
         $this->service                = $service;
         $this->variantVoteInputFilter = $variantVoteInputFilter;

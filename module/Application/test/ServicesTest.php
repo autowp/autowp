@@ -23,7 +23,7 @@ class ServicesTest extends AbstractHttpControllerTestCase
     /**
      * @dataProvider servicesProvider
      */
-    public function testServiceRegistered(string $serviceName)
+    public function testServiceRegistered(string $serviceName): void
     {
         $services = $this->getApplicationServiceLocator();
 

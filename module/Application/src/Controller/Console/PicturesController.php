@@ -34,7 +34,7 @@ class PicturesController extends AbstractActionController
     /**
      * @suppress PhanDeprecatedFunction
      */
-    public function fillPointAction()
+    public function fillPointAction(): void
     {
         $console      = Console::getInstance();
         $imageStorage = $this->imageStorage();
@@ -68,7 +68,7 @@ class PicturesController extends AbstractActionController
         $console->writeLine("Done");
     }
 
-    public function dfIndexAction()
+    public function dfIndexAction(): void
     {
         $table  = $this->picture->getTable();
         $select = $table->getSql()->select()
@@ -85,7 +85,7 @@ class PicturesController extends AbstractActionController
         }
     }
 
-    public function fixFilenamesAction()
+    public function fixFilenamesAction(): void
     {
         $table   = $this->picture->getTable();
         $perPage = 100;

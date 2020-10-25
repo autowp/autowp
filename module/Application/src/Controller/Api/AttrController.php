@@ -754,7 +754,7 @@ class AttrController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
-    private function setAttributePosition(int $attributeId, int $position)
+    private function setAttributePosition(int $attributeId, int $position): void
     {
         $this->specsService->getAttributeTable()->update([
             'position' => $position,

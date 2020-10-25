@@ -10,7 +10,7 @@ class EnvTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
 
-    public function testDbTimezone()
+    public function testDbTimezone(): void
     {
         $db = $this->getApplication()->getServiceManager()->get(AdapterInterface::class);
 

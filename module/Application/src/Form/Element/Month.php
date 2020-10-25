@@ -12,6 +12,7 @@ use Traversable;
 
 class Month extends Select implements InputProviderInterface
 {
+    /** @var array<string, string> */
     protected $attributes = [
         'type' => 'select',
     ];

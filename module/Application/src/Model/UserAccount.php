@@ -85,7 +85,7 @@ class UserAccount
         ]);
     }
 
-    public function setAccountData(string $service, string $externalId, array $data)
+    public function setAccountData(string $service, string $externalId, array $data): void
     {
         $this->table->update([
             'name' => $data['name'],
@@ -96,7 +96,7 @@ class UserAccount
         ]);
     }
 
-    public function create(string $service, string $externalId, array $data)
+    public function create(string $service, string $externalId, array $data): void
     {
         $this->table->insert([
             'service_id'   => $service,

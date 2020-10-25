@@ -9,7 +9,7 @@ class ConsoleControllerTest extends AbstractConsoleControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
-    public function testRefreshRepliesCount()
+    public function testRefreshRepliesCount(): void
     {
         $this->dispatch('comments refresh-replies-count');
 
@@ -19,7 +19,7 @@ class ConsoleControllerTest extends AbstractConsoleControllerTestCase
         $this->assertConsoleOutputContains('ok');
     }
 
-    public function testCleanupDeleted()
+    public function testCleanupDeleted(): void
     {
         $this->dispatch('comments cleanup-deleted');
 

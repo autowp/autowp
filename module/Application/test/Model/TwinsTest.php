@@ -66,7 +66,7 @@ class TwinsTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
-    public function testGetCarsGroups()
+    public function testGetCarsGroups(): void
     {
         $vehicle1Id = $this->createItem([
             'item_type_id' => 1,

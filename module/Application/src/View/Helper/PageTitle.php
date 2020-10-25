@@ -136,10 +136,8 @@ class PageTitle extends AbstractStandalone
      * If translation is not enabled, or no translator is present, returns a
      * callable that simply returns the provided item; otherwise, returns a
      * callable that returns a translation of the provided item.
-     *
-     * @return callable
      */
-    private function getTitleItemCallback()
+    private function getTitleItemCallback(): callable
     {
         if (! $this->isTranslatorEnabled() || ! $this->hasTranslator()) {
             return function ($item) {

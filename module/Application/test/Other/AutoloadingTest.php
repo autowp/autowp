@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class AutoloadingTest extends TestCase
 {
-    public function testProjectIsAutoloads()
+    public function testProjectIsAutoloads(): void
     {
         $form = new Form();
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Frontend\Controller;
+namespace ApplicationTest\Controller\Frontend;
 
 use Application\Controller\Api\MapController;
 use Application\Test\AbstractHttpControllerTestCase;
@@ -10,7 +10,7 @@ class MapControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testData()
+    public function testData(): void
     {
         $this->dispatch('https://www.autowp.ru/api/map/data', Request::METHOD_GET, [
             'bounds' => '-90,-180,90,180',

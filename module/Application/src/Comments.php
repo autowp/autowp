@@ -84,7 +84,7 @@ class Comments
             $route[0] = ltrim($route[0], '/');
         }
 
-        array_walk($route, function (&$item) {
+        array_walk($route, function (&$item): void {
             $item = urlencode($item);
         });
 
@@ -176,7 +176,7 @@ class Comments
         // pictures
         $rows = $this->service()->getList([
             'type'     => self::PICTURES_TYPE_ID,
-            'callback' => function (Sql\Select $select) {
+            'callback' => function (Sql\Select $select): void {
                 $select
                     ->join('pictures', 'comment_message.item_id = pictures.id', [], $select::JOIN_LEFT)
                     ->where('pictures.id is null');
@@ -189,7 +189,7 @@ class Comments
         // item
         $rows = $this->service()->getList([
             'type'     => self::ITEM_TYPE_ID,
-            'callback' => function (Sql\Select $select) {
+            'callback' => function (Sql\Select $select): void {
                 $select
                     ->join('item', 'comment_message.item_id = item.id', [], $select::JOIN_LEFT)
                     ->where('item.id is null');
@@ -202,7 +202,7 @@ class Comments
         // votings
         $rows = $this->service()->getList([
             'type'     => self::VOTINGS_TYPE_ID,
-            'callback' => function (Sql\Select $select) {
+            'callback' => function (Sql\Select $select): void {
                 $select
                     ->join('voting', 'comment_message.item_id = voting.id', [], $select::JOIN_LEFT)
                     ->where('voting.id is null');
@@ -215,7 +215,7 @@ class Comments
         // articles
         $rows = $this->service()->getList([
             'type'     => self::ARTICLES_TYPE_ID,
-            'callback' => function (Sql\Select $select) {
+            'callback' => function (Sql\Select $select): void {
                 $select
                     ->join('articles', 'comment_message.item_id = articles.id', [], $select::JOIN_LEFT)
                     ->where('articles.id is null');
@@ -228,7 +228,7 @@ class Comments
         // forums
         $rows = $this->service()->getList([
             'type'     => self::FORUMS_TYPE_ID,
-            'callback' => function (Sql\Select $select) {
+            'callback' => function (Sql\Select $select): void {
                 $select
                     ->join('forums_topics', 'comment_message.item_id = forums_topics.id', [], $select::JOIN_LEFT)
                     ->where('forums_topics.id is null');

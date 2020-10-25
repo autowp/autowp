@@ -60,12 +60,14 @@ class UserController extends AbstractRestfulController
 
     private InputFilter $postPhotoInputFilter;
 
+    /** @var array<string, mixed> */
     private array $recaptcha;
 
     private bool $captchaEnabled;
 
     private UserRename $userRename;
 
+    /** @var array<string, mixed> */
     private array $hosts;
 
     public function __construct(

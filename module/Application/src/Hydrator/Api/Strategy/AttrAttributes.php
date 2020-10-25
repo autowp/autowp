@@ -7,8 +7,6 @@ use ArrayAccess;
 
 class AttrAttributes extends AbstractHydratorStrategy
 {
-    private int $userId = 0;
-
     protected function getHydrator(): Hydrator
     {
         if (! isset($this->hydrator)) {
@@ -27,7 +25,6 @@ class AttrAttributes extends AbstractHydratorStrategy
 
         $hydrator->setFields($this->fields);
         $hydrator->setLanguage($this->language);
-        $hydrator->setUserId($this->userId);
 
         $result = [];
         foreach ($value as $row) {
@@ -36,10 +33,4 @@ class AttrAttributes extends AbstractHydratorStrategy
         return $result;
     }
 
-    public function setUserId(int $userId): self
-    {
-        $this->userId = $userId;
-
-        return $this;
-    }
 }

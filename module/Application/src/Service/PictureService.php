@@ -75,7 +75,7 @@ class PictureService
      * @suppress PhanPluginMixedKeyNoKey
      * @throws Image\Storage\Exception
      */
-    public function clearQueue()
+    public function clearQueue(): void
     {
         $select = $this->picture->getTable()->getSql()->select();
 

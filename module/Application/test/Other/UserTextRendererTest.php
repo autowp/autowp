@@ -15,7 +15,7 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
      * @dataProvider hyperlinksProvider
      * @throws Exception
      */
-    public function testHyperlinks(string $text, string $expected)
+    public function testHyperlinks(string $text, string $expected): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
         /** @var HelperPluginManager $viewHelperManager */
@@ -60,7 +60,7 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
      * @dataProvider usersProvider
      * @throws Exception
      */
-    public function testUsers(string $text, string $expected)
+    public function testUsers(string $text, string $expected): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
         /** @var HelperPluginManager $viewHelperManager */

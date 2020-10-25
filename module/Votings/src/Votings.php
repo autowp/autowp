@@ -2,7 +2,6 @@
 
 namespace Autowp\Votings;
 
-use ArrayObject;
 use Autowp\Commons\Db\Table\Row;
 use DateTime;
 use Exception;
@@ -32,10 +31,10 @@ class Votings
     }
 
     /**
-     * @param ArrayObject|array $voting
+     * @param array<string, mixed> $voting
      * @throws Exception
      */
-    private function canVote($voting, int $userId): bool
+    private function canVote(array $voting, int $userId): bool
     {
         if (! $userId) {
             return false;
@@ -52,7 +51,7 @@ class Votings
             return false;
         }
 
-        $voted = $this->voteTable->select(function (Sql\Select $select) use ($voting, $userId) {
+        $voted = $this->voteTable->select(function (Sql\Select $select) use ($voting, $userId): void {
             $select
                 ->join(
                     'voting_variant',
@@ -75,6 +74,7 @@ class Votings
 
     /**
      * @throws Exception
+     * @return array<string, mixed>
      */
     public function getVoting(int $id, int $filter, int $userId): ?array
     {
@@ -87,7 +87,7 @@ class Votings
         }
 
         $variants = [];
-        $vvRows   = $this->variantTable->select(function (Sql\Select $select) use ($voting) {
+        $vvRows   = $this->variantTable->select(function (Sql\Select $select) use ($voting): void {
             $select
                 ->where(['voting_id' => $voting['id']])
                 ->order('position');
@@ -101,7 +101,7 @@ class Votings
                         /**
                          * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
                          */
-                        function (Sql\Select $select) use ($vvRow) {
+                        function (Sql\Select $select) use ($vvRow): void {
                             $select
                                 ->columns(['count' => new Sql\Expression('count(1)')])
                                 ->join('users', 'voting_variant_vote.user_id = users.id', [])
@@ -166,6 +166,9 @@ class Votings
         ];
     }
 
+    /**
+     * @return array<int, array<string, int>>
+     */
     public function getVotes(int $id): array
     {
         $variant = $this->variantTable->select([
@@ -249,7 +252,7 @@ class Votings
             /**
              * @suppress PhanDeprecatedFunction
              */
-            function (Sql\Select $select) use ($variantId) {
+            function (Sql\Select $select) use ($variantId): void {
                 $select
                     ->columns(['count' => new Sql\Expression('count(1)')])
                     ->where(['voting_variant_id' => $variantId]);
@@ -269,7 +272,7 @@ class Votings
             /**
              * @suppress PhanDeprecatedFunction
              */
-            function (Sql\Select $select) use ($votingId) {
+            function (Sql\Select $select) use ($votingId): void {
                 $select
                     ->columns(['count' => new Sql\Expression('count(distinct voting_variant_vote.user_id)')])
                     ->join('voting_variant', 'voting_variant_vote.voting_variant_id = voting_variant.id', [])

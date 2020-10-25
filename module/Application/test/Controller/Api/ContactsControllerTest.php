@@ -15,7 +15,7 @@ class ContactsControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testCreateDeleteContact()
+    public function testCreateDeleteContact(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/contacts/1', Request::METHOD_PUT);

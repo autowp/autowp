@@ -138,7 +138,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function acceptPicture(int $pictureId)
+    private function acceptPicture(int $pictureId): void
     {
         $this->reset();
 
@@ -159,7 +159,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testGetList()
+    public function testGetList(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('http://www.autowp.ru/api/picture', Request::METHOD_GET, [
@@ -183,7 +183,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($json);
     }
 
-    public function testRandomPicture()
+    public function testRandomPicture(): void
     {
         $this->dispatch('http://www.autowp.ru/api/picture/random-picture', 'GET');
 
@@ -202,7 +202,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertArrayHasKey('page', $json);
     }
 
-    public function testNewPicture()
+    public function testNewPicture(): void
     {
         $this->dispatch('http://www.autowp.ru/api/picture/new-picture', 'GET');
 
@@ -221,7 +221,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertArrayHasKey('page', $json);
     }
 
-    public function testCarOfDayPicture()
+    public function testCarOfDayPicture(): void
     {
         $itemOfDay = $this->getApplicationServiceLocator()->get(CarOfDay::class);
         $row       = $itemOfDay->getCurrent();

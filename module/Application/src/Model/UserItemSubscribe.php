@@ -18,7 +18,7 @@ class UserItemSubscribe
         $this->userModel = $userModel;
     }
 
-    public function subscribe(int $userId, int $itemId)
+    public function subscribe(int $userId, int $itemId): void
     {
         $sql = '
             INSERT IGNORE INTO user_item_subscribe (user_id, item_id)

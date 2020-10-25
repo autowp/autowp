@@ -24,7 +24,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
-    public function testPattern()
+    public function testPattern(): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
@@ -39,7 +39,7 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($pattern);
     }
 
-    private function mockDuplicateFinder()
+    private function mockDuplicateFinder(): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
@@ -136,7 +136,7 @@ class PictureTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function addPictureItem(int $pictureId, int $itemId, int $typeId)
+    private function addPictureItem(int $pictureId, int $itemId, int $typeId): void
     {
         $this->reset();
 

@@ -252,7 +252,7 @@ class CommentHydrator extends AbstractRestHydrator
      * @param array|ArrayAccess $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object)
+    public function hydrate(array $data, $object): void
     {
         throw new Exception("Not supported");
     }

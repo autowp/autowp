@@ -40,7 +40,7 @@ class User
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
-    public function updateSpecsVolumes()
+    public function updateSpecsVolumes(): void
     {
         $select = $this->table->getSql()->select()
             ->columns(['id', 'count' => new Sql\Expression('count(attrs_user_values.user_id)')])
@@ -58,7 +58,7 @@ class User
         }
     }
 
-    public function invalidateSpecsVolume(int $userId)
+    public function invalidateSpecsVolume(int $userId): void
     {
         $this->table->update([
             'specs_volume_valid' => 0,
@@ -301,7 +301,7 @@ class User
      * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
-    public function registerVisit(int $userId, Request $request)
+    public function registerVisit(int $userId, Request $request): void
     {
         $user = $this->getRow($userId);
         if (! $user) {
@@ -368,7 +368,7 @@ class User
     /**
      * @suppress PhanDeprecatedFunction
      */
-    public function decVotes(int $userId)
+    public function decVotes(int $userId): void
     {
         $this->table->update([
             'votes_left' => new Sql\Expression('votes_left - 1'),

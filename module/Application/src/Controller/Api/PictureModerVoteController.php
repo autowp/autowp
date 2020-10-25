@@ -74,7 +74,7 @@ class PictureModerVoteController extends AbstractRestfulController
      * @param array|ArrayAccess $picture
      * @throws Exception
      */
-    private function notifyVote($picture, bool $vote, string $reason)
+    private function notifyVote($picture, bool $vote, string $reason): void
     {
         $owner        = $this->userModel->getRow((int) $picture['owner_id']);
         $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');

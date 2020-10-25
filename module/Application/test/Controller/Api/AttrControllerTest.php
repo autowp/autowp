@@ -12,7 +12,7 @@ class AttrControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testUnitIndex()
+    public function testUnitIndex(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/attr/unit', Request::METHOD_GET);
@@ -24,7 +24,7 @@ class AttrControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('unit-index');
     }
 
-    public function testListOptionsIndex()
+    public function testListOptionsIndex(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/attr/list-option', Request::METHOD_GET, [

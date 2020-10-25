@@ -11,7 +11,7 @@ class ItemTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
-    public function testInvalidRequestsHandled()
+    public function testInvalidRequestsHandled(): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
 

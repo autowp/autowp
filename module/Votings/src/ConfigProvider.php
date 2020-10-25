@@ -4,6 +4,9 @@ namespace Autowp\Votings;
 
 class ConfigProvider
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function __invoke(): array
     {
         return [
@@ -12,6 +15,9 @@ class ConfigProvider
         ];
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     public function getDependencyConfig(): array
     {
         return [
@@ -21,6 +27,9 @@ class ConfigProvider
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getTablesConfig(): array
     {
         return [

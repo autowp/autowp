@@ -183,7 +183,7 @@ class Brand
                 ),
                 'pictures_count' => $select,
             ],
-        ], function (Sql\Select $select) {
+        ], function (Sql\Select $select): void {
             $select
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
                 ->where(['item_parent_cache.item_id <> item_parent_cache.parent_id'])
@@ -281,10 +281,9 @@ class Brand
 
     /**
      * @suppress PhanUndeclaredMethod
-     * @param callable $callback
      * @throws Exception
      */
-    private function fetchBrand(string $language, $callback): ?array
+    private function fetchBrand(string $language, callable $callback): ?array
     {
         $select = $this->item->getSelect([
             'language'     => $language,
@@ -314,7 +313,7 @@ class Brand
      */
     public function getBrandById(int $id, string $language): ?array
     {
-        return $this->fetchBrand($language, function (Sql\Select $select) use ($id) {
+        return $this->fetchBrand($language, function (Sql\Select $select) use ($id): void {
             $select->where(['item.id' => $id]);
         });
     }
@@ -324,7 +323,7 @@ class Brand
      */
     public function getBrandByCatname(string $catname, string $language): ?array
     {
-        return $this->fetchBrand($language, function (Sql\Select $select) use ($catname) {
+        return $this->fetchBrand($language, function (Sql\Select $select) use ($catname): void {
             $select->where(['item.catname' => $catname]);
         });
     }
@@ -395,14 +394,14 @@ class Brand
      * @throws ImagickException
      * @throws Exception
      */
-    public function createIconsSprite(Image\Storage $imageStorage, S3Client $s3, string $bucket)
+    public function createIconsSprite(Image\Storage $imageStorage, S3Client $s3, string $bucket): void
     {
         $list = $this->getList([
             'language' => 'en',
             'columns'  => [
                 'logo_id',
             ],
-        ], function ($select) {
+        ], function ($select): void {
             $select->where(['logo_id']);
         });
 

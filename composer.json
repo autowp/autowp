@@ -78,7 +78,7 @@
 		"phan/phan": "^3.2.2",
 		"sensiolabs/security-checker": "^6.0",
         "laminas/laminas-coding-standard": "^2.1.0",
-		"vimeo/psalm": "^3.16",
+		"vimeo/psalm": "^4.0.1",
 		"phpstan/phpstan": "^0.12.50"
     },
 	"autoload-dev" : {

@@ -98,10 +98,9 @@ class RabbitMQ
     }
 
     /**
-     * @param callable $callback
      * @throws ErrorException
      */
-    public function consume(string $queue, int $timeout, $callback): void
+    public function consume(string $queue, int $timeout, callable $callback): void
     {
         $channel = $this->getChannel($queue);
 

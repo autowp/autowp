@@ -52,7 +52,7 @@ class PictureItem
         ])->current();
     }
 
-    public function add(int $pictureId, int $itemId, int $type)
+    public function add(int $pictureId, int $itemId, int $type): void
     {
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
@@ -81,7 +81,7 @@ class PictureItem
         }
     }
 
-    public function remove(int $pictureId, int $itemId, int $type)
+    public function remove(int $pictureId, int $itemId, int $type): void
     {
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
@@ -105,7 +105,7 @@ class PictureItem
         return (bool) $this->getRow($pictureId, $itemId, $type);
     }
 
-    public function changePictureItem(int $pictureId, int $type, int $oldItemId, int $newItemId)
+    public function changePictureItem(int $pictureId, int $type, int $oldItemId, int $newItemId): void
     {
         if (! $newItemId) {
             throw new InvalidArgumentException("Item id is invalid");
@@ -130,7 +130,7 @@ class PictureItem
         ]);
     }
 
-    public function setPictureItems(int $pictureId, int $type, array $itemIds)
+    public function setPictureItems(int $pictureId, int $type, array $itemIds): void
     {
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
@@ -312,7 +312,7 @@ class PictureItem
         return $result;
     }
 
-    public function setProperties(int $pictureId, int $itemId, int $type, array $properties)
+    public function setProperties(int $pictureId, int $itemId, int $type, array $properties): void
     {
         $row = $this->getRow($pictureId, $itemId, $type);
         if (! $row) {
@@ -431,7 +431,7 @@ class PictureItem
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
-    public function updateContentCount(int $pictureId)
+    public function updateContentCount(int $pictureId): void
     {
         $select = $this->table->getSql()->select()
             ->columns(['count' => new Sql\Expression('COUNT(1)')])

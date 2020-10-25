@@ -44,7 +44,7 @@ class InboxController extends AbstractRestfulController
 
         $brands = $this->brand->getList([
             'language' => $language,
-        ], function (Sql\Select $select) {
+        ], function (Sql\Select $select): void {
             $subSelect = new Sql\Select('item');
             $subSelect->columns(['id'])
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])

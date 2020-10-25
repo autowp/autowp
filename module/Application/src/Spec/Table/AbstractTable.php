@@ -79,10 +79,7 @@ abstract class AbstractTable
         return $this->attributes;
     }
 
-    /**
-     * @return object
-     */
-    protected function getRenderer(string $name, array $options)
+    protected function getRenderer(string $name, array $options): object
     {
         $className = 'Application\\Spec\\Table\\Value\\' . ucfirst($name);
         return new $className($options);

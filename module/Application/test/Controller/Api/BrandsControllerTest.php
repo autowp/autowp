@@ -14,7 +14,7 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testBrandsIndex()
+    public function testBrandsIndex(): void
     {
         $this->dispatch('https://www.autowp.ru/api/brands', Request::METHOD_GET);
 
@@ -28,7 +28,7 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testNewItems()
+    public function testNewItems(): void
     {
         $brandId = 204;
 

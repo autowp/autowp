@@ -46,7 +46,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         return (int) $parts[count($parts) - 1];
     }
 
-    private function activateUser()
+    private function activateUser(): void
     {
         $mailTransport = $this->getApplicationServiceLocator()->get(TransportInterface::class);
         $message       = $mailTransport->getLastMessage();
@@ -65,7 +65,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('emailcheck');
     }
 
-    public function testRestorePassword()
+    public function testRestorePassword(): void
     {
         $email       = 'test' . microtime(true) . '@example.com';
         $password    = 'password';

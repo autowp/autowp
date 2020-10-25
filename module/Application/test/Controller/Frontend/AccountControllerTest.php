@@ -81,7 +81,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testSpecsConflicts()
+    public function testSpecsConflicts(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/attr/conflict?filter=0', Request::METHOD_GET);

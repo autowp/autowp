@@ -9,7 +9,7 @@ class RegistrationTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
-    public function testRegistration()
+    public function testRegistration(): void
     {
         $serviceManager = $this->getApplicationServiceLocator();
         $usersService   = $serviceManager->get(UsersService::class);

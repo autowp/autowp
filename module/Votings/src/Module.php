@@ -9,6 +9,9 @@ class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\ConfigProviderInterface
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function getConfig(): array
     {
         $provider = new ConfigProvider();
@@ -18,6 +21,9 @@ class Module implements
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getAutoloaderConfig(): array
     {
         return [

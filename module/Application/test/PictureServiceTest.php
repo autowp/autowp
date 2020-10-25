@@ -33,7 +33,7 @@ class PictureServiceTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanDeprecatedFunction
      */
-    public function testClearQueue()
+    public function testClearQueue(): void
     {
         $services = $this->getApplicationServiceLocator();
         $service  = $services->get(PictureService::class);

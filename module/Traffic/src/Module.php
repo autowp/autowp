@@ -33,7 +33,7 @@ class Module implements
         ];
     }
 
-    public function onBootstrap(Event $e)
+    public function onBootstrap(Event $e): void
     {
         $trafficListener = new TrafficRouteListener();
         /* @phan-suppress-next-line PhanUndeclaredMethod */

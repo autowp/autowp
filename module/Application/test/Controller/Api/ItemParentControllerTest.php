@@ -15,7 +15,7 @@ class ItemParentControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testCategoriesFirstOrder()
+    public function testCategoriesFirstOrder(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_GET, [

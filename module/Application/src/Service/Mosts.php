@@ -317,9 +317,9 @@ class Mosts
         ],
     ];
 
-    private $years;
+    private array $years;
 
-    private $perspectiveGroups;
+    private array $perspectiveGroups;
 
     private SpecificationsService $specs;
 
@@ -358,7 +358,7 @@ class Mosts
 
     public function getYears(): array
     {
-        if ($this->years === null) {
+        if (! isset($this->years)) {
             $cy = (int) date('Y');
 
             $prevYear = $cy - 1;
@@ -439,7 +439,7 @@ class Mosts
 
     public function getPrespectiveGroups(): array
     {
-        if ($this->perspectiveGroups === null) {
+        if (! isset($this->perspectiveGroups)) {
             $ids = $this->perspective->getPageGroupIds(1);
 
             $this->perspectiveGroups = $ids;

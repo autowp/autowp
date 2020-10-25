@@ -78,7 +78,7 @@ class MessageService
             /**
              * @suppress PhanPluginMixedKeyNoKey
              */
-            function (Sql\Select $select) use ($userId) {
+            function (Sql\Select $select) use ($userId): void {
                 $select
                     ->columns(['count' => new Sql\Expression('COUNT(1)')])
                     ->where([
@@ -91,7 +91,7 @@ class MessageService
         return $row ? (int) $row['count'] : 0;
     }
 
-    public function delete(int $userId, int $messageId)
+    public function delete(int $userId, int $messageId): void
     {
         $this->table->update([
             'deleted_by_from' => 1,

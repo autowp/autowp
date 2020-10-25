@@ -678,7 +678,7 @@ class Item
      * @param array|ArrayAccess $car
      * @throws Exception
      */
-    private function updateItemInteritance($car)
+    private function updateItemInteritance($car): void
     {
         $parents = $this->getRows([
             'child' => $car['id'],
@@ -1123,7 +1123,7 @@ class Item
      * @param array|int $value
      * @throws Exception
      */
-    private function applyLinkTypeFilter(Sql\Select $select, string $alias, $value)
+    private function applyLinkTypeFilter(Sql\Select $select, string $alias, $value): void
     {
         $column = $alias . '.type';
         if (is_array($value)) {

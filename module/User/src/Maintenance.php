@@ -16,7 +16,7 @@ class Maintenance extends AbstractListenerAggregate
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param int $priority
      */
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_DAILY_MAINTENANCE, [$this, 'dailyMaintenance']);
     }
@@ -24,7 +24,7 @@ class Maintenance extends AbstractListenerAggregate
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function dailyMaintenance(Cron\CronEvent $event)
+    public function dailyMaintenance(Cron\CronEvent $event): void
     {
         $application    = $event->getApplication();
         $serviceManager = $application->getServiceManager();

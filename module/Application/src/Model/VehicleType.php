@@ -50,7 +50,7 @@ class VehicleType
         }
     }
 
-    public function addVehicleType(int $vehicleId, int $type)
+    public function addVehicleType(int $vehicleId, int $type): void
     {
         $changed = $this->setRow($vehicleId, $type, false);
 
@@ -60,7 +60,7 @@ class VehicleType
         }
     }
 
-    public function setVehicleTypes(int $vehicleId, array $types)
+    public function setVehicleTypes(int $vehicleId, array $types): void
     {
         $inherited = false;
 
@@ -163,7 +163,7 @@ class VehicleType
         }
     }
 
-    private function refreshInheritance(int $vehicleId)
+    private function refreshInheritance(int $vehicleId): void
     {
         $select = new Sql\Select($this->itemParentTable->getTable());
         $select->columns(['item_id'])

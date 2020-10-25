@@ -15,7 +15,7 @@ class PropertyFilter implements FilterInterface
         $this->setProperties($properties);
     }
 
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): void
     {
         $this->properties = $properties;
     }

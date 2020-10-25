@@ -47,7 +47,7 @@ class Twins
                     'count(distinct if(twins.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), twins.id, null))'
                 ),
             ],
-        ], function (Sql\Select $select) use ($limit) {
+        ], function (Sql\Select $select) use ($limit): void {
             $select
                 ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', [])
                 ->join('item_parent', 'ipc1.item_id = item_parent.item_id', [])

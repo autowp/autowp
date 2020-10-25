@@ -325,7 +325,7 @@ class Picture
         return ['pictures.id'];
     }
 
-    private function applyColumns(Sql\Select $select, array $columns)
+    private function applyColumns(Sql\Select $select, array $columns): void
     {
         $result = [];
 
@@ -797,7 +797,7 @@ class Picture
     /**
      * @throws Exception
      */
-    private function setDateFilter(Sql\Select $select, string $column, string $date, string $timezone)
+    private function setDateFilter(Sql\Select $select, string $column, string $date, string $timezone): void
     {
         $timezone   = new DateTimeZone($timezone);
         $dbTimezine = new DateTimeZone(Module::MYSQL_TIMEZONE);

@@ -15,7 +15,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testTopic()
+    public function testTopic(): void
     {
         $this->dispatch('https://www.autowp.ru/api/forum/topic/1', Request::METHOD_GET);
 
@@ -25,7 +25,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('get-topic');
     }
 
-    public function testNewIsForbidden()
+    public function testNewIsForbidden(): void
     {
         $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_POST);
 
@@ -35,7 +35,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testCreateTopic()
+    public function testCreateTopic(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_POST, [

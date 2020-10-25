@@ -233,7 +233,7 @@ class AclController extends AbstractRestfulController
     {
         $rules = [];
 
-        $rows = $this->privilegeAllowedTable->select(function (Sql\Select $select) {
+        $rows = $this->privilegeAllowedTable->select(function (Sql\Select $select): void {
             $select
                 ->join(
                     'acl_resources_privileges',
@@ -260,7 +260,7 @@ class AclController extends AbstractRestfulController
             ];
         }
 
-        $rows = $this->privilegeDeniedTable->select(function (Sql\Select $select) {
+        $rows = $this->privilegeDeniedTable->select(function (Sql\Select $select): void {
             $select
                 ->join(
                     'acl_resources_privileges',
@@ -486,7 +486,7 @@ class AclController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
-    private function resetCache()
+    private function resetCache(): void
     {
         $this->cache->removeItem($this->cacheKey);
     }

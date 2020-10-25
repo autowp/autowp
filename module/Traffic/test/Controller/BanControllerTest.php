@@ -11,7 +11,7 @@ class BanControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
-    public function testBanIpForbidden()
+    public function testBanIpForbidden(): void
     {
         $this->dispatch('https://www.autowp.ru/ban/ban-ip/ip/127.0.0.1', Request::METHOD_POST);
 
@@ -21,7 +21,7 @@ class BanControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('forbidden');
     }
 
-    public function testUnbanIpForbidden()
+    public function testUnbanIpForbidden(): void
     {
         $this->dispatch('https://www.autowp.ru/ban/unban-ip/ip/127.0.0.1', Request::METHOD_POST);
 
@@ -34,7 +34,7 @@ class BanControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testBanUnbanIp()
+    public function testBanUnbanIp(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/ban/ban-ip/ip/127.0.0.1', Request::METHOD_POST, [

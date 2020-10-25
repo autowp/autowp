@@ -9,7 +9,7 @@ class SpecsControllerTest extends AbstractConsoleControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testRefreshConflictFlags()
+    public function testRefreshConflictFlags(): void
     {
         $this->dispatch('specs refresh-conflict-flags');
 
@@ -20,7 +20,7 @@ class SpecsControllerTest extends AbstractConsoleControllerTestCase
         $this->assertConsoleOutputContains('done');
     }
 
-    public function testRefreshItemConflictFlags()
+    public function testRefreshItemConflictFlags(): void
     {
         $this->dispatch('specs refresh-item-conflict-flags 1');
 
@@ -31,7 +31,7 @@ class SpecsControllerTest extends AbstractConsoleControllerTestCase
         $this->assertConsoleOutputContains('done');
     }
 
-    public function testRefreshUserStat()
+    public function testRefreshUserStat(): void
     {
         $this->dispatch('specs refresh-user-stat 1');
 
@@ -42,7 +42,7 @@ class SpecsControllerTest extends AbstractConsoleControllerTestCase
         $this->assertConsoleOutputContains('done');
     }
 
-    public function testRefreshUsersStat()
+    public function testRefreshUsersStat(): void
     {
         $this->dispatch('specs refresh-users-stat');
 

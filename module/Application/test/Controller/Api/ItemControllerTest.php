@@ -241,7 +241,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
-    private function acceptPicture(int $pictureId)
+    private function acceptPicture(int $pictureId): void
     {
         $this->reset();
 

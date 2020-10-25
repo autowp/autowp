@@ -9,7 +9,7 @@ class CronControllerTest extends AbstractConsoleControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testDailyMaintenance()
+    public function testDailyMaintenance(): void
     {
         $this->dispatch('cron daily-maintenance');
 
@@ -20,7 +20,7 @@ class CronControllerTest extends AbstractConsoleControllerTestCase
         //$this->assertConsoleOutputContains('Garbage collected');
     }
 
-    public function testMidnight()
+    public function testMidnight(): void
     {
         $this->dispatch('cron midnight');
 

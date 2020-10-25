@@ -19,7 +19,8 @@ class CommentControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param string $requestedName
+     * @param string                $requestedName
+     * @param ?array<string, mixed> $options
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): CommentController
     {

@@ -15,7 +15,7 @@ class PictureItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testGetList()
+    public function testGetList(): void
     {
         $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/picture-item', Request::METHOD_GET, [

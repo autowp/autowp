@@ -60,7 +60,7 @@ class PictureModerVote
     /**
      * @suppress PhanDeprecatedFunction
      */
-    public function add(int $pictureId, int $userId, int $vote, string $reason)
+    public function add(int $pictureId, int $userId, int $vote, string $reason): void
     {
         $this->table->insert([
             'user_id'    => $userId,
@@ -71,7 +71,7 @@ class PictureModerVote
         ]);
     }
 
-    public function delete(int $pictureId, int $userId)
+    public function delete(int $pictureId, int $userId): void
     {
         $this->table->delete([
             'user_id = ?'    => $userId,

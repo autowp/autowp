@@ -26,9 +26,8 @@ class PictureVoteController extends AbstractRestfulController
      *
      * @param  mixed $id
      * @param  mixed $data
-     * @return ViewModel
      */
-    public function update($id, $data)
+    public function update($id, $data): ViewModel
     {
         $currentUser = $this->user()->get();
         if (! $currentUser) {

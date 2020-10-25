@@ -230,7 +230,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object)
+    public function hydrate(array $data, $object): void
     {
         throw new Exception("Not supported");
     }

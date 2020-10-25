@@ -10,7 +10,7 @@ class AclTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
 
-    public function testAclServiceRegisters()
+    public function testAclServiceRegisters(): void
     {
         $services = $this->getApplicationServiceLocator();
 
@@ -19,7 +19,7 @@ class AclTest extends AbstractHttpControllerTestCase
         $this->assertInstanceOf(Acl::class, $acl);
     }
 
-    public function testAclControllerPluginRegisters()
+    public function testAclControllerPluginRegisters(): void
     {
         $services = $this->getApplicationServiceLocator();
 

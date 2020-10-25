@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Frontend\Controller;
+namespace ApplicationTest\Controller\Frontend;
 
 use Application\Controller\Api\VotingController;
 use Application\Test\AbstractHttpControllerTestCase;
@@ -13,7 +13,7 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testVoting()
+    public function testVoting(): void
     {
         $this->dispatch('https://www.autowp.ru/api/voting/1', Request::METHOD_GET);
 
@@ -26,7 +26,7 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
-    public function testVoteAndGetVotes()
+    public function testVoteAndGetVotes(): void
     {
         $tables = $this->getApplication()->getServiceManager()->get('TableManager');
 

@@ -15,7 +15,7 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param int $priority
      */
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(MvcEvent::EVENT_DISPATCH, [$this, 'onDispatch'], 100);
     }

@@ -35,7 +35,7 @@ class DuplicateFinder
             /**
              * @suppress PhanPluginMixedKeyNoKey
              */
-            function (Select $select) use ($id) {
+            function (Select $select) use ($id): void {
                 $select
                     ->columns([
                         'dst_picture_id',
@@ -61,7 +61,7 @@ class DuplicateFinder
         ];
     }
 
-    public function hideSimilar(int $srcId, int $dstId)
+    public function hideSimilar(int $srcId, int $dstId): void
     {
         $this->distanceTable->update([
             'hide' => 1,

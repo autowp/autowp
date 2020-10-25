@@ -18,7 +18,7 @@ class UserControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    public function testDelete()
+    public function testDelete(): void
     {
         $email    = 'test' . microtime(true) . '@example.com';
         $password = 'password';
@@ -60,7 +60,7 @@ class UserControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
     }
 
-    public function testOnline()
+    public function testOnline(): void
     {
         $this->dispatch('https://www.autowp.ru/api/user/online', Request::METHOD_GET);
 

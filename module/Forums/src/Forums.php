@@ -150,7 +150,7 @@ class Forums
                  * @suppress PhanPluginMixedKeyNoKey
                  */
             'callback'
-                => function (Sql\Select $select) use ($theme) {
+                => function (Sql\Select $select) use ($theme): void {
                     $select
                         ->join('forums_topics', 'comment_message.item_id = forums_topics.id', [])
                         ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])

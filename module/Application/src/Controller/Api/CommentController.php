@@ -225,7 +225,7 @@ class CommentController extends AbstractRestfulController
 
             if ($values['pictures_of_item_id']) {
                 $options['type']     = Comments::PICTURES_TYPE_ID;
-                $options['callback'] = function (Sql\Select $select) use ($values) {
+                $options['callback'] = function (Sql\Select $select) use ($values): void {
                     $select
                         ->join('pictures', 'comment_message.item_id = pictures.id', [])
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', [])

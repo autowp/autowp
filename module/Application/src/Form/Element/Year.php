@@ -9,10 +9,11 @@ use function date;
 
 class Year extends Number implements InputProviderInterface
 {
+    /** @var array<string, string> */
     protected $attributes = [
         'type'      => 'number',
-        'maxlength' => 4,
-        'size'      => 4,
+        'maxlength' => '4',
+        'size'      => '4',
     ];
 
     /** @var null|string */

@@ -20,7 +20,7 @@ class UserPicture
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
-    public function refreshAllPicturesCount()
+    public function refreshAllPicturesCount(): void
     {
         $select = new Sql\Select($this->pictureTable->getTable());
         $select->columns([

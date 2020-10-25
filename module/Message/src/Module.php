@@ -11,7 +11,7 @@ class Module implements
     Feature\BootstrapListenerInterface,
     Feature\ConfigProviderInterface
 {
-    public function onBootstrap(EventInterface $e)
+    public function onBootstrap(EventInterface $e): void
     {
         $application    = $e->getApplication();
         $serviceManager = $application->getServiceManager();

@@ -20,7 +20,8 @@ class AclFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param string $requestedName
+     * @param string                $requestedName
+     * @param ?array<string, mixed> $options
      * @throws Exception
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Acl
@@ -82,7 +83,7 @@ class AclFactory implements FactoryInterface
             $acl->addResource(new GenericResource($resource['name']));
         }
 
-        $rows = $privilegeAllowedTable->select(function (Sql\Select $select) {
+        $rows = $privilegeAllowedTable->select(function (Sql\Select $select): void {
             $select
                 ->columns([])
                 ->join(
@@ -109,7 +110,7 @@ class AclFactory implements FactoryInterface
             );
         }
 
-        $rows = $privilegeDeniedTable->select(function (Sql\Select $select) {
+        $rows = $privilegeDeniedTable->select(function (Sql\Select $select): void {
             $select
                 ->columns([])
                 ->join(
@@ -152,7 +153,7 @@ class AclFactory implements FactoryInterface
         }
 
         // parent roles
-        $rows = $roleTable->select(function (Sql\Select $select) use ($role) {
+        $rows = $roleTable->select(function (Sql\Select $select) use ($role): void {
             $select
                 ->join('acl_roles_parents', 'acl_roles.id = acl_roles_parents.parent_role_id', [])
                 ->where([

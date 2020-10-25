@@ -758,7 +758,7 @@ class ItemHydrator extends AbstractRestHydrator
                 $result['comments_attentions_count'] = $this->comments->service()->getTotalMessagesCount([
                     'attention' => Attention::REQUIRED,
                     'type'      => Comments::PICTURES_TYPE_ID,
-                    'callback'  => function (Sql\Select $select) use ($object) {
+                    'callback'  => function (Sql\Select $select) use ($object): void {
                         $select
                             ->join('pictures', 'comment_message.item_id = pictures.id', [])
                             ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
@@ -915,7 +915,7 @@ class ItemHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object)
+    public function hydrate(array $data, $object): void
     {
         throw new Exception("Not supported");
     }

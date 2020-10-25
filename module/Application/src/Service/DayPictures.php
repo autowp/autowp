@@ -77,20 +77,14 @@ class DayPictures
         return $this;
     }
 
-    /**
-     * @param string $timezone
-     */
-    public function setTimeZone($timezone): self
+    public function setTimeZone(string $timezone): self
     {
         $this->timezone = new DateTimeZone($timezone);
 
         return $this->reset();
     }
 
-    /**
-     * @param string $timezone
-     */
-    public function setDbTimeZone($timezone): self
+    public function setDbTimeZone(string $timezone): self
     {
         $this->dbTimezone = new DateTimeZone($timezone);
 
@@ -111,10 +105,7 @@ class DayPictures
         return $this;
     }
 
-    /**
-     * @param string $column
-     */
-    public function setOrderColumn($column): self
+    public function setOrderColumn(string $column): self
     {
         $this->orderColumn = $column;
 

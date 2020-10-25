@@ -9,7 +9,7 @@ class PulseControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->dispatch('https://www.autowp.ru/api/pulse', 'GET');
 

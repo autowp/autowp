@@ -21,10 +21,9 @@ class TelegramController extends AbstractActionController
     }
 
     /**
-     * @return ViewModel
      * @throws TelegramSDKException
      */
-    public function webhookAction()
+    public function webhookAction(): ViewModel
     {
         if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
