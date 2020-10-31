@@ -32,5 +32,4 @@ class AttrAttributes extends AbstractHydratorStrategy
         }
         return $result;
     }
-
 }
