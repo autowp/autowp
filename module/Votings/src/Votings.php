@@ -2,6 +2,7 @@
 
 namespace Autowp\Votings;
 
+use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use DateTime;
 use Exception;
@@ -32,10 +33,10 @@ class Votings
     }
 
     /**
-     * @param array<string, mixed> $voting
+     * @param array|ArrayAccess $voting
      * @throws Exception
      */
-    private function canVote(array $voting, int $userId): bool
+    private function canVote($voting, int $userId): bool
     {
         if (! $userId) {
             return false;
