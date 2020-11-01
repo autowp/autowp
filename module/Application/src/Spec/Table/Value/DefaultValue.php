@@ -3,6 +3,9 @@
 namespace Application\Spec\Table\Value;
 
 use ArrayAccess;
+use Laminas\I18n\View\Helper\Translate;
+use Laminas\View\Helper\EscapeHtml;
+use Laminas\View\Helper\EscapeHtmlAttr;
 use Laminas\View\Renderer\PhpRenderer;
 
 class DefaultValue
@@ -19,15 +22,19 @@ class DefaultValue
             return '';
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $html = $view->escapeHtml($value);
+        /** @var Translate $translateHelper */
+        $translateHelper = $view->getHelperPluginManager()->get('translate');
+        /** @var EscapeHtml $escapeHtmlHelper */
+        $escapeHtmlHelper = $view->getHelperPluginManager()->get('escapeHtml');
+        /** @var EscapeHtmlAttr $escapeHtmlAttrHelper */
+        $escapeHtmlAttrHelper = $view->getHelperPluginManager()->get('escapeHtmlAttr');
+
+        $html = $escapeHtmlHelper($value);
         if (isset($attribute['unit']) && $attribute['unit']) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-            $title = $view->escapeHtmlAttr($view->translate($attribute['unit']['name']));
+            $title = $escapeHtmlAttrHelper($translateHelper($attribute['unit']['name']));
             $html .=
                 ' <span class="unit" title="' . $title . '">'
-                    . /* @phan-suppress-next-line PhanUndeclaredMethod */
-                    $view->escapeHtml($view->translate($attribute['unit']['abbr']))
+                    . $escapeHtmlHelper($translateHelper($attribute['unit']['abbr']))
                 . '</span>';
         }
 

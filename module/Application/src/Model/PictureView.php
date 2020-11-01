@@ -2,10 +2,11 @@
 
 namespace Application\Model;
 
-use Laminas\Db\Adapter\Driver\StatementInterface;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 
 class PictureView
@@ -25,17 +26,15 @@ class PictureView
             ON DUPLICATE KEY UPDATE views=views+1
         ';
 
+        /** @var Adapter $adapter */
         $adapter = $this->table->getAdapter();
-        /** @var StatementInterface $stmt */
-        $stmt = $adapter->query($sql);
+        $stmt    = $adapter->query($sql);
         $stmt->execute([$pictureId]);
     }
 
     public function get(int $pictureId): int
     {
-        $row = $this->table->select([
-            'picture_id' => $pictureId,
-        ])->current();
+        $row = currentFromResultSetInterface($this->table->select(['picture_id' => $pictureId]));
 
         return $row ? (int) $row['views'] : 0;
     }

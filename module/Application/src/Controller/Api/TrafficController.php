@@ -5,6 +5,8 @@ namespace Application\Controller\Api;
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Controller\Plugin\User;
+use Exception;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
@@ -15,6 +17,7 @@ use function trim;
 /**
  * @method User user($user = null)
  * @method ViewModel forbiddenAction()
+ * @method string language()
  */
 class TrafficController extends AbstractRestfulController
 {
@@ -57,6 +60,7 @@ class TrafficController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function whitelistListAction()
     {
@@ -93,8 +97,9 @@ class TrafficController extends AbstractRestfulController
         $ip = trim($data['ip']);
 
         if (! $ip) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-            return $this->getResponse()->setStatusCode(400);
+            /** @var Response $response */
+            $response = $this->getResponse();
+            return $response->setStatusCode(Response::STATUS_CODE_400);
         }
 
         $this->service->addToWhitelist($ip, 'manual click');
@@ -105,8 +110,9 @@ class TrafficController extends AbstractRestfulController
                 'id' => $ip
             ])
         );*/
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -120,8 +126,9 @@ class TrafficController extends AbstractRestfulController
 
         $this->service->deleteFromWhitelist($this->params('ip'));
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     /**
@@ -149,8 +156,9 @@ class TrafficController extends AbstractRestfulController
             (string) $data['reason']
         );
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -171,7 +179,8 @@ class TrafficController extends AbstractRestfulController
 
         $this->service->unban($ip);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 }

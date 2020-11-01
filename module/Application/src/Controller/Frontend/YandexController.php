@@ -5,6 +5,8 @@ namespace Application\Controller\Frontend;
 use Application\Model\CarOfDay;
 use DateTime;
 use DateTimeZone;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
@@ -49,11 +51,14 @@ class YandexController extends AbstractActionController
         return $result;
     }
 
-    public function informingAction(): ViewModel
+    /**
+     * @return Response|ViewModel
+     */
+    public function informingAction()
     {
+        /** @var Request $request */
         $request = $this->getRequest();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $request->isPost()) {
             return $this->forbiddenAction();
         }
@@ -128,7 +133,8 @@ class YandexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 }

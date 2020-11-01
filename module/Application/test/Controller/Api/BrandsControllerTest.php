@@ -5,7 +5,9 @@ namespace ApplicationTest\Controller\Api;
 use Application\Controller\Api\BrandsController;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
+use Laminas\Http\Header\Location;
 use Laminas\Http\Request;
+use Laminas\Http\Response;
 
 use function count;
 use function explode;
@@ -25,14 +27,13 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('index');
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testNewItems(): void
     {
         $brandId = 204;
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
             'name'         => 'Car for testNewcars',
             'item_type_id' => 1,
@@ -40,14 +41,19 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(201);
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
-        $carId   = $parts[count($parts) - 1];
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
+        $carId    = $parts[count($parts) - 1];
 
         // add to brand
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_POST, [
             'parent_id' => $brandId,
             'item_id'   => $carId,

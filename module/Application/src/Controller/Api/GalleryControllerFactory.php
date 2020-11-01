@@ -8,6 +8,7 @@ use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\PictureNameFormatter;
 use Autowp\Comments\CommentsService;
+use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -26,7 +27,8 @@ class GalleryControllerFactory implements FactoryInterface
             $container->get(Item::class),
             $container->get(CommentsService::class),
             $container->get(PictureNameFormatter::class),
-            $container->get(ItemNameFormatter::class)
+            $container->get(ItemNameFormatter::class),
+            $container->get(Storage::class)
         );
     }
 }

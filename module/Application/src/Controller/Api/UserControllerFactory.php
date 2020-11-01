@@ -4,6 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\UserHydrator;
 use Application\Service\UsersService;
+use Autowp\Image\Storage;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
 use Interop\Container\ContainerInterface;
@@ -38,7 +39,8 @@ class UserControllerFactory implements FactoryInterface
             $config['recaptcha'],
             (bool) getenv('AUTOWP_CAPTCHA'),
             $container->get(UserRename::class),
-            $config['hosts']
+            $config['hosts'],
+            $container->get(Storage::class)
         );
     }
 }

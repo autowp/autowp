@@ -12,12 +12,11 @@ class SpecControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testDelete(): void
     {
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/spec', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);

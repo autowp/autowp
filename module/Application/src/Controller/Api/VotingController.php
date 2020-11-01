@@ -7,6 +7,7 @@ use Autowp\User\Controller\Plugin\User;
 use Autowp\Votings;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -117,7 +118,8 @@ class VotingController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 }

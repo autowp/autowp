@@ -6,6 +6,7 @@ use ArrayAccess;
 use Exception;
 use Laminas\Db\Sql;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function htmlspecialchars;
 use function implode;
 use function sprintf;
@@ -35,7 +36,9 @@ class Power extends AbstractAdapter
      */
     public function getCars(Sql\Select $select, string $language): array
     {
-        $powerAttr = $this->attributeTable->select(['id' => (int) $this->attributes['power']])->current();
+        $powerAttr = currentFromResultSetInterface(
+            $this->attributeTable->select(['id' => (int) $this->attributes['power']])
+        );
 
         $specService = $this->most->getSpecs();
 

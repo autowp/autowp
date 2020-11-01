@@ -3,10 +3,12 @@
 namespace Application\Telegram\Command;
 
 use Application\Model\Item;
+use Exception;
 use Laminas\Db\TableGateway\TableGateway;
 use Telegram\Bot\Commands\Command;
 
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 
 class NewCommand extends Command
 {
@@ -31,6 +33,7 @@ class NewCommand extends Command
     /**
      * @inheritDoc
      * @param mixed $arguments
+     * @throws Exception
      */
     public function handle($arguments)
     {
@@ -41,10 +44,10 @@ class NewCommand extends Command
             return;
         }
 
-        $brandRow = $this->itemTable->select([
+        $brandRow = currentFromResultSetInterface($this->itemTable->select([
             'name'         => (string) $arguments,
             'item_type_id' => Item::BRAND,
-        ])->current();
+        ]));
 
         if (! $brandRow) {
             $this->replyWithMessage([
@@ -60,7 +63,7 @@ class NewCommand extends Command
             'chat_id' => $chatId,
         ];
 
-        $telegramBrandRow = $this->telegramItemTable->select($primaryKey)->current();
+        $telegramBrandRow = currentFromResultSetInterface($this->telegramItemTable->select($primaryKey));
 
         if ($telegramBrandRow && $telegramBrandRow['new']) {
             $this->telegramItemTable->update(['new' => 0], $primaryKey);

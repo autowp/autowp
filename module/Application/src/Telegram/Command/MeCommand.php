@@ -10,6 +10,7 @@ use Laminas\Math\Rand;
 use Telegram\Bot\Commands\Command;
 
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function preg_split;
 use function strcmp;
@@ -56,7 +57,7 @@ class MeCommand extends Command
             'chat_id' => $chatId,
         ];
 
-        $telegramChatRow = $this->telegramChatTable->select($primaryKey)->current();
+        $telegramChatRow = currentFromResultSetInterface($this->telegramChatTable->select($primaryKey));
 
         if (count($args) <= 0) {
             if (! $telegramChatRow || ! $telegramChatRow['user_id']) {

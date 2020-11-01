@@ -2,9 +2,11 @@
 
 namespace Application\Model;
 
+use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 
 class PictureModerVote
@@ -92,7 +94,7 @@ class PictureModerVote
             ])
             ->where(['picture_id' => $pictureId]);
 
-        $row = $this->table->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->table->selectWith($select));
         return [
             'vote'  => (int) $row['vote'],
             'count' => (int) $row['count'],
@@ -133,14 +135,15 @@ class PictureModerVote
 
     public function hasVote(int $pictureId, int $userId): bool
     {
-        return (bool) $this->table->select([
+        return (bool) currentFromResultSetInterface($this->table->select([
             'picture_id' => $pictureId,
             'user_id'    => $userId,
-        ])->current();
+        ]));
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @throws Exception
      */
     public function getPositiveVotesCount(int $pictureId): int
     {
@@ -151,12 +154,13 @@ class PictureModerVote
                 'vote > 0',
             ]);
 
-        $row = $this->table->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->table->selectWith($select));
         return $row ? (int) $row['count'] : 0;
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @throws Exception
      */
     public function getNegativeVotesCount(int $pictureId): int
     {
@@ -167,7 +171,7 @@ class PictureModerVote
                 'vote = 0',
             ]);
 
-        $row = $this->table->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->table->selectWith($select));
         return $row ? (int) $row['count'] : 0;
     }
 }

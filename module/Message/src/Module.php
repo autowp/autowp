@@ -5,12 +5,16 @@ namespace Autowp\Message;
 use Laminas\EventManager\EventInterface;
 use Laminas\Loader\StandardAutoloader;
 use Laminas\ModuleManager\Feature;
+use Laminas\Mvc\MvcEvent;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\BootstrapListenerInterface,
     Feature\ConfigProviderInterface
 {
+    /**
+     * @param MvcEvent $e
+     */
     public function onBootstrap(EventInterface $e): void
     {
         $application    = $e->getApplication();

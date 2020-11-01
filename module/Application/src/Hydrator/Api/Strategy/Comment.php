@@ -4,6 +4,7 @@ namespace Application\Hydrator\Api\Strategy;
 
 use Application\Hydrator\Api\CommentHydrator as Hydrator;
 use ArrayAccess;
+use Exception;
 
 class Comment extends AbstractHydratorStrategy
 {
@@ -15,11 +16,15 @@ class Comment extends AbstractHydratorStrategy
             $this->hydrator = new Hydrator($this->serviceManager);
         }
 
-        return $this->hydrator;
+        /** @var Hydrator $result */
+        $result = $this->hydrator;
+
+        return $result;
     }
 
     /**
      * @param array|ArrayAccess $value
+     * @throws Exception
      */
     public function extract($value): array
     {

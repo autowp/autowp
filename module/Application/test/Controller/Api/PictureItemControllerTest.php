@@ -12,12 +12,11 @@ class PictureItemControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testGetList(): void
     {
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/picture-item', Request::METHOD_GET, [
             'fields' => 'item,picture,area',
         ]);

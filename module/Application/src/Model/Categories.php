@@ -36,7 +36,7 @@ class Categories
                 'cars_count'     => new Sql\Expression('COUNT(1)'),
                 'new_cars_count' => new Sql\Expression(
                     'COUNT(IF(ip_cat2car.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY), 1, NULL))',
-                    self::NEW_DAYS
+                    [self::NEW_DAYS]
                 ),
             ])
             ->where(['item.item_type_id = ?' => Item::CATEGORY])

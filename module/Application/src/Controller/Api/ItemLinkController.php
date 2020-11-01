@@ -7,6 +7,8 @@ use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -15,6 +17,7 @@ use Laminas\View\Model\ViewModel;
 
 use function array_key_exists;
 use function array_keys;
+use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
  * @method User user($user = null)
@@ -83,9 +86,9 @@ class ItemLinkController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->table->select([
+        $row = currentFromResultSetInterface($this->table->select([
             'id' => (int) $this->params('id'),
-        ])->current();
+        ]));
 
         if (! $row) {
             return $this->notFoundAction();
@@ -126,9 +129,9 @@ class ItemLinkController extends AbstractRestfulController
 
         $data = $this->putInputFilter->getValues();
 
-        $row = $this->table->select([
+        $row = currentFromResultSetInterface($this->table->select([
             'id' => (int) $this->params('id'),
-        ])->current();
+        ]));
 
         if (! $row) {
             return $this->notFoundAction();
@@ -152,8 +155,9 @@ class ItemLinkController extends AbstractRestfulController
             $this->table->update($set, ['id' => $row['id']]);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -165,11 +169,11 @@ class ItemLinkController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -191,10 +195,11 @@ class ItemLinkController extends AbstractRestfulController
         $url = $this->url()->fromRoute('api/item-link/item/get', [
             'id' => $this->table->getLastInsertValue(),
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -206,9 +211,9 @@ class ItemLinkController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->table->select([
+        $row = currentFromResultSetInterface($this->table->select([
             'id' => (int) $this->params('id'),
-        ])->current();
+        ]));
 
         if (! $row) {
             return $this->notFoundAction();
@@ -216,7 +221,8 @@ class ItemLinkController extends AbstractRestfulController
 
         $this->table->delete(['id' => $row['id']]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 }

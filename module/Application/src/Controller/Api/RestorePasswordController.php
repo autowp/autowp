@@ -8,6 +8,8 @@ use Autowp\User\Model\User;
 use Autowp\User\Model\UserPasswordRemind;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mail;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -69,11 +71,11 @@ class RestorePasswordController extends AbstractRestfulController
      */
     public function requestAction()
     {
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -85,8 +87,7 @@ class RestorePasswordController extends AbstractRestfulController
                 $captchaResponse = (string) $data['captcha'];
             }
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-            $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
+            $result = $recaptcha->verify($captchaResponse, $request->getServer('REMOTE_ADDR'));
 
             if (! $result->isSuccess()) {
                 return new ApiProblemResponse(
@@ -145,8 +146,9 @@ class RestorePasswordController extends AbstractRestfulController
 
         $this->transport->send($mail);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->setStatusCode(Response::STATUS_CODE_201);
 
         return new JsonModel([
             'ok' => true,
@@ -180,11 +182,11 @@ class RestorePasswordController extends AbstractRestfulController
      */
     public function newPostAction()
     {
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 

@@ -9,6 +9,8 @@ use Laminas\Db\Sql\Select;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Json\Json;
 
+use function Autowp\Commons\currentFromResultSetInterface;
+
 class DuplicateFinder
 {
     private RabbitMQ $rabbitmq;
@@ -31,25 +33,20 @@ class DuplicateFinder
 
     public function findSimilar(int $id): ?array
     {
-        $row = $this->distanceTable->select(
-            /**
-             * @suppress PhanPluginMixedKeyNoKey
-             */
-            function (Select $select) use ($id): void {
-                $select
-                    ->columns([
-                        'dst_picture_id',
-                        'distance',
-                    ])
-                    ->where([
-                        'src_picture_id' => $id,
-                        'src_picture_id <> dst_picture_id',
-                        'not hide',
-                    ])
-                    ->order('distance ASC')
-                    ->limit(1);
-            }
-        )->current();
+        $row = currentFromResultSetInterface($this->distanceTable->select(function (Select $select) use ($id): void {
+            $select
+                ->columns([
+                    'dst_picture_id',
+                    'distance',
+                ])
+                ->where([
+                    'src_picture_id' => $id,
+                    'src_picture_id <> dst_picture_id',
+                    'not hide',
+                ])
+                ->order('distance ASC')
+                ->limit(1);
+        }));
 
         if (! $row) {
             return null;

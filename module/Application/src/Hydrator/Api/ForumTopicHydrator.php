@@ -15,6 +15,7 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function is_array;
 
 class ForumTopicHydrator extends AbstractRestHydrator
@@ -91,17 +92,26 @@ class ForumTopicHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->userId = $userId;
+        $this->userId = (int) $userId;
 
-        $this->getStrategy('theme')->setUserId($userId);
-        $this->getStrategy('themes')->setUserId($userId);
-        $this->getStrategy('last_message')->setUserId($userId);
+        /** @var Strategy\ForumTheme $strategy */
+        $strategy = $this->getStrategy('theme');
+        $strategy->setUserId($userId);
+
+        /** @var Strategy\ForumThemes $strategy */
+        $strategy = $this->getStrategy('themes');
+        $strategy->setUserId($userId);
+
+        /** @var Strategy\Comment $strategy */
+        $strategy = $this->getStrategy('last_message');
+        $strategy->setUserId($userId);
 
         return $this;
     }
 
     /**
      * @param array|ArrayAccess $object
+     * @throws Exception
      */
     public function extract($object): ?array
     {
@@ -163,7 +173,9 @@ class ForumTopicHydrator extends AbstractRestHydrator
         }
 
         if ($this->filterComposite->filter('theme')) {
-            $row             = $this->themeTable->select(['id' => (int) $object['theme_id']])->current();
+            $row             = currentFromResultSetInterface(
+                $this->themeTable->select(['id' => (int) $object['theme_id']])
+            );
             $result['theme'] = $this->extractValue('theme', $row);
         }
 
@@ -184,7 +196,7 @@ class ForumTopicHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

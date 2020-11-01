@@ -10,7 +10,10 @@ use Autowp\User\Model\User;
 use DateTime;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
@@ -20,6 +23,7 @@ use Laminas\View\Model\ViewModel;
 
 use function array_key_exists;
 use function array_keys;
+use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
  * @method UserModel user($user = null)
@@ -159,7 +163,7 @@ class ForumController extends AbstractRestfulController
             $select->where(['not is_moderator']);
         }
 
-        $row = $this->forums->getThemeTable()->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->forums->getThemeTable()->selectWith($select));
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -235,8 +239,10 @@ class ForumController extends AbstractRestfulController
             'user_id'  => $userId,
         ]);
 
+        /** @var Adapter $adapter */
+        $adapter   = $this->forums->getTopicTable()->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->forums->getTopicTable()->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -331,8 +337,9 @@ class ForumController extends AbstractRestfulController
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     private function needWait(): bool
@@ -359,11 +366,11 @@ class ForumController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -403,8 +410,7 @@ class ForumController extends AbstractRestfulController
 
         $data['user_id']  = $user['id'];
         $data['theme_id'] = $theme['id'];
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $data['ip'] = $request->getServer('REMOTE_ADDR');
+        $data['ip']       = $request->getServer('REMOTE_ADDR');
 
         $topicId = $this->forums->addTopic($data);
 
@@ -419,10 +425,11 @@ class ForumController extends AbstractRestfulController
         $url = $this->url()->fromRoute('api/forum/topic/item/get', [
             'id' => $topicId,
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -452,7 +459,7 @@ class ForumController extends AbstractRestfulController
                 ->where(['not forums_themes.is_moderator']);
         }
 
-        $row = $this->forums->getTopicTable()->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->forums->getTopicTable()->selectWith($select));
 
         if (! $row) {
             return $this->notFoundAction();

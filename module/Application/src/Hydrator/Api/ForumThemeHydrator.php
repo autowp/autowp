@@ -7,6 +7,7 @@ use ArrayAccess;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
 use Exception;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
@@ -16,6 +17,7 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function is_array;
 
 class ForumThemeHydrator extends AbstractRestHydrator
@@ -103,9 +105,12 @@ class ForumThemeHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->userId = $userId;
+        $this->userId = (int) $userId;
 
-        $this->getStrategy('themes')->setUserId($userId);
+        /** @var Strategy\ForumThemes $strategy */
+        $strategy = $this->getStrategy('themes');
+        $strategy->setUserId($userId);
+
         //$this->getStrategy('replies')->setUser($user);
 
         return $this;
@@ -114,6 +119,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
     /**
      * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      * @param array|ArrayAccess $object
+     * @throws Exception
      */
     public function extract($object): ?array
     {
@@ -144,7 +150,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
                 ->order('comment_topic.last_update DESC')
                 ->limit(1);
 
-            $lastTopicRow = $this->topicTable->selectWith($select)->current();
+            $lastTopicRow = currentFromResultSetInterface($this->topicTable->selectWith($select));
 
             $lastMessageRow = null;
             if ($lastTopicRow) {
@@ -206,8 +212,10 @@ class ForumThemeHydrator extends AbstractRestHydrator
                 ])
                 ->order('comment_topic.last_update DESC');
 
+            /** @var Adapter $adapter */
+            $adapter   = $this->topicTable->getAdapter();
             $paginator = new Paginator\Paginator(
-                new Paginator\Adapter\DbSelect($select, $this->topicTable->getAdapter())
+                new Paginator\Adapter\DbSelect($select, $adapter)
             );
 
             $paginator->setItemCountPerPage(Forums::TOPICS_PER_PAGE);
@@ -230,7 +238,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

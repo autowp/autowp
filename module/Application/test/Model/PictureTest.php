@@ -10,8 +10,11 @@ use Application\Model\Picture;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
 use Exception;
-use Laminas\Http\Request;
+use Laminas\Http\Header\Location;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\Response;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function copy;
 use function count;
 use function explode;
@@ -59,14 +62,15 @@ class PictureTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function createItem(array $params): int
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -75,16 +79,18 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/item/post');
         $this->assertActionName('post');
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
-        $itemId  = $parts[count($parts) - 1];
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
+        $itemId   = $parts[count($parts) - 1];
 
         return (int) $itemId;
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function addPictureToItem(int $itemId): int
@@ -93,18 +99,17 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $this->mockDuplicateFinder();
 
+        /** @var Request $request */
         $request = $this->getRequest();
         $request->getHeaders()
             ->addHeader(Data::getAdminAuthHeader())
             ->addHeaderLine('Content-Type', 'multipart/form-data');
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file     = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../_files/' . $filename, $file);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,
@@ -124,8 +129,11 @@ class PictureTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/picture/post');
         $this->assertActionName('post');
 
-        $headers   = $this->getResponse()->getHeaders();
-        $uri       = $headers->get('Location')->uri();
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location  = $response->getHeaders()->get('Location');
+        $uri       = $location->uri();
         $parts     = explode('/', $uri->getPath());
         $pictureId = $parts[count($parts) - 1];
 
@@ -133,14 +141,15 @@ class PictureTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function addPictureItem(int $pictureId, int $itemId, int $typeId): void
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
             'https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/' . $typeId,
             Request::METHOD_POST
@@ -158,17 +167,17 @@ class PictureTest extends AbstractHttpControllerTestCase
         $serviceManager = $this->getApplicationServiceLocator();
         $tableManager   = $serviceManager->get('TableManager');
 
-        $picture = $tableManager->get('pictures')->select([
+        $picture = currentFromResultSetInterface($tableManager->get('pictures')->select([
             'id' => $pictureId,
-        ])->current();
+        ]));
 
         if (! $picture) {
             return '';
         }
 
-        $image = $tableManager->get('image')->select([
+        $image = currentFromResultSetInterface($tableManager->get('image')->select([
             'id' => $picture['image_id'],
-        ])->current();
+        ]));
 
         if (! $image) {
             return '';
@@ -190,7 +199,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $filename = $this->getPictureFilename($pictureId);
 
-        $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
+        $this->assertMatchesRegularExpression('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
     public function testPersonAndCopyrightPictureFilenamePattern(): void
@@ -209,7 +218,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $filename = $this->getPictureFilename($pictureId);
 
-        $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
+        $this->assertMatchesRegularExpression('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
     public function testAuthorAndVehiclePictureFilenamePattern(): void
@@ -228,7 +237,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $filename = $this->getPictureFilename($pictureId);
 
-        $this->assertRegExp('/^t\/toyota_corolla\/toyota_corolla(_[0-9]+)?\.jpeg$/', $filename);
+        $this->assertMatchesRegularExpression('/^t\/toyota_corolla\/toyota_corolla(_[0-9]+)?\.jpeg$/', $filename);
     }
 
     public function testPersonAndVehiclePictureFilenamePattern(): void
@@ -248,7 +257,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $filename = $this->getPictureFilename($pictureId);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^t\/toyota_corolla\/a\.s\._pushkin\/toyota_corolla_a\.s\._pushkin(_[0-9]+)?\.jpeg$/',
             $filename
         );

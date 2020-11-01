@@ -2,12 +2,14 @@
 
 namespace Application\Model;
 
+use Exception;
 use InvalidArgumentException;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
 use function array_merge;
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function is_bool;
 use function usort;
@@ -61,6 +63,7 @@ class Catalogue
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getCataloguePaths(int $id, array $options = []): array
     {
@@ -96,7 +99,7 @@ class Catalogue
                     'item_type_id' => Item::BRAND,
                 ]);
 
-            $brand = $this->itemTable->selectWith($select)->current();
+            $brand = currentFromResultSetInterface($this->itemTable->selectWith($select));
 
             if ($brand) {
                 $result[] = [
@@ -107,7 +110,7 @@ class Catalogue
                     'stock'         => true,
                 ];
 
-                if ($breakOnFirst && count($result)) {
+                if ($breakOnFirst && count($result) > 0) {
                     return $result;
                 }
             }
@@ -122,7 +125,7 @@ class Catalogue
                     new Sql\Predicate\In('item_type_id', [Item::CATEGORY, Item::PERSON]),
                 ]);
 
-            $category = $this->itemTable->selectWith($select)->current();
+            $category = currentFromResultSetInterface($this->itemTable->selectWith($select));
 
             if ($category) {
                 switch ($category['item_type_id']) {
@@ -132,7 +135,7 @@ class Catalogue
                             'category_catname' => $category['catname'],
                         ];
 
-                        if ($breakOnFirst && count($result)) {
+                        if ($breakOnFirst && count($result) > 0) {
                             return $result;
                         }
                         break;
@@ -143,7 +146,7 @@ class Catalogue
                             'id'   => $category['id'],
                         ];
 
-                        if ($breakOnFirst && count($result)) {
+                        if ($breakOnFirst && count($result) > 0) {
                             return $result;
                         }
                         break;

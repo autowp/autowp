@@ -4,6 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Model\PictureVote;
 use Autowp\User\Controller\Plugin\User;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -38,8 +39,9 @@ class PictureVoteController extends AbstractRestfulController
 
         $this->model->vote($id, $currentUser['id'], $value);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->setStatusCode(Response::STATUS_CODE_200);
 
         return new JsonModel($this->model->getVote($id, $currentUser['id']));
     }

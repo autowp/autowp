@@ -13,7 +13,7 @@ class DateString extends Date
     /**
      * Attempts to convert an string to a DateTime object
      *
-     * @param  string|int|array $param
+     * @param  string|int|array|DateTime|DateTimeImmutable $param
      * @param  bool             $addErrors
      * @return bool|DateTime|DateTimeImmutable
      */

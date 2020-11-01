@@ -6,6 +6,8 @@ use Autowp\User\Model\User;
 use Laminas\Db\Sql;
 use Laminas\Validator\AbstractValidator;
 
+use function Autowp\Commons\currentFromResultSetInterface;
+
 class Login extends AbstractValidator
 {
     private const USER_NOT_FOUND = 'userNotFound';
@@ -32,9 +34,9 @@ class Login extends AbstractValidator
 
         $table = $this->userModel->getTable();
 
-        $user = $table->select([
+        $user = currentFromResultSetInterface($table->select([
             new Sql\Predicate\Expression('login = ? or e_mail = ?', [(string) $value, (string) $value]),
-        ])->current();
+        ]));
 
         if (! $user) {
             $this->error(self::USER_NOT_FOUND);

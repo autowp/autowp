@@ -12,6 +12,7 @@ use Transliterator;
 
 use function array_replace;
 use function array_values;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function ceil;
 use function chmod;
 use function count;
@@ -90,6 +91,7 @@ class Brand
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @throws Exception
      */
     public function getTopBrandsList(string $language): array
     {
@@ -125,7 +127,7 @@ class Brand
                         [self::NEW_DAYS]
                     ),
                 ]);
-            $row = $this->item->getTable()->selectWith($select)->current();
+            $row = currentFromResultSetInterface($this->item->getTable()->selectWith($select));
 
             $newCarsCount = $row ? (int) $row['count'] : 0;
 
@@ -293,7 +295,7 @@ class Brand
 
         $callback($select);
 
-        $brand = $this->item->getTable()->selectWith($select)->current();
+        $brand = currentFromResultSetInterface($this->item->getTable()->selectWith($select));
 
         if (! $brand) {
             return null;

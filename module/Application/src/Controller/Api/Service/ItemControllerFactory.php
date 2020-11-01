@@ -11,6 +11,7 @@ use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
+use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -42,7 +43,8 @@ class ItemControllerFactory implements FactoryInterface
             $container->get(Item::class),
             $container->get(VehicleType::class),
             $container->get('InputFilterManager'),
-            $container->get(SpecificationsService::class)
+            $container->get(SpecificationsService::class),
+            $container->get(Storage::class)
         );
     }
 }

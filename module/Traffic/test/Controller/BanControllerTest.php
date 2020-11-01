@@ -31,12 +31,11 @@ class BanControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('forbidden');
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testBanUnbanIp(): void
     {
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/ban/ban-ip/ip/127.0.0.1', Request::METHOD_POST, [
             'period' => '1',
             'reason' => 'test',
@@ -49,7 +48,9 @@ class BanControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/ban/unban-ip/ip/127.0.0.1', Request::METHOD_POST);
 
         $this->assertResponseStatusCode(302);

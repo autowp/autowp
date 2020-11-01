@@ -3,6 +3,7 @@
 namespace Application\Spec\Table\Value;
 
 use ArrayAccess;
+use Laminas\View\Helper\EscapeHtml;
 use Laminas\View\Renderer\PhpRenderer;
 
 class Gearbox
@@ -49,7 +50,9 @@ class Gearbox
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $view->escapeHtml($result);
+        /** @var EscapeHtml $escapeHtmlHelper */
+        $escapeHtmlHelper = $view->getHelperPluginManager()->get('escapeHtml');
+
+        return $escapeHtmlHelper($result);
     }
 }

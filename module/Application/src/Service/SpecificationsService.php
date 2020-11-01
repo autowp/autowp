@@ -14,6 +14,7 @@ use ArrayAccess;
 use ArrayObject;
 use Autowp\User\Model\User;
 use Exception;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\I18n\Translator\TranslatorInterface;
@@ -30,6 +31,7 @@ use function array_merge;
 use function array_replace;
 use function array_reverse;
 use function array_unique;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function implode;
 use function in_array;
@@ -551,7 +553,9 @@ class SpecificationsService
 
                 if (count($value)) {
                     // insert new descriptors and values
-                    $this->userValueTable->getAdapter()->query('
+                    /** @var Adapter $adapter */
+                    $adapter = $this->userValueTable->getAdapter();
+                    $adapter->query('
                         INSERT INTO attrs_user_values (attribute_id, item_id, user_id, add_date, update_date)
                         VALUES (:attribute_id, :item_id, :user_id, NOW(), NOW())
                         ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
@@ -564,7 +568,9 @@ class SpecificationsService
                             'ordering' => $ordering,
                             'value'    => $oneValue,
                         ]);
-                        $userValueDataTable->getAdapter()->query('
+                        /** @var Adapter $adapter */
+                        $adapter = $userValueDataTable->getAdapter();
+                        $adapter->query('
                             INSERT INTO `' . $userValueDataTable->getTable() . '`
                                 (attribute_id, item_id, user_id, ordering, value)
                             VALUES (:attribute_id, :item_id, :user_id, :ordering, :value)
@@ -579,10 +585,10 @@ class SpecificationsService
         } else {
             if (strlen($value) > 0 || $empty) {
                 // insert/update value descriptor
-                $userValue = $this->userValueTable->select($userValuePrimaryKey)->current();
+                $userValue = currentFromResultSetInterface($this->userValueTable->select($userValuePrimaryKey));
 
                 // insert update value
-                $userValueData = $userValueDataTable->select($userValuePrimaryKey)->current();
+                $userValueData = currentFromResultSetInterface($userValueDataTable->select($userValuePrimaryKey));
 
                 if ($empty) {
                     $value = null;
@@ -597,7 +603,9 @@ class SpecificationsService
                 }
 
                 if (! $userValue || $valueChanged) {
-                    $this->userValueTable->getAdapter()->query('
+                    /** @var Adapter $adapter */
+                    $adapter = $this->userValueTable->getAdapter();
+                    $adapter->query('
                         INSERT INTO attrs_user_values (attribute_id, item_id, user_id, add_date, update_date)
                         VALUES (:attribute_id, :item_id, :user_id, NOW(), NOW())
                         ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
@@ -606,7 +614,9 @@ class SpecificationsService
                     $params = array_replace($userValuePrimaryKey, [
                         'value' => $value,
                     ]);
-                    $userValueDataTable->getAdapter()->query('
+                    /** @var Adapter $adapter */
+                    $adapter = $userValueDataTable->getAdapter();
+                    $adapter->query('
                         INSERT INTO `' . $userValueDataTable->getTable() . '` (attribute_id, item_id, user_id, value)
                         VALUES (:attribute_id, :item_id, :user_id, :value)
                         ON DUPLICATE KEY UPDATE value = VALUES(value)
@@ -707,10 +717,10 @@ class SpecificationsService
         } else {
             if (strlen($value) > 0) {
                 // insert/update value decsriptor
-                $userValue = $this->userValueTable->select($userValuePrimaryKey)->current();
+                $userValue = currentFromResultSetInterface($this->userValueTable->select($userValuePrimaryKey));
 
                 // insert update value
-                $userValueData = $userValueDataTable->select($userValuePrimaryKey)->current();
+                $userValueData = currentFromResultSetInterface($userValueDataTable->select($userValuePrimaryKey));
 
                 if ($value === self::NULL_VALUE_STR) {
                     $value = null;
@@ -824,10 +834,10 @@ class SpecificationsService
 
     private function haveOwnAttributeValue(int $attributeId, int $itemId): bool
     {
-        return (bool) $this->userValueTable->select([
+        return (bool) currentFromResultSetInterface($this->userValueTable->select([
             'attribute_id' => $attributeId,
             'item_id'      => $itemId,
-        ])->current();
+        ]));
     }
 
     /**
@@ -990,7 +1000,7 @@ class SpecificationsService
                 return $values;
             }
         } else {
-            $row = $valuesTable->selectWith($select)->current();
+            $row = currentFromResultSetInterface($valuesTable->selectWith($select));
 
             if ($row) {
                 return $row['value'];
@@ -1108,7 +1118,9 @@ class SpecificationsService
 
             // append engine name
             if (! (isset($values[$engineNameAttr]) && $values[$engineNameAttr]) && $car['engine_item_id']) {
-                $engineRow = $this->itemModel->getTable()->select(['id' => (int) $car['engine_item_id']])->current();
+                $engineRow = currentFromResultSetInterface(
+                    $this->itemModel->getTable()->select(['id' => (int) $car['engine_item_id']])
+                );
                 if ($engineRow) {
                     $values[$engineNameAttr] = $engineRow['name'];
                 }
@@ -1342,11 +1354,11 @@ class SpecificationsService
                 }
             }
 
-            $row = $this->userValueTable->select([
+            $row = currentFromResultSetInterface($this->userValueTable->select([
                 'attribute_id' => $attribute['id'],
                 'item_id'      => $itemId,
                 'user_id'      => $uid,
-            ])->current();
+            ]));
             if (! $row) {
                 throw new Exception('Row(rows) without descriptors');
             }
@@ -1413,9 +1425,9 @@ class SpecificationsService
             ];
         }
 
-        $carRow = $this->itemModel->getTable()->select([
+        $carRow = currentFromResultSetInterface($this->itemModel->getTable()->select([
             'id' => $itemId,
-        ])->current();
+        ]));
 
         if (! $carRow) {
             return [
@@ -1434,11 +1446,11 @@ class SpecificationsService
         $valueDataTable = $this->getValueDataTable($attribute['typeId']);
 
         if (! $attribute['isMultiple']) {
-            $valueDataRow = $valueDataTable->select([
+            $valueDataRow = currentFromResultSetInterface($valueDataTable->select([
                 'attribute_id' => $attribute['id'],
                 'item_id'      => $carRow['engine_item_id'],
                 'value IS NOT NULL',
-            ])->current();
+            ]));
 
             if ($valueDataRow) {
                 return [
@@ -1580,7 +1592,9 @@ class SpecificationsService
             ];
 
             // descriptor
-            $this->valueTable->getAdapter()->query('
+            /** @var Adapter $adapter */
+            $adapter = $this->valueTable->getAdapter();
+            $adapter->query('
                 INSERT INTO attrs_values (attribute_id, item_id, update_date)
                 VALUES (:attribute_id, :item_id, NOW())
                 ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
@@ -1593,7 +1607,9 @@ class SpecificationsService
                     $somethingChanges = true;
                 }
 
-                $stmt = $valueDataTable->getAdapter()->query('
+                /** @var Adapter $adapter */
+                $adapter = $valueDataTable->getAdapter();
+                $stmt    = $adapter->createStatement('
                     INSERT INTO `' . $valueDataTable->getTable() . '` (attribute_id, item_id, ordering, value)
                     VALUES (:attribute_id, :item_id, :ordering, :value)
                     ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
@@ -1615,11 +1631,14 @@ class SpecificationsService
                     'attribute_id' => $attribute['id'],
                     'item_id'      => $itemId,
                 ];
-                $result = $valueDataTable->getAdapter()->query('
+                /** @var Adapter $adapter */
+                $adapter = $valueDataTable->getAdapter();
+                $stmt    = $adapter->createStatement('
                     INSERT INTO `' . $valueDataTable->getTable() . '` (attribute_id, item_id, value)
                     VALUES (:attribute_id, :item_id, :value)
                     ON DUPLICATE KEY UPDATE value = VALUES(value)
-                ', $params);
+                ');
+                $result  = $stmt->execute($params);
 
                 if ($result->getAffectedRows() > 0) {
                     $somethingChanges = true;
@@ -1671,6 +1690,7 @@ class SpecificationsService
      * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
      * @return bool|array
+     * @throws Exception
      */
     public function hasSpecs($itemId)
     {
@@ -1699,11 +1719,12 @@ class SpecificationsService
         $select->where(['item_id' => (int) $itemId])
             ->limit(1);
 
-        return (bool) $this->valueTable->selectWith($select)->current();
+        return (bool) currentFromResultSetInterface($this->valueTable->selectWith($select));
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getSpecsCount(int $itemId): int
     {
@@ -1711,7 +1732,7 @@ class SpecificationsService
         $select->columns(['count' => new Sql\Expression('count(1)')])
             ->where(['item_id' => $itemId]);
 
-        $row = $this->valueTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->valueTable->selectWith($select));
 
         return $row ? (int) $row['count'] : 0;
     }
@@ -1720,6 +1741,7 @@ class SpecificationsService
      * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
      * @return bool|array
+     * @throws Exception
      */
     public function hasChildSpecs($itemId)
     {
@@ -1746,7 +1768,7 @@ class SpecificationsService
         }
 
         $select->where(['item_parent.parent_id' => $itemId]);
-        return (bool) $this->valueTable->selectWith($select)->current();
+        return (bool) currentFromResultSetInterface($this->valueTable->selectWith($select));
     }
 
     /**
@@ -2204,10 +2226,10 @@ class SpecificationsService
         $uniqueValues = array_unique($uniqueValues);
         $hasConflict  = count($uniqueValues) > 1;
 
-        $valueRow = $this->valueTable->select([
+        $valueRow = currentFromResultSetInterface($this->valueTable->select([
             'attribute_id' => $attribute['id'],
             'item_id'      => $itemId,
-        ])->current();
+        ]));
 
         if (! $valueRow) {
             return;
@@ -2368,8 +2390,10 @@ class SpecificationsService
             $select->where(['attrs_user_values.conflict < 0']);
         }
 
+        /** @var Adapter $adapter */
+        $adapter   = $this->valueTable->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->valueTable->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator

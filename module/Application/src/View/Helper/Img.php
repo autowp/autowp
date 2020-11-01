@@ -3,15 +3,24 @@
 namespace Application\View\Helper;
 
 use Autowp\Image\Storage;
+use Autowp\ZFComponents\View\Helper\HtmlImg;
 use Exception;
 use ImagickException;
 use Laminas\View\Helper\AbstractHtmlElement;
+use Laminas\View\Renderer\PhpRenderer;
 
 use function array_key_exists;
 
 class Img extends AbstractHtmlElement
 {
     private array $attribs;
+
+    private Storage $imageStorage;
+
+    public function __construct(Storage $imageStorage)
+    {
+        $this->imageStorage = $imageStorage;
+    }
 
     /**
      * @throws Storage\Exception
@@ -30,13 +39,10 @@ class Img extends AbstractHtmlElement
             return $this;
         }
 
-        /** @var Storage $storage */
-        $storage = $this->view->imageStorage();
-
         if ($format) {
-            $imageInfo = $storage->getFormatedImage($imageId, $format);
+            $imageInfo = $this->imageStorage->getFormatedImage($imageId, $format);
         } else {
-            $imageInfo = $storage->getImage($imageId);
+            $imageInfo = $this->imageStorage->getImage($imageId);
         }
 
         if ($imageInfo) {
@@ -54,9 +60,13 @@ class Img extends AbstractHtmlElement
 
     public function __toString(): string
     {
+        /** @var PhpRenderer $view */
+        $view = $this->view;
+        /** @var HtmlImg $htmlImgHelper */
+        $htmlImgHelper = $view->getHelperPluginManager()->get('htmlImg');
         try {
             if (isset($this->attribs['src'])) {
-                return $this->view->htmlImg($this->attribs);
+                return $htmlImgHelper($this->attribs);
             }
         } catch (Exception $e) {
             print $e->getMessage();

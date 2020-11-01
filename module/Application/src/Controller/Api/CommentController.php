@@ -18,6 +18,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Http\Request;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -27,6 +28,7 @@ use Laminas\View\Model\ViewModel;
 
 use function array_key_exists;
 use function array_keys;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function get_object_vars;
 use function is_numeric;
 use function sprintf;
@@ -126,7 +128,10 @@ class CommentController extends AbstractRestfulController
         $itemId = (int) $this->params('item_id');
         $typeId = (int) $this->params('type_id');
 
-        switch ($this->getRequest()->getMethod()) {
+        /** @var \Laminas\Http\PhpEnvironment\Request $request */
+        $request = $this->getRequest();
+
+        switch ($request->getMethod()) {
             case Request::METHOD_POST:
             case Request::METHOD_PUT:
                 $this->comments->service()->subscribe($typeId, $itemId, $user['id']);
@@ -208,9 +213,7 @@ class CommentController extends AbstractRestfulController
         if ($isModer) {
             if ($values['user']) {
                 if (! is_numeric($values['user'])) {
-                    $userRow = $this->userTable->select([
-                        'identity' => $values['user'],
-                    ])->current();
+                    $userRow = currentFromResultSetInterface($this->userTable->select(['identity' => $values['user']]));
                     if ($userRow) {
                         $values['user'] = $userRow['id'];
                     }
@@ -328,11 +331,11 @@ class CommentController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @var \Laminas\Http\PhpEnvironment\Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -380,11 +383,11 @@ class CommentController extends AbstractRestfulController
                 break;
 
             case Comments::ARTICLES_TYPE_ID:
-                $object = $this->articleTable->select(['id' => $itemId])->current();
+                $object = currentFromResultSetInterface($this->articleTable->select(['id' => $itemId]));
                 break;
 
             case Comments::FORUMS_TYPE_ID:
-                $object = $this->forums->getTopicTable()->select(['id' => $itemId])->current();
+                $object = currentFromResultSetInterface($this->forums->getTopicTable()->select(['id' => $itemId]));
                 break;
 
             default:
@@ -400,7 +403,6 @@ class CommentController extends AbstractRestfulController
             $moderatorAttention = (bool) $data['moderator_attention'];
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $ip = $request->getServer('REMOTE_ADDR');
         if (! $ip) {
             $ip = '127.0.0.1';
@@ -442,7 +444,9 @@ class CommentController extends AbstractRestfulController
         if ($data['parent_id']) {
             $authorId = $this->comments->service()->getMessageAuthorId($data['parent_id']);
             if ($authorId && ($authorId !== (int) $currentUser['id'])) {
-                $parentMessageAuthor = $this->userModel->getTable()->select(['id' => (int) $authorId])->current();
+                $parentMessageAuthor = currentFromResultSetInterface(
+                    $this->userModel->getTable()->select(['id' => (int) $authorId])
+                );
                 if ($parentMessageAuthor && ! $parentMessageAuthor['deleted']) {
                     $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor['language']);
 
@@ -469,10 +473,11 @@ class CommentController extends AbstractRestfulController
         $url = $this->url()->fromRoute('api/comment/item/get', [
             'id' => $messageId,
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -576,8 +581,9 @@ class CommentController extends AbstractRestfulController
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -639,7 +645,7 @@ class CommentController extends AbstractRestfulController
     }
 
     /**
-     * @return array|ViewModel
+     * @return array|ViewModel|Response
      */
     public function postViewAction()
     {
@@ -653,6 +659,8 @@ class CommentController extends AbstractRestfulController
 
         $this->comments->service()->updateTopicView($typeId, $itemId, $user['id']);
 
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 }

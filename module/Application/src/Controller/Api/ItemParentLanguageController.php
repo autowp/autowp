@@ -8,6 +8,7 @@ use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -16,6 +17,7 @@ use Laminas\View\Model\ViewModel;
 
 use function array_key_exists;
 use function array_keys;
+use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
  * @method User user($user = null)
@@ -77,11 +79,11 @@ class ItemParentLanguageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->table->select([
+        $row = currentFromResultSetInterface($this->table->select([
             'item_id'   => (int) $this->params('item_id'),
             'parent_id' => (int) $this->params('parent_id'),
             'language'  => (string) $this->params('language'),
-        ])->current();
+        ]));
 
         if (! $row) {
             return $this->notFoundAction();
@@ -133,7 +135,8 @@ class ItemParentLanguageController extends AbstractRestfulController
             ], false);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 }

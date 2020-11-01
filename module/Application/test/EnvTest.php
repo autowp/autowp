@@ -12,9 +12,9 @@ class EnvTest extends AbstractHttpControllerTestCase
 
     public function testDbTimezone(): void
     {
+        /** @var Adapter $db */
         $db = $this->getApplication()->getServiceManager()->get(AdapterInterface::class);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $timezone = $db->query('select @@session.time_zone as timezone', Adapter::QUERY_MODE_EXECUTE);
         $timezone = $timezone->current();
 

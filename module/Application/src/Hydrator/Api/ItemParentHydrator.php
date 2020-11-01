@@ -81,12 +81,23 @@ class ItemParentHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->userId = $userId;
+        $this->userId = (int) $userId;
 
-        $this->getStrategy('item')->setUserId($userId);
-        $this->getStrategy('parent')->setUserId($userId);
-        $this->getStrategy('duplicate_parent')->setUserId($userId);
-        $this->getStrategy('duplicate_child')->setUserId($userId);
+        /** @var Strategy\Item $strategy */
+        $strategy = $this->getStrategy('item');
+        $strategy->setUserId($userId);
+
+        /** @var Strategy\Item $strategy */
+        $strategy = $this->getStrategy('parent');
+        $strategy->setUserId($userId);
+
+        /** @var Strategy\Item $strategy */
+        $strategy = $this->getStrategy('duplicate_parent');
+        $strategy->setUserId($userId);
+
+        /** @var Strategy\Item $strategy */
+        $strategy = $this->getStrategy('duplicate_child');
+        $strategy->setUserId($userId);
 
         return $this;
     }
@@ -169,7 +180,7 @@ class ItemParentHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

@@ -14,6 +14,7 @@ use function array_keys;
 use function array_merge;
 use function array_unique;
 use function array_values;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function in_array;
 use function ksort;
 use function sort;
@@ -101,7 +102,7 @@ class ChartController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $attrRow = $this->attributeTable->select(['id' => $id])->current();
+        $attrRow = currentFromResultSetInterface($this->attributeTable->select(['id' => $id]));
         if (! $attrRow) {
             return $this->notFoundAction();
         }
@@ -112,7 +113,7 @@ class ChartController extends AbstractRestfulController
 
         $datasets = [];
         foreach ($this->specs as $specId) {
-            $specRow = $this->specTable->select(['id' => $specId])->current();
+            $specRow = currentFromResultSetInterface($this->specTable->select(['id' => $specId]));
             $specIds = $this->specIds($specId);
 
             $select = new Sql\Select($dataTable->getTable());

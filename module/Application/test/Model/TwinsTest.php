@@ -8,7 +8,9 @@ use Application\Model\Twins;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
 use Exception;
+use Laminas\Http\Header\Location;
 use Laminas\Http\Request;
+use Laminas\Http\Response;
 
 use function array_replace;
 use function count;
@@ -19,14 +21,15 @@ class TwinsTest extends AbstractHttpControllerTestCase
     protected string $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function createItem(array $params): int
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -35,21 +38,25 @@ class TwinsTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/item/post');
         $this->assertActionName('post');
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function addItemParent(int $itemId, int $parentId, array $params = []): void
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
             'https://www.autowp.ru/api/item-parent',
             Request::METHOD_POST,

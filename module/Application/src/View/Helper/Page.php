@@ -4,8 +4,11 @@ namespace Application\View\Helper;
 
 use ArrayObject;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\I18n\View\Helper\Translate;
 use Laminas\View\Helper\AbstractHelper;
+use Laminas\View\Renderer\PhpRenderer;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function is_array;
 use function is_numeric;
 
@@ -55,17 +58,22 @@ class Page extends AbstractHelper
             case 'breadcrumbs':
                 $key = 'page/' . $this->doc['id'] . '/' . $name;
 
-                $result = $this->view->translate($key);
+                /** @var PhpRenderer $view */
+                $view = $this->view;
+                /** @var Translate $translateHelper */
+                $translateHelper = $view->getHelperPluginManager()->get('translate');
+
+                $result = $translateHelper($key);
                 if (! $result || $result === $key) {
-                    $result = $this->view->translate($key, null, 'en');
+                    $result = $translateHelper($key, null, 'en');
                 }
 
                 if ((! $result || $result === $key) && ($name !== 'name')) {
                     $key = 'page/' . $this->doc['id'] . '/name';
 
-                    $result = $this->view->translate($key);
+                    $result = $translateHelper($key);
                     if (! $result || $result === $key) {
-                        $result = $this->view->translate($key, null, 'en');
+                        $result = $translateHelper($key, null, 'en');
                     }
                 }
 
@@ -84,9 +92,9 @@ class Page extends AbstractHelper
             return $this->pages[$id];
         }
 
-        $row = $this->pageTable->select([
+        $row = currentFromResultSetInterface($this->pageTable->select([
             'id' => $id,
-        ])->current();
+        ]));
 
         $this->pages[$id] = $row;
 

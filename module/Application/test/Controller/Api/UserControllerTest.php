@@ -5,7 +5,9 @@ namespace ApplicationTest\Controller\Api;
 use Application\Controller\Api\UserController;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
+use Laminas\Http\Header\Location;
 use Laminas\Http\Request;
+use Laminas\Http\Response;
 
 use function count;
 use function explode;
@@ -15,9 +17,6 @@ class UserControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testDelete(): void
     {
         $email    = 'test' . microtime(true) . '@example.com';
@@ -37,14 +36,19 @@ class UserControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         // get id
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
-        $userId  = $parts[count($parts) - 1];
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
+        $userId   = $parts[count($parts) - 1];
 
         // delete user
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
             'https://www.autowp.ru/api/user/' . $userId,
             Request::METHOD_PUT,

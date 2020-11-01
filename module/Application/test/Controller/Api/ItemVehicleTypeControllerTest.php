@@ -9,7 +9,9 @@ use Application\Model\VehicleType;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
 use Exception;
+use Laminas\Http\Header\Location;
 use Laminas\Http\Request;
+use Laminas\Http\Response;
 use Laminas\Json\Json;
 
 use function array_replace;
@@ -23,14 +25,15 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function createItem(array $params): int
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -39,22 +42,26 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/item/post');
         $this->assertActionName('post');
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
 
         return (int) $parts[count($parts) - 1];
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function addItemParent(int $itemId, int $parentId, array $params = []): void
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
             'https://www.autowp.ru/api/item-parent',
             Request::METHOD_POST,
@@ -72,7 +79,6 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function setItemVehicleTypes(int $itemId, array $vehicleTypeIds): void
@@ -84,7 +90,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         foreach ($ids as $id) {
             if (! in_array($id, $vehicleTypeIds)) {
                 $this->reset();
-                $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+                /** @var Request $request */
+                $request = $this->getRequest();
+                $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
                 $url = 'https://www.autowp.ru/api/item-vehicle-type/' . $itemId . '/' . $id;
                 $this->dispatch($url, Request::METHOD_DELETE);
 
@@ -99,7 +107,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         foreach ($vehicleTypeIds as $id) {
             if (! in_array($id, $ids)) {
                 $this->reset();
-                $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+                /** @var Request $request */
+                $request = $this->getRequest();
+                $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
                 $url = sprintf(
                     'https://www.autowp.ru/api/item-vehicle-type/%s/%s',
                     $itemId,
@@ -117,13 +127,14 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function getItemVehicleTypeIds(int $itemId): array
     {
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-vehicle-type', Request::METHOD_GET, [
             'item_id' => $itemId,
         ]);
@@ -160,12 +171,11 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertEquals($inheritedExpected, $this->getItemInheritedVehicleTypeIds($itemId));
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testList(): void
     {
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-vehicle-type', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);

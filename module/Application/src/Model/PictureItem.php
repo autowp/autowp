@@ -5,11 +5,13 @@ namespace Application\Model;
 use ArrayObject;
 use Exception;
 use InvalidArgumentException;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
 use function array_key_exists;
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function in_array;
 
 class PictureItem
@@ -34,6 +36,7 @@ class PictureItem
 
     /**
      * @return array|ArrayObject|null
+     * @throws Exception
      */
     private function getRow(int $pictureId, int $itemId, int $type)
     {
@@ -45,11 +48,11 @@ class PictureItem
             throw new InvalidArgumentException("Item id is invalid");
         }
 
-        return $this->table->select([
+        return currentFromResultSetInterface($this->table->select([
             'picture_id' => $pictureId,
             'item_id'    => $itemId,
             'type'       => $type,
-        ])->current();
+        ]));
     }
 
     public function add(int $pictureId, int $itemId, int $type): void
@@ -71,10 +74,13 @@ class PictureItem
             'item_id'    => $itemId,
             'type'       => $type,
         ];
-        $result = $this->table->getAdapter()->query('
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+        $stmt    = $adapter->createStatement('
             INSERT IGNORE INTO picture_item (picture_id, item_id, type)
             VALUES (:picture_id, :item_id, :type)
-        ', $params);
+        ');
+        $result  = $stmt->execute($params);
 
         if ($result->getAffectedRows() > 0) {
             $this->updateContentCount($pictureId);
@@ -193,14 +199,15 @@ class PictureItem
 
     /**
      * @return array|ArrayObject|null
+     * @throws Exception
      */
     public function getPictureItemData(int $pictureId, int $itemId, int $type)
     {
-        return $this->table->select([
+        return currentFromResultSetInterface($this->table->select([
             'picture_id' => $pictureId,
             'item_id'    => $itemId,
             'type'       => $type,
-        ])->current();
+        ]));
     }
 
     public function getPictureItemsData(int $pictureId, int $type = 0): array
@@ -408,6 +415,7 @@ class PictureItem
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function isAllowedTypeByItemId(int $itemId, int $type): bool
     {
@@ -415,7 +423,7 @@ class PictureItem
             ->columns(['item_type_id'])
             ->where(['id' => $itemId]);
 
-        $row = $this->itemTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->itemTable->selectWith($select));
         if (! $row) {
             return false;
         }
@@ -430,6 +438,7 @@ class PictureItem
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @throws Exception
      */
     public function updateContentCount(int $pictureId): void
     {
@@ -440,7 +449,7 @@ class PictureItem
                 'type'       => self::PICTURE_CONTENT,
             ]);
 
-        $row   = $this->table->selectWith($select)->current();
+        $row   = currentFromResultSetInterface($this->table->selectWith($select));
         $count = $row ? $row['count'] : 0;
 
         $this->pictureTable->update([

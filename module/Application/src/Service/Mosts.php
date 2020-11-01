@@ -13,6 +13,7 @@ use Laminas\Db\TableGateway\TableGateway;
 
 use function array_merge;
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function date;
 
@@ -349,7 +350,7 @@ class Mosts
         $this->itemTable      = $itemTable;
     }
 
-    private function betweenYearsExpr(string $from, string $to): string
+    private function betweenYearsExpr(int $from, int $to): string
     {
         return '(item.begin_order_cache between "' . $from . '-01-01" and "' . $to . '-12-31" or '
                . 'item.end_order_cache between "' . $from . '-01-01" and "' . $to . '-12-31" or '
@@ -655,7 +656,7 @@ class Mosts
             foreach ($years as $idx => $year) {
                 $cSelect = clone $select;
                 $cSelect->where($year['where']);
-                $rowExists = (bool) $this->itemTable->selectWith($cSelect)->current();
+                $rowExists = (bool) currentFromResultSetInterface($this->itemTable->selectWith($cSelect));
                 if (! $rowExists) {
                     unset($years[$idx]);
                 }

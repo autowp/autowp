@@ -6,7 +6,9 @@ use Application\Controller\Api\RestorePasswordController;
 use Application\Controller\Api\UserController;
 use Application\Test\AbstractHttpControllerTestCase;
 use Exception;
+use Laminas\Http\Header\Location;
 use Laminas\Http\Request;
+use Laminas\Http\Response;
 use Laminas\Mail\Transport\TransportInterface;
 
 use function count;
@@ -19,7 +21,6 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function createUser(string $email, string $password, string $name): int
@@ -40,9 +41,12 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
 
         // get id
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 

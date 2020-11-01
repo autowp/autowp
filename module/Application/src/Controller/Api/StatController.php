@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\User\Controller\Plugin\User;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
@@ -45,9 +46,9 @@ class StatController extends AbstractActionController
             'item_type_id' => Item::VEHICLE,
         ]);
 
+        /** @var Adapter $db */
         $db = $this->item->getTable()->getAdapter();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $row           = $db->query('
             select count(1) as count
             from attrs_attributes
@@ -56,14 +57,12 @@ class StatController extends AbstractActionController
         ')->execute()->current();
         $totalCarAttrs = $row ? (int) $row['count'] : null;
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $row            = $db->query('
             select count(1) as count
             from attrs_values
         ')->execute()->current();
         $carAttrsValues = $row ? (int) $row['count'] : null;
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $row                     = $db->query('
             select count(1) as count from (
                 select item.id, count(pictures.id) as c

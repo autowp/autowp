@@ -69,7 +69,9 @@ class MessageHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->getStrategy('author')->setUserId($userId);
+        /** @var Strategy\User $strategy */
+        $strategy = $this->getStrategy('author');
+        $strategy->setUserId($userId);
 
         return $this;
     }
@@ -115,7 +117,7 @@ class MessageHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

@@ -4,6 +4,7 @@ namespace Application\Model;
 
 use Laminas\Db\TableGateway\TableGateway;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function str_replace;
 
 class UserAccount
@@ -17,10 +18,10 @@ class UserAccount
 
     public function getServiceExternalId(int $userId, string $service): string
     {
-        $row = $this->table->select([
+        $row = currentFromResultSetInterface($this->table->select([
             'user_id'    => $userId,
             'service_id' => $service,
-        ])->current();
+        ]));
         if (! $row) {
             return '';
         }
@@ -30,10 +31,10 @@ class UserAccount
 
     public function getUserId(string $service, string $externalId): int
     {
-        $row = $this->table->select([
+        $row = currentFromResultSetInterface($this->table->select([
             'external_id' => $externalId,
             'service_id'  => $service,
-        ])->current();
+        ]));
         if (! $row) {
             return 0;
         }
@@ -63,10 +64,10 @@ class UserAccount
 
     public function haveAccountsForOtherServices(int $userId, int $id): bool
     {
-        return (bool) $this->table->select([
+        return (bool) currentFromResultSetInterface($this->table->select([
             'user_id' => $userId,
             'id != ?' => $id,
-        ])->current();
+        ]));
     }
 
     public function removeAccount(int $id): bool

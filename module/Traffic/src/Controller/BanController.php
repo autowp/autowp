@@ -5,6 +5,7 @@ namespace Autowp\Traffic\Controller;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Controller\Plugin\User;
 use Exception;
+use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
@@ -28,8 +29,9 @@ class BanController extends AbstractActionController
      */
     public function unbanIpAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        if (! $this->getRequest()->isPost()) {
+        /** @var Request $request */
+        $request = $this->getRequest();
+        if (! $request->isPost()) {
             return $this->forbiddenAction();
         }
 
@@ -46,8 +48,7 @@ class BanController extends AbstractActionController
 
         $this->service->unban($ip);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $referer = $this->getRequest()->getServer('HTTP_REFERER');
+        $referer = $request->getServer('HTTP_REFERER');
 
         return $this->redirect()->toUrl($referer ? $referer : '/');
     }
@@ -58,12 +59,12 @@ class BanController extends AbstractActionController
      */
     public function banIpAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        if (! $this->getRequest()->isPost()) {
+        /** @var Request $request */
+        $request = $this->getRequest();
+        if (! $request->isPost()) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canBan = $this->user()->isAllowed('user', 'ban');
         if (! $canBan) {
             return $this->forbiddenAction();
@@ -82,8 +83,7 @@ class BanController extends AbstractActionController
             $this->params()->fromPost('reason')
         );
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $referer = $this->getRequest()->getServer('HTTP_REFERER');
+        $referer = $request->getServer('HTTP_REFERER');
 
         return $this->redirect()->toUrl($referer ? $referer : '/');
     }

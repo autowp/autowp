@@ -9,8 +9,11 @@ use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
@@ -20,6 +23,7 @@ use Laminas\View\Model\ViewModel;
 
 use function array_keys;
 use function array_values;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function implode;
 use function strlen;
 
@@ -220,8 +224,10 @@ class AttrController extends AbstractRestfulController
                 ->where(['attrs_zone_attributes.zone_id' => $values['zone_id']]);
         }
 
+        /** @var Adapter $adapter */
+        $adapter   = $this->userValueTable->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->userValueTable->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -260,8 +266,9 @@ class AttrController extends AbstractRestfulController
 
         $this->specsService->deleteUserValue($attributeId, $itemId, $userId);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     /**
@@ -321,7 +328,7 @@ class AttrController extends AbstractRestfulController
                             'item_id' => $dstItemId,
                         ];
 
-                        $cUserValueRow = $this->userValueTable->select($dstPrimaryKey)->current();
+                        $cUserValueRow = currentFromResultSetInterface($this->userValueTable->select($dstPrimaryKey));
 
                         if ($cUserValueRow) {
                             $rowId = implode('/', [
@@ -332,9 +339,9 @@ class AttrController extends AbstractRestfulController
                             throw new Exception("Value row $rowId already exists");
                         }
 
-                        $attrRow = $this->specsService->getAttributeTable()->select([
+                        $attrRow = currentFromResultSetInterface($this->specsService->getAttributeTable()->select([
                             'id' => $eUserValueRow['attribute_id'],
-                        ])->current();
+                        ]));
 
                         if (! $attrRow) {
                             throw new Exception("Attr not found");
@@ -353,7 +360,7 @@ class AttrController extends AbstractRestfulController
                             if ($attrRow['multiple']) {
                                 $filter['ordering'] = $eDataRow['ordering'];
                             }
-                            $cDataRow = $dataTable->select($filter)->current();
+                            $cDataRow = currentFromResultSetInterface($dataTable->select($filter));
 
                             if ($cDataRow) {
                                 throw new Exception("Data row already exists");
@@ -398,8 +405,9 @@ class AttrController extends AbstractRestfulController
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -414,12 +422,12 @@ class AttrController extends AbstractRestfulController
 
         $attributeTable = $this->specsService->getAttributeTable();
 
+        /** @var Request $request */
         $request = $this->getRequest();
 
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -437,7 +445,7 @@ class AttrController extends AbstractRestfulController
             ->columns(['max' => new Sql\Expression('max(position)')])
             ->where(['parent_id' => $parentId]);
 
-        $row = $attributeTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($attributeTable->selectWith($select));
 
         $max = $row ? (int) $row['max'] : 0;
 
@@ -458,10 +466,11 @@ class AttrController extends AbstractRestfulController
         $url = $this->url()->fromRoute('api/attr/attribute/item/get', [
             'id' => $id,
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -594,8 +603,10 @@ class AttrController extends AbstractRestfulController
                 ->where(['attrs_zone_attributes.zone_id' => $values['zone_id']]);
         }
 
+        /** @var Adapter $adapter */
+        $adapter   = $this->userValueTable->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->userValueTable->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -646,7 +657,7 @@ class AttrController extends AbstractRestfulController
 
         $attributeTable = $this->specsService->getAttributeTable();
 
-        $attribute = $attributeTable->select(['id' => (int) $this->params('id')])->current();
+        $attribute = currentFromResultSetInterface($attributeTable->select(['id' => (int) $this->params('id')]));
         if (! $attribute) {
             return $this->notFoundAction();
         }
@@ -714,7 +725,7 @@ class AttrController extends AbstractRestfulController
                     } else {
                         $select->where(['attrs_attributes.parent_id IS NULL']);
                     }
-                    $prev = $attributeTable->selectWith($select)->current();
+                    $prev = currentFromResultSetInterface($attributeTable->selectWith($select));
 
                     if ($prev) {
                         $prevPos = $prev['position'];
@@ -736,7 +747,7 @@ class AttrController extends AbstractRestfulController
                     } else {
                         $select->where(['attrs_attributes.parent_id IS NULL']);
                     }
-                    $next = $attributeTable->selectWith($select)->current();
+                    $next = currentFromResultSetInterface($attributeTable->selectWith($select));
 
                     if ($next) {
                         $nextPos = $next['position'];
@@ -750,8 +761,9 @@ class AttrController extends AbstractRestfulController
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     private function setAttributePosition(int $attributeId, int $position): void
@@ -803,12 +815,12 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @var Request $request */
         $request = $this->getRequest();
 
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -824,7 +836,7 @@ class AttrController extends AbstractRestfulController
         $select->columns(['max' => new Sql\Expression('MAX(position)')])
             ->where(['zone_id' => $values['zone_id']]);
 
-        $row         = $this->zoneAttributeTable->selectWith($select)->current();
+        $row         = currentFromResultSetInterface($this->zoneAttributeTable->selectWith($select));
         $maxPosition = $row ? $row['max'] : 0;
 
         $this->zoneAttributeTable->insert([
@@ -833,8 +845,9 @@ class AttrController extends AbstractRestfulController
             'position'     => $maxPosition + 1,
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -854,8 +867,9 @@ class AttrController extends AbstractRestfulController
             'attribute_id' => $attributeId,
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     /**
@@ -946,12 +960,12 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @var Request $request */
         $request = $this->getRequest();
 
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -967,7 +981,7 @@ class AttrController extends AbstractRestfulController
             ->columns(['max' => new Sql\Expression('MAX(position)')])
             ->where(['attribute_id' => $values['attribute_id']]);
 
-        $row = $this->listOptionTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->listOptionTable->selectWith($select));
         $max = $row ? (int) $row['max'] : 0;
 
         $this->listOptionTable->insert([
@@ -977,7 +991,8 @@ class AttrController extends AbstractRestfulController
             'position'     => 1 + $max,
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 }

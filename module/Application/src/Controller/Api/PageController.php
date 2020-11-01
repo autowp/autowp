@@ -3,12 +3,16 @@
 namespace Application\Controller\Api;
 
 use Autowp\User\Controller\Plugin\User;
+use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\ResultSet\ResultSet;
+use Laminas\Db\RowGateway\RowGatewayInterface;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\Feature\RowGatewayFeature;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -17,6 +21,7 @@ use Laminas\View\Model\ViewModel;
 
 use function array_key_exists;
 use function array_keys;
+use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
  * @method User user($user = null)
@@ -90,7 +95,7 @@ class PageController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        $page = $this->table->select(['id' => (int) $this->params('id')])->current();
+        $page = currentFromResultSetInterface($this->table->select(['id' => (int) $this->params('id')]));
         if (! $page) {
             return new ApiProblemResponse(new ApiProblem(404, 'Not found'));
         }
@@ -111,6 +116,7 @@ class PageController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function itemPutAction()
     {
@@ -118,7 +124,10 @@ class PageController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        $page = $this->table->select(['id' => (int) $this->params('id')])->current();
+        /** @var ResultSet $resultSet */
+        $resultSet = $this->table->select(['id' => (int) $this->params('id')]);
+        /** @var RowGatewayInterface $page */
+        $page = $resultSet->current();
         if (! $page) {
             return new ApiProblemResponse(new ApiProblem(404, 'Not found'));
         }
@@ -154,7 +163,10 @@ class PageController extends AbstractRestfulController
                     ])
                     ->order('position DESC')
                     ->limit(1);
-                $prevPage = $this->table->selectWith($select)->current();
+                /** @var ResultSet $resultSet */
+                $resultSet = $this->table->selectWith($select);
+                /** @var RowGatewayInterface $prevPage */
+                $prevPage = $resultSet->current();
 
                 if ($prevPage) {
                     $prevPagePos = $prevPage['position'];
@@ -179,7 +191,10 @@ class PageController extends AbstractRestfulController
                     ])
                     ->order('position ASC')
                     ->limit(1);
-                $nextPage = $this->table->selectWith($select)->current();
+                /** @var ResultSet $resultSet */
+                $resultSet = $this->table->selectWith($select);
+                /** @var RowGatewayInterface $nextPage */
+                $nextPage = $resultSet->current();
 
                 if ($nextPage) {
                     $nextPagePos = $nextPage['position'];
@@ -241,8 +256,9 @@ class PageController extends AbstractRestfulController
             ]);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -300,10 +316,11 @@ class PageController extends AbstractRestfulController
         $url = $this->url()->fromRoute('api/page/item/get', [
             'id' => $id,
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -315,15 +332,20 @@ class PageController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        $page = $this->table->select(['id' => (int) $this->params('id')])->current();
+        /** @var ResultSet $resultSet */
+        $resultSet = $this->table->select(['id' => (int) $this->params('id')]);
+        /** @var RowGatewayInterface $page */
+        $page = $resultSet->current();
+
         if (! $page) {
             return new ApiProblemResponse(new ApiProblem(404, 'Not found'));
         }
 
         $page->delete();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     public function parentsAction(): JsonModel
@@ -333,9 +355,9 @@ class PageController extends AbstractRestfulController
         $pageId = (int) $this->params()->fromQuery('id');
 
         do {
-            $row = $this->table->select([
+            $row = currentFromResultSetInterface($this->table->select([
                 'id' => $pageId,
-            ])->current();
+            ]));
 
             if ($row) {
                 $result[] = [

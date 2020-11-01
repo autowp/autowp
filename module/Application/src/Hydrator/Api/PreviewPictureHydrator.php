@@ -55,8 +55,6 @@ class PreviewPictureHydrator extends AbstractRestHydrator
             $this->userId = $userId;
         }
 
-        $this->getStrategy('picture')->setUserId($this->userId);
-
         return $this;
     }
 
@@ -98,7 +96,7 @@ class PreviewPictureHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

@@ -6,12 +6,13 @@ use Application\Service\TelegramService;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Exception;
-use Laminas\Db\ResultSet\ResultSet;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Paginator;
 
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function mb_strlen;
 use function trim;
@@ -64,17 +65,16 @@ class MessageService
             'readen'       => 0,
         ]);
 
-        if ($this->telegram) {
-            $this->telegram->notifyMessage($fromId, $toId, $message);
-        }
+        $this->telegram->notifyMessage($fromId, $toId, $message);
     }
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @throws Exception
      */
     public function getNewCount(int $userId): int
     {
-        $row = $this->table->select(
+        $row = currentFromResultSetInterface($this->table->select(
             /**
              * @suppress PhanPluginMixedKeyNoKey
              */
@@ -86,7 +86,7 @@ class MessageService
                         'NOT readen',
                     ]);
             }
-        )->current();
+        ));
 
         return $row ? (int) $row['count'] : 0;
     }
@@ -213,8 +213,11 @@ class MessageService
     {
         $select = $this->getSystemSelect($userId);
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -225,8 +228,11 @@ class MessageService
         $select = $this->getSystemSelect($userId)
             ->where('NOT readen');
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -236,8 +242,11 @@ class MessageService
     {
         $select = $this->getInboxSelect($userId);
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -248,8 +257,11 @@ class MessageService
         $select = $this->getInboxSelect($userId)
             ->where('NOT readen');
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -259,8 +271,11 @@ class MessageService
     {
         $select = $this->getDialogSelect($userId, $withUserId);
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -270,8 +285,11 @@ class MessageService
     {
         $select = $this->getSentSelect($userId);
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -288,10 +306,7 @@ class MessageService
         }
     }
 
-    /**
-     * @param ResultSet|array $rows
-     */
-    private function markReadenRows($rows, int $userId): void
+    private function markReadenRows(iterable $rows, int $userId): void
     {
         $ids = [];
         foreach ($rows as $message) {
@@ -310,8 +325,11 @@ class MessageService
     {
         $select = $this->getInboxSelect($userId);
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -335,8 +353,11 @@ class MessageService
     {
         $select = $this->getSentSelect($userId);
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -358,8 +379,11 @@ class MessageService
     {
         $select = $this->getSystemSelect($userId);
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -383,8 +407,11 @@ class MessageService
     {
         $select = $this->getDialogSelect($userId, $withUserId);
 
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -404,10 +431,9 @@ class MessageService
     }
 
     /**
-     * @param ResultSet|array $rows
      * @throws Exception
      */
-    private function prepareList(int $userId, $rows, array $options = []): array
+    private function prepareList(int $userId, iterable $rows, array $options = []): array
     {
         $defaults = [
             'allMessagesLink' => true,

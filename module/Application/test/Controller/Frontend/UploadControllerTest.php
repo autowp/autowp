@@ -1,11 +1,13 @@
 <?php
 
-namespace ApplicationTest\Frontend\Controller;
+namespace ApplicationTest\Controller\Frontend;
 
 use Application\Controller\Api\PictureController;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
-use Laminas\Http\Request;
+use Laminas\Http\Header\Location;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\Response;
 
 use function copy;
 use function count;
@@ -19,26 +21,20 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testUploadVehicle(): void
     {
-        /**
-         * @var Request $request
-         */
+        /** @var Request $request */
         $request = $this->getRequest();
         $request->getHeaders()
             ->addHeader(Data::getAdminAuthHeader())
             ->addHeaderLine('Content-Type', 'multipart/form-data');
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
+
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file     = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,
@@ -58,10 +54,13 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/picture/post');
         $this->assertActionName('post');
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
-        $id      = $parts[count($parts) - 1];
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
+        $id       = $parts[count($parts) - 1];
 
         $this->assertNotEmpty($id);
     }

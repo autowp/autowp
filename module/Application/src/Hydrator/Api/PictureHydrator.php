@@ -4,6 +4,8 @@ namespace Application\Hydrator\Api;
 
 use Application\Comments;
 use Application\DuplicateFinder;
+use Application\Hydrator\Api\Strategy\Ip;
+use Application\Hydrator\Api\Strategy\Items;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Picture;
@@ -131,7 +133,7 @@ class PictureHydrator extends AbstractRestHydrator
         $this->addStrategy('replaceable', $strategy);
         $this->addStrategy('siblings', $strategy);
 
-        $strategy = new Strategy\Ip($serviceManager);
+        $strategy = new Ip($serviceManager);
         $this->addStrategy('ip', $strategy);
 
         $strategy = new Strategy\Item($serviceManager);
@@ -189,8 +191,13 @@ class PictureHydrator extends AbstractRestHydrator
             $this->userRole = null;
         }
 
-        $this->getStrategy('ip')->setUserId($this->userId);
-        $this->getStrategy('items')->setUserId($this->userId);
+        /** @var Ip $strategy */
+        $strategy = $this->getStrategy('ip');
+        $strategy->setUserId($this->userId);
+
+        /** @var Items $strategy */
+        $strategy = $this->getStrategy('items');
+        $strategy->setUserId($this->userId);
 
         return $this;
     }
@@ -902,7 +909,7 @@ class PictureHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

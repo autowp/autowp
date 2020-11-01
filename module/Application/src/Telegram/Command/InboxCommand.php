@@ -3,11 +3,13 @@
 namespace Application\Telegram\Command;
 
 use Application\Model\Item;
+use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Telegram\Bot\Commands\Command;
 
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 
 class InboxCommand extends Command
 {
@@ -37,6 +39,7 @@ class InboxCommand extends Command
      * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      * @inheritDoc
      * @param mixed $arguments
+     * @throws Exception
      */
     public function handle($arguments)
     {
@@ -50,7 +53,7 @@ class InboxCommand extends Command
             ])
             ->limit(1);
 
-        $chatRow = $this->telegramChatTable->selectWith($select)->current();
+        $chatRow = currentFromResultSetInterface($this->telegramChatTable->selectWith($select));
 
         if (! $chatRow) {
             $this->replyWithMessage([
@@ -60,17 +63,17 @@ class InboxCommand extends Command
         }
 
         if ($arguments) {
-            $brandRow = $this->itemTable->select([
+            $brandRow = currentFromResultSetInterface($this->itemTable->select([
                 'name'         => (string) $arguments,
                 'item_type_id' => Item::BRAND,
-            ])->current();
+            ]));
 
             if ($brandRow) {
                 $primaryKey       = [
                     'item_id' => $brandRow['id'],
                     'chat_id' => $chatId,
                 ];
-                $telegramBrandRow = $this->telegramItemTable->select($primaryKey)->current();
+                $telegramBrandRow = currentFromResultSetInterface($this->telegramItemTable->select($primaryKey));
 
                 if ($telegramBrandRow && $telegramBrandRow['inbox']) {
                     $this->telegramItemTable->update(['inbox' => 0], $primaryKey);

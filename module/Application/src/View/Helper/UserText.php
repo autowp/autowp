@@ -5,12 +5,16 @@ namespace Application\View\Helper;
 use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User as UserModel;
+use Autowp\ZFComponents\View\Helper\HtmlA;
 use DateInterval;
 use DateTime;
 use Exception;
+use Laminas\I18n\View\Helper\Translate;
 use Laminas\Permissions\Acl\Acl;
 use Laminas\Uri;
 use Laminas\View\Helper\AbstractHtmlElement;
+use Laminas\View\Helper\EscapeHtml;
+use Laminas\View\Renderer\PhpRenderer;
 
 use function implode;
 use function in_array;
@@ -88,8 +92,12 @@ class UserText extends AbstractHtmlElement
 
     private function preparePlainText(string $text): string
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $out = $this->view->escapeHtml($text);
+        /** @var PhpRenderer $view */
+        $view = $this->view;
+        /** @var EscapeHtml $escapeHtmlHelper */
+        $escapeHtmlHelper = $view->getHelperPluginManager()->get('escapeHtml');
+
+        $out = $escapeHtmlHelper($text);
         $out = str_replace("\r", '', $out);
         $out = str_replace("\n", '<br />', $out);
         return $out;
@@ -135,8 +143,12 @@ class UserText extends AbstractHtmlElement
             }*/
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return '<a href="' . $this->view->escapeHtmlAttr($url) . '">' . $this->view->escapeHtml($url) . '</a>';
+        /** @var PhpRenderer $view */
+        $view = $this->view;
+        /** @var HtmlA $htmlAhelper */
+        $htmlAhelper = $view->getHelperPluginManager()->get('htmlA');
+
+        return $htmlAhelper($url, $url);
     }
 
     private function tryUserLink(Uri\Uri $uri): ?string
@@ -160,7 +172,6 @@ class UserText extends AbstractHtmlElement
             $user = $this->userModel->getRow(['id' => (int) $userId]);
 
             if ($user) {
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 return $this->renderUser($user);
             }
         }
@@ -171,7 +182,6 @@ class UserText extends AbstractHtmlElement
             ]);
 
             if ($user) {
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 return $this->renderUser($user);
             }
         }
@@ -180,8 +190,8 @@ class UserText extends AbstractHtmlElement
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @param array|ArrayAccess $user
+     * @throws Exception
      */
     private function renderUser($user): string
     {
@@ -189,10 +199,18 @@ class UserText extends AbstractHtmlElement
             return '';
         }
 
+        /** @var PhpRenderer $view */
+        $view = $this->view;
+        /** @var Translate $translateHelper */
+        $translateHelper = $view->getHelperPluginManager()->get('translate');
+        /** @var EscapeHtml $escapeHtmlHelper */
+        $escapeHtmlHelper = $view->getHelperPluginManager()->get('escapeHtml');
+        /** @var HtmlA $htmlAhelper */
+        $htmlAhelper = $view->getHelperPluginManager()->get('htmlA');
+
         if ($user['deleted']) {
             return '<span class="muted"><i class="fa fa-user" aria-hidden="true"></i> '
-                        . /* @phan-suppress-next-line PhanUndeclaredMethod */
-                        $this->view->escapeHtml($this->view->translate('deleted-user'))
+                        . $escapeHtmlHelper($translateHelper('deleted-user'))
                     . '</span>';
         }
 
@@ -216,8 +234,7 @@ class UserText extends AbstractHtmlElement
 
         return '<span class="' . implode(' ', $classes) . '">'
             . '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;'
-            . /* @phan-suppress-next-line PhanUndeclaredMethod */
-            $this->view->htmlA($url, $user['name'])
+            . $htmlAhelper($url, $user['name'])
         . '</span>';
     }
 

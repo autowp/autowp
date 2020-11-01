@@ -8,9 +8,11 @@ use Autowp\Commons\Db\Table\Row;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Paginator;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function is_string;
 use function method_exists;
 use function ucfirst;
@@ -117,7 +119,7 @@ class DayPictures
         return (bool) $this->currentDate;
     }
 
-    public function getCurrentDate(): DateTime
+    public function getCurrentDate(): ?DateTime
     {
         return $this->currentDate;
     }
@@ -180,7 +182,7 @@ class DayPictures
             ->order($this->orderColumn . ' desc')
             ->limit(1);
 
-        $lastPicture = $this->picture->getTable()->selectWith($select)->current();
+        $lastPicture = currentFromResultSetInterface($this->picture->getTable()->selectWith($select));
         if (! $lastPicture) {
             return null;
         }
@@ -227,7 +229,7 @@ class DayPictures
                 ]);
             }
 
-            $prevDatePicture = $this->picture->getTable()->selectWith($select)->current();
+            $prevDatePicture = currentFromResultSetInterface($this->picture->getTable()->selectWith($select));
 
             $prevDate = false;
             if ($prevDatePicture) {
@@ -248,10 +250,9 @@ class DayPictures
     }
 
     /**
-     * @return false|DateTime
      * @throws Exception
      */
-    public function getPrevDate()
+    public function getPrevDate(): ?DateTime
     {
         $this->calcPrevDate();
 
@@ -302,7 +303,7 @@ class DayPictures
                 ->order($this->orderColumn)
                 ->limit(1);
 
-            $nextDatePicture = $this->picture->getTable()->selectWith($select)->current();
+            $nextDatePicture = currentFromResultSetInterface($this->picture->getTable()->selectWith($select));
 
             $nextDate = false;
             if ($nextDatePicture) {
@@ -323,10 +324,9 @@ class DayPictures
     }
 
     /**
-     * @return false|DateTime
      * @throws Exception
      */
-    public function getNextDate()
+    public function getNextDate(): ?DateTime
     {
         $this->calcNextDate();
 
@@ -364,8 +364,10 @@ class DayPictures
         if (! isset($this->paginator)) {
             $select = $this->getCurrentDateSelect();
 
+            /** @var Adapter $adapter */
+            $adapter         = $this->picture->getTable()->getAdapter();
             $this->paginator = new Paginator\Paginator(
-                new Paginator\Adapter\DbSelect($select, $this->picture->getTable()->getAdapter())
+                new Paginator\Adapter\DbSelect($select, $adapter)
             );
         }
 
@@ -382,8 +384,10 @@ class DayPictures
             ),
         ]);
 
+        /** @var Adapter $adapter */
+        $adapter   = $this->picture->getTable()->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->picture->getTable()->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();

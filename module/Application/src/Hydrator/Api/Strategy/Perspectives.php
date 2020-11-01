@@ -13,7 +13,10 @@ class Perspectives extends AbstractHydratorStrategy
             $this->hydrator = new Hydrator();
         }
 
-        return $this->hydrator;
+        /** @var Hydrator $result */
+        $result = $this->hydrator;
+
+        return $result;
     }
 
     /**

@@ -9,6 +9,7 @@ use Autowp\User\Model\User;
 use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Mvc\Controller\AbstractController;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 use function array_replace;
@@ -71,8 +72,11 @@ class PictureVote extends AbstractPlugin
             'negative' => [],
         ];
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $user = $this->getController()->user()->get();
+        /** @var AbstractController $ctrl */
+        $ctrl = $this->getController();
+        /** @var \Autowp\User\Controller\Plugin\User $plugin */
+        $plugin = $ctrl->getPluginManager()->get('user');
+        $user   = $plugin->get();
 
         if ($user) {
             $select = new Sql\Select($this->voteTemplateTable->getTable());
@@ -100,15 +104,16 @@ class PictureVote extends AbstractPlugin
             return null;
         }
 
+        /** @var AbstractController $controller */
         $controller = $this->getController();
+        /** @var \Autowp\User\Controller\Plugin\User $userPlugin */
+        $userPlugin = $controller->getPluginManager()->get('user');
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        if (! $controller->user()->inheritsRole('moder')) {
+        if (! $userPlugin->inheritsRole('moder')) {
             return null;
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $user       = $controller->user()->get();
+        $user       = $userPlugin->get();
         $voteExists = $this->pictureModerVote->hasVote($picture['id'], $user['id']);
 
         $moderVotes = null;
@@ -130,12 +135,11 @@ class PictureVote extends AbstractPlugin
             'apiUrl'        => $controller->url()->fromRoute('api/picture/picture/update', [
                 'id' => $picture['id'],
             ]),
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-            'canVote'     => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
-            'voteExists'  => $voteExists,
-            'moderVotes'  => $moderVotes,
-            'voteOptions' => $this->getVoteOptions2(),
-            'voteUrl'     => $controller->url()->fromRoute('api/picture-moder-vote', [
+            'canVote'       => ! $voteExists && $userPlugin->isAllowed('picture', 'moder_vote'),
+            'voteExists'    => $voteExists,
+            'moderVotes'    => $moderVotes,
+            'voteOptions'   => $this->getVoteOptions2(),
+            'voteUrl'       => $controller->url()->fromRoute('api/picture-moder-vote', [
                 'id' => $picture['id'],
             ]),
         ];
@@ -151,15 +155,19 @@ class PictureVote extends AbstractPlugin
         }
 
         $canDelete = false;
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $user = $this->getController()->user()->get();
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        if ($this->getController()->user()->isAllowed('picture', 'remove')) {
+
+        /** @var AbstractController $controller */
+        $controller = $this->getController();
+        /** @var \Autowp\User\Controller\Plugin\User $userPlugin */
+        $userPlugin = $controller->getPluginManager()->get('user');
+
+        $user = $userPlugin->get();
+
+        if ($userPlugin->isAllowed('picture', 'remove')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $canDelete = true;
             }
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        } elseif ($this->getController()->user()->isAllowed('picture', 'remove_by_vote')) {
+        } elseif ($userPlugin->isAllowed('picture', 'remove_by_vote')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
                 $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);

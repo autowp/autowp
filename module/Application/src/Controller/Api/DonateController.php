@@ -7,6 +7,9 @@ use IntlDateFormatter;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 
+/**
+ * @method string language()
+ */
 class DonateController extends AbstractActionController
 {
     private CarOfDay $carOfDay;

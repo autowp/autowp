@@ -22,7 +22,6 @@ use function floor;
 
 /**
  * @method User user($user = null)
- * @method Storage imageStorage()
  * @method string language()
  * @method ViewModel forbiddenAction()
  */
@@ -42,13 +41,16 @@ class GalleryController extends AbstractRestfulController
 
     private int $itemsPerPage = 10;
 
+    private Storage $imageStorage;
+
     public function __construct(
         Picture $picture,
         PictureItem $pictureItem,
         Item $itemModel,
         CommentsService $comments,
         PictureNameFormatter $pictureNameFormatter,
-        ItemNameFormatter $itemNameFormatter
+        ItemNameFormatter $itemNameFormatter,
+        Storage $imageStorage
     ) {
         $this->picture              = $picture;
         $this->pictureItem          = $pictureItem;
@@ -56,6 +58,7 @@ class GalleryController extends AbstractRestfulController
         $this->comments             = $comments;
         $this->pictureNameFormatter = $pictureNameFormatter;
         $this->itemNameFormatter    = $itemNameFormatter;
+        $this->imageStorage         = $imageStorage;
     }
 
     /**
@@ -153,8 +156,6 @@ class GalleryController extends AbstractRestfulController
                 break;
         }
 
-        $imageStorage = $this->imageStorage();
-
         $language = $this->language();
 
         if ($pictureIdentity) {
@@ -210,7 +211,7 @@ class GalleryController extends AbstractRestfulController
             $imageId            = (int) $picture['image_id'];
             $fullRequests[$idx] = $imageId;
 
-            $crop = $imageStorage->getImageCrop($imageId);
+            $crop = $this->imageStorage->getImageCrop($imageId);
 
             if ($crop) {
                 $cropRequests[$idx] = $imageId;
@@ -221,9 +222,9 @@ class GalleryController extends AbstractRestfulController
         }
 
         // images
-        $images         = $imageStorage->getImages($imageIds);
-        $fullImagesInfo = $imageStorage->getFormatedImages($fullRequests, 'picture-gallery-full');
-        $cropImagesInfo = $imageStorage->getFormatedImages($cropRequests, 'picture-gallery');
+        $images         = $this->imageStorage->getImages($imageIds);
+        $fullImagesInfo = $this->imageStorage->getFormatedImages($fullRequests, 'picture-gallery-full');
+        $cropImagesInfo = $this->imageStorage->getFormatedImages($cropRequests, 'picture-gallery');
 
         // names
         $names = $this->picture->getNameData($rows, [

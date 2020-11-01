@@ -5,6 +5,8 @@ namespace Application\Model;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
+use function Autowp\Commons\currentFromResultSetInterface;
+
 class UserPicture
 {
     private TableGateway $pictureTable;
@@ -64,7 +66,7 @@ class UserPicture
                 'status'   => Picture::STATUS_ACCEPTED,
             ]);
 
-        $row = $this->pictureTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->pictureTable->selectWith($select));
 
         $this->userTable->update([
             'pictures_total' => $row ? $row['count'] : 0,

@@ -8,6 +8,7 @@ use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function ceil;
 use function count;
 use function round;
@@ -51,19 +52,21 @@ class Votings
             return false;
         }
 
-        $voted = $this->voteTable->select(function (Sql\Select $select) use ($voting, $userId): void {
-            $select
-                ->join(
-                    'voting_variant',
-                    'voting_variant_vote.voting_variant_id = voting_variant.id',
-                    []
-                )
-                ->where([
-                    'voting_variant.voting_id'    => $voting['id'],
-                    'voting_variant_vote.user_id' => $userId,
-                ])
-                ->limit(1);
-        })->current();
+        $voted = currentFromResultSetInterface(
+            $this->voteTable->select(function (Sql\Select $select) use ($voting, $userId): void {
+                $select
+                    ->join(
+                        'voting_variant',
+                        'voting_variant_vote.voting_variant_id = voting_variant.id',
+                        []
+                    )
+                    ->where([
+                        'voting_variant.voting_id'    => $voting['id'],
+                        'voting_variant_vote.user_id' => $userId,
+                    ])
+                    ->limit(1);
+            })
+        );
 
         if ($voted) {
             return false;
@@ -74,13 +77,11 @@ class Votings
 
     /**
      * @throws Exception
-     * @return array<string, mixed>
+     * @return ?array<string, mixed>
      */
     public function getVoting(int $id, int $filter, int $userId): ?array
     {
-        $voting = $this->votingTable->select([
-            'id' => $id,
-        ])->current();
+        $voting = currentFromResultSetInterface($this->votingTable->select(['id' => $id]));
 
         if (! $voting) {
             return null;
@@ -97,7 +98,7 @@ class Votings
         foreach ($vvRows as $vvRow) {
             switch ($filter) {
                 case 1:
-                    $row = $this->voteTable->select(
+                    $row = currentFromResultSetInterface($this->voteTable->select(
                         /**
                          * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
                          */
@@ -110,8 +111,8 @@ class Votings
                                     'users.pictures_added > 100',
                                 ]);
                         }
-                    )->current();
-                    $votes = (int) $row['count'];
+                    ));
+                    $votes = $row ? (int) $row['count'] : 0;
                     break;
 
                 default:
@@ -168,12 +169,13 @@ class Votings
 
     /**
      * @return array<int, array<string, int>>
+     * @throws Exception
      */
     public function getVotes(int $id): array
     {
-        $variant = $this->variantTable->select([
+        $variant = currentFromResultSetInterface($this->variantTable->select([
             'id' => $id,
-        ])->current();
+        ]));
 
         if (! $variant) {
             return [];
@@ -198,9 +200,7 @@ class Votings
      */
     public function vote(int $id, array $variantId, int $userId): bool
     {
-        $voting = $this->votingTable->select([
-            'id' => $id,
-        ])->current();
+        $voting = currentFromResultSetInterface($this->votingTable->select(['id' => $id]));
 
         if (! $voting) {
             return false;
@@ -226,10 +226,10 @@ class Votings
         }
 
         foreach ($vvRows as $vvRow) {
-            $vvvRow = $this->voteTable->select([
+            $vvvRow = currentFromResultSetInterface($this->voteTable->select([
                 'voting_variant_id' => $vvRow['id'],
                 'user_id'           => $userId,
-            ])->current();
+            ]));
             if (! $vvvRow) {
                 $this->voteTable->insert([
                     'voting_variant_id' => $vvRow['id'],
@@ -248,7 +248,7 @@ class Votings
 
     private function updateVariantVotesCount(int $variantId): void
     {
-        $count = $this->voteTable->select(
+        $count = currentFromResultSetInterface($this->voteTable->select(
             /**
              * @suppress PhanDeprecatedFunction
              */
@@ -257,10 +257,10 @@ class Votings
                     ->columns(['count' => new Sql\Expression('count(1)')])
                     ->where(['voting_variant_id' => $variantId]);
             }
-        )->current();
+        ));
 
         $this->variantTable->update([
-            'votes' => $count['count'],
+            'votes' => $count ? $count['count'] : 0,
         ], [
             'id' => $variantId,
         ]);
@@ -268,7 +268,7 @@ class Votings
 
     private function updateVotingVotesCount(int $votingId): void
     {
-        $count = $this->voteTable->select(
+        $count = currentFromResultSetInterface($this->voteTable->select(
             /**
              * @suppress PhanDeprecatedFunction
              */
@@ -278,9 +278,9 @@ class Votings
                     ->join('voting_variant', 'voting_variant_vote.voting_variant_id = voting_variant.id', [])
                     ->where(['voting_variant.voting_id' => $votingId]);
             }
-        )->current();
+        ));
         $this->votingTable->update([
-            'votes' => $count['count'],
+            'votes' => $count ? $count['count'] : 0,
         ], [
             'id' => $votingId,
         ]);
@@ -288,9 +288,7 @@ class Votings
 
     public function isVotingExists(int $votingId): bool
     {
-        $voting = $this->votingTable->select([
-            'id' => $votingId,
-        ])->current();
+        $voting = currentFromResultSetInterface($this->votingTable->select(['id' => $votingId]));
 
         return (bool) $voting;
     }

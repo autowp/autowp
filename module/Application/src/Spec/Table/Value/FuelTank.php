@@ -3,6 +3,8 @@
 namespace Application\Spec\Table\Value;
 
 use ArrayAccess;
+use Laminas\I18n\View\Helper\Translate;
+use Laminas\View\Helper\EscapeHtml;
 use Laminas\View\Renderer\PhpRenderer;
 
 class FuelTank
@@ -33,9 +35,13 @@ class FuelTank
         }
 
         if ($html) {
-            $html .= ' <span class="unit" title="">'
-                         . /* @phan-suppress-next-line PhanUndeclaredMethod */
-                         $view->escapeHtml($view->translate('specs/unit/12/abbr'))
+            /** @var Translate $translateHelper */
+            $translateHelper = $view->getHelperPluginManager()->get('translate');
+            /** @var EscapeHtml $escapeHtmlHelper */
+            $escapeHtmlHelper = $view->getHelperPluginManager()->get('escapeHtml');
+
+            $html .= ' <span class="unit">'
+                         . $escapeHtmlHelper($translateHelper('specs/unit/12/abbr'))
                      . '</span>';
         }
 

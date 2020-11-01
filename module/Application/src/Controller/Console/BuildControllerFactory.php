@@ -3,6 +3,7 @@
 namespace Application\Controller\Console;
 
 use Application\Model\Brand;
+use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -18,7 +19,8 @@ class BuildControllerFactory implements FactoryInterface
         $config = $container->get('Config')['fileStorage'];
         return new BuildController(
             $container->get(Brand::class),
-            $config
+            $config,
+            $container->get(Storage::class)
         );
     }
 }

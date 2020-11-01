@@ -2,9 +2,11 @@
 
 namespace Autowp\User\Model;
 
+use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function md5;
 use function uniqid;
 
@@ -30,33 +32,35 @@ class UserPasswordRemind
     public function deleteToken(string $token): void
     {
         $this->table->delete([
-            'hash = ?' => $token,
+            'hash' => $token,
         ]);
     }
 
     /**
      * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @throws Exception
      */
     public function getUserId(string $token): int
     {
-        $uprRow = $this->table->select([
-            'hash = ?' => $token,
+        $uprRow = currentFromResultSetInterface($this->table->select([
+            'hash' => $token,
             'created > DATE_SUB(NOW(), INTERVAL 10 DAY)',
-        ])->current();
+        ]));
 
         return $uprRow ? (int) $uprRow['user_id'] : 0;
     }
 
     /**
      * @suppress PhanUndeclaredMethod, PhanDeprecatedFunction
+     * @throws Exception
      */
     public function createToken(int $userId): string
     {
         do {
             $token  = md5($this->salt . uniqid());
-            $exists = (bool) $this->table->select([
+            $exists = (bool) currentFromResultSetInterface($this->table->select([
                 'hash' => $token,
-            ])->current();
+            ]));
         } while ($exists);
 
         $this->table->insert([

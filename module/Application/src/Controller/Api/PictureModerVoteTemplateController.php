@@ -6,11 +6,14 @@ use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+
+use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
  * @method User user($user = null)
@@ -79,7 +82,7 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
                 'id'      => (int) $this->params('id'),
             ]);
 
-        $row = $this->table->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->table->selectWith($select));
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -105,8 +108,9 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
             'id'      => (int) $this->params('id'),
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     /**
@@ -138,14 +142,14 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
 
         $id = $this->table->getLastInsertValue();
 
-        $this->getResponse()->getHeaders()->addHeaderLine(
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine(
             'Location',
             $this->url()->fromRoute('api/picture-moder-vote-template/item/get', [
                 'id' => $id,
             ])
         );
-
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 }

@@ -28,7 +28,6 @@ return [
         'invokables' => [
             'pageTitle' => View\Helper\PageTitle::class,
             'markdown'  => View\Helper\Markdown::class,
-            'img'       => View\Helper\Img::class,
             'count'     => View\Helper\Count::class,
             'favicons'  => View\Helper\Favicons::class,
         ],
@@ -36,6 +35,7 @@ return [
             'car'           => View\Helper\Service\CarFactory::class,
             'fileSize'      => View\Helper\Service\FileSizeFactory::class,
             'hostManager'   => View\Helper\Service\HostManagerFactory::class,
+            'img'           => View\Helper\Service\ImgFactory::class,
             'inlinePicture' => View\Helper\Service\InlinePictureFactory::class,
             'language'      => View\Helper\Service\LanguageFactory::class,
             'page'          => View\Helper\Service\PageFactory::class,

@@ -4,6 +4,7 @@ namespace Application\Model;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Adapter\Exception\InvalidQueryException;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
@@ -171,8 +172,10 @@ class Log
             $select->where(['log_events.user_id = ?' => $userId]);
         }
 
+        /** @var Adapter $adapter */
+        $adapter   = $this->eventTable->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->eventTable->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator

@@ -8,6 +8,7 @@ use Exception;
 use GuzzleHttp\Client;
 use Laminas\Json\Json;
 
+use function count;
 use function explode;
 use function in_array;
 use function parse_url;
@@ -60,7 +61,7 @@ class Referer
         $accept = trim($accept);
         if ($accept) {
             $medias = explode(',', $accept);
-            if ($medias) {
+            if (count($medias) > 0) {
                 $firstMedia = trim($medias[0]);
                 if (in_array($firstMedia, ['image/png'])) {
                     $result = true;

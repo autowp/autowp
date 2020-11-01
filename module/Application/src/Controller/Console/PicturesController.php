@@ -37,7 +37,7 @@ class PicturesController extends AbstractActionController
     public function fillPointAction(): void
     {
         $console      = Console::getInstance();
-        $imageStorage = $this->imageStorage();
+        $imageStorage = $this->imageStorage;
 
         $rows = $this->picture->getRows([
             'has_point' => false,

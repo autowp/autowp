@@ -3,6 +3,7 @@
 namespace Application\Controller\Console;
 
 use Application\Model\Brand;
+use Autowp\Image\Storage;
 use Aws\S3\S3Client;
 use Laminas\Mvc\Controller\AbstractActionController;
 
@@ -15,10 +16,13 @@ class BuildController extends AbstractActionController
 
     private array $fileStorageConfig;
 
-    public function __construct(Brand $brand, array $fileStorageConfig)
+    private Storage $imageStorage;
+
+    public function __construct(Brand $brand, array $fileStorageConfig, Storage $imageStorage)
     {
         $this->brand             = $brand;
         $this->fileStorageConfig = $fileStorageConfig;
+        $this->imageStorage      = $imageStorage;
     }
 
     public function brandsSpriteAction(): string
@@ -31,7 +35,7 @@ class BuildController extends AbstractActionController
         }
 
         $this->brand->createIconsSprite(
-            $this->imageStorage(),
+            $this->imageStorage,
             new S3Client($s3Config),
             $this->fileStorageConfig['bucket']
         );

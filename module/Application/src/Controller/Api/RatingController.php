@@ -17,6 +17,9 @@ use function arsort;
 
 use const SORT_NUMERIC;
 
+/**
+ * @method string language()
+ */
 class RatingController extends AbstractActionController
 {
     private StorageInterface $cache;

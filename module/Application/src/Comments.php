@@ -16,6 +16,7 @@ use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Uri\Uri;
 
 use function array_walk;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function implode;
 use function ltrim;
 use function sprintf;
@@ -111,7 +112,7 @@ class Comments
                 break;
 
             case self::ITEM_TYPE_ID:
-                $item = $this->itemTable->select(['id' => (int) $message['item_id']])->current();
+                $item = currentFromResultSetInterface($this->itemTable->select(['id' => (int) $message['item_id']]));
                 if (! $item) {
                     throw new Exception("Item `{$message['item_id']}` not found");
                 }
@@ -136,9 +137,7 @@ class Comments
                 break;
 
             case self::ARTICLES_TYPE_ID:
-                $article = $this->articleTable->select([
-                    'id = ?' => $message['item_id'],
-                ])->current();
+                $article = currentFromResultSetInterface($this->articleTable->select(['id' => $message['item_id']]));
                 if (! $article) {
                     throw new Exception("Article `{$message['item_id']}` not found");
                 }

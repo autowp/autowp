@@ -9,6 +9,7 @@ use Application\Model\VehicleType;
 use Exception;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
+use Laminas\Http\PhpEnvironment\Request;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Stdlib\ResponseInterface;
@@ -56,8 +57,10 @@ class BrandsController extends AbstractActionController
 
     public function indexAction(): JsonModel
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $isHttps = (bool) $this->getRequest()->getServer('HTTPS');
+        /** @var Request $request */
+        $request = $this->getRequest();
+
+        $isHttps = (bool) $request->getServer('HTTPS');
 
         $language = $this->language();
 

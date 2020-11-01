@@ -76,7 +76,9 @@ class PictureItemHydrator extends AbstractRestHydrator
             $this->userId   = $userId;
             $this->userRole = null;
 
-            $this->getStrategy('item')->setUserId($userId);
+            /** @var Strategy\Item $strategy */
+            $strategy = $this->getStrategy('item');
+            $strategy->setUserId($userId);
         }
 
         return $this;
@@ -148,7 +150,7 @@ class PictureItemHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

@@ -16,6 +16,7 @@ use Application\Model\UserPicture;
 use Application\Service\PictureService;
 use Application\Service\TelegramService;
 use Autowp\Comments\CommentsService;
+use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service;
 use Autowp\User\Model\User;
@@ -55,7 +56,8 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(User::class),
             $container->get(PictureService::class),
             $container->get(Catalogue::class),
-            $container->get(PictureView::class)
+            $container->get(PictureView::class),
+            $container->get(Storage::class)
         );
     }
 }

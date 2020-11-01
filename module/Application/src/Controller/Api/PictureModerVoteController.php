@@ -15,11 +15,13 @@ use Autowp\User\Model\User;
 use Exception;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Form\Form;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function htmlspecialchars;
 use function sprintf;
 use function urlencode;
@@ -157,7 +159,7 @@ class PictureModerVoteController extends AbstractRestfulController
      *
      * @param string $id
      * @param mixed  $data
-     * @return ViewModel|array
+     * @return ViewModel|array|Response
      * @throws Exception
      */
     public function update($id, $data)
@@ -175,15 +177,17 @@ class PictureModerVoteController extends AbstractRestfulController
         $voteExists = $this->pictureModerVote->hasVote($picture['id'], $user['id']);
 
         if ($voteExists) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-            return $this->getResponse()->setStatusCode(400);
+            /** @var Response $response */
+            $response = $this->getResponse();
+            return $response->setStatusCode(Response::STATUS_CODE_400);
         }
 
         $this->voteForm->setData($data);
 
         if (! $this->voteForm->isValid()) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-            $this->getResponse()->setStatusCode(400);
+            /** @var Response $response */
+            $response = $this->getResponse();
+            $response->setStatusCode(Response::STATUS_CODE_400);
             return new JsonModel([
                 'details' => $this->voteForm->getMessages(),
             ]);
@@ -208,10 +212,10 @@ class PictureModerVoteController extends AbstractRestfulController
         }
 
         if ($values['save']) {
-            $row = $this->templateTable->select([
+            $row = currentFromResultSetInterface($this->templateTable->select([
                 'user_id' => $user['id'],
                 'reason'  => $values['reason'],
-            ])->current();
+            ]));
             if (! $row) {
                 $this->templateTable->insert([
                     'user_id' => $user['id'],
@@ -233,8 +237,9 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $this->notifyVote($picture, $vote, $values['reason']);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->setStatusCode(Response::STATUS_CODE_200);
 
         return new JsonModel([
             'status' => true,
@@ -275,7 +280,8 @@ class PictureModerVoteController extends AbstractRestfulController
             'pictures' => $picture['id'],
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 }

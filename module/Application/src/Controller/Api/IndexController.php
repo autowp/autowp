@@ -17,6 +17,7 @@ use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
+use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
 
@@ -338,8 +339,9 @@ class IndexController extends AbstractRestfulController
     public function itemOfDayAction(): JsonModel
     {
         $language = $this->language();
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $httpsFlag = $this->getRequest()->getUri()->getScheme();
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $httpsFlag = $request->getUri()->getScheme();
 
         $itemOfDay = $this->itemOfDay->getCurrent();
 

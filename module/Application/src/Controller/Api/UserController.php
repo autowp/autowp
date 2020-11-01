@@ -16,6 +16,8 @@ use Exception;
 use Imagick;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Permissions\Acl\Acl;
@@ -37,7 +39,6 @@ use function sprintf;
  * @method ViewModel forbiddenAction()
  * @method string language()
  * @method void log(string $message, array $objects)
- * @method Storage imageStorage()
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */
 class UserController extends AbstractRestfulController
@@ -70,6 +71,8 @@ class UserController extends AbstractRestfulController
     /** @var array<string, mixed> */
     private array $hosts;
 
+    private Storage $imageStorage;
+
     public function __construct(
         Acl $acl,
         AbstractRestHydrator $hydrator,
@@ -83,7 +86,8 @@ class UserController extends AbstractRestfulController
         array $recaptcha,
         bool $captchaEnabled,
         UserRename $userRename,
-        array $hosts
+        array $hosts,
+        Storage $imageStorage
     ) {
         $this->acl                  = $acl;
         $this->hydrator             = $hydrator;
@@ -98,6 +102,7 @@ class UserController extends AbstractRestfulController
         $this->captchaEnabled       = $captchaEnabled;
         $this->userRename           = $userRename;
         $this->hosts                = $hosts;
+        $this->imageStorage         = $imageStorage;
     }
 
     /**
@@ -294,12 +299,6 @@ class UserController extends AbstractRestfulController
                         ])
                     );
                 }
-
-                $can = true;
-            }
-
-            if (! $can) {
-                return $this->forbiddenAction();
             }
 
             if ($values['deleted'] && ! $row['deleted']) {
@@ -406,8 +405,9 @@ class UserController extends AbstractRestfulController
             $this->userService->setPassword($row, $values['password']);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -443,7 +443,7 @@ class UserController extends AbstractRestfulController
                 'id' => $row['id'],
             ]);
 
-            $this->imageStorage()->removeImage($oldImageId);
+            $this->imageStorage->removeImage($oldImageId);
         }
 
         $this->log(sprintf(
@@ -453,8 +453,9 @@ class UserController extends AbstractRestfulController
             'users' => $row['id'],
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     /**
@@ -462,11 +463,11 @@ class UserController extends AbstractRestfulController
      */
     public function postAction()
     {
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -478,8 +479,7 @@ class UserController extends AbstractRestfulController
                 $captchaResponse = (string) $data['captcha'];
             }
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-            $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
+            $result = $recaptcha->verify($captchaResponse, $request->getServer('REMOTE_ADDR'));
 
             if (! $result->isSuccess()) {
                 return new ApiProblemResponse(
@@ -501,7 +501,6 @@ class UserController extends AbstractRestfulController
 
         $values = $this->postInputFilter->getValues();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $ip = $request->getServer('REMOTE_ADDR');
         if (! $ip) {
             $ip = '127.0.0.1';
@@ -517,10 +516,11 @@ class UserController extends AbstractRestfulController
         $url = $this->url()->fromRoute('api/user/user/item', [
             'id' => $user['id'],
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     public function onlineAction(): JsonModel
@@ -595,7 +595,10 @@ class UserController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $data = $this->getRequest()->getFiles()->toArray(); // @phan-suppress-current-line PhanUndeclaredMethod
+        /** @var Request $request */
+        $request = $this->getRequest();
+
+        $data = $request->getFiles()->toArray(); // @phan-suppress-current-line PhanUndeclaredMethod
 
         $this->postPhotoInputFilter->setData($data);
         if (! $this->postPhotoInputFilter->isValid()) {
@@ -604,17 +607,16 @@ class UserController extends AbstractRestfulController
 
         $values = $this->postPhotoInputFilter->getValues();
 
-        $imageStorage = $this->imageStorage();
-        $imageSampler = $imageStorage->getImageSampler();
+        $imageSampler = $this->imageStorage->getImageSampler();
 
         $imagick = new Imagick();
         if (! $imagick->readImage($values['file']['tmp_name'])) {
             throw new Exception("Error loading image");
         }
-        $format = $imageStorage->getFormat('photo');
+        $format = $this->imageStorage->getFormat('photo');
         $imageSampler->convertImagick($imagick, null, $format);
 
-        $newImageId = $imageStorage->addImageFromImagick($imagick, 'user', [
+        $newImageId = $this->imageStorage->addImageFromImagick($imagick, 'user', [
             's3' => true,
         ]);
 
@@ -629,11 +631,12 @@ class UserController extends AbstractRestfulController
         ]);
 
         if ($oldImageId) {
-            $imageStorage->removeImage($oldImageId);
+            $this->imageStorage->removeImage($oldImageId);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -641,11 +644,11 @@ class UserController extends AbstractRestfulController
      */
     public function emailcheckAction()
     {
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -656,7 +659,8 @@ class UserController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(400, 'Code is invalid'));
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 }

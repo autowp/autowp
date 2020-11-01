@@ -9,7 +9,9 @@ use Application\Model\CarOfDay;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
 use Exception;
-use Laminas\Http\Request;
+use Laminas\Http\Header\Location;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\Response;
 use Laminas\Json\Json;
 
 use function copy;
@@ -44,7 +46,6 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function addPictureToItem(int $vehicleId): int
@@ -53,18 +54,18 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
         $this->mockDuplicateFinder();
 
+        /** @var Request $request */
         $request = $this->getRequest();
         $request->getHeaders()
             ->addHeader(Data::getAdminAuthHeader())
             ->addHeaderLine('Content-Type', 'multipart/form-data');
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
+
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file     = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,
@@ -84,21 +85,25 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/picture/post');
         $this->assertActionName('post');
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function createItem(array $params): int
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -107,20 +112,24 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/item/post');
         $this->assertActionName('post');
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function getItemById(int $itemId): array
     {
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item/' . $itemId, Request::METHOD_GET, [
             'fields' => 'total_pictures,begin_year,end_year',
         ]);
@@ -135,14 +144,15 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function acceptPicture(int $pictureId): void
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch(
             'https://www.autowp.ru/api/picture/' . $pictureId,
             Request::METHOD_PUT,
@@ -156,12 +166,11 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('update');
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testGetList(): void
     {
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('http://www.autowp.ru/api/picture', Request::METHOD_GET, [
             'fields' => 'owner,thumb_medium,add_date,exif,image,items.item.name_html,'
                         . 'items.item.brands.name_html,special_name,copyrights,'

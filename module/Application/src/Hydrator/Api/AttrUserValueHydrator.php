@@ -16,6 +16,7 @@ use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
 use function array_reverse;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function is_array;
 
 class AttrUserValueHydrator extends AbstractRestHydrator
@@ -69,8 +70,13 @@ class AttrUserValueHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->getStrategy('user')->setUserId($userId);
-        $this->getStrategy('item')->setUserId($userId);
+        /** @var Strategy\User $strategy */
+        $strategy = $this->getStrategy('user');
+        $strategy->setUserId($userId);
+
+        /** @var Strategy\Item $strategy */
+        $strategy = $this->getStrategy('item');
+        $strategy->setUserId($userId);
 
         return $this;
     }
@@ -120,13 +126,13 @@ class AttrUserValueHydrator extends AbstractRestHydrator
             $attributeTable = $this->specService->getAttributeTable();
 
             $path      = [];
-            $attribute = $attributeTable->select(['id' => $object['attribute_id']])->current();
+            $attribute = currentFromResultSetInterface($attributeTable->select(['id' => $object['attribute_id']]));
             if ($attribute) {
                 $parents = [];
                 $parent  = $attribute;
                 do {
                     $parents[] = $parent['name'];
-                    $parent    = $attributeTable->select(['id' => $parent['parent_id']])->current();
+                    $parent    = currentFromResultSetInterface($attributeTable->select(['id' => $parent['parent_id']]));
                 } while ($parent);
 
                 $path = array_reverse($parents);
@@ -169,7 +175,7 @@ class AttrUserValueHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

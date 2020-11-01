@@ -3,6 +3,7 @@
 namespace Application\Spec\Table\Value;
 
 use ArrayAccess;
+use Laminas\View\Helper\EscapeHtml;
 use Laminas\View\Renderer\PhpRenderer;
 
 use function sprintf;
@@ -54,7 +55,9 @@ class Wheel
             );
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $view->escapeHtml($diskName) . '<br />' . $view->escapeHtml($tyreName);
+        /** @var EscapeHtml $escapeHtmlHelper */
+        $escapeHtmlHelper = $view->getHelperPluginManager()->get('escapeHtml');
+
+        return $escapeHtmlHelper($diskName) . '<br />' . $escapeHtmlHelper($tyreName);
     }
 }

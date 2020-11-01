@@ -19,6 +19,7 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Mail;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function md5;
 use function microtime;
 use function round;
@@ -127,7 +128,7 @@ class UsersService
 
     /**
      * @suppress PhanDeprecatedFunction
-     * @return ArrayObject|array
+     * @return ArrayObject|array|null
      * @throws Exception
      */
     public function addUser(array $values, string $language)
@@ -203,12 +204,12 @@ class UsersService
             return null;
         }
 
-        $user = $this->userModel->getTable()->select([
+        $user = currentFromResultSetInterface($this->userModel->getTable()->select([
             'not deleted',
             'email_check_code' => (string) $code,
             new Sql\Predicate\Expression('LENGTH(email_check_code)'),
             new Sql\Predicate\Expression('LENGTH(email_to_check)'),
-        ])->current();
+        ]));
 
         if (! $user) {
             return null;
@@ -380,10 +381,10 @@ class UsersService
 
     public function checkPassword(int $userId, string $password): bool
     {
-        return (bool) $this->userModel->getTable()->select([
+        return (bool) currentFromResultSetInterface($this->userModel->getTable()->select([
             'id'       => $userId,
             'password' => $this->getPasswordHashExpr($password),
-        ])->current();
+        ]));
     }
 
     /**

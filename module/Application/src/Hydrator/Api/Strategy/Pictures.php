@@ -16,7 +16,10 @@ class Pictures extends AbstractHydratorStrategy
             $this->hydrator = new Hydrator($this->serviceManager);
         }
 
-        return $this->hydrator;
+        /** @var Hydrator $result */
+        $result = $this->hydrator;
+
+        return $result;
     }
 
     /**

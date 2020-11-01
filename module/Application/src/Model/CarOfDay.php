@@ -11,6 +11,7 @@ use DateTime;
 use Exception;
 use Facebook;
 use GuzzleHttp\Exception\BadResponseException;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\Client;
 use Laminas\Http\Request;
@@ -22,6 +23,7 @@ use League\OAuth1\Client\Server\Twitter;
 use function array_merge;
 use function array_replace;
 use function array_shift;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function mb_strtoupper;
 use function mb_substr;
@@ -89,8 +91,9 @@ class CarOfDay
             LIMIT 1
         ';
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, 5]);
+        /** @var Adapter $adapter */
+        $adapter   = $this->table->getAdapter();
+        $resultSet = $adapter->query($sql, [Picture::STATUS_ACCEPTED, 5]);
         $row       = $resultSet->current();
 
         return $row ? (int) $row['id'] : 0;
@@ -113,6 +116,7 @@ class CarOfDay
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getCurrent(): ?array
     {
@@ -121,7 +125,7 @@ class CarOfDay
             ->order('day_date DESC')
             ->limit(1);
 
-        $row = $this->table->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->table->selectWith($select));
 
         return $row ? [
             'item_id' => $row['item_id'],
@@ -151,12 +155,15 @@ class CarOfDay
         return $fc . mb_substr($str, 1);
     }
 
+    /**
+     * @throws Exception
+     */
     public function putCurrentToTwitter(array $twOptions): void
     {
-        $dayRow = $this->table->select([
+        $dayRow = currentFromResultSetInterface($this->table->select([
             'day_date = CURDATE()',
             'not twitter_sent',
-        ])->current();
+        ]));
 
         if (! $dayRow) {
             print 'Day row not found or already sent' . PHP_EOL;
@@ -184,7 +191,7 @@ class CarOfDay
         }
 
         if (! $picture) {
-            $picture = $this->pictureByPerspective($car['id'], false);
+            $picture = $this->pictureByPerspective($car['id'], null);
         }
 
         if (! $picture) {
@@ -248,10 +255,10 @@ class CarOfDay
 
     public function putCurrentToFacebook(array $fbOptions): void
     {
-        $dayRow = $this->table->select([
+        $dayRow = currentFromResultSetInterface($this->table->select([
             'day_date = CURDATE()',
             'not facebook_sent',
-        ])->current();
+        ]));
 
         if (! $dayRow) {
             print 'Day row not found or already sent' . PHP_EOL;
@@ -279,7 +286,7 @@ class CarOfDay
         }
 
         if (! $picture) {
-            $picture = $this->pictureByPerspective($car['id'], false);
+            $picture = $this->pictureByPerspective($car['id'], null);
         }
 
         if (! $picture) {
@@ -331,10 +338,10 @@ class CarOfDay
     {
         $language = 'ru';
 
-        $dayRow = $this->table->select([
+        $dayRow = currentFromResultSetInterface($this->table->select([
             'day_date = CURDATE()',
             'not vk_sent',
-        ])->current();
+        ]));
 
         if (! $dayRow) {
             print 'Day row not found or already sent' . PHP_EOL;
@@ -362,7 +369,7 @@ class CarOfDay
         }
 
         if (! $picture) {
-            $picture = $this->pictureByPerspective($car['id'], false);
+            $picture = $this->pictureByPerspective($car['id'], null);
         }
 
         if (! $picture) {
@@ -425,10 +432,10 @@ class CarOfDay
         $result = [];
 
         for ($i = 0; $i < 10; $i++) {
-            $dayRow = $this->table->select([
+            $dayRow = currentFromResultSetInterface($this->table->select([
                 'day_date' => $now->format('Y-m-d'),
                 'item_id is not null',
-            ])->current();
+            ]));
 
             $result[] = [
                 'date' => clone $now,
@@ -569,7 +576,7 @@ class CarOfDay
                 ->group(['ipc_ancestor.sport', 'ipc_ancestor.tuning', 'mp.position'])
                 ->limit(1);
 
-            $picture = $this->picture->getTable()->selectWith($select)->current();
+            $picture = currentFromResultSetInterface($this->picture->getTable()->selectWith($select));
 
             if ($picture) {
                 $pictures[] = $picture;
@@ -632,8 +639,9 @@ class CarOfDay
             HAVING p_count >= ?
             LIMIT 1
         ';
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, $itemId, 3]);
+        /** @var Adapter $adapter */
+        $adapter   = $this->table->getAdapter();
+        $resultSet = $adapter->query($sql, [Picture::STATUS_ACCEPTED, $itemId, 3]);
         $row       = $resultSet->current();
 
         return (bool) $row;
@@ -651,7 +659,7 @@ class CarOfDay
             'day_date' => $dateStr,
         ];
 
-        $dayRow = $this->table->select($primaryKey)->current();
+        $dayRow = currentFromResultSetInterface($this->table->select($primaryKey));
 
         if ($dayRow && $dayRow['item_id']) {
             return false;

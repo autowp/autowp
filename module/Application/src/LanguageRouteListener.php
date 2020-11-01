@@ -90,7 +90,6 @@ class LanguageRouteListener extends AbstractListenerAggregate
         Request $request,
         array $whitelist
     ): ?string {
-        /** @var Request $acceptLanguage */
         $acceptLanguage = $request->getServer('HTTP_ACCEPT_LANGUAGE');
         if ($acceptLanguage) {
             $locale = Locale::acceptFromHttp($acceptLanguage);

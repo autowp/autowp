@@ -69,10 +69,13 @@ class Module implements
         ];
     }
 
+    /**
+     * @param MvcEvent $e
+     */
     public function onBootstrap(Event $e): void
     {
         error_reporting(E_ALL);
-        ini_set('display_errors', true);
+        ini_set('display_errors', '1');
 
         PaginationControl::setDefaultViewPartial('paginator');
 

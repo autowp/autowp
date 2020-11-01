@@ -12,8 +12,11 @@ use ArrayObject;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service as TextStorage;
 use Autowp\User\Controller\Plugin\User;
+use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -23,6 +26,7 @@ use Laminas\View\Model\ViewModel;
 
 use function array_key_exists;
 use function array_keys;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function htmlspecialchars;
 use function implode;
 use function sprintf;
@@ -111,10 +115,10 @@ class ItemLanguageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->table->select([
+        $row = currentFromResultSetInterface($this->table->select([
             'item_id'  => (int) $this->params('id'),
             'language' => (string) $this->params('language'),
-        ])->current();
+        ]));
 
         if (! $row) {
             return $this->notFoundAction();
@@ -125,6 +129,7 @@ class ItemLanguageController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function putAction()
     {
@@ -160,10 +165,10 @@ class ItemLanguageController extends AbstractRestfulController
 
         $language = (string) $this->params('language');
 
-        $row = $this->table->select([
+        $row = currentFromResultSetInterface($this->table->select([
             'item_id'  => $item['id'],
             'language' => $language,
-        ])->current();
+        ]));
 
         $set = [];
 
@@ -238,7 +243,9 @@ class ItemLanguageController extends AbstractRestfulController
                 ON DUPLICATE KEY UPDATE ' . implode(', ', $sqlUpdates) . '
             ';
 
-            $this->table->getAdapter()->query($sql, $values);
+            /** @var Adapter $adapter */
+            $adapter = $this->table->getAdapter();
+            $adapter->query($sql, $values);
 
             $this->itemParent->refreshAutoByVehicle($item['id']);
         }
@@ -285,8 +292,9 @@ class ItemLanguageController extends AbstractRestfulController
             ]);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**

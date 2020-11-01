@@ -15,7 +15,7 @@ class RabbitMQ
 {
     private array $config;
 
-    private AMQPStreamConnection $connection;
+    private ?AMQPStreamConnection $connection;
 
     /** @var AMQPChannel[] */
     private array $channels = [];

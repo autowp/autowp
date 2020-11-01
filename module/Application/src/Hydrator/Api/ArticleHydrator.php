@@ -13,6 +13,8 @@ use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Traversable;
 
+use function Autowp\Commons\currentFromResultSetInterface;
+
 class ArticleHydrator extends AbstractRestHydrator
 {
     private User $userModel;
@@ -78,9 +80,9 @@ class ArticleHydrator extends AbstractRestHydrator
         }
 
         if ($this->filterComposite->filter('html')) {
-            $htmlRow        = $this->htmlTable->select([
+            $htmlRow        = currentFromResultSetInterface($this->htmlTable->select([
                 'id' => (int) $object['html_id'],
-            ])->current();
+            ]));
             $result['html'] = $htmlRow ? $htmlRow['html'] : null;
         }
 
@@ -92,7 +94,7 @@ class ArticleHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

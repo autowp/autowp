@@ -10,6 +10,7 @@ use Exception;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\Response;
 use Laminas\Mvc\MvcEvent;
 use Laminas\Permissions\Acl\Acl;
 
@@ -127,6 +128,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
 
                 $banInfo = $service->getBanInfo($ip);
                 if ($banInfo) {
+                    /** @var Response $response */
                     $response = $e->getResponse();
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $response->setStatusCode(429);

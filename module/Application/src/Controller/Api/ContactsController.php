@@ -8,11 +8,14 @@ use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+
+use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
  * @method UserPlugin user($user = null)
@@ -106,8 +109,9 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->setStatusCode(Response::STATUS_CODE_200);
 
         return new JsonModel([
             'contact_user_id' => $id,
@@ -131,10 +135,10 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $user = $this->userTable->select([
+        $user = currentFromResultSetInterface($this->userTable->select([
             'id = ?' => (int) $id,
             'not deleted',
-        ])->current();
+        ]));
 
         if (! $user) {
             return $this->forbiddenAction();
@@ -142,8 +146,9 @@ class ContactsController extends AbstractRestfulController
 
         $this->contact->create($currentUser['id'], $user['id']);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->setStatusCode(Response::STATUS_CODE_200);
 
         return new JsonModel([
             'status' => true,
@@ -166,9 +171,7 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $user = $this->userTable->select([
-            'id' => (int) $id,
-        ])->current();
+        $user = currentFromResultSetInterface($this->userTable->select(['id' => (int) $id]));
 
         if (! $user) {
             return $this->forbiddenAction();
@@ -176,8 +179,9 @@ class ContactsController extends AbstractRestfulController
 
         $this->contact->delete($currentUser['id'], $user['id']);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->setStatusCode(Response::STATUS_CODE_204);
 
         return new JsonModel([
             'status' => true,

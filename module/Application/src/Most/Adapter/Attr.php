@@ -5,6 +5,8 @@ namespace Application\Most\Adapter;
 use Exception;
 use Laminas\Db\Sql;
 
+use function Autowp\Commons\currentFromResultSetInterface;
+
 class Attr extends AbstractAdapter
 {
     protected int $attribute;
@@ -26,7 +28,7 @@ class Attr extends AbstractAdapter
      */
     public function getCars(Sql\Select $select, string $language): array
     {
-        $attribute = $this->attributeTable->select(['id' => $this->attribute])->current();
+        $attribute = currentFromResultSetInterface($this->attributeTable->select(['id' => $this->attribute]));
         if (! $attribute) {
             throw new Exception("Attribute '{$this->attribute}' not found");
         }

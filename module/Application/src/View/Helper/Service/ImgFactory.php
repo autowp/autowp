@@ -2,13 +2,12 @@
 
 namespace Application\View\Helper\Service;
 
-use Application\ItemNameFormatter;
-use Application\Language;
-use Application\View\Helper\Car as Helper;
+use Application\View\Helper\Img as Helper;
+use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class CarFactory implements FactoryInterface
+class ImgFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -18,8 +17,7 @@ class CarFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Helper
     {
         return new Helper(
-            $container->get(ItemNameFormatter::class),
-            $container->get(Language::class)
+            $container->get(Storage::class)
         );
     }
 }

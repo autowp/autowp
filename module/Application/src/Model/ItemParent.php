@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayObject;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 use Exception;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
@@ -14,6 +15,7 @@ use function array_keys;
 use function array_merge;
 use function array_replace;
 use function array_unique;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function in_array;
 use function ltrim;
@@ -105,21 +107,19 @@ class ItemParent
 
     public function delete(int $parentId, int $itemId): bool
     {
-        $brandRow = $this->itemTable->select([
-            'id' => $parentId,
-        ])->current();
+        $brandRow = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
         if (! $brandRow) {
             return false;
         }
 
         $this->itemParentLanguageTable->delete([
-            'parent_id = ?' => $parentId,
-            'item_id = ?'   => $itemId,
+            'parent_id' => $parentId,
+            'item_id'   => $itemId,
         ]);
 
         $this->itemParentTable->delete([
-            'parent_id = ?' => $parentId,
-            'item_id = ?'   => $itemId,
+            'parent_id' => $parentId,
+            'item_id'   => $itemId,
         ]);
 
         return true;
@@ -156,6 +156,7 @@ class ItemParent
     /**
      * @param array|ArrayAccess $parentRow
      * @param array|ArrayAccess $vehicleRow
+     * @throws Exception
      */
     private function extractName($parentRow, $vehicleRow, string $language): string
     {
@@ -205,7 +206,9 @@ class ItemParent
         if (! $name && $vehicleRow['spec_id']) {
             $specsDifferent = $vehicleRow['spec_id'] !== $parentRow['spec_id'];
             if ($specsDifferent) {
-                $specRow = $this->specTable->select(['id' => (int) $vehicleRow['spec_id']])->current();
+                $specRow = currentFromResultSetInterface(
+                    $this->specTable->select(['id' => (int) $vehicleRow['spec_id']])
+                );
 
                 if ($specRow) {
                     $name = $specRow['short_name'];
@@ -230,11 +233,11 @@ class ItemParent
             return false;
         }
 
-        return ! $this->itemParentTable->select([
+        return ! currentFromResultSetInterface($this->itemParentTable->select([
             'parent_id'    => $parentId,
             'catname'      => $catname,
             'item_id != ?' => $itemId,
-        ])->current();
+        ]));
     }
 
     /**
@@ -274,8 +277,8 @@ class ItemParent
      */
     public function create(int $parentId, int $itemId, array $options = []): bool
     {
-        $parentRow = $this->itemTable->select(['id' => $parentId])->current();
-        $itemRow   = $this->itemTable->select(['id' => $itemId])->current();
+        $parentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
+        $itemRow   = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
         if (! $parentRow || ! $itemRow) {
             return false;
         }
@@ -327,10 +330,10 @@ class ItemParent
             throw new Exception('Cycle detected');
         }
 
-        $itemParentRow = $this->itemParentTable->select([
+        $itemParentRow = currentFromResultSetInterface($this->itemParentTable->select([
             'parent_id' => $parentId,
             'item_id'   => $itemId,
-        ])->current();
+        ]));
 
         if ($itemParentRow) {
             return false;
@@ -361,9 +364,9 @@ class ItemParent
 
     public function move(int $itemId, int $fromParentId, int $toParentId): bool
     {
-        $oldParentRow = $this->itemTable->select(['id' => $fromParentId])->current();
-        $newParentRow = $this->itemTable->select(['id' => $toParentId])->current();
-        $itemRow      = $this->itemTable->select(['id' => $itemId])->current();
+        $oldParentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $fromParentId]));
+        $newParentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $toParentId]));
+        $itemRow      = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
         if (! $oldParentRow || ! $newParentRow || ! $itemRow) {
             return false;
         }
@@ -396,7 +399,7 @@ class ItemParent
             'item_id'   => $itemId,
         ];
 
-        $itemParentRow = $this->itemParentTable->select($primaryKey)->current();
+        $itemParentRow = currentFromResultSetInterface($this->itemParentTable->select($primaryKey));
 
         if (! $itemParentRow) {
             return false;
@@ -419,8 +422,8 @@ class ItemParent
 
     public function remove(int $parentId, int $itemId): void
     {
-        $parentRow = $this->itemTable->select(['id' => $parentId])->current();
-        $itemRow   = $this->itemTable->select(['id' => $itemId])->current();
+        $parentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
+        $itemRow   = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
         if (! $parentRow || ! $itemRow) {
             return;
         }
@@ -457,7 +460,7 @@ class ItemParent
             'language'  => $language,
         ];
 
-        $bvlRow = $this->itemParentLanguageTable->select($primaryKey)->current();
+        $bvlRow = currentFromResultSetInterface($this->itemParentLanguageTable->select($primaryKey));
 
         if ($forceIsAuto) {
             $isAuto = true;
@@ -473,8 +476,8 @@ class ItemParent
         }
 
         if (! $values['name']) {
-            $parentRow      = $this->itemTable->select(['id' => $parentId])->current();
-            $itemRow        = $this->itemTable->select(['id' => $itemId])->current();
+            $parentRow      = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
+            $itemRow        = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
             $values['name'] = $this->extractName($parentRow, $itemRow, $language);
             $isAuto         = true;
         }
@@ -483,7 +486,9 @@ class ItemParent
             'name'    => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
             'is_auto' => $isAuto ? 1 : 0,
         ], $primaryKey);
-        $this->itemParentLanguageTable->getAdapter()->query('
+        /** @var Adapter $adapter */
+        $adapter = $this->itemParentLanguageTable->getAdapter();
+        $adapter->query('
             INSERT INTO item_parent_language (item_id, parent_id, language, name, is_auto)
             VALUES (:item_id, :parent_id, :language, :name, :is_auto)
             ON DUPLICATE KEY UPDATE name = VALUES(name), is_auto = VALUES(is_auto)
@@ -508,10 +513,10 @@ class ItemParent
 
     public function setItemParent(int $parentId, int $itemId, array $values, bool $forceIsAuto): bool
     {
-        $itemParentRow = $this->itemParentTable->select([
+        $itemParentRow = currentFromResultSetInterface($this->itemParentTable->select([
             'parent_id' => $parentId,
             'item_id'   => $itemId,
-        ])->current();
+        ]));
 
         if (! $itemParentRow) {
             return false;
@@ -538,8 +543,8 @@ class ItemParent
             }
 
             if (! $newCatname || $newCatname === '_' || in_array($newCatname, $this->catnameBlacklist)) {
-                $parentRow  = $this->itemTable->select(['id' => $parentId])->current();
-                $itemRow    = $this->itemTable->select(['id' => $itemId])->current();
+                $parentRow  = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
+                $itemRow    = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
                 $newCatname = $this->extractCatname($parentRow, $itemRow);
                 $isAuto     = true;
             }
@@ -580,17 +585,17 @@ class ItemParent
 
         $this->setItemParentLanguages($parentId, $itemId, $values, false);
 
-        $bvRow = $this->itemParentTable->select([
-            'item_id = ?'   => $itemId,
-            'parent_id = ?' => $parentId,
-        ])->current();
+        $bvRow = currentFromResultSetInterface($this->itemParentTable->select([
+            'item_id'   => $itemId,
+            'parent_id' => $parentId,
+        ]));
 
         if (! $bvRow) {
             return false;
         }
         if (! $bvRow['manual_catname']) {
-            $brandRow   = $this->itemTable->select(['id' => (int) $parentId])->current();
-            $vehicleRow = $this->itemTable->select(['id' => $itemId])->current();
+            $brandRow   = currentFromResultSetInterface($this->itemTable->select(['id' => (int) $parentId]));
+            $vehicleRow = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
 
             $catname = $this->extractCatname($brandRow, $vehicleRow);
             if (! $catname) {
@@ -672,33 +677,35 @@ class ItemParent
 
     /**
      * @return array|ArrayObject|null
+     * @throws Exception
      */
     public function getRow(int $parentId, int $itemId)
     {
-        return $this->itemParentTable->select([
-            'parent_id = ?' => $parentId,
-            'item_id = ?'   => $itemId,
-        ])->current();
+        return currentFromResultSetInterface($this->itemParentTable->select([
+            'parent_id' => $parentId,
+            'item_id'   => $itemId,
+        ]));
     }
 
     /**
      * @return array|ArrayObject|null
+     * @throws Exception
      */
     public function getRowByCatname(int $parentId, string $catname)
     {
-        return $this->itemParentTable->select([
+        return currentFromResultSetInterface($this->itemParentTable->select([
             'parent_id' => $parentId,
             'catname'   => $catname,
-        ])->current();
+        ]));
     }
 
     public function getName(int $parentId, int $itemId, string $language): ?string
     {
-        $bvlRow = $this->itemParentLanguageTable->select([
+        $bvlRow = currentFromResultSetInterface($this->itemParentLanguageTable->select([
             'parent_id' => $parentId,
             'item_id'   => $itemId,
             'language'  => $language,
-        ])->current();
+        ]));
 
         if (! $bvlRow) {
             return null;
@@ -709,6 +716,7 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @throws Exception
      */
     public function getNamePreferLanguage(int $parentId, int $itemId, string $language): string
     {
@@ -721,7 +729,7 @@ class ItemParent
             ])
             ->order(new Sql\Expression('language = ? desc', [$language]));
 
-        $row = $this->itemParentLanguageTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->itemParentLanguageTable->selectWith($select));
 
         return $row ? $row['name'] : '';
     }
@@ -809,7 +817,9 @@ class ItemParent
 
         $updates = 0;
 
-        $stmt = $this->itemParentCacheTable->getAdapter()->query('
+        /** @var Adapter $adapter */
+        $adapter = $this->itemParentCacheTable->getAdapter();
+        $stmt    = $adapter->createStatement('
             INSERT INTO item_parent_cache (item_id, parent_id, diff, tuning, sport, design)
             VALUES (:item_id, :parent_id, :diff, :tuning, :sport, :design)
             ON DUPLICATE KEY UPDATE
@@ -851,6 +861,7 @@ class ItemParent
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function hasChildItems(int $parentId): bool
     {
@@ -859,11 +870,12 @@ class ItemParent
             ->where(['parent_id' => $parentId])
             ->limit(1);
 
-        return (bool) $this->itemParentTable->selectWith($select)->current();
+        return (bool) currentFromResultSetInterface($this->itemParentTable->selectWith($select));
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getChildItemsCount(int $parentId): int
     {
@@ -871,12 +883,13 @@ class ItemParent
         $select->columns(['count' => new Sql\Expression('count(1)')])
             ->where(['parent_id' => $parentId]);
 
-        $row = $this->itemParentTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->itemParentTable->selectWith($select));
         return $row ? (int) $row['count'] : 0;
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getParentItemsCount(int $itemId): int
     {
@@ -884,7 +897,7 @@ class ItemParent
         $select->columns(['count' => new Sql\Expression('count(1)')])
             ->where(['item_id' => $itemId]);
 
-        $row = $this->itemParentTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->itemParentTable->selectWith($select));
         return $row ? (int) $row['count'] : 0;
     }
 

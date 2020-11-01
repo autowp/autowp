@@ -31,6 +31,8 @@ use ImagickException;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -59,7 +61,6 @@ use function urlencode;
 /**
  * @method Pic pic()
  * @method string language()
- * @method Storage imageStorage()
  * @method UserPlugin user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method ViewModel forbiddenAction()
@@ -112,6 +113,8 @@ class PictureController extends AbstractRestfulController
 
     private PictureView $pictureView;
 
+    private Storage $imageStorage;
+
     public function __construct(
         AbstractRestHydrator $hydrator,
         PictureItem $pictureItem,
@@ -134,7 +137,8 @@ class PictureController extends AbstractRestfulController
         User $userModel,
         PictureService $pictureService,
         Catalogue $catalogue,
-        PictureView $pictureView
+        PictureView $pictureView,
+        Storage $imageStorage
     ) {
         $this->carOfDay = $carOfDay;
 
@@ -159,6 +163,7 @@ class PictureController extends AbstractRestfulController
         $this->pictureService        = $pictureService;
         $this->catalogue             = $catalogue;
         $this->pictureView           = $pictureView;
+        $this->imageStorage          = $imageStorage;
     }
 
     /**
@@ -257,7 +262,7 @@ class PictureController extends AbstractRestfulController
         ];
 
         if ($pictureRow) {
-            $imageInfo = $this->imageStorage()->getImage($pictureRow['image_id']);
+            $imageInfo = $this->imageStorage->getImage($pictureRow['image_id']);
 
             $uri = $this->hostManager->getUriByLanguage($this->language());
             $uri->setPath('/picture/' . urlencode($pictureRow['identity']));
@@ -289,7 +294,7 @@ class PictureController extends AbstractRestfulController
         ];
 
         if ($pictureRow) {
-            $imageInfo = $this->imageStorage()->getImage($pictureRow['image_id']);
+            $imageInfo = $this->imageStorage->getImage($pictureRow['image_id']);
 
             $uri = $this->hostManager->getUriByLanguage($this->language());
             $uri->setPath('/picture/' . urlencode($pictureRow['identity']));
@@ -347,7 +352,7 @@ class PictureController extends AbstractRestfulController
         ];
 
         if ($pictureRow) {
-            $imageInfo = $this->imageStorage()->getImage($pictureRow['image_id']);
+            $imageInfo = $this->imageStorage->getImage($pictureRow['image_id']);
 
             $uri = $this->hostManager->getUriByLanguage($this->language());
             $uri->setPath('/picture/' . urlencode($pictureRow['identity']));
@@ -645,9 +650,12 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @var Request $request */
+        $request = $this->getRequest();
+
         $data = array_merge(
             $this->params()->fromPost(),
-            $this->getRequest()->getFiles()->toArray() // @phan-suppress-current-line PhanUndeclaredMethod
+            $request->getFiles()->toArray() // @phan-suppress-current-line PhanUndeclaredMethod
         );
 
         $this->postInputFilter->setData($data);
@@ -673,10 +681,13 @@ class PictureController extends AbstractRestfulController
             );
         }
 
+        /** @var Request $request */
+        $request = $this->getRequest();
+
         $picture = $this->pictureService->addPictureFromFile(
             $values['file']['tmp_name'],
             $user['id'],
-            $this->getRequest()->getServer('REMOTE_ADDR'), // @phan-suppress-current-line PhanUndeclaredMethod
+            $request->getServer('REMOTE_ADDR'),
             $itemId,
             $perspectiveId,
             $replacePictureId,
@@ -686,10 +697,11 @@ class PictureController extends AbstractRestfulController
         $url = $this->url()->fromRoute('api/picture/picture/item', [
             'id' => $picture['id'],
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -761,7 +773,7 @@ class PictureController extends AbstractRestfulController
                 ];
             }
 
-            $this->imageStorage()->setImageCrop((int) $picture['image_id'], $crop);
+            $this->imageStorage->setImageCrop((int) $picture['image_id'], $crop);
 
             $this->log(sprintf(
                 'Выделение области на картинке %s',
@@ -1043,8 +1055,9 @@ class PictureController extends AbstractRestfulController
             ]);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -1131,7 +1144,7 @@ class PictureController extends AbstractRestfulController
         }
 
         if ($row['image_id']) {
-            $this->imageStorage()->normalize($row['image_id']);
+            $this->imageStorage->normalize($row['image_id']);
         }
 
         $this->log(sprintf(
@@ -1141,8 +1154,9 @@ class PictureController extends AbstractRestfulController
             'pictures' => $row['id'],
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -1169,7 +1183,7 @@ class PictureController extends AbstractRestfulController
         }
 
         if ($row['image_id']) {
-            $this->imageStorage()->flop($row['image_id']);
+            $this->imageStorage->flop($row['image_id']);
         }
 
         $this->log(sprintf(
@@ -1179,8 +1193,9 @@ class PictureController extends AbstractRestfulController
             'pictures' => $row['id'],
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -1199,13 +1214,14 @@ class PictureController extends AbstractRestfulController
         }
 
         if ($row['image_id']) {
-            $this->imageStorage()->flush([
+            $this->imageStorage->flush([
                 'image' => $row['image_id'],
             ]);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -1224,13 +1240,14 @@ class PictureController extends AbstractRestfulController
         }
 
         if ($row['image_id']) {
-            $this->imageStorage()->changeImageName($row['image_id'], [
+            $this->imageStorage->changeImageName($row['image_id'], [
                 'pattern' => $this->picture->getFileNamePattern($row['id']),
             ]);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -1252,8 +1269,9 @@ class PictureController extends AbstractRestfulController
             'pictures' => [$srcPicture['id'], $dstPicture['id']],
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     /**
@@ -1404,8 +1422,9 @@ class PictureController extends AbstractRestfulController
             'pictures' => [$picture['id'], $replacePicture['id']],
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -1449,6 +1468,8 @@ class PictureController extends AbstractRestfulController
 
         $this->pictureView->inc($picture['id']);
 
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 }

@@ -3,7 +3,9 @@
 namespace Application\Controller\Plugin;
 
 use Application\Model\Log as Model;
+use Autowp\User\Controller\Plugin\User;
 use Exception;
+use Laminas\Mvc\Controller\AbstractController;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class Log extends AbstractPlugin
@@ -17,8 +19,12 @@ class Log extends AbstractPlugin
 
     public function __invoke(string $message, array $objects): void
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $user = $this->getController()->user()->get();
+        /** @var AbstractController $controller */
+        $controller = $this->getController();
+        /** @var User $userPlugin */
+        $userPlugin = $controller->getPluginManager()->get('user');
+
+        $user = $userPlugin->get();
         if (! $user) {
             throw new Exception('User id not detected');
         }

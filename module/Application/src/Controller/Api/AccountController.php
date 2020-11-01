@@ -4,6 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Model\UserAccount;
 use Autowp\User\Controller\Plugin\User;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
@@ -87,7 +88,8 @@ class AccountController extends AbstractRestfulController
 
         $this->userAccount->removeAccount($id);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 }

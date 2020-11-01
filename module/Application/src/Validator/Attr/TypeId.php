@@ -5,6 +5,8 @@ namespace Application\Validator\Attr;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Validator\AbstractValidator;
 
+use function Autowp\Commons\currentFromResultSetInterface;
+
 class TypeId extends AbstractValidator
 {
     private const INVALID = 'invalidTypeId';
@@ -29,9 +31,9 @@ class TypeId extends AbstractValidator
     {
         $this->setValue($value);
 
-        $row = $this->table->select([
+        $row = currentFromResultSetInterface($this->table->select([
             'id' => (int) $value,
-        ])->current();
+        ]));
 
         if (! $row) {
             $this->error(self::INVALID);

@@ -29,6 +29,8 @@ use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Hydrator\Strategy\StrategyInterface;
 use Laminas\InputFilter\Factory;
 use Laminas\InputFilter\InputFilter;
@@ -48,6 +50,7 @@ use function array_keys;
 use function array_merge;
 use function array_unshift;
 use function array_values;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function date;
 use function explode;
@@ -72,7 +75,6 @@ use function usort;
  * @method Catalogue catalogue()
  * @method Car car()
  * @method void log(string $message, array $objects)
- * @method Storage imageStorage()
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */
 class ItemController extends AbstractRestfulController
@@ -109,6 +111,8 @@ class ItemController extends AbstractRestfulController
 
     private SpecificationsService $specsService;
 
+    private Storage $imageStorage;
+
     public function __construct(
         AbstractRestHydrator $hydrator,
         Image $logoHydrator,
@@ -124,7 +128,8 @@ class ItemController extends AbstractRestfulController
         Item $itemModel,
         VehicleType $vehicleType,
         InputFilterPluginManager $inputFilterManager,
-        SpecificationsService $specsService
+        SpecificationsService $specsService,
+        Storage $imageStorage
     ) {
         $this->hydrator              = $hydrator;
         $this->logoHydrator          = $logoHydrator;
@@ -141,6 +146,7 @@ class ItemController extends AbstractRestfulController
         $this->vehicleType           = $vehicleType;
         $this->inputFilterManager    = $inputFilterManager;
         $this->specsService          = $specsService;
+        $this->imageStorage          = $imageStorage;
     }
 
     private function getCollator(string $language): Collator
@@ -677,9 +683,9 @@ class ItemController extends AbstractRestfulController
 
                 $specId = null;
                 if ($query) {
-                    $specRow = $this->specTable->select([
+                    $specRow = currentFromResultSetInterface($this->specTable->select([
                         new Sql\Predicate\Expression('INSTR(?, short_name)', $query),
-                    ])->current();
+                    ]));
 
                     if ($specRow) {
                         $specId = $specRow['id'];
@@ -1213,11 +1219,11 @@ class ItemController extends AbstractRestfulController
 
         $user = $this->user()->get();
 
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -1419,10 +1425,11 @@ class ItemController extends AbstractRestfulController
         $url = $this->url()->fromRoute('api/item/item/get', [
             'id' => $itemId,
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -1831,8 +1838,9 @@ class ItemController extends AbstractRestfulController
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -1918,8 +1926,8 @@ class ItemController extends AbstractRestfulController
                     $old = $oldData[$field];
                     $new = $newData[$field];
                     if ($old !== $new) {
-                        $old       = $this->specTable->select(['id' => (int) $old])->current();
-                        $new       = $this->specTable->select(['id' => (int) $new])->current();
+                        $old       = currentFromResultSetInterface($this->specTable->select(['id' => (int) $old]));
+                        $new       = currentFromResultSetInterface($this->specTable->select(['id' => (int) $new]));
                         $changes[] = sprintf(
                             $message,
                             $old ? $old['short_name'] : '-',
@@ -1970,9 +1978,12 @@ class ItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /** @var Request $request */
+        $request = $this->getRequest();
+
         $data = array_merge(
             $this->params()->fromPost(),
-            $this->getRequest()->getFiles()->toArray() // @phan-suppress-current-line PhanUndeclaredMethod
+            $request->getFiles()->toArray() // @phan-suppress-current-line PhanUndeclaredMethod
         );
 
         $this->itemLogoPutFilter->setData($data);
@@ -1985,7 +1996,7 @@ class ItemController extends AbstractRestfulController
 
         $oldImageId = $item['logo_id'];
 
-        $imageId = $this->imageStorage()->addImageFromFile($values['file']['tmp_name'], 'brand', [
+        $imageId = $this->imageStorage->addImageFromFile($values['file']['tmp_name'], 'brand', [
             's3' => true,
         ]);
 
@@ -1996,7 +2007,7 @@ class ItemController extends AbstractRestfulController
         ]);
 
         if ($oldImageId) {
-            $this->imageStorage()->removeImage($oldImageId);
+            $this->imageStorage->removeImage($oldImageId);
         }
 
         $this->log(sprintf(
@@ -2006,8 +2017,9 @@ class ItemController extends AbstractRestfulController
             'items' => $item['id'],
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -2080,8 +2092,9 @@ class ItemController extends AbstractRestfulController
 
         $this->specsService->updateActualValues($item['id']);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**

@@ -3,29 +3,35 @@
 namespace Application\View\Helper;
 
 use ArrayAccess;
+use Autowp\ZFComponents\View\Helper\HtmlA;
+use Exception;
 use Laminas\View\Helper\AbstractHelper;
+use Laminas\View\Renderer\PhpRenderer;
 
 class InlinePicture extends AbstractHelper
 {
-    public function __construct()
-    {
-    }
-
     /**
      * @param array|ArrayAccess $picture
+     * @throws Exception
      */
     public function __invoke($picture): string
     {
+        /** @var PhpRenderer $view */
         $view = $this->view;
+        /** @var Pic $picHelper */
+        $picHelper = $view->getHelperPluginManager()->get('pic');
+        /** @var Language $languageHelper */
+        $languageHelper = $view->getHelperPluginManager()->get('language');
+        /** @var HtmlA $htmlAhelper */
+        $htmlAhelper = $view->getHelperPluginManager()->get('htmlA');
+        /** @var Img $imgHelper */
+        $imgHelper = $view->getHelperPluginManager()->get('img');
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $url = $view->pic($picture)->url();
+        $url = $picHelper($picture)->url();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $name = $view->pic()->name($picture, $this->view->language());
+        $name = $picHelper()->name($picture, $languageHelper());
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $imageHtml = $view->img($picture['image_id'], [
+        $imageHtml = $imgHelper($picture['image_id'], [
             'format'  => 'picture-thumb',
             'alt'     => $name,
             'title'   => $name,
@@ -33,8 +39,7 @@ class InlinePicture extends AbstractHelper
             'class'   => 'rounded border border-light',
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $view->htmlA([
+        return $htmlAhelper([
             'href'  => $url,
             'class' => 'd-inline-block rounded',
         ], $imageHtml, false);

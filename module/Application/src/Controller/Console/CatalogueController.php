@@ -11,7 +11,6 @@ use Application\Service\TelegramService;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\Uri\UriFactory;
 
 use function htmlspecialchars;
 use function sleep;
@@ -96,11 +95,6 @@ class CatalogueController extends AbstractActionController
                 $owner = $this->userModel->getRow((int) $picture['owner_id']);
                 if ($owner && ((int) $owner['id'] !== $userId)) {
                     $uri = $this->hostManager->getUriByLanguage($owner['language']);
-
-                    if (! $uri) {
-                        $uri = UriFactory::factory('https://www.autowp.ru');
-                    }
-
                     $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
 
                     $message = sprintf(

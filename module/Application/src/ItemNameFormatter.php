@@ -164,7 +164,7 @@ class ItemNameFormatter
      */
     public function format($item, string $language): string
     {
-        if (! $item instanceof ArrayAccess && ! is_array($item)) {
+        if (! ($item instanceof ArrayAccess || is_array($item))) {
             throw new Exception("`item` must be array or ArrayAccess");
         }
 

@@ -3,13 +3,14 @@
 namespace Application\Controller\Api;
 
 use Application\Service\TelegramService;
+use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use Telegram\Bot\Exceptions\TelegramSDKException;
 
 /**
- * @method ViewModel forbiddenAction
+ * @method ViewModel forbiddenAction()
  */
 class TelegramController extends AbstractActionController
 {
@@ -25,7 +26,9 @@ class TelegramController extends AbstractActionController
      */
     public function webhookAction(): ViewModel
     {
-        if (! $this->getRequest()->isPost()) {
+        /** @var Request $request */
+        $request = $this->getRequest();
+        if (! $request->isPost()) {
             return $this->forbiddenAction();
         }
 

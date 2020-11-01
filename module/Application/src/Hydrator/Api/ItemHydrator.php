@@ -29,6 +29,7 @@ use Traversable;
 
 use function array_keys;
 use function array_merge;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function in_array;
 use function is_array;
@@ -218,7 +219,7 @@ class ItemHydrator extends AbstractRestHydrator
         $spec     = null;
         $specFull = null;
         if ($object['spec_id']) {
-            $specRow = $this->specTable->select(['id' => (int) $object['spec_id']])->current();
+            $specRow = currentFromResultSetInterface($this->specTable->select(['id' => (int) $object['spec_id']]));
             if ($specRow) {
                 $spec     = $specRow['short_name'];
                 $specFull = $specRow['name'];
@@ -244,11 +245,12 @@ class ItemHydrator extends AbstractRestHydrator
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @throws Exception
      */
     private function getCountBySelect(Sql\Select $select, TableGateway $table): int
     {
         $select->columns(['count' => new Sql\Expression('count(1)')]);
-        $row = $table->selectWith($select)->current();
+        $row = currentFromResultSetInterface($table->selectWith($select));
         return $row ? (int) $row['count'] : 0;
     }
 
@@ -915,7 +917,7 @@ class ItemHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

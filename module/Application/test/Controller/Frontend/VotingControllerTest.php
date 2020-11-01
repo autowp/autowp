@@ -23,9 +23,6 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/voting/item/get');
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
-     */
     public function testVoteAndGetVotes(): void
     {
         $tables = $this->getApplication()->getServiceManager()->get('TableManager');
@@ -60,7 +57,9 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
         $variantId = $table->getLastInsertValue();
 
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/voting/' . $id, Request::METHOD_PATCH, [
             'vote' => $variantId,
         ]);

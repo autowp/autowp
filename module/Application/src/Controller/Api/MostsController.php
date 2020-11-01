@@ -19,7 +19,6 @@ use function array_merge;
 /**
  * @method User user($user = null)
  * @method string language()
- * @method Storage imageStorage()
  * @method Catalogue catalogue()
  */
 class MostsController extends AbstractActionController
@@ -32,16 +31,20 @@ class MostsController extends AbstractActionController
 
     private PictureNameFormatter $pictureNameFormatter;
 
+    private Storage $imageStorage;
+
     public function __construct(
         Mosts $mosts,
         Picture $picture,
         AbstractRestHydrator $itemHydrator,
-        PictureNameFormatter $pictureNameFormatter
+        PictureNameFormatter $pictureNameFormatter,
+        Storage $imageStorage
     ) {
         $this->itemHydrator         = $itemHydrator;
         $this->mosts                = $mosts;
         $this->picture              = $picture;
         $this->pictureNameFormatter = $pictureNameFormatter;
+        $this->imageStorage         = $imageStorage;
     }
 
     /**
@@ -80,8 +83,7 @@ class MostsController extends AbstractActionController
             }
         }
 
-        $imageStorage = $this->imageStorage();
-        $imagesInfo   = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb-medium');
+        $imagesInfo = $this->imageStorage->getFormatedImages($formatRequests, 'picture-thumb-medium');
 
         $names = $this->picture->getNameData($allPictures, [
             'language' => $language,

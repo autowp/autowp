@@ -3,8 +3,11 @@
 namespace Application\Model;
 
 use Autowp\User\Model\User;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\ResultSet\ResultSetInterface;
 use Laminas\Db\TableGateway\TableGateway;
+
+use function Autowp\Commons\currentFromResultSetInterface;
 
 class UserItemSubscribe
 {
@@ -24,7 +27,9 @@ class UserItemSubscribe
             INSERT IGNORE INTO user_item_subscribe (user_id, item_id)
             VALUES (:user_id, :item_id)
         ';
-        $this->table->getAdapter()->query($sql, [
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
+        $adapter->query($sql, [
             'user_id' => $userId,
             'item_id' => $itemId,
         ]);
@@ -58,9 +63,9 @@ class UserItemSubscribe
 
     public function isSubscribed(int $userId, int $itemId): bool
     {
-        return (bool) $this->table->select([
+        return (bool) currentFromResultSetInterface($this->table->select([
             'user_id' => $userId,
             'item_id' => $itemId,
-        ])->current();
+        ]));
     }
 }

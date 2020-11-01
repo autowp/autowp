@@ -3,9 +3,10 @@
 namespace Application\Router\Http;
 
 use Exception;
+use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Router\Http\RouteInterface;
 use Laminas\Router\Http\RouteMatch;
-use Laminas\Stdlib\RequestInterface as Request;
+use Laminas\Stdlib\RequestInterface;
 use Traversable;
 
 use function array_merge;
@@ -13,7 +14,6 @@ use function array_replace;
 use function count;
 use function explode;
 use function implode;
-use function method_exists;
 use function strlen;
 use function urldecode;
 use function urlencode;
@@ -22,7 +22,7 @@ class FilePath implements RouteInterface
 {
     private const URI_DELIMITER = '/';
 
-    private array $defaults = [];
+    private array $defaults;
 
     /**
      * Create a new route with given options.
@@ -39,13 +39,12 @@ class FilePath implements RouteInterface
         $this->defaults = $options['defaults'];
     }
 
-    public function match(Request $request): ?RouteMatch
+    public function match(RequestInterface $request): ?RouteMatch
     {
-        if (! method_exists($request, 'getUri')) {
+        if (! $request instanceof Request) {
             return null;
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $path = $request->getUri()->getPath();
 
         $length = strlen($path);

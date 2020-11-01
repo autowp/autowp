@@ -5,6 +5,8 @@ namespace Application\Controller\Api;
 use Application\Model\Item;
 use Application\Model\VehicleType;
 use Autowp\User\Controller\Plugin\User;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
 use Laminas\Stdlib\ResponseInterface;
@@ -44,11 +46,10 @@ class ItemVehicleTypeController extends AbstractRestfulController
         );
         $select->where('not inherited');
 
+        /** @var Adapter $adapter */
+        $adapter   = $this->vehicleType->getItemTable()->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect(
-                $select,
-                $this->vehicleType->getItemTable()->getAdapter()
-            )
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -104,8 +105,9 @@ class ItemVehicleTypeController extends AbstractRestfulController
             $this->params('vehicle_type_id')
         );
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     /**
@@ -136,9 +138,10 @@ class ItemVehicleTypeController extends AbstractRestfulController
             'vehicle_type_id' => $vehicleTypeId,
             'item_id'         => $itemId,
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 }

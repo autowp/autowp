@@ -7,11 +7,14 @@ use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Exception;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
+use Laminas\Db\Sql\Predicate;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Paginator;
 
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
  * @todo Remove \Application\Comments::FORUMS_TYPE_ID
@@ -97,7 +100,7 @@ class Forums
 
     public function delete(int $topicId): bool
     {
-        $topic = $this->topicTable->select(['id' => $topicId])->current();
+        $topic = currentFromResultSetInterface($this->topicTable->select(['id' => $topicId]));
         if (! $topic) {
             return false;
         }
@@ -124,12 +127,11 @@ class Forums
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @throws Exception
      */
     public function updateThemeStat(int $themeId): void
     {
-        $theme = $this->themeTable->select([
-            'id = ?' => (int) $themeId,
-        ])->current();
+        $theme = currentFromResultSetInterface($this->themeTable->select(['id' => (int) $themeId]));
         if (! $theme) {
             return;
         }
@@ -140,9 +142,9 @@ class Forums
             ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
             ->where([
                 'forums_theme_parent.parent_id = ?' => $theme['id'],
-                new Sql\Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED]),
+                new Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED]),
             ]);
-        $topics = $this->topicTable->selectWith($select)->current();
+        $topics = currentFromResultSetInterface($this->topicTable->selectWith($select));
 
         $messages = $this->comments->getTotalMessagesCount([
             'type' => AppComments::FORUMS_TYPE_ID,
@@ -156,7 +158,7 @@ class Forums
                         ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
                         ->where([
                             'forums_theme_parent.parent_id = ?' => $theme['id'],
-                            new Sql\Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED]),
+                            new Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED]),
                         ]);
                 },
         ]);
@@ -178,7 +180,7 @@ class Forums
         $select
             ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
             ->where([
-                new Sql\Predicate\In('forums_topics.status', [self::STATUS_CLOSED, self::STATUS_NORMAL]),
+                new Predicate\In('forums_topics.status', [self::STATUS_CLOSED, self::STATUS_NORMAL]),
                 'comment_topic.type_id = ?' => AppComments::FORUMS_TYPE_ID,
             ])
             ->order('comment_topic.last_update DESC');
@@ -189,8 +191,11 @@ class Forums
             $select->where(['forums_topics.theme_id IS NULL']);
         }
 
+        /** @var Adapter $adapter */
+        $adapter = $this->topicTable->getAdapter();
+
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->topicTable->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -266,7 +271,7 @@ class Forums
             $select->where(['not is_moderator']);
         }
 
-        $currentTheme = $this->themeTable->selectWith($select)->current();
+        $currentTheme = currentFromResultSetInterface($this->themeTable->selectWith($select));
 
         $data = [
             'topics'    => [],
@@ -346,9 +351,7 @@ class Forums
 
     public function getTheme(int $themeId): ?array
     {
-        $theme = $this->themeTable->select([
-            'id = ?' => $themeId,
-        ])->current();
+        $theme = currentFromResultSetInterface($this->themeTable->select(['id' => $themeId]));
         if (! $theme) {
             return null;
         }
@@ -377,22 +380,32 @@ class Forums
         return $result;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function getTopics(int $themeId): array
     {
         $select = new Sql\Select($this->topicTable->getTable());
+
         $select
             ->where([
-                new Sql\Predicate\In('forums_topics.status', [self::STATUS_CLOSED, self::STATUS_NORMAL]),
+                new Predicate\In('forums_topics.status', [self::STATUS_CLOSED, self::STATUS_NORMAL]),
             ])
             ->join(
                 'comment_topic',
-                new Sql\Expression(
-                    'forums_topics.id = comment_topic.item_id and comment_topic.type_id = ?',
-                    AppComments::FORUMS_TYPE_ID
-                ),
+                new Predicate\PredicateSet([
+                    new Predicate\Operator(
+                        'forums_topics.id',
+                        Predicate\Operator::OPERATOR_EQUAL_TO,
+                        'comment_topic.item_id',
+                        Predicate\Operator::TYPE_IDENTIFIER,
+                        Predicate\Operator::TYPE_IDENTIFIER
+                    ),
+                    new Predicate\Operator(
+                        'comment_topic.type_id',
+                        Predicate\Operator::OPERATOR_EQUAL_TO,
+                        AppComments::FORUMS_TYPE_ID,
+                        Predicate\Operator::TYPE_IDENTIFIER,
+                        Predicate\Operator::TYPE_VALUE
+                    ),
+                ], Predicate\PredicateSet::COMBINED_BY_AND),
                 [],
                 $select::JOIN_LEFT
             )
@@ -417,9 +430,7 @@ class Forums
 
     public function moveMessage(int $messageId, int $topicId): bool
     {
-        $topic = $this->topicTable->select([
-            'id' => $topicId,
-        ])->current();
+        $topic = currentFromResultSetInterface($this->topicTable->select(['id' => $topicId]));
         if (! $topic) {
             return false;
         }
@@ -431,16 +442,12 @@ class Forums
 
     public function moveTopic(int $topicId, int $themeId): bool
     {
-        $topic = $this->topicTable->select([
-            'id' => $topicId,
-        ])->current();
+        $topic = currentFromResultSetInterface($this->topicTable->select(['id' => $topicId]));
         if (! $topic) {
             return false;
         }
 
-        $theme = $this->themeTable->select([
-            'id' => $themeId,
-        ])->current();
+        $theme = currentFromResultSetInterface($this->themeTable->select(['id' => $themeId]));
         if (! $theme) {
             return false;
         }
@@ -482,10 +489,10 @@ class Forums
         }
 
         if ($options['status']) {
-            $select->where([new Sql\Predicate\In('status', $options['status'])]);
+            $select->where([new Predicate\In('status', $options['status'])]);
         }
 
-        $topic = $this->topicTable->selectWith($select)->current();
+        $topic = currentFromResultSetInterface($this->topicTable->selectWith($select));
         if (! $topic) {
             return null;
         }
@@ -509,9 +516,7 @@ class Forums
             return null;
         }
 
-        $topic = $this->topicTable->select([
-            'id = ?' => $message['item_id'],
-        ])->current();
+        $topic = currentFromResultSetInterface($this->topicTable->select(['id' => $message['item_id']]));
         if (! $topic) {
             return null;
         }
@@ -692,6 +697,7 @@ class Forums
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getSubscribedTopicsCount(int $userId): int
     {
@@ -708,7 +714,7 @@ class Forums
                 'comment_topic.type_id'           => AppComments::FORUMS_TYPE_ID,
                 'comment_topic_subscribe.type_id' => AppComments::FORUMS_TYPE_ID,
             ]);
-        $row = $this->topicTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->topicTable->selectWith($select));
 
         return $row ? (int) $row['count'] : 0;
     }

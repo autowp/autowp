@@ -6,6 +6,7 @@ use Application\Hydrator\Api\ItemHydrator;
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use Application\Service\Mosts;
+use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -23,7 +24,8 @@ class MostsControllerFactory implements FactoryInterface
             $container->get(Mosts::class),
             $container->get(Picture::class),
             $hydrators->get(ItemHydrator::class),
-            $container->get(PictureNameFormatter::class)
+            $container->get(PictureNameFormatter::class),
+            $container->get(Storage::class)
         );
     }
 }

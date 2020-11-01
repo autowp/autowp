@@ -10,6 +10,7 @@ use DateTime;
 use Exception;
 use Geometry;
 use geoPHP;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Paginator;
@@ -22,6 +23,7 @@ use function array_search;
 use function array_splice;
 use function array_unique;
 use function array_values;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function is_array;
 use function is_numeric;
@@ -184,7 +186,7 @@ class Item
             'name' => $name,
         ];
 
-        $row = $this->itemLanguageTable->select($primaryKey)->current();
+        $row = currentFromResultSetInterface($this->itemLanguageTable->select($primaryKey));
 
         if (! $row) {
             $this->itemLanguageTable->insert(array_replace($set, $primaryKey));
@@ -196,6 +198,7 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getUsedLanguagesCount(int $id): int
     {
@@ -206,7 +209,7 @@ class Item
                 'language != ?' => 'xx',
             ]);
 
-        $row = $this->itemLanguageTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->itemLanguageTable->selectWith($select));
         return $row ? (int) $row['count'] : 0;
     }
 
@@ -345,6 +348,7 @@ class Item
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getLanguageName(int $itemId, string $language): string
     {
@@ -355,25 +359,27 @@ class Item
                 'language' => $language,
             ]);
 
-        $row = $this->itemLanguageTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->itemLanguageTable->selectWith($select));
 
         return $row ? $row['name'] : '';
     }
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getName(int $itemId, string $language): string
     {
         $select = $this->getNameSelect($itemId, Sql\ExpressionInterface::TYPE_VALUE, $language);
 
-        $row = $this->itemLanguageTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->itemLanguageTable->selectWith($select));
 
         return $row ? $row['name'] : '';
     }
 
     /**
      * @param array|ArrayAccess $row
+     * @throws Exception
      */
     public function getNameData($row, string $language): array
     {
@@ -382,7 +388,7 @@ class Item
         $spec     = null;
         $specFull = null;
         if ($row['spec_id']) {
-            $specRow = $this->specTable->select(['id' => (int) $row['spec_id']])->current();
+            $specRow = currentFromResultSetInterface($this->specTable->select(['id' => (int) $row['spec_id']]));
             if ($specRow) {
                 $spec     = $specRow['short_name'];
                 $specFull = $specRow['name'];
@@ -580,7 +586,7 @@ class Item
     {
         $primaryKey = ['id' => $itemId];
 
-        $row = $this->itemTable->select($primaryKey)->current();
+        $row = currentFromResultSetInterface($this->itemTable->select($primaryKey));
         if (! $row) {
             return false;
         }
@@ -666,7 +672,7 @@ class Item
      */
     public function updateInteritance(int $itemId): void
     {
-        $item = $this->itemTable->select(['id' => $itemId])->current();
+        $item = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
         if (! $item) {
             throw new Exception("Item `$itemId` not found");
         }
@@ -842,6 +848,7 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @throws Exception
      */
     public function setPoint(int $itemId, Geometry $point): void
     {
@@ -856,7 +863,7 @@ class Item
             'point' => new Sql\Expression('ST_GeomFromText(?)', [$point->out('wkt')]),
         ];
 
-        $row = $this->itemPointTable->select($primaryKey)->current();
+        $row = currentFromResultSetInterface($this->itemPointTable->select($primaryKey));
         if ($row) {
             $this->itemPointTable->update($set, $primaryKey);
             return;
@@ -871,7 +878,7 @@ class Item
     public function getPoint(int $itemId)
     {
         $point = null;
-        $row   = $this->itemPointTable->select(['item_id' => $itemId])->current();
+        $row   = currentFromResultSetInterface($this->itemPointTable->select(['item_id' => $itemId]));
         if ($row && $row['point']) {
             geoPHP::version(); // for autoload classes
             $point = geoPHP::load(substr($row['point'], 4), 'wkb');
@@ -1692,11 +1699,10 @@ class Item
      */
     public function getPaginator(array $options): Paginator\Paginator
     {
+        /** @var Adapter $adapter */
+        $adapter = $this->itemTable->getAdapter();
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect(
-                $this->getSelect($options),
-                $this->itemTable->getAdapter()
-            )
+            new Paginator\Adapter\DbSelect($this->getSelect($options), $adapter)
         );
     }
 
@@ -1767,7 +1773,7 @@ class Item
         $select = $this->getSelect($options);
         $select->limit(1);
 
-        return $this->itemTable->selectWith($select)->current();
+        return currentFromResultSetInterface($this->itemTable->selectWith($select));
     }
 
     /**
@@ -1783,7 +1789,7 @@ class Item
         $select->columns(['id']);
         $select->limit(1);
 
-        return (bool) $this->itemTable->selectWith($select)->current();
+        return (bool) currentFromResultSetInterface($this->itemTable->selectWith($select));
     }
 
     /**

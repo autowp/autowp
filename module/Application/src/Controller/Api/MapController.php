@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\Picture;
+use Autowp\Image\Storage;
 use geoPHP;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
@@ -21,6 +22,9 @@ use function count;
 use function explode;
 use function substr;
 
+/**
+ * @method string language()
+ */
 class MapController extends AbstractActionController
 {
     private ItemNameFormatter $itemNameFormatter;
@@ -29,14 +33,18 @@ class MapController extends AbstractActionController
 
     private TableGateway $itemTable;
 
+    private Storage $imageStorage;
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
         Picture $picture,
-        TableGateway $itemTable
+        TableGateway $itemTable,
+        Storage $imageStorage
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->picture           = $picture;
         $this->itemTable         = $itemTable;
+        $this->imageStorage      = $imageStorage;
     }
 
     /**
@@ -70,8 +78,6 @@ class MapController extends AbstractActionController
         $pointsOnly = (bool) $this->params()->fromQuery('points-only', 14);
 
         $language = $this->language();
-
-        $imageStorage = $this->imageStorage();
 
         $select = new Sql\Select($this->itemTable->getTable());
         $select->columns(
@@ -126,7 +132,7 @@ class MapController extends AbstractActionController
                 ]);
 
                 if ($picture) {
-                    $image = $imageStorage->getFormatedImage(
+                    $image = $this->imageStorage->getFormatedImage(
                         $picture['image_id'],
                         'format9'
                     );

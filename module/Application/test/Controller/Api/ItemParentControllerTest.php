@@ -12,12 +12,11 @@ class ItemParentControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testCategoriesFirstOrder(): void
     {
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_GET, [
             'order' => 'categories_first',
         ]);

@@ -20,6 +20,7 @@ use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
 use function array_keys;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function inet_ntop;
 use function is_array;
 
@@ -103,9 +104,11 @@ class CommentHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->userId = $userId;
+        $this->userId = (int) $userId;
 
-        $this->getStrategy('user')->setUserId($userId);
+        /** @var Strategy\User $strategy */
+        $strategy = $this->getStrategy('user');
+        $strategy->setUserId($userId);
         //$this->getStrategy('replies')->setUser($user);
 
         return $this;
@@ -113,6 +116,7 @@ class CommentHydrator extends AbstractRestHydrator
 
     /**
      * @param array|ArrayAccess $object
+     * @throws Exception
      */
     public function extract($object): ?array
     {
@@ -173,10 +177,10 @@ class CommentHydrator extends AbstractRestHydrator
             if ($this->filterComposite->filter('user_vote')) {
                 $vote = null;
                 if ($this->userId) {
-                    $voteRow = $this->voteTable->select([
-                        'comment_id = ?' => $object['id'],
-                        'user_id = ?'    => (int) $this->userId,
-                    ])->current();
+                    $voteRow = currentFromResultSetInterface($this->voteTable->select([
+                        'comment_id' => $object['id'],
+                        'user_id'    => (int) $this->userId,
+                    ]));
                     $vote    = $voteRow ? $voteRow['vote'] : null;
                 }
 
@@ -252,7 +256,7 @@ class CommentHydrator extends AbstractRestHydrator
      * @param array|ArrayAccess $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

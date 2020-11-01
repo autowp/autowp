@@ -7,6 +7,7 @@ use Laminas\Db\TableGateway\TableGateway;
 use Telegram\Bot\Commands\Command;
 
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 
 class MessagesCommand extends Command
 {
@@ -41,7 +42,7 @@ class MessagesCommand extends Command
             ->where(array_replace([
                 'not users.deleted',
             ], $primaryKey));
-        $chatRow = $this->telegramChatTable->selectWith($select)->current();
+        $chatRow = currentFromResultSetInterface($this->telegramChatTable->selectWith($select));
 
         if (! $chatRow) {
             $this->replyWithMessage([

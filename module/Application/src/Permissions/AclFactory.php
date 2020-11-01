@@ -11,7 +11,7 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Permissions\Acl\Acl;
 use Laminas\Permissions\Acl\Resource\GenericResource;
 use Laminas\Permissions\Acl\Role\GenericRole;
-use Laminas\ServiceManager\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
 use function in_array;
@@ -55,14 +55,6 @@ class AclFactory implements FactoryInterface
         }
 
         return $acl;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function createService(ServiceLocatorInterface $controllers): Acl
-    {
-        return $this($controllers, self::class);
     }
 
     private function load(Acl $acl, ContainerInterface $container): void

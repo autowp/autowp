@@ -3,6 +3,8 @@
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractActionController;
@@ -13,6 +15,10 @@ use Laminas\View\Model\ViewModel;
 
 use function get_object_vars;
 
+/**
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ */
 class ArticleController extends AbstractActionController
 {
     public const PREVIEW_CAT_PATH = '/img/articles/preview/';
@@ -54,8 +60,10 @@ class ArticleController extends AbstractActionController
             $select->where(['catname' => $data['catname']]);
         }
 
+        /** @var Adapter $adapter */
+        $adapter   = $this->table->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator

@@ -7,6 +7,7 @@ use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
+use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -31,7 +32,8 @@ class PictureItemControllerFactory implements FactoryInterface
             $filters->get('api_picture_item_list'),
             $filters->get('api_picture_item_item'),
             $container->get(Item::class),
-            $container->get(Picture::class)
+            $container->get(Picture::class),
+            $container->get(Storage::class)
         );
     }
 }

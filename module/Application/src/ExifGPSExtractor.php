@@ -31,7 +31,7 @@ class ExifGPSExtractor
         $lng = $this->getGps($gps["GPSLongitude"], $gps['GPSLongitudeRef']);
         $lat = $this->getGps($gps["GPSLatitude"], $gps['GPSLatitudeRef']);
 
-        if ($lng === false || $lat === false) {
+        if (! $lng || ! $lat) {
             return null;
         }
 

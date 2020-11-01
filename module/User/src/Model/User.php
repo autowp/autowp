@@ -10,6 +10,7 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Request;
@@ -17,6 +18,7 @@ use Laminas\Paginator;
 
 use function array_replace;
 use function array_values;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function inet_pton;
 use function is_array;
@@ -94,7 +96,7 @@ class User
      */
     public function getNextMessageTime(int $userId): ?DateTime
     {
-        $row = $this->table->select(['id' => $userId])->current();
+        $row = currentFromResultSetInterface($this->table->select(['id' => $userId]));
         if (! $row) {
             return null;
         }
@@ -153,9 +155,7 @@ class User
      */
     private function getSelect($options): Sql\Select
     {
-        if (! is_array($options)) {
-            $options = ['id' => $options];
-        }
+        $options = is_array($options) ? $options : ['id' => $options];
 
         $defaults = [
             'id'               => null,
@@ -204,7 +204,7 @@ class User
         }
 
         if ($options['limit']) {
-            $select->limit($options['limit']);
+            $select->limit((int) $options['limit']);
         }
 
         if ($options['order']) {
@@ -241,7 +241,7 @@ class User
     {
         $select = $this->getSelect($options);
 
-        return $this->table->selectWith($select)->current();
+        return currentFromResultSetInterface($this->table->selectWith($select));
     }
 
     /**
@@ -265,11 +265,10 @@ class User
      */
     public function getPaginator(array $options): Paginator\Paginator
     {
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect(
-                $this->getSelect($options),
-                $this->table->getAdapter()
-            )
+            new Paginator\Adapter\DbSelect($this->getSelect($options), $adapter)
         );
     }
 
@@ -294,7 +293,7 @@ class User
         $select->columns(['id']);
         $select->limit(1);
 
-        return (bool) $this->table->selectWith($select)->current();
+        return (bool) currentFromResultSetInterface($this->table->selectWith($select));
     }
 
     /**
@@ -331,6 +330,7 @@ class User
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getUserLanguage(int $userId): string
     {
@@ -338,7 +338,7 @@ class User
             ->columns(['language'])
             ->where(['id' => $userId]);
 
-        $user = $this->table->selectWith($select)->current();
+        $user = currentFromResultSetInterface($this->table->selectWith($select));
 
         if (! $user) {
             return '';
@@ -349,6 +349,7 @@ class User
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getUserRole(int $userId): string
     {
@@ -356,7 +357,7 @@ class User
             ->columns(['role'])
             ->where(['id' => $userId]);
 
-        $user = $this->table->selectWith($select)->current();
+        $user = currentFromResultSetInterface($this->table->selectWith($select));
 
         if (! $user) {
             return '';

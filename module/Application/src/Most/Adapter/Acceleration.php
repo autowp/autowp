@@ -7,6 +7,7 @@ use ArrayObject;
 use Exception;
 use Laminas\Db\Sql;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function implode;
 
 class Acceleration extends AbstractAdapter
@@ -27,8 +28,12 @@ class Acceleration extends AbstractAdapter
     {
         $this->attributes = $value;
 
-        $this->kmhAttribute = $this->attributeTable->select(['id' => $this->attributes['to100kmh']])->current();
-        $this->mphAttribute = $this->attributeTable->select(['id' => $this->attributes['to60mph']])->current();
+        $this->kmhAttribute = currentFromResultSetInterface(
+            $this->attributeTable->select(['id' => $this->attributes['to100kmh']])
+        );
+        $this->mphAttribute = currentFromResultSetInterface(
+            $this->attributeTable->select(['id' => $this->attributes['to60mph']])
+        );
     }
 
     public function setOrder(string $value): void

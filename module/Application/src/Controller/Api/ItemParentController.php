@@ -16,7 +16,10 @@ use Autowp\User\Controller\Plugin\User;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
@@ -212,8 +215,10 @@ class ItemParentController extends AbstractRestfulController
             $select->group(['item_parent.item_id', 'item_parent.parent_id']);
         }
 
+        /** @var Adapter $adapter */
+        $adapter   = $this->itemParent->getTable()->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->itemParent->getTable()->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $limit = $data['limit'] ? $data['limit'] : 1;
@@ -285,11 +290,11 @@ class ItemParentController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -376,10 +381,11 @@ class ItemParentController extends AbstractRestfulController
             'parent_id' => $parentItem['id'],
             'item_id'   => $item['id'],
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -459,8 +465,9 @@ class ItemParentController extends AbstractRestfulController
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
@@ -567,7 +574,8 @@ class ItemParentController extends AbstractRestfulController
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 }

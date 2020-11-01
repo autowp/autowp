@@ -23,6 +23,7 @@ use Telegram\Bot\Api;
 use Telegram\Bot\Exceptions\TelegramSDKException;
 use Telegram\Bot\Objects\Update;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function sprintf;
 use function strpos;
@@ -219,7 +220,7 @@ class TelegramService
             $select->columns(['chat_id'])
                 ->where(['user_id' => (int) $picture['owner_id']]);
 
-            $row = $this->telegramChatTable->selectWith($select)->current();
+            $row = currentFromResultSetInterface($this->telegramChatTable->selectWith($select));
 
             $authorChatId = $row ? $row['chat_id'] : null;
 
@@ -277,9 +278,9 @@ class TelegramService
 
     private function getUriByChatId(int $chatId): Uri
     {
-        $chat = $this->telegramChatTable->select([
+        $chat = currentFromResultSetInterface($this->telegramChatTable->select([
             'chat_id' => $chatId,
-        ])->current();
+        ]));
 
         if ($chat && $chat['user_id']) {
             $language = $this->userModel->getUserLanguage($chat['user_id']);

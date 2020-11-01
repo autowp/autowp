@@ -4,6 +4,8 @@ namespace Application\Controller\Api;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mail;
 use Laminas\Mail\Transport\TransportInterface;
@@ -48,11 +50,11 @@ class FeedbackController extends AbstractRestfulController
      */
     public function postAction()
     {
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -64,8 +66,7 @@ class FeedbackController extends AbstractRestfulController
                 $captchaResponse = (string) $data['captcha'];
             }
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-            $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
+            $result = $recaptcha->verify($captchaResponse, $request->getServer('REMOTE_ADDR'));
 
             if (! $result->isSuccess()) {
                 return new ApiProblemResponse(
@@ -109,7 +110,8 @@ class FeedbackController extends AbstractRestfulController
 
         $this->transport->send($mail);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 }

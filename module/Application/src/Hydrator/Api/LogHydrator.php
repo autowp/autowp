@@ -59,9 +59,17 @@ class LogHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->getStrategy('user')->setUserId($userId);
-        $this->getStrategy('pictures')->setUserId($userId);
-        $this->getStrategy('items')->setUserId($userId);
+        /** @var Strategy\User $strategy */
+        $strategy = $this->getStrategy('user');
+        $strategy->setUserId($userId);
+
+        /** @var Strategy\Pictures $strategy */
+        $strategy = $this->getStrategy('pictures');
+        $strategy->setUserId($userId);
+
+        /** @var Strategy\Items $strategy */
+        $strategy = $this->getStrategy('items');
+        $strategy->setUserId($userId);
 
         return $this;
     }
@@ -96,7 +104,7 @@ class LogHydrator extends AbstractRestHydrator
      * @param object $object
      * @throws Exception
      */
-    public function hydrate(array $data, $object): void
+    public function hydrate(array $data, $object): object
     {
         throw new Exception("Not supported");
     }

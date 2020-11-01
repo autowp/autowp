@@ -84,7 +84,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return array|ArrayObject
+     * @return ArrayObject|array|null
      */
     public function get()
     {

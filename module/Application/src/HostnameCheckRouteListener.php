@@ -55,9 +55,6 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
         }
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     private function redirect(MvcEvent $e, string $url): ResponseInterface
     {
         /**
@@ -65,7 +62,6 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
          */
         $response = $e->getResponse();
         $response->getHeaders()->addHeaderLine('Location', $url);
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $response->setStatusCode(302);
 
         return $response;

@@ -11,6 +11,7 @@ use Autowp\ZFComponents\Filter\FilenameSafe;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Math\Rand;
@@ -22,6 +23,7 @@ use function array_merge;
 use function array_replace;
 use function array_unique;
 use function array_values;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function implode;
 use function in_array;
@@ -830,11 +832,10 @@ class Picture
      */
     public function getPaginator(array $options): Paginator\Paginator
     {
+        /** @var Adapter $adapter */
+        $adapter = $this->table->getAdapter();
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect(
-                $this->getSelect($options),
-                $this->table->getAdapter()
-            )
+            new Paginator\Adapter\DbSelect($this->getSelect($options), $adapter)
         );
     }
 
@@ -883,7 +884,7 @@ class Picture
         $select = $this->getSelect($options);
         $select->limit(1);
 
-        return $this->table->selectWith($select)->current();
+        return currentFromResultSetInterface($this->table->selectWith($select));
     }
 
     /**
@@ -899,7 +900,7 @@ class Picture
         $select->columns(['id']);
         $select->limit(1);
 
-        return (bool) $this->table->selectWith($select)->current();
+        return (bool) currentFromResultSetInterface($this->table->selectWith($select));
     }
 
     /**
@@ -1159,12 +1160,13 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @throws Exception
      */
     public function getTotalPicturesSize(): int
     {
         $select = $this->table->getSql()->select();
         $select->columns(['sum' => new Sql\Expression('sum(filesize)')]);
-        $row = $this->table->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->table->selectWith($select));
         return $row ? (int) $row['sum'] : 0;
     }
 

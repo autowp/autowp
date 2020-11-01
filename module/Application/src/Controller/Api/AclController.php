@@ -8,6 +8,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -15,6 +16,7 @@ use Laminas\Validator;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
+use function Autowp\Commons\currentFromResultSetInterface;
 use function explode;
 
 /**
@@ -198,8 +200,9 @@ class AclController extends AbstractRestfulController
 
         $this->resetCache();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     public function resourcesAction(): JsonModel
@@ -330,24 +333,20 @@ class AclController extends AbstractRestfulController
 
         $data = $this->rulesPostFilter->getValues();
 
-        $role = $this->roleTable->select([
-            'name' => $data['role'],
-        ])->current();
+        $role = currentFromResultSetInterface($this->roleTable->select(['name' => $data['role']]));
         if (! $role) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
 
-        $resource = $this->resourceTable->select([
-            'name' => $data['resource'],
-        ])->current();
+        $resource = currentFromResultSetInterface($this->resourceTable->select(['name' => $data['resource']]));
         if (! $resource) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
 
-        $privilege = $this->privilegeTable->select([
+        $privilege = currentFromResultSetInterface($this->privilegeTable->select([
             'name'        => $data['privilege'],
             'resource_id' => $resource['id'],
-        ])->current();
+        ]));
         if (! $privilege) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
@@ -374,8 +373,9 @@ class AclController extends AbstractRestfulController
 
         $this->resetCache();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -383,9 +383,9 @@ class AclController extends AbstractRestfulController
      */
     public function roleAction()
     {
-        $role = $this->roleTable->select([
+        $role = currentFromResultSetInterface($this->roleTable->select([
             'name' => $this->params()->fromRoute('role'),
-        ])->current();
+        ]));
 
         if (! $role) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
@@ -401,9 +401,9 @@ class AclController extends AbstractRestfulController
      */
     public function roleParentsAction()
     {
-        $role = $this->roleTable->select([
+        $role = currentFromResultSetInterface($this->roleTable->select([
             'name' => $this->params()->fromRoute('role'),
-        ])->current();
+        ]));
 
         if (! $role) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
@@ -436,9 +436,9 @@ class AclController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        $role = $this->roleTable->select([
+        $role = currentFromResultSetInterface($this->roleTable->select([
             'name' => $this->params()->fromRoute('role'),
-        ])->current();
+        ]));
 
         if (! $role) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
@@ -467,9 +467,9 @@ class AclController extends AbstractRestfulController
 
         $data = $this->roleParentsPostFilter->getValues();
 
-        $parentRole = $this->roleTable->select([
+        $parentRole = currentFromResultSetInterface($this->roleTable->select([
             'name' => $data['role'],
-        ])->current();
+        ]));
 
         if (! $parentRole) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
@@ -482,8 +482,9 @@ class AclController extends AbstractRestfulController
 
         $this->resetCache();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     private function resetCache(): void

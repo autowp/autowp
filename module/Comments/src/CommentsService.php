@@ -6,11 +6,13 @@ use ArrayObject;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Exception;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Paginator;
 
 use function array_replace;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function ceil;
 use function count;
 use function inet_ntop;
@@ -63,11 +65,11 @@ class CommentsService
 
         $parentMessage = null;
         if ($parentId) {
-            $parentMessage = $this->messageTable->select([
+            $parentMessage = currentFromResultSetInterface($this->messageTable->select([
                 'type_id' => $typeId,
                 'item_id' => $itemId,
                 'id'      => $parentId,
-            ])->current();
+            ]));
             if (! $parentMessage) {
                 return 0;
             }
@@ -105,6 +107,7 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @throws Exception
      */
     private function updateMessageRepliesCount(int $messageId): void
     {
@@ -112,7 +115,7 @@ class CommentsService
             ->columns(['count' => new Sql\Expression('count(1)')])
             ->where(['parent_id' => $messageId]);
 
-        $row = $this->messageTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->messageTable->selectWith($select));
 
         $this->messageTable->update([
             'replies_count' => $row['count'],
@@ -162,10 +165,10 @@ class CommentsService
 
             $vote = null;
             if ($userId) {
-                $voteRow = $this->voteTable->select([
+                $voteRow = currentFromResultSetInterface($this->voteTable->select([
                     'comment_id' => $row['id'],
                     'user_id'    => $userId,
-                ])->current();
+                ]));
                 $vote    = $voteRow ? $voteRow['vote'] : null;
             }
 
@@ -213,8 +216,9 @@ class CommentsService
             values (?, ?, ?, NOW())
             on duplicate key update `timestamp` = values(`timestamp`)
         ';
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $statement = $this->topicTable->getAdapter()->query($sql);
+        /** @var Adapter $adapter */
+        $adapter   = $this->topicTable->getAdapter();
+        $statement = $adapter->query($sql);
         $statement->execute([$userId, $typeId, $itemId]);
     }
 
@@ -289,11 +293,14 @@ class CommentsService
             'user_id'    => $userId,
             'vote'       => $vote > 0 ? 1 : -1,
         ];
-        $result = $this->voteTable->getAdapter()->query('
+        /** @var Adapter $adapter */
+        $adapter = $this->voteTable->getAdapter();
+        $stmt    = $adapter->createStatement('
             INSERT INTO comment_vote (comment_id, user_id, vote)
             VALUES (:comment_id, :user_id, :vote)
             ON DUPLICATE KEY UPDATE vote = VALUES(vote)
-        ', $params);
+        ');
+        $result  = $stmt->execute($params);
 
         if ($result->getAffectedRows() === 0) {
             return [
@@ -319,7 +326,7 @@ class CommentsService
             ->columns(['count' => new Sql\Expression('sum(vote)')])
             ->where(['comment_id' => $messageId]);
 
-        $row = $this->voteTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->voteTable->selectWith($select));
 
         $this->messageTable->update([
             'vote' => $row['count'],
@@ -376,6 +383,7 @@ class CommentsService
 
     /**
      * @return array|ArrayObject|null
+     * @throws Exception
      */
     public function getLastMessageRow(int $type, int $item)
     {
@@ -387,42 +395,44 @@ class CommentsService
             ->order('datetime DESC')
             ->limit(1);
 
-        return $this->messageTable->selectWith($select)->current();
+        return currentFromResultSetInterface($this->messageTable->selectWith($select));
     }
 
     public function topicHaveModeratorAttention(int $type, int $item): bool
     {
-        return (bool) $this->messageTable->select([
+        return (bool) currentFromResultSetInterface($this->messageTable->select([
             'item_id'             => $item,
             'type_id'             => $type,
             'moderator_attention' => Attention::REQUIRED,
-        ])->current();
+        ]));
     }
 
     /**
-     * @return array|ArrayObject
+     * @return ArrayObject|array|null
+     * @throws Exception
      */
     public function getMessageRow(int $id)
     {
-        return $this->messageTable->select([
+        return currentFromResultSetInterface($this->messageTable->select([
             'id' => $id,
-        ])->current();
+        ]));
     }
 
     /**
      * @param array|ArrayObject $message
      * @return array|ArrayObject|null
+     * @throws Exception
      */
     private function getMessageRoot($message)
     {
         $root = $message;
 
         while ($root['parent_id']) {
-            $root = $this->messageTable->select([
+            $root = currentFromResultSetInterface($this->messageTable->select([
                 'item_id' => $root['item_id'],
                 'type_id' => $root['type_id'],
                 'id'      => $root['parent_id'],
-            ])->current();
+            ]));
         }
 
         return $root;
@@ -431,6 +441,7 @@ class CommentsService
     /**
      * @suppress PhanDeprecatedFunction
      * @param array $message
+     * @throws Exception
      */
     public function getMessagePage($message, int $perPage): int
     {
@@ -445,7 +456,7 @@ class CommentsService
                 'parent_id is null',
             ]);
 
-        $row = $this->messageTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->messageTable->selectWith($select));
 
         return (int) ceil(($row['count'] + 1) / $perPage);
     }
@@ -462,19 +473,18 @@ class CommentsService
 
     public function updateRepliesCount(): int
     {
+        /** @var Adapter $db */
         $db = $this->messageTable->getAdapter();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $db->query('
             create temporary table __cms
             select type_id, item_id, parent_id as id, count(1) as count
             from comment_message
             where parent_id is not null
             group by type_id, item_id, parent_id
-        ', $db::QUERY_MODE_EXECUTE);
+        ', Adapter::QUERY_MODE_EXECUTE);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $statement = $db->query('
+        $statement = $db->createStatement('
             update comment_message
                 inner join __cms
                 using(type_id, item_id, id)
@@ -535,6 +545,7 @@ class CommentsService
 
     /**
      * @param ArrayObject|array $messageRow
+     * @throws Exception
      */
     public function isNewMessage($messageRow, int $userId): bool
     {
@@ -546,7 +557,7 @@ class CommentsService
                 'user_id' => $userId,
             ]);
 
-        $row = $this->topicViewTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->topicViewTable->selectWith($select));
 
         return $row ? $messageRow['datetime'] > $row['timestamp'] : true;
     }
@@ -676,13 +687,16 @@ class CommentsService
             VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE last_update=VALUES(last_update), messages=VALUES(messages)
         ';
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $statement = $this->topicTable->getAdapter()->query($sql);
+
+        /** @var Adapter $adapter */
+        $adapter   = $this->topicTable->getAdapter();
+        $statement = $adapter->query($sql);
         $statement->execute([$itemId, $typeId, $lastUpdate, $messagesCount]);
     }
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @throws Exception
      */
     private function getMessagesCountFromTimestamp(int $typeId, int $itemId, string $timestamp): int
     {
@@ -694,7 +708,7 @@ class CommentsService
                 'datetime > ?' => $timestamp,
             ]);
 
-        $countRow = $this->messageTable->selectWith($select)->current();
+        $countRow = currentFromResultSetInterface($this->messageTable->selectWith($select));
 
         return (int) $countRow['count'];
     }
@@ -741,6 +755,7 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @throws Exception
      */
     private function countMessages(int $typeId, int $itemId): int
     {
@@ -750,7 +765,7 @@ class CommentsService
                 'item_id' => $itemId,
                 'type_id' => $typeId,
             ]);
-        $countRow = $this->messageTable->selectWith($select)->current();
+        $countRow = currentFromResultSetInterface($this->messageTable->selectWith($select));
 
         return (int) $countRow['count'];
     }
@@ -764,7 +779,7 @@ class CommentsService
                 'item_id' => $itemId,
             ]);
 
-        $row = $this->topicTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->topicTable->selectWith($select));
 
         return $row ? (int) $row['messages'] : 0;
     }
@@ -779,7 +794,7 @@ class CommentsService
             ])
             ->order('datetime desc')
             ->limit(1);
-        $row    = $this->messageTable->selectWith($select)->current();
+        $row    = currentFromResultSetInterface($this->messageTable->selectWith($select));
 
         return $row ? $row['datetime'] : null;
     }
@@ -788,11 +803,11 @@ class CommentsService
     {
         $select = $this->getMessagesSelect($options);
 
+        /** @var Adapter $adapter */
+        $adapter = $this->messageTable->getAdapter();
+
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect(
-                $select,
-                $this->messageTable->getAdapter()
-            )
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
     }
 
@@ -809,11 +824,11 @@ class CommentsService
             ])
             ->order('datetime');
 
+        /** @var Adapter $adapter */
+        $adapter = $this->messageTable->getAdapter();
+
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect(
-                $select,
-                $this->messageTable->getAdapter()
-            )
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
     }
 
@@ -939,6 +954,7 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @throws Exception
      */
     public function getUserAvgVote(int $userId): float
     {
@@ -949,7 +965,7 @@ class CommentsService
                 'vote <> 0',
             ]);
 
-        $row = $this->messageTable->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->messageTable->selectWith($select));
 
         return $row ? (float) $row['avg_vote'] : 0.0;
     }
@@ -1031,38 +1047,40 @@ class CommentsService
 
     public function cleanTopics(): int
     {
+        /** @var Adapter $adapter */
         $adapter = $this->topicViewTable->getAdapter();
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $result = $adapter->query('
+        $stmt    = $adapter->createStatement('
             DELETE comment_topic_view
                 FROM comment_topic_view
                     LEFT JOIN comment_message on comment_topic_view.item_id=comment_message.item_id
                         and comment_topic_view.type_id=comment_message.type_id
             WHERE comment_message.type_id is null
-        ', $adapter::QUERY_MODE_EXECUTE);
+        ');
+        $result  = $stmt->execute();
 
         $affected = $result->getAffectedRows();
 
+        /** @var Adapter $adapter */
         $adapter = $this->topicTable->getAdapter();
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $result = $adapter->query('
+        $stmt    = $adapter->createStatement('
             DELETE comment_topic
                 FROM comment_topic
                     LEFT JOIN comment_message on comment_topic.item_id=comment_message.item_id
                         and comment_topic.type_id=comment_message.type_id
             WHERE comment_message.type_id is null
-        ', $adapter::QUERY_MODE_EXECUTE);
+        ');
+        $result  = $stmt->execute();
 
         return $affected + $result->getAffectedRows();
     }
 
     public function userSubscribed(int $typeId, int $itemId, int $userId): bool
     {
-        return (bool) $this->topicSubscribeTable->select([
+        return (bool) currentFromResultSetInterface($this->topicSubscribeTable->select([
             'type_id' => $typeId,
             'item_id' => $itemId,
             'user_id' => $userId,
-        ])->current();
+        ]));
     }
 
     public function canSubscribe(int $typeId, int $itemId, int $userId): bool

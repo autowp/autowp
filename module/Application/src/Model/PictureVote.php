@@ -2,7 +2,10 @@
 
 namespace Application\Model;
 
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\TableGateway;
+
+use function Autowp\Commons\currentFromResultSetInterface;
 
 class PictureVote
 {
@@ -28,8 +31,9 @@ class PictureVote
                 timestamp = VALUES(timestamp)
         ';
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $statement = $this->voteTable->getAdapter()->query($sql);
+        /** @var Adapter $adapter */
+        $adapter   = $this->voteTable->getAdapter();
+        $statement = $adapter->createStatement($sql);
         $statement->execute([(int) $pictureId, (int) $userId, $value]);
 
         $this->updatePictureSummary($pictureId);
@@ -39,15 +43,15 @@ class PictureVote
     {
         $row = null;
         if ($userId) {
-            $row = $this->voteTable->select([
+            $row = currentFromResultSetInterface($this->voteTable->select([
                 'picture_id' => $pictureId,
                 'user_id'    => $userId,
-            ])->current();
+            ]));
         }
 
-        $summary = $this->summaryTable->select([
+        $summary = currentFromResultSetInterface($this->summaryTable->select([
             'picture_id' => $pictureId,
-        ])->current();
+        ]));
 
         return [
             'value'    => $row ? $row['value'] : null,
@@ -69,8 +73,9 @@ class PictureVote
                 positive = VALUES(positive),
                 negative = VALUES(negative)
         ';
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $statement = $this->summaryTable->getAdapter()->query($sql);
+        /** @var Adapter $adapter */
+        $adapter   = $this->summaryTable->getAdapter();
+        $statement = $adapter->createStatement($sql);
         $statement->execute([$pictureId, $pictureId, $pictureId]);
     }
 }

@@ -3,10 +3,12 @@
 namespace Application\Model;
 
 use ArrayAccess;
+use Exception;
 use Laminas\Db\Sql;
 
 use function array_merge;
 use function array_shift;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function ucfirst;
 
@@ -137,6 +139,7 @@ class PerspectivePictureFetcher
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @throws Exception
      */
     public function getTotalPictures(int $itemId, bool $onlyExactly): int
     {
@@ -165,7 +168,7 @@ class PerspectivePictureFetcher
                 ->where(['item_parent_cache.parent_id' => $itemId]);
         }
 
-        $row = $this->pictureModel->getTable()->selectWith($select)->current();
+        $row = currentFromResultSetInterface($this->pictureModel->getTable()->selectWith($select));
         if (! $row) {
             return 0;
         }
@@ -204,6 +207,7 @@ class PerspectivePictureFetcher
     /**
      * @suppress PhanUndeclaredMethod
      * @param array|ArrayAccess $item
+     * @throws Exception
      */
     public function fetch($item, array $options = []): array
     {
@@ -232,7 +236,7 @@ class PerspectivePictureFetcher
 
             $select->limit(1);
 
-            $picture = $this->pictureModel->getTable()->selectWith($select)->current();
+            $picture = currentFromResultSetInterface($this->pictureModel->getTable()->selectWith($select));
 
             if ($picture) {
                 $pictures[] = $picture;

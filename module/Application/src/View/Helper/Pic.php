@@ -6,6 +6,7 @@ use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use ArrayObject;
 use Laminas\View\Helper\AbstractHtmlElement;
+use Laminas\View\Renderer\PhpRenderer;
 
 use function urlencode;
 
@@ -46,12 +47,22 @@ class Pic extends AbstractHtmlElement
 
     public function htmlTitle(array $picture): string
     {
-        return $this->pictureNameFormatter->formatHtml($picture, $this->view->language());
+        /** @var PhpRenderer $view */
+        $view = $this->view;
+        /** @var Language $languageHelper */
+        $languageHelper = $view->getHelperPluginManager()->get('language');
+
+        return $this->pictureNameFormatter->formatHtml($picture, $languageHelper());
     }
 
     public function textTitle(array $picture): string
     {
-        return $this->pictureNameFormatter->format($picture, $this->view->language());
+        /** @var PhpRenderer $view */
+        $view = $this->view;
+        /** @var Language $languageHelper */
+        $languageHelper = $view->getHelperPluginManager()->get('language');
+
+        return $this->pictureNameFormatter->format($picture, $languageHelper());
     }
 
     /**

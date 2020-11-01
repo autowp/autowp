@@ -8,6 +8,7 @@ use Exception;
 use Laminas\Db\Sql;
 
 use function array_keys;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function implode;
 
 class Wheelsize extends AbstractAdapter
@@ -42,13 +43,19 @@ class Wheelsize extends AbstractAdapter
 
         $specService = $this->most->getSpecs();
 
-        $tyrewidth            = $this->attributeTable->select(['id' => $wheel['tyrewidth']])->current();
+        $tyrewidth            = currentFromResultSetInterface(
+            $this->attributeTable->select(['id' => $wheel['tyrewidth']])
+        );
         $tyrewidthValuesTable = $specService->getValueDataTable($tyrewidth['type_id'])->getTable();
 
-        $tyreseries            = $this->attributeTable->select(['id' => $wheel['tyreseries']])->current();
+        $tyreseries            = currentFromResultSetInterface(
+            $this->attributeTable->select(['id' => $wheel['tyreseries']])
+        );
         $tyreseriesValuesTable = $specService->getValueDataTable($tyreseries['type_id'])->getTable();
 
-        $radius            = $this->attributeTable->select(['id' => $wheel['radius']])->current();
+        $radius            = currentFromResultSetInterface(
+            $this->attributeTable->select(['id' => $wheel['radius']])
+        );
         $radiusValuesTable = $specService->getValueDataTable($radius['type_id'])->getTable();
 
         $select

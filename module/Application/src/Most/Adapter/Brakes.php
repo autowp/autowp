@@ -7,6 +7,7 @@ use Exception;
 use Laminas\Db\Sql;
 
 use function array_keys;
+use function Autowp\Commons\currentFromResultSetInterface;
 use function implode;
 
 class Brakes extends AbstractAdapter
@@ -61,10 +62,14 @@ class Brakes extends AbstractAdapter
             }
             $axisSelect->reset($select::COLUMNS);
 
-            $diameter            = $this->attributeTable->select(['id' => $axis['diameter']])->current();
+            $diameter            = currentFromResultSetInterface(
+                $this->attributeTable->select(['id' => $axis['diameter']])
+            );
             $diameterValuesTable = $specService->getValueDataTable($diameter['type_id'])->getTable();
 
-            $thickness            = $this->attributeTable->select(['id' => $axis['thickness']])->current();
+            $thickness            = currentFromResultSetInterface(
+                $this->attributeTable->select(['id' => $axis['thickness']])
+            );
             $thicknessValuesTable = $specService->getValueDataTable($thickness['type_id'])->getTable();
 
             $axisSelect

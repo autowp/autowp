@@ -7,7 +7,9 @@ use Application\Controller\Api\ItemController;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
 use Exception;
+use Laminas\Http\Header\Location;
 use Laminas\Http\Request;
+use Laminas\Http\Response;
 
 use function count;
 use function explode;
@@ -17,14 +19,15 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function createItem(array $params): int
     {
         $this->reset();
 
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -33,15 +36,15 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/item/post');
         $this->assertActionName('post');
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri     = $headers->get('Location')->uri();
-        $parts   = explode('/', $uri->getPath());
+        /** @var Response $response */
+        $response = $this->getResponse();
+        /** @var Location $location */
+        $location = $response->getHeaders()->get('Location');
+        $uri      = $location->uri();
+        $parts    = explode('/', $uri->getPath());
         return (int) $parts[count($parts) - 1];
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testSelectCarEngine(): void
     {
         // create engine
@@ -52,7 +55,9 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
         // select engine
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
             'engine_id' => $engineId,
         ]);
@@ -65,7 +70,9 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
         // cancel engine
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
             'engine_id' => '',
             'foo'       => 'bar', // workaround for zf bug
@@ -79,7 +86,9 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
         // inherit engine
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
             'engine_id' => 'inherited',
         ]);
@@ -91,13 +100,12 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function testCarsSpecificationsEditor(): void
     {
         $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $url = 'https://www.autowp.ru/api/attr/user-value';
         $this->dispatch($url, Request::METHOD_PATCH, [
             'items' => [

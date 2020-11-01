@@ -12,6 +12,8 @@ use ArrayAccess;
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
@@ -33,7 +35,6 @@ use function sprintf;
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  * @method void log(string $message, array $objects)
- * @method Storage imageStorage()
  * @method Pic pic()
  */
 class PictureItemController extends AbstractRestfulController
@@ -52,6 +53,8 @@ class PictureItemController extends AbstractRestfulController
 
     private Picture $picture;
 
+    private Storage $imageStorage;
+
     public function __construct(
         PictureItem $pictureItem,
         Log $log,
@@ -59,7 +62,8 @@ class PictureItemController extends AbstractRestfulController
         InputFilter $listInputFilter,
         InputFilter $itemInputFilter,
         Item $item,
-        Picture $picture
+        Picture $picture,
+        Storage $imageStorage
     ) {
         $this->pictureItem     = $pictureItem;
         $this->log             = $log;
@@ -68,6 +72,7 @@ class PictureItemController extends AbstractRestfulController
         $this->itemInputFilter = $itemInputFilter;
         $this->item            = $item;
         $this->picture         = $picture;
+        $this->imageStorage    = $imageStorage;
     }
 
     /**
@@ -137,8 +142,10 @@ class PictureItemController extends AbstractRestfulController
             }
         }
 
+        /** @var Adapter $adapter */
+        $adapter   = $table->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $table->getAdapter())
+            new Paginator\Adapter\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -242,14 +249,15 @@ class PictureItemController extends AbstractRestfulController
             ]);
 
             if ($picture['image_id']) {
-                $this->imageStorage()->changeImageName($picture['image_id'], [
+                $this->imageStorage->changeImageName($picture['image_id'], [
                     'pattern' => $this->picture->getFileNamePattern($picture['id']),
                 ]);
             }
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(204);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     /**
@@ -289,7 +297,7 @@ class PictureItemController extends AbstractRestfulController
         ]);
 
         if ($picture['image_id']) {
-            $this->imageStorage()->changeImageName($picture['image_id'], [
+            $this->imageStorage->changeImageName($picture['image_id'], [
                 'pattern' => $this->picture->getFileNamePattern($picture['id']),
             ]);
         }
@@ -308,10 +316,11 @@ class PictureItemController extends AbstractRestfulController
             'item_id'    => $item['id'],
             'type'       => $type,
         ]);
-        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(201);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -432,7 +441,8 @@ class PictureItemController extends AbstractRestfulController
             ]);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return $this->getResponse()->setStatusCode(200);
+        /** @var Response $response */
+        $response = $this->getResponse();
+        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 }

@@ -4,6 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\ItemNameFormatter;
 use Application\Model\Picture;
+use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -20,7 +21,8 @@ class MapControllerFactory implements FactoryInterface
         return new MapController(
             $container->get(ItemNameFormatter::class),
             $container->get(Picture::class),
-            $tables->get('item')
+            $tables->get('item'),
+            $container->get(Storage::class)
         );
     }
 }

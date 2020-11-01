@@ -10,6 +10,7 @@ use Laminas\View\Model\ViewModel;
 
 /**
  * @method User user($user = null)
+ * @method ViewModel forbiddenAction()
  */
 class ContentLanguageController extends AbstractRestfulController
 {
