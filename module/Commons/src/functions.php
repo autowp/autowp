@@ -33,6 +33,6 @@ function parsePointWkb(string $str): ?Coordinate
     if (! $str) {
         return null;
     }
-    $coordinates = unpack('x/x/x/x/corder/Ltype/dlat/dlng', $str);
+    $coordinates = unpack('x/x/x/x/corder/Ltype/dlng/dlat', $str);
     return new Coordinate($coordinates['lat'], $coordinates['lng']);
 }
