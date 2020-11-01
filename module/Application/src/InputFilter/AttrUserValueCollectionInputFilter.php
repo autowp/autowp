@@ -120,6 +120,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
     }
 
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @psalm-suppress InvalidPropertyAssignmentValue
      * @param null|mixed $context Ignored, but present to retain signature compatibility.
      * @throws Exception
