@@ -126,7 +126,6 @@ class Forums
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function updateThemeStat(int $themeId): void
@@ -148,9 +147,6 @@ class Forums
 
         $messages = $this->comments->getTotalMessagesCount([
             'type' => AppComments::FORUMS_TYPE_ID,
-            /**
-                 * @suppress PhanPluginMixedKeyNoKey
-                 */
             'callback'
                 => function (Sql\Select $select) use ($theme): void {
                     $select
@@ -171,7 +167,6 @@ class Forums
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function getTopicList(int $themeId, int $page, int $userId): array
@@ -259,7 +254,6 @@ class Forums
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function getThemePage(int $themeId, int $page, int $userId, bool $isModerator): array
@@ -300,7 +294,6 @@ class Forums
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function addTopic(array $values): int
@@ -384,31 +377,29 @@ class Forums
     {
         $select = new Sql\Select($this->topicTable->getTable());
 
+        /** @var Predicate\Expression $on */
+        $on = new Predicate\PredicateSet([
+            new Predicate\Operator(
+                'forums_topics.id',
+                Predicate\Operator::OPERATOR_EQUAL_TO,
+                'comment_topic.item_id',
+                Predicate\Operator::TYPE_IDENTIFIER,
+                Predicate\Operator::TYPE_IDENTIFIER
+            ),
+            new Predicate\Operator(
+                'comment_topic.type_id',
+                Predicate\Operator::OPERATOR_EQUAL_TO,
+                AppComments::FORUMS_TYPE_ID,
+                Predicate\Operator::TYPE_IDENTIFIER,
+                Predicate\Operator::TYPE_VALUE
+            ),
+        ], Predicate\PredicateSet::COMBINED_BY_AND);
+
         $select
             ->where([
                 new Predicate\In('forums_topics.status', [self::STATUS_CLOSED, self::STATUS_NORMAL]),
             ])
-            ->join(
-                'comment_topic',
-                new Predicate\PredicateSet([
-                    new Predicate\Operator(
-                        'forums_topics.id',
-                        Predicate\Operator::OPERATOR_EQUAL_TO,
-                        'comment_topic.item_id',
-                        Predicate\Operator::TYPE_IDENTIFIER,
-                        Predicate\Operator::TYPE_IDENTIFIER
-                    ),
-                    new Predicate\Operator(
-                        'comment_topic.type_id',
-                        Predicate\Operator::OPERATOR_EQUAL_TO,
-                        AppComments::FORUMS_TYPE_ID,
-                        Predicate\Operator::TYPE_IDENTIFIER,
-                        Predicate\Operator::TYPE_VALUE
-                    ),
-                ], Predicate\PredicateSet::COMBINED_BY_AND),
-                [],
-                $select::JOIN_LEFT
-            )
+            ->join('comment_topic', $on, [], $select::JOIN_LEFT)
             ->order('comment_topic.last_update DESC');
 
         if ($themeId) {
@@ -466,9 +457,6 @@ class Forums
         return true;
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function getTopic(int $topicId, array $options = []): ?array
     {
         $defaults = [
@@ -529,9 +517,6 @@ class Forums
         ];
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function registerTopicView(int $topicId, int $userId): void
     {
         $this->topicTable->update([
@@ -696,7 +681,6 @@ class Forums
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      * @throws Exception
      */
     public function getSubscribedTopicsCount(int $userId): int

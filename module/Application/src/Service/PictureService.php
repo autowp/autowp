@@ -14,10 +14,8 @@ use Autowp\Comments\CommentsService;
 use Autowp\Image;
 use Autowp\TextStorage;
 use Exception;
-use geoPHP;
 use ImagickException;
 use Laminas\Db\Sql;
-use Point;
 
 use function count;
 use function getimagesize;
@@ -72,7 +70,6 @@ class PictureService
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @throws Image\Storage\Exception
      */
     public function clearQueue(): void
@@ -120,7 +117,6 @@ class PictureService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return array|ArrayObject|null
      * @throws Image\Storage\Exception
      * @throws ImagickException
@@ -254,11 +250,8 @@ class PictureService
         $extractor = new ExifGPSExtractor();
         $gps       = $extractor->extract($exif);
         if ($gps) {
-            geoPHP::version();
-            $point = new Point($gps['lng'], $gps['lat']);
-
             $this->picture->getTable()->update([
-                'point' => new Sql\Expression('ST_GeomFromWKB(?)', [$point->out('wkb')]),
+                'point' => new Sql\Expression('Point(?, ?)', [$gps['lng'], $gps['lat']]),
             ], [
                 'id' => $pictureId,
             ]);

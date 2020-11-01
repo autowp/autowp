@@ -22,9 +22,6 @@ class UserRename
         ]);
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function add(int $userId, string $oldName, string $newName): void
     {
         $this->table->insert([

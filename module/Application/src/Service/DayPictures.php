@@ -173,7 +173,6 @@ class DayPictures
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function getLastDateStr(): ?string
@@ -198,7 +197,6 @@ class DayPictures
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function calcPrevDate(): self
@@ -282,7 +280,6 @@ class DayPictures
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function calcNextDate(): self

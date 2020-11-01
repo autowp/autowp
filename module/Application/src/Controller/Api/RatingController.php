@@ -113,9 +113,6 @@ class RatingController extends AbstractActionController
         ]);
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function picturesAction(): JsonModel
     {
         $rows = $this->userModel->getRows([

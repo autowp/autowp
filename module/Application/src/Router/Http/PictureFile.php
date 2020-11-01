@@ -49,7 +49,6 @@ class PictureFile implements RouteInterface
             return null;
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $uri  = $request->getUri();
         $path = $uri->getPath();
 

@@ -62,7 +62,6 @@ class Catalogue
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function getCataloguePaths(int $id, array $options = []): array

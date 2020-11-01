@@ -97,7 +97,6 @@ class UsersService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function getPasswordHashExpr(string $password): Sql\Expression
@@ -127,7 +126,6 @@ class UsersService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ArrayObject|array|null
      * @throws Exception
      */
@@ -195,7 +193,6 @@ class UsersService
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @return null|array|ArrayObject
      */
     public function emailChangeFinish(string $code)
@@ -353,9 +350,6 @@ class UsersService
         return true;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function restoreVotes(): void
     {
         $this->userModel->getTable()->update([
@@ -387,9 +381,6 @@ class UsersService
         ]));
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function deleteUnused(): void
     {
         $table = $this->userModel->getTable();

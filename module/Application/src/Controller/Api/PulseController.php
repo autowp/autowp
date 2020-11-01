@@ -54,9 +54,6 @@ class PulseController extends AbstractActionController
         return $this->colors[$this->lastColor++ % count($this->colors)];
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function indexAction(): JsonModel
     {
         $now = new DateTime();

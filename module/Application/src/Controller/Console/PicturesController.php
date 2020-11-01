@@ -6,11 +6,9 @@ use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Model\Picture;
 use Autowp\Image\StorageInterface;
-use geoPHP;
 use Laminas\Console\Console;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractActionController;
-use Point;
 
 use function strpos;
 
@@ -31,9 +29,6 @@ class PicturesController extends AbstractActionController
         $this->imageStorage = $storage;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function fillPointAction(): void
     {
         $console      = Console::getInstance();
@@ -46,8 +41,6 @@ class PicturesController extends AbstractActionController
 
         $extractor = new ExifGPSExtractor();
 
-        geoPHP::version();
-
         foreach ($rows as $row) {
             $console->writeLine($row['id']);
             $exif = $imageStorage->getImageEXIF($row['image_id']);
@@ -55,10 +48,8 @@ class PicturesController extends AbstractActionController
             if ($gps !== false) {
                 $console->writeLine("Picture " . $row['id']);
 
-                $point = new Point($gps['lng'], $gps['lat']);
-
                 $this->picture->getTable()->update([
-                    'point' => new Sql\Expression('ST_GeomFromWKB(?)', [$point->out('wkb')]),
+                    'point' => new Sql\Expression('Point(?, ?)', [$gps['lng'], $gps['lat']]),
                 ], [
                     'id' => $row['id'],
                 ]);

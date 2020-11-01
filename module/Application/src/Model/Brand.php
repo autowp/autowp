@@ -90,7 +90,6 @@ class Brand
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function getTopBrandsList(string $language): array
@@ -158,9 +157,6 @@ class Brand
         return $number;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function getFullBrandsList(string $language): array
     {
         $select = new Sql\Select(['ipc_all' => 'item_parent_cache']);
@@ -282,7 +278,6 @@ class Brand
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function fetchBrand(string $language, callable $callback): ?array

@@ -79,7 +79,7 @@ class BanController extends AbstractActionController
         $this->service->ban(
             $ip,
             $this->params()->fromPost('period') * 3600,
-            $this->user()->get()['id'], // @phan-suppress-current-line PhanUndeclaredMethod
+            $this->user()->get()['id'],
             $this->params()->fromPost('reason')
         );
 

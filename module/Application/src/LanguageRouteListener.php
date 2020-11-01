@@ -45,7 +45,6 @@ class LanguageRouteListener extends AbstractListenerAggregate
 
             $language = $this->defaultLanguage;
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $hostname = $request->getUri()->getHost();
 
             if (in_array($hostname, $this->userDetectable)) {
@@ -54,7 +53,6 @@ class LanguageRouteListener extends AbstractListenerAggregate
                 $userLanguage = $this->detectUserLanguage($request, $languageWhitelist);
 
                 if (isset($hosts[$userLanguage])) {
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $redirectUrl = $request->getUri()->getScheme() . '://'
                         . $hosts[$userLanguage]['hostname'] . $request->getRequestUri();
 
@@ -65,7 +63,6 @@ class LanguageRouteListener extends AbstractListenerAggregate
 
             foreach ($hosts as $host) {
                 if (in_array($hostname, $host['aliases'])) {
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $redirectUrl = $request->getUri()->getScheme() . '://'
                         . $host['hostname'] . $request->getRequestUri();
 
@@ -104,15 +101,11 @@ class LanguageRouteListener extends AbstractListenerAggregate
         return null;
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     private function redirect(MvcEvent $e, string $url): ResponseInterface
     {
         /** @var Response $response */
         $response = $e->getResponse();
         $response->getHeaders()->addHeaderLine('Location', $url);
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $response->setStatusCode(302);
 
         return $response;

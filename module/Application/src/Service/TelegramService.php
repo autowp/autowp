@@ -167,7 +167,6 @@ class TelegramService
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function notifyInbox(int $pictureId): void
@@ -203,7 +202,6 @@ class TelegramService
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function notifyPicture(int $pictureId): void
@@ -294,7 +292,6 @@ class TelegramService
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function notifyMessage(?int $fromId, int $userId, string $text): void

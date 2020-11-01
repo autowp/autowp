@@ -24,7 +24,6 @@ use Autowp\ZFComponents\Filter\FilenameSafe;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Collator;
 use Exception;
-use geoPHP;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Adapter\Adapter;
@@ -44,7 +43,7 @@ use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use Point;
+use Location\Coordinate;
 
 use function array_key_exists;
 use function array_keys;
@@ -285,7 +284,6 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      * @return ViewModel|ResponseInterface|array
      * @throws Exception
      */
@@ -588,7 +586,7 @@ class ItemController extends AbstractRestfulController
 
                 $select
                     ->join(['ils' => 'item_language'], 'item.id = ils.item_id', [])
-                    ->join(['ils2' => 'item_language'], new Sql\Expression('INSTR(ils.name, ils2.name)'), [])
+                    ->join(['ils2' => 'item_language'], new Sql\Predicate\Expression('INSTR(ils.name, ils2.name)'), [])
                     ->where([
                         'item.item_type_id' => Item::BRAND,
                         'ils2.item_id'      => $data['suggestions_to'],
@@ -731,7 +729,7 @@ class ItemController extends AbstractRestfulController
                 $select
                     ->join(
                         ['esac' => 'item_parent_cache'],
-                        new Sql\Expression(
+                        new Sql\Predicate\Expression(
                             'item.id = esac.item_id and esac.parent_id = ?',
                             [$data['exclude_self_and_childs']]
                         ),
@@ -846,7 +844,6 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
      */
     public function alphaAction()
@@ -1204,8 +1201,8 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function postAction()
     {
@@ -1388,8 +1385,7 @@ class ItemController extends AbstractRestfulController
         if (array_key_exists('lat', $values) && array_key_exists('lng', $values)) {
             $point = null;
             if (strlen($values['lat']) && strlen($values['lng'])) {
-                geoPHP::version(); // for autoload classes
-                $point = new Point($values['lng'], $values['lat']);
+                $point = new Coordinate($values['lat'], $values['lng']);
             }
             $this->itemModel->setPoint($itemId, $point);
         }
@@ -1430,6 +1426,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function putAction()
     {
@@ -1442,7 +1439,6 @@ class ItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $request = $this->getRequest();
@@ -1775,8 +1771,7 @@ class ItemController extends AbstractRestfulController
             $subscribe = true;
             $point     = null;
             if (strlen($values['lat']) && strlen($values['lng'])) {
-                geoPHP::version(); // for autoload classes
-                $point = new Point($values['lng'], $values['lat']);
+                $point = new Coordinate($values['lat'], $values['lng']);
             }
             $this->itemModel->setPoint($item['id'], $point);
         }
@@ -2055,7 +2050,6 @@ class ItemController extends AbstractRestfulController
      */
     public function treeAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }

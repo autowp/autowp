@@ -42,7 +42,6 @@ class Acceleration extends AbstractAdapter
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function getCars(Sql\Select $select, string $language): array

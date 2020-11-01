@@ -26,9 +26,6 @@ class Twins
         $this->brand   = $brand;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function getBrands(array $options): array
     {
         $defaults = [
@@ -63,9 +60,6 @@ class Twins
         });
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function getGroupsPicturesCount(array $groupIds): array
     {
         if (! $groupIds) {

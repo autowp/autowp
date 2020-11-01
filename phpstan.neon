@@ -4,3 +4,5 @@ parameters:
         processTimeout: 300.0
     paths:
         - module
+    excludes_analyse:
+        - "*/AttrUserValueCollectionInputFilter.php"

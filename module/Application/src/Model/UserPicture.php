@@ -19,9 +19,6 @@ class UserPicture
         $this->userTable    = $userTable;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function refreshAllPicturesCount(): void
     {
         $select = new Sql\Select($this->pictureTable->getTable());
@@ -54,9 +51,6 @@ class UserPicture
         ], $filter);
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function refreshPicturesCount(int $userId): void
     {
         $select = new Sql\Select($this->pictureTable->getTable());
@@ -75,9 +69,6 @@ class UserPicture
         ]);
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function incrementUploads(int $userId): void
     {
         $this->userTable->update([

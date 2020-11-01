@@ -510,7 +510,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @param mixed $value
      * @throws Exception
      */
@@ -646,7 +645,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @param mixed $value
      * @throws Exception
      */
@@ -863,7 +861,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @param array|ArrayAccess $car
      * @return array|ArrayObject|null
      * @throws Exception
@@ -962,7 +959,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      * @return null|mixed
      */
@@ -1412,7 +1408,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @param array|ArrayAccess $attribute
      * @throws Exception
      */
@@ -1490,7 +1485,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @param array|ArrayAccess $attribute
      * @throws Exception
      */
@@ -1562,7 +1556,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     private function setActualValue(array $attribute, int $itemId, array $actualValue): bool
@@ -1687,7 +1680,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
      * @return bool|array
      * @throws Exception
@@ -1723,7 +1715,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      * @throws Exception
      */
     public function getSpecsCount(int $itemId): int
@@ -1738,7 +1729,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
      * @return bool|array
      * @throws Exception
@@ -1818,9 +1808,6 @@ class SpecificationsService
         }
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function getContributors(int $itemId): array
     {
         if (! $itemId) {
@@ -2306,7 +2293,6 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @param int|int[] $userId
      */
     public function refreshUserConflicts($userId): void
@@ -2446,9 +2432,6 @@ class SpecificationsService
         $this->refreshUserConflicts($userIds);
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function refreshUsersConflictsStat(): void
     {
         $pSelect = 'SELECT sum(weight) FROM attrs_user_values WHERE user_id = users.id AND weight > 0';

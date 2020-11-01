@@ -53,9 +53,6 @@ class CommentsService
         $this->userModel           = $userModel;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function add(array $data): int
     {
         $typeId   = (int) $data['typeId'];
@@ -106,7 +103,6 @@ class CommentsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     private function updateMessageRepliesCount(int $messageId): void
@@ -222,9 +218,6 @@ class CommentsService
         $statement->execute([$userId, $typeId, $itemId]);
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function queueDeleteMessage(int $id, int $userId): bool
     {
         $comment = $this->getMessageRow($id);
@@ -317,9 +310,6 @@ class CommentsService
         ];
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     private function updateVote(int $messageId): int
     {
         $select = $this->voteTable->getSql()->select()
@@ -439,7 +429,6 @@ class CommentsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @param array $message
      * @throws Exception
      */
@@ -695,7 +684,6 @@ class CommentsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     private function getMessagesCountFromTimestamp(int $typeId, int $itemId, string $timestamp): int
@@ -754,7 +742,6 @@ class CommentsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     private function countMessages(int $typeId, int $itemId): int
@@ -811,9 +798,6 @@ class CommentsService
         );
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function getMessagePaginator(int $type, int $item): Paginator\Paginator
     {
         $select = $this->messageTable->getSql()->select()
@@ -953,7 +937,6 @@ class CommentsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function getUserAvgVote(int $userId): float
@@ -1161,7 +1144,7 @@ class CommentsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * , PhanPluginMixedKeyNoKey
      */
     public function getTopAuthors(int $limit): array
     {

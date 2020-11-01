@@ -5,6 +5,7 @@ namespace ApplicationTest\Controller\Frontend;
 use Application\Controller\Api\AttrController;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
+use Exception;
 use Laminas\Http\Request;
 
 class AccountControllerTest extends AbstractHttpControllerTestCase
@@ -69,6 +70,9 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 //        return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
 //    }
 
+    /**
+     * @throws Exception
+     */
     public function testSpecsConflicts(): void
     {
         /** @var Request $request */

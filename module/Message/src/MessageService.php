@@ -69,15 +69,11 @@ class MessageService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function getNewCount(int $userId): int
     {
         $row = currentFromResultSetInterface($this->table->select(
-            /**
-             * @suppress PhanPluginMixedKeyNoKey
-             */
             function (Sql\Select $select) use ($userId): void {
                 $select
                     ->columns(['count' => new Sql\Expression('COUNT(1)')])
@@ -108,9 +104,6 @@ class MessageService
         ]);
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function deleteAllSystem(int $userId): void
     {
         $this->table->delete([
@@ -144,9 +137,6 @@ class MessageService
         ]);
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     private function getSystemSelect(int $userId): Sql\Select
     {
         return $this->table->getSql()->select()
@@ -158,9 +148,6 @@ class MessageService
             ->order('add_datetime DESC');
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     private function getInboxSelect(int $userId): Sql\Select
     {
         return $this->table->getSql()->select()
@@ -172,9 +159,6 @@ class MessageService
             ->order('add_datetime DESC');
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     private function getSentSelect(int $userId): Sql\Select
     {
         return $this->table->getSql()->select()

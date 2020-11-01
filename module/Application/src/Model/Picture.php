@@ -348,6 +348,7 @@ class Picture
                     }
                     break;
                 case 'messages':
+                    /** @var Sql\Predicate\Expression $predicate */
                     $predicate = new Sql\Predicate\PredicateSet([
                         new Sql\Predicate\Operator(
                             'ct.type_id',
@@ -362,9 +363,6 @@ class Picture
                             Sql\Predicate\Operator::TYPE_IDENTIFIER
                         ),
                     ]);
-                    /**
-                     * @psalm-suppress InvalidArgument
-                     */
                     $select->join(
                         ['ct' => 'comment_topic'],
                         $predicate,
@@ -379,7 +377,6 @@ class Picture
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function getSelect(array $options): Sql\Select
@@ -844,7 +841,6 @@ class Picture
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function getCountDistinct(array $options): int
@@ -871,7 +867,6 @@ class Picture
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @return array|ArrayObject|null
      * @throws Exception
      */
@@ -884,7 +879,6 @@ class Picture
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function isExists(array $options): bool
@@ -935,9 +929,6 @@ class Picture
         return $this->table;
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function getFileNamePattern(int $pictureId): string
     {
         $result = rand(1, 9999);
@@ -1101,7 +1092,6 @@ class Picture
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function accept(int $pictureId, int $userId, bool &$isFirstTimeAccepted): bool
@@ -1155,7 +1145,6 @@ class Picture
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      * @throws Exception
      */
     public function getTotalPicturesSize(): int
@@ -1167,7 +1156,6 @@ class Picture
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      * @param array|ArrayAccess|Traversable $rows
      */
     public function getNameData($rows, array $options = []): array
@@ -1297,9 +1285,6 @@ class Picture
         return $result;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function getTopLikes(int $limit): array
     {
         $select = $this->table->getSql()->select()
@@ -1318,9 +1303,6 @@ class Picture
         return $result;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function getTopOwnerFans(int $userId, int $limit): array
     {
         $select = $this->table->getSql()->select()

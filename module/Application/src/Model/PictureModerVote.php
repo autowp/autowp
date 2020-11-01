@@ -38,9 +38,6 @@ class PictureModerVote
         return $result;
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function getNegativeVotes(int $pictureId): array
     {
         $rows = $this->table->select([
@@ -59,9 +56,6 @@ class PictureModerVote
         return $result;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function add(int $pictureId, int $userId, int $vote, string $reason): void
     {
         $this->table->insert([
@@ -81,9 +75,6 @@ class PictureModerVote
         ]);
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
-     */
     public function getVoteCount(int $pictureId): array
     {
         $select = new Sql\Select($this->table->getTable());
@@ -101,9 +92,6 @@ class PictureModerVote
         ];
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function getVoteCountArray(array $ids): array
     {
         if (! count($ids)) {
@@ -142,7 +130,8 @@ class PictureModerVote
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * , PhanPluginMixedKeyNoKey
+     *
      * @throws Exception
      */
     public function getPositiveVotesCount(int $pictureId): int
@@ -159,7 +148,8 @@ class PictureModerVote
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * , PhanPluginMixedKeyNoKey
+     *
      * @throws Exception
      */
     public function getNegativeVotesCount(int $pictureId): int

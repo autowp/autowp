@@ -52,7 +52,7 @@ class ExifGPSExtractor
         return $flip * ($degrees + $minutes / 60 + $seconds / 3600);
     }
 
-    private function gps2Num(string $coordPart): ?float
+    private function gps2Num(string $coordPart): float
     {
         $parts = explode('/', $coordPart);
 

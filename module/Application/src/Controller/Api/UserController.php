@@ -599,7 +599,7 @@ class UserController extends AbstractRestfulController
         /** @var Request $request */
         $request = $this->getRequest();
 
-        $data = $request->getFiles()->toArray(); // @phan-suppress-current-line PhanUndeclaredMethod
+        $data = $request->getFiles()->toArray();
 
         $this->postPhotoInputFilter->setData($data);
         if (! $this->postPhotoInputFilter->isValid()) {

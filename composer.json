@@ -22,7 +22,6 @@
         "ext-fileinfo" : "*",
         "ext-bcmath": "*",
 		"irazasyed/telegram-bot-sdk" : "2.0.x-dev",
-		"phayes/geophp" : "^1.2",
 		"michelf/php-markdown" : "^1.8.0",
 		"autowp/textstorage" : "^3.0.1",
 		"autowp/zf-components" : "^3.0.3",
@@ -54,7 +53,8 @@
 		"php-amqplib/php-amqplib": "^2.7",
 		"sentry/sdk": "^3.0",
 		"firebase/php-jwt": "^5.2",
-		"aws/aws-sdk-php": "^3.158"
+		"aws/aws-sdk-php": "^3.158",
+		"mjaschen/phpgeo": "^3.2"
 	},
 	"autoload" : {
 		"psr-4" : {

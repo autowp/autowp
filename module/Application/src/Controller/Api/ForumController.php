@@ -357,7 +357,6 @@ class ForumController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
      */
     public function postTopicAction()

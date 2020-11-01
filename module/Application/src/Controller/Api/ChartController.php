@@ -91,7 +91,6 @@ class ChartController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      * @return ViewModel|ResponseInterface|array
      */
     public function dataAction()

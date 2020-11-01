@@ -39,9 +39,6 @@ class User
         $this->table = $table;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function updateSpecsVolumes(): void
     {
         $select = $this->table->getSql()->select()
@@ -232,7 +229,6 @@ class User
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @param int|array $options
      * @return array|ArrayObject|null
      * @throws Exception
@@ -281,7 +277,6 @@ class User
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function isExists(array $options): bool
@@ -297,7 +292,6 @@ class User
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function registerVisit(int $userId, Request $request): void
@@ -314,7 +308,6 @@ class User
             $set['last_online'] = new Sql\Expression('NOW()');
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $remoteAddr = $request->getServer('REMOTE_ADDR');
         if ($remoteAddr) {
             $ip = inet_pton($remoteAddr);
@@ -329,7 +322,6 @@ class User
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function getUserLanguage(int $userId): string
@@ -348,7 +340,6 @@ class User
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function getUserRole(int $userId): string
@@ -366,9 +357,6 @@ class User
         return (string) $user['role'];
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function decVotes(int $userId): void
     {
         $this->table->update([

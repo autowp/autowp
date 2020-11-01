@@ -244,7 +244,6 @@ class ItemHydrator extends AbstractRestHydrator
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      * @throws Exception
      */
     private function getCountBySelect(Sql\Select $select, TableGateway $table): int
@@ -405,11 +404,11 @@ class ItemHydrator extends AbstractRestHydrator
             $point = $this->itemModel->getPoint($object['id']);
 
             if ($showLat) {
-                $result['lat'] = $point ? $point->y() : null;
+                $result['lat'] = $point ? $point->getLat() : null;
             }
 
             if ($showLat) {
-                $result['lng'] = $point ? $point->x() : null;
+                $result['lng'] = $point ? $point->getLng() : null;
             }
         }
 

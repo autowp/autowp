@@ -321,7 +321,6 @@ class CommentController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
      * @throws Exception
      */

@@ -21,7 +21,6 @@ use Autowp\TextStorage;
 use Autowp\User\Model\User;
 use DateTime;
 use Exception;
-use geoPHP;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
@@ -33,6 +32,7 @@ use Traversable;
 
 use function array_search;
 use function array_values;
+use function Autowp\Commons\parsePointWkb;
 use function count;
 use function explode;
 use function htmlspecialchars;
@@ -40,7 +40,6 @@ use function implode;
 use function in_array;
 use function inet_ntop;
 use function is_array;
-use function substr;
 use function urlencode;
 
 class PictureHydrator extends AbstractRestHydrator
@@ -310,11 +309,11 @@ class PictureHydrator extends AbstractRestHydrator
         ];
 
         if ($object['point']) {
-            $point = geoPHP::load(substr($object['point'], 4), 'wkb');
+            $point = parsePointWkb($object['point']);
             if ($point) {
                 $picture['point'] = [
-                    'lng' => $point->x(),
-                    'lat' => $point->y(),
+                    'lng' => $point->getLng(),
+                    'lat' => $point->getLat(),
                 ];
             }
         }

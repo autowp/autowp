@@ -138,7 +138,6 @@ class PerspectivePictureFetcher
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function getTotalPictures(int $itemId, bool $onlyExactly): int
@@ -205,7 +204,6 @@ class PerspectivePictureFetcher
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @param array|ArrayAccess $item
      * @throws Exception
      */

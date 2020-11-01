@@ -6,21 +6,18 @@ use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\Image\Storage;
-use geoPHP;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use LineString;
-use Point;
-use Polygon;
 
 use function array_replace;
+use function Autowp\Commons\parsePointWkb;
 use function count;
 use function explode;
-use function substr;
+use function sprintf;
 
 /**
  * @method string language()
@@ -52,8 +49,6 @@ class MapController extends AbstractActionController
      */
     public function dataAction()
     {
-        geoPHP::version(); // for autoload classes
-
         $bounds = $this->params()->fromQuery('bounds');
         $bounds = explode(',', (string) $bounds);
 
@@ -66,15 +61,6 @@ class MapController extends AbstractActionController
         $lngHi = (float) $bounds[2];
         $latHi = (float) $bounds[3];
 
-        $line    = new LineString([
-            new Point($lngLo, $latLo),
-            new Point($lngLo, $latHi),
-            new Point($lngHi, $latHi),
-            new Point($lngHi, $latLo),
-            new Point($lngLo, $latLo),
-        ]);
-        $polygon = new Polygon([$line]);
-
         $pointsOnly = (bool) $this->params()->fromQuery('points-only', 14);
 
         $language = $this->language();
@@ -86,7 +72,21 @@ class MapController extends AbstractActionController
                     : ['id', 'name', 'begin_year', 'end_year', 'item_type_id']
         )
             ->join('item_point', 'item.id = item_point.item_id', ['point'])
-            ->where(['ST_Contains(ST_GeomFromText(?), item_point.point)' => $polygon->out('wkt')])
+            ->where([
+                'ST_Contains(ST_GeomFromText(?), item_point.point)' => sprintf(
+                    'POLYGON((%F %F, %F %F, %F %F, %F %F, %F %F))',
+                    $lngLo,
+                    $latLo,
+                    $lngLo,
+                    $latHi,
+                    $lngHi,
+                    $latHi,
+                    $lngHi,
+                    $latLo,
+                    $lngLo,
+                    $latLo,
+                ),
+            ])
             ->order('item.name');
 
         $factories = $this->itemTable->selectWith($select);
@@ -95,13 +95,13 @@ class MapController extends AbstractActionController
         foreach ($factories as $item) {
             $point = null;
             if ($item['point']) {
-                $point = geoPHP::load(substr($item['point'], 4), 'wkb');
+                $point = parsePointWkb($item['point']);
             }
 
             $row = [
                 'location' => [
-                    'lat' => $point ? $point->y() : null,
-                    'lng' => $point ? $point->x() : null,
+                    'lat' => $point ? $point->getLat() : null,
+                    'lng' => $point ? $point->getLng() : null,
                 ],
             ];
 

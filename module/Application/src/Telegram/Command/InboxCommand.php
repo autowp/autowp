@@ -36,7 +36,6 @@ class InboxCommand extends Command
     }
 
     /**
-     * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      * @inheritDoc
      * @param mixed $arguments
      * @throws Exception

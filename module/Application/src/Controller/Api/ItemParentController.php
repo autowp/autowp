@@ -101,7 +101,6 @@ class ItemParentController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
      */
     public function indexAction()
@@ -491,7 +490,6 @@ class ItemParentController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @throws Exception
      * @return ViewModel|ResponseInterface|array
      */

@@ -98,10 +98,7 @@ class Votings
         foreach ($vvRows as $vvRow) {
             switch ($filter) {
                 case 1:
-                    $row = currentFromResultSetInterface($this->voteTable->select(
-                        /**
-                         * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-                         */
+                    $row   = currentFromResultSetInterface($this->voteTable->select(
                         function (Sql\Select $select) use ($vvRow): void {
                             $select
                                 ->columns(['count' => new Sql\Expression('count(1)')])
@@ -195,7 +192,6 @@ class Votings
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function vote(int $id, array $variantId, int $userId): bool
@@ -249,9 +245,6 @@ class Votings
     private function updateVariantVotesCount(int $variantId): void
     {
         $count = currentFromResultSetInterface($this->voteTable->select(
-            /**
-             * @suppress PhanDeprecatedFunction
-             */
             function (Sql\Select $select) use ($variantId): void {
                 $select
                     ->columns(['count' => new Sql\Expression('count(1)')])
@@ -269,9 +262,6 @@ class Votings
     private function updateVotingVotesCount(int $votingId): void
     {
         $count = currentFromResultSetInterface($this->voteTable->select(
-            /**
-             * @suppress PhanDeprecatedFunction
-             */
             function (Sql\Select $select) use ($votingId): void {
                 $select
                     ->columns(['count' => new Sql\Expression('count(distinct voting_variant_vote.user_id)')])

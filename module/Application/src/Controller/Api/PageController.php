@@ -263,7 +263,6 @@ class PageController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
      */
     public function postAction()

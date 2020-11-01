@@ -12,9 +12,6 @@ class PictureServiceTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../config/application.config.php';
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     private function getRandomVehicleId(): int
     {
         $services  = $this->getApplicationServiceLocator();
@@ -30,9 +27,6 @@ class PictureServiceTest extends AbstractHttpControllerTestCase
         return $item['id'];
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function testClearQueue(): void
     {
         $services = $this->getApplicationServiceLocator();

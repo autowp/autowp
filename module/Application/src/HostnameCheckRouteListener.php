@@ -39,7 +39,6 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
         $request = $e->getRequest();
 
         if ($request instanceof Request) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $hostname = $request->getUri()->getHost();
 
             $isAllowed = in_array($hostname, $this->hostnameWhitelist);

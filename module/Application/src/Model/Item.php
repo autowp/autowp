@@ -8,12 +8,11 @@ use ArrayObject;
 use Autowp\TextStorage\Service as TextStorage;
 use DateTime;
 use Exception;
-use Geometry;
-use geoPHP;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Paginator;
+use Location\Coordinate;
 
 use function array_diff;
 use function array_keys;
@@ -24,6 +23,7 @@ use function array_splice;
 use function array_unique;
 use function array_values;
 use function Autowp\Commons\currentFromResultSetInterface;
+use function Autowp\Commons\parsePointWkb;
 use function count;
 use function is_array;
 use function is_numeric;
@@ -31,7 +31,6 @@ use function is_scalar;
 use function key;
 use function min;
 use function str_repeat;
-use function substr;
 
 use const SORT_STRING;
 
@@ -94,9 +93,6 @@ class Item
         $this->languagePriority = new LanguagePriority();
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function getEngineVehiclesGroups(int $engineId, array $options = []): array
     {
         $defaults = [
@@ -197,7 +193,6 @@ class Item
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      * @throws Exception
      */
     public function getUsedLanguagesCount(int $id): int
@@ -213,9 +208,6 @@ class Item
         return $row ? (int) $row['count'] : 0;
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function getLanguageNamesOfItems(array $ids, string $language): array
     {
         if (! $ids) {
@@ -235,9 +227,6 @@ class Item
         return $result;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     public function getTextsOfItem(int $id, string $language): array
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -403,9 +392,6 @@ class Item
         ];
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     private function getAncestorsId(int $itemId, array $itemTypes): array
     {
         $select = new Sql\Select($this->itemParentCacheTable->getTable());
@@ -633,9 +619,6 @@ class Item
         return true;
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     private function getChildVehicleTypesByWhitelist(int $parentId, array $whitelist): array
     {
         if (count($whitelist) <= 0) {
@@ -840,7 +823,7 @@ class Item
     /**
      * @throws Exception
      */
-    public function setPoint(int $itemId, ?Geometry $point): void
+    public function setPoint(int $itemId, ?Coordinate $point): void
     {
         $primaryKey = ['item_id' => $itemId];
 
@@ -850,7 +833,7 @@ class Item
         }
 
         $set = [
-            'point' => new Sql\Expression('ST_GeomFromText(?)', [$point->out('wkt')]),
+            'point' => new Sql\Expression('Point(?, ?)', [$point->getLng(), $point->getLat()]),
         ];
 
         $row = currentFromResultSetInterface($this->itemPointTable->select($primaryKey));
@@ -862,7 +845,7 @@ class Item
     }
 
     /**
-     * @return mixed|null
+     * @return Coordinate|null
      * @throws Exception
      */
     public function getPoint(int $itemId)
@@ -870,8 +853,7 @@ class Item
         $point = null;
         $row   = currentFromResultSetInterface($this->itemPointTable->select(['item_id' => $itemId]));
         if ($row && $row['point']) {
-            geoPHP::version(); // for autoload classes
-            $point = geoPHP::load(substr($row['point'], 4), 'wkb');
+            $point = parsePointWkb($row['point']);
         }
 
         return $point;
@@ -1352,9 +1334,6 @@ class Item
         }
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     private function getNameSelect(int $value, string $valueType, string $language): Sql\Select
     {
         $predicate = new Sql\Predicate\Operator(
@@ -1384,9 +1363,6 @@ class Item
         return $select;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction
-     */
     private function getItemParentNameSelect(string $itemParentAlias, string $language): Sql\Select
     {
         $predicate1 = new Sql\Predicate\Operator(
@@ -1425,7 +1401,6 @@ class Item
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function getSelect(array $options): Sql\Select
@@ -1704,7 +1679,6 @@ class Item
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
     public function getCountDistinct(array $options): int
@@ -1731,7 +1705,6 @@ class Item
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function getCountPairs(array $options): array

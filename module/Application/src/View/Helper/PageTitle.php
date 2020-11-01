@@ -103,7 +103,6 @@ class PageTitle extends AbstractStandalone
             $output .= $postfix;
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $output = $this->autoEscape ? $this->escape($output) : $output;
 
         return $output;

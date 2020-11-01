@@ -191,6 +191,60 @@ class NewController extends AbstractRestfulController
         ]);
     }
 
+    private function expandSmallItems(array $items): array
+    {
+        $result = [];
+        foreach ($items as $item) {
+            if ($item['type'] !== 'item') {
+                $result[] = $item;
+                continue;
+            }
+
+            if (count($item['pictures']) <= 2) {
+                foreach ($item['pictures'] as $picture) {
+                    $result[] = [
+                        'type'    => 'picture',
+                        'picture' => $picture,
+                    ];
+                }
+            } else {
+                $result[] = $item;
+            }
+        }
+
+        return $result;
+    }
+
+    private function mergeSiblings(array $items): array
+    {
+        $result         = [];
+        $picturesBuffer = [];
+        foreach ($items as $itemId => $item) {
+            if ($item['type'] === 'item') {
+                if (count($picturesBuffer) > 0) {
+                    $result[]       = [
+                        'type'     => 'pictures',
+                        'pictures' => $picturesBuffer,
+                    ];
+                    $picturesBuffer = [];
+                }
+
+                $result[$itemId] = $item;
+            } else {
+                $picturesBuffer[] = $item['picture'];
+            }
+        }
+
+        if (count($picturesBuffer) > 0) {
+            $result[] = [
+                'type'     => 'pictures',
+                'pictures' => $picturesBuffer,
+            ];
+        }
+
+        return $result;
+    }
+
     /**
      * @param array|ArrayAccess|Traversable $pictures
      */
@@ -228,88 +282,7 @@ class NewController extends AbstractRestfulController
         }
 
         // convert single picture items to picture record
-        $tempItems = $items;
-        $items     = [];
-        foreach ($tempItems as $item) {
-            if ($item['type'] !== 'item') {
-                $items[] = $item;
-                continue;
-            }
-
-            if (count($item['pictures']) <= 2) {
-                foreach ($item['pictures'] as $picture) {
-                    $items[] = [
-                        'type'    => 'picture',
-                        'picture' => $picture,
-                    ];
-                }
-            } else {
-                $items[] = $item;
-            }
-        }
-
         // merge sibling single items
-        $tmpItems       = $items;
-        $items          = [];
-        $picturesBuffer = [];
-        foreach ($tmpItems as $itemId => $item) {
-            if ($item['type'] === 'item') {
-                if (count($picturesBuffer) > 0) {
-                    $items[]        = [
-                        'type'     => 'pictures',
-                        'pictures' => $picturesBuffer,
-                    ];
-                    $picturesBuffer = [];
-                }
-
-                $items[$itemId] = $item;
-            } else {
-                $picturesBuffer[] = $item['picture'];
-            }
-        }
-
-        if (count($picturesBuffer) > 0) {
-            $items[] = [
-                'type'     => 'pictures',
-                'pictures' => $picturesBuffer,
-            ];
-        }
-
-        /*foreach ($items as &$item) {
-            if ($item['type'] == 'item') {
-                $itemRow = $this->itemModel->getRow(['id' => $item['item_id']]);
-
-                $ids = [];
-                foreach ($item['pictures'] as $row) {
-                    $ids[] = $row['id'];
-                }
-
-                $item['listData'] = $this->car()->listData([$itemRow], [
-                    'thumbColumns'   => 6,
-                    'disableDetailsLink' => true,
-                    'disableSpecs'       => true,
-                    'pictureFetcher' => new \Application\Model\Item\NewPictureFetcher([
-                        'pictureModel' => $this->picture,
-                        'itemModel'    => $this->itemModel,
-                        'pictureIds'   => $ids
-                    ]),
-                    'listBuilder' => new \Application\Model\Item\ListBuilder\NewPicturesListBuilder([
-                        'date'         => $currentDateStr,
-                        'pictureIds'   => $ids,
-                        'catalogue'    => $this->catalogue(),
-                        'router'       => $this->getEvent()->getRouter(),
-                        'picHelper'    => $this->getPluginManager()->get('pic'),
-                        'specsService' => $this->specsService
-                    ])
-                ]);
-            } else {
-                $item['picture'] = $this->pic()->listData($item['pictures'], [
-                    'width' => 6
-                ]);
-            }
-        }
-        unset($item);*/
-
-        return $items;
+        return $this->mergeSiblings($this->expandSmallItems($items));
     }
 }

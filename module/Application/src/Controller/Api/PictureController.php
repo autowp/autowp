@@ -26,7 +26,6 @@ use Autowp\TextStorage;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Exception;
-use geoPHP;
 use ImagickException;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
@@ -40,7 +39,6 @@ use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use Point;
 
 use function array_key_exists;
 use function array_keys;
@@ -656,7 +654,7 @@ class PictureController extends AbstractRestfulController
 
         $data = array_merge(
             $this->params()->fromPost(),
-            $request->getFiles()->toArray() // @phan-suppress-current-line PhanUndeclaredMethod
+            $request->getFiles()->toArray()
         );
 
         $this->postInputFilter->setData($data);
@@ -706,7 +704,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      * @return ViewModel|ResponseInterface|array
      */
@@ -1041,9 +1038,7 @@ class PictureController extends AbstractRestfulController
 
             if (isset($data['point']['lat'], $data['point']['lng'])) {
                 if ($data['point']['lat'] && $data['point']['lng']) {
-                    geoPHP::version();
-                    $point        = new Point($data['point']['lng'], $data['point']['lat']);
-                    $set['point'] = new Sql\Expression('ST_GeomFromText(?)', [$point->out('wkt')]);
+                    $set['point'] = new Sql\Expression('Point(?, ?)', [$data['point']['lng'], $data['point']['lat']]);
                 } else {
                     $set['point'] = null;
                 }
@@ -1166,7 +1161,6 @@ class PictureController extends AbstractRestfulController
      */
     public function flopAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1313,7 +1307,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      * @return ViewModel|ResponseInterface|array
      */
@@ -1456,7 +1449,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      * @return ViewModel|ResponseInterface|array
      */

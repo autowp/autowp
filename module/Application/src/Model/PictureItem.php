@@ -230,9 +230,6 @@ class PictureItem
         return $result;
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function getPictureItemsByItemType(int $pictureId, array $itemType): array
     {
         $select = $this->table->getSql()->select();
@@ -257,9 +254,6 @@ class PictureItem
         return $result;
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function getData(array $options): array
     {
         $defaults = [
@@ -414,7 +408,6 @@ class PictureItem
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function isAllowedTypeByItemId(int $itemId, int $type): bool
@@ -437,7 +430,6 @@ class PictureItem
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      * @throws Exception
      */
     public function updateContentCount(int $pictureId): void

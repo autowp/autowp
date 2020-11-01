@@ -120,7 +120,6 @@ class ContactsController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @return ViewModel|ResponseInterface|array
      */
     public function putAction()

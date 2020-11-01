@@ -542,7 +542,6 @@ class Mosts
     }
 
     /**
-     * @suppress PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     private function getCarsData(array $cMost, int $carTypeId, ?array $cYear, int $brandId, string $language): array
@@ -600,7 +599,6 @@ class Mosts
     }
 
     /**
-     * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      * @throws Exception
      */
     public function getData(array $options): array

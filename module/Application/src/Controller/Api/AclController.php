@@ -91,7 +91,7 @@ class AclController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'result' => $this->user()->isAllowed( // @phan-suppress-current-line PhanUndeclaredMethod
+            'result' => $this->user()->isAllowed(
                 $this->params()->fromQuery('resource'),
                 $this->params()->fromQuery('privilege')
             ),

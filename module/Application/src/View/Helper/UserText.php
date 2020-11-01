@@ -268,7 +268,6 @@ class UserText extends AbstractHtmlElement
             ]);
 
             if ($picture) {
-                * @phan-suppress-next-line PhanUndeclaredMethod *
                 return $this->view->inlinePicture($picture);
             }
         }

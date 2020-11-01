@@ -412,7 +412,6 @@ class AttrController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
      */
     public function attributePostAction()
@@ -807,7 +806,6 @@ class AttrController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
      */
     public function zoneAttributePostAction()
@@ -952,7 +950,6 @@ class AttrController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @return ViewModel|ResponseInterface|array
      */
     public function listOptionPostAction()

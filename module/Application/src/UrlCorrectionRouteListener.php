@@ -34,7 +34,6 @@ class UrlCorrectionRouteListener extends AbstractListenerAggregate
                 $filteredUri = preg_replace('|^/index\.php|isu', '', $uri);
 
                 if ($filteredUri !== $uri) {
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $requestUri  = $request->getUri();
                     $redirectUrl = $requestUri->getScheme() . '://'
                         . $requestUri->getHost() . $filteredUri;

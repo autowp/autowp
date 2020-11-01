@@ -117,7 +117,6 @@ class ForumThemeHydrator extends AbstractRestHydrator
     }
 
     /**
-     * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      * @param array|ArrayAccess $object
      * @throws Exception
      */

@@ -115,7 +115,6 @@ class CarOfDay
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function getCurrent(): ?array
@@ -421,9 +420,6 @@ class CarOfDay
         print 'ok' . PHP_EOL;
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function getNextDates(): array
     {
         $now      = new DateTime();
@@ -534,7 +530,6 @@ class CarOfDay
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     private function getOrientedPictureList(int $itemId): array

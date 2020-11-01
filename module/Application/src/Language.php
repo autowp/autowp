@@ -26,7 +26,6 @@ class Language
         }
 
         if ($request instanceof Request) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $hostname = $request->getServer('HTTP_HOST');
             if (isset($map[$hostname])) {
                 $this->language = $map[$hostname];

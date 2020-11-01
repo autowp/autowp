@@ -22,9 +22,6 @@ class Categories
         $this->itemModel = $itemModel;
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     private function getCategoriesSelect(int $parentId, string $order): Sql\Select
     {
         $select = new Sql\Select($this->itemTable->getTable());
