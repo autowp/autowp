@@ -266,14 +266,12 @@ class GalleryController extends AbstractRestfulController
 
                 $cropInfo = $crops[$idx];
 
-                if ($cropInfo) {
-                    $crop['crop'] = [
-                        'left'   => $cropInfo['left'] / $image->getWidth(),
-                        'top'    => $cropInfo['top'] / $image->getHeight(),
-                        'width'  => $cropInfo['width'] / $image->getWidth(),
-                        'height' => $cropInfo['height'] / $image->getHeight(),
-                    ];
-                }
+                $crop['crop'] = [
+                    'left'   => $cropInfo['left'] / $image->getWidth(),
+                    'top'    => $cropInfo['top'] / $image->getHeight(),
+                    'width'  => $cropInfo['width'] / $image->getWidth(),
+                    'height' => $cropInfo['height'] / $image->getHeight(),
+                ];
             }
 
             $full = isset($fullImagesInfo[$idx]) ? $fullImagesInfo[$idx]->toArray() : null;

@@ -6,6 +6,7 @@ use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
@@ -14,7 +15,7 @@ use Laminas\View\Model\ViewModel;
 /**
  * @method User user($user = null)
  * @method ViewModel forbiddenAction()
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method string language()
  */
 class IpController extends AbstractRestfulController

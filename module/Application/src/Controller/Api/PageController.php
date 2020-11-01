@@ -14,6 +14,7 @@ use Laminas\Db\TableGateway\Feature\RowGatewayFeature;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
@@ -25,7 +26,7 @@ use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
  * @method User user($user = null)
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  */
 class PageController extends AbstractRestfulController
 {
@@ -126,7 +127,7 @@ class PageController extends AbstractRestfulController
 
         /** @var ResultSet $resultSet */
         $resultSet = $this->table->select(['id' => (int) $this->params('id')]);
-        /** @var RowGatewayInterface $page */
+        /** @var RowGatewayInterface|null $page */
         $page = $resultSet->current();
         if (! $page) {
             return new ApiProblemResponse(new ApiProblem(404, 'Not found'));
@@ -165,7 +166,7 @@ class PageController extends AbstractRestfulController
                     ->limit(1);
                 /** @var ResultSet $resultSet */
                 $resultSet = $this->table->selectWith($select);
-                /** @var RowGatewayInterface $prevPage */
+                /** @var RowGatewayInterface|null $prevPage */
                 $prevPage = $resultSet->current();
 
                 if ($prevPage) {
@@ -193,7 +194,7 @@ class PageController extends AbstractRestfulController
                     ->limit(1);
                 /** @var ResultSet $resultSet */
                 $resultSet = $this->table->selectWith($select);
-                /** @var RowGatewayInterface $nextPage */
+                /** @var RowGatewayInterface|null $nextPage */
                 $nextPage = $resultSet->current();
 
                 if ($nextPage) {
@@ -334,7 +335,7 @@ class PageController extends AbstractRestfulController
 
         /** @var ResultSet $resultSet */
         $resultSet = $this->table->select(['id' => (int) $this->params('id')]);
-        /** @var RowGatewayInterface $page */
+        /** @var RowGatewayInterface|null $page */
         $page = $resultSet->current();
 
         if (! $page) {

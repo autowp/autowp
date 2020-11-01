@@ -59,7 +59,7 @@ class PreviewPictureHydrator extends AbstractRestHydrator
     }
 
     /**
-     * @param array|ArrayAccess $object
+     * @param mixed $object
      * @param mixed|null        $context
      * @throws Exception
      */

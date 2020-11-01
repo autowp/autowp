@@ -11,6 +11,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
@@ -21,7 +22,7 @@ use function get_object_vars;
 /**
  * @method UserPlugin user($user = null)
  * @method ViewModel forbiddenAction()
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method string language()
  */
 class MessageController extends AbstractRestfulController
@@ -136,7 +137,7 @@ class MessageController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $params['fields'],
-            'user_id'  => $user ? $user['id'] : null,
+            'user_id'  => $user['id'],
         ]);
 
         $items = [];

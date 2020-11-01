@@ -12,13 +12,14 @@ use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
 
 /**
  * @method User user($user = null)
  * @method string language()
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  */
 class InboxController extends AbstractRestfulController
 {

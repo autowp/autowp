@@ -10,6 +10,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
@@ -22,7 +23,7 @@ use function Autowp\Commons\currentFromResultSetInterface;
 /**
  * @method User user($user = null)
  * @method ViewModel forbiddenAction()
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  */
 class ItemParentLanguageController extends AbstractRestfulController
 {

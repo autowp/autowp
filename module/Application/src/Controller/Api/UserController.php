@@ -19,6 +19,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Permissions\Acl\Acl;
 use Laminas\Stdlib\ResponseInterface;
@@ -35,7 +36,7 @@ use function sprintf;
 
 /**
  * @method UserPlugin user($user = null)
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method ViewModel forbiddenAction()
  * @method string language()
  * @method void log(string $message, array $objects)

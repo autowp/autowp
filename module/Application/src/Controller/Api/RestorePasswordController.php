@@ -11,6 +11,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mail;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -21,7 +22,7 @@ use ReCaptcha\ReCaptcha;
 use function sprintf;
 
 /**
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */
 class RestorePasswordController extends AbstractRestfulController

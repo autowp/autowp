@@ -31,6 +31,8 @@ class AttrUserValueCollectionInputFilter extends InputFilter
 
     /**
      * Get the input filter used when looping the data
+     *
+     * @throws Exception
      */
     public function getInputFilter(int $attributeId): ?parent
     {
@@ -87,8 +89,6 @@ class AttrUserValueCollectionInputFilter extends InputFilter
 
     /**
      * @param  null|array|Traversable $data null is cast to an empty array.
-     *
-     * {@inheritdoc}
      */
     public function setData($data): self
     {
@@ -120,8 +120,6 @@ class AttrUserValueCollectionInputFilter extends InputFilter
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @psalm-suppress InvalidPropertyAssignmentValue
      * @param null|mixed $context Ignored, but present to retain signature compatibility.
      * @throws Exception
@@ -170,17 +168,11 @@ class AttrUserValueCollectionInputFilter extends InputFilter
         return $valid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getValues(): array
     {
         return $this->collectionValues;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRawValues(): array
     {
         return $this->collectionRawValues;
@@ -202,9 +194,6 @@ class AttrUserValueCollectionInputFilter extends InputFilter
         return $this->collectionRawValues = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessages(): array
     {
         return $this->collectionMessages;

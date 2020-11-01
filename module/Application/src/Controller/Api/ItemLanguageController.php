@@ -18,6 +18,7 @@ use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
@@ -34,7 +35,7 @@ use function sprintf;
 /**
  * @method User user($user = null)
  * @method ViewModel forbiddenAction()
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method string language()
  * @method Car car()
  * @method void log(string $message, array $objects)

@@ -10,6 +10,16 @@ use Laminas\View\Helper\TranslatorAwareTrait;
 use function implode;
 use function in_array;
 
+/**
+ * @method prepend(mixed $value)
+ * @method append(mixed $value)
+ * @method set(mixed $value)
+ * @method string getWhitespace(int|string $indent)
+ * @method string getIndent()
+ * @method string getSeparator()
+ * @method string getPrefix()
+ * @method string getPostfix()
+ */
 class PageTitle extends AbstractStandalone
 {
     use TranslatorAwareTrait;

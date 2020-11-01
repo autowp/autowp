@@ -34,6 +34,7 @@ use Laminas\Db\Sql;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
@@ -62,7 +63,7 @@ use function urlencode;
  * @method Pic pic()
  * @method string language()
  * @method UserPlugin user($user = null)
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method ViewModel forbiddenAction()
  * @method void log(string $message, array $objects)
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
@@ -1082,7 +1083,7 @@ class PictureController extends AbstractRestfulController
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            'user_id'  => $user ? $user['id'] : null,
+            'user_id'  => $user['id'],
             'fields'   => $data['fields'],
         ]);
 

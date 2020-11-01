@@ -15,6 +15,7 @@ use Laminas\Db\Sql;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
 use Laminas\Stdlib\ResponseInterface;
@@ -28,7 +29,7 @@ use function Autowp\Commons\currentFromResultSetInterface;
 /**
  * @method UserModel user($user = null)
  * @method ViewModel forbiddenAction()
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method string language()
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */

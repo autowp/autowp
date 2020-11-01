@@ -27,6 +27,7 @@ use Exception;
 use geoPHP;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Request;
@@ -70,7 +71,7 @@ use function usort;
 /**
  * @method User user($user = null)
  * @method ViewModel forbiddenAction()
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method string language()
  * @method Catalogue catalogue()
  * @method Car car()
@@ -159,7 +160,7 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @return int|bool
+     * @return int
      */
     private function compareName(string $a, string $b, string $language)
     {
@@ -362,10 +363,8 @@ class ItemController extends AbstractRestfulController
         }
 
         if ($data['name']) {
-            if (! $itemLanguageJoined) {
-                $itemLanguageJoined = true;
-                $select->join('item_language', 'item.id = item_language.item_id', []);
-            }
+            $itemLanguageJoined = true;
+            $select->join('item_language', 'item.id = item_language.item_id', []);
             $select->where(['item_language.name like ?' => $data['name']]);
 
             $group['item.id'] = true;
@@ -450,7 +449,7 @@ class ItemController extends AbstractRestfulController
                 break;
             case 'categories_first':
                 $select->order(array_merge([
-                    new Sql\Expression('item.item_type_id != ?', Item::CATEGORY),
+                    new Sql\Expression('item.item_type_id != ?', [Item::CATEGORY]),
                 ], $this->catalogue()->itemOrdering()));
                 break;
             case 'cars_count_desc':
@@ -789,12 +788,9 @@ class ItemController extends AbstractRestfulController
         $select->columns($columns);
 
         try {
-            $paginator = new Paginator(
-                new DbSelect(
-                    $select,
-                    $this->itemModel->getTable()->getAdapter()
-                )
-            );
+            /** @var Adapter $adapter */
+            $adapter   = $this->itemModel->getTable()->getAdapter();
+            $paginator = new Paginator(new DbSelect($select, $adapter));
 
             $limit = $data['limit'] ? $data['limit'] : 1;
 

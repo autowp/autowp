@@ -25,7 +25,9 @@ class ItemLanguages extends Form implements InputFilterProviderInterface
                     'label' => $language,
                 ],
             ]);
-            $this->get($language)->setWrapElements(true)->prepare();
+            /** @var Form $element */
+            $element = $this->get($language);
+            $element->setWrapElements(true)->prepare();
         }
 
         $this->setAttribute('method', 'post');

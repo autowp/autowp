@@ -56,10 +56,6 @@ class ExifGPSExtractor
     {
         $parts = explode('/', $coordPart);
 
-        if (count($parts) <= 0) {
-            return null;
-        }
-
         if (count($parts) === 1) {
             return (float) $parts[0];
         }

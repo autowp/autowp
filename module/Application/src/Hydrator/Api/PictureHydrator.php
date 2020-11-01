@@ -271,13 +271,13 @@ class PictureHydrator extends AbstractRestHydrator
     }
 
     /**
-     * @param array|ArrayAccess $object
+     * @param mixed $object
      * @throws Image\Storage\Exception
      * @throws Exception
      */
     public function extract($object): ?array
     {
-        if ($object === null || $object === false) {
+        if (! (is_array($object) || $object instanceof ArrayAccess)) {
             return null;
         }
 

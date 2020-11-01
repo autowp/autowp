@@ -275,14 +275,13 @@ class Item
         ];
     }
 
-    /**
-     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
-     */
     public function getTextOfItem(int $id, string $language): string
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
 
-        $orderBy = $this->languagePriority->getOrderByExpression($language, $this->itemLanguageTable->getAdapter());
+        /** @var Adapter $adapter */
+        $adapter = $this->itemLanguageTable->getAdapter();
+        $orderBy = $this->languagePriority->getOrderByExpression($language, $adapter);
 
         $select
             ->columns(['text_id'])
@@ -307,9 +306,6 @@ class Item
         return $text ? $text : '';
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function hasFullText(int $id): bool
     {
         $rows = $this->itemLanguageTable->select([
@@ -329,9 +325,6 @@ class Item
         return (bool) $this->textStorage->getFirstText($ids);
     }
 
-    /**
-     * @suppress PhanPluginMixedKeyNoKey
-     */
     public function getNames(int $itemId): array
     {
         $rows   = $this->itemLanguageTable->select([
@@ -347,7 +340,6 @@ class Item
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function getLanguageName(int $itemId, string $language): string
@@ -365,7 +357,6 @@ class Item
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function getName(int $itemId, string $language): string
@@ -847,10 +838,9 @@ class Item
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
      * @throws Exception
      */
-    public function setPoint(int $itemId, Geometry $point): void
+    public function setPoint(int $itemId, ?Geometry $point): void
     {
         $primaryKey = ['item_id' => $itemId];
 
@@ -1503,10 +1493,9 @@ class Item
                             throw new Exception("Language is required for `name` select");
                         }
 
-                        $subSelect = $this->languagePriority->getSelectItemName(
-                            $language,
-                            $this->itemTable->getAdapter()
-                        );
+                        /** @var Adapter $adapter */
+                        $adapter   = $this->itemTable->getAdapter();
+                        $subSelect = $this->languagePriority->getSelectItemName($language, $adapter);
 
                         $columns = array_merge($columns, [
                             'begin_year',
@@ -1764,7 +1753,6 @@ class Item
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @return array|ArrayObject|null
      * @throws Exception
      */
@@ -1777,7 +1765,6 @@ class Item
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
      * @throws Exception
      */
     public function isExists(array $options): bool

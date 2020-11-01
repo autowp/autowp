@@ -15,6 +15,7 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
 use Laminas\Stdlib\ResponseInterface;
@@ -31,7 +32,7 @@ use function strlen;
  * @method UserPlugin user($user = null)
  * @method ViewModel forbiddenAction()
  * @method string language()
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  */
 class AttrController extends AbstractRestfulController
 {
@@ -154,7 +155,7 @@ class AttrController extends AbstractRestfulController
         $this->conflictHydrator->setOptions([
             'fields'   => $values['fields'],
             'language' => $this->language(),
-            'user_id'  => $user ? $user['id'] : null,
+            'user_id'  => $user['id'],
         ]);
 
         $items = [];
@@ -505,7 +506,7 @@ class AttrController extends AbstractRestfulController
         $this->attributeHydrator->setOptions([
             'fields'   => $values['fields'],
             'language' => $this->language(),
-            'user_id'  => $user ? $user['id'] : null,
+            'user_id'  => $user['id'],
         ]);
 
         return new JsonModel($this->attributeHydrator->extract($attribute));
@@ -543,7 +544,7 @@ class AttrController extends AbstractRestfulController
         $this->attributeHydrator->setOptions([
             'fields'   => $values['fields'],
             'language' => $this->language(),
-            'user_id'  => $user ? $user['id'] : null,
+            'user_id'  => $user['id'],
         ]);
 
         $items = [];
@@ -617,7 +618,7 @@ class AttrController extends AbstractRestfulController
         $this->valueHydrator->setOptions([
             'fields'   => $values['fields'],
             'language' => $this->language(),
-            'user_id'  => $user ? $user['id'] : null,
+            'user_id'  => $user['id'],
         ]);
 
         $items = [];

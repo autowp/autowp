@@ -21,6 +21,7 @@ use Laminas\Db\Sql;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
 use Laminas\Stdlib\ResponseInterface;
@@ -37,7 +38,7 @@ use function strlen;
 
 /**
  * @method User user($user = null)
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method string language()
  * @method ViewModel forbiddenAction()
  * @method void log(string $message, array $objects)

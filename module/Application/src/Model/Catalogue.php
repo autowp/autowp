@@ -110,7 +110,7 @@ class Catalogue
                     'stock'         => true,
                 ];
 
-                if ($breakOnFirst && count($result) > 0) {
+                if ($breakOnFirst) {
                     return $result;
                 }
             }
@@ -135,7 +135,7 @@ class Catalogue
                             'category_catname' => $category['catname'],
                         ];
 
-                        if ($breakOnFirst && count($result) > 0) {
+                        if ($breakOnFirst) {
                             return $result;
                         }
                         break;
@@ -146,7 +146,7 @@ class Catalogue
                             'id'   => $category['id'],
                         ];
 
-                        if ($breakOnFirst && count($result) > 0) {
+                        if ($breakOnFirst) {
                             return $result;
                         }
                         break;

@@ -132,7 +132,7 @@ class ForumTopicHydrator extends AbstractRestHydrator
             );
             $lastMessage    = false;
             if ($lastMessageRow) {
-                $lastMessage = $lastMessageRow ? $this->extractValue('last_message', $lastMessageRow) : null;
+                $lastMessage = $this->extractValue('last_message', $lastMessageRow);
             }
 
             $result['last_message'] = $lastMessage;

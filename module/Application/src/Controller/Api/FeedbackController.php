@@ -7,6 +7,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mail;
 use Laminas\Mail\Transport\TransportInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -17,7 +18,7 @@ use ReCaptcha\ReCaptcha;
 use function sprintf;
 
 /**
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  */
 class FeedbackController extends AbstractRestfulController
 {

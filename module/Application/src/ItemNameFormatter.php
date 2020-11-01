@@ -159,18 +159,12 @@ class ItemNameFormatter
     }
 
     /**
-     * @param array|ArrayAccess $item
+     * @param array|ArrayAccess $input
      * @throws Exception
      */
-    public function format($item, string $language): string
+    public function format($input, string $language): string
     {
-        if (! ($item instanceof ArrayAccess || is_array($item))) {
-            throw new Exception("`item` must be array or ArrayAccess");
-        }
-
-        if ($item instanceof ArrayAccess) {
-            $item = (array) $item;
-        }
+        $item = (array) $input;
 
         $defaults = [
             'begin_model_year'          => null,

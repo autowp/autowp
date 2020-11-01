@@ -10,6 +10,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
@@ -20,7 +21,7 @@ use function Autowp\Commons\currentFromResultSetInterface;
 /**
  * @method UserPlugin user($user = null)
  * @method ViewModel forbiddenAction()
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method string language()
  */
 class ContactsController extends AbstractRestfulController
@@ -71,7 +72,7 @@ class ContactsController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $params['fields'],
-            'user_id'  => $user ? $user['id'] : null,
+            'user_id'  => $user['id'],
         ]);
 
         $userRows = $this->userModel->getRows([

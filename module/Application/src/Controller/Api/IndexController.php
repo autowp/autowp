@@ -189,7 +189,7 @@ class IndexController extends AbstractRestfulController
                     'count'     => new Sql\Expression('COUNT(1)'),
                     'new_count' => new Sql\Expression(
                         'COUNT(IF(item_parent.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY), 1, NULL))',
-                        7
+                        [7]
                     ),
                 ])
                 ->where([
@@ -340,7 +340,7 @@ class IndexController extends AbstractRestfulController
     {
         $language = $this->language();
         /** @var Request $request */
-        $request = $this->getRequest();
+        $request   = $this->getRequest();
         $httpsFlag = $request->getUri()->getScheme();
 
         $itemOfDay = $this->itemOfDay->getCurrent();

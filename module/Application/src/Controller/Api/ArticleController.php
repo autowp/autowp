@@ -7,6 +7,7 @@ use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\InputFilter\InputFilter;
+use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Paginator;
 use Laminas\Stdlib\ResponseInterface;
@@ -16,7 +17,7 @@ use Laminas\View\Model\ViewModel;
 use function get_object_vars;
 
 /**
- * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ApiProblemResponse inputFilterResponse(InputFilterInterface $inputFilter)
  * @method string language()
  */
 class ArticleController extends AbstractActionController

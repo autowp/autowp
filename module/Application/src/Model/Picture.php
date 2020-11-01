@@ -455,13 +455,9 @@ class Picture
         }
 
         if ($options['id_exclude']) {
-            $value = $options['id_exclude'];
-            if (is_array($value)) {
-                if (count($value) > 0) {
-                    $select->where([new Sql\Predicate\NotIn('pictures.id', $value)]);
-                }
-            } else {
-                $select->where(['pictures.id != ?' => $value]);
+            $value = (array) $options['id_exclude'];
+            if (count($value) > 0) {
+                $select->where([new Sql\Predicate\NotIn('pictures.id', $value)]);
             }
         }
 
@@ -953,7 +949,7 @@ class Picture
             ->columns(['id', 'name', 'item_type_id'])
             ->join('picture_item', 'item.id = picture_item.item_id', ['type'])
             ->where(['picture_item.picture_id' => $pictureId])
-            ->order([new Sql\Expression('picture_item.type = ? DESC', PictureItem::PICTURE_CONTENT)])
+            ->order([new Sql\Expression('picture_item.type = ? DESC', [PictureItem::PICTURE_CONTENT])])
             ->limit(3);
 
         $items = [];
@@ -1200,7 +1196,9 @@ class Picture
 
         $items = [];
         if (count($itemIds)) {
-            $subSelect = $this->languagePriority->getSelectItemName($language, $this->table->getAdapter());
+            /** @var Adapter $adapter */
+            $adapter   = $this->table->getAdapter();
+            $subSelect = $this->languagePriority->getSelectItemName($language, $adapter);
 
             $columns = [
                 'id',
