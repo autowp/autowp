@@ -34,12 +34,15 @@ class Maintenance extends AbstractListenerAggregate
         $comments->service()->cleanupDeleted();
         $comments->service()->cleanTopics();*/
 
+        /** @var PictureService $pictureService */
         $pictureService = $serviceManager->get(PictureService::class);
         $pictureService->clearQueue();
 
+        /** @var User $userModel */
         $userModel = $serviceManager->get(User::class);
         $userModel->updateSpecsVolumes();
 
+        /** @var Service\UsersService $usersService */
         $usersService = $serviceManager->get(Service\UsersService::class);
         $usersService->deleteUnused();
 
@@ -53,6 +56,7 @@ class Maintenance extends AbstractListenerAggregate
         $application    = $event->getApplication();
         $serviceManager = $application->getServiceManager();
 
+        /** @var Model\CarOfDay $carOfDay */
         $carOfDay = $serviceManager->get(Model\CarOfDay::class);
         $carOfDay->pick();
 
@@ -62,6 +66,7 @@ class Maintenance extends AbstractListenerAggregate
         $facebookConfig = $serviceManager->get('Config')['facebook'];
         $carOfDay->putCurrentToFacebook($facebookConfig);
 
+        /** @var Service\UsersService $usersService */
         $usersService = $serviceManager->get(Service\UsersService::class);
 
         $usersService->restoreVotes();

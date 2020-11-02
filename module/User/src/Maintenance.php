@@ -29,10 +29,12 @@ class Maintenance extends AbstractListenerAggregate
         $application    = $event->getApplication();
         $serviceManager = $application->getServiceManager();
 
+        /** @var Model\UserPasswordRemind $userPasswordRemind */
         $userPasswordRemind = $serviceManager->get(Model\UserPasswordRemind::class);
         $count              = $userPasswordRemind->garbageCollect();
         print sprintf("%d password remind rows was deleted\ndone\n", $count);
 
+        /** @var Model\UserRename $userRename */
         $userRename = $serviceManager->get(Model\UserRename::class);
         $count      = $userRename->garbageCollect();
         print sprintf("%d user rename rows was deleted\ndone\n", $count);
