@@ -18,9 +18,8 @@ build:
     - docker pull autowp/autowp || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp -t autowp/autowp .
     - docker-compose -f docker-compose-test.yml up -d
-    - docker exec -it autowp_test_backend bash -c "waitforit -host=mysql -port=3306 -timeout=60"
-    - docker logs autowp_test_backend
-    - docker exec -it autowp_test_backend bash -c "waitforit -host=goautowp -port=8080 -timeout=60"
+    - docker exec -it autowp_test_backend bash -c "waitforit -host=mysql -port=3306 -timeout=60" || docker logs autowp_test_backend
+    - docker exec -it autowp_test_backend bash -c "waitforit -host=goautowp -port=8080 -timeout=60" || docker logs autowp_test_backend
 
   script:
     - docker exec -it autowp_test_backend sh -c "./install-dev-db.sh"
