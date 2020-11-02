@@ -14,7 +14,7 @@ build:
   services:
     - docker:dind
   before_script:
-    - apk add --update py-pip && pip install docker-compose
+    - apk add --update py-pip alpine-sdk && pip install docker-compose
     - docker pull autowp/autowp || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp -t autowp/autowp .
     - docker-compose -f docker-compose-test.yml up -d
