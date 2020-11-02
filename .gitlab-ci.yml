@@ -18,22 +18,22 @@ build:
     - docker pull autowp/autowp || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp -t autowp/autowp .
     - docker-compose -f docker-compose-test.yml up -d
-    - docker exec -it autowp_test_backend bash -c "waitforit -host=mysql -port=3306 -timeout=60" || docker logs autowp_test_backend
-    - docker exec -it autowp_test_backend bash -c "waitforit -host=goautowp -port=8080 -timeout=60" || docker logs autowp_test_backend
+    - docker-compose exec -T autowp_test_backend bash -c "waitforit -host=mysql -port=3306 -timeout=60" || docker logs autowp_test_backend
+    - docker-compose exec -T autowp_test_backend bash -c "waitforit -host=goautowp -port=8080 -timeout=60" || docker logs autowp_test_backend
 
   script:
-    - docker exec -it autowp_test_backend sh -c "./install-dev-db.sh"
-    - docker exec -it autowp_test_backend sh -c "./install-dev.sh"
-    # - docker exec -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" -it autowp_test_backend sh -c "./cc-test-reporter before-build"
-    - docker exec -it autowp_test_backend sh -c "./vendor/bin/security-checker security:check composer.lock"
-    - docker exec -it autowp_test_backend sh -c "./vendor/bin/phpcs --encoding=utf-8"
-    - docker exec -it autowp_test_backend sh -c "composer phpmd"
-    - docker exec -it autowp_test_backend sh -c "./vendor/bin/psalm"
-    - docker exec -it autowp_test_backend sh -c "./vendor/bin/phpstan analyze --no-progress"
-    - docker exec -it autowp_test_backend sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./clover.xml"
-    - docker exec -it autowp_test_backend bash -c "./vendor/bin/php-coveralls -v"
-    #- docker exec -it autowp_test_backend bash -c "./sonar-scanner/bin/sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true"
-    #- docker exec -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" -it autowp_test_backend bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
+    - docker-compose exec -T autowp_test_backend sh -c "./install-dev-db.sh"
+    - docker-compose exec -T autowp_test_backend sh -c "./install-dev.sh"
+    # - docker-compose exec -T -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" autowp_test_backend sh -c "./cc-test-reporter before-build"
+    - docker-compose exec -T autowp_test_backend sh -c "./vendor/bin/security-checker security:check composer.lock"
+    - docker-compose exec -T autowp_test_backend sh -c "./vendor/bin/phpcs --encoding=utf-8"
+    - docker-compose exec -T autowp_test_backend sh -c "composer phpmd"
+    - docker-compose exec -T autowp_test_backend sh -c "./vendor/bin/psalm"
+    - docker-compose exec -T autowp_test_backend sh -c "./vendor/bin/phpstan analyze --no-progress"
+    - docker-compose exec -T autowp_test_backend sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./clover.xml"
+    - docker-compose exec -T autowp_test_backend bash -c "./vendor/bin/php-coveralls -v"
+    #- docker-compose exec -T autowp_test_backend bash -c "./sonar-scanner/bin/sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true"
+    #- docker-compose exec -T -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" autowp_test_backend bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
 
 publish:
   stage: publish
