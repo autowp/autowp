@@ -380,7 +380,7 @@ class Brand
                 return $a['position'] < $b['position'] ? -1 : 1;
             }
 
-            return $this->compareName($a['name'], $b['name'], $options['language']);
+            return $this->compareName((string) $a['name'], (string) $b['name'], $options['language']);
         });
 
         return $items;
