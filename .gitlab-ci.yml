@@ -16,7 +16,7 @@ build:
   before_script:
     - apk add --update docker-compose
     - docker pull autowp/autowp || true
-    - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp -t autowp/autowp .
+    - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG .
     - docker-compose -f docker-compose-test.yml up -d
     - docker-compose -f docker-compose-test.yml exec -T backend bash -c "waitforit -host=mysql -port=3306 -timeout=60" || docker logs autowp_test_backend
     - docker-compose -f docker-compose-test.yml exec -T backend bash -c "waitforit -host=goautowp -port=8080 -timeout=60" || docker logs autowp_test_backend
@@ -34,12 +34,17 @@ build:
     #- docker-compose -f docker-compose-test.yml exec -T backend bash -c "./vendor/bin/php-coveralls -v"
     #- docker-compose -f docker-compose-test.yml exec -T backend bash -c "./sonar-scanner/bin/sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true"
     #- docker-compose -f docker-compose-test.yml exec -T -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" backend bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
 
 publish:
   stage: publish
   services:
     - docker:dind
   script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG autowp/autowp
     - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
     - docker push autowp/autowp
   only:
