@@ -11,8 +11,6 @@ use Interop\Container\ContainerInterface;
 use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-use function getenv;
-
 class UserControllerFactory implements FactoryInterface
 {
     /**

@@ -3,7 +3,6 @@
 namespace Application;
 
 use Autowp\ZFComponents\Resources;
-use Exception;
 use Laminas\Cache\Service\StorageCacheAbstractServiceFactory;
 use Laminas\I18n\Translator\Loader\PhpArray;
 use Laminas\I18n\Translator\Resources as TranslatorResources;

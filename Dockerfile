@@ -77,7 +77,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
 COPY ./etc/ /etc/
 
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
+RUN composer install --no-dev --no-progress --no-interaction --optimize-autoloader && \
     composer clearcache
 
 COPY . /app

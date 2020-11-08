@@ -6,8 +6,6 @@ use Interop\Container\ContainerInterface;
 use Laminas\Mail\Transport\TransportInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-use function getenv;
-
 class FeedbackControllerFactory implements FactoryInterface
 {
     /**
