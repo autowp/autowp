@@ -35,7 +35,7 @@ class RestorePasswordControllerFactory implements FactoryInterface
             $container->get(UserPasswordRemind::class),
             $container->get(User::class),
             $config['recaptcha'],
-            (bool) getenv('AUTOWP_CAPTCHA')
+            (bool) $config['captcha']
         );
     }
 }

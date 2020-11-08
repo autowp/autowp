@@ -25,7 +25,7 @@ class FeedbackControllerFactory implements FactoryInterface
             $container->get(TransportInterface::class),
             $config['feedback'],
             $config['recaptcha'],
-            (bool) getenv('AUTOWP_CAPTCHA')
+            (bool) $config['captcha']
         );
     }
 }

@@ -28,7 +28,7 @@ build:
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/security-checker security:check composer.lock"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/phpcs --encoding=utf-8"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "composer phpmd"
-    - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/psalm"
+    - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/psalm --no-progress"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/phpstan analyze --no-progress"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./clover.xml"
     - docker-compose -f docker-compose-test.yml exec -T backend bash -c "./vendor/bin/php-coveralls -v"

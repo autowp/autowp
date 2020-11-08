@@ -12,37 +12,6 @@ use Laminas\Mvc\I18n\TranslatorFactory;
 use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
-use function getenv;
-
-$host = getenv('AUTOWP_HOST');
-
-$mailTypes = [
-    'in-memory' => [
-        'type' => 'in-memory',
-    ],
-    'smtp'      => [
-        'type'    => 'smtp',
-        'options' => [
-            'host'              => getenv('AUTOWP_MAIL_SMTP_HOST'),
-            'connection_class'  => 'login',
-            'connection_config' => [
-                'username' => getenv('AUTOWP_MAIL_SMTP_USERNAME'),
-                'password' => getenv('AUTOWP_MAIL_SMTP_PASSWORD'),
-                'ssl'      => 'tls',
-            ],
-        ],
-    ],
-];
-
-$mailType = getenv('AUTOWP_MAIL_TYPE');
-if (! $mailType) {
-    throw new Exception("Mail type not provided");
-}
-if (! isset($mailTypes[$mailType])) {
-    throw new Exception("Mail type `$mailType` not found");
-}
-$mailTransport = $mailTypes[$mailType];
-
 return [
     'controllers'        => [
         'factories' => [
@@ -141,95 +110,60 @@ return [
         ],
     ],
     'telegram'           => [
-        'accessToken' => getenv('AUTOWP_TELEGRAM_ACCESS_TOKEN'),
-        'token'       => getenv('AUTOWP_TELEGRAM_TOKEN'),
-        'webhook'     => 'https://www.autowp.ru/telegram/webhook/token/' . getenv('AUTOWP_TELEGRAM_TOKEN'),
+        'accessToken' => '',
+        'token'       => 'example',
+        'webhook'     => 'http://localhost/telegram/webhook/token/example',
     ],
     'twitter'            => [
-        'username'     => getenv('AUTOWP_TWITTER_USERNAME'),
+        'username'     => '',
         'oauthOptions' => [
-            'consumerKey'    => getenv('AUTOWP_TWITTER_OAUTH_KEY'),
-            'consumerSecret' => getenv('AUTOWP_TWITTER_OAUTH_SECRET'),
+            'consumerKey'    => '',
+            'consumerSecret' => '',
         ],
         'token'        => [
-            'oauth_token'        => getenv('AUTOWP_TWITTER_TOKEN_OAUTH'),
-            'oauth_token_secret' => getenv('AUTOWP_TWITTER_TOKEN_OAUTH_SECRET'),
+            'oauth_token'        => '',
+            'oauth_token_secret' => '',
         ],
     ],
     'facebook'           => [
-        'app_id'            => getenv('AUTOWP_FACEBOOK_APP_ID'),
-        'app_secret'        => getenv('AUTOWP_FACEBOOK_APP_SECRET'),
-        'page_access_token' => getenv('AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN'),
+        'app_id'            => '',
+        'app_secret'        => '',
+        'page_access_token' => '',
     ],
     'hosts'              => [
         'en'    => [
-            'hostname' => 'en.' . $host,
-            'timezone' => 'Europe/London',
-            'name'     => 'English',
-            'flag'     => 'flag-icon flag-icon-gb',
-            'aliases'  => [
-                'en.autowp.ru',
-                $host,
-                'www' . $host,
-            ],
+            'hostname' => 'en.localhost',
         ],
         'zh'    => [
-            'hostname' => 'zh.' . $host,
-            'timezone' => 'Asia/Shanghai',
-            'name'     => '中文 (beta)',
-            'flag'     => 'flag-icon flag-icon-cn',
-            'aliases'  => [],
+            'hostname' => 'zh.localhost',
         ],
         'ru'    => [
-            'hostname' => getenv('AUTOWP_HOST_RU'),
-            'timezone' => 'Europe/Moscow',
-            'name'     => 'Русский',
-            'flag'     => 'flag-icon flag-icon-ru',
-            'aliases'  => [
-                'ru.autowp.ru',
-            ],
+            'hostname' => 'ru.localhost',
         ],
         'pt-br' => [
-            'hostname' => 'br.' . $host,
-            'timezone' => 'Brazil/West',
-            'name'     => 'Português brasileiro',
-            'flag'     => 'flag-icon flag-icon-br',
-            'aliases'  => [],
+            'hostname' => 'br.localhost',
         ],
         'fr'    => [
-            'hostname' => 'fr.' . $host,
-            'timezone' => 'Europe/Paris',
-            'name'     => 'Français (beta)',
-            'flag'     => 'flag-icon flag-icon-fr',
-            'aliases'  => [],
+            'hostname' => 'fr.localhost',
         ],
         'be'    => [
-            'hostname' => 'be.' . $host,
-            'timezone' => 'Europe/Minsk',
-            'name'     => 'Беларуская',
-            'flag'     => 'flag-icon flag-icon-by',
-            'aliases'  => [],
+            'hostname' => 'be.localhost',
         ],
         'uk'    => [
-            'hostname' => 'uk.' . $host,
-            'timezone' => 'Europe/Kiev',
-            'name'     => 'Українська (beta)',
-            'flag'     => 'flag-icon flag-icon-ua',
-            'aliases'  => [],
+            'hostname' => 'uk.localhost',
         ],
     ],
     'hostname_whitelist' => [
         'www.autowp.ru',
-        'i.' . $host,
-        'en.' . $host,
-        'fr.' . $host,
-        'ru.' . $host,
-        'zh.' . $host,
-        'be.' . $host,
-        'br.' . $host,
-        'uk.' . $host,
-        'www.' . $host,
-        $host,
+        'en.localhost',
+        'fr.localhost',
+        'ru.localhost',
+        'zh.localhost',
+        'be.localhost',
+        'br.localhost',
+        'uk.localhost',
+        'www.localhost',
+        'localhost',
     ],
     'force_https'        => true,
     'content_languages'  => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp'],
@@ -270,12 +204,12 @@ return [
     ],
     'mosts_min_vehicles_count' => 200,
     'yandex'                   => [
-        'secret' => getenv('AUTOWP_YANDEX_SECRET'),
-        'price'  => (int) getenv('AUTOWP_YANDEX_PRICE'),
+        'secret' => '',
+        'price'  => 1,
     ],
     'vk'                       => [
-        'token'    => getenv('AUTOWP_VK_TOKEN'),
-        'owner_id' => getenv('AUTOWP_VK_OWNER_ID'),
+        'token'    => '',
+        'owner_id' => '',
     ],
     'input_filters'            => [
         'factories'          => [
@@ -287,25 +221,27 @@ return [
         ],
     ],
     'users'                    => [
-        'salt'      => getenv('AUTOWP_USERS_SALT'),
-        'emailSalt' => getenv('AUTOWP_EMAIL_SALT'),
+        'salt'      => 'users-salt',
+        'emailSalt' => 'email-salt',
     ],
     'mail'                     => [
-        'transport' => $mailTransport,
+        'transport' => [
+            'type' => 'in-memory',
+        ],
     ],
     'recaptcha'                => [
-        'publicKey'  => getenv('AUTOWP_RECAPTCHA_PUBLICKEY'),
-        'privateKey' => getenv('AUTOWP_RECAPTCHA_PRIVATEKEY'),
+        'publicKey'  => 'public',
+        'privateKey' => 'private',
     ],
     'sentry'                   => [
-        'dsn'         => getenv('SENTRY_DSN'),
-        'environment' => getenv('SENTRY_ENVIRONMENT'),
-        'release'     => getenv('SENTRY_RELEASE'),
+        'dsn'         => '',
+        'environment' => 'development',
+        'release'     => '',
     ],
     'traffic'                  => [
         'url' => 'http://traffic',
     ],
-    'authSecret'               => getenv('AUTOWP_AUTH_SECRET'),
+    'authSecret'               => 'example_secret',
     'fileStorage'              => [
         's3'          => [
             'region'                  => '',
@@ -320,4 +256,5 @@ return [
         'bucket'      => 'files',
         'srcOverride' => [],
     ],
+    'captcha'                  => false,
 ];

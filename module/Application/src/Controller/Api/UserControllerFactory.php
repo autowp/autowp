@@ -37,7 +37,7 @@ class UserControllerFactory implements FactoryInterface
             $container->get(UsersService::class),
             $container->get(User::class),
             $config['recaptcha'],
-            (bool) getenv('AUTOWP_CAPTCHA'),
+            (bool) $config['captcha'],
             $container->get(UserRename::class),
             $config['hosts'],
             $container->get(Storage::class)

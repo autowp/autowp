@@ -86,4 +86,3 @@ RUN chmod +x zf && \
     chmod +x start.sh
 
 ARG COMMIT
-ENV SENTRY_RELEASE=$COMMIT
