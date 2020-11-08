@@ -1,12 +1,14 @@
 <?php
 
-namespace Application\Controller\Api\Service;
+namespace Application\Controller\Api;
 
-use Application\Controller\Api\PictureModerVoteTemplateController as Controller;
+use Application\Controller\Api\TrafficController as Controller;
+use Application\Hydrator\Api\TrafficHydrator;
+use Autowp\Traffic\TrafficControl;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class PictureModerVoteTemplateControllerFactory implements FactoryInterface
+class TrafficControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -15,11 +17,10 @@ class PictureModerVoteTemplateControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
-        $filters = $container->get('InputFilterManager');
-        $tables  = $container->get('TableManager');
+        $hydrators = $container->get('HydratorManager');
         return new Controller(
-            $filters->get('api_picture_moder_vote_template_list'),
-            $tables->get('picture_moder_vote_template')
+            $container->get(TrafficControl::class),
+            $hydrators->get(TrafficHydrator::class)
         );
     }
 }

@@ -1,8 +1,7 @@
 <?php
 
-namespace Application\Controller\Api\Service;
+namespace Application\Controller\Api;
 
-use Application\Controller\Api\LogController;
 use Application\Hydrator\Api\LogHydrator;
 use Application\Model\Log;
 use Interop\Container\ContainerInterface;

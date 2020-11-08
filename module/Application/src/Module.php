@@ -96,10 +96,6 @@ class Module implements
         $urlCorrectionListener = new UrlCorrectionRouteListener();
         $urlCorrectionListener->attach($eventManager);
 
-        /** @var HostnameCheckRouteListener $hostnameListener */
-        $hostnameListener = $serviceManager->get(HostnameCheckRouteListener::class);
-        $hostnameListener->attach($eventManager);
-
         $config = $serviceManager->get('Config');
 
         if (isset($config['sentry']['dsn']) && $config['sentry']['dsn']) {
@@ -138,11 +134,6 @@ class Module implements
      */
     public function getConsoleUsage(Console $console): array
     {
-        //description command
-        return [
-            'db_migrations_version'             => 'Get current migration version',
-            'db_migrations_migrate [<version>]' => 'Execute migrate',
-            'db_migrations_generate'            => 'Generate new migration class',
-        ];
+        return [];
     }
 }

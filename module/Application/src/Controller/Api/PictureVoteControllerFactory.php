@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Controller\Api\Service;
+namespace Application\Controller\Api;
 
 use Application\Controller\Api\PictureVoteController as Controller;
 use Application\Model\PictureVote;

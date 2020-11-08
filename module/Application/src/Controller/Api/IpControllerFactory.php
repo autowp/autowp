@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Controller\Api\Service;
+namespace Application\Controller\Api;
 
 use Application\Controller\Api\IpController as Controller;
 use Application\Hydrator\Api\IpHydrator;

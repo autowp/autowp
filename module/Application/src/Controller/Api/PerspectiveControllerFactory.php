@@ -1,14 +1,13 @@
 <?php
 
-namespace Application\Controller\Api\Service;
+namespace Application\Controller\Api;
 
-use Application\Controller\Api\TrafficController as Controller;
-use Application\Hydrator\Api\TrafficHydrator;
-use Autowp\Traffic\TrafficControl;
+use Application\Controller\Api\PerspectiveController as Controller;
+use Application\Hydrator\Api\PerspectiveHydrator;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class TrafficControllerFactory implements FactoryInterface
+class PerspectiveControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -18,9 +17,10 @@ class TrafficControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
         $hydrators = $container->get('HydratorManager');
+        $tables    = $container->get('TableManager');
         return new Controller(
-            $container->get(TrafficControl::class),
-            $hydrators->get(TrafficHydrator::class)
+            $hydrators->get(PerspectiveHydrator::class),
+            $tables->get('perspectives')
         );
     }
 }

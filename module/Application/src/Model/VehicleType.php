@@ -329,31 +329,6 @@ class VehicleType
         return $result;
     }
 
-    public function getTree(int $parentId = 0): array
-    {
-        if ($parentId) {
-            $filter = ['parent_id' => $parentId];
-        } else {
-            $filter = 'parent_id is null';
-        }
-
-        $select = new Sql\Select($this->vehicleTypeTable->getTable());
-        $select->columns(['id', 'name'])
-            ->where($filter)
-            ->order('position');
-
-        $result = [];
-        foreach ($this->vehicleTypeTable->selectWith($select) as $row) {
-            $result[] = [
-                'id'     => (int) $row['id'],
-                'name'   => $row['name'],
-                'childs' => $this->getTree($row['id']),
-            ];
-        }
-
-        return $result;
-    }
-
     public function getBrandVehicleTypes(int $brandId): array
     {
         $select = new Sql\Select($this->vehicleTypeTable->getTable());

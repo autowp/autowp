@@ -1,13 +1,12 @@
 <?php
 
-namespace Application\Controller\Api\Service;
+namespace Application\Controller\Api;
 
-use Application\Controller\Api\PerspectiveController as Controller;
-use Application\Hydrator\Api\PerspectiveHydrator;
+use Application\Controller\Api\PictureModerVoteTemplateController as Controller;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class PerspectiveControllerFactory implements FactoryInterface
+class PictureModerVoteTemplateControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -16,11 +15,11 @@ class PerspectiveControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
     {
-        $hydrators = $container->get('HydratorManager');
-        $tables    = $container->get('TableManager');
+        $filters = $container->get('InputFilterManager');
+        $tables  = $container->get('TableManager');
         return new Controller(
-            $hydrators->get(PerspectiveHydrator::class),
-            $tables->get('perspectives')
+            $filters->get('api_picture_moder_vote_template_list'),
+            $tables->get('picture_moder_vote_template')
         );
     }
 }

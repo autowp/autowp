@@ -72,7 +72,6 @@ return [
             DuplicateFinder::class               => Service\DuplicateFinderFactory::class,
             FileSize::class                      => InvokableFactory::class,
             HostManager::class                   => Service\HostManagerFactory::class,
-            HostnameCheckRouteListener::class    => HostnameCheckRouteListenerFactory::class,
             Language::class                      => Service\LanguageFactory::class,
             Model\Brand::class                   => Model\BrandFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
@@ -180,19 +179,6 @@ return [
             'aliases'  => [],
         ],
     ],
-    'hostname_whitelist' => [
-        'www.autowp.ru',
-        'en.localhost',
-        'fr.localhost',
-        'ru.localhost',
-        'zh.localhost',
-        'be.localhost',
-        'br.localhost',
-        'uk.localhost',
-        'www.localhost',
-        'localhost',
-    ],
-    'force_https'        => true,
     'content_languages'  => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp'],
 
     /*'acl' => [

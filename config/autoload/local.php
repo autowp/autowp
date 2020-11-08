@@ -39,5 +39,4 @@ return [
         ],
     ],
     'mosts_min_vehicles_count' => 1,
-    'force_https'              => false,
 ];

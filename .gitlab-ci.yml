@@ -31,7 +31,7 @@ build:
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/psalm --no-progress"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/phpstan analyze --no-progress"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./clover.xml"
-    - docker-compose -f docker-compose-test.yml exec -T backend bash -c "./vendor/bin/php-coveralls -v"
+    #- docker-compose -f docker-compose-test.yml exec -T backend bash -c "./vendor/bin/php-coveralls -v"
     #- docker-compose -f docker-compose-test.yml exec -T backend bash -c "./sonar-scanner/bin/sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true"
     #- docker-compose -f docker-compose-test.yml exec -T -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" backend bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
 

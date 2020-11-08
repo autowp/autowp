@@ -54,7 +54,6 @@ class TrafficRouteListener extends AbstractListenerAggregate
         '/api/timezone',
         '/api/traffic',
         '/api/stat',
-        '/api/vehicle-types',
         '/api/perspective',
         '/api/perspective-page',
         '/api/picture-moder-vote-template',
