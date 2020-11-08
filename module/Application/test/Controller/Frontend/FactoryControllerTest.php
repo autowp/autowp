@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Frontend\Controller;
+namespace ApplicationTest\Controller\Frontend;
 
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;

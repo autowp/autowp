@@ -132,24 +132,52 @@ return [
     'hosts'              => [
         'en'    => [
             'hostname' => 'en.localhost',
+            'timezone' => 'Europe/London',
+            'name'     => 'English',
+            'flag'     => 'flag-icon flag-icon-gb',
+            'aliases'  => [],
         ],
         'zh'    => [
             'hostname' => 'zh.localhost',
+            'timezone' => 'Asia/Shanghai',
+            'name'     => '中文 (beta)',
+            'flag'     => 'flag-icon flag-icon-cn',
+            'aliases'  => [],
         ],
         'ru'    => [
             'hostname' => 'ru.localhost',
+            'timezone' => 'Europe/Moscow',
+            'name'     => 'Русский',
+            'flag'     => 'flag-icon flag-icon-ru',
+            'aliases'  => [],
         ],
         'pt-br' => [
             'hostname' => 'br.localhost',
+            'timezone' => 'Brazil/West',
+            'name'     => 'Português brasileiro',
+            'flag'     => 'flag-icon flag-icon-br',
+            'aliases'  => [],
         ],
         'fr'    => [
             'hostname' => 'fr.localhost',
+            'timezone' => 'Europe/Paris',
+            'name'     => 'Français (beta)',
+            'flag'     => 'flag-icon flag-icon-fr',
+            'aliases'  => [],
         ],
         'be'    => [
             'hostname' => 'be.localhost',
+            'timezone' => 'Europe/Minsk',
+            'name'     => 'Беларуская',
+            'flag'     => 'flag-icon flag-icon-by',
+            'aliases'  => [],
         ],
         'uk'    => [
             'hostname' => 'uk.localhost',
+            'timezone' => 'Europe/Kiev',
+            'name'     => 'Українська (beta)',
+            'flag'     => 'flag-icon flag-icon-ua',
+            'aliases'  => [],
         ],
     ],
     'hostname_whitelist' => [
