@@ -67,7 +67,7 @@ RUN composer install --no-dev --no-progress --no-interaction --optimize-autoload
 
 COPY . /app
 
-RUN mkdir -p --mode=0777 cache/modulecache && \
+RUN mkdir -p --mode=0777 /app/cache/modulecache && \
     chmod +x zf && \
     chmod +x start.sh
 
