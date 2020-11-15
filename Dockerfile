@@ -45,19 +45,19 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         unzip \
         xmlstarlet \
     && \
-    DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y
-
-RUN cat /etc/ImageMagick-6/policy.xml | \
+    DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y && \
+    \
+    cat /etc/ImageMagick-6/policy.xml | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='disk']/@value" -v "10GiB" > /etc/ImageMagick-6/policy2.xml && \
     cat /etc/ImageMagick-6/policy2.xml > /etc/ImageMagick-6/policy.xml && \
     \
     curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
-    chmod +x /usr/local/bin/waitforit
-
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-RUN php -r "unlink('composer-setup.php');"
+    chmod +x /usr/local/bin/waitforit && \
+    \
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
+    php -r "unlink('composer-setup.php');"
 
 COPY ./etc/ /etc/
 
@@ -67,7 +67,9 @@ RUN composer install --no-dev --no-progress --no-interaction --optimize-autoload
 
 COPY . /app
 
-RUN chmod +x zf && \
+RUN mkdir cache/modulecache && \
+    chmod 0777 cache/modulecache && \
+    chmod +x zf && \
     chmod +x start.sh
 
 ARG COMMIT

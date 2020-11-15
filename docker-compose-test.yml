@@ -1,5 +1,15 @@
 version: "3.3"
 services:
+
+  backend-nginx:
+    image: autowp/autowp:nginx
+    container_name: autowp_test_backend_nginx
+    restart: always
+    environment:
+      FASTCGI: backend:9000
+    depends_on:
+      - backend
+
   backend:
     image: autowp/autowp
     container_name: autowp_test_backend
