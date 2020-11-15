@@ -9,8 +9,8 @@ mkdir -p /app/public_html/img
 
 echo "Create cache dir"
 
-# shellcheck disable=SC2174
-mkdir -p --mode=0777 /app/cache/modulecache
+mkdir --mode=0777 -p /app/cache
+mkdir --mode=0777 -p /app/cache/modulecache
 ls -lah /app/cache/modulecache
 
 echo "Waiting for mysql"
