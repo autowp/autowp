@@ -110,7 +110,7 @@ return [
     'telegram'           => [
         'accessToken' => '',
         'token'       => 'example',
-        'webhook'     => 'http://localhost/telegram/webhook/token/example',
+        'webhook'     => 'http://localhost/api/telegram/webhook/token/example',
     ],
     'twitter'            => [
         'username'     => '',
