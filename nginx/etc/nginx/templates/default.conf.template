@@ -32,6 +32,12 @@ server {
         include       fastcgi_params;
     }
 
+    location /telegram/ {
+        fastcgi_pass  ${FASTCGI};
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        include       fastcgi_params;
+    }
+
     location ~* ^.+\.(jpg|jpeg|gif|css|js|ico|png|txt|woff|woff2|ttf|svg)$ {
         expires 7d;
         access_log off;
