@@ -6,11 +6,9 @@ mkdir -p /var/run/php
 mkdir -p /run/php
 mkdir -p /var/log/php7
 mkdir -p /app/public_html/img
-
-echo "Create cache dir"
-
 mkdir --mode=0777 -p /app/cache
 mkdir --mode=0777 -p /app/cache/modulecache
+
 ls -lah /app/cache/modulecache
 
 echo "Waiting for mysql"
