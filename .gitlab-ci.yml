@@ -22,6 +22,7 @@ build-php-fpm:
     - docker-compose -f docker-compose-test.yml up -d
     - docker-compose -f docker-compose-test.yml exec -T backend bash -c "waitforit -host=mysql -port=3306 -timeout=60" || docker logs autowp_test_backend
     - docker-compose -f docker-compose-test.yml exec -T backend bash -c "waitforit -host=goautowp -port=8080 -timeout=60" || docker logs autowp_test_backend
+    - docker-compose -f docker-compose-test.yml exec -T backend sh -c "ls -lah /app"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "ls -lah /app/cache"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "ls -lah /app/cache/modulecache"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./install-dev-db.sh" || docker logs autowp_test_backend
