@@ -8,3 +8,10 @@ docker-compose-test.yml
 Dockerfile
 README.md
 minio
+mysql
+frontend
+data
+vendor
+traffic
+goautowp
+cache
