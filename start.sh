@@ -4,10 +4,10 @@ set -e
 
 mkdir -p /var/run/php
 mkdir -p /run/php
-
 mkdir -p /var/log/php7
-
 mkdir -p /app/public_html/img
+# shellcheck disable=SC2174
+mkdir -p --mode=0777 /app/cache/modulecache
 
 echo "Waiting for mysql"
 
