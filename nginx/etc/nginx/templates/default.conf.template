@@ -32,7 +32,7 @@ server {
         include       fastcgi_params;
     }
 
-    location /telegram/ {
+    location /telegram/webhook/ {
         fastcgi_pass  ${FASTCGI};
         fastcgi_param SCRIPT_FILENAME $document_root/index.php;
         include       fastcgi_params;
