@@ -19,13 +19,13 @@ use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
 use Autowp\TextStorage;
 use Autowp\User\Model\User;
+use Casbin\Enforcer;
 use DateTime;
 use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -46,7 +46,7 @@ class PictureHydrator extends AbstractRestHydrator
 {
     private Comments $comments;
 
-    private Acl $acl;
+    private Enforcer $acl;
 
     private PictureVote $pictureVote;
 
@@ -96,7 +96,7 @@ class PictureHydrator extends AbstractRestHydrator
         $this->pictureView      = $serviceManager->get(PictureView::class);
         $this->pictureModerVote = $serviceManager->get(PictureModerVote::class);
 
-        $this->acl                  = $serviceManager->get(Acl::class);
+        $this->acl                  = $serviceManager->get(Enforcer::class);
         $this->pictureVote          = $serviceManager->get(PictureVote::class);
         $this->comments             = $serviceManager->get(Comments::class);
         $this->pictureNameFormatter = $serviceManager->get(PictureNameFormatter::class);
@@ -287,7 +287,7 @@ class PictureHydrator extends AbstractRestHydrator
         $isModer = false;
         $role    = $this->getUserRole();
         if ($role) {
-            $isModer = $this->acl->inheritsRole($role, 'moder');
+            $isModer = $this->acl->enforce($role, 'global', 'moderate');
         }
 
         $addDate = Row::getDateTimeByColumnType('timestamp', $object['add_date']);
@@ -801,18 +801,18 @@ class PictureHydrator extends AbstractRestHydrator
                 $role = $this->getUserRole();
                 if ($role) {
                     $picture['rights'] = [
-                        'move'      => $this->acl->isAllowed($role, 'picture', 'move'),
+                        'move'      => $this->acl->enforce($role, 'picture', 'move'),
                         'unaccept'  => ($object['status'] === Picture::STATUS_ACCEPTED)
-                                    && $this->acl->isAllowed($role, 'picture', 'unaccept'),
+                                    && $this->acl->enforce($role, 'picture', 'unaccept'),
                         'accept'    => $this->picture->canAccept($object)
-                                    && $this->acl->isAllowed($role, 'picture', 'accept'),
+                                    && $this->acl->enforce($role, 'picture', 'accept'),
                         'restore'   => ($object['status'] === Picture::STATUS_REMOVING)
-                                    && $this->acl->isAllowed($role, 'picture', 'restore'),
+                                    && $this->acl->enforce($role, 'picture', 'restore'),
                         'normalize' => ($object['status'] === Picture::STATUS_INBOX)
-                                    && $this->acl->isAllowed($role, 'picture', 'normalize'),
+                                    && $this->acl->enforce($role, 'picture', 'normalize'),
                         'flop'      => ($object['status'] === Picture::STATUS_INBOX)
-                                    && $this->acl->isAllowed($role, 'picture', 'flop'),
-                        'crop'      => $this->acl->isAllowed($role, 'picture', 'crop'),
+                                    && $this->acl->enforce($role, 'picture', 'flop'),
+                        'crop'      => $this->acl->enforce($role, 'picture', 'crop'),
                         'delete'    => $this->canDelete($object),
                     ];
                 }
@@ -895,7 +895,7 @@ class PictureHydrator extends AbstractRestHydrator
                 }
             }
 
-            if ($this->acl->isAllowed($role, 'user', 'ip')) {
+            if ($this->acl->enforce($role, 'user', 'ip')) {
                 $picture['ip'] = $object['ip'] ? $this->extractValue('ip', inet_ntop($object['ip'])) : null;
             }
         }
@@ -940,13 +940,13 @@ class PictureHydrator extends AbstractRestHydrator
             return false;
         }
 
-        if ($this->acl->isAllowed($role, 'picture', 'remove')) {
+        if ($this->acl->enforce($role, 'picture', 'remove')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $this->userId)) {
                 return true;
             }
         }
 
-        if (! $this->acl->isAllowed($role, 'picture', 'remove_by_vote')) {
+        if (! $this->acl->enforce($role, 'picture', 'remove_by_vote')) {
             return false;
         }
 

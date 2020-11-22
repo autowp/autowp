@@ -5,15 +5,15 @@ namespace Autowp\User\Controller\Plugin;
 use ArrayObject;
 use Autowp\User\Model\User as UserModel;
 use Autowp\User\Service\OAuth;
+use Casbin\Enforcer;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
-use Laminas\Permissions\Acl\Acl;
 
 use function array_key_exists;
 use function is_array;
 
 class User extends AbstractPlugin
 {
-    private Acl $acl;
+    private Enforcer $acl;
 
     private UserModel $userModel;
 
@@ -24,7 +24,7 @@ class User extends AbstractPlugin
 
     private OAuth $oauth;
 
-    public function __construct(Acl $acl, UserModel $userModel, OAuth $oauth)
+    public function __construct(Enforcer $acl, UserModel $userModel, OAuth $oauth)
     {
         $this->acl       = $acl;
         $this->userModel = $userModel;
@@ -91,19 +91,11 @@ class User extends AbstractPlugin
         return $this->user ?? null;
     }
 
-    public function isAllowed(string $resource, string $privilege): bool
+    public function enforce(string $resource, string $privilege): bool
     {
         return isset($this->user)
             && $this->user['role']
-            && $this->acl->isAllowed($this->user['role'], $resource, $privilege);
-    }
-
-    public function inheritsRole(string $inherit): bool
-    {
-        return isset($this->user)
-            && $this->user['role']
-            && $this->acl->hasRole($inherit)
-            && $this->acl->inheritsRole($this->user['role'], $inherit);
+            && $this->acl->enforce($this->user['role'], $resource, $privilege);
     }
 
     public function timezone(): string

@@ -81,7 +81,7 @@ class PictureItemController extends AbstractRestfulController
      */
     private function canChangePerspective($picture): bool
     {
-        if ($this->user()->inheritsRole('moder')) {
+        if ($this->user()->enforce('global', 'moderate')) {
             return true;
         }
 
@@ -104,7 +104,7 @@ class PictureItemController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -175,7 +175,7 @@ class PictureItemController extends AbstractRestfulController
      */
     public function itemAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -220,7 +220,7 @@ class PictureItemController extends AbstractRestfulController
      */
     public function deleteAction()
     {
-        $canMove = $this->user()->isAllowed('picture', 'move');
+        $canMove = $this->user()->enforce('picture', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
         }
@@ -266,7 +266,7 @@ class PictureItemController extends AbstractRestfulController
      */
     public function createAction()
     {
-        $canMove = $this->user()->isAllowed('picture', 'move');
+        $canMove = $this->user()->enforce('picture', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
         }
@@ -360,7 +360,7 @@ class PictureItemController extends AbstractRestfulController
         }
 
         if (isset($data['area'])) {
-            if (! $this->user()->inheritsRole('moder')) {
+            if (! $this->user()->enforce('global', 'moderate')) {
                 return $this->forbiddenAction();
             }
 
@@ -413,7 +413,7 @@ class PictureItemController extends AbstractRestfulController
         }
 
         if (isset($data['item_id'])) {
-            $canMove = $this->user()->isAllowed('picture', 'move');
+            $canMove = $this->user()->enforce('picture', 'move');
             if (! $canMove) {
                 return $this->forbiddenAction();
             }

@@ -6,13 +6,13 @@ namespace Autowp\Traffic;
 
 use Autowp\User\Model\User;
 use Autowp\User\Service\OAuth;
+use Casbin\Enforcer;
 use Exception;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\Response;
 use Laminas\Mvc\MvcEvent;
-use Laminas\Permissions\Acl\Acl;
 
 use function strlen;
 use function strncasecmp;
@@ -112,8 +112,8 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 $user      = $userModel->getRow(['id' => $userId]);
 
                 if ($user) {
-                    $acl              = $serviceManager->get(Acl::class);
-                    $unlimitedTraffic = $acl->isAllowed($user['role'], 'website', 'unlimited-traffic');
+                    $acl              = $serviceManager->get(Enforcer::class);
+                    $unlimitedTraffic = $acl->enforce($user['role'], 'global', 'unlimited-traffic');
                 }
             }
 

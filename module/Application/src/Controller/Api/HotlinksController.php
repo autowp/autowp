@@ -30,7 +30,7 @@ class HotlinksController extends AbstractRestfulController
      */
     public function hostsAction()
     {
-        if (! $this->user()->isAllowed('hotlinks', 'view')) {
+        if (! $this->user()->enforce('hotlinks', 'view')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
@@ -44,7 +44,7 @@ class HotlinksController extends AbstractRestfulController
      */
     public function hostsDeleteAction()
     {
-        if (! $this->user()->isAllowed('hotlinks', 'manage')) {
+        if (! $this->user()->enforce('hotlinks', 'manage')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
@@ -60,7 +60,7 @@ class HotlinksController extends AbstractRestfulController
      */
     public function hostDeleteAction()
     {
-        if (! $this->user()->isAllowed('hotlinks', 'manage')) {
+        if (! $this->user()->enforce('hotlinks', 'manage')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
@@ -76,7 +76,7 @@ class HotlinksController extends AbstractRestfulController
      */
     public function whitelistPostAction()
     {
-        if (! $this->user()->isAllowed('hotlinks', 'manage')) {
+        if (! $this->user()->enforce('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
 
@@ -100,7 +100,7 @@ class HotlinksController extends AbstractRestfulController
      */
     public function blacklistPostAction()
     {
-        if (! $this->user()->isAllowed('hotlinks', 'manage')) {
+        if (! $this->user()->enforce('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
 

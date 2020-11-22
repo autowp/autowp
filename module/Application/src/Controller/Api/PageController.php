@@ -51,7 +51,7 @@ class PageController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
@@ -92,7 +92,7 @@ class PageController extends AbstractRestfulController
      */
     public function itemAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
@@ -121,7 +121,7 @@ class PageController extends AbstractRestfulController
      */
     public function itemPutAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('pages', 'moderate')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
@@ -267,7 +267,7 @@ class PageController extends AbstractRestfulController
      */
     public function postAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('pages', 'moderate')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
@@ -328,7 +328,7 @@ class PageController extends AbstractRestfulController
      */
     public function itemDeleteAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('pages', 'moderate')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 

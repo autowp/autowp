@@ -6,13 +6,13 @@ use Application\Comments;
 use ArrayAccess;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
+use Casbin\Enforcer;
 use Exception;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Paginator;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -30,7 +30,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
 
     private User $userModel;
 
-    private Acl $acl;
+    private Enforcer $acl;
 
     private TableGateway $themeTable;
 
@@ -48,7 +48,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
 
         $this->userId = 0;
 
-        $this->acl = $serviceManager->get(Acl::class);
+        $this->acl = $serviceManager->get(Enforcer::class);
 
         $tables           = $serviceManager->get('TableManager');
         $this->themeTable = $tables->get('forums_themes');
@@ -189,7 +189,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
             $isModerator = false;
             $role        = $this->getUserRole();
             if ($role) {
-                $isModerator = $this->acl->inheritsRole($role, 'moder');
+                $isModerator = $this->acl->enforce($role, 'global', 'moderate');
             }
 
             if (! $isModerator) {

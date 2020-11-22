@@ -180,7 +180,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->enforce('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -257,7 +257,7 @@ class AttrController extends AbstractRestfulController
      */
     public function userValueItemDeleteAction()
     {
-        if (! $this->user()->isAllowed('specifications', 'admin')) {
+        if (! $this->user()->enforce('specifications', 'admin')) {
             return $this->forbiddenAction();
         }
 
@@ -283,7 +283,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->enforce('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -416,7 +416,7 @@ class AttrController extends AbstractRestfulController
      */
     public function attributePostAction()
     {
-        if (! $this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->enforce('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -484,7 +484,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->enforce('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -522,7 +522,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->enforce('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -567,7 +567,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->enforce('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -651,7 +651,7 @@ class AttrController extends AbstractRestfulController
      */
     public function attributeItemPatchAction()
     {
-        if (! $this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->enforce('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -810,7 +810,7 @@ class AttrController extends AbstractRestfulController
      */
     public function zoneAttributePostAction()
     {
-        if (! $this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->enforce('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -854,7 +854,7 @@ class AttrController extends AbstractRestfulController
      */
     public function zoneAttributeItemDeleteAction()
     {
-        if (! $this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->enforce('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -882,7 +882,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->enforce('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -910,7 +910,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->enforce('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -930,7 +930,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->enforce('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -954,7 +954,7 @@ class AttrController extends AbstractRestfulController
      */
     public function listOptionPostAction()
     {
-        if (! $this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->enforce('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
 

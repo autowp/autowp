@@ -36,7 +36,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -74,7 +74,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
      */
     public function itemAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -95,7 +95,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
      */
     public function deleteAction()
     {
-        $canMove = $this->user()->isAllowed('car', 'move');
+        $canMove = $this->user()->enforce('car', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
         }
@@ -115,7 +115,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
      */
     public function createAction()
     {
-        $canMove = $this->user()->isAllowed('car', 'move');
+        $canMove = $this->user()->enforce('car', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
         }

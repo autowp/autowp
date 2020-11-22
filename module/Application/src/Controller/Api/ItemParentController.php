@@ -107,7 +107,7 @@ class ItemParentController extends AbstractRestfulController
     {
         $user = $this->user()->get();
 
-        $isModer = $this->user()->inheritsRole('moder');
+        $isModer = $this->user()->enforce('global', 'moderate');
 
         $this->listInputFilter->setData($this->params()->fromQuery());
 
@@ -250,7 +250,7 @@ class ItemParentController extends AbstractRestfulController
     public function itemAction()
     {
         $user = $this->user()->get();
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -285,7 +285,7 @@ class ItemParentController extends AbstractRestfulController
      */
     public function postAction()
     {
-        $canMove = $this->user()->isAllowed('car', 'move');
+        $canMove = $this->user()->enforce('car', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
         }
@@ -394,7 +394,7 @@ class ItemParentController extends AbstractRestfulController
      */
     public function putAction()
     {
-        $canMove = $this->user()->isAllowed('car', 'move');
+        $canMove = $this->user()->enforce('car', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
         }
@@ -495,7 +495,7 @@ class ItemParentController extends AbstractRestfulController
      */
     public function deleteAction()
     {
-        if (! $this->user()->isAllowed('car', 'move')) {
+        if (! $this->user()->enforce('car', 'move')) {
             return $this->forbiddenAction();
         }
 

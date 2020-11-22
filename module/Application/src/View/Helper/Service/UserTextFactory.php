@@ -4,8 +4,8 @@ namespace Application\View\Helper\Service;
 
 use Application\View\Helper\UserText as Helper;
 use Autowp\User\Model\User;
+use Casbin\Enforcer;
 use Interop\Container\ContainerInterface;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class UserTextFactory implements FactoryInterface
@@ -19,7 +19,7 @@ class UserTextFactory implements FactoryInterface
     {
         return new Helper(
             $container->get(User::class),
-            $container->get(Acl::class)
+            $container->get(Enforcer::class)
         );
     }
 }

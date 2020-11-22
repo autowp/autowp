@@ -35,7 +35,7 @@ class BanController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $canBan = $this->user()->isAllowed('user', 'ban');
+        $canBan = $this->user()->enforce('user', 'ban');
         if (! $canBan) {
             return $this->forbiddenAction();
         }
@@ -65,7 +65,7 @@ class BanController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $canBan = $this->user()->isAllowed('user', 'ban');
+        $canBan = $this->user()->enforce('user', 'ban');
         if (! $canBan) {
             return $this->forbiddenAction();
         }

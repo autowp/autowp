@@ -38,7 +38,7 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -69,7 +69,7 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
      */
     public function itemAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -100,7 +100,7 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
      */
     public function deleteAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -119,7 +119,7 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
      */
     public function createAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 

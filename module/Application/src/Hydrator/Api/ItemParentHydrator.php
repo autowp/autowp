@@ -6,9 +6,9 @@ use Application\Model\Item;
 use Application\Model\ItemParent;
 use ArrayAccess;
 use Autowp\User\Model\User;
+use Casbin\Enforcer;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -25,7 +25,7 @@ class ItemParentHydrator extends AbstractRestHydrator
 
     private ItemParent $itemParent;
 
-    private Acl $acl;
+    private Enforcer $acl;
 
     private User $userModel;
 
@@ -37,7 +37,7 @@ class ItemParentHydrator extends AbstractRestHydrator
 
         $this->item = $serviceManager->get(Item::class);
 
-        $this->acl       = $serviceManager->get(Acl::class);
+        $this->acl       = $serviceManager->get(Enforcer::class);
         $this->userModel = $serviceManager->get(User::class);
 
         $strategy = new Strategy\Item($serviceManager);
@@ -118,7 +118,7 @@ class ItemParentHydrator extends AbstractRestHydrator
         $isModer = false;
         $role    = $this->getUserRole();
         if ($role) {
-            $isModer = $this->acl->inheritsRole($role, 'moder');
+            $isModer = $this->acl->enforce($role, 'global', 'moderate');
         }
 
         if ($this->filterComposite->filter('item')) {

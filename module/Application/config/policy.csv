@@ -1,0 +1,53 @@
+p, admin, attrs, edit
+p, admin, car, edit_meta
+p, admin, comment, remove
+p, admin, hotlinks, manage
+p, admin, hotlinks, view
+p, admin, picture, restore
+p, admin, picture, unaccept
+p, admin, picture, flop
+p, admin, picture, normalize
+p, admin, rights, edit
+p, admin, specifications, admin
+p, admin, specifications, edit-engine
+p, admin, user, ban
+p, admin, user, delete
+p, brands-moder, brand, logo
+p, cars-moder, car, add
+p, cars-moder, car, edit_meta
+p, cars-moder, car, move
+p, cars-moder, specifications, edit-engine
+p, comments-writer, comment, add
+p, forums-moder, forums, moderate
+p, green-user, status, be-green
+p, moder, global, moderate
+p, moder, global, unlimited-traffic
+p, moder, user, ip
+p, pages-admin, pages, moderate
+p, pictures-moder, picture, remove_by_vote
+p, pictures-moder, picture, unaccept
+p, pictures-moder, picture, accept
+p, pictures-moder, picture, crop
+p, pictures-moder, picture, moder_vote
+p, pictures-moder, picture, move
+p, pictures-moder, picture, normalize
+p, user, specifications, edit
+p, user, comment, moderator-attention
+
+g, moder, green-user
+
+g, brands-moder, moder
+g, cars-moder, moder
+g, forums-moder, moder
+g, pictures-moder, moder
+
+g, admin, articles-moder
+g, admin, brands-moder
+g, admin, cars-moder
+g, admin, forums-moder
+g, admin, pictures-moder
+g, admin, user
+
+g, user, comments-writer
+g, green-user, user
+

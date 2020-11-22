@@ -18,11 +18,11 @@ use ArrayAccess;
 use Autowp\Comments\Attention;
 use Autowp\Image\StorageInterface;
 use Autowp\User\Model\User;
+use Casbin\Enforcer;
 use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -70,7 +70,7 @@ class ItemHydrator extends AbstractRestHydrator
 
     private StorageInterface $imageStorage;
 
-    private Acl $acl;
+    private Enforcer $acl;
 
     private VehicleType $vehicleType;
 
@@ -107,7 +107,7 @@ class ItemHydrator extends AbstractRestHydrator
         $this->itemModel  = $serviceManager->get(Item::class);
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
-        $this->acl = $serviceManager->get(Acl::class);
+        $this->acl = $serviceManager->get(Enforcer::class);
 
         $this->catalogue = $serviceManager->get(Catalogue::class);
 
@@ -196,7 +196,7 @@ class ItemHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->userId = $userId;
+        $this->userId = (int) $userId;
 
         //$this->getStrategy('content')->setUser($user);
         //$this->getStrategy('replies')->setUser($user);
@@ -309,7 +309,7 @@ class ItemHydrator extends AbstractRestHydrator
         $isModer = false;
         $role    = $this->getUserRole();
         if ($role) {
-            $isModer = $this->acl->inheritsRole($role, 'moder');
+            $isModer = $this->acl->enforce($role, 'global', 'moderate');
         }
 
         $result = [
@@ -394,7 +394,7 @@ class ItemHydrator extends AbstractRestHydrator
 
         if ($this->filterComposite->filter('can_edit_specs')) {
             $isSpecsAvailabe          = in_array($object['item_type_id'], [Item::ENGINE, Item::TWINS, Item::VEHICLE]);
-            $result['can_edit_specs'] = $isSpecsAvailabe && $this->isAllowed('specifications', 'edit');
+            $result['can_edit_specs'] = $isSpecsAvailabe && $this->enforce('specifications', 'edit');
         }
 
         $showLat = $this->filterComposite->filter('lat');
@@ -934,13 +934,13 @@ class ItemHydrator extends AbstractRestHydrator
         return $this->userRole;
     }
 
-    private function isAllowed(string $resource, string $privilege): bool
+    private function enforce(string $resource, string $privilege): bool
     {
         $role = $this->getUserRole();
         if (! $role) {
             return false;
         }
-        return $this->acl->isAllowed($role, $resource, $privilege);
+        return $this->acl->enforce($role, $resource, $privilege);
     }
 
     /**

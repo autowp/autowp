@@ -103,7 +103,7 @@ class ForumController extends AbstractRestfulController
         $user   = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
-        $isModerator = $this->user()->inheritsRole('moder');
+        $isModerator = $this->user()->enforce('global', 'moderate');
 
         $this->themeListInputFilter->setData($this->params()->fromQuery());
 
@@ -147,7 +147,7 @@ class ForumController extends AbstractRestfulController
      */
     public function getThemeAction()
     {
-        $isModerator = $this->user()->inheritsRole('moder');
+        $isModerator = $this->user()->enforce('global', 'moderate');
 
         $this->themeInputFilter->setData($this->params()->fromQuery());
 
@@ -190,7 +190,7 @@ class ForumController extends AbstractRestfulController
         $user   = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
-        $isModerator = $this->user()->inheritsRole('moder');
+        $isModerator = $this->user()->enforce('global', 'moderate');
 
         $this->topicListInputFilter->setData($this->params()->fromQuery());
 
@@ -271,7 +271,7 @@ class ForumController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
+        $forumAdmin = $this->user()->enforce('forums', 'moderate');
 
         $row = $this->forums->getTopic((int) $this->params('id'));
         if (! $row) {
@@ -448,7 +448,7 @@ class ForumController extends AbstractRestfulController
         $user   = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
-        $isModerator = $this->user()->inheritsRole('moder');
+        $isModerator = $this->user()->enforce('global', 'moderate');
 
         $select = $this->forums->getTopicTable()->getSql()->select();
         $select->where(['forums_topics.id' => (int) $this->params('id')]);

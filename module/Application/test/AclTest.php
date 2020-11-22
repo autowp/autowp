@@ -3,8 +3,8 @@
 namespace ApplicationTest;
 
 use Application\Test\AbstractHttpControllerTestCase;
+use Casbin\Enforcer;
 use Laminas\Mvc\Controller\PluginManager;
-use Laminas\Permissions\Acl\Acl;
 
 class AclTest extends AbstractHttpControllerTestCase
 {
@@ -14,9 +14,9 @@ class AclTest extends AbstractHttpControllerTestCase
     {
         $services = $this->getApplicationServiceLocator();
 
-        $acl = $services->get(Acl::class);
+        $acl = $services->get(Enforcer::class);
 
-        $this->assertInstanceOf(Acl::class, $acl);
+        $this->assertInstanceOf(Enforcer::class, $acl);
     }
 
     public function testAclControllerPluginRegisters(): void
@@ -26,10 +26,10 @@ class AclTest extends AbstractHttpControllerTestCase
         $manager = $services->get(PluginManager::class);
         $plugin  = $manager->get('user');
 
-        $result = $plugin()->inheritsRole('moder');
+        $result = $plugin()->enforce('global', 'moderate');
         $this->assertIsBool($result);
 
-        $result = $plugin()->isAllowed('pictures', 'edit');
+        $result = $plugin()->enforce('pictures', 'edit');
         $this->assertIsBool($result);
     }
 }

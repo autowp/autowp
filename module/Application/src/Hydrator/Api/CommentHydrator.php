@@ -10,11 +10,11 @@ use Application\View\Helper\UserText;
 use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
+use Casbin\Enforcer;
 use Exception;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -40,7 +40,7 @@ class CommentHydrator extends AbstractRestHydrator
 
     private TableGateway $voteTable;
 
-    private Acl $acl;
+    private Enforcer $acl;
 
     private int $limit;
 
@@ -57,7 +57,7 @@ class CommentHydrator extends AbstractRestHydrator
 
         $this->userId = 0;
 
-        $this->acl = $serviceManager->get(Acl::class);
+        $this->acl = $serviceManager->get(Enforcer::class);
 
         $tables          = $serviceManager->get('TableManager');
         $this->voteTable = $tables->get('comment_vote');
@@ -125,9 +125,9 @@ class CommentHydrator extends AbstractRestHydrator
         $canViewIp = false;
         $role      = $this->getUserRole();
         if ($role) {
-            $canRemove = $this->acl->isAllowed($role, 'comment', 'remove');
-            $isModer   = $this->acl->inheritsRole($role, 'moder');
-            $canViewIp = $this->acl->isAllowed($role, 'user', 'ip');
+            $canRemove = $this->acl->enforce($role, 'comment', 'remove');
+            $isModer   = $this->acl->enforce($role, 'global', 'moderate');
+            $canViewIp = $this->acl->enforce($role, 'user', 'ip');
         }
 
         $addDate = Row::getDateTimeByColumnType('timestamp', $object['datetime']);

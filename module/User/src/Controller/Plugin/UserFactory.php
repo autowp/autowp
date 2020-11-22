@@ -4,8 +4,8 @@ namespace Autowp\User\Controller\Plugin;
 
 use Autowp\User\Model\User as UserModel;
 use Autowp\User\Service\OAuth;
+use Casbin\Enforcer;
 use Interop\Container\ContainerInterface;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class UserFactory implements FactoryInterface
@@ -18,7 +18,7 @@ class UserFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): User
     {
         return new User(
-            $container->get(Acl::class),
+            $container->get(Enforcer::class),
             $container->get(UserModel::class),
             $container->get(OAuth::class)
         );

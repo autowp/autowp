@@ -79,7 +79,7 @@ class PictureModerVoteController extends AbstractRestfulController
     private function notifyVote($picture, bool $vote, string $reason): void
     {
         $owner        = $this->userModel->getRow((int) $picture['owner_id']);
-        $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
+        $ownerIsModer = $owner && $this->user($owner)->enforce('global', 'moderate');
         if ($ownerIsModer) {
             if ((int) $owner['id'] !== (int) $this->user()->get()['id']) {
                 $uri = $this->hostManager->getUriByLanguage($owner['language']);
@@ -164,7 +164,7 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     public function update($id, $data)
     {
-        if (! $this->user()->isAllowed('picture', 'moder_vote')) {
+        if (! $this->user()->enforce('picture', 'moder_vote')) {
             return $this->forbiddenAction();
         }
 

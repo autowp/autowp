@@ -372,7 +372,7 @@ class PictureController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        $isModer = $this->user()->inheritsRole('moder');
+        $isModer = $this->user()->enforce('global', 'moderate');
         $user    = $this->user()->get();
 
         $inputFilter = $isModer ? $this->listInputFilter : $this->publicListInputFilter;
@@ -623,7 +623,7 @@ class PictureController extends AbstractRestfulController
     private function canAccept($picture): bool
     {
         return $this->picture->canAccept($picture)
-            && $this->user()->isAllowed('picture', 'accept');
+            && $this->user()->enforce('picture', 'accept');
     }
 
     /**
@@ -734,12 +734,12 @@ class PictureController extends AbstractRestfulController
 
         $data = $this->editInputFilter->getValues();
 
-        $isModer = $this->user()->inheritsRole('moder');
+        $isModer = $this->user()->enforce('global', 'moderate');
 
         $set = [];
 
         if (isset($data['crop'])) {
-            $canCrop = $this->user()->isAllowed('picture', 'crop')
+            $canCrop = $this->user()->enforce('picture', 'crop')
                     || ($picture['owner_id'] === $user['id']) && ($picture['status'] === Picture::STATUS_INBOX);
 
             if (! $canCrop) {
@@ -789,7 +789,7 @@ class PictureController extends AbstractRestfulController
                         return $this->notFoundAction();
                     }
 
-                    if (! $this->user()->isAllowed('picture', 'move')) {
+                    if (! $this->user()->enforce('picture', 'move')) {
                         return $this->forbiddenAction();
                     }
 
@@ -932,7 +932,7 @@ class PictureController extends AbstractRestfulController
 
                 if ($data['status'] === Picture::STATUS_INBOX) {
                     if ($picture['status'] === Picture::STATUS_REMOVING) {
-                        $canRestore = $this->user()->isAllowed('picture', 'restore');
+                        $canRestore = $this->user()->enforce('picture', 'restore');
                         if (! $canRestore) {
                             return $this->forbiddenAction();
                         }
@@ -949,7 +949,7 @@ class PictureController extends AbstractRestfulController
                             'pictures' => $picture['id'],
                         ]);
                     } elseif ($picture['status'] === Picture::STATUS_ACCEPTED) {
-                        $canUnaccept = $this->user()->isAllowed('picture', 'unaccept');
+                        $canUnaccept = $this->user()->enforce('picture', 'unaccept');
                         if (! $canUnaccept) {
                             return $this->forbiddenAction();
                         }
@@ -1101,11 +1101,11 @@ class PictureController extends AbstractRestfulController
 
         $canDelete = false;
         $user      = $this->user()->get();
-        if ($this->user()->isAllowed('picture', 'remove')) {
+        if ($this->user()->enforce('picture', 'remove')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $canDelete = true;
             }
-        } elseif ($this->user()->isAllowed('picture', 'remove_by_vote')) {
+        } elseif ($this->user()->enforce('picture', 'remove_by_vote')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
                 $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
@@ -1123,7 +1123,7 @@ class PictureController extends AbstractRestfulController
      */
     public function normalizeAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -1133,7 +1133,7 @@ class PictureController extends AbstractRestfulController
         }
 
         $canNormalize = $row['status'] === Picture::STATUS_INBOX
-                     && $this->user()->isAllowed('picture', 'normalize');
+                     && $this->user()->enforce('picture', 'normalize');
 
         if (! $canNormalize) {
             return $this->forbiddenAction();
@@ -1161,7 +1161,7 @@ class PictureController extends AbstractRestfulController
      */
     public function flopAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -1171,7 +1171,7 @@ class PictureController extends AbstractRestfulController
         }
 
         $canFlop = $row['status'] === Picture::STATUS_INBOX
-                && $this->user()->isAllowed('picture', 'flop');
+                && $this->user()->enforce('picture', 'flop');
 
         if (! $canFlop) {
             return $this->forbiddenAction();
@@ -1199,7 +1199,7 @@ class PictureController extends AbstractRestfulController
      */
     public function repairAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -1225,7 +1225,7 @@ class PictureController extends AbstractRestfulController
      */
     public function correctFileNamesAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -1282,19 +1282,19 @@ class PictureController extends AbstractRestfulController
                 break;
 
             case Picture::STATUS_INBOX:
-                $can1 = $this->user()->isAllowed('picture', 'accept');
+                $can1 = $this->user()->enforce('picture', 'accept');
                 break;
         }
 
         $can2 = false;
         switch ($replacedPicture['status']) {
             case Picture::STATUS_ACCEPTED:
-                $can2 = $this->user()->isAllowed('picture', 'unaccept')
-                     && $this->user()->isAllowed('picture', 'remove_by_vote');
+                $can2 = $this->user()->enforce('picture', 'unaccept')
+                     && $this->user()->enforce('picture', 'remove_by_vote');
                 break;
 
             case Picture::STATUS_INBOX:
-                $can2 = $this->user()->isAllowed('picture', 'remove_by_vote');
+                $can2 = $this->user()->enforce('picture', 'remove_by_vote');
                 break;
 
             case Picture::STATUS_REMOVING:
@@ -1303,7 +1303,7 @@ class PictureController extends AbstractRestfulController
                 break;
         }
 
-        return $can1 && $can2 && $this->user()->isAllowed('picture', 'move');
+        return $can1 && $can2 && $this->user()->enforce('picture', 'move');
     }
 
     /**
@@ -1312,7 +1312,7 @@ class PictureController extends AbstractRestfulController
      */
     public function acceptReplaceAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 

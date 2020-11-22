@@ -6,11 +6,14 @@ use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\Comments;
 use Autowp\User\Model\User;
+use Casbin\Enforcer;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\View\Model\JsonModel;
 
+use function array_merge;
+use function array_pop;
+use function array_unique;
 use function array_values;
 use function ksort;
 use function round;
@@ -19,7 +22,7 @@ use const SORT_NUMERIC;
 
 class AboutController extends AbstractRestfulController
 {
-    private Acl $acl;
+    private Enforcer $acl;
 
     private Comments\CommentsService $comments;
 
@@ -30,7 +33,7 @@ class AboutController extends AbstractRestfulController
     private User $userModel;
 
     public function __construct(
-        Acl $acl,
+        Enforcer $acl,
         Comments\CommentsService $comments,
         Picture $picture,
         Item $item,
@@ -51,11 +54,15 @@ class AboutController extends AbstractRestfulController
         $contributors = [];
 
         $greenUserRoles = [];
-        foreach ($this->acl->getRoles() as $role) {
-            if ($this->acl->isAllowed($role, 'status', 'be-green')) {
-                $greenUserRoles[] = $role;
-            }
+
+        $toFetch = ['green-user'];
+        while ($toFetch) {
+            $role           = array_pop($toFetch);
+            $roles          = $this->acl->getUsersForRole($role);
+            $toFetch        = array_merge($toFetch, $roles);
+            $greenUserRoles = array_merge($greenUserRoles, $roles);
         }
+        $greenUserRoles = array_unique($greenUserRoles);
 
         if ($greenUserRoles) {
             $userTable = $this->userModel->getTable();

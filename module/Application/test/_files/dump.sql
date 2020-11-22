@@ -6,16 +6,6 @@ VALUES
 (2,   NULL,                                '',              NULL,'tester2',                 NULL,NOW(),0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user', 10,NULL,0,'identity',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru'),
 (3,'admin','72a4a00d16ecf16d8bef792ef553c2d7',              NULL,  'admin','2004-11-25 18:31:52',NOW(),0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',0,NULL,0,'admin',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
 
-/*!40000 ALTER TABLE `acl_roles_parents` DISABLE KEYS */;
-INSERT IGNORE INTO `acl_roles_parents` (`role_id`, `parent_role_id`) VALUES (14,6),(5,9),(5,10),(5,14),(10,14),(5,58),(5,13);
-/*!40000 ALTER TABLE `acl_roles_parents` ENABLE KEYS */;
-
-/*!40000 ALTER TABLE `acl_roles_privileges_allowed` DISABLE KEYS */;
-INSERT IGNORE INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`)
-VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10),
-(5,11),(5,12),(5, 13),(5,14),(5,17),(5,18),(5,19),(5,20),(5,16),(5,21),(5,22);
-/*!40000 ALTER TABLE `acl_roles_privileges_allowed` ENABLE KEYS */;
-
 /*!40000 ALTER TABLE `item` DISABLE KEYS */;
 INSERT INTO `item` (`id`, `name`, `begin_year`, `end_year`, `body`, `spec_id`, `spec_inherit`, `produced`, `produced_exactly`, `is_concept`, `today`, `add_datetime`, `begin_month`, `end_month`, `begin_order_cache`, `end_order_cache`, `begin_model_year`, `end_model_year`, `is_group`, `car_type_inherit`, `is_concept_inherit`, `engine_item_id`, `engine_inherit`, `item_type_id`, `catname`, `full_name`, `position`, `logo_id`)
 VALUES
