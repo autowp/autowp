@@ -15,59 +15,6 @@ use function range;
 
 return [
     'input_filter_specs' => [
-        'api_acl_roles_list'                   => [
-            'recursive' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-        ],
-        'api_acl_roles_post'                   => [
-            'name' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-        ],
-        'api_acl_roles_role_parents_post'      => [
-            'role' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-        ],
-        'api_acl_rules_post'                   => [
-            'role'      => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'resource'  => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'privilege' => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'allowed'   => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-        ],
         'api_article_list'                     => [
             'catname' => [
                 'required' => false,

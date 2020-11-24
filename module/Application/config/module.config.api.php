@@ -38,7 +38,7 @@ return [
         'factories' => [
             Controller\Api\AboutController::class           => Controller\Api\AboutControllerFactory::class,
             Controller\Api\AccountController::class         => Controller\Api\AccountControllerFactory::class,
-            Controller\Api\AclController::class             => Controller\Api\AclControllerFactory::class,
+            Controller\Api\AclController::class             => InvokableFactory::class,
             Controller\Api\ArticleController::class         => Controller\Api\ArticleControllerFactory::class,
             Controller\Api\AttrController::class            => Controller\Api\AttrControllerFactory::class,
             Controller\Api\BrandsController::class          => Controller\Api\BrandsControllerFactory::class,
