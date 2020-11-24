@@ -6,11 +6,11 @@ use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User as UserModel;
 use Autowp\ZFComponents\View\Helper\HtmlA;
+use Casbin\Enforcer;
 use DateInterval;
 use DateTime;
 use Exception;
 use Laminas\I18n\View\Helper\Translate;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\Uri;
 use Laminas\View\Helper\AbstractHtmlElement;
 use Laminas\View\Helper\EscapeHtml;
@@ -43,9 +43,9 @@ class UserText extends AbstractHtmlElement
 
     private UserModel $userModel;
 
-    private Acl $acl;
+    private Enforcer $acl;
 
-    public function __construct(UserModel $userModel, Acl $acl)
+    public function __construct(UserModel $userModel, Enforcer $acl)
     {
         $this->userModel = $userModel;
         $this->acl       = $acl;
@@ -228,7 +228,7 @@ class UserText extends AbstractHtmlElement
             $classes[] = 'long-away';
         }
 
-        if ($user['role'] && $this->acl->isAllowed($user['role'], 'status', 'be-green')) {
+        if ($user['role'] && $this->acl->enforce($user['role'], 'status', 'be-green')) {
             $classes[] = 'green-man';
         }
 

@@ -37,7 +37,7 @@ class IpController extends AbstractRestfulController
      */
     public function itemAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 

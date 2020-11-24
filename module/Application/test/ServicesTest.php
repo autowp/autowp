@@ -14,7 +14,7 @@ use Application\Test\AbstractHttpControllerTestCase;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service;
-use Laminas\Permissions\Acl\Acl;
+use Casbin\Enforcer;
 
 class ServicesTest extends AbstractHttpControllerTestCase
 {
@@ -44,7 +44,7 @@ class ServicesTest extends AbstractHttpControllerTestCase
             [TelegramService::class],
             [Language::class],
             [Service::class],
-            [Acl::class],
+            [Enforcer::class],
             [FileSize::class],
             [SpecificationsService::class],
         ];

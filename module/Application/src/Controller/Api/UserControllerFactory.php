@@ -7,8 +7,8 @@ use Application\Service\UsersService;
 use Autowp\Image\Storage;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
+use Casbin\Enforcer;
 use Interop\Container\ContainerInterface;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class UserControllerFactory implements FactoryInterface
@@ -25,7 +25,7 @@ class UserControllerFactory implements FactoryInterface
         $config    = $container->get('Config');
 
         return new UserController(
-            $container->get(Acl::class),
+            $container->get(Enforcer::class),
             $hydrators->get(UserHydrator::class),
             $filters->get('api_user_item'),
             $filters->get('api_user_list'),

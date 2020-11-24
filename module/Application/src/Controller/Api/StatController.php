@@ -32,7 +32,7 @@ class StatController extends AbstractActionController
      */
     public function globalSummaryAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 

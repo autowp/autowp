@@ -18,7 +18,6 @@ use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
 use function Autowp\Commons\currentFromResultSetInterface;
-use function explode;
 
 /**
  * @method User user($user = null)
@@ -91,36 +90,11 @@ class AclController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'result' => $this->user()->isAllowed(
+            'result' => $this->user()->enforce(
                 $this->params()->fromQuery('resource'),
                 $this->params()->fromQuery('privilege')
             ),
         ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function inheritRolesAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
-        }
-
-        $user   = $this->user()->get();
-        $result = [
-            $user['role'] => true,
-        ];
-
-        $roles = $this->params()->fromQuery('roles');
-        $roles = explode(',', $roles);
-
-        foreach ($roles as $role) {
-            $result[$role] = $this->user()->inheritsRole($role);
-        }
-
-        return new JsonModel($result);
     }
 
     private function getRoles(?int $parentId): array
@@ -182,7 +156,7 @@ class AclController extends AbstractRestfulController
      */
     public function rolesPostAction()
     {
-        if (! $this->user()->isAllowed('rights', 'edit')) {
+        if (! $this->user()->enforce('rights', 'edit')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
@@ -301,7 +275,7 @@ class AclController extends AbstractRestfulController
      */
     public function rulesPostAction()
     {
-        if (! $this->user()->isAllowed('rights', 'edit')) {
+        if (! $this->user()->enforce('rights', 'edit')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
@@ -433,7 +407,7 @@ class AclController extends AbstractRestfulController
      */
     public function roleParentsPostAction()
     {
-        if (! $this->user()->isAllowed('rights', 'edit')) {
+        if (! $this->user()->enforce('rights', 'edit')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 

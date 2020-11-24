@@ -289,7 +289,7 @@ class ItemController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        $isModer = $this->user()->inheritsRole('moder');
+        $isModer = $this->user()->enforce('global', 'moderate');
 
         $user = $this->user()->get();
 
@@ -848,7 +848,7 @@ class ItemController extends AbstractRestfulController
      */
     public function alphaAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -1206,7 +1206,7 @@ class ItemController extends AbstractRestfulController
      */
     public function postAction()
     {
-        if (! $this->user()->isAllowed('car', 'add')) {
+        if (! $this->user()->enforce('car', 'add')) {
             return $this->forbiddenAction();
         }
 
@@ -1430,7 +1430,7 @@ class ItemController extends AbstractRestfulController
      */
     public function putAction()
     {
-        if (! $this->user()->isAllowed('car', 'edit_meta')) {
+        if (! $this->user()->enforce('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
 
@@ -1637,11 +1637,11 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('engine_id', $values)) {
-            if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
+            if (! $this->user()->enforce('specifications', 'edit-engine')) {
                 return $this->forbiddenAction();
             }
 
-            if (! $this->user()->isAllowed('specifications', 'edit')) {
+            if (! $this->user()->enforce('specifications', 'edit')) {
                 return $this->forbiddenAction();
             }
 
@@ -1937,7 +1937,7 @@ class ItemController extends AbstractRestfulController
      */
     public function getLogoAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -1960,7 +1960,7 @@ class ItemController extends AbstractRestfulController
      */
     public function postLogoAction()
     {
-        if (! $this->user()->isAllowed('brand', 'logo')) {
+        if (! $this->user()->enforce('brand', 'logo')) {
             return $this->forbiddenAction();
         }
 
@@ -2050,7 +2050,7 @@ class ItemController extends AbstractRestfulController
      */
     public function treeAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -2069,7 +2069,7 @@ class ItemController extends AbstractRestfulController
      */
     public function refreshInheritanceAction()
     {
-        if (! $this->user()->isAllowed('specifications', 'admin')) {
+        if (! $this->user()->enforce('specifications', 'admin')) {
             return $this->forbiddenAction();
         }
 

@@ -38,7 +38,6 @@
 		"laminas/laminas-mvc-console" : ">=1.2.0",
 		"laminas/laminas-mvc-i18n" : ">=1.1.0",
 		"laminas/laminas-paginator" : ">=2.8.1",
-		"laminas/laminas-permissions-acl" : ">=2.7.0",
 		"laminas/laminas-uri" : ">=2.6.1",
 		"laminas/laminas-view" : ">=2.10.0",
 		"laminas-api-tools/api-tools-oauth2" : "^1.4.0",
@@ -54,7 +53,8 @@
 		"sentry/sdk": "^3.0",
 		"firebase/php-jwt": "^5.2",
 		"aws/aws-sdk-php": "^3.158",
-		"mjaschen/phpgeo": "^3.2"
+		"mjaschen/phpgeo": "^3.2",
+		"casbin/casbin": "^2.3"
 	},
 	"autoload" : {
 		"psr-4" : {

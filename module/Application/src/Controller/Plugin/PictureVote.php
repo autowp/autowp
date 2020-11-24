@@ -109,7 +109,7 @@ class PictureVote extends AbstractPlugin
         /** @var \Autowp\User\Controller\Plugin\User $userPlugin */
         $userPlugin = $controller->getPluginManager()->get('user');
 
-        if (! $userPlugin->inheritsRole('moder')) {
+        if (! $userPlugin->enforce('global', 'moderate')) {
             return null;
         }
 
@@ -135,7 +135,7 @@ class PictureVote extends AbstractPlugin
             'apiUrl'        => $controller->url()->fromRoute('api/picture/picture/update', [
                 'id' => $picture['id'],
             ]),
-            'canVote'       => ! $voteExists && $userPlugin->isAllowed('picture', 'moder_vote'),
+            'canVote'       => ! $voteExists && $userPlugin->enforce('picture', 'moder_vote'),
             'voteExists'    => $voteExists,
             'moderVotes'    => $moderVotes,
             'voteOptions'   => $this->getVoteOptions2(),
@@ -163,11 +163,11 @@ class PictureVote extends AbstractPlugin
 
         $user = $userPlugin->get();
 
-        if ($userPlugin->isAllowed('picture', 'remove')) {
+        if ($userPlugin->enforce('picture', 'remove')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $canDelete = true;
             }
-        } elseif ($userPlugin->isAllowed('picture', 'remove_by_vote')) {
+        } elseif ($userPlugin->enforce('picture', 'remove_by_vote')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
                 $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);

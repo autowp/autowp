@@ -83,7 +83,7 @@ class ItemLinkController extends AbstractRestfulController
      */
     public function getAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -103,7 +103,7 @@ class ItemLinkController extends AbstractRestfulController
      */
     public function putAction()
     {
-        if (! $this->user()->isAllowed('car', 'edit_meta')) {
+        if (! $this->user()->enforce('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
 
@@ -166,7 +166,7 @@ class ItemLinkController extends AbstractRestfulController
      */
     public function postAction()
     {
-        if (! $this->user()->isAllowed('car', 'edit_meta')) {
+        if (! $this->user()->enforce('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
 
@@ -208,7 +208,7 @@ class ItemLinkController extends AbstractRestfulController
      */
     public function deleteAction()
     {
-        if (! $this->user()->isAllowed('car', 'edit_meta')) {
+        if (! $this->user()->enforce('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
 

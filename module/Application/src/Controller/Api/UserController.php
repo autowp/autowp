@@ -9,6 +9,7 @@ use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
+use Casbin\Enforcer;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -21,7 +22,6 @@ use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -44,7 +44,7 @@ use function sprintf;
  */
 class UserController extends AbstractRestfulController
 {
-    private Acl $acl;
+    private Enforcer $acl;
 
     private AbstractRestHydrator $hydrator;
 
@@ -75,7 +75,7 @@ class UserController extends AbstractRestfulController
     private Storage $imageStorage;
 
     public function __construct(
-        Acl $acl,
+        Enforcer $acl,
         AbstractRestHydrator $hydrator,
         InputFilter $itemInputFilter,
         InputFilter $listInputFilter,
@@ -272,7 +272,7 @@ class UserController extends AbstractRestfulController
         $values = $this->putInputFilter->getValues();
 
         if (array_key_exists('deleted', $values)) {
-            $can = $this->user()->isAllowed('user', 'delete');
+            $can = $this->user()->enforce('user', 'delete');
 
             if (! $can) {
                 if (! isset($values['password_old'])) {
@@ -431,7 +431,7 @@ class UserController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
 
-        $can = $this->user()->isAllowed('user', 'ban');
+        $can = $this->user()->enforce('user', 'ban');
         if (! $can) {
             return $this->forbiddenAction();
         }
@@ -556,7 +556,7 @@ class UserController extends AbstractRestfulController
                     $longAway = true;
                 }
 
-                $isGreen = $row['role'] && $this->acl->isAllowed($row['role'], 'status', 'be-green');
+                $isGreen = $row['role'] && $this->acl->enforce($row['role'], 'status', 'be-green');
 
                 $result[] = [
                     'id'        => $row['id'],

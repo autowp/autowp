@@ -159,7 +159,7 @@ class CommentController extends AbstractRestfulController
     {
         $user = $this->user()->get();
 
-        $isModer = $this->user()->inheritsRole('moder');
+        $isModer = $this->user()->enforce('global', 'moderate');
 
         $inputFilter = $isModer ? $this->listInputFilter : $this->publicListInputFilter;
 
@@ -399,7 +399,7 @@ class CommentController extends AbstractRestfulController
         }
 
         $moderatorAttention = false;
-        if ($this->user()->isAllowed('comment', 'moderator-attention')) {
+        if ($this->user()->enforce('comment', 'moderator-attention')) {
             $moderatorAttention = (bool) $data['moderator_attention'];
         }
 
@@ -428,7 +428,7 @@ class CommentController extends AbstractRestfulController
             'id' => $currentUser['id'],
         ]);
 
-        if ($this->user()->inheritsRole('moder') && $data['parent_id'] && $data['resolve']) {
+        if ($this->user()->enforce('global', 'moderate') && $data['parent_id'] && $data['resolve']) {
             $this->comments->service()->completeMessage($data['parent_id']);
         }
 
@@ -565,7 +565,7 @@ class CommentController extends AbstractRestfulController
         }
 
         if (array_key_exists('deleted', $values)) {
-            if ($this->user()->isAllowed('comment', 'remove')) {
+            if ($this->user()->enforce('comment', 'remove')) {
                 if ($values['deleted']) {
                     $this->comments->service()->queueDeleteMessage($row['id'], $user['id']);
                 } else {
@@ -576,7 +576,7 @@ class CommentController extends AbstractRestfulController
 
         if (array_key_exists('item_id', $values)) {
             $isForum = (int) $row['type_id'] === Comments::FORUMS_TYPE_ID;
-            if ($isForum && $this->user()->isAllowed('forums', 'moderate')) {
+            if ($isForum && $this->user()->enforce('forums', 'moderate')) {
                 $this->comments->service()->moveMessage($row['id'], $row['type_id'], $values['item_id']);
             }
         }

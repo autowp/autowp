@@ -178,16 +178,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'inherit-roles' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/inherit-roles',
-                                    'defaults' => [
-                                        'action' => 'inherit-roles',
-                                    ],
-                                ],
-                            ],
-                            'is-allowed'    => [
+                            'is-allowed' => [
                                 'type'    => 'Literal',
                                 'options' => [
                                     'route'    => '/is-allowed',
@@ -196,7 +187,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'roles'         => [
+                            'roles'      => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/roles',
@@ -271,7 +262,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'resources'     => [
+                            'resources'  => [
                                 'type'    => 'Literal',
                                 'options' => [
                                     'route'    => '/resources',
@@ -280,7 +271,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'rules'         => [
+                            'rules'      => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/rules',

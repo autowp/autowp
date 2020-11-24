@@ -26,7 +26,7 @@ class ContentLanguageController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 

@@ -4,10 +4,10 @@ namespace Application\Hydrator\Api;
 
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\User;
+use Casbin\Enforcer;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -21,7 +21,7 @@ class IpHydrator extends AbstractRestHydrator
 
     private ?string $userRole;
 
-    private Acl $acl;
+    private Enforcer $acl;
 
     private TrafficControl $trafficControl;
 
@@ -31,7 +31,7 @@ class IpHydrator extends AbstractRestHydrator
     {
         parent::__construct();
 
-        $this->acl            = $serviceManager->get(Acl::class);
+        $this->acl            = $serviceManager->get(Enforcer::class);
         $this->trafficControl = $serviceManager->get(TrafficControl::class);
         $this->userModel      = $serviceManager->get(User::class);
 
@@ -70,7 +70,7 @@ class IpHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        $this->userId = $userId;
+        $this->userId = (int) $userId;
 
         //$this->getStrategy('content')->setUser($user);
         //$this->getStrategy('replies')->setUser($user);
@@ -95,7 +95,7 @@ class IpHydrator extends AbstractRestHydrator
             $canView = false;
             $role    = $this->getUserRole();
             if ($role) {
-                $canView = $this->acl->inheritsRole($role, 'moder');
+                $canView = $this->acl->enforce($role, 'global', 'moderate');
             }
 
             if ($canView) {
@@ -116,7 +116,7 @@ class IpHydrator extends AbstractRestHydrator
 
             $role = $this->getUserRole();
             if ($role) {
-                $canBan = $this->acl->isAllowed($role, 'user', 'ban');
+                $canBan = $this->acl->enforce($role, 'user', 'ban');
             }
 
             $result['rights'] = [

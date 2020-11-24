@@ -3,12 +3,12 @@
 namespace Application;
 
 use Autowp\ZFComponents\Resources;
+use Casbin\Enforcer;
 use Laminas\Cache\Service\StorageCacheAbstractServiceFactory;
 use Laminas\I18n\Translator\Loader\PhpArray;
 use Laminas\I18n\Translator\Resources as TranslatorResources;
 use Laminas\InputFilter\InputFilterAbstractServiceFactory;
 use Laminas\Mvc\I18n\TranslatorFactory;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
@@ -67,9 +67,9 @@ return [
     ],
     'service_manager'    => [
         'factories'          => [
-            Acl::class                           => Permissions\AclFactory::class,
             Comments::class                      => Service\CommentsFactory::class,
             DuplicateFinder::class               => Service\DuplicateFinderFactory::class,
+            Enforcer::class                      => Permissions\CasbinFactory::class,
             FileSize::class                      => InvokableFactory::class,
             HostManager::class                   => Service\HostManagerFactory::class,
             Language::class                      => Service\LanguageFactory::class,

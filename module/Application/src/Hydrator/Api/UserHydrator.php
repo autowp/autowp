@@ -8,12 +8,12 @@ use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
+use Casbin\Enforcer;
 use DateInterval;
 use DateTime;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
@@ -30,7 +30,7 @@ class UserHydrator extends AbstractRestHydrator
 
     private ?string $userRole;
 
-    private Acl $acl;
+    private Enforcer $acl;
 
     private User $userModel;
 
@@ -44,7 +44,7 @@ class UserHydrator extends AbstractRestHydrator
     {
         parent::__construct();
 
-        $this->acl         = $serviceManager->get(Acl::class);
+        $this->acl         = $serviceManager->get(Enforcer::class);
         $this->userModel   = $serviceManager->get(User::class);
         $this->userRename  = $serviceManager->get(UserRename::class);
         $this->userAccount = $serviceManager->get(UserAccount::class);
@@ -120,7 +120,7 @@ class UserHydrator extends AbstractRestHydrator
                 $longAway = true;
             }
 
-            $isGreen = $object['role'] && $this->acl->isAllowed($object['role'], 'status', 'be-green');
+            $isGreen = $object['role'] && $this->acl->enforce($object['role'], 'status', 'be-green');
 
             $user = [
                 'id'        => (int) $object['id'],
@@ -229,7 +229,7 @@ class UserHydrator extends AbstractRestHydrator
             }
 
             if ($this->filterComposite->filter('is_moder')) {
-                $user['is_moder'] = $this->acl->inheritsRole($object['role'], 'moder');
+                $user['is_moder'] = $this->acl->enforce($object['role'], 'global', 'moderate');
             }
 
             if ($this->filterComposite->filter('accounts')) {
@@ -251,7 +251,7 @@ class UserHydrator extends AbstractRestHydrator
                 $canViewIp = false;
                 $role      = $this->getUserRole();
                 if ($role) {
-                    $canViewIp = $this->acl->isAllowed($role, 'user', 'ip');
+                    $canViewIp = $this->acl->enforce($role, 'user', 'ip');
                 }
 
                 if ($canViewIp) {
@@ -270,7 +270,7 @@ class UserHydrator extends AbstractRestHydrator
             return false;
         }
 
-        return $this->acl->inheritsRole($role, 'moder');
+        return $this->acl->enforce($role, 'global', 'moderate');
     }
 
     /**

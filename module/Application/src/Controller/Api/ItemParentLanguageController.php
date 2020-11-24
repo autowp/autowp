@@ -52,7 +52,7 @@ class ItemParentLanguageController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -76,7 +76,7 @@ class ItemParentLanguageController extends AbstractRestfulController
      */
     public function getAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
@@ -98,7 +98,7 @@ class ItemParentLanguageController extends AbstractRestfulController
      */
     public function putAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->enforce('global', 'moderate')) {
             return $this->forbiddenAction();
         }
 
