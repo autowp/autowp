@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM php:8-fpm-alpine
 
 LABEL maintainer="dmitry@pereslegin.ru"
 
@@ -11,43 +11,27 @@ ENV COMPOSER_ALLOW_SUPERUSER="1" \
 
 CMD ["./start.sh"]
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -qq -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -qq -y \
-        bash \
+RUN apk update && apk add \
+        alpine-sdk \
+        autoconf \
         ca-certificates \
         curl \
         git \
-        imagemagick \
+        imagemagick-dev \
         libtool \
         libxml2 \
-        mysql-client \
         openssh-client \
-        php7.4 \
-        php7.4-bcmath \
-        php7.4-common \
-        php7.4-curl \
-        php7.4-fpm \
-        php7.4-imagick \
-        php7.4-intl \
-        php7.4-json \
-        php7.4-gd \
-        php7.4-mbstring \
-        php7.4-memcached \
-        php7.4-mysql \
-        php7.4-opcache \
-        php7.4-tokenizer \
-        php7.4-xml \
-        php7.4-zip \
-        ssmtp \
         tzdata \
         unzip \
-        xmlstarlet \
-    && \
-    DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y && \
-    \
-    cat /etc/ImageMagick-6/policy.xml | \
+        xmlstarlet
+
+RUN pecl install imagick-3.4.4 && \
+    docker-php-source extract && \
+    docker-php-ext-enable opcache && \
+    docker-php-ext-install bcmath curl imagick intl gd mbstring memcached pdo_mysql sockets tokenizer xml zip && \
+    docker-php-source delete
+
+RUN cat /etc/ImageMagick-6/policy.xml | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='disk']/@value" -v "10GiB" > /etc/ImageMagick-6/policy2.xml && \
     cat /etc/ImageMagick-6/policy2.xml > /etc/ImageMagick-6/policy.xml && \
