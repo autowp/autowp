@@ -40,7 +40,6 @@ return [
             'language'      => View\Helper\Service\LanguageFactory::class,
             'page'          => View\Helper\Service\PageFactory::class,
             'pic'           => View\Helper\Service\PicFactory::class,
-            'userText'      => View\Helper\Service\UserTextFactory::class,
         ],
     ],
     'view_helper_config' => [],

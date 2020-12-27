@@ -6,7 +6,6 @@ use Application\Comments;
 use Application\Hydrator\Api\Filter\PropertyFilter;
 use Application\Hydrator\Api\Strategy\AbstractHydratorStrategy;
 use Application\Model\Picture;
-use Application\View\Helper\UserText;
 use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
@@ -36,8 +35,6 @@ class CommentHydrator extends AbstractRestHydrator
 
     private User $userModel;
 
-    private UserText $userText;
-
     private TableGateway $voteTable;
 
     private Enforcer $acl;
@@ -52,8 +49,6 @@ class CommentHydrator extends AbstractRestHydrator
 
         $this->picture   = $serviceManager->get(Picture::class);
         $this->userModel = $serviceManager->get(User::class);
-
-        $this->userText = $serviceManager->get('ViewHelperManager')->get('userText');
 
         $this->userId = 0;
 
@@ -166,8 +161,8 @@ class CommentHydrator extends AbstractRestHydrator
                 $result['route'] = $this->comments->getMessageRowRoute($object);
             }
 
-            if ($this->filterComposite->filter('text_html')) {
-                $result['text_html'] = $this->userText->__invoke($object['message']);
+            if ($this->filterComposite->filter('text')) {
+                $result['text'] = $object['message'];
             }
 
             if ($this->filterComposite->filter('vote')) {

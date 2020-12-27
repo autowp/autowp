@@ -2,7 +2,6 @@
 
 namespace Application\Hydrator\Api;
 
-use Application\View\Helper\UserText;
 use ArrayAccess;
 use Autowp\User\Model\User;
 use Exception;
@@ -18,15 +17,11 @@ class MessageHydrator extends AbstractRestHydrator
 {
     private User $userModel;
 
-    private UserText $userText;
-
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
         $this->userModel = $serviceManager->get(User::class);
-
-        $this->userText = $serviceManager->get('ViewHelperManager')->get('userText');
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('author', $strategy);
@@ -83,7 +78,7 @@ class MessageHydrator extends AbstractRestHydrator
     {
         $result = [
             'id'                  => (int) $object['id'],
-            'text_html'           => $this->userText->__invoke($object['contents']),
+            'text'                => $object['contents'],
             'is_new'              => $object['isNew'],
             'can_delete'          => $object['canDelete'],
             'can_reply'           => $object['canReply'],
