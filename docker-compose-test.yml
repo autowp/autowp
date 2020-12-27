@@ -109,6 +109,8 @@ services:
     restart: always
     volumes:
     - "./goautowp/config.yaml:/config.yaml:ro"
+    - "./module/Application/config/model.conf:/model.conf:ro"
+    - "./module/Application/config/policy.csv:/policy.csv:ro"
     depends_on:
     - rabbitmq
     - mysql
