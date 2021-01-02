@@ -618,33 +618,6 @@ class CommentController extends AbstractRestfulController
     }
 
     /**
-     * @return array|ViewModel
-     * @throws Exception
-     */
-    public function votesAction()
-    {
-        $votes = $this->comments->service()->getVotes($this->params()->fromQuery('id'));
-        if (! $votes) {
-            return $this->notFoundAction();
-        }
-
-        $this->userHydrator->setFields([]);
-
-        $result = [
-            'positive' => [],
-            'negative' => [],
-        ];
-        foreach ($votes['positiveVotes'] as $user) {
-            $result['positive'][] = $this->userHydrator->extract($user);
-        }
-        foreach ($votes['negativeVotes'] as $user) {
-            $result['negative'][] = $this->userHydrator->extract($user);
-        }
-
-        return new JsonModel($result);
-    }
-
-    /**
      * @return array|ViewModel|Response
      */
     public function postViewAction()

@@ -612,15 +612,6 @@ return [
                                     ],
                                 ],
                             ],
-                            'votes' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/votes',
-                                    'defaults' => [
-                                        'action' => 'votes',
-                                    ],
-                                ],
-                            ],
                             'topic' => [
                                 'type'          => 'Segment',
                                 'options'       => [
