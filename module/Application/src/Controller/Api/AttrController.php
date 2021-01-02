@@ -314,78 +314,72 @@ class AttrController extends AbstractRestfulController
 
             if ($dstItemId) {
                 foreach ($eUserValueRows as $eUserValueRow) {
-                    if ($dstItemId) {
-                        $srcPrimaryKey = [
-                            'item_id'      => $eUserValueRow['item_id'],
-                            'attribute_id' => $eUserValueRow['attribute_id'],
-                            'user_id'      => $eUserValueRow['user_id'],
-                        ];
-                        $dstPrimaryKey = [
-                            'item_id'      => $dstItemId,
-                            'attribute_id' => $eUserValueRow['attribute_id'],
-                            'user_id'      => $eUserValueRow['user_id'],
-                        ];
-                        $set           = [
-                            'item_id' => $dstItemId,
-                        ];
+                    $srcPrimaryKey = [
+                        'item_id'      => $eUserValueRow['item_id'],
+                        'attribute_id' => $eUserValueRow['attribute_id'],
+                        'user_id'      => $eUserValueRow['user_id'],
+                    ];
+                    $dstPrimaryKey = [
+                        'item_id'      => $dstItemId,
+                        'attribute_id' => $eUserValueRow['attribute_id'],
+                        'user_id'      => $eUserValueRow['user_id'],
+                    ];
+                    $set           = [
+                        'item_id' => $dstItemId,
+                    ];
 
-                        $cUserValueRow = currentFromResultSetInterface($this->userValueTable->select($dstPrimaryKey));
+                    $cUserValueRow = currentFromResultSetInterface($this->userValueTable->select($dstPrimaryKey));
 
-                        if ($cUserValueRow) {
-                            $rowId = implode('/', [
-                                $dstItemId,
-                                $eUserValueRow['attribute_id'],
-                                $eUserValueRow['user_id'],
-                            ]);
-                            throw new Exception("Value row $rowId already exists");
+                    if ($cUserValueRow) {
+                        $rowId = implode('/', [
+                            $dstItemId,
+                            $eUserValueRow['attribute_id'],
+                            $eUserValueRow['user_id'],
+                        ]);
+                        throw new Exception("Value row $rowId already exists");
+                    }
+
+                    $attrRow = currentFromResultSetInterface($this->specsService->getAttributeTable()->select([
+                        'id' => $eUserValueRow['attribute_id'],
+                    ]));
+
+                    if (! $attrRow) {
+                        throw new Exception("Attr not found");
+                    }
+
+                    $dataTable = $this->specsService->getUserValueDataTable($attrRow['type_id']);
+
+                    $eDataRows = [];
+                    foreach ($dataTable->select($srcPrimaryKey) as $row) {
+                        $eDataRows[] = $row;
+                    }
+
+                    foreach ($eDataRows as $eDataRow) {
+                        // check for data row existance
+                        $filter = $dstPrimaryKey;
+                        if ($attrRow['multiple']) {
+                            $filter['ordering'] = $eDataRow['ordering'];
                         }
+                        $cDataRow = currentFromResultSetInterface($dataTable->select($filter));
 
-                        $attrRow = currentFromResultSetInterface($this->specsService->getAttributeTable()->select([
-                            'id' => $eUserValueRow['attribute_id'],
-                        ]));
-
-                        if (! $attrRow) {
-                            throw new Exception("Attr not found");
-                        }
-
-                        $dataTable = $this->specsService->getUserValueDataTable($attrRow['type_id']);
-
-                        $eDataRows = [];
-                        foreach ($dataTable->select($srcPrimaryKey) as $row) {
-                            $eDataRows[] = $row;
-                        }
-
-                        foreach ($eDataRows as $eDataRow) {
-                            // check for data row existance
-                            $filter = $dstPrimaryKey;
-                            if ($attrRow['multiple']) {
-                                $filter['ordering'] = $eDataRow['ordering'];
-                            }
-                            $cDataRow = currentFromResultSetInterface($dataTable->select($filter));
-
-                            if ($cDataRow) {
-                                throw new Exception("Data row already exists");
-                            }
-                        }
-
-                        $this->userValueTable->update($set, $srcPrimaryKey);
-
-                        foreach ($eDataRows as $eDataRow) {
-                            $filter = $srcPrimaryKey;
-                            if ($attrRow['multiple']) {
-                                $filter['ordering'] = $eDataRow['ordering'];
-                            }
-
-                            $dataTable->update($set, $filter);
+                        if ($cDataRow) {
+                            throw new Exception("Data row already exists");
                         }
                     }
 
-                    if ($dstItemId) {
-                        $this->specsService->updateActualValues($dstItemId);
-                        if ($srcItemId) {
-                            $this->specsService->updateActualValues($eUserValueRow['item_id']);
+                    $this->userValueTable->update($set, $srcPrimaryKey);
+
+                    foreach ($eDataRows as $eDataRow) {
+                        $filter = $srcPrimaryKey;
+                        if ($attrRow['multiple']) {
+                            $filter['ordering'] = $eDataRow['ordering'];
                         }
+
+                        $dataTable->update($set, $filter);
                     }
+
+                    $this->specsService->updateActualValues($dstItemId);
+                    $this->specsService->updateActualValues($eUserValueRow['item_id']);
                 }
             }
         }
@@ -589,9 +583,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if ($itemId) {
-            $select->where(['item_id' => $itemId]);
-        }
+        $select->where(['item_id' => $itemId]);
 
         if ($values['zone_id']) {
             $select

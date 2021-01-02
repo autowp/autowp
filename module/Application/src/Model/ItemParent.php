@@ -838,10 +838,8 @@ class ItemParent
 
         $filter = [
             'item_id = ?' => $itemId,
+            new Sql\Predicate\NotIn('parent_id', array_keys($parentInfo)),
         ];
-        if ($parentInfo) {
-            $filter[] = new Sql\Predicate\NotIn('parent_id', array_keys($parentInfo));
-        }
 
         $updates += $this->itemParentCacheTable->delete($filter);
 

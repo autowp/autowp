@@ -11,7 +11,6 @@ use Traversable;
 
 use function array_merge;
 use function array_replace;
-use function count;
 use function explode;
 use function implode;
 use function strlen;
@@ -54,10 +53,6 @@ class FilePath implements RouteInterface
 
         foreach ($path as &$node) {
             $node = urldecode($node);
-        }
-
-        if (! count($path)) {
-            return null;
         }
 
         $variables = [

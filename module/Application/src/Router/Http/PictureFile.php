@@ -10,7 +10,6 @@ use Laminas\Stdlib\RequestInterface as Request;
 use Traversable;
 
 use function array_replace;
-use function count;
 use function explode;
 use function implode;
 use function method_exists;
@@ -60,9 +59,6 @@ class PictureFile implements RouteInterface
             $node = urldecode($node);
         }
 
-        if (! count($path)) {
-            return null;
-        }
         if ($path[0] !== 'pictures') {
             return null;
         }
