@@ -48,8 +48,6 @@ class CommentController extends AbstractRestfulController
 
     private AbstractRestHydrator $hydrator;
 
-    private AbstractRestHydrator $userHydrator;
-
     private TableGateway $userTable;
 
     private InputFilter $postInputFilter;
@@ -81,7 +79,6 @@ class CommentController extends AbstractRestfulController
     public function __construct(
         Comments $comments,
         AbstractRestHydrator $hydrator,
-        AbstractRestHydrator $userHydrator,
         TableGateway $userTable,
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
@@ -99,7 +96,6 @@ class CommentController extends AbstractRestfulController
     ) {
         $this->comments              = $comments;
         $this->hydrator              = $hydrator;
-        $this->userHydrator          = $userHydrator;
         $this->userTable             = $userTable;
         $this->listInputFilter       = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
