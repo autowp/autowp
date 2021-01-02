@@ -54,7 +54,7 @@
 		"firebase/php-jwt": "^5.2",
 		"aws/aws-sdk-php": "^3.158",
 		"mjaschen/phpgeo": "^3.2",
-		"casbin/casbin": "^2.3"
+		"casbin/casbin": "^3.0.0"
 	},
 	"autoload" : {
 		"psr-4" : {
@@ -76,7 +76,7 @@
 		"phpmd/phpmd" : "^2.9.1",
 		"onesky/api-library-php5" : "^1.0",
 		"wapmorgan/php-code-fixer": "^2.0",
-		"phan/phan": "^3.2.2",
+		"phan/phan": "^4.0.0",
 		"sensiolabs/security-checker": "^6.0",
         "laminas/laminas-coding-standard": "^2.1.0",
 		"vimeo/psalm": "^4.0.1",

@@ -8,3 +8,5 @@ file_storage:
   s3:
     endpoints:
       - http://minio:9000
+oauth:
+  secret: example_secret

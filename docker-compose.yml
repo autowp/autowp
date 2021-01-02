@@ -50,7 +50,7 @@ services:
     #- ./etc/php/7.3/fpm/php-fpm.conf:/etc/php/7.3/fpm/php-fpm.conf
     #- ./etc/php/7.3/fpm/pool.d/www.conf:/etc/php/7.3/fpm/pool.d/www.conf
     - ./etc/nginx/sites-available:/etc/nginx/sites-available
-    - ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    #- ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
     - ./composer.json:/app/composer.json
     - ./composer.lock:/app/composer.lock
     - ./install-dev-db.sh:/app/install-dev-db.sh
@@ -209,6 +209,5 @@ services:
       /usr/bin/mc policy set download autowp/picture;
       /usr/bin/mc mb autowp/files;
       /usr/bin/mc policy set download autowp/files;
-      sleep 3000;
       exit 0;
       "
