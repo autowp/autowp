@@ -1,0 +1,4 @@
+rabbitmq: amqp://guest:guest@autowp_test_rabbitmq:5672/
+dsn: postgres://traffic:password@autowp_test_traffic_postgres:5432/traffic?sslmode=disable
+migrations:
+  dsn: postgres://traffic:password@autowp_test_traffic_postgres/traffic?sslmode=disable
