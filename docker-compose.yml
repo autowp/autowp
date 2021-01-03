@@ -118,26 +118,18 @@ services:
     restart: always
     depends_on:
     - rabbitmq
-    - traffic-mysql
+    - traffic-postgres
     volumes:
-    - "./traffic/logs:/var/log"
-    environment:
-    - TRAFFIC_RABBITMQ_HOST=autowp_test_rabbitmq
-    - TRAFFIC_RABBITMQ_PORT=5672
-    - TRAFFIC_MONITORING_QUEUE=input
-    - TRAFFIC_HOTLINK_QUEUE=hotlink
-    - TRAFFIC_MYSQL_DSN=root:password@tcp(autowp_test_traffic_mysql:3306)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
-    - TRAFFIC_MIGRATIONS_DSN=mysql://root:password@tcp(autowp_test_traffic_mysql)/traffic?charset=utf8mb4&parseTime=true&loc=UTC
-    - TRAFFIC_SENTRY_DSN=
-    - TRAFFIC_SENTRY_ENVIRONMENT=development
+    - "./goautowp/config.yaml:/config.yaml:ro"
 
-  traffic-mysql:
-    image: mysql:8
-    container_name: autowp_test_traffic_mysql
+  traffic-postgres:
+    image: postgres:13
+    container_name: autowp_test_traffic_postgres
     restart: always
     environment:
-    - MYSQL_ROOT_PASSWORD=password
-    - MYSQL_DATABASE=traffic
+    - POSTGRES_DB=traffic
+    - POSTGRES_USER=traffic
+    - POSTGRES_PASSWORD=password
 
   goautowp:
     image: autowp/goautowp
