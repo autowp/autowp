@@ -32,7 +32,6 @@ class TrafficRouteListener extends AbstractListenerAggregate
         '/api/donate',
         '/api/feedback',
         '/api/forum',
-        '/api/hotlinks',
         '/api/ip',
         '/api/index',
         '/api/item-link',

@@ -49,7 +49,6 @@ return [
             Controller\Api\DonateController::class          => Controller\Api\DonateControllerFactory::class,
             Controller\Api\FeedbackController::class        => Controller\Api\FeedbackControllerFactory::class,
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
-            Controller\Api\HotlinksController::class        => Controller\Api\HotlinksControllerFactory::class,
             Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IndexController::class           => Controller\Api\IndexControllerFactory::class,
             Controller\Api\IpController::class              => Controller\Api\IpControllerFactory::class,
@@ -941,102 +940,6 @@ return [
                                     'defaults' => [
                                         'controller' => Controller\Api\GalleryController::class,
                                         'action'     => 'gallery',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'hotlinks'                    => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/hotlinks',
-                            'defaults' => [
-                                'controller' => Controller\Api\HotlinksController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'blacklist' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/blacklist',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'post' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'blacklist-post',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'whitelist' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/whitelist',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'post' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'whitelist-post',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'hosts'     => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/hosts',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'hosts',
-                                            ],
-                                        ],
-                                    ],
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'hosts-delete',
-                                            ],
-                                        ],
-                                    ],
-                                    'host'   => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route'    => '/:host',
-                                            'defaults' => [
-                                                'action' => 'host',
-                                            ],
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'delete' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'delete',
-                                                    'defaults' => [
-                                                        'action' => 'host-delete',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
                                     ],
                                 ],
                             ],
