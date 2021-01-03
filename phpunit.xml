@@ -24,9 +24,6 @@
     <testsuite name="comments">
       <directory>./module/Comments/test</directory>
     </testsuite>
-    <testsuite name="message">
-      <directory>./module/Message/test</directory>
-    </testsuite>
     <testsuite name="traffic">
       <directory>./module/Traffic/test</directory>
     </testsuite>
