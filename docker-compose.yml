@@ -163,7 +163,7 @@ services:
       - "./module/Application/config/model.conf:/model.conf:ro"
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
-  goautowp-df-listen-amqp:
+  goautowp-listen-monitoring-amqp:
     image: autowp/goautowp
     container_name: autowp_test_goautowp_listen_monitoring_amqp
     restart: always
