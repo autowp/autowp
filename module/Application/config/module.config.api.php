@@ -28,7 +28,6 @@ return [
             Hydrator\Api\PerspectivePageHydrator::class    => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\PictureHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\PictureItemHydrator::class        => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\TrafficHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\SimilarHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\UserHydrator::class               => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\VotingVariantVoteHydrator::class  => Hydrator\Api\RestHydrator::class,
@@ -84,7 +83,6 @@ return [
             Controller\Api\TelegramController::class        => Controller\Api\TelegramControllerFactory::class,
             Controller\Api\TextController::class            => Controller\Api\TextControllerFactory::class,
             Controller\Api\TimezoneController::class        => InvokableFactory::class,
-            Controller\Api\TrafficController::class         => Controller\Api\TrafficControllerFactory::class,
             Controller\Api\TwinsController::class           => Controller\Api\TwinsControllerFactory::class,
             Controller\Api\UserController::class            => Controller\Api\UserControllerFactory::class,
             Controller\Api\VotingController::class          => Controller\Api\VotingControllerFactory::class,
@@ -2420,108 +2418,6 @@ return [
                                     'verb'     => 'get',
                                     'defaults' => [
                                         'action' => 'list',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'traffic'                     => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/traffic',
-                            'defaults' => [
-                                'controller' => Controller\Api\TrafficController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'list'      => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'list',
-                                    ],
-                                ],
-                            ],
-                            'whitelist' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/whitelist',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'list'   => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'whitelist-list',
-                                            ],
-                                        ],
-                                    ],
-                                    'create' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'whitelist-create',
-                                            ],
-                                        ],
-                                    ],
-                                    'item'   => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/:ip',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'delete' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'delete',
-                                                    'defaults' => [
-                                                        'action' => 'whitelist-item-delete',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'blacklist' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/blacklist',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'create' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'blacklist-create',
-                                            ],
-                                        ],
-                                    ],
-                                    'item'   => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/:ip',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'delete' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'delete',
-                                                    'defaults' => [
-                                                        'action' => 'blacklist-item-delete',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
                                     ],
                                 ],
                             ],

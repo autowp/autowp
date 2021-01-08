@@ -251,7 +251,7 @@ return [
         'release'     => '',
     ],
     'traffic'                  => [
-        'url' => 'http://traffic:8080',
+        'url' => 'http://goautowp-private:8081',
     ],
     'authSecret'               => 'example_secret',
     'fileStorage'              => [

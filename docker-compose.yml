@@ -9,7 +9,7 @@ services:
     depends_on:
     - backend
     - frontend
-    - goautowp
+    - goautowp-public
     - auth
     ports:
     - "80:80"
@@ -60,7 +60,7 @@ services:
     - memcached
     - mysql
     - rabbitmq
-    - traffic
+    - goautowp-private
     - minio
     - createbuckets
 
@@ -112,16 +112,6 @@ services:
     - "5672:5672"
     - "15672:15672"
 
-  traffic:
-    image: autowp/traffic
-    container_name: autowp_test_traffic
-    restart: always
-    depends_on:
-    - rabbitmq
-    - traffic-postgres
-    volumes:
-    - "./goautowp/config.yaml:/config.yaml:ro"
-
   traffic-postgres:
     image: postgres:13
     container_name: autowp_test_traffic_postgres
@@ -131,17 +121,75 @@ services:
     - POSTGRES_USER=traffic
     - POSTGRES_PASSWORD=password
 
-  goautowp:
+  goautowp-public:
     image: autowp/goautowp
-    container_name: autowp_test_goautowp
+    container_name: autowp_test_goautowp_serve_public
     restart: always
+    command: serve-public
     depends_on:
     - rabbitmq
     - mysql
+    - traffic-postgres
     volumes:
     - "./goautowp/config.yaml:/config.yaml:ro"
     - "./module/Application/config/model.conf:/model.conf:ro"
     - "./module/Application/config/policy.csv:/policy.csv:ro"
+
+  goautowp-private:
+    image: autowp/goautowp
+    container_name: autowp_test_goautowp_serve_private
+    restart: always
+    command: serve-private
+    depends_on:
+      - rabbitmq
+      - mysql
+      - traffic-postgres
+    volumes:
+      - "./goautowp/config.yaml:/config.yaml:ro"
+      - "./module/Application/config/model.conf:/model.conf:ro"
+      - "./module/Application/config/policy.csv:/policy.csv:ro"
+
+  goautowp-listen-df-amqp:
+    image: autowp/goautowp
+    container_name: autowp_test_goautowp_listen_df_amqp
+    restart: always
+    command: listen-df-amqp
+    depends_on:
+      - rabbitmq
+      - mysql
+      - traffic-postgres
+    volumes:
+      - "./goautowp/config.yaml:/config.yaml:ro"
+      - "./module/Application/config/model.conf:/model.conf:ro"
+      - "./module/Application/config/policy.csv:/policy.csv:ro"
+
+  goautowp-df-listen-amqp:
+    image: autowp/goautowp
+    container_name: autowp_test_goautowp_listen_monitoring_amqp
+    restart: always
+    command: listen-monitoring-amqp
+    depends_on:
+      - rabbitmq
+      - mysql
+      - traffic-postgres
+    volumes:
+      - "./goautowp/config.yaml:/config.yaml:ro"
+      - "./module/Application/config/model.conf:/model.conf:ro"
+      - "./module/Application/config/policy.csv:/policy.csv:ro"
+
+  goautowp-autoban:
+    image: autowp/goautowp
+    container_name: autowp_test_goautowp_autoban
+    restart: always
+    command: autoban
+    depends_on:
+      - rabbitmq
+      - mysql
+      - traffic-postgres
+    volumes:
+      - "./goautowp/config.yaml:/config.yaml:ro"
+      - "./module/Application/config/model.conf:/model.conf:ro"
+      - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   auth:
     image: autowp/auth

@@ -10,16 +10,13 @@ use Laminas\Mvc\MvcEvent;
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\BootstrapListenerInterface,
-    //Feature\ControllerProviderInterface,
     Feature\ConfigProviderInterface
 {
     public function getConfig(): array
     {
         $provider = new ConfigProvider();
         return [
-            'controllers'     => $provider->getControllersConfig(),
             'service_manager' => $provider->getDependencyConfig(),
-            'router'          => $provider->getRouterConfig(),
         ];
     }
 
