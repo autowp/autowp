@@ -132,9 +132,6 @@ class PictureHydrator extends AbstractRestHydrator
         $this->addStrategy('replaceable', $strategy);
         $this->addStrategy('siblings', $strategy);
 
-        $strategy = new Ip($serviceManager);
-        $this->addStrategy('ip', $strategy);
-
         $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('twins', $strategy);
 
@@ -191,8 +188,8 @@ class PictureHydrator extends AbstractRestHydrator
         }
 
         /** @var Ip $strategy */
-        $strategy = $this->getStrategy('ip');
-        $strategy->setUserId($this->userId);
+        //$strategy = $this->getStrategy('ip');
+        //$strategy->setUserId($this->userId);
 
         /** @var Items $strategy */
         $strategy = $this->getStrategy('items');
@@ -896,7 +893,7 @@ class PictureHydrator extends AbstractRestHydrator
             }
 
             if ($this->acl->enforce($role, 'user', 'ip')) {
-                $picture['ip'] = $object['ip'] ? $this->extractValue('ip', inet_ntop($object['ip'])) : null;
+                $picture['ip'] = $object['ip'] ? inet_ntop($object['ip']) : null;
             }
         }
 

@@ -9,7 +9,7 @@ services:
     depends_on:
     - backend
     - frontend
-    - goautowp-public
+    - goautowp-serve-public
     - auth
     ports:
     - "80:80"
@@ -60,7 +60,7 @@ services:
     - memcached
     - mysql
     - rabbitmq
-    - goautowp-private
+    - goautowp-serve-private
     - minio
     - createbuckets
 
@@ -121,7 +121,7 @@ services:
     - POSTGRES_USER=traffic
     - POSTGRES_PASSWORD=password
 
-  goautowp-public:
+  goautowp-serve-public:
     image: autowp/goautowp
     container_name: autowp_test_goautowp_serve_public
     restart: always
@@ -135,7 +135,7 @@ services:
     - "./module/Application/config/model.conf:/model.conf:ro"
     - "./module/Application/config/policy.csv:/policy.csv:ro"
 
-  goautowp-private:
+  goautowp-serve-private:
     image: autowp/goautowp
     container_name: autowp_test_goautowp_serve_private
     restart: always
