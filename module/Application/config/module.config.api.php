@@ -15,7 +15,6 @@ return [
             Hydrator\Api\CommentHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ForumThemeHydrator::class         => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ForumTopicHydrator::class         => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\IpHydrator::class                 => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemLanguageHydrator::class       => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemLinkHydrator::class           => Hydrator\Api\RestHydrator::class,
@@ -50,7 +49,6 @@ return [
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
             Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IndexController::class           => Controller\Api\IndexControllerFactory::class,
-            Controller\Api\IpController::class              => Controller\Api\IpControllerFactory::class,
             Controller\Api\ItemController::class            => Controller\Api\ItemControllerFactory::class,
             Controller\Api\GalleryController::class         => Controller\Api\GalleryControllerFactory::class,
             Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
@@ -1115,27 +1113,6 @@ return [
                                                 'action' => 'item-of-day',
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'ip'                          => [
-                        'type'          => 'Segment',
-                        'options'       => [
-                            'route'    => '/ip/:ip',
-                            'defaults' => [
-                                'controller' => Controller\Api\IpController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'item' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'item',
                                     ],
                                 ],
                             ],
