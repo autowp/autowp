@@ -698,45 +698,6 @@ return [
                                     ],
                                 ],
                             ],
-                            'item' => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route'       => '/:id',
-                                    'constraints' => [
-                                        'id' => '[0-9]+',
-                                    ],
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'get',
-                                            ],
-                                        ],
-                                    ],
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'delete',
-                                            ],
-                                        ],
-                                    ],
-                                    'put'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'put',
-                                            'defaults' => [
-                                                'action' => 'put',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
                         ],
                     ],
                     'content-language'            => [
