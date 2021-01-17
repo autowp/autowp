@@ -190,8 +190,8 @@ return [
     ],
     'feedback'                 => [
         'from'     => 'no-reply@autowp.ru',
-        'fromname' => 'robot autowp.ru',
-        'to'       => 'autowp@gmail.com',
+        'fromname' => 'Robot autowp.ru',
+        'to'       => 'test@example.com',
         'subject'  => 'AutoWP Feedback',
     ],
     'validators'               => [

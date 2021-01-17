@@ -45,7 +45,6 @@ return [
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
             Controller\Api\DonateController::class          => Controller\Api\DonateControllerFactory::class,
-            Controller\Api\FeedbackController::class        => Controller\Api\FeedbackControllerFactory::class,
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
             Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IndexController::class           => Controller\Api\IndexControllerFactory::class,
@@ -74,7 +73,6 @@ return [
             Controller\Api\PictureVoteController::class     => Controller\Api\PictureVoteControllerFactory::class,
             Controller\Api\PulseController::class           => Controller\Api\PulseControllerFactory::class,
             Controller\Api\RatingController::class          => Controller\Api\RatingControllerFactory::class,
-            Controller\Api\RecaptchaController::class       => Controller\Api\RecaptchaControllerFactory::class,
             Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
             Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
             Controller\Api\StatController::class            => Controller\Api\StatControllerFactory::class,
@@ -746,27 +744,6 @@ return [
                                                 'action' => 'get-vod',
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'feedback'                    => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/feedback',
-                            'defaults' => [
-                                'controller' => Controller\Api\FeedbackController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'post' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'post',
                                     ],
                                 ],
                             ],
@@ -2216,27 +2193,6 @@ return [
                                     'route'    => '/picture-likes',
                                     'defaults' => [
                                         'action' => 'picture-likes',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'recaptcha'                   => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/recaptcha',
-                            'defaults' => [
-                                'controller' => Controller\Api\RecaptchaController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'get',
                                     ],
                                 ],
                             ],
