@@ -26,6 +26,8 @@ class PerspectivePictureFetcher
 
     private Perspective $perspective;
 
+    private int $perspectiveId = 0;
+
     public function __construct(array $options)
     {
         $this->setOptions($options);
@@ -106,7 +108,9 @@ class PerspectivePictureFetcher
             $order[] = 'item_parent_cache.tuning asc';
         }
 
-        if ($options['perspectiveGroup']) {
+        if ($this->perspectiveId) {
+            $select->where(['picture_item.perspective_id' => $this->perspectiveId]);
+        } elseif ($options['perspectiveGroup']) {
             $select
                 ->join(
                     ['mp' => 'perspectives_groups_perspectives'],
@@ -196,6 +200,11 @@ class PerspectivePictureFetcher
     public function setPerspectivePageId(int $id): void
     {
         $this->perspectivePageId = $id;
+    }
+
+    public function setPerspectiveId(int $id): void
+    {
+        $this->perspectiveId = $id;
     }
 
     public function setOnlyExactlyPictures(bool $value): void

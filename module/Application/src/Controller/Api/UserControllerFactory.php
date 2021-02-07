@@ -35,7 +35,7 @@ class UserControllerFactory implements FactoryInterface
             $container->get(UsersService::class),
             $container->get(User::class),
             $config['recaptcha'],
-            (bool) $config['captcha'],
+            (bool) isset($config['captcha']) && $config['captcha'],
             $container->get(UserRename::class),
             $config['hosts'],
             $container->get(Storage::class)

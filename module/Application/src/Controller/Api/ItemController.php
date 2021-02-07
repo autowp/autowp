@@ -331,16 +331,24 @@ class ItemController extends AbstractRestfulController
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
                 ->join('pictures', 'picture_item.picture_id = pictures.id', $joinColumns);
 
-            if (isset($data['descendant_pictures']['status']) && $data['descendant_pictures']['status']) {
-                $select->where(['pictures.status' => $data['descendant_pictures']['status']]);
-            }
+            if (isset($data['descendant_pictures'])) {
+                $descendantPictures = $data['descendant_pictures'];
 
-            if (isset($data['descendant_pictures']['owner_id']) && $data['descendant_pictures']['owner_id']) {
-                $select->where(['pictures.owner_id' => $data['descendant_pictures']['owner_id']]);
-            }
+                if (isset($descendantPictures['status']) && $descendantPictures['status']) {
+                    $select->where(['pictures.status' => $descendantPictures['status']]);
+                }
 
-            if (isset($data['descendant_pictures']['type_id']) && $data['descendant_pictures']['type_id']) {
-                $select->where(['picture_item.type' => $data['descendant_pictures']['type_id']]);
+                if (isset($descendantPictures['owner_id']) && $descendantPictures['owner_id']) {
+                    $select->where(['pictures.owner_id' => $descendantPictures['owner_id']]);
+                }
+
+                if (isset($descendantPictures['type_id']) && $descendantPictures['type_id']) {
+                    $select->where(['picture_item.type' => $descendantPictures['type_id']]);
+                }
+
+                if (isset($descendantPictures['perspective_id']) && $descendantPictures['perspective_id']) {
+                    $select->where(['picture_item.perspective_id' => $descendantPictures['perspective_id']]);
+                }
             }
         }
 
@@ -806,6 +814,10 @@ class ItemController extends AbstractRestfulController
         $previewPictures = [];
         if (isset($data['preview_pictures']['type_id']) && $data['preview_pictures']['type_id']) {
             $previewPictures['type_id'] = $data['preview_pictures']['type_id'];
+        }
+
+        if (isset($data['preview_pictures']['perspective_id']) && $data['preview_pictures']['perspective_id']) {
+            $previewPictures['perspective_id'] = $data['preview_pictures']['perspective_id'];
         }
 
         $this->hydrator->setOptions([

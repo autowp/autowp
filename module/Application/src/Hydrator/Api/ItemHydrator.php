@@ -546,12 +546,18 @@ class ItemHydrator extends AbstractRestHydrator
                 $perspectivePageId = $this->previewPictures['perspective_page_id'];
             }
 
+            $perspectiveId = 0;
+            if (isset($this->previewPictures['perspective_id']) && $this->previewPictures['perspective_id']) {
+                $perspectiveId = $this->previewPictures['perspective_id'];
+            }
+
             $cFetcher = new PerspectivePictureFetcher([
                 'pictureModel'        => $this->picture,
                 'perspective'         => $this->perspective,
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'perspectivePageId'   => $perspectivePageId,
                 'pictureItemTypeId'   => $pictureItemTypeId,
+                'perspectiveId'       => $perspectiveId,
             ]);
 
             $totalPictures = $cFetcher->getTotalPictures($object['id'], $onlyExactlyPictures);

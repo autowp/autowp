@@ -1538,6 +1538,15 @@ return [
                         ['name' => 'Digits'],
                     ],
                 ],
+                'perspective_id'         => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits'],
+                    ],
+                ],
             ],
             'preview_pictures'                => [
                 'type'    => InputFilter::class,
@@ -1557,6 +1566,15 @@ return [
                                 ],
                             ],
                         ],
+                    ],
+                ],
+                'perspective_id'         => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits'],
                     ],
                 ],
             ],
