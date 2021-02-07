@@ -28,6 +28,8 @@ class PerspectivePictureFetcher
 
     private int $perspectiveId = 0;
 
+    private int $containsPerspectiveId = 0;
+
     public function __construct(array $options)
     {
         $this->setOptions($options);
@@ -122,6 +124,12 @@ class PerspectivePictureFetcher
             $order[] = 'mp.position';
         }
 
+        if ($this->containsPerspectiveId) {
+            $select
+                ->join(['pi2' => 'picture_item'], 'pictures.id = pi2.picture_id', [])
+                ->where(['pi2.perspective_id' => $this->containsPerspectiveId]);
+        }
+
         if ($options['ids']) {
             $select->where([new Sql\Predicate\In('pictures.id', $options['ids'])]);
         }
@@ -205,6 +213,11 @@ class PerspectivePictureFetcher
     public function setPerspectiveId(int $id): void
     {
         $this->perspectiveId = $id;
+    }
+
+    public function setContainsPerspectiveId(int $id): void
+    {
+        $this->containsPerspectiveId = $id;
     }
 
     public function setOnlyExactlyPictures(bool $value): void
