@@ -190,7 +190,7 @@ Para discutir lo que sea o conversar sobre autos, puedes hacerlo en [the forum](
   'layout/brand' => 'WheelsAge.org',
   'ng-layout/you-have-new-messages' => '{messages, plural,
 one {Usted tiene {messages} nuevo mensaje}
-other {Usted tiene {messages} nuevos mensajes
+other {Usted tiene {messages} nuevos mensajes}
 }',
   'layout/search' => 'Buscar',
   'layout/footer' => 'Por favor, considerar que todo el material disponible en el servidor autowp.ru ha sido agregado por sus propios visitantes.
