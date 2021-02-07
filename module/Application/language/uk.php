@@ -1117,7 +1117,7 @@ E-mail: %2$s
   'moder/vehicle/tabs/categories' => 'Категорії',
   'moder/vehicle/tabs/twins' => 'Близнята',
   'moder/vehicle/tabs/factories' => 'Заводи',
-  'moder/vehicle/tabs/pictures' => 'Картинки',
+  'moder/vehicle/tabs/pictures' => 'Зображення',
   'moder/vehicle/tabs/modifications' => 'Модифікації',
   'moder/vehicle/tabs/vehicles' => 'ТЗ',
   'moder/vehicle/meta/description' => 'короткий опис',

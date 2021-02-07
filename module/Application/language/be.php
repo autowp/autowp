@@ -1115,7 +1115,7 @@ Brazilian portuguese site translation: %pt-br-translator%
   'moder/vehicle/tabs/categories' => 'Катэгорыі',
   'moder/vehicle/tabs/twins' => 'Двайняты',
   'moder/vehicle/tabs/factories' => 'Заводы',
-  'moder/vehicle/tabs/pictures' => 'Карцінкі',
+  'moder/vehicle/tabs/pictures' => 'Выявы',
   'moder/vehicle/tabs/modifications' => 'Мадыфікацыі',
   'moder/vehicle/tabs/vehicles' => 'ТС',
   'moder/vehicle/meta/description' => 'Кароткае апісанне',

@@ -28,7 +28,7 @@
   'page/136/name' => '关于我们',
   'page/136/title' => '关于我们',
   '{count} vehicles' => '{count}辆',
-  'select' => 'select',
+  'select' => '选择',
   'picture/text' => '任何图片都有权益人。
 
 如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。
@@ -58,7 +58,7 @@
   'page/213/name' => '%PERSON_NAME%',
   'page/51/name' => '最新添加',
   'forums/theme/all-other/description' => 'Other topics not included in the above sections',
-  'inbox/all-brands' => 'All brands',
+  'inbox/all-brands' => '所有品牌',
   'forums/theme/german-cars/description' => 'Audi, BMW, Mercedes-Benz, Opel, Volkswagen, ...',
   'forums/theme/italian-cars/description' => 'Alfa Romeo, Ferrari, Fiat, Lamborghini, Lancia, ...',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroën, Delahaye ...',
