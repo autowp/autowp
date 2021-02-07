@@ -536,28 +536,36 @@ class ItemHydrator extends AbstractRestHydrator
         $onlyExactlyPictures = false;
 
         if ($showTotalPictures || $showPreviewPictures) {
+            $pps = $this->previewPictures;
+
             $pictureItemTypeId = null;
-            if (isset($this->previewPictures['type_id']) && $this->previewPictures['type_id']) {
-                $pictureItemTypeId = $this->previewPictures['type_id'];
+            if (isset($pps['type_id']) && $pps['type_id']) {
+                $pictureItemTypeId = $pps['type_id'];
             }
 
             $perspectivePageId = 0;
-            if (isset($this->previewPictures['perspective_page_id']) && $this->previewPictures['perspective_page_id']) {
-                $perspectivePageId = $this->previewPictures['perspective_page_id'];
+            if (isset($pps['perspective_page_id']) && $pps['perspective_page_id']) {
+                $perspectivePageId = $pps['perspective_page_id'];
             }
 
             $perspectiveId = 0;
-            if (isset($this->previewPictures['perspective_id']) && $this->previewPictures['perspective_id']) {
-                $perspectiveId = $this->previewPictures['perspective_id'];
+            if (isset($pps['perspective_id']) && $pps['perspective_id']) {
+                $perspectiveId = $pps['perspective_id'];
+            }
+
+            $containsPerspectiveId = 0;
+            if (isset($pps['contains_perspective_id']) && $pps['contains_perspective_id']) {
+                $containsPerspectiveId = $pps['contains_perspective_id'];
             }
 
             $cFetcher = new PerspectivePictureFetcher([
-                'pictureModel'        => $this->picture,
-                'perspective'         => $this->perspective,
-                'onlyExactlyPictures' => $onlyExactlyPictures,
-                'perspectivePageId'   => $perspectivePageId,
-                'pictureItemTypeId'   => $pictureItemTypeId,
-                'perspectiveId'       => $perspectiveId,
+                'pictureModel'          => $this->picture,
+                'perspective'           => $this->perspective,
+                'onlyExactlyPictures'   => $onlyExactlyPictures,
+                'perspectivePageId'     => $perspectivePageId,
+                'pictureItemTypeId'     => $pictureItemTypeId,
+                'perspectiveId'         => $perspectiveId,
+                'containsPerspectiveId' => $containsPerspectiveId,
             ]);
 
             $totalPictures = $cFetcher->getTotalPictures($object['id'], $onlyExactlyPictures);

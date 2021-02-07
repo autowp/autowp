@@ -332,22 +332,28 @@ class ItemController extends AbstractRestfulController
                 ->join('pictures', 'picture_item.picture_id = pictures.id', $joinColumns);
 
             if (isset($data['descendant_pictures'])) {
-                $descendantPictures = $data['descendant_pictures'];
+                $dp = $data['descendant_pictures'];
 
-                if (isset($descendantPictures['status']) && $descendantPictures['status']) {
-                    $select->where(['pictures.status' => $descendantPictures['status']]);
+                if (isset($dp['status']) && $dp['status']) {
+                    $select->where(['pictures.status' => $dp['status']]);
                 }
 
-                if (isset($descendantPictures['owner_id']) && $descendantPictures['owner_id']) {
-                    $select->where(['pictures.owner_id' => $descendantPictures['owner_id']]);
+                if (isset($dp['owner_id']) && $dp['owner_id']) {
+                    $select->where(['pictures.owner_id' => $dp['owner_id']]);
                 }
 
-                if (isset($descendantPictures['type_id']) && $descendantPictures['type_id']) {
-                    $select->where(['picture_item.type' => $descendantPictures['type_id']]);
+                if (isset($dp['type_id']) && $dp['type_id']) {
+                    $select->where(['picture_item.type' => $dp['type_id']]);
                 }
 
-                if (isset($descendantPictures['perspective_id']) && $descendantPictures['perspective_id']) {
-                    $select->where(['picture_item.perspective_id' => $descendantPictures['perspective_id']]);
+                if (isset($dp['perspective_id']) && $dp['perspective_id']) {
+                    $select->where(['picture_item.perspective_id' => $dp['perspective_id']]);
+                }
+
+                if (isset($dp['contains_perspective_id']) && $dp['contains_perspective_id']) {
+                    $select
+                        ->join(['pi_cp' => 'picture_item'], 'pictures.id = pi_cp.picture_id', [])
+                        ->where(['pi_cp.perspective_id' => $dp['contains_perspective_id']]);
                 }
             }
         }
@@ -812,12 +818,20 @@ class ItemController extends AbstractRestfulController
         }
 
         $previewPictures = [];
-        if (isset($data['preview_pictures']['type_id']) && $data['preview_pictures']['type_id']) {
-            $previewPictures['type_id'] = $data['preview_pictures']['type_id'];
-        }
+        if (isset($data['preview_pictures'])) {
+            $pps = $data['preview_pictures'];
 
-        if (isset($data['preview_pictures']['perspective_id']) && $data['preview_pictures']['perspective_id']) {
-            $previewPictures['perspective_id'] = $data['preview_pictures']['perspective_id'];
+            if (isset($pps['type_id']) && $pps['type_id']) {
+                $previewPictures['type_id'] = $pps['type_id'];
+            }
+
+            if (isset($pps['perspective_id']) && $pps['perspective_id']) {
+                $previewPictures['perspective_id'] = $pps['perspective_id'];
+            }
+
+            if (isset($pps['contains_perspective_id']) && $pps['contains_perspective_id']) {
+                $previewPictures['contains_perspective_id'] = $pps['contains_perspective_id'];
+            }
         }
 
         $this->hydrator->setOptions([

@@ -4,7 +4,6 @@ namespace Application\Hydrator\Api;
 
 use Application\Comments;
 use Application\DuplicateFinder;
-use Application\Hydrator\Api\Strategy\Ip;
 use Application\Hydrator\Api\Strategy\Items;
 use Application\Model\Item;
 use Application\Model\ItemParent;
