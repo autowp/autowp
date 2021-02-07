@@ -187,10 +187,6 @@ class PictureHydrator extends AbstractRestHydrator
             $this->userRole = null;
         }
 
-        /** @var Ip $strategy */
-        //$strategy = $this->getStrategy('ip');
-        //$strategy->setUserId($this->userId);
-
         /** @var Items $strategy */
         $strategy = $this->getStrategy('items');
         $strategy->setUserId($this->userId);

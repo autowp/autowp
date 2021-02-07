@@ -1507,11 +1507,11 @@ return [
                 ],
             ],
             'descendant_pictures'             => [
-                'type'     => InputFilter::class,
-                'status'   => [
+                'type'           => InputFilter::class,
+                'status'         => [
                     'required' => false,
                 ],
-                'type_id'  => [
+                'type_id'        => [
                     'required'   => false,
                     'filters'    => [
                         ['name' => 'StringTrim'],
@@ -1529,7 +1529,7 @@ return [
                         ],
                     ],
                 ],
-                'owner_id' => [
+                'owner_id'       => [
                     'required'   => false,
                     'filters'    => [
                         ['name' => 'StringTrim'],
@@ -1538,7 +1538,7 @@ return [
                         ['name' => 'Digits'],
                     ],
                 ],
-                'perspective_id'         => [
+                'perspective_id' => [
                     'required'   => false,
                     'filters'    => [
                         ['name' => 'StringTrim'],
@@ -1549,8 +1549,8 @@ return [
                 ],
             ],
             'preview_pictures'                => [
-                'type'    => InputFilter::class,
-                'type_id' => [
+                'type'           => InputFilter::class,
+                'type_id'        => [
                     'required'   => false,
                     'filters'    => [
                         ['name' => 'StringTrim'],
@@ -1568,7 +1568,7 @@ return [
                         ],
                     ],
                 ],
-                'perspective_id'         => [
+                'perspective_id' => [
                     'required'   => false,
                     'filters'    => [
                         ['name' => 'StringTrim'],

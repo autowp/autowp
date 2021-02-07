@@ -687,7 +687,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'get'  => [
+                            'get' => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
