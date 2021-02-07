@@ -101,6 +101,7 @@ services:
     - "./frontend/ru:/usr/share/nginx/html/ru"
     - "./frontend/uk:/usr/share/nginx/html/uk"
     - "./frontend/zh-CN:/usr/share/nginx/html/zh-CN"
+    - "./frontend/es:/usr/share/nginx/html/es"
     - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
     - "./hostmap:/etc/nginx/hostmap:ro"
     user: "101:101"
