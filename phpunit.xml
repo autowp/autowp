@@ -24,11 +24,5 @@
     <testsuite name="comments">
       <directory>./module/Comments/test</directory>
     </testsuite>
-    <testsuite name="traffic">
-      <directory>./module/Traffic/test</directory>
-    </testsuite>
-    <testsuite name="user">
-      <directory>./module/User/test</directory>
-    </testsuite>
   </testsuites>
 </phpunit>
