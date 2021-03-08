@@ -177,6 +177,13 @@ return [
             'flag'     => 'flag-icon flag-icon-ua',
             'aliases'  => [],
         ],
+        'es'    => [
+            'hostname' => 'es.localhost',
+            'timezone' => 'Europe/Madrid',
+            'name'     => 'Español (beta)',
+            'flag'     => 'flag-icon flag-icon-es',
+            'aliases'  => [],
+        ],
     ],
     'content_languages'  => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp'],
 

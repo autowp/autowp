@@ -3,6 +3,9 @@
 namespace Application;
 
 use Laminas\Http\PhpEnvironment\Request;
+use Locale;
+
+use function array_keys;
 
 class Language
 {
@@ -17,18 +20,16 @@ class Language
     {
         $this->language = $this->defaultLanguage;
 
-        $map = [];
-        foreach ($hosts as $language => $host) {
-            $map[$host['hostname']] = $language;
-            foreach ($host['aliases'] as $alias) {
-                $map[$alias] = $language;
-            }
-        }
-
         if ($request instanceof Request) {
-            $hostname = $request->getServer('HTTP_HOST');
-            if (isset($map[$hostname])) {
-                $this->language = $map[$hostname];
+            $acceptLanguage = $request->getHeader('Accept-Language');
+            if ($acceptLanguage) {
+                $locale = Locale::acceptFromHttp($acceptLanguage->getFieldValue());
+                if ($locale) {
+                    $closest = Locale::lookup(array_keys($hosts), $locale, false, $this->defaultLanguage);
+                    if (isset($hosts[$closest])) {
+                        $this->language = $closest;
+                    }
+                }
             }
         }
     }
