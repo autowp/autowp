@@ -98,6 +98,7 @@ class MostsController extends AbstractActionController
         $unit = null;
         if (isset($list['unit'])) {
             $unit = [
+                'id'   => $list['unit']['id'],
                 'abbr' => $list['unit']['abbr'],
                 'name' => $list['unit']['name'],
             ];
