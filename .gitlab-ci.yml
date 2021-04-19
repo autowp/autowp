@@ -15,7 +15,7 @@ build-php-fpm:
     - name: docker:dind
       alias: docker
   before_script:
-    - apk add --update docker-compose
+    - apk add --update curl docker-compose
 
   script:
     - curl -v http://docker:2375 || true
