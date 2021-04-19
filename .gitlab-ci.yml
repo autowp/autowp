@@ -3,7 +3,7 @@ image: docker
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_HOST: tcp://docker:2375
 
 stages:
   - build
@@ -12,7 +12,8 @@ stages:
 build-php-fpm:
   stage: build
   services:
-    - docker:dind
+    - name: docker:dind
+      alias: docker
   before_script:
     - apk add --update docker-compose
 
@@ -42,7 +43,8 @@ build-php-fpm:
 build-nginx:
   stage: build
   services:
-    - docker:dind
+    - name: docker:dind
+      alias: docker
   script:
     - docker pull autowp/autowp:nginx || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp:nginx -t $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG --pull nginx
@@ -52,7 +54,8 @@ build-nginx:
 publish-php-fpm:
   stage: publish
   services:
-    - docker:dind
+    - name: docker:dind
+      alias: docker
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
@@ -65,7 +68,8 @@ publish-php-fpm:
 publish-nginx:
   stage: publish
   services:
-    - docker:dind
+    - name: docker:dind
+      alias: docker
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG
