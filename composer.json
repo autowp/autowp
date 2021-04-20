@@ -77,7 +77,6 @@
 		"onesky/api-library-php5" : "^1.0",
 		"wapmorgan/php-code-fixer": "^2.0",
 		"phan/phan": "^4.0.0",
-		"sensiolabs/security-checker": "^6.0",
         "laminas/laminas-coding-standard": "^2.1.0",
 		"vimeo/psalm": "^4.0.1",
 		"phpstan/phpstan": "^0.12.50"
