@@ -7,14 +7,15 @@ WORKDIR /app
 EXPOSE 9000
 
 ENV COMPOSER_ALLOW_SUPERUSER="1" \
-    WAITFORIT_VERSION="v2.4.1"
+    WAITFORIT_VERSION="v2.4.1" \
+    DEBIAN_FRONTEND=noninteractive
 
 CMD ["./start.sh"]
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -qq -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -qq -y \
+RUN apt-get autoremove -qq -y && \
+    apt-get update -qq -y && \
+    apt-get dist-upgrade -qq -y && \
+    apt-get install -qq -y \
         bash \
         ca-certificates \
         curl \
@@ -45,7 +46,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         unzip \
         xmlstarlet \
     && \
-    DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y && \
+    apt-get autoclean -qq -y && \
     \
     cat /etc/ImageMagick-6/policy.xml | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \
