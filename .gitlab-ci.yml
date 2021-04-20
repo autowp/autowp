@@ -14,12 +14,13 @@ build-php-fpm:
   services:
     - name: docker:dind
       alias: docker
+
   before_script:
     - apk add --update curl docker-compose
-
+    - curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.4.1/waitforit-linux_amd64
+    - chmod +x /usr/local/bin/waitforit
+    - waitforit -address=tcp://docker:2375
   script:
-    - sleep 30
-    - curl -v http://docker:2375 || true
     - docker pull autowp/autowp || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG -t autowp/autowp --pull .
     - docker-compose -f docker-compose-test.yml up -d
@@ -47,6 +48,11 @@ build-nginx:
   services:
     - name: docker:dind
       alias: docker
+  before_script:
+    - apk add --update curl
+    - curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.4.1/waitforit-linux_amd64
+    - chmod +x /usr/local/bin/waitforit
+    - waitforit -address=tcp://docker:2375
   script:
     - docker pull autowp/autowp:nginx || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp:nginx -t $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG --pull nginx
@@ -58,6 +64,11 @@ publish-php-fpm:
   services:
     - name: docker:dind
       alias: docker
+  before_script:
+    - apk add --update curl
+    - curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.4.1/waitforit-linux_amd64
+    - chmod +x /usr/local/bin/waitforit
+    - waitforit -address=tcp://docker:2375
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
@@ -72,6 +83,11 @@ publish-nginx:
   services:
     - name: docker:dind
       alias: docker
+  before_script:
+    - apk add --update curl
+    - curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.4.1/waitforit-linux_amd64
+    - chmod +x /usr/local/bin/waitforit
+    - waitforit -address=tcp://docker:2375
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG
