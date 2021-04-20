@@ -19,7 +19,7 @@ build-php-fpm:
     - apk add --update curl docker-compose
     - curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.4.1/waitforit-linux_amd64
     - chmod +x /usr/local/bin/waitforit
-    - waitforit -address=tcp://docker:2375
+    - waitforit -address=tcp://docker:2375 -timeout=30
   script:
     - docker pull autowp/autowp || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG -t autowp/autowp --pull .
@@ -52,7 +52,7 @@ build-nginx:
     - apk add --update curl
     - curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.4.1/waitforit-linux_amd64
     - chmod +x /usr/local/bin/waitforit
-    - waitforit -address=tcp://docker:2375
+    - waitforit -address=tcp://docker:2375 -timeout=30
   script:
     - docker pull autowp/autowp:nginx || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp:nginx -t $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG --pull nginx
@@ -68,7 +68,7 @@ publish-php-fpm:
     - apk add --update curl
     - curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.4.1/waitforit-linux_amd64
     - chmod +x /usr/local/bin/waitforit
-    - waitforit -address=tcp://docker:2375
+    - waitforit -address=tcp://docker:2375 -timeout=30
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
@@ -87,7 +87,7 @@ publish-nginx:
     - apk add --update curl
     - curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.4.1/waitforit-linux_amd64
     - chmod +x /usr/local/bin/waitforit
-    - waitforit -address=tcp://docker:2375
+    - waitforit -address=tcp://docker:2375 -timeout=30
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG
