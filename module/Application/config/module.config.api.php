@@ -22,9 +22,6 @@ return [
             Hydrator\Api\ItemParentLanguageHydrator::class => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\LogHydrator::class                => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\MessageHydrator::class            => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\PerspectiveHydrator::class        => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\PerspectiveGroupHydrator::class   => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\PerspectivePageHydrator::class    => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\PictureHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\PictureItemHydrator::class        => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\SimilarHydrator::class            => Hydrator\Api\RestHydrator::class,
@@ -63,8 +60,6 @@ return [
             Controller\Api\MostsController::class            => Controller\Api\MostsControllerFactory::class,
             Controller\Api\NewController::class              => Controller\Api\NewControllerFactory::class,
             Controller\Api\PageController::class             => Controller\Api\PageControllerFactory::class,
-            Controller\Api\PerspectiveController::class      => Controller\Api\PerspectiveControllerFactory::class,
-            Controller\Api\PerspectivePageController::class  => Controller\Api\PerspectivePageControllerFactory::class,
             Controller\Api\PictureController::class          => Controller\Api\PictureControllerFactory::class,
             Controller\Api\PictureItemController::class      => Controller\Api\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
@@ -74,7 +69,6 @@ return [
             Controller\Api\PulseController::class           => Controller\Api\PulseControllerFactory::class,
             Controller\Api\RatingController::class          => Controller\Api\RatingControllerFactory::class,
             Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
-            Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
             Controller\Api\StatController::class            => Controller\Api\StatControllerFactory::class,
             Controller\Api\TelegramController::class        => Controller\Api\TelegramControllerFactory::class,
             Controller\Api\TextController::class            => Controller\Api\TextControllerFactory::class,
@@ -2449,27 +2443,6 @@ return [
                             ],
                         ],
                     ],
-                    'spec'                        => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/spec',
-                            'defaults' => [
-                                'controller' => Controller\Api\SpecController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
                     'stat'                        => [
                         'type'          => 'Literal',
                         'options'       => [
@@ -2488,26 +2461,6 @@ return [
                                         'action' => 'global-summary',
                                     ],
                                 ],
-                            ],
-                        ],
-                    ],
-                    'perspective'                 => [
-                        'type'    => 'Literal',
-                        'options' => [
-                            'route'    => '/perspective',
-                            'defaults' => [
-                                'controller' => Controller\Api\PerspectiveController::class,
-                                'action'     => 'index',
-                            ],
-                        ],
-                    ],
-                    'perspective-page'            => [
-                        'type'    => 'Literal',
-                        'options' => [
-                            'route'    => '/perspective-page',
-                            'defaults' => [
-                                'controller' => Controller\Api\PerspectivePageController::class,
-                                'action'     => 'index',
                             ],
                         ],
                     ],

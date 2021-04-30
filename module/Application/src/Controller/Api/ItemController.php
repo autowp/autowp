@@ -60,7 +60,6 @@ use function implode;
 use function in_array;
 use function is_string;
 use function preg_match;
-use function print_r;
 use function sprintf;
 use function str_replace;
 use function strlen;
@@ -799,23 +798,15 @@ class ItemController extends AbstractRestfulController
 
         $select->columns($columns);
 
-        try {
-            /** @var Adapter $adapter */
-            $adapter   = $this->itemModel->getTable()->getAdapter();
-            $paginator = new Paginator(new DbSelect($select, $adapter));
+        /** @var Adapter $adapter */
+        $adapter   = $this->itemModel->getTable()->getAdapter();
+        $paginator = new Paginator(new DbSelect($select, $adapter));
 
-            $limit = $data['limit'] ? $data['limit'] : 1;
+        $limit = $data['limit'] ? $data['limit'] : 1;
 
-            $paginator
-                ->setItemCountPerPage($limit)
-                ->setCurrentPageNumber($data['page']);
-        } catch (Exception $e) {
-            throw new Exception(
-                'SQL Error : '
-                . print_r($this->params()->fromQuery(), true) . "\n"
-                . $select->getSqlString($this->itemModel->getTable()->getAdapter()->getPlatform())
-            );
-        }
+        $paginator
+            ->setItemCountPerPage($limit)
+            ->setCurrentPageNumber($data['page']);
 
         $previewPictures = [];
         if (isset($data['preview_pictures'])) {
