@@ -2153,17 +2153,6 @@ class ItemController extends AbstractRestfulController
         return $viewModel->setTerminal(true);
     }
 
-    public function vehicleTypeAction(): JsonModel
-    {
-        $brandId = (int) $this->params()->fromQuery('brand_id');
-
-        $list = $this->vehicleType->getBrandVehicleTypes($brandId);
-
-        return new JsonModel([
-            'items' => $list,
-        ]);
-    }
-
     /**
      * @return ViewModel|ResponseInterface|array
      * @throws Exception

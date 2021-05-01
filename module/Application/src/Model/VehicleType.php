@@ -328,38 +328,4 @@ class VehicleType
 
         return $result;
     }
-
-    public function getBrandVehicleTypes(int $brandId): array
-    {
-        $select = new Sql\Select($this->vehicleTypeTable->getTable());
-
-        $select->columns([
-            'id',
-            'name',
-            'catname',
-            'cars_count' => new Sql\Expression('COUNT(DISTINCT item.id)'),
-        ])
-            ->join('vehicle_vehicle_type', 'car_types.id = vehicle_vehicle_type.vehicle_type_id', [])
-            ->join('item', 'vehicle_vehicle_type.vehicle_id = item.id', [])
-            ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
-            ->where([
-                'item_parent_cache.parent_id' => $brandId,
-                '(item.begin_year or item.begin_model_year)',
-                'not item.is_group',
-            ])
-            ->group('car_types.id')
-            ->order('car_types.position');
-
-        $result = [];
-        foreach ($this->vehicleTypeTable->selectWith($select) as $row) {
-            $result[] = [
-                'id'        => (int) $row['id'],
-                'name'      => $row['name'],
-                'catname'   => $row['catname'],
-                'carsCount' => (int) $row['cars_count'],
-            ];
-        }
-
-        return $result;
-    }
 }
