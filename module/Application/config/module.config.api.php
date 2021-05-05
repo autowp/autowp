@@ -753,7 +753,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'themes'       => [
+                            'themes' => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/themes',
@@ -789,7 +789,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'topic'        => [
+                            'topic'  => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/topic',
@@ -1051,7 +1051,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'list'         => [
+                            'list'  => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
@@ -1060,7 +1060,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'post'         => [
+                            'post'  => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'post',
@@ -1069,7 +1069,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'alpha'        => [
+                            'alpha' => [
                                 'type'    => 'Literal',
                                 'options' => [
                                     'route'    => '/alpha',
@@ -1078,7 +1078,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'path'         => [
+                            'path'  => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/path',
@@ -1096,7 +1096,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'item'         => [
+                            'item'  => [
                                 'type'          => 'Segment',
                                 'options'       => [
                                     'route'       => '/:id',
@@ -1613,7 +1613,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'get'     => [
+                            'get'    => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
@@ -1622,7 +1622,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'post'    => [
+                            'post'   => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'post',
@@ -1631,7 +1631,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'delete'  => [
+                            'delete' => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'delete',
@@ -1640,7 +1640,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'item'    => [
+                            'item'   => [
                                 'type'          => 'Segment',
                                 'options'       => [
                                     'route' => '/:id',
