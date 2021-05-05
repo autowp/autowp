@@ -753,15 +753,6 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'user-summary' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/user-summary',
-                                    'defaults' => [
-                                        'action' => 'user-summary',
-                                    ],
-                                ],
-                            ],
                             'themes'       => [
                                 'type'          => 'Literal',
                                 'options'       => [
@@ -1673,24 +1664,6 @@ return [
                                                 'action' => 'delete',
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                            'summary' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/summary',
-                                    'defaults' => [
-                                        'action' => 'summary',
-                                    ],
-                                ],
-                            ],
-                            'new'     => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/new',
-                                    'defaults' => [
-                                        'action' => 'new',
                                     ],
                                 ],
                             ],

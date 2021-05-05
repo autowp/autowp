@@ -82,22 +82,6 @@ class ForumController extends AbstractRestfulController
     /**
      * @return ViewModel|ResponseInterface|array
      */
-    public function userSummaryAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        return new JsonModel([
-            'subscriptionsCount' => $this->forums->getSubscribedTopicsCount($user['id']),
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
     public function getThemesAction()
     {
         $user   = $this->user()->get();

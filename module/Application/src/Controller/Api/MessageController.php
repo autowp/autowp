@@ -203,40 +203,4 @@ class MessageController extends AbstractRestfulController
         $response = $this->getResponse();
         return $response->setStatusCode(Response::STATUS_CODE_204);
     }
-
-    public function summaryAction(): ViewModel
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        return new JsonModel([
-            'inbox'  => [
-                'count'     => $this->message->getInboxCount($user['id']),
-                'new_count' => $this->message->getInboxNewCount($user['id']),
-            ],
-            'sent'   => [
-                'count' => $this->message->getSentCount($user['id']),
-            ],
-            'system' => [
-                'count'     => $this->message->getSystemCount($user['id']),
-                'new_count' => $this->message->getNewSystemCount($user['id']),
-            ],
-        ]);
-    }
-
-    public function newAction(): ViewModel
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        return new JsonModel([
-            'count' => $this->message->getNewCount($user['id']),
-        ]);
-    }
 }
