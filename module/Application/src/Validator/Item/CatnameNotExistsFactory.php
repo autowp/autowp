@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Validator\Item;
 
 use Application\Model\Item;

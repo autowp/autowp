@@ -11,6 +11,7 @@ services:
     - frontend
     - goautowp-serve-public
     - auth
+    - keycloak
     ports:
     - "80:80"
 
@@ -252,3 +253,18 @@ services:
       /usr/bin/mc policy set download autowp/files;
       exit 0;
       "
+
+  keycloak:
+    image: jboss/keycloak
+    container_name: autowp_test_keycloak
+    restart: always
+    environment:
+      DB_VENDOR: h2
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_IMPORT: /tmp/realm.json
+      JAVA_OPTS_APPEND: "-Dkeycloak.profile.feature.upload_scripts=enabled"
+    volumes:
+      - ./keycloak/realm.json:/tmp/realm.json
+    ports:
+      - "8081:8080"

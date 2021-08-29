@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\User\Service;
 
 use Interop\Container\ContainerInterface;

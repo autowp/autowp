@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application;
 
 use Laminas\ServiceManager\Factory\InvokableFactory;
@@ -65,17 +67,16 @@ return [
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
             Controller\Api\PictureModerVoteTemplateController::class
                 => Controller\Api\PictureModerVoteTemplateControllerFactory::class,
-            Controller\Api\PictureVoteController::class     => Controller\Api\PictureVoteControllerFactory::class,
-            Controller\Api\PulseController::class           => Controller\Api\PulseControllerFactory::class,
-            Controller\Api\RatingController::class          => Controller\Api\RatingControllerFactory::class,
-            Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
-            Controller\Api\StatController::class            => Controller\Api\StatControllerFactory::class,
-            Controller\Api\TelegramController::class        => Controller\Api\TelegramControllerFactory::class,
-            Controller\Api\TextController::class            => Controller\Api\TextControllerFactory::class,
-            Controller\Api\TimezoneController::class        => InvokableFactory::class,
-            Controller\Api\TwinsController::class           => Controller\Api\TwinsControllerFactory::class,
-            Controller\Api\UserController::class            => Controller\Api\UserControllerFactory::class,
-            Controller\Api\VotingController::class          => Controller\Api\VotingControllerFactory::class,
+            Controller\Api\PictureVoteController::class => Controller\Api\PictureVoteControllerFactory::class,
+            Controller\Api\PulseController::class       => Controller\Api\PulseControllerFactory::class,
+            Controller\Api\RatingController::class      => Controller\Api\RatingControllerFactory::class,
+            Controller\Api\StatController::class        => Controller\Api\StatControllerFactory::class,
+            Controller\Api\TelegramController::class    => Controller\Api\TelegramControllerFactory::class,
+            Controller\Api\TextController::class        => Controller\Api\TextControllerFactory::class,
+            Controller\Api\TimezoneController::class    => InvokableFactory::class,
+            Controller\Api\TwinsController::class       => Controller\Api\TwinsControllerFactory::class,
+            Controller\Api\UserController::class        => Controller\Api\UserControllerFactory::class,
+            Controller\Api\VotingController::class      => Controller\Api\VotingControllerFactory::class,
         ],
     ],
     'router'      => [
@@ -2156,64 +2157,6 @@ return [
                             ],
                         ],
                     ],
-                    'restore-password'            => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/restore-password',
-                            'defaults' => [
-                                'controller' => Controller\Api\RestorePasswordController::class,
-                                'action'     => 'index',
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'request' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/request',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'post' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'request',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'new'     => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/new',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'  => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'new-get',
-                                            ],
-                                        ],
-                                    ],
-                                    'post' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'new-post',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
                     'telegram-webhook'            => [
                         'type'    => 'Segment',
                         'options' => [
@@ -2315,7 +2258,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'list'       => [
+                            'list'   => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
@@ -2324,16 +2267,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'post'       => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'post',
-                                    ],
-                                ],
-                            ],
-                            'user'       => [
+                            'user'   => [
                                 'type'          => 'Segment',
                                 'options'       => [
                                     'route' => '/:id',
@@ -2387,21 +2321,12 @@ return [
                                     ],
                                 ],
                             ],
-                            'online'     => [
+                            'online' => [
                                 'type'    => 'Literal',
                                 'options' => [
                                     'route'    => '/online',
                                     'defaults' => [
                                         'action' => 'online',
-                                    ],
-                                ],
-                            ],
-                            'emailcheck' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/emailcheck',
-                                    'defaults' => [
-                                        'action' => 'emailcheck',
                                     ],
                                 ],
                             ],

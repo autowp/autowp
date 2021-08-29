@@ -6,7 +6,6 @@ use Application\Model\Contact;
 use Application\Model\Picture;
 use Application\Model\UserAccount;
 use Application\Model\UserItemSubscribe;
-use ArrayAccess;
 use ArrayObject;
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
@@ -34,7 +33,7 @@ class UsersService
 
     private string $emailSalt;
 
-    private array $hosts = [];
+    private array $hosts;
 
     private TranslatorInterface $translator;
 
@@ -172,59 +171,6 @@ class UsersService
 
     /**
      * @param array|ArrayObject $user
-     * @throws Exception
-     */
-    public function changeEmailStart($user, string $email, string $language): void
-    {
-        $host = $this->getHostOptions($language);
-
-        $emailCheckCode = $this->emailCheckCode($email);
-
-        $this->userModel->getTable()->update([
-            'email_to_check'   => $email,
-            'email_check_code' => $emailCheckCode,
-        ], [
-            'id' => $user['id'],
-        ]);
-
-        $user = $this->userModel->getRow($user['id']);
-
-        $this->sendChangeConfirmEmail($user, $host['hostname']);
-    }
-
-    /**
-     * @return null|array|ArrayObject
-     */
-    public function emailChangeFinish(string $code)
-    {
-        if (! $code) {
-            return null;
-        }
-
-        $user = currentFromResultSetInterface($this->userModel->getTable()->select([
-            'not deleted',
-            'email_check_code' => (string) $code,
-            new Sql\Predicate\Expression('LENGTH(email_check_code)'),
-            new Sql\Predicate\Expression('LENGTH(email_to_check)'),
-        ]));
-
-        if (! $user) {
-            return null;
-        }
-
-        $this->userModel->getTable()->update([
-            'e_mail'           => $user['email_to_check'],
-            'email_check_code' => null,
-            'email_to_check'   => null,
-        ], [
-            'id' => $user['id'],
-        ]);
-
-        return $user;
-    }
-
-    /**
-     * @param array|ArrayObject $user
      */
     public function sendRegistrationConfirmEmail($user, string $hostname): void
     {
@@ -241,7 +187,7 @@ class UsersService
             $subject = sprintf($subject, $hostname);
             $message = sprintf(
                 $message,
-                'http://' . $hostname . '/',
+                'https://' . $hostname . '/',
                 $values['email'],
                 $values['url'],
                 $hostname
@@ -260,40 +206,8 @@ class UsersService
     }
 
     /**
-     * @param array|ArrayObject $user
+     * @throws Exception
      */
-    public function sendChangeConfirmEmail($user, string $hostname): void
-    {
-        if ($user['email_to_check'] && $user['email_check_code']) {
-            $values = [
-                'email' => $user['email_to_check'],
-                'name'  => $user['name'],
-                'url'   => 'https://' . $hostname . '/account/emailcheck/' . $user['email_check_code'],
-            ];
-
-            $subject = $this->translator->translate('users/change-email/confirm-subject');
-            $message = $this->translator->translate('users/change-email/confirm-message');
-
-            $subject = sprintf($subject, $hostname);
-            $message = sprintf(
-                $message,
-                $hostname,
-                $values['email'],
-                $values['url']
-            );
-
-            $mail = new Mail\Message();
-            $mail
-                ->setEncoding('utf-8')
-                ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
-                ->setBody($message)
-                ->addTo($values['email'], $values['name'])
-                ->setSubject($subject);
-
-            $this->transport->send($mail);
-        }
-    }
-
     public function updateUsersVoteLimits(): int
     {
         $select = $this->userModel->getTable()->getSql()->select()
@@ -312,6 +226,9 @@ class UsersService
         return $affected;
     }
 
+    /**
+     * @throws Exception
+     */
     public function updateUserVoteLimit(int $userId): bool
     {
         $userRow = $this->userModel->getRow($userId);
@@ -361,18 +278,8 @@ class UsersService
     }
 
     /**
-     * @param array|ArrayAccess $user
      * @throws Exception
      */
-    public function setPassword($user, string $password): void
-    {
-        $this->userModel->getTable()->update([
-            'password' => $this->getPasswordHashExpr($password),
-        ], [
-            'id' => $user['id'],
-        ]);
-    }
-
     public function checkPassword(int $userId, string $password): bool
     {
         return (bool) currentFromResultSetInterface($this->userModel->getTable()->select([
@@ -381,6 +288,9 @@ class UsersService
         ]));
     }
 
+    /**
+     * @throws Exception
+     */
     public function deleteUnused(): void
     {
         $table = $this->userModel->getTable();
@@ -418,6 +328,9 @@ class UsersService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function delete(int $userId): void
     {
         $row = $this->userModel->getRow($userId);
@@ -443,6 +356,9 @@ class UsersService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function markDeleted(int $userId): bool
     {
         $row = $this->userModel->getRow($userId);

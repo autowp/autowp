@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\View\Helper\Service;
 
 use Application\Model\Picture;

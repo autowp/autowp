@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Forums;
 
 use Autowp\Comments\CommentsService;

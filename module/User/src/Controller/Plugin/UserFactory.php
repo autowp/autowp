@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\User\Controller\Plugin;
 
 use Autowp\User\Model\User as UserModel;

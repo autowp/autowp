@@ -25,7 +25,6 @@ use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use ReCaptcha\ReCaptcha;
 
 use function array_key_exists;
 use function array_keys;
@@ -58,14 +57,7 @@ class UserController extends AbstractRestfulController
 
     private User $userModel;
 
-    private InputFilter $postInputFilter;
-
     private InputFilter $postPhotoInputFilter;
-
-    /** @var array<string, mixed> */
-    private array $recaptcha;
-
-    private bool $captchaEnabled;
 
     private UserRename $userRename;
 
@@ -79,13 +71,10 @@ class UserController extends AbstractRestfulController
         AbstractRestHydrator $hydrator,
         InputFilter $itemInputFilter,
         InputFilter $listInputFilter,
-        InputFilter $postInputFilter,
         InputFilter $putInputFilter,
         InputFilter $postPhotoInputFilter,
         UsersService $userService,
         User $userModel,
-        array $recaptcha,
-        bool $captchaEnabled,
         UserRename $userRename,
         array $hosts,
         Storage $imageStorage
@@ -94,13 +83,10 @@ class UserController extends AbstractRestfulController
         $this->hydrator             = $hydrator;
         $this->itemInputFilter      = $itemInputFilter;
         $this->listInputFilter      = $listInputFilter;
-        $this->postInputFilter      = $postInputFilter;
         $this->putInputFilter       = $putInputFilter;
         $this->postPhotoInputFilter = $postPhotoInputFilter;
         $this->userService          = $userService;
         $this->userModel            = $userModel;
-        $this->recaptcha            = $recaptcha;
-        $this->captchaEnabled       = $captchaEnabled;
         $this->userRename           = $userRename;
         $this->hosts                = $hosts;
         $this->imageStorage         = $imageStorage;
@@ -140,7 +126,7 @@ class UserController extends AbstractRestfulController
 
         $paginator = $this->userModel->getPaginator($filter);
 
-        $limit = $data['limit'] ? $data['limit'] : 1;
+        $limit = $data['limit'] ?: 1;
 
         $paginator
             ->setItemCountPerPage($limit)
@@ -358,54 +344,6 @@ class UserController extends AbstractRestfulController
             ]);
         }
 
-        if (array_key_exists('email', $values)) {
-            $this->userService->changeEmailStart($user, $values['email'], $this->language());
-        }
-
-        if (array_key_exists('password', $values)) {
-            if (! isset($values['password_old'])) {
-                return new ApiProblemResponse(
-                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                        'invalid_params' => [
-                            'password_old' => [
-                                'invalid' => 'Old password is required',
-                            ],
-                        ],
-                    ])
-                );
-            }
-
-            if (! isset($values['password_confirm'])) {
-                return new ApiProblemResponse(
-                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                        'invalid_params' => [
-                            'password_confirm' => [
-                                'invalid' => 'Confirm password is required',
-                            ],
-                        ],
-                    ])
-                );
-            }
-
-            $correct = $this->userService->checkPassword($row['id'], $values['password_old']);
-
-            if (! $correct) {
-                return new ApiProblemResponse(
-                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                        'invalid_params' => [
-                            'password_old' => [
-                                'invalid' => $this->translate(
-                                    'account/access/change-password/current-password-is-incorrect'
-                                ),
-                            ],
-                        ],
-                    ])
-                );
-            }
-
-            $this->userService->setPassword($row, $values['password']);
-        }
-
         /** @var Response $response */
         $response = $this->getResponse();
         return $response->setStatusCode(Response::STATUS_CODE_200);
@@ -457,71 +395,6 @@ class UserController extends AbstractRestfulController
         /** @var Response $response */
         $response = $this->getResponse();
         return $response->setStatusCode(Response::STATUS_CODE_204);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function postAction()
-    {
-        /** @var Request $request */
-        $request = $this->getRequest();
-        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
-            $data = $this->jsonDecode($request->getContent());
-        } else {
-            $data = $request->getPost()->toArray();
-        }
-
-        if ($this->captchaEnabled) {
-            $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
-
-            $captchaResponse = null;
-            if (isset($data['captcha'])) {
-                $captchaResponse = (string) $data['captcha'];
-            }
-
-            $result = $recaptcha->verify($captchaResponse, $request->getServer('REMOTE_ADDR'));
-
-            if (! $result->isSuccess()) {
-                return new ApiProblemResponse(
-                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                        'invalid_params' => [
-                            'captcha' => [
-                                'invalid' => 'Captcha is invalid',
-                            ],
-                        ],
-                    ])
-                );
-            }
-        }
-
-        $this->postInputFilter->setData($data);
-        if (! $this->postInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->postInputFilter);
-        }
-
-        $values = $this->postInputFilter->getValues();
-
-        $ip = $request->getServer('REMOTE_ADDR');
-        if (! $ip) {
-            $ip = '127.0.0.1';
-        }
-
-        $user = $this->userService->addUser([
-            'email'    => $values['email'],
-            'password' => $values['password'],
-            'name'     => $values['name'],
-            'ip'       => $ip,
-        ], $this->language());
-
-        $url = $this->url()->fromRoute('api/user/user/item', [
-            'id' => $user['id'],
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        $response->getHeaders()->addHeaderLine('Location', $url);
-        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     public function onlineAction(): JsonModel
@@ -638,30 +511,5 @@ class UserController extends AbstractRestfulController
         /** @var Response $response */
         $response = $this->getResponse();
         return $response->setStatusCode(Response::STATUS_CODE_201);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function emailcheckAction()
-    {
-        /** @var Request $request */
-        $request = $this->getRequest();
-        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
-            $data = $this->jsonDecode($request->getContent());
-        } else {
-            $data = $request->getPost()->toArray();
-        }
-
-        $code = isset($data['code']) ? (string) $data['code'] : '';
-        $user = $this->userService->emailChangeFinish($code);
-
-        if (! $user) {
-            return new ApiProblemResponse(new ApiProblem(400, 'Code is invalid'));
-        }
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Validator\User;
 
 use Autowp\User\Model\User;

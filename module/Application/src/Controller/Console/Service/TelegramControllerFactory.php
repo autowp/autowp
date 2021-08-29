@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Controller\Console\Service;
 
 use Application\Controller\Console\TelegramController as Controller;

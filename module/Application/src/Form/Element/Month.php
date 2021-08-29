@@ -8,7 +8,10 @@ use IntlDateFormatter;
 use Laminas\Form\Element\Select;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\InputFilter\InputProviderInterface;
+use Laminas\Stdlib\ArrayUtils;
 use Traversable;
+
+use function is_array;
 
 class Month extends Select implements InputProviderInterface
 {
@@ -24,11 +27,18 @@ class Month extends Select implements InputProviderInterface
 
     /**
      * @param array|Traversable $options
-     * @throws InvalidArgumentException
      * @throws Exception
      */
-    public function setOptions($options): self
+    public function setOptions($options): Month
     {
+        if ($options instanceof Traversable) {
+            $options = ArrayUtils::iteratorToArray($options);
+        } elseif (! is_array($options)) {
+            throw new InvalidArgumentException(
+                'The options parameter must be an array or a Traversable'
+            );
+        }
+
         if (isset($options['language'])) {
             $this->language = $options['language'];
         }

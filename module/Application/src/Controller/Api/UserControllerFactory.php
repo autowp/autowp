@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\UserHydrator;
@@ -29,13 +31,10 @@ class UserControllerFactory implements FactoryInterface
             $hydrators->get(UserHydrator::class),
             $filters->get('api_user_item'),
             $filters->get('api_user_list'),
-            $filters->get('api_user_post'),
             $filters->get('api_user_put'),
             $filters->get('api_user_photo_post'),
             $container->get(UsersService::class),
             $container->get(User::class),
-            $config['recaptcha'],
-            (bool) isset($config['captcha']) && $config['captcha'],
             $container->get(UserRename::class),
             $config['hosts'],
             $container->get(Storage::class)
