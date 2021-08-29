@@ -142,9 +142,7 @@ class Brakes extends AbstractAdapter
             if ($diameterValue || $thicknessValue) {
                 $value = $diameterValue . ' × ' . $thicknessValue . ' <span class="unit">мм</span>';
 
-                if ($value) {
-                    $text[$value] = 0;
-                }
+                $text[$value] = 0;
             }
         }
 
