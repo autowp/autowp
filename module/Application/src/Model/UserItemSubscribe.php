@@ -54,13 +54,6 @@ class UserItemSubscribe
         );
     }
 
-    public function unsubscribeAll(int $userId): void
-    {
-        $this->table->delete([
-            'user_id' => $userId,
-        ]);
-    }
-
     public function isSubscribed(int $userId, int $itemId): bool
     {
         return (bool) currentFromResultSetInterface($this->table->select([

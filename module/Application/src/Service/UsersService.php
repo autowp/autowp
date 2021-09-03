@@ -2,10 +2,7 @@
 
 namespace Application\Service;
 
-use Application\Model\Contact;
 use Application\Model\Picture;
-use Application\Model\UserAccount;
-use Application\Model\UserItemSubscribe;
 use ArrayObject;
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
@@ -18,7 +15,6 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Mail;
 
-use function Autowp\Commons\currentFromResultSetInterface;
 use function md5;
 use function microtime;
 use function round;
@@ -45,15 +41,7 @@ class UsersService
 
     private Comments\CommentsService $comments;
 
-    private UserItemSubscribe $userItemSubscribe;
-
-    private Contact $contact;
-
-    private UserAccount $userAccount;
-
     private Picture $picture;
-
-    private TableGateway $telegramChatTable;
 
     private User $userModel;
 
@@ -67,11 +55,7 @@ class UsersService
         SpecificationsService $specsService,
         Image\Storage $imageStorage,
         Comments\CommentsService $comments,
-        UserItemSubscribe $userItemSubscribe,
-        Contact $contact,
-        UserAccount $userAccount,
         Picture $picture,
-        TableGateway $telegramChatTable,
         User $userModel,
         TableGateway $logEventUserTable
     ) {
@@ -86,11 +70,7 @@ class UsersService
 
         $this->comments = $comments;
 
-        $this->userItemSubscribe = $userItemSubscribe;
-        $this->contact           = $contact;
-        $this->userAccount       = $userAccount;
         $this->picture           = $picture;
-        $this->telegramChatTable = $telegramChatTable;
         $this->userModel         = $userModel;
         $this->logEventUserTable = $logEventUserTable;
     }
@@ -280,17 +260,6 @@ class UsersService
     /**
      * @throws Exception
      */
-    public function checkPassword(int $userId, string $password): bool
-    {
-        return (bool) currentFromResultSetInterface($this->userModel->getTable()->select([
-            'id'       => $userId,
-            'password' => $this->getPasswordHashExpr($password),
-        ]));
-    }
-
-    /**
-     * @throws Exception
-     */
     public function deleteUnused(): void
     {
         $table = $this->userModel->getTable();
@@ -354,45 +323,5 @@ class UsersService
         if ($imageId) {
             $this->imageStorage->removeImage($imageId);
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function markDeleted(int $userId): bool
-    {
-        $row = $this->userModel->getRow($userId);
-        if (! $row) {
-            return false;
-        }
-
-        $oldImageId = $row['img'];
-
-        $this->userModel->getTable()->update([
-            'deleted' => 1,
-            'img'     => null,
-        ], [
-            'id' => $userId,
-        ]);
-
-        if ($oldImageId) {
-            $this->imageStorage->removeImage($oldImageId);
-        }
-
-        // delete from contacts
-        $this->contact->deleteUserEverywhere($userId);
-
-        // unsubscribe from telegram
-        $this->telegramChatTable->delete([
-            'user_id = ?' => $userId,
-        ]);
-
-        // delete linked profiles
-        $this->userAccount->removeUserAccounts($userId);
-
-        // unsubscribe from items
-        $this->userItemSubscribe->unsubscribeAll($userId);
-
-        return true;
     }
 }

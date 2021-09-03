@@ -3,12 +3,10 @@
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
-use Application\Service\UsersService;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
-use Autowp\User\Model\UserRename;
 use Casbin\Enforcer;
 use DateInterval;
 use DateTime;
@@ -53,13 +51,9 @@ class UserController extends AbstractRestfulController
 
     private InputFilter $putInputFilter;
 
-    private UsersService $userService;
-
     private User $userModel;
 
     private InputFilter $postPhotoInputFilter;
-
-    private UserRename $userRename;
 
     /** @var array<string, mixed> */
     private array $hosts;
@@ -73,9 +67,7 @@ class UserController extends AbstractRestfulController
         InputFilter $listInputFilter,
         InputFilter $putInputFilter,
         InputFilter $postPhotoInputFilter,
-        UsersService $userService,
         User $userModel,
-        UserRename $userRename,
         array $hosts,
         Storage $imageStorage
     ) {
@@ -85,9 +77,7 @@ class UserController extends AbstractRestfulController
         $this->listInputFilter      = $listInputFilter;
         $this->putInputFilter       = $putInputFilter;
         $this->postPhotoInputFilter = $postPhotoInputFilter;
-        $this->userService          = $userService;
         $this->userModel            = $userModel;
-        $this->userRename           = $userRename;
         $this->hosts                = $hosts;
         $this->imageStorage         = $imageStorage;
     }
@@ -189,6 +179,7 @@ class UserController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function putAction()
     {
@@ -256,69 +247,6 @@ class UserController extends AbstractRestfulController
         }
 
         $values = $this->putInputFilter->getValues();
-
-        if (array_key_exists('deleted', $values)) {
-            $can = $this->user()->enforce('user', 'delete');
-
-            if (! $can) {
-                if (! isset($values['password_old'])) {
-                    return new ApiProblemResponse(
-                        new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                            'invalid_params' => [
-                                'password_old' => [
-                                    'invalid' => 'Old password is required',
-                                ],
-                            ],
-                        ])
-                    );
-                }
-
-                $correct = $this->userService->checkPassword($row['id'], $values['password_old']);
-
-                if (! $correct) {
-                    return new ApiProblemResponse(
-                        new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                            'invalid_params' => [
-                                'password_old' => [
-                                    'invalid' => $this->translate('account/access/self-delete/password-is-incorrect'),
-                                ],
-                            ],
-                        ])
-                    );
-                }
-            }
-
-            if ($values['deleted'] && ! $row['deleted']) {
-                $this->userService->markDeleted($row['id']);
-
-                $this->log(sprintf(
-                    'Удаление пользователя №%s',
-                    $row['id']
-                ), [
-                    'users' => $row['id'],
-                ]);
-            }
-        }
-
-        if (array_key_exists('name', $values)) {
-            if ((int) $user['id'] !== (int) $row['id']) {
-                return $this->forbiddenAction();
-            }
-
-            $oldName = $user['name'];
-
-            $this->userModel->getTable()->update([
-                'name' => $values['name'],
-            ], [
-                'id' => $user['id'],
-            ]);
-
-            $newName = $values['name'];
-
-            if ($oldName !== $newName) {
-                $this->userRename->add($user['id'], $oldName, $newName);
-            }
-        }
 
         if (array_key_exists('language', $values)) {
             if ((int) $user['id'] !== (int) $row['id']) {

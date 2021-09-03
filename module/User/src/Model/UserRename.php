@@ -15,23 +15,6 @@ class UserRename
         $this->table = $table;
     }
 
-    public function garbageCollect(): int
-    {
-        return (int) $this->table->delete([
-            'date < DATE_SUB(NOW(), INTERVAL 3 MONTH)',
-        ]);
-    }
-
-    public function add(int $userId, string $oldName, string $newName): void
-    {
-        $this->table->insert([
-            'user_id'  => $userId,
-            'old_name' => $oldName,
-            'new_name' => $newName,
-            'date'     => new Sql\Expression('NOW()'),
-        ]);
-    }
-
     public function getRenames(int $userId): array
     {
         $select = new Sql\Select($this->table->getTable());

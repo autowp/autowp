@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Application\Service;
 
-use Application\Model\Contact;
 use Application\Model\Picture;
-use Application\Model\UserAccount;
-use Application\Model\UserItemSubscribe;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\User\Model\User;
@@ -34,11 +31,7 @@ class UsersServiceFactory implements FactoryInterface
             $container->get(SpecificationsService::class),
             $container->get(Storage::class),
             $container->get(CommentsService::class),
-            $container->get(UserItemSubscribe::class),
-            $container->get(Contact::class),
-            $container->get(UserAccount::class),
             $container->get(Picture::class),
-            $tables->get('telegram_chat'),
             $container->get(User::class),
             $tables->get('log_events_user')
         );

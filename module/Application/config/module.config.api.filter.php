@@ -3582,28 +3582,6 @@ return [
             ],
         ],
         'api_user_put'                         => [
-            'deleted'  => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'name'     => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => User::MIN_NAME,
-                            'max' => User::MAX_NAME,
-                        ],
-                    ],
-                ],
-            ],
             'language' => [
                 'required'   => true,
                 'validators' => [
