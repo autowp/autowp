@@ -13,7 +13,7 @@ class CronControllerTest extends AbstractConsoleControllerTestCase
     {
         $this->dispatch('cron daily-maintenance');
 
-        $this->assertModuleName('autowp');
+        $this->assertModuleName('cron');
         $this->assertControllerName(CronController::class);
         $this->assertMatchedRouteName('cron');
         $this->assertActionName('daily-maintenance');
@@ -24,7 +24,7 @@ class CronControllerTest extends AbstractConsoleControllerTestCase
     {
         $this->dispatch('cron midnight');
 
-        $this->assertModuleName('autowp');
+        $this->assertModuleName('cron');
         $this->assertControllerName(CronController::class);
         $this->assertMatchedRouteName('cron');
         $this->assertActionName('midnight');
