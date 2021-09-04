@@ -18,7 +18,7 @@ build-php-fpm:
   before_script:
     - waitforit -address=tcp://docker:2375 -timeout=30
   script:
-    - ./local-php-security-checker --path=composer.lock
+    - local-php-security-checker --path=composer.lock
     - docker pull autowp/autowp || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG -t autowp/autowp --pull .
     - docker-compose -f docker-compose-test.yml up -d
