@@ -8,8 +8,6 @@ file_storage:
   s3:
     endpoints:
       - http://minio:9000
-oauth:
-  secret: example_secret
 rabbitmq: amqp://guest:guest@autowp_test_rabbitmq:5672/
 traffic-dsn: postgres://traffic:password@autowp_test_traffic_postgres:5432/traffic?sslmode=disable
 traffic-migrations:
@@ -20,3 +18,21 @@ keycloak:
   client-id: autowp
   client-secret: c0fce0df-6105-4d1e-bc23-8e67239f7640
 captcha: false
+auth:
+  migrations:
+    dsn: postgres://auth:password@auth-postgres/auth?sslmode=disable
+  oauth:
+    dsn: postgres://auth:password@auth-postgres:5432/auth?sslmode=disable
+    secret: example_secret
+    access_token_expires_in: 1
+  services:
+    redirect_uri: https://en.wheelsage.org/api/oauth/service-callback
+    google:
+      client_id: "774656693670.apps.googleusercontent.com"
+      client_secret: "Ax2pIu3sQQXHix9EZ4B5Ify_"
+    facebook:
+      client_id: "258693154144687"
+      client_secret: "fa642545099dbd03c6bf0687b4d70410"
+    vk:
+      client_id: "2833304"
+      client_secret: "bMfuKDRlWLTp3XDYfBRv"

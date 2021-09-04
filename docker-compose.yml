@@ -10,8 +10,8 @@ services:
     - backend
     - frontend
     - goautowp-serve-public
-    - auth
     - keycloak
+    - goautowp-auth
     ports:
     - "80:80"
 
@@ -198,19 +198,19 @@ services:
       - "./module/Application/config/model.conf:/model.conf:ro"
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
-  auth:
-    image: autowp/auth
+  goautowp-auth:
+    image: autowp/goautowp
     container_name: autowp_test_auth
     restart: always
+    command: serve-auth
     volumes:
-    - "./auth-config.yaml:/config.yaml:ro"
+      - "./goautowp/config.yaml:/config.yaml:ro"
+      - "./module/Application/config/model.conf:/model.conf:ro"
+      - "./module/Application/config/policy.csv:/policy.csv:ro"
     depends_on:
     - auth-postgres
     - mysql
-    expose:
-    - "8080"
-    ports:
-    - "8080:8080"
+    - keycloak
 
   auth-postgres:
     image: postgres:12
