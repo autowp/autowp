@@ -9,7 +9,6 @@ use Autowp\Comments\Attention;
 use Autowp\Comments\CommentsService;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
-use Autowp\User\Model\User;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Laminas\InputFilter\InputFilter;
 
