@@ -4,11 +4,8 @@ namespace Application;
 
 use Application\Service\PictureService;
 use Autowp\Cron;
-use Autowp\User\Model\User;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
-
-use function sprintf;
 
 class Maintenance extends AbstractListenerAggregate
 {
@@ -38,10 +35,6 @@ class Maintenance extends AbstractListenerAggregate
         $pictureService = $serviceManager->get(PictureService::class);
         $pictureService->clearQueue();
 
-        /** @var User $userModel */
-        $userModel = $serviceManager->get(User::class);
-        $userModel->updateSpecsVolumes();
-
         /** @var Service\UsersService $usersService */
         $usersService = $serviceManager->get(Service\UsersService::class);
         $usersService->deleteUnused();
@@ -65,15 +58,6 @@ class Maintenance extends AbstractListenerAggregate
 
         $facebookConfig = $serviceManager->get('Config')['facebook'];
         $carOfDay->putCurrentToFacebook($facebookConfig);
-
-        /** @var Service\UsersService $usersService */
-        $usersService = $serviceManager->get(Service\UsersService::class);
-
-        $usersService->restoreVotes();
-        print "User votes restored\n";
-
-        $affected = $usersService->updateUsersVoteLimits();
-        print sprintf("Updated %s users vote limits\n", $affected);
 
         $vkConfig = $serviceManager->get('Config')['vk'];
         $carOfDay->putCurrentToVk($vkConfig);

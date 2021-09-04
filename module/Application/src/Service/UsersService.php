@@ -188,27 +188,6 @@ class UsersService
     /**
      * @throws Exception
      */
-    public function updateUsersVoteLimits(): int
-    {
-        $select = $this->userModel->getTable()->getSql()->select()
-            ->columns(['id'])
-            ->where([
-                'not deleted',
-                new Sql\Predicate\Expression('last_online > DATE_SUB(NOW(), INTERVAL 3 MONTH)'),
-            ]);
-
-        $affected = 0;
-        foreach ($this->userModel->getTable()->selectWith($select) as $row) {
-            $this->updateUserVoteLimit($row['id']);
-            $affected++;
-        }
-
-        return $affected;
-    }
-
-    /**
-     * @throws Exception
-     */
     public function updateUserVoteLimit(int $userId): bool
     {
         $userRow = $this->userModel->getRow($userId);
@@ -245,16 +224,6 @@ class UsersService
         ]);
 
         return true;
-    }
-
-    public function restoreVotes(): void
-    {
-        $this->userModel->getTable()->update([
-            'votes_left' => new Sql\Expression('votes_per_day'),
-        ], [
-            'votes_left < votes_per_day',
-            'not deleted',
-        ]);
     }
 
     /**
