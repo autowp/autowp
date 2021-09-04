@@ -26,8 +26,6 @@ build-php-fpm:
     - docker-compose -f docker-compose-test.yml exec -T backend bash -c "waitforit -host=goautowp -port=8080 -timeout=60" || docker logs autowp_test_backend
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./install-dev-db.sh" || docker logs autowp_test_backend
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./install-dev.sh" || docker logs autowp_test_backend
-    - docker logs autowp_test_createbuckets
-    - docker logs autowp_test_minio
     # - docker-compose -f docker-compose-test.yml exec -T -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" backend sh -c "./cc-test-reporter before-build"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "php -d memory_limit=100M ./vendor/bin/phpcs --encoding=utf-8"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/phpdd module/"
@@ -36,7 +34,7 @@ build-php-fpm:
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/phpstan analyze --no-progress"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./clover.xml"
     #- docker-compose -f docker-compose-test.yml exec -T backend bash -c "./vendor/bin/php-coveralls -v"
-    - docker-compose -f docker-compose-test.yml exec -T backend bash -c "./sonar-scanner/bin/sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true"
+    - docker-compose -f docker-compose-test.yml exec -T backend bash -c "./sonar-scanner/bin/sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN"
     #- docker-compose -f docker-compose-test.yml exec -T -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" backend bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
