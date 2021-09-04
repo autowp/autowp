@@ -22,15 +22,13 @@ services:
     environment:
       FASTCGI: backend:9000
     depends_on:
-    - backend
+      - backend
 
   backend:
     image: autowp/autowp
     container_name: autowp_test_backend
     restart: always
     environment:
-      AUTOWP_USERS_SALT: "users-salt"
-      AUTOWP_EMAIL_SALT: "email-salt"
       AUTOWP_TWITTER_USERNAME: ""
       AUTOWP_TWITTER_OAUTH_KEY: ""
       AUTOWP_TWITTER_OAUTH_SECRET: ""
@@ -40,6 +38,7 @@ services:
       AUTOWP_FACEBOOK_APP_SECRET: ""
       AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN: ""
       AUTOWP_VK_TOKEN: ""
+      SONARCLOUD_TOKEN: ${SONARCLOUD_TOKEN}
     volumes:
     - ./config:/app/config
     - ./data:/app/data
@@ -48,14 +47,10 @@ services:
     - ./public_html:/app/public_html
     - ./vendor:/app/vendor
     - ./etc/nginx/conf.d:/etc/nginx/conf.d
-    #- ./etc/php/7.3/fpm/php-fpm.conf:/etc/php/7.3/fpm/php-fpm.conf
-    #- ./etc/php/7.3/fpm/pool.d/www.conf:/etc/php/7.3/fpm/pool.d/www.conf
     - ./etc/nginx/sites-available:/etc/nginx/sites-available
-    #- ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
     - ./composer.json:/app/composer.json
     - ./composer.lock:/app/composer.lock
     - ./install-dev-db.sh:/app/install-dev-db.sh
-    #- ./goautowp:/app/goautowp
     - ./start.sh:/app/start.sh
     depends_on:
     - memcached
@@ -77,12 +72,11 @@ services:
     container_name: autowp_test_mysql
     restart: always
     environment:
-    - MYSQL_ROOT_PASSWORD=password
-    - MYSQL_DATABASE=autowp_test
-    - MYSQL_USER=autowp_test
-    - MYSQL_PASSWORD=test
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: autowp_test
+      MYSQL_USER: autowp_test
+      MYSQL_PASSWORD: test
     volumes:
-    - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
     - "./mysql:/var/lib/mysql"
     - "./mysql.conf.d:/etc/mysql/conf.d"
     expose:
@@ -119,9 +113,9 @@ services:
     container_name: autowp_test_traffic_postgres
     restart: always
     environment:
-    - POSTGRES_DB=traffic
-    - POSTGRES_USER=traffic
-    - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=traffic
+      - POSTGRES_USER=traffic
+      - POSTGRES_PASSWORD=password
 
   goautowp-serve-public:
     image: autowp/goautowp
@@ -129,14 +123,14 @@ services:
     restart: always
     command: serve-public
     depends_on:
-    - rabbitmq
-    - mysql
-    - traffic-postgres
-    - keycloak
+      - rabbitmq
+      - mysql
+      - traffic-postgres
+      - keycloak
     volumes:
-    - "./goautowp/config.yaml:/config.yaml:ro"
-    - "./module/Application/config/model.conf:/model.conf:ro"
-    - "./module/Application/config/policy.csv:/policy.csv:ro"
+      - "./goautowp/config.yaml:/config.yaml:ro"
+      - "./module/Application/config/model.conf:/model.conf:ro"
+      - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-serve-private:
     image: autowp/goautowp
