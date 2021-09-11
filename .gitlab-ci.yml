@@ -17,6 +17,7 @@ build-php-fpm:
 
   before_script:
     - waitforit -address=tcp://docker:2375 -timeout=30
+    - cp /opt/sonar-scanner.zip sonar-scanner.zip
   script:
     - local-php-security-checker --path=composer.lock
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY

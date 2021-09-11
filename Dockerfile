@@ -13,7 +13,7 @@ ENV COMPOSER_ALLOW_SUPERUSER="1" \
 
 CMD ["./start.sh"]
 
-COPY /opt/sonar-scanner.zip /opt/sonar-scanner.zip
+COPY sonar-scanner.zip /opt/sonar-scanner.zip
 
 RUN apt-get autoremove -qq -y && \
     apt-get update -qq -y && \
