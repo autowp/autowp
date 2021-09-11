@@ -211,7 +211,7 @@ services:
     - keycloak
 
   auth-postgres:
-    image: postgres:12
+    image: postgres:13
     container_name: autowp_test_auth_postgres
     restart: always
     environment:
@@ -226,8 +226,8 @@ services:
     container_name: autowp_test_minio
     restart: always
     environment:
-      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
-      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      MINIO_ACCESS_KEY: "AKIAIOSFODNN7EXAMPLE"
+      MINIO_SECRET_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
     ports:
       - "9000:9000"
     volumes:

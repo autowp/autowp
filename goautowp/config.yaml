@@ -36,3 +36,9 @@ auth:
     vk:
       client_id: "2833304"
       client_secret: "bMfuKDRlWLTp3XDYfBRv"
+image-storage:
+  s3:
+    region: "us-east-1"
+    credentials:
+      key: "AKIAIOSFODNN7EXAMPLE"
+      secret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"

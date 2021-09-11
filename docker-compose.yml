@@ -50,6 +50,7 @@ services:
     - ./etc/nginx/sites-available:/etc/nginx/sites-available
     - ./composer.json:/app/composer.json
     - ./composer.lock:/app/composer.lock
+    - ./install-dev.sh:/app/install-dev.sh
     - ./install-dev-db.sh:/app/install-dev-db.sh
     - ./start.sh:/app/start.sh
     depends_on:
@@ -105,8 +106,14 @@ services:
     image: rabbitmq:management
     container_name: autowp_test_rabbitmq
     ports:
+    - "4369:4369"
+    - "5671:5671"
     - "5672:5672"
+    - "15671:15671"
     - "15672:15672"
+    - "15691:15691"
+    - "15692:15692"
+    - "25672:25672"
 
   traffic-postgres:
     image: postgres:13
@@ -207,7 +214,7 @@ services:
     - keycloak
 
   auth-postgres:
-    image: postgres:12
+    image: postgres:13
     container_name: autowp_test_auth_postgres
     restart: always
     environment:
@@ -218,17 +225,18 @@ services:
       - "5432:5432"
 
   minio:
-    image: minio/minio
+    image: quay.io/minio/minio
     container_name: autowp_test_minio
     restart: always
     environment:
-      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
-      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      MINIO_ROOT_USER: "AKIAIOSFODNN7EXAMPLE"
+      MINIO_ROOT_PASSWORD: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
     ports:
       - "9000:9000"
+      - "9001:9001"
     volumes:
       - "./minio/data:/data"
-    command: server /data
+    command: server --console-address ":9001" /data
 
   createbuckets:
     image: minio/mc
