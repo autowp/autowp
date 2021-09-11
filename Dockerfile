@@ -8,9 +8,12 @@ EXPOSE 9000
 
 ENV COMPOSER_ALLOW_SUPERUSER="1" \
     WAITFORIT_VERSION="v2.4.1" \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    SONAR_SCANNER_VERSION="4.6.2.2472"
 
 CMD ["./start.sh"]
+
+COPY /opt/sonar-scanner.zip /opt/sonar-scanner.zip
 
 RUN apt-get autoremove -qq -y && \
     apt-get update -qq -y && \
@@ -59,17 +62,16 @@ RUN apt-get autoremove -qq -y && \
     \
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
-    php -r "unlink('composer-setup.php');"
-
-COPY ./etc/ /etc/
-
-ENV SONAR_SCANNER_VERSION="4.6.2.2472"
-
-RUN mkdir -p /opt && \
-    curl -fSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip -o /opt/sonar-scanner.zip && \
+    php -r "unlink('composer-setup.php');" && \
+    \
+    # mkdir -p /opt && \
+    # curl -fSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip -o /opt/sonar-scanner.zip && \
     unzip /opt/sonar-scanner.zip -d /opt && \
     rm /opt/sonar-scanner.zip && \
     ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}/bin/sonar-scanner /usr/bin/sonar-scanner
+
+
+COPY ./etc/ /etc/
 
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-progress --no-interaction --optimize-autoloader && \
