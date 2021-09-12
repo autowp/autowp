@@ -1113,9 +1113,6 @@ class CommentsService
         ]);
     }
 
-    /**
-     * , PhanPluginMixedKeyNoKey
-     */
     public function getTopAuthors(int $limit): array
     {
         $select = $this->messageTable->getSql()->select()

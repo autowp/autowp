@@ -130,8 +130,6 @@ class PictureModerVote
     }
 
     /**
-     * , PhanPluginMixedKeyNoKey
-     *
      * @throws Exception
      */
     public function getPositiveVotesCount(int $pictureId): int
@@ -148,8 +146,6 @@ class PictureModerVote
     }
 
     /**
-     * , PhanPluginMixedKeyNoKey
-     *
      * @throws Exception
      */
     public function getNegativeVotesCount(int $pictureId): int

@@ -29,6 +29,8 @@ RUN apt-get autoremove -qq -y && \
         mysql-client \
         openjdk-11-jre \
         openssh-client \
+        php-dev \
+        php-pear \
         php7.4 \
         php7.4-bcmath \
         php7.4-common \
@@ -51,6 +53,7 @@ RUN apt-get autoremove -qq -y && \
         xmlstarlet \
     && \
     apt-get autoclean -qq -y && \
+    pecl install ast && \
     \
     cat /etc/ImageMagick-6/policy.xml | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \
@@ -65,7 +68,7 @@ RUN apt-get autoremove -qq -y && \
     php -r "unlink('composer-setup.php');" && \
     \
     # mkdir -p /opt && \
-    # curl -fSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip -o /opt/sonar-scanner.zip && \
+    # curl -fSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472.zip -o /opt/sonar-scanner.zip && \
     unzip /opt/sonar-scanner.zip -d /opt && \
     rm /opt/sonar-scanner.zip && \
     ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}/bin/sonar-scanner /usr/bin/sonar-scanner && \

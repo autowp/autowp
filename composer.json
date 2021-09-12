@@ -70,14 +70,14 @@
         "files": [ "module/Commons/src/functions.php" ]
 	},
 	"require-dev" : {
-        "phpunit/phpunit": "^9.0",
-		"laminas/laminas-test" : "^3.3",
-		"php-coveralls/php-coveralls" : "^2.2",
-		"phpmd/phpmd" : "^2.9.1",
+        "phpunit/phpunit": "^9.5",
+		"laminas/laminas-test" : "^3.5",
+		"php-coveralls/php-coveralls" : "^2.4",
+		"phpmd/phpmd" : "^2.10.2",
 		"onesky/api-library-php5" : "^1.0",
-		"phan/phan": "^4.0.0",
-        "laminas/laminas-coding-standard": "^2.1.0",
-		"vimeo/psalm": "^4.0.1",
+		"phan/phan": "^5.2.0",
+        "laminas/laminas-coding-standard": "^2.3.0",
+		"vimeo/psalm": "^4.10.0",
 		"phpstan/phpstan": "^0.12.50",
 		"wapmorgan/php-deprecation-detector": "^2.0"
     },
