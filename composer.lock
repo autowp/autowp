@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2e2e85bdabe6d884d61ff6205c1822f6",
+    "content-hash": "ecc4d803afb98e473433a651c764ea2a",
     "packages": [
         {
             "name": "autowp/cron",
