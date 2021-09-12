@@ -14,6 +14,7 @@ ENV COMPOSER_ALLOW_SUPERUSER="1" \
 CMD ["./start.sh"]
 
 COPY sonar-scanner.zip /opt/sonar-scanner.zip
+COPY waitforit /usr/local/bin/waitforit
 
 RUN apt-get autoremove -qq -y && \
     apt-get update -qq -y && \
@@ -60,8 +61,8 @@ RUN apt-get autoremove -qq -y && \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='disk']/@value" -v "10GiB" > /etc/ImageMagick-6/policy2.xml && \
     cat /etc/ImageMagick-6/policy2.xml > /etc/ImageMagick-6/policy.xml && \
     \
-    curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
-    chmod +x /usr/local/bin/waitforit && \
+    # curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
+    # chmod +x /usr/local/bin/waitforit && \
     \
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
@@ -71,10 +72,11 @@ RUN apt-get autoremove -qq -y && \
     # curl -fSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472.zip -o /opt/sonar-scanner.zip && \
     unzip /opt/sonar-scanner.zip -d /opt && \
     rm /opt/sonar-scanner.zip && \
-    ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}/bin/sonar-scanner /usr/bin/sonar-scanner && \
-    \
-    curl -Ls https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter && \
-    chmod +x ./cc-test-reporter
+    ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}/bin/sonar-scanner /usr/bin/sonar-scanner
+    # && \
+    #\
+    #curl -Ls https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter && \
+    #chmod +x ./cc-test-reporter
 
 COPY ./etc/ /etc/
 
