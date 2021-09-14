@@ -28,6 +28,7 @@ class CatalogueRebuildItemOrderCacheCommand extends Command
     }
 
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int

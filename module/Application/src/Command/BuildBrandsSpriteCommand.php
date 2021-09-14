@@ -5,6 +5,7 @@ namespace Application\Command;
 use Application\Model\Brand;
 use Autowp\Image\Storage;
 use Aws\S3\S3Client;
+use ImagickException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,6 +38,11 @@ class BuildBrandsSpriteCommand extends Command
         $this->imageStorage      = $imageStorage;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // pick random endpoint

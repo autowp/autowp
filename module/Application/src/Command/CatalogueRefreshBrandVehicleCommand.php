@@ -26,6 +26,9 @@ class CatalogueRefreshBrandVehicleCommand extends Command
         $this->itemParent = $itemParent;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->itemParent->refreshAllAuto();

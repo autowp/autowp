@@ -32,6 +32,9 @@ class PicturesFixFilenamesCommand extends Command
         $this->imageStorage = $storage;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $table   = $this->picture->getTable();

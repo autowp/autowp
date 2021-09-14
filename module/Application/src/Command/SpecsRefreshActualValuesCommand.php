@@ -3,6 +3,7 @@
 namespace Application\Command;
 
 use Application\Service\SpecificationsService;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,6 +27,10 @@ class SpecsRefreshActualValuesCommand extends Command
         $this->specsService = $specsService;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->specsService->updateAllActualValues();

@@ -28,6 +28,9 @@ class SpecsRefreshUserStatCommand extends Command
         $this->specsService = $specsService;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $userId = $input->getArgument('user_id');

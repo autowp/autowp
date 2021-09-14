@@ -4,6 +4,7 @@ namespace Application\Command;
 
 use Application\DuplicateFinder;
 use Application\Model\Picture;
+use Autowp\Image\Storage\Exception;
 use Autowp\Image\StorageInterface;
 use Laminas\Db\Sql;
 use Symfony\Component\Console\Command\Command;
@@ -37,6 +38,10 @@ class PicturesDfIndexCommand extends Command
         $this->imageStorage = $storage;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $table  = $this->picture->getTable();

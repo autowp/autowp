@@ -26,6 +26,9 @@ class RefreshRepliesCountCommand extends Command
         $this->service = $message;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $affected = $this->service->updateRepliesCount();
