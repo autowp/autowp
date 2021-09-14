@@ -80,7 +80,7 @@ RUN apt-get autoremove -qq -y && \
 
 COPY ./etc/ /etc/
 
-COPY composer.json composer.lock ./
+COPY composer.json composer.lock phpcs.xml ./
 RUN composer install --no-progress --no-interaction --optimize-autoloader && \
     composer clearcache
 

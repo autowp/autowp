@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8e310287e7b5791b71d3b30b4c4e8674",
+    "content-hash": "a887b368f901fd5fbf3168e009230949",
     "packages": [
         {
             "name": "autowp/cron",
@@ -274,16 +274,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.193.3",
+            "version": "3.193.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "eec653425d08850d6becfd1653c9443c8b003991"
+                "reference": "758c2225c484088b2118c4e3ff5b37ccfea3948f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/eec653425d08850d6becfd1653c9443c8b003991",
-                "reference": "eec653425d08850d6becfd1653c9443c8b003991",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/758c2225c484088b2118c4e3ff5b37ccfea3948f",
+                "reference": "758c2225c484088b2118c4e3ff5b37ccfea3948f",
                 "shasum": ""
             },
             "require": {
@@ -359,9 +359,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.193.3"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.193.4"
             },
-            "time": "2021-09-13T18:16:41+00:00"
+            "time": "2021-09-14T18:19:00+00:00"
         },
         {
             "name": "brick/varexporter",
@@ -3764,24 +3764,23 @@
         },
         {
             "name": "laminas/laminas-i18n-resources",
-            "version": "2.7.0",
+            "version": "2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-i18n-resources.git",
-                "reference": "fc0211052aa7576bc960b30194c87f6f60a0089c"
+                "reference": "7d7062849064bb89e7cdd7193c43ef95e95fbe4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-i18n-resources/zipball/fc0211052aa7576bc960b30194c87f6f60a0089c",
-                "reference": "fc0211052aa7576bc960b30194c87f6f60a0089c",
+                "url": "https://api.github.com/repos/laminas/laminas-i18n-resources/zipball/7d7062849064bb89e7cdd7193c43ef95e95fbe4b",
+                "reference": "7d7062849064bb89e7cdd7193c43ef95e95fbe4b",
                 "shasum": ""
             },
             "require": {
-                "laminas/laminas-zendframework-bridge": "^1.0",
-                "php": "^7.3 || ~8.0.0"
+                "php": "^7.3 || ~8.0.0 || ~8.1.0"
             },
-            "replace": {
-                "zendframework/zend-i18n-resources": "^2.6.1"
+            "conflict": {
+                "zendframework/zend-i18n-resources": "*"
             },
             "require-dev": {
                 "laminas/laminas-coding-standard": "~1.0.0",
@@ -3818,7 +3817,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2021-04-15T13:39:19+00:00"
+            "time": "2021-09-14T04:16:52+00:00"
         },
         {
             "name": "laminas/laminas-inputfilter",
@@ -4780,46 +4779,43 @@
         },
         {
             "name": "laminas/laminas-servicemanager",
-            "version": "3.7.0",
+            "version": "3.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-servicemanager.git",
-                "reference": "2b0aee477fdbd3191af7c302b93dbc5fda0626f4"
+                "reference": "499a6ea14d9f7465df331112cade42ad1241f154"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-servicemanager/zipball/2b0aee477fdbd3191af7c302b93dbc5fda0626f4",
-                "reference": "2b0aee477fdbd3191af7c302b93dbc5fda0626f4",
+                "url": "https://api.github.com/repos/laminas/laminas-servicemanager/zipball/499a6ea14d9f7465df331112cade42ad1241f154",
+                "reference": "499a6ea14d9f7465df331112cade42ad1241f154",
                 "shasum": ""
             },
             "require": {
                 "container-interop/container-interop": "^1.2",
                 "laminas/laminas-stdlib": "^3.2.1",
-                "laminas/laminas-zendframework-bridge": "^1.0",
-                "php": "^7.3 || ~8.0.0",
+                "php": "~7.4.0 || ~8.0.0 || ~8.1.0",
                 "psr/container": "^1.0"
             },
             "conflict": {
                 "laminas/laminas-code": "<3.3.1",
-                "zendframework/zend-code": "<3.3.1"
+                "zendframework/zend-code": "<3.3.1",
+                "zendframework/zend-servicemanager": "*"
             },
             "provide": {
                 "container-interop/container-interop-implementation": "^1.2",
                 "psr/container-implementation": "^1.0"
             },
-            "replace": {
-                "zendframework/zend-servicemanager": "^3.4.0"
-            },
             "require-dev": {
                 "composer/package-versions-deprecated": "^1.0",
-                "laminas/laminas-coding-standard": "~2.2.0",
+                "laminas/laminas-coding-standard": "~2.2.1",
                 "laminas/laminas-container-config-test": "^0.3",
                 "laminas/laminas-dependency-plugin": "^2.1.2",
-                "mikey179/vfsstream": "^1.6.8",
-                "ocramius/proxy-manager": "^2.2.3",
-                "phpbench/phpbench": "^1.0.4",
+                "mikey179/vfsstream": "^1.6.10@alpha",
+                "ocramius/proxy-manager": "^2.11",
+                "phpbench/phpbench": "^1.1",
                 "phpspec/prophecy-phpunit": "^2.0",
-                "phpunit/phpunit": "^9.4",
+                "phpunit/phpunit": "^9.5.5",
                 "psalm/plugin-phpunit": "^0.16.1",
                 "vimeo/psalm": "^4.8"
             },
@@ -4865,7 +4861,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2021-07-24T19:33:07+00:00"
+            "time": "2021-09-14T03:43:26+00:00"
         },
         {
             "name": "laminas/laminas-stdlib",
