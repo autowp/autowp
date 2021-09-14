@@ -2,36 +2,40 @@
 
 declare(strict_types=1);
 
-namespace Application\Controller\Console\Service;
+namespace Application\Command;
 
-use Application\Controller\Console\CatalogueController;
 use Application\HostManager;
-use Application\Model\Item;
-use Application\Model\ItemParent;
+use Application\Model\Log;
 use Application\Model\Picture;
+use Application\PictureNameFormatter;
 use Application\Service\TelegramService;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class CatalogueControllerFactory implements FactoryInterface
+class CatalogueAcceptOldUnsortedCommandFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): CatalogueController
-    {
-        return new CatalogueController(
-            $container->get(ItemParent::class),
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        ?array $options = null
+    ): CatalogueAcceptOldUnsortedCommand {
+        return new CatalogueAcceptOldUnsortedCommand(
+            'catalogue-accept-old-unsorted',
             $container->get(HostManager::class),
             $container->get(TelegramService::class),
             $container->get(MessageService::class),
-            $container->get(Item::class),
             $container->get(Picture::class),
-            $container->get(User::class)
+            $container->get(User::class),
+            $container->get('MvcTranslator'),
+            $container->get(Log::class),
+            $container->get(PictureNameFormatter::class)
         );
     }
 }

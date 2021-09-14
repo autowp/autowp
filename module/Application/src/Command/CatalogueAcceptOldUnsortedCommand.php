@@ -1,16 +1,19 @@
 <?php
 
-namespace Application\Controller\Console;
+namespace Application\Command;
 
-use Application\Controller\Plugin\Pic;
 use Application\HostManager;
-use Application\Model\Item;
-use Application\Model\ItemParent;
+use Application\Model\Log;
 use Application\Model\Picture;
+use Application\PictureNameFormatter;
 use Application\Service\TelegramService;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
-use Laminas\Mvc\Controller\AbstractActionController;
+use Exception;
+use Laminas\I18n\Translator\TranslatorInterface;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function htmlspecialchars;
 use function sleep;
@@ -19,19 +22,9 @@ use function urlencode;
 
 use const PHP_EOL;
 
-/**
- * @method Pic pic()
- * @method void log(string $message, array $objects)
- * @method string language()
- * @method string translate(string $message, string $textDomain = 'default', $locale = null)
- */
-class CatalogueController extends AbstractActionController
+class CatalogueAcceptOldUnsortedCommand extends Command
 {
-    private ItemParent $itemParent;
-
     private MessageService $message;
-
-    private Item $itemModel;
 
     private Picture $picture;
 
@@ -41,32 +34,47 @@ class CatalogueController extends AbstractActionController
 
     private TelegramService $telegram;
 
+    private TranslatorInterface $translator;
+
+    private Log $log;
+
+    private PictureNameFormatter $pictureNameFormatter;
+
+    /** @var string|null The default command name */
+    protected static $defaultName = 'catalogue-accept-old-unsorted';
+
+    protected function configure(): void
+    {
+        $this->setName(self::$defaultName);
+    }
+
     public function __construct(
-        ItemParent $itemParent,
+        string $name,
         HostManager $hostManager,
         TelegramService $telegram,
         MessageService $message,
-        Item $itemModel,
         Picture $picture,
-        User $userModel
+        User $userModel,
+        TranslatorInterface $translator,
+        Log $log,
+        PictureNameFormatter $pictureNameFormatter
     ) {
-        $this->itemParent  = $itemParent;
-        $this->hostManager = $hostManager;
-        $this->telegram    = $telegram;
-        $this->message     = $message;
-        $this->itemModel   = $itemModel;
-        $this->picture     = $picture;
-        $this->userModel   = $userModel;
+        parent::__construct($name);
+
+        $this->hostManager          = $hostManager;
+        $this->telegram             = $telegram;
+        $this->message              = $message;
+        $this->picture              = $picture;
+        $this->userModel            = $userModel;
+        $this->translator           = $translator;
+        $this->log                  = $log;
+        $this->pictureNameFormatter = $pictureNameFormatter;
     }
 
-    public function refreshBrandVehicleAction(): string
-    {
-        $this->itemParent->refreshAllAuto();
-
-        return "done\n";
-    }
-
-    public function acceptOldUnsortedAction(): string
+    /**
+     * @throws Exception
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $select = $this->picture->getTable()->getSql()->select();
         $select
@@ -95,7 +103,7 @@ class CatalogueController extends AbstractActionController
                     $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
 
                     $message = sprintf(
-                        $this->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
+                        $this->translator->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
                         $uri->toString()
                     );
 
@@ -106,7 +114,7 @@ class CatalogueController extends AbstractActionController
             }
 
             if ($previousStatusUserId !== $userId) {
-                $prevUser = $this->userModel->getRow((int) $previousStatusUserId);
+                $prevUser = $this->userModel->getRow($previousStatusUserId);
                 if ($prevUser) {
                     $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
 
@@ -120,9 +128,17 @@ class CatalogueController extends AbstractActionController
                 }
             }
 
-            $this->log(sprintf(
+            $language = 'en';
+
+            $names = $this->picture->getNameData([$picture], [
+                'language' => $language,
+                'large'    => true,
+            ]);
+            $name  = $names[$picture['id']];
+
+            $this->log->addEvent(9, sprintf(
                 'Картинка %s принята',
-                htmlspecialchars($this->pic()->name($picture, $this->language()))
+                htmlspecialchars($this->pictureNameFormatter->format($name, $language))
             ), [
                 'pictures' => $picture['id'],
             ]);
@@ -130,25 +146,6 @@ class CatalogueController extends AbstractActionController
             sleep(20);
         }
 
-        return "done\n";
-    }
-
-    public function rebuildCarOrderCacheAction(): string
-    {
-        $paginator = $this->itemModel->getPaginator([
-            'columns' => ['id'],
-        ]);
-        $paginator->setItemCountPerPage(100);
-
-        $pagesCount = $paginator->count();
-        for ($i = 1; $i <= $pagesCount; $i++) {
-            $paginator->setCurrentPageNumber($i);
-            foreach ($paginator->getCurrentItems() as $item) {
-                print $item['id'] . "\n";
-                $this->itemModel->updateOrderCache($item['id']);
-            }
-        }
-
-        return "ok\n";
+        return 0;
     }
 }

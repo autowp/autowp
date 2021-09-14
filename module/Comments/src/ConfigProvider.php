@@ -11,37 +11,19 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'console'      => $this->getConsoleConfig(),
-            'controllers'  => $this->getControllersConfig(),
+            'laminas-cli'  => $this->getCliConfig(),
             'dependencies' => $this->getDependencyConfig(),
             'forms'        => $this->getFormsConfig(),
             'tables'       => $this->getTablesConfig(),
         ];
     }
 
-    public function getConsoleConfig(): array
+    public function getCliConfig(): array
     {
         return [
-            'router' => [
-                'routes' => [
-                    'comments' => [
-                        'options' => [
-                            'route'    => 'comments (refresh-replies-count|cleanup-deleted):action',
-                            'defaults' => [
-                                'controller' => Controller\ConsoleController::class,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    public function getControllersConfig(): array
-    {
-        return [
-            'factories' => [
-                Controller\ConsoleController::class => Controller\ConsoleControllerFactory::class,
+            'commands' => [
+                'comments:cleanup-deleted'       => Command\CleanupDeletedCommand::class,
+                'comments:refresh-replies-count' => Command\RefreshRepliesCountCommand::class,
             ],
         ];
     }
@@ -53,7 +35,9 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                CommentsService::class => CommentsServiceFactory::class,
+                CommentsService::class                    => CommentsServiceFactory::class,
+                Command\CleanupDeletedCommand::class      => Command\CleanupDeletedCommandFactory::class,
+                Command\RefreshRepliesCountCommand::class => Command\RefreshRepliesCountCommandFactory::class,
             ],
         ];
     }

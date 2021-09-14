@@ -1,16 +1,18 @@
 <?php
 
-namespace Application\Controller\Console;
+namespace Application\Command;
 
 use Application\Model\Brand;
 use Autowp\Image\Storage;
 use Aws\S3\S3Client;
-use Laminas\Mvc\Controller\AbstractActionController;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function array_rand;
 use function is_array;
 
-class BuildController extends AbstractActionController
+class BuildBrandsSpriteCommand extends Command
 {
     private Brand $brand;
 
@@ -18,14 +20,24 @@ class BuildController extends AbstractActionController
 
     private Storage $imageStorage;
 
-    public function __construct(Brand $brand, array $fileStorageConfig, Storage $imageStorage)
+    /** @var string|null The default command name */
+    protected static $defaultName = 'build-brands-sprite';
+
+    protected function configure(): void
     {
+        $this->setName(self::$defaultName);
+    }
+
+    public function __construct(string $name, Brand $brand, array $fileStorageConfig, Storage $imageStorage)
+    {
+        parent::__construct($name);
+
         $this->brand             = $brand;
         $this->fileStorageConfig = $fileStorageConfig;
         $this->imageStorage      = $imageStorage;
     }
 
-    public function brandsSpriteAction(): string
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // pick random endpoint
         $s3Config = $this->fileStorageConfig['s3'];
@@ -40,6 +52,6 @@ class BuildController extends AbstractActionController
             $this->fileStorageConfig['bucket']
         );
 
-        return "done\n";
+        return 0;
     }
 }
