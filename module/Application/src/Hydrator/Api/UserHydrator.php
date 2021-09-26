@@ -9,6 +9,7 @@ use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
 use Casbin\Enforcer;
+use Casbin\Exceptions\CasbinException;
 use DateInterval;
 use DateTime;
 use Exception;
@@ -102,7 +103,7 @@ class UserHydrator extends AbstractRestHydrator
             $user = [
                 'id'       => null,
                 'name'     => null,
-                'deleted'  => $deleted,
+                'deleted'  => true,
                 'url'      => null,
                 'longAway' => false,
                 'green'    => false,
@@ -125,7 +126,7 @@ class UserHydrator extends AbstractRestHydrator
             $user = [
                 'id'        => (int) $object['id'],
                 'name'      => $object['name'],
-                'deleted'   => $deleted,
+                'deleted'   => false,
                 'route'     => ['/users', $object['identity'] ? $object['identity'] : 'user' . $object['id']],
                 'long_away' => $longAway,
                 'green'     => $isGreen,
@@ -263,6 +264,10 @@ class UserHydrator extends AbstractRestHydrator
         return $user;
     }
 
+    /**
+     * @throws CasbinException
+     * @throws Exception
+     */
     private function isModer(): bool
     {
         $role = $this->getUserRole();
@@ -293,6 +298,9 @@ class UserHydrator extends AbstractRestHydrator
         return $this;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getUserRole(): ?string
     {
         if (! $this->userId) {

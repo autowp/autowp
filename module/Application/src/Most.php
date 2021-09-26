@@ -38,6 +38,9 @@ class Most
         $this->setOptions($options);
     }
 
+    /**
+     * @throws Exception
+     */
     public function setOptions(array $options): void
     {
         foreach ($options as $key => $value) {

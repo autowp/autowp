@@ -7,6 +7,8 @@ use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\User\Model\User;
+use Exception;
+use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractActionController;
@@ -50,6 +52,10 @@ class RatingController extends AbstractActionController
         $this->userHydrator = $userHydrator;
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function specsAction(): JsonModel
     {
         $rows = $this->userModel->getRows([
@@ -113,6 +119,10 @@ class RatingController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function picturesAction(): JsonModel
     {
         $rows = $this->userModel->getRows([
@@ -169,6 +179,9 @@ class RatingController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function likesAction(): JsonModel
     {
         $this->userHydrator->setOptions([
@@ -190,6 +203,9 @@ class RatingController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function pictureLikesAction(): JsonModel
     {
         $this->userHydrator->setOptions([

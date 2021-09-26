@@ -4,6 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Model\PictureVote;
 use Autowp\User\Controller\Plugin\User;
+use Exception;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
@@ -25,8 +26,9 @@ class PictureVoteController extends AbstractRestfulController
     /**
      * Update an existing resource
      *
-     * @param  mixed $id
-     * @param  mixed $data
+     * @param mixed $id
+     * @param mixed $data
+     * @throws Exception
      */
     public function update($id, $data): ViewModel
     {

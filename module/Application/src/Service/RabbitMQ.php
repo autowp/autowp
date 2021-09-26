@@ -27,6 +27,9 @@ class RabbitMQ
         $this->config = $config;
     }
 
+    /**
+     * @throws Exception
+     */
     public function connect(): void
     {
         if (isset($this->connection)) {
@@ -60,6 +63,9 @@ class RabbitMQ
         $this->connection = $connection;
     }
 
+    /**
+     * @throws Exception
+     */
     public function disconnect(): void
     {
         $this->channels = [];
@@ -70,6 +76,9 @@ class RabbitMQ
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function getChannel(string $queue): AMQPChannel
     {
         if (isset($this->channels[$queue])) {
@@ -88,6 +97,9 @@ class RabbitMQ
         return $channel;
     }
 
+    /**
+     * @throws Exception
+     */
     public function send(string $queue, string $body): void
     {
         $message = new AMQPMessage($body, [
@@ -99,6 +111,7 @@ class RabbitMQ
 
     /**
      * @throws ErrorException
+     * @throws Exception
      */
     public function consume(string $queue, int $timeout, callable $callback): void
     {

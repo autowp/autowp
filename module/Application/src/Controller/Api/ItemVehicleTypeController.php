@@ -49,7 +49,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
         /** @var Adapter $adapter */
         $adapter   = $this->vehicleType->getItemTable()->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator

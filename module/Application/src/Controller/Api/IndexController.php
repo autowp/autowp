@@ -15,6 +15,8 @@ use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
+use Exception;
+use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\Http\PhpEnvironment\Request;
@@ -78,6 +80,10 @@ class IndexController extends AbstractRestfulController
         $this->userHydrator = $userHydrator;
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function brandsAction(): JsonModel
     {
         $language = $this->language();
@@ -100,6 +106,10 @@ class IndexController extends AbstractRestfulController
         return new JsonModel($brands);
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function personsContentAction(): JsonModel
     {
         $language = $this->language();
@@ -128,6 +138,10 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function personsAuthorAction(): JsonModel
     {
         $language = $this->language();
@@ -156,6 +170,9 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     public function categoriesAction(): JsonModel
     {
         $language = $this->language();
@@ -175,6 +192,9 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     public function factoriesAction(): JsonModel
     {
         $cacheKey  = 'API_INDEX_FACTORIES_2';
@@ -225,6 +245,10 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function twinsAction(): JsonModel
     {
         $language = $this->language();
@@ -249,6 +273,10 @@ class IndexController extends AbstractRestfulController
         return new JsonModel($twinsBlock);
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function specItemsAction(): JsonModel
     {
         $language = $this->language();
@@ -336,6 +364,10 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function itemOfDayAction(): JsonModel
     {
         $language = $this->language();

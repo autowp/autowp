@@ -37,8 +37,7 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\InputFilter\InputFilterPluginManager;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\Paginator\Adapter\DbSelect;
-use Laminas\Paginator\Paginator;
+use Laminas\Paginator;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
@@ -157,10 +156,7 @@ class ItemController extends AbstractRestfulController
         return $this->collators[$language];
     }
 
-    /**
-     * @return int
-     */
-    private function compareName(string $a, string $b, string $language)
+    private function compareName(string $a, string $b, string $language): int
     {
         $coll = $this->getCollator($language);
         switch ($language) {
@@ -264,7 +260,7 @@ class ItemController extends AbstractRestfulController
 
         $parentId = null;
         foreach ($breadcrumbs as $idx => $item) {
-            if ((int) $idx === count($breadcrumbs) - 1) {
+            if ($idx === count($breadcrumbs) - 1) {
                 $fields['description'] = true;
                 $this->hydrator->setFields($fields);
             }
@@ -800,9 +796,9 @@ class ItemController extends AbstractRestfulController
 
         /** @var Adapter $adapter */
         $adapter   = $this->itemModel->getTable()->getAdapter();
-        $paginator = new Paginator(new DbSelect($select, $adapter));
+        $paginator = new Paginator\Paginator(new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter));
 
-        $limit = $data['limit'] ? $data['limit'] : 1;
+        $limit = $data['limit'] ?: 1;
 
         $paginator
             ->setItemCountPerPage($limit)
@@ -1282,7 +1278,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('full_name', $values)) {
-            $set['full_name'] = $values['full_name'] ? $values['full_name'] : null;
+            $set['full_name'] = $values['full_name'] ?: null;
         }
 
         if (array_key_exists('body', $values)) {
@@ -1290,15 +1286,15 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('begin_year', $values)) {
-            $set['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
+            $set['begin_year'] = $values['begin_year'] ?: null;
         }
 
         if (array_key_exists('begin_month', $values)) {
-            $set['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
+            $set['begin_month'] = $values['begin_month'] ?: null;
         }
 
         if (array_key_exists('end_year', $values)) {
-            $endYear         = $values['end_year'] ? $values['end_year'] : null;
+            $endYear         = $values['end_year'] ?: null;
             $set['end_year'] = $endYear;
 
             if ($endYear) {
@@ -1309,7 +1305,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('end_month', $values)) {
-            $set['end_month'] = $values['end_month'] ? $values['end_month'] : null;
+            $set['end_month'] = $values['end_month'] ?: null;
         }
 
         if (array_key_exists('today', $values)) {
@@ -1321,23 +1317,19 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('begin_model_year', $values)) {
-            $set['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
+            $set['begin_model_year'] = $values['begin_model_year'] ?: null;
         }
 
         if (array_key_exists('end_model_year', $values)) {
-            $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
+            $set['end_model_year'] = $values['end_model_year'] ?: null;
         }
 
         if (array_key_exists('begin_model_year_fraction', $values)) {
-            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction']
-                ? $values['begin_model_year_fraction']
-                : null;
+            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction'] ?: null;
         }
 
         if (array_key_exists('end_model_year_fraction', $values)) {
-            $set['end_model_year_fraction'] = $values['end_model_year_fraction']
-                ? $values['end_model_year_fraction']
-                : null;
+            $set['end_model_year_fraction'] = $values['end_model_year_fraction'] ?: null;
         }
 
         if (array_key_exists('is_concept', $values)) {
@@ -1508,7 +1500,7 @@ class ItemController extends AbstractRestfulController
         if (array_key_exists('full_name', $values)) {
             $notifyMeta       = true;
             $subscribe        = true;
-            $set['full_name'] = $values['full_name'] ? $values['full_name'] : null;
+            $set['full_name'] = $values['full_name'] ?: null;
         }
 
         if (array_key_exists('body', $values)) {
@@ -1519,19 +1511,19 @@ class ItemController extends AbstractRestfulController
         if (array_key_exists('begin_year', $values)) {
             $notifyMeta        = true;
             $subscribe         = true;
-            $set['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
+            $set['begin_year'] = $values['begin_year'] ?: null;
         }
 
         if (array_key_exists('begin_month', $values)) {
             $notifyMeta         = true;
             $subscribe          = true;
-            $set['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
+            $set['begin_month'] = $values['begin_month'] ?: null;
         }
 
         if (array_key_exists('end_year', $values)) {
             $notifyMeta      = true;
             $subscribe       = true;
-            $endYear         = $values['end_year'] ? $values['end_year'] : null;
+            $endYear         = $values['end_year'] ?: null;
             $set['end_year'] = $endYear;
 
             if ($endYear && $endYear < date('Y')) {
@@ -1542,7 +1534,7 @@ class ItemController extends AbstractRestfulController
         if (array_key_exists('end_month', $values)) {
             $notifyMeta       = true;
             $subscribe        = true;
-            $set['end_month'] = $values['end_month'] ? $values['end_month'] : null;
+            $set['end_month'] = $values['end_month'] ?: null;
         }
 
         if (array_key_exists('today', $values)) {
@@ -1561,29 +1553,25 @@ class ItemController extends AbstractRestfulController
         if (array_key_exists('begin_model_year', $values)) {
             $notifyMeta              = true;
             $subscribe               = true;
-            $set['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
+            $set['begin_model_year'] = $values['begin_model_year'] ?: null;
         }
 
         if (array_key_exists('end_model_year', $values)) {
             $notifyMeta            = true;
             $subscribe             = true;
-            $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
+            $set['end_model_year'] = $values['end_model_year'] ?: null;
         }
 
         if (array_key_exists('begin_model_year_fraction', $values)) {
             $notifyMeta                       = true;
             $subscribe                        = true;
-            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction']
-                ? $values['begin_model_year_fraction']
-                : null;
+            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction'] ?: null;
         }
 
         if (array_key_exists('end_model_year_fraction', $values)) {
             $notifyMeta                     = true;
             $subscribe                      = true;
-            $set['end_model_year_fraction'] = $values['end_model_year_fraction']
-                ? $values['end_model_year_fraction']
-                : null;
+            $set['end_model_year_fraction'] = $values['end_model_year_fraction'] ?: null;
         }
 
         if (array_key_exists('is_concept', $values)) {
@@ -1873,6 +1861,7 @@ class ItemController extends AbstractRestfulController
     /**
      * @param array|ArrayAccess $oldData
      * @param array|ArrayAccess $newData
+     * @throws Exception
      */
     private function buildChangesMessage($oldData, $newData, string $language): array
     {
@@ -1951,6 +1940,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function getLogoAction()
     {
@@ -1974,6 +1964,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function postLogoAction()
     {
@@ -2040,7 +2031,7 @@ class ItemController extends AbstractRestfulController
             'id'     => (int) $car['id'],
             'name'   => $this->car()->formatName($car, $this->language()),
             'childs' => [],
-            'type'   => $parentType ? $parentType : null,
+            'type'   => $parentType ?: null,
         ];
 
         $table = $this->itemParent->getTable();
@@ -2064,6 +2055,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function treeAction()
     {
@@ -2083,6 +2075,7 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function refreshInheritanceAction()
     {

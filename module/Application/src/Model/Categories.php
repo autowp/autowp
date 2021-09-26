@@ -95,8 +95,8 @@ class Categories
             $category = [
                 'id'             => (int) $item['id'],
                 'catname'        => $item['catname'],
-                'name'           => $langName ? $langName : $item['name'],
-                'short_name'     => $langName ? $langName : $item['name'],
+                'name'           => $langName ?: $item['name'],
+                'short_name'     => $langName ?: $item['name'],
                 'cars_count'     => $item['cars_count'],
                 'new_cars_count' => $item['new_cars_count'],
             ];

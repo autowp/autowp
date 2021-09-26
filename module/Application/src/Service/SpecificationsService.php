@@ -2379,7 +2379,7 @@ class SpecificationsService
         /** @var Adapter $adapter */
         $adapter   = $this->valueTable->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator

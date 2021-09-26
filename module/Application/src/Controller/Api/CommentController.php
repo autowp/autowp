@@ -114,6 +114,7 @@ class CommentController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function subscribeAction()
     {
@@ -150,6 +151,7 @@ class CommentController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function indexAction()
     {
@@ -296,6 +298,9 @@ class CommentController extends AbstractRestfulController
         return new JsonModel($result);
     }
 
+    /**
+     * @throws Exception
+     */
     private function nextMessageTime(): ?DateTime
     {
         $user = $this->user()->get();
@@ -306,6 +311,9 @@ class CommentController extends AbstractRestfulController
         return $this->userModel->getNextMessageTime($user['id']);
     }
 
+    /**
+     * @throws Exception
+     */
     private function needWait(): bool
     {
         $nextMessageTime = $this->nextMessageTime();
@@ -441,7 +449,7 @@ class CommentController extends AbstractRestfulController
             $authorId = $this->comments->service()->getMessageAuthorId($data['parent_id']);
             if ($authorId && ($authorId !== (int) $currentUser['id'])) {
                 $parentMessageAuthor = currentFromResultSetInterface(
-                    $this->userModel->getTable()->select(['id' => (int) $authorId])
+                    $this->userModel->getTable()->select(['id' => $authorId])
                 );
                 if ($parentMessageAuthor && ! $parentMessageAuthor['deleted']) {
                     $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor['language']);
@@ -478,6 +486,7 @@ class CommentController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function putAction()
     {
@@ -584,6 +593,7 @@ class CommentController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function getAction()
     {

@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\ItemParent;
 use Autowp\User\Controller\Plugin\User;
+use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
@@ -73,6 +74,7 @@ class ItemParentLanguageController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function getAction()
     {
@@ -95,6 +97,7 @@ class ItemParentLanguageController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function putAction()
     {

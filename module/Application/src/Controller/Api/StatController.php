@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\User\Controller\Plugin\User;
+use Exception;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Stdlib\ResponseInterface;
@@ -29,6 +30,7 @@ class StatController extends AbstractActionController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function globalSummaryAction()
     {

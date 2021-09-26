@@ -80,7 +80,7 @@ class Catalogue
         $breakOnFirst = (bool) $options['breakOnFirst'];
         $stockFirst   = (bool) $options['stockFirst'];
         if (isset($options['toBrand'])) {
-            $toBrand   = is_bool($options['toBrand']) ? $options['toBrand'] : true;
+            $toBrand   = ! is_bool($options['toBrand']) || $options['toBrand'];
             $toBrandId = is_bool($options['toBrand']) ? null : (int) $options['toBrand'];
         } else {
             $toBrand   = true;

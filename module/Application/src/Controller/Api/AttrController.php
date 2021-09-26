@@ -228,11 +228,11 @@ class AttrController extends AbstractRestfulController
         /** @var Adapter $adapter */
         $adapter   = $this->userValueTable->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator
-            ->setItemCountPerPage($values['limit'] ? $values['limit'] : 30)
+            ->setItemCountPerPage($values['limit'] ?: 30)
             ->setPageRange(20)
             ->setCurrentPageNumber($values['page']);
 
@@ -254,6 +254,7 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function userValueItemDeleteAction()
     {
@@ -274,6 +275,7 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function userValuePatchAction()
     {
@@ -355,7 +357,7 @@ class AttrController extends AbstractRestfulController
                     }
 
                     foreach ($eDataRows as $eDataRow) {
-                        // check for data row existance
+                        // check for data row existence
                         $filter = $dstPrimaryKey;
                         if ($attrRow['multiple']) {
                             $filter['ordering'] = $eDataRow['ordering'];
@@ -407,6 +409,7 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function attributePostAction()
     {
@@ -598,7 +601,7 @@ class AttrController extends AbstractRestfulController
         /** @var Adapter $adapter */
         $adapter   = $this->userValueTable->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -640,6 +643,7 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function attributeItemPatchAction()
     {
@@ -684,7 +688,7 @@ class AttrController extends AbstractRestfulController
         }
 
         if (isset($values['type_id'])) {
-            $set['type_id'] = $values['type_id'] ? $values['type_id'] : null;
+            $set['type_id'] = $values['type_id'] ?: null;
         }
 
         if (isset($values['description'])) {
@@ -692,7 +696,7 @@ class AttrController extends AbstractRestfulController
         }
 
         if (isset($values['unit_id'])) {
-            $set['unit_id'] = $values['unit_id'] ? $values['unit_id'] : null;
+            $set['unit_id'] = $values['unit_id'] ?: null;
         }
 
         if (isset($values['precision'])) {
@@ -799,6 +803,7 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function zoneAttributePostAction()
     {
@@ -943,6 +948,7 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function listOptionPostAction()
     {

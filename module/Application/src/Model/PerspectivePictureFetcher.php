@@ -89,9 +89,7 @@ class PerspectivePictureFetcher
             )
             ->where([
                 'pictures.status'   => Picture::STATUS_ACCEPTED,
-                'picture_item.type' => $this->pictureItemTypeId
-                    ? $this->pictureItemTypeId
-                    : PictureItem::PICTURE_CONTENT,
+                'picture_item.type' => $this->pictureItemTypeId ?: PictureItem::PICTURE_CONTENT,
             ])
             ->limit($options['limit']);
 
@@ -236,7 +234,6 @@ class PerspectivePictureFetcher
 
         $totalPictures = isset($options['totalPictures']) ? (int) $options['totalPictures'] : null;
 
-        $pPageId        = null;
         $useLargeFormat = false;
         if ($this->perspectivePageId) {
             $pPageId = $this->perspectivePageId;
@@ -295,7 +292,7 @@ class PerspectivePictureFetcher
 
         $result        = [];
         $emptyPictures = 0;
-        foreach ($pictures as $idx => $picture) {
+        foreach ($pictures as $picture) {
             if ($picture) {
                 $result[] = [
                     'row' => $picture,

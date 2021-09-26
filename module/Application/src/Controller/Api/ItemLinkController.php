@@ -4,6 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\User\Controller\Plugin\User;
+use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\TableGateway\TableGateway;
@@ -80,6 +81,7 @@ class ItemLinkController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function getAction()
     {
@@ -100,6 +102,7 @@ class ItemLinkController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function putAction()
     {
@@ -205,6 +208,7 @@ class ItemLinkController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function deleteAction()
     {

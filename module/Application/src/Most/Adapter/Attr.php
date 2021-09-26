@@ -30,7 +30,7 @@ class Attr extends AbstractAdapter
     {
         $attribute = currentFromResultSetInterface($this->attributeTable->select(['id' => $this->attribute]));
         if (! $attribute) {
-            throw new Exception("Attribute '{$this->attribute}' not found");
+            throw new Exception("Attribute '$this->attribute' not found");
         }
 
         $specService = $this->most->getSpecs();

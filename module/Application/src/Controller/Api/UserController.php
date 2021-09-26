@@ -8,6 +8,7 @@ use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Casbin\Enforcer;
+use Casbin\Exceptions\CasbinException;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -84,6 +85,7 @@ class UserController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function indexAction()
     {
@@ -141,6 +143,7 @@ class UserController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function itemAction()
     {
@@ -279,6 +282,7 @@ class UserController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function deletePhotoAction()
     {
@@ -325,6 +329,10 @@ class UserController extends AbstractRestfulController
         return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
+    /**
+     * @throws CasbinException
+     * @throws Exception
+     */
     public function onlineAction(): JsonModel
     {
         $rows = $this->userModel->getRows([
@@ -339,7 +347,7 @@ class UserController extends AbstractRestfulController
                 $result[] = [
                     'id'       => null,
                     'name'     => null,
-                    'deleted'  => $deleted,
+                    'deleted'  => true,
                     'url'      => null,
                     'longAway' => false,
                     'green'    => false,
@@ -362,7 +370,7 @@ class UserController extends AbstractRestfulController
                 $result[] = [
                     'id'        => $row['id'],
                     'name'      => $row['name'],
-                    'deleted'   => $deleted,
+                    'deleted'   => false,
                     'url'       => '/users/' . ($row['identity'] ? $row['identity'] : 'user' . $row['id']),
                     'long_away' => $longAway,
                     'green'     => $isGreen,
@@ -378,6 +386,7 @@ class UserController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function postPhotoAction()
     {

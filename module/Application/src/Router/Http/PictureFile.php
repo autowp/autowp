@@ -22,7 +22,7 @@ class PictureFile implements RouteInterface
 {
     private const URI_DELIMITER = '/';
 
-    private array $defaults = [];
+    private array $defaults;
 
     /**
      * Create a new route with given options.
@@ -71,6 +71,9 @@ class PictureFile implements RouteInterface
         return new RouteMatch(array_replace($this->defaults, $variables), $length);
     }
 
+    /**
+     * @throws Exception
+     */
     public function assemble(array $params = [], array $options = []): string
     {
         $data = array_replace($this->defaults, $params);

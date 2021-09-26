@@ -89,6 +89,7 @@ class PageController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function itemAction()
     {
@@ -348,6 +349,9 @@ class PageController extends AbstractRestfulController
         return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
+    /**
+     * @throws Exception
+     */
     public function parentsAction(): JsonModel
     {
         $result = [];

@@ -135,7 +135,7 @@ class Brand
                 'catname'        => $brandRow['catname'],
                 'name'           => $brandRow['name'],
                 'cars_count'     => (int) $brandRow['cars_count'],
-                'new_cars_count' => (int) $newCarsCount,
+                'new_cars_count' => $newCarsCount,
             ];
         }
 
@@ -157,6 +157,9 @@ class Brand
         return $number;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getFullBrandsList(string $language): array
     {
         $select = new Sql\Select(['ipc_all' => 'item_parent_cache']);
@@ -272,9 +275,7 @@ class Brand
         }
         unset($line);
 
-        $result = array_values($result);
-
-        return $result;
+        return array_values($result);
     }
 
     /**
@@ -443,7 +444,7 @@ class Brand
 
         $cmd = sprintf(
             'montage ' . implode(' ', $images) . ' -background %s -geometry +1+1 -tile %dx %s',
-            escapeshellarg($background ? $background : 'none'),
+            escapeshellarg($background ?: 'none'),
             $width,
             escapeshellarg($destImg)
         );

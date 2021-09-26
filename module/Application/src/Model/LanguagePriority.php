@@ -47,13 +47,6 @@ class LanguagePriority
 
     public function getSelectItemName(string $language, Adapter $adapter): string
     {
-        $languages = $this->getList($language);
-
-        $quoted = [];
-        foreach ($languages as $lang) {
-            $quoted[] = $adapter->platform->quoteValue($lang);
-        }
-
         return '
             SELECT name
             FROM item_language

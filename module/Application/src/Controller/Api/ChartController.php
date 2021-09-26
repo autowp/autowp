@@ -3,6 +3,7 @@
 namespace Application\Controller\Api;
 
 use Application\Service\SpecificationsService;
+use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -92,6 +93,7 @@ class ChartController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function dataAction()
     {

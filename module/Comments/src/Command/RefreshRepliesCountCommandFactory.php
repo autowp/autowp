@@ -13,7 +13,7 @@ class RefreshRepliesCountCommandFactory implements FactoryInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string                $requestedName
-     * @param ?array<string, mixed> $options
+     * @param null|array $options
      */
     public function __invoke(
         ContainerInterface $container,

@@ -8,6 +8,7 @@ use Application\Service\SpecificationsService;
 use ArrayAccess;
 use Autowp\User\Model\User;
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use Laminas\Hydrator\Exception\InvalidArgumentException;
@@ -83,6 +84,7 @@ class AttrUserValueHydrator extends AbstractRestHydrator
 
     /**
      * @param array|ArrayAccess $object
+     * @throws Exception
      */
     public function extract($object): ?array
     {
@@ -93,7 +95,7 @@ class AttrUserValueHydrator extends AbstractRestHydrator
         }
 
         $result = [
-            'update_date'  => $updateDate ? $updateDate->format(DateTime::ISO8601) : null,
+            'update_date'  => $updateDate ? $updateDate->format(DateTimeInterface::ISO8601) : null,
             'item_id'      => (int) $object['item_id'],
             'attribute_id' => (int) $object['attribute_id'],
             'user_id'      => (int) $object['user_id'],

@@ -42,3 +42,6 @@ image-storage:
     credentials:
       key: "AKIAIOSFODNN7EXAMPLE"
       secret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  src-override:
+    host: localhost:9000
+    scheme: http

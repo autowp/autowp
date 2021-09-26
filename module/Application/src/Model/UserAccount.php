@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Exception;
 use Laminas\Db\TableGateway\TableGateway;
 
 use function Autowp\Commons\currentFromResultSetInterface;
@@ -16,6 +17,9 @@ class UserAccount
         $this->table = $table;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getServiceExternalId(int $userId, string $service): string
     {
         $row = currentFromResultSetInterface($this->table->select([
@@ -29,6 +33,9 @@ class UserAccount
         return $row['external_id'];
     }
 
+    /**
+     * @throws Exception
+     */
     public function getUserId(string $service, string $externalId): int
     {
         $row = currentFromResultSetInterface($this->table->select([
@@ -62,6 +69,9 @@ class UserAccount
         return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     public function haveAccountsForOtherServices(int $userId, int $id): bool
     {
         return (bool) currentFromResultSetInterface($this->table->select([

@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Exception;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
@@ -32,6 +33,9 @@ class PictureView
         $stmt->execute([$pictureId]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function get(int $pictureId): int
     {
         $row = currentFromResultSetInterface($this->table->select(['picture_id' => $pictureId]));

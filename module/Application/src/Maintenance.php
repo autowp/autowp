@@ -4,6 +4,7 @@ namespace Application;
 
 use Application\Service\PictureService;
 use Autowp\Cron;
+use Exception;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 
@@ -19,6 +20,9 @@ class Maintenance extends AbstractListenerAggregate
         $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_MIDNIGHT, [$this, 'midnight']);
     }
 
+    /**
+     * @throws Exception
+     */
     public function dailyMaintenance(Cron\CronEvent $event): void
     {
         print "Daily maintenance\n";
@@ -42,6 +46,9 @@ class Maintenance extends AbstractListenerAggregate
         print "Daily maintenance done\n";
     }
 
+    /**
+     * @throws Exception
+     */
     public function midnight(Cron\CronEvent $event): void
     {
         print "Midnight\n";

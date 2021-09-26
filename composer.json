@@ -54,7 +54,8 @@
 		"aws/aws-sdk-php": "^3.158",
 		"mjaschen/phpgeo": "^3.2",
 		"casbin/casbin": "^3.11.0",
-		"laminas/laminas-cli": "^1.1"
+		"laminas/laminas-cli": "^1.1",
+		"laminas/laminas-paginator-adapter-laminasdb": "^1.0"
 	},
 	"autoload" : {
 		"psr-4" : {

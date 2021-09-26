@@ -71,6 +71,7 @@ class PictureService
 
     /**
      * @throws Image\Storage\Exception
+     * @throws Exception
      */
     public function clearQueue(): void
     {
@@ -177,12 +178,12 @@ class PictureService
             'removing_date'      => null,
             'ip'                 => inet_pton($remoteAddr),
             'identity'           => $this->picture->generateIdentity(),
-            'replace_picture_id' => $replacePictureId ? $replacePictureId : null,
+            'replace_picture_id' => $replacePictureId ?: null,
         ]);
 
-        $pictureId = (int) $this->picture->getTable()->getLastInsertValue();
+        $pictureId = $this->picture->getTable()->getLastInsertValue();
 
-        $picture = $this->picture->getRow(['id' => (int) $pictureId]);
+        $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
             throw new Exception("Picture `$pictureId` not found");
         }

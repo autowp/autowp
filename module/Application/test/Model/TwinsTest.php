@@ -95,6 +95,7 @@ class TwinsTest extends AbstractHttpControllerTestCase
 
         $serviceManager = $this->getApplicationServiceLocator();
 
+        /** @var Twins $model */
         $model = $serviceManager->get(Twins::class);
 
         $groups = $model->getCarsGroups([$vehicle1Id, $vehicle2Id], 'en');

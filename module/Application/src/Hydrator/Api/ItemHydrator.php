@@ -19,6 +19,7 @@ use Autowp\Comments\Attention;
 use Autowp\Image\StorageInterface;
 use Autowp\User\Model\User;
 use Casbin\Enforcer;
+use Casbin\Exceptions\CasbinException;
 use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
@@ -78,7 +79,7 @@ class ItemHydrator extends AbstractRestHydrator
 
     private Comments $comments;
 
-    private int $mostsMinCarsCount = 1;
+    private int $mostsMinCarsCount;
 
     private int $routeBrandId = 0;
 
@@ -253,6 +254,9 @@ class ItemHydrator extends AbstractRestHydrator
         return $row ? (int) $row['count'] : 0;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getCataloguePath(int $id, array $options): array
     {
         if (! isset($this->cataloguePaths[$id])) {
@@ -264,6 +268,7 @@ class ItemHydrator extends AbstractRestHydrator
 
     /**
      * @return string[]|null
+     * @throws Exception
      */
     public function getDetailsRoute(int $itemId, array $options): ?array
     {
@@ -278,6 +283,7 @@ class ItemHydrator extends AbstractRestHydrator
 
     /**
      * @return string[]|null
+     * @throws Exception
      */
     public function getSpecificationsRoute(int $itemId): ?array
     {
@@ -813,14 +819,14 @@ class ItemHydrator extends AbstractRestHydrator
                 $value                               = (int) $object['begin_model_year'];
                 $result['begin_model_year']          = $value > 0 ? $value : null;
                 $value                               = $object['begin_model_year_fraction'];
-                $result['begin_model_year_fraction'] = $value ? $value : null;
+                $result['begin_model_year_fraction'] = $value ?: null;
             }
 
             if ($this->filterComposite->filter('end_model_year')) {
                 $value                             = (int) $object['end_model_year'];
                 $result['end_model_year']          = $value > 0 ? $value : null;
                 $value                             = $object['end_model_year_fraction'];
-                $result['end_model_year_fraction'] = $value ? $value : null;
+                $result['end_model_year_fraction'] = $value ?: null;
             }
 
             if ($this->filterComposite->filter('begin_year')) {
@@ -849,7 +855,7 @@ class ItemHydrator extends AbstractRestHydrator
 
             if ($this->filterComposite->filter('subscription') && $this->userId) {
                 $result['subscription'] = $this->userItemSubscribe->isSubscribed(
-                    (int) $this->userId,
+                    $this->userId,
                     (int) $object['id']
                 );
             }
@@ -948,6 +954,9 @@ class ItemHydrator extends AbstractRestHydrator
         return $this->userRole;
     }
 
+    /**
+     * @throws CasbinException
+     */
     private function enforce(string $resource, string $privilege): bool
     {
         $role = $this->getUserRole();

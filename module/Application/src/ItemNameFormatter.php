@@ -316,7 +316,7 @@ class ItemNameFormatter
                    . ($em ? sprintf($this->textMonthFormat, $em) : '') . ($em ? $ey : sprintf('%02d', $ey % 100));
         }
 
-        return (($bm ? sprintf($this->textMonthFormat, $bm) : '') . ($by ? $by : '????'))
+        return (($bm ? sprintf($this->textMonthFormat, $bm) : '') . ($by ?: '????'))
                 . (
                     $ey
                         ? '–' . ($em ? sprintf($this->textMonthFormat, $em) : '') . $ey
@@ -353,7 +353,7 @@ class ItemNameFormatter
                    . ($em ? sprintf($this->monthFormat, $em) : '') . ($em ? $ey : sprintf('%02d', $ey % 100));
         }
 
-        return (($bm ? sprintf($this->monthFormat, $bm) : '') . ($by ? $by : '????'))
+        return (($bm ? sprintf($this->monthFormat, $bm) : '') . ($by ?: '????'))
                 . (
                     $ey
                         ? '–' . ($em ? sprintf($this->monthFormat, $em) : '') . $ey
