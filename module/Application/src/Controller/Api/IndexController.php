@@ -4,13 +4,10 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Hydrator\Api\ItemHydrator;
-use Application\Model\Brand;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
 use Application\Model\Categories;
 use Application\Model\Item;
-use Application\Model\Picture;
-use Application\Model\PictureItem;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
@@ -34,8 +31,6 @@ class IndexController extends AbstractRestfulController
 {
     private StorageInterface $cache;
 
-    private Brand $brand;
-
     private Item $item;
 
     private Categories $categories;
@@ -56,7 +51,6 @@ class IndexController extends AbstractRestfulController
 
     public function __construct(
         StorageInterface $cache,
-        Brand $brand,
         Item $item,
         Categories $categories,
         Twins $twins,
@@ -68,7 +62,6 @@ class IndexController extends AbstractRestfulController
         AbstractRestHydrator $userHydrator
     ) {
         $this->cache        = $cache;
-        $this->brand        = $brand;
         $this->item         = $item;
         $this->categories   = $categories;
         $this->twins        = $twins;
@@ -78,96 +71,6 @@ class IndexController extends AbstractRestfulController
         $this->catalogue    = $catalogue;
         $this->itemHydrator = $itemHydrator;
         $this->userHydrator = $userHydrator;
-    }
-
-    /**
-     * @throws ExceptionInterface
-     * @throws Exception
-     */
-    public function brandsAction(): JsonModel
-    {
-        $language = $this->language();
-
-        $cacheKey = 'API_INDEX_BRANDS_2_' . $language;
-        $success  = false;
-        $brands   = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            // cache missing
-            $brands = [
-                'brands' => $this->brand->getTopBrandsList($language),
-                'total'  => $this->item->getCount([
-                    'item_type_id' => Item::BRAND,
-                ]),
-            ];
-
-            $this->cache->setItem($cacheKey, $brands);
-        }
-
-        return new JsonModel($brands);
-    }
-
-    /**
-     * @throws ExceptionInterface
-     * @throws Exception
-     */
-    public function personsContentAction(): JsonModel
-    {
-        $language = $this->language();
-
-        $cacheKey       = 'API_INDEX_PERSONS_CONTENT_' . $language;
-        $success        = false;
-        $contentPersons = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $contentPersons = $this->item->getRows([
-                'language'     => $language,
-                'columns'      => ['id', 'name'],
-                'limit'        => 5,
-                'item_type_id' => 8,
-                'pictures'     => [
-                    'status' => Picture::STATUS_ACCEPTED,
-                    'type'   => PictureItem::PICTURE_CONTENT,
-                ],
-                'order'        => new Sql\Expression('COUNT(pi1.picture_id) desc'),
-            ]);
-
-            $this->cache->setItem($cacheKey, $contentPersons);
-        }
-
-        return new JsonModel([
-            'items' => $contentPersons,
-        ]);
-    }
-
-    /**
-     * @throws ExceptionInterface
-     * @throws Exception
-     */
-    public function personsAuthorAction(): JsonModel
-    {
-        $language = $this->language();
-
-        $cacheKey      = 'API_INDEX_PERSONS_AUTHOR_' . $language;
-        $success       = false;
-        $authorPersons = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $authorPersons = $this->item->getRows([
-                'language'     => $language,
-                'columns'      => ['id', 'name'],
-                'limit'        => 5,
-                'item_type_id' => 8,
-                'pictures'     => [
-                    'status' => Picture::STATUS_ACCEPTED,
-                    'type'   => PictureItem::PICTURE_AUTHOR,
-                ],
-                'order'        => new Sql\Expression('COUNT(pi1.picture_id) desc'),
-            ]);
-
-            $this->cache->setItem($cacheKey, $authorPersons);
-        }
-
-        return new JsonModel([
-            'items' => $authorPersons,
-        ]);
     }
 
     /**

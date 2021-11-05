@@ -896,61 +896,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'brands'          => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/brands',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'brands',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'persons-content' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/persons-content',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'persons-content',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'persons-author'  => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/persons-author',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'persons-author',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'categories'      => [
+                            'categories'  => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/categories',
@@ -968,7 +914,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'factories'       => [
+                            'factories'   => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/factories',
@@ -986,7 +932,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'twins'           => [
+                            'twins'       => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/twins',
@@ -1004,7 +950,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'spec-items'      => [
+                            'spec-items'  => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/spec-items',
@@ -1022,7 +968,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'item-of-day'     => [
+                            'item-of-day' => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/item-of-day',

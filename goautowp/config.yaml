@@ -45,3 +45,5 @@ image-storage:
   src-override:
     host: localhost:9000
     scheme: http
+memcached:
+  - "memcached:11211"

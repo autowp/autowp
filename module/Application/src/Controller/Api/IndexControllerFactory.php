@@ -29,7 +29,6 @@ class IndexControllerFactory implements FactoryInterface
         $hydrators = $container->get('HydratorManager');
         return new IndexController(
             $container->get('fastCache'),
-            $container->get(Brand::class),
             $container->get(Item::class),
             $container->get(Categories::class),
             $container->get(Twins::class),

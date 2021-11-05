@@ -134,6 +134,7 @@ services:
       - mysql
       - traffic-postgres
       - keycloak
+      - memcached
     volumes:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
@@ -149,6 +150,7 @@ services:
       - mysql
       - traffic-postgres
       - keycloak
+      - memcached
     volumes:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
@@ -164,6 +166,7 @@ services:
       - mysql
       - traffic-postgres
       - keycloak
+      - memcached
     volumes:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
@@ -179,6 +182,7 @@ services:
       - mysql
       - traffic-postgres
       - keycloak
+      - memcached
     volumes:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
@@ -194,6 +198,7 @@ services:
       - mysql
       - traffic-postgres
       - keycloak
+      - memcached
     volumes:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
@@ -212,6 +217,7 @@ services:
     - auth-postgres
     - mysql
     - keycloak
+    - memcached
 
   auth-postgres:
     image: postgres:13
