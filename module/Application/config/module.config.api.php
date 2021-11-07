@@ -914,24 +914,6 @@ return [
                                     ],
                                 ],
                             ],
-                            'factories'   => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/factories',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'factories',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
                             'twins'       => [
                                 'type'          => 'Literal',
                                 'options'       => [

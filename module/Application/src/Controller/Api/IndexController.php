@@ -97,59 +97,6 @@ class IndexController extends AbstractRestfulController
 
     /**
      * @throws ExceptionInterface
-     */
-    public function factoriesAction(): JsonModel
-    {
-        $cacheKey  = 'API_INDEX_FACTORIES_2';
-        $success   = true;
-        $factories = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $select = new Sql\Select($this->item->getTable()->getTable());
-            $select
-                ->columns([
-                    'id',
-                    'name',
-                    'count'     => new Sql\Expression('COUNT(1)'),
-                    'new_count' => new Sql\Expression(
-                        'COUNT(IF(item_parent.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY), 1, NULL))',
-                        [7]
-                    ),
-                ])
-                ->where([
-                    'item.item_type_id = ?' => Item::FACTORY,
-                    new Sql\Predicate\In('product.item_type_id', [
-                        Item::VEHICLE,
-                        Item::ENGINE,
-                    ]),
-                ])
-                ->join('item_parent', 'item.id = item_parent.parent_id', [])
-                ->join(['product' => 'item'], 'item_parent.item_id = product.id', [])
-                ->group('item.id')
-                ->order(['new_count desc', 'count desc'])
-                ->limit(8);
-
-            $items = $this->item->getTable()->selectWith($select);
-
-            $factories = [];
-            foreach ($items as $item) {
-                $factories[] = [
-                    'id'        => $item['id'],
-                    'name'      => $item['name'],
-                    'count'     => $item['count'],
-                    'new_count' => $item['new_count'],
-                ];
-            }
-
-            $this->cache->setItem($cacheKey, $factories);
-        }
-
-        return new JsonModel([
-            'items' => $factories,
-        ]);
-    }
-
-    /**
-     * @throws ExceptionInterface
      * @throws Exception
      */
     public function twinsAction(): JsonModel
