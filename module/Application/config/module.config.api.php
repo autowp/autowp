@@ -896,24 +896,6 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'categories'  => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/categories',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'categories',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
                             'twins'       => [
                                 'type'          => 'Literal',
                                 'options'       => [

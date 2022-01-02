@@ -78,7 +78,6 @@ return [
             Model\Brand::class                   => Model\BrandFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\Catalogue::class               => Model\Service\CatalogueFactory::class,
-            Model\Categories::class              => Model\Service\CategoriesFactory::class,
             Model\Item::class                    => Model\ItemFactory::class,
             Model\ItemAlias::class               => Model\ItemAliasFactory::class,
             Model\ItemParent::class              => Model\ItemParentFactory::class,

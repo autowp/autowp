@@ -6,10 +6,8 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\ItemHydrator;
 use Application\Hydrator\Api\UserHydrator;
-use Application\Model\Brand;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
-use Application\Model\Categories;
 use Application\Model\Item;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
@@ -30,7 +28,6 @@ class IndexControllerFactory implements FactoryInterface
         return new IndexController(
             $container->get('fastCache'),
             $container->get(Item::class),
-            $container->get(Categories::class),
             $container->get(Twins::class),
             $container->get(SpecificationsService::class),
             $container->get(User::class),

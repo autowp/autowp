@@ -6,7 +6,6 @@ use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Hydrator\Api\ItemHydrator;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
-use Application\Model\Categories;
 use Application\Model\Item;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
@@ -33,8 +32,6 @@ class IndexController extends AbstractRestfulController
 
     private Item $item;
 
-    private Categories $categories;
-
     private Twins $twins;
 
     private SpecificationsService $specsService;
@@ -52,7 +49,6 @@ class IndexController extends AbstractRestfulController
     public function __construct(
         StorageInterface $cache,
         Item $item,
-        Categories $categories,
         Twins $twins,
         SpecificationsService $specsService,
         User $userModel,
@@ -63,7 +59,6 @@ class IndexController extends AbstractRestfulController
     ) {
         $this->cache        = $cache;
         $this->item         = $item;
-        $this->categories   = $categories;
         $this->twins        = $twins;
         $this->specsService = $specsService;
         $this->userModel    = $userModel;
@@ -71,28 +66,6 @@ class IndexController extends AbstractRestfulController
         $this->catalogue    = $catalogue;
         $this->itemHydrator = $itemHydrator;
         $this->userHydrator = $userHydrator;
-    }
-
-    /**
-     * @throws ExceptionInterface
-     */
-    public function categoriesAction(): JsonModel
-    {
-        $language = $this->language();
-
-        // categories
-        $cacheKey   = 'API_INDEX_CATEGORY_' . $language;
-        $success    = false;
-        $categories = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $categories = $this->categories->getCategoriesList(0, $language, 15, 'name');
-
-            $this->cache->setItem($cacheKey, $categories);
-        }
-
-        return new JsonModel([
-            'items' => $categories,
-        ]);
     }
 
     /**
