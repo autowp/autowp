@@ -177,6 +177,10 @@ class PerspectivePictureFetcher
                 ->where(['item_parent_cache.parent_id' => $itemId]);
         }
 
+        if ($this->perspectiveId) {
+            $select->where(['picture_item.perspective_id' => $this->perspectiveId]);
+        }
+
         $row = currentFromResultSetInterface($this->pictureModel->getTable()->selectWith($select));
         if (! $row) {
             return 0;

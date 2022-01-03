@@ -539,7 +539,6 @@ class ItemHydrator extends AbstractRestHydrator
         $cFetcher            = null;
         $showTotalPictures   = $this->filterComposite->filter('total_pictures');
         $showPreviewPictures = $this->filterComposite->filter('preview_pictures');
-        $onlyExactlyPictures = false;
 
         if ($showTotalPictures || $showPreviewPictures) {
             $pps = $this->previewPictures;
@@ -567,14 +566,14 @@ class ItemHydrator extends AbstractRestHydrator
             $cFetcher = new PerspectivePictureFetcher([
                 'pictureModel'          => $this->picture,
                 'perspective'           => $this->perspective,
-                'onlyExactlyPictures'   => $onlyExactlyPictures,
+                'onlyExactlyPictures'   => false,
                 'perspectivePageId'     => $perspectivePageId,
                 'pictureItemTypeId'     => $pictureItemTypeId,
                 'perspectiveId'         => $perspectiveId,
                 'containsPerspectiveId' => $containsPerspectiveId,
             ]);
 
-            $totalPictures = $cFetcher->getTotalPictures($object['id'], $onlyExactlyPictures);
+            $totalPictures = $cFetcher->getTotalPictures($object['id'], false);
         }
 
         if ($showPreviewPictures) {
