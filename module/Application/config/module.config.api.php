@@ -896,24 +896,6 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'twins'       => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/twins',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'twins',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
                             'spec-items'  => [
                                 'type'          => 'Literal',
                                 'options'       => [

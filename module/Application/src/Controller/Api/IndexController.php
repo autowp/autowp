@@ -7,7 +7,6 @@ use Application\Hydrator\Api\ItemHydrator;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
 use Application\Model\Item;
-use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
@@ -32,8 +31,6 @@ class IndexController extends AbstractRestfulController
 
     private Item $item;
 
-    private Twins $twins;
-
     private SpecificationsService $specsService;
 
     private User $userModel;
@@ -49,7 +46,6 @@ class IndexController extends AbstractRestfulController
     public function __construct(
         StorageInterface $cache,
         Item $item,
-        Twins $twins,
         SpecificationsService $specsService,
         User $userModel,
         CarOfDay $itemOfDay,
@@ -59,41 +55,12 @@ class IndexController extends AbstractRestfulController
     ) {
         $this->cache        = $cache;
         $this->item         = $item;
-        $this->twins        = $twins;
         $this->specsService = $specsService;
         $this->userModel    = $userModel;
         $this->itemOfDay    = $itemOfDay;
         $this->catalogue    = $catalogue;
         $this->itemHydrator = $itemHydrator;
         $this->userHydrator = $userHydrator;
-    }
-
-    /**
-     * @throws ExceptionInterface
-     * @throws Exception
-     */
-    public function twinsAction(): JsonModel
-    {
-        $language = $this->language();
-
-        $cacheKey   = 'API_INDEX_INTERESTS_TWINS_BLOCK_' . $language;
-        $success    = false;
-        $twinsBlock = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $twinsBrands = $this->twins->getBrands([
-                'language' => $language,
-                'limit'    => 20,
-            ]);
-
-            $twinsBlock = [
-                'brands'       => $twinsBrands,
-                'brands_count' => $this->twins->getTotalBrandsCount(),
-            ];
-
-            $this->cache->setItem($cacheKey, $twinsBlock);
-        }
-
-        return new JsonModel($twinsBlock);
     }
 
     /**

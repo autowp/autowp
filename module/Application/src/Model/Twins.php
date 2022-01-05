@@ -107,21 +107,6 @@ class Twins
     /**
      * @throws Exception
      */
-    public function getTotalBrandsCount(): int
-    {
-        return $this->item->getCountDistinct([
-            'item_type_id'       => Item::BRAND,
-            'descendant_or_self' => [
-                'parent' => [
-                    'item_type_id' => Item::TWINS,
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * @throws Exception
-     */
     public function getGroupsPaginator(int $brandId = 0): Paginator
     {
         $filter = [

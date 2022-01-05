@@ -28,7 +28,6 @@ class IndexControllerFactory implements FactoryInterface
         return new IndexController(
             $container->get('fastCache'),
             $container->get(Item::class),
-            $container->get(Twins::class),
             $container->get(SpecificationsService::class),
             $container->get(User::class),
             $container->get(CarOfDay::class),
