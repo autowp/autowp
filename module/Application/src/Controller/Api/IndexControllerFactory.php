@@ -9,7 +9,6 @@ use Application\Hydrator\Api\UserHydrator;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
 use Application\Model\Item;
-use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
