@@ -260,7 +260,6 @@ return [
     'traffic'                  => [
         'url' => 'http://goautowp-serve-private:8080',
     ],
-    'authSecret'               => 'example_secret',
     'fileStorage'              => [
         's3'          => [
             'region'                  => '',
@@ -276,4 +275,8 @@ return [
         'srcOverride' => [],
     ],
     'captcha'                  => false,
+    'keycloak'                 => [
+        'url'   => 'http://keycloak',
+        'realm' => 'autowp',
+    ],
 ];

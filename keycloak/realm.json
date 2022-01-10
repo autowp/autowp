@@ -31,7 +31,7 @@
     "registrationAllowed": true,
     "registrationEmailAsUsername": false,
     "rememberMe": true,
-    "verifyEmail": true,
+    "verifyEmail": false,
     "loginWithEmailAllowed": true,
     "duplicateEmailsAllowed": false,
     "resetPasswordAllowed": true,

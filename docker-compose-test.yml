@@ -196,31 +196,6 @@ services:
       - "./module/Application/config/model.conf:/model.conf:ro"
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
-  goautowp-auth:
-    image: autowp/goautowp
-    container_name: autowp_test_auth
-    restart: always
-    command: serve-auth
-    volumes:
-      - "./goautowp/config.yaml:/config.yaml:ro"
-      - "./module/Application/config/model.conf:/model.conf:ro"
-      - "./module/Application/config/policy.csv:/policy.csv:ro"
-    depends_on:
-    - auth-postgres
-    - mysql
-    - keycloak
-
-  auth-postgres:
-    image: postgres:13
-    container_name: autowp_test_auth_postgres
-    restart: always
-    environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_USER=auth
-      - POSTGRES_DB=auth
-    ports:
-      - "5432:5432"
-
   minio:
     image: minio/minio
     container_name: autowp_test_minio

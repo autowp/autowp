@@ -48,14 +48,15 @@
 		"laminas/laminas-inputfilter" : ">=2.12",
 		"league/oauth1-client" : "^1.10",
 		"google/recaptcha" : "^1.2.4",
-		"php-amqplib/php-amqplib": "^2.12",
+		"php-amqplib/php-amqplib": "^3.1.1",
 		"sentry/sdk": "^3.1",
 		"firebase/php-jwt": "^5.4",
 		"aws/aws-sdk-php": "^3.158",
 		"mjaschen/phpgeo": "^3.2",
 		"casbin/casbin": "^3.11.0",
 		"laminas/laminas-cli": "^1.1",
-		"laminas/laminas-paginator-adapter-laminasdb": "^1.0"
+		"laminas/laminas-paginator-adapter-laminasdb": "^1.0",
+		"laminas/laminas-cache-storage-adapter-memcached": "^2.0"
 	},
 	"autoload" : {
 		"psr-4" : {
@@ -79,7 +80,7 @@
 		"phan/phan": "^5.2.0",
         "laminas/laminas-coding-standard": "^2.3.0",
 		"vimeo/psalm": "^4.10.0",
-		"phpstan/phpstan": "^0.12.99",
+		"phpstan/phpstan": "^1.3.3",
 		"wapmorgan/php-deprecation-detector": "^2.0"
     },
 	"autoload-dev" : {

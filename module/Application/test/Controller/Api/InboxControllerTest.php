@@ -54,7 +54,7 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
 
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -92,7 +92,7 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
         /** @var Request $request */
         $request = $this->getRequest();
         $request->getHeaders()
-            ->addHeader(Data::getAdminAuthHeader())
+            ->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 

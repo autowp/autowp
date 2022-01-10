@@ -16,7 +16,7 @@ class PictureItemControllerTest extends AbstractHttpControllerTestCase
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
         $this->dispatch('https://www.autowp.ru/api/picture-item', Request::METHOD_GET, [
             'fields' => 'item,picture,area',
         ]);

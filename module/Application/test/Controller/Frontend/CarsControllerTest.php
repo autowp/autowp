@@ -27,7 +27,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -57,7 +57,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
         $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
             'engine_id' => $engineId,
         ]);
@@ -72,7 +72,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
         $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
             'engine_id' => '',
             'foo'       => 'bar', // workaround for zf bug
@@ -88,7 +88,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
         $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
             'engine_id' => 'inherited',
         ]);
@@ -105,7 +105,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
         $url = 'https://www.autowp.ru/api/attr/user-value';
         $this->dispatch($url, Request::METHOD_PATCH, [
             'items' => [

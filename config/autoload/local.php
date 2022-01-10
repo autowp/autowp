@@ -41,4 +41,8 @@ return [
         ],
     ],
     'mosts_min_vehicles_count' => 1,
+    'keycloak'                 => [
+        'url'   => 'http://keycloak:8080',
+        'realm' => 'autowp',
+    ],
 ];

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Autowp\User\Service;
 
+use Application\Model\UserAccount;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -18,8 +19,10 @@ class OAuthFactory implements FactoryInterface
     {
         $config = $container->get('Config');
         return new OAuth(
+            $container->get(UserAccount::class),
             $container->get('Request'),
-            $config['authSecret']
+            $config['keycloak'],
+            $container->get('longCache'),
         );
     }
 }
