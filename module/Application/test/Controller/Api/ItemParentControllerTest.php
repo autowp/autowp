@@ -16,7 +16,7 @@ class ItemParentControllerTest extends AbstractHttpControllerTestCase
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_GET, [
             'order' => 'categories_first',
         ]);

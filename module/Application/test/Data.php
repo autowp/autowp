@@ -5,13 +5,10 @@ namespace ApplicationTest;
 use GuzzleHttp\Client;
 use JsonException;
 use Laminas\Http\Header\Authorization;
-use Laminas\ServiceManager\ServiceManager;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 use function json_decode;
-use function rtrim;
-use function urlencode;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -22,16 +19,12 @@ class Data
      * @throws NotFoundExceptionInterface
      * @throws JsonException
      */
-    public static function getAdminAuthHeader(ServiceManager $serviceManager): Authorization
+    public static function getAdminAuthHeader(): Authorization
     {
-        $keycloakConfig = $serviceManager->get('config')['keycloak'];
-
         $client = new Client();
-        $url    = rtrim($keycloakConfig['url']) . '/auth/realms/'
-                . urlencode($keycloakConfig['realm']) . '/protocol/openid-connect/token';
+        $url    = 'http://goautowp-serve-public:8080/api/oauth/token';
         $res    = $client->post($url, [
-            'auth'        => ['autowp', 'c0fce0df-6105-4d1e-bc23-8e67239f7640'],
-            'form_params' => [
+            'json' => [
                 'grant_type' => 'password',
                 'username'   => 'admin',
                 'password'   => '123123',

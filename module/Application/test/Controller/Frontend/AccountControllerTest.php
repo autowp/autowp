@@ -58,7 +58,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 //    private function getUser(int $userId): array
 //    {
 //        $this->reset();
-//        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
+//        $this->getRequest()->getHeaders()->addHeader(Data::getAdminAuthHeader());
 //        $this->dispatch('https://www.autowp.ru/api/user/' . $userId, Request::METHOD_GET);
 //
 //        $this->assertResponseStatusCode(200);
@@ -77,7 +77,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader($this->getApplicationServiceLocator()));
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
         $this->dispatch('https://www.autowp.ru/api/attr/conflict?filter=0', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
