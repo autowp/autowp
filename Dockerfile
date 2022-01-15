@@ -25,11 +25,13 @@ RUN apt-get autoremove -qq -y && \
         curl \
         git \
         imagemagick \
+        libmemcached-dev \
         libtool \
         libxml2 \
         mysql-client \
         openjdk-11-jre \
         openssh-client \
+        pkg-config \
         php-dev \
         php-pear \
         php7.4 \
@@ -42,7 +44,6 @@ RUN apt-get autoremove -qq -y && \
         php7.4-json \
         php7.4-gd \
         php7.4-mbstring \
-        php7.4-memcached \
         php7.4-mysql \
         php7.4-opcache \
         php7.4-tokenizer \
@@ -52,9 +53,11 @@ RUN apt-get autoremove -qq -y && \
         tzdata \
         unzip \
         xmlstarlet \
+        zlib1g-dev \
     && \
     apt-get autoclean -qq -y && \
     pecl install ast && \
+    pecl install memcached && \
     \
     cat /etc/ImageMagick-6/policy.xml | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \
