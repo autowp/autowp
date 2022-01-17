@@ -240,8 +240,7 @@ return [
         ],
     ],
     'users'                    => [
-        'salt'      => 'users-salt',
-        'emailSalt' => 'email-salt',
+        'salt' => 'users-salt',
     ],
     'mail'                     => [
         'transport' => [
