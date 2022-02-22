@@ -13,6 +13,6 @@ mkdir --mode=0777 -p /app/cache/modulecache
 
 echo "Waiting for mysql"
 
-waitforit -host=mysql -port=3306 -timeout=60
+# waitforit -host=mysql -port=3306 -timeout=60
 
 php-fpm7.4 --nodaemonize --allow-to-run-as-root
