@@ -57,7 +57,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         /** @var Request $request */
         $request = $this->getRequest();
         $request->getHeaders()
-            ->addHeader(Data::getAdminAuthHeader())
+            ->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
 
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
@@ -103,7 +105,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -129,7 +133,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/item/' . $itemId, Request::METHOD_GET, [
             'fields' => 'total_pictures,begin_year,end_year',
         ]);
@@ -152,7 +158,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch(
             'https://www.autowp.ru/api/picture/' . $pictureId,
             Request::METHOD_PUT,
@@ -170,7 +178,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('http://www.autowp.ru/api/picture', Request::METHOD_GET, [
             'fields' => 'owner,thumb_medium,add_date,exif,image,items.item.name_html,'
                         . 'items.item.brands.name_html,special_name,copyrights,'

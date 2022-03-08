@@ -33,7 +33,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -61,7 +63,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch(
             'https://www.autowp.ru/api/item-parent',
             Request::METHOD_POST,
@@ -92,7 +96,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
                 $this->reset();
                 /** @var Request $request */
                 $request = $this->getRequest();
-                $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+                $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
                 $url = 'https://www.autowp.ru/api/item-vehicle-type/' . $itemId . '/' . $id;
                 $this->dispatch($url, Request::METHOD_DELETE);
 
@@ -109,7 +115,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
                 $this->reset();
                 /** @var Request $request */
                 $request = $this->getRequest();
-                $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+                $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
                 $url = sprintf(
                     'https://www.autowp.ru/api/item-vehicle-type/%s/%s',
                     $itemId,
@@ -134,7 +142,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/item-vehicle-type', Request::METHOD_GET, [
             'item_id' => $itemId,
         ]);
@@ -175,7 +185,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/item-vehicle-type', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);

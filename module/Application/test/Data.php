@@ -9,6 +9,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 use function json_decode;
+use function rtrim;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -19,12 +20,14 @@ class Data
      * @throws NotFoundExceptionInterface
      * @throws JsonException
      */
-    public static function getAdminAuthHeader(): Authorization
+    public static function getAdminAuthHeader(array $keycloak): Authorization
     {
         $client = new Client();
-        $url    = 'http://goautowp-serve-public:8080/api/oauth/token';
+        $url    = rtrim($keycloak['url'], '/')
+                  . '/auth/realms/' . $keycloak['realm'] . '/protocol/openid-connect/token';
         $res    = $client->post($url, [
-            'json' => [
+            'form_params' => [
+                'client_id'  => 'frontend',
                 'grant_type' => 'password',
                 'username'   => 'admin',
                 'password'   => '123123',

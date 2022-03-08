@@ -41,7 +41,9 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
 
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
             'name'         => 'Car for testNewcars',
             'item_type_id' => 1,
@@ -61,7 +63,9 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_POST, [
             'parent_id' => $brandId,
             'item_id'   => $carId,

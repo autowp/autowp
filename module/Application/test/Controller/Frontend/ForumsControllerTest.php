@@ -38,7 +38,9 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_POST, [
             'theme_id'            => 2,
             'name'                => 'Test topic',
@@ -66,7 +68,9 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'subscription' => 0,
         ]);
@@ -80,7 +84,9 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'subscription' => 1,
         ]);
@@ -94,7 +100,9 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'status' => 'closed',
         ]);
@@ -108,7 +116,9 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'status' => 'normal',
         ]);
@@ -122,7 +132,9 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_GET, [
             'subscription' => 1,
         ]);
@@ -136,7 +148,9 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/comment', Request::METHOD_POST, [
             'item_id'             => $topicId,
             'type_id'             => 5,
@@ -154,7 +168,9 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
             'status' => 'deleted',
         ]);

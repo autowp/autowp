@@ -56,7 +56,9 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
         /** @var Request $request */
         $request = $this->getRequest();
         $request->getHeaders()
-            ->addHeader(Data::getAdminAuthHeader())
+            ->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
@@ -101,7 +103,9 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
 
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
         $this->assertResponseStatusCode(201);
@@ -132,7 +136,9 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('http://www.autowp.ru/api/picture-moder-vote/' . $pictureId, Request::METHOD_PUT, [
             'vote'   => 1,
             'reason' => 'Good pic',
@@ -147,7 +153,9 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('http://www.autowp.ru/api/picture-moder-vote/' . $pictureId, Request::METHOD_DELETE);
 
         $this->assertResponseStatusCode(204);
@@ -158,7 +166,9 @@ class PictureModerVoteControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('http://www.autowp.ru/api/picture-moder-vote/' . $pictureId, Request::METHOD_PUT, [
             'vote'   => -1,
             'reason' => 'Poor pic',

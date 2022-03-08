@@ -18,6 +18,8 @@ use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function explode;
 use function file_get_contents;
+use function in_array;
+use function is_array;
 use function json_decode;
 use function mb_strtolower;
 use function rtrim;
@@ -89,6 +91,7 @@ class OAuth
                 $this->ensureUserImported($decoded);
                 $userGuid = (string) ($decoded->sub ?? '');
             } catch (UnexpectedValueException $e) {
+                var_dump($e->getMessage());
                 $userGuid = '';
             }
 
@@ -127,12 +130,22 @@ class OAuth
             $claims->preferred_username ?? ''
         );
         $remoteAddr = $this->request->getServer('REMOTE_ADDR');
+        if (!$remoteAddr) {
+            $remoteAddr = '127.0.0.1';
+        }
+        $role       = 'user';
+
+        if (isset($claims->resource_access->autowp->roles)) {
+            $roles = $claims->resource_access->autowp->roles;
+            if (is_array($roles) && in_array('admin', $roles)) {
+                $role = 'admin';
+            }
+        }
 
         $row = currentFromResultSetInterface($this->userAccountTable->select([
             'service_id'  => 'keycloak',
             'external_id' => $guid,
         ]));
-
         if (! $row) {
             $this->userTable->insert([
                 'login'            => null,
@@ -147,11 +160,11 @@ class OAuth
                 'timezone'         => $language['timezone'],
                 'last_ip'          => $remoteAddr,
                 'language'         => $locale,
-                'role'             => 'user',
+                'role'             => $role,
             ]);
             $userId = $this->userTable->getLastInsertValue();
         } else {
-            $userId = (int) $row['id'];
+            $userId = (int) $row['user_id'];
 
             $this->userTable->update([
                 'e_mail'  => $emailAddr,

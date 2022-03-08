@@ -24,7 +24,9 @@ class AttrControllerTest extends AbstractHttpControllerTestCase
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/attr/unit', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -43,7 +45,9 @@ class AttrControllerTest extends AbstractHttpControllerTestCase
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader());
+        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
+            $this->getApplicationServiceLocator()->get('Config')['keycloak']
+        ));
         $this->dispatch('https://www.autowp.ru/api/attr/list-option', Request::METHOD_GET, [
             'attribute_id' => 20,
         ]);
