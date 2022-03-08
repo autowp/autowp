@@ -461,18 +461,3 @@ insert into voting_variant(id, voting_id, name, votes, position, text)
 values (1, 1, "First variant", 0, 1, "First variant text"),
 (2, 1, "Second variant", 0, 2, "Second variant text");
 /*!40000 ALTER TABLE `voting_variant` ENABLE KEYS */;
-
-INSERT INTO `attrs_user_values` (`attribute_id`, `item_id`, `user_id`, `add_date`, `update_date`, `conflict`, `weight`)
-VALUES (20,1,1,'2016-11-25 18:31:46','2016-11-25 18:31:46',0,1);
-
-INSERT INTO `attrs_user_values_list` (`attribute_id`, `item_id`, `user_id`, `value`, `ordering`)
-VALUES (20,1,1,1,1);
-
-INSERT INTO `attrs_values` (`attribute_id`, `item_id`, `conflict`, `update_date`)
-VALUES (20,1,0,'2016-11-25 18:31:46');
-
-INSERT INTO `attrs_values_list` (`attribute_id`, `item_id`, `value`, `ordering`)
-VALUES (20,1,1,1);
-
-INSERT INTO `forums_topics` (`id`, `theme_id`, `name`, `author_id`, `add_datetime`, `_messages`, `views`, `status`, `author_ip`)
-VALUES (1,2,'Test topic',1,'2016-11-25 18:31:48',0,0,'normal',0x30);
