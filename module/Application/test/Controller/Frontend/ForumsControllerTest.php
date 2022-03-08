@@ -17,16 +17,6 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    public function testTopic(): void
-    {
-        $this->dispatch('https://www.autowp.ru/api/forum/topic/1', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertControllerName(ForumController::class);
-        $this->assertMatchedRouteName('api/forum/topic/item/get');
-        $this->assertActionName('get-topic');
-    }
-
     public function testNewIsForbidden(): void
     {
         $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_POST);
