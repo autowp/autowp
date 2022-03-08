@@ -86,8 +86,8 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
         $request = $this->getRequest();
         $request->getHeaders()
             ->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ))
+                $this->getApplicationServiceLocator()->get('Config')['keycloak']
+            ))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 

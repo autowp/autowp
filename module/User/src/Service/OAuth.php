@@ -25,6 +25,7 @@ use function mb_strtolower;
 use function rtrim;
 use function trim;
 use function urlencode;
+use function var_dump;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -130,10 +131,10 @@ class OAuth
             $claims->preferred_username ?? ''
         );
         $remoteAddr = $this->request->getServer('REMOTE_ADDR');
-        if (!$remoteAddr) {
+        if (! $remoteAddr) {
             $remoteAddr = '127.0.0.1';
         }
-        $role       = 'user';
+        $role = 'user';
 
         if (isset($claims->resource_access->autowp->roles)) {
             $roles = $claims->resource_access->autowp->roles;

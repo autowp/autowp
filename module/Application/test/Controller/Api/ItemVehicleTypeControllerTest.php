@@ -97,8 +97,8 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
                 /** @var Request $request */
                 $request = $this->getRequest();
                 $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
+                    $this->getApplicationServiceLocator()->get('Config')['keycloak']
+                ));
                 $url = 'https://www.autowp.ru/api/item-vehicle-type/' . $itemId . '/' . $id;
                 $this->dispatch($url, Request::METHOD_DELETE);
 
@@ -116,8 +116,8 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
                 /** @var Request $request */
                 $request = $this->getRequest();
                 $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
+                    $this->getApplicationServiceLocator()->get('Config')['keycloak']
+                ));
                 $url = sprintf(
                     'https://www.autowp.ru/api/item-vehicle-type/%s/%s',
                     $itemId,
