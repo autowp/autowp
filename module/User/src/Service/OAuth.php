@@ -25,7 +25,6 @@ use function mb_strtolower;
 use function rtrim;
 use function trim;
 use function urlencode;
-use function var_dump;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -92,7 +91,6 @@ class OAuth
                 $this->ensureUserImported($decoded);
                 $userGuid = (string) ($decoded->sub ?? '');
             } catch (UnexpectedValueException $e) {
-                var_dump($e->getMessage());
                 $userGuid = '';
             }
 
