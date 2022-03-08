@@ -13,6 +13,8 @@ use Laminas\InputFilter\InputFilterAbstractServiceFactory;
 use Laminas\Mvc\I18n\TranslatorFactory;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
+use function defined;
+
 return [
     'controllers'        => [
         'factories' => [
@@ -278,4 +280,5 @@ return [
         'url'   => 'http://keycloak',
         'realm' => 'autowp',
     ],
+    'message_interval'         => 300,
 ];

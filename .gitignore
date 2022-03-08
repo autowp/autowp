@@ -1,4 +1,3 @@
-.idea
 /mysql
 /composer.phar
 /node_modules
@@ -14,3 +13,4 @@
 /sonar-scanner
 /minio
 /cache
+/.idea/

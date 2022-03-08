@@ -33,10 +33,12 @@ class User
     public const MAX_PASSWORD = 50;
 
     private TableGateway $table;
+    private int $messageInterval;
 
-    public function __construct(TableGateway $table)
+    public function __construct(TableGateway $table, int $messageInterval)
     {
-        $this->table = $table;
+        $this->table           = $table;
+        $this->messageInterval = $messageInterval;
     }
 
     public function invalidateSpecsVolume(int $userId): void
@@ -56,10 +58,8 @@ class User
     {
         $date = Row::getDateTimeByColumnType('timestamp', $row['reg_date']);
 
-        $defaultInterval = 300;
-
         if (! $date) {
-            return $defaultInterval;
+            return $this->messageInterval;
         }
 
         $tenDaysBefore = (new DateTime())->sub(new DateInterval('P10D'));
@@ -67,7 +67,7 @@ class User
             return $row['messaging_interval'];
         }
 
-        return max($row['messaging_interval'], $defaultInterval);
+        return max($row['messaging_interval'], $this->messageInterval);
     }
 
     /**
@@ -75,6 +75,10 @@ class User
      */
     public function getNextMessageTime(int $userId): ?DateTime
     {
+        if ($this->messageInterval <= 0) {
+            return null;
+        }
+
         $row = currentFromResultSetInterface($this->table->select(['id' => $userId]));
         if (! $row) {
             return null;
