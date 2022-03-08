@@ -44,7 +44,7 @@ class ItemParent
 
     private TableGateway $itemParentLanguageTable;
 
-    private array $languages = ['en'];
+    private array $languages;
 
     private array $allowedCombinations = [
         Item::VEHICLE   => [
@@ -105,6 +105,9 @@ class ItemParent
         $this->itemAlias               = $itemAlias;
     }
 
+    /**
+     * @throws Exception
+     */
     public function delete(int $parentId, int $itemId): bool
     {
         $brandRow = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
@@ -162,7 +165,7 @@ class ItemParent
     {
         $langName = $this->itemModel->getName($vehicleRow['id'], $language);
 
-        $vehicleName = $langName ? $langName : $vehicleRow['name'];
+        $vehicleName = $langName ?: $vehicleRow['name'];
 
         $aliases = $this->itemAlias->getAliases($parentRow['id']);
 
@@ -223,6 +226,9 @@ class ItemParent
         return $name;
     }
 
+    /**
+     * @throws Exception
+     */
     private function isAllowedCatname(int $itemId, int $parentId, string $catname): bool
     {
         if (mb_strlen($catname) <= 0) {
@@ -243,6 +249,7 @@ class ItemParent
     /**
      * @param array|ArrayAccess $brandRow
      * @param array|ArrayAccess $vehicleRow
+     * @throws Exception
      */
     private function extractCatname($brandRow, $vehicleRow): string
     {
@@ -361,6 +368,9 @@ class ItemParent
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
     public function move(int $itemId, int $fromParentId, int $toParentId): bool
     {
         $oldParentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $fromParentId]));
@@ -419,6 +429,9 @@ class ItemParent
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
     public function remove(int $parentId, int $itemId): void
     {
         $parentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
@@ -510,6 +523,9 @@ class ItemParent
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function setItemParent(int $parentId, int $itemId, array $values, bool $forceIsAuto): bool
     {
         $itemParentRow = currentFromResultSetInterface($this->itemParentTable->select([
@@ -568,6 +584,9 @@ class ItemParent
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
     public function refreshAuto(int $parentId, int $itemId): bool
     {
         $bvlRows = $this->itemParentLanguageTable->select([
@@ -593,7 +612,7 @@ class ItemParent
             return false;
         }
         if (! $bvRow['manual_catname']) {
-            $brandRow   = currentFromResultSetInterface($this->itemTable->select(['id' => (int) $parentId]));
+            $brandRow   = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
             $vehicleRow = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
 
             $catname = $this->extractCatname($brandRow, $vehicleRow);
@@ -612,6 +631,9 @@ class ItemParent
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
     public function refreshAutoByVehicle(int $itemId): bool
     {
         foreach ($this->getParentRows($itemId) as $itemParentRow) {
@@ -621,6 +643,9 @@ class ItemParent
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
     public function refreshAllAuto(): bool
     {
         $itemParentRows = $this->itemParentTable->select([
@@ -695,6 +720,9 @@ class ItemParent
         ]));
     }
 
+    /**
+     * @throws Exception
+     */
     public function getName(int $parentId, int $itemId, string $language): ?string
     {
         $bvlRow = currentFromResultSetInterface($this->itemParentLanguageTable->select([
@@ -905,39 +933,6 @@ class ItemParent
         $result = [];
         foreach ($this->itemParentTable->selectWith($select) as $row) {
             $result[(int) $row['parent_id']] = (int) $row['count'];
-        }
-
-        return $result;
-    }
-
-    public function getChildItemsCountArrayByTypes(array $parentIds, array $typeIds): array
-    {
-        if (count($parentIds) <= 0) {
-            return [];
-        }
-
-        if (count($typeIds) <= 0) {
-            return [];
-        }
-
-        $select = new Sql\Select($this->itemParentTable->getTable());
-        $select->columns(['parent_id', 'type', 'count' => new Sql\Expression('count(1)')])
-            ->where([
-                new Sql\Predicate\In('parent_id', $parentIds),
-                new Sql\Predicate\In('type', $typeIds),
-            ])
-            ->group(['parent_id', 'type']);
-
-        $rows = $this->itemParentTable->selectWith($select);
-
-        $result = [];
-        foreach ($rows as $row) {
-            $itemId = (int) $row['parent_id'];
-            $typeId = (int) $row['type'];
-            if (! isset($result[$itemId])) {
-                $result[$itemId] = [];
-            }
-            $result[$itemId][$typeId] = (int) $row['count'];
         }
 
         return $result;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application;
 
 use Autowp\ZFComponents\Resources;
@@ -76,8 +78,6 @@ return [
             Model\Brand::class                   => Model\BrandFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\Catalogue::class               => Model\Service\CatalogueFactory::class,
-            Model\Categories::class              => Model\Service\CategoriesFactory::class,
-            Model\Contact::class                 => Model\ContactFactory::class,
             Model\Item::class                    => Model\ItemFactory::class,
             Model\ItemAlias::class               => Model\ItemAliasFactory::class,
             Model\ItemParent::class              => Model\ItemParentFactory::class,
@@ -240,8 +240,7 @@ return [
         ],
     ],
     'users'                    => [
-        'salt'      => 'users-salt',
-        'emailSalt' => 'email-salt',
+        'salt' => 'users-salt',
     ],
     'mail'                     => [
         'transport' => [
@@ -260,7 +259,6 @@ return [
     'traffic'                  => [
         'url' => 'http://goautowp-serve-private:8080',
     ],
-    'authSecret'               => 'example_secret',
     'fileStorage'              => [
         's3'          => [
             'region'                  => '',
@@ -276,4 +274,8 @@ return [
         'srcOverride' => [],
     ],
     'captcha'                  => false,
+    'keycloak'                 => [
+        'url'   => 'http://keycloak',
+        'realm' => 'autowp',
+    ],
 ];

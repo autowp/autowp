@@ -3,6 +3,7 @@
 namespace Application\Model;
 
 use Autowp\User\Model\User;
+use Exception;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\ResultSet\ResultSetInterface;
 use Laminas\Db\TableGateway\TableGateway;
@@ -54,13 +55,9 @@ class UserItemSubscribe
         );
     }
 
-    public function unsubscribeAll(int $userId): void
-    {
-        $this->table->delete([
-            'user_id' => $userId,
-        ]);
-    }
-
+    /**
+     * @throws Exception
+     */
     public function isSubscribed(int $userId, int $itemId): bool
     {
         return (bool) currentFromResultSetInterface($this->table->select([

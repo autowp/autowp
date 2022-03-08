@@ -1666,7 +1666,7 @@ class Item
         /** @var Adapter $adapter */
         $adapter = $this->itemTable->getAdapter();
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($this->getSelect($options), $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($this->getSelect($options), $adapter)
         );
     }
 

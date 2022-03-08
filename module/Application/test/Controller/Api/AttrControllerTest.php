@@ -5,13 +5,21 @@ namespace ApplicationTest\Controller\Api;
 use Application\Controller\Api\AttrController;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
+use JsonException;
 use Laminas\Http\Request;
 use Laminas\Json\Json;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class AttrControllerTest extends AbstractHttpControllerTestCase
 {
     protected string $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws JsonException
+     */
     public function testUnitIndex(): void
     {
         /** @var Request $request */
@@ -26,6 +34,11 @@ class AttrControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('unit-index');
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws JsonException
+     */
     public function testListOptionsIndex(): void
     {
         /** @var Request $request */

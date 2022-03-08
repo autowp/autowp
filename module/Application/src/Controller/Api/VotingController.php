@@ -67,6 +67,7 @@ class VotingController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function getVoteListAction()
     {
@@ -97,6 +98,7 @@ class VotingController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function patchItemAction()
     {

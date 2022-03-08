@@ -1,3 +1,7 @@
+public-rest:
+  cors:
+    origin:
+      - http://localhost:4200
 autowp-migrations:
   dsn: mysql://root:password@tcp(mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
 duplicate_finder:
@@ -8,9 +12,24 @@ file_storage:
   s3:
     endpoints:
       - http://minio:9000
-oauth:
-  secret: example_secret
 rabbitmq: amqp://guest:guest@autowp_test_rabbitmq:5672/
 traffic-dsn: postgres://traffic:password@autowp_test_traffic_postgres:5432/traffic?sslmode=disable
 traffic-migrations:
   dsn: postgres://traffic:password@autowp_test_traffic_postgres/traffic?sslmode=disable
+keycloak:
+  url: http://keycloak:8080
+  realm: autowp
+  client-id: autowp
+  client-secret: c0fce0df-6105-4d1e-bc23-8e67239f7640
+captcha: false
+image-storage:
+  s3:
+    region: "us-east-1"
+    credentials:
+      key: "AKIAIOSFODNN7EXAMPLE"
+      secret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  src-override:
+    host: localhost:9000
+    scheme: http
+memcached:
+  - "memcached:11211"

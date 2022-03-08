@@ -10,6 +10,7 @@ use Application\Module;
 use Application\Service\DayPictures;
 use ArrayAccess;
 use Autowp\User\Controller\Plugin\User;
+use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
@@ -64,6 +65,7 @@ class NewController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function indexAction()
     {
@@ -259,7 +261,7 @@ class NewController extends AbstractRestfulController
                     'picture' => $pictureRow,
                 ];
             } else {
-                $itemId = (int) $itemIds[0];
+                $itemId = $itemIds[0];
 
                 $found = false;
                 foreach ($items as &$item) {

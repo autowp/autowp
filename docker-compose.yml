@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.3"
 services:
   router:
     image: nginx:1-alpine
@@ -10,7 +10,7 @@ services:
     - backend
     - frontend
     - goautowp-serve-public
-    - auth
+    - keycloak
     ports:
     - "80:80"
 
@@ -21,15 +21,13 @@ services:
     environment:
       FASTCGI: backend:9000
     depends_on:
-    - backend
+      - backend
 
   backend:
     image: autowp/autowp
     container_name: autowp_test_backend
     restart: always
     environment:
-      AUTOWP_USERS_SALT: "users-salt"
-      AUTOWP_EMAIL_SALT: "email-salt"
       AUTOWP_TWITTER_USERNAME: ""
       AUTOWP_TWITTER_OAUTH_KEY: ""
       AUTOWP_TWITTER_OAUTH_SECRET: ""
@@ -39,6 +37,7 @@ services:
       AUTOWP_FACEBOOK_APP_SECRET: ""
       AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN: ""
       AUTOWP_VK_TOKEN: ""
+      SONARCLOUD_TOKEN: ${SONARCLOUD_TOKEN}
     volumes:
     - ./config:/app/config
     - ./data:/app/data
@@ -47,14 +46,11 @@ services:
     - ./public_html:/app/public_html
     - ./vendor:/app/vendor
     - ./etc/nginx/conf.d:/etc/nginx/conf.d
-    #- ./etc/php/7.3/fpm/php-fpm.conf:/etc/php/7.3/fpm/php-fpm.conf
-    #- ./etc/php/7.3/fpm/pool.d/www.conf:/etc/php/7.3/fpm/pool.d/www.conf
     - ./etc/nginx/sites-available:/etc/nginx/sites-available
-    #- ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
     - ./composer.json:/app/composer.json
     - ./composer.lock:/app/composer.lock
+    - ./install-dev.sh:/app/install-dev.sh
     - ./install-dev-db.sh:/app/install-dev-db.sh
-    #- ./goautowp:/app/goautowp
     - ./start.sh:/app/start.sh
     depends_on:
     - memcached
@@ -76,12 +72,11 @@ services:
     container_name: autowp_test_mysql
     restart: always
     environment:
-    - MYSQL_ROOT_PASSWORD=password
-    - MYSQL_DATABASE=autowp_test
-    - MYSQL_USER=autowp_test
-    - MYSQL_PASSWORD=test
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: autowp_test
+      MYSQL_USER: autowp_test
+      MYSQL_PASSWORD: test
     volumes:
-    - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
     - "./mysql:/var/lib/mysql"
     - "./mysql.conf.d:/etc/mysql/conf.d"
     expose:
@@ -110,17 +105,23 @@ services:
     image: rabbitmq:management
     container_name: autowp_test_rabbitmq
     ports:
+    - "4369:4369"
+    - "5671:5671"
     - "5672:5672"
+    - "15671:15671"
     - "15672:15672"
+    - "15691:15691"
+    - "15692:15692"
+    - "25672:25672"
 
   traffic-postgres:
     image: postgres:13
     container_name: autowp_test_traffic_postgres
     restart: always
     environment:
-    - POSTGRES_DB=traffic
-    - POSTGRES_USER=traffic
-    - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=traffic
+      - POSTGRES_USER=traffic
+      - POSTGRES_PASSWORD=password
 
   goautowp-serve-public:
     image: autowp/goautowp
@@ -128,13 +129,15 @@ services:
     restart: always
     command: serve-public
     depends_on:
-    - rabbitmq
-    - mysql
-    - traffic-postgres
+      - rabbitmq
+      - mysql
+      - traffic-postgres
+      - keycloak
+      - memcached
     volumes:
-    - "./goautowp/config.yaml:/config.yaml:ro"
-    - "./module/Application/config/model.conf:/model.conf:ro"
-    - "./module/Application/config/policy.csv:/policy.csv:ro"
+      - "./goautowp/config.yaml:/config.yaml:ro"
+      - "./module/Application/config/model.conf:/model.conf:ro"
+      - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-serve-private:
     image: autowp/goautowp
@@ -145,6 +148,8 @@ services:
       - rabbitmq
       - mysql
       - traffic-postgres
+      - keycloak
+      - memcached
     volumes:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
@@ -159,6 +164,8 @@ services:
       - rabbitmq
       - mysql
       - traffic-postgres
+      - keycloak
+      - memcached
     volumes:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
@@ -173,6 +180,8 @@ services:
       - rabbitmq
       - mysql
       - traffic-postgres
+      - keycloak
+      - memcached
     volumes:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
@@ -187,48 +196,26 @@ services:
       - rabbitmq
       - mysql
       - traffic-postgres
+      - keycloak
+      - memcached
     volumes:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
-  auth:
-    image: autowp/auth
-    container_name: autowp_test_auth
-    restart: always
-    volumes:
-    - "./auth-config.yaml:/config.yaml:ro"
-    depends_on:
-    - auth-postgres
-    - mysql
-    expose:
-    - "8080"
-    ports:
-    - "8080:8080"
-
-  auth-postgres:
-    image: postgres:12
-    container_name: autowp_test_auth_postgres
-    restart: always
-    environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_USER=auth
-      - POSTGRES_DB=auth
-    ports:
-      - "5432:5432"
-
   minio:
-    image: minio/minio
+    image: quay.io/minio/minio
     container_name: autowp_test_minio
     restart: always
     environment:
-      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
-      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      MINIO_ROOT_USER: "AKIAIOSFODNN7EXAMPLE"
+      MINIO_ROOT_PASSWORD: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
     ports:
       - "9000:9000"
+      - "9001:9001"
     volumes:
       - "./minio/data:/data"
-    command: server /data
+    command: server --console-address ":9001" /data
 
   createbuckets:
     image: minio/mc
@@ -252,3 +239,18 @@ services:
       /usr/bin/mc policy set download autowp/files;
       exit 0;
       "
+
+  keycloak:
+    image: jboss/keycloak:16.1.1
+    container_name: autowp_test_keycloak
+    restart: always
+    environment:
+      DB_VENDOR: h2
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_IMPORT: /tmp/realm.json
+      JAVA_OPTS_APPEND: "-Dkeycloak.profile.feature.upload_scripts=enabled"
+    volumes:
+      - ./keycloak/realm.json:/tmp/realm.json
+    ports:
+      - "8081:8080"

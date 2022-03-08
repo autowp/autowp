@@ -201,7 +201,7 @@ class MessageService
         $adapter = $this->table->getAdapter();
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -215,7 +215,7 @@ class MessageService
         $adapter = $this->table->getAdapter();
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -255,7 +255,7 @@ class MessageService
         $adapter = $this->table->getAdapter();
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -283,7 +283,7 @@ class MessageService
         $adapter = $this->table->getAdapter();
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -309,7 +309,7 @@ class MessageService
         $adapter = $this->table->getAdapter();
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator
@@ -337,7 +337,7 @@ class MessageService
         $adapter = $this->table->getAdapter();
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator

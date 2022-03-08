@@ -24,6 +24,9 @@ class Acceleration extends AbstractAdapter
     /** @var array|ArrayObject|null */
     private $mphAttribute;
 
+    /**
+     * @throws Exception
+     */
     public function setAttributes(array $value): void
     {
         $this->attributes = $value;

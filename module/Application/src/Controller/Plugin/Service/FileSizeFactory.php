@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Controller\Plugin\Service;
 
 use Application\Controller\Plugin\FileSize as Plugin;

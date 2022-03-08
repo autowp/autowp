@@ -28,6 +28,7 @@ class AttrConflictHydrator extends AbstractRestHydrator
 
     /**
      * @param array|ArrayAccess $object
+     * @throws Exception
      */
     public function extract($object): ?array
     {

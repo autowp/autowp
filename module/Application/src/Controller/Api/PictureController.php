@@ -591,7 +591,7 @@ class PictureController extends AbstractRestfulController
         }
 
         $paginator
-            ->setItemCountPerPage($limit ? $limit : 1)
+            ->setItemCountPerPage($limit ?: 1)
             ->setCurrentPageNumber($data['page']);
 
         $result = [
@@ -1092,6 +1092,7 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @param array|ArrayAccess $picture
+     * @throws Exception
      */
     private function pictureCanDelete($picture): bool
     {
@@ -1118,8 +1119,9 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @throws Storage\Exception
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
+     * @throws Storage\Exception
      */
     public function normalizeAction()
     {
@@ -1156,8 +1158,9 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @throws Storage\Exception
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
+     * @throws Storage\Exception
      */
     public function flopAction()
     {
@@ -1220,8 +1223,9 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @throws Storage\Exception
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
+     * @throws Storage\Exception
      */
     public function correctFileNamesAction()
     {

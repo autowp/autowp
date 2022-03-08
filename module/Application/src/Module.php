@@ -2,7 +2,6 @@
 
 namespace Application;
 
-use Laminas\Console\Adapter\AdapterInterface as Console;
 use Laminas\EventManager\EventInterface as Event;
 use Laminas\Loader\StandardAutoloader;
 use Laminas\ModuleManager\Feature;
@@ -22,8 +21,6 @@ use const E_ALL;
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\BootstrapListenerInterface,
-    Feature\ConsoleUsageProviderInterface,
-    Feature\ConsoleBannerProviderInterface,
     Feature\ConfigProviderInterface
 {
     public const VERSION               = '1.0dev';
@@ -40,7 +37,7 @@ class Module implements
             __DIR__ . '/../config/module.config.api.php',
             __DIR__ . '/../config/module.config.api.filter.php',
             __DIR__ . '/../config/module.config.cache.php',
-            __DIR__ . '/../config/module.config.console.php',
+            __DIR__ . '/../config/module.config.cli.php',
             __DIR__ . '/../config/module.config.forms.php',
             __DIR__ . '/../config/module.config.imagestorage.php',
             __DIR__ . '/../config/module.config.routes.php',
@@ -119,21 +116,5 @@ class Module implements
         if ($exception) {
             captureException($exception);
         }
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function getConsoleBanner(Console $console): string
-    {
-        return 'WheelsAge Module';
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function getConsoleUsage(Console $console): array
-    {
-        return [];
     }
 }

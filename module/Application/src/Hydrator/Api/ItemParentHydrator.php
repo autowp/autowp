@@ -185,6 +185,9 @@ class ItemParentHydrator extends AbstractRestHydrator
         throw new Exception("Not supported");
     }
 
+    /**
+     * @throws Exception
+     */
     private function getUserRole(): ?string
     {
         if (! $this->userId) {

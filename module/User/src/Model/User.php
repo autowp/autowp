@@ -39,24 +39,6 @@ class User
         $this->table = $table;
     }
 
-    public function updateSpecsVolumes(): void
-    {
-        $select = $this->table->getSql()->select()
-            ->columns(['id', 'count' => new Sql\Expression('count(attrs_user_values.user_id)')])
-            ->join('attrs_user_values', 'attrs_user_values.user_id = users.id', [], Sql\Select::JOIN_LEFT)
-            ->where('not users.specs_volume_valid')
-            ->group('users.id');
-
-        foreach ($this->table->selectWith($select) as $row) {
-            $this->table->update([
-                'specs_volume'       => $row['count'],
-                'specs_volume_valid' => 1,
-            ], [
-                'id = ?' => $row['id'],
-            ]);
-        }
-    }
-
     public function invalidateSpecsVolume(int $userId): void
     {
         $this->table->update([
@@ -264,7 +246,7 @@ class User
         /** @var Adapter $adapter */
         $adapter = $this->table->getAdapter();
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($this->getSelect($options), $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($this->getSelect($options), $adapter)
         );
     }
 

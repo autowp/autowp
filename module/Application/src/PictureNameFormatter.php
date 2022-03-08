@@ -74,6 +74,9 @@ class PictureNameFormatter
         return 'Picture';
     }
 
+    /**
+     * @throws Exception
+     */
     public function formatHtml(array $picture, string $language): string
     {
         if (isset($picture['name']) && $picture['name']) {

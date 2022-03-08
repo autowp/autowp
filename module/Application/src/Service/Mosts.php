@@ -506,7 +506,7 @@ class Mosts
                 'order'  => 'perspective_group',
             ]);
 
-            $pictures[] = $picture ? $picture : null;
+            $pictures[] = $picture ?: null;
         }
 
         $ids = [];
@@ -747,7 +747,7 @@ class Mosts
                 'name'   => $year['name'],
                 'params' => [
                     'most_catname'  => $cMost['catName'],
-                    'shape_catname' => $carTypeCatname ? $carTypeCatname : 'car',
+                    'shape_catname' => $carTypeCatname ?: 'car',
                     'years_catname' => $year['folder'],
                 ],
             ];
@@ -757,7 +757,7 @@ class Mosts
             'name'   => 'mosts/period/all-time',
             'params' => [
                 'most_catname'  => $cMost['catName'],
-                'shape_catname' => $carTypeCatname ? $carTypeCatname : null,
+                'shape_catname' => $carTypeCatname ?: null,
                 'years_catname' => null,
             ],
         ];

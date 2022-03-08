@@ -45,6 +45,9 @@ class DayPictures
 
     private Picture $picture;
 
+    /**
+     * @throws Exception
+     */
     public function __construct(array $options = [])
     {
         $this->currentDate = null;
@@ -57,6 +60,9 @@ class DayPictures
         $this->setOptions($options);
     }
 
+    /**
+     * @throws Exception
+     */
     public function setOptions(array $options): self
     {
         foreach ($options as $key => $value) {
@@ -199,10 +205,10 @@ class DayPictures
     /**
      * @throws Exception
      */
-    private function calcPrevDate(): self
+    private function calcPrevDate(): void
     {
         if (! $this->currentDate) {
-            return $this;
+            return;
         }
 
         if ($this->prevDate === null) {
@@ -243,8 +249,6 @@ class DayPictures
                 $this->prevDate = null;
             }
         }
-
-        return $this;
     }
 
     /**
@@ -282,10 +286,10 @@ class DayPictures
     /**
      * @throws Exception
      */
-    private function calcNextDate(): self
+    private function calcNextDate(): void
     {
         if (! $this->currentDate) {
-            return $this;
+            return;
         }
 
         if ($this->nextDate === null) {
@@ -316,8 +320,6 @@ class DayPictures
                 $this->nextDate = null;
             }
         }
-
-        return $this;
     }
 
     /**
@@ -364,7 +366,7 @@ class DayPictures
             /** @var Adapter $adapter */
             $adapter         = $this->picture->getTable()->getAdapter();
             $this->paginator = new Paginator\Paginator(
-                new Paginator\Adapter\DbSelect($select, $adapter)
+                new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
             );
         }
 
@@ -384,7 +386,7 @@ class DayPictures
         /** @var Adapter $adapter */
         $adapter   = $this->picture->getTable()->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -408,7 +410,7 @@ class DayPictures
     private function startOfDay(DateTime $date): DateTime
     {
         $d = clone $date;
-        return $d->setTime(0, 0, 0);
+        return $d->setTime(0, 0);
     }
 
     private function startOfDayDbValue(DateTime $date): string

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application;
 
 return [
@@ -39,4 +41,8 @@ return [
         ],
     ],
     'mosts_min_vehicles_count' => 1,
+    'keycloak'                 => [
+        'url'   => 'http://keycloak:8080',
+        'realm' => 'autowp',
+    ],
 ];

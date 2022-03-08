@@ -3,6 +3,8 @@
 namespace Application\Controller\Api;
 
 use Application\Model\Twins;
+use Exception;
+use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
@@ -22,6 +24,10 @@ class TwinsController extends AbstractRestfulController
         $this->cache = $cache;
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function getBrandsAction(): JsonModel
     {
         $language = $this->language();
@@ -35,7 +41,7 @@ class TwinsController extends AbstractRestfulController
             ]);
 
             $result = [];
-            foreach ($arr as &$brand) {
+            foreach ($arr as $brand) {
                 $result[] = [
                     'catname'   => $brand['catname'],
                     'name'      => $brand['name'],

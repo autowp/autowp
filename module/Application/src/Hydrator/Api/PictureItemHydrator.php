@@ -86,6 +86,7 @@ class PictureItemHydrator extends AbstractRestHydrator
 
     /**
      * @param array|ArrayAccess $object
+     * @throws Exception
      */
     public function extract($object): ?array
     {
@@ -132,6 +133,9 @@ class PictureItemHydrator extends AbstractRestHydrator
         return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getUserRole(): ?string
     {
         if (! $this->userId) {

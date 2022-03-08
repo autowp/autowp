@@ -36,8 +36,6 @@ class AttrAttributeHydrator extends AbstractRestHydrator
      */
     public function setOptions($options): self
     {
-        parent::setOptions($options);
-
         if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
@@ -45,6 +43,8 @@ class AttrAttributeHydrator extends AbstractRestHydrator
                 'The options parameter must be an array or a Traversable'
             );
         }
+
+        parent::setOptions($options);
 
         return $this;
     }

@@ -7,6 +7,7 @@ use Application\Model\Picture;
 use Autowp\Comments;
 use Autowp\User\Model\User;
 use Casbin\Enforcer;
+use Exception;
 use Laminas\Db\Sql;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
@@ -46,6 +47,9 @@ class AboutController extends AbstractRestfulController
         $this->userModel = $userModel;
     }
 
+    /**
+     * @throws Exception
+     */
     public function indexAction(): JsonModel
     {
         $totalUsers = $this->userModel->getCount([]);

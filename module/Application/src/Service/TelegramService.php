@@ -101,6 +101,9 @@ class TelegramService
         return $this->token === $token;
     }
 
+    /**
+     * @throws TelegramSDKException
+     */
     public function registerWebhook(): void
     {
         $this->getApi()->setWebhook([
@@ -109,6 +112,9 @@ class TelegramService
         ]);
     }
 
+    /**
+     * @throws TelegramSDKException
+     */
     public function getWebhookUpdates(): Update
     {
         return $this->getApi()->getWebhookUpdates();
@@ -142,6 +148,9 @@ class TelegramService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function unsubscribeChat(int $chatId): void
     {
         if (! $chatId) {
@@ -265,6 +274,7 @@ class TelegramService
 
     /**
      * @param array|ArrayAccess $picture
+     * @throws Exception
      */
     private function getPictureUrl(int $chatId, $picture): string
     {
@@ -274,6 +284,9 @@ class TelegramService
         return $uri->toString();
     }
 
+    /**
+     * @throws Exception
+     */
     private function getUriByChatId(int $chatId): Uri
     {
         $chat = currentFromResultSetInterface($this->telegramChatTable->select([
@@ -288,7 +301,7 @@ class TelegramService
             }
         }
 
-        return UriFactory::factory('http://wheelsage.org');
+        return UriFactory::factory('https://wheelsage.org');
     }
 
     /**

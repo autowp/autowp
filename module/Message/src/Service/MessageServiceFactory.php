@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Message\Service;
 
 use Application\Service\TelegramService;
@@ -16,7 +18,7 @@ class MessageServiceFactory implements FactoryInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string                $requestedName
-     * @param ?array<string, mixed> $options
+     * @param null|array $options
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): MessageService
     {

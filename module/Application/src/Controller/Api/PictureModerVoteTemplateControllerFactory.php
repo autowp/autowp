@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Controller\Api;
 
 use Application\Controller\Api\PictureModerVoteTemplateController as Controller;

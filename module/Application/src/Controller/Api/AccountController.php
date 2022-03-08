@@ -4,6 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Model\UserAccount;
 use Autowp\User\Controller\Plugin\User;
+use Exception;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -26,6 +27,9 @@ class AccountController extends AbstractRestfulController
         $this->userAccount = $userAccount;
     }
 
+    /**
+     * @throws Exception
+     */
     private function canRemoveAccount(int $id): bool
     {
         $user = $this->user()->get();

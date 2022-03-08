@@ -190,7 +190,7 @@ class Forums
         $adapter = $this->topicTable->getAdapter();
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator

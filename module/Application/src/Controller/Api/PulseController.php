@@ -7,6 +7,7 @@ use Application\Module;
 use Autowp\User\Model\User;
 use DateInterval;
 use DateTime;
+use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractActionController;
@@ -54,6 +55,9 @@ class PulseController extends AbstractActionController
         return $this->colors[$this->lastColor++ % count($this->colors)];
     }
 
+    /**
+     * @throws Exception
+     */
     public function indexAction(): JsonModel
     {
         $now = new DateTime();

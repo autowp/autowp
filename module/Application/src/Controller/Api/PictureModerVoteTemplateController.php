@@ -3,6 +3,7 @@
 namespace Application\Controller\Api;
 
 use Autowp\User\Controller\Plugin\User;
+use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
@@ -66,6 +67,7 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function itemAction()
     {

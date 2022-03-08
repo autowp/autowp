@@ -55,6 +55,9 @@ class PictureItem
         ]));
     }
 
+    /**
+     * @throws Exception
+     */
     public function add(int $pictureId, int $itemId, int $type): void
     {
         if (! $pictureId) {
@@ -87,6 +90,9 @@ class PictureItem
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function remove(int $pictureId, int $itemId, int $type): void
     {
         if (! $pictureId) {
@@ -106,11 +112,17 @@ class PictureItem
         $this->updateContentCount($pictureId);
     }
 
+    /**
+     * @throws Exception
+     */
     public function isExists(int $pictureId, int $itemId, int $type): bool
     {
         return (bool) $this->getRow($pictureId, $itemId, $type);
     }
 
+    /**
+     * @throws Exception
+     */
     public function changePictureItem(int $pictureId, int $type, int $oldItemId, int $newItemId): void
     {
         if (! $newItemId) {
@@ -136,6 +148,9 @@ class PictureItem
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function setPictureItems(int $pictureId, int $type, array $itemIds): void
     {
         if (! $pictureId) {
@@ -313,6 +328,9 @@ class PictureItem
         return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     public function setProperties(int $pictureId, int $itemId, int $type, array $properties): void
     {
         $row = $this->getRow($pictureId, $itemId, $type);
@@ -357,6 +375,9 @@ class PictureItem
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function getPerspective(int $pictureId, int $itemId): ?int
     {
         $row = $this->getRow($pictureId, $itemId, self::PICTURE_CONTENT);
@@ -367,6 +388,9 @@ class PictureItem
         return (int) $row['perspective_id'];
     }
 
+    /**
+     * @throws Exception
+     */
     public function getArea(int $pictureId, int $itemId): ?array
     {
         $row = $this->getRow($pictureId, $itemId, self::PICTURE_CONTENT);

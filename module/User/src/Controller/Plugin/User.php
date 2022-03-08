@@ -19,7 +19,7 @@ class User extends AbstractPlugin
 
     private array $users = [];
 
-    /** @var array|ArrayObject */
+    /** @var array|ArrayObject|null */
     private $user;
 
     private OAuth $oauth;
@@ -41,7 +41,7 @@ class User extends AbstractPlugin
         }
 
         if (! array_key_exists($id, $this->users)) {
-            $this->users[$id] = $this->userModel->getRow(['id' => (int) $id]);
+            $this->users[$id] = $this->userModel->getRow(['id' => $id]);
         }
 
         return $this->users[$id];

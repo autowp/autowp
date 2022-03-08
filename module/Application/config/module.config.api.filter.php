@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application;
 
 use Application\InputFilter\AttrUserValueCollectionInputFilter;
@@ -7,7 +9,6 @@ use Autowp\Comments\Attention;
 use Autowp\Comments\CommentsService;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
-use Autowp\User\Model\User;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Laminas\InputFilter\InputFilter;
 
@@ -3457,68 +3458,6 @@ return [
                 ],
             ],
         ],
-        'api_restore_password_request'         => [
-            'email' => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'                   => 'EmailAddress',
-                        'break_chain_on_failure' => true,
-                    ],
-                    ['name' => Validator\User\EmailExists::class],
-                ],
-            ],
-        ],
-        'api_restore_password_new'             => [
-            'code'             => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => null,
-                            'max' => 500,
-                        ],
-                    ],
-                ],
-            ],
-            'password'         => [
-                'required'   => true,
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD,
-                        ],
-                    ],
-                ],
-            ],
-            'password_confirm' => [
-                'required'   => true,
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD,
-                        ],
-                    ],
-                    [
-                        'name'    => 'Identical',
-                        'options' => [
-                            'token' => 'password',
-                        ],
-                    ],
-                ],
-            ],
-        ],
         'api_user_item'                        => [
             'fields' => [
                 'required' => false,
@@ -3535,7 +3474,6 @@ return [
                                 'avatar',
                                 'photo',
                                 'gravatar',
-                                'renames',
                                 'is_moder',
                                 'accounts',
                                 'pictures_added',
@@ -3621,7 +3559,6 @@ return [
                                 'avatar',
                                 'photo',
                                 'gravatar',
-                                'renames',
                                 'is_moder',
                                 'accounts',
                                 'pictures_added',
@@ -3642,29 +3579,7 @@ return [
             ],
         ],
         'api_user_put'                         => [
-            'deleted'          => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'name'             => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => User::MIN_NAME,
-                            'max' => User::MAX_NAME,
-                        ],
-                    ],
-                ],
-            ],
-            'language'         => [
+            'language' => [
                 'required'   => true,
                 'validators' => [
                     [
@@ -3675,127 +3590,13 @@ return [
                     ],
                 ],
             ],
-            'timezone'         => [
+            'timezone' => [
                 'required'   => true,
                 'validators' => [
                     [
                         'name'    => 'InArray',
                         'options' => [
                             'haystack' => [],
-                        ],
-                    ],
-                ],
-            ],
-            'email'            => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'                   => 'EmailAddress',
-                        'break_chain_on_failure' => true,
-                    ],
-                    ['name' => Validator\User\EmailNotExists::class],
-                ],
-            ],
-            'password_old'     => [
-                'required' => true,
-            ],
-            'password'         => [
-                'required'   => true,
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD,
-                        ],
-                    ],
-                ],
-            ],
-            'password_confirm' => [
-                'required'   => true,
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD,
-                        ],
-                    ],
-                    [
-                        'name'    => 'Identical',
-                        'options' => [
-                            'token' => 'password',
-                        ],
-                    ],
-                ],
-            ],
-        ],
-        'api_user_post'                        => [
-            'email'            => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => null,
-                            'max' => 50,
-                        ],
-                    ],
-                    [
-                        'name'                   => 'EmailAddress',
-                        'break_chain_on_failure' => true,
-                    ],
-                    ['name' => Validator\User\EmailNotExists::class],
-                ],
-            ],
-            'name'             => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => User::MIN_NAME,
-                            'max' => User::MAX_NAME,
-                        ],
-                    ],
-                ],
-            ],
-            'password'         => [
-                'required'   => true,
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD,
-                        ],
-                    ],
-                ],
-            ],
-            'password_confirm' => [
-                'required'   => true,
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => User::MIN_PASSWORD,
-                            'max' => User::MAX_PASSWORD,
-                        ],
-                    ],
-                    [
-                        'name'    => 'Identical',
-                        'options' => [
-                            'token' => 'password',
                         ],
                     ],
                 ],

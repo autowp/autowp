@@ -6,6 +6,7 @@ use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\Image\Storage;
+use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Mvc\Controller\AbstractActionController;
@@ -46,6 +47,7 @@ class MapController extends AbstractActionController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function dataAction()
     {

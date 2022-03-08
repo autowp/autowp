@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Validator\Attr;
 
 use Interop\Container\ContainerInterface;

@@ -7,7 +7,6 @@ use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
 use function Autowp\Commons\currentFromResultSetInterface;
-use function count;
 
 class PictureModerVote
 {
@@ -75,6 +74,9 @@ class PictureModerVote
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function getVoteCount(int $pictureId): array
     {
         $select = new Sql\Select($this->table->getTable());
@@ -92,35 +94,9 @@ class PictureModerVote
         ];
     }
 
-    public function getVoteCountArray(array $ids): array
-    {
-        if (! count($ids)) {
-            return [];
-        }
-
-        $select = new Sql\Select($this->table->getTable());
-        $select
-            ->columns([
-                'picture_id',
-                'vote'  => new Sql\Expression('sum(if(vote, 1, -1))'),
-                'count' => new Sql\Expression('count(1)'),
-            ])
-            ->where([new Sql\Predicate\In('picture_id', $ids)])
-            ->group('picture_id');
-
-        $rows = $this->table->selectWith($select);
-
-        $result = [];
-        foreach ($rows as $row) {
-            $result[$row['picture_id']] = [
-                'moder_votes'       => (int) $row['vote'],
-                'moder_votes_count' => (int) $row['count'],
-            ];
-        }
-
-        return $result;
-    }
-
+    /**
+     * @throws Exception
+     */
     public function hasVote(int $pictureId, int $userId): bool
     {
         return (bool) currentFromResultSetInterface($this->table->select([
@@ -130,8 +106,6 @@ class PictureModerVote
     }
 
     /**
-     * , PhanPluginMixedKeyNoKey
-     *
      * @throws Exception
      */
     public function getPositiveVotesCount(int $pictureId): int
@@ -148,8 +122,6 @@ class PictureModerVote
     }
 
     /**
-     * , PhanPluginMixedKeyNoKey
-     *
      * @throws Exception
      */
     public function getNegativeVotesCount(int $pictureId): int

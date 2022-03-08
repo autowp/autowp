@@ -4,17 +4,14 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Hydrator\Api\ItemHydrator;
-use Application\Model\Brand;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
-use Application\Model\Categories;
 use Application\Model\Item;
-use Application\Model\Picture;
-use Application\Model\PictureItem;
-use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
+use Exception;
+use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
 use Laminas\Http\PhpEnvironment\Request;
@@ -32,13 +29,7 @@ class IndexController extends AbstractRestfulController
 {
     private StorageInterface $cache;
 
-    private Brand $brand;
-
     private Item $item;
-
-    private Categories $categories;
-
-    private Twins $twins;
 
     private SpecificationsService $specsService;
 
@@ -54,10 +45,7 @@ class IndexController extends AbstractRestfulController
 
     public function __construct(
         StorageInterface $cache,
-        Brand $brand,
         Item $item,
-        Categories $categories,
-        Twins $twins,
         SpecificationsService $specsService,
         User $userModel,
         CarOfDay $itemOfDay,
@@ -66,10 +54,7 @@ class IndexController extends AbstractRestfulController
         AbstractRestHydrator $userHydrator
     ) {
         $this->cache        = $cache;
-        $this->brand        = $brand;
         $this->item         = $item;
-        $this->categories   = $categories;
-        $this->twins        = $twins;
         $this->specsService = $specsService;
         $this->userModel    = $userModel;
         $this->itemOfDay    = $itemOfDay;
@@ -78,177 +63,10 @@ class IndexController extends AbstractRestfulController
         $this->userHydrator = $userHydrator;
     }
 
-    public function brandsAction(): JsonModel
-    {
-        $language = $this->language();
-
-        $cacheKey = 'API_INDEX_BRANDS_2_' . $language;
-        $success  = false;
-        $brands   = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            // cache missing
-            $brands = [
-                'brands' => $this->brand->getTopBrandsList($language),
-                'total'  => $this->item->getCount([
-                    'item_type_id' => Item::BRAND,
-                ]),
-            ];
-
-            $this->cache->setItem($cacheKey, $brands);
-        }
-
-        return new JsonModel($brands);
-    }
-
-    public function personsContentAction(): JsonModel
-    {
-        $language = $this->language();
-
-        $cacheKey       = 'API_INDEX_PERSONS_CONTENT_' . $language;
-        $success        = false;
-        $contentPersons = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $contentPersons = $this->item->getRows([
-                'language'     => $language,
-                'columns'      => ['id', 'name'],
-                'limit'        => 5,
-                'item_type_id' => 8,
-                'pictures'     => [
-                    'status' => Picture::STATUS_ACCEPTED,
-                    'type'   => PictureItem::PICTURE_CONTENT,
-                ],
-                'order'        => new Sql\Expression('COUNT(pi1.picture_id) desc'),
-            ]);
-
-            $this->cache->setItem($cacheKey, $contentPersons);
-        }
-
-        return new JsonModel([
-            'items' => $contentPersons,
-        ]);
-    }
-
-    public function personsAuthorAction(): JsonModel
-    {
-        $language = $this->language();
-
-        $cacheKey      = 'API_INDEX_PERSONS_AUTHOR_' . $language;
-        $success       = false;
-        $authorPersons = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $authorPersons = $this->item->getRows([
-                'language'     => $language,
-                'columns'      => ['id', 'name'],
-                'limit'        => 5,
-                'item_type_id' => 8,
-                'pictures'     => [
-                    'status' => Picture::STATUS_ACCEPTED,
-                    'type'   => PictureItem::PICTURE_AUTHOR,
-                ],
-                'order'        => new Sql\Expression('COUNT(pi1.picture_id) desc'),
-            ]);
-
-            $this->cache->setItem($cacheKey, $authorPersons);
-        }
-
-        return new JsonModel([
-            'items' => $authorPersons,
-        ]);
-    }
-
-    public function categoriesAction(): JsonModel
-    {
-        $language = $this->language();
-
-        // categories
-        $cacheKey   = 'API_INDEX_CATEGORY_' . $language;
-        $success    = false;
-        $categories = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $categories = $this->categories->getCategoriesList(0, $language, 15, 'name');
-
-            $this->cache->setItem($cacheKey, $categories);
-        }
-
-        return new JsonModel([
-            'items' => $categories,
-        ]);
-    }
-
-    public function factoriesAction(): JsonModel
-    {
-        $cacheKey  = 'API_INDEX_FACTORIES_2';
-        $success   = true;
-        $factories = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $select = new Sql\Select($this->item->getTable()->getTable());
-            $select
-                ->columns([
-                    'id',
-                    'name',
-                    'count'     => new Sql\Expression('COUNT(1)'),
-                    'new_count' => new Sql\Expression(
-                        'COUNT(IF(item_parent.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY), 1, NULL))',
-                        [7]
-                    ),
-                ])
-                ->where([
-                    'item.item_type_id = ?' => Item::FACTORY,
-                    new Sql\Predicate\In('product.item_type_id', [
-                        Item::VEHICLE,
-                        Item::ENGINE,
-                    ]),
-                ])
-                ->join('item_parent', 'item.id = item_parent.parent_id', [])
-                ->join(['product' => 'item'], 'item_parent.item_id = product.id', [])
-                ->group('item.id')
-                ->order(['new_count desc', 'count desc'])
-                ->limit(8);
-
-            $items = $this->item->getTable()->selectWith($select);
-
-            $factories = [];
-            foreach ($items as $item) {
-                $factories[] = [
-                    'id'        => $item['id'],
-                    'name'      => $item['name'],
-                    'count'     => $item['count'],
-                    'new_count' => $item['new_count'],
-                ];
-            }
-
-            $this->cache->setItem($cacheKey, $factories);
-        }
-
-        return new JsonModel([
-            'items' => $factories,
-        ]);
-    }
-
-    public function twinsAction(): JsonModel
-    {
-        $language = $this->language();
-
-        $cacheKey   = 'API_INDEX_INTERESTS_TWINS_BLOCK_' . $language;
-        $success    = false;
-        $twinsBlock = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $twinsBrands = $this->twins->getBrands([
-                'language' => $language,
-                'limit'    => 20,
-            ]);
-
-            $twinsBlock = [
-                'brands'       => $twinsBrands,
-                'brands_count' => $this->twins->getTotalBrandsCount(),
-            ];
-
-            $this->cache->setItem($cacheKey, $twinsBlock);
-        }
-
-        return new JsonModel($twinsBlock);
-    }
-
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function specItemsAction(): JsonModel
     {
         $language = $this->language();
@@ -336,6 +154,10 @@ class IndexController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
     public function itemOfDayAction(): JsonModel
     {
         $language = $this->language();
@@ -406,25 +228,9 @@ class IndexController extends AbstractRestfulController
                     }
                 }
 
-                $itemOfDayUser = null;
-                if ($itemOfDay['user_id']) {
-                    $itemOfDayUser = $this->userModel->getRow([
-                        'id' => $itemOfDay['user_id'],
-                    ]);
-                }
-
-                if ($itemOfDayUser) {
-                    $this->userHydrator->setOptions([
-                        'language' => $language,
-                        'fields'   => [],
-                        'user_id'  => null,
-                    ]);
-                    $itemOfDayUser = $this->userHydrator->extract($itemOfDayUser);
-                }
-
                 $itemOfDayInfo = [
-                    'item' => $item,
-                    'user' => $itemOfDayUser,
+                    'item'    => $item,
+                    'user_id' => $itemOfDay['user_id'],
                 ];
 
                 $this->cache->setItem($key, $itemOfDayInfo);

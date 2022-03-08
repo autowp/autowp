@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\User\Controller\Plugin;
 
 use Autowp\User\Model\User as UserModel;
@@ -13,7 +15,7 @@ class UserFactory implements FactoryInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string                $requestedName
-     * @param ?array<string, mixed> $options
+     * @param null|array $options
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): User
     {

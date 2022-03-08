@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\User;
 
 class ConfigProvider
@@ -33,10 +35,8 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                Model\User::class               => Model\UserFactory::class,
-                Model\UserPasswordRemind::class => Model\UserPasswordRemindFactory::class,
-                Model\UserRename::class         => Model\UserRenameFactory::class,
-                Service\OAuth::class            => Service\OAuthFactory::class,
+                Model\User::class    => Model\UserFactory::class,
+                Service\OAuth::class => Service\OAuthFactory::class,
             ],
         ];
     }

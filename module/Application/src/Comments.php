@@ -168,6 +168,9 @@ class Comments
         return $this->service;
     }
 
+    /**
+     * @throws Exception
+     */
     public function cleanBrokenMessages(): int
     {
         $affected = 0;

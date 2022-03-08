@@ -10,6 +10,7 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Paginator;
+use Laminas\Paginator\Adapter\LaminasDb\DbSelect;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
@@ -64,7 +65,7 @@ class ArticleController extends AbstractActionController
         /** @var Adapter $adapter */
         $adapter   = $this->table->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new DbSelect($select, $adapter)
         );
 
         $paginator

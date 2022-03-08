@@ -5,6 +5,7 @@ namespace Application\View\Helper;
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use ArrayObject;
+use Exception;
 use Laminas\View\Helper\AbstractHtmlElement;
 use Laminas\View\Renderer\PhpRenderer;
 
@@ -45,6 +46,9 @@ class Pic extends AbstractHtmlElement
         return null;
     }
 
+    /**
+     * @throws Exception
+     */
     public function htmlTitle(array $picture): string
     {
         /** @var PhpRenderer $view */
@@ -55,6 +59,9 @@ class Pic extends AbstractHtmlElement
         return $this->pictureNameFormatter->formatHtml($picture, $languageHelper());
     }
 
+    /**
+     * @throws Exception
+     */
     public function textTitle(array $picture): string
     {
         /** @var PhpRenderer $view */
@@ -67,6 +74,7 @@ class Pic extends AbstractHtmlElement
 
     /**
      * @param array|ArrayObject $pictureRow
+     * @throws Exception
      */
     public function name($pictureRow, string $language): string
     {

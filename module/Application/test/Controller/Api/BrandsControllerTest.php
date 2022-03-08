@@ -5,9 +5,12 @@ namespace ApplicationTest\Controller\Api;
 use Application\Controller\Api\BrandsController;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
+use JsonException;
 use Laminas\Http\Header\Location;
 use Laminas\Http\Request;
 use Laminas\Http\Response;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 use function count;
 use function explode;
@@ -27,6 +30,11 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('index');
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws JsonException
+     */
     public function testNewItems(): void
     {
         $brandId = 204;

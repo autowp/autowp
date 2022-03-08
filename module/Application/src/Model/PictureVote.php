@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Exception;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\TableGateway;
 
@@ -34,11 +35,14 @@ class PictureVote
         /** @var Adapter $adapter */
         $adapter   = $this->voteTable->getAdapter();
         $statement = $adapter->createStatement($sql);
-        $statement->execute([(int) $pictureId, (int) $userId, $value]);
+        $statement->execute([$pictureId, $userId, $value]);
 
         $this->updatePictureSummary($pictureId);
     }
 
+    /**
+     * @throws Exception
+     */
     public function getVote(int $pictureId, int $userId): array
     {
         $row = null;

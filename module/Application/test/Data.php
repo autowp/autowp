@@ -2,16 +2,36 @@
 
 namespace ApplicationTest;
 
+use GuzzleHttp\Client;
+use JsonException;
 use Laminas\Http\Header\Authorization;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+
+use function json_decode;
+
+use const JSON_THROW_ON_ERROR;
 
 class Data
 {
-    public const ADMIN_AUTH_HEADER = 'Authorization: Bearer '
-        . 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJkZWZhdWx0IiwiZXhwIjoxODgwMDAwMDAwLCJzdWIiOiIzIn0.'
-        . '5l0HxtAvH9kmfpJXC85lpcEf2EzPucxFCLmXl1oatPwKEDb__YTIdEDaaINplD4oWg10HbOc0-vDJVoQngKn9g';
-
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws JsonException
+     */
     public static function getAdminAuthHeader(): Authorization
     {
-        return Authorization::fromString(self::ADMIN_AUTH_HEADER);
+        $client = new Client();
+        $url    = 'http://goautowp-serve-public:8080/api/oauth/token';
+        $res    = $client->post($url, [
+            'json' => [
+                'grant_type' => 'password',
+                'username'   => 'admin',
+                'password'   => '123123',
+            ],
+        ]);
+        $tokens = json_decode($res->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
+        return Authorization::fromString('Authorization: Bearer ' . $tokens['access_token']);
     }
 }

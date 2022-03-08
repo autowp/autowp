@@ -218,7 +218,7 @@ class GalleryController extends AbstractRestfulController
                 $crops[$idx]        = $crop;
             }
             $ids[]      = (int) $picture['id'];
-            $imageIds[] = (int) $imageId;
+            $imageIds[] = $imageId;
         }
 
         // images

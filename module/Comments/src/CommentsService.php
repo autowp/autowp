@@ -10,6 +10,7 @@ use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Paginator;
+use Laminas\Paginator\Adapter\LaminasDb\DbSelect;
 
 use function array_replace;
 use function Autowp\Commons\currentFromResultSetInterface;
@@ -53,6 +54,9 @@ class CommentsService
         $this->userModel           = $userModel;
     }
 
+    /**
+     * @throws Exception
+     */
     public function add(array $data): int
     {
         $typeId   = (int) $data['typeId'];
@@ -218,6 +222,9 @@ class CommentsService
         $statement->execute([$userId, $typeId, $itemId]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function queueDeleteMessage(int $id, int $userId): bool
     {
         $comment = $this->getMessageRow($id);
@@ -241,6 +248,9 @@ class CommentsService
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
     public function restoreMessage(int $id): void
     {
         $comment = $this->getMessageRow($id);
@@ -264,6 +274,9 @@ class CommentsService
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function voteMessage(int $id, int $userId, int $vote): array
     {
         $message = $this->getMessageRow($id);
@@ -310,6 +323,9 @@ class CommentsService
         ];
     }
 
+    /**
+     * @throws Exception
+     */
     private function updateVote(int $messageId): int
     {
         $select = $this->voteTable->getSql()->select()
@@ -327,6 +343,9 @@ class CommentsService
         return (int) $row['count'];
     }
 
+    /**
+     * @throws Exception
+     */
     public function moveMessages(int $srcTypeId, int $srcItemId, int $dstTypeId, int $dstItemId): void
     {
         $this->messageTable->update([
@@ -358,6 +377,9 @@ class CommentsService
         return currentFromResultSetInterface($this->messageTable->selectWith($select));
     }
 
+    /**
+     * @throws Exception
+     */
     public function topicHaveModeratorAttention(int $type, int $item): bool
     {
         return (bool) currentFromResultSetInterface($this->messageTable->select([
@@ -399,7 +421,7 @@ class CommentsService
     }
 
     /**
-     * @param array $message
+     * @param array|ArrayObject $message
      * @throws Exception
      */
     public function getMessagePage($message, int $perPage): int
@@ -420,6 +442,9 @@ class CommentsService
         return (int) ceil(($row['count'] + 1) / $perPage);
     }
 
+    /**
+     * @throws Exception
+     */
     public function getMessageAuthorId(int $messageId): ?int
     {
         $row = $this->getMessageRow($messageId);
@@ -472,6 +497,9 @@ class CommentsService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function moveMessage(int $id, int $newTypeId, int $newItemId): bool
     {
         $messageRow = $this->getMessageRow($id);
@@ -518,11 +546,12 @@ class CommentsService
 
         $row = currentFromResultSetInterface($this->topicViewTable->selectWith($select));
 
-        return $row ? $messageRow['datetime'] > $row['timestamp'] : true;
+        return ! $row || $messageRow['datetime'] > $row['timestamp'];
     }
 
     /**
      * @param int|array $itemId
+     * @throws Exception
      */
     public function getTopicStatForUser(int $typeId, $itemId, int $userId): array
     {
@@ -532,6 +561,16 @@ class CommentsService
 
         $rows = [];
         if (count($itemId) > 0) {
+            /** @var Sql\Predicate\Expression $join */
+            $join   = new Sql\Predicate\PredicateSet([
+                new Sql\Predicate\Expression('comment_topic.type_id = comment_topic_view.type_id'),
+                new Sql\Predicate\Expression('comment_topic.item_id = comment_topic_view.item_id'),
+                new Sql\Predicate\Operator(
+                    'comment_topic_view.user_id',
+                    Sql\Predicate\Operator::OP_EQ,
+                    $userId
+                ),
+            ]);
             $select = $this->topicTable->getSql()->select()
                 ->columns(['item_id', 'messages'])
                 ->where([
@@ -540,15 +579,7 @@ class CommentsService
                 ])
                 ->join(
                     'comment_topic_view',
-                    new Sql\Predicate\PredicateSet([
-                        new Sql\Predicate\Expression('comment_topic.type_id = comment_topic_view.type_id'),
-                        new Sql\Predicate\Expression('comment_topic.item_id = comment_topic_view.item_id'),
-                        new Sql\Predicate\Operator(
-                            'comment_topic_view.user_id',
-                            Sql\Predicate\Operator::OP_EQ,
-                            $userId
-                        ),
-                    ]),
+                    $join,
                     ['timestamp'],
                     Sql\Select::JOIN_LEFT
                 );
@@ -627,6 +658,9 @@ class CommentsService
         return reset($result);
     }
 
+    /**
+     * @throws Exception
+     */
     private function updateTopicStat(int $typeId, int $itemId): void
     {
         $messagesCount = $this->countMessages($typeId, $itemId);
@@ -674,6 +708,7 @@ class CommentsService
     /**
      * @param int|array $itemId
      * @return array|int
+     * @throws Exception
      */
     public function getNewMessages(int $typeId, $itemId, int $userId)
     {
@@ -727,6 +762,9 @@ class CommentsService
         return (int) $countRow['count'];
     }
 
+    /**
+     * @throws Exception
+     */
     public function getMessagesCount(int $typeId, int $itemId): int
     {
         $select = $this->topicTable->getSql()->select()
@@ -741,6 +779,9 @@ class CommentsService
         return $row ? (int) $row['messages'] : 0;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getLastUpdate(int $typeId, int $itemId): ?string
     {
         $select = $this->messageTable->getSql()->select()
@@ -764,7 +805,7 @@ class CommentsService
         $adapter = $this->messageTable->getAdapter();
 
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new DbSelect($select, $adapter)
         );
     }
 
@@ -782,7 +823,7 @@ class CommentsService
         $adapter = $this->messageTable->getAdapter();
 
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new DbSelect($select, $adapter)
         );
     }
 
@@ -923,6 +964,9 @@ class CommentsService
         return $row ? (float) $row['avg_vote'] : 0.0;
     }
 
+    /**
+     * @throws Exception
+     */
     public function cleanupDeleted(): int
     {
         $subSelect = $this->messageTable->getSql()->select()
@@ -985,6 +1029,9 @@ class CommentsService
         return $items;
     }
 
+    /**
+     * @throws Exception
+     */
     public function deleteMessage(int $id): int
     {
         $message = $this->getMessageRow($id);
@@ -1027,6 +1074,9 @@ class CommentsService
         return $affected + $result->getAffectedRows();
     }
 
+    /**
+     * @throws Exception
+     */
     public function userSubscribed(int $typeId, int $itemId, int $userId): bool
     {
         return (bool) currentFromResultSetInterface($this->topicSubscribeTable->select([
@@ -1036,11 +1086,17 @@ class CommentsService
         ]));
     }
 
+    /**
+     * @throws Exception
+     */
     public function canSubscribe(int $typeId, int $itemId, int $userId): bool
     {
         return ! $this->userSubscribed($typeId, $itemId, $userId);
     }
 
+    /**
+     * @throws Exception
+     */
     public function canUnSubscribe(int $typeId, int $itemId, int $userId): bool
     {
         return $this->userSubscribed($typeId, $itemId, $userId);
@@ -1113,9 +1169,6 @@ class CommentsService
         ]);
     }
 
-    /**
-     * , PhanPluginMixedKeyNoKey
-     */
     public function getTopAuthors(int $limit): array
     {
         $select = $this->messageTable->getSql()->select()

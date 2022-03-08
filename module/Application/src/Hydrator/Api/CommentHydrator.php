@@ -29,7 +29,7 @@ class CommentHydrator extends AbstractRestHydrator
 
     private Picture $picture;
 
-    private int $userId = 0;
+    private int $userId;
 
     private ?string $userRole;
 
@@ -174,7 +174,7 @@ class CommentHydrator extends AbstractRestHydrator
                 if ($this->userId) {
                     $voteRow = currentFromResultSetInterface($this->voteTable->select([
                         'comment_id' => $object['id'],
-                        'user_id'    => (int) $this->userId,
+                        'user_id'    => $this->userId,
                     ]));
                     $vote    = $voteRow ? $voteRow['vote'] : null;
                 }
@@ -287,6 +287,9 @@ class CommentHydrator extends AbstractRestHydrator
         return $this;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getUserRole(): ?string
     {
         if (! $this->userId) {

@@ -99,6 +99,9 @@ class CarOfDay
         return $row ? (int) $row['id'] : 0;
     }
 
+    /**
+     * @throws Exception
+     */
     public function pick(): bool
     {
         $itemId = $this->getCarOfDayCandidate();
@@ -142,7 +145,7 @@ class CarOfDay
             'status' => Picture::STATUS_ACCEPTED,
             'item'   => [
                 'ancestor_or_self' => $itemId,
-                'perspective'      => $perspective ? $perspective : null,
+                'perspective'      => $perspective ?: null,
             ],
             'order'  => 'resolution_desc',
         ]);
@@ -215,7 +218,7 @@ class CarOfDay
         $server = new Twitter([
             'identifier'   => $twOptions['oauthOptions']['consumerKey'],
             'secret'       => $twOptions['oauthOptions']['consumerSecret'],
-            'callback_uri' => "http://example.com/",
+            'callback_uri' => "https://example.com/",
         ]);
 
         $tokenCredentials = new TokenCredentials();
@@ -252,6 +255,9 @@ class CarOfDay
         print 'ok' . PHP_EOL;
     }
 
+    /**
+     * @throws Exception
+     */
     public function putCurrentToFacebook(array $fbOptions): void
     {
         $dayRow = currentFromResultSetInterface($this->table->select([
@@ -333,6 +339,9 @@ class CarOfDay
         print 'ok' . PHP_EOL;
     }
 
+    /**
+     * @throws Exception
+     */
     public function putCurrentToVk(array $vkOptions): void
     {
         $language = 'ru';
@@ -420,6 +429,9 @@ class CarOfDay
         print 'ok' . PHP_EOL;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getNextDates(): array
     {
         $now      = new DateTime();
@@ -444,10 +456,13 @@ class CarOfDay
         return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getItemOfDayPictures(int $itemId, string $language): array
     {
         $carOfDay = $this->itemModel->getRow([
-            'id' => (int) $itemId,
+            'id' => $itemId,
         ]);
 
         $carOfDayPictures = $this->getOrientedPictureList($itemId);
@@ -468,7 +483,7 @@ class CarOfDay
 
         // names
         $notEmptyPics = [];
-        foreach ($carOfDayPictures as $idx => $picture) {
+        foreach ($carOfDayPictures as $picture) {
             if ($picture) {
                 $notEmptyPics[] = $picture;
             }
@@ -642,6 +657,9 @@ class CarOfDay
         return (bool) $row;
     }
 
+    /**
+     * @throws Exception
+     */
     public function setItemOfDay(DateTime $dateTime, int $itemId, ?int $userId): bool
     {
         if (! $this->isComplies($itemId)) {

@@ -4,11 +4,9 @@ namespace Application;
 
 use Application\Service\PictureService;
 use Autowp\Cron;
-use Autowp\User\Model\User;
+use Exception;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
-
-use function sprintf;
 
 class Maintenance extends AbstractListenerAggregate
 {
@@ -22,6 +20,9 @@ class Maintenance extends AbstractListenerAggregate
         $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_MIDNIGHT, [$this, 'midnight']);
     }
 
+    /**
+     * @throws Exception
+     */
     public function dailyMaintenance(Cron\CronEvent $event): void
     {
         print "Daily maintenance\n";
@@ -38,10 +39,6 @@ class Maintenance extends AbstractListenerAggregate
         $pictureService = $serviceManager->get(PictureService::class);
         $pictureService->clearQueue();
 
-        /** @var User $userModel */
-        $userModel = $serviceManager->get(User::class);
-        $userModel->updateSpecsVolumes();
-
         /** @var Service\UsersService $usersService */
         $usersService = $serviceManager->get(Service\UsersService::class);
         $usersService->deleteUnused();
@@ -49,6 +46,9 @@ class Maintenance extends AbstractListenerAggregate
         print "Daily maintenance done\n";
     }
 
+    /**
+     * @throws Exception
+     */
     public function midnight(Cron\CronEvent $event): void
     {
         print "Midnight\n";
@@ -63,17 +63,8 @@ class Maintenance extends AbstractListenerAggregate
         $twitterConfig = $serviceManager->get('Config')['twitter'];
         $carOfDay->putCurrentToTwitter($twitterConfig);
 
-        $facebookConfig = $serviceManager->get('Config')['facebook'];
-        $carOfDay->putCurrentToFacebook($facebookConfig);
-
-        /** @var Service\UsersService $usersService */
-        $usersService = $serviceManager->get(Service\UsersService::class);
-
-        $usersService->restoreVotes();
-        print "User votes restored\n";
-
-        $affected = $usersService->updateUsersVoteLimits();
-        print sprintf("Updated %s users vote limits\n", $affected);
+//        $facebookConfig = $serviceManager->get('Config')['facebook'];
+//        $carOfDay->putCurrentToFacebook($facebookConfig);
 
         $vkConfig = $serviceManager->get('Config')['vk'];
         $carOfDay->putCurrentToVk($vkConfig);

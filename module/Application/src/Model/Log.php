@@ -172,7 +172,7 @@ class Log
         /** @var Adapter $adapter */
         $adapter   = $this->eventTable->getAdapter();
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
         );
 
         $paginator

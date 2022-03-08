@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\View\Helper\Service;
 
 use Application\Model\Picture;
@@ -13,7 +15,7 @@ class PicFactory implements FactoryInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string                $requestedName
-     * @param ?array<string, mixed> $options
+     * @param null|array $options
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Helper
     {

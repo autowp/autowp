@@ -40,8 +40,6 @@ use function usort;
 
 class Brand
 {
-    private const TOP_COUNT = 150;
-
     private const NEW_DAYS = 7;
 
     public const MAX_FULLNAME = 255;
@@ -89,63 +87,6 @@ class Brand
         }
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getTopBrandsList(string $language): array
-    {
-        $subSelect = new Sql\Select(['product' => 'item']);
-        $subSelect->columns([new Sql\Expression('count(distinct product.id)')])
-            ->join('item_parent_cache', 'product.id = item_parent_cache.item_id', [])
-            ->where('item_parent_cache.parent_id = item.id')
-            ->limit(1);
-
-        $rows = $this->item->getRows([
-            'language'     => $language,
-            'columns'      => [
-                'id',
-                'catname',
-                'name',
-                'cars_count' => $subSelect,
-            ],
-            'item_type_id' => Item::BRAND,
-            'limit'        => self::TOP_COUNT,
-            'order'        => 'cars_count DESC',
-        ]);
-
-        $items = [];
-        foreach ($rows as $brandRow) {
-            $select = new Sql\Select($this->item->getTable()->getTable());
-            $select->columns(['count' => new Sql\Expression('count(distinct item.id)')])
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
-                ->where([
-                    'item_parent_cache.parent_id' => $brandRow['id'],
-                    'item_parent_cache.item_id <> item_parent_cache.parent_id',
-                    new Sql\Predicate\Expression(
-                        'item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)',
-                        [self::NEW_DAYS]
-                    ),
-                ]);
-            $row = currentFromResultSetInterface($this->item->getTable()->selectWith($select));
-
-            $newCarsCount = $row ? (int) $row['count'] : 0;
-
-            $items[] = [
-                'id'             => (int) $brandRow['id'],
-                'catname'        => $brandRow['catname'],
-                'name'           => $brandRow['name'],
-                'cars_count'     => (int) $brandRow['cars_count'],
-                'new_cars_count' => (int) $newCarsCount,
-            ];
-        }
-
-        usort($items, function ($a, $b) use ($language) {
-            return $this->compareName((string) $a['name'], (string) $b['name'], $language);
-        });
-
-        return $items;
-    }
-
     private function utfCharToNumber(string $char): string
     {
         $i      = 0;
@@ -157,6 +98,9 @@ class Brand
         return $number;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getFullBrandsList(string $language): array
     {
         $select = new Sql\Select(['ipc_all' => 'item_parent_cache']);
@@ -272,9 +216,7 @@ class Brand
         }
         unset($line);
 
-        $result = array_values($result);
-
-        return $result;
+        return array_values($result);
     }
 
     /**
@@ -443,7 +385,7 @@ class Brand
 
         $cmd = sprintf(
             'montage ' . implode(' ', $images) . ' -background %s -geometry +1+1 -tile %dx %s',
-            escapeshellarg($background ? $background : 'none'),
+            escapeshellarg($background ?: 'none'),
             $width,
             escapeshellarg($destImg)
         );

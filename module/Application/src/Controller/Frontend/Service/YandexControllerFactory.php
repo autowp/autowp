@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Controller\Frontend\Service;
 
 use Application\Controller\Frontend\YandexController as Controller;

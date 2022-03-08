@@ -5,6 +5,7 @@ namespace Application\Controller\Frontend;
 use Application\Model\CarOfDay;
 use DateTime;
 use DateTimeZone;
+use Exception;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
@@ -34,6 +35,9 @@ class YandexController extends AbstractActionController
         $this->itemOfDay = $itemOfDay;
     }
 
+    /**
+     * @throws Exception
+     */
     private function isAvailableDate(DateTime $date): ?DateTime
     {
         $result = null;
@@ -53,6 +57,7 @@ class YandexController extends AbstractActionController
 
     /**
      * @return Response|ViewModel
+     * @throws Exception
      */
     public function informingAction()
     {

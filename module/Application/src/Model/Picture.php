@@ -13,6 +13,7 @@ use DateTimeZone;
 use Exception;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
+use Laminas\Db\Sql\ExpressionInterface;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Math\Rand;
 use Laminas\Paginator;
@@ -359,8 +360,8 @@ class Picture
                             'ct.item_id',
                             Sql\Predicate\Operator::OPERATOR_EQUAL_TO,
                             'pictures.id',
-                            Sql\Predicate\Operator::TYPE_IDENTIFIER,
-                            Sql\Predicate\Operator::TYPE_IDENTIFIER
+                            ExpressionInterface::TYPE_IDENTIFIER,
+                            ExpressionInterface::TYPE_IDENTIFIER
                         ),
                     ]);
                     $select->join(
@@ -485,7 +486,7 @@ class Picture
             $date = DateTime::createFromFormat('Y-m-d', $options['added_from'], $timezone);
 
             $start = clone $date;
-            $start->setTime(0, 0, 0);
+            $start->setTime(0, 0);
             $start->setTimezone($dbTimezine);
 
             $select->where([
@@ -743,15 +744,12 @@ class Picture
         }
 
         if ($joinLeftComments) {
-            $select->join(
-                'comment_topic',
-                new Sql\Expression(
-                    'pictures.id = comment_topic.item_id and comment_topic.type_id = ?',
-                    [Comments::PICTURES_TYPE_ID]
-                ),
-                [],
-                $select::JOIN_LEFT
+            /** @var Sql\Predicate\Expression $expr */
+            $expr = new Sql\Expression(
+                'pictures.id = comment_topic.item_id and comment_topic.type_id = ?',
+                [Comments::PICTURES_TYPE_ID]
             );
+            $select->join('comment_topic', $expr, [], $select::JOIN_LEFT);
         } elseif ($joinComments) {
             $select
                 ->join('comment_topic', 'pictures.id = comment_topic.item_id', [])
@@ -804,7 +802,7 @@ class Picture
         }
 
         $start = clone $dateObj;
-        $start->setTime(0, 0, 0);
+        $start->setTime(0, 0);
         $start->setTimezone($dbTimezine);
 
         $end = clone $dateObj;
@@ -828,7 +826,7 @@ class Picture
         /** @var Adapter $adapter */
         $adapter = $this->table->getAdapter();
         return new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($this->getSelect($options), $adapter)
+            new Paginator\Adapter\LaminasDb\DbSelect($this->getSelect($options), $adapter)
         );
     }
 
@@ -1058,17 +1056,16 @@ class Picture
             $result    = $firstChar . '/' . $folder;
         }
 
-        $result = str_replace('//', '/', $result);
-
-        return $result;
+        return str_replace('//', '/', $result);
     }
 
     /**
      * @param array|ArrayAccess $row
+     * @throws Exception
      */
     public function canAccept($row): bool
     {
-        if (! in_array($row['status'], [self::STATUS_INBOX])) {
+        if ($row['status'] !== self::STATUS_INBOX) {
             return false;
         }
 
@@ -1079,10 +1076,11 @@ class Picture
 
     /**
      * @param array|ArrayAccess $row
+     * @throws Exception
      */
     public function canDelete($row): bool
     {
-        if (! in_array($row['status'], [self::STATUS_INBOX])) {
+        if ($row['status'] !== self::STATUS_INBOX) {
             return false;
         }
 
@@ -1168,7 +1166,7 @@ class Picture
         // prefetch
         $itemIds        = [];
         $perspectiveIds = [];
-        foreach ($rows as $index => $row) {
+        foreach ($rows as $row) {
             $pictureItemRows = $this->pictureItemTable->select([
                 'picture_id' => $row['id'],
                 'type'       => PictureItem::PICTURE_CONTENT,
@@ -1237,7 +1235,7 @@ class Picture
 
         $perspectives = $this->perspective->getOnlyPairs(array_keys($perspectiveIds));
 
-        foreach ($rows as $index => $row) {
+        foreach ($rows as $row) {
             if ($row['name']) {
                 $result[$row['id']] = [
                     'name' => $row['name'],

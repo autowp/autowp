@@ -1,7 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
+use Laminas\Cache\Storage\Adapter\Memcached;
+
 return [
     'modules' => [
+        'Laminas\\Cache',
+        Memcached::class,
         'Laminas\\Db',
         'Laminas\\Form',
         'Laminas\\Filter',

@@ -214,7 +214,7 @@ class ForumThemeHydrator extends AbstractRestHydrator
             /** @var Adapter $adapter */
             $adapter   = $this->topicTable->getAdapter();
             $paginator = new Paginator\Paginator(
-                new Paginator\Adapter\DbSelect($select, $adapter)
+                new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
             );
 
             $paginator->setItemCountPerPage(Forums::TOPICS_PER_PAGE);

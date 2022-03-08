@@ -22,7 +22,7 @@ class ForumTopicHydrator extends AbstractRestHydrator
 {
     private Comments $comments;
 
-    private int $userId = 0;
+    private int $userId;
 
     private User $userModel;
 

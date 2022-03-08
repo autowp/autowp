@@ -188,6 +188,9 @@ class VehicleType
         return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getItemRow(int $vehicleId, int $typeId): ?array
     {
         $row = currentFromResultSetInterface($this->itemVehicleTypeTable->select([

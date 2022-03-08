@@ -29,9 +29,9 @@
     "enabled": true,
     "sslRequired": "external",
     "registrationAllowed": true,
-    "registrationEmailAsUsername": true,
+    "registrationEmailAsUsername": false,
     "rememberMe": true,
-    "verifyEmail": true,
+    "verifyEmail": false,
     "loginWithEmailAllowed": true,
     "duplicateEmailsAllowed": false,
     "resetPasswordAllowed": true,
@@ -102,45 +102,48 @@
             "requiredActions": [],
             "clientRoles": {
                 "realm-management": [
-                    "manage-authorization",
-                    "manage-users",
-                    "view-users"
+                    "view-users",
+                    "manage-users"
                 ]
             },
-            "notBefore": 0,
-            "groups": []
+            "notBefore": 0
         },
         {
+            "id": "02be87b1-7ca3-4f0d-ad75-3df52831e769",
+            "createdTimestamp": 1628199088724,
             "username": "admin",
-            "enabled": true,
             "email": "admin@example.com",
-            "firstName": "Admin",
+            "enabled": true,
+            "totp": false,
+            "emailVerified": true,
+            "disableableCredentialTypes": [],
+            "requiredActions": [],
+            "notBefore": 0,
             "credentials": [
                 {
+                    "temporary": false,
                     "type": "password",
                     "value": "123123"
                 }
-            ]
+            ],
+            "clientRoles": {
+                "autowp": [ "admin" ]
+            }
         },
         {
+            "id": "02be87b1-7ca3-4f0d-ad75-3df52831e770",
+            "createdTimestamp": 1628199088724,
             "username": "tester",
-            "enabled": true,
             "email": "tester@example.com",
-            "firstName": "Tester",
-            "credentials": [
-                {
-                    "type": "password",
-                    "value": "123123"
-                }
-            ]
-        },
-        {
-            "username": "tester2",
             "enabled": true,
-            "email": "tester2@example.com",
-            "firstName": "Tester2",
+            "totp": false,
+            "emailVerified": true,
+            "disableableCredentialTypes": [],
+            "requiredActions": [],
+            "notBefore": 0,
             "credentials": [
                 {
+                    "temporary": false,
                     "type": "password",
                     "value": "123123"
                 }
@@ -177,7 +180,17 @@
             "redirectUris": [
                 "*"
             ],
-            "webOrigins": [],
+            "webOrigins": [
+                "http://br.localhost",
+                "http://be.localhost",
+                "http://ru.localhost",
+                "http://es.localhost",
+                "http://en.localhost",
+                "http://uk.localhost",
+                "http://zh.localhost",
+                "http://fr.localhost",
+                "http://localhost:4200"
+            ],
             "notBefore": 0,
             "bearerOnly": false,
             "consentRequired": false,
@@ -323,6 +336,65 @@
                 "scopes": [],
                 "decisionStrategy": "UNANIMOUS"
             }
+        },
+        {
+            "id": "5a9e54e3-33cc-4ea7-b3f6-ac6c34ec47c4",
+            "clientId": "frontend",
+            "surrogateAuthRequired": false,
+            "enabled": true,
+            "alwaysDisplayInConsole": false,
+            "clientAuthenticatorType": "client-secret",
+            "redirectUris": [
+                "http://br.localhost/*",
+                "http://be.localhost/*",
+                "http://ru.localhost/*",
+                "http://es.localhost/*",
+                "http://en.localhost/*",
+                "http://uk.localhost/*",
+                "http://zh.localhost/*",
+                "http://fr.localhost/*",
+                "http://localhost:4200/*"
+            ],
+            "webOrigins": [
+                "http://br.localhost",
+                "http://be.localhost",
+                "http://ru.localhost",
+                "http://es.localhost",
+                "http://en.localhost",
+                "http://uk.localhost",
+                "http://zh.localhost",
+                "http://fr.localhost",
+                "http://localhost:4200"
+            ],
+            "notBefore": 0,
+            "bearerOnly": false,
+            "consentRequired": false,
+            "standardFlowEnabled": true,
+            "implicitFlowEnabled": false,
+            "directAccessGrantsEnabled": true,
+            "serviceAccountsEnabled": false,
+            "publicClient": true,
+            "frontchannelLogout": false,
+            "protocol": "openid-connect",
+            "attributes": {
+                "backchannel.logout.session.required": "true",
+                "backchannel.logout.revoke.offline.tokens": "false"
+            },
+            "authenticationFlowBindingOverrides": {},
+            "fullScopeAllowed": true,
+            "nodeReRegistrationTimeout": -1,
+            "defaultClientScopes": [
+                "web-origins",
+                "roles",
+                "profile",
+                "email"
+            ],
+            "optionalClientScopes": [
+                "address",
+                "phone",
+                "offline_access",
+                "microprofile-jwt"
+            ]
         }
     ],
     "clientScopes": [
@@ -800,7 +872,6 @@
                     "consentRequired": false,
                     "config": {
                         "multivalued": "true",
-                        "userinfo.token.claim": "true",
                         "user.attribute": "foo",
                         "id.token.claim": "true",
                         "access.token.claim": "true",
@@ -1015,8 +1086,18 @@
             }
         ]
     },
-    "internationalizationEnabled": false,
-    "supportedLocales": [],
+    "internationalizationEnabled": true,
+    "supportedLocales": [
+        "ru",
+        "pt-BR",
+        "en",
+        "fr",
+        "zh-CN",
+        "es",
+        "be",
+        "uk"
+    ],
+    "defaultLocale": "en",
     "authenticationFlows": [
         {
             "id": "c2c238cc-4ccb-4a0b-9853-4259ad131d46",
@@ -1706,5 +1787,19 @@
     },
     "clientPolicies": {
         "policies": []
+    },
+    "roles": {
+        "client": {
+            "autowp": [
+                {
+                    "id": "105ec479-9032-4c1f-8685-7a35cececb9a",
+                    "name": "admin",
+                    "composite": false,
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200",
+                    "attributes": {}
+                }
+            ]
+        }
     }
 }

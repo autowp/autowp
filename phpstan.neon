@@ -5,5 +5,5 @@ parameters:
         maximumNumberOfProcesses: 2
     paths:
         - module
-    excludes_analyse:
+    excludePaths:
         - "*/AttrUserValueCollectionInputFilter.php"

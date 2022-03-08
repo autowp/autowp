@@ -15,6 +15,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use Throwable;
 
 use function array_merge;
 use function array_values;
@@ -55,6 +56,9 @@ class BrandsController extends AbstractActionController
         $this->translator  = $translator;
     }
 
+    /**
+     * @throws Throwable
+     */
     public function indexAction(): JsonModel
     {
         /** @var Request $request */
@@ -109,7 +113,7 @@ class BrandsController extends AbstractActionController
         // create groups array
         $sections = $this->carSections($language, $brandId, $brandCatname, true);
 
-        $sections = array_merge(
+        return array_merge(
             $sections,
             [
                 [
@@ -123,8 +127,6 @@ class BrandsController extends AbstractActionController
                 ],
             ]
         );
-
-        return $sections;
     }
 
     /**
@@ -204,6 +206,9 @@ class BrandsController extends AbstractActionController
         return array_values($groups);
     }
 
+    /**
+     * @throws Exception
+     */
     private function carSections(
         string $language,
         int $brandId,
@@ -268,6 +273,9 @@ class BrandsController extends AbstractActionController
         return $sections;
     }
 
+    /**
+     * @throws Exception
+     */
     private function carSectionGroups(
         string $language,
         int $brandId,
@@ -428,7 +436,7 @@ class BrandsController extends AbstractActionController
         $viewModel = new ViewModel([
             'brand'   => $brand,
             'carList' => $cars,
-            'name'    => $langName ? $langName : $brand['name'],
+            'name'    => $langName ?: $brand['name'],
         ]);
         $viewModel->setTerminal(true);
 

@@ -26,6 +26,9 @@ class Twins
         $this->brand   = $brand;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getBrands(array $options): array
     {
         $defaults = [
@@ -85,6 +88,9 @@ class Twins
         return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getGroupBrandIds(int $groupId): array
     {
         return $this->item->getIds([
@@ -98,18 +104,9 @@ class Twins
         ]);
     }
 
-    public function getTotalBrandsCount(): int
-    {
-        return $this->item->getCountDistinct([
-            'item_type_id'       => Item::BRAND,
-            'descendant_or_self' => [
-                'parent' => [
-                    'item_type_id' => Item::TWINS,
-                ],
-            ],
-        ]);
-    }
-
+    /**
+     * @throws Exception
+     */
     public function getGroupsPaginator(int $brandId = 0): Paginator
     {
         $filter = [
@@ -129,6 +126,9 @@ class Twins
         return $this->item->getPaginator($filter);
     }
 
+    /**
+     * @throws Exception
+     */
     public function getGroupCars(int $groupId): array
     {
         return $this->item->getRows([
@@ -159,6 +159,9 @@ class Twins
         ];
     }
 
+    /**
+     * @throws Exception
+     */
     public function getCarGroups(int $itemId): array
     {
         $rows = $this->item->getRows([
@@ -177,6 +180,9 @@ class Twins
         return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getCarsGroups(array $itemIds, string $language): array
     {
         if (! $itemIds) {
