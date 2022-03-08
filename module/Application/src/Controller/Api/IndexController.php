@@ -228,25 +228,9 @@ class IndexController extends AbstractRestfulController
                     }
                 }
 
-                $itemOfDayUser = null;
-                if ($itemOfDay['user_id']) {
-                    $itemOfDayUser = $this->userModel->getRow([
-                        'id' => $itemOfDay['user_id'],
-                    ]);
-                }
-
-                if ($itemOfDayUser) {
-                    $this->userHydrator->setOptions([
-                        'language' => $language,
-                        'fields'   => [],
-                        'user_id'  => null,
-                    ]);
-                    $itemOfDayUser = $this->userHydrator->extract($itemOfDayUser);
-                }
-
                 $itemOfDayInfo = [
-                    'item' => $item,
-                    'user' => $itemOfDayUser,
+                    'item'    => $item,
+                    'user_id' => $itemOfDay['user_id'],
                 ];
 
                 $this->cache->setItem($key, $itemOfDayInfo);

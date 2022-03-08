@@ -7,7 +7,6 @@ use Application\Model\UserAccount;
 use ArrayAccess;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
-use Autowp\User\Model\UserRename;
 use Casbin\Enforcer;
 use Casbin\Exceptions\CasbinException;
 use DateInterval;
@@ -17,6 +16,8 @@ use Laminas\Hydrator\Exception\InvalidArgumentException;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Stdlib\ArrayUtils;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Traversable;
 
 use function inet_ntop;
@@ -35,19 +36,20 @@ class UserHydrator extends AbstractRestHydrator
 
     private User $userModel;
 
-    private UserRename $userRename;
-
     private UserAccount $userAccount;
 
     private Picture $picture;
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
 
         $this->acl         = $serviceManager->get(Enforcer::class);
         $this->userModel   = $serviceManager->get(User::class);
-        $this->userRename  = $serviceManager->get(UserRename::class);
         $this->userAccount = $serviceManager->get(UserAccount::class);
         $this->picture     = $serviceManager->get(Picture::class);
 
@@ -124,13 +126,14 @@ class UserHydrator extends AbstractRestHydrator
             $isGreen = $object['role'] && $this->acl->enforce($object['role'], 'status', 'be-green');
 
             $user = [
-                'id'        => (int) $object['id'],
-                'name'      => $object['name'],
-                'deleted'   => false,
-                'route'     => ['/users', $object['identity'] ? $object['identity'] : 'user' . $object['id']],
-                'long_away' => $longAway,
-                'green'     => $isGreen,
-                'identity'  => $object['identity'],
+                'id'           => (int) $object['id'],
+                'name'         => $object['name'],
+                'deleted'      => false,
+                'route'        => ['/users', $object['identity'] ? $object['identity'] : 'user' . $object['id']],
+                'long_away'    => $longAway,
+                'green'        => $isGreen,
+                'identity'     => $object['identity'],
+                'specs_weight' => (float) $object['specs_weight'],
             ];
 
             if ($this->filterComposite->filter('last_online')) {
@@ -213,20 +216,6 @@ class UserHydrator extends AbstractRestHydrator
 
             if ($isMe && $this->filterComposite->filter('votes_per_day')) {
                 $user['votes_per_day'] = (int) $object['votes_per_day'];
-            }
-
-            if ($isMe && $this->filterComposite->filter('specs_weight')) {
-                $user['specs_weight'] = (float) $object['specs_weight'];
-            }
-
-            if ($this->filterComposite->filter('renames')) {
-                $user['renames'] = [];
-                foreach ($this->userRename->getRenames($user['id']) as $rename) {
-                    $user['renames'][] = [
-                        'old_name' => $rename['old_name'],
-                        'date'     => $this->extractValue('rename_date', $rename['date']),
-                    ];
-                }
             }
 
             if ($this->filterComposite->filter('is_moder')) {

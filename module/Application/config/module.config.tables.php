@@ -58,8 +58,6 @@ return [
         'telegram_chat'               => [],
         'user_account'                => [],
         'user_item_subscribe'         => [],
-        'user_password_remind'        => [],
-        'user_renames'                => [],
         'vehicle_vehicle_type'        => [], //TODO: rename to item_vehicle_type
     ],
 ];

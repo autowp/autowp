@@ -1,3 +1,7 @@
+public-rest:
+  cors:
+    origin:
+      - http://localhost:4200
 autowp-migrations:
   dsn: mysql://root:password@tcp(mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
 duplicate_finder:

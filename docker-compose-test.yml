@@ -233,7 +233,7 @@ services:
       "
 
   keycloak:
-    image: jboss/keycloak
+    image: jboss/keycloak:16.1.1
     container_name: autowp_test_keycloak
     restart: always
     environment:
