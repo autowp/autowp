@@ -1,6 +1,6 @@
 <?php if (count($this->carList)) { ?>
     <?php if ($this->brand['logo_id']) { ?>
-        <?=$this->img($this->brand['logo_id'], [
+        <?=$this->img((int) $this->brand['logo_id'], [
             'alt'    => '',
             'title'  => $this->name,
             'style'  => "float:right;margin:0 0 5px 5px",

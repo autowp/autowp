@@ -15,7 +15,7 @@
                 <?php if ($car['topPicture']) { ?>
                     <?=$this->htmlA(
                         $this->pic($car['topPicture'])->url(),
-                        $this->img($car['topPictureRequest'], [
+                        $this->img((int) $car['topPictureRequest'], [
                             'format'  => 'picture-thumb',
                             'shuffle' => true
                         ]),
@@ -68,7 +68,7 @@
                 <?php if ($car['bottomPicture']) { ?>
                     <?=$this->htmlA(
                         $this->pic($car['bottomPicture'])->url(),
-                        $this->img($car['bottomPictureRequest'], [
+                        $this->img((int) $car['bottomPictureRequest'], [
                             'format'  => 'picture-thumb',
                             'shuffle' => true
                         ]),
