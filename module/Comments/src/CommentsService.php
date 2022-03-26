@@ -235,26 +235,6 @@ class CommentsService
     /**
      * @throws Exception
      */
-    private function updateVote(int $messageId): int
-    {
-        $select = $this->voteTable->getSql()->select()
-            ->columns(['count' => new Sql\Expression('sum(vote)')])
-            ->where(['comment_id' => $messageId]);
-
-        $row = currentFromResultSetInterface($this->voteTable->selectWith($select));
-
-        $this->messageTable->update([
-            'vote' => $row['count'],
-        ], [
-            'id' => $messageId,
-        ]);
-
-        return (int) $row['count'];
-    }
-
-    /**
-     * @throws Exception
-     */
     public function moveMessages(int $srcTypeId, int $srcItemId, int $dstTypeId, int $dstItemId): void
     {
         $this->messageTable->update([
@@ -803,23 +783,6 @@ class CommentsService
             'type_id' => $typeId,
             'item_id' => $itemId,
         ]);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getUserAvgVote(int $userId): float
-    {
-        $select = $this->messageTable->getSql()->select()
-            ->columns(['avg_vote' => new Sql\Expression('avg(vote)')])
-            ->where([
-                'author_id' => $userId,
-                'vote <> 0',
-            ]);
-
-        $row = currentFromResultSetInterface($this->messageTable->selectWith($select));
-
-        return $row ? (float) $row['avg_vote'] : 0.0;
     }
 
     /**
