@@ -57,7 +57,6 @@ return [
             Controller\Api\ItemVehicleTypeController::class  => Controller\Api\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LanguageController::class         => Controller\Api\LanguageControllerFactory::class,
             Controller\Api\LogController::class              => Controller\Api\LogControllerFactory::class,
-            Controller\Api\MapController::class              => Controller\Api\MapControllerFactory::class,
             Controller\Api\MessageController::class          => Controller\Api\MessageControllerFactory::class,
             Controller\Api\MostsController::class            => Controller\Api\MostsControllerFactory::class,
             Controller\Api\NewController::class              => Controller\Api\NewControllerFactory::class,
@@ -1400,28 +1399,6 @@ return [
                                     'verb'     => 'get',
                                     'defaults' => [
                                         'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'map'                         => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/map',
-                            'defaults' => [
-                                'controller' => Controller\Api\MapController::class,
-                                'action'     => 'index',
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'data' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/data',
-                                    'defaults' => [
-                                        'action' => 'data',
                                     ],
                                 ],
                             ],
