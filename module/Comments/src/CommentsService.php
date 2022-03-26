@@ -222,48 +222,6 @@ class CommentsService
         $statement->execute([$userId, $typeId, $itemId]);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function queueDeleteMessage(int $id, int $userId): bool
-    {
-        $comment = $this->getMessageRow($id);
-
-        if ((int) $comment['moderator_attention'] === Attention::REQUIRED) {
-            return false;
-        }
-
-        if (! $comment) {
-            return false;
-        }
-
-        $this->messageTable->update([
-            'deleted'     => 1,
-            'deleted_by'  => $userId,
-            'delete_date' => new Sql\Expression('NOW()'),
-        ], [
-            'id' => $comment['id'],
-        ]);
-
-        return true;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function restoreMessage(int $id): void
-    {
-        $comment = $this->getMessageRow($id);
-        if ($comment) {
-            $this->messageTable->update([
-                'deleted'     => 0,
-                'delete_date' => null,
-            ], [
-                'id' => $comment['id'],
-            ]);
-        }
-    }
-
     public function completeMessage(int $id): void
     {
         $this->messageTable->update([
@@ -272,55 +230,6 @@ class CommentsService
             'id'                  => $id,
             'moderator_attention' => Attention::REQUIRED,
         ]);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function voteMessage(int $id, int $userId, int $vote): array
-    {
-        $message = $this->getMessageRow($id);
-        if (! $message) {
-            return [
-                'success' => false,
-                'error'   => 'Message not found',
-            ];
-        }
-
-        if ((int) $message['author_id'] === $userId) {
-            return [
-                'success' => false,
-                'error'   => 'Self-vote forbidden',
-            ];
-        }
-
-        $params = [
-            'comment_id' => $message['id'],
-            'user_id'    => $userId,
-            'vote'       => $vote > 0 ? 1 : -1,
-        ];
-        /** @var Adapter $adapter */
-        $adapter = $this->voteTable->getAdapter();
-        $stmt    = $adapter->createStatement('
-            INSERT INTO comment_vote (comment_id, user_id, vote)
-            VALUES (:comment_id, :user_id, :vote)
-            ON DUPLICATE KEY UPDATE vote = VALUES(vote)
-        ');
-        $result  = $stmt->execute($params);
-
-        if ($result->getAffectedRows() === 0) {
-            return [
-                'success' => false,
-                'error'   => 'Already voted',
-            ];
-        }
-
-        $newVote = $this->updateVote((int) $message['id']);
-
-        return [
-            'success' => true,
-            'vote'    => $newVote,
-        ];
     }
 
     /**
@@ -477,57 +386,6 @@ class CommentsService
         $result    = $statement->execute();
 
         return $result->getAffectedRows();
-    }
-
-    private function moveMessageRecursive(int $parentId, int $newTypeId, int $newItemId): void
-    {
-        $this->messageTable->update([
-            'item_id' => $newItemId,
-            'type_id' => $newTypeId,
-        ], [
-            'parent_id' => $parentId,
-        ]);
-
-        $rows = $this->messageTable->select([
-            'parent_id' => $parentId,
-        ]);
-
-        foreach ($rows as $row) {
-            $this->moveMessageRecursive($row['id'], $newTypeId, $newItemId);
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function moveMessage(int $id, int $newTypeId, int $newItemId): bool
-    {
-        $messageRow = $this->getMessageRow($id);
-        if (! $messageRow) {
-            return false;
-        }
-
-        $oldTypeId = (int) $messageRow['type_id'];
-        $oldItemId = (int) $messageRow['item_id'];
-
-        if ($oldItemId === $newItemId && $oldTypeId === $newTypeId) {
-            return false;
-        }
-
-        $this->messageTable->update([
-            'item_id'   => $newItemId,
-            'type_id'   => $newTypeId,
-            'parent_id' => null,
-        ], [
-            'id' => $messageRow['id'],
-        ]);
-
-        $this->moveMessageRecursive($messageRow['id'], $newTypeId, $newItemId);
-
-        $this->updateTopicStat($oldTypeId, $oldItemId);
-        $this->updateTopicStat($newTypeId, $newItemId);
-
-        return true;
     }
 
     /**

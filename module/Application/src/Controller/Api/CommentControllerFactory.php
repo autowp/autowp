@@ -35,7 +35,6 @@ class CommentControllerFactory implements FactoryInterface
             $filters->get('api_comments_get'),
             $filters->get('api_comments_get_public'),
             $filters->get('api_comments_post'),
-            $filters->get('api_comments_put'),
             $filters->get('api_comments_item_get'),
             $container->get(User::class),
             $container->get(HostManager::class),

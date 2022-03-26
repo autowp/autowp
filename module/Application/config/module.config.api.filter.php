@@ -832,34 +832,6 @@ return [
                 ],
             ],
         ],
-        'api_comments_put'                     => [
-            'user_vote' => [
-                'required'   => false,
-                'validators' => [
-                    [
-                        'name'    => 'InArray',
-                        'options' => [
-                            'haystack' => [
-                                '-1',
-                                '1',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'deleted'   => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'item_id'   => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-        ],
         'api_comments_item_get'                => [
             'limit'  => [
                 'required'   => false,

@@ -555,7 +555,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'get'   => [
+                            'get'  => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
@@ -564,7 +564,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'post'  => [
+                            'post' => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'post',
@@ -573,7 +573,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'item'  => [
+                            'item' => [
                                 'type'          => 'Segment',
                                 'options'       => [
                                     'route' => '/:id',
@@ -586,75 +586,6 @@ return [
                                             'verb'     => 'get',
                                             'defaults' => [
                                                 'action' => 'get',
-                                            ],
-                                        ],
-                                    ],
-                                    'put' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'put',
-                                            'defaults' => [
-                                                'action' => 'put',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'topic' => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route'    => '/topic/:type_id/:item_id',
-                                    'defaults' => [
-                                        'action' => 'subscribe',
-                                    ],
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'subscribe' => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route'    => '/subscribe',
-                                            'defaults' => [
-                                                'action' => 'subscribe',
-                                            ],
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'post'   => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'post',
-                                                    'defaults' => [
-                                                        'action' => 'subscribe',
-                                                    ],
-                                                ],
-                                            ],
-                                            'delete' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'delete',
-                                                    'defaults' => [
-                                                        'action' => 'subscribe',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                    'view'      => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/view',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'post' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'post',
-                                                    'defaults' => [
-                                                        'action' => 'post-view',
-                                                    ],
-                                                ],
                                             ],
                                         ],
                                     ],

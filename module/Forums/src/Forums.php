@@ -419,18 +419,6 @@ class Forums
         return $result;
     }
 
-    public function moveMessage(int $messageId, int $topicId): bool
-    {
-        $topic = currentFromResultSetInterface($this->topicTable->select(['id' => $topicId]));
-        if (! $topic) {
-            return false;
-        }
-
-        $this->comments->moveMessage($messageId, AppComments::FORUMS_TYPE_ID, $topic['id']);
-
-        return true;
-    }
-
     public function moveTopic(int $topicId, int $themeId): bool
     {
         $topic = currentFromResultSetInterface($this->topicTable->select(['id' => $topicId]));

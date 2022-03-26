@@ -18,8 +18,8 @@ use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
-use Laminas\Http\Request;
 use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -27,8 +27,6 @@ use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
-use function array_key_exists;
-use function array_keys;
 use function Autowp\Commons\currentFromResultSetInterface;
 use function get_object_vars;
 use function is_numeric;
@@ -72,8 +70,6 @@ class CommentController extends AbstractRestfulController
 
     private InputFilter $publicListInputFilter;
 
-    private InputFilter $putInputFilter;
-
     private InputFilter $getInputFilter;
 
     public function __construct(
@@ -83,7 +79,6 @@ class CommentController extends AbstractRestfulController
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
         InputFilter $postInputFilter,
-        InputFilter $putInputFilter,
         InputFilter $getInputFilter,
         User $userModel,
         HostManager $hostManager,
@@ -100,7 +95,6 @@ class CommentController extends AbstractRestfulController
         $this->listInputFilter       = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
         $this->postInputFilter       = $postInputFilter;
-        $this->putInputFilter        = $putInputFilter;
         $this->getInputFilter        = $getInputFilter;
         $this->userModel             = $userModel;
         $this->hostManager           = $hostManager;
@@ -110,43 +104,6 @@ class CommentController extends AbstractRestfulController
         $this->votings               = $votings;
         $this->articleTable          = $articleTable;
         $this->forums                = $forums;
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function subscribeAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        $itemId = (int) $this->params('item_id');
-        $typeId = (int) $this->params('type_id');
-
-        /** @var \Laminas\Http\PhpEnvironment\Request $request */
-        $request = $this->getRequest();
-
-        switch ($request->getMethod()) {
-            case Request::METHOD_POST:
-            case Request::METHOD_PUT:
-                $this->comments->service()->subscribe($typeId, $itemId, $user['id']);
-
-                return new JsonModel([
-                    'status' => true,
-                ]);
-
-            case Request::METHOD_DELETE:
-                $this->comments->service()->unSubscribe($typeId, $itemId, $user['id']);
-
-                return new JsonModel([
-                    'status' => true,
-                ]);
-        }
-
-        return $this->notFoundAction();
     }
 
     /**
@@ -335,7 +292,7 @@ class CommentController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        /** @var \Laminas\Http\PhpEnvironment\Request $request */
+        /** @var Request $request */
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
@@ -488,113 +445,6 @@ class CommentController extends AbstractRestfulController
      * @return ViewModel|ResponseInterface|array
      * @throws Exception
      */
-    public function putAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        //TODO: prevent load message from admin forum
-        $row = $this->comments->service()->getMessageRow((int) $this->params('id'));
-        if (! $row) {
-            return $this->notFoundAction();
-        }
-
-        $request = $this->getRequest();
-        $data    = (array) $this->processBodyContent($request);
-
-        $fields = [];
-        foreach (array_keys($data) as $key) {
-            if ($this->putInputFilter->has($key)) {
-                $fields[] = $key;
-            }
-        }
-
-        if (! $fields) {
-            return new ApiProblemResponse(new ApiProblem(400, 'No fields provided'));
-        }
-
-        $this->putInputFilter->setValidationGroup($fields);
-
-        $this->putInputFilter->setData($data);
-        if (! $this->putInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->putInputFilter);
-        }
-
-        $values = $this->putInputFilter->getValues();
-
-        if (array_key_exists('user_vote', $values)) {
-            if ($user['votes_left'] <= 0) {
-                return new ApiProblemResponse(
-                    new ApiProblem(
-                        400,
-                        'Data is invalid. Check `detail`.',
-                        null,
-                        'Validation error',
-                        [
-                            'invalid_params' => [
-                                'user_vote' => [
-                                    'invalid' => $this->translate('comments/vote/no-more-votes'),
-                                ],
-                            ],
-                        ]
-                    )
-                );
-            }
-
-            $result = $this->comments->service()->voteMessage(
-                $row['id'],
-                $user['id'],
-                $values['user_vote']
-            );
-            if (! $result['success']) {
-                return new ApiProblemResponse(
-                    new ApiProblem(
-                        400,
-                        'Data is invalid. Check `detail`.',
-                        null,
-                        'Validation error',
-                        [
-                            'invalid_params' => [
-                                'user_vote' => [
-                                    'invalid' => $result['error'],
-                                ],
-                            ],
-                        ]
-                    )
-                );
-            }
-
-            $this->userModel->decVotes($user['id']);
-        }
-
-        if (array_key_exists('deleted', $values)) {
-            if ($this->user()->enforce('comment', 'remove')) {
-                if ($values['deleted']) {
-                    $this->comments->service()->queueDeleteMessage($row['id'], $user['id']);
-                } else {
-                    $this->comments->service()->restoreMessage($row['id']);
-                }
-            }
-        }
-
-        if (array_key_exists('item_id', $values)) {
-            $isForum = (int) $row['type_id'] === Comments::FORUMS_TYPE_ID;
-            if ($isForum && $this->user()->enforce('forums', 'moderate')) {
-                $this->comments->service()->moveMessage($row['id'], $row['type_id'], $values['item_id']);
-            }
-        }
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
     public function getAction()
     {
         $user = $this->user()->get();
@@ -621,25 +471,5 @@ class CommentController extends AbstractRestfulController
         ]);
 
         return new JsonModel($this->hydrator->extract($row));
-    }
-
-    /**
-     * @return array|ViewModel|Response
-     */
-    public function postViewAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        $itemId = (int) $this->params('item_id');
-        $typeId = (int) $this->params('type_id');
-
-        $this->comments->service()->updateTopicView($typeId, $itemId, $user['id']);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 }

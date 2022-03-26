@@ -342,13 +342,4 @@ class User
 
         return (string) $user['role'];
     }
-
-    public function decVotes(int $userId): void
-    {
-        $this->table->update([
-            'votes_left' => new Sql\Expression('votes_left - 1'),
-        ], [
-            'id' => $userId,
-        ]);
-    }
 }

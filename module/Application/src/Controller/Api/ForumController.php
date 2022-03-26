@@ -8,6 +8,7 @@ use Autowp\Forums\Forums;
 use Autowp\User\Controller\Plugin\User as UserModel;
 use Autowp\User\Model\User;
 use DateTime;
+use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Adapter\Adapter;
@@ -247,6 +248,7 @@ class ForumController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function putTopicAction()
     {
