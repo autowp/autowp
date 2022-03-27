@@ -226,10 +226,6 @@ return [
         'secret' => '',
         'price'  => 1,
     ],
-    'vk'                       => [
-        'token'    => '',
-        'owner_id' => '',
-    ],
     'input_filters'            => [
         'factories'          => [
             InputFilter\AttrUserValueCollectionInputFilter::class
