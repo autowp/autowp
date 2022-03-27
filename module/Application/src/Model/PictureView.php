@@ -3,7 +3,6 @@
 namespace Application\Model;
 
 use Exception;
-use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 

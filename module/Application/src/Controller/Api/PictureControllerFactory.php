@@ -13,7 +13,6 @@ use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
-use Application\Model\PictureView;
 use Application\Model\UserPicture;
 use Application\Service\PictureService;
 use Application\Service\TelegramService;

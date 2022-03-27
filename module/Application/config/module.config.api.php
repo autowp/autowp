@@ -1414,7 +1414,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'get'    => [
+                            'get'  => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
@@ -1423,7 +1423,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'post'   => [
+                            'post' => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'post',

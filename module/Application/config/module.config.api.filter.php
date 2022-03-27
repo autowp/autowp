@@ -8,7 +8,6 @@ use Application\InputFilter\AttrUserValueCollectionInputFilter;
 use Autowp\Comments\Attention;
 use Autowp\Comments\CommentsService;
 use Autowp\Forums\Forums;
-use Autowp\Message\MessageService;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Laminas\InputFilter\InputFilter;
 
