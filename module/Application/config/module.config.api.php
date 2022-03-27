@@ -1432,42 +1432,6 @@ return [
                                     ],
                                 ],
                             ],
-                            'delete' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'delete',
-                                    'defaults' => [
-                                        'action' => 'delete-list',
-                                    ],
-                                ],
-                            ],
-                            'item'   => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:id',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    /*'get' => [
-                                        'type' => 'Method',
-                                        'options' => [
-                                            'verb' => 'get',
-                                            'defaults' => [
-                                                'action' => 'item'
-                                            ]
-                                        ]
-                                    ],*/
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'delete',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
                         ],
                     ],
                     'mosts'                       => [
@@ -1748,24 +1712,6 @@ return [
                                             'verb'     => 'put',
                                             'defaults' => [
                                                 'action' => 'update',
-                                            ],
-                                        ],
-                                    ],
-                                    'view'               => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/view',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'post' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'post',
-                                                    'defaults' => [
-                                                        'action' => 'view',
-                                                    ],
-                                                ],
                                             ],
                                         ],
                                     ],

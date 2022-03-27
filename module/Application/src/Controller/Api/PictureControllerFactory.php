@@ -58,7 +58,6 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(User::class),
             $container->get(PictureService::class),
             $container->get(Catalogue::class),
-            $container->get(PictureView::class),
             $container->get(Storage::class)
         );
     }

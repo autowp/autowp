@@ -19,20 +19,6 @@ class PictureView
         $this->table = $table;
     }
 
-    public function inc(int $pictureId): void
-    {
-        $sql = '
-            INSERT INTO picture_view (picture_id, views)
-            VALUES (?, 1)
-            ON DUPLICATE KEY UPDATE views=views+1
-        ';
-
-        /** @var Adapter $adapter */
-        $adapter = $this->table->getAdapter();
-        $stmt    = $adapter->query($sql);
-        $stmt->execute([$pictureId]);
-    }
-
     /**
      * @throws Exception
      */

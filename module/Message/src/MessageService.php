@@ -87,40 +87,6 @@ class MessageService
         return $row ? (int) $row['count'] : 0;
     }
 
-    public function delete(int $userId, int $messageId): void
-    {
-        $this->table->update([
-            'deleted_by_from' => 1,
-        ], [
-            'from_user_id = ?' => $userId,
-            'id = ?'           => $messageId,
-        ]);
-
-        $this->table->update([
-            'deleted_by_to' => 1,
-        ], [
-            'to_user_id = ?' => $userId,
-            'id = ?'         => $messageId,
-        ]);
-    }
-
-    public function deleteAllSystem(int $userId): void
-    {
-        $this->table->delete([
-            'to_user_id = ?' => $userId,
-            'from_user_id IS NULL',
-        ]);
-    }
-
-    public function deleteAllSent(int $userId): void
-    {
-        $this->table->update([
-            'deleted_by_from' => 1,
-        ], [
-            'from_user_id = ?' => $userId,
-        ]);
-    }
-
     public function recycle(): int
     {
         return $this->table->delete([

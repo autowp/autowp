@@ -28,12 +28,6 @@ class MessageHydrator extends AbstractRestHydrator
 
         $strategy = new DateTimeFormatterStrategy();
         $this->addStrategy('date', $strategy);
-
-        $strategy = new Strategy\Pictures($serviceManager);
-        $this->addStrategy('pictures', $strategy);
-
-        $strategy = new Strategy\Items($serviceManager);
-        $this->addStrategy('items', $strategy);
     }
 
     /**
@@ -96,14 +90,6 @@ class MessageHydrator extends AbstractRestHydrator
 
             $result['author'] = $author ? $this->extractValue('author', $author) : null;
         }
-
-        /*if ($this->filterComposite->filter('pictures')) {
-            $result['pictures'] = $this->extractValue('pictures', $object['pictures']);
-        }
-
-        if ($this->filterComposite->filter('items')) {
-            $result['items'] = $this->extractValue('items', $object['items']);
-        }*/
 
         return $result;
     }

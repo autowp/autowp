@@ -110,8 +110,6 @@ class PictureController extends AbstractRestfulController
 
     private Catalogue $catalogue;
 
-    private PictureView $pictureView;
-
     private Storage $imageStorage;
 
     public function __construct(
@@ -136,7 +134,6 @@ class PictureController extends AbstractRestfulController
         User $userModel,
         PictureService $pictureService,
         Catalogue $catalogue,
-        PictureView $pictureView,
         Storage $imageStorage
     ) {
         $this->carOfDay = $carOfDay;
@@ -161,7 +158,6 @@ class PictureController extends AbstractRestfulController
         $this->userModel             = $userModel;
         $this->pictureService        = $pictureService;
         $this->catalogue             = $catalogue;
-        $this->pictureView           = $pictureView;
         $this->imageStorage          = $imageStorage;
     }
 
@@ -1450,23 +1446,5 @@ class PictureController extends AbstractRestfulController
             'inboxCount'    => $inboxCount,
             'acceptedCount' => $acceptedCount,
         ]);
-    }
-
-    /**
-     * @throws Exception
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function viewAction()
-    {
-        $picture = $this->picture->getRow(['id' => (int) $this->params('id')]);
-        if (! $picture) {
-            return $this->notFoundAction();
-        }
-
-        $this->pictureView->inc($picture['id']);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 }

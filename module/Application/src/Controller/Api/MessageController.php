@@ -5,11 +5,8 @@ namespace Application\Controller\Api;
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Message\MessageService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
-use Autowp\User\Model\User;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
-use Laminas\Http\PhpEnvironment\Request;
-use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -33,65 +30,14 @@ class MessageController extends AbstractRestfulController
 
     private InputFilter $listInputFilter;
 
-    private InputFilter $postInputFilter;
-
-    private User $userModel;
-
     public function __construct(
         AbstractRestHydrator $hydrator,
         MessageService $message,
-        InputFilter $listInputFilter,
-        InputFilter $postInputFilter,
-        User $userModel
+        InputFilter $listInputFilter
     ) {
         $this->message         = $message;
         $this->hydrator        = $hydrator;
         $this->listInputFilter = $listInputFilter;
-        $this->postInputFilter = $postInputFilter;
-        $this->userModel       = $userModel;
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function postAction()
-    {
-        $currentUser = $this->user()->get();
-        if (! $currentUser) {
-            return $this->forbiddenAction();
-        }
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
-            $data = $this->jsonDecode($request->getContent());
-        } else {
-            $data = $request->getPost()->toArray();
-        }
-
-        $this->postInputFilter->setData($data);
-
-        if (! $this->postInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->postInputFilter);
-        }
-
-        $data = $this->postInputFilter->getValues();
-
-        $user = $this->userModel->getRow((int) $data['user_id']);
-        if (! $user) {
-            return $this->notFoundAction();
-        }
-
-        if ((int) $currentUser['id'] === (int) $user['id']) {
-            return $this->forbiddenAction();
-        }
-
-        $this->message->send($currentUser['id'], $user['id'], $data['text']);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
@@ -149,58 +95,5 @@ class MessageController extends AbstractRestfulController
             'paginator' => get_object_vars($messages['paginator']->getPages()),
             'items'     => $items,
         ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function deleteListAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        $this->listInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->listInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->listInputFilter);
-        }
-
-        $params = $this->listInputFilter->getValues();
-
-        switch ($params['folder']) {
-            case 'sent':
-                $this->message->deleteAllSent($user['id']);
-                break;
-            case 'system':
-                $this->message->deleteAllSystem($user['id']);
-                break;
-            default:
-                return $this->notFoundAction();
-        }
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_204);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface
-     */
-    public function deleteAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        $this->message->delete($user['id'], (int) $this->params('id'));
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 }

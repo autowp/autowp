@@ -2259,31 +2259,6 @@ return [
                 ],
             ],
         ],
-        'api_message_post'                     => [
-            'user_id' => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'text'    => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'max' => MessageService::MAX_TEXT,
-                        ],
-                    ],
-                ],
-            ],
-        ],
         'api_new_get'                          => [
             'date'   => [
                 'required'   => false,
