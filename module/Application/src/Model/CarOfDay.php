@@ -13,10 +13,7 @@ use Facebook;
 use GuzzleHttp\Exception\BadResponseException;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\TableGateway;
-use Laminas\Http\Client;
-use Laminas\Http\Request;
 use Laminas\I18n\Translator\TranslatorInterface;
-use Laminas\Json\Json;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Twitter;
 
