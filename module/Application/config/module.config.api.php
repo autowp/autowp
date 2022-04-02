@@ -23,7 +23,6 @@ return [
             Hydrator\Api\ItemParentHydrator::class         => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemParentLanguageHydrator::class => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\LogHydrator::class                => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\MessageHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\PictureHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\PictureItemHydrator::class        => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\SimilarHydrator::class            => Hydrator\Api\RestHydrator::class,
@@ -57,7 +56,6 @@ return [
             Controller\Api\ItemVehicleTypeController::class  => Controller\Api\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LanguageController::class         => Controller\Api\LanguageControllerFactory::class,
             Controller\Api\LogController::class              => Controller\Api\LogControllerFactory::class,
-            Controller\Api\MessageController::class          => Controller\Api\MessageControllerFactory::class,
             Controller\Api\MostsController::class            => Controller\Api\MostsControllerFactory::class,
             Controller\Api\NewController::class              => Controller\Api\NewControllerFactory::class,
             Controller\Api\PageController::class             => Controller\Api\PageControllerFactory::class,
@@ -1399,36 +1397,6 @@ return [
                                     'verb'     => 'get',
                                     'defaults' => [
                                         'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'message'                     => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/message',
-                            'defaults' => [
-                                'controller' => Controller\Api\MessageController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get'  => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                            'post' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'post',
                                     ],
                                 ],
                             ],
