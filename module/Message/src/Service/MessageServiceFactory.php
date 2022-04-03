@@ -6,7 +6,6 @@ namespace Autowp\Message\Service;
 
 use Application\Service\TelegramService;
 use Autowp\Message\MessageService;
-use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -25,8 +24,7 @@ class MessageServiceFactory implements FactoryInterface
         $tables = $container->get('TableManager');
         return new MessageService(
             $container->get(TelegramService::class),
-            $tables->get('personal_messages'),
-            $container->get(User::class)
+            $tables->get('personal_messages')
         );
     }
 }
