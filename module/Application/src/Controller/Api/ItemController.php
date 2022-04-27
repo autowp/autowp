@@ -1136,6 +1136,10 @@ class ItemController extends AbstractRestfulController
                 'required'    => false,
                 'allow_empty' => true,
             ],
+            'is_concept_inherit'        => [
+                'required'    => false,
+                'allow_empty' => true,
+            ],
             'is_group'                  => [
                 'required'    => false,
                 'allow_empty' => true,
@@ -1200,7 +1204,7 @@ class ItemController extends AbstractRestfulController
 
         if (! in_array($itemTypeId, [Item::VEHICLE, Item::ENGINE])) {
             unset($spec['is_group']);
-            unset($spec['is_concept']);
+            unset($spec['is_concept'], $spec['is_concept_inherit']);
             unset($spec['produced'], $spec['produced_exactly']);
             unset($spec['begin_model_year'], $spec['end_model_year']);
             unset($spec['begin_model_year_fraction'], $spec['end_model_year_fraction']);
@@ -1333,10 +1337,11 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('is_concept', $values)) {
-            $set['is_concept_inherit'] = ((string) $values['is_concept']) === 'inherited' ? 1 : 0;
-            if (! $set['is_concept_inherit']) {
-                $set['is_concept'] = $values['is_concept'] ? 1 : 0;
-            }
+            $set['is_concept'] = $values['is_concept'] ? 1 : 0;
+        }
+
+        if (array_key_exists('is_concept_inherit', $values)) {
+            $set['is_concept_inherit'] = $values['is_concept_inherit'] ? 1 : 0;
         }
 
         if (array_key_exists('catname', $values)) {
@@ -1575,12 +1580,15 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('is_concept', $values)) {
+            $notifyMeta        = true;
+            $subscribe         = true;
+            $set['is_concept'] = $values['is_concept'] ? 1 : 0;
+        }
+
+        if (array_key_exists('is_concept_inherit', $values)) {
             $notifyMeta                = true;
             $subscribe                 = true;
-            $set['is_concept_inherit'] = $values['is_concept'] === 'inherited' ? 1 : 0;
-            if (! $set['is_concept_inherit']) {
-                $set['is_concept'] = $values['is_concept'] ? 1 : 0;
-            }
+            $set['is_concept_inherit'] = $values['is_concept_inherit'] ? 1 : 0;
         }
 
         if (array_key_exists('catname', $values)) {
