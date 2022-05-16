@@ -64,16 +64,15 @@ return [
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
             Controller\Api\PictureModerVoteTemplateController::class
                 => Controller\Api\PictureModerVoteTemplateControllerFactory::class,
-            Controller\Api\PictureVoteController::class => Controller\Api\PictureVoteControllerFactory::class,
-            Controller\Api\PulseController::class       => Controller\Api\PulseControllerFactory::class,
-            Controller\Api\RatingController::class      => Controller\Api\RatingControllerFactory::class,
-            Controller\Api\StatController::class        => Controller\Api\StatControllerFactory::class,
-            Controller\Api\TelegramController::class    => Controller\Api\TelegramControllerFactory::class,
-            Controller\Api\TextController::class        => Controller\Api\TextControllerFactory::class,
-            Controller\Api\TimezoneController::class    => InvokableFactory::class,
-            Controller\Api\TwinsController::class       => Controller\Api\TwinsControllerFactory::class,
-            Controller\Api\UserController::class        => Controller\Api\UserControllerFactory::class,
-            Controller\Api\VotingController::class      => Controller\Api\VotingControllerFactory::class,
+            Controller\Api\PulseController::class    => Controller\Api\PulseControllerFactory::class,
+            Controller\Api\RatingController::class   => Controller\Api\RatingControllerFactory::class,
+            Controller\Api\StatController::class     => Controller\Api\StatControllerFactory::class,
+            Controller\Api\TelegramController::class => Controller\Api\TelegramControllerFactory::class,
+            Controller\Api\TextController::class     => Controller\Api\TextControllerFactory::class,
+            Controller\Api\TimezoneController::class => InvokableFactory::class,
+            Controller\Api\TwinsController::class    => Controller\Api\TwinsControllerFactory::class,
+            Controller\Api\UserController::class     => Controller\Api\UserControllerFactory::class,
+            Controller\Api\VotingController::class   => Controller\Api\VotingControllerFactory::class,
         ],
     ],
     'router'      => [
@@ -1732,18 +1731,6 @@ return [
                             ],
                             'defaults'    => [
                                 'controller' => Controller\Api\PictureModerVoteController::class,
-                            ],
-                        ],
-                    ],
-                    'picture-vote'                => [
-                        'type'    => 'Segment',
-                        'options' => [
-                            'route'       => '/picture-vote/:id',
-                            'constraints' => [
-                                'id' => '[0-9]+',
-                            ],
-                            'defaults'    => [
-                                'controller' => Controller\Api\PictureVoteController::class,
                             ],
                         ],
                     ],
