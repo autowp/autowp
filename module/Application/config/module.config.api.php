@@ -62,17 +62,15 @@ return [
             Controller\Api\PictureController::class          => Controller\Api\PictureControllerFactory::class,
             Controller\Api\PictureItemController::class      => Controller\Api\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
-            Controller\Api\PictureModerVoteTemplateController::class
-                => Controller\Api\PictureModerVoteTemplateControllerFactory::class,
-            Controller\Api\PulseController::class    => Controller\Api\PulseControllerFactory::class,
-            Controller\Api\RatingController::class   => Controller\Api\RatingControllerFactory::class,
-            Controller\Api\StatController::class     => Controller\Api\StatControllerFactory::class,
-            Controller\Api\TelegramController::class => Controller\Api\TelegramControllerFactory::class,
-            Controller\Api\TextController::class     => Controller\Api\TextControllerFactory::class,
-            Controller\Api\TimezoneController::class => InvokableFactory::class,
-            Controller\Api\TwinsController::class    => Controller\Api\TwinsControllerFactory::class,
-            Controller\Api\UserController::class     => Controller\Api\UserControllerFactory::class,
-            Controller\Api\VotingController::class   => Controller\Api\VotingControllerFactory::class,
+            Controller\Api\PulseController::class            => Controller\Api\PulseControllerFactory::class,
+            Controller\Api\RatingController::class           => Controller\Api\RatingControllerFactory::class,
+            Controller\Api\StatController::class             => Controller\Api\StatControllerFactory::class,
+            Controller\Api\TelegramController::class         => Controller\Api\TelegramControllerFactory::class,
+            Controller\Api\TextController::class             => Controller\Api\TextControllerFactory::class,
+            Controller\Api\TimezoneController::class         => InvokableFactory::class,
+            Controller\Api\TwinsController::class            => Controller\Api\TwinsControllerFactory::class,
+            Controller\Api\UserController::class             => Controller\Api\UserControllerFactory::class,
+            Controller\Api\VotingController::class           => Controller\Api\VotingControllerFactory::class,
         ],
     ],
     'router'      => [
@@ -84,7 +82,7 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes'  => [
-                    'about'                       => [
+                    'about'              => [
                         'type'    => 'Literal',
                         'options' => [
                             'route'    => '/about',
@@ -94,7 +92,7 @@ return [
                             ],
                         ],
                     ],
-                    'account'                     => [
+                    'account'            => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/account',
@@ -151,7 +149,7 @@ return [
                             ],
                         ],
                     ],
-                    'article'                     => [
+                    'article'            => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/article',
@@ -172,7 +170,7 @@ return [
                             ],
                         ],
                     ],
-                    'attr'                        => [
+                    'attr'               => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/attr',
@@ -445,7 +443,7 @@ return [
                             ],
                         ],
                     ],
-                    'brands'                      => [
+                    'brands'             => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/brands',
@@ -511,7 +509,7 @@ return [
                             ],
                         ],
                     ],
-                    'chart'                       => [
+                    'chart'              => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/chart',
@@ -541,7 +539,7 @@ return [
                             ],
                         ],
                     ],
-                    'comment'                     => [
+                    'comment'            => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/comment',
@@ -589,7 +587,7 @@ return [
                             ],
                         ],
                     ],
-                    'config'                      => [
+                    'config'             => [
                         'type'    => 'Literal',
                         'options' => [
                             'route'    => '/config',
@@ -599,7 +597,7 @@ return [
                             ],
                         ],
                     ],
-                    'contacts'                    => [
+                    'contacts'           => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/contacts',
@@ -620,7 +618,7 @@ return [
                             ],
                         ],
                     ],
-                    'content-language'            => [
+                    'content-language'   => [
                         'type'          => 'Segment',
                         'options'       => [
                             'route'    => '/content-language',
@@ -641,7 +639,7 @@ return [
                             ],
                         ],
                     ],
-                    'donate'                      => [
+                    'donate'             => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/donate',
@@ -671,7 +669,7 @@ return [
                             ],
                         ],
                     ],
-                    'forum'                       => [
+                    'forum'              => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/forum',
@@ -773,7 +771,7 @@ return [
                             ],
                         ],
                     ],
-                    'gallery'                     => [
+                    'gallery'            => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route' => '/gallery',
@@ -792,7 +790,7 @@ return [
                             ],
                         ],
                     ],
-                    'inbox'                       => [
+                    'inbox'              => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/inbox',
@@ -813,7 +811,7 @@ return [
                             ],
                         ],
                     ],
-                    'index'                       => [
+                    'index'              => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/index',
@@ -861,7 +859,7 @@ return [
                             ],
                         ],
                     ],
-                    'item'                        => [
+                    'item'               => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/item',
@@ -1119,7 +1117,7 @@ return [
                             ],
                         ],
                     ],
-                    'item-link'                   => [
+                    'item-link'          => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/item-link',
@@ -1185,7 +1183,7 @@ return [
                             ],
                         ],
                     ],
-                    'item-parent'                 => [
+                    'item-parent'        => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/item-parent',
@@ -1299,7 +1297,7 @@ return [
                             ],
                         ],
                     ],
-                    'item-vehicle-type'           => [
+                    'item-vehicle-type'  => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/item-vehicle-type',
@@ -1359,7 +1357,7 @@ return [
                             ],
                         ],
                     ],
-                    'language'                    => [
+                    'language'           => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/language',
@@ -1380,7 +1378,7 @@ return [
                             ],
                         ],
                     ],
-                    'log'                         => [
+                    'log'                => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/log',
@@ -1401,7 +1399,7 @@ return [
                             ],
                         ],
                     ],
-                    'mosts'                       => [
+                    'mosts'              => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/mosts',
@@ -1449,7 +1447,7 @@ return [
                             ],
                         ],
                     ],
-                    'new'                         => [
+                    'new'                => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/new',
@@ -1470,7 +1468,7 @@ return [
                             ],
                         ],
                     ],
-                    'page'                        => [
+                    'page'               => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/page',
@@ -1545,7 +1543,7 @@ return [
                             ],
                         ],
                     ],
-                    'picture'                     => [
+                    'picture'            => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/picture',
@@ -1722,7 +1720,7 @@ return [
                             ],
                         ],
                     ],
-                    'picture-moder-vote'          => [
+                    'picture-moder-vote' => [
                         'type'    => 'Segment',
                         'options' => [
                             'route'       => '/picture-moder-vote/:id',
@@ -1734,7 +1732,7 @@ return [
                             ],
                         ],
                     ],
-                    'picture-item'                => [
+                    'picture-item'       => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/picture-item',
@@ -1800,7 +1798,7 @@ return [
                             ],
                         ],
                     ],
-                    'pulse'                       => [
+                    'pulse'              => [
                         'type'    => 'Literal',
                         'options' => [
                             'route'    => '/pulse',
@@ -1810,7 +1808,7 @@ return [
                             ],
                         ],
                     ],
-                    'rating'                      => [
+                    'rating'             => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/rating',
@@ -1858,7 +1856,7 @@ return [
                             ],
                         ],
                     ],
-                    'telegram-webhook'            => [
+                    'telegram-webhook'   => [
                         'type'    => 'Segment',
                         'options' => [
                             'route'    => '/telegram/webhook/token/:token',
@@ -1868,7 +1866,7 @@ return [
                             ],
                         ],
                     ],
-                    'text'                        => [
+                    'text'               => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/text',
@@ -1898,7 +1896,7 @@ return [
                             ],
                         ],
                     ],
-                    'timezone'                    => [
+                    'timezone'           => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/timezone',
@@ -1919,7 +1917,7 @@ return [
                             ],
                         ],
                     ],
-                    'twins'                       => [
+                    'twins'              => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/twins',
@@ -1949,7 +1947,7 @@ return [
                             ],
                         ],
                     ],
-                    'user'                        => [
+                    'user'               => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/user',
@@ -2033,7 +2031,7 @@ return [
                             ],
                         ],
                     ],
-                    'stat'                        => [
+                    'stat'               => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/stat',
@@ -2054,64 +2052,7 @@ return [
                             ],
                         ],
                     ],
-                    'picture-moder-vote-template' => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/picture-moder-vote-template',
-                            'defaults' => [
-                                'controller' => Controller\Api\PictureModerVoteTemplateController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'list'   => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                            'create' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'create',
-                                    ],
-                                ],
-                            ],
-                            'item'   => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:id',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'delete',
-                                            ],
-                                        ],
-                                    ],
-                                    'get'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'item',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'voting'                      => [
+                    'voting'             => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/voting',
