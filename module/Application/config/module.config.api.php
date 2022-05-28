@@ -62,7 +62,6 @@ return [
             Controller\Api\PictureController::class          => Controller\Api\PictureControllerFactory::class,
             Controller\Api\PictureItemController::class      => Controller\Api\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
-            Controller\Api\PulseController::class            => Controller\Api\PulseControllerFactory::class,
             Controller\Api\RatingController::class           => Controller\Api\RatingControllerFactory::class,
             Controller\Api\StatController::class             => Controller\Api\StatControllerFactory::class,
             Controller\Api\TelegramController::class         => Controller\Api\TelegramControllerFactory::class,
@@ -1795,16 +1794,6 @@ return [
                                         ],
                                     ],
                                 ],
-                            ],
-                        ],
-                    ],
-                    'pulse'              => [
-                        'type'    => 'Literal',
-                        'options' => [
-                            'route'    => '/pulse',
-                            'defaults' => [
-                                'controller' => Controller\Api\PulseController::class,
-                                'action'     => 'index',
                             ],
                         ],
                     ],
