@@ -42,7 +42,6 @@ return [
             Controller\Api\ConfigController::class          => Controller\Api\ConfigControllerFactory::class,
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
-            Controller\Api\DonateController::class          => Controller\Api\DonateControllerFactory::class,
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
             Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IndexController::class           => Controller\Api\IndexControllerFactory::class,
@@ -54,7 +53,6 @@ return [
             Controller\Api\ItemParentLanguageController::class
                 => Controller\Api\ItemParentLanguageControllerFactory::class,
             Controller\Api\ItemVehicleTypeController::class  => Controller\Api\ItemVehicleTypeControllerFactory::class,
-            Controller\Api\LanguageController::class         => Controller\Api\LanguageControllerFactory::class,
             Controller\Api\LogController::class              => Controller\Api\LogControllerFactory::class,
             Controller\Api\MostsController::class            => Controller\Api\MostsControllerFactory::class,
             Controller\Api\NewController::class              => Controller\Api\NewControllerFactory::class,
@@ -633,36 +631,6 @@ return [
                                     'verb'     => 'get',
                                     'defaults' => [
                                         'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'donate'             => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/donate',
-                            'defaults' => [
-                                'controller' => Controller\Api\DonateController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'vod' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/vod',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'get-vod',
-                                            ],
-                                        ],
                                     ],
                                 ],
                             ],
@@ -1351,27 +1319,6 @@ return [
                                                 'action' => 'delete',
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'language'           => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/language',
-                            'defaults' => [
-                                'controller' => Controller\Api\LanguageController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'list' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'list',
                                     ],
                                 ],
                             ],

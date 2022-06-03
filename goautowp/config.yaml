@@ -33,3 +33,4 @@ image-storage:
     scheme: http
 memcached:
   - "memcached:11211"
+donations-vod-price: 100
