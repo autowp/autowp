@@ -40,7 +40,6 @@ return [
             Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
             Controller\Api\CommentController::class         => Controller\Api\CommentControllerFactory::class,
             Controller\Api\ConfigController::class          => Controller\Api\ConfigControllerFactory::class,
-            Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
             Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
@@ -591,27 +590,6 @@ return [
                             'defaults' => [
                                 'controller' => Controller\Api\ConfigController::class,
                                 'action'     => 'index',
-                            ],
-                        ],
-                    ],
-                    'contacts'           => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/contacts',
-                            'defaults' => [
-                                'controller' => Controller\Api\ContactsController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
                             ],
                         ],
                     ],
