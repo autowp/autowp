@@ -1143,17 +1143,6 @@ class Picture
     }
 
     /**
-     * @throws Exception
-     */
-    public function getTotalPicturesSize(): int
-    {
-        $select = $this->table->getSql()->select();
-        $select->columns(['sum' => new Sql\Expression('sum(filesize)')]);
-        $row = currentFromResultSetInterface($this->table->selectWith($select));
-        return $row ? (int) $row['sum'] : 0;
-    }
-
-    /**
      * @param array|ArrayAccess|Traversable $rows
      */
     public function getNameData($rows, array $options = []): array

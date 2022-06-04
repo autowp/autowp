@@ -34,3 +34,9 @@ image-storage:
 memcached:
   - "memcached:11211"
 donations-vod-price: 100
+about:
+  developer: "3"
+  fr-translator: "3"
+  zh-translator: "3"
+  be-translator: "3"
+  pt-br-translator: "3"

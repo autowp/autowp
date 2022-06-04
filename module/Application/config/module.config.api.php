@@ -32,7 +32,6 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Api\AboutController::class           => Controller\Api\AboutControllerFactory::class,
             Controller\Api\AccountController::class         => Controller\Api\AccountControllerFactory::class,
             Controller\Api\ArticleController::class         => Controller\Api\ArticleControllerFactory::class,
             Controller\Api\AttrController::class            => Controller\Api\AttrControllerFactory::class,
@@ -77,16 +76,6 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes'  => [
-                    'about'              => [
-                        'type'    => 'Literal',
-                        'options' => [
-                            'route'    => '/about',
-                            'defaults' => [
-                                'controller' => Controller\Api\AboutController::class,
-                                'action'     => 'index',
-                            ],
-                        ],
-                    ],
                     'account'            => [
                         'type'          => 'Literal',
                         'options'       => [
