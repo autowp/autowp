@@ -16,6 +16,7 @@ use UnexpectedValueException;
 use function array_filter;
 use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
+use function error_log;
 use function explode;
 use function file_get_contents;
 use function in_array;
@@ -64,6 +65,8 @@ class OAuth
         $this->hosts            = $hosts;
         $this->userAccountTable = $userAccountTable;
         $this->userTable        = $userTable;
+
+        error_log('Bla-bla-bla');
     }
 
     /**
@@ -91,6 +94,7 @@ class OAuth
                 $this->ensureUserImported($decoded);
                 $userGuid = (string) ($decoded->sub ?? '');
             } catch (UnexpectedValueException $e) {
+                error_log($e->getMessage());
                 $userGuid = '';
             }
 
