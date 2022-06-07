@@ -32,7 +32,7 @@
 		"laminas/laminas-form" : ">=2.15.1",
 		"laminas/laminas-i18n" : ">=2.11.2",
 		"laminas/laminas-i18n-resources" : ">=2.7.0",
-		"laminas/laminas-log" : "^2.13.1",
+		"laminas/laminas-log" : "^2.15",
 		"laminas/laminas-mail" : ">=2.14.1",
 		"laminas/laminas-mvc" : ">=3.2.0",
 		"laminas/laminas-mvc-i18n" : ">=1.2.0",
