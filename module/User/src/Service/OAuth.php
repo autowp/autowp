@@ -65,8 +65,6 @@ class OAuth
         $this->hosts            = $hosts;
         $this->userAccountTable = $userAccountTable;
         $this->userTable        = $userTable;
-
-        error_log('Bla-bla-bla');
     }
 
     /**
