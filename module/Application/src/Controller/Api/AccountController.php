@@ -62,9 +62,11 @@ class AccountController extends AbstractRestfulController
 
         $accounts = [];
         foreach ($this->userAccount->getAccounts($user['id']) as $row) {
-            $accounts[] = array_replace($row, [
-                'can_remove' => $this->canRemoveAccount($row['id']),
-            ]);
+            if ($row['service_id'] !== 'keycloak') {
+                $accounts[] = array_replace($row, [
+                    'can_remove' => $this->canRemoveAccount($row['id']),
+                ]);
+            }
         }
 
         return new JsonModel([
