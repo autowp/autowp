@@ -75,7 +75,7 @@ RUN apt-get autoremove -qq -y && \
     # curl -fSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472.zip -o /opt/sonar-scanner.zip && \
     unzip /opt/sonar-scanner.zip -d /opt && \
     rm /opt/sonar-scanner.zip && \
-    ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}/bin/sonar-scanner /usr/bin/sonar-scanner
+    ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin/sonar-scanner /usr/bin/sonar-scanner
     # && \
     #\
     #curl -Ls https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter && \
