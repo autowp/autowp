@@ -85,6 +85,10 @@ class OAuth
                 $userGuid = '';
             }
 
+            if (! $userGuid) {
+                return 0;
+            }
+
             /** @var Adapter $adapter */
             $adapter = $this->userTable->getAdapter();
             $row     = $adapter->query(
