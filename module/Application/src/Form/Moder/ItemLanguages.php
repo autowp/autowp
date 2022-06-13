@@ -56,7 +56,7 @@ class ItemLanguages extends Form implements InputFilterProviderInterface
      * Should return an array specification compatible with
      * {@link \Laminas\InputFilter\Factory::createInputFilter()}.
      */
-    public function getInputFilterSpecification(): array
+    public function getInputFilterSpecification(): array // @phpstan-ignore-line
     {
         return [];
     }

@@ -40,6 +40,7 @@ use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Paginator;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
+use Laminas\Validator\Between;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use Location\Coordinate;
@@ -293,7 +294,9 @@ class ItemController extends AbstractRestfulController
         if (isset($params['type_id'])) {
             $typeId = (int) $params['type_id'];
             if ($typeId === Item::BRAND) {
-                $this->listInputFilter->get('limit')->getValidatorChain()->getValidators()[1]['instance']->setMax(5000);
+                /** @var Between $validator */
+                $validator = $this->listInputFilter->get('limit')->getValidatorChain()->getValidators()[1]['instance'];
+                $validator->setMax(5000);
             }
         }
 
@@ -1214,7 +1217,7 @@ class ItemController extends AbstractRestfulController
 
         $factory = new Factory();
         $this->inputFilterManager->populateFactoryPluginManagers($factory);
-        return $factory->createInputFilter($spec);
+        return $factory->createInputFilter($spec); // @phpstan-ignore-line
     }
 
     /**

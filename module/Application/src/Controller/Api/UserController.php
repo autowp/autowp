@@ -22,6 +22,7 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
+use Laminas\Validator\InArray;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
@@ -223,7 +224,9 @@ class UserController extends AbstractRestfulController
                 $languages[] = $language;
             }
             $validators = $this->putInputFilter->get('language')->getValidatorChain()->getValidators();
-            $validators[0]['instance']->setHaystack($languages);
+            /** @var InArray $validator */
+            $validator = $validators[0]['instance'];
+            $validator->setHaystack($languages);
         }
 
         if (in_array('timezone', $fields)) {
@@ -239,7 +242,9 @@ class UserController extends AbstractRestfulController
             }
 
             $validators = $this->putInputFilter->get('timezone')->getValidatorChain()->getValidators();
-            $validators[0]['instance']->setHaystack($list);
+            /** @var InArray $validator */
+            $validator = $validators[0]['instance'];
+            $validator->setHaystack($list);
         }
 
         $this->putInputFilter->setValidationGroup($fields);
