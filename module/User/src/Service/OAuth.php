@@ -2,7 +2,6 @@
 
 namespace Autowp\User\Service;
 
-use Application\Model\UserAccount;
 use Exception;
 use Firebase\JWT\JWT;
 use Laminas\Cache\Exception\ExceptionInterface;
@@ -29,8 +28,6 @@ use const JSON_THROW_ON_ERROR;
 
 class OAuth
 {
-    private UserAccount $userAccount;
-
     private Request $request;
 
     private int $userId;
@@ -46,14 +43,12 @@ class OAuth
     private TableGateway $userTable;
 
     public function __construct(
-        UserAccount $userAccount,
         Request $request,
         array $keycloakConfig,
         StorageInterface $cache,
         array $hosts,
         TableGateway $userTable
     ) {
-        $this->userAccount    = $userAccount;
         $this->request        = $request;
         $this->keycloakConfig = $keycloakConfig;
         $this->cache          = $cache;
@@ -90,7 +85,18 @@ class OAuth
                 $userGuid = '';
             }
 
-            $this->userId = $this->userAccount->getUserId("keycloak", $userGuid);
+            /** @var Adapter $adapter */
+            $adapter = $this->userTable->getAdapter();
+            $row     = $adapter->query(
+                'SELECT id FROM users WHERE uuid = UUID_TO_BIN(?)',
+                [$userGuid]
+            )->current();
+
+            if (! $row) {
+                return 0;
+            }
+
+            $this->userId = (int) $row['id'];
         }
 
         return $this->userId;

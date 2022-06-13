@@ -51,6 +51,7 @@ class AccountController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function indexAction()
     {
@@ -76,6 +77,7 @@ class AccountController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
+     * @throws Exception
      */
     public function deleteAction()
     {

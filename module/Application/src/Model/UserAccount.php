@@ -17,38 +17,6 @@ class UserAccount
         $this->table = $table;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getServiceExternalId(int $userId, string $service): string
-    {
-        $row = currentFromResultSetInterface($this->table->select([
-            'user_id'    => $userId,
-            'service_id' => $service,
-        ]));
-        if (! $row) {
-            return '';
-        }
-
-        return $row['external_id'];
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getUserId(string $service, string $externalId): int
-    {
-        $row = currentFromResultSetInterface($this->table->select([
-            'external_id' => $externalId,
-            'service_id'  => $service,
-        ]));
-        if (! $row) {
-            return 0;
-        }
-
-        return $row['user_id'];
-    }
-
     public function getAccounts(int $userId): array
     {
         $rows = $this->table->select([
@@ -87,24 +55,6 @@ class UserAccount
         ]);
 
         return $affected > 0;
-    }
-
-    public function removeUserAccounts(int $userId): void
-    {
-        $this->table->delete([
-            'user_id = ?' => $userId,
-        ]);
-    }
-
-    public function setAccountData(string $service, string $externalId, array $data): void
-    {
-        $this->table->update([
-            'name' => $data['name'],
-            'link' => (string) $data['link'],
-        ], [
-            'service_id'  => $service,
-            'external_id' => $externalId,
-        ]);
     }
 
     public function create(string $service, string $externalId, array $data): void
