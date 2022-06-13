@@ -8,13 +8,11 @@ use Firebase\JWT\JWT;
 use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql\Expression;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Request;
 use UnexpectedValueException;
 
 use function array_filter;
-use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function error_log;
 use function explode;
@@ -45,8 +43,6 @@ class OAuth
 
     private array $hosts;
 
-    private TableGateway $userAccountTable;
-
     private TableGateway $userTable;
 
     public function __construct(
@@ -55,16 +51,14 @@ class OAuth
         array $keycloakConfig,
         StorageInterface $cache,
         array $hosts,
-        TableGateway $userAccountTable,
         TableGateway $userTable
     ) {
-        $this->userAccount      = $userAccount;
-        $this->request          = $request;
-        $this->keycloakConfig   = $keycloakConfig;
-        $this->cache            = $cache;
-        $this->hosts            = $hosts;
-        $this->userAccountTable = $userAccountTable;
-        $this->userTable        = $userTable;
+        $this->userAccount    = $userAccount;
+        $this->request        = $request;
+        $this->keycloakConfig = $keycloakConfig;
+        $this->cache          = $cache;
+        $this->hosts          = $hosts;
+        $this->userTable      = $userTable;
     }
 
     /**
@@ -143,47 +137,14 @@ class OAuth
             }
         }
 
-        $row = currentFromResultSetInterface($this->userAccountTable->select([
-            'service_id'  => 'keycloak',
-            'external_id' => $guid,
-        ]));
-        if (! $row) {
-            $this->userTable->insert([
-                'login'            => null,
-                'e_mail'           => $emailAddr,
-                'password'         => null,
-                'email_to_check'   => null,
-                'hide_e_mail'      => 1,
-                'email_check_code' => null,
-                'name'             => $name,
-                'reg_date'         => new Expression('NOW()'),
-                'last_online'      => new Expression('NOW()'),
-                'timezone'         => $language['timezone'],
-                'last_ip'          => $remoteAddr,
-                'language'         => $locale,
-                'role'             => $role,
-            ]);
-            $userId = $this->userTable->getLastInsertValue();
-        } else {
-            $userId = (int) $row['user_id'];
-
-            $this->userTable->update([
-                'e_mail'  => $emailAddr,
-                'name'    => $name,
-                'last_ip' => $remoteAddr,
-            ], [
-                'id' => $userId,
-            ]);
-        }
-
         /** @var Adapter $adapter */
-        $adapter = $this->userAccountTable->getAdapter();
-        $stmt    = $adapter->query('
-            INSERT INTO user_account (user_id, service_id, external_id, used_for_reg, name, link)
-            VALUES (?, ?, ?, 0, ?, "")
-            ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), name=VALUES(name)
-        ');
-        $stmt->execute([$userId, "keycloak", $guid, $name]);
+        $adapter = $this->userTable->getAdapter();
+        $adapter->query('
+            INSERT INTO users (login, e_mail, password, email_to_check, hide_e_mail, email_check_code, name,
+                               reg_date, last_online, timezone, last_ip, language, role, uuid)
+            VALUES (NULL, ?, NULL, NULL, 1, NULL, ?, NOW(), NOW(), ?, ?, ?, ?, UUID_TO_BIN(?))
+            ON DUPLICATE KEY UPDATE e_mail=VALUES(e_mail), name=VALUES(name), last_ip=VALUES(last_ip)
+        ', [$emailAddr, $name, $language['timezone'], $remoteAddr, $locale, $role, $guid]);
     }
 
     /**

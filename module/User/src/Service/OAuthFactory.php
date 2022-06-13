@@ -26,7 +26,6 @@ class OAuthFactory implements FactoryInterface
             $config['keycloak'],
             $container->get('longCache'),
             $config['hosts'],
-            $tables->get('user_account'),
             $tables->get('users')
         );
     }
