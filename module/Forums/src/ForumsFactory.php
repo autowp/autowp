@@ -6,7 +6,7 @@ namespace Autowp\Forums;
 
 use Autowp\Comments\CommentsService;
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ForumsFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class ForumsFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Forums
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Forums
     {
         $tables = $container->get('TableManager');
         return new Forums(

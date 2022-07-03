@@ -7,7 +7,7 @@ namespace Application\Model\Service;
 use Application\Model\Log;
 use Application\Model\Picture;
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class LogFactory implements FactoryInterface
@@ -17,7 +17,7 @@ class LogFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Log
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Log
     {
         $tables = $container->get('TableManager');
         return new Log(

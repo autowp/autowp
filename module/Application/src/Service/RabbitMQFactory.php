@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Application\Service;
 
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class RabbitMQFactory implements FactoryInterface
@@ -14,7 +14,7 @@ class RabbitMQFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): RabbitMQ
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): RabbitMQ
     {
         return new RabbitMQ(
             $container->get('Config')['rabbitmq']

@@ -6,7 +6,7 @@ namespace Application\View\Helper\Service;
 
 use Application\HostManager;
 use Application\View\Helper\HostManager as Helper;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class HostManagerFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class HostManagerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param null|array $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Helper
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Helper
     {
         return new Helper(
             $container->get(HostManager::class)

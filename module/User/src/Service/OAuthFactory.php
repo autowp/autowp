@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Autowp\User\Service;
 
 use Autowp\ZFComponents\Db\TableManager;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class OAuthFactory implements FactoryInterface
@@ -15,7 +15,7 @@ class OAuthFactory implements FactoryInterface
      * @param string                $requestedName
      * @param null|array $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): OAuth
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): OAuth
     {
         $config = $container->get('Config');
         $tables = $container->get(TableManager::class);

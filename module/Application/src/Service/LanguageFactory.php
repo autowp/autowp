@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Application\Service;
 
 use Application\Language;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class LanguageFactory implements FactoryInterface
@@ -15,7 +15,7 @@ class LanguageFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Language
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Language
     {
         $config = $container->get('Config');
         return new Language(

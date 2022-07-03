@@ -3,7 +3,7 @@
 namespace Application\InputFilter;
 
 use Application\Service\SpecificationsService;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class AttrUserValueCollectionInputFilterFactory implements FactoryInterface
@@ -13,7 +13,7 @@ class AttrUserValueCollectionInputFilterFactory implements FactoryInterface
      * @param string $requestedName
      */
     public function __invoke(
-        ContainerInterface $container,
+        containerinterface $container,
         $requestedName,
         ?array $options = null
     ): AttrUserValueCollectionInputFilter {

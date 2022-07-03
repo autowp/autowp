@@ -6,7 +6,7 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\VotingVariantVoteHydrator;
 use Autowp\Votings\Votings;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class VotingControllerFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class VotingControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): VotingController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): VotingController
     {
         $filters   = $container->get('InputFilterManager');
         $hydrators = $container->get('HydratorManager');

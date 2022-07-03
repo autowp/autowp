@@ -7,7 +7,7 @@ namespace Application\View\Helper\Service;
 use Application\ItemNameFormatter;
 use Application\Language;
 use Application\View\Helper\Car as Helper;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CarFactory implements FactoryInterface
@@ -17,7 +17,7 @@ class CarFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Helper
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Helper
     {
         return new Helper(
             $container->get(ItemNameFormatter::class),

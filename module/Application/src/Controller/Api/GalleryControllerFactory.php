@@ -11,7 +11,7 @@ use Application\Model\PictureItem;
 use Application\PictureNameFormatter;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class GalleryControllerFactory implements FactoryInterface
@@ -21,7 +21,7 @@ class GalleryControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): GalleryController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): GalleryController
     {
         return new GalleryController(
             $container->get(Picture::class),

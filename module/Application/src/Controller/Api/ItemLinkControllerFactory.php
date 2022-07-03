@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\ItemLinkHydrator;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemLinkControllerFactory implements FactoryInterface
@@ -15,7 +15,7 @@ class ItemLinkControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ItemLinkController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): ItemLinkController
     {
         $tables    = $container->get('TableManager');
         $hydrators = $container->get('HydratorManager');

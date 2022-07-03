@@ -6,7 +6,7 @@ namespace Application\Controller\Plugin\Service;
 
 use Application\Controller\Plugin\Log as Plugin;
 use Application\Model\Log;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class LogFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class LogFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Plugin
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Plugin
     {
         return new Plugin(
             $container->get(Log::class)

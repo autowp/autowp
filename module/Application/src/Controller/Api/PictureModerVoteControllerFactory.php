@@ -10,7 +10,7 @@ use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PictureModerVoteControllerFactory implements FactoryInterface
@@ -20,7 +20,7 @@ class PictureModerVoteControllerFactory implements FactoryInterface
      * @param string $requestedName
      */
     public function __invoke(
-        ContainerInterface $container,
+        containerinterface $container,
         $requestedName,
         ?array $options = null
     ): PictureModerVoteController {

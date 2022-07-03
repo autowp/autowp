@@ -6,7 +6,7 @@ namespace Application\Controller\Plugin\Service;
 
 use Application\Controller\Plugin\Language as Plugin;
 use Application\Language;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class LanguageFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class LanguageFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Plugin
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Plugin
     {
         return new Plugin(
             $container->get(Language::class)

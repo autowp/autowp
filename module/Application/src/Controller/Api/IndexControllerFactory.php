@@ -11,7 +11,7 @@ use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class IndexControllerFactory implements FactoryInterface
@@ -21,7 +21,7 @@ class IndexControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): IndexController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): IndexController
     {
         $hydrators = $container->get('HydratorManager');
         return new IndexController(

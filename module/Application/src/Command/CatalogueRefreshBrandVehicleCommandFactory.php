@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Application\Command;
 
 use Application\Model\ItemParent;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CatalogueRefreshBrandVehicleCommandFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class CatalogueRefreshBrandVehicleCommandFactory implements FactoryInterface
      * @param null|array $options
      */
     public function __invoke(
-        ContainerInterface $container,
+        containerinterface $container,
         $requestedName,
         ?array $options = null
     ): CatalogueRefreshBrandVehicleCommand {

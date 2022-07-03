@@ -6,7 +6,7 @@ namespace Application\Controller\Api;
 
 use Application\Controller\Api\TelegramController as Controller;
 use Application\Service\TelegramService;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class TelegramControllerFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class TelegramControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Controller
     {
         return new Controller(
             $container->get(TelegramService::class)

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Application\Model;
 
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PictureFactory implements FactoryInterface
@@ -14,7 +14,7 @@ class PictureFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Picture
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Picture
     {
         $tables = $container->get('TableManager');
         return new Picture(

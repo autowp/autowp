@@ -3,7 +3,7 @@
 namespace Application\Model;
 
 use Autowp\TextStorage\Service;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemFactory implements FactoryInterface
@@ -13,7 +13,7 @@ class ItemFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Item
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Item
     {
         $tables = $container->get('TableManager');
         return new Item(

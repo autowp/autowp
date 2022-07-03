@@ -2,7 +2,7 @@
 
 namespace Application\Hydrator\Api;
 
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class RestHydrator implements FactoryInterface
@@ -12,7 +12,7 @@ class RestHydrator implements FactoryInterface
      * @param string $requestedName
      */
     public function __invoke(
-        ContainerInterface $container,
+        containerinterface $container,
         $requestedName,
         ?array $options = null
     ): AbstractRestHydrator {

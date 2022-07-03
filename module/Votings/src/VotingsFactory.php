@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Autowp\Votings;
 
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class VotingsFactory implements FactoryInterface
@@ -14,7 +14,7 @@ class VotingsFactory implements FactoryInterface
      * @param string                $requestedName
      * @param null|array $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Votings
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Votings
     {
         $tables = $container->get('TableManager');
         return new Votings(

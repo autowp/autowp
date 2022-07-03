@@ -7,7 +7,7 @@ namespace Application\Controller\Api;
 use Application\Controller\Api\ItemVehicleTypeController as Controller;
 use Application\Model\Item;
 use Application\Model\VehicleType;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemVehicleTypeControllerFactory implements FactoryInterface
@@ -17,7 +17,7 @@ class ItemVehicleTypeControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Controller
     {
         return new Controller(
             $container->get(VehicleType::class),

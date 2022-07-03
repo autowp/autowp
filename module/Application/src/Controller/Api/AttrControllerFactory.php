@@ -9,7 +9,7 @@ use Application\Hydrator\Api\AttrConflictHydrator;
 use Application\Hydrator\Api\AttrUserValueHydrator;
 use Application\Hydrator\Api\AttrValueHydrator;
 use Application\Service\SpecificationsService;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class AttrControllerFactory implements FactoryInterface
@@ -19,7 +19,7 @@ class AttrControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): AttrController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): AttrController
     {
         $hydrators = $container->get('HydratorManager');
         $filters   = $container->get('InputFilterManager');

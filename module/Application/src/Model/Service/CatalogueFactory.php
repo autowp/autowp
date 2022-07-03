@@ -4,7 +4,7 @@ namespace Application\Model\Service;
 
 use Application\Model\Catalogue;
 use Application\Model\ItemParent;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CatalogueFactory implements FactoryInterface
@@ -14,7 +14,7 @@ class CatalogueFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Catalogue
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Catalogue
     {
         $tables = $container->get('TableManager');
         return new Catalogue(

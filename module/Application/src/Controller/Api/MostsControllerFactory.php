@@ -9,7 +9,7 @@ use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use Application\Service\Mosts;
 use Autowp\Image\Storage;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class MostsControllerFactory implements FactoryInterface
@@ -19,7 +19,7 @@ class MostsControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): MostsController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): MostsController
     {
         $hydrators = $container->get('HydratorManager');
         return new MostsController(

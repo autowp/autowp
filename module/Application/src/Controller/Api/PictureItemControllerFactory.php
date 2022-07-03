@@ -10,7 +10,7 @@ use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Autowp\Image\Storage;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PictureItemControllerFactory implements FactoryInterface
@@ -20,7 +20,7 @@ class PictureItemControllerFactory implements FactoryInterface
      * @param string $requestedName
      */
     public function __invoke(
-        ContainerInterface $container,
+        containerinterface $container,
         $requestedName,
         ?array $options = null
     ): PictureItemController {

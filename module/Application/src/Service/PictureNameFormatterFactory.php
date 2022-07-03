@@ -6,7 +6,7 @@ namespace Application\Service;
 
 use Application\ItemNameFormatter;
 use Application\PictureNameFormatter as Model;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PictureNameFormatterFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class PictureNameFormatterFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Model
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Model
     {
         return new Model(
             $container->get('MvcTranslator'),

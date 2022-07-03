@@ -7,7 +7,7 @@ namespace Application\Command;
 use Application\DuplicateFinder;
 use Application\Model\Picture;
 use Autowp\Image\Storage;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PicturesDfIndexCommandFactory implements FactoryInterface
@@ -18,7 +18,7 @@ class PicturesDfIndexCommandFactory implements FactoryInterface
      * @param null|array $options
      */
     public function __invoke(
-        ContainerInterface $container,
+        containerinterface $container,
         $requestedName,
         ?array $options = null
     ): PicturesDfIndexCommand {

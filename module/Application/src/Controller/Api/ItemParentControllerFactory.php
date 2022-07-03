@@ -12,7 +12,7 @@ use Application\Model\UserItemSubscribe;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
 use Autowp\Message\MessageService;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemParentControllerFactory implements FactoryInterface
@@ -22,7 +22,7 @@ class ItemParentControllerFactory implements FactoryInterface
      * @param string $requestedName
      */
     public function __invoke(
-        ContainerInterface $container,
+        containerinterface $container,
         $requestedName,
         ?array $options = null
     ): ItemParentController {

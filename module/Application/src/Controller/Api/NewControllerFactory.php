@@ -9,7 +9,7 @@ use Application\Hydrator\Api\PictureHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class NewControllerFactory implements FactoryInterface
@@ -19,7 +19,7 @@ class NewControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): NewController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): NewController
     {
         $filters   = $container->get('InputFilterManager');
         $hydrators = $container->get('HydratorManager');

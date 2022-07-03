@@ -10,7 +10,7 @@ use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use Autowp\Image\Storage;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CarOfDayFactory implements FactoryInterface
@@ -20,7 +20,7 @@ class CarOfDayFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): CarOfDay
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): CarOfDay
     {
         $tables = $container->get('TableManager');
         return new CarOfDay(

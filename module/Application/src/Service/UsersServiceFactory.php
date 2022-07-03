@@ -6,7 +6,7 @@ namespace Application\Service;
 
 use Autowp\Image\Storage;
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class UsersServiceFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class UsersServiceFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): UsersService
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): UsersService
     {
         $tables = $container->get('TableManager');
         return new UsersService(

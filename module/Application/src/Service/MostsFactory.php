@@ -7,7 +7,7 @@ namespace Application\Service;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class MostsFactory implements FactoryInterface
@@ -17,7 +17,7 @@ class MostsFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Mosts
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Mosts
     {
         $tables = $container->get('TableManager');
         return new Mosts(

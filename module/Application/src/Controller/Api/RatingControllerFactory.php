@@ -9,7 +9,7 @@ use Application\Hydrator\Api\UserHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class RatingControllerFactory implements FactoryInterface
@@ -19,7 +19,7 @@ class RatingControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): RatingController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): RatingController
     {
         $hydrators = $container->get('HydratorManager');
         return new RatingController(

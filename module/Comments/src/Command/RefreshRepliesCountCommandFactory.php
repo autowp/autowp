@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Autowp\Comments\Command;
 
 use Autowp\Comments\CommentsService;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class RefreshRepliesCountCommandFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class RefreshRepliesCountCommandFactory implements FactoryInterface
      * @param null|array $options
      */
     public function __invoke(
-        ContainerInterface $container,
+        containerinterface $container,
         $requestedName,
         ?array $options = null
     ): RefreshRepliesCountCommand {

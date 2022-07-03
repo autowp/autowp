@@ -8,7 +8,7 @@ use Application\Hydrator\Api\UserHydrator;
 use Autowp\Image\Storage;
 use Autowp\User\Model\User;
 use Casbin\Enforcer;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class UserControllerFactory implements FactoryInterface
@@ -18,7 +18,7 @@ class UserControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): UserController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): UserController
     {
         $hydrators = $container->get('HydratorManager');
         $filters   = $container->get('InputFilterManager');

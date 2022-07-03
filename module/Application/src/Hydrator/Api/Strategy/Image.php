@@ -5,16 +5,16 @@ namespace Application\Hydrator\Api\Strategy;
 use ArrayAccess;
 use Autowp\Image\Storage;
 use ImagickException;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\Hydrator\Strategy\StrategyInterface;
 
 class Image implements StrategyInterface
 {
-    private ContainerInterface $serviceManager;
+    private containerinterface $serviceManager;
 
     private Storage $imageStorage;
 
-    public function __construct(ContainerInterface $serviceManager)
+    public function __construct(containerinterface $serviceManager)
     {
         $this->serviceManager = $serviceManager;
     }

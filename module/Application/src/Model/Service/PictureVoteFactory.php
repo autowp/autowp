@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Application\Model\Service;
 
 use Application\Model\PictureVote;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PictureVoteFactory implements FactoryInterface
@@ -15,7 +15,7 @@ class PictureVoteFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): PictureVote
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): PictureVote
     {
         $tables = $container->get('TableManager');
         return new PictureVote(

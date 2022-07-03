@@ -6,7 +6,7 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\LogHydrator;
 use Application\Model\Log;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class LogControllerFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class LogControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): LogController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): LogController
     {
         $hydrators = $container->get('HydratorManager');
         $filters   = $container->get('InputFilterManager');

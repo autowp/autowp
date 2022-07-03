@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Application\Controller\Api;
 
 use Application\Service\SpecificationsService;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ChartControllerFactory implements FactoryInterface
@@ -15,7 +15,7 @@ class ChartControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ChartController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): ChartController
     {
         $tables = $container->get('TableManager');
         return new ChartController(

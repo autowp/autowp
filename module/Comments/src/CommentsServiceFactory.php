@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Autowp\Comments;
 
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CommentsServiceFactory implements FactoryInterface
@@ -15,7 +15,7 @@ class CommentsServiceFactory implements FactoryInterface
      * @param string                $requestedName
      * @param null|array $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): CommentsService
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): CommentsService
     {
         $tables = $container->get('TableManager');
         return new CommentsService(

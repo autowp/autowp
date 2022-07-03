@@ -11,7 +11,7 @@ use Application\Model\UserPicture;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\TextStorage;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PictureServiceFactory implements FactoryInterface
@@ -21,7 +21,7 @@ class PictureServiceFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): PictureService
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): PictureService
     {
         return new PictureService(
             $container->get(Picture::class),

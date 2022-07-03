@@ -8,7 +8,7 @@ use Application\Hydrator\Api\ForumThemeHydrator;
 use Application\Hydrator\Api\ForumTopicHydrator;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ForumControllerFactory implements FactoryInterface
@@ -18,7 +18,7 @@ class ForumControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ForumController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): ForumController
     {
         $hydrators = $container->get('HydratorManager');
         $filters   = $container->get('InputFilterManager');

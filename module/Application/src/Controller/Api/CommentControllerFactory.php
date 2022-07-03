@@ -13,7 +13,7 @@ use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Autowp\Votings\Votings;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class CommentControllerFactory implements FactoryInterface
@@ -23,7 +23,7 @@ class CommentControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): CommentController
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): CommentController
     {
         $hydrators = $container->get('HydratorManager');
         $filters   = $container->get('InputFilterManager');

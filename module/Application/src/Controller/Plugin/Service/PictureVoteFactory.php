@@ -8,7 +8,7 @@ use Application\Controller\Plugin\PictureVote as Plugin;
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PictureVoteFactory implements FactoryInterface
@@ -18,7 +18,7 @@ class PictureVoteFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Plugin
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Plugin
     {
         $tables = $container->get('TableManager');
         return new Plugin(

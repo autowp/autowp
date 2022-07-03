@@ -6,7 +6,7 @@ namespace Application\Controller\Frontend\Service;
 
 use Application\Controller\Frontend\YandexController as Controller;
 use Application\Model\CarOfDay;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class YandexControllerFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class YandexControllerFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): Controller
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Controller
     {
         $config = $container->get('Config');
         return new Controller(

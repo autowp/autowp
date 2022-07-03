@@ -6,7 +6,7 @@ namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\ItemParentLanguageHydrator;
 use Application\Model\ItemParent;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemParentLanguageControllerFactory implements FactoryInterface
@@ -16,7 +16,7 @@ class ItemParentLanguageControllerFactory implements FactoryInterface
      * @param string $requestedName
      */
     public function __invoke(
-        ContainerInterface $container,
+        containerinterface $container,
         $requestedName,
         ?array $options = null
     ): ItemParentLanguageController {

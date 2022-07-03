@@ -8,7 +8,7 @@ use Application\HostManager;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Autowp\User\Model\User;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class TelegramServiceFactory implements FactoryInterface
@@ -18,7 +18,7 @@ class TelegramServiceFactory implements FactoryInterface
      * @param string                $requestedName
      * @param ?array<string, mixed> $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): TelegramService
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): TelegramService
     {
         $config = $container->get('Config');
         $tables = $container->get('TableManager');

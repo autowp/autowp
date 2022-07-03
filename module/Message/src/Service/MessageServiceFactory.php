@@ -6,7 +6,7 @@ namespace Autowp\Message\Service;
 
 use Application\Service\TelegramService;
 use Autowp\Message\MessageService;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
@@ -19,7 +19,7 @@ class MessageServiceFactory implements FactoryInterface
      * @param string                $requestedName
      * @param null|array $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): MessageService
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): MessageService
     {
         $tables = $container->get('TableManager');
         return new MessageService(

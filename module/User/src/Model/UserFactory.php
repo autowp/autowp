@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Autowp\User\Model;
 
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 use function defined;
@@ -16,7 +16,7 @@ class UserFactory implements FactoryInterface
      * @param string                $requestedName
      * @param null|array $options
      */
-    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): User
+    public function __invoke(containerinterface $container, $requestedName, ?array $options = null): User
     {
         $tables = $container->get('TableManager');
         $config = $container->get('Config');
