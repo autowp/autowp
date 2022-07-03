@@ -9,6 +9,7 @@ use Application\HostManager;
 use Application\Model\Picture;
 use Autowp\Comments\CommentsService;
 use Autowp\Message\MessageService;
+use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -31,7 +32,8 @@ class CommentsFactory implements FactoryInterface
             $container->get(Picture::class),
             $tables->get('articles'),
             $tables->get('item'),
-            $container->get(User::class)
+            $container->get(User::class),
+            $container->get(TrafficControl::class)
         );
     }
 }

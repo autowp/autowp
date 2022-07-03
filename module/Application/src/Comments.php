@@ -7,6 +7,7 @@ use Application\Model\Picture;
 use ArrayAccess;
 use Autowp\Comments\CommentsService;
 use Autowp\Message\MessageService;
+use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\User;
 use Exception;
 use InvalidArgumentException;
@@ -15,8 +16,10 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Uri\Uri;
 
+use function array_filter;
 use function array_walk;
 use function Autowp\Commons\currentFromResultSetInterface;
+use function count;
 use function implode;
 use function ltrim;
 use function sprintf;
@@ -48,6 +51,8 @@ class Comments
 
     private User $userModel;
 
+    private TrafficControl $traffic;
+
     public function __construct(
         CommentsService $service,
         HostManager $hostManager,
@@ -56,7 +61,8 @@ class Comments
         Picture $picture,
         TableGateway $articleTable,
         TableGateway $itemTable,
-        User $userModel
+        User $userModel,
+        TrafficControl $traffic
     ) {
         $this->service      = $service;
         $this->hostManager  = $hostManager;
@@ -66,6 +72,7 @@ class Comments
         $this->articleTable = $articleTable;
         $this->itemTable    = $itemTable;
         $this->userModel    = $userModel;
+        $this->traffic      = $traffic;
     }
 
     /**
@@ -260,7 +267,16 @@ class Comments
             return;
         }
 
-        $ids         = $this->service->getSubscribersIds($comment['type_id'], $comment['item_id'], true);
+        $ids = $this->service->getSubscribersIds($comment['type_id'], $comment['item_id'], true);
+        $ids = array_filter($ids, function ($id) use ($author) {
+            $prefs = $this->traffic->getUserUserPreferences((int) $id, (int) $author['id']);
+            return ! $prefs['disable_comments_notifications'];
+        });
+
+        if (count($ids) <= 0) {
+            return;
+        }
+
         $subscribers = $this->userModel->getRows(['id' => $ids]);
 
         foreach ($subscribers as $subscriber) {

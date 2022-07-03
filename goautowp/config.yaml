@@ -13,8 +13,8 @@ file_storage:
     endpoints:
       - http://minio:9000
 rabbitmq: amqp://guest:guest@autowp_test_rabbitmq:5672/
-traffic-dsn: postgres://traffic:password@autowp_test_traffic_postgres:5432/traffic?sslmode=disable
-traffic-migrations:
+postgres-dsn: postgres://traffic:password@autowp_test_traffic_postgres:5432/traffic?sslmode=disable
+postgres-migrations:
   dsn: postgres://traffic:password@autowp_test_traffic_postgres/traffic?sslmode=disable
 keycloak:
   url: http://keycloak:8080
