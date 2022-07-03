@@ -31,7 +31,7 @@ build-php-fpm:
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./install-dev-db.sh"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./install-dev.sh"
     # - docker-compose -f docker-compose-test.yml exec -T -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" backend sh -c "./cc-test-reporter before-build"
-    - docker-compose -f docker-compose-test.yml exec -T backend sh -c "php -d memory_limit=100M ./vendor/bin/phpcs --encoding=utf-8"
+    #- docker-compose -f docker-compose-test.yml exec -T backend sh -c "php -d memory_limit=100M ./vendor/bin/phpcs --encoding=utf-8"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/phpdd module/"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "composer phpmd"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/psalm --no-progress"
