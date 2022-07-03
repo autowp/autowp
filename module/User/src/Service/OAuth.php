@@ -4,6 +4,7 @@ namespace Autowp\User\Service;
 
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Adapter\Adapter;
@@ -77,7 +78,8 @@ class OAuth
             }
 
             try {
-                $decoded = JWT::decode($parts[1], $this->getCert(), [self::ALG]);
+                $key     = new Key($this->getCert(), self::ALG);
+                $decoded = JWT::decode($parts[1], $key);
                 $this->ensureUserImported($decoded);
                 $userGuid = (string) ($decoded->sub ?? '');
             } catch (UnexpectedValueException $e) {
