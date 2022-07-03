@@ -14,7 +14,7 @@ ENV COMPOSER_ALLOW_SUPERUSER="1" \
 CMD ["./start.sh"]
 
 COPY sonar-scanner.zip /opt/sonar-scanner.zip
-COPY waitforit/usr/lo cal/bin/waitforit
+COPY waitforit /usr/local/bin/waitforit
 
 RUN apt-get autoremove -qq -y && \
     apt-get update -qq -y && \
