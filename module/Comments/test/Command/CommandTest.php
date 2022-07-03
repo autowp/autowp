@@ -19,6 +19,7 @@ class CommandTest extends AbstractConsoleControllerTestCase
     public function testRefreshRepliesCount(): void
     {
         $factory = new RefreshRepliesCountCommandFactory();
+        // @phpstan-ignore-next-line
         $command = $factory($this->getApplicationServiceLocator(), '');
 
         $result = $command->run(
@@ -35,6 +36,7 @@ class CommandTest extends AbstractConsoleControllerTestCase
     public function testCleanupDeleted(): void
     {
         $factory = new CleanupDeletedCommandFactory();
+        // @phpstan-ignore-next-line
         $command = $factory($this->getApplicationServiceLocator(), '');
 
         $result = $command->run(

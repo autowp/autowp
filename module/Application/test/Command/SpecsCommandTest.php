@@ -21,6 +21,7 @@ class SpecsCommandTest extends AbstractConsoleControllerTestCase
     public function testRefreshConflictFlags(): void
     {
         $factory = new SpecsRefreshConflictFlagsCommandFactory();
+        // @phpstan-ignore-next-line
         $command = $factory($this->getApplicationServiceLocator(), '');
 
         $result = $command->run(
@@ -37,6 +38,7 @@ class SpecsCommandTest extends AbstractConsoleControllerTestCase
     public function testRefreshItemConflictFlags(): void
     {
         $factory = new SpecsRefreshItemConflictFlagsCommandFactory();
+        // @phpstan-ignore-next-line
         $command = $factory($this->getApplicationServiceLocator(), '');
 
         $result = $command->run(
@@ -53,6 +55,7 @@ class SpecsCommandTest extends AbstractConsoleControllerTestCase
     public function testRefreshUserStat(): void
     {
         $factory = new SpecsRefreshUserStatCommandFactory();
+        // @phpstan-ignore-next-line
         $command = $factory($this->getApplicationServiceLocator(), '');
 
         $result = $command->run(
@@ -69,6 +72,7 @@ class SpecsCommandTest extends AbstractConsoleControllerTestCase
     public function testRefreshUsersStat(): void
     {
         $factory = new SpecsRefreshUsersStatCommandFactory();
+        // @phpstan-ignore-next-line
         $command = $factory($this->getApplicationServiceLocator(), '');
 
         $result = $command->run(

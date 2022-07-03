@@ -106,7 +106,7 @@ class PictureHydrator extends AbstractRestHydrator
 
         $this->linksTable = $serviceManager->get('TableManager')->get('links');
 
-        $strategy = new Strategy\Image($serviceManager);
+        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
         $this->addStrategy('image', $strategy);
         $this->addStrategy('thumb', $strategy);
         $this->addStrategy('thumb_medium', $strategy);

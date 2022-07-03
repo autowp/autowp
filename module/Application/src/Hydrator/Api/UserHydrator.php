@@ -58,13 +58,13 @@ class UserHydrator extends AbstractRestHydrator
         $this->addStrategy('reg_date', $strategy);
         $this->addStrategy('rename_date', $strategy);
 
-        $strategy = new Strategy\Image($serviceManager);
+        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
         $this->addStrategy('image', $strategy);
 
-        $strategy = new Strategy\Image($serviceManager);
+        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
         $this->addStrategy('img', $strategy);
 
-        $strategy = new Strategy\Image($serviceManager);
+        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
         $this->addStrategy('avatar', $strategy);
     }
 

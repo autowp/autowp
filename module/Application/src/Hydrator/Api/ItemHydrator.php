@@ -144,13 +144,13 @@ class ItemHydrator extends AbstractRestHydrator
         $strategy = new Strategy\Picture($serviceManager);
         $this->addStrategy('exact_picture', $strategy);
 
-        $strategy = new Strategy\Image($serviceManager);
+        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
         $this->addStrategy('logo', $strategy);
 
-        $strategy = new Strategy\Image($serviceManager);
+        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
         $this->addStrategy('logo120', $strategy);
 
-        $strategy = new Strategy\Image($serviceManager);
+        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
         $this->addStrategy('brandicon', $strategy);
     }
 
