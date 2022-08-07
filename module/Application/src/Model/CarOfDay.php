@@ -408,25 +408,31 @@ class CarOfDay
         foreach ($carOfDayPictures as $idx => $row) {
             if ($row) {
                 $route = null;
-                foreach ($paths as $path) {
-                    switch ($path['type']) {
-                        case 'brand':
-                            $route = ['/picture', $row['identity']];
-                            break;
-                        case 'brand-item':
-                            $route = array_merge(
-                                ['/', $path['brand_catname'], $path['car_catname']],
-                                $path['path'],
-                                ['pictures',  $row['identity']]
-                            );
-                            break;
-                        case 'category':
-                            $route = ['/category', $path['category_catname'], 'pictures', $row['identity']];
-                            break;
-                        case 'person':
-                            $route = ['/persons', $path['id']];
-                            break;
-                    }
+                switch ($carOfDay['item_type_id']) {
+                    case Item::TWINS:
+                        $route = ['/twins/group', $carOfDay['id'], 'pictures', $row['identity']];
+                        break;
+                    default:
+                        foreach ($paths as $path) {
+                            switch ($path['type']) {
+                                case 'brand':
+                                    $route = ['/picture', $row['identity']];
+                                    break;
+                                case 'brand-item':
+                                    $route = array_merge(
+                                        ['/', $path['brand_catname'], $path['car_catname']],
+                                        $path['path'],
+                                        ['pictures',  $row['identity']]
+                                    );
+                                    break;
+                                case 'category':
+                                    $route = ['/category', $path['category_catname'], 'pictures', $row['identity']];
+                                    break;
+                                case 'person':
+                                    $route = ['/persons', $path['id']];
+                                    break;
+                            }
+                        }
                 }
 
                 $format = (int) $idx === 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
