@@ -189,7 +189,16 @@
                 "http://uk.localhost",
                 "http://zh.localhost",
                 "http://fr.localhost",
-                "http://localhost:4200"
+                "http://localhost:4200",
+                "https://br.localhost",
+                "https://be.localhost",
+                "https://ru.localhost",
+                "https://es.localhost",
+                "https://en.localhost",
+                "https://uk.localhost",
+                "https://zh.localhost",
+                "https://fr.localhost",
+                "https://localhost:4200"
             ],
             "notBefore": 0,
             "bearerOnly": false,
@@ -353,18 +362,19 @@
                 "http://uk.localhost/*",
                 "http://zh.localhost/*",
                 "http://fr.localhost/*",
-                "http://localhost:4200/*"
+                "http://localhost:4200/*",
+                "https://br.localhost/*",
+                "https://be.localhost/*",
+                "https://ru.localhost/*",
+                "https://es.localhost/*",
+                "https://en.localhost/*",
+                "https://uk.localhost/*",
+                "https://zh.localhost/*",
+                "https://fr.localhost/*",
+                "https://localhost:4200/*"
             ],
             "webOrigins": [
-                "http://br.localhost",
-                "http://be.localhost",
-                "http://ru.localhost",
-                "http://es.localhost",
-                "http://en.localhost",
-                "http://uk.localhost",
-                "http://zh.localhost",
-                "http://fr.localhost",
-                "http://localhost:4200"
+                "+"
             ],
             "notBefore": 0,
             "bearerOnly": false,

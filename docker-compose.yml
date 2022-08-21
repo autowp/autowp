@@ -6,6 +6,8 @@ services:
     restart: always
     volumes:
     - ./router.conf:/etc/nginx/nginx.conf:ro
+    - ./localhost.crt:/localhost.crt
+    - ./localhost.key:/localhost.key
     depends_on:
     - backend
     - frontend
@@ -13,6 +15,7 @@ services:
     - keycloak
     ports:
     - "80:80"
+    - "443:443"
 
   backend-nginx:
     image: autowp/autowp:nginx
