@@ -27,7 +27,6 @@ return [
         'contact'                     => [],
         'df_distance'                 => [],
         'df_hash'                     => [],
-        'htmls'                       => [],
         'item'                        => [],
         'item_language'               => [],
         'item_parent'                 => [],

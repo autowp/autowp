@@ -116,5 +116,10 @@
 		"email" : "dmitry@pereslegin.ru",
 		"source" : "https://github.com/autowp/autowp"
 	},
-	"minimum-stability" : "stable"
+	"minimum-stability" : "stable",
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
 }

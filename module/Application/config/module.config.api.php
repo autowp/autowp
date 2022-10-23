@@ -9,7 +9,6 @@ use Laminas\ServiceManager\Factory\InvokableFactory;
 return [
     'hydrators'   => [
         'factories' => [
-            Hydrator\Api\ArticleHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrAttributeHydrator::class      => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydrator::class,
@@ -33,7 +32,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\Api\AccountController::class         => Controller\Api\AccountControllerFactory::class,
-            Controller\Api\ArticleController::class         => Controller\Api\ArticleControllerFactory::class,
             Controller\Api\AttrController::class            => Controller\Api\AttrControllerFactory::class,
             Controller\Api\BrandsController::class          => Controller\Api\BrandsControllerFactory::class,
             Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
@@ -128,27 +126,6 @@ return [
                                                 'action' => 'start',
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'article'            => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/article',
-                            'defaults' => [
-                                'controller' => Controller\Api\ArticleController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
                                     ],
                                 ],
                             ],
