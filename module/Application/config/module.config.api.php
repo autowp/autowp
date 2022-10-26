@@ -50,7 +50,6 @@ return [
             Controller\Api\LogController::class              => Controller\Api\LogControllerFactory::class,
             Controller\Api\MostsController::class            => Controller\Api\MostsControllerFactory::class,
             Controller\Api\NewController::class              => Controller\Api\NewControllerFactory::class,
-            Controller\Api\PageController::class             => Controller\Api\PageControllerFactory::class,
             Controller\Api\PictureController::class          => Controller\Api\PictureControllerFactory::class,
             Controller\Api\PictureItemController::class      => Controller\Api\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
@@ -1320,81 +1319,6 @@ return [
                                     'verb'     => 'get',
                                     'defaults' => [
                                         'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'page'               => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/page',
-                            'defaults' => [
-                                'controller' => Controller\Api\PageController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'list'    => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                            'post'    => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'post',
-                                    ],
-                                ],
-                            ],
-                            'item'    => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:id',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'item',
-                                            ],
-                                        ],
-                                    ],
-                                    'put'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'put',
-                                            'defaults' => [
-                                                'action' => 'item-put',
-                                            ],
-                                        ],
-                                    ],
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'item-delete',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'parents' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/parents',
-                                    'defaults' => [
-                                        'action' => 'parents',
                                     ],
                                 ],
                             ],

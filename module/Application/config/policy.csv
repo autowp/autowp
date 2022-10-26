@@ -21,7 +21,6 @@ p, green-user, status, be-green
 p, moder, global, moderate
 p, moder, global, unlimited-traffic
 p, moder, user, ip
-p, pages-admin, pages, moderate
 p, pictures-moder, picture, remove_by_vote
 p, pictures-moder, picture, unaccept
 p, pictures-moder, picture, accept
