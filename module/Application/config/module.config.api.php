@@ -31,20 +31,19 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Api\AccountController::class         => Controller\Api\AccountControllerFactory::class,
-            Controller\Api\AttrController::class            => Controller\Api\AttrControllerFactory::class,
-            Controller\Api\BrandsController::class          => Controller\Api\BrandsControllerFactory::class,
-            Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
-            Controller\Api\CommentController::class         => Controller\Api\CommentControllerFactory::class,
-            Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
-            Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
-            Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
-            Controller\Api\IndexController::class           => Controller\Api\IndexControllerFactory::class,
-            Controller\Api\ItemController::class            => Controller\Api\ItemControllerFactory::class,
-            Controller\Api\GalleryController::class         => Controller\Api\GalleryControllerFactory::class,
-            Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
-            Controller\Api\ItemLinkController::class        => Controller\Api\ItemLinkControllerFactory::class,
-            Controller\Api\ItemParentController::class      => Controller\Api\ItemParentControllerFactory::class,
+            Controller\Api\AccountController::class      => Controller\Api\AccountControllerFactory::class,
+            Controller\Api\AttrController::class         => Controller\Api\AttrControllerFactory::class,
+            Controller\Api\BrandsController::class       => Controller\Api\BrandsControllerFactory::class,
+            Controller\Api\ChartController::class        => Controller\Api\ChartControllerFactory::class,
+            Controller\Api\CommentController::class      => Controller\Api\CommentControllerFactory::class,
+            Controller\Api\ForumController::class        => Controller\Api\ForumControllerFactory::class,
+            Controller\Api\InboxController::class        => Controller\Api\InboxControllerFactory::class,
+            Controller\Api\IndexController::class        => Controller\Api\IndexControllerFactory::class,
+            Controller\Api\ItemController::class         => Controller\Api\ItemControllerFactory::class,
+            Controller\Api\GalleryController::class      => Controller\Api\GalleryControllerFactory::class,
+            Controller\Api\ItemLanguageController::class => Controller\Api\ItemLanguageControllerFactory::class,
+            Controller\Api\ItemLinkController::class     => Controller\Api\ItemLinkControllerFactory::class,
+            Controller\Api\ItemParentController::class   => Controller\Api\ItemParentControllerFactory::class,
             Controller\Api\ItemParentLanguageController::class
                 => Controller\Api\ItemParentLanguageControllerFactory::class,
             Controller\Api\ItemVehicleTypeController::class  => Controller\Api\ItemVehicleTypeControllerFactory::class,
@@ -543,27 +542,6 @@ return [
                                                 'action' => 'get',
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'content-language'   => [
-                        'type'          => 'Segment',
-                        'options'       => [
-                            'route'    => '/content-language',
-                            'defaults' => [
-                                'controller' => Controller\Api\ContentLanguageController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'index' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
                                     ],
                                 ],
                             ],
