@@ -88,7 +88,7 @@ services:
     - "3306:3306"
 
   frontend:
-    image: autowp/autowp-frontend:v1.15.0
+    image: autowp/autowp-frontend:v1.31.0
     container_name: autowp_test_frontend
     restart: always
     volumes:

@@ -9,7 +9,6 @@ use Laminas\ServiceManager\Factory\InvokableFactory;
 return [
     'hydrators'   => [
         'factories' => [
-            Hydrator\Api\ArticleHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrAttributeHydrator::class      => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydrator::class,
@@ -32,28 +31,25 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Api\AccountController::class         => Controller\Api\AccountControllerFactory::class,
-            Controller\Api\ArticleController::class         => Controller\Api\ArticleControllerFactory::class,
-            Controller\Api\AttrController::class            => Controller\Api\AttrControllerFactory::class,
-            Controller\Api\BrandsController::class          => Controller\Api\BrandsControllerFactory::class,
-            Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
-            Controller\Api\CommentController::class         => Controller\Api\CommentControllerFactory::class,
-            Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
-            Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
-            Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
-            Controller\Api\IndexController::class           => Controller\Api\IndexControllerFactory::class,
-            Controller\Api\ItemController::class            => Controller\Api\ItemControllerFactory::class,
-            Controller\Api\GalleryController::class         => Controller\Api\GalleryControllerFactory::class,
-            Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
-            Controller\Api\ItemLinkController::class        => Controller\Api\ItemLinkControllerFactory::class,
-            Controller\Api\ItemParentController::class      => Controller\Api\ItemParentControllerFactory::class,
+            Controller\Api\AccountController::class      => Controller\Api\AccountControllerFactory::class,
+            Controller\Api\AttrController::class         => Controller\Api\AttrControllerFactory::class,
+            Controller\Api\BrandsController::class       => Controller\Api\BrandsControllerFactory::class,
+            Controller\Api\ChartController::class        => Controller\Api\ChartControllerFactory::class,
+            Controller\Api\CommentController::class      => Controller\Api\CommentControllerFactory::class,
+            Controller\Api\ForumController::class        => Controller\Api\ForumControllerFactory::class,
+            Controller\Api\InboxController::class        => Controller\Api\InboxControllerFactory::class,
+            Controller\Api\IndexController::class        => Controller\Api\IndexControllerFactory::class,
+            Controller\Api\ItemController::class         => Controller\Api\ItemControllerFactory::class,
+            Controller\Api\GalleryController::class      => Controller\Api\GalleryControllerFactory::class,
+            Controller\Api\ItemLanguageController::class => Controller\Api\ItemLanguageControllerFactory::class,
+            Controller\Api\ItemLinkController::class     => Controller\Api\ItemLinkControllerFactory::class,
+            Controller\Api\ItemParentController::class   => Controller\Api\ItemParentControllerFactory::class,
             Controller\Api\ItemParentLanguageController::class
                 => Controller\Api\ItemParentLanguageControllerFactory::class,
             Controller\Api\ItemVehicleTypeController::class  => Controller\Api\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LogController::class              => Controller\Api\LogControllerFactory::class,
             Controller\Api\MostsController::class            => Controller\Api\MostsControllerFactory::class,
             Controller\Api\NewController::class              => Controller\Api\NewControllerFactory::class,
-            Controller\Api\PageController::class             => Controller\Api\PageControllerFactory::class,
             Controller\Api\PictureController::class          => Controller\Api\PictureControllerFactory::class,
             Controller\Api\PictureItemController::class      => Controller\Api\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
@@ -128,27 +124,6 @@ return [
                                                 'action' => 'start',
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'article'            => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/article',
-                            'defaults' => [
-                                'controller' => Controller\Api\ArticleController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
                                     ],
                                 ],
                             ],
@@ -566,27 +541,6 @@ return [
                                                 'action' => 'get',
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'content-language'   => [
-                        'type'          => 'Segment',
-                        'options'       => [
-                            'route'    => '/content-language',
-                            'defaults' => [
-                                'controller' => Controller\Api\ContentLanguageController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'index' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
                                     ],
                                 ],
                             ],
@@ -1365,81 +1319,6 @@ return [
                                     'verb'     => 'get',
                                     'defaults' => [
                                         'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'page'               => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/page',
-                            'defaults' => [
-                                'controller' => Controller\Api\PageController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'list'    => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                            'post'    => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'post',
-                                    ],
-                                ],
-                            ],
-                            'item'    => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:id',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'item',
-                                            ],
-                                        ],
-                                    ],
-                                    'put'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'put',
-                                            'defaults' => [
-                                                'action' => 'item-put',
-                                            ],
-                                        ],
-                                    ],
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'item-delete',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'parents' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/parents',
-                                    'defaults' => [
-                                        'action' => 'parents',
                                     ],
                                 ],
                             ],
