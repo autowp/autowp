@@ -21,8 +21,5 @@
     <testsuite name="application">
       <directory>./module/Application/test</directory>
     </testsuite>
-    <testsuite name="comments">
-      <directory>./module/Comments/test</directory>
-    </testsuite>
   </testsuites>
 </phpunit>
