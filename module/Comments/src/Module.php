@@ -16,7 +16,6 @@ class Module implements
     {
         $provider = new ConfigProvider();
         return [
-            'laminas-cli'     => $provider->getCliConfig(),
             'service_manager' => $provider->getDependencyConfig(),
             'forms'           => $provider->getFormsConfig(),
             'tables'          => $provider->getTablesConfig(),

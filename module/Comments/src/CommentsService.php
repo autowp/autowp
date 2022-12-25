@@ -22,8 +22,6 @@ use function reset;
 
 class CommentsService
 {
-    private const DELETE_TTL_DAYS = 300;
-
     public const MAX_MESSAGE_LENGTH = 16 * 1024;
 
     private TableGateway $voteTable;
@@ -342,30 +340,6 @@ class CommentsService
         }
 
         return null;
-    }
-
-    public function updateRepliesCount(): int
-    {
-        /** @var Adapter $db */
-        $db = $this->messageTable->getAdapter();
-
-        $db->query('
-            create temporary table __cms
-            select type_id, item_id, parent_id as id, count(1) as count
-            from comment_message
-            where parent_id is not null
-            group by type_id, item_id, parent_id
-        ', Adapter::QUERY_MODE_EXECUTE);
-
-        $statement = $db->createStatement('
-            update comment_message
-                inner join __cms
-                using(type_id, item_id, id)
-            set comment_message.replies_count = __cms.count
-        ');
-        $result    = $statement->execute();
-
-        return $result->getAffectedRows();
     }
 
     /**
@@ -783,40 +757,6 @@ class CommentsService
             'type_id' => $typeId,
             'item_id' => $itemId,
         ]);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function cleanupDeleted(): int
-    {
-        $subSelect = $this->messageTable->getSql()->select()
-            ->quantifier(Sql\Select::QUANTIFIER_DISTINCT)
-            ->columns(['parent_id'])
-            ->where(['parent_id']);
-
-        $select = $this->messageTable->getSql()->select()
-            ->columns(['id', 'type_id', 'item_id'])
-            ->where([
-                new Sql\Predicate\NotIn('id', $subSelect),
-                'deleted',
-                new Sql\Predicate\Expression('delete_date < DATE_SUB(NOW(), INTERVAL ? DAY)', [self::DELETE_TTL_DAYS]),
-            ]);
-
-        $rows = $this->messageTable->selectWith($select);
-
-        $affected = 0;
-        foreach ($rows as $row) {
-            $affected += $this->messageTable->delete([
-                'id'      => $row['id'],
-                'type_id' => $row['type_id'],
-                'item_id' => $row['item_id'],
-            ]);
-
-            $this->updateTopicStat($row['type_id'], $row['item_id']);
-        }
-
-        return $affected;
     }
 
     public function getList(array $options): array

@@ -11,20 +11,9 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'laminas-cli'  => $this->getCliConfig(),
             'dependencies' => $this->getDependencyConfig(),
             'forms'        => $this->getFormsConfig(),
             'tables'       => $this->getTablesConfig(),
-        ];
-    }
-
-    public function getCliConfig(): array
-    {
-        return [
-            'commands' => [
-                'comments:cleanup-deleted'       => Command\CleanupDeletedCommand::class,
-                'comments:refresh-replies-count' => Command\RefreshRepliesCountCommand::class,
-            ],
         ];
     }
 
@@ -35,9 +24,7 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                CommentsService::class                    => CommentsServiceFactory::class,
-                Command\CleanupDeletedCommand::class      => Command\CleanupDeletedCommandFactory::class,
-                Command\RefreshRepliesCountCommand::class => Command\RefreshRepliesCountCommandFactory::class,
+                CommentsService::class => CommentsServiceFactory::class,
             ],
         ];
     }

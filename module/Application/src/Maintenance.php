@@ -32,7 +32,6 @@ class Maintenance extends AbstractListenerAggregate
 
         /* $comments = $serviceManager->get(Comments::class);
         $comments->cleanBrokenMessages();
-        $comments->service()->cleanupDeleted();
         $comments->service()->cleanTopics();*/
 
         /** @var PictureService $pictureService */
