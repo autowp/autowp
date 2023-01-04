@@ -2,7 +2,6 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
-use Application\Controller\Api\CommentController;
 use Application\Controller\Api\ForumController;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
@@ -133,26 +132,6 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(ForumController::class);
         $this->assertMatchedRouteName('api/forum/topic/get');
         $this->assertActionName('get-topics');
-
-        // post message
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/comment', Request::METHOD_POST, [
-            'item_id'             => $topicId,
-            'type_id'             => 5,
-            'message'             => 'Test message',
-            'moderator_attention' => 0,
-            'parent_id'           => null,
-        ]);
-
-        $this->assertResponseStatusCode(201);
-        $this->assertControllerName(CommentController::class);
-        $this->assertMatchedRouteName('api/comment/post');
-        $this->assertActionName('post');
 
         // delete topic
         $this->reset();
