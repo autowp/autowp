@@ -517,15 +517,6 @@ return [
                                     ],
                                 ],
                             ],
-                            'post' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'post',
-                                    ],
-                                ],
-                            ],
                             'item' => [
                                 'type'          => 'Segment',
                                 'options'       => [

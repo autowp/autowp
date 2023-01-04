@@ -5,14 +5,7 @@ declare(strict_types=1);
 namespace Application\Controller\Api;
 
 use Application\Comments;
-use Application\HostManager;
 use Application\Hydrator\Api\CommentHydrator;
-use Application\Model\Item;
-use Application\Model\Picture;
-use Autowp\Forums\Forums;
-use Autowp\Message\MessageService;
-use Autowp\User\Model\User;
-use Autowp\Votings\Votings;
 use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -34,16 +27,7 @@ class CommentControllerFactory implements FactoryInterface
             $tables->get('users'),
             $filters->get('api_comments_get'),
             $filters->get('api_comments_get_public'),
-            $filters->get('api_comments_post'),
-            $filters->get('api_comments_item_get'),
-            $container->get(User::class),
-            $container->get(HostManager::class),
-            $container->get(MessageService::class),
-            $container->get(Picture::class),
-            $container->get(Item::class),
-            $container->get(Votings::class),
-            $tables->get('articles'),
-            $container->get(Forums::class)
+            $filters->get('api_comments_item_get')
         );
     }
 }

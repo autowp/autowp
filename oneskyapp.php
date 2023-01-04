@@ -9,7 +9,7 @@ use Onesky\Api\Client;
 use Zend\Json\Json;
 
 if (! isset($argv[1]) || ! $argv[1]) {
-    throw new \Exception("Secret not provided");
+    throw new Exception("Secret not provided");
 }
 
 $languages = ['en', 'zh', 'ru', 'pt-br', 'fr', 'be', 'uk', 'es'];
@@ -27,7 +27,7 @@ foreach ($languages as $language) {
     $response = $client->translations('export', [
         'project_id'       => $projectID,
         'locale'           => $language,
-        'source_file_name' => 'frontend.json'
+        'source_file_name' => 'frontend.json',
     ]);
 
     $data = Json::decode($response, Json::TYPE_ARRAY);

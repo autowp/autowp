@@ -784,53 +784,6 @@ return [
                 ],
             ],
         ],
-        'api_comments_post'                    => [
-            'item_id'             => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'type_id'             => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'message'             => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => 0,
-                            'max' => CommentsService::MAX_MESSAGE_LENGTH,
-                        ],
-                    ],
-                ],
-            ],
-            'moderator_attention' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'parent_id'           => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'resolve'             => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-        ],
         'api_comments_item_get'                => [
             'limit'  => [
                 'required'   => false,

@@ -6,24 +6,12 @@ use Application\Model\Item;
 use Application\Model\Picture;
 use ArrayAccess;
 use Autowp\Comments\CommentsService;
-use Autowp\Message\MessageService;
-use Autowp\Traffic\TrafficControl;
-use Autowp\User\Model\User;
 use Exception;
-use InvalidArgumentException;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
-use Laminas\I18n\Translator\TranslatorInterface;
-use Laminas\Uri\Uri;
 
-use function array_filter;
-use function array_walk;
 use function Autowp\Commons\currentFromResultSetInterface;
-use function count;
-use function implode;
-use function ltrim;
 use function sprintf;
-use function urlencode;
 
 class Comments
 {
@@ -37,69 +25,22 @@ class Comments
 
     private CommentsService $service;
 
-    private HostManager $hostManager;
-
-    private MessageService $message;
-
-    private TranslatorInterface $translator;
-
     private Picture $picture;
 
     private TableGateway $articleTable;
 
     private TableGateway $itemTable;
 
-    private User $userModel;
-
-    private TrafficControl $traffic;
-
     public function __construct(
         CommentsService $service,
-        HostManager $hostManager,
-        MessageService $message,
-        TranslatorInterface $translator,
         Picture $picture,
         TableGateway $articleTable,
-        TableGateway $itemTable,
-        User $userModel,
-        TrafficControl $traffic
+        TableGateway $itemTable
     ) {
         $this->service      = $service;
-        $this->hostManager  = $hostManager;
-        $this->message      = $message;
-        $this->translator   = $translator;
         $this->picture      = $picture;
         $this->articleTable = $articleTable;
         $this->itemTable    = $itemTable;
-        $this->userModel    = $userModel;
-        $this->traffic      = $traffic;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getMessageUrl(int $messageId, Uri $uri): string
-    {
-        $message = $this->service->getMessageRow($messageId);
-
-        if (! $message) {
-            throw new InvalidArgumentException("Message `$messageId` not found");
-        }
-
-        $route = $this->getMessageRowRoute($message);
-
-        if ($route) {
-            $route[0] = ltrim($route[0], '/');
-        }
-
-        array_walk($route, function (&$item): void {
-            $item = urlencode($item);
-        });
-
-        $uri->setPath('/' . implode('/', $route));
-        $uri->setFragment('msg' . $messageId);
-
-        return $uri->toString();
     }
 
     /**
@@ -248,56 +189,5 @@ class Comments
         }
 
         return $affected;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function notifySubscribers(int $messageId): void
-    {
-        $comment = $this->service->getMessageRow($messageId);
-
-        if (! $comment) {
-            return;
-        }
-
-        $author = $this->userModel->getRow(['id' => (int) $comment['author_id']]);
-
-        if (! $author) {
-            return;
-        }
-
-        $ids = $this->service->getSubscribersIds($comment['type_id'], $comment['item_id'], true);
-        $ids = array_filter($ids, function ($id) use ($author) {
-            $prefs = $this->traffic->getUserUserPreferences((int) $id, (int) $author['id']);
-            return ! $prefs['disable_comments_notifications'];
-        });
-
-        if (count($ids) <= 0) {
-            return;
-        }
-
-        $subscribers = $this->userModel->getRows(['id' => $ids]);
-
-        foreach ($subscribers as $subscriber) {
-            if ((int) $subscriber['id'] === (int) $author['id']) {
-                continue;
-            }
-
-            $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
-            $uri->setPath('/users/' . ($author['identity'] ? $author['identity'] : 'user' . $author['id']));
-            $userUrl = $uri->toString();
-
-            $url = $this->getMessageUrl($messageId, $uri);
-
-            $message = sprintf(
-                $this->translator->translate('pm/user-%s-post-new-message-%s', 'default', $subscriber['language']),
-                $userUrl,
-                $url
-            );
-            $this->message->send(null, $subscriber['id'], $message);
-
-            $this->service->setSubscriptionSent($comment['type_id'], $comment['item_id'], $subscriber['id'], true);
-        }
     }
 }

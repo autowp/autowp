@@ -39,19 +39,6 @@ class TrafficControl
     /**
      * @throws Exception
      */
-    public function getUserUserPreferences(int $userId, int $toUserId): ?array
-    {
-        $response = $this->getClient()->request(
-            'GET',
-            '/user-user-preferences/' . $userId . '/' . $toUserId,
-        );
-
-        return Json::decode($response->getBody(), Json::TYPE_ARRAY);
-    }
-
-    /**
-     * @throws Exception
-     */
     public function getBanInfo(string $ip): ?array
     {
         $response = $this->getClient()->request('GET', '/ban/' . $ip, [

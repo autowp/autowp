@@ -330,19 +330,6 @@ class CommentsService
     }
 
     /**
-     * @throws Exception
-     */
-    public function getMessageAuthorId(int $messageId): ?int
-    {
-        $row = $this->getMessageRow($messageId);
-        if ($row) {
-            return $row['author_id'] ? $row['author_id'] : null;
-        }
-
-        return null;
-    }
-
-    /**
      * @param ArrayObject|array $messageRow
      * @throws Exception
      */

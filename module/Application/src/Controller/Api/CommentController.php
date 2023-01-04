@@ -3,23 +3,13 @@
 namespace Application\Controller\Api;
 
 use Application\Comments;
-use Application\HostManager;
 use Application\Hydrator\Api\AbstractRestHydrator;
-use Application\Model\Item;
-use Application\Model\Picture;
-use Autowp\Forums\Forums;
-use Autowp\Message\MessageService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
-use Autowp\User\Model\User;
-use Autowp\Votings\Votings;
-use DateTime;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
-use Laminas\Http\PhpEnvironment\Request;
-use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -30,7 +20,6 @@ use Laminas\View\Model\ViewModel;
 use function Autowp\Commons\currentFromResultSetInterface;
 use function get_object_vars;
 use function is_numeric;
-use function sprintf;
 use function strlen;
 
 /**
@@ -48,24 +37,6 @@ class CommentController extends AbstractRestfulController
 
     private TableGateway $userTable;
 
-    private InputFilter $postInputFilter;
-
-    private User $userModel;
-
-    private HostManager $hostManager;
-
-    private MessageService $message;
-
-    private Picture $picture;
-
-    private Item $item;
-
-    private Votings $votings;
-
-    private TableGateway $articleTable;
-
-    private Forums $forums;
-
     private InputFilter $listInputFilter;
 
     private InputFilter $publicListInputFilter;
@@ -78,32 +49,14 @@ class CommentController extends AbstractRestfulController
         TableGateway $userTable,
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
-        InputFilter $postInputFilter,
-        InputFilter $getInputFilter,
-        User $userModel,
-        HostManager $hostManager,
-        MessageService $message,
-        Picture $picture,
-        Item $item,
-        Votings $votings,
-        TableGateway $articleTable,
-        Forums $forums
+        InputFilter $getInputFilter
     ) {
         $this->comments              = $comments;
         $this->hydrator              = $hydrator;
         $this->userTable             = $userTable;
         $this->listInputFilter       = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
-        $this->postInputFilter       = $postInputFilter;
         $this->getInputFilter        = $getInputFilter;
-        $this->userModel             = $userModel;
-        $this->hostManager           = $hostManager;
-        $this->message               = $message;
-        $this->picture               = $picture;
-        $this->item                  = $item;
-        $this->votings               = $votings;
-        $this->articleTable          = $articleTable;
-        $this->forums                = $forums;
     }
 
     /**
@@ -253,192 +206,6 @@ class CommentController extends AbstractRestfulController
         }
 
         return new JsonModel($result);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function nextMessageTime(): ?DateTime
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return null;
-        }
-
-        return $this->userModel->getNextMessageTime($user['id']);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function needWait(): bool
-    {
-        $nextMessageTime = $this->nextMessageTime();
-        if ($nextMessageTime) {
-            return $nextMessageTime > new DateTime();
-        }
-
-        return false;
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function postAction()
-    {
-        $currentUser = $this->user()->get();
-        if (! $currentUser) {
-            return $this->forbiddenAction();
-        }
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
-            $data = $this->jsonDecode($request->getContent());
-        } else {
-            $data = $request->getPost()->toArray();
-        }
-
-        $this->postInputFilter->setData($data);
-
-        if (! $this->postInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->postInputFilter);
-        }
-
-        $data = $this->postInputFilter->getValues();
-
-        $itemId = (int) $data['item_id'];
-        $typeId = (int) $data['type_id'];
-
-        if ($this->needWait()) {
-            return new ApiProblemResponse(
-                new ApiProblem(
-                    400,
-                    'Data is invalid. Check `detail`.',
-                    null,
-                    'Validation error',
-                    [
-                        'invalid_params' => [
-                            'message' => [
-                                'invalid' => 'Too often',
-                            ],
-                        ],
-                    ]
-                )
-            );
-        }
-
-        $object = null;
-        switch ($typeId) {
-            case Comments::PICTURES_TYPE_ID:
-                $object = $this->picture->getRow(['id' => $itemId]);
-                break;
-
-            case Comments::ITEM_TYPE_ID:
-                $object = $this->item->getRow(['id' => $itemId]);
-                break;
-
-            case Comments::VOTINGS_TYPE_ID:
-                $object = $this->votings->isVotingExists($itemId);
-                break;
-
-            case Comments::ARTICLES_TYPE_ID:
-                $object = currentFromResultSetInterface($this->articleTable->select(['id' => $itemId]));
-                break;
-
-            case Comments::FORUMS_TYPE_ID:
-                $object = currentFromResultSetInterface($this->forums->getTopicTable()->select(['id' => $itemId]));
-                break;
-
-            default:
-                throw new Exception('Unknown type_id');
-        }
-
-        if (! $object) {
-            return $this->notFoundAction();
-        }
-
-        $moderatorAttention = false;
-        if ($this->user()->enforce('comment', 'moderator-attention')) {
-            $moderatorAttention = (bool) $data['moderator_attention'];
-        }
-
-        $ip = $request->getServer('REMOTE_ADDR');
-        if (! $ip) {
-            $ip = '127.0.0.1';
-        }
-
-        $messageId = $this->comments->service()->add([
-            'typeId'             => $typeId,
-            'itemId'             => $itemId,
-            'parentId'           => $data['parent_id'] ? (int) $data['parent_id'] : null,
-            'authorId'           => $currentUser['id'],
-            'message'            => $data['message'],
-            'ip'                 => $ip,
-            'moderatorAttention' => $moderatorAttention,
-        ]);
-
-        if (! $messageId) {
-            throw new Exception("Message add fails");
-        }
-
-        $this->userModel->getTable()->update([
-            'last_message_time' => new Sql\Expression('NOW()'),
-        ], [
-            'id' => $currentUser['id'],
-        ]);
-
-        if ($this->user()->enforce('global', 'moderate') && $data['parent_id'] && $data['resolve']) {
-            $this->comments->service()->completeMessage($data['parent_id']);
-        }
-
-        if ($typeId === Comments::FORUMS_TYPE_ID) {
-            $this->userModel->getTable()->update([
-                'forums_messages'   => new Sql\Expression('forums_messages + 1'),
-                'last_message_time' => new Sql\Expression('NOW()'),
-            ], [
-                'id' => $currentUser['id'],
-            ]);
-        }
-
-        if ($data['parent_id']) {
-            $authorId = $this->comments->service()->getMessageAuthorId($data['parent_id']);
-            if ($authorId && ($authorId !== (int) $currentUser['id'])) {
-                $parentMessageAuthor = currentFromResultSetInterface(
-                    $this->userModel->getTable()->select(['id' => $authorId])
-                );
-                if ($parentMessageAuthor && ! $parentMessageAuthor['deleted']) {
-                    $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor['language']);
-
-                    $url      = $this->comments->getMessageUrl($messageId, $uri);
-                    $path     = '/users/'
-                            . ($currentUser['identity'] ? $currentUser['identity'] : 'user' . $currentUser['id']);
-                    $moderUrl = $uri->setPath($path)->toString();
-                    $message  = sprintf(
-                        $this->translate(
-                            'pm/user-%s-replies-to-you-%s',
-                            'default',
-                            $parentMessageAuthor['language']
-                        ),
-                        $moderUrl,
-                        $url
-                    );
-                    $this->message->send(null, $parentMessageAuthor['id'], $message);
-                }
-            }
-        }
-
-        $this->comments->notifySubscribers($messageId);
-
-        $url = $this->url()->fromRoute('api/comment/item/get', [
-            'id' => $messageId,
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        $response->getHeaders()->addHeaderLine('Location', $url);
-        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**
