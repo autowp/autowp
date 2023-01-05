@@ -4,7 +4,6 @@ namespace Autowp\Forums;
 
 use Application\Comments as AppComments;
 use Autowp\Comments;
-use Autowp\User\Model\User;
 use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\Sql\Predicate;
