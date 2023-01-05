@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Autowp\Forums;
 
 use Autowp\Comments\CommentsService;
-use Autowp\User\Model\User;
 use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -22,8 +21,7 @@ class ForumsFactory implements FactoryInterface
         return new Forums(
             $container->get(CommentsService::class),
             $tables->get('forums_themes'),
-            $tables->get('forums_topics'),
-            $container->get(User::class)
+            $tables->get('forums_topics')
         );
     }
 }
