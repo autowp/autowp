@@ -220,16 +220,6 @@ class CommentsService
         $statement->execute([$userId, $typeId, $itemId]);
     }
 
-    public function completeMessage(int $id): void
-    {
-        $this->messageTable->update([
-            'moderator_attention' => Attention::COMPLETED,
-        ], [
-            'id'                  => $id,
-            'moderator_attention' => Attention::REQUIRED,
-        ]);
-    }
-
     /**
      * @throws Exception
      */
@@ -881,29 +871,6 @@ class CommentsService
             'item_id' => $itemId,
             'user_id' => $userId,
         ]);
-    }
-
-    public function getSubscribersIds(int $typeId, int $itemId, bool $onlyAwaiting = false): array
-    {
-        $where = [
-            'type_id' => $typeId,
-            'item_id' => $itemId,
-        ];
-
-        if ($onlyAwaiting) {
-            $where[] = 'NOT sent';
-        }
-
-        $select = $this->topicSubscribeTable->getSql()->select()
-            ->columns(['user_id'])
-            ->where($where);
-
-        $ids = [];
-        foreach ($this->topicSubscribeTable->selectWith($select) as $row) {
-            $ids[] = $row['user_id'];
-        }
-
-        return $ids;
     }
 
     public function setSubscriptionSent(int $typeId, int $itemId, int $userId, bool $sent): void
