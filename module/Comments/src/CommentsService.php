@@ -835,14 +835,6 @@ class CommentsService
     /**
      * @throws Exception
      */
-    public function canUnSubscribe(int $typeId, int $itemId, int $userId): bool
-    {
-        return $this->userSubscribed($typeId, $itemId, $userId);
-    }
-
-    /**
-     * @throws Exception
-     */
     public function subscribe(int $typeId, int $itemId, int $userId): void
     {
         if (! $this->canSubscribe($typeId, $itemId, $userId)) {
@@ -854,22 +846,6 @@ class CommentsService
             'item_id' => $itemId,
             'user_id' => $userId,
             'sent'    => 0,
-        ]);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function unSubscribe(int $typeId, int $itemId, int $userId): void
-    {
-        if (! $this->canUnSubscribe($typeId, $itemId, $userId)) {
-            throw new Exception('User not subscribed');
-        }
-
-        $this->topicSubscribeTable->delete([
-            'type_id' => $typeId,
-            'item_id' => $itemId,
-            'user_id' => $userId,
         ]);
     }
 

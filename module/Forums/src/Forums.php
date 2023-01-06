@@ -44,32 +44,6 @@ class Forums
         return $this->comments->userSubscribed(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
-    public function canSubscribe(int $topicId, int $userId): bool
-    {
-        return $this->comments->canSubscribe(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
-    }
-
-    public function canUnSubscribe(int $topicId, int $userId): bool
-    {
-        return $this->comments->canUnSubscribe(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function subscribe(int $topicId, int $userId): void
-    {
-        $this->comments->subscribe(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function unsubscribe(int $topicId, int $userId): void
-    {
-        $this->comments->unSubscribe(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
-    }
-
     public function open(int $topicId): void
     {
         $this->topicTable->update([

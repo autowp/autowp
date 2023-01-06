@@ -292,18 +292,6 @@ class ForumController extends AbstractRestfulController
             }
         }
 
-        if (array_key_exists('subscription', $values)) {
-            if ($values['subscription']) {
-                if ($this->forums->canSubscribe($row['id'], $user['id'])) {
-                    $this->forums->subscribe($row['id'], $user['id']);
-                }
-            } else {
-                if ($this->forums->canUnSubscribe($row['id'], $user['id'])) {
-                    $this->forums->unsubscribe($row['id'], $user['id']);
-                }
-            }
-        }
-
         if (array_key_exists('theme_id', $values) && $forumAdmin) {
             $theme = $this->forums->getTheme($values['theme_id']);
 
