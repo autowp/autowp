@@ -957,17 +957,6 @@ return [
                 ],
             ],
         ],
-        'api_forum_topic_put'                  => [
-            'theme_id' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-        ],
         'api_inbox_get'                        => [
             'brand_id' => [
                 'required' => false,

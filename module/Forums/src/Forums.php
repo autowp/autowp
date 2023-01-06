@@ -4,7 +4,6 @@ namespace Autowp\Forums;
 
 use Application\Comments as AppComments;
 use Autowp\Comments;
-use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\Sql\Predicate;
 use Laminas\Db\TableGateway\TableGateway;
@@ -44,47 +43,6 @@ class Forums
         return $this->comments->userSubscribed(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function updateThemeStat(int $themeId): void
-    {
-        $theme = currentFromResultSetInterface($this->themeTable->select(['id' => (int) $themeId]));
-        if (! $theme) {
-            return;
-        }
-
-        $select = new Sql\Select($this->topicTable->getTable());
-        $select
-            ->columns(['count' => new Sql\Expression('count(1)')])
-            ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
-            ->where([
-                'forums_theme_parent.parent_id = ?' => $theme['id'],
-                new Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED]),
-            ]);
-        $topics = currentFromResultSetInterface($this->topicTable->selectWith($select));
-
-        $messages = $this->comments->getTotalMessagesCount([
-            'type' => AppComments::FORUMS_TYPE_ID,
-            'callback'
-                => function (Sql\Select $select) use ($theme): void {
-                    $select
-                        ->join('forums_topics', 'comment_message.item_id = forums_topics.id', [])
-                        ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
-                        ->where([
-                            'forums_theme_parent.parent_id = ?' => $theme['id'],
-                            new Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED]),
-                        ]);
-                },
-        ]);
-        $this->themeTable->update([
-            'topics'   => $topics['count'],
-            'messages' => $messages,
-        ], [
-            'id = ?' => $theme['id'],
-        ]);
-    }
-
     public function getTheme(int $themeId): ?array
     {
         $theme = currentFromResultSetInterface($this->themeTable->select(['id' => $themeId]));
@@ -98,32 +56,6 @@ class Forums
             'disable_topics' => $theme['disable_topics'],
             'is_moderator'   => $theme['is_moderator'],
         ];
-    }
-
-    public function moveTopic(int $topicId, int $themeId): bool
-    {
-        $topic = currentFromResultSetInterface($this->topicTable->select(['id' => $topicId]));
-        if (! $topic) {
-            return false;
-        }
-
-        $theme = currentFromResultSetInterface($this->themeTable->select(['id' => $themeId]));
-        if (! $theme) {
-            return false;
-        }
-
-        $oldThemeId = $topic['theme_id'];
-
-        $this->topicTable->update([
-            'theme_id' => $theme['id'],
-        ], [
-            'id' => $topic['id'],
-        ]);
-
-        $this->updateThemeStat($theme['id']);
-        $this->updateThemeStat($oldThemeId);
-
-        return true;
     }
 
     public function getTopic(int $topicId, array $options = []): ?array

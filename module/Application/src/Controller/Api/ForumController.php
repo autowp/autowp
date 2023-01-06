@@ -6,11 +6,8 @@ use Application\Comments;
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Forums\Forums;
 use Autowp\User\Controller\Plugin\User as UserModel;
-use Exception;
-use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -19,8 +16,6 @@ use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
-use function array_key_exists;
-use function array_keys;
 use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
@@ -46,8 +41,6 @@ class ForumController extends AbstractRestfulController
 
     private InputFilter $topicGetInputFilter;
 
-    private InputFilter $topicPutInputFilter;
-
     public function __construct(
         Forums $forums,
         AbstractRestHydrator $themeHydrator,
@@ -55,8 +48,7 @@ class ForumController extends AbstractRestfulController
         InputFilter $themeListInputFilter,
         InputFilter $themeInputFilter,
         InputFilter $topicListInputFilter,
-        InputFilter $topicGetInputFilter,
-        InputFilter $topicPutInputFilter
+        InputFilter $topicGetInputFilter
     ) {
         $this->forums               = $forums;
         $this->themeHydrator        = $themeHydrator;
@@ -65,7 +57,6 @@ class ForumController extends AbstractRestfulController
         $this->themeInputFilter     = $themeInputFilter;
         $this->topicListInputFilter = $topicListInputFilter;
         $this->topicGetInputFilter  = $topicGetInputFilter;
-        $this->topicPutInputFilter  = $topicPutInputFilter;
     }
 
     /**
@@ -232,60 +223,6 @@ class ForumController extends AbstractRestfulController
             'items'     => $items,
             'paginator' => $paginator->getPages(),
         ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function putTopicAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        $forumAdmin = $this->user()->enforce('forums', 'moderate');
-
-        $row = $this->forums->getTopic((int) $this->params('id'));
-        if (! $row) {
-            return $this->notFoundAction();
-        }
-
-        $request = $this->getRequest();
-        $data    = (array) $this->processBodyContent($request);
-
-        $fields = [];
-        foreach (array_keys($data) as $key) {
-            if ($this->topicPutInputFilter->has($key)) {
-                $fields[] = $key;
-            }
-        }
-
-        if (! $fields) {
-            return new ApiProblemResponse(new ApiProblem(400, 'No fields provided'));
-        }
-
-        $this->topicPutInputFilter->setValidationGroup($fields);
-
-        $this->topicPutInputFilter->setData($data);
-        if (! $this->topicPutInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->topicPutInputFilter);
-        }
-
-        $values = $this->topicPutInputFilter->getValues();
-
-        if (array_key_exists('theme_id', $values) && $forumAdmin) {
-            $theme = $this->forums->getTheme($values['theme_id']);
-
-            if ($theme) {
-                $this->forums->moveTopic($row['id'], $theme['id']);
-            }
-        }
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
     }
 
     /**
