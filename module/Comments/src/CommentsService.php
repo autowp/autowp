@@ -255,18 +255,6 @@ class CommentsService
     }
 
     /**
-     * @throws Exception
-     */
-    public function topicHaveModeratorAttention(int $type, int $item): bool
-    {
-        return (bool) currentFromResultSetInterface($this->messageTable->select([
-            'item_id'             => $item,
-            'type_id'             => $type,
-            'moderator_attention' => Attention::REQUIRED,
-        ]));
-    }
-
-    /**
      * @return ArrayObject|array|null
      * @throws Exception
      */

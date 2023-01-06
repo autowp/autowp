@@ -7,7 +7,6 @@ namespace Application;
 use Application\InputFilter\AttrUserValueCollectionInputFilter;
 use Autowp\Comments\Attention;
 use Autowp\Comments\CommentsService;
-use Autowp\Forums\Forums;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Laminas\InputFilter\InputFilter;
 
@@ -959,34 +958,7 @@ return [
             ],
         ],
         'api_forum_topic_put'                  => [
-            'status'       => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'InArray',
-                        'options' => [
-                            'haystack' => [
-                                Forums::STATUS_NORMAL,
-                                Forums::STATUS_CLOSED,
-                                Forums::STATUS_DELETED,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'subscription' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'theme_id'     => [
+            'theme_id' => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],

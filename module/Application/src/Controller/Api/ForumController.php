@@ -275,23 +275,6 @@ class ForumController extends AbstractRestfulController
 
         $values = $this->topicPutInputFilter->getValues();
 
-        if (array_key_exists('status', $values) && $forumAdmin) {
-            switch ($values['status']) {
-                case Forums::STATUS_CLOSED:
-                    $this->forums->close($row['id']);
-                    break;
-                case Forums::STATUS_DELETED:
-                    $success = $this->forums->delete($row['id']);
-                    if (! $success) {
-                        return $this->forbiddenAction();
-                    }
-                    break;
-                case Forums::STATUS_NORMAL:
-                    $this->forums->open($row['id']);
-                    break;
-            }
-        }
-
         if (array_key_exists('theme_id', $values) && $forumAdmin) {
             $theme = $this->forums->getTheme($values['theme_id']);
 

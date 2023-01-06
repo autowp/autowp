@@ -44,51 +44,6 @@ class Forums
         return $this->comments->userSubscribed(AppComments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
-    public function open(int $topicId): void
-    {
-        $this->topicTable->update([
-            'status' => self::STATUS_NORMAL,
-        ], [
-            'id = ?' => $topicId,
-        ]);
-    }
-
-    public function close(int $topicId): void
-    {
-        $this->topicTable->update([
-            'status' => self::STATUS_CLOSED,
-        ], [
-            'id = ?' => $topicId,
-        ]);
-    }
-
-    public function delete(int $topicId): bool
-    {
-        $topic = currentFromResultSetInterface($this->topicTable->select(['id' => $topicId]));
-        if (! $topic) {
-            return false;
-        }
-
-        $needAttention = $this->comments->topicHaveModeratorAttention(
-            AppComments::FORUMS_TYPE_ID,
-            $topic['id']
-        );
-
-        if ($needAttention) {
-            return false;
-        }
-
-        $this->topicTable->update([
-            'status' => self::STATUS_DELETED,
-        ], [
-            'id = ?' => $topic['id'],
-        ]);
-
-        $this->updateThemeStat($topic['theme_id']);
-
-        return true;
-    }
-
     /**
      * @throws Exception
      */
