@@ -958,65 +958,6 @@ return [
                 ],
             ],
         ],
-        'api_forum_topic_post'                 => [
-            'theme_id'            => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'name'                => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => 0,
-                            'max' => 100,
-                        ],
-                    ],
-                ],
-            ],
-            'text'                => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => 0,
-                            'max' => 1024 * 4,
-                        ],
-                    ],
-                ],
-            ],
-            'moderator_attention' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'subscription'        => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-        ],
         'api_forum_topic_put'                  => [
             'status'       => [
                 'required'   => false,

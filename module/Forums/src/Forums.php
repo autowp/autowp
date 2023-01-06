@@ -156,55 +156,6 @@ class Forums
         ]);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function addTopic(array $values): int
-    {
-        $userId = (int) $values['user_id'];
-        if (! $userId) {
-            throw new Exception("User id not provided");
-        }
-
-        $theme = $this->getTheme($values['theme_id']);
-        if (! $theme || $theme['disable_topics']) {
-            return 0;
-        }
-
-        if (! $values['ip']) {
-            $values['ip'] = '127.0.0.1';
-        }
-
-        $this->topicTable->insert([
-            'theme_id'     => $theme['id'],
-            'name'         => $values['name'],
-            'author_id'    => $userId,
-            'author_ip'    => new Sql\Expression('INET6_ATON(?)', $values['ip']),
-            'add_datetime' => new Sql\Expression('NOW()'),
-            'views'        => 0,
-            'status'       => self::STATUS_NORMAL,
-        ]);
-        $id = $this->topicTable->getLastInsertValue();
-
-        $this->comments->add([
-            'typeId'             => AppComments::FORUMS_TYPE_ID,
-            'itemId'             => $id,
-            'authorId'           => $userId,
-            'datetime'           => new Sql\Expression('NOW()'),
-            'message'            => $values['text'],
-            'ip'                 => $values['ip'],
-            'moderatorAttention' => (bool) $values['moderator_attention'],
-        ]);
-
-        if ($values['subscription']) {
-            $this->subscribe($id, $userId);
-        }
-
-        $this->updateThemeStat($theme['id']);
-
-        return $id;
-    }
-
     public function getTheme(int $themeId): ?array
     {
         $theme = currentFromResultSetInterface($this->themeTable->select(['id' => $themeId]));

@@ -7,7 +7,6 @@ namespace Application\Controller\Api;
 use Application\Hydrator\Api\ForumThemeHydrator;
 use Application\Hydrator\Api\ForumTopicHydrator;
 use Autowp\Forums\Forums;
-use Autowp\User\Model\User;
 use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -24,15 +23,13 @@ class ForumControllerFactory implements FactoryInterface
         $filters   = $container->get('InputFilterManager');
         return new ForumController(
             $container->get(Forums::class),
-            $container->get(User::class),
             $hydrators->get(ForumThemeHydrator::class),
             $hydrators->get(ForumTopicHydrator::class),
             $filters->get('api_forum_theme_list'),
             $filters->get('api_forum_theme_get'),
             $filters->get('api_forum_topic_list'),
             $filters->get('api_forum_topic_get'),
-            $filters->get('api_forum_topic_put'),
-            $filters->get('api_forum_topic_post')
+            $filters->get('api_forum_topic_put')
         );
     }
 }

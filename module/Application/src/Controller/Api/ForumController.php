@@ -6,14 +6,10 @@ use Application\Comments;
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Forums\Forums;
 use Autowp\User\Controller\Plugin\User as UserModel;
-use Autowp\User\Model\User;
-use DateTime;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql;
-use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
@@ -38,8 +34,6 @@ class ForumController extends AbstractRestfulController
 {
     private Forums $forums;
 
-    private User $userModel;
-
     private AbstractRestHydrator $themeHydrator;
 
     private AbstractRestHydrator $topicHydrator;
@@ -54,22 +48,17 @@ class ForumController extends AbstractRestfulController
 
     private InputFilter $topicPutInputFilter;
 
-    private InputFilter $topicPostInputFilter;
-
     public function __construct(
         Forums $forums,
-        User $userModel,
         AbstractRestHydrator $themeHydrator,
         AbstractRestHydrator $topicHydrator,
         InputFilter $themeListInputFilter,
         InputFilter $themeInputFilter,
         InputFilter $topicListInputFilter,
         InputFilter $topicGetInputFilter,
-        InputFilter $topicPutInputFilter,
-        InputFilter $topicPostInputFilter
+        InputFilter $topicPutInputFilter
     ) {
         $this->forums               = $forums;
-        $this->userModel            = $userModel;
         $this->themeHydrator        = $themeHydrator;
         $this->topicHydrator        = $topicHydrator;
         $this->themeListInputFilter = $themeListInputFilter;
@@ -77,7 +66,6 @@ class ForumController extends AbstractRestfulController
         $this->topicListInputFilter = $topicListInputFilter;
         $this->topicGetInputFilter  = $topicGetInputFilter;
         $this->topicPutInputFilter  = $topicPutInputFilter;
-        $this->topicPostInputFilter = $topicPostInputFilter;
     }
 
     /**
@@ -327,95 +315,6 @@ class ForumController extends AbstractRestfulController
         /** @var Response $response */
         $response = $this->getResponse();
         return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    private function needWait(): bool
-    {
-        $user = $this->user()->get();
-        if ($user) {
-            $nextMessageTime = $this->userModel->getNextMessageTime($user['id']);
-            if ($nextMessageTime) {
-                return $nextMessageTime > new DateTime();
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function postTopicAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
-            $data = $this->jsonDecode($request->getContent());
-        } else {
-            $data = $request->getPost()->toArray();
-        }
-
-        $this->topicPostInputFilter->setData($data);
-
-        if (! $this->topicPostInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->topicPostInputFilter);
-        }
-
-        $data = $this->topicPostInputFilter->getValues();
-
-        $theme = $this->forums->getTheme($data['theme_id']);
-
-        if (! $theme || $theme['disable_topics']) {
-            return $this->notFoundAction();
-        }
-
-        $needWait = $this->needWait();
-
-        if ($needWait) {
-            return new ApiProblemResponse(
-                new ApiProblem(
-                    400,
-                    'Data is invalid. Check `detail`.',
-                    null,
-                    'Validation error',
-                    [
-                        'invalid_params' => [
-                            'text' => [
-                                'invalid' => $this->translate('forums/need-wait-to-post'),
-                            ],
-                        ],
-                    ]
-                )
-            );
-        }
-
-        $data['user_id']  = $user['id'];
-        $data['theme_id'] = $theme['id'];
-        $data['ip']       = $request->getServer('REMOTE_ADDR');
-
-        $topicId = $this->forums->addTopic($data);
-
-        $this->userModel->getTable()->update([
-            'forums_topics'     => new Sql\Expression('forums_topics + 1'),
-            'forums_messages'   => new Sql\Expression('forums_messages + 1'),
-            'last_message_time' => new Sql\Expression('NOW()'),
-        ], [
-            'id' => $user['id'],
-        ]);
-
-        $url = $this->url()->fromRoute('api/forum/topic/item/get', [
-            'id' => $topicId,
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        $response->getHeaders()->addHeaderLine('Location', $url);
-        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 
     /**

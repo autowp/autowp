@@ -590,15 +590,6 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'post' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'post-topic',
-                                            ],
-                                        ],
-                                    ],
                                     'get'  => [
                                         'type'    => 'Method',
                                         'options' => [
