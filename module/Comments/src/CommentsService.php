@@ -755,22 +755,6 @@ class CommentsService
         return $items;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function deleteMessage(int $id): int
-    {
-        $message = $this->getMessageRow($id);
-
-        $affected = $this->messageTable->delete([
-            'id' => $message['id'],
-        ]);
-
-        $this->updateTopicStat($message['type_id'], $message['item_id']);
-
-        return $affected;
-    }
-
     public function cleanTopics(): int
     {
         /** @var Adapter $adapter */
