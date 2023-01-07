@@ -755,35 +755,6 @@ class CommentsService
         return $items;
     }
 
-    public function cleanTopics(): int
-    {
-        /** @var Adapter $adapter */
-        $adapter = $this->topicViewTable->getAdapter();
-        $stmt    = $adapter->createStatement('
-            DELETE comment_topic_view
-                FROM comment_topic_view
-                    LEFT JOIN comment_message on comment_topic_view.item_id=comment_message.item_id
-                        and comment_topic_view.type_id=comment_message.type_id
-            WHERE comment_message.type_id is null
-        ');
-        $result  = $stmt->execute();
-
-        $affected = $result->getAffectedRows();
-
-        /** @var Adapter $adapter */
-        $adapter = $this->topicTable->getAdapter();
-        $stmt    = $adapter->createStatement('
-            DELETE comment_topic
-                FROM comment_topic
-                    LEFT JOIN comment_message on comment_topic.item_id=comment_message.item_id
-                        and comment_topic.type_id=comment_message.type_id
-            WHERE comment_message.type_id is null
-        ');
-        $result  = $stmt->execute();
-
-        return $affected + $result->getAffectedRows();
-    }
-
     /**
      * @throws Exception
      */

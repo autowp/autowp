@@ -30,9 +30,6 @@ class Maintenance extends AbstractListenerAggregate
         $application    = $event->getApplication();
         $serviceManager = $application->getServiceManager();
 
-        /* $comments = $serviceManager->get(Comments::class);
-        $comments->service()->cleanTopics();*/
-
         /** @var PictureService $pictureService */
         $pictureService = $serviceManager->get(PictureService::class);
         $pictureService->clearQueue();
