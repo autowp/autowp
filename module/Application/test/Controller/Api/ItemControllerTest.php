@@ -4,7 +4,6 @@ namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemLanguageController;
-use Application\Controller\Api\ItemLinkController;
 use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureItemController;
@@ -489,24 +488,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
 
         $this->reset();
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/item-link', Request::METHOD_POST, [
-            'item_id' => $brandId,
-            'name'    => 'Тест',
-            'url'     => 'http://example.com',
-            'type_id' => 'default',
-        ]);
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemLinkController::class);
-        $this->assertMatchedRouteName('api/item-link/post');
-        $this->assertActionName('post');
     }
 
     /**

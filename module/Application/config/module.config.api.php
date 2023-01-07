@@ -18,7 +18,6 @@ return [
             Hydrator\Api\ForumTopicHydrator::class         => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemLanguageHydrator::class       => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\ItemLinkHydrator::class           => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemParentHydrator::class         => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemParentLanguageHydrator::class => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\LogHydrator::class                => Hydrator\Api\RestHydrator::class,
@@ -42,7 +41,6 @@ return [
             Controller\Api\ItemController::class         => Controller\Api\ItemControllerFactory::class,
             Controller\Api\GalleryController::class      => Controller\Api\GalleryControllerFactory::class,
             Controller\Api\ItemLanguageController::class => Controller\Api\ItemLanguageControllerFactory::class,
-            Controller\Api\ItemLinkController::class     => Controller\Api\ItemLinkControllerFactory::class,
             Controller\Api\ItemParentController::class   => Controller\Api\ItemParentControllerFactory::class,
             Controller\Api\ItemParentLanguageController::class
                 => Controller\Api\ItemParentLanguageControllerFactory::class,
@@ -969,72 +967,6 @@ return [
                                                         'action' => 'new-items',
                                                     ],
                                                 ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'item-link'          => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/item-link',
-                            'defaults' => [
-                                'controller' => Controller\Api\ItemLinkController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'index' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                            'post'  => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'post',
-                                    ],
-                                ],
-                            ],
-                            'item'  => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:id',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'get',
-                                            ],
-                                        ],
-                                    ],
-                                    'put'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'put',
-                                            'defaults' => [
-                                                'action' => 'put',
-                                            ],
-                                        ],
-                                    ],
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'delete',
                                             ],
                                         ],
                                     ],
