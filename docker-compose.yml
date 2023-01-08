@@ -260,16 +260,34 @@ services:
       "
 
   keycloak:
-    image: jboss/keycloak:16.1.1
+    image: bitnami/keycloak:20
     container_name: autowp_test_keycloak
     restart: always
     environment:
-      DB_VENDOR: h2
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: password
-      KEYCLOAK_IMPORT: /tmp/realm.json
-      JAVA_OPTS_APPEND: "-Dkeycloak.profile.feature.upload_scripts=enabled"
+      KEYCLOAK_ADMIN_USER: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+      KEYCLOAK_MANAGEMENT_USER: manager
+      KEYCLOAK_MANAGEMENT_PASSWORD: password
+      KEYCLOAK_DATABASE_HOST: postgres-keycloak
+      KEYCLOAK_DATABASE_NAME: keycloak
+      KEYCLOAK_DATABASE_USER: keycloak
+      KEYCLOAK_DATABASE_PASSWORD: password
+      KC_HTTP_RELATIVE_PATH: /auth
+      KEYCLOAK_EXTRA_ARGS: -Dkeycloak.import=/opt/keycloak/data/import/realm.json
     volumes:
-      - ./keycloak/realm.json:/tmp/realm.json
+      - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
     ports:
       - "8081:8080"
+    depends_on:
+      - postgres-keycloak
+
+  postgres-keycloak:
+    image: postgres:15
+    container_name: autowp_test_postgres_keycloak
+    restart: always
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5433:5432"
