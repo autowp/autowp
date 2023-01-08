@@ -44,7 +44,6 @@ return [
             Controller\Api\ItemParentController::class   => Controller\Api\ItemParentControllerFactory::class,
             Controller\Api\ItemParentLanguageController::class
                 => Controller\Api\ItemParentLanguageControllerFactory::class,
-            Controller\Api\ItemVehicleTypeController::class  => Controller\Api\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LogController::class              => Controller\Api\LogControllerFactory::class,
             Controller\Api\MostsController::class            => Controller\Api\MostsControllerFactory::class,
             Controller\Api\NewController::class              => Controller\Api\NewControllerFactory::class,
@@ -1083,66 +1082,6 @@ return [
                                     'verb'     => 'post',
                                     'defaults' => [
                                         'action' => 'post',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'item-vehicle-type'  => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/item-vehicle-type',
-                            'defaults' => [
-                                'controller' => Controller\Api\ItemVehicleTypeController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'index' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                            'item'  => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route'    => '/:item_id/:vehicle_type_id',
-                                    'defaults' => [
-                                        'controller' => Controller\Api\ItemVehicleTypeController::class,
-                                    ],
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'item',
-                                            ],
-                                        ],
-                                    ],
-                                    'post'   => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'create',
-                                            ],
-                                        ],
-                                    ],
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'delete',
-                                            ],
-                                        ],
                                     ],
                                 ],
                             ],

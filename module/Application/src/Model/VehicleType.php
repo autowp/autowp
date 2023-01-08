@@ -8,7 +8,6 @@ use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 
-use function array_merge;
 use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function is_array;
@@ -33,46 +32,6 @@ class VehicleType
         $this->itemVehicleTypeTable   = $itemVehicleTypeTable;
         $this->itemParentTable        = $itemParentTable;
         $this->vehicleTypeParentTable = $vehicleTypeParentTable;
-    }
-
-    public function removeVehicleType(int $vehicleId, int $type): void
-    {
-        $deleted = $this->itemVehicleTypeTable->delete([
-            'vehicle_id = ?'      => $vehicleId,
-            'vehicle_type_id = ?' => $type,
-            'not inherited',
-        ]);
-
-        if ($deleted > 0) {
-            $this->refreshInheritanceFromParents($vehicleId);
-            $this->refreshInheritance($vehicleId);
-        }
-    }
-
-    public function addVehicleType(int $vehicleId, int $type): void
-    {
-        $changed = $this->setRow($vehicleId, $type, false);
-
-        if ($changed) {
-            $this->refreshInheritanceFromParents($vehicleId);
-            $this->refreshInheritance($vehicleId);
-        }
-    }
-
-    public function setVehicleTypes(int $vehicleId, array $types): void
-    {
-        $inherited = false;
-
-        if (! $types) {
-            $types     = $this->getInheritedIds($vehicleId);
-            $inherited = true;
-        }
-
-        $changed = $this->setRows($vehicleId, $types, $inherited);
-
-        if ($changed) {
-            $this->refreshInheritance($vehicleId);
-        }
     }
 
     private function setRows(int $vehicleId, array $types, bool $inherited): bool
@@ -186,84 +145,6 @@ class VehicleType
         }
 
         return $result;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getItemRow(int $vehicleId, int $typeId): ?array
-    {
-        $row = currentFromResultSetInterface($this->itemVehicleTypeTable->select([
-            'vehicle_id'      => $vehicleId,
-            'vehicle_type_id' => $typeId,
-        ]));
-
-        if (! $row) {
-            return null;
-        }
-
-        return [
-            'item_id'         => (int) $row['vehicle_id'],
-            'vehicle_type_id' => (int) $row['vehicle_type_id'],
-        ];
-    }
-
-    public function getItemSelect(int $vehicleId, int $typeId): Sql\Select
-    {
-        $select = new Sql\Select($this->itemVehicleTypeTable->getTable());
-        if ($vehicleId) {
-            $select->where(['vehicle_id' => $vehicleId]);
-        }
-        if ($typeId) {
-            $select->where(['vehicle_type_id' => $typeId]);
-        }
-
-        return $select;
-    }
-
-    public function getItemTable(): TableGateway
-    {
-        return $this->itemVehicleTypeTable;
-    }
-
-    public function rebuildParents(): void
-    {
-        $this->vehicleTypeParentTable->delete([]);
-
-        $this->rebuildStep([0], 0);
-    }
-
-    private function rebuildStep(array $id, int $level): void
-    {
-        $select = new Sql\Select($this->vehicleTypeTable->getTable());
-        $select->columns(['id']);
-
-        if ($id[0] === 0) {
-            $select->where(['parent_id is null']);
-        } else {
-            $select->where(['parent_id' => $id[0]]);
-        }
-
-        foreach ($this->vehicleTypeTable->selectWith($select) as $row) {
-            $this->vehicleTypeParentTable->insert([
-                'id'        => $row['id'],
-                'parent_id' => $row['id'],
-                'level'     => $level,
-            ]);
-
-            $this->rebuildStep(array_merge([(int) $row['id']], $id), $level + 1);
-        }
-
-        --$level;
-        foreach ($id as $tid) {
-            if ($tid && ( $id[0] !== $tid )) {
-                $this->vehicleTypeParentTable->insert([
-                    'id'        => $id[0],
-                    'parent_id' => $tid,
-                    'level'     => --$level,
-                ]);
-            }
-        }
     }
 
     /**
