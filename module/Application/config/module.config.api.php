@@ -53,7 +53,6 @@ return [
             Controller\Api\RatingController::class           => Controller\Api\RatingControllerFactory::class,
             Controller\Api\StatController::class             => Controller\Api\StatControllerFactory::class,
             Controller\Api\TelegramController::class         => Controller\Api\TelegramControllerFactory::class,
-            Controller\Api\TextController::class             => Controller\Api\TextControllerFactory::class,
             Controller\Api\TimezoneController::class         => InvokableFactory::class,
             Controller\Api\TwinsController::class            => Controller\Api\TwinsControllerFactory::class,
             Controller\Api\UserController::class             => Controller\Api\UserControllerFactory::class,
@@ -1487,36 +1486,6 @@ return [
                             'defaults' => [
                                 'controller' => Controller\Api\TelegramController::class,
                                 'action'     => 'webhook',
-                            ],
-                        ],
-                    ],
-                    'text'               => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/text',
-                            'defaults' => [
-                                'controller' => Controller\Api\TextController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'user' => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:id',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'item' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'item',
-                                            ],
-                                        ],
-                                    ],
-                                ],
                             ],
                         ],
                     ],
