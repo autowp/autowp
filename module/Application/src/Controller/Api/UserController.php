@@ -335,61 +335,6 @@ class UserController extends AbstractRestfulController
     }
 
     /**
-     * @throws CasbinException
-     * @throws Exception
-     */
-    public function onlineAction(): JsonModel
-    {
-        $rows = $this->userModel->getRows([
-            'online' => true,
-        ]);
-
-        $result = [];
-        foreach ($rows as $row) {
-            $deleted = (bool) $row['deleted'];
-
-            if ($deleted) {
-                $result[] = [
-                    'id'       => null,
-                    'name'     => null,
-                    'deleted'  => true,
-                    'url'      => null,
-                    'longAway' => false,
-                    'green'    => false,
-                ];
-            } else {
-                $longAway   = false;
-                $lastOnline = Row::getDateTimeByColumnType('timestamp', $row['last_online']);
-                if ($lastOnline) {
-                    $date = new DateTime();
-                    $date->sub(new DateInterval('P6M'));
-                    if ($date > $lastOnline) {
-                        $longAway = true;
-                    }
-                } else {
-                    $longAway = true;
-                }
-
-                $isGreen = $row['role'] && $this->acl->enforce($row['role'], 'status', 'be-green');
-
-                $result[] = [
-                    'id'        => $row['id'],
-                    'name'      => $row['name'],
-                    'deleted'   => false,
-                    'url'       => '/users/' . ($row['identity'] ? $row['identity'] : 'user' . $row['id']),
-                    'long_away' => $longAway,
-                    'green'     => $isGreen,
-                    'identity'  => $row['identity'],
-                ];
-            }
-        }
-
-        return new JsonModel([
-            'items' => $result,
-        ]);
-    }
-
-    /**
      * @return ViewModel|ResponseInterface|array
      * @throws Exception
      */

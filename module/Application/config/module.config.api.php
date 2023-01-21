@@ -1613,15 +1613,6 @@ return [
                                     ],
                                 ],
                             ],
-                            'online' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/online',
-                                    'defaults' => [
-                                        'action' => 'online',
-                                    ],
-                                ],
-                            ],
                         ],
                     ],
                     'stat'               => [
