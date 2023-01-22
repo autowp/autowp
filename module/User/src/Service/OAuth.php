@@ -192,10 +192,16 @@ class OAuth
 
         $response = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
-        $keys = array_filter($response['keys'], fn($key) => $key['alg'] === self::ALG && $key['use'] === 'sig');
+        $keys = array_values(
+            array_filter($response['keys'], fn($key) => $key['alg'] === self::ALG && $key['use'] === 'sig')
+        );
+
+        if (count($keys) === 0) {
+            throw new Exception("No compatible keys found");
+        }
 
         if (! isset($keys[0]['x5c'][0])) {
-            throw new Exception("Key not found");
+            throw new Exception("Key x5c not found in `$url`");
         }
 
         return "-----BEGIN CERTIFICATE-----\n{$keys[0]['x5c'][0]}\n-----END CERTIFICATE-----";
