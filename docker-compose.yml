@@ -127,7 +127,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   goautowp-serve-public:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.32.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.32.1
     container_name: autowp_test_goautowp_serve_public
     restart: always
     command: serve-public
@@ -143,7 +143,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-serve-grpc:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.32.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.32.1
     container_name: autowp_test_goautowp_serve_grpc
     restart: always
     command: serve-grpc
@@ -159,7 +159,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-serve-private:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.32.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.32.1
     container_name: autowp_test_goautowp_serve_private
     restart: always
     command: serve-private
@@ -175,7 +175,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-listen-df-amqp:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.32.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.32.1
     container_name: autowp_test_goautowp_listen_df_amqp
     restart: always
     command: listen-df-amqp
@@ -191,7 +191,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-listen-monitoring-amqp:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.32.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.32.1
     container_name: autowp_test_goautowp_listen_monitoring_amqp
     restart: always
     command: listen-monitoring-amqp
@@ -207,7 +207,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-autoban:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.32.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.32.1
     container_name: autowp_test_goautowp_autoban
     restart: always
     command: autoban
@@ -247,15 +247,15 @@ services:
         do echo 'Wait minio to startup...' && sleep 1;
       done;
       /usr/bin/mc mb autowp/format;
-      /usr/bin/mc policy set download autowp/format;
+      /usr/bin/mc anonymous set download autowp/format;
       /usr/bin/mc mb autowp/user;
-      /usr/bin/mc policy set download autowp/user;
+      /usr/bin/mc anonymous set download autowp/user;
       /usr/bin/mc mb autowp/brand;
-      /usr/bin/mc policy set download autowp/brand;
+      /usr/bin/mc anonymous set download autowp/brand;
       /usr/bin/mc mb autowp/picture;
-      /usr/bin/mc policy set download autowp/picture;
+      /usr/bin/mc anonymous set download autowp/picture;
       /usr/bin/mc mb autowp/files;
-      /usr/bin/mc policy set download autowp/files;
+      /usr/bin/mc anonymous set download autowp/files;
       exit 0;
       "
 

@@ -220,15 +220,15 @@ services:
         do echo 'Wait minio to startup...' && sleep 1;
       done;
       /usr/bin/mc mb autowp/format;
-      /usr/bin/mc policy set download autowp/format;
+      /usr/bin/mc anonymous set download autowp/format;
       /usr/bin/mc mb autowp/user;
-      /usr/bin/mc policy set download autowp/user;
+      /usr/bin/mc anonymous set download autowp/user;
       /usr/bin/mc mb autowp/brand;
-      /usr/bin/mc policy set download autowp/brand;
+      /usr/bin/mc anonymous set download autowp/brand;
       /usr/bin/mc mb autowp/picture;
-      /usr/bin/mc policy set download autowp/picture;
+      /usr/bin/mc anonymous set download autowp/picture;
       /usr/bin/mc mb autowp/files;
-      /usr/bin/mc policy set download autowp/files;
+      /usr/bin/mc anonymous set download autowp/files;
       exit 0;
       "
 
