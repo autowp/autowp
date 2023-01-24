@@ -7,7 +7,6 @@ namespace Application\Controller\Api;
 use Application\Hydrator\Api\UserHydrator;
 use Autowp\Image\Storage;
 use Autowp\User\Model\User;
-use Casbin\Enforcer;
 use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -25,7 +24,6 @@ class UserControllerFactory implements FactoryInterface
         $config    = $container->get('Config');
 
         return new UserController(
-            $container->get(Enforcer::class),
             $hydrators->get(UserHydrator::class),
             $filters->get('api_user_item'),
             $filters->get('api_user_list'),

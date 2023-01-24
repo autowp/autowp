@@ -3,14 +3,10 @@
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
-use Autowp\Commons\Db\Table\Row;
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Casbin\Enforcer;
-use Casbin\Exceptions\CasbinException;
-use DateInterval;
-use DateTime;
 use DateTimeZone;
 use Exception;
 use Imagick;
@@ -43,8 +39,6 @@ use function sprintf;
  */
 class UserController extends AbstractRestfulController
 {
-    private Enforcer $acl;
-
     private AbstractRestHydrator $hydrator;
 
     private InputFilter $itemInputFilter;
@@ -63,7 +57,6 @@ class UserController extends AbstractRestfulController
     private Storage $imageStorage;
 
     public function __construct(
-        Enforcer $acl,
         AbstractRestHydrator $hydrator,
         InputFilter $itemInputFilter,
         InputFilter $listInputFilter,
@@ -73,7 +66,6 @@ class UserController extends AbstractRestfulController
         array $hosts,
         Storage $imageStorage
     ) {
-        $this->acl                  = $acl;
         $this->hydrator             = $hydrator;
         $this->itemInputFilter      = $itemInputFilter;
         $this->listInputFilter      = $listInputFilter;
