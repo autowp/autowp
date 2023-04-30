@@ -46,7 +46,9 @@ class VotingController extends AbstractRestfulController
      */
     public function getItemAction()
     {
-        $id     = (int) $this->params('id');
+        /** @psalm-suppress InvalidCast */
+        $id = (int) $this->params('id');
+        /** @psalm-suppress InvalidCast */
         $filter = (int) $this->params()->fromQuery('filter');
 
         $user = $this->user()->get();
@@ -107,6 +109,7 @@ class VotingController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $id = (int) $this->params('id');
 
         $data    = $this->processBodyContent($this->getRequest());

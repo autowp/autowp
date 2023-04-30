@@ -121,6 +121,7 @@ class ForumController extends AbstractRestfulController
 
         $data = $this->themeInputFilter->getValues();
 
+        /** @psalm-suppress InvalidCast */
         $select = $this->forums->getThemeTable()->getSql()->select()
             ->where(['id' => (int) $this->params('id')]);
 
@@ -244,6 +245,7 @@ class ForumController extends AbstractRestfulController
         $isModerator = $this->user()->enforce('global', 'moderate');
 
         $select = $this->forums->getTopicTable()->getSql()->select();
+        /** @psalm-suppress InvalidCast */
         $select->where(['forums_topics.id' => (int) $this->params('id')]);
 
         if (! $isModerator) {

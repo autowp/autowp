@@ -225,6 +225,7 @@ class CommentController extends AbstractRestfulController
         $values = $this->getInputFilter->getValues();
 
         //TODO: prevent load message from admin forum
+        /** @psalm-suppress InvalidCast */
         $row = $this->comments->service()->getMessageRow((int) $this->params('id'));
         if (! $row) {
             return $this->notFoundAction();

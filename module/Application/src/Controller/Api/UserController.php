@@ -6,7 +6,6 @@ use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
-use Casbin\Enforcer;
 use DateTimeZone;
 use Exception;
 use Imagick;
@@ -159,6 +158,7 @@ class UserController extends AbstractRestfulController
             $id = $user['id'];
         }
 
+        /** @psalm-suppress InvalidCast */
         $row = $this->userModel->getRow((int) $id);
         if (! $row) {
             return $this->notFoundAction();
@@ -190,6 +190,7 @@ class UserController extends AbstractRestfulController
             $id = $user['id'];
         }
 
+        /** @psalm-suppress InvalidCast */
         $row = $this->userModel->getRow((int) $id);
         if (! $row) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
@@ -293,6 +294,7 @@ class UserController extends AbstractRestfulController
             $id = $user['id'];
         }
 
+        /** @psalm-suppress InvalidCast */
         $row = $this->userModel->getRow((int) $id);
         if (! $row) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
@@ -343,6 +345,7 @@ class UserController extends AbstractRestfulController
             $id = $user['id'];
         }
 
+        /** @psalm-suppress InvalidCast */
         $row = $this->userModel->getRow((int) $id);
         if (! $row) {
             return $this->notFoundAction();

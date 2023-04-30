@@ -13,6 +13,7 @@ use Laminas\Http\PhpEnvironment\Request;
 use UnexpectedValueException;
 
 use function array_filter;
+use function array_values;
 use function count;
 use function error_log;
 use function explode;

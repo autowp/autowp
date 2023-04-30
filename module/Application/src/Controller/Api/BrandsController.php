@@ -89,6 +89,7 @@ class BrandsController extends AbstractActionController
     {
         $language = $this->language();
 
+        /** @psalm-suppress InvalidCast */
         $rows  = $this->itemModel->getRows([
             'id'           => (int) $this->params('id'),
             'item_type_id' => Item::BRAND,

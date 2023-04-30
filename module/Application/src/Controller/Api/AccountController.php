@@ -86,6 +86,7 @@ class AccountController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $id = (int) $this->params('id');
 
         if (! $this->canRemoveAccount($id)) {

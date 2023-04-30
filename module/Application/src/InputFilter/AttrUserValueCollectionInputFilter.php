@@ -8,7 +8,6 @@ use InvalidArgumentException;
 use Laminas\InputFilter\InputFilter;
 use Traversable;
 
-use function get_class;
 use function gettype;
 use function is_array;
 use function is_object;
@@ -96,7 +95,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
             throw new InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable collection; invalid collection of type %s provided',
                 __METHOD__,
-                is_object($data) ? get_class($data) : gettype($data)
+                is_object($data) ? $data::class : gettype($data)
             ));
         }
 
@@ -111,7 +110,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
                 '%s expects each item in a collection to be an array or Traversable; '
                 . 'invalid item in collection of type %s detected',
                 __METHOD__,
-                is_object($item) ? get_class($item) : gettype($item)
+                is_object($item) ? $item::class : gettype($item)
             ));
         }
 

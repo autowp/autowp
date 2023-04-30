@@ -914,6 +914,7 @@ class ItemController extends AbstractRestfulController
 
         $data = $this->itemInputFilter->getValues();
 
+        /** @psalm-suppress InvalidCast */
         $row = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
 
         if (! $row) {
@@ -1451,6 +1452,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
@@ -1959,6 +1961,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
@@ -1983,6 +1986,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
@@ -2074,6 +2078,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
@@ -2094,6 +2099,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
@@ -2114,6 +2120,7 @@ class ItemController extends AbstractRestfulController
      */
     public function specificationsAction()
     {
+        /** @psalm-suppress InvalidCast */
         $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
@@ -2136,6 +2143,7 @@ class ItemController extends AbstractRestfulController
      */
     public function childSpecificationsAction()
     {
+        /** @psalm-suppress InvalidCast */
         $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
@@ -2163,6 +2171,7 @@ class ItemController extends AbstractRestfulController
      */
     public function newItemsAction()
     {
+        /** @psalm-suppress InvalidCast */
         $category = $this->itemModel->getRow([
             'item_type_id' => Item::CATEGORY,
             'id'           => (int) $this->params('id'),

@@ -57,6 +57,7 @@ class ItemParentLanguageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $rows = $this->table->select([
             'item_id'   => (int) $this->params('item_id'),
             'parent_id' => (int) $this->params('parent_id'),
@@ -82,6 +83,7 @@ class ItemParentLanguageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $row = currentFromResultSetInterface($this->table->select([
             'item_id'   => (int) $this->params('item_id'),
             'parent_id' => (int) $this->params('parent_id'),
@@ -130,7 +132,9 @@ class ItemParentLanguageController extends AbstractRestfulController
 
         $language = (string) $this->params('language');
 
-        $itemId   = (int) $this->params('item_id');
+        /** @psalm-suppress InvalidCast */
+        $itemId = (int) $this->params('item_id');
+        /** @psalm-suppress InvalidCast */
         $parentId = (int) $this->params('parent_id');
 
         if (array_key_exists('name', $data)) {

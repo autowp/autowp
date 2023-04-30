@@ -262,6 +262,7 @@ class ItemParentController extends AbstractRestfulController
 
         $data = $this->itemInputFilter->getValues();
 
+        /** @psalm-suppress InvalidCast */
         $row = $this->itemParent->getRow(
             (int) $this->params('parent_id'),
             (int) $this->params('item_id')
@@ -505,6 +506,7 @@ class ItemParentController extends AbstractRestfulController
             return $this->inputFilterResponse($this->itemInputFilter);
         }
 
+        /** @psalm-suppress InvalidCast */
         $row = $this->itemParent->getRow(
             (int) $this->params('parent_id'),
             (int) $this->params('item_id')

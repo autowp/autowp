@@ -1550,7 +1550,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'list'   => [
+                            'list' => [
                                 'type'    => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
@@ -1559,7 +1559,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'user'   => [
+                            'user' => [
                                 'type'          => 'Segment',
                                 'options'       => [
                                     'route' => '/:id',

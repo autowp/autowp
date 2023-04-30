@@ -92,6 +92,7 @@ class ItemLanguageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $rows = $this->table->select([
             'item_id'       => (int) $this->params('id'),
             'language <> ?' => 'xx',
@@ -117,6 +118,7 @@ class ItemLanguageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $row = currentFromResultSetInterface($this->table->select([
             'item_id'  => (int) $this->params('id'),
             'language' => (string) $this->params('language'),
@@ -139,6 +141,7 @@ class ItemLanguageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $item = $this->item->getRow(['id' => (int) $this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();

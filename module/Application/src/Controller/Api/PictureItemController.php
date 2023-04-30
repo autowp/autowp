@@ -181,16 +181,19 @@ class PictureItemController extends AbstractRestfulController
 
         $userId = $this->user()->get()['id'];
 
+        /** @psalm-suppress InvalidCast */
         $picture = $this->picture->getRow(['id' => (int) $this->params('picture_id')]);
         if (! $picture) {
             return $this->notFoundAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $item = $this->item->getRow(['id' => (int) $this->params('item_id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $type = (int) $this->params('type');
 
         $this->itemInputFilter->setData($this->params()->fromQuery());
@@ -225,16 +228,19 @@ class PictureItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $picture = $this->picture->getRow(['id' => (int) $this->params('picture_id')]);
         if (! $picture) {
             return $this->notFoundAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $item = $this->item->getRow(['id' => (int) $this->params('item_id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $type = (int) $this->params('type');
 
         if ($this->pictureItem->isExists($picture['id'], $item['id'], $type)) {
@@ -273,9 +279,12 @@ class PictureItemController extends AbstractRestfulController
 
         $userId = $this->user()->get()['id'];
 
+        /** @psalm-suppress InvalidCast */
         $pictureId = (int) $this->params('picture_id');
-        $itemId    = (int) $this->params('item_id');
-        $type      = (int) $this->params('type');
+        /** @psalm-suppress InvalidCast */
+        $itemId = (int) $this->params('item_id');
+        /** @psalm-suppress InvalidCast */
+        $type = (int) $this->params('type');
 
         $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
@@ -329,9 +338,12 @@ class PictureItemController extends AbstractRestfulController
      */
     public function updateAction()
     {
+        /** @psalm-suppress InvalidCast */
         $pictureId = (int) $this->params('picture_id');
-        $itemId    = (int) $this->params('item_id');
-        $type      = (int) $this->params('type');
+        /** @psalm-suppress InvalidCast */
+        $itemId = (int) $this->params('item_id');
+        /** @psalm-suppress InvalidCast */
+        $type = (int) $this->params('type');
 
         $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {

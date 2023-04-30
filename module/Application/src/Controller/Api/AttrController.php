@@ -262,9 +262,12 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        /** @psalm-suppress InvalidCast */
         $attributeId = (int) $this->params('attribute_id');
-        $itemId      = (int) $this->params('item_id');
-        $userId      = (int) $this->params('user_id');
+        /** @psalm-suppress InvalidCast */
+        $itemId = (int) $this->params('item_id');
+        /** @psalm-suppress InvalidCast */
+        $userId = (int) $this->params('user_id');
 
         $this->specsService->deleteUserValue($attributeId, $itemId, $userId);
 
@@ -653,6 +656,7 @@ class AttrController extends AbstractRestfulController
 
         $attributeTable = $this->specsService->getAttributeTable();
 
+        /** @psalm-suppress InvalidCast */
         $attribute = currentFromResultSetInterface($attributeTable->select(['id' => (int) $this->params('id')]));
         if (! $attribute) {
             return $this->notFoundAction();
@@ -855,7 +859,9 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $zoneId      = (int) $this->params('zone_id');
+        /** @psalm-suppress InvalidCast */
+        $zoneId = (int) $this->params('zone_id');
+        /** @psalm-suppress InvalidCast */
         $attributeId = (int) $this->params('attribute_id');
 
         $this->zoneAttributeTable->delete([

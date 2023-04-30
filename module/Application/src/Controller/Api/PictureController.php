@@ -166,6 +166,7 @@ class PictureController extends AbstractRestfulController
      */
     public function canonicalRouteAction()
     {
+        /** @psalm-suppress InvalidCast */
         $picture = $this->picture->getRow(['identity' => (string) $this->params('id')]);
 
         if (! $picture) {
@@ -709,7 +710,9 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->picture->getRow(['id' => (int) $this->params('id')]);
+        /** @psalm-suppress InvalidCast */
+        $id      = (int) $this->params('id');
+        $picture = $this->picture->getRow(['id' => $id]);
 
         if (! $picture) {
             return $this->notFoundAction();
@@ -1077,7 +1080,9 @@ class PictureController extends AbstractRestfulController
             'fields'   => $data['fields'],
         ]);
 
-        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
+        /** @psalm-suppress InvalidCast */
+        $id  = (int) $this->params('id');
+        $row = $this->picture->getRow(['id' => $id]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -1124,7 +1129,9 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
+        /** @psalm-suppress InvalidCast */
+        $id  = (int) $this->params('id');
+        $row = $this->picture->getRow(['id' => $id]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -1163,7 +1170,9 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
+        /** @psalm-suppress InvalidCast */
+        $id  = (int) $this->params('id');
+        $row = $this->picture->getRow(['id' => $id]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -1201,7 +1210,9 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
+        /** @psalm-suppress InvalidCast */
+        $id  = (int) $this->params('id');
+        $row = $this->picture->getRow(['id' => $id]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -1228,7 +1239,9 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->picture->getRow(['id' => (int) $this->params('id')]);
+        /** @psalm-suppress InvalidCast */
+        $id  = (int) $this->params('id');
+        $row = $this->picture->getRow(['id' => $id]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -1250,8 +1263,12 @@ class PictureController extends AbstractRestfulController
      */
     public function deleteSimilarAction()
     {
-        $srcPicture = $this->picture->getRow(['id' => (int) $this->params('id')]);
-        $dstPicture = $this->picture->getRow(['id' => (int) $this->params('similar_picture_id')]);
+        /** @psalm-suppress InvalidCast */
+        $id         = (int) $this->params('id');
+        $srcPicture = $this->picture->getRow(['id' => $id]);
+        /** @psalm-suppress InvalidCast */
+        $similarPictureId = (int) $this->params('similar_picture_id');
+        $dstPicture       = $this->picture->getRow(['id' => $similarPictureId]);
 
         if (! $srcPicture || ! $dstPicture) {
             return $this->notFoundAction();
@@ -1315,7 +1332,9 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->picture->getRow(['id' => (int) $this->params('id')]);
+        /** @psalm-suppress InvalidCast */
+        $id      = (int) $this->params('id');
+        $picture = $this->picture->getRow(['id' => $id]);
         if (! $picture) {
             return $this->notFoundAction();
         }
