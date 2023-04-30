@@ -10,7 +10,6 @@ use Traversable;
 
 use function gettype;
 use function is_array;
-use function is_object;
 use function sprintf;
 
 class AttrUserValueCollectionInputFilter extends InputFilter
@@ -95,7 +94,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
             throw new InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable collection; invalid collection of type %s provided',
                 __METHOD__,
-                is_object($data) ? $data::class : gettype($data)
+                gettype($data)
             ));
         }
 
@@ -110,7 +109,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
                 '%s expects each item in a collection to be an array or Traversable; '
                 . 'invalid item in collection of type %s detected',
                 __METHOD__,
-                is_object($item) ? $item::class : gettype($item)
+                gettype($item)
             ));
         }
 
