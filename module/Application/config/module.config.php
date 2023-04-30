@@ -138,7 +138,7 @@ return [
         'zh'    => [
             'hostname' => 'zh.localhost',
             'timezone' => 'Asia/Shanghai',
-            'name'     => '中文 (beta)',
+            'name'     => '中文',
             'flag'     => 'flag-icon flag-icon-cn',
             'aliases'  => [],
         ],
@@ -159,7 +159,7 @@ return [
         'fr'    => [
             'hostname' => 'fr.localhost',
             'timezone' => 'Europe/Paris',
-            'name'     => 'Français (beta)',
+            'name'     => 'Français',
             'flag'     => 'flag-icon flag-icon-fr',
             'aliases'  => [],
         ],
@@ -173,14 +173,21 @@ return [
         'uk'    => [
             'hostname' => 'uk.localhost',
             'timezone' => 'Europe/Kiev',
-            'name'     => 'Українська (beta)',
+            'name'     => 'Українська',
             'flag'     => 'flag-icon flag-icon-ua',
             'aliases'  => [],
         ],
         'es'    => [
             'hostname' => 'es.localhost',
             'timezone' => 'Europe/Madrid',
-            'name'     => 'Español (beta)',
+            'name'     => 'Español',
+            'flag'     => 'flag-icon flag-icon-es',
+            'aliases'  => [],
+        ],
+        'it'    => [
+            'hostname' => 'es.localhost',
+            'timezone' => 'Europe/Rome',
+            'name'     => 'Italiano',
             'flag'     => 'flag-icon flag-icon-es',
             'aliases'  => [],
         ],

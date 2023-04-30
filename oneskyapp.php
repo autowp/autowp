@@ -12,7 +12,7 @@ if (! isset($argv[1]) || ! $argv[1]) {
     throw new Exception("Secret not provided");
 }
 
-$languages = ['en', 'zh', 'ru', 'pt-br', 'fr', 'be', 'uk', 'es'];
+$languages = ['en', 'zh', 'ru', 'pt-br', 'fr', 'be', 'uk', 'es', 'it'];
 $projectID = 129670;
 
 $client = new Client();

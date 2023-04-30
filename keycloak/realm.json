@@ -144,6 +144,7 @@
                 "http://uk.localhost",
                 "http://zh.localhost",
                 "http://fr.localhost",
+                "http://it.localhost",
                 "http://localhost:4200",
                 "https://br.localhost",
                 "https://be.localhost",
@@ -153,6 +154,7 @@
                 "https://uk.localhost",
                 "https://zh.localhost",
                 "https://fr.localhost",
+                "https://it.localhost",
                 "https://localhost:4200"
             ],
             "notBefore": 0,
@@ -183,6 +185,7 @@
                 "http://uk.localhost/*",
                 "http://zh.localhost/*",
                 "http://fr.localhost/*",
+                "http://it.localhost/*",
                 "http://localhost:4200/*",
                 "https://br.localhost/*",
                 "https://be.localhost/*",
@@ -192,6 +195,7 @@
                 "https://uk.localhost/*",
                 "https://zh.localhost/*",
                 "https://fr.localhost/*",
+                "https://it.localhost/*",
                 "https://localhost:4200/*"
             ],
             "webOrigins": [
@@ -222,7 +226,8 @@
         "zh-CN",
         "es",
         "be",
-        "uk"
+        "uk",
+        "it"
     ],
     "defaultLocale": "en",
     "browserFlow": "browser",

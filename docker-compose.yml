@@ -100,6 +100,7 @@ services:
     - "./frontend/uk:/usr/share/nginx/html/uk"
     - "./frontend/zh-CN:/usr/share/nginx/html/zh-CN"
     - "./frontend/es:/usr/share/nginx/html/es"
+    - "./frontend/it:/usr/share/nginx/html/it"
     - "../autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
     - "./hostmap:/etc/nginx/hostmap:ro"
     user: "101:101"
