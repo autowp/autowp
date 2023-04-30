@@ -664,7 +664,7 @@ class ItemController extends AbstractRestfulController
                         $eyLength = strlen($endYear);
                         if ($eyLength) {
                             if ($eyLength === 2) {
-                                $endYear = $beginYear - $beginYear % 100 + $endYear;
+                                $endYear = $beginYear - $beginYear % 100 + (int) $endYear;
                             } else {
                                 $endYear = (int) $endYear;
                             }
@@ -680,7 +680,7 @@ class ItemController extends AbstractRestfulController
                         $eyLength = strlen($endModelYear);
                         if ($eyLength) {
                             if ($eyLength === 2) {
-                                $endModelYear = $beginModelYear - $beginModelYear % 100 + $endModelYear;
+                                $endModelYear = $beginModelYear - $beginModelYear % 100 + (int) $endModelYear;
                             } else {
                                 $endModelYear = (int) $endModelYear;
                             }

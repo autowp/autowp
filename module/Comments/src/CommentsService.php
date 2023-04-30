@@ -267,7 +267,7 @@ class CommentsService
 
     /**
      * @param array|ArrayObject $message
-     * @return array|ArrayObject|null
+     * @return array|ArrayObject
      * @throws Exception
      */
     private function getMessageRoot($message)
