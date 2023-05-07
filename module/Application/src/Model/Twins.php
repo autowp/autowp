@@ -4,26 +4,15 @@ namespace Application\Model;
 
 use Exception;
 use Laminas\Db\Sql;
-use Laminas\Paginator\Paginator;
 
 use function array_replace;
 
 class Twins
 {
-    private Picture $picture;
-
-    private Item $item;
-
     private Brand $brand;
 
-    public function __construct(
-        Picture $picture,
-        Item $item,
-        Brand $brand
-    ) {
-        $this->picture = $picture;
-        $this->item    = $item;
-        $this->brand   = $brand;
+    public function __construct(Brand $brand) {
+        $this->brand = $brand;
     }
 
     /**
@@ -61,156 +50,5 @@ class Twins
                     ->limit($limit);
             }
         });
-    }
-
-    public function getGroupsPicturesCount(array $groupIds): array
-    {
-        if (! $groupIds) {
-            return [];
-        }
-
-        $select = $this->picture->getTable()->getSql()->select();
-
-        $select->columns(['count' => new Sql\Expression('COUNT(DISTINCT pictures.id)')])
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', ['parent_id'])
-            ->where([
-                'pictures.status' => Picture::STATUS_ACCEPTED,
-                new Sql\Predicate\In('item_parent_cache.parent_id', $groupIds),
-            ])
-            ->group('item_parent_cache.parent_id');
-
-        $result = [];
-        foreach ($this->picture->getTable()->selectWith($select) as $row) {
-            $result[(int) $row['parent_id']] = (int) $row['count'];
-        }
-
-        return $result;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getGroupBrandIds(int $groupId): array
-    {
-        return $this->item->getIds([
-            'item_type_id'       => Item::BRAND,
-            'descendant_or_self' => [
-                'parent' => [
-                    'id'           => $groupId,
-                    'item_type_id' => Item::TWINS,
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getGroupsPaginator(int $brandId = 0): Paginator
-    {
-        $filter = [
-            'item_type_id' => Item::TWINS,
-            'order'        => 'item.add_datetime desc',
-        ];
-
-        if ($brandId) {
-            $filter['child'] = [
-                'ancestor_or_self' => [
-                    'item_type_id' => Item::BRAND,
-                    'id'           => $brandId,
-                ],
-            ];
-        }
-
-        return $this->item->getPaginator($filter);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getGroupCars(int $groupId): array
-    {
-        return $this->item->getRows([
-            'parent' => $groupId,
-            'order'  => 'name',
-        ]);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getGroup(int $groupId): ?array
-    {
-        $row = $this->item->getRow([
-            'id'           => $groupId,
-            'item_type_id' => Item::TWINS,
-        ]);
-        if (! $row) {
-            return null;
-        }
-
-        return [
-            'id'         => $row['id'],
-            'name'       => $row['name'],
-            'begin_year' => $row['begin_year'],
-            'end_year'   => $row['end_year'],
-            'today'      => $row['today'],
-        ];
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getCarGroups(int $itemId): array
-    {
-        $rows = $this->item->getRows([
-            'item_type_id'       => Item::TWINS,
-            'descendant_or_self' => $itemId,
-        ]);
-
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = [
-                'id'   => (int) $row['id'],
-                'name' => $row['name'],
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getCarsGroups(array $itemIds, string $language): array
-    {
-        if (! $itemIds) {
-            return [];
-        }
-
-        $rows = $this->item->getRows([
-            'language'           => $language,
-            'columns'            => ['id', 'name'],
-            'item_type_id'       => Item::TWINS,
-            'descendant_or_self' => [
-                'id'      => $itemIds,
-                'columns' => ['item_id' => 'id'],
-            ],
-        ]);
-
-        $result = [];
-        foreach ($itemIds as $itemId) {
-            $result[(int) $itemId] = [];
-        }
-        foreach ($rows as $row) {
-            $itemId            = (int) $row['item_id'];
-            $result[$itemId][] = [
-                'id'   => (int) $row['id'],
-                'name' => $row['name'],
-            ];
-        }
-
-        return $result;
     }
 }

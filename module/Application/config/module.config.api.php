@@ -54,7 +54,6 @@ return [
             Controller\Api\StatController::class             => Controller\Api\StatControllerFactory::class,
             Controller\Api\TelegramController::class         => Controller\Api\TelegramControllerFactory::class,
             Controller\Api\TimezoneController::class         => InvokableFactory::class,
-            Controller\Api\TwinsController::class            => Controller\Api\TwinsControllerFactory::class,
             Controller\Api\UserController::class             => Controller\Api\UserControllerFactory::class,
             Controller\Api\VotingController::class           => Controller\Api\VotingControllerFactory::class,
         ],
@@ -1505,36 +1504,6 @@ return [
                                     'verb'     => 'get',
                                     'defaults' => [
                                         'action' => 'list',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'twins'              => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/twins',
-                            'defaults' => [
-                                'controller' => Controller\Api\TwinsController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'brands' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/brands',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'list' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'get-brands',
-                                            ],
-                                        ],
                                     ],
                                 ],
                             ],

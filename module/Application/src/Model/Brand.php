@@ -260,16 +260,6 @@ class Brand
     /**
      * @throws Exception
      */
-    public function getBrandByCatname(string $catname, string $language): ?array
-    {
-        return $this->fetchBrand($language, function (Sql\Select $select) use ($catname): void {
-            $select->where(['item.catname' => $catname]);
-        });
-    }
-
-    /**
-     * @throws Exception
-     */
     public function getList(array $options, ?callable $callback = null): array
     {
         $defaults = [

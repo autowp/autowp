@@ -17,8 +17,6 @@ class TwinsFactory implements FactoryInterface
     public function __invoke(containerinterface $container, $requestedName, ?array $options = null): Twins
     {
         return new Twins(
-            $container->get(Picture::class),
-            $container->get(Item::class),
             $container->get(Brand::class)
         );
     }
