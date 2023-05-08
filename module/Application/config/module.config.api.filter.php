@@ -784,22 +784,6 @@ return [
             ],
         ],
         'api_comments_item_get'                => [
-            'limit'  => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'Between',
-                        'options' => [
-                            'min' => 1,
-                            'max' => 500,
-                        ],
-                    ],
-                ],
-            ],
             'fields' => [
                 'required' => false,
                 'filters'  => [
@@ -817,7 +801,6 @@ return [
                                 'user_vote',
                                 'is_new',
                                 'status',
-                                'page',
                             ],
                         ],
                     ],

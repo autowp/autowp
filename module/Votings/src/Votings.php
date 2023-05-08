@@ -276,11 +276,4 @@ class Votings
             'id' => $votingId,
         ]);
     }
-
-    public function isVotingExists(int $votingId): bool
-    {
-        $voting = currentFromResultSetInterface($this->votingTable->select(['id' => $votingId]));
-
-        return (bool) $voting;
-    }
 }

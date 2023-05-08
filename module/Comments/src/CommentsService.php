@@ -266,48 +266,6 @@ class CommentsService
     }
 
     /**
-     * @param array|ArrayObject $message
-     * @return array|ArrayObject
-     * @throws Exception
-     */
-    private function getMessageRoot($message)
-    {
-        $root = $message;
-
-        while ($root['parent_id']) {
-            $root = currentFromResultSetInterface($this->messageTable->select([
-                'item_id' => $root['item_id'],
-                'type_id' => $root['type_id'],
-                'id'      => $root['parent_id'],
-            ]));
-        }
-
-        return $root;
-    }
-
-    /**
-     * @param array|ArrayObject $message
-     * @throws Exception
-     */
-    public function getMessagePage($message, int $perPage): int
-    {
-        $root = $this->getMessageRoot($message);
-
-        $select = $this->messageTable->getSql()->select()
-            ->columns(['count' => new Sql\Expression('COUNT(1)')])
-            ->where([
-                'item_id'      => $root['item_id'],
-                'type_id'      => $root['type_id'],
-                'datetime < ?' => $root['datetime'],
-                'parent_id is null',
-            ]);
-
-        $row = currentFromResultSetInterface($this->messageTable->selectWith($select));
-
-        return (int) ceil(($row['count'] + 1) / $perPage);
-    }
-
-    /**
      * @param ArrayObject|array $messageRow
      * @throws Exception
      */
@@ -324,76 +282,6 @@ class CommentsService
         $row = currentFromResultSetInterface($this->topicViewTable->selectWith($select));
 
         return ! $row || $messageRow['datetime'] > $row['timestamp'];
-    }
-
-    /**
-     * @param int|array $itemId
-     * @throws Exception
-     */
-    public function getTopicStatForUser(int $typeId, $itemId, int $userId): array
-    {
-        $isArrayRequest = is_array($itemId);
-
-        $itemId = (array) $itemId;
-
-        $rows = [];
-        if (count($itemId) > 0) {
-            /** @var Sql\Predicate\Expression $join */
-            $join   = new Sql\Predicate\PredicateSet([
-                new Sql\Predicate\Expression('comment_topic.type_id = comment_topic_view.type_id'),
-                new Sql\Predicate\Expression('comment_topic.item_id = comment_topic_view.item_id'),
-                new Sql\Predicate\Operator(
-                    'comment_topic_view.user_id',
-                    Sql\Predicate\Operator::OP_EQ,
-                    $userId
-                ),
-            ]);
-            $select = $this->topicTable->getSql()->select()
-                ->columns(['item_id', 'messages'])
-                ->where([
-                    'comment_topic.type_id' => $typeId,
-                    new Sql\Predicate\In('comment_topic.item_id', $itemId),
-                ])
-                ->join(
-                    'comment_topic_view',
-                    $join,
-                    ['timestamp'],
-                    Sql\Select::JOIN_LEFT
-                );
-
-            $rows = $this->topicTable->selectWith($select);
-        }
-
-        $result = [];
-        foreach ($rows as $row) {
-            $id       = $row['item_id'];
-            $viewTime = $row['timestamp'];
-            $messages = (int) $row['messages'];
-
-            if (! $viewTime) {
-                $newMessages = $messages;
-            } else {
-                $newMessages = $this->getMessagesCountFromTimestamp($typeId, $id, $viewTime);
-            }
-
-            $result[$id] = [
-                'messages'    => $messages,
-                'newMessages' => $newMessages,
-            ];
-        }
-
-        if ($isArrayRequest) {
-            return $result;
-        }
-
-        if (count($result) <= 0) {
-            return [
-                'messages'    => 0,
-                'newMessages' => 0,
-            ];
-        }
-
-        return reset($result);
     }
 
     /**

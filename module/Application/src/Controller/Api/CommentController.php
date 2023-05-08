@@ -235,7 +235,6 @@ class CommentController extends AbstractRestfulController
             'fields'   => $values['fields'],
             'language' => $this->language(),
             'user_id'  => $user ? $user['id'] : null,
-            'limit'    => $values['limit'],
         ]);
 
         return new JsonModel($this->hydrator->extract($row));

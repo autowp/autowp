@@ -39,8 +39,6 @@ class CommentHydrator extends AbstractRestHydrator
 
     private Enforcer $acl;
 
-    private int $limit;
-
     public function __construct(ServiceLocatorInterface $serviceManager)
     {
         parent::__construct();
@@ -85,10 +83,6 @@ class CommentHydrator extends AbstractRestHydrator
 
         if (isset($options['user_id'])) {
             $this->setUserId($options['user_id']);
-        }
-
-        if (isset($options['limit'])) {
-            $this->limit = (int) $options['limit'];
         }
 
         return $this;
@@ -233,10 +227,6 @@ class CommentHydrator extends AbstractRestHydrator
 
                 $result['status'] = $status;
             }
-        }
-
-        if ($this->filterComposite->filter('page') && $this->limit > 0) {
-            $result['page'] = $this->comments->service()->getMessagePage($object, $this->limit);
         }
 
         if ($canViewIp) {
