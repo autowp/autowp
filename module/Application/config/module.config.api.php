@@ -14,8 +14,6 @@ return [
             Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrValueHydrator::class          => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\CommentHydrator::class            => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\ForumThemeHydrator::class         => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\ForumTopicHydrator::class         => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemLanguageHydrator::class       => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemParentHydrator::class         => Hydrator\Api\RestHydrator::class,
@@ -35,7 +33,6 @@ return [
             Controller\Api\BrandsController::class       => Controller\Api\BrandsControllerFactory::class,
             Controller\Api\ChartController::class        => Controller\Api\ChartControllerFactory::class,
             Controller\Api\CommentController::class      => Controller\Api\CommentControllerFactory::class,
-            Controller\Api\ForumController::class        => Controller\Api\ForumControllerFactory::class,
             Controller\Api\InboxController::class        => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IndexController::class        => Controller\Api\IndexControllerFactory::class,
             Controller\Api\ItemController::class         => Controller\Api\ItemControllerFactory::class,
@@ -525,99 +522,6 @@ return [
                                             'verb'     => 'get',
                                             'defaults' => [
                                                 'action' => 'get',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'forum'              => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/forum',
-                            'defaults' => [
-                                'controller' => Controller\Api\ForumController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'themes' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/themes',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'  => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'get-themes',
-                                            ],
-                                        ],
-                                    ],
-                                    'item' => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/:id',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'get' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'get',
-                                                    'defaults' => [
-                                                        'action' => 'get-theme',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'topic'  => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/topic',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'  => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'get-topics',
-                                            ],
-                                        ],
-                                    ],
-                                    'item' => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/:id',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'get' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'get',
-                                                    'defaults' => [
-                                                        'action' => 'get-topic',
-                                                    ],
-                                                ],
-                                            ],
-                                            'put' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'put',
-                                                    'defaults' => [
-                                                        'action' => 'put-topic',
-                                                    ],
-                                                ],
                                             ],
                                         ],
                                     ],

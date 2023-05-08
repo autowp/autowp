@@ -23,7 +23,6 @@ return [
         'Autowp\\User',
         'Autowp\\Comments',
         'Autowp\\Cron',
-        'Autowp\\Forums',
         'Autowp\\Image',
         'Autowp\\Message',
         'Autowp\\TextStorage',

@@ -278,16 +278,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.269.2",
+            "version": "3.269.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "29318777b1a259471827d0f9f174e48677903d60"
+                "reference": "f34afba20e3ad782ed91332a8306b91b06a1de5c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/29318777b1a259471827d0f9f174e48677903d60",
-                "reference": "29318777b1a259471827d0f9f174e48677903d60",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/f34afba20e3ad782ed91332a8306b91b06a1de5c",
+                "reference": "f34afba20e3ad782ed91332a8306b91b06a1de5c",
                 "shasum": ""
             },
             "require": {
@@ -367,9 +367,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.269.2"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.269.7"
             },
-            "time": "2023-04-28T18:22:53+00:00"
+            "time": "2023-05-05T19:51:13+00:00"
         },
         {
             "name": "brick/varexporter",
@@ -5323,16 +5323,16 @@
         },
         {
             "name": "php-http/discovery",
-            "version": "1.17.0",
+            "version": "1.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/discovery.git",
-                "reference": "bd810d15957cf165230e65d9e1a130793265e3b7"
+                "reference": "29ae6fae35f4116bbfe4c8b96ccc3f687eb07cd9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/discovery/zipball/bd810d15957cf165230e65d9e1a130793265e3b7",
-                "reference": "bd810d15957cf165230e65d9e1a130793265e3b7",
+                "url": "https://api.github.com/repos/php-http/discovery/zipball/29ae6fae35f4116bbfe4c8b96ccc3f687eb07cd9",
+                "reference": "29ae6fae35f4116bbfe4c8b96ccc3f687eb07cd9",
                 "shasum": ""
             },
             "require": {
@@ -5395,9 +5395,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-http/discovery/issues",
-                "source": "https://github.com/php-http/discovery/tree/1.17.0"
+                "source": "https://github.com/php-http/discovery/tree/1.18.0"
             },
-            "time": "2023-04-26T15:39:13+00:00"
+            "time": "2023-05-03T14:49:12+00:00"
         },
         {
             "name": "php-http/httplug",
@@ -6360,16 +6360,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "3.17.0",
+            "version": "3.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "95d2e932383cf684f77acff0d2a5aef5ad2f1933"
+                "reference": "2041f2ed3f82a55eaca31079e106c8b17c89dbda"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/95d2e932383cf684f77acff0d2a5aef5ad2f1933",
-                "reference": "95d2e932383cf684f77acff0d2a5aef5ad2f1933",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/2041f2ed3f82a55eaca31079e106c8b17c89dbda",
+                "reference": "2041f2ed3f82a55eaca31079e106c8b17c89dbda",
                 "shasum": ""
             },
             "require": {
@@ -6448,7 +6448,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/3.17.0"
+                "source": "https://github.com/getsentry/sentry-php/tree/3.18.0"
             },
             "funding": [
                 {
@@ -6460,7 +6460,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2023-03-26T21:54:06+00:00"
+            "time": "2023-05-03T10:21:22+00:00"
         },
         {
             "name": "stella-maris/clock",
@@ -11174,16 +11174,16 @@
         },
         {
             "name": "sebastian/diff",
-            "version": "4.0.4",
+            "version": "4.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "3461e3fccc7cfdfc2720be910d3bd73c69be590d"
+                "reference": "74be17022044ebaaecfdf0c5cd504fc9cd5a7131"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/3461e3fccc7cfdfc2720be910d3bd73c69be590d",
-                "reference": "3461e3fccc7cfdfc2720be910d3bd73c69be590d",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/74be17022044ebaaecfdf0c5cd504fc9cd5a7131",
+                "reference": "74be17022044ebaaecfdf0c5cd504fc9cd5a7131",
                 "shasum": ""
             },
             "require": {
@@ -11228,7 +11228,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/diff/issues",
-                "source": "https://github.com/sebastianbergmann/diff/tree/4.0.4"
+                "source": "https://github.com/sebastianbergmann/diff/tree/4.0.5"
             },
             "funding": [
                 {
@@ -11236,7 +11236,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-10-26T13:10:38+00:00"
+            "time": "2023-05-07T05:35:17+00:00"
         },
         {
             "name": "sebastian/environment",

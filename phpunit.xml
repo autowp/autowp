@@ -4,7 +4,6 @@
     <include>
       <directory suffix=".php">./module/Application/src</directory>
       <directory suffix=".php">./module/Comments/src</directory>
-      <directory suffix=".php">./module/Forums/src</directory>
       <directory suffix=".php">./module/Message/src</directory>
       <directory suffix=".php">./module/Traffic/src</directory>
       <directory suffix=".php">./module/User/src</directory>
