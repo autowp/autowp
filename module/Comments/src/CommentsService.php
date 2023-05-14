@@ -238,23 +238,6 @@ class CommentsService
     }
 
     /**
-     * @return array|ArrayObject|null
-     * @throws Exception
-     */
-    public function getLastMessageRow(int $type, int $item)
-    {
-        $select = $this->messageTable->getSql()->select()
-            ->where([
-                'type_id' => $type,
-                'item_id' => $item,
-            ])
-            ->order('datetime DESC')
-            ->limit(1);
-
-        return currentFromResultSetInterface($this->messageTable->selectWith($select));
-    }
-
-    /**
      * @return ArrayObject|array|null
      * @throws Exception
      */
@@ -610,37 +593,6 @@ class CommentsService
             'type_id' => $typeId,
             'item_id' => $itemId,
         ]);
-    }
-
-    public function getList(array $options): array
-    {
-        $defaults = [
-            'type'     => null,
-            'callback' => null,
-        ];
-        $options  = array_replace($defaults, $options);
-
-        $select = $this->messageTable->getSql()->select()->order('datetime');
-
-        if ($options['type']) {
-            $select->where(['type_id' => (int) $options['type']]);
-        }
-
-        if ($options['callback']) {
-            $options['callback']($select);
-        }
-
-        $items = [];
-
-        foreach ($this->messageTable->selectWith($select) as $row) {
-            $items[] = [
-                'id'      => $row['id'],
-                'item_id' => $row['item_id'],
-                'type_id' => $row['type_id'],
-            ];
-        }
-
-        return $items;
     }
 
     /**
