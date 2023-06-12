@@ -13,7 +13,6 @@ return [
             Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrValueHydrator::class          => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\CommentHydrator::class            => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemLanguageHydrator::class       => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemParentHydrator::class         => Hydrator\Api\RestHydrator::class,
@@ -32,7 +31,6 @@ return [
             Controller\Api\AttrController::class         => Controller\Api\AttrControllerFactory::class,
             Controller\Api\BrandsController::class       => Controller\Api\BrandsControllerFactory::class,
             Controller\Api\ChartController::class        => Controller\Api\ChartControllerFactory::class,
-            Controller\Api\CommentController::class      => Controller\Api\CommentControllerFactory::class,
             Controller\Api\InboxController::class        => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IndexController::class        => Controller\Api\IndexControllerFactory::class,
             Controller\Api\ItemController::class         => Controller\Api\ItemControllerFactory::class,
@@ -485,45 +483,6 @@ return [
                                     'route'    => '/data',
                                     'defaults' => [
                                         'action' => 'data',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'comment'            => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/comment',
-                            'defaults' => [
-                                'controller' => Controller\Api\CommentController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get'  => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                            'item' => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:id',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'get',
-                                            ],
-                                        ],
                                     ],
                                 ],
                             ],

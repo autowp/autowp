@@ -2,9 +2,6 @@
 
 namespace Autowp\Comments;
 
-use ArrayObject;
-use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\User;
 use Exception;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
@@ -14,17 +11,13 @@ use Laminas\Paginator\Adapter\LaminasDb\DbSelect;
 
 use function array_replace;
 use function Autowp\Commons\currentFromResultSetInterface;
-use function ceil;
 use function count;
-use function inet_ntop;
 use function is_array;
 use function reset;
 
 class CommentsService
 {
     public const MAX_MESSAGE_LENGTH = 16 * 1024;
-
-    private TableGateway $voteTable;
 
     private TableGateway $topicTable;
 
@@ -34,22 +27,16 @@ class CommentsService
 
     private TableGateway $topicSubscribeTable;
 
-    private User $userModel;
-
     public function __construct(
-        TableGateway $voteTable,
         TableGateway $topicTable,
         TableGateway $messageTable,
         TableGateway $topicViewTable,
-        TableGateway $topicSubscribeTable,
-        User $userModel
+        TableGateway $topicSubscribeTable
     ) {
-        $this->voteTable           = $voteTable;
         $this->topicTable          = $topicTable;
         $this->messageTable        = $messageTable;
         $this->topicViewTable      = $topicViewTable;
         $this->topicSubscribeTable = $topicSubscribeTable;
-        $this->userModel           = $userModel;
     }
 
     /**
@@ -122,91 +109,6 @@ class CommentsService
         ]);
     }
 
-    public function getPaginator(int $type, int $item, int $perPage = 0, int $page = 0): Paginator\Paginator
-    {
-        return $this->getMessagePaginator($type, $item)
-            ->setItemCountPerPage($perPage)
-            ->setCurrentPageNumber($page);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getRecursive(
-        int $type,
-        int $item,
-        int $parentId,
-        int $userId,
-        int $perPage = 0,
-        int $page = 0
-    ): array {
-        if ($perPage) {
-            $paginator = $this->getPaginator($type, $item, $perPage, $page);
-
-            $rows = $paginator->getCurrentItems();
-        } else {
-            $filter = [
-                'type_id' => $type,
-                'item_id' => $item,
-            ];
-            if ($parentId) {
-                $filter['parent_id'] = $parentId;
-            } else {
-                $filter[] = 'parent_id is null';
-            }
-            $rows = $this->messageTable->select($filter);
-        }
-
-        $comments = [];
-        foreach ($rows as $row) {
-            $author = $this->userModel->getRow(['id' => (int) $row['author_id']]);
-
-            $vote = null;
-            if ($userId) {
-                $voteRow = currentFromResultSetInterface($this->voteTable->select([
-                    'comment_id' => $row['id'],
-                    'user_id'    => $userId,
-                ]));
-                $vote    = $voteRow ? $voteRow['vote'] : null;
-            }
-
-            $deletedBy = null;
-            if ($row['deleted']) {
-                $deletedBy = $this->userModel->getRow(['id' => (int) $row['deleted_by']]);
-            }
-
-            if ($row['replies_count'] > 0) {
-                $submessages = $this->getRecursive($type, $item, $row['id'], $userId);
-            } else {
-                $submessages = [];
-            }
-
-            $comments[] = [
-                'id'                  => (int) $row['id'],
-                'author'              => $author,
-                'message'             => $row['message'],
-                'datetime'            => Row::getDateTimeByColumnType('timestamp', $row['datetime']),
-                'ip'                  => $row['ip'] ? inet_ntop($row['ip']) : null,
-                'vote'                => $row['vote'],
-                'moderator_attention' => (int) $row['moderator_attention'],
-                'userVote'            => $vote,
-                'deleted'             => $row['deleted'],
-                'deletedBy'           => $deletedBy,
-                'messages'            => $submessages,
-            ];
-        }
-
-        return $comments;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function get(int $type, int $item, int $userId, int $perPage = 0, int $page = 0): array
-    {
-        return $this->getRecursive($type, $item, 0, $userId, $perPage, $page);
-    }
-
     public function updateTopicView(int $typeId, int $itemId, int $userId): void
     {
         $sql = '
@@ -235,36 +137,6 @@ class CommentsService
 
         $this->updateTopicStat($srcTypeId, $srcItemId);
         $this->updateTopicStat($dstTypeId, $dstItemId);
-    }
-
-    /**
-     * @return ArrayObject|array|null
-     * @throws Exception
-     */
-    public function getMessageRow(int $id)
-    {
-        return currentFromResultSetInterface($this->messageTable->select([
-            'id' => $id,
-        ]));
-    }
-
-    /**
-     * @param ArrayObject|array $messageRow
-     * @throws Exception
-     */
-    public function isNewMessage($messageRow, int $userId): bool
-    {
-        $select = $this->topicViewTable->getSql()->select()
-            ->columns(['timestamp'])
-            ->where([
-                'item_id' => $messageRow['item_id'],
-                'type_id' => $messageRow['type_id'],
-                'user_id' => $userId,
-            ]);
-
-        $row = currentFromResultSetInterface($this->topicViewTable->selectWith($select));
-
-        return ! $row || $messageRow['datetime'] > $row['timestamp'];
     }
 
     /**
@@ -457,24 +329,6 @@ class CommentsService
         );
     }
 
-    public function getMessagePaginator(int $type, int $item): Paginator\Paginator
-    {
-        $select = $this->messageTable->getSql()->select()
-            ->where([
-                'item_id' => $item,
-                'type_id' => $type,
-                'parent_id is null',
-            ])
-            ->order('datetime');
-
-        /** @var Adapter $adapter */
-        $adapter = $this->messageTable->getAdapter();
-
-        return new Paginator\Paginator(
-            new DbSelect($select, $adapter)
-        );
-    }
-
     public function getMessagesSelect(array $options = []): Sql\Select
     {
         $defaults = [
@@ -629,17 +483,6 @@ class CommentsService
             'item_id' => $itemId,
             'user_id' => $userId,
             'sent'    => 0,
-        ]);
-    }
-
-    public function setSubscriptionSent(int $typeId, int $itemId, int $userId, bool $sent): void
-    {
-        $this->topicSubscribeTable->update([
-            'sent' => $sent ? 1 : 0,
-        ], [
-            'type_id' => $typeId,
-            'item_id' => $itemId,
-            'user_id' => $userId,
         ]);
     }
 
