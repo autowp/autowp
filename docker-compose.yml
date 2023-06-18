@@ -119,7 +119,7 @@ services:
     - "25672:25672"
 
   traffic-postgres:
-    image: postgres:15
+    image: postgres:13-alpine
     container_name: autowp_test_traffic_postgres
     restart: always
     environment:
@@ -283,7 +283,7 @@ services:
       - postgres-keycloak
 
   postgres-keycloak:
-    image: postgres:15
+    image: postgres:13-alpine
     container_name: autowp_test_postgres_keycloak
     restart: always
     environment:

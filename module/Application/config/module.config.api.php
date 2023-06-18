@@ -9,7 +9,6 @@ use Laminas\ServiceManager\Factory\InvokableFactory;
 return [
     'hydrators'   => [
         'factories' => [
-            Hydrator\Api\AttrAttributeHydrator::class      => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\AttrValueHydrator::class          => Hydrator\Api\RestHydrator::class,
@@ -129,7 +128,7 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'attribute'      => [
+                            'attribute'  => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/attribute',
@@ -183,25 +182,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'attribute-type' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/attribute-type',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'attribute-type-index',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'conflict'       => [
+                            'conflict'   => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/conflict',
@@ -219,34 +200,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'list-option'    => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/list-option',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'  => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'list-option-index',
-                                            ],
-                                        ],
-                                    ],
-                                    'post' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'list-option-post',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'value'          => [
+                            'value'      => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/value',
@@ -264,7 +218,7 @@ return [
                                     ],
                                 ],
                             ],
-                            'user-value'     => [
+                            'user-value' => [
                                 'type'          => 'Literal',
                                 'options'       => [
                                     'route' => '/user-value',
@@ -302,87 +256,6 @@ return [
                                                     'verb'     => 'delete',
                                                     'defaults' => [
                                                         'action' => 'user-value-item-delete',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'unit'           => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/unit',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'unit-index',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'zone'           => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/zone',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'zone-index',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'zone-attribute' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/zone-attribute',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'  => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'zone-attribute-index',
-                                            ],
-                                        ],
-                                    ],
-                                    'post' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'zone-attribute-post',
-                                            ],
-                                        ],
-                                    ],
-                                    'item' => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/:zone_id/:attribute_id',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'delete' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'delete',
-                                                    'defaults' => [
-                                                        'action' => 'zone-attribute-item-delete',
                                                     ],
                                                 ],
                                             ],

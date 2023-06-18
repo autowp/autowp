@@ -191,13 +191,6 @@ class SpecificationsService
         }
     }
 
-    public function getUnits(): array
-    {
-        $this->loadUnits();
-
-        return $this->units;
-    }
-
     public function getUnit(int $id): ?array
     {
         $this->loadUnits();

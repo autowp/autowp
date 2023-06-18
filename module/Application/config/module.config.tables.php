@@ -20,7 +20,6 @@ return [
         'attrs_values_list'           => [],
         'attrs_values_string'         => [],
         'attrs_zone_attributes'       => [],
-        'attrs_zones'                 => [],
         'brand_alias'                 => [], //TODO: rename to item_alias
         'car_types'                   => [], //TODO: rename to vehicle_type
         'car_types_parents'           => [], //TODO: rename to vehicle_type_parent

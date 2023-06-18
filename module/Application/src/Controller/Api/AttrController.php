@@ -3,16 +3,13 @@
 namespace Application\Controller\Api;
 
 use Application\Hydrator\Api\AbstractRestHydrator;
-use Application\Hydrator\Api\AttrAttributeHydrator;
 use Application\Service\SpecificationsService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Exception;
-use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
-use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
@@ -22,11 +19,8 @@ use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
-use function array_keys;
-use function array_values;
 use function Autowp\Commons\currentFromResultSetInterface;
 use function implode;
-use function strlen;
 
 /**
  * @method UserPlugin user($user = null)
@@ -54,81 +48,29 @@ class AttrController extends AbstractRestfulController
 
     private InputFilter $userValuePatchDataFilter;
 
-    private InputFilter $attributeListInputFilter;
-
-    private InputFilter $attributePostInputFilter;
-
-    private InputFilter $attributeItemGetInputFilter;
-
-    private AttrAttributeHydrator $attributeHydrator;
-
     private InputFilter $valueListInputFilter;
-
-    private InputFilter $attributeItemPatchInputFilter;
-
-    private InputFilter $zoneAttributeListInputFilter;
-
-    private InputFilter $zoneAttributePostInputFilter;
-
-    private InputFilter $listOptionIndexInputFilter;
-
-    private InputFilter $listOptionPostInputFilter;
-
-    private TableGateway $zoneTable;
-
-    private TableGateway $zoneAttributeTable;
-
-    private TableGateway $typeTable;
-
-    private TableGateway $listOptionTable;
 
     public function __construct(
         SpecificationsService $specsService,
         AbstractRestHydrator $conflictHydrator,
         AbstractRestHydrator $userValueHydrator,
-        AttrAttributeHydrator $attributeHydrator,
         AbstractRestHydrator $valueHydrator,
         InputFilter $conflictListInputFilter,
         InputFilter $userValueListInputFilter,
         InputFilter $userValuePatchQueryFilter,
         InputFilter $userValuePatchDataFilter,
-        InputFilter $attributeListInputFilter,
-        InputFilter $attributePostInputFilter,
-        InputFilter $attributeItemGetInputFilter,
-        InputFilter $valueListInputFilter,
-        InputFilter $attributeItemPatchInputFilter,
-        InputFilter $zoneAttributeListInputFilter,
-        InputFilter $zoneAttributePostInputFilter,
-        InputFilter $listOptionIndexInputFilter,
-        InputFilter $listOptionPostInputFilter,
-        TableGateway $zoneTable,
-        TableGateway $zoneAttributeTable,
-        TableGateway $typeTable,
-        TableGateway $listOptionTable
+        InputFilter $valueListInputFilter
     ) {
-        $this->specsService                  = $specsService;
-        $this->conflictHydrator              = $conflictHydrator;
-        $this->conflictListInputFilter       = $conflictListInputFilter;
-        $this->userValueTable                = $specsService->getUserValueTable();
-        $this->userValueHydrator             = $userValueHydrator;
-        $this->attributeHydrator             = $attributeHydrator;
-        $this->valueHydrator                 = $valueHydrator;
-        $this->userValueListInputFilter      = $userValueListInputFilter;
-        $this->attributePostInputFilter      = $attributePostInputFilter;
-        $this->userValuePatchQueryFilter     = $userValuePatchQueryFilter;
-        $this->userValuePatchDataFilter      = $userValuePatchDataFilter;
-        $this->attributeListInputFilter      = $attributeListInputFilter;
-        $this->attributeItemGetInputFilter   = $attributeItemGetInputFilter;
-        $this->valueListInputFilter          = $valueListInputFilter;
-        $this->attributeItemPatchInputFilter = $attributeItemPatchInputFilter;
-        $this->zoneAttributeListInputFilter  = $zoneAttributeListInputFilter;
-        $this->zoneAttributePostInputFilter  = $zoneAttributePostInputFilter;
-        $this->listOptionIndexInputFilter    = $listOptionIndexInputFilter;
-        $this->listOptionPostInputFilter     = $listOptionPostInputFilter;
-        $this->zoneTable                     = $zoneTable;
-        $this->zoneAttributeTable            = $zoneAttributeTable;
-        $this->typeTable                     = $typeTable;
-        $this->listOptionTable               = $listOptionTable;
+        $this->specsService              = $specsService;
+        $this->conflictHydrator          = $conflictHydrator;
+        $this->conflictListInputFilter   = $conflictListInputFilter;
+        $this->userValueTable            = $specsService->getUserValueTable();
+        $this->userValueHydrator         = $userValueHydrator;
+        $this->valueHydrator             = $valueHydrator;
+        $this->userValueListInputFilter  = $userValueListInputFilter;
+        $this->userValuePatchQueryFilter = $userValuePatchQueryFilter;
+        $this->userValuePatchDataFilter  = $userValuePatchDataFilter;
+        $this->valueListInputFilter      = $valueListInputFilter;
     }
 
     /**
@@ -412,152 +354,6 @@ class AttrController extends AbstractRestfulController
 
     /**
      * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function attributePostAction()
-    {
-        if (! $this->user()->enforce('attrs', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $attributeTable = $this->specsService->getAttributeTable();
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-
-        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
-            $data = $this->jsonDecode($request->getContent());
-        } else {
-            $data = $request->getPost()->toArray();
-        }
-
-        $this->attributePostInputFilter->setData($data);
-
-        if (! $this->attributePostInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->attributePostInputFilter);
-        }
-
-        $values = $this->attributePostInputFilter->getValues();
-
-        $parentId = $values['parent_id'] ? $values['parent_id'] : null;
-
-        $select = $attributeTable->getSql()->select()
-            ->columns(['max' => new Sql\Expression('max(position)')])
-            ->where(['parent_id' => $parentId]);
-
-        $row = currentFromResultSetInterface($attributeTable->selectWith($select));
-
-        $max = $row ? (int) $row['max'] : 0;
-
-        $set = [
-            'name'        => $values['name'],
-            'parent_id'   => $parentId,
-            'type_id'     => $values['type_id'] ? $values['type_id'] : null,
-            'description' => $values['description'],
-            'unit_id'     => $values['unit_id'] ? $values['unit_id'] : null,
-            'precision'   => strlen($values['precision']) > 0 ? $values['precision'] : null,
-            'position'    => $max + 1,
-        ];
-
-        $attributeTable->insert($set);
-
-        $id = $attributeTable->getLastInsertValue();
-
-        $url = $this->url()->fromRoute('api/attr/attribute/item/get', [
-            'id' => $id,
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        $response->getHeaders()->addHeaderLine('Location', $url);
-        return $response->setStatusCode(Response::STATUS_CODE_201);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function attributeItemGetAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        if (! $this->user()->enforce('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $this->attributeItemGetInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->attributeItemGetInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->attributeItemGetInputFilter);
-        }
-
-        $values = $this->attributeItemGetInputFilter->getValues();
-
-        $attribute = $this->specsService->getAttribute($this->params('id'));
-
-        if (! $attribute) {
-            return $this->notFoundAction();
-        }
-
-        $this->attributeHydrator->setOptions([
-            'fields'   => $values['fields'],
-            'language' => $this->language(),
-            'user_id'  => $user['id'],
-        ]);
-
-        return new JsonModel($this->attributeHydrator->extract($attribute));
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function attributeIndexAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        if (! $this->user()->enforce('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $this->attributeListInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->attributeListInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->attributeListInputFilter);
-        }
-
-        $values = $this->attributeListInputFilter->getValues();
-
-        $attributes = $this->specsService->getAttributes([
-            'parent'    => (int) $values['parent_id'],
-            'zone'      => $values['zone_id'],
-            'recursive' => (bool) $values['recursive'],
-        ]);
-
-        $this->attributeHydrator->setOptions([
-            'fields'   => $values['fields'],
-            'language' => $this->language(),
-            'user_id'  => $user['id'],
-        ]);
-
-        $items = [];
-        foreach ($attributes as $row) {
-            $items[] = $this->attributeHydrator->extract($row);
-        }
-
-        return new JsonModel([
-            'items' => $items,
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
      */
     public function valueIndexAction()
     {
@@ -627,374 +423,5 @@ class AttrController extends AbstractRestfulController
             'paginator' => $paginator->getPages(),
             'items'     => $items,
         ]);
-    }
-
-    public function zoneIndexAction(): JsonModel
-    {
-        $zones = [];
-        foreach ($this->zoneTable->select([]) as $row) {
-            $zones[] = [
-                'id'   => (int) $row['id'],
-                'name' => $row['name'],
-            ];
-        }
-
-        return new JsonModel([
-            'items' => $zones,
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function attributeItemPatchAction()
-    {
-        if (! $this->user()->enforce('attrs', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $attributeTable = $this->specsService->getAttributeTable();
-
-        /** @psalm-suppress InvalidCast */
-        $attribute = currentFromResultSetInterface($attributeTable->select(['id' => (int) $this->params('id')]));
-        if (! $attribute) {
-            return $this->notFoundAction();
-        }
-
-        $data = $this->processBodyContent($this->getRequest());
-
-        $fields = [];
-        foreach (array_keys($data) as $key) {
-            if ($this->attributeItemPatchInputFilter->has($key)) {
-                $fields[] = $key;
-            }
-        }
-
-        if (! $fields) {
-            return new ApiProblemResponse(new ApiProblem(400, 'No fields provided'));
-        }
-
-        $this->attributeItemPatchInputFilter->setValidationGroup($fields);
-
-        $this->attributeItemPatchInputFilter->setData($data);
-
-        if (! $this->attributeItemPatchInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->attributeItemPatchInputFilter);
-        }
-
-        $values = $this->attributeItemPatchInputFilter->getValues();
-
-        $set = [];
-
-        if (isset($values['name'])) {
-            $set['name'] = $values['name'];
-        }
-
-        if (isset($values['type_id'])) {
-            $set['type_id'] = $values['type_id'] ?: null;
-        }
-
-        if (isset($values['description'])) {
-            $set['description'] = $values['description'];
-        }
-
-        if (isset($values['unit_id'])) {
-            $set['unit_id'] = $values['unit_id'] ?: null;
-        }
-
-        if (isset($values['precision'])) {
-            $set['precision'] = strlen($values['precision']) > 0 ? $values['precision'] : null;
-        }
-
-        if ($set) {
-            $attributeTable->update($set, [
-                'id' => $attribute['id'],
-            ]);
-        }
-
-        if (isset($values['move'])) {
-            switch ($values['move']) {
-                case 'up':
-                    $select = new Sql\Select($attributeTable->getTable());
-                    $select->where(['attrs_attributes.position < ?' => $attribute['position']])
-                        ->order('attrs_attributes.position DESC')
-                        ->limit(1);
-                    if ($attribute['parent_id']) {
-                        $select->where(['attrs_attributes.parent_id' => $attribute['parent_id']]);
-                    } else {
-                        $select->where(['attrs_attributes.parent_id IS NULL']);
-                    }
-                    $prev = currentFromResultSetInterface($attributeTable->selectWith($select));
-
-                    if ($prev) {
-                        $prevPos = $prev['position'];
-                        $pagePos = $attribute['position'];
-
-                        $this->setAttributePosition($prev['id'], 10000);
-                        $this->setAttributePosition($attribute['id'], $prevPos);
-                        $this->setAttributePosition($prev['id'], $pagePos);
-                    }
-                    break;
-
-                case 'down':
-                    $select = new Sql\Select($attributeTable->getTable());
-                    $select->where(['attrs_attributes.position > ?' => $attribute['position']])
-                        ->order('attrs_attributes.position ASC')
-                        ->limit(1);
-                    if ($attribute['parent_id']) {
-                        $select->where(['attrs_attributes.parent_id' => $attribute['parent_id']]);
-                    } else {
-                        $select->where(['attrs_attributes.parent_id IS NULL']);
-                    }
-                    $next = currentFromResultSetInterface($attributeTable->selectWith($select));
-
-                    if ($next) {
-                        $nextPos = $next['position'];
-                        $pagePos = $attribute['position'];
-
-                        $this->setAttributePosition($next['id'], 10000);
-                        $this->setAttributePosition($attribute['id'], $nextPos);
-                        $this->setAttributePosition($next['id'], $pagePos);
-                    }
-                    break;
-            }
-        }
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    private function setAttributePosition(int $attributeId, int $position): void
-    {
-        $this->specsService->getAttributeTable()->update([
-            'position' => $position,
-        ], [
-            'id' => $attributeId,
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function zoneAttributeIndexAction()
-    {
-        $this->zoneAttributeListInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->zoneAttributeListInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->zoneAttributeListInputFilter);
-        }
-
-        $values = $this->zoneAttributeListInputFilter->getValues();
-
-        $select = $this->zoneAttributeTable->getSql()->select();
-
-        $select->where(['zone_id' => (int) $values['zone_id']]);
-
-        $items = [];
-        foreach ($this->zoneAttributeTable->selectWith($select) as $row) {
-            $items[] = [
-                'zone_id'      => (int) $row['zone_id'],
-                'attribute_id' => (int) $row['attribute_id'],
-            ];
-        }
-
-        return new JsonModel([
-            'items' => $items,
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function zoneAttributePostAction()
-    {
-        if (! $this->user()->enforce('attrs', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-
-        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
-            $data = $this->jsonDecode($request->getContent());
-        } else {
-            $data = $request->getPost()->toArray();
-        }
-
-        $this->zoneAttributePostInputFilter->setData($data);
-
-        if (! $this->zoneAttributePostInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->zoneAttributePostInputFilter);
-        }
-
-        $values = $this->zoneAttributePostInputFilter->getValues();
-
-        $select = new Sql\Select($this->zoneAttributeTable->getTable());
-        $select->columns(['max' => new Sql\Expression('MAX(position)')])
-            ->where(['zone_id' => $values['zone_id']]);
-
-        $row         = currentFromResultSetInterface($this->zoneAttributeTable->selectWith($select));
-        $maxPosition = $row ? $row['max'] : 0;
-
-        $this->zoneAttributeTable->insert([
-            'zone_id'      => $values['zone_id'],
-            'attribute_id' => $values['attribute_id'],
-            'position'     => $maxPosition + 1,
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_201);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function zoneAttributeItemDeleteAction()
-    {
-        if (! $this->user()->enforce('attrs', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $zoneId = (int) $this->params('zone_id');
-        /** @psalm-suppress InvalidCast */
-        $attributeId = (int) $this->params('attribute_id');
-
-        $this->zoneAttributeTable->delete([
-            'zone_id'      => $zoneId,
-            'attribute_id' => $attributeId,
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_204);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function attributeTypeIndexAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        if (! $this->user()->enforce('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $items = [];
-        foreach ($this->typeTable->select([]) as $type) {
-            $items[] = [
-                'id'   => (int) $type['id'],
-                'name' => $type['name'],
-            ];
-        }
-
-        return new JsonModel([
-            'items' => $items,
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function unitIndexAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        if (! $this->user()->enforce('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        return new JsonModel([
-            'items' => array_values($this->specsService->getUnits()),
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function listOptionIndexAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        if (! $this->user()->enforce('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $this->listOptionIndexInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->listOptionIndexInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->listOptionIndexInputFilter);
-        }
-
-        $values = $this->listOptionIndexInputFilter->getValues();
-
-        $listOptions = $this->specsService->getListOptionsArray($values['attribute_id']);
-
-        return new JsonModel([
-            'items' => $listOptions,
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function listOptionPostAction()
-    {
-        if (! $this->user()->enforce('attrs', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-
-        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
-            $data = $this->jsonDecode($request->getContent());
-        } else {
-            $data = $request->getPost()->toArray();
-        }
-
-        $this->listOptionPostInputFilter->setData($data);
-
-        if (! $this->listOptionPostInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->listOptionPostInputFilter);
-        }
-
-        $values = $this->listOptionPostInputFilter->getValues();
-
-        $select = $this->listOptionTable->getSql()->select()
-            ->columns(['max' => new Sql\Expression('MAX(position)')])
-            ->where(['attribute_id' => $values['attribute_id']]);
-
-        $row = currentFromResultSetInterface($this->listOptionTable->selectWith($select));
-        $max = $row ? (int) $row['max'] : 0;
-
-        $this->listOptionTable->insert([
-            'name'         => $values['name'],
-            'attribute_id' => $values['attribute_id'],
-            'parent_id'    => $values['parent_id'] ? $values['parent_id'] : null,
-            'position'     => 1 + $max,
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_201);
     }
 }
