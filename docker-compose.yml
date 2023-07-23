@@ -107,7 +107,7 @@ services:
     user: "101:101"
 
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq:management-alpine
     container_name: autowp_test_rabbitmq
     ports:
     - "4369:4369"

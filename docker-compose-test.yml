@@ -109,7 +109,7 @@ services:
     - "3306"
 
   rabbitmq:
-    image: rabbitmq
+    image: rabbitmq:alpine
     container_name: autowp_test_rabbitmq
     restart: always
     expose:
