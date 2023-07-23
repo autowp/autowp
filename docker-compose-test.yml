@@ -111,6 +111,9 @@ services:
   rabbitmq:
     image: rabbitmq
     container_name: autowp_test_rabbitmq
+    restart: always
+    expose:
+    - "5672"
 
   traffic-postgres:
     image: postgres:13-alpine
@@ -122,7 +125,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   goautowp-serve-public:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.37.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.44.0
     container_name: autowp_test_goautowp_serve_public
     restart: always
     command: serve-public
@@ -137,7 +140,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-serve-private:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.37.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.44.0
     container_name: autowp_test_goautowp_serve_private
     restart: always
     command: serve-private
@@ -152,7 +155,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-listen-df-amqp:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.37.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.44.0
     container_name: autowp_test_goautowp_listen_df_amqp
     restart: always
     command: listen-df-amqp
@@ -167,7 +170,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-listen-monitoring-amqp:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.37.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.44.0
     container_name: autowp_test_goautowp_listen_monitoring_amqp
     restart: always
     command: listen-monitoring-amqp
@@ -182,7 +185,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-autoban:
-    image: registry.pereslegin.ru/autowp/goautowp:v1.37.0
+    image: registry.pereslegin.ru/autowp/goautowp:v1.44.0
     container_name: autowp_test_goautowp_autoban
     restart: always
     command: autoban
@@ -197,7 +200,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   minio:
-    image: minio/minio
+    image: quay.io/minio/minio
     container_name: autowp_test_minio
     restart: always
     environment:
