@@ -191,6 +191,13 @@ return [
             'flag'     => 'flag-icon flag-icon-es',
             'aliases'  => [],
         ],
+        'he'    => [
+            'hostname' => 'he.localhost',
+            'timezone' => 'Asia/Jerusalem',
+            'name'     => 'עִברִית',
+            'flag'     => 'flag-icon flag-icon-he',
+            'aliases'  => [],
+        ],
     ],
     'content_languages'  => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp'],
 

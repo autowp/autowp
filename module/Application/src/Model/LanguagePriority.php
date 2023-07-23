@@ -10,14 +10,16 @@ use function implode;
 class LanguagePriority
 {
     private array $values = [
-        'xx'    => ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'xx'],
-        'en'    => ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'xx'],
-        'fr'    => ['fr', 'en', 'it', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'xx'],
-        'pt-br' => ['pt', 'en', 'it', 'fr', 'de', 'es', 'ru', 'be', 'uk', 'zh', 'jp', 'xx'],
-        'ru'    => ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'xx'],
-        'be'    => ['be', 'ru', 'uk', 'en', 'it', 'fr', 'de', 'es', 'pt', 'zh', 'jp', 'xx'],
-        'uk'    => ['uk', 'ru', 'en', 'it', 'fr', 'de', 'es', 'pt', 'be', 'zh', 'jp', 'xx'],
-        'zh'    => ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'xx'],
+        'xx'    => ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'he', 'xx'],
+        'en'    => ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'he', 'xx'],
+        'fr'    => ['fr', 'en', 'it', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'he', 'xx'],
+        'pt-br' => ['pt', 'en', 'it', 'fr', 'de', 'es', 'ru', 'be', 'uk', 'zh', 'jp', 'he', 'xx'],
+        'ru'    => ['ru', 'en', 'it', 'fr', 'de', 'es', 'pt', 'be', 'uk', 'zh', 'jp', 'he', 'xx'],
+        'be'    => ['be', 'ru', 'uk', 'en', 'it', 'fr', 'de', 'es', 'pt', 'zh', 'jp', 'he', 'xx'],
+        'uk'    => ['uk', 'ru', 'en', 'it', 'fr', 'de', 'es', 'pt', 'be', 'zh', 'jp', 'he', 'xx'],
+        'zh'    => ['zh', 'en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'jp', 'he', 'xx'],
+        'it'    => ['it', 'en', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'he', 'xx'],
+        'he'    => ['he', 'en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'jp', 'xx'],
     ];
 
     public function getList(string $language): array
