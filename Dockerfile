@@ -13,7 +13,7 @@ ENV COMPOSER_ALLOW_SUPERUSER="1" \
 
 CMD ["./start.sh"]
 
-COPY sonar-scanner.zip /opt/sonar-scanner.zip
+# COPY sonar-scanner.zip /opt/sonar-scanner.zip
 COPY waitforit /usr/local/bin/waitforit
 
 RUN apt-get autoremove -qq -y && \
@@ -25,7 +25,6 @@ RUN apt-get autoremove -qq -y && \
         curl \
         git \
         imagemagick \
-        libmemcached-dev \
         libtool \
         libxml2 \
         mysql-client \
@@ -46,6 +45,7 @@ RUN apt-get autoremove -qq -y && \
         php7.4-mbstring \
         php7.4-mysql \
         php7.4-opcache \
+        php7.4-redis \
         php7.4-tokenizer \
         php7.4-xml \
         php7.4-zip \
@@ -57,7 +57,6 @@ RUN apt-get autoremove -qq -y && \
     && \
     apt-get autoclean -qq -y && \
     pecl install ast && \
-    pecl install memcached && \
     \
     cat /etc/ImageMagick-6/policy.xml | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \

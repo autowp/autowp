@@ -14,7 +14,7 @@
 		"ext-imagick" : "*",
 		"ext-pdo" : "*",
 		"ext-pdo_mysql" : "*",
-		"ext-memcached" : "*",
+		"ext-redis" : "*",
 		"ext-mbstring" : "*",
 		"ext-json" : "*",
 		"ext-intl" : "*",
@@ -56,7 +56,8 @@
 		"casbin/casbin": "^3.11.0",
 		"laminas/laminas-cli": "^1.1",
 		"laminas/laminas-paginator-adapter-laminasdb": "^1.0",
-		"laminas/laminas-cache-storage-adapter-memcached": "^2.0"
+		"laminas/laminas-cache-storage-adapter-redis": "^2.4",
+		"laminas/laminas-serializer": "^2.13"
 	},
 	"autoload" : {
 		"psr-4" : {
@@ -110,7 +111,7 @@
 		"test" : "phpunit --colors=always",
 		"phpmd" : "phpmd config,module,public_html text ruleset.xml --suffixes php,phtml"
     },
-	"homepage" : "http://wheelsage.org/",
+	"homepage" : "https://wheelsage.org/",
 	"support" : {
 		"email" : "dmitry@pereslegin.ru",
 		"source" : "https://github.com/autowp/autowp"

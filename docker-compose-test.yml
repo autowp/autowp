@@ -80,12 +80,19 @@ services:
     - ./module/Application/test/_files/pictures:/app/public_html/pictures
     - ./sonar-project.properties:/app/sonar-project.properties:ro
     depends_on:
-    - memcached
+    - redis
     - mysql
     - rabbitmq
     - goautowp-serve-private
     - minio
     - createbuckets
+
+  redis:
+    image: redis:alpine
+    container_name: autowp_test_redis
+    restart: always
+    expose:
+      - "6379"
 
   memcached:
     image: memcached:alpine

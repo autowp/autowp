@@ -4,44 +4,33 @@ declare(strict_types=1);
 
 namespace Application;
 
+use Laminas\Cache\Storage\Adapter\Redis;
+
 return [
     'caches' => [
         'fastCache' => [
-            'adapter' => 'memcached',
+            'adapter' => Redis::class,
             'options' => [
-                'ttl'        => 180,
-                'servers'    => [
-                    'main' => [
-                        'host' => 'memcached',
-                        'port' => 11211,
-                    ],
+                'ttl'       => 180,
+                'server'    => [
+                    'host'    => 'redis',
+                    'port'    => 6379,
+                    'timeout' => 10,
                 ],
-                'namespace'  => 'FAST',
-                'liboptions' => [
-                    'COMPRESSION'     => false,
-                    'binary_protocol' => true,
-                    'no_block'        => true,
-                    'connect_timeout' => 100,
-                ],
+                'namespace' => 'FAST',
             ],
+            'plugins' => [['name' => 'serializer']],
         ],
         'longCache' => [
-            'adapter' => 'memcached',
+            'adapter' => Redis::class,
             'options' => [
-                'ttl'        => 600,
-                'servers'    => [
-                    'main' => [
-                        'host' => 'memcached',
-                        'port' => 11211,
-                    ],
+                'ttl'       => 600,
+                'server'    => [
+                    'host'    => 'redis',
+                    'port'    => 6379,
+                    'timeout' => 10,
                 ],
-                'namespace'  => 'LONG',
-                'liboptions' => [
-                    'COMPRESSION'     => false,
-                    'binary_protocol' => true,
-                    'no_block'        => true,
-                    'connect_timeout' => 100,
-                ],
+                'namespace' => 'LONG',
             ],
         ],
     ],

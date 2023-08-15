@@ -56,15 +56,22 @@ services:
     - ./install-dev-db.sh:/app/install-dev-db.sh
     - ./start.sh:/app/start.sh
     depends_on:
-    - memcached
+    - redis
     - mysql
     - rabbitmq
     - goautowp-serve-private
     - minio
     - createbuckets
 
+  redis:
+    image: redis:alpine
+    container_name: autowp_test_redis
+    restart: always
+    expose:
+    - "6379"
+
   memcached:
-    image: memcached
+    image: memcached:alpine
     container_name: autowp_test_memcached
     restart: always
     expose:
