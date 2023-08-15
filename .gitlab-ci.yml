@@ -1,4 +1,4 @@
-image: autowp/runner-base-image
+image: $CI_REGISTRY/autowp/runner-base-image
 
 variables:
   DOCKER_DRIVER: overlay2
