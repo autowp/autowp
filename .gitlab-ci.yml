@@ -9,7 +9,7 @@ stages:
   - build
   - publish
 
-build-php-fpm:
+build:
   stage: build
   services:
     - name: docker:dind
@@ -19,11 +19,11 @@ build-php-fpm:
     - waitforit -address=tcp://docker:2375 -timeout=30
     - cp /opt/sonar-scanner.zip sonar-scanner.zip
     - cp /usr/local/bin/waitforit waitforit
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - local-php-security-checker --path=composer.lock
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull autowp/autowp || true
-    - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG -t autowp/autowp --pull .
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
+    - docker build --build-arg COMMIT="$CI_COMMIT_SHA" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" -t autowp/autowp --pull .
     - docker-compose -f docker-compose-test.yml up -d
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./tools/wait.sh"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./install-dev-db.sh"
@@ -40,47 +40,37 @@ build-php-fpm:
     #- docker-compose -f docker-compose-test.yml exec -T -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" backend bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
 
-build-nginx:
-  stage: build
-  services:
-    - name: docker:dind
-      alias: docker
-  before_script:
-    - waitforit -address=tcp://docker:2375 -timeout=30
-  script:
-    - docker pull autowp/autowp:nginx || true
-    - docker build --build-arg COMMIT=$CI_COMMIT_SHA --cache-from autowp/autowp:nginx -t $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG --pull nginx
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG
+    - docker pull $CI_REGISTRY_IMAGE:nginx-latest || true
+    - docker build -t "$CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG" --pull nginx
 
-publish-php-fpm:
+    - npx semantic-release
+  interruptible: true
+  rules:
+    - if: $CI_COMMIT_TAG !~ /^v\d.*/
+
+publish:
   stage: publish
   services:
     - name: docker:dind
       alias: docker
   before_script:
     - waitforit -address=tcp://docker:2375 -timeout=30
-  script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG autowp/autowp
     - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-    - docker push autowp/autowp
-  only:
-    - master
+  script:
+    - docker pull "$CI_REGISTRY_IMAGE:latest" || true
+    - docker build --build-arg COMMIT=$CI_COMMIT_SHA -t "autowp/autowp:$CI_COMMIT_TAG" -t "$CI_REGISTRY_IMAGE:latest" --pull .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+    - docker push autowp/autowp:$CI_COMMIT_TAG
 
-publish-nginx:
-  stage: publish
-  services:
-    - name: docker:dind
-      alias: docker
-  before_script:
-    - waitforit -address=tcp://docker:2375 -timeout=30
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG
-    - docker tag $CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_REF_SLUG autowp/autowp:nginx
-    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-    - docker push autowp/autowp:nginx
-  only:
-    - master
+    - docker pull "$CI_REGISTRY_IMAGE:nginx:latest" || true
+    - docker build -t "autowp/autowp:nginx-$CI_COMMIT_TAG" -t "$CI_REGISTRY_IMAGE:nginx-latest" --pull nginx
+    - docker push "$CI_REGISTRY_IMAGE:nginx-$CI_COMMIT_TAG"
+    - docker push "$CI_REGISTRY_IMAGE:nginx-latest"
+    - docker push autowp/autowp:nginx-$CI_COMMIT_TAG
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d.*/
+  environment:
+    name: production
+    url: https://www.wheelsage.org/
