@@ -55,6 +55,8 @@ publish:
       alias: docker
   before_script:
     - waitforit -address=tcp://docker:2375 -timeout=30
+    - cp /opt/sonar-scanner.zip sonar-scanner.zip
+    - cp /usr/local/bin/waitforit waitforit
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
