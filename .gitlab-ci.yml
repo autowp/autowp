@@ -55,8 +55,8 @@ publish:
       alias: docker
   before_script:
     - waitforit -address=tcp://docker:2375 -timeout=30
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
     - docker pull "$CI_REGISTRY_IMAGE:latest" || true
     - docker build --build-arg COMMIT=$CI_COMMIT_SHA -t "autowp/autowp:$CI_COMMIT_TAG" -t "$CI_REGISTRY_IMAGE:latest" --pull .
