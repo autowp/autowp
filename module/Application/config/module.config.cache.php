@@ -32,6 +32,7 @@ return [
                 ],
                 'namespace' => 'LONG',
             ],
+            'plugins' => [['name' => 'serializer']],
         ],
     ],
 ];
