@@ -31,8 +31,7 @@ image-storage:
   src-override:
     host: localhost:9000
     scheme: http
-memcached:
-  - "memcached:11211"
+redis: redis://redis:6379
 donations-vod-price: 100
 about:
   developer: "3"
