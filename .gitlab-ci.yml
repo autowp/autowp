@@ -54,6 +54,8 @@ publish:
     - name: docker:dind
       alias: docker
   before_script:
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+    - git config --global user.name "$GITLAB_USER_NAME"
     - waitforit -address=tcp://docker:2375 -timeout=30
     - cp /opt/sonar-scanner.zip sonar-scanner.zip
     - cp /usr/local/bin/waitforit waitforit
