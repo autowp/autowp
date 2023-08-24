@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Application\Controller\Api;
 
 use Application\HostManager;
-use Application\Hydrator\Api\ItemLanguageHydrator;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
@@ -25,14 +24,12 @@ class ItemLanguageControllerFactory implements FactoryInterface
         $requestedName,
         ?array $options = null
     ): ItemLanguageController {
-        $tables    = $container->get('TableManager');
-        $hydrators = $container->get('HydratorManager');
-        $filters   = $container->get('InputFilterManager');
+        $tables  = $container->get('TableManager');
+        $filters = $container->get('InputFilterManager');
 
         return new ItemLanguageController(
             $tables->get('item_language'),
             $container->get(Service::class),
-            $hydrators->get(ItemLanguageHydrator::class),
             $container->get(ItemParent::class),
             $container->get(HostManager::class),
             $filters->get('api_item_language_put'),

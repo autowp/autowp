@@ -14,12 +14,10 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
-use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
 use function array_key_exists;
 use function array_keys;
-use function Autowp\Commons\currentFromResultSetInterface;
 
 /**
  * @method User user($user = null)
@@ -28,73 +26,16 @@ use function Autowp\Commons\currentFromResultSetInterface;
  */
 class ItemParentLanguageController extends AbstractRestfulController
 {
-    private TableGateway $table;
-
-    private AbstractRestHydrator $hydrator;
-
     private ItemParent $itemParent;
 
     private InputFilter $putInputFilter;
 
     public function __construct(
-        TableGateway $table,
-        AbstractRestHydrator $hydrator,
         ItemParent $itemParent,
         InputFilter $putInputFilter
     ) {
-        $this->table          = $table;
-        $this->hydrator       = $hydrator;
         $this->itemParent     = $itemParent;
         $this->putInputFilter = $putInputFilter;
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function indexAction()
-    {
-        if (! $this->user()->enforce('global', 'moderate')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $rows = $this->table->select([
-            'item_id'   => (int) $this->params('item_id'),
-            'parent_id' => (int) $this->params('parent_id'),
-        ]);
-
-        $items = [];
-        foreach ($rows as $row) {
-            $items[] = $this->hydrator->extract($row);
-        }
-
-        return new JsonModel([
-            'items' => $items,
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function getAction()
-    {
-        if (! $this->user()->enforce('global', 'moderate')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $row = currentFromResultSetInterface($this->table->select([
-            'item_id'   => (int) $this->params('item_id'),
-            'parent_id' => (int) $this->params('parent_id'),
-            'language'  => (string) $this->params('language'),
-        ]));
-
-        if (! $row) {
-            return $this->notFoundAction();
-        }
-
-        return new JsonModel($this->hydrator->extract($row));
     }
 
     /**

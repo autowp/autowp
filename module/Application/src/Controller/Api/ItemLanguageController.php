@@ -4,7 +4,6 @@ namespace Application\Controller\Api;
 
 use Application\Controller\Plugin\Car;
 use Application\HostManager;
-use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
@@ -22,7 +21,6 @@ use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\Uri\Uri;
-use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
 use function array_key_exists;
@@ -47,8 +45,6 @@ class ItemLanguageController extends AbstractRestfulController
 
     private TextStorage $textStorage;
 
-    private AbstractRestHydrator $hydrator;
-
     private ItemParent $itemParent;
 
     private HostManager $hostManager;
@@ -64,7 +60,6 @@ class ItemLanguageController extends AbstractRestfulController
     public function __construct(
         TableGateway $table,
         TextStorage $textStorage,
-        AbstractRestHydrator $hydrator,
         ItemParent $itemParent,
         HostManager $hostManager,
         InputFilter $putInputFilter,
@@ -74,61 +69,12 @@ class ItemLanguageController extends AbstractRestfulController
     ) {
         $this->table             = $table;
         $this->textStorage       = $textStorage;
-        $this->hydrator          = $hydrator;
         $this->itemParent        = $itemParent;
         $this->hostManager       = $hostManager;
         $this->putInputFilter    = $putInputFilter;
         $this->message           = $message;
         $this->userItemSubscribe = $userItemSubscribe;
         $this->item              = $item;
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function indexAction()
-    {
-        if (! $this->user()->enforce('global', 'moderate')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $rows = $this->table->select([
-            'item_id'       => (int) $this->params('id'),
-            'language <> ?' => 'xx',
-        ]);
-
-        $items = [];
-        foreach ($rows as $row) {
-            $items[] = $this->hydrator->extract($row);
-        }
-
-        return new JsonModel([
-            'items' => $items,
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function getAction()
-    {
-        if (! $this->user()->enforce('global', 'moderate')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $row = currentFromResultSetInterface($this->table->select([
-            'item_id'  => (int) $this->params('id'),
-            'language' => (string) $this->params('language'),
-        ]));
-
-        if (! $row) {
-            return $this->notFoundAction();
-        }
-
-        return new JsonModel($this->hydrator->extract($row));
     }
 
     /**

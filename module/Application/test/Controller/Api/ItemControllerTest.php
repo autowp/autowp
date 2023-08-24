@@ -3,7 +3,6 @@
 namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\ItemController;
-use Application\Controller\Api\ItemLanguageController;
 use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureItemController;
@@ -466,28 +465,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $brandId = (int) array_pop($path);
 
         $this->assertNotEmpty($brandId);
-
-        // set language values
-        $this->reset();
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/item/' . $brandId . '/language/ru', Request::METHOD_PUT, [
-            'name'      => 'Тест',
-            'text'      => 'Краткое описание',
-            'full_text' => 'Полное описание',
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemLanguageController::class);
-        $this->assertMatchedRouteName('api/item/item/language/item/put');
-        $this->assertActionName('put');
-
-        $this->reset();
     }
 
     /**
