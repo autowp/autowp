@@ -581,15 +581,6 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'have_childs_of_type'             => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
             'have_common_childs_with'         => [
                 'required'   => false,
                 'filters'    => [

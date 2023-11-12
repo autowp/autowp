@@ -608,15 +608,6 @@ class ItemController extends AbstractRestfulController
                 $group['item.id'] = true;
             }
 
-            if ($data['have_childs_of_type']) {
-                $select
-                    ->join(['ipc3' => 'item_parent_cache'], 'item.id = ipc3.parent_id', [])
-                    ->join(['child' => 'item'], 'ipc3.item_id = child.id', [])
-                    ->where(['child.item_type_id' => (int) $data['have_childs_of_type']]);
-
-                $group['item.id'] = true;
-            }
-
             if ($data['have_childs_with_parent_of_type']) {
                 $select
                     ->join(['ipc4' => 'item_parent_cache'], 'item.id = ipc4.parent_id', [])

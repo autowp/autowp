@@ -208,25 +208,6 @@ class Item
         return $row ? (int) $row['count'] : 0;
     }
 
-    public function getLanguageNamesOfItems(array $ids, string $language): array
-    {
-        if (! $ids) {
-            return [];
-        }
-
-        $rows   = $this->itemLanguageTable->select([
-            new Sql\Predicate\In('item_id', $ids),
-            'language' => $language,
-            new Sql\Predicate\Expression('length(name) > 0'),
-        ]);
-        $result = [];
-        foreach ($rows as $row) {
-            $result[(int) $row['item_id']] = $row['name'];
-        }
-
-        return $result;
-    }
-
     public function getTextsOfItem(int $id, string $language): array
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -262,37 +243,6 @@ class Item
             'full_text' => $text,
             'text'      => $description,
         ];
-    }
-
-    public function getTextOfItem(int $id, string $language): string
-    {
-        $select = new Sql\Select($this->itemLanguageTable->getTable());
-
-        /** @var Adapter $adapter */
-        $adapter = $this->itemLanguageTable->getAdapter();
-        $orderBy = $this->languagePriority->getOrderByExpression($language, $adapter);
-
-        $select
-            ->columns(['text_id'])
-            ->where([
-                'item_id' => $id,
-                new Sql\Predicate\IsNotNull('text_id'),
-            ])
-            ->order([new Sql\Expression($orderBy)]);
-
-        $rows = $this->itemLanguageTable->selectWith($select);
-
-        $textIds = [];
-        foreach ($rows as $row) {
-            $textIds[] = $row['text_id'];
-        }
-
-        $text = null;
-        if ($textIds) {
-            $text = $this->textStorage->getFirstText($textIds);
-        }
-
-        return $text ? $text : '';
     }
 
     public function hasFullText(int $id): bool
@@ -489,60 +439,6 @@ class Item
         }
 
         return $result;
-    }
-
-    public function getRelatedCarGroupId(int $itemId): array
-    {
-        $carIds = $this->getChildItemsId($itemId);
-
-        $vectors = [];
-        foreach ($carIds as $carId) {
-            $parentIds = $this->getAncestorsId($carId, [
-                self::VEHICLE,
-                self::ENGINE,
-            ]);
-
-            // remove parents
-            foreach ($parentIds as $parentId) {
-                $index = array_search($parentId, $carIds);
-                if ($index !== false) {
-                    unset($carIds[$index]);
-                }
-            }
-
-            $vector   = $parentIds;
-            $vector[] = $carId;
-
-            $vectors[] = $vector;
-        }
-
-        do {
-            // look for same root
-
-            $matched = false;
-            for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
-                for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
-                    if ($vectors[$i][0] === $vectors[$j][0]) {
-                        $matched = true;
-                        // matched root
-                        $newVector = [];
-                        $length    = min(count($vectors[$i]), count($vectors[$j]));
-                        for ($k = 0; $k < $length && $vectors[$i][$k] === $vectors[$j][$k]; $k++) {
-                            $newVector[] = $vectors[$i][$k];
-                        }
-                        $vectors[$i] = $newVector;
-                        array_splice($vectors, $j, 1);
-                    }
-                }
-            }
-        } while ($matched);
-
-        $resultIds = [];
-        foreach ($vectors as $vector) {
-            $resultIds[] = $vector[count($vector) - 1];
-        }
-
-        return $resultIds;
     }
 
     private function fractionToMonth(?string $fraction): int
@@ -806,18 +702,6 @@ class Item
                 $this->updateItemInteritance($child);
             }
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getVehiclesAndEnginesCount(int $parentId): int
-    {
-        return $this->getCount([
-            'item_type_id' => [self::ENGINE, self::VEHICLE],
-            'ancestor'     => $parentId,
-            'is_group'     => false,
-        ]);
     }
 
     /**
@@ -1676,32 +1560,6 @@ class Item
     public function getCount(array $options): int
     {
         return $this->getPaginator($options)->getTotalItemCount();
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getCountDistinct(array $options): int
-    {
-        $select = $this->getSelect($options);
-
-        $select->reset(Sql\Select::LIMIT);
-        $select->reset(Sql\Select::OFFSET);
-        $select->reset(Sql\Select::ORDER);
-        $select->reset(Sql\Select::COLUMNS);
-        $select->reset(Sql\Select::GROUP);
-        $select->columns(['id']);
-        $select->quantifier(Sql\Select::QUANTIFIER_DISTINCT);
-
-        $countSelect = new Sql\Select();
-
-        $countSelect->columns(['count' => new Sql\Expression('COUNT(1)')]);
-        $countSelect->from(['original_select' => $select]);
-
-        $statement = $this->itemTable->getSql()->prepareStatementForSqlObject($countSelect);
-        $row       = $statement->execute()->current();
-
-        return (int) $row['count'];
     }
 
     /**
