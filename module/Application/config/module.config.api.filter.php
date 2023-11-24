@@ -563,15 +563,6 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'engine_id'                       => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
             'factories_of_brand'              => [
                 'required'   => false,
                 'filters'    => [

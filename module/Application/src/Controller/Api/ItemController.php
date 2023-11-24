@@ -618,10 +618,6 @@ class ItemController extends AbstractRestfulController
                 $group['item.id'] = true;
             }
 
-            if ($data['engine_id']) {
-                $select->where(['item.engine_item_id' => (int) $data['engine_id']]);
-            }
-
             if ($data['is_group']) {
                 $select->where(['item.is_group']);
             }
