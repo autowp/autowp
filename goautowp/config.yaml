@@ -28,6 +28,7 @@ image-storage:
     credentials:
       key: "AKIAIOSFODNN7EXAMPLE"
       secret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    endpoint: http://minio:9000
   src-override:
     host: localhost:9000
     scheme: http

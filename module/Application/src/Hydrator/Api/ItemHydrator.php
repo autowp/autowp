@@ -148,9 +148,6 @@ class ItemHydrator extends AbstractRestHydrator
         $this->addStrategy('logo', $strategy);
 
         $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
-        $this->addStrategy('logo120', $strategy);
-
-        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
         $this->addStrategy('brandicon', $strategy);
     }
 
@@ -652,13 +649,6 @@ class ItemHydrator extends AbstractRestHydrator
             ]);
 
             $result['categories'] = $this->extractValue('categories', $rows);
-        }
-
-        if ($this->filterComposite->filter('logo120')) {
-            $result['logo120'] = $this->extractValue('logo120', [
-                'image'  => $object['logo_id'],
-                'format' => 'logo',
-            ]);
         }
 
         if ($this->filterComposite->filter('related_group_pictures')) {
