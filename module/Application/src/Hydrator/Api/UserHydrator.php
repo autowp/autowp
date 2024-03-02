@@ -20,10 +20,13 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Traversable;
 
+use function hash;
 use function inet_ntop;
 use function is_array;
 use function md5;
 use function sprintf;
+use function strtolower;
+use function trim;
 use function urlencode;
 
 class UserHydrator extends AbstractRestHydrator
@@ -193,7 +196,7 @@ class UserHydrator extends AbstractRestHydrator
             if ($this->filterComposite->filter('gravatar') && $object['e_mail']) {
                 $user['gravatar'] = sprintf(
                     'https://www.gravatar.com/avatar/%s?s=70&d=%s&r=g',
-                    md5($object['e_mail']),
+                    hash('sha256', strtolower(trim($object['e_mail']))),
                     urlencode('https://www.autowp.ru/_.gif')
                 );
             }
