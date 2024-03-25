@@ -6,8 +6,6 @@ use Application\ItemNameFormatter;
 use Application\PictureNameFormatter;
 use ArrayObject;
 use Autowp\Image;
-use DateInterval;
-use DateTime;
 use Exception;
 use Facebook;
 use GuzzleHttp\Exception\BadResponseException;
@@ -18,7 +16,6 @@ use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Twitter;
 
 use function array_merge;
-use function array_replace;
 use function array_shift;
 use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
@@ -69,49 +66,6 @@ class CarOfDay
         $this->pictureNameFormatter = $pictureNameFormatter;
 
         $this->table = $table;
-    }
-
-    public function getCarOfDayCandidate(): int
-    {
-        $sql = '
-            SELECT c.id, count(p.id) AS p_count
-            FROM item AS c
-                INNER JOIN item_parent_cache AS cpc ON c.id=cpc.parent_id
-                INNER JOIN picture_item ON cpc.item_id = picture_item.item_id
-                INNER JOIN pictures AS p ON picture_item.picture_id=p.id
-            WHERE p.status=?
-                AND (c.begin_year AND c.end_year OR c.begin_model_year AND c.end_model_year)
-                AND c.id NOT IN (SELECT item_id FROM of_day WHERE item_id)
-            GROUP BY c.id
-            HAVING p_count >= ?
-            ORDER BY RAND()
-            LIMIT 1
-        ';
-
-        /** @var Adapter $adapter */
-        $adapter   = $this->table->getAdapter();
-        $resultSet = $adapter->query($sql, [Picture::STATUS_ACCEPTED, 5]);
-        $row       = $resultSet->current();
-
-        return $row ? (int) $row['id'] : 0;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function pick(): bool
-    {
-        $itemId = $this->getCarOfDayCandidate();
-        if ($itemId) {
-            print $itemId . "\n";
-
-            $now = new DateTime();
-            $this->setItemOfDay($now, $itemId, null);
-
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -339,33 +293,6 @@ class CarOfDay
     /**
      * @throws Exception
      */
-    public function getNextDates(): array
-    {
-        $now      = new DateTime();
-        $interval = new DateInterval('P1D');
-
-        $result = [];
-
-        for ($i = 0; $i < 10; $i++) {
-            $dayRow = currentFromResultSetInterface($this->table->select([
-                'day_date' => $now->format('Y-m-d'),
-                'item_id is not null',
-            ]));
-
-            $result[] = [
-                'date' => clone $now,
-                'free' => ! $dayRow,
-            ];
-
-            $now->add($interval);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @throws Exception
-     */
     public function getItemOfDayPictures(int $itemId, string $language): array
     {
         $carOfDay = $this->itemModel->getRow([
@@ -568,40 +495,5 @@ class CarOfDay
         $row       = $resultSet->current();
 
         return (bool) $row;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function setItemOfDay(DateTime $dateTime, int $itemId, ?int $userId): bool
-    {
-        if (! $this->isComplies($itemId)) {
-            return false;
-        }
-
-        $dateStr = $dateTime->format('Y-m-d');
-
-        $primaryKey = [
-            'day_date' => $dateStr,
-        ];
-
-        $dayRow = currentFromResultSetInterface($this->table->select($primaryKey));
-
-        if ($dayRow && $dayRow['item_id']) {
-            return false;
-        }
-
-        $set = [
-            'item_id' => $itemId,
-            'user_id' => $userId,
-        ];
-
-        if ($dayRow) {
-            $this->table->update($set, $primaryKey);
-        } else {
-            $this->table->insert(array_replace($set, $primaryKey));
-        }
-
-        return true;
     }
 }

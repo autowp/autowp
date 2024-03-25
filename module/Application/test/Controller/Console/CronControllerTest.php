@@ -19,15 +19,4 @@ class CronControllerTest extends AbstractConsoleControllerTestCase
         $this->assertActionName('daily-maintenance');
         //$this->assertConsoleOutputContains('Garbage collected');
     }
-
-    public function testMidnight(): void
-    {
-        $this->dispatch('cron midnight');
-
-        $this->assertModuleName('cron');
-        $this->assertControllerName(CronController::class);
-        $this->assertMatchedRouteName('cron');
-        $this->assertActionName('midnight');
-        //$this->assertConsoleOutputContains('Garbage collected');
-    }
 }

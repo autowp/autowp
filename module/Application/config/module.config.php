@@ -14,11 +14,6 @@ use Laminas\Mvc\I18n\TranslatorFactory;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
-    'controllers'        => [
-        'factories' => [
-            Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,
-        ],
-    ],
     'controller_plugins' => [
         'invokables' => [
             'forbiddenAction'     => Controller\Plugin\ForbiddenAction::class,
@@ -236,10 +231,6 @@ return [
         'prefix'   => '',
     ],
     'mosts_min_vehicles_count' => 200,
-    'yandex'                   => [
-        'secret' => '',
-        'price'  => 1,
-    ],
     'input_filters'            => [
         'factories'          => [
             InputFilter\AttrUserValueCollectionInputFilter::class
