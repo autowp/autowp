@@ -9,7 +9,6 @@ use Autowp\Image;
 use Exception;
 use Facebook;
 use GuzzleHttp\Exception\BadResponseException;
-use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\I18n\Translator\TranslatorInterface;
 use League\OAuth1\Client\Credentials\TokenCredentials;
@@ -473,27 +472,5 @@ class CarOfDay
         }
 
         return $pictures;
-    }
-
-    public function isComplies(int $itemId): bool
-    {
-        $sql = '
-            SELECT item.id, count(distinct pictures.id) AS p_count
-            FROM item
-                INNER JOIN item_parent_cache AS cpc ON item.id = cpc.parent_id
-                INNER JOIN picture_item ON cpc.item_id = picture_item.item_id
-                INNER JOIN pictures ON picture_item.picture_id = pictures.id
-            WHERE pictures.status = ?
-                AND item.id NOT IN (SELECT item_id FROM of_day WHERE item_id)
-                AND item.id = ?
-            HAVING p_count >= ?
-            LIMIT 1
-        ';
-        /** @var Adapter $adapter */
-        $adapter   = $this->table->getAdapter();
-        $resultSet = $adapter->query($sql, [Picture::STATUS_ACCEPTED, $itemId, 3]);
-        $row       = $resultSet->current();
-
-        return (bool) $row;
     }
 }

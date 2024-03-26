@@ -470,10 +470,6 @@ class ItemHydrator extends AbstractRestHydrator
                 : null;
         }
 
-        if ($this->filterComposite->filter('is_compiles_item_of_day')) {
-            $result['is_compiles_item_of_day'] = $this->carOfDay->isComplies($object['id']);
-        }
-
         if ($this->filterComposite->filter('childs_count')) {
             if (isset($object['childs_count'])) {
                 $result['childs_count'] = (int) $object['childs_count'];
