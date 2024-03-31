@@ -43,7 +43,6 @@ return [
             Controller\Api\PictureItemController::class      => Controller\Api\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
             Controller\Api\RatingController::class           => Controller\Api\RatingControllerFactory::class,
-            Controller\Api\StatController::class             => Controller\Api\StatControllerFactory::class,
             Controller\Api\TelegramController::class         => Controller\Api\TelegramControllerFactory::class,
             Controller\Api\TimezoneController::class         => InvokableFactory::class,
             Controller\Api\UserController::class             => Controller\Api\UserControllerFactory::class,
@@ -1277,27 +1276,6 @@ return [
                                                 ],
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'stat'               => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/stat',
-                            'defaults' => [
-                                'controller' => Controller\Api\StatController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'global-summary' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/global-summary',
-                                    'defaults' => [
-                                        'action' => 'global-summary',
                                     ],
                                 ],
                             ],

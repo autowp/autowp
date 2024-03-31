@@ -405,7 +405,6 @@ class Picture
             'is_lost'          => null,
             'has_point'        => null,
             'order'            => null,
-            'has_copyrights'   => null,
             'limit'            => null,
             'accepted_in_days' => null,
             'log'              => null,
