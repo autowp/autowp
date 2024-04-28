@@ -1563,27 +1563,6 @@ class Item
     }
 
     /**
-     * @throws Exception
-     */
-    public function getCountPairs(array $options): array
-    {
-        $select = $this->getSelect($options);
-        $select->reset($select::COLUMNS);
-        $select->reset($select::ORDER);
-        $select->reset($select::GROUP);
-        $select->columns(['id', 'count' => new Sql\Expression('count(1)')])
-            ->group('item.id')
-            ->order('count DESC');
-
-        $result = [];
-        foreach ($this->itemTable->selectWith($select) as $row) {
-            $result[(int) $row['id']] = (int) $row['count'];
-        }
-
-        return $result;
-    }
-
-    /**
      * @return array|ArrayObject|null
      * @throws Exception
      */

@@ -42,7 +42,6 @@ return [
             Controller\Api\PictureController::class          => Controller\Api\PictureControllerFactory::class,
             Controller\Api\PictureItemController::class      => Controller\Api\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
-            Controller\Api\RatingController::class           => Controller\Api\RatingControllerFactory::class,
             Controller\Api\TelegramController::class         => Controller\Api\TelegramControllerFactory::class,
             Controller\Api\TimezoneController::class         => InvokableFactory::class,
             Controller\Api\UserController::class             => Controller\Api\UserControllerFactory::class,
@@ -1122,54 +1121,6 @@ return [
                                                 'action' => 'delete',
                                             ],
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'rating'             => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/rating',
-                            'defaults' => [
-                                'controller' => Controller\Api\RatingController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'specs'         => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/specs',
-                                    'defaults' => [
-                                        'action' => 'specs',
-                                    ],
-                                ],
-                            ],
-                            'pictures'      => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/pictures',
-                                    'defaults' => [
-                                        'action' => 'pictures',
-                                    ],
-                                ],
-                            ],
-                            'likes'         => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/likes',
-                                    'defaults' => [
-                                        'action' => 'likes',
-                                    ],
-                                ],
-                            ],
-                            'picture-likes' => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/picture-likes',
-                                    'defaults' => [
-                                        'action' => 'picture-likes',
                                     ],
                                 ],
                             ],

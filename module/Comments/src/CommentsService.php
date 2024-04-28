@@ -485,20 +485,4 @@ class CommentsService
             'sent'    => 0,
         ]);
     }
-
-    public function getTopAuthors(int $limit): array
-    {
-        $select = $this->messageTable->getSql()->select()
-            ->columns(['author_id', 'volume' => new Sql\Expression('sum(vote)')])
-            ->group('author_id')
-            ->order('volume DESC')
-            ->limit($limit);
-
-        $result = [];
-        foreach ($this->messageTable->selectWith($select) as $row) {
-            $result[(int) $row['author_id']] = (int) $row['volume'];
-        }
-
-        return $result;
-    }
 }
