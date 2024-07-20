@@ -14,7 +14,6 @@ return [
             Hydrator\Api\AttrValueHydrator::class         => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemHydrator::class              => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\ItemParentHydrator::class        => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\LogHydrator::class               => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\PictureHydrator::class           => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\PictureItemHydrator::class       => Hydrator\Api\RestHydrator::class,
             Hydrator\Api\SimilarHydrator::class           => Hydrator\Api\RestHydrator::class,
@@ -36,7 +35,6 @@ return [
             Controller\Api\ItemParentController::class   => Controller\Api\ItemParentControllerFactory::class,
             Controller\Api\ItemParentLanguageController::class
                 => Controller\Api\ItemParentLanguageControllerFactory::class,
-            Controller\Api\LogController::class              => Controller\Api\LogControllerFactory::class,
             Controller\Api\MostsController::class            => Controller\Api\MostsControllerFactory::class,
             Controller\Api\NewController::class              => Controller\Api\NewControllerFactory::class,
             Controller\Api\PictureController::class          => Controller\Api\PictureControllerFactory::class,
@@ -776,27 +774,6 @@ return [
                                     'verb'     => 'post',
                                     'defaults' => [
                                         'action' => 'post',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'log'                => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/log',
-                            'defaults' => [
-                                'controller' => Controller\Api\LogController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
                                     ],
                                 ],
                             ],

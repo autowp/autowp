@@ -1144,69 +1144,6 @@ return [
                 ],
             ],
         ],
-        'api_log_list'                         => [
-            'article_id' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'item_id'    => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'picture_id' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'user_id'    => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'page'       => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'GreaterThan',
-                        'options' => [
-                            'min'       => 1,
-                            'inclusive' => true,
-                        ],
-                    ],
-                ],
-            ],
-            'fields'     => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name'    => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['user', 'pictures', 'items']],
-                    ],
-                ],
-            ],
-        ],
         'api_login'                            => [
             'login'    => [
                 'required'   => true,
