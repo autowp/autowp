@@ -877,23 +877,6 @@ return [
                 ],
             ],
         ],
-        'api_item_parent_language_put'         => [
-            'name' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'max' => Model\ItemParent::MAX_LANGUAGE_NAME,
-                        ],
-                    ],
-                ],
-            ],
-        ],
         'api_item_parent_list'                 => [
             'ancestor_id'     => [
                 'required'   => false,

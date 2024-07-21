@@ -597,7 +597,7 @@ class Picture
             }
         }
 
-        if ($options['has_copyrights']) {
+        if (isset($options['has_copyrights']) && $options['has_copyrights']) {
             $select->where(['pictures.copyrights_text_id IS NOT NULL']);
         }
 
