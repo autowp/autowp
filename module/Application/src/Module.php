@@ -41,7 +41,6 @@ class Module implements
             __DIR__ . '/../config/module.config.forms.php',
             __DIR__ . '/../config/module.config.imagestorage.php',
             __DIR__ . '/../config/module.config.tables.php',
-            __DIR__ . '/../config/module.config.moder.php',
             __DIR__ . '/../config/module.config.view.php',
             __DIR__ . '/../config/module.config.rabbitmq.php',
         ];

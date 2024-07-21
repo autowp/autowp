@@ -55,25 +55,6 @@ class PictureModerVote
         return $result;
     }
 
-    public function add(int $pictureId, int $userId, int $vote, string $reason): void
-    {
-        $this->table->insert([
-            'user_id'    => $userId,
-            'picture_id' => $pictureId,
-            'day_date'   => new Sql\Expression('NOW()'),
-            'reason'     => $reason,
-            'vote'       => $vote ? 1 : 0,
-        ]);
-    }
-
-    public function delete(int $pictureId, int $userId): void
-    {
-        $this->table->delete([
-            'user_id = ?'    => $userId,
-            'picture_id = ?' => $pictureId,
-        ]);
-    }
-
     /**
      * @throws Exception
      */

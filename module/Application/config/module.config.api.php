@@ -23,25 +23,24 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Api\AccountController::class          => Controller\Api\AccountControllerFactory::class,
-            Controller\Api\AttrController::class             => Controller\Api\AttrControllerFactory::class,
-            Controller\Api\BrandsController::class           => Controller\Api\BrandsControllerFactory::class,
-            Controller\Api\ChartController::class            => Controller\Api\ChartControllerFactory::class,
-            Controller\Api\InboxController::class            => Controller\Api\InboxControllerFactory::class,
-            Controller\Api\IndexController::class            => Controller\Api\IndexControllerFactory::class,
-            Controller\Api\ItemController::class             => Controller\Api\ItemControllerFactory::class,
-            Controller\Api\GalleryController::class          => Controller\Api\GalleryControllerFactory::class,
-            Controller\Api\ItemLanguageController::class     => Controller\Api\ItemLanguageControllerFactory::class,
-            Controller\Api\ItemParentController::class       => Controller\Api\ItemParentControllerFactory::class,
-            Controller\Api\MostsController::class            => Controller\Api\MostsControllerFactory::class,
-            Controller\Api\NewController::class              => Controller\Api\NewControllerFactory::class,
-            Controller\Api\PictureController::class          => Controller\Api\PictureControllerFactory::class,
-            Controller\Api\PictureItemController::class      => Controller\Api\PictureItemControllerFactory::class,
-            Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
-            Controller\Api\TelegramController::class         => Controller\Api\TelegramControllerFactory::class,
-            Controller\Api\TimezoneController::class         => InvokableFactory::class,
-            Controller\Api\UserController::class             => Controller\Api\UserControllerFactory::class,
-            Controller\Api\VotingController::class           => Controller\Api\VotingControllerFactory::class,
+            Controller\Api\AccountController::class      => Controller\Api\AccountControllerFactory::class,
+            Controller\Api\AttrController::class         => Controller\Api\AttrControllerFactory::class,
+            Controller\Api\BrandsController::class       => Controller\Api\BrandsControllerFactory::class,
+            Controller\Api\ChartController::class        => Controller\Api\ChartControllerFactory::class,
+            Controller\Api\InboxController::class        => Controller\Api\InboxControllerFactory::class,
+            Controller\Api\IndexController::class        => Controller\Api\IndexControllerFactory::class,
+            Controller\Api\ItemController::class         => Controller\Api\ItemControllerFactory::class,
+            Controller\Api\GalleryController::class      => Controller\Api\GalleryControllerFactory::class,
+            Controller\Api\ItemLanguageController::class => Controller\Api\ItemLanguageControllerFactory::class,
+            Controller\Api\ItemParentController::class   => Controller\Api\ItemParentControllerFactory::class,
+            Controller\Api\MostsController::class        => Controller\Api\MostsControllerFactory::class,
+            Controller\Api\NewController::class          => Controller\Api\NewControllerFactory::class,
+            Controller\Api\PictureController::class      => Controller\Api\PictureControllerFactory::class,
+            Controller\Api\PictureItemController::class  => Controller\Api\PictureItemControllerFactory::class,
+            Controller\Api\TelegramController::class     => Controller\Api\TelegramControllerFactory::class,
+            Controller\Api\TimezoneController::class     => InvokableFactory::class,
+            Controller\Api\UserController::class         => Controller\Api\UserControllerFactory::class,
+            Controller\Api\VotingController::class       => Controller\Api\VotingControllerFactory::class,
         ],
     ],
     'router'      => [
@@ -53,7 +52,7 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes'  => [
-                    'account'            => [
+                    'account'          => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/account',
@@ -110,7 +109,7 @@ return [
                             ],
                         ],
                     ],
-                    'attr'               => [
+                    'attr'             => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/attr',
@@ -257,7 +256,7 @@ return [
                             ],
                         ],
                     ],
-                    'brands'             => [
+                    'brands'           => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/brands',
@@ -323,7 +322,7 @@ return [
                             ],
                         ],
                     ],
-                    'chart'              => [
+                    'chart'            => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/chart',
@@ -353,7 +352,7 @@ return [
                             ],
                         ],
                     ],
-                    'gallery'            => [
+                    'gallery'          => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route' => '/gallery',
@@ -372,7 +371,7 @@ return [
                             ],
                         ],
                     ],
-                    'inbox'              => [
+                    'inbox'            => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/inbox',
@@ -393,7 +392,7 @@ return [
                             ],
                         ],
                     ],
-                    'index'              => [
+                    'index'            => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/index',
@@ -441,7 +440,7 @@ return [
                             ],
                         ],
                     ],
-                    'item'               => [
+                    'item'             => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/item',
@@ -681,7 +680,7 @@ return [
                             ],
                         ],
                     ],
-                    'item-parent'        => [
+                    'item-parent'      => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/item-parent',
@@ -747,7 +746,7 @@ return [
                             ],
                         ],
                     ],
-                    'mosts'              => [
+                    'mosts'            => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/mosts',
@@ -795,7 +794,7 @@ return [
                             ],
                         ],
                     ],
-                    'new'                => [
+                    'new'              => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/new',
@@ -816,7 +815,7 @@ return [
                             ],
                         ],
                     ],
-                    'picture'            => [
+                    'picture'          => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/picture',
@@ -993,19 +992,7 @@ return [
                             ],
                         ],
                     ],
-                    'picture-moder-vote' => [
-                        'type'    => 'Segment',
-                        'options' => [
-                            'route'       => '/picture-moder-vote/:id',
-                            'constraints' => [
-                                'id' => '[0-9]+',
-                            ],
-                            'defaults'    => [
-                                'controller' => Controller\Api\PictureModerVoteController::class,
-                            ],
-                        ],
-                    ],
-                    'picture-item'       => [
+                    'picture-item'     => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/picture-item',
@@ -1071,7 +1058,7 @@ return [
                             ],
                         ],
                     ],
-                    'telegram-webhook'   => [
+                    'telegram-webhook' => [
                         'type'    => 'Segment',
                         'options' => [
                             'route'    => '/telegram/webhook/token/:token',
@@ -1081,7 +1068,7 @@ return [
                             ],
                         ],
                     ],
-                    'timezone'           => [
+                    'timezone'         => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/timezone',
@@ -1102,7 +1089,7 @@ return [
                             ],
                         ],
                     ],
-                    'user'               => [
+                    'user'             => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/user',
@@ -1177,7 +1164,7 @@ return [
                             ],
                         ],
                     ],
-                    'voting'             => [
+                    'voting'           => [
                         'type'          => 'Literal',
                         'options'       => [
                             'route'    => '/voting',
