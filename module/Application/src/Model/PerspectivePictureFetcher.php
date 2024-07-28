@@ -81,6 +81,7 @@ class PerspectivePictureFetcher
                 'dpi_x',
                 'dpi_y',
                 'point',
+                'change_status_user_id',
             ])
             ->join(
                 'picture_item',

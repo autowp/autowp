@@ -341,6 +341,7 @@ class Picture
                 case 'height':
                 case 'image_id':
                 case 'filesize':
+                case 'change_status_user_id':
                 case 'status':
                     if (is_numeric($key)) {
                         $result[] = $column;
@@ -780,8 +781,6 @@ class Picture
         if ($options['limit']) {
             $select->limit($options['limit']);
         }
-
-        //print_r($select->getSqlString($this->table->getAdapter()->getPlatform())); exit;
 
         return $select;
     }
