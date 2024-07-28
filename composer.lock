@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1ab632e73611e4487a923f3f31cf8418",
+    "content-hash": "a70d7a7f82e5a7f07c152f415f70e81a",
     "packages": [
         {
             "name": "autowp/cron",
@@ -54,16 +54,16 @@
         },
         {
             "name": "autowp/image",
-            "version": "v6.1.0",
+            "version": "v6.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/autowp/image.git",
-                "reference": "e0ab852e108038e823d0bf034e1f462ba7e033e7"
+                "reference": "b7a3b77f156951a2400181a02fa7cd4ddb78a0d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/autowp/image/zipball/e0ab852e108038e823d0bf034e1f462ba7e033e7",
-                "reference": "e0ab852e108038e823d0bf034e1f462ba7e033e7",
+                "url": "https://api.github.com/repos/autowp/image/zipball/b7a3b77f156951a2400181a02fa7cd4ddb78a0d2",
+                "reference": "b7a3b77f156951a2400181a02fa7cd4ddb78a0d2",
                 "shasum": ""
             },
             "require": {
@@ -84,8 +84,9 @@
                 "laminas/laminas-test": "^3.4",
                 "php-coveralls/php-coveralls": "^2.0",
                 "phpmd/phpmd": "^2.8",
+                "phpstan/phpstan": "^0.12.64",
                 "phpunit/phpunit": "^9.0",
-                "vimeo/psalm": "^3.16"
+                "vimeo/psalm": "^4.3.2"
             },
             "type": "library",
             "autoload": {
@@ -107,9 +108,9 @@
             "description": "Image services for autowp.ru",
             "support": {
                 "issues": "https://github.com/autowp/image/issues",
-                "source": "https://github.com/autowp/image/tree/v6.1.0"
+                "source": "https://github.com/autowp/image/tree/v6.2.0"
             },
-            "time": "2020-10-11T17:08:31+00:00"
+            "time": "2024-07-28T11:30:17+00:00"
         },
         {
             "name": "autowp/textstorage",
