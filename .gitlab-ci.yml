@@ -17,7 +17,7 @@ build:
 
   before_script:
     - waitforit -address=tcp://docker:2375 -timeout=30
-    - cp /opt/sonar-scanner.zip sonar-scanner.zip
+    #- cp /opt/sonar-scanner.zip sonar-scanner.zip
     - cp /usr/local/bin/waitforit waitforit
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
@@ -36,7 +36,7 @@ build:
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "./vendor/bin/phpstan analyze --no-progress"
     - docker-compose -f docker-compose-test.yml exec -T backend sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./clover.xml"
     #- docker-compose -f docker-compose-test.yml exec -T backend bash -c "./vendor/bin/php-coveralls -v"
-    - docker-compose -f docker-compose-test.yml exec -T backend bash -c "sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN"
+    #- docker-compose -f docker-compose-test.yml exec -T backend bash -c "sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN"
     #- docker-compose -f docker-compose-test.yml exec -T -e CC_TEST_REPORTER_ID="$CC_TEST_REPORTER_ID" backend bash -c "./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml"
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
 
@@ -57,7 +57,7 @@ publish:
     - git config --global user.email "$GITLAB_USER_EMAIL"
     - git config --global user.name "$GITLAB_USER_NAME"
     - waitforit -address=tcp://docker:2375 -timeout=30
-    - cp /opt/sonar-scanner.zip sonar-scanner.zip
+    #- cp /opt/sonar-scanner.zip sonar-scanner.zip
     - cp /usr/local/bin/waitforit waitforit
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
