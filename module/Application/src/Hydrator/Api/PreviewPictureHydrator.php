@@ -22,7 +22,7 @@ class PreviewPictureHydrator extends AbstractRestHydrator
         $strategy = new Strategy\Picture($serviceManager);
         $this->addStrategy('picture', $strategy);
 
-        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
+        $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('thumb', $strategy);
     }
 
