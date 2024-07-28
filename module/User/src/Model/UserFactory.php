@@ -7,8 +7,6 @@ namespace Autowp\User\Model;
 use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-use function defined;
-
 class UserFactory implements FactoryInterface
 {
     /**
@@ -19,10 +17,6 @@ class UserFactory implements FactoryInterface
     public function __invoke(containerinterface $container, $requestedName, ?array $options = null): User
     {
         $tables = $container->get('TableManager');
-        $config = $container->get('Config');
-        return new User(
-            $tables->get('users'),
-            defined('PHPUNIT_COMPOSER_INSTALL') ? 0 : (int) $config['message_interval']
-        );
+        return new User($tables->get('users'));
     }
 }

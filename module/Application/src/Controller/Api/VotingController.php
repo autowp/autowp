@@ -2,14 +2,12 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\VotingVariantVoteHydrator;
 use Autowp\User\Controller\Plugin\User;
 use Autowp\Votings;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
@@ -26,18 +24,9 @@ class VotingController extends AbstractRestfulController
 {
     private Votings\Votings $service;
 
-    private InputFilter $variantVoteInputFilter;
-
-    private VotingVariantVoteHydrator $variantVoteHydrator;
-
-    public function __construct(
-        Votings\Votings $service,
-        InputFilter $variantVoteInputFilter,
-        VotingVariantVoteHydrator $variantVoteHydrator
-    ) {
-        $this->service                = $service;
-        $this->variantVoteInputFilter = $variantVoteInputFilter;
-        $this->variantVoteHydrator    = $variantVoteHydrator;
+    public function __construct(Votings\Votings $service)
+    {
+        $this->service = $service;
     }
 
     /**
@@ -73,24 +62,11 @@ class VotingController extends AbstractRestfulController
      */
     public function getVoteListAction()
     {
-        $this->variantVoteInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->variantVoteInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->variantVoteInputFilter);
-        }
-
-        $values = $this->variantVoteInputFilter->getValues();
-
-        $rows = $this->service->getVotes($this->params('id'));
-
-        $this->variantVoteHydrator->setOptions([
-            'language' => $this->language(),
-            'fields'   => $values['fields'] ?? [],
-        ]);
-
         $result = [];
-        foreach ($rows as $row) {
-            $result[] = $this->variantVoteHydrator->extract($row);
+        foreach ($this->service->getVotes($this->params('id')) as $row) {
+            $result[] = [
+                'user_id' => $row['user_id'],
+            ];
         }
 
         return new JsonModel([
