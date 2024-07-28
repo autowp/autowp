@@ -9,16 +9,14 @@ use Laminas\ServiceManager\Factory\InvokableFactory;
 return [
     'hydrators'   => [
         'factories' => [
-            Hydrator\Api\AttrConflictHydrator::class      => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\AttrUserValueHydrator::class     => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\AttrValueHydrator::class         => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\ItemHydrator::class              => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\ItemParentHydrator::class        => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\PictureHydrator::class           => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\PictureItemHydrator::class       => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\SimilarHydrator::class           => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\UserHydrator::class              => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\VotingVariantVoteHydrator::class => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\AttrConflictHydrator::class  => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\AttrUserValueHydrator::class => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\AttrValueHydrator::class     => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ItemHydrator::class          => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ItemParentHydrator::class    => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\PictureHydrator::class       => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\PictureItemHydrator::class   => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\SimilarHydrator::class       => Hydrator\Api\RestHydrator::class,
         ],
     ],
     'controllers' => [
@@ -1099,15 +1097,6 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'list' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
                             'user' => [
                                 'type'          => 'Segment',
                                 'options'       => [
@@ -1115,15 +1104,6 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'item'  => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'item',
-                                            ],
-                                        ],
-                                    ],
                                     'put'   => [
                                         'type'    => 'Method',
                                         'options' => [

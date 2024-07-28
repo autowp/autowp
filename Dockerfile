@@ -13,7 +13,7 @@ ENV COMPOSER_ALLOW_SUPERUSER="1" \
 
 CMD ["./start.sh"]
 
-COPY sonar-scanner.zip /opt/sonar-scanner.zip
+# COPY sonar-scanner.zip /opt/sonar-scanner.zip
 COPY waitforit /usr/local/bin/waitforit
 
 RUN apt-get autoremove -qq -y && \
@@ -68,13 +68,13 @@ RUN apt-get autoremove -qq -y && \
     \
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
-    php -r "unlink('composer-setup.php');" && \
-    \
+    php -r "unlink('composer-setup.php');"
+    #\
     # mkdir -p /opt && \
     # curl -fSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472.zip -o /opt/sonar-scanner.zip && \
-    unzip /opt/sonar-scanner.zip -d /opt && \
-    rm /opt/sonar-scanner.zip && \
-    ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin/sonar-scanner /usr/bin/sonar-scanner
+    # unzip /opt/sonar-scanner.zip -d /opt && \
+    # rm /opt/sonar-scanner.zip && \
+    # ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin/sonar-scanner /usr/bin/sonar-scanner
     # && \
     #\
     #curl -Ls https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter && \

@@ -3,18 +3,15 @@
 namespace Autowp\User\Model;
 
 use Application\Module;
-use ArrayAccess;
 use ArrayObject;
 use Autowp\Commons\Db\Table\Row;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Request;
-use Laminas\Paginator;
 
 use function array_replace;
 use function array_values;
@@ -23,78 +20,14 @@ use function count;
 use function inet_pton;
 use function is_array;
 use function is_scalar;
-use function max;
 
 class User
 {
-    public const MIN_NAME     = 2;
-    public const MAX_NAME     = 50;
-    public const MIN_PASSWORD = 6;
-    public const MAX_PASSWORD = 50;
-
     private TableGateway $table;
-    private int $messageInterval;
 
-    public function __construct(TableGateway $table, int $messageInterval)
+    public function __construct(TableGateway $table)
     {
-        $this->table           = $table;
-        $this->messageInterval = $messageInterval;
-    }
-
-    public function invalidateSpecsVolume(int $userId): void
-    {
-        $this->table->update([
-            'specs_volume_valid' => 0,
-        ], [
-            'id = ?' => $userId,
-        ]);
-    }
-
-    /**
-     * @param array|ArrayAccess $row
-     * @throws Exception
-     */
-    private function getMessagingInterval($row): int
-    {
-        $date = Row::getDateTimeByColumnType('timestamp', $row['reg_date']);
-
-        if (! $date) {
-            return $this->messageInterval;
-        }
-
-        $tenDaysBefore = (new DateTime())->sub(new DateInterval('P10D'));
-        if ($tenDaysBefore > $date) {
-            return $row['messaging_interval'];
-        }
-
-        return max($row['messaging_interval'], $this->messageInterval);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getNextMessageTime(int $userId): ?DateTime
-    {
-        if ($this->messageInterval <= 0) {
-            return null;
-        }
-
-        $row = currentFromResultSetInterface($this->table->select(['id' => $userId]));
-        if (! $row) {
-            return null;
-        }
-
-        $lastMessageTime = Row::getDateTimeByColumnType('timestamp', $row['last_message_time']);
-
-        if ($lastMessageTime) {
-            $messagingInterval = $this->getMessagingInterval($row);
-            if ($messagingInterval) {
-                $interval = new DateInterval('PT' . $messagingInterval . 'S');
-                return $lastMessageTime->add($interval);
-            }
-        }
-
-        return null;
+        $this->table = $table;
     }
 
     public function getTable(): TableGateway
@@ -224,57 +157,6 @@ class User
         $select = $this->getSelect($options);
 
         return currentFromResultSetInterface($this->table->selectWith($select));
-    }
-
-    /**
-     * @param int|array $options
-     * @throws Exception
-     */
-    public function getRows($options): array
-    {
-        $select = $this->getSelect($options);
-
-        $result = [];
-        foreach ($this->table->selectWith($select) as $row) {
-            $result[] = $row;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getPaginator(array $options): Paginator\Paginator
-    {
-        /** @var Adapter $adapter */
-        $adapter = $this->table->getAdapter();
-        return new Paginator\Paginator(
-            new Paginator\Adapter\LaminasDb\DbSelect($this->getSelect($options), $adapter)
-        );
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getCount(array $options): int
-    {
-        return $this->getPaginator($options)->getTotalItemCount();
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function isExists(array $options): bool
-    {
-        $select = $this->getSelect($options);
-        $select->reset($select::COLUMNS);
-        $select->reset($select::ORDER);
-        $select->reset($select::GROUP);
-        $select->columns(['id']);
-        $select->limit(1);
-
-        return (bool) currentFromResultSetInterface($this->table->selectWith($select));
     }
 
     /**

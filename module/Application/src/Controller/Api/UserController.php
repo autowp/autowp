@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\AbstractRestHydrator;
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
@@ -18,14 +17,11 @@ use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\Validator\InArray;
-use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
 use function array_key_exists;
 use function array_keys;
-use function get_object_vars;
 use function in_array;
-use function is_array;
 use function sprintf;
 
 /**
@@ -38,12 +34,6 @@ use function sprintf;
  */
 class UserController extends AbstractRestfulController
 {
-    private AbstractRestHydrator $hydrator;
-
-    private InputFilter $itemInputFilter;
-
-    private InputFilter $listInputFilter;
-
     private InputFilter $putInputFilter;
 
     private User $userModel;
@@ -56,121 +46,17 @@ class UserController extends AbstractRestfulController
     private Storage $imageStorage;
 
     public function __construct(
-        AbstractRestHydrator $hydrator,
-        InputFilter $itemInputFilter,
-        InputFilter $listInputFilter,
         InputFilter $putInputFilter,
         InputFilter $postPhotoInputFilter,
         User $userModel,
         array $hosts,
         Storage $imageStorage
     ) {
-        $this->hydrator             = $hydrator;
-        $this->itemInputFilter      = $itemInputFilter;
-        $this->listInputFilter      = $listInputFilter;
         $this->putInputFilter       = $putInputFilter;
         $this->postPhotoInputFilter = $postPhotoInputFilter;
         $this->userModel            = $userModel;
         $this->hosts                = $hosts;
         $this->imageStorage         = $imageStorage;
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function indexAction()
-    {
-        $user = $this->user()->get();
-
-        $this->listInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->listInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->listInputFilter);
-        }
-
-        $data = $this->listInputFilter->getValues();
-
-        $filter = [
-            'not_deleted' => true,
-        ];
-
-        $search = $data['search'];
-        if ($search) {
-            $filter['search'] = $search . '%';
-        }
-
-        if ($data['id']) {
-            $filter['id'] = is_array($data['id']) ? $data['id'] : (int) $data['id'];
-        }
-
-        if ($data['identity']) {
-            $filter['identity'] = $data['identity'];
-        }
-
-        $paginator = $this->userModel->getPaginator($filter);
-
-        $limit = $data['limit'] ?: 1;
-
-        $paginator
-            ->setItemCountPerPage($limit)
-            ->setCurrentPageNumber($data['page']);
-
-        $this->hydrator->setOptions([
-            'language' => $this->language(),
-            'fields'   => $data['fields'],
-            'user_id'  => $user ? $user['id'] : null,
-        ]);
-
-        $items = [];
-        foreach ($paginator->getCurrentItems() as $row) {
-            $items[] = $this->hydrator->extract($row);
-        }
-
-        return new JsonModel([
-            'paginator' => get_object_vars($paginator->getPages()),
-            'items'     => $items,
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function itemAction()
-    {
-        $this->itemInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->itemInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->itemInputFilter);
-        }
-
-        $data = $this->itemInputFilter->getValues();
-
-        $user = $this->user()->get();
-
-        $id = $this->params('id');
-
-        if ($id === 'me') {
-            if (! $user) {
-                return new ApiProblemResponse(new ApiProblem(401, 'Not authorized'));
-            }
-            $id = $user['id'];
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $row = $this->userModel->getRow((int) $id);
-        if (! $row) {
-            return $this->notFoundAction();
-        }
-
-        $this->hydrator->setOptions([
-            'language' => $this->language(),
-            'fields'   => $data['fields'],
-            'user_id'  => $user ? $user['id'] : null,
-        ]);
-
-        return new JsonModel($this->hydrator->extract($row));
     }
 
     /**

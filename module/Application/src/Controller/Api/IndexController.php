@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Hydrator\Api\ItemHydrator;
 use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
@@ -33,11 +32,7 @@ class IndexController extends AbstractRestfulController
 
     private SpecificationsService $specsService;
 
-    private User $userModel;
-
     private ItemHydrator $itemHydrator;
-
-    private AbstractRestHydrator $userHydrator;
 
     private CarOfDay $itemOfDay;
 
@@ -47,20 +42,16 @@ class IndexController extends AbstractRestfulController
         StorageInterface $cache,
         Item $item,
         SpecificationsService $specsService,
-        User $userModel,
         CarOfDay $itemOfDay,
         Catalogue $catalogue,
-        ItemHydrator $itemHydrator,
-        AbstractRestHydrator $userHydrator
+        ItemHydrator $itemHydrator
     ) {
         $this->cache        = $cache;
         $this->item         = $item;
         $this->specsService = $specsService;
-        $this->userModel    = $userModel;
         $this->itemOfDay    = $itemOfDay;
         $this->catalogue    = $catalogue;
         $this->itemHydrator = $itemHydrator;
-        $this->userHydrator = $userHydrator;
     }
 
     /**
@@ -126,26 +117,12 @@ class IndexController extends AbstractRestfulController
             ],
         ]);
 
-        $this->userHydrator->setOptions([
-            'language' => $language,
-            'fields'   => [],
-            'user_id'  => $user ? $user['id'] : null,
-        ]);
-
         $items = [];
         foreach ($cars as $row) {
             $extracted                 = $this->itemHydrator->extract($row);
-            $extracted['contributors'] = [];
             $contribPairs              = $this->specsService->getContributors($row['id']);
-            if ($contribPairs) {
-                $contributors = $this->userModel->getRows([
-                    'id' => array_keys($contribPairs),
-                    'not_deleted',
-                ]);
-                foreach ($contributors as $contributor) {
-                    $extracted['contributors'][] = $this->userHydrator->extract($contributor);
-                }
-            }
+            $extracted['contributors'] = array_keys($contribPairs);
+
             $items[] = $extracted;
         }
 

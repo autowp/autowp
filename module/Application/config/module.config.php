@@ -220,9 +220,6 @@ return [
             Validator\Attr\UnitId::class                 => Validator\Attr\UnitIdFactory::class,
             Validator\Item\CatnameNotExists::class       => Validator\Item\CatnameNotExistsFactory::class,
             Validator\ItemParent\CatnameNotExists::class => Validator\ItemParent\CatnameNotExistsFactory::class,
-            Validator\User\EmailExists::class            => Validator\User\EmailExistsFactory::class,
-            Validator\User\EmailNotExists::class         => Validator\User\EmailNotExistsFactory::class,
-            Validator\User\Login::class                  => Validator\User\LoginFactory::class,
             Validator\DateString::class                  => InvokableFactory::class,
         ],
     ],
@@ -262,7 +259,7 @@ return [
     ],
     'fileStorage'              => [
         's3'          => [
-            'region'                  => '',
+            'region'                  => 'us-east-1',
             'version'                 => 'latest',
             'endpoint'                => 'http://minio:9000',
             'credentials'             => [

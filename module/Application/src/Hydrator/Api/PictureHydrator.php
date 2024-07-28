@@ -106,17 +106,12 @@ class PictureHydrator extends AbstractRestHydrator
 
         $this->linksTable = $serviceManager->get('TableManager')->get('links');
 
-        $strategy = new Strategy\Image($serviceManager); // @phpstan-ignore-line
+        $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('image', $strategy);
         $this->addStrategy('thumb', $strategy);
         $this->addStrategy('thumb_medium', $strategy);
         $this->addStrategy('image_gallery_full', $strategy);
         $this->addStrategy('preview_large', $strategy);
-
-        $strategy = new Strategy\User($serviceManager);
-        $this->addStrategy('owner', $strategy);
-        $this->addStrategy('change_status_user', $strategy);
-        $this->addStrategy('moder_vote_user', $strategy);
 
         $strategy = new DateTimeFormatterStrategy();
         $this->addStrategy('add_date', $strategy);
@@ -285,19 +280,20 @@ class PictureHydrator extends AbstractRestHydrator
         $addDate = Row::getDateTimeByColumnType('timestamp', $object['add_date']);
 
         $picture = [
-            'id'         => (int) $object['id'],
-            'identity'   => (string) $object['identity'],
-            'url'        => '/picture/' . urlencode($object['identity']),
-            'resolution' => (int) $object['width'] . '×' . (int) $object['height'],
-            'status'     => $object['status'],
-            'owner_id'   => $object['owner_id'] ? (int) $object['owner_id'] : null,
-            'width'      => (int) $object['width'],
-            'height'     => (int) $object['height'],
-            'filesize'   => (int) $object['filesize'],
-            'add_date'   => $this->extractValue('add_date', $addDate),
-            'dpi_x'      => $object['dpi_x'],
-            'dpi_y'      => $object['dpi_y'],
-            'point'      => null,
+            'id'                    => (int) $object['id'],
+            'identity'              => (string) $object['identity'],
+            'url'                   => '/picture/' . urlencode($object['identity']),
+            'resolution'            => (int) $object['width'] . '×' . (int) $object['height'],
+            'status'                => $object['status'],
+            'owner_id'              => $object['owner_id'],
+            'width'                 => (int) $object['width'],
+            'height'                => (int) $object['height'],
+            'filesize'              => (int) $object['filesize'],
+            'add_date'              => $this->extractValue('add_date', $addDate),
+            'dpi_x'                 => $object['dpi_x'],
+            'dpi_y'                 => $object['dpi_y'],
+            'point'                 => null,
+            'change_status_user_id' => $object['change_status_user_id'],
         ];
 
         if ($object['point']) {
@@ -549,15 +545,6 @@ class PictureHydrator extends AbstractRestHydrator
             $picture['name_text'] = $this->pictureNameFormatter->format($nameData, $this->language);
         }
 
-        if ($this->filterComposite->filter('owner')) {
-            $owner = null;
-            if ($object['owner_id']) {
-                $owner = $this->userModel->getRow((int) $object['owner_id']);
-            }
-
-            $picture['owner'] = $owner ? $this->extractValue('owner', $owner) : null;
-        }
-
         if ($this->filterComposite->filter('thumb')) {
             $picture['thumb'] = $this->extractValue('thumb', [
                 'image'  => $object['image_id'],
@@ -659,11 +646,10 @@ class PictureHydrator extends AbstractRestHydrator
         if ($this->filterComposite->filter('moder_votes')) {
             $moderVotes = [];
             foreach ($this->pictureModerVote->getVotes($object['id']) as $row) {
-                $user         = $this->userModel->getRow((int) $row['user_id']);
                 $moderVotes[] = [
-                    'reason' => $row['reason'],
-                    'vote'   => (int) $row['vote'],
-                    'user'   => $user ? $this->extractValue('moder_vote_user', $user) : null,
+                    'reason'  => $row['reason'],
+                    'vote'    => (int) $row['vote'],
+                    'user_id' => $row['user_id'],
                 ];
             }
             $picture['moder_votes'] = $moderVotes;
@@ -771,11 +757,6 @@ class PictureHydrator extends AbstractRestHydrator
                 if ($similar) {
                     $picture['similar'] = $this->extractValue('similar', $similar);
                 }
-            }
-
-            if ($this->filterComposite->filter('change_status_user')) {
-                $user                          = $this->userModel->getRow((int) $object['change_status_user_id']);
-                $picture['change_status_user'] = $user ? $this->extractValue('change_status_user', $user) : null;
             }
 
             if ($this->filterComposite->filter('rights')) {

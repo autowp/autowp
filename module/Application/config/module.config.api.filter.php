@@ -1127,27 +1127,6 @@ return [
                 ],
             ],
         ],
-        'api_login'                            => [
-            'login'    => [
-                'required'   => true,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => null,
-                            'max' => 50,
-                        ],
-                    ],
-                    ['name' => Validator\User\Login::class],
-                ],
-            ],
-            'password' => [
-                'required' => true,
-            ],
-        ],
         'api_message_list'                     => [
             'user_id' => [
                 'required'   => false,
@@ -2154,126 +2133,6 @@ return [
                 ],
             ],
         ],
-        'api_user_item'                        => [
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name'    => Filter\Api\FieldsFilter::class,
-                        'options' => [
-                            'fields' => [
-                                'last_online',
-                                'reg_date',
-                                'image',
-                                'email',
-                                'login',
-                                'avatar',
-                                'photo',
-                                'gravatar',
-                                'is_moder',
-                                'accounts',
-                                'pictures_added',
-                                'pictures_accepted_count',
-                                'last_ip',
-                                'timezone',
-                                'language',
-                                'votes_per_day',
-                                'votes_left',
-                                'img',
-                                'specs_weight',
-                                'identity',
-                                'gravatar_hash',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ],
-        'api_user_list'                        => [
-            'limit'    => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'Between',
-                        'options' => [
-                            'min' => 1,
-                            'max' => 500,
-                        ],
-                    ],
-                ],
-            ],
-            'page'     => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'GreaterThan',
-                        'options' => [
-                            'min'       => 1,
-                            'inclusive' => true,
-                        ],
-                    ],
-                ],
-            ],
-            'search'   => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'id'       => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'identity' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'fields'   => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name'    => Filter\Api\FieldsFilter::class,
-                        'options' => [
-                            'fields' => [
-                                'last_online',
-                                'reg_date',
-                                'image',
-                                'email',
-                                'login',
-                                'avatar',
-                                'photo',
-                                'gravatar',
-                                'is_moder',
-                                'accounts',
-                                'pictures_added',
-                                'pictures_accepted_count',
-                                'last_ip',
-                                'timezone',
-                                'language',
-                                'votes_per_day',
-                                'votes_left',
-                                'img',
-                                'specs_weight',
-                                'identity',
-                                'gravatar_hash',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ],
         'api_user_put'                         => [
             'language' => [
                 'required'   => true,
@@ -2335,17 +2194,6 @@ return [
                             'minWidth'  => 100,
                             'minHeight' => 100,
                         ],
-                    ],
-                ],
-            ],
-        ],
-        'api_voting_variant_vote_get'          => [
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name'    => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['user']],
                     ],
                 ],
             ],

@@ -6,7 +6,6 @@ use Application\Model\Item;
 use Application\Module;
 use Application\Service\SpecificationsService;
 use ArrayAccess;
-use Autowp\User\Model\User;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
@@ -24,8 +23,6 @@ class AttrUserValueHydrator extends AbstractRestHydrator
 {
     private Item $item;
 
-    private User $userModel;
-
     private SpecificationsService $specService;
 
     public function __construct(ServiceLocatorInterface $serviceManager)
@@ -33,11 +30,7 @@ class AttrUserValueHydrator extends AbstractRestHydrator
         parent::__construct();
 
         $this->item        = $serviceManager->get(Item::class);
-        $this->userModel   = $serviceManager->get(User::class);
         $this->specService = $serviceManager->get(SpecificationsService::class);
-
-        $strategy = new Strategy\User($serviceManager);
-        $this->addStrategy('user', $strategy);
 
         $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('item', $strategy);
@@ -71,10 +64,6 @@ class AttrUserValueHydrator extends AbstractRestHydrator
      */
     public function setUserId($userId = null): self
     {
-        /** @var Strategy\User $strategy */
-        $strategy = $this->getStrategy('user');
-        $strategy->setUserId($userId);
-
         /** @var Strategy\Item $strategy */
         $strategy = $this->getStrategy('item');
         $strategy->setUserId($userId);
@@ -98,7 +87,7 @@ class AttrUserValueHydrator extends AbstractRestHydrator
             'update_date'  => $updateDate ? $updateDate->format(DateTimeInterface::ISO8601) : null,
             'item_id'      => (int) $object['item_id'],
             'attribute_id' => (int) $object['attribute_id'],
-            'user_id'      => (int) $object['user_id'],
+            'user_id'      => $object['user_id'],
         ];
 
         if ($this->filterComposite->filter('value')) {
@@ -141,18 +130,6 @@ class AttrUserValueHydrator extends AbstractRestHydrator
             }
 
             $result['path'] = $path;
-        }
-
-        if ($this->filterComposite->filter('user')) {
-            $user = null;
-            if ($object['user_id']) {
-                $userRow = $this->userModel->getRow((int) $object['user_id']);
-                if ($userRow) {
-                    $user = $this->extractValue('user', $userRow);
-                }
-            }
-
-            $result['user'] = $user;
         }
 
         if ($this->filterComposite->filter('item')) {

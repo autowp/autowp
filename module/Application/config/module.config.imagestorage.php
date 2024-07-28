@@ -145,7 +145,7 @@ return [
             ],
         ],
         's3'                     => [
-            'region'                  => '',
+            'region'                  => 'us-east-1',
             'version'                 => 'latest',
             'endpoint'                => 'http://minio:9000',
             'credentials'             => [
