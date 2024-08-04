@@ -64,20 +64,4 @@ class DuplicateFinder
             'distance'   => $row['distance'],
         ];
     }
-
-    public function hideSimilar(int $srcId, int $dstId): void
-    {
-        $this->distanceTable->update([
-            'hide' => 1,
-        ], [
-            'src_picture_id' => $srcId,
-            'dst_picture_id' => $dstId,
-        ]);
-        $this->distanceTable->update([
-            'hide' => 1,
-        ], [
-            'src_picture_id' => $dstId,
-            'dst_picture_id' => $srcId,
-        ]);
-    }
 }

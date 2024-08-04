@@ -857,24 +857,6 @@ return [
                                             ],
                                         ],
                                     ],
-                                    'normalize'          => [
-                                        'type'    => 'Literal',
-                                        'options' => [
-                                            'route'    => '/normalize',
-                                            'defaults' => [
-                                                'action' => 'normalize',
-                                            ],
-                                        ],
-                                    ],
-                                    'flop'               => [
-                                        'type'    => 'Literal',
-                                        'options' => [
-                                            'route'    => '/flop',
-                                            'defaults' => [
-                                                'action' => 'flop',
-                                            ],
-                                        ],
-                                    ],
                                     'repair'             => [
                                         'type'    => 'Literal',
                                         'options' => [
@@ -890,27 +872,6 @@ return [
                                             'route'    => '/correct-file-names',
                                             'defaults' => [
                                                 'action' => 'correct-file-names',
-                                            ],
-                                        ],
-                                    ],
-                                    'similar'            => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route'       => '/similar/:similar_picture_id',
-                                            'constraints' => [
-                                                'similar_picture_id' => '[0-9]+',
-                                            ],
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'delete' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'delete',
-                                                    'defaults' => [
-                                                        'action' => 'delete-similar',
-                                                    ],
-                                                ],
                                             ],
                                         ],
                                     ],
@@ -976,15 +937,6 @@ return [
                                     'route'    => '/car-of-day-picture',
                                     'defaults' => [
                                         'action' => 'car-of-day-picture',
-                                    ],
-                                ],
-                            ],
-                            'user-summary'       => [
-                                'type'    => 'Literal',
-                                'options' => [
-                                    'route'    => '/user-summary',
-                                    'defaults' => [
-                                        'action' => 'user-summary',
                                     ],
                                 ],
                             ],

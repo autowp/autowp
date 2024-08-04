@@ -4,7 +4,6 @@ namespace Application\Controller\Api;
 
 use Application\Comments;
 use Application\Controller\Plugin\Pic;
-use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Model\CarOfDay;
@@ -73,8 +72,6 @@ class PictureController extends AbstractRestfulController
 
     private PictureItem $pictureItem;
 
-    private DuplicateFinder $duplicateFinder;
-
     private UserPicture $userPicture;
 
     private HostManager $hostManager;
@@ -114,7 +111,6 @@ class PictureController extends AbstractRestfulController
     public function __construct(
         AbstractRestHydrator $hydrator,
         PictureItem $pictureItem,
-        DuplicateFinder $duplicateFinder,
         UserPicture $userPicture,
         HostManager $hostManager,
         TelegramService $telegram,
@@ -139,7 +135,6 @@ class PictureController extends AbstractRestfulController
 
         $this->hydrator              = $hydrator;
         $this->pictureItem           = $pictureItem;
-        $this->duplicateFinder       = $duplicateFinder;
         $this->userPicture           = $userPicture;
         $this->hostManager           = $hostManager;
         $this->telegram              = $telegram;
@@ -1119,88 +1114,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     * @throws Storage\Exception
-     */
-    public function normalizeAction()
-    {
-        if (! $this->user()->enforce('global', 'moderate')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $id  = (int) $this->params('id');
-        $row = $this->picture->getRow(['id' => $id]);
-        if (! $row) {
-            return $this->notFoundAction();
-        }
-
-        $canNormalize = $row['status'] === Picture::STATUS_INBOX
-                     && $this->user()->enforce('picture', 'normalize');
-
-        if (! $canNormalize) {
-            return $this->forbiddenAction();
-        }
-
-        if ($row['image_id']) {
-            $this->imageStorage->normalize($row['image_id']);
-        }
-
-        $this->log(sprintf(
-            'К картинке %s применён normalize',
-            htmlspecialchars($this->pic()->name($row, $this->language()))
-        ), [
-            'pictures' => $row['id'],
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     * @throws Storage\Exception
-     */
-    public function flopAction()
-    {
-        if (! $this->user()->enforce('global', 'moderate')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $id  = (int) $this->params('id');
-        $row = $this->picture->getRow(['id' => $id]);
-        if (! $row) {
-            return $this->notFoundAction();
-        }
-
-        $canFlop = $row['status'] === Picture::STATUS_INBOX
-                && $this->user()->enforce('picture', 'flop');
-
-        if (! $canFlop) {
-            return $this->forbiddenAction();
-        }
-
-        if ($row['image_id']) {
-            $this->imageStorage->flop($row['image_id']);
-        }
-
-        $this->log(sprintf(
-            'К картинке %s применён flop',
-            htmlspecialchars($this->pic()->name($row, $this->language()))
-        ), [
-            'pictures' => $row['id'],
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
      * @throws Exception
      * @return ViewModel|ResponseInterface|array
      */
@@ -1255,34 +1168,6 @@ class PictureController extends AbstractRestfulController
         /** @var Response $response */
         $response = $this->getResponse();
         return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
-     * @throws Exception
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function deleteSimilarAction()
-    {
-        /** @psalm-suppress InvalidCast */
-        $id         = (int) $this->params('id');
-        $srcPicture = $this->picture->getRow(['id' => $id]);
-        /** @psalm-suppress InvalidCast */
-        $similarPictureId = (int) $this->params('similar_picture_id');
-        $dstPicture       = $this->picture->getRow(['id' => $similarPictureId]);
-
-        if (! $srcPicture || ! $dstPicture) {
-            return $this->notFoundAction();
-        }
-
-        $this->duplicateFinder->hideSimilar($srcPicture['id'], $dstPicture['id']);
-
-        $this->log('Отменёно предупреждение о повторе', [
-            'pictures' => [$srcPicture['id'], $dstPicture['id']],
-        ]);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_204);
     }
 
     /**
@@ -1437,32 +1322,5 @@ class PictureController extends AbstractRestfulController
         /** @var Response $response */
         $response = $this->getResponse();
         return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function userSummaryAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        $acceptedCount = $this->picture->getCount([
-            'status' => Picture::STATUS_ACCEPTED,
-            'user'   => $user['id'],
-        ]);
-
-        $inboxCount = $this->picture->getCount([
-            'status' => Picture::STATUS_INBOX,
-            'user'   => $user['id'],
-        ]);
-
-        return new JsonModel([
-            'inboxCount'    => $inboxCount,
-            'acceptedCount' => $acceptedCount,
-        ]);
     }
 }

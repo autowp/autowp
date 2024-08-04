@@ -129,7 +129,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   goautowp-serve-public:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.2.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.15.0
     container_name: autowp_test_goautowp_serve_public
     restart: always
     command: serve-public
@@ -145,7 +145,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-serve-grpc:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.2.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.15.0
     container_name: autowp_test_goautowp_serve_grpc
     restart: always
     command: serve-grpc
@@ -161,7 +161,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-serve-private:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.2.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.15.0
     container_name: autowp_test_goautowp_serve_private
     restart: always
     command: serve-private
@@ -177,7 +177,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-listen-df-amqp:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.2.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.15.0
     container_name: autowp_test_goautowp_listen_df_amqp
     restart: always
     command: listen-df-amqp
@@ -193,7 +193,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-listen-monitoring-amqp:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.2.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.15.0
     container_name: autowp_test_goautowp_listen_monitoring_amqp
     restart: always
     command: listen-monitoring-amqp
@@ -209,7 +209,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   goautowp-autoban:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.2.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.15.0
     container_name: autowp_test_goautowp_autoban
     restart: always
     command: autoban

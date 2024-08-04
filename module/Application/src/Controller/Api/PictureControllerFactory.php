@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Application\Controller\Api;
 
-use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Hydrator\Api\PictureHydrator;
 use Application\Model\CarOfDay;
@@ -38,7 +37,6 @@ class PictureControllerFactory implements FactoryInterface
         return new PictureController(
             $hydrators->get(PictureHydrator::class),
             $container->get(PictureItem::class),
-            $container->get(DuplicateFinder::class),
             $container->get(UserPicture::class),
             $container->get(HostManager::class),
             $container->get(TelegramService::class),
