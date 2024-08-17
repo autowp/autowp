@@ -866,15 +866,6 @@ class Item
 
         $select->join([$alias => 'item_parent'], $id . ' = ' . $alias . '.item_id', $columns);
 
-        if (isset($options['linked_in_days']) && $options['linked_in_days']) {
-            $select->where([
-                new Sql\Predicate\Expression(
-                    $alias . '.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)',
-                    [$options['linked_in_days']]
-                ),
-            ]);
-        }
-
         if (isset($options['link_catname']) && $options['link_catname']) {
             $select->where([$alias . '.catname' => $options['link_catname']]);
         }
@@ -1044,7 +1035,6 @@ class Item
             'parent'             => null,
             'child'              => null,
             'has_specs_of_user'  => null,
-            'linked_in_days'     => null,
             'catname'            => null,
             'language'           => null,
         ];
@@ -1298,7 +1288,6 @@ class Item
             'exclude_id'           => null,
             'limit'                => null,
             'order'                => null,
-            'created_in_days'      => null,
             'engine_id'            => null,
             'dateless'             => null,
             'dateful'              => null,
@@ -1446,15 +1435,6 @@ class Item
 
         if ($options['limit']) {
             $select->limit($options['limit']);
-        }
-
-        if ($options['created_in_days']) {
-            $select->where([
-                new Sql\Predicate\Expression(
-                    'item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)',
-                    [$options['created_in_days']]
-                ),
-            ]);
         }
 
         if ($options['engine_id']) {

@@ -2151,45 +2151,4 @@ class ItemController extends AbstractRestfulController
 
         return $viewModel->setTerminal(true);
     }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
-    public function newItemsAction()
-    {
-        /** @psalm-suppress InvalidCast */
-        $category = $this->itemModel->getRow([
-            'item_type_id' => Item::CATEGORY,
-            'id'           => (int) $this->params('id'),
-        ]);
-        if (! $category) {
-            return $this->notFoundAction();
-        }
-
-        $language = $this->language();
-
-        $rows = $this->itemModel->getRows([
-            'item_type_id' => [Item::VEHICLE, Item::ENGINE],
-            'order'        => new Sql\Expression('MAX(ip1.timestamp) DESC'),
-            'parent'       => [
-                'item_type_id'     => [Item::CATEGORY, Item::FACTORY],
-                'ancestor_or_self' => $category['id'],
-                'linked_in_days'   => Categories::NEW_DAYS,
-            ],
-            'limit'        => 20,
-        ]);
-
-        $items = [];
-        foreach ($rows as $row) {
-            $items[] = $this->itemModel->getNameData($row, $language);
-        }
-
-        $viewModel = new ViewModel([
-            'items' => $items,
-        ]);
-        $viewModel->setTerminal(true);
-
-        return $viewModel;
-    }
 }

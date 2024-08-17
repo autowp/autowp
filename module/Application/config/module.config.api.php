@@ -280,7 +280,7 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'sections'  => [
+                                    'sections' => [
                                         'type'          => 'Literal',
                                         'options'       => [
                                             'route' => '/sections',
@@ -293,24 +293,6 @@ return [
                                                     'verb'     => 'get',
                                                     'defaults' => [
                                                         'action' => 'sections',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                    'new-items' => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/new-items',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'get' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'get',
-                                                    'defaults' => [
-                                                        'action' => 'new-items',
                                                     ],
                                                 ],
                                             ],
@@ -656,24 +638,6 @@ return [
                                             ],
                                         ],
                                     ],
-                                    'new-items'            => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/new-items',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'get' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'get',
-                                                    'defaults' => [
-                                                        'action' => 'new-items',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
                                 ],
                             ],
                         ],
@@ -854,15 +818,6 @@ return [
                                             'route'    => '/accept-replace',
                                             'defaults' => [
                                                 'action' => 'accept-replace',
-                                            ],
-                                        ],
-                                    ],
-                                    'repair'             => [
-                                        'type'    => 'Literal',
-                                        'options' => [
-                                            'route'    => '/repair',
-                                            'defaults' => [
-                                                'action' => 'repair',
                                             ],
                                         ],
                                     ],

@@ -1114,34 +1114,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @throws Exception
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function repairAction()
-    {
-        if (! $this->user()->enforce('global', 'moderate')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $id  = (int) $this->params('id');
-        $row = $this->picture->getRow(['id' => $id]);
-        if (! $row) {
-            return $this->notFoundAction();
-        }
-
-        if ($row['image_id']) {
-            $this->imageStorage->flush([
-                'image' => $row['image_id'],
-            ]);
-        }
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
      * @return ViewModel|ResponseInterface|array
      * @throws Exception
      * @throws Storage\Exception
