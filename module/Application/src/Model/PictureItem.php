@@ -345,25 +345,6 @@ class PictureItem
                 $perspective           = $properties['perspective'];
                 $set['perspective_id'] = $perspective ? (int) $perspective : null;
             }
-
-            if (array_key_exists('area', $properties)) {
-                $area = $properties['area'];
-                if ($area) {
-                    $set = array_replace($set, [
-                        'crop_left'   => $area['left'],
-                        'crop_top'    => $area['top'],
-                        'crop_width'  => $area['width'],
-                        'crop_height' => $area['height'],
-                    ]);
-                } else {
-                    $set = array_replace($set, [
-                        'crop_left'   => null,
-                        'crop_top'    => null,
-                        'crop_width'  => null,
-                        'crop_height' => null,
-                    ]);
-                }
-            }
         }
 
         if ($set) {

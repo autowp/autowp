@@ -8,7 +8,6 @@ use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
-use ArrayAccess;
 use Autowp\Image\Storage;
 use Autowp\User\Controller\Plugin\User;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
@@ -22,12 +21,8 @@ use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
-use function array_key_exists;
 use function get_object_vars;
 use function htmlspecialchars;
-use function max;
-use function min;
-use function round;
 use function sprintf;
 
 /**
@@ -74,29 +69,6 @@ class PictureItemController extends AbstractRestfulController
         $this->item            = $item;
         $this->picture         = $picture;
         $this->imageStorage    = $imageStorage;
-    }
-
-    /**
-     * @param array|ArrayAccess $picture
-     */
-    private function canChangePerspective($picture): bool
-    {
-        if ($this->user()->enforce('global', 'moderate')) {
-            return true;
-        }
-
-        $currentUser = $this->user()->get();
-        if (! $currentUser) {
-            return false;
-        }
-
-        if ((int) $picture['owner_id'] === (int) $currentUser['id']) {
-            if ($picture['status'] === Picture::STATUS_INBOX) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -350,79 +322,16 @@ class PictureItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if (! $this->canChangePerspective($picture)) {
+        if (! $this->user()->enforce('global', 'moderate')) {
+            return $this->forbiddenAction();
+        }
+
+        $currentUser = $this->user()->get();
+        if (! $currentUser) {
             return $this->forbiddenAction();
         }
 
         $data = $this->processBodyContent($this->getRequest());
-
-        if (array_key_exists('perspective_id', $data)) {
-            $perspectiveId = (int) $data['perspective_id'];
-
-            $this->pictureItem->setProperties($picture['id'], $itemId, $type, [
-                'perspective' => $perspectiveId ? $perspectiveId : null,
-            ]);
-
-            $this->log(sprintf(
-                'Установка ракурса картинки %s',
-                htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), [
-                'pictures' => $picture['id'],
-            ]);
-        }
-
-        if (isset($data['area'])) {
-            if (! $this->user()->enforce('global', 'moderate')) {
-                return $this->forbiddenAction();
-            }
-
-            $item = $this->item->getRow(['id' => $itemId]);
-            if (! $item) {
-                return $this->notFoundAction();
-            }
-
-            $left   = round($data['area']['left']);
-            $top    = round($data['area']['top']);
-            $width  = round($data['area']['width']);
-            $height = round($data['area']['height']);
-
-            $left  = max(0, $left);
-            $left  = min($picture['width'], $left);
-            $width = max(1, $width);
-            $width = min($picture['width'], $width);
-
-            $top    = max(0, $top);
-            $top    = min($picture['height'], $top);
-            $height = max(1, $height);
-            $height = min($picture['height'], $height);
-
-            if ($left > 0 || $top > 0 || $width < $picture['width'] || $height < $picture['height']) {
-                $area = [
-                    'left'   => $left,
-                    'top'    => $top,
-                    'width'  => $width,
-                    'height' => $height,
-                ];
-            } else {
-                $area = [
-                    'left'   => null,
-                    'top'    => null,
-                    'width'  => null,
-                    'height' => null,
-                ];
-            }
-            $this->pictureItem->setProperties($picture['id'], $item['id'], $type, [
-                'area' => $area,
-            ]);
-
-            $this->log(sprintf(
-                'Выделение области на картинке %s',
-                htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), [
-                'pictures' => $picture['id'],
-                'items'    => $item['id'],
-            ]);
-        }
 
         if (isset($data['item_id'])) {
             $canMove = $this->user()->enforce('picture', 'move');
