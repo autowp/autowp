@@ -93,64 +93,6 @@ class PictureItem
     /**
      * @throws Exception
      */
-    public function remove(int $pictureId, int $itemId, int $type): void
-    {
-        if (! $pictureId) {
-            throw new InvalidArgumentException("Picture id is invalid");
-        }
-
-        if (! $itemId) {
-            throw new InvalidArgumentException("Item id is invalid");
-        }
-
-        $this->table->delete([
-            'picture_id = ?' => $pictureId,
-            'item_id = ?'    => $itemId,
-            'type'           => $type,
-        ]);
-
-        $this->updateContentCount($pictureId);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function isExists(int $pictureId, int $itemId, int $type): bool
-    {
-        return (bool) $this->getRow($pictureId, $itemId, $type);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function changePictureItem(int $pictureId, int $type, int $oldItemId, int $newItemId): void
-    {
-        if (! $newItemId) {
-            throw new InvalidArgumentException("Item id is invalid");
-        }
-
-        $row = $this->getRow($pictureId, $oldItemId, $type);
-
-        if (! $row) {
-            throw new Exception("Item not found");
-        }
-
-        if (! $this->isAllowedTypeByItemId($newItemId, $type)) {
-            throw new InvalidArgumentException("Combination not allowed");
-        }
-
-        $this->table->update([
-            'item_id' => $newItemId,
-        ], [
-            'type'           => $type,
-            'picture_id = ?' => $pictureId,
-            'item_id = ?'    => $oldItemId,
-        ]);
-    }
-
-    /**
-     * @throws Exception
-     */
     public function setPictureItems(int $pictureId, int $type, array $itemIds): void
     {
         if (! $pictureId) {

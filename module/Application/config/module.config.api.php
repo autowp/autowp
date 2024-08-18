@@ -923,39 +923,12 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'item'   => [
+                                    'item' => [
                                         'type'    => 'Method',
                                         'options' => [
                                             'verb'     => 'get',
                                             'defaults' => [
                                                 'action' => 'item',
-                                            ],
-                                        ],
-                                    ],
-                                    'create' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'create',
-                                            ],
-                                        ],
-                                    ],
-                                    'update' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'put',
-                                            'defaults' => [
-                                                'action' => 'update',
-                                            ],
-                                        ],
-                                    ],
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'delete',
                                             ],
                                         ],
                                     ],
