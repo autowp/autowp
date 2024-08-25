@@ -38,7 +38,6 @@ use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
-use function array_key_exists;
 use function array_keys;
 use function array_merge;
 use function array_replace;
@@ -48,9 +47,6 @@ use function get_object_vars;
 use function htmlspecialchars;
 use function implode;
 use function in_array;
-use function max;
-use function min;
-use function round;
 use function sprintf;
 use function strlen;
 use function urlencode;
@@ -732,22 +728,6 @@ class PictureController extends AbstractRestfulController
         $set = [];
 
         if ($isModer) {
-            if (array_key_exists('taken_year', $data)) {
-                $set['taken_year'] = $data['taken_year'];
-            }
-
-            if (array_key_exists('taken_month', $data)) {
-                $set['taken_month'] = $data['taken_month'];
-            }
-
-            if (array_key_exists('taken_day', $data)) {
-                $set['taken_day'] = $data['taken_day'];
-            }
-
-            if (isset($data['special_name'])) {
-                $set['name'] = $data['special_name'];
-            }
-
             if (isset($data['copyrights'])) {
                 $text = $data['copyrights'];
 

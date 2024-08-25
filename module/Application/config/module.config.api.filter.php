@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Application;
 
 use Application\InputFilter\AttrUserValueCollectionInputFilter;
-use Autowp\Comments\Attention;
 use Autowp\Comments\CommentsService;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Laminas\InputFilter\InputFilter;
-
-use function range;
 
 return [
     'input_filter_specs' => [
@@ -1790,57 +1787,7 @@ return [
             ],
         ],
         'api_picture_edit'                     => [
-            'taken_year'         => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'GreaterThan',
-                        'options' => [
-                            'min'       => 1800,
-                            'inclusive' => true,
-                        ],
-                    ],
-                    [
-                        'name'    => 'LessThan',
-                        'options' => [
-                            'max'       => 2030,
-                            'inclusive' => true,
-                        ],
-                    ],
-                ],
-            ],
-            'taken_month'        => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'InArray',
-                        'options' => [
-                            'haystack' => range(1, 12),
-                        ],
-                    ],
-                ],
-            ],
-            'taken_day'          => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'InArray',
-                        'options' => [
-                            'haystack' => range(1, 31),
-                        ],
-                    ],
-                ],
-            ],
-            'status'             => [
+            'status'     => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -1858,22 +1805,7 @@ return [
                     ],
                 ],
             ],
-            'special_name'       => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => 0,
-                            'max' => Model\Picture::MAX_NAME,
-                        ],
-                    ],
-                ],
-            ],
-            'copyrights'         => [
+            'copyrights' => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
