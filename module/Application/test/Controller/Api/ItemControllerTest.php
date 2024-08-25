@@ -233,33 +233,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @throws Exception
      */
-    private function setPerspective(int $pictureId, int $itemId, int $perspectiveId): void
-    {
-        $this->reset();
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/1',
-            Request::METHOD_PUT,
-            [
-                'perspective_id' => $perspectiveId,
-            ]
-        );
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(PictureItemController::class);
-        $this->assertMatchedRouteName('api/picture-item/item/update');
-        $this->assertActionName('update');
-    }
-
-    /**
-     * @throws Exception
-     */
     private function acceptPicture(int $pictureId): void
     {
         $this->reset();
@@ -306,53 +279,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('item');
 
         return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function testEngineUnderTheHoodPreviews(): void
-    {
-        $vehicleId = $this->createVehicle();
-        $engineId  = $this->createEngine();
-        $brand     = $this->getRandomBrand();
-        $this->addItemParent($engineId, $brand['id']);
-        $this->setEngineToVehicle($engineId, $vehicleId);
-        $pictureId = $this->addPictureToItem($vehicleId);
-
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/picture/' . $pictureId, Request::METHOD_GET);
-        $this->assertResponseStatusCode(200);
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-        $this->assertEquals('inbox', $json['status']);
-
-        $this->acceptPicture($pictureId);
-        $this->setPerspective($pictureId, $vehicleId, 17);
-
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/item/' . $engineId, Request::METHOD_GET, [
-            'fields' => 'preview_pictures',
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/item/get');
-        $this->assertActionName('item');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertNotEmpty($json);
     }
 
     /**

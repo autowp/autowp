@@ -1888,69 +1888,6 @@ return [
                     ],
                 ],
             ],
-            'crop'               => [
-                'required' => false,
-                'left'     => [
-                    'required'   => false,
-                    'filters'    => [
-                        ['name' => 'StringTrim'],
-                    ],
-                    'validators' => [
-                        ['name' => 'Digits'],
-                    ],
-                ],
-                'top'      => [
-                    'required'   => false,
-                    'filters'    => [
-                        ['name' => 'StringTrim'],
-                    ],
-                    'validators' => [
-                        ['name' => 'Digits'],
-                    ],
-                ],
-                'width'    => [
-                    'required'   => false,
-                    'filters'    => [
-                        ['name' => 'StringTrim'],
-                    ],
-                    'validators' => [
-                        ['name' => 'Digits'],
-                    ],
-                ],
-                'height'   => [
-                    'required'   => false,
-                    'filters'    => [
-                        ['name' => 'StringTrim'],
-                    ],
-                    'validators' => [
-                        ['name' => 'Digits'],
-                    ],
-                ],
-            ],
-            'replace_picture_id' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'point'              => [
-                'required' => false,
-                'lat'      => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim'],
-                    ],
-                ],
-                'lng'      => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim'],
-                    ],
-                ],
-            ],
         ],
         'api_picture_item'                     => [
             'fields' => [

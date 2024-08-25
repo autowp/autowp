@@ -731,74 +731,7 @@ class PictureController extends AbstractRestfulController
 
         $set = [];
 
-        if (isset($data['crop'])) {
-            $canCrop = $this->user()->enforce('picture', 'crop')
-                    || ($picture['owner_id'] === $user['id']) && ($picture['status'] === Picture::STATUS_INBOX);
-
-            if (! $canCrop) {
-                return $this->forbiddenAction();
-            }
-
-            $left   = round($data['crop']['left']);
-            $top    = round($data['crop']['top']);
-            $width  = round($data['crop']['width']);
-            $height = round($data['crop']['height']);
-
-            $left  = max(0, $left);
-            $left  = min($picture['width'], $left);
-            $width = max(1, $width);
-            $width = min($picture['width'], $width);
-
-            $top    = max(0, $top);
-            $top    = min($picture['height'], $top);
-            $height = max(1, $height);
-            $height = min($picture['height'], $height);
-
-            $crop = null;
-            if ($left > 0 || $top > 0 || $width < $picture['width'] || $height < $picture['height']) {
-                $crop = [
-                    'left'   => $left,
-                    'top'    => $top,
-                    'width'  => $width,
-                    'height' => $height,
-                ];
-            }
-
-            $this->imageStorage->setImageCrop((int) $picture['image_id'], $crop);
-
-            $this->log(sprintf(
-                'Выделение области на картинке %s',
-                htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), [
-                'pictures' => $picture['id'],
-            ]);
-        }
-
         if ($isModer) {
-            if (array_key_exists('replace_picture_id', $data)) {
-                if ($picture['replace_picture_id'] && ! $data['replace_picture_id']) {
-                    $replacePicture = $this->picture->getRow(['id' => (int) $picture['replace_picture_id']]);
-                    if (! $replacePicture) {
-                        return $this->notFoundAction();
-                    }
-
-                    if (! $this->user()->enforce('picture', 'move')) {
-                        return $this->forbiddenAction();
-                    }
-
-                    $set['replace_picture_id'] = null;
-
-                    // log
-                    $this->log(sprintf(
-                        'Замена %s на %s отклонена',
-                        htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
-                        htmlspecialchars($this->pic()->name($picture, $this->language()))
-                    ), [
-                        'pictures' => [$picture['id'], $replacePicture['id']],
-                    ]);
-                }
-            }
-
             if (array_key_exists('taken_year', $data)) {
                 $set['taken_year'] = $data['taken_year'];
             }
@@ -1026,14 +959,6 @@ class PictureController extends AbstractRestfulController
                     ), [
                         'pictures' => $picture['id'],
                     ]);
-                }
-            }
-
-            if (isset($data['point']['lat'], $data['point']['lng'])) {
-                if ($data['point']['lat'] && $data['point']['lng']) {
-                    $set['point'] = new Sql\Expression('Point(?, ?)', [$data['point']['lng'], $data['point']['lat']]);
-                } else {
-                    $set['point'] = null;
                 }
             }
         }
