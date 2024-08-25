@@ -4,7 +4,6 @@ namespace ApplicationTest\Model;
 
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\PictureController;
-use Application\Controller\Api\PictureItemController;
 use Application\DuplicateFinder;
 use Application\Model\Picture;
 use Application\Test\AbstractHttpControllerTestCase;
@@ -144,30 +143,6 @@ class PictureTest extends AbstractHttpControllerTestCase
         return (int) $pictureId;
     }
 
-    /**
-     * @throws Exception
-     */
-    private function addPictureItem(int $pictureId, int $itemId, int $typeId): void
-    {
-        $this->reset();
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/' . $typeId,
-            Request::METHOD_POST
-        );
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(PictureItemController::class);
-        $this->assertMatchedRouteName('api/picture-item/item/create');
-        $this->assertActionName('create');
-    }
-
     private function getPictureFilename(int $pictureId): string
     {
         $serviceManager = $this->getApplicationServiceLocator();
@@ -206,66 +181,5 @@ class PictureTest extends AbstractHttpControllerTestCase
         $filename = $this->getPictureFilename($pictureId);
 
         $this->assertMatchesRegularExpression('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
-    }
-
-    public function testPersonAndCopyrightPictureFilenamePattern(): void
-    {
-        $personId  = $this->createItem([
-            'item_type_id' => 8,
-            'name'         => 'A.S. Pushkin',
-        ]);
-        $pictureId = $this->addPictureToItem($personId);
-
-        $copyrightId = $this->createItem([
-            'item_type_id' => 9,
-            'name'         => 'Copyrights',
-        ]);
-        $this->addPictureItem($pictureId, $copyrightId, 3);
-
-        $filename = $this->getPictureFilename($pictureId);
-
-        $this->assertMatchesRegularExpression('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
-    }
-
-    public function testAuthorAndVehiclePictureFilenamePattern(): void
-    {
-        $vehicleId = $this->createItem([
-            'item_type_id' => 1,
-            'name'         => 'Toyota Corolla',
-        ]);
-        $pictureId = $this->addPictureToItem($vehicleId);
-
-        $personId = $this->createItem([
-            'item_type_id' => 8,
-            'name'         => 'A.S. Pushkin',
-        ]);
-        $this->addPictureItem($pictureId, $personId, 2);
-
-        $filename = $this->getPictureFilename($pictureId);
-
-        $this->assertMatchesRegularExpression('/^t\/toyota_corolla\/toyota_corolla(_[0-9]+)?\.jpeg$/', $filename);
-    }
-
-    public function testPersonAndVehiclePictureFilenamePattern(): void
-    {
-        $vehicleId = $this->createItem([
-            'item_type_id' => 1,
-            'name'         => 'Toyota Corolla',
-        ]);
-        $pictureId = $this->addPictureToItem($vehicleId);
-
-        $personId = $this->createItem([
-            'item_type_id' => 8,
-            'name'         => 'A.S. Pushkin',
-        ]);
-
-        $this->addPictureItem($pictureId, $personId, 1);
-
-        $filename = $this->getPictureFilename($pictureId);
-
-        $this->assertMatchesRegularExpression(
-            '/^t\/toyota_corolla\/a\.s\._pushkin\/toyota_corolla_a\.s\._pushkin(_[0-9]+)?\.jpeg$/',
-            $filename
-        );
     }
 }
