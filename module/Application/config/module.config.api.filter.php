@@ -1787,7 +1787,7 @@ return [
             ],
         ],
         'api_picture_edit'                     => [
-            'status'     => [
+            'status' => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -1801,21 +1801,6 @@ return [
                                 Model\Picture::STATUS_ACCEPTED,
                                 Model\Picture::STATUS_REMOVING,
                             ],
-                        ],
-                    ],
-                ],
-            ],
-            'copyrights' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => 0,
-                            'max' => 65536,
                         ],
                     ],
                 ],

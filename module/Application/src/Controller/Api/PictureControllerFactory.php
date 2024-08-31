@@ -18,7 +18,6 @@ use Application\Service\TelegramService;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
-use Autowp\TextStorage\Service;
 use Autowp\User\Model\User;
 use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -47,7 +46,6 @@ class PictureControllerFactory implements FactoryInterface
             $filters->get('api_picture_list'),
             $filters->get('api_picture_list_public'),
             $filters->get('api_picture_edit'),
-            $container->get(Service::class),
             $container->get(CommentsService::class),
             $container->get(PictureModerVote::class),
             $container->get(Item::class),

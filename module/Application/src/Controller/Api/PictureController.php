@@ -20,7 +20,6 @@ use ArrayObject;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
-use Autowp\TextStorage;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Autowp\User\Model\User;
 use Exception;
@@ -82,8 +81,6 @@ class PictureController extends AbstractRestfulController
 
     private InputFilter $editInputFilter;
 
-    private TextStorage\Service $textStorage;
-
     private CommentsService $comments;
 
     private PictureModerVote $pictureModerVote;
@@ -117,7 +114,6 @@ class PictureController extends AbstractRestfulController
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
         InputFilter $editInputFilter,
-        TextStorage\Service $textStorage,
         CommentsService $comments,
         PictureModerVote $pictureModerVote,
         Item $item,
@@ -140,7 +136,6 @@ class PictureController extends AbstractRestfulController
         $this->listInputFilter       = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
         $this->editInputFilter       = $editInputFilter;
-        $this->textStorage           = $textStorage;
         $this->comments              = $comments;
         $this->pictureModerVote      = $pictureModerVote;
         $this->picture               = $picture;
@@ -728,53 +723,6 @@ class PictureController extends AbstractRestfulController
         $set = [];
 
         if ($isModer) {
-            if (isset($data['copyrights'])) {
-                $text = $data['copyrights'];
-
-                $user = $this->user()->get();
-
-                if ($picture['copyrights_text_id']) {
-                    $this->textStorage->setText($picture['copyrights_text_id'], $text, $user['id']);
-                } elseif ($text) {
-                    $textId                    = $this->textStorage->createText($text, $user['id']);
-                    $set['copyrights_text_id'] = $textId;
-                }
-
-                $this->log(sprintf(
-                    'Редактирование текста копирайтов изображения %s',
-                    htmlspecialchars($this->pic()->name($picture, $this->language()))
-                ), [
-                    'pictures' => $picture['id'],
-                ]);
-
-                if ($picture['copyrights_text_id']) {
-                    $userIds = $this->textStorage->getTextUserIds($picture['copyrights_text_id']);
-
-                    foreach ($userIds as $userId) {
-                        if ($userId !== (int) $user['id']) {
-                            $userRow = $this->userModel->getRow((int) $userId);
-                            if ($userRow) {
-                                $uri = $this->hostManager->getUriByLanguage($userRow['language']);
-                                $uri->setPath('/moder/pictures/' . $picture['id']);
-
-                                $message = sprintf(
-                                    $this->translate(
-                                        'pm/user-%s-edited-picture-copyrights-%s-%s',
-                                        'default',
-                                        $userRow['language']
-                                    ),
-                                    $this->userModerUrl($user, $uri),
-                                    $this->pic()->name($picture, $userRow['language']),
-                                    $uri->toString()
-                                );
-
-                                $this->message->send(null, $userRow['id'], $message);
-                            }
-                        }
-                    }
-                }
-            }
-
             if (isset($data['status'])) {
                 $user                 = $this->user()->get();
                 $previousStatusUserId = (int) $picture['change_status_user_id'];
