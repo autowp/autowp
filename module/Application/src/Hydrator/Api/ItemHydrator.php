@@ -757,6 +757,14 @@ class ItemHydrator extends AbstractRestHydrator
             $result['has_text'] = $this->itemModel->hasFullText($object['id']);
         }
 
+        if ($this->filterComposite->filter('attr_zone_id')) {
+            $vehicleTypeIds         = $this->vehicleType->getVehicleTypes($object['id']);
+            $result['attr_zone_id'] = $this->specificationsService->getZoneIdByCarTypeId(
+                $object['item_type_id'],
+                $vehicleTypeIds
+            );
+        }
+
         if ($isModer) {
             $result['body'] = (string) $object['body'];
 
@@ -902,14 +910,6 @@ class ItemHydrator extends AbstractRestHydrator
                     'image'  => $object['logo_id'],
                     'format' => 'brandicon2',
                 ]);
-            }
-
-            if ($this->filterComposite->filter('attr_zone_id')) {
-                $vehicleTypeIds         = $this->vehicleType->getVehicleTypes($object['id']);
-                $result['attr_zone_id'] = $this->specificationsService->getZoneIdByCarTypeId(
-                    $object['item_type_id'],
-                    $vehicleTypeIds
-                );
             }
         }
 
