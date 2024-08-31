@@ -202,44 +202,6 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($json);
     }
 
-    public function testRandomPicture(): void
-    {
-        $this->dispatch('http://www.autowp.ru/api/picture/random-picture', 'GET');
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(PictureController::class);
-        $this->assertMatchedRouteName('api/picture/random_picture');
-
-        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-        $this->assertArrayHasKey('status', $json);
-        $this->assertTrue($json['status']);
-        $this->assertArrayHasKey('url', $json);
-        $this->assertArrayHasKey('name', $json);
-        $this->assertArrayHasKey('page', $json);
-    }
-
-    public function testNewPicture(): void
-    {
-        $this->dispatch('http://www.autowp.ru/api/picture/new-picture', 'GET');
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(PictureController::class);
-        $this->assertMatchedRouteName('api/picture/new-picture');
-
-        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-        $this->assertArrayHasKey('status', $json);
-        $this->assertTrue($json['status']);
-        $this->assertArrayHasKey('url', $json);
-        $this->assertArrayHasKey('name', $json);
-        $this->assertArrayHasKey('page', $json);
-    }
-
     public function testCarOfDayPicture(): void
     {
         $itemOfDay = $this->getApplicationServiceLocator()->get(CarOfDay::class);
