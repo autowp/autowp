@@ -857,15 +857,6 @@ return [
                                             ],
                                         ],
                                     ],
-                                    'update'             => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'put',
-                                            'defaults' => [
-                                                'action' => 'update',
-                                            ],
-                                        ],
-                                    ],
                                 ],
                             ],
                             'random_picture'     => [

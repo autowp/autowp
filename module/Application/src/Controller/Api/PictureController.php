@@ -11,12 +11,9 @@ use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
-use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
 use Application\Service\PictureService;
-use Application\Service\TelegramService;
 use ArrayAccess;
-use ArrayObject;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
@@ -33,18 +30,14 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Stdlib\ResponseInterface;
-use Laminas\Uri\Uri;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
-use function array_keys;
 use function array_merge;
-use function array_replace;
 use function count;
 use function explode;
 use function get_object_vars;
 use function htmlspecialchars;
-use function implode;
 use function in_array;
 use function sprintf;
 use function strlen;
@@ -79,11 +72,7 @@ class PictureController extends AbstractRestfulController
 
     private InputFilter $publicListInputFilter;
 
-    private InputFilter $editInputFilter;
-
     private CommentsService $comments;
-
-    private PictureModerVote $pictureModerVote;
 
     private Item $item;
 
@@ -92,8 +81,6 @@ class PictureController extends AbstractRestfulController
     private User $userModel;
 
     private PictureService $pictureService;
-
-    private TelegramService $telegram;
 
     private MessageService $message;
 
@@ -106,16 +93,13 @@ class PictureController extends AbstractRestfulController
         PictureItem $pictureItem,
         UserPicture $userPicture,
         HostManager $hostManager,
-        TelegramService $telegram,
         MessageService $message,
         CarOfDay $carOfDay,
         InputFilter $itemInputFilter,
         InputFilter $postInputFilter,
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
-        InputFilter $editInputFilter,
         CommentsService $comments,
-        PictureModerVote $pictureModerVote,
         Item $item,
         Picture $picture,
         User $userModel,
@@ -129,15 +113,12 @@ class PictureController extends AbstractRestfulController
         $this->pictureItem           = $pictureItem;
         $this->userPicture           = $userPicture;
         $this->hostManager           = $hostManager;
-        $this->telegram              = $telegram;
         $this->message               = $message;
         $this->itemInputFilter       = $itemInputFilter;
         $this->postInputFilter       = $postInputFilter;
         $this->listInputFilter       = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
-        $this->editInputFilter       = $editInputFilter;
         $this->comments              = $comments;
-        $this->pictureModerVote      = $pictureModerVote;
         $this->picture               = $picture;
         $this->item                  = $item;
         $this->userModel             = $userModel;
@@ -600,26 +581,6 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @param array|ArrayAccess $picture
-     */
-    private function canAccept($picture): bool
-    {
-        return $this->picture->canAccept($picture)
-            && $this->user()->enforce('picture', 'accept');
-    }
-
-    /**
-     * @param array|ArrayObject $user
-     */
-    private function userModerUrl($user, Uri $uri): string
-    {
-        $u = clone $uri;
-        $u->setPath('/users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']));
-
-        return $u->toString();
-    }
-
-    /**
      * @throws Storage\Exception
      * @throws ImagickException
      * @return ViewModel|ResponseInterface|array
@@ -689,223 +650,6 @@ class PictureController extends AbstractRestfulController
      * @throws Exception
      * @return ViewModel|ResponseInterface|array
      */
-    public function updateAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $id      = (int) $this->params('id');
-        $picture = $this->picture->getRow(['id' => $id]);
-
-        if (! $picture) {
-            return $this->notFoundAction();
-        }
-
-        $data            = (array) $this->processBodyContent($this->getRequest());
-        $validationGroup = array_keys($data); // TODO: intersect with real keys
-        if (! $validationGroup) {
-            return $this->forbiddenAction();
-        }
-        $this->editInputFilter->setValidationGroup($validationGroup);
-        $this->editInputFilter->setData($data);
-
-        if (! $this->editInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->editInputFilter);
-        }
-
-        $data = $this->editInputFilter->getValues();
-
-        $isModer = $this->user()->enforce('global', 'moderate');
-
-        $set = [];
-
-        if ($isModer) {
-            if (isset($data['status'])) {
-                $user                 = $this->user()->get();
-                $previousStatusUserId = (int) $picture['change_status_user_id'];
-
-                if ($data['status'] === Picture::STATUS_ACCEPTED) {
-                    $canAccept = $this->canAccept($picture);
-
-                    if (! $canAccept) {
-                        return $this->forbiddenAction();
-                    }
-
-                    $isFirstTimeAccepted = false;
-                    $success             = $this->picture->accept($picture['id'], $user['id'], $isFirstTimeAccepted);
-                    if ($success) {
-                        $owner = $this->userModel->getRow((int) $picture['owner_id']);
-
-                        if ($owner) {
-                            $this->userPicture->refreshPicturesCount($owner['id']);
-                        }
-
-                        if ($isFirstTimeAccepted) {
-                            if ($owner && ((int) $owner['id'] !== (int) $user['id'])) {
-                                $uri = $this->hostManager->getUriByLanguage($owner['language']);
-
-                                $uri->setPath('/picture/' . urlencode($picture['identity']));
-
-                                $message = sprintf(
-                                    $this->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
-                                    $uri->toString()
-                                );
-
-                                $this->message->send(null, $owner['id'], $message);
-                            }
-
-                            $this->telegram->notifyPicture($picture['id']);
-                        }
-                    }
-
-                    if ($previousStatusUserId !== (int) $user['id']) {
-                        $prevUser = $this->userModel->getRow($previousStatusUserId);
-                        if ($prevUser) {
-                            $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
-
-                            $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
-
-                            $message = sprintf(
-                                'Принята картинка %s',
-                                $uri->toString()
-                            );
-                            $this->message->send(null, $prevUser['id'], $message);
-                        }
-                    }
-
-                    $this->log(sprintf(
-                        'Картинка %s принята',
-                        htmlspecialchars($this->pic()->name($picture, $this->language()))
-                    ), [
-                        'pictures' => $picture['id'],
-                    ]);
-                }
-
-                if ($data['status'] === Picture::STATUS_INBOX) {
-                    if ($picture['status'] === Picture::STATUS_REMOVING) {
-                        $canRestore = $this->user()->enforce('picture', 'restore');
-                        if (! $canRestore) {
-                            return $this->forbiddenAction();
-                        }
-
-                        $set = array_replace($set, [
-                            'status'                => Picture::STATUS_INBOX,
-                            'change_status_user_id' => $user['id'],
-                        ]);
-
-                        $this->log(sprintf(
-                            'Картинки `%s` восстановлена из очереди удаления',
-                            htmlspecialchars($this->pic()->name($picture, $this->language()))
-                        ), [
-                            'pictures' => $picture['id'],
-                        ]);
-                    } elseif ($picture['status'] === Picture::STATUS_ACCEPTED) {
-                        $canUnaccept = $this->user()->enforce('picture', 'unaccept');
-                        if (! $canUnaccept) {
-                            return $this->forbiddenAction();
-                        }
-
-                        $this->picture->getTable()->update([
-                            'status'                => Picture::STATUS_INBOX,
-                            'change_status_user_id' => $user['id'],
-                        ], [
-                            'id' => $picture['id'],
-                        ]);
-
-                        if ($picture['owner_id']) {
-                            $this->userPicture->refreshPicturesCount($picture['owner_id']);
-                        }
-
-                        $this->log(sprintf(
-                            'С картинки %s снят статус "принято"',
-                            htmlspecialchars($this->pic()->name($picture, $this->language()))
-                        ), [
-                            'pictures' => $picture['id'],
-                        ]);
-
-                        if ($previousStatusUserId !== (int) $user['id']) {
-                            $prevUser = $this->userModel->getRow($previousStatusUserId);
-                            if ($prevUser) {
-                                $uri = $this->hostManager->getUriByLanguage($prevUser['language']);
-
-                                $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
-
-                                $message = sprintf(
-                                    'С картинки %s снят статус "принято"',
-                                    $uri->toString()
-                                );
-                                $this->message->send(null, $prevUser['id'], $message);
-                            }
-                        }
-                    }
-                }
-
-                if ($data['status'] === Picture::STATUS_REMOVING) {
-                    $canDelete = $this->pictureCanDelete($picture);
-                    if (! $canDelete) {
-                        return $this->forbiddenAction();
-                    }
-
-                    $user = $this->user()->get();
-                    $set  = array_replace($set, [
-                        'status'                => Picture::STATUS_REMOVING,
-                        'removing_date'         => new Sql\Expression('CURDATE()'),
-                        'change_status_user_id' => $user['id'],
-                    ]);
-
-                    $owner = $this->userModel->getRow((int) $picture['owner_id']);
-                    if ($owner && (int) $owner['id'] !== (int) $user['id']) {
-                        $uri = $this->hostManager->getUriByLanguage($owner['language']);
-
-                        $deleteRequests = $this->pictureModerVote->getNegativeVotes($picture['id']);
-
-                        $reasons = [];
-                        foreach ($deleteRequests as $request) {
-                            $user = $this->userModel->getRow((int) $request['user_id']);
-                            if ($user) {
-                                $reasons[] = $this->userModerUrl($user, $uri) . ' : ' . $request['reason'];
-                            }
-                        }
-
-                        $uri->setPath('/picture/' . urlencode($picture['identity']));
-
-                        $message = sprintf(
-                            $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner['language']),
-                            $uri->toString(),
-                            implode("\n", $reasons)
-                        );
-
-                        $this->message->send(null, $owner['id'], $message);
-                    }
-
-                    $this->log(sprintf(
-                        'Картинка %s поставлена в очередь на удаление',
-                        htmlspecialchars($this->pic()->name($picture, $this->language()))
-                    ), [
-                        'pictures' => $picture['id'],
-                    ]);
-                }
-            }
-        }
-
-        if ($set) {
-            $this->picture->getTable()->update($set, [
-                'id' => $picture['id'],
-            ]);
-        }
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
-     * @throws Exception
-     * @return ViewModel|ResponseInterface|array
-     */
     public function itemAction()
     {
         $user = $this->user()->get();
@@ -936,34 +680,6 @@ class PictureController extends AbstractRestfulController
         }
 
         return new JsonModel($this->hydrator->extract($row));
-    }
-
-    /**
-     * @param array|ArrayAccess $picture
-     * @throws Exception
-     */
-    private function pictureCanDelete($picture): bool
-    {
-        if (! $this->picture->canDelete($picture)) {
-            return false;
-        }
-
-        $canDelete = false;
-        $user      = $this->user()->get();
-        if ($this->user()->enforce('picture', 'remove')) {
-            if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
-                $canDelete = true;
-            }
-        } elseif ($this->user()->enforce('picture', 'remove_by_vote')) {
-            if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
-                $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
-                $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
-
-                $canDelete = $deleteVotes > $acceptVotes;
-            }
-        }
-
-        return $canDelete;
     }
 
     /**

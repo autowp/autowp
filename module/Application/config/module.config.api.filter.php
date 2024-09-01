@@ -1786,26 +1786,6 @@ return [
                 ],
             ],
         ],
-        'api_picture_edit'                     => [
-            'status' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'InArray',
-                        'options' => [
-                            'haystack' => [
-                                Model\Picture::STATUS_INBOX,
-                                Model\Picture::STATUS_ACCEPTED,
-                                Model\Picture::STATUS_REMOVING,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ],
         'api_picture_item'                     => [
             'fields' => [
                 'required' => false,

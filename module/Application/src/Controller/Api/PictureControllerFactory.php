@@ -11,10 +11,8 @@ use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
-use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
 use Application\Service\PictureService;
-use Application\Service\TelegramService;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
@@ -38,16 +36,13 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(PictureItem::class),
             $container->get(UserPicture::class),
             $container->get(HostManager::class),
-            $container->get(TelegramService::class),
             $container->get(MessageService::class),
             $container->get(CarOfDay::class),
             $filters->get('api_picture_item'),
             $filters->get('api_picture_post'),
             $filters->get('api_picture_list'),
             $filters->get('api_picture_list_public'),
-            $filters->get('api_picture_edit'),
             $container->get(CommentsService::class),
-            $container->get(PictureModerVote::class),
             $container->get(Item::class),
             $container->get(Picture::class),
             $container->get(User::class),

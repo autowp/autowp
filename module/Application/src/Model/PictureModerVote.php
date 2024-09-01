@@ -37,24 +37,6 @@ class PictureModerVote
         return $result;
     }
 
-    public function getNegativeVotes(int $pictureId): array
-    {
-        $rows = $this->table->select([
-            'picture_id' => $pictureId,
-            'vote = 0',
-        ]);
-
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = [
-                'user_id' => (int) $row['user_id'],
-                'reason'  => $row['reason'],
-            ];
-        }
-
-        return $result;
-    }
-
     /**
      * @throws Exception
      */
