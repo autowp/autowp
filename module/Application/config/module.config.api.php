@@ -812,15 +812,6 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'accept-replace'     => [
-                                        'type'    => 'Literal',
-                                        'options' => [
-                                            'route'    => '/accept-replace',
-                                            'defaults' => [
-                                                'action' => 'accept-replace',
-                                            ],
-                                        ],
-                                    ],
                                     'correct-file-names' => [
                                         'type'    => 'Literal',
                                         'options' => [

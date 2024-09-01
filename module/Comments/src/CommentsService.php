@@ -123,23 +123,6 @@ class CommentsService
     }
 
     /**
-     * @throws Exception
-     */
-    public function moveMessages(int $srcTypeId, int $srcItemId, int $dstTypeId, int $dstItemId): void
-    {
-        $this->messageTable->update([
-            'type_id' => $dstTypeId,
-            'item_id' => $dstItemId,
-        ], [
-            'type_id' => $srcTypeId,
-            'item_id' => $srcItemId,
-        ]);
-
-        $this->updateTopicStat($srcTypeId, $srcItemId);
-        $this->updateTopicStat($dstTypeId, $dstItemId);
-    }
-
-    /**
      * @param int|array $itemId
      */
     public function getTopicStat(int $typeId, $itemId): array

@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Api;
 
-use Application\Comments;
 use Application\Controller\Plugin\Pic;
 use Application\HostManager;
 use Application\Hydrator\Api\AbstractRestHydrator;
@@ -11,9 +10,7 @@ use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
-use Application\Model\UserPicture;
 use Application\Service\PictureService;
-use ArrayAccess;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
@@ -23,7 +20,6 @@ use Exception;
 use ImagickException;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
-use Laminas\Db\Sql;
 use Laminas\Http\PhpEnvironment\Request;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
@@ -37,9 +33,6 @@ use function array_merge;
 use function count;
 use function explode;
 use function get_object_vars;
-use function htmlspecialchars;
-use function in_array;
-use function sprintf;
 use function strlen;
 use function urlencode;
 
@@ -60,8 +53,6 @@ class PictureController extends AbstractRestfulController
 
     private PictureItem $pictureItem;
 
-    private UserPicture $userPicture;
-
     private HostManager $hostManager;
 
     private InputFilter $itemInputFilter;
@@ -72,17 +63,11 @@ class PictureController extends AbstractRestfulController
 
     private InputFilter $publicListInputFilter;
 
-    private CommentsService $comments;
-
     private Item $item;
 
     private Picture $picture;
 
-    private User $userModel;
-
     private PictureService $pictureService;
-
-    private MessageService $message;
 
     private Catalogue $catalogue;
 
@@ -91,37 +76,28 @@ class PictureController extends AbstractRestfulController
     public function __construct(
         AbstractRestHydrator $hydrator,
         PictureItem $pictureItem,
-        UserPicture $userPicture,
         HostManager $hostManager,
-        MessageService $message,
         CarOfDay $carOfDay,
         InputFilter $itemInputFilter,
         InputFilter $postInputFilter,
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
-        CommentsService $comments,
         Item $item,
         Picture $picture,
-        User $userModel,
         PictureService $pictureService,
         Catalogue $catalogue,
         Storage $imageStorage
     ) {
-        $this->carOfDay = $carOfDay;
-
+        $this->carOfDay              = $carOfDay;
         $this->hydrator              = $hydrator;
         $this->pictureItem           = $pictureItem;
-        $this->userPicture           = $userPicture;
         $this->hostManager           = $hostManager;
-        $this->message               = $message;
         $this->itemInputFilter       = $itemInputFilter;
         $this->postInputFilter       = $postInputFilter;
         $this->listInputFilter       = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
-        $this->comments              = $comments;
         $this->picture               = $picture;
         $this->item                  = $item;
-        $this->userModel             = $userModel;
         $this->pictureService        = $pictureService;
         $this->catalogue             = $catalogue;
         $this->imageStorage          = $imageStorage;
@@ -705,160 +681,6 @@ class PictureController extends AbstractRestfulController
                 'pattern' => $this->picture->getFileNamePattern($row['id']),
             ]);
         }
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
-     * @param array|ArrayAccess $picture
-     * @param array|ArrayAccess $replacedPicture
-     */
-    private function canReplace($picture, $replacedPicture): bool
-    {
-        $can1 = false;
-        switch ($picture['status']) {
-            case Picture::STATUS_ACCEPTED:
-                $can1 = true;
-                break;
-
-            case Picture::STATUS_INBOX:
-                $can1 = $this->user()->enforce('picture', 'accept');
-                break;
-        }
-
-        $can2 = false;
-        switch ($replacedPicture['status']) {
-            case Picture::STATUS_ACCEPTED:
-                $can2 = $this->user()->enforce('picture', 'unaccept')
-                     && $this->user()->enforce('picture', 'remove_by_vote');
-                break;
-
-            case Picture::STATUS_INBOX:
-                $can2 = $this->user()->enforce('picture', 'remove_by_vote');
-                break;
-
-            case Picture::STATUS_REMOVING:
-            case Picture::STATUS_REMOVED:
-                $can2 = true;
-                break;
-        }
-
-        return $can1 && $can2 && $this->user()->enforce('picture', 'move');
-    }
-
-    /**
-     * @throws Exception
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function acceptReplaceAction()
-    {
-        if (! $this->user()->enforce('global', 'moderate')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $id      = (int) $this->params('id');
-        $picture = $this->picture->getRow(['id' => $id]);
-        if (! $picture) {
-            return $this->notFoundAction();
-        }
-
-        if (! $picture['replace_picture_id']) {
-            return $this->notFoundAction();
-        }
-
-        $replacePicture = $this->picture->getRow(['id' => (int) $picture['replace_picture_id']]);
-        if (! $replacePicture) {
-            return $this->notFoundAction();
-        }
-
-        if (! $this->canReplace($picture, $replacePicture)) {
-            return $this->forbiddenAction();
-        }
-
-        $user = $this->user()->get();
-
-        // statuses
-        if ($picture['status'] !== Picture::STATUS_ACCEPTED) {
-            $set = [
-                'status'                => Picture::STATUS_ACCEPTED,
-                'change_status_user_id' => $user['id'],
-            ];
-            if (! $picture['accept_datetime']) {
-                $set['accept_datetime'] = new Sql\Expression('NOW()');
-            }
-
-            $this->picture->getTable()->update($set, [
-                'id' => $picture['id'],
-            ]);
-
-            if ($picture['owner_id']) {
-                $this->userPicture->refreshPicturesCount($picture['owner_id']);
-            }
-        }
-
-        if (! in_array($replacePicture['status'], [Picture::STATUS_REMOVING, Picture::STATUS_REMOVED])) {
-            $this->picture->getTable()->update([
-                'status'                => Picture::STATUS_REMOVING,
-                'removing_date'         => new Sql\Expression('now()'),
-                'change_status_user_id' => $user['id'],
-            ], [
-                'id' => $replacePicture['id'],
-            ]);
-            if ($replacePicture['owner_id']) {
-                $this->userPicture->refreshPicturesCount($replacePicture['owner_id']);
-            }
-        }
-
-        // comments
-        $this->comments->moveMessages(
-            Comments::PICTURES_TYPE_ID,
-            $replacePicture['id'],
-            Comments::PICTURES_TYPE_ID,
-            $picture['id']
-        );
-
-        // pms
-        $owner        = $this->userModel->getRow((int) $picture['owner_id']);
-        $replaceOwner = $this->userModel->getRow((int) $replacePicture['owner_id']);
-        $recepients   = [];
-        if ($owner) {
-            $recepients[$owner['id']] = $owner;
-        }
-        if ($replaceOwner) {
-            $recepients[$replaceOwner['id']] = $replaceOwner;
-        }
-        unset($recepients[$user['id']]);
-        if ($recepients) {
-            foreach ($recepients as $recepient) {
-                $uri = $this->hostManager->getUriByLanguage($recepient['language']);
-
-                $url        = $uri->setPath('/picture/' . urlencode($picture['identity']))->toString();
-                $replaceUrl = $uri->setPath('/picture/' . urlencode($replacePicture['identity']))->toString();
-                $moderUrl   = $uri->setPath('/users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']))
-                                ->toString();
-
-                $message = sprintf(
-                    $this->translate('pm/user-%s-accept-replace-%s-%s', 'default', $recepient['language']),
-                    $moderUrl,
-                    $replaceUrl,
-                    $url
-                );
-
-                $this->message->send(null, $recepient['id'], $message);
-            }
-        }
-
-        // log
-        $this->log(sprintf(
-            'Замена %s на %s',
-            htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
-            htmlspecialchars($this->pic()->name($picture, $this->language()))
-        ), [
-            'pictures' => [$picture['id'], $replacePicture['id']],
-        ]);
 
         /** @var Response $response */
         $response = $this->getResponse();

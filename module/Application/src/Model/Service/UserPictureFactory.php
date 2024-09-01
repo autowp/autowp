@@ -19,7 +19,6 @@ class UserPictureFactory implements FactoryInterface
     {
         $tables = $container->get('TableManager');
         return new UserPicture(
-            $tables->get('pictures'),
             $tables->get('users')
         );
     }
