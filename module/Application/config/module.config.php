@@ -255,7 +255,7 @@ return [
         'release'     => '',
     ],
     'traffic'                  => [
-        'url' => 'http://goautowp-serve-private:8080',
+        'url' => 'http://goautowp-serve:8081',
     ],
     'fileStorage'              => [
         's3'          => [

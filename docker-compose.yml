@@ -11,7 +11,7 @@ services:
     depends_on:
     - backend
     - frontend
-    - goautowp-serve-public
+    - goautowp-serve
     - keycloak
     ports:
     - "80:80"
@@ -59,7 +59,7 @@ services:
     - redis
     - mysql
     - rabbitmq
-    - goautowp-serve-private
+    - goautowp-serve
     - minio
     - createbuckets
 
@@ -128,11 +128,11 @@ services:
       - POSTGRES_USER=traffic
       - POSTGRES_PASSWORD=password
 
-  goautowp-serve-public:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.31.0
-    container_name: autowp_test_goautowp_serve_public
+  goautowp-serve:
+    image: registry.pereslegin.ru/autowp/goautowp:v2.37.1
+    container_name: autowp_test_goautowp_serve
     restart: always
-    command: serve-public
+    command: serve --df-amqp --monitoring-amqp --grpc --public --private --autoban
     depends_on:
       - rabbitmq
       - mysql
@@ -143,86 +143,8 @@ services:
       - "./goautowp/config.yaml:/config.yaml:ro"
       - "./module/Application/config/model.conf:/model.conf:ro"
       - "./module/Application/config/policy.csv:/policy.csv:ro"
-
-  goautowp-serve-grpc:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.31.0
-    container_name: autowp_test_goautowp_serve_grpc
-    restart: always
-    command: serve-grpc
-    depends_on:
-      - rabbitmq
-      - mysql
-      - traffic-postgres
-      - keycloak
-      - redis
-    volumes:
-      - "./goautowp/config.yaml:/config.yaml:ro"
-      - "./module/Application/config/model.conf:/model.conf:ro"
-      - "./module/Application/config/policy.csv:/policy.csv:ro"
-
-  goautowp-serve-private:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.31.0
-    container_name: autowp_test_goautowp_serve_private
-    restart: always
-    command: serve-private
-    depends_on:
-      - rabbitmq
-      - mysql
-      - traffic-postgres
-      - keycloak
-      - redis
-    volumes:
-      - "./goautowp/config.yaml:/config.yaml:ro"
-      - "./module/Application/config/model.conf:/model.conf:ro"
-      - "./module/Application/config/policy.csv:/policy.csv:ro"
-
-  goautowp-listen-df-amqp:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.31.0
-    container_name: autowp_test_goautowp_listen_df_amqp
-    restart: always
-    command: listen-df-amqp
-    depends_on:
-      - rabbitmq
-      - mysql
-      - traffic-postgres
-      - keycloak
-      - redis
-    volumes:
-      - "./goautowp/config.yaml:/config.yaml:ro"
-      - "./module/Application/config/model.conf:/model.conf:ro"
-      - "./module/Application/config/policy.csv:/policy.csv:ro"
-
-  goautowp-listen-monitoring-amqp:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.31.0
-    container_name: autowp_test_goautowp_listen_monitoring_amqp
-    restart: always
-    command: listen-monitoring-amqp
-    depends_on:
-      - rabbitmq
-      - mysql
-      - traffic-postgres
-      - keycloak
-      - redis
-    volumes:
-      - "./goautowp/config.yaml:/config.yaml:ro"
-      - "./module/Application/config/model.conf:/model.conf:ro"
-      - "./module/Application/config/policy.csv:/policy.csv:ro"
-
-  goautowp-autoban:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.31.0
-    container_name: autowp_test_goautowp_autoban
-    restart: always
-    command: autoban
-    depends_on:
-      - rabbitmq
-      - mysql
-      - traffic-postgres
-      - keycloak
-      - redis
-    volumes:
-      - "./goautowp/config.yaml:/config.yaml:ro"
-      - "./module/Application/config/model.conf:/model.conf:ro"
-      - "./module/Application/config/policy.csv:/policy.csv:ro"
+    ports:
+      - "2112:2112"
 
   minio:
     image: quay.io/minio/minio
