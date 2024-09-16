@@ -112,7 +112,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.38.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.39.0
     container_name: autowp_test_goautowp_serve
     restart: always
     command: serve --df-amqp --monitoring-amqp --grpc --public --private --autoban

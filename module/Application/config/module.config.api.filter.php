@@ -158,67 +158,6 @@ return [
                 'type' => AttrUserValueCollectionInputFilter::class,
             ],
         ],
-        'api_attr_value_get'                   => [
-            'zone_id' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'item_id' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'page'    => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'GreaterThan',
-                        'options' => [
-                            'min'       => 1,
-                            'inclusive' => true,
-                        ],
-                    ],
-                ],
-            ],
-            'limit'   => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'Between',
-                        'options' => [
-                            'min' => 1,
-                            'max' => 500,
-                        ],
-                    ],
-                ],
-            ],
-            'fields'  => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name'    => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['value', 'value_text']],
-                    ],
-                ],
-            ],
-        ],
         'api_contacts_list'                    => [
             'fields' => [
                 'required' => false,

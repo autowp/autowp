@@ -36,8 +36,6 @@ class AttrController extends AbstractRestfulController
 
     private AbstractRestHydrator $userValueHydrator;
 
-    private AbstractRestHydrator $valueHydrator;
-
     private InputFilter $conflictListInputFilter;
 
     private InputFilter $userValueListInputFilter;
@@ -48,29 +46,23 @@ class AttrController extends AbstractRestfulController
 
     private InputFilter $userValuePatchDataFilter;
 
-    private InputFilter $valueListInputFilter;
-
     public function __construct(
         SpecificationsService $specsService,
         AbstractRestHydrator $conflictHydrator,
         AbstractRestHydrator $userValueHydrator,
-        AbstractRestHydrator $valueHydrator,
         InputFilter $conflictListInputFilter,
         InputFilter $userValueListInputFilter,
         InputFilter $userValuePatchQueryFilter,
-        InputFilter $userValuePatchDataFilter,
-        InputFilter $valueListInputFilter
+        InputFilter $userValuePatchDataFilter
     ) {
         $this->specsService              = $specsService;
         $this->conflictHydrator          = $conflictHydrator;
         $this->conflictListInputFilter   = $conflictListInputFilter;
         $this->userValueTable            = $specsService->getUserValueTable();
         $this->userValueHydrator         = $userValueHydrator;
-        $this->valueHydrator             = $valueHydrator;
         $this->userValueListInputFilter  = $userValueListInputFilter;
         $this->userValuePatchQueryFilter = $userValuePatchQueryFilter;
         $this->userValuePatchDataFilter  = $userValuePatchDataFilter;
-        $this->valueListInputFilter      = $valueListInputFilter;
     }
 
     /**
@@ -350,78 +342,5 @@ class AttrController extends AbstractRestfulController
         /** @var Response $response */
         $response = $this->getResponse();
         return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function valueIndexAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        if (! $this->user()->enforce('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $this->valueListInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->valueListInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->valueListInputFilter);
-        }
-
-        $values = $this->valueListInputFilter->getValues();
-
-        $select = $this->specsService->getValueTable()->getSql()->select();
-
-        $select->order('update_date DESC');
-
-        $itemId = (int) $values['item_id'];
-
-        if (! $itemId) {
-            return $this->forbiddenAction();
-        }
-
-        $select->where(['item_id' => $itemId]);
-
-        if ($values['zone_id']) {
-            $select
-                ->join(
-                    'attrs_zone_attributes',
-                    'attrs_values.attribute_id = attrs_zone_attributes.attribute_id',
-                    []
-                )
-                ->where(['attrs_zone_attributes.zone_id' => $values['zone_id']]);
-        }
-
-        /** @var Adapter $adapter */
-        $adapter   = $this->userValueTable->getAdapter();
-        $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
-        );
-
-        $paginator
-            ->setItemCountPerPage($values['limit'])
-            ->setPageRange(20)
-            ->setCurrentPageNumber($values['page']);
-
-        $this->valueHydrator->setOptions([
-            'fields'   => $values['fields'],
-            'language' => $this->language(),
-            'user_id'  => $user['id'],
-        ]);
-
-        $items = [];
-        foreach ($paginator->getCurrentItems() as $row) {
-            $items[] = $this->valueHydrator->extract($row);
-        }
-
-        return new JsonModel([
-            'paginator' => $paginator->getPages(),
-            'items'     => $items,
-        ]);
     }
 }
