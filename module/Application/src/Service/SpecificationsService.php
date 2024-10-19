@@ -421,9 +421,7 @@ class SpecificationsService
                         ],
                     ],
                 ];
-                if ($attribute['isMultiple']) {
-                    $inputType = ArrayInput::class;
-                }
+                $inputType  = ArrayInput::class;
                 break;
         }
 
@@ -534,47 +532,54 @@ class SpecificationsService
             // remove values
             $userValueDataTable->delete($userValuePrimaryKey);
 
-            if ($value) {
-                if ($value === [null]) {
-                    $value = [];
-                }
-
-                if ($empty) {
-                    $value = [null];
-                }
-
-                if (count($value)) {
-                    // insert new descriptors and values
-                    /** @var Adapter $adapter */
-                    $adapter = $this->userValueTable->getAdapter();
-                    $adapter->query('
-                        INSERT INTO attrs_user_values (attribute_id, item_id, user_id, add_date, update_date)
-                        VALUES (:attribute_id, :item_id, :user_id, NOW(), NOW())
-                        ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
-                    ', $userValuePrimaryKey);
-
-                    $ordering = 1;
-
-                    foreach ($value as $oneValue) {
-                        $params = array_replace($userValuePrimaryKey, [
-                            'ordering' => $ordering,
-                            'value'    => $oneValue,
-                        ]);
-                        /** @var Adapter $adapter */
-                        $adapter = $userValueDataTable->getAdapter();
-                        $adapter->query('
-                            INSERT INTO `' . $userValueDataTable->getTable() . '`
-                                (attribute_id, item_id, user_id, ordering, value)
-                            VALUES (:attribute_id, :item_id, :user_id, :ordering, :value)
-                            ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
-                        ', $params);
-                        $ordering++;
+            if (is_array($value)) {
+                foreach ($value as $v) {
+                    if ($v === null) {
+                        $value = [];
+                        break;
                     }
+                }
+            }
+
+            if ($empty) {
+                $value = [null];
+            }
+
+            if (count($value)) {
+                // insert new descriptors and values
+                /** @var Adapter $adapter */
+                $adapter = $this->userValueTable->getAdapter();
+                $adapter->query('
+                    INSERT INTO attrs_user_values (attribute_id, item_id, user_id, add_date, update_date)
+                    VALUES (:attribute_id, :item_id, :user_id, NOW(), NOW())
+                    ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
+                ', $userValuePrimaryKey);
+
+                $ordering = 1;
+
+                foreach ($value as $oneValue) {
+                    $params = array_replace($userValuePrimaryKey, [
+                        'ordering' => $ordering,
+                        'value'    => $oneValue,
+                    ]);
+                    /** @var Adapter $adapter */
+                    $adapter = $userValueDataTable->getAdapter();
+                    $adapter->query('
+                        INSERT INTO `' . $userValueDataTable->getTable() . '`
+                            (attribute_id, item_id, user_id, ordering, value)
+                        VALUES (:attribute_id, :item_id, :user_id, :ordering, :value)
+                        ON DUPLICATE KEY UPDATE ordering = VALUES(ordering), value = VALUES(value)
+                    ', $params);
+                    $ordering++;
                 }
             }
 
             $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
         } else {
+            if (is_array($value)) {
+                $value = count($value) > 0 ? $value[0] : null;
+            }
+
             if (strlen($value) > 0 || $empty) {
                 // insert/update value descriptor
                 $userValue = currentFromResultSetInterface($this->userValueTable->select($userValuePrimaryKey));
@@ -1894,59 +1899,6 @@ class SpecificationsService
     /**
      * @throws Exception
      */
-    public function getUserValue2(int $attributeId, int $itemId, int $userId): array
-    {
-        if (! $itemId) {
-            throw new Exception("item_id not set");
-        }
-
-        $attribute = $this->getAttribute($attributeId);
-        if (! $attribute) {
-            throw new Exception("attribute not found");
-        }
-
-        $valuesTable = $this->getUserValueDataTable($attribute['typeId']);
-
-        $select = new Sql\Select($valuesTable->getTable());
-        $select->columns(['value'])
-            ->where([
-                'attribute_id' => (int) $attribute['id'],
-                'item_id'      => $itemId,
-                'user_id'      => $userId,
-            ]);
-
-        if ($attribute['isMultiple']) {
-            $select->order('ordering');
-        }
-
-        $values = [];
-        foreach ($valuesTable->selectWith($select) as $row) {
-            $values[] = $this->prepareValue($attribute['typeId'], $row['value']);
-        }
-
-        if (count($values) <= 0) {
-            return [
-                'value' => null,
-                'empty' => false,
-            ];
-        }
-
-        if ($attribute['isMultiple']) {
-            return [
-                'value' => $values,
-                'empty' => $values === [null],
-            ];
-        }
-
-        return [
-            'value' => $values[0],
-            'empty' => $values[0] === null,
-        ];
-    }
-
-    /**
-     * @throws Exception
-     */
     public function getUserValueText(int $attributeId, int $itemId, int $userId, string $language): ?string
     {
         if (! $itemId) {
@@ -2410,19 +2362,6 @@ class SpecificationsService
             'conflicts' => $conflicts,
             'paginator' => $paginator,
         ];
-    }
-
-    public function refreshUserConflictsStat(): void
-    {
-        $select = new Sql\Select($this->userValueTable->getTable());
-        $select->columns(['user_id']);
-
-        $userIds = [];
-        foreach ($this->userValueTable->selectWith($select) as $row) {
-            $userIds[] = (int) $row['user_id'];
-        }
-
-        $this->refreshUserConflicts($userIds);
     }
 
     public function refreshUsersConflictsStat(): void

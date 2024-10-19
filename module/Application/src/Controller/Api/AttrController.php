@@ -34,11 +34,7 @@ class AttrController extends AbstractRestfulController
 
     private AbstractRestHydrator $conflictHydrator;
 
-    private AbstractRestHydrator $userValueHydrator;
-
     private InputFilter $conflictListInputFilter;
-
-    private InputFilter $userValueListInputFilter;
 
     private TableGateway $userValueTable;
 
@@ -49,9 +45,7 @@ class AttrController extends AbstractRestfulController
     public function __construct(
         SpecificationsService $specsService,
         AbstractRestHydrator $conflictHydrator,
-        AbstractRestHydrator $userValueHydrator,
         InputFilter $conflictListInputFilter,
-        InputFilter $userValueListInputFilter,
         InputFilter $userValuePatchQueryFilter,
         InputFilter $userValuePatchDataFilter
     ) {
@@ -59,8 +53,6 @@ class AttrController extends AbstractRestfulController
         $this->conflictHydrator          = $conflictHydrator;
         $this->conflictListInputFilter   = $conflictListInputFilter;
         $this->userValueTable            = $specsService->getUserValueTable();
-        $this->userValueHydrator         = $userValueHydrator;
-        $this->userValueListInputFilter  = $userValueListInputFilter;
         $this->userValuePatchQueryFilter = $userValuePatchQueryFilter;
         $this->userValuePatchDataFilter  = $userValuePatchDataFilter;
     }
@@ -100,89 +92,6 @@ class AttrController extends AbstractRestfulController
         return new JsonModel([
             'items'     => $items,
             'paginator' => $data['paginator']->getPages(),
-        ]);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function userValueIndexAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        if (! $this->user()->enforce('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $this->userValueListInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->userValueListInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->userValueListInputFilter);
-        }
-
-        $values = $this->userValueListInputFilter->getValues();
-
-        $select = new Sql\Select($this->userValueTable->getTable());
-
-        $select->order('update_date DESC');
-
-        $userId = (int) $values['user_id'];
-        $itemId = (int) $values['item_id'];
-
-        if (! $userId && ! $itemId) {
-            return $this->forbiddenAction();
-        }
-
-        if ($userId) {
-            $select->where(['user_id' => $userId]);
-        }
-
-        if ($itemId) {
-            $select->where(['item_id' => $itemId]);
-        }
-
-        if ($values['exclude_user_id']) {
-            $select->where(['user_id <> ?' => $values['exclude_user_id']]);
-        }
-
-        if ($values['zone_id']) {
-            $select
-                ->join(
-                    'attrs_zone_attributes',
-                    'attrs_user_values.attribute_id = attrs_zone_attributes.attribute_id',
-                    []
-                )
-                ->where(['attrs_zone_attributes.zone_id' => $values['zone_id']]);
-        }
-
-        /** @var Adapter $adapter */
-        $adapter   = $this->userValueTable->getAdapter();
-        $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
-        );
-
-        $paginator
-            ->setItemCountPerPage($values['limit'] ?: 30)
-            ->setPageRange(20)
-            ->setCurrentPageNumber($values['page']);
-
-        $this->userValueHydrator->setOptions([
-            'fields'   => $values['fields'],
-            'language' => $this->language(),
-        ]);
-
-        $items = [];
-        foreach ($paginator->getCurrentItems() as $row) {
-            $items[] = $this->userValueHydrator->extract($row);
-        }
-
-        return new JsonModel([
-            'paginator' => $paginator->getPages(),
-            'items'     => $items,
         ]);
     }
 
