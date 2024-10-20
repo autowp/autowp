@@ -11,49 +11,6 @@ use Laminas\InputFilter\InputFilter;
 
 return [
     'input_filter_specs' => [
-        'api_attr_conflict_get'                => [
-            'filter' => [
-                'required'   => true,
-                'validators' => [
-                    [
-                        'name'    => 'InArray',
-                        'options' => [
-                            'haystack' => [
-                                '0',
-                                '1',
-                                '-1',
-                                'minus-weight',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'page'   => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name'    => 'GreaterThan',
-                        'options' => [
-                            'min'       => 1,
-                            'inclusive' => true,
-                        ],
-                    ],
-                ],
-            ],
-            'fields' => [
-                'required' => false,
-                'filters'  => [
-                    [
-                        'name'    => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['values']],
-                    ],
-                ],
-            ],
-        ],
         'api_attr_user_value_patch_query'      => [
             'item_id' => [
                 'required'   => false,

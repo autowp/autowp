@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\AttrConflictHydrator;
 use Application\Service\SpecificationsService;
 use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -18,12 +17,9 @@ class AttrControllerFactory implements FactoryInterface
      */
     public function __invoke(containerinterface $container, $requestedName, ?array $options = null): AttrController
     {
-        $hydrators = $container->get('HydratorManager');
         $filters   = $container->get('InputFilterManager');
         return new AttrController(
             $container->get(SpecificationsService::class),
-            $hydrators->get(AttrConflictHydrator::class),
-            $filters->get('api_attr_conflict_get'),
             $filters->get('api_attr_user_value_patch_query'),
             $filters->get('api_attr_user_value_patch_data'),
         );

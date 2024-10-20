@@ -2,21 +2,16 @@
 
 namespace Application\Controller\Api;
 
-use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Service\SpecificationsService;
 use Autowp\User\Controller\Plugin\User as UserPlugin;
 use Exception;
 use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
-use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\InputFilter\InputFilter;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\Paginator;
 use Laminas\Stdlib\ResponseInterface;
-use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 
 use function Autowp\Commons\currentFromResultSetInterface;
@@ -32,10 +27,6 @@ class AttrController extends AbstractRestfulController
 {
     private SpecificationsService $specsService;
 
-    private AbstractRestHydrator $conflictHydrator;
-
-    private InputFilter $conflictListInputFilter;
-
     private TableGateway $userValueTable;
 
     private InputFilter $userValuePatchQueryFilter;
@@ -44,55 +35,13 @@ class AttrController extends AbstractRestfulController
 
     public function __construct(
         SpecificationsService $specsService,
-        AbstractRestHydrator $conflictHydrator,
-        InputFilter $conflictListInputFilter,
         InputFilter $userValuePatchQueryFilter,
         InputFilter $userValuePatchDataFilter
     ) {
         $this->specsService              = $specsService;
-        $this->conflictHydrator          = $conflictHydrator;
-        $this->conflictListInputFilter   = $conflictListInputFilter;
         $this->userValueTable            = $specsService->getUserValueTable();
         $this->userValuePatchQueryFilter = $userValuePatchQueryFilter;
         $this->userValuePatchDataFilter  = $userValuePatchDataFilter;
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     */
-    public function conflictIndexAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        $this->conflictListInputFilter->setData($this->params()->fromQuery());
-
-        if (! $this->conflictListInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->conflictListInputFilter);
-        }
-
-        $values = $this->conflictListInputFilter->getValues();
-
-        $data = $this->specsService->getConflicts($user['id'], $values['filter'], (int) $values['page'], 30);
-
-        $this->conflictHydrator->setOptions([
-            'fields'   => $values['fields'],
-            'language' => $this->language(),
-            'user_id'  => $user['id'],
-        ]);
-
-        $items = [];
-        foreach ($data['conflicts'] as $conflict) {
-            $items[] = $this->conflictHydrator->extract($conflict);
-        }
-
-        return new JsonModel([
-            'items'     => $items,
-            'paginator' => $data['paginator']->getPages(),
-        ]);
     }
 
     /**

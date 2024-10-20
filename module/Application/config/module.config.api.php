@@ -9,12 +9,11 @@ use Laminas\ServiceManager\Factory\InvokableFactory;
 return [
     'hydrators'   => [
         'factories' => [
-            Hydrator\Api\AttrConflictHydrator::class => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\ItemHydrator::class         => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\ItemParentHydrator::class   => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\PictureHydrator::class      => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\PictureItemHydrator::class  => Hydrator\Api\RestHydrator::class,
-            Hydrator\Api\SimilarHydrator::class      => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ItemHydrator::class        => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\ItemParentHydrator::class  => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\PictureHydrator::class     => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\PictureItemHydrator::class => Hydrator\Api\RestHydrator::class,
+            Hydrator\Api\SimilarHydrator::class     => Hydrator\Api\RestHydrator::class,
         ],
     ],
     'controllers' => [

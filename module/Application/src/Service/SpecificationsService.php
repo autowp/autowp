@@ -20,7 +20,6 @@ use Laminas\Db\TableGateway\TableGateway;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\InputFilter\ArrayInput;
 use Laminas\InputFilter\Input;
-use Laminas\Paginator;
 use NumberFormatter;
 
 use function array_diff;
@@ -29,7 +28,6 @@ use function array_key_exists;
 use function array_keys;
 use function array_merge;
 use function array_replace;
-use function array_reverse;
 use function array_unique;
 use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
@@ -239,37 +237,6 @@ class SpecificationsService
                 }
             }
         }
-    }
-
-    public function getListOptionsArray(int $attributeId): array
-    {
-        $this->loadListOptions([$attributeId]);
-
-        if (! isset($this->listOptions[$attributeId])) {
-            return [];
-        }
-
-        return $this->getListOptionsArrayRecursive($attributeId, 0);
-    }
-
-    private function getListOptionsArrayRecursive(int $aid, int $parentId): array
-    {
-        $result = [];
-        if (isset($this->listOptionsChilds[$aid][$parentId])) {
-            foreach ($this->listOptionsChilds[$aid][$parentId] as $childId) {
-                $result[]     = [
-                    'id'   => (int) $childId,
-                    'name' => $this->translator->translate($this->listOptions[$aid][$childId]),
-                ];
-                $childOptions = $this->getListOptionsArrayRecursive($aid, $childId);
-                foreach ($childOptions as &$value) {
-                    $value['name'] = '… ' . $this->translator->translate($value['name']);
-                }
-                unset($value); // prevent future bugs
-                $result = array_merge($result, $childOptions);
-            }
-        }
-        return $result;
     }
 
     private function getListsOptions(array $attributeIds): array
@@ -618,137 +585,6 @@ class SpecificationsService
                         VALUES (:attribute_id, :item_id, :user_id, :value)
                         ON DUPLICATE KEY UPDATE value = VALUES(value)
                     ', $params);
-
-                    $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
-                }
-            } else {
-                // delete value descriptor
-                $affected = $this->userValueTable->delete($userValuePrimaryKey);
-                // remove value
-                $affected += $userValueDataTable->delete($userValuePrimaryKey);
-
-                if ($affected > 0) {
-                    $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
-                }
-            }
-        }
-
-        if ($somethingChanged) {
-            $this->propagateInheritance($attribute, $itemId);
-
-            $this->propageteEngine($attribute, $itemId);
-
-            $this->refreshConflictFlag($attribute['id'], $itemId);
-        }
-    }
-
-    /**
-     * @param mixed $value
-     * @throws Exception
-     */
-    public function setUserValue(int $uid, int $attributeId, int $itemId, $value): void
-    {
-        $attribute = $this->getAttribute($attributeId);
-        if (! $attribute) {
-            throw new Exception("attribute `$attributeId` not found");
-        }
-        $somethingChanged = false;
-
-        $userValueDataTable = $this->getUserValueDataTable($attribute['typeId']);
-
-        $userValuePrimaryKey = [
-            'attribute_id' => $attribute['id'],
-            'item_id'      => $itemId,
-            'user_id'      => $uid,
-        ];
-
-        if ($attribute['isMultiple']) {
-            // remove value descriptiors
-            $this->userValueTable->delete([
-                'attribute_id = ?' => $attribute['id'],
-                'item_id = ?'      => $itemId,
-                'user_id = ?'      => $uid,
-            ]);
-
-            // remove values
-            $userValueDataTable->delete($userValuePrimaryKey);
-
-            if ($value) {
-                $empty    = true;
-                $valueNot = false;
-                foreach ($value as $oneValue) {
-                    if ($oneValue) {
-                        $empty = false;
-                    }
-
-                    if ($oneValue === self::NULL_VALUE_STR) {
-                        $valueNot = true;
-                    }
-                }
-
-                if (! $empty) {
-                    // insert new descriptiors and values
-                    $this->userValueTable->insert(array_replace([
-                        'add_date'    => new Sql\Expression('NOW()'),
-                        'update_date' => new Sql\Expression('NOW()'),
-                    ], $userValuePrimaryKey));
-                    $ordering = 1;
-
-                    if ($valueNot) {
-                        $value = [null];
-                    }
-
-                    foreach ($value as $oneValue) {
-                        $userValueDataTable->insert(array_replace([
-                            'ordering' => $ordering,
-                            'value'    => $oneValue,
-                        ], $userValuePrimaryKey));
-
-                        $ordering++;
-                    }
-                }
-            }
-
-            $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
-        } else {
-            if (strlen($value) > 0) {
-                // insert/update value decsriptor
-                $userValue = currentFromResultSetInterface($this->userValueTable->select($userValuePrimaryKey));
-
-                // insert update value
-                $userValueData = currentFromResultSetInterface($userValueDataTable->select($userValuePrimaryKey));
-
-                if ($value === self::NULL_VALUE_STR) {
-                    $value = null;
-                }
-
-                if ($userValueData) {
-                    $valueChanged = $value === null
-                        ? $userValueData['value'] !== null
-                        : $userValueData['value'] !== $value;
-                } else {
-                    $valueChanged = true;
-                }
-
-                if (! $userValue || $valueChanged) {
-                    if (! $userValue) {
-                        $this->userValueTable->insert(array_replace([
-                            'add_date'    => new Sql\Expression('NOW()'),
-                            'update_date' => new Sql\Expression('NOW()'),
-                        ], $userValuePrimaryKey));
-                    } else {
-                        $this->userValueTable->update([
-                            'update_date' => new Sql\Expression('NOW()'),
-                        ], $userValuePrimaryKey);
-                    }
-
-                    $set = ['value' => $value];
-
-                    if ($userValueData) {
-                        $userValueDataTable->update($set, $userValuePrimaryKey);
-                    } else {
-                        $userValueDataTable->insert(array_merge($set, $userValuePrimaryKey));
-                    }
 
                     $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
                 }
@@ -1197,11 +1033,6 @@ class SpecificationsService
                 unset($attributes[$idx]);
             }
         }
-    }
-
-    public function getValueTable(): TableGateway
-    {
-        return $this->valueTable;
     }
 
     /**
@@ -1899,53 +1730,6 @@ class SpecificationsService
     /**
      * @throws Exception
      */
-    public function getUserValueText(int $attributeId, int $itemId, int $userId, string $language): ?string
-    {
-        if (! $itemId) {
-            throw new Exception("item_id not set");
-        }
-
-        $attribute = $this->getAttribute($attributeId);
-        if (! $attribute) {
-            throw new Exception("attribute not found");
-        }
-
-        $valuesTable = $this->getUserValueDataTable($attribute['typeId']);
-
-        $select = new Sql\Select($valuesTable->getTable());
-
-        $select->columns(['value'])
-            ->where([
-                'attribute_id' => (int) $attribute['id'],
-                'item_id'      => $itemId,
-                'user_id'      => $userId,
-            ]);
-
-        if ($attribute['isMultiple']) {
-            $select->order('ordering');
-        }
-
-        $values = [];
-        foreach ($valuesTable->selectWith($select) as $row) {
-            $values[] = $this->valueToText($attribute, $row['value'], $language);
-        }
-
-        if (count($values) > 1) {
-            return implode(', ', $values);
-        } elseif (count($values) === 1) {
-            if ($values[0] === null) {
-                return null;
-            } else {
-                return $values[0];
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @throws Exception
-     */
     public function getActualValueText(int $attributeId, int $itemId, string $language): ?string
     {
         if (! $itemId) {
@@ -2290,78 +2074,6 @@ class SpecificationsService
         foreach ($this->userValueTable->select(['item_id' => $itemId]) as $valueRow) {
             $this->refreshConflictFlag($valueRow['attribute_id'], $valueRow['item_id']);
         }
-    }
-
-    /**
-     * @param mixed $filter
-     * @throws Exception
-     */
-    public function getConflicts(int $userId, $filter, int $page, int $perPage): array
-    {
-        $userId = (int) $userId;
-
-        $select = new Sql\Select($this->valueTable->getTable());
-        $select
-            ->join(
-                'attrs_user_values',
-                'attrs_values.attribute_id = attrs_user_values.attribute_id '
-                    . 'and attrs_values.item_id = attrs_user_values.item_id',
-                []
-            )
-            ->where(['attrs_user_values.user_id' => $userId])
-            ->order('attrs_values.update_date desc');
-
-        if ($filter === 'minus-weight') {
-            $select->where(['attrs_user_values.weight < 0']);
-        } elseif ($filter === 0) {
-            $select->where(['attrs_values.conflict']);
-        } elseif ($filter > 0) {
-            $select->where(['attrs_user_values.conflict > 0']);
-        } elseif ($filter < 0) {
-            $select->where(['attrs_user_values.conflict < 0']);
-        }
-
-        /** @var Adapter $adapter */
-        $adapter   = $this->valueTable->getAdapter();
-        $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\LaminasDb\DbSelect($select, $adapter)
-        );
-
-        $paginator
-            ->setItemCountPerPage($perPage)
-            ->setCurrentPageNumber($page);
-
-        $conflicts = [];
-        foreach ($paginator->getCurrentItems() as $valueRow) {
-            $attribute = $this->getAttribute($valueRow['attribute_id']);
-            if (! $attribute) {
-                throw new Exception("attribute `{$valueRow['attribute_id']}` not found");
-            }
-
-            $unit = null;
-            if ($attribute['unitId']) {
-                $unit = $this->getUnit($attribute['unitId']);
-            }
-
-            $attributeName = [];
-            $cAttr         = $attribute;
-            do {
-                $attributeName[] = $this->translator->translate($cAttr['name']);
-                $cAttr           = $this->getAttribute((int) $cAttr['parentId']);
-            } while ($cAttr);
-
-            $conflicts[] = [
-                'attribute_id' => (int) $valueRow['attribute_id'],
-                'item_id'      => (int) $valueRow['item_id'],
-                'attribute'    => implode(' / ', array_reverse($attributeName)),
-                'unit'         => $unit,
-            ];
-        }
-
-        return [
-            'conflicts' => $conflicts,
-            'paginator' => $paginator,
-        ];
     }
 
     public function refreshUsersConflictsStat(): void
