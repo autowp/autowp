@@ -675,7 +675,7 @@ class ItemHydrator extends AbstractRestHydrator
                     if ($pictureRow) {
                         $imagesInfo = $this->imageStorage->getFormatedImage(
                             $pictureRow['image_id'],
-                            'picture-thumb'
+                            'picture-thumb-large'
                         );
                         $src        = $imagesInfo->getSrc();
                     }
