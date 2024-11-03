@@ -306,8 +306,6 @@ class SpecificationsService
             return null;
         }
 
-        $multioptions = $this->getListsOptions([$attributeId]);
-
         $maxlength = null;
         if ($type['maxlength']) {
             $maxlength = $type['maxlength'];
@@ -358,10 +356,9 @@ class SpecificationsService
                         'name'    => 'InArray',
                         'options' => [
                             'haystack' => [
-                                '',
-                                '-',
-                                '0',
-                                '1',
+                                null,
+                                false,
+                                true,
                             ],
                         ],
                     ],
@@ -370,6 +367,8 @@ class SpecificationsService
 
             case 6: // select
             case 7: // treeselect
+                $multioptions = $this->getListsOptions([$attributeId]);
+
                 $haystack = [
                     '',
                     '-',
@@ -393,10 +392,11 @@ class SpecificationsService
         }
 
         return [
-            'type'       => $inputType,
-            'required'   => false,
-            'filters'    => $filters,
-            'validators' => $validators,
+            'type'        => $inputType,
+            'required'    => false,
+            'allow_empty' => true,
+            'filters'     => $filters,
+            'validators'  => $validators,
         ];
     }
 
@@ -547,7 +547,9 @@ class SpecificationsService
                 $value = count($value) > 0 ? $value[0] : null;
             }
 
-            if (strlen($value) > 0 || $empty) {
+            $valueNotEmpty = strlen($value) > 0 || $attribute['typeId'] === 5 && $value === false;
+
+            if ($valueNotEmpty || $empty) {
                 // insert/update value descriptor
                 $userValue = currentFromResultSetInterface($this->userValueTable->select($userValuePrimaryKey));
 
