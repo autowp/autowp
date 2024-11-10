@@ -8,7 +8,6 @@ use Application\Hydrator\Api\AbstractRestHydrator;
 use Application\Hydrator\Api\Strategy\Image;
 use Application\Model\Brand;
 use Application\Model\Catalogue;
-use Application\Model\Categories;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Picture;

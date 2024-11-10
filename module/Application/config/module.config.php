@@ -83,7 +83,6 @@ return [
             Model\PictureModerVote::class        => Model\PictureModerVoteFactory::class,
             Model\PictureView::class             => Model\PictureViewFactory::class,
             Model\PictureVote::class             => Model\Service\PictureVoteFactory::class,
-            Model\Twins::class                   => Model\TwinsFactory::class,
             Model\UserPicture::class             => Model\Service\UserPictureFactory::class,
             Model\UserAccount::class             => Model\UserAccountFactory::class,
             Model\UserItemSubscribe::class       => Model\UserItemSubscribeFactory::class,

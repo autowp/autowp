@@ -41,16 +41,6 @@ class Perspective
         return $this->fetchBySelect($select);
     }
 
-    public function getPairs(): array
-    {
-        $options = [];
-        foreach ($this->getArray() as $row) {
-            $options[$row['id']] = $row['name'];
-        }
-
-        return $options;
-    }
-
     public function getOnlyPairs(array $ids): array
     {
         if (count($ids) <= 0) {
@@ -68,21 +58,6 @@ class Perspective
         }
 
         return $result;
-    }
-
-    public function getGroupPerspectives(int $groupId): array
-    {
-        $select = new Sql\Select($this->table->getTable());
-        $select->columns(['id', 'name'])
-            ->join(
-                'perspectives_groups_perspectives',
-                'perspectives.id = perspectives_groups_perspectives.perspective_id',
-                []
-            )
-            ->where(['perspectives_groups_perspectives.group_id = ?' => $groupId])
-            ->order('perspectives_groups_perspectives.position');
-
-        return $this->fetchBySelect($select);
     }
 
     public function getPageGroupIds(int $pageId): array

@@ -16,10 +16,6 @@ use function usort;
 
 class Catalogue
 {
-    private int $picturesPerPage = 20;
-
-    private int $carsPerPage = 7;
-
     private TableGateway $itemTable;
 
     private ItemParent $itemParent;
@@ -39,26 +35,6 @@ class Catalogue
             'item.body',
             'item.spec_id',
         ];
-    }
-
-    public function picturesOrdering(): array
-    {
-        return [
-            'pictures.width DESC',
-            'pictures.height DESC',
-            'pictures.add_date DESC',
-            'pictures.id DESC',
-        ];
-    }
-
-    public function getCarsPerPage(): int
-    {
-        return $this->carsPerPage;
-    }
-
-    public function getPicturesPerPage(): int
-    {
-        return $this->picturesPerPage;
     }
 
     /**

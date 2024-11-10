@@ -837,32 +837,6 @@ class Picture
     }
 
     /**
-     * @throws Exception
-     */
-    public function getCountDistinct(array $options): int
-    {
-        $select = $this->getSelect($options);
-
-        $select->reset(Sql\Select::LIMIT);
-        $select->reset(Sql\Select::OFFSET);
-        $select->reset(Sql\Select::ORDER);
-        $select->reset(Sql\Select::COLUMNS);
-        $select->reset(Sql\Select::GROUP);
-        $select->columns(['id']);
-        $select->quantifier(Sql\Select::QUANTIFIER_DISTINCT);
-
-        $countSelect = new Sql\Select();
-
-        $countSelect->columns(['count' => new Sql\Expression('COUNT(1)')]);
-        $countSelect->from(['original_select' => $select]);
-
-        $statement = $this->itemTable->getSql()->prepareStatementForSqlObject($countSelect);
-        $row       = $statement->execute()->current();
-
-        return (int) $row['count'];
-    }
-
-    /**
      * @return array|ArrayObject|null
      * @throws Exception
      */
@@ -898,23 +872,6 @@ class Picture
         $result = [];
         foreach ($this->table->selectWith($select) as $row) {
             $result[] = $row;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getIds(array $options): array
-    {
-        $select = $this->getSelect($options);
-        $select->reset($select::COLUMNS);
-        $select->columns(['id']);
-
-        $result = [];
-        foreach ($this->table->selectWith($select) as $row) {
-            $result[] = (int) $row['id'];
         }
 
         return $result;
