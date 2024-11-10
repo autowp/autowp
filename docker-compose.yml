@@ -40,7 +40,6 @@ services:
       AUTOWP_FACEBOOK_APP_SECRET: ""
       AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN: ""
       AUTOWP_VK_TOKEN: ""
-      SONARCLOUD_TOKEN: ${SONARCLOUD_TOKEN}
     volumes:
     - ./config:/app/config
     - ./data:/app/data
@@ -92,16 +91,16 @@ services:
     container_name: autowp_test_frontend
     restart: always
     volumes:
-    - "./frontend/be-BY:/usr/share/nginx/html/be-BY"
-    - "./frontend/en-GB:/usr/share/nginx/html/en-GB"
-    - "./frontend/fr:/usr/share/nginx/html/fr"
-    - "./frontend/pt-BR:/usr/share/nginx/html/pt-BR"
-    - "./frontend/ru:/usr/share/nginx/html/ru"
-    - "./frontend/uk:/usr/share/nginx/html/uk"
-    - "./frontend/zh-CN:/usr/share/nginx/html/zh-CN"
-    - "./frontend/es:/usr/share/nginx/html/es"
-    - "./frontend/it:/usr/share/nginx/html/it"
-    - "./frontend/he:/usr/share/nginx/html/he"
+    - "./frontend/browser/be-BY:/usr/share/nginx/html/be-BY"
+    - "./frontend/browser/en-GB:/usr/share/nginx/html/en-GB"
+    - "./frontend/browser/fr:/usr/share/nginx/html/fr"
+    - "./frontend/browser/pt-BR:/usr/share/nginx/html/pt-BR"
+    - "./frontend/browser/ru:/usr/share/nginx/html/ru"
+    - "./frontend/browser/uk:/usr/share/nginx/html/uk"
+    - "./frontend/browser/zh-CN:/usr/share/nginx/html/zh-CN"
+    - "./frontend/browser/es:/usr/share/nginx/html/es"
+    - "./frontend/browser/it:/usr/share/nginx/html/it"
+    - "./frontend/browser/he:/usr/share/nginx/html/he"
     - "../autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
     - "./hostmap:/etc/nginx/hostmap:ro"
     user: "101:101"
@@ -129,10 +128,10 @@ services:
       - POSTGRES_PASSWORD=password
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.40.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.44.2
     container_name: autowp_test_goautowp_serve
     restart: always
-    command: serve --df-amqp --monitoring-amqp --grpc --public --private --autoban
+    command: serve --df-amqp --monitoring-amqp --grpc --public --private --autoban --attrs-update-values-amqp
     depends_on:
       - rabbitmq
       - mysql
@@ -145,6 +144,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
     ports:
       - "2112:2112"
+      - "2113:8080"
 
   minio:
     image: quay.io/minio/minio

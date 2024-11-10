@@ -4,38 +4,12 @@ declare(strict_types=1);
 
 namespace Application;
 
-use Application\InputFilter\AttrUserValueCollectionInputFilter;
 use Autowp\Comments\CommentsService;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Laminas\InputFilter\InputFilter;
 
 return [
     'input_filter_specs' => [
-        'api_attr_user_value_patch_query'      => [
-            'item_id' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-        ],
-        'api_attr_user_value_patch_data'       => [
-            'item_id' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'items'   => [
-                'type' => AttrUserValueCollectionInputFilter::class,
-            ],
-        ],
         'api_contacts_list'                    => [
             'fields' => [
                 'required' => false,

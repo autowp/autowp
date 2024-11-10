@@ -229,10 +229,6 @@ return [
     ],
     'mosts_min_vehicles_count' => 200,
     'input_filters'            => [
-        'factories'          => [
-            InputFilter\AttrUserValueCollectionInputFilter::class
-                => InputFilter\AttrUserValueCollectionInputFilterFactory::class,
-        ],
         'abstract_factories' => [
             InputFilterAbstractServiceFactory::class,
         ],

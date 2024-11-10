@@ -680,22 +680,6 @@ class ItemParent
         return $result;
     }
 
-    public function getParentIds(int $itemId): array
-    {
-        $select = new Sql\Select($this->itemParentTable->getTable());
-        $select->columns(['parent_id'])
-            ->where(['item_id' => $itemId]);
-
-        $rows = $this->itemParentTable->selectWith($select);
-
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = (int) $row['parent_id'];
-        }
-
-        return $result;
-    }
-
     /**
      * @return array|ArrayObject|null
      * @throws Exception
@@ -917,25 +901,6 @@ class ItemParent
 
         $row = currentFromResultSetInterface($this->itemParentTable->selectWith($select));
         return $row ? (int) $row['count'] : 0;
-    }
-
-    public function getChildItemsCountArray(array $parentIds): array
-    {
-        if (count($parentIds) <= 0) {
-            return [];
-        }
-
-        $select = new Sql\Select($this->itemParentTable->getTable());
-        $select->columns(['parent_id', 'count' => new Sql\Expression('count(1)')])
-            ->where([new Sql\Predicate\In('parent_id', $parentIds)])
-            ->group('parent_id');
-
-        $result = [];
-        foreach ($this->itemParentTable->selectWith($select) as $row) {
-            $result[(int) $row['parent_id']] = (int) $row['count'];
-        }
-
-        return $result;
     }
 
     public function getTable(): TableGateway

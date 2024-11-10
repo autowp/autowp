@@ -19,7 +19,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\Api\AccountController::class      => Controller\Api\AccountControllerFactory::class,
-            Controller\Api\AttrController::class         => Controller\Api\AttrControllerFactory::class,
             Controller\Api\BrandsController::class       => Controller\Api\BrandsControllerFactory::class,
             Controller\Api\ChartController::class        => Controller\Api\ChartControllerFactory::class,
             Controller\Api\InboxController::class        => Controller\Api\InboxControllerFactory::class,
@@ -97,126 +96,6 @@ return [
                                             'verb'     => 'post',
                                             'defaults' => [
                                                 'action' => 'start',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'attr'             => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/attr',
-                            'defaults' => [
-                                'controller' => Controller\Api\AttrController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'attribute'  => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/attribute',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get'  => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'attribute-index',
-                                            ],
-                                        ],
-                                    ],
-                                    'post' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'attribute-post',
-                                            ],
-                                        ],
-                                    ],
-                                    'item' => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/:id',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'get'   => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'get',
-                                                    'defaults' => [
-                                                        'action' => 'attribute-item-get',
-                                                    ],
-                                                ],
-                                            ],
-                                            'patch' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'patch',
-                                                    'defaults' => [
-                                                        'action' => 'attribute-item-patch',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'conflict'   => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/conflict',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'get' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'conflict-index',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'user-value' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/user-value',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'patch' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'patch',
-                                            'defaults' => [
-                                                'action' => 'user-value-patch',
-                                            ],
-                                        ],
-                                    ],
-                                    'item'  => [
-                                        'type'          => 'Segment',
-                                        'options'       => [
-                                            'route' => '/:attribute_id/:item_id/:user_id',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'delete' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'delete',
-                                                    'defaults' => [
-                                                        'action' => 'user-value-item-delete',
-                                                    ],
-                                                ],
                                             ],
                                         ],
                                     ],

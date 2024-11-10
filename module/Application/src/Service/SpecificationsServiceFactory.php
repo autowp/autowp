@@ -9,7 +9,6 @@ use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
-use Autowp\User\Model\User;
 use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -32,22 +31,17 @@ class SpecificationsServiceFactory implements FactoryInterface
             $container->get(ItemParent::class),
             $container->get(Picture::class),
             $container->get(VehicleType::class),
-            $container->get(User::class),
             $tables->get('attrs_units'),
             $tables->get('attrs_list_options'),
-            $tables->get('attrs_types'),
             $tables->get('attrs_attributes'),
             $tables->get('attrs_zone_attributes'),
             $tables->get('attrs_user_values'),
-            $tables->get('attrs_user_values_float'),
-            $tables->get('attrs_user_values_int'),
-            $tables->get('attrs_user_values_list'),
-            $tables->get('attrs_user_values_string'),
             $tables->get('attrs_values'),
             $tables->get('attrs_values_float'),
             $tables->get('attrs_values_int'),
             $tables->get('attrs_values_list'),
-            $tables->get('attrs_values_string')
+            $tables->get('attrs_values_string'),
+            $container->get('RabbitMQ')
         );
     }
 }
