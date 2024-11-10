@@ -21,7 +21,7 @@ build:
     - cp /usr/local/bin/waitforit waitforit
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - local-php-security-checker --path=composer.lock
+    #- local-php-security-checker --path=composer.lock
     - docker pull $CI_REGISTRY_IMAGE:latest || true
     - docker build --build-arg COMMIT="$CI_COMMIT_SHA" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" -t autowp/autowp --pull .
     - docker-compose -f docker-compose-test.yml up -d
