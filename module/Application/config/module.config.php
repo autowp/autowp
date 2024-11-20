@@ -193,7 +193,7 @@ return [
             'aliases'  => [],
         ],
     ],
-    'content_languages'  => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp'],
+    'content_languages'  => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'jp', 'he'],
 
     /*'acl' => [
         'cache'         => 'long',
