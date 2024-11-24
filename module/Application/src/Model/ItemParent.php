@@ -12,11 +12,8 @@ use Laminas\Db\TableGateway\TableGateway;
 
 use function array_key_exists;
 use function array_keys;
-use function array_merge;
 use function array_replace;
-use function array_unique;
 use function Autowp\Commons\currentFromResultSetInterface;
-use function count;
 use function in_array;
 use function ltrim;
 use function mb_strlen;
@@ -46,34 +43,6 @@ class ItemParent
 
     private array $languages;
 
-    private array $allowedCombinations = [
-        Item::VEHICLE   => [
-            Item::VEHICLE => true,
-        ],
-        Item::ENGINE    => [
-            Item::ENGINE => true,
-        ],
-        Item::CATEGORY  => [
-            Item::VEHICLE  => true,
-            Item::CATEGORY => true,
-            Item::BRAND    => true,
-        ],
-        Item::TWINS     => [
-            Item::VEHICLE => true,
-        ],
-        Item::BRAND     => [
-            Item::BRAND   => true,
-            Item::VEHICLE => true,
-            Item::ENGINE  => true,
-        ],
-        Item::FACTORY   => [
-            Item::VEHICLE => true,
-            Item::ENGINE  => true,
-        ],
-        Item::PERSON    => [],
-        Item::COPYRIGHT => [],
-    ];
-
     private array $catnameBlacklist = ['sport', 'tuning', 'related', 'pictures', 'specifications'];
 
     private TableGateway $specTable;
@@ -94,10 +63,9 @@ class ItemParent
         ItemAlias $itemAlias,
         Item $itemModel
     ) {
-        $this->languages = $languages;
-        $this->specTable = $specTable;
-        $this->itemModel = $itemModel;
-
+        $this->languages               = $languages;
+        $this->specTable               = $specTable;
+        $this->itemModel               = $itemModel;
         $this->itemTable               = $itemTable;
         $this->itemParentTable         = $itemParentTable;
         $this->itemParentLanguageTable = $itemParentLanguageTable;
@@ -273,189 +241,6 @@ class ItemParent
         return $catname;
     }
 
-    public function isAllowedCombination(int $itemTypeId, int $parentItemTypeId): bool
-    {
-        return isset($this->allowedCombinations[$parentItemTypeId][$itemTypeId]);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function create(int $parentId, int $itemId, array $options = []): bool
-    {
-        $parentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
-        $itemRow   = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
-        if (! $parentRow || ! $itemRow) {
-            return false;
-        }
-
-        if (! $parentRow['is_group']) {
-            throw new Exception("Only groups can have childs");
-        }
-
-        if (! $this->isAllowedCombination($itemRow['item_type_id'], $parentRow['item_type_id'])) {
-            throw new Exception("That type of parent is not allowed for this type");
-        }
-
-        $itemId   = (int) $itemRow['id'];
-        $parentId = (int) $parentRow['id'];
-
-        if (isset($options['catname'])) {
-            $allowed = $this->isAllowedCatname($itemId, $parentId, $options['catname']);
-            if (! $allowed) {
-                unset($options['catname']);
-            }
-        }
-
-        if (array_key_exists('type', $options) && $options['type'] === null) {
-            unset($options['type']);
-        }
-
-        $defaults = [
-            'type'           => self::TYPE_DEFAULT,
-            'catname'        => null,
-            'manual_catname' => isset($options['catname']),
-        ];
-        $options  = array_replace($defaults, $options);
-
-        if (! isset($options['catname']) || ! $options['catname'] || $options['catname'] === '_') {
-            $catname = $this->extractCatname($parentRow, $itemRow);
-            if (! $catname) {
-                throw new Exception('Failed to create catname');
-            }
-
-            $options['catname'] = $catname;
-        }
-
-        if (! isset($options['type'])) {
-            throw new Exception("Type cannot be null");
-        }
-
-        $parentIds = $this->collectAncestorsIds($parentId);
-        if (in_array($itemId, $parentIds)) {
-            throw new Exception('Cycle detected');
-        }
-
-        $itemParentRow = currentFromResultSetInterface($this->itemParentTable->select([
-            'parent_id' => $parentId,
-            'item_id'   => $itemId,
-        ]));
-
-        if ($itemParentRow) {
-            return false;
-        }
-
-        $this->itemParentTable->insert([
-            'parent_id'      => $parentId,
-            'item_id'        => $itemId,
-            'type'           => $options['type'],
-            'catname'        => $options['catname'],
-            'manual_catname' => $options['manual_catname'] ? 1 : 0,
-            'timestamp'      => new Sql\Expression('now()'),
-        ]);
-
-        $values = [];
-        foreach ($this->languages as $language) {
-            $values[$language] = [
-                'name' => $this->extractName($parentRow, $itemRow, $language),
-            ];
-        }
-
-        $this->setItemParentLanguages($parentId, $itemId, $values, true);
-
-        $this->rebuildCache($itemId);
-
-        return true;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function move(int $itemId, int $fromParentId, int $toParentId): bool
-    {
-        $oldParentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $fromParentId]));
-        $newParentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $toParentId]));
-        $itemRow      = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
-        if (! $oldParentRow || ! $newParentRow || ! $itemRow) {
-            return false;
-        }
-
-        if ((int) $oldParentRow['id'] === (int) $newParentRow['id']) {
-            return false;
-        }
-
-        if (! $oldParentRow['is_group']) {
-            throw new Exception("Only groups can have childs");
-        }
-
-        if (! $newParentRow['is_group']) {
-            throw new Exception("Only groups can have childs");
-        }
-
-        if (! $this->isAllowedCombination($itemRow['item_type_id'], $newParentRow['item_type_id'])) {
-            throw new Exception("That type of parent is not allowed for this type");
-        }
-
-        $itemId = (int) $itemRow['id'];
-
-        $parentIds = $this->collectAncestorsIds($newParentRow['id']);
-        if (in_array($itemId, $parentIds)) {
-            throw new Exception('Cycle detected');
-        }
-
-        $primaryKey = [
-            'parent_id' => $fromParentId,
-            'item_id'   => $itemId,
-        ];
-
-        $itemParentRow = currentFromResultSetInterface($this->itemParentTable->select($primaryKey));
-
-        if (! $itemParentRow) {
-            return false;
-        }
-
-        $this->itemParentTable->update([
-            'parent_id' => $toParentId,
-        ], $primaryKey);
-
-        $this->itemParentLanguageTable->update([
-            'parent_id' => $toParentId,
-        ], $primaryKey);
-
-        $this->rebuildCache($itemRow['id']);
-
-        $this->refreshAuto($toParentId, $itemId);
-
-        return true;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function remove(int $parentId, int $itemId): void
-    {
-        $parentRow = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
-        $itemRow   = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
-        if (! $parentRow || ! $itemRow) {
-            return;
-        }
-
-        $itemId   = (int) $itemRow['id'];
-        $parentId = (int) $parentRow['id'];
-
-        $this->itemParentTable->delete([
-            'item_id = ?'   => $itemId,
-            'parent_id = ?' => $parentId,
-        ]);
-
-        $this->itemParentLanguageTable->delete([
-            'item_id = ?'   => $itemId,
-            'parent_id = ?' => $parentId,
-        ]);
-
-        $this->rebuildCache($itemRow['id']);
-    }
-
     /**
      * @throws Exception
      */
@@ -521,67 +306,6 @@ class ItemParent
             }
             $this->setItemParentLanguage($parentId, $itemId, $language, $languageValues, $forceIsAuto);
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function setItemParent(int $parentId, int $itemId, array $values, bool $forceIsAuto): bool
-    {
-        $itemParentRow = currentFromResultSetInterface($this->itemParentTable->select([
-            'parent_id' => $parentId,
-            'item_id'   => $itemId,
-        ]));
-
-        if (! $itemParentRow) {
-            return false;
-        }
-
-        $set          = [];
-        $rebuildCache = false;
-
-        if (array_key_exists('type', $values)) {
-            $set['type']  = $values['type'];
-            $rebuildCache = true;
-        }
-
-        if (array_key_exists('catname', $values)) {
-            $newCatname = $values['catname'];
-
-            if ($forceIsAuto) {
-                $isAuto = true;
-            } else {
-                $isAuto = ! $itemParentRow['manual_catname'];
-                if ($itemParentRow['catname'] !== $newCatname) {
-                    $isAuto = false;
-                }
-            }
-
-            if (! $newCatname || $newCatname === '_' || in_array($newCatname, $this->catnameBlacklist)) {
-                $parentRow  = currentFromResultSetInterface($this->itemTable->select(['id' => $parentId]));
-                $itemRow    = currentFromResultSetInterface($this->itemTable->select(['id' => $itemId]));
-                $newCatname = $this->extractCatname($parentRow, $itemRow);
-                $isAuto     = true;
-            }
-
-            $set = array_replace($set, [
-                'catname'        => $newCatname,
-                'manual_catname' => $isAuto ? 0 : 1,
-            ]);
-        }
-
-        if ($set) {
-            $this->itemParentTable->update($set, [
-                'parent_id = ?' => $parentId,
-                'item_id = ?'   => $itemId,
-            ]);
-        }
-
-        if ($rebuildCache) {
-            $this->rebuildCache($itemId);
-        }
-
-        return true;
     }
 
     /**
@@ -753,29 +477,6 @@ class ItemParent
         }
 
         return $result;
-    }
-
-    private function collectAncestorsIds(int $id): array
-    {
-        $cpTableName = $this->itemParentTable->getTable();
-
-        $toCheck = [$id];
-        $ids     = [];
-
-        while (count($toCheck) > 0) {
-            $ids = array_merge($ids, $toCheck);
-
-            $select = new Sql\Select($cpTableName);
-            $select->columns(['parent_id'])
-                ->where([new Sql\Predicate\In('item_id', $toCheck)]);
-
-            $toCheck = [];
-            foreach ($this->itemParentTable->selectWith($select) as $row) {
-                $toCheck [] = (int) $row['parent_id'];
-            }
-        }
-
-        return array_unique($ids);
     }
 
     private function collectParentInfo(int $id, int $diff = 1): array

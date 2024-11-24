@@ -517,7 +517,7 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'get'    => [
+                                    'get' => [
                                         'type'    => 'Method',
                                         'options' => [
                                             'verb'     => 'get',
@@ -525,33 +525,6 @@ return [
                                                 'action' => 'item',
                                             ],
                                         ],
-                                    ],
-                                    'put'    => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'put',
-                                            'defaults' => [
-                                                'action' => 'put',
-                                            ],
-                                        ],
-                                    ],
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'delete',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'post' => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'post',
                                     ],
                                 ],
                             ],
