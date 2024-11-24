@@ -2079,31 +2079,6 @@ class ItemController extends AbstractRestfulController
      * @return ViewModel|ResponseInterface|array
      * @throws Exception
      */
-    public function refreshInheritanceAction()
-    {
-        if (! $this->user()->enforce('specifications', 'admin')) {
-            return $this->forbiddenAction();
-        }
-
-        /** @psalm-suppress InvalidCast */
-        $item = $this->itemModel->getRow(['id' => (int) $this->params('id')]);
-        if (! $item) {
-            return $this->notFoundAction();
-        }
-
-        $this->itemModel->updateInteritance($item['id']);
-
-        $this->specsService->updateActualValues($item['id']);
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        return $response->setStatusCode(Response::STATUS_CODE_200);
-    }
-
-    /**
-     * @return ViewModel|ResponseInterface|array
-     * @throws Exception
-     */
     public function specificationsAction()
     {
         /** @psalm-suppress InvalidCast */
