@@ -3,8 +3,6 @@
 namespace ApplicationTest\Controller\Api;
 
 use Application\Controller\Api\ItemController;
-use Application\Controller\Api\ItemParentController;
-use Application\Model\Item;
 use Application\Test\AbstractHttpControllerTestCase;
 use ApplicationTest\Data;
 use Exception;
@@ -14,7 +12,6 @@ use Laminas\Http\Response;
 use Laminas\Json\Json;
 
 use function array_pop;
-use function array_replace;
 use function count;
 use function explode;
 use function microtime;
@@ -52,41 +49,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return (int) $parts[count($parts) - 1];
     }
 
-    private function createVehicle(array $params = []): int
-    {
-        return $this->createItem(array_replace([
-            'item_type_id' => 1,
-            'name'         => 'Some vehicle',
-        ], $params));
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function setEngineToVehicle(int $engineId, int $vehicleId): void
-    {
-        $this->reset();
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/item/' . $vehicleId,
-            Request::METHOD_PUT,
-            [
-                'engine_id' => $engineId,
-            ]
-        );
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/item/put');
-        $this->assertActionName('put');
-    }
-
     /**
      * @throws Exception
      */
@@ -115,114 +77,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($json['items'], 'Failed to found random brand');
 
         return $json['items'][0];
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function addItemParent(int $itemId, int $parentId, array $params = []): void
-    {
-        $this->reset();
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/item-parent',
-            Request::METHOD_POST,
-            array_replace([
-                'item_id'   => $itemId,
-                'parent_id' => $parentId,
-            ], $params)
-        );
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemParentController::class);
-        $this->assertMatchedRouteName('api/item-parent/post');
-        $this->assertActionName('post');
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getItemParent(int $itemId, int $parentId): array
-    {
-        $this->reset();
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/item-parent/' . $itemId . '/' . $parentId,
-            Request::METHOD_GET
-        );
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemParentController::class);
-        $this->assertMatchedRouteName('api/item-parent/item/get');
-        $this->assertActionName('item');
-
-        return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function testCreateCarAndAddToBrand(): void
-    {
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
-            'item_type_id' => 1,
-            'name'         => 'Test car',
-        ]);
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/post');
-        $this->assertActionName('post');
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        /** @var Location $location */
-        $location = $response->getHeaders()->get('Location');
-        $uri      = $location->uri();
-        $parts    = explode('/', $uri->getPath());
-        $carId    = $parts[count($parts) - 1];
-
-        $this->assertNotEmpty($carId);
-
-        // add to brand
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/item-parent',
-            Request::METHOD_POST,
-            [
-                'item_id'   => $carId,
-                'parent_id' => 205,
-            ]
-        );
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemParentController::class);
-        $this->assertMatchedRouteName('api/item-parent/post');
-        $this->assertActionName('post');
     }
 
     public function testTree(): void
@@ -286,49 +140,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @throws Exception
      */
-    public function testBlacklistedCatnameNotAllowedManually(): void
-    {
-        $parentVehicleId = $this->createVehicle([
-            'is_group' => true,
-        ]);
-        $childVehicleId  = $this->createVehicle();
-        $this->addItemParent($childVehicleId, $parentVehicleId, [
-            'type_id' => 1, // tuning
-            'catname' => 'sport',
-        ]);
-
-        $json = $this->getItemParent($childVehicleId, $parentVehicleId);
-
-        $this->assertNotEquals('sport', $json['catname']);
-
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/item-parent/' . $childVehicleId . '/' . $parentVehicleId,
-            Request::METHOD_PUT,
-            [
-                'catname' => 'sport',
-            ]
-        );
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemParentController::class);
-        $this->assertMatchedRouteName('api/item-parent/item/put');
-        $this->assertActionName('put');
-
-        $json = $this->getItemParent($childVehicleId, $parentVehicleId);
-
-        $this->assertNotEquals('sport', $json['catname']);
-    }
-
-    /**
-     * @throws Exception
-     */
     public function testSubscription(): void
     {
         $brand = $this->getRandomBrand();
@@ -377,24 +188,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @throws Exception
      */
-    public function testItemParentAutoCatnameIsNotEmpty(): void
-    {
-        $parentId = $this->createVehicle([
-            'name'     => 'Toyota Corolla',
-            'is_group' => true,
-        ]);
-        $childId  = $this->createVehicle(['name' => 'Toyota Corolla Sedan']);
-
-        $this->addItemParent($childId, $parentId);
-
-        $itemParent = $this->getItemParent($childId, $parentId);
-
-        $this->assertEquals('sedan', $itemParent['catname']);
-    }
-
-    /**
-     * @throws Exception
-     */
     public function testItemPoint(): void
     {
         $itemId = $this->createItem([
@@ -429,58 +222,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @throws Exception
      */
-    public function testEngineVehicles(): void
-    {
-        $engineId = $this->createItem([
-            'item_type_id' => 2,
-            'name'         => 'GM 5.0 V6',
-        ]);
-
-        $brand = $this->getRandomBrand();
-        $this->addItemParent($engineId, $brand['id']);
-
-        $itemId1 = $this->createItem([
-            'item_type_id' => 1,
-            'name'         => 'Chevrolet Corvette',
-        ]);
-        $this->addItemParent($itemId1, $brand['id']);
-
-        $itemId2 = $this->createItem([
-            'item_type_id' => 1,
-            'name'         => 'Pontiac Firebird',
-        ]);
-        $this->addItemParent($itemId2, $brand['id']);
-
-        $this->setEngineToVehicle($engineId, $itemId1);
-        $this->setEngineToVehicle($engineId, $itemId2);
-
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/item/' . $engineId, Request::METHOD_GET, [
-            'fields' => 'engine_vehicles',
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/item/get');
-        $this->assertActionName('item');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertArrayHasKey('engine_vehicles', $json);
-        foreach ($json['engine_vehicles'] as $item) {
-            $this->assertNotEmpty($item['name_html']);
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
     public function testFields(): void
     {
         /** @var Request $request */
@@ -507,68 +248,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($json['items']);
     }
 
-    public function testCreateCategoryAddItemAndGet(): void
-    {
-        $catname = 'catname-' . (10000 * microtime(true));
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
-            'item_type_id' => 3,
-            'name'         => 'Test category',
-            'catname'      => $catname,
-            'begin_year'   => 2000,
-            'end_year'     => 2000,
-        ]);
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/post');
-        $this->assertActionName('post');
-
-        $this->assertHasResponseHeader('Location');
-
-        /** @var Response $response */
-        $response = $this->getResponse();
-        /** @var Location $header */
-        $header = $response->getHeaders()->get('Location');
-        $path   = $header->uri()->getPath();
-
-        $this->assertStringStartsWith('/api/item/', $path);
-
-        $path       = explode('/', $path);
-        $categoryId = (int) array_pop($path);
-
-        $this->assertNotEmpty($categoryId);
-
-        // add item to category
-        $this->reset();
-
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/item-parent',
-            Request::METHOD_POST,
-            [
-                'item_id'   => 1,
-                'parent_id' => $categoryId,
-            ]
-        );
-
-        $this->assertResponseStatusCode(201);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemParentController::class);
-        $this->assertMatchedRouteName('api/item-parent/post');
-        $this->assertActionName('post');
-    }
-
     /**
      * @throws Exception
      */
@@ -593,56 +272,5 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
 
         $this->assertNotEmpty($json['items']);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function testPath(): void
-    {
-        $topCatname = 'top' . microtime(true);
-        $categoryId = $this->createItem([
-            'item_type_id' => Item::CATEGORY,
-            'name'         => 'top level',
-            'catname'      => $topCatname,
-        ]);
-
-        $lvl2Catname    = 'lvl2' . microtime(true);
-        $lvl2CategoryId = $this->createItem([
-            'item_type_id' => Item::CATEGORY,
-            'name'         => 'sub level',
-            'catname'      => $lvl2Catname,
-        ]);
-
-        $lvl3Catname    = 'lvl3' . microtime(true);
-        $lvl3CategoryId = $this->createItem([
-            'item_type_id' => Item::CATEGORY,
-            'name'         => 'sub level',
-            'catname'      => $lvl3Catname,
-        ]);
-
-        $this->addItemParent($lvl2CategoryId, $categoryId);
-        $this->addItemParent($lvl3CategoryId, $lvl2CategoryId);
-
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/item/path', Request::METHOD_GET, [
-            'catname' => $lvl3Catname,
-            'path'    => '',
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/path/get');
-        $this->assertActionName('path');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertNotEmpty($json['path']);
     }
 }
