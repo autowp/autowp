@@ -107,8 +107,6 @@ class ItemController extends AbstractRestfulController
 
     private array $collators = [];
 
-    private SpecificationsService $specsService;
-
     private Storage $imageStorage;
 
     public function __construct(
@@ -126,7 +124,6 @@ class ItemController extends AbstractRestfulController
         Item $itemModel,
         VehicleType $vehicleType,
         InputFilterPluginManager $inputFilterManager,
-        SpecificationsService $specsService,
         Storage $imageStorage
     ) {
         $this->hydrator              = $hydrator;
@@ -143,7 +140,6 @@ class ItemController extends AbstractRestfulController
         $this->itemModel             = $itemModel;
         $this->vehicleType           = $vehicleType;
         $this->inputFilterManager    = $inputFilterManager;
-        $this->specsService          = $specsService;
         $this->imageStorage          = $imageStorage;
     }
 
@@ -1638,7 +1634,7 @@ class ItemController extends AbstractRestfulController
         $this->itemParent->refreshAutoByVehicle($item['id']);
 
         if ($updateActual) {
-            $this->specsService->updateActualValues($item['id']);
+            $this->specificationsService->updateActualValues($item['id']);
         }
 
         if ($subscribe) {
@@ -1939,7 +1935,7 @@ class ItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $specs = $this->specsService->specifications([$item], [
+        $specs = $this->specificationsService->specifications([$item], [
             'language' => $this->language(),
         ]);
 
@@ -1967,7 +1963,7 @@ class ItemController extends AbstractRestfulController
             'parent' => $item['id'],
         ]);
 
-        $specs = $this->specsService->specifications($childItems, [
+        $specs = $this->specificationsService->specifications($childItems, [
             'language' => $this->language(),
         ]);
 

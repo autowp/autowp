@@ -45,7 +45,6 @@ class ItemControllerFactory implements FactoryInterface
             $container->get(Item::class),
             $container->get(VehicleType::class),
             $container->get('InputFilterManager'),
-            $container->get(SpecificationsService::class),
             $container->get(Storage::class)
         );
     }
