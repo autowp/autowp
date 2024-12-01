@@ -1173,10 +1173,6 @@ class ItemController extends AbstractRestfulController
             unset($spec['full_name']);
         }
 
-        if ($itemTypeId !== Item::VEHICLE) {
-            unset($spec['engine_id']);
-        }
-
         if (! in_array($itemTypeId, [Item::CATEGORY, Item::BRAND])) {
             unset($spec['catname']);
         }
