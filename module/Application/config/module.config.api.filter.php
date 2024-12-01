@@ -587,51 +587,6 @@ return [
                 ],
             ],
         ],
-        'api_item_language_put'                => [
-            'name'      => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'max' => 255,
-                        ],
-                    ],
-                ],
-            ],
-            'text'      => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'max' => 4096,
-                        ],
-                    ],
-                ],
-            ],
-            'full_text' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'max' => 65536,
-                        ],
-                    ],
-                ],
-            ],
-        ],
         'api_item_logo_put'                    => [
             'file' => [
                 'required'   => true,

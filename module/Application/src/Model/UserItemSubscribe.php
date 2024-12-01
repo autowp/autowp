@@ -36,14 +36,6 @@ class UserItemSubscribe
         ]);
     }
 
-    public function unsubscribe(int $userId, int $itemId): void
-    {
-        $this->table->delete([
-            'user_id' => $userId,
-            'item_id' => $itemId,
-        ]);
-    }
-
     public function getItemSubscribers(int $itemId): ResultSetInterface
     {
         $table = $this->userModel->getTable();

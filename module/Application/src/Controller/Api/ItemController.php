@@ -1159,17 +1159,6 @@ class ItemController extends AbstractRestfulController
                 'required'    => false,
                 'allow_empty' => true,
             ],
-            'subscription'              => [
-                'required'    => false,
-                'allow_empty' => true,
-            ],
-            'engine_id'                 => [
-                'required'    => false,
-                'allow_empty' => true,
-                'filters'     => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
         ];
 
         $pointFields = in_array($itemTypeId, [
@@ -1478,14 +1467,6 @@ class ItemController extends AbstractRestfulController
         $notifyMeta   = false;
         $subscribe    = false;
 
-        if (array_key_exists('subscription', $values)) {
-            if ($values['subscription']) {
-                $subscribe = true;
-            } else {
-                $this->userItemSubscribe->unsubscribe($user['id'], $item['id']);
-            }
-        }
-
         if (array_key_exists('name', $values)) {
             $notifyMeta  = true;
             $subscribe   = true;
@@ -1637,131 +1618,6 @@ class ItemController extends AbstractRestfulController
             } else {
                 $set['spec_inherit'] = 0;
                 $set['spec_id']      = $values['spec_id'] ? (int) $values['spec_id'] : null;
-            }
-        }
-
-        if (array_key_exists('engine_id', $values)) {
-            if (! $this->user()->enforce('specifications', 'edit-engine')) {
-                return $this->forbiddenAction();
-            }
-
-            if (! $this->user()->enforce('specifications', 'edit')) {
-                return $this->forbiddenAction();
-            }
-
-            $updateActual = true;
-            $subscribe    = true;
-
-            if ($values['engine_id'] === 'inherited') {
-                $set['engine_inherit'] = 1;
-                $set['engine_item_id'] = null;
-
-                $message = sprintf(
-                    'У автомобиля %s установлено наследование двигателя',
-                    htmlspecialchars($this->car()->formatName($item, 'en'))
-                );
-                $this->log($message, [
-                    'items' => $item['id'],
-                ]);
-
-                $user = $this->user()->get();
-
-                foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                    if ($subscriber && ((int) $subscriber['id'] !== (int) $user['id'])) {
-                        $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
-
-                        $message = sprintf(
-                            $this->translate(
-                                'pm/user-%s-set-inherited-vehicle-engine-%s-%s',
-                                'default',
-                                $subscriber['language']
-                            ),
-                            $this->userUrl($user, $uri),
-                            $this->car()->formatName($item, $subscriber['language']),
-                            $this->itemModerUrl($item['id'], $uri)
-                        );
-
-                        $this->message->send(null, $subscriber['id'], $message);
-                    }
-                }
-            } elseif ($values['engine_id'] === null || $values['engine_id'] === '') {
-                $engine = $this->itemModel->getRow(['id' => (int) $item['engine_item_id']]);
-
-                $set['engine_inherit'] = 0;
-                $set['engine_item_id'] = null;
-
-                if ($engine) {
-                    $message = sprintf(
-                        'У автомобиля %s убран двигатель (был %s)',
-                        htmlspecialchars($this->car()->formatName($item, 'en')),
-                        htmlspecialchars($engine['name'])
-                    );
-                    $this->log($message, [
-                        'items' => $item['id'],
-                    ]);
-
-                    $user = $this->user()->get();
-
-                    foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                        if ($subscriber && ((int) $subscriber['id'] !== (int) $user['id'])) {
-                            $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
-
-                            $message = sprintf(
-                                $this->translate(
-                                    'pm/user-%s-canceled-vehicle-engine-%s-%s-%s',
-                                    'default',
-                                    $subscriber['language']
-                                ),
-                                $this->userUrl($user, $uri),
-                                $engine['name'],
-                                $this->car()->formatName($item, $subscriber['language']),
-                                $this->itemModerUrl($item['id'], $uri)
-                            );
-
-                            $this->message->send(null, $subscriber['id'], $message);
-                        }
-                    }
-                }
-            } else {
-                $engine = $this->itemModel->getRow([
-                    'id'           => (int) $values['engine_id'],
-                    'item_type_id' => Item::ENGINE,
-                ]);
-                if (! $engine) {
-                    return $this->notFoundAction();
-                }
-
-                $set['engine_inherit'] = 0;
-                $set['engine_item_id'] = $values['engine_id'];
-
-                $message = sprintf(
-                    'Автомобилю %s назначен двигатель %s',
-                    htmlspecialchars($this->car()->formatName($item, 'en')),
-                    htmlspecialchars($engine['name'])
-                );
-                $this->log($message, [
-                    'items' => $item['id'],
-                ]);
-
-                foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                    if ($subscriber && ((int) $subscriber['id'] !== (int) $user['id'])) {
-                        $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
-
-                        $message = sprintf(
-                            $this->translate(
-                                'pm/user-%s-set-vehicle-engine-%s-%s-%s',
-                                'default',
-                                $subscriber['language']
-                            ),
-                            $this->userUrl($user, $uri),
-                            $engine['name'],
-                            $this->car()->formatName($item, $subscriber['language']),
-                            $this->itemModerUrl($item['id'], $uri)
-                        );
-
-                        $this->message->send(null, $subscriber['id'], $message);
-                    }
-                }
             }
         }
 

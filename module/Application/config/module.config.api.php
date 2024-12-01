@@ -18,23 +18,22 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Api\AccountController::class      => Controller\Api\AccountControllerFactory::class,
-            Controller\Api\BrandsController::class       => Controller\Api\BrandsControllerFactory::class,
-            Controller\Api\ChartController::class        => Controller\Api\ChartControllerFactory::class,
-            Controller\Api\InboxController::class        => Controller\Api\InboxControllerFactory::class,
-            Controller\Api\IndexController::class        => Controller\Api\IndexControllerFactory::class,
-            Controller\Api\ItemController::class         => Controller\Api\ItemControllerFactory::class,
-            Controller\Api\GalleryController::class      => Controller\Api\GalleryControllerFactory::class,
-            Controller\Api\ItemLanguageController::class => Controller\Api\ItemLanguageControllerFactory::class,
-            Controller\Api\ItemParentController::class   => Controller\Api\ItemParentControllerFactory::class,
-            Controller\Api\MostsController::class        => Controller\Api\MostsControllerFactory::class,
-            Controller\Api\NewController::class          => Controller\Api\NewControllerFactory::class,
-            Controller\Api\PictureController::class      => Controller\Api\PictureControllerFactory::class,
-            Controller\Api\PictureItemController::class  => Controller\Api\PictureItemControllerFactory::class,
-            Controller\Api\TelegramController::class     => Controller\Api\TelegramControllerFactory::class,
-            Controller\Api\TimezoneController::class     => InvokableFactory::class,
-            Controller\Api\UserController::class         => Controller\Api\UserControllerFactory::class,
-            Controller\Api\VotingController::class       => Controller\Api\VotingControllerFactory::class,
+            Controller\Api\AccountController::class     => Controller\Api\AccountControllerFactory::class,
+            Controller\Api\BrandsController::class      => Controller\Api\BrandsControllerFactory::class,
+            Controller\Api\ChartController::class       => Controller\Api\ChartControllerFactory::class,
+            Controller\Api\InboxController::class       => Controller\Api\InboxControllerFactory::class,
+            Controller\Api\IndexController::class       => Controller\Api\IndexControllerFactory::class,
+            Controller\Api\ItemController::class        => Controller\Api\ItemControllerFactory::class,
+            Controller\Api\GalleryController::class     => Controller\Api\GalleryControllerFactory::class,
+            Controller\Api\ItemParentController::class  => Controller\Api\ItemParentControllerFactory::class,
+            Controller\Api\MostsController::class       => Controller\Api\MostsControllerFactory::class,
+            Controller\Api\NewController::class         => Controller\Api\NewControllerFactory::class,
+            Controller\Api\PictureController::class     => Controller\Api\PictureControllerFactory::class,
+            Controller\Api\PictureItemController::class => Controller\Api\PictureItemControllerFactory::class,
+            Controller\Api\TelegramController::class    => Controller\Api\TelegramControllerFactory::class,
+            Controller\Api\TimezoneController::class    => InvokableFactory::class,
+            Controller\Api\UserController::class        => Controller\Api\UserControllerFactory::class,
+            Controller\Api\VotingController::class      => Controller\Api\VotingControllerFactory::class,
         ],
     ],
     'router'      => [
@@ -377,36 +376,6 @@ return [
                                                     'verb'     => 'post',
                                                     'defaults' => [
                                                         'action' => 'post-logo',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                    'language'             => [
-                                        'type'          => 'Literal',
-                                        'options'       => [
-                                            'route'    => '/language',
-                                            'defaults' => [
-                                                'controller' => Controller\Api\ItemLanguageController::class,
-                                            ],
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'item' => [
-                                                'type'          => 'Segment',
-                                                'options'       => [
-                                                    'route' => '/:language',
-                                                ],
-                                                'may_terminate' => false,
-                                                'child_routes'  => [
-                                                    'put' => [
-                                                        'type'    => 'Method',
-                                                        'options' => [
-                                                            'verb'     => 'put',
-                                                            'defaults' => [
-                                                                'action' => 'put',
-                                                            ],
-                                                        ],
                                                     ],
                                                 ],
                                             ],
