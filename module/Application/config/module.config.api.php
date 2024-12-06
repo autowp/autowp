@@ -112,15 +112,6 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'get'  => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
                             'item' => [
                                 'type'          => 'Segment',
                                 'options'       => [

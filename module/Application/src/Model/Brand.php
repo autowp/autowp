@@ -8,10 +8,8 @@ use Collator;
 use Exception;
 use ImagickException;
 use Laminas\Db\Sql;
-use Transliterator;
 
 use function array_replace;
-use function array_values;
 use function Autowp\Commons\currentFromResultSetInterface;
 use function ceil;
 use function chmod;
@@ -25,23 +23,17 @@ use function floor;
 use function fopen;
 use function implode;
 use function is_numeric;
-use function mb_strtoupper;
-use function mb_substr;
 use function mkdir;
-use function ord;
 use function preg_match;
 use function sprintf;
 use function sqrt;
 use function str_replace;
 use function sys_get_temp_dir;
 use function tempnam;
-use function uksort;
 use function usort;
 
 class Brand
 {
-    private const NEW_DAYS = 7;
-
     public const MAX_FULLNAME = 255;
 
     private const ICON_FORMAT = 'brandicon';
@@ -85,138 +77,6 @@ class Brand
             default:
                 return $coll->compare($a, $b);
         }
-    }
-
-    private function utfCharToNumber(string $char): string
-    {
-        $i      = 0;
-        $number = '';
-        while (isset($char[$i])) {
-            $number .= ord($char[$i]);
-            ++$i;
-        }
-        return $number;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getFullBrandsList(string $language): array
-    {
-        $select = new Sql\Select(['ipc_all' => 'item_parent_cache']);
-        $select->columns([new Sql\Expression('COUNT(DISTINCT pictures.id)')])
-            ->join('picture_item', 'ipc_all.item_id = picture_item.item_id', [])
-            ->join('pictures', 'picture_item.picture_id = pictures.id', [])
-            ->where([
-                'item.id = ipc_all.parent_id',
-                'pictures.status' => Picture::STATUS_ACCEPTED,
-            ]);
-
-        $rows = $this->getList([
-            'language' => $language,
-            'columns'  => [
-                'logo_id',
-                'cars_count'     => new Sql\Expression(
-                    'COUNT(subitem.id)'
-                ),
-                'new_cars_count' => new Sql\Expression(
-                    'COUNT(IF(subitem.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY), 1, NULL))',
-                    [self::NEW_DAYS]
-                ),
-                'pictures_count' => $select,
-            ],
-        ], function (Sql\Select $select): void {
-            $select
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-                ->where(['item_parent_cache.item_id <> item_parent_cache.parent_id'])
-                ->join(['subitem' => 'item'], 'item_parent_cache.item_id = subitem.id', [])
-                ->group('item.id');
-        });
-
-        $result = [
-            'numbers'  => [],
-            'cyrillic' => [],
-            'latin'    => [],
-            'other'    => [],
-        ];
-
-        $tr = Transliterator::create('Any-Latin;Latin-ASCII;');
-
-        /*foreach ($rows as $row) {
-            print $row['name'] . PHP_EOL;
-        }*/
-
-        foreach ($rows as $row) {
-            $name = $row['name'];
-
-            $char = mb_substr($name, 0, 1);
-
-            $isNumber   = preg_match("/^[0-9]$/u", $char);
-            $isCyrillic = false;
-            $isLatin    = false;
-
-            if (! $isNumber) {
-                $isHan = preg_match("/^\p{Han}$/u", $char);
-                if ($isHan) {
-                    $char    = mb_substr($tr->transliterate($char), 0, 1);
-                    $isLatin = true;
-                }
-
-                if (! $isHan) {
-                    $isCyrillic = preg_match("/^\p{Cyrillic}$/u", $char);
-
-                    if (! $isCyrillic) {
-                        $char = $tr->transliterate($char);
-
-                        $isLatin = preg_match("/^[A-Za-z]$/u", $char);
-                    }
-                }
-                $char = mb_strtoupper($char);
-            }
-
-            if ($isNumber) {
-                $line = 'numbers';
-            } elseif ($isCyrillic) {
-                $line = 'cyrillic';
-            } elseif ($isLatin) {
-                $line = 'latin';
-            } else {
-                $line = 'other';
-            }
-
-            if (! isset($result[$line][$char])) {
-                $result[$line][$char] = [
-                    'id'     => $this->utfCharToNumber($char),
-                    'char'   => $char,
-                    'brands' => [],
-                ];
-            }
-
-            /*$picturesCount = $row['carpictures_count'] + $row['enginepictures_count'] +
-                $row['logopictures_count'] + $row['mixedpictures_count'] +
-                $row['unsortedpictures_count'];*/
-
-            $result[$line][$char]['brands'][] = [
-                'id'            => (int) $row['id'],
-                'name'          => $name,
-                'catname'       => $row['catname'],
-                'logo_id'       => $row['logo_id'],
-                'totalPictures' => (int) $row['pictures_count'],
-                'newCars'       => (int) $row['new_cars_count'],
-                'totalCars'     => (int) $row['cars_count'],
-            ];
-        }
-
-        foreach ($result as &$line) {
-            uksort($line, function ($a, $b) use ($language) {
-                return $this->compareName($a, $b, $language);
-            });
-
-            $line = array_values($line);
-        }
-        unset($line);
-
-        return array_values($result);
     }
 
     /**

@@ -2,20 +2,16 @@
 
 namespace Application\Controller\Api;
 
-use Application\Model\Brand;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
 use Exception;
-use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Db\Sql;
-use Laminas\Http\PhpEnvironment\Request;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Stdlib\ResponseInterface;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use Throwable;
 
 use function array_merge;
 use function array_values;
@@ -28,10 +24,6 @@ use function usort;
  */
 class BrandsController extends AbstractActionController
 {
-    private StorageInterface $cache;
-
-    private Brand $brand;
-
     private VehicleType $vehicleType;
 
     private Item $itemModel;
@@ -41,44 +33,15 @@ class BrandsController extends AbstractActionController
     private TranslatorInterface $translator;
 
     public function __construct(
-        StorageInterface $cache,
-        Brand $brand,
         VehicleType $vehicleType,
         Item $itemModel,
         Picture $picture,
         TranslatorInterface $translator
     ) {
-        $this->cache       = $cache;
-        $this->brand       = $brand;
         $this->vehicleType = $vehicleType;
         $this->itemModel   = $itemModel;
         $this->picture     = $picture;
         $this->translator  = $translator;
-    }
-
-    /**
-     * @throws Throwable
-     */
-    public function indexAction(): JsonModel
-    {
-        /** @var Request $request */
-        $request = $this->getRequest();
-
-        $isHttps = (bool) $request->getServer('HTTPS');
-
-        $language = $this->language();
-
-        $cacheKey = 'brands_list_46_' . $language . '_' . ($isHttps ? 'HTTPS' : 'HTTP');
-
-        $items = $this->cache->getItem($cacheKey, $success);
-        if (! $success) {
-            $items = $this->brand->getFullBrandsList($language);
-            $this->cache->setItem($cacheKey, $items);
-        }
-
-        return new JsonModel([
-            'items' => $items,
-        ]);
     }
 
     /**
