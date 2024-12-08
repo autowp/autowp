@@ -1557,21 +1557,6 @@ class Item
     /**
      * @throws Exception
      */
-    public function isExists(array $options): bool
-    {
-        $select = $this->getSelect($options);
-        $select->reset($select::COLUMNS);
-        $select->reset($select::ORDER);
-        $select->reset($select::GROUP);
-        $select->columns(['id']);
-        $select->limit(1);
-
-        return (bool) currentFromResultSetInterface($this->itemTable->selectWith($select));
-    }
-
-    /**
-     * @throws Exception
-     */
     public function getRows(array $options): array
     {
         $select = $this->getSelect($options);

@@ -19,7 +19,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\Api\AccountController::class     => Controller\Api\AccountControllerFactory::class,
-            Controller\Api\BrandsController::class      => Controller\Api\BrandsControllerFactory::class,
             Controller\Api\ChartController::class       => Controller\Api\ChartControllerFactory::class,
             Controller\Api\InboxController::class       => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IndexController::class       => Controller\Api\IndexControllerFactory::class,
@@ -95,45 +94,6 @@ return [
                                             'verb'     => 'post',
                                             'defaults' => [
                                                 'action' => 'start',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'brands'           => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/brands',
-                            'defaults' => [
-                                'controller' => Controller\Api\BrandsController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'item' => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:id',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'sections' => [
-                                        'type'          => 'Literal',
-                                        'options'       => [
-                                            'route' => '/sections',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'get' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'get',
-                                                    'defaults' => [
-                                                        'action' => 'sections',
-                                                    ],
-                                                ],
                                             ],
                                         ],
                                     ],

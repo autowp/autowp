@@ -128,7 +128,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.51.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.53.1
     container_name: autowp_test_goautowp_serve
     restart: always
     command: serve --df-amqp --monitoring-amqp --grpc --public --private --autoban --attrs-update-values-amqp
@@ -145,6 +145,22 @@ services:
     ports:
       - "2112:2112"
       - "2113:8080"
+
+  goautowp-scheduler-generate-index-cache:
+    image: registry.pereslegin.ru/autowp/goautowp:v2.53.1
+    container_name: autowp_test_goautowp_scheduler_generate_index_cache
+    restart: always
+    command: scheduler-generate-index-cache
+    depends_on:
+      - rabbitmq
+      - mysql
+      - traffic-postgres
+      - keycloak
+      - redis
+    volumes:
+      - "./goautowp/config.yaml:/config.yaml:ro"
+      - "./module/Application/config/model.conf:/model.conf:ro"
+      - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   minio:
     image: quay.io/minio/minio

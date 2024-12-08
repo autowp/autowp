@@ -1455,7 +1455,6 @@ class ItemController extends AbstractRestfulController
         $values = $inputFilter->getValues();
 
         $set          = [];
-        $updateActual = false;
         $notifyMeta   = false;
         $subscribe    = false;
 
@@ -1632,10 +1631,6 @@ class ItemController extends AbstractRestfulController
         $this->itemModel->updateOrderCache($item['id']);
 
         $this->itemParent->refreshAutoByVehicle($item['id']);
-
-        if ($updateActual) {
-            $this->specificationsService->updateActualValues($item['id']);
-        }
 
         if ($subscribe) {
             $this->userItemSubscribe->subscribe($user['id'], $item['id']);

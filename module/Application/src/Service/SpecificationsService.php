@@ -736,17 +736,6 @@ class SpecificationsService
     /**
      * @throws Exception
      */
-    public function updateActualValues(int $itemId): void
-    {
-        $this->rabbitmq->send('attrs_update_values', Json::encode([
-            'type'    => 'actual',
-            'item_id' => $itemId,
-        ]));
-    }
-
-    /**
-     * @throws Exception
-     */
     public function updateInheritedValues(int $itemId): void
     {
         $this->rabbitmq->send('attrs_update_values', Json::encode([
