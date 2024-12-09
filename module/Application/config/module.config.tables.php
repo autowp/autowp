@@ -50,7 +50,6 @@ return [
         'spec'                        => [],
         'telegram_brand'              => [],
         'telegram_chat'               => [],
-        'user_account'                => [],
         'user_item_subscribe'         => [],
         'vehicle_vehicle_type'        => [], //TODO: rename to item_vehicle_type
     ],

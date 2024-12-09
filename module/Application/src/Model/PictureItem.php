@@ -154,19 +154,6 @@ class PictureItem
         return $result;
     }
 
-    /**
-     * @return array|ArrayObject|null
-     * @throws Exception
-     */
-    public function getPictureItemData(int $pictureId, int $itemId, int $type)
-    {
-        return currentFromResultSetInterface($this->table->select([
-            'picture_id' => $pictureId,
-            'item_id'    => $itemId,
-            'type'       => $type,
-        ]));
-    }
-
     public function getPictureItemsData(int $pictureId, int $type = 0): array
     {
         $filter = [
@@ -311,28 +298,6 @@ class PictureItem
         return (int) $row['perspective_id'];
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getArea(int $pictureId, int $itemId): ?array
-    {
-        $row = $this->getRow($pictureId, $itemId, self::PICTURE_CONTENT);
-        if (! $row) {
-            return null;
-        }
-
-        if (! $row['crop_left'] || ! $row['crop_top'] || ! $row['crop_width'] || ! $row['crop_height']) {
-            return null;
-        }
-
-        return [
-            (int) $row['crop_left'],
-            (int) $row['crop_top'],
-            (int) $row['crop_width'],
-            (int) $row['crop_height'],
-        ];
-    }
-
     public function isAllowedType(int $itemTypeId, int $type): bool
     {
         $allowed = [
@@ -369,11 +334,6 @@ class PictureItem
         }
 
         return $this->isAllowedType($row['item_type_id'], $type);
-    }
-
-    public function getTable(): TableGateway
-    {
-        return $this->table;
     }
 
     /**

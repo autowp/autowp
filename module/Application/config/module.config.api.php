@@ -18,21 +18,19 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Api\AccountController::class     => Controller\Api\AccountControllerFactory::class,
-            Controller\Api\ChartController::class       => Controller\Api\ChartControllerFactory::class,
-            Controller\Api\InboxController::class       => Controller\Api\InboxControllerFactory::class,
-            Controller\Api\IndexController::class       => Controller\Api\IndexControllerFactory::class,
-            Controller\Api\ItemController::class        => Controller\Api\ItemControllerFactory::class,
-            Controller\Api\GalleryController::class     => Controller\Api\GalleryControllerFactory::class,
-            Controller\Api\ItemParentController::class  => Controller\Api\ItemParentControllerFactory::class,
-            Controller\Api\MostsController::class       => Controller\Api\MostsControllerFactory::class,
-            Controller\Api\NewController::class         => Controller\Api\NewControllerFactory::class,
-            Controller\Api\PictureController::class     => Controller\Api\PictureControllerFactory::class,
-            Controller\Api\PictureItemController::class => Controller\Api\PictureItemControllerFactory::class,
-            Controller\Api\TelegramController::class    => Controller\Api\TelegramControllerFactory::class,
-            Controller\Api\TimezoneController::class    => InvokableFactory::class,
-            Controller\Api\UserController::class        => Controller\Api\UserControllerFactory::class,
-            Controller\Api\VotingController::class      => Controller\Api\VotingControllerFactory::class,
+            Controller\Api\ChartController::class      => Controller\Api\ChartControllerFactory::class,
+            Controller\Api\InboxController::class      => Controller\Api\InboxControllerFactory::class,
+            Controller\Api\IndexController::class      => Controller\Api\IndexControllerFactory::class,
+            Controller\Api\ItemController::class       => Controller\Api\ItemControllerFactory::class,
+            Controller\Api\GalleryController::class    => Controller\Api\GalleryControllerFactory::class,
+            Controller\Api\ItemParentController::class => Controller\Api\ItemParentControllerFactory::class,
+            Controller\Api\MostsController::class      => Controller\Api\MostsControllerFactory::class,
+            Controller\Api\NewController::class        => Controller\Api\NewControllerFactory::class,
+            Controller\Api\PictureController::class    => Controller\Api\PictureControllerFactory::class,
+            Controller\Api\TelegramController::class   => Controller\Api\TelegramControllerFactory::class,
+            Controller\Api\TimezoneController::class   => InvokableFactory::class,
+            Controller\Api\UserController::class       => Controller\Api\UserControllerFactory::class,
+            Controller\Api\VotingController::class     => Controller\Api\VotingControllerFactory::class,
         ],
     ],
     'router'      => [
@@ -44,63 +42,6 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes'  => [
-                    'account'          => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/account',
-                            'defaults' => [
-                                'controller' => Controller\Api\AccountController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get'   => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                            'item'  => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:id',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'delete' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'delete',
-                                            'defaults' => [
-                                                'action' => 'delete',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'start' => [
-                                'type'          => 'Literal',
-                                'options'       => [
-                                    'route' => '/start',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'post' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'start',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
                     'chart'            => [
                         'type'          => 'Literal',
                         'options'       => [
@@ -598,45 +539,6 @@ return [
                                     'route'    => '/car-of-day-picture',
                                     'defaults' => [
                                         'action' => 'car-of-day-picture',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'picture-item'     => [
-                        'type'          => 'Literal',
-                        'options'       => [
-                            'route'    => '/picture-item',
-                            'defaults' => [
-                                'controller' => Controller\Api\PictureItemController::class,
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'get'  => [
-                                'type'    => 'Method',
-                                'options' => [
-                                    'verb'     => 'get',
-                                    'defaults' => [
-                                        'action' => 'index',
-                                    ],
-                                ],
-                            ],
-                            'item' => [
-                                'type'          => 'Segment',
-                                'options'       => [
-                                    'route' => '/:picture_id/:item_id/:type',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'item' => [
-                                        'type'    => 'Method',
-                                        'options' => [
-                                            'verb'     => 'get',
-                                            'defaults' => [
-                                                'action' => 'item',
-                                            ],
-                                        ],
                                     ],
                                 ],
                             ],
