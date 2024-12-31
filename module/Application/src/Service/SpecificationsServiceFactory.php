@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Application\Service;
 
-use Application\ItemNameFormatter;
-use Application\Model\Item;
-use Application\Model\ItemParent;
-use Application\Model\Picture;
-use Application\Model\VehicleType;
 use interop\container\containerinterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -26,11 +21,6 @@ class SpecificationsServiceFactory implements FactoryInterface
         $tables = $container->get('TableManager');
         return new SpecificationsService(
             $container->get('MvcTranslator'),
-            $container->get(ItemNameFormatter::class),
-            $container->get(Item::class),
-            $container->get(ItemParent::class),
-            $container->get(Picture::class),
-            $container->get(VehicleType::class),
             $tables->get('attrs_units'),
             $tables->get('attrs_list_options'),
             $tables->get('attrs_attributes'),

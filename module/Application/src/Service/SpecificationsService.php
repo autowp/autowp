@@ -2,14 +2,7 @@
 
 namespace Application\Service;
 
-use Application\ItemNameFormatter;
 use Application\Model\Item;
-use Application\Model\ItemParent;
-use Application\Model\Picture;
-use Application\Model\VehicleType;
-use Application\Spec\Table\Car as CarSpecTable;
-use ArrayAccess;
-use ArrayObject;
 use Exception;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
@@ -25,7 +18,6 @@ use function Autowp\Commons\currentFromResultSetInterface;
 use function count;
 use function implode;
 use function is_array;
-use function reset;
 
 class SpecificationsService
 {
@@ -35,12 +27,6 @@ class SpecificationsService
         BUS_ZONE_ID     = 3;
 
     private const BUS_VEHICLE_TYPES = [19, 39, 28, 32];
-
-    private const
-        TOP_PERSPECTIVES    = [10, 1, 7, 8, 11, 12, 2, 4, 13, 5],
-        BOTTOM_PERSPECTIVES = [13, 2, 9, 6, 5];
-
-    public const NULL_VALUE_STR = '-';
 
     private TableGateway $attributeTable;
 
@@ -62,16 +48,6 @@ class SpecificationsService
 
     private TranslatorInterface $translator;
 
-    private ItemNameFormatter $itemNameFormatter;
-
-    private Item $itemModel;
-
-    private ItemParent $itemParent;
-
-    private Picture $picture;
-
-    private VehicleType $vehicleType;
-
     private TableGateway $zoneAttributeTable;
 
     private TableGateway $valueTable;
@@ -88,11 +64,6 @@ class SpecificationsService
 
     public function __construct(
         TranslatorInterface $translator,
-        ItemNameFormatter $itemNameFormatter,
-        Item $itemModel,
-        ItemParent $itemParent,
-        Picture $picture,
-        VehicleType $vehicleType,
         TableGateway $unitTable,
         TableGateway $listOptionsTable,
         TableGateway $attributeTable,
@@ -106,11 +77,6 @@ class SpecificationsService
         RabbitMQ $rabbitmq
     ) {
         $this->translator         = $translator;
-        $this->itemNameFormatter  = $itemNameFormatter;
-        $this->itemModel          = $itemModel;
-        $this->itemParent         = $itemParent;
-        $this->picture            = $picture;
-        $this->vehicleType        = $vehicleType;
         $this->unitTable          = $unitTable;
         $this->listOptionsTable   = $listOptionsTable;
         $this->attributeTable     = $attributeTable;
@@ -266,32 +232,6 @@ class SpecificationsService
         return $this->attributes[$id] ?? null;
     }
 
-    /**
-     * @param array|ArrayAccess $car
-     * @return array|ArrayObject|null
-     * @throws Exception
-     */
-    private function specPicture($car, ?array $perspectives)
-    {
-        $order = [];
-        if ($perspectives) {
-            foreach ($perspectives as $pid) {
-                $order[] = new Sql\Expression('picture_item.perspective_id = ? DESC', [$pid]);
-            }
-        } else {
-            $order[] = 'pictures.id desc';
-        }
-
-        return $this->picture->getRow([
-            'status' => Picture::STATUS_ACCEPTED,
-            'item'   => [
-                'ancestor_or_self' => $car['id'],
-            ],
-            'order'  => $order,
-            'group'  => ['picture_item.perspective_id'],
-        ]);
-    }
-
     public function getAttributes(array $options = []): array
     {
         $defaults = [
@@ -410,165 +350,6 @@ class SpecificationsService
         }
 
         return null;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function specifications(array $cars, array $options): CarSpecTable
-    {
-        $options = array_merge([
-            'contextCarId' => null,
-            'language'     => 'en',
-        ], $options);
-
-        $language     = $options['language'];
-        $contextCarId = (int) $options['contextCarId'];
-
-        $result = [];
-
-        $zoneIds = [];
-        foreach ($cars as $car) {
-            $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
-            $zoneId         = $this->getZoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
-
-            $zoneIds[$zoneId] = true;
-        }
-
-        $zoneMixed = count($zoneIds) > 1;
-
-        if ($zoneMixed) {
-            $specsZoneId = null;
-        } else {
-            $keys        = array_keys($zoneIds);
-            $specsZoneId = reset($keys);
-        }
-
-        $attributes = $this->getAttributes([
-            'zone'      => $specsZoneId,
-            'recursive' => true,
-            'parent'    => 0,
-        ]);
-
-        $engineNameAttr = 100;
-
-        $carIds = [];
-        foreach ($cars as $car) {
-            $carIds[] = $car['id'];
-        }
-
-        if ($specsZoneId) {
-            $this->loadListOptions($this->zoneAttrs[$specsZoneId]);
-            $actualValues = $this->getZoneItemsActualValues($specsZoneId, $carIds);
-        } else {
-            $actualValues = $this->getItemsActualValues($carIds);
-        }
-
-        foreach ($actualValues as &$itemActualValues) {
-            foreach ($itemActualValues as $attributeId => &$value) {
-                $attribute = $this->getAttribute($attributeId);
-                if (! $attribute) {
-                    throw new Exception("Attribute `$attributeId` not found");
-                }
-                $value = $this->valueToText($attribute, $value, $language);
-            }
-            unset($value); // prevent future bugs
-        }
-        unset($itemActualValues); // prevent future bugs
-
-        foreach ($cars as $car) {
-            $itemId = (int) $car['id'];
-
-            //$values = $this->loadValues($attributes, $itemId);
-            $values = $actualValues[$itemId] ?? [];
-
-            // append engine name
-            if (! (isset($values[$engineNameAttr]) && $values[$engineNameAttr]) && $car['engine_item_id']) {
-                $engineRow = currentFromResultSetInterface(
-                    $this->itemModel->getTable()->select(['id' => (int) $car['engine_item_id']])
-                );
-                if ($engineRow) {
-                    $values[$engineNameAttr] = $engineRow['name'];
-                }
-            }
-
-            $name = null;
-            if ($contextCarId) {
-                $name = $this->itemParent->getNamePreferLanguage($contextCarId, $car['id'], $language);
-            }
-            if (! $name) {
-                $name = $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language);
-            }
-
-            $topPicture        = $this->specPicture($car, self::TOP_PERSPECTIVES);
-            $topPictureRequest = null;
-            if ($topPicture) {
-                $topPictureRequest = $topPicture['image_id'];
-            }
-            $bottomPicture        = $this->specPicture($car, self::BOTTOM_PERSPECTIVES);
-            $bottomPictureRequest = null;
-            if ($bottomPicture) {
-                $bottomPictureRequest = $bottomPicture['image_id'];
-            }
-
-            $result[] = [
-                'id'                   => $itemId,
-                'name'                 => $name,
-                'beginYear'            => $car['begin_year'],
-                'endYear'              => $car['end_year'],
-                'produced'             => $car['produced'],
-                'produced_exactly'     => $car['produced_exactly'],
-                'topPicture'           => $topPicture,
-                'topPictureRequest'    => $topPictureRequest,
-                'bottomPicture'        => $bottomPicture,
-                'bottomPictureRequest' => $bottomPictureRequest,
-                'carType'              => null,
-                'values'               => $values,
-            ];
-        }
-
-        // remove empty attributes
-        $this->removeEmpty($attributes, $result);
-
-        // load units
-        $this->addUnitsToAttributes($attributes);
-
-        return new CarSpecTable($result, $attributes);
-    }
-
-    private function addUnitsToAttributes(array &$attributes): void
-    {
-        foreach ($attributes as &$attribute) {
-            if ($attribute['unitId']) {
-                $attribute['unit'] = $this->getUnit($attribute['unitId']);
-            }
-
-            $this->addUnitsToAttributes($attribute['childs']);
-        }
-    }
-
-    private function removeEmpty(array &$attributes, array $cars): void
-    {
-        foreach ($attributes as $idx => &$attribute) {
-            $this->removeEmpty($attribute['childs'], $cars);
-
-            if (count($attribute['childs']) > 0) {
-                $haveValue = true;
-            } else {
-                $id        = $attribute['id'];
-                $haveValue = false;
-                foreach ($cars as $car) {
-                    if (isset($car['values'][$id])) {
-                        $haveValue = true;
-                        break;
-                    }
-                }
-            }
-
-            if (! $haveValue) {
-                unset($attributes[$idx]);
-            }
-        }
     }
 
     /**
@@ -765,35 +546,6 @@ class SpecificationsService
     }
 
     /**
-     * @param mixed $value
-     * @return mixed|null
-     */
-    private function prepareValue(int $typeId, $value)
-    {
-        switch ($typeId) {
-            case 1: // string
-                return $value;
-
-            case 2: // int
-                return $value;
-
-            case 3: // float
-                return $value;
-
-            case 4: // textarea
-                return $value;
-
-            case 5: // checkbox
-                return $value === null ? null : ($value ? 1 : 0);
-
-            case 6: // select
-            case 7: // tree select
-                return $value === null ? null : (int) $value;
-        }
-        return null;
-    }
-
-    /**
      * @throws Exception
      */
     public function getActualValueText(int $attributeId, int $itemId, string $language): ?string
@@ -818,126 +570,5 @@ class SpecificationsService
         } else {
             return $this->valueToText($attribute, $value, $language);
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getItemsActualValues(array $itemIds): array
-    {
-        if (count($itemIds) <= 0) {
-            return [];
-        }
-
-        $requests = [
-            1 => false,
-            2 => false, /* , 5*/
-            3 => false,
-            //4 => [false],
-            6 => true, /* , 7 */
-        ];
-
-        $values = [];
-        foreach ($requests as $typeId => $isMultiple) {
-            $valueDataTable = $this->getValueDataTable($typeId);
-
-            $select = new Sql\Select($valueDataTable->getTable());
-            $select->where([new Sql\Predicate\In('item_id', $itemIds)]);
-
-            if ($isMultiple) {
-                $select->order('ordering');
-            }
-
-            foreach ($valueDataTable->selectWith($select) as $row) {
-                $aid   = (int) $row['attribute_id'];
-                $id    = (int) $row['item_id'];
-                $value = $this->prepareValue($typeId, $row['value']);
-                if (! isset($values[$id])) {
-                    $values[$id] = [];
-                }
-
-                $attribute = $this->getAttribute($aid);
-                if (! $attribute) {
-                    throw new Exception("attribute `$aid` not found");
-                }
-
-                if ($attribute['isMultiple']) {
-                    if (! isset($values[$id][$aid])) {
-                        $values[$id][$aid] = [];
-                    }
-                    $values[$id][$aid][] = $value;
-                } else {
-                    $values[$id][$aid] = $value;
-                }
-            }
-        }
-
-        return $values;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getZoneItemsActualValues(int $zoneId, array $itemIds): array
-    {
-        if (count($itemIds) <= 0) {
-            return [];
-        }
-
-        $this->loadZone($zoneId);
-
-        $attributes = $this->getAttributes([
-            'zone'   => $zoneId,
-            'parent' => null,
-        ]);
-
-        $requests = [];
-
-        foreach ($attributes as $attribute) {
-            $typeId     = $attribute['typeId'];
-            $isMultiple = $attribute['isMultiple'] ? 1 : 0;
-            if ($typeId) {
-                if (! isset($requests[$typeId][$isMultiple])) {
-                    $requests[$typeId][$isMultiple] = [];
-                }
-                $requests[$typeId][$isMultiple][] = $attribute['id'];
-            }
-        }
-
-        $values = [];
-        foreach ($requests as $typeId => $multiples) {
-            $valueDataTable = $this->getValueDataTable($typeId);
-
-            foreach ($multiples as $isMultiple => $ids) {
-                $select = new Sql\Select($valueDataTable->getTable());
-                $select->where([
-                    new Sql\Predicate\In('attribute_id', $ids),
-                    new Sql\Predicate\In('item_id', $itemIds),
-                ]);
-
-                if ($isMultiple) {
-                    $select->order('ordering');
-                }
-
-                foreach ($valueDataTable->selectWith($select) as $row) {
-                    $aid   = (int) $row['attribute_id'];
-                    $id    = (int) $row['item_id'];
-                    $value = $this->prepareValue($typeId, $row['value']);
-                    if (! isset($values[$id])) {
-                        $values[$id] = [];
-                    }
-                    if ($isMultiple) {
-                        if (! isset($values[$id][$aid])) {
-                            $values[$id][$aid] = [];
-                        }
-                        $values[$id][$aid][] = $value;
-                    } else {
-                        $values[$id][$aid] = $value;
-                    }
-                }
-            }
-        }
-
-        return $values;
     }
 }

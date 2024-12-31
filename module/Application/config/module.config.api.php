@@ -225,7 +225,7 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'get'                  => [
+                                    'get'  => [
                                         'type'    => 'Method',
                                         'options' => [
                                             'verb'     => 'get',
@@ -234,7 +234,7 @@ return [
                                             ],
                                         ],
                                     ],
-                                    'put'                  => [
+                                    'put'  => [
                                         'type'    => 'Method',
                                         'options' => [
                                             'verb'     => 'put',
@@ -243,7 +243,7 @@ return [
                                             ],
                                         ],
                                     ],
-                                    'logo'                 => [
+                                    'logo' => [
                                         'type'          => 'Literal',
                                         'options'       => [
                                             'route'    => '/logo',
@@ -273,7 +273,7 @@ return [
                                             ],
                                         ],
                                     ],
-                                    'tree'                 => [
+                                    'tree' => [
                                         'type'          => 'Literal',
                                         'options'       => [
                                             'route'    => '/tree',
@@ -289,42 +289,6 @@ return [
                                                     'verb'     => 'get',
                                                     'defaults' => [
                                                         'action' => 'tree',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                    'specifications'       => [
-                                        'type'          => 'Literal',
-                                        'options'       => [
-                                            'route' => '/specifications',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'get' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'get',
-                                                    'defaults' => [
-                                                        'action' => 'specifications',
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                    'child-specifications' => [
-                                        'type'          => 'Literal',
-                                        'options'       => [
-                                            'route' => '/child-specifications',
-                                        ],
-                                        'may_terminate' => false,
-                                        'child_routes'  => [
-                                            'get' => [
-                                                'type'    => 'Method',
-                                                'options' => [
-                                                    'verb'     => 'get',
-                                                    'defaults' => [
-                                                        'action' => 'child-specifications',
                                                     ],
                                                 ],
                                             ],
