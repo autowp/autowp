@@ -49,36 +49,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return (int) $parts[count($parts) - 1];
     }
 
-    /**
-     * @throws Exception
-     */
-    private function getRandomBrand(): array
-    {
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
-            'type_id' => 5,
-            'order'   => 'id_desc',
-            'fields'  => 'catname,subscription',
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/list');
-        $this->assertActionName('index');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertNotEmpty($json['items'], 'Failed to found random brand');
-
-        return $json['items'][0];
-    }
-
     public function testTree(): void
     {
         /** @var Request $request */
