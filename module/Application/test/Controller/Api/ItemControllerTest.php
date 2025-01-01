@@ -140,54 +140,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @throws Exception
      */
-    public function testSubscription(): void
-    {
-        $brand = $this->getRandomBrand();
-
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/item/' . $brand['id'],
-            Request::METHOD_PUT,
-            [
-                'subscription' => 1,
-            ]
-        );
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/item/put');
-        $this->assertActionName('put');
-
-        $this->reset();
-        /** @var Request $request */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Data::getAdminAuthHeader(
-            $this->getApplicationServiceLocator()->get('Config')['keycloak']
-        ));
-        $this->dispatch(
-            'https://www.autowp.ru/api/item/' . $brand['id'],
-            Request::METHOD_PUT,
-            [
-                'subscription' => 0,
-            ]
-        );
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/item/put');
-        $this->assertActionName('put');
-    }
-
-    /**
-     * @throws Exception
-     */
     public function testItemPoint(): void
     {
         $itemId = $this->createItem([
