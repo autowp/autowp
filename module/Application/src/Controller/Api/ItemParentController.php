@@ -110,15 +110,6 @@ class ItemParentController extends AbstractRestfulController
             $select->where(['not item.is_concept']);
         }
 
-        if ($data['ancestor_id']) {
-            $select
-                ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', [])
-                ->where(['item_parent_cache.parent_id' => $data['ancestor_id']])
-                ->group(['item_parent.item_id', 'item_parent.parent_id']);
-
-            $group = true;
-        }
-
         if ($isModer) {
             if ($data['item_id']) {
                 $select->where(['item_parent.item_id' => $data['item_id']]);

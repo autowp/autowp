@@ -416,10 +416,6 @@ class PictureController extends AbstractRestfulController
             $filter['add_date'] = $data['add_date'];
         }
 
-        if (strlen($data['accept_date'])) {
-            $filter['accept_date'] = $data['accept_date'];
-        }
-
         if ($data['perspective_id']) {
             if ($data['perspective_id'] === 'null') {
                 $filter['item']['perspective_is_null'] = true;
@@ -447,10 +443,6 @@ class PictureController extends AbstractRestfulController
 
         if ($data['exact_item_link_type']) {
             $filter['item']['link_type'] = $data['exact_item_link_type'];
-        }
-
-        if ($data['accepted_in_days']) {
-            $filter['accepted_in_days'] = $data['accepted_in_days'];
         }
 
         if ($isModer) {

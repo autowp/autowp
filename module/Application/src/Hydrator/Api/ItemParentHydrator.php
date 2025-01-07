@@ -45,12 +45,6 @@ class ItemParentHydrator extends AbstractRestHydrator
 
         $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('parent', $strategy);
-
-        $strategy = new Strategy\Item($serviceManager);
-        $this->addStrategy('duplicate_parent', $strategy);
-
-        $strategy = new Strategy\Item($serviceManager);
-        $this->addStrategy('duplicate_child', $strategy);
     }
 
     /**
@@ -89,14 +83,6 @@ class ItemParentHydrator extends AbstractRestHydrator
 
         /** @var Strategy\Item $strategy */
         $strategy = $this->getStrategy('parent');
-        $strategy->setUserId($userId);
-
-        /** @var Strategy\Item $strategy */
-        $strategy = $this->getStrategy('duplicate_parent');
-        $strategy->setUserId($userId);
-
-        /** @var Strategy\Item $strategy */
-        $strategy = $this->getStrategy('duplicate_child');
         $strategy->setUserId($userId);
 
         return $this;
@@ -138,37 +124,6 @@ class ItemParentHydrator extends AbstractRestHydrator
                     $object['item_id'],
                     $this->language
                 );
-            }
-
-            if ($this->filterComposite->filter('duplicate_parent')) {
-                $duplicateRow = $this->item->getRow([
-                    'exclude_id'       => $object['parent_id'],
-                    'child'            => [
-                        'id'        => $object['item_id'],
-                        'link_type' => ItemParent::TYPE_DEFAULT,
-                    ],
-                    'ancestor_or_self' => [
-                        'id'         => $object['parent_id'],
-                        'stock_only' => true,
-                    ],
-                ]);
-
-                $result['duplicate_parent'] = $duplicateRow
-                    ? $this->extractValue('duplicate_parent', $duplicateRow) : null;
-            }
-
-            if ($this->filterComposite->filter('duplicate_child')) {
-                $duplicateRow = $this->item->getRow([
-                    'exclude_id'         => $object['item_id'],
-                    'parent'             => [
-                        'id'        => $object['parent_id'],
-                        'link_type' => $object['type'],
-                    ],
-                    'descendant_or_self' => $object['item_id'],
-                ]);
-
-                $result['duplicate_child'] = $duplicateRow
-                    ? $this->extractValue('duplicate_child', $duplicateRow) : null;
             }
         }
 

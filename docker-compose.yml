@@ -128,7 +128,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.57.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.73.0
     container_name: autowp_test_goautowp_serve
     restart: always
     command: serve --df-amqp --monitoring-amqp --grpc --public --private --autoban --attrs-update-values-amqp
@@ -147,7 +147,7 @@ services:
       - "2113:8080"
 
   goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.57.0
+    image: registry.pereslegin.ru/autowp/goautowp:v2.73.0
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     restart: always
     command: scheduler-generate-index-cache

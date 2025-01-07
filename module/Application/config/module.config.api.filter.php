@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Application;
 
 use Autowp\Comments\CommentsService;
-use Autowp\ZFComponents\Filter\SingleSpaces;
 use Laminas\InputFilter\InputFilter;
 
 return [
@@ -95,13 +94,7 @@ return [
             ],
         ],
         'api_item_list'                        => [
-            'catname'                         => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'descendant'                      => [
+            'descendant'              => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -110,7 +103,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'ancestor_id'                     => [
+            'ancestor_id'             => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -119,7 +112,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'parent_id'                       => [
+            'parent_id'               => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -128,7 +121,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'type_id'                         => [
+            'type_id'                 => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -152,25 +145,25 @@ return [
                     ],
                 ],
             ],
-            'concept'                         => [
+            'concept'                 => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
                 ],
             ],
-            'concept_inherit'                 => [
+            'concept_inherit'         => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
                 ],
             ],
-            'vehicle_type_id'                 => [
+            'vehicle_type_id'         => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
                 ],
             ],
-            'vehicle_childs_type_id'          => [
+            'vehicle_childs_type_id'  => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -179,13 +172,13 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'spec'                            => [
+            'spec'                    => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
                 ],
             ],
-            'limit'                           => [
+            'limit'                   => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -201,7 +194,7 @@ return [
                     ],
                 ],
             ],
-            'page'                            => [
+            'page'                    => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -217,7 +210,7 @@ return [
                     ],
                 ],
             ],
-            'fields'                          => [
+            'fields'                  => [
                 'required' => false,
                 'filters'  => [
                     [
@@ -274,7 +267,7 @@ return [
                     ],
                 ],
             ],
-            'order'                           => [
+            'order'                   => [
                 'required'   => false,
                 'validators' => [
                     [
@@ -293,37 +286,25 @@ return [
                     ],
                 ],
             ],
-            'name'                            => [
+            'name_exclude'            => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
                 ],
             ],
-            'name_exclude'                    => [
+            'no_parent'               => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
                 ],
             ],
-            'no_parent'                       => [
+            'text'                    => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
                 ],
             ],
-            'is_group'                        => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'text'                            => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'from_year'                       => [
+            'from_year'               => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -332,7 +313,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'to_year'                         => [
+            'to_year'                 => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -341,7 +322,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'suggestions_to'                  => [
+            'factories_of_brand'      => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -350,7 +331,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'factories_of_brand'              => [
+            'have_common_childs_with' => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -359,49 +340,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'have_common_childs_with'         => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'have_childs_with_parent_of_type' => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'autocomplete'                    => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-            ],
-            'exclude_self_and_childs'         => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'parent_types_of'                 => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
-            'descendant_pictures'             => [
+            'descendant_pictures'     => [
                 'type'                    => InputFilter::class,
                 'status'                  => [
                     'required' => false,
@@ -452,7 +391,7 @@ return [
                     ],
                 ],
             ],
-            'preview_pictures'                => [
+            'preview_pictures'        => [
                 'type'                    => InputFilter::class,
                 'type_id'                 => [
                     'required'   => false,
@@ -491,7 +430,7 @@ return [
                     ],
                 ],
             ],
-            'related_groups_of'               => [
+            'related_groups_of'       => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -500,7 +439,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'dateless'                        => [
+            'dateless'                => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -509,7 +448,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'dateful'                         => [
+            'dateful'                 => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -518,7 +457,7 @@ return [
                     ['name' => 'Digits'],
                 ],
             ],
-            'route_brand_id'                  => [
+            'route_brand_id'          => [
                 'required'   => false,
                 'filters'    => [
                     ['name' => 'StringTrim'],
@@ -621,15 +560,6 @@ return [
             ],
         ],
         'api_item_parent_list'                 => [
-            'ancestor_id'     => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                ],
-            ],
             'concept'         => [
                 'required' => false,
                 'filters'  => [
@@ -1067,20 +997,6 @@ return [
                     ],
                 ],
             ],
-            'accept_date'            => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => Validator\DateString::class,
-                        'options' => [
-                            'format' => 'Y-m-d',
-                        ],
-                    ],
-                ],
-            ],
             'added_from'             => [
                 'required'   => false,
                 'filters'    => [
@@ -1135,15 +1051,6 @@ return [
                 ],
                 'perspective_exclude_id' => [
                     'required' => false,
-                ],
-            ],
-            'accepted_in_days'       => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
                 ],
             ],
         ],
@@ -1265,20 +1172,6 @@ return [
                     ],
                 ],
             ],
-            'accept_date'            => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => Validator\DateString::class,
-                        'options' => [
-                            'format' => 'Y-m-d',
-                        ],
-                    ],
-                ],
-            ],
             'perspective_id'         => [
                 'required' => false,
             ],
@@ -1343,15 +1236,6 @@ return [
                 ],
                 'perspective_exclude_id' => [
                     'required' => false,
-                ],
-            ],
-            'accepted_in_days'       => [
-                'required'   => false,
-                'filters'    => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
                 ],
             ],
         ],

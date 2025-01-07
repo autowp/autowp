@@ -146,9 +146,6 @@ class ItemHydrator extends AbstractRestHydrator
 
         $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('logo', $strategy);
-
-        $strategy = new Strategy\Image($serviceManager);
-        $this->addStrategy('brandicon', $strategy);
     }
 
     /**
@@ -895,20 +892,9 @@ class ItemHydrator extends AbstractRestHydrator
                 $result['name'] = $this->itemModel->getLanguageName($object['id'], 'xx');
             }
 
-            if ($this->filterComposite->filter('public_routes')) {
-                $result['public_routes'] = $this->getItemPublicRoutes($object);
-            }
-
             if ($this->filterComposite->filter('logo')) {
                 $result['logo'] = $this->extractValue('logo', [
                     'image' => $object['logo_id'],
-                ]);
-            }
-
-            if ($this->filterComposite->filter('brandicon')) {
-                $result['brandicon'] = $this->extractValue('brandicon', [
-                    'image'  => $object['logo_id'],
-                    'format' => 'brandicon2',
                 ]);
             }
         }
@@ -984,66 +970,5 @@ class ItemHydrator extends AbstractRestHydrator
         }
 
         return $result;
-    }
-
-    /**
-     * @param array|ArrayAccess $item
-     * @throws Exception
-     */
-    private function getItemPublicRoutes($item): array
-    {
-        if ((int) $item['item_type_id'] === Item::FACTORY) {
-            return [
-                ['/factories', (string) $item['id']],
-            ];
-        }
-
-        if ((int) $item['item_type_id'] === Item::CATEGORY) {
-            return [
-                ['/category', $item['catname']],
-            ];
-        }
-
-        if ((int) $item['item_type_id'] === Item::TWINS) {
-            return [
-                ['/twins', 'group', $item['id']],
-            ];
-        }
-
-        if ((int) $item['item_type_id'] === Item::BRAND) {
-            return [
-                ['/' . $item['catname']],
-            ];
-        }
-
-        return $this->walkUpUntilBrand((int) $item['id'], []);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function walkUpUntilBrand(int $id, array $path): array
-    {
-        $routes = [];
-
-        $parentRows = $this->itemParent->getParentRows($id);
-
-        foreach ($parentRows as $parentRow) {
-            $brand = $this->itemModel->getRow([
-                'item_type_id' => Item::BRAND,
-                'id'           => $parentRow['parent_id'],
-            ]);
-
-            if ($brand) {
-                $routes[] = array_merge(['/', $brand['catname'], $parentRow['catname']], $path);
-            }
-
-            $routes = array_merge(
-                $routes,
-                $this->walkUpUntilBrand((int) $parentRow['parent_id'], array_merge([$parentRow['catname']], $path))
-            );
-        }
-
-        return $routes;
     }
 }

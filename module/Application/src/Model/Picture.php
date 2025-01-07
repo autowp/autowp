@@ -407,11 +407,9 @@ class Picture
             'has_point'        => null,
             'order'            => null,
             'limit'            => null,
-            'accepted_in_days' => null,
             'log'              => null,
             'group'            => [],
             'add_date'         => null,
-            'accept_date'      => null,
             'timezone'         => null,
             'added_from'       => null,
         ];
@@ -457,22 +455,6 @@ class Picture
             if (count($value) > 0) {
                 $select->where([new Sql\Predicate\NotIn('pictures.id', $value)]);
             }
-        }
-
-        if ($options['add_date']) {
-            if (! isset($options['timezone'])) {
-                throw new Exception("Timezone not provided");
-            }
-
-            $this->setDateFilter($select, 'pictures.add_date', $options['add_date'], $options['timezone']);
-        }
-
-        if ($options['accept_date']) {
-            if (! isset($options['timezone'])) {
-                throw new Exception("Timezone not provided");
-            }
-
-            $this->setDateFilter($select, 'pictures.accept_datetime', $options['accept_date'], $options['timezone']);
         }
 
         if ($options['added_from']) {
@@ -600,15 +582,6 @@ class Picture
 
         if (isset($options['has_copyrights']) && $options['has_copyrights']) {
             $select->where(['pictures.copyrights_text_id IS NOT NULL']);
-        }
-
-        if ($options['accepted_in_days']) {
-            $select->where([
-                new Sql\Predicate\Expression(
-                    'pictures.accept_datetime > DATE_SUB(CURDATE(), INTERVAL ? DAY)',
-                    [(int) $options['accepted_in_days']]
-                ),
-            ]);
         }
 
         if ($options['log']) {
