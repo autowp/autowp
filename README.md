@@ -29,10 +29,3 @@ The following versions of PHP are supported.
 ## License
 
 The MIT License (MIT). Please see [License File](https://github.com/autowp/autowp/blob/master/LICENSE) for more information.
-
-## Tools
-
-<a href="https://php.net/"><img src="php.svg" height="80" ></a>
-<a href="https://framework.zend.com/"><img src="zf-logo.png" height="80" ></a>
-<a href="https://www.jetbrains.com/phpstorm/"><img src="phpstorm.svg" height="80" ></a>
-<a href="https://sentry.io/"><img src="sentry.svg" height="80" ></a>

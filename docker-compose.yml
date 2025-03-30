@@ -1,4 +1,3 @@
-version: "3.3"
 services:
   router:
     image: nginx:1-alpine
@@ -9,58 +8,12 @@ services:
     - ./localhost.crt:/localhost.crt
     - ./localhost.key:/localhost.key
     depends_on:
-    - backend
     - frontend
     - goautowp-serve
     - keycloak
     ports:
     - "80:80"
     - "443:443"
-
-  backend-nginx:
-    image: registry.pereslegin.ru/autowp/backend:nginx-v1.4.0
-    container_name: autowp_test_backend_nginx
-    restart: always
-    environment:
-      FASTCGI: backend:9000
-    depends_on:
-      - backend
-
-  backend:
-    image: registry.pereslegin.ru/autowp/backend:v1.4.0
-    container_name: autowp_test_backend
-    restart: always
-    environment:
-      AUTOWP_TWITTER_USERNAME: ""
-      AUTOWP_TWITTER_OAUTH_KEY: ""
-      AUTOWP_TWITTER_OAUTH_SECRET: ""
-      AUTOWP_TWITTER_TOKEN_OAUTH: ""
-      AUTOWP_TWITTER_TOKEN_OAUTH_SECRET: ""
-      AUTOWP_FACEBOOK_APP_ID: ""
-      AUTOWP_FACEBOOK_APP_SECRET: ""
-      AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN: ""
-      AUTOWP_VK_TOKEN: ""
-    volumes:
-    - ./config:/app/config
-    - ./data:/app/data
-    - ./cache:/app/cache
-    - ./module:/app/module
-    - ./public_html:/app/public_html
-    - ./vendor:/app/vendor
-    - ./etc/nginx/conf.d:/etc/nginx/conf.d
-    - ./etc/nginx/sites-available:/etc/nginx/sites-available
-    - ./composer.json:/app/composer.json
-    - ./composer.lock:/app/composer.lock
-    - ./install-dev.sh:/app/install-dev.sh
-    - ./install-dev-db.sh:/app/install-dev-db.sh
-    - ./start.sh:/app/start.sh
-    depends_on:
-    - redis
-    - mysql
-    - rabbitmq
-    - goautowp-serve
-    - minio
-    - createbuckets
 
   redis:
     image: redis:alpine
@@ -128,10 +81,11 @@ services:
       - POSTGRES_PASSWORD=password
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.73.0
+    user: "0"
+    image: registry.pereslegin.ru/autowp/goautowp:v5.6.2
     container_name: autowp_test_goautowp_serve
     restart: always
-    command: serve --df-amqp --monitoring-amqp --grpc --public --private --autoban --attrs-update-values-amqp
+    command: serve --df-amqp --monitoring-amqp --grpc --public --autoban --attrs-update-values-amqp --loglevel=debug
     depends_on:
       - rabbitmq
       - mysql
@@ -147,10 +101,10 @@ services:
       - "2113:8080"
 
   goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/goautowp:v2.73.0
+    image: registry.pereslegin.ru/autowp/goautowp:v5.6.2
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     restart: always
-    command: scheduler-generate-index-cache
+    command: scheduler-generate-index-cache --loglevel=debug
     depends_on:
       - rabbitmq
       - mysql
@@ -200,7 +154,7 @@ services:
       "
 
   keycloak:
-    image: bitnami/keycloak:20
+    image: bitnami/keycloak:25
     container_name: autowp_test_keycloak
     restart: always
     environment:
@@ -213,7 +167,7 @@ services:
       KEYCLOAK_DATABASE_USER: keycloak
       KEYCLOAK_DATABASE_PASSWORD: password
       KC_HTTP_RELATIVE_PATH: /auth
-      KEYCLOAK_EXTRA_ARGS: -Dkeycloak.import=/opt/keycloak/data/import/realm.json
+      KEYCLOAK_EXTRA_ARGS: -Dkeycloak.import=/opt/keycloak/data/import/
     volumes:
       - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
     ports:

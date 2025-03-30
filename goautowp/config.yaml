@@ -1,3 +1,5 @@
+gin-mode: debug
+log-level: debug
 public-rest:
   cors:
     origin:
@@ -8,10 +10,13 @@ duplicate_finder:
   rabbitmq: amqp://guest:guest@rabbitmq:5672/
   queue: duplicate_finder
 autowp-dsn: root:password@tcp(mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
-file_storage:
+file-storage:
   s3:
-    endpoints:
-      - http://minio:9000
+    region: "us-east-1"
+    credentials:
+      key: "AKIAIOSFODNN7EXAMPLE"
+      secret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    endpoint: http://minio:9000
 rabbitmq: amqp://guest:guest@autowp_test_rabbitmq:5672/
 postgres-dsn: postgres://traffic:password@autowp_test_traffic_postgres:5432/traffic?sslmode=disable
 postgres-migrations:
