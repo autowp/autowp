@@ -26,15 +26,16 @@
   <h4>
     <a [routerLink]="['/', brand.catname]" [textContent]="brand.name"></a>
     <small class="badge bg-secondary-subtle text-secondary-emphasis">
-      {{ brand.itemsCount - brand.newItemsCount
-      }}<span
-        *ngIf="brand.newItemsCount > 0"
-        [ngbPopover]="popover"
-        triggers="mouseenter:mouseleave"
-        popoverTitle="New {{ brand.name }} vehicles"
-        i18n-popoverTitle
-        >+{{ brand.newItemsCount }}</span
-      >
+      {{ brand.itemsCount - brand.newItemsCount }}
+      @if (brand.newItemsCount > 0) {
+        <span
+          [ngbPopover]="popover"
+          triggers="mouseenter:mouseleave"
+          popoverTitle="New {{ brand.name }} vehicles"
+          i18n-popoverTitle
+          >+{{ brand.newItemsCount }}</span
+        >
+      }
     </small>
   </h4>
   <p>

@@ -1,4 +1,4 @@
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
@@ -11,7 +11,7 @@ import {switchMap} from 'rxjs/operators';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgbPopover, AsyncPipe, NgIf],
+  imports: [RouterLink, NgbPopover, AsyncPipe],
   selector: 'app-index-brands-brand',
   styleUrls: ['./brand.component.scss'],
   templateUrl: './brand.component.html',
@@ -28,7 +28,7 @@ export class IndexBrandsBrandComponent {
       brand
         ? this.#itemsClient.getBrandNewItems(
             new NewItemsRequest({
-              itemId: '' + brand.id,
+              itemId: brand.id,
               language: this.#languageService.language,
             }),
           )

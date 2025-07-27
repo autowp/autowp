@@ -30,57 +30,51 @@
  */
 
 import $ from 'jquery';
-import {hasTouchSupport} from "./touch";
+
+import {hasTouchSupport} from './touch';
 
 // Global Defaults {{{
 const defaults = {
   // Styling Options
   addClass: null,
+  aspectRatio: 0,
   bgOpacity: 0.6,
   borderOpacity: 0.4,
-  handleOpacity: 0.5,
-  handleSize: null,
-
-  aspectRatio: 0,
-  createHandles: ['n', 's', 'e', 'w', 'nw', 'ne', 'se', 'sw'],
-  createDragbars: ['n', 's', 'e', 'w'],
-  createBorders: ['n', 's', 'e', 'w'],
-  touchSupport: null,
-
-  boxWidth: 0,
-  boxHeight: 0,
   boundary: 2,
 
-  minSelect: [0, 0],
-  maxSize: [0, 0],
-  minSize: [0, 0],
+  boxHeight: 0,
+  boxWidth: 0,
+  createBorders: ['n', 's', 'e', 'w'],
+  createDragbars: ['n', 's', 'e', 'w'],
+  createHandles: ['n', 's', 'e', 'w', 'nw', 'ne', 'se', 'sw'],
 
+  handleOpacity: 0.5,
+  handleSize: null,
+  maxSize: [0, 0],
+
+  minSelect: [0, 0],
+  minSize: [0, 0],
   // Callbacks / Event Handlers
-  onSelect: function() {}
+  onSelect: function () {},
+
+  touchSupport: null,
 };
 
 function Jcrop(obj, opt) {
-
   let $img;
   let xscale;
   let yscale;
 
   let options = $.extend({}, defaults);
   const _ua = navigator.userAgent.toLowerCase(),
-      is_msie = /msie/.test(_ua);
+    is_msie = /msie/.test(_ua);
 
-  let $hdl_holder = $('<div />')
-      .width('100%')
-      .height('100%')
-      .css('zIndex', 320),
-    $img_holder = $('<div />')
-      .width('100%')
-      .height('100%')
-      .css({
-        zIndex: 310,
-        position: 'absolute',
-        overflow: 'hidden'
-      });
+  let $hdl_holder = $('<div />').width('100%').height('100%').css('zIndex', 320),
+    $img_holder = $('<div />').width('100%').height('100%').css({
+      overflow: 'hidden',
+      position: 'absolute',
+      zIndex: 310,
+    });
 
   // Initialization {{{
   // Sanitize some options {{{
@@ -99,18 +93,18 @@ function Jcrop(obj, opt) {
   // character in the DOM will be as you left it.
   const img_css = {
     border: 'none',
-    visibility: 'visible',
+    left: 0,
     margin: 0,
     padding: 0,
     position: 'absolute',
     top: 0,
-    left: 0
+    visibility: 'visible',
   };
 
   let $origimg = $(obj);
 
   if (obj.tagName !== 'IMG') {
-    throw new Error("Only img is supported");
+    throw new Error('Only img is supported');
   }
   // Fix size of crop image.
   // Necessary when crop image is within a hidden element when page is loaded.
@@ -126,11 +120,7 @@ function Jcrop(obj, opt) {
     $origimg.height(tempImage.height);
   }
 
-  $img = $origimg
-    .clone()
-    .removeAttr('id')
-    .css(img_css)
-    .show();
+  $img = $origimg.clone().removeAttr('id').css(img_css).show();
 
   $img.width($origimg.width());
   $img.height($origimg.height());
@@ -145,8 +135,8 @@ function Jcrop(obj, opt) {
       .height(boundy)
       .addClass(cssClass('holder'))
       .css({
+        backgroundColor: 'black',
         position: 'relative',
-        backgroundColor: 'black'
       })
       .insertAfter($origimg)
       .append($img);
@@ -160,10 +150,10 @@ function Jcrop(obj, opt) {
     .width(boundx + bound * 2)
     .height(boundy + bound * 2)
     .css({
+      left: px(-bound),
       position: 'absolute',
       top: px(-bound),
-      left: px(-bound),
-      zIndex: 290
+      zIndex: 290,
     })
     .on('mousedown', newSelection);
 
@@ -171,20 +161,24 @@ function Jcrop(obj, opt) {
     $sel = $('<div />')
       .css({
         position: 'absolute',
-        zIndex: 600
+        zIndex: 600,
       })
       .insertBefore($img)
       .append($img_holder, $hdl_holder);
 
   function detectSupport() {
-    if (options.touchSupport === true || options.touchSupport === false)
-      return options.touchSupport;
+    if (options.touchSupport === true || options.touchSupport === false) return options.touchSupport;
     else return hasTouchSupport();
   }
 
   // Touch Module {{{
   const Touch = (function () {
     return {
+      cfilter: function (e) {
+        e.pageX = e.originalEvent.changedTouches[0].pageX;
+        e.pageY = e.originalEvent.changedTouches[0].pageY;
+        return e;
+      },
       createDragger: function (ord) {
         return function (e) {
           if (options.disabled) {
@@ -198,33 +192,28 @@ function Jcrop(obj, opt) {
           return false;
         };
       },
+      isSupported: hasTouchSupport,
       newSelection: function (e) {
         return newSelection(Touch.cfilter(e));
       },
-      cfilter: function (e) {
-        e.pageX = e.originalEvent.changedTouches[0].pageX;
-        e.pageY = e.originalEvent.changedTouches[0].pageY;
-        return e;
-      },
-      isSupported: hasTouchSupport,
-      support: detectSupport()
+      support: detectSupport(),
     };
   })();
 
   // Selection Module {{{
-  const Selection = (function() {
+  const Selection = (function () {
     let awake,
-      hdep = 370,
       borders = {},
+      dragbar = {},
       handle = {},
-      dragbar = {};
+      hdep = 370;
 
     // Private Methods
     function insertBorder(type) {
       const jq = $('<div />')
         .css({
+          opacity: options.borderOpacity,
           position: 'absolute',
-          opacity: options.borderOpacity
         })
         .addClass(cssClass(type));
       $img_holder.append(jq);
@@ -237,7 +226,7 @@ function Jcrop(obj, opt) {
         .css({
           cursor: ord + '-resize',
           position: 'absolute',
-          zIndex: zi
+          zIndex: zi,
         })
         .addClass('ord-' + ord);
 
@@ -250,12 +239,12 @@ function Jcrop(obj, opt) {
     }
 
     function insertHandle(ord) {
-      const hs = options.handleSize,
-        div = dragDiv(ord, hdep++)
+      const div = dragDiv(ord, hdep++)
           .css({
-            opacity: options.handleOpacity
+            opacity: options.handleOpacity,
           })
-          .addClass(cssClass('handle'));
+          .addClass(cssClass('handle')),
+        hs = options.handleSize;
 
       if (hs) {
         div.width(hs).height(hs);
@@ -278,14 +267,14 @@ function Jcrop(obj, opt) {
       let cl;
       for (let i = 0; i < li.length; i++) {
         switch (li[i]) {
+          case 'e':
+            cl = 'vline right';
+            break;
           case 'n':
             cl = 'hline';
             break;
           case 's':
             cl = 'hline bottom';
-            break;
-          case 'e':
-            cl = 'vline right';
             break;
           case 'w':
             cl = 'vline';
@@ -303,12 +292,12 @@ function Jcrop(obj, opt) {
 
     function moveto(x, y) {
       $img2.css({
+        left: px(-x),
         top: px(-y),
-        left: px(-x)
       });
       $sel.css({
+        left: px(x),
         top: px(y),
-        left: px(x)
       });
     }
 
@@ -392,26 +381,22 @@ function Jcrop(obj, opt) {
     // Insert draggable elements {{{
     // Insert border divs for outline
 
-    if (Array.isArray(options.createDragbars))
-      createDragbars(options.createDragbars);
+    if (Array.isArray(options.createDragbars)) createDragbars(options.createDragbars);
 
     if (Array.isArray(options.createHandles)) createHandles(options.createHandles);
 
-    if (Array.isArray(options.createBorders))
-      createBorders(options.createBorders);
+    if (Array.isArray(options.createBorders)) createBorders(options.createBorders);
 
     // This is a hack for iOS5 to support drag/move touch functionality
-    $(document).on('touchstart.jcrop-ios', function(e) {
+    $(document).on('touchstart.jcrop-ios', function (e) {
       if ($(e.currentTarget).hasClass('jcrop-tracker')) e.stopPropagation();
     });
 
-    const $track = newTracker()
-      .on('mousedown', createDragger('move'))
-      .css({
-        cursor: 'move',
-        position: 'absolute',
-        zIndex: 360
-      });
+    const $track = newTracker().on('mousedown', createDragger('move')).css({
+      cursor: 'move',
+      position: 'absolute',
+      zIndex: 360,
+    });
 
     if (Touch.support) {
       $track.on('touchstart.jcrop', Touch.createDragger('move'));
@@ -421,66 +406,58 @@ function Jcrop(obj, opt) {
     disableHandles();
 
     return {
-      update: update,
-      release: release,
-      refresh: refresh,
-      isAwake: function() {
+      disableHandles: disableHandles,
+      done: done,
+      enableHandles: enableHandles,
+      enableOnly: function () {},
+      isAwake: function () {
         return awake;
       },
-      setCursor: function(cursor) {
+      refresh: refresh,
+      release: release,
+      setBgOpacity: setBgOpacity,
+      setCursor: function (cursor) {
         $track.css('cursor', cursor);
       },
-      enableHandles: enableHandles,
-      enableOnly: function() {},
-      disableHandles: disableHandles,
-      setBgOpacity: setBgOpacity,
-      done: done
+      update: update,
     };
   })();
 
   let api = {
-    setSelect: setSelect,
-    setOptions: setOptionsNew,
+    cancel: cancelCrop,
+    destroy: destroy,
 
     disable: disableCrop,
     enable: enableCrop,
-    cancel: cancelCrop,
-    release: Selection.release,
-    destroy: destroy,
-
     focus: null,
+    release: Selection.release,
+    setOptions: setOptionsNew,
+
+    setSelect: setSelect,
 
     ui: {
       holder: $div,
-      selection: $sel
-    }
+      selection: $sel,
+    },
   };
 
-// Tracker Module {{{
-  const Tracker = (function() {
-    let onMove = function () {
-      },
-      onDone = function () {
-      };
+  // Tracker Module {{{
+  const Tracker = (function () {
+    let onDone = function () {},
+      onMove = function () {};
 
     function toFront(touch) {
       $trk.css({
-        zIndex: 450
+        zIndex: 450,
       });
 
-      if (touch)
-        $(document)
-          .on('touchmove.jcrop', trackTouchMove)
-          .on('touchend.jcrop', trackTouchEnd);
-      else
-        $(document)
-          .on('mousemove.jcrop', trackMove)
-          .on('mouseup.jcrop', trackUp);
+      if (touch) $(document).on('touchmove.jcrop', trackTouchMove).on('touchend.jcrop', trackTouchEnd);
+      else $(document).on('mousemove.jcrop', trackMove).on('mouseup.jcrop', trackUp);
     }
 
     function toBack() {
       $trk.css({
-        zIndex: 290
+        zIndex: 290,
       });
       $(document).off('.jcrop');
     }
@@ -504,8 +481,8 @@ function Jcrop(obj, opt) {
         }
 
         toBack();
-        onMove = function() {};
-        onDone = function() {};
+        onMove = function () {};
+        onDone = function () {};
       }
 
       return false;
@@ -535,15 +512,15 @@ function Jcrop(obj, opt) {
     $img.before($trk);
     return {
       activateHandlers: activateHandlers,
-      setCursor: setCursor
+      setCursor: setCursor,
     };
   })();
 
-// Coords Module {{{
-  const Coords = (function() {
+  // Coords Module {{{
+  const Coords = (function () {
     let x1 = 0,
-      y1 = 0,
       x2 = 0,
+      y1 = 0,
       y2 = 0;
 
     function setPressed(pos) {
@@ -560,7 +537,7 @@ function Jcrop(obj, opt) {
 
     function moveOffset(offset) {
       let ox = offset[0],
-          oy = offset[1];
+        oy = offset[1];
 
       if (0 > x1 + ox) {
         ox -= ox + x1;
@@ -603,17 +580,16 @@ function Jcrop(obj, opt) {
       // This function could use some optimization I think...
       const aspect = options.aspectRatio,
         min_x = options.minSize[0] / xscale,
-        rw = x2 - x1,
         rh = y2 - y1,
-        rwa = Math.abs(rw),
         rha = Math.abs(rh),
+        rw = x2 - x1,
+        rwa = Math.abs(rw),
         real_ratio = rwa / rha;
-      let
+      let h,
         max_x = options.maxSize[0] / xscale,
-        xx,
-        yy,
         w,
-        h;
+        xx,
+        yy;
 
       if (max_x === 0) {
         max_x = boundx * 10;
@@ -720,9 +696,9 @@ function Jcrop(obj, opt) {
     }
 
     function getRect() {
-      let xsize = x2 - x1,
-        ysize = y2 - y1,
-        delta;
+      let delta,
+        xsize = x2 - x1,
+        ysize = y2 - y1;
 
       if (xlimit && Math.abs(xsize) > xlimit) {
         x2 = xsize > 0 ? x1 + xlimit : x1 - xlimit;
@@ -780,21 +756,21 @@ function Jcrop(obj, opt) {
 
     function makeObj(a) {
       return {
-        x: a[0],
-        y: a[1],
-        x2: a[2],
-        y2: a[3],
+        h: a[3] - a[1],
         w: a[2] - a[0],
-        h: a[3] - a[1]
+        x: a[0],
+        x2: a[2],
+        y: a[1],
+        y2: a[3],
       };
     }
 
     return {
-      setPressed: setPressed,
-      setCurrent: setCurrent,
-      moveOffset: moveOffset,
       getCorner: getCorner,
-      getFixed: getFixed
+      getFixed: getFixed,
+      moveOffset: moveOffset,
+      setCurrent: setCurrent,
+      setPressed: setPressed,
     };
   })();
 
@@ -823,7 +799,7 @@ function Jcrop(obj, opt) {
     options = $.extend(options, opt);
 
     if (typeof options.onSelect !== 'function') {
-      options.onSelect = function() {};
+      options.onSelect = function () {};
     }
   }
 
@@ -846,13 +822,10 @@ function Jcrop(obj, opt) {
   }
 
   function dragmodeHandler(mode, f) {
-    return function(pos) {
+    return function (pos) {
       if (!options.aspectRatio) {
         switch (mode) {
           case 'e':
-            pos[1] = f.y2;
-            break;
-          case 'w':
             pos[1] = f.y2;
             break;
           case 'n':
@@ -860,6 +833,9 @@ function Jcrop(obj, opt) {
             break;
           case 's':
             pos[0] = f.x2;
+            break;
+          case 'w':
+            pos[1] = f.y2;
             break;
         }
       } else {
@@ -867,14 +843,14 @@ function Jcrop(obj, opt) {
           case 'e':
             pos[1] = f.y + 1;
             break;
-          case 'w':
-            pos[1] = f.y + 1;
-            break;
           case 'n':
             pos[0] = f.x + 1;
             break;
           case 's':
             pos[0] = f.x + 1;
+            break;
+          case 'w':
+            pos[1] = f.y + 1;
             break;
         }
       }
@@ -886,7 +862,7 @@ function Jcrop(obj, opt) {
   function createMover(pos) {
     let lloc = pos;
 
-    return function(pos) {
+    return function (pos) {
       Coords.moveOffset([pos[0] - lloc[0], pos[1] - lloc[1]]);
       lloc = pos;
 
@@ -896,27 +872,27 @@ function Jcrop(obj, opt) {
 
   function oppLockCorner(ord) {
     switch (ord) {
-      case 'n':
-        return 'sw';
-      case 's':
-        return 'nw';
       case 'e':
         return 'nw';
-      case 'w':
-        return 'ne';
+      case 'n':
+        return 'sw';
       case 'ne':
         return 'sw';
       case 'nw':
         return 'se';
+      case 's':
+        return 'nw';
       case 'se':
         return 'nw';
       case 'sw':
+        return 'ne';
+      case 'w':
         return 'ne';
     }
   }
 
   function createDragger(ord) {
-    return function(e) {
+    return function (e) {
       if (options.disabled) {
         return false;
       }
@@ -934,8 +910,8 @@ function Jcrop(obj, opt) {
   }
 
   function presize($obj, w, h) {
-    let nw = $obj.width(),
-      nh = $obj.height();
+    let nh = $obj.height(),
+      nw = $obj.width();
     if (nw > w && w > 0) {
       nw = w;
       nh = (w / $obj.width()) * $obj.height();
@@ -951,12 +927,12 @@ function Jcrop(obj, opt) {
 
   function unscale(c) {
     return {
-      x: c.x * xscale,
-      y: c.y * yscale,
-      x2: c.x2 * xscale,
-      y2: c.y2 * yscale,
+      h: c.h * yscale,
       w: c.w * xscale,
-      h: c.h * yscale
+      x: c.x * xscale,
+      x2: c.x2 * xscale,
+      y: c.y * yscale,
+      y2: c.y2 * yscale,
     };
   }
 
@@ -982,11 +958,7 @@ function Jcrop(obj, opt) {
     const pos = mouseAbs(e);
     Coords.setPressed(pos);
     Selection.update();
-    Tracker.activateHandlers(
-      selectDrag,
-      doneSelect,
-      e.type.substring(0, 5) === 'touch'
-    );
+    Tracker.activateHandlers(selectDrag, doneSelect, e.type.substring(0, 5) === 'touch');
 
     e.stopPropagation();
     e.preventDefault();
@@ -1002,18 +974,14 @@ function Jcrop(obj, opt) {
     const trk = $('<div></div>').addClass(cssClass('tracker'));
     if (is_msie) {
       trk.css({
+        backgroundColor: 'white',
         opacity: 0,
-        backgroundColor: 'white'
       });
     }
     return trk;
   }
 
-  $img2 = $('<img />')
-    .attr('src', $img.attr('src'))
-    .css(img_css)
-    .width(boundx)
-    .height(boundy);
+  $img2 = $('<img />').attr('src', $img.attr('src')).css(img_css).width(boundx).height(boundy);
   $img_holder.append($img2);
 
   /* }}} */
@@ -1021,8 +989,8 @@ function Jcrop(obj, opt) {
   let bgcolor = 'black',
     bgopacity = options.bgOpacity,
     xlimit,
-    ylimit,
     xmin,
+    ylimit,
     ymin;
 
   docOffset = getPos($img);
@@ -1034,12 +1002,7 @@ function Jcrop(obj, opt) {
   // API methods {{{
 
   function setSelect(rect) {
-    setSelectRaw([
-      rect[0] / xscale,
-      rect[1] / yscale,
-      rect[2] / xscale,
-      rect[3] / yscale
-    ]);
+    setSelectRaw([rect[0] / xscale, rect[1] / yscale, rect[2] / xscale, rect[3] / yscale]);
     options.onSelect.call(api, unscale(Coords.getFixed()));
     Selection.enableHandles();
   }
@@ -1080,7 +1043,7 @@ function Jcrop(obj, opt) {
   }
 
   function interfaceUpdate(
-    alt // This method tweaks the interface based on options object. // Called when options are changed and at end of initialization.
+    alt, // This method tweaks the interface based on options object. // Called when options are changed and at end of initialization.
   ) {
     if (alt) {
       Selection.enableOnly();
@@ -1089,7 +1052,7 @@ function Jcrop(obj, opt) {
     }
 
     Tracker.setCursor('crosshair');
-    Selection.setCursor( 'move');
+    Selection.setCursor('move');
 
     if (options.hasOwnProperty('trueSize')) {
       xscale = options.trueSize[0] / boundx;
@@ -1130,9 +1093,8 @@ function Jcrop(obj, opt) {
   $hdl_holder.hide();
   interfaceUpdate(true);
 
-
   if (is_msie)
-    $div.on('selectstart', function() {
+    $div.on('selectstart', function () {
       return false;
     });
 

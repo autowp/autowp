@@ -19,16 +19,18 @@
   <span>
     <a [routerLink]="brand.catname">{{ brand.name }}</a>
     <span class="count"
-      >({{ brand.itemsCount - brand.newItemsCount
-      }}<span
-        *ngIf="brand.newItemsCount > 0"
-        [ngbPopover]="popover"
-        triggers="mouseenter:mouseleave"
-        container="body"
-        popoverTitle="New {{ brand.name }} vehicles"
-        i18n-popoverTitle
-        >+{{ brand.newItemsCount }}</span
-      >)</span
+      >({{ brand.itemsCount - brand.newItemsCount }}
+      @if (brand.newItemsCount > 0) {
+        <span
+          [ngbPopover]="popover"
+          triggers="mouseenter:mouseleave"
+          container="body"
+          popoverTitle="New {{ brand.name }} vehicles"
+          i18n-popoverTitle
+          >+{{ brand.newItemsCount }}</span
+        >
+      }
+      )</span
     >
   </span>
 }

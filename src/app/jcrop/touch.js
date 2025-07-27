@@ -1,9 +1,9 @@
 // Touch support detection function adapted (under MIT License)
 // from code by Jeffrey Sambells - http://github.com/iamamused/
 export function hasTouchSupport() {
-  const support = {},
+  const el = document.createElement('div'),
     events = ['touchstart', 'touchmove', 'touchend'],
-    el = document.createElement('div');
+    support = {};
 
   try {
     for (let i = 0; i < events.length; i++) {

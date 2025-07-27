@@ -486,6 +486,7 @@
               @for (picture of data; track picture) {
                 <div class="col-md-3 mb-4">
                   <button
+                    type="button"
                     class="btn btn-secondary"
                     [class.btn-success]="picture.selected"
                     (click)="onPictureClick(picture, control)"

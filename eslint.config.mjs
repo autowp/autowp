@@ -4,10 +4,11 @@ import depend from 'eslint-plugin-depend';
 import perfectionist from 'eslint-plugin-perfectionist';
 import {default as eslintPluginPrettierRecommended} from 'eslint-plugin-prettier/recommended';
 import sonarjs from 'eslint-plugin-sonarjs';
-import {defineConfig} from 'eslint/config';
+import {defineConfig, globalIgnores} from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
+  globalIgnores(['dist/**/*', '.scannerwork/**/*', 'node_modules/**/*', '.idea/**/*', '.angular/**/*']),
   {
     extends: [
       // Apply the recommended core rules
