@@ -25,10 +25,10 @@ import {ToastsService} from '../../../../toasts/toasts.service';
 import {CatalogueService} from '../../../catalogue-service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, CommentsComponent, AsyncPipe, PictureComponent],
   selector: 'app-catalogue-vehicles-pictures-picture',
+  imports: [RouterLink, CommentsComponent, AsyncPipe, PictureComponent],
   templateUrl: './picture.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueVehiclesPicturesPictureComponent {
   readonly #pageEnv = inject(PageEnvService);

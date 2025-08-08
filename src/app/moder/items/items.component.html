@@ -14,10 +14,10 @@
 </div>
 
 <div class="nav nav-pills mb-4">
-  <a class="nav-link" routerLink="." [queryParams]="{vehicle_type_id: 'empty', vehicle_childs_type_id: 19}" i18n
+  <a class="nav-link" routerLink="." i18n [queryParams]="{vehicle_type_id: 'empty', vehicle_childs_type_id: 19}"
     >Buses without type</a
   >
-  <a class="nav-link" routerLink="." [queryParams]="{vehicle_type_id: 'empty', vehicle_childs_type_id: 17}" i18n
+  <a class="nav-link" routerLink="." i18n [queryParams]="{vehicle_type_id: 'empty', vehicle_childs_type_id: 17}"
     >Truck without type</a
   >
 </div>
@@ -60,16 +60,16 @@
           [(ngModel)]="itemTypeID"
           (change)="onItemTypeChanged()"
         >
-          <option [ngValue]="ItemType.ITEM_TYPE_UNKNOWN" i18n>Any</option>
-          <option [ngValue]="ItemType.ITEM_TYPE_VEHICLE" i18n>Vehicle</option>
-          <option [ngValue]="ItemType.ITEM_TYPE_ENGINE" i18n>Engine</option>
-          <option [ngValue]="ItemType.ITEM_TYPE_CATEGORY" i18n>Category</option>
-          <option [ngValue]="ItemType.ITEM_TYPE_TWINS" i18n>Twins</option>
-          <option [ngValue]="ItemType.ITEM_TYPE_BRAND" i18n>Brand</option>
-          <option [ngValue]="ItemType.ITEM_TYPE_FACTORY" i18n>Factory</option>
-          <option [ngValue]="ItemType.ITEM_TYPE_MUSEUM" i18n>Museum</option>
-          <option [ngValue]="ItemType.ITEM_TYPE_PERSON" i18n>Person</option>
-          <option [ngValue]="ItemType.ITEM_TYPE_COPYRIGHT" i18n>Copyright block</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_UNKNOWN">Any</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_VEHICLE">Vehicle</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_ENGINE">Engine</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_CATEGORY">Category</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_TWINS">Twins</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_BRAND">Brand</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_FACTORY">Factory</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_MUSEUM">Museum</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_PERSON">Person</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_COPYRIGHT">Copyright block</option>
         </select>
       </div>
       <div class="mb-3">
@@ -81,8 +81,8 @@
           [(ngModel)]="vehicleTypeID"
           (change)="onVehicleTypeChanged()"
         >
-          <option [ngValue]="null" i18n>Any</option>
-          <option [ngValue]="'empty'" i18n>Empty</option>
+          <option i18n [ngValue]="null">Any</option>
+          <option ngValue="empty" i18n>Empty</option>
           @for (item of vehicleTypeOptions$ | async; track item.id) {
             <option [ngValue]="item.id">{{ '...'.repeat(item.deep || 0) }}{{ item.name }}</option>
           }
@@ -97,7 +97,7 @@
           [(ngModel)]="vehicleChildsTypeID"
           (change)="onVehicleChildsTypeChanged()"
         >
-          <option [ngValue]="null" i18n>Any</option>
+          <option i18n [ngValue]="null">Any</option>
           @for (item of vehicleTypeOptions$ | async; track item.id) {
             <option [ngValue]="item.id">{{ '...'.repeat(item.deep || 0) }}{{ item.name }}</option>
           }
@@ -106,7 +106,7 @@
       <div class="mb-3">
         <label i18n for="spec">Spec</label>
         <select name="spec" id="spec" class="form-select" [(ngModel)]="specID" (change)="onSpecChanged()">
-          <option [ngValue]="null" i18n>Any</option>
+          <option i18n [ngValue]="null">Any</option>
           @for (item of specOptions$ | async; track item.id) {
             <option [ngValue]="item.id">{{ '...'.repeat(item.deep || 0) }}{{ item.shortName }}</option>
           }
@@ -119,9 +119,9 @@
           id="from_year"
           name="from_year"
           class="form-control"
+          maxlength="4"
           [(ngModel)]="fromYear"
           (input)="onFromYearChanged()"
-          maxlength="4"
         />
       </div>
       <div class="mb-3">
@@ -131,9 +131,9 @@
           id="to_year"
           name="to_year"
           class="form-control"
+          maxlength="4"
           [(ngModel)]="toYear"
           (input)="onToYearChanged()"
-          maxlength="4"
         />
       </div>
       <div class="mb-3">
@@ -143,15 +143,15 @@
         </ng-template>
         <div class="input-group mb-3">
           <input
-            [ngbTypeahead]="ancestorsDataSource"
             name="ancestor"
             id="ancestor"
-            [(ngModel)]="ancestorQuery"
-            [inputFormatter]="ancestorFormatter"
-            (selectItem)="ancestorOnSelect($event)"
-            [resultTemplate]="ancestorTemplate"
             class="form-control"
+            [ngbTypeahead]="ancestorsDataSource"
+            [inputFormatter]="ancestorFormatter"
+            [resultTemplate]="ancestorTemplate"
             [class.border-primary]="ancestorID"
+            [(ngModel)]="ancestorQuery"
+            (selectItem)="ancestorOnSelect($event)"
           />
           <button class="btn btn-outline-secondary" type="button" [disabled]="!ancestorID" (click)="clearAncestor()">
             <span class="bi bi-x" aria-hidden="true"></span>
@@ -171,10 +171,10 @@
       <div class="mb-3">
         <label i18n for="order">Order</label>
         <select name="order" id="order" class="form-select" [(ngModel)]="order" (change)="onOrderChanged()">
-          <option [value]="ItemsRequest.Order.ID_DESC" i18n>id desc</option>
-          <option [value]="ItemsRequest.Order.ID_ASC" i18n>id asc</option>
-          <option [value]="ItemsRequest.Order.CHILDS_COUNT" i18n>childs count</option>
-          <option [value]="ItemsRequest.Order.NAME" i18n>name</option>
+          <option i18n [value]="ItemsRequest.Order.ID_DESC">id desc</option>
+          <option i18n [value]="ItemsRequest.Order.ID_ASC">id asc</option>
+          <option i18n [value]="ItemsRequest.Order.CHILDS_COUNT">childs count</option>
+          <option i18n [value]="ItemsRequest.Order.NAME">name</option>
         </select>
       </div>
     </form>
@@ -184,18 +184,18 @@
       <div class="btn-group float-end">
         <a
           routerLink="."
-          [queryParams]="{list: null}"
           queryParamsHandling="merge"
           class="btn btn-outline-secondary"
+          [queryParams]="{list: null}"
           [class.active]="!data.listMode"
         >
           <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
         </a>
         <a
           routerLink="."
-          [queryParams]="{list: '1', order: 'name'}"
           queryParamsHandling="merge"
           class="btn btn-outline-secondary"
+          [queryParams]="{list: '1', order: 'name'}"
           [class.active]="data.listMode"
         >
           <i class="bi bi-list" aria-hidden="true"></i>

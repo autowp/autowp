@@ -30,10 +30,10 @@
         <app-item-meta-form
           class="mb-4"
           [item]="newItem"
-          (submitted)="submit(item, $event, pictures)"
           [vehicleTypeIDs]="(vehicleTypeIDs$ | async) || []"
           [invalidParams]="invalidParams()"
           [pictures]="pictures"
+          (submitted)="submit(item, $event, pictures)"
         />
       }
     }

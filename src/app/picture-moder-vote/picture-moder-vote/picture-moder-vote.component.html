@@ -7,6 +7,7 @@
           @for (template of moderVoteTemplateOptions$ | async; track template.id) {
             @if (template.vote > 0) {
               <button
+                type="button"
                 class="dropdown-item"
                 [textContent]="template.message"
                 (click)="votePicture(picture, template.vote, template.message)"
@@ -14,7 +15,7 @@
             }
           }
           <div class="dropdown-divider"></div>
-          <button class="dropdown-item" (click)="showCustomDialog(picture, 1)" i18n>Custom …</button>
+          <button type="button" class="dropdown-item" i18n (click)="showCustomDialog(picture, 1)">Custom …</button>
         </div>
       </div>
       <div ngbDropdown>
@@ -23,6 +24,7 @@
           @for (template of moderVoteTemplateOptions$ | async; track template.id) {
             @if (template.vote < 0) {
               <button
+                type="button"
                 class="dropdown-item"
                 [textContent]="template.message"
                 (click)="votePicture(picture, template.vote, template.message)"
@@ -30,11 +32,11 @@
             }
           }
           <div class="dropdown-divider"></div>
-          <button class="dropdown-item" (click)="showCustomDialog(picture, -1)" i18n>Custom …</button>
+          <button type="button" class="dropdown-item" i18n (click)="showCustomDialog(picture, -1)">Custom …</button>
         </div>
       </div>
     } @else {
-      <button class="btn btn-secondary" (click)="cancelVotePicture(picture)" i18n>Cancel my vote</button>
+      <button type="button" class="btn btn-secondary" i18n (click)="cancelVotePicture(picture)">Cancel my vote</button>
     }
   </div>
 }

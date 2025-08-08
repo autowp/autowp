@@ -9,10 +9,10 @@ import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-moder-items-too-big',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './too-big.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsTooBigComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

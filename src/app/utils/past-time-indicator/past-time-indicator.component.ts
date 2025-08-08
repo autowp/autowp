@@ -4,11 +4,11 @@ import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgbTooltip, DatePipe, TimeAgoPipe],
   selector: 'app-past-time-indicator',
-  styleUrls: ['./styles.scss'],
+  imports: [NgbTooltip, DatePipe, TimeAgoPipe],
   templateUrl: './past-time-indicator.component.html',
+  styleUrl: './styles.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PastTimeIndicatorComponent {
   readonly date = input.required<Date | string>();

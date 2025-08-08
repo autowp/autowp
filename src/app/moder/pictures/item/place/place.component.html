@@ -11,7 +11,7 @@
     </li>
     @if (picture$ | async; as picture) {
       <li class="breadcrumb-item">
-        <a [routerLink]="['/moder/pictures', picture.id]" i18n>Picture №{{ picture.id }}</a>
+        <a i18n [routerLink]="['/moder/pictures', picture.id]">Picture №{{ picture.id }}</a>
       </li>
     }
   </ol>
@@ -23,7 +23,7 @@
   </div>
 
   @if (form$ | async; as form) {
-    <form method="post" class="form-horizontal" (ngSubmit)="doSubmit(form, picture)" [formGroup]="form">
+    <form method="post" class="form-horizontal" [formGroup]="form" (ngSubmit)="doSubmit(form, picture)">
       <div class="mb-3 row">
         <label class="col-md-2 col-form-label" for="lat" i18n>Point</label>
         <div class="col-md-10 coords mb-3">
@@ -31,22 +31,22 @@
             type="text"
             id="lat"
             name="lat"
-            [formControl]="form.controls.lat"
             maxlength="20"
             size="20"
             placeholder="Latitude"
             i18n-placeholder
             class="form-control"
+            [formControl]="form.controls.lat"
           />
           <input
             type="text"
             name="lng"
-            [formControl]="form.controls.lng"
             maxlength="20"
             size="20"
             placeholder="Longitude"
             i18n-placeholder
             class="form-control"
+            [formControl]="form.controls.lng"
           />
         </div>
       </div>

@@ -12,10 +12,10 @@ import {map, shareReplay, switchMap} from 'rxjs/operators';
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe],
   selector: 'app-moder-items-alpha',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe],
   templateUrl: './alpha.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsAlphaComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

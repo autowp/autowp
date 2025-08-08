@@ -11,12 +11,12 @@
         />
       }
       @if (item.logo) {
-        <img alt="" [src]="item.logo.src" style="max-width: 100%" />
+        <img alt="" style="max-width: 100%" [src]="item.logo.src" />
       }
       @if (canLogo) {
         <div>
           <div class="mb-3">
-            <input type="file" #input name="file" class="form-control" (change)="onChange($event)" accept="image/*" />
+            <input #input type="file" name="file" class="form-control" accept="image/*" (change)="onChange($event)" />
           </div>
           @if (progress && !progress.success) {
             <ngb-progressbar

@@ -13,13 +13,13 @@
           }
           @case ('picture') {
             @if (element.picture) {
-              <a [routerLink]="['/picture', element.picture.identity]" class="thumbnail-inline">
+              <a class="thumbnail-inline" [routerLink]="['/picture', element.picture.identity]">
                 <img
                   class="card-img-top"
+                  loading="lazy"
                   [src]="element.picture.thumbMedium?.src"
                   [alt]="element.picture.nameText"
                   [title]="element.picture.nameText"
-                  loading="lazy"
                 />
               </a>
             }

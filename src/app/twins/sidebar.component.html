@@ -3,7 +3,7 @@
     <ul class="nav flex-column nav-pills">
       @for (item of brands.items; track item) {
         <li class="nav-item">
-          <a [routerLink]="['/twins', item.catname]" class="nav-link" [class.active]="active(item)">
+          <a class="nav-link" [routerLink]="['/twins', item.catname]" [class.active]="active(item)">
             {{ item.name }}
             @if (item.newCount <= 0) {
               <span class="count">({{ item.count }})</span>

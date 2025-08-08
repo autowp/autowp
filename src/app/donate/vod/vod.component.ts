@@ -17,10 +17,10 @@ import {DonateService} from '../donate.service';
 const VOD_TIMEZONE = 'UTC';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, MarkdownComponent, ItemOfDayComponent, AsyncPipe],
   selector: 'app-donate-vod',
+  imports: [RouterLink, MarkdownComponent, ItemOfDayComponent, AsyncPipe],
   templateUrl: './vod.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DonateVodComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

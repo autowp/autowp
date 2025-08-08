@@ -29,10 +29,10 @@ import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} fr
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   selector: 'app-catalogue-concepts',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   templateUrl: './concepts.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueConceptsComponent {
   readonly #pageEnv = inject(PageEnvService);

@@ -66,7 +66,7 @@ const cropTitle = (image: APIImage | undefined): string => {
 };
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Default,
+  selector: 'app-upload-index',
   imports: [
     MarkdownComponent,
     FormsModule,
@@ -77,8 +77,9 @@ const cropTitle = (image: APIImage | undefined): string => {
     ThumbnailComponent,
     ReactiveFormsModule,
   ],
-  selector: 'app-upload-index',
   templateUrl: './index.component.html',
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class UploadIndexComponent implements OnInit {
   readonly #http = inject(HttpClient);
@@ -100,7 +101,7 @@ export class UploadIndexComponent implements OnInit {
   protected readonly formHidden = signal(false);
   protected readonly authenticated$ = this.auth.authenticated$;
 
-  public input = viewChild<ElementRef>('input');
+  public readonly input = viewChild<ElementRef>('input');
 
   protected readonly perspectiveID$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('perspective_id') ?? '', 10)),

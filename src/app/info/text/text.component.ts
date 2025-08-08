@@ -31,10 +31,10 @@ interface InfoText {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, UserComponent, AsyncPipe, DiffEditorComponent],
   selector: 'app-info-text',
+  imports: [RouterLink, UserComponent, AsyncPipe, DiffEditorComponent],
   templateUrl: './text.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InfoTextComponent implements OnInit {
   readonly #userService = inject(UserService);

@@ -1,7 +1,7 @@
 @if (item$ | async; as item) {
   @if ((item.item?.childsCount || 0) > 0) {
     <div>
-      <button class="btn btn-link toggle" (click)="open = !open">
+      <button type="button" class="btn btn-link toggle" (click)="open = !open">
         @if (!open) {
           <i class="bi bi-folder2" aria-hidden="true"></i>
         } @else {
@@ -35,8 +35,8 @@
             <a
               class="btn btn-link"
               routerLink="/upload"
-              [queryParams]="{item_id: item.itemId, perspective_id: null}"
               i18n
+              [queryParams]="{item_id: item.itemId, perspective_id: null}"
               >other modification</a
             >
           </li>

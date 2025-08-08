@@ -1,15 +1,15 @@
-<ul ngbNav #nav="ngbNav" class="nav-tabs">
+<ul #nav="ngbNav" ngbNav class="nav-tabs">
   <li ngbNavItem>
     <a ngbNavLink i18n>Edit</a>
     <ng-template ngbNavContent>
       @if (control(); as control) {
         <textarea
-          [formControl]="control"
           class="form-control"
           maxlength="65536"
           rows="1"
           aria-label="Text"
           cdkTextareaAutosize
+          [formControl]="control"
           (change)="onChange(control.value)"
         ></textarea>
       }

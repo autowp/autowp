@@ -10,10 +10,10 @@ import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/opera
 import {APIAttrsService} from '../../../api/attrs/attrs.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-moder-attrs-attribute',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './attribute.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerAttrsAttributeComponent {
   readonly #attrsService = inject(APIAttrsService);

@@ -30,10 +30,10 @@ import {ThumbnailComponent} from '../../../thumbnail/thumbnail/thumbnail.compone
 import {ToastsService} from '../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MarkdownComponent, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-persons-person-info',
+  imports: [MarkdownComponent, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './info.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PersonsPersonInfoComponent {
   readonly #router = inject(Router);

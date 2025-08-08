@@ -21,10 +21,10 @@ import {
 } from '../../item-meta-form/item-meta-form.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgbProgressbar, ItemMetaFormComponent, AsyncPipe],
   selector: 'app-moder-items-item-meta',
+  imports: [NgbProgressbar, ItemMetaFormComponent, AsyncPipe],
   templateUrl: './meta.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemMetaComponent {
   readonly #auth = inject(AuthService);

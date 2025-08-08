@@ -12,10 +12,10 @@ import {catchError, distinctUntilChanged, map, shareReplay, switchMap, tap} from
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterOutlet, AsyncPipe],
   selector: 'app-persons-person',
+  imports: [RouterLink, RouterOutlet, AsyncPipe],
   templateUrl: './person.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PersonsPersonComponent {
   readonly #router = inject(Router);

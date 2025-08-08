@@ -6,13 +6,14 @@
   }
   @if ((item.row.item?.childsCount || 0) <= 0) {
     <button
+      type="button"
       class="btn btn-link d-block text-start"
-      (click)="selectItem({itemId: item.row.itemId, perspectiveId: 0, type: PictureItemType.PICTURE_ITEM_CONTENT})"
       [innerHTML]="item.row.item?.nameHtml"
+      (click)="selectItem({itemId: item.row.itemId, perspectiveId: 0, type: PictureItemType.PICTURE_ITEM_CONTENT})"
     ></button>
   } @else {
     <div>
-      <button class="btn btn-link d-block text-start" (click)="toggleItem(item)">
+      <button class="btn btn-link d-block text-start" type="button" (click)="toggleItem(item)">
         <i class="bi me-1" [class.bi-plus-circle]="!item.expanded" [class.bi-dash-circle]="item.expanded"></i>
         <span [innerHTML]="item.row.item?.nameHtml"></span>
       </button>
@@ -26,11 +27,12 @@
             <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
           }
           <button
+            type="button"
             class="btn btn-link d-block text-start"
+            i18n
             (click)="
               selectItem({itemId: item.row.itemId, perspectiveId: 0, type: PictureItemType.PICTURE_ITEM_CONTENT})
             "
-            i18n
           >
             other modification
           </button>

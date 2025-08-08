@@ -27,10 +27,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {BrandPerspectivePageData} from '../catalogue.module';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-catalogue-mixed',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './mixed.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueMixedComponent {
   readonly #pageEnv = inject(PageEnvService);

@@ -11,10 +11,10 @@ import {catchError, map} from 'rxjs/operators';
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MarkdownComponent, AsyncPipe],
   selector: 'app-account-accounts',
+  imports: [MarkdownComponent, AsyncPipe],
   templateUrl: './accounts.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountAccountsComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

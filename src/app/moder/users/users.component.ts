@@ -14,10 +14,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, AsyncPipe, DatePipe, TimeAgoPipe],
   selector: 'app-moder-users',
+  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, AsyncPipe, DatePipe, TimeAgoPipe],
   templateUrl: './users.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerUsersComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

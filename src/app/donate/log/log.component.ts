@@ -12,10 +12,10 @@ import {map} from 'rxjs/operators';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgbTooltip, UserComponent, AsyncPipe, CurrencyPipe, DatePipe, TimeAgoPipe],
   selector: 'app-donate-log',
+  imports: [RouterLink, NgbTooltip, UserComponent, AsyncPipe, CurrencyPipe, DatePipe, TimeAgoPipe],
   templateUrl: './log.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DonateLogComponent implements OnInit {
   readonly #userService = inject(UserService);

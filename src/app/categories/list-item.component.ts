@@ -16,10 +16,10 @@ interface PictureThumbRoute {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe],
   selector: 'app-categories-list-item',
+  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe],
   templateUrl: './list-item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesListItemComponent {
   readonly #auth = inject(AuthService);

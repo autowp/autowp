@@ -22,10 +22,10 @@ import {CommentsComponent} from '../../../../comments/comments/comments.componen
 import {PictureComponent} from '../../../../picture/picture.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommentsComponent, AsyncPipe, PictureComponent],
   selector: 'app-twins-group-picture',
+  imports: [CommentsComponent, AsyncPipe, PictureComponent],
   templateUrl: './picture.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TwinsGroupPictureComponent {
   readonly #route = inject(ActivatedRoute);

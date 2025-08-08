@@ -20,10 +20,10 @@ interface Period {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, BaseChartDirective, UserComponent, AsyncPipe],
   selector: 'app-pulse',
+  imports: [RouterLink, BaseChartDirective, UserComponent, AsyncPipe],
   templateUrl: './pulse.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PulseComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

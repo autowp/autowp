@@ -12,10 +12,10 @@ import {catchError, map} from 'rxjs/operators';
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-moder-perspectives',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './perspectives.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPerspectivesComponent implements OnInit {
   readonly #grpc = inject(AutowpClient);

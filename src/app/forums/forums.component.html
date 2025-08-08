@@ -58,7 +58,7 @@
               </div>
             } @else {
               <p>
-                <a [routerLink]="['/forums', theme.id]" i18n>Go to forum …</a>
+                <a i18n [routerLink]="['/forums', theme.id]">Go to forum …</a>
               </p>
             }
           }
@@ -69,7 +69,7 @@
           <div class="m-4 transparent">
             <p>
               <i class="bi bi-chat-fill" aria-hidden="true"></i>
-              <a [routerLink]="['/forums/topic', lastTopic.id]" i18n>Last message in topic «{{ lastTopic.name }}»</a>
+              <a i18n [routerLink]="['/forums/topic', lastTopic.id]">Last message in topic «{{ lastTopic.name }}»</a>
             </p>
             @if (theme.lastMessage$ | async; as lastMessage) {
               <p>
@@ -79,7 +79,7 @@
                 @if (theme.lastMessageAuthor$ | async; as lastMessageAuthor) {
                   <app-user [user]="lastMessageAuthor" />
                 }
-                <a [routerLink]="['/forums/message', lastMessage.id]" i18n-title title="Go to last message">
+                <a i18n-title title="Go to last message" [routerLink]="['/forums/message', lastMessage.id]">
                   <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
                 </a>
               </p>
@@ -91,7 +91,7 @@
   }
   @if (data.theme && !data.theme.disableTopics) {
     <div>
-      <a [routerLink]="['/forums/new-topic', data.theme.id]" class="btn btn-primary mb-3">
+      <a class="btn btn-primary mb-3" [routerLink]="['/forums/new-topic', data.theme.id]">
         <i class="bi bi-chat-fill" aria-hidden="true"></i>
         <ng-container i18n>Create new topic</ng-container>
       </a>

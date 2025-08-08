@@ -31,10 +31,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, NgbTypeahead, UserComponent, PaginatorComponent, AsyncPipe, ReactiveFormsModule],
   selector: 'app-moder-comments',
+  imports: [RouterLink, FormsModule, NgbTypeahead, UserComponent, PaginatorComponent, AsyncPipe, ReactiveFormsModule],
   templateUrl: './comments.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerCommentsComponent implements OnInit {
   readonly #userService = inject(UserService);

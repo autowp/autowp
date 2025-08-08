@@ -26,10 +26,10 @@ import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, LeafletModule, MarkdownComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-factories',
+  imports: [RouterLink, LeafletModule, MarkdownComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './factories.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FactoryComponent {
   readonly #route = inject(ActivatedRoute);

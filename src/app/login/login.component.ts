@@ -3,11 +3,11 @@ import {LanguageService} from '@services/language';
 import Keycloak from 'keycloak-js';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-login',
   standalone: true,
-  styleUrls: [],
   template: 'Redirecting …',
+  styleUrls: [],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {
   readonly #languageService = inject(LanguageService);

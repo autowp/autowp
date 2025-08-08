@@ -11,10 +11,10 @@ import {catchError, map} from 'rxjs/operators';
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgbProgressbar, AsyncPipe],
   selector: 'app-moder-stat',
+  imports: [RouterLink, NgbProgressbar, AsyncPipe],
   templateUrl: './stat.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerStatComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

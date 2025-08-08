@@ -49,7 +49,7 @@
               @if (topic.lastMessageAuthor$ | async; as lastMessageAuthor) {
                 <app-user [user]="lastMessageAuthor" />
               }
-              <a [routerLink]="['/forums/message', lastMessage.id]" i18n-title title="Go to last message">
+              <a i18n-title title="Go to last message" [routerLink]="['/forums/message', lastMessage.id]">
                 <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
               </a>
             </div>
@@ -59,31 +59,49 @@
         </td>
         @if (showSubscribe()) {
           <td>
-            <button class="btn btn-sm btn-warning" (click)="unsubscribe(topic)" i18n>Unsubscribe</button>
+            <button type="button" class="btn btn-sm btn-warning" i18n (click)="unsubscribe(topic)">Unsubscribe</button>
           </td>
         }
         @if (forumAdmin$ | async) {
           <td>
             <div class="btn-group">
               @if (topic.status === 'closed') {
-                <button i18n-title title="open" class="btn btn-sm btn-warning open" (click)="openTopic(topic)">
+                <button
+                  type="button"
+                  i18n-title
+                  title="open"
+                  class="btn btn-sm btn-warning open"
+                  (click)="openTopic(topic)"
+                >
                   <i class="bi bi-check-circle" aria-hidden="true"></i>
                 </button>
               } @else {
-                <button i18n-title title="close" class="btn btn-sm btn-warning close-topic" (click)="closeTopic(topic)">
+                <button
+                  type="button"
+                  i18n-title
+                  title="close"
+                  class="btn btn-sm btn-warning close-topic"
+                  (click)="closeTopic(topic)"
+                >
                   <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
                 </button>
               }
               <a
                 routerLink="/forums/move-topic"
-                [queryParams]="{topic_id: topic.id}"
                 class="btn btn-secondary btn-sm"
                 title="move"
                 i18n-title
+                [queryParams]="{topic_id: topic.id}"
               >
                 <i class="bi bi-arrows-move" aria-hidden="true"></i>
               </a>
-              <button i18n-title title="delete" class="btn btn-sm btn-danger delete" (click)="deleteTopic(topic)">
+              <button
+                type="button"
+                i18n-title
+                title="delete"
+                class="btn btn-sm btn-danger delete"
+                (click)="deleteTopic(topic)"
+              >
                 <i class="bi bi-slash-circle" aria-hidden="true"></i>
               </button>
             </div>

@@ -14,8 +14,8 @@
         <div ngbDropdownMenu style="max-height: 200px; overflow-x: hidden">
           @for (rating of ratings; track rating) {
             <a
-              [class.active]="rating.catname === ratingCatname"
               class="dropdown-item"
+              [class.active]="rating.catname === ratingCatname"
               [routerLink]="prefix().concat([rating.catname])"
               [textContent]="getMostsRatingsTranslation(rating.name)"
             >
@@ -69,8 +69,8 @@
             @if (typeCatname$ | async; as typeCatname) {
               @for (year of years; track year) {
                 <a
-                  [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
                   class="dropdown-item"
+                  [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
                   [routerLink]="prefix().concat([ratingCatname, typeCatname, year.catname ? year.catname : ''])"
                   [textContent]="getMostsPeriodsTranslation(year.name)"
                 >
@@ -79,8 +79,8 @@
             } @else {
               @for (year of years; track year) {
                 <a
-                  [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
                   class="dropdown-item"
+                  [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
                   [routerLink]="prefix().concat([ratingCatname, defaultTypeCatname, year.catname ? year.catname : ''])"
                   [textContent]="getMostsPeriodsTranslation(year.name)"
                 >
@@ -110,14 +110,14 @@
             @for (picture of item.item?.previewPictures?.pictures || []; track picture) {
               <div class="col-md-4">
                 @if (picture.picture; as pic) {
-                  <a [routerLink]="item.item?.route" class="rounded d-block mb-4">
+                  <a class="rounded d-block mb-4" [routerLink]="item.item?.route">
                     @if (pic.thumbMedium) {
                       <img
                         class="rounded w-100 border border-light"
+                        loading="lazy"
                         [src]="pic.thumbMedium.src"
                         [alt]="pic.nameText"
                         [title]="pic.nameText"
-                        loading="lazy"
                       />
                     }
                   </a>
@@ -139,8 +139,8 @@
             @if (item.unitId && item.unitId !== '0') {
               <small
                 class="unit"
-                [textContent]="getUnitAbbrTranslation(item.unitId)"
                 placement="top"
+                [textContent]="getUnitAbbrTranslation(item.unitId)"
                 [ngbTooltip]="getUnitNameTranslation(item.unitId)"
               ></small>
             }

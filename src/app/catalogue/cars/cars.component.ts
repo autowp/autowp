@@ -35,10 +35,10 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
 import {convertChildsCounts} from '../catalogue-service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   selector: 'app-catalogue-cars',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   templateUrl: './cars.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueCarsComponent {
   readonly #pageEnv = inject(PageEnvService);

@@ -21,15 +21,15 @@
             } @else {
               @if (picture.picture.thumbMedium) {
                 <a
-                  [routerLink]="['/twins/group', groupId(), 'pictures', picture.picture.identity]"
                   class="d-block rounded mb-4"
+                  [routerLink]="['/twins/group', groupId(), 'pictures', picture.picture.identity]"
                 >
                   <img
+                    class="rounded w-100 border border-light"
+                    loading="lazy"
                     [src]="picture.picture.thumbMedium.src"
                     [alt]="picture.picture.nameText"
                     [title]="picture.picture.nameText"
-                    class="rounded w-100 border border-light"
-                    loading="lazy"
                   />
                 </a>
               }
@@ -44,11 +44,11 @@
           <div class="no-photo rounded w-100 border border-light mb-4" i18n-title title="No photos available">
             <a
               routerLink="/upload"
-              [queryParams]="{item_id: item.id}"
               i18n-title
               title="Add photo"
               class="bi bi-plus-circle text-success"
               aria-hidden="true"
+              [queryParams]="{item_id: item.id}"
             ></a>
             <span class="bi bi-camera fs-1" aria-hidden="true"></span>
           </div>
@@ -81,14 +81,14 @@
         @if (isModer) {
           <li class="list-inline-item">
             <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
-            <a [routerLink]="['/moder/items/item', item.id]" i18n>edit</a>
+            <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
           </li>
         }
       }
       @if (item.canEditSpecs) {
         <li class="list-inline-item">
           <i class="bi bi-pencil-fill me-1" aria-hidden="true"></i>
-          <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id}" i18n>edit specs</a>
+          <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
         </li>
       }
     </ul>

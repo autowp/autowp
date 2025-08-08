@@ -24,10 +24,10 @@ import {CommentsFormComponent} from '../form/form.component';
 import {CommentsListComponent} from '../list/list.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommentsListComponent, PaginatorComponent, CommentsFormComponent, MarkdownComponent, AsyncPipe],
   selector: 'app-comments',
+  imports: [CommentsListComponent, PaginatorComponent, CommentsFormComponent, MarkdownComponent, AsyncPipe],
   templateUrl: './comments.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentsComponent {
   readonly #router = inject(Router);

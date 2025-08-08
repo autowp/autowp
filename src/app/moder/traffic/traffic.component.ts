@@ -22,10 +22,10 @@ interface ListItem {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, UserComponent, AsyncPipe, DatePipe],
   selector: 'app-moder-traffic',
+  imports: [RouterLink, UserComponent, AsyncPipe, DatePipe],
   templateUrl: './traffic.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerTrafficComponent implements OnInit {
   readonly #trafficGrpc = inject(TrafficClient);

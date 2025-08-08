@@ -18,7 +18,12 @@
     <div>
       @for (topic of topics$ | async; track topic.id) {
         <p>
-          <button class="btn btn-link" [textContent]="topic.name" (click)="selectTopic(messageID + '', topic)"></button>
+          <button
+            type="button"
+            class="btn btn-link"
+            [textContent]="topic.name"
+            (click)="selectTopic(messageID + '', topic)"
+          ></button>
         </p>
       }
     </div>
@@ -27,9 +32,9 @@
       @for (theme of themes$ | async; track theme.id) {
         <li>
           <a
+            queryParamsHandling="merge"
             [routerLink]="['.']"
             [queryParams]="{theme_id: theme.id}"
-            queryParamsHandling="merge"
             [textContent]="getForumsThemeTranslation(theme.name)"
           ></a>
         </li>

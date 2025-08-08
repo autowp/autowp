@@ -20,10 +20,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {MESSAGES_PER_PAGE} from '../forums.module';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-forums-move-message',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './move-message.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForumsMoveMessageComponent implements OnInit {
   readonly #commentsClient = inject(CommentsClient);

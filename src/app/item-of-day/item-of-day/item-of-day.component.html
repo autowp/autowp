@@ -29,12 +29,12 @@
     <div class="col-sm-6">
       @for (picture of pictures.first; track picture) {
         @if (picture && picture.thumb) {
-          <a [routerLink]="picture.route" class="d-block rounded mb-4">
+          <a class="d-block rounded mb-4" [routerLink]="picture.route">
             <img
+              class="rounded w-100 border border-light"
               [src]="picture.thumb.src"
               [alt]="picture.name"
               [title]="picture.name"
-              class="rounded w-100 border border-light"
             />
           </a>
         }
@@ -44,12 +44,12 @@
       <div class="row">
         @for (picture of pictures.others; track picture) {
           @if (picture && picture.thumb) {
-            <a [routerLink]="picture.route" class="d-block rounded mb-3 col-6">
+            <a class="d-block rounded mb-3 col-6" [routerLink]="picture.route">
               <img
+                class="rounded w-100 border border-light"
                 [src]="picture.thumb.src"
                 [alt]="picture.name"
                 [title]="picture.name"
-                class="rounded w-100 border border-light"
               />
             </a>
           }
@@ -86,7 +86,7 @@
     @if (item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
       <span>
         <span class="bi bi-text-left" aria-hidden="true"></span>
-        <a [routerLink]="['/category', item.catname]" i18n>details</a>
+        <a i18n [routerLink]="['/category', item.catname]">details</a>
       </span>
       @if (item.acceptedPicturesCount && item.acceptedPicturesCount > 6) {
         <span>
@@ -126,7 +126,7 @@
       @for (group of item.twins; track group.id) {
         <span>
           <span class="bi bi-circle-half" aria-hidden="true"></span>
-          <a [routerLink]="['/twins/group', group.id]" i18n>twins</a>
+          <a i18n [routerLink]="['/twins/group', group.id]">twins</a>
         </span>
       }
     }

@@ -9,10 +9,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {MESSAGES_PER_PAGE} from '../forums.module';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-forums-message',
   standalone: true,
   template: '<h2>Redirecting …</h2>',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MessageComponent implements OnDestroy, OnInit {
   readonly #router = inject(Router);

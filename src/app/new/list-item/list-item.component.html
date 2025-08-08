@@ -16,13 +16,13 @@
       @for (picture of pictures(); track picture) {
         <div class="col-6 col-sm-4 col-lg-2">
           @if (picture.thumbMedium) {
-            <a [routerLink]="['/picture', picture.identity]" class="d-block rounded mb-4">
+            <a class="d-block rounded mb-4" [routerLink]="['/picture', picture.identity]">
               <img
+                class="rounded w-100 border border-light"
+                loading="lazy"
                 [src]="picture.thumbMedium.src"
                 [alt]="picture.nameText"
                 [title]="picture.nameText"
-                class="rounded w-100 border border-light"
-                loading="lazy"
               />
             </a>
           }
@@ -47,13 +47,13 @@
       @if (item.specsRoute.length > 0) {
         <li class="list-inline-item">
           <i class="bi bi-card-list me-1" aria-hidden="true"></i>
-          <a [routerLink]="item.specsRoute" i18n>specifications</a>
+          <a i18n [routerLink]="item.specsRoute">specifications</a>
         </li>
       }
       @for (twinsGroup of item.twins; track twinsGroup.id) {
         <li class="list-inline-item">
           <i class="bi bi-circle-half me-1" aria-hidden="true"></i>
-          <a [routerLink]="['/twins/group', twinsGroup.id]" i18n>twins</a>
+          <a i18n [routerLink]="['/twins/group', twinsGroup.id]">twins</a>
         </li>
       }
       @for (category of item.categories; track category.id) {
@@ -66,14 +66,14 @@
         @if (isModer) {
           <li class="list-inline-item">
             <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
-            <a [routerLink]="['/moder/items/item', item.id]" i18n>edit</a>
+            <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
           </li>
         }
       }
       @if (item.canEditSpecs) {
         <li class="list-inline-item">
           <i class="bi bi-pencil-fill me-1" aria-hidden="true"></i>
-          <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id}" i18n>edit specs</a>
+          <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
         </li>
       }
     </ul>

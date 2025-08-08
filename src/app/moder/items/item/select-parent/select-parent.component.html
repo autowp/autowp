@@ -26,8 +26,8 @@
     <div class="nav nav-pills" style="margin-bottom: 10px">
       @if (showCatalogueTab$ | async) {
         <a
-          [class.active]="tab === 'catalogue'"
           class="nav-link"
+          [class.active]="tab === 'catalogue'"
           [routerLink]="['/moder/items/item', itemID, 'select-parent']"
           [queryParams]="{tab: 'catalogue'}"
         >
@@ -37,8 +37,8 @@
       }
       @if (showBrandsTab$ | async) {
         <a
-          [class.active]="tab === 'brands'"
           class="nav-link"
+          [class.active]="tab === 'brands'"
           [routerLink]="['/moder/items/item', itemID, 'select-parent']"
           [queryParams]="{tab: 'brands'}"
         >
@@ -47,8 +47,8 @@
         </a>
       }
       <a
-        [class.active]="tab === 'categories'"
         class="nav-link"
+        [class.active]="tab === 'categories'"
         [routerLink]="['/moder/items/item', itemID, 'select-parent']"
         [queryParams]="{tab: 'categories'}"
       >
@@ -57,8 +57,8 @@
       </a>
       @if (showTwinsTab$ | async) {
         <a
-          [class.active]="tab === 'twins'"
           class="nav-link"
+          [class.active]="tab === 'twins'"
           [routerLink]="['/moder/items/item', itemID, 'select-parent']"
           [queryParams]="{tab: 'twins'}"
         >
@@ -68,8 +68,8 @@
       }
       @if (showFactoriesTab$ | async) {
         <a
-          [class.active]="tab === 'factories'"
           class="nav-link"
+          [class.active]="tab === 'factories'"
           [routerLink]="['/moder/items/item', itemID, 'select-parent']"
           [queryParams]="{tab: 'factories'}"
         >

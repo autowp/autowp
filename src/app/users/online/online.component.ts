@@ -9,10 +9,10 @@ import {map, switchMap} from 'rxjs/operators';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [UserComponent, AsyncPipe],
   selector: 'app-users-online',
+  imports: [UserComponent, AsyncPipe],
   templateUrl: './online.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersOnlineComponent {
   protected readonly activeModal = inject(NgbActiveModal);

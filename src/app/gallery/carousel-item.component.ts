@@ -71,11 +71,11 @@ function maxBounds(bounds: Dimension, max: Dimension): Dimension {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgStyle, AreaComponent, RouterLink, NgMathPipesModule],
   selector: 'app-gallery-carousel-item',
-  styleUrls: ['./carousel-item.component.scss'],
+  imports: [NgStyle, AreaComponent, RouterLink, NgMathPipesModule],
   templateUrl: './carousel-item.component.html',
+  styleUrl: './carousel-item.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarouselItemComponent implements AfterViewInit {
   readonly #el: ElementRef<HTMLElement> = inject(ElementRef);

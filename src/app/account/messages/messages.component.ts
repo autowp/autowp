@@ -17,10 +17,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [UserComponent, RouterLink, UserTextComponent, PastTimeIndicatorComponent, PaginatorComponent, AsyncPipe],
   selector: 'app-account-messages',
+  imports: [UserComponent, RouterLink, UserTextComponent, PastTimeIndicatorComponent, PaginatorComponent, AsyncPipe],
   templateUrl: './messages.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountMessagesComponent {
   readonly #messageService = inject(MessageService);

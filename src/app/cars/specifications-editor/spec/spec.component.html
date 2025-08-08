@@ -30,9 +30,9 @@
                       <button
                         type="button"
                         class="btn btn-secondary btn-sm"
-                        (click)="control.disabled ? control.enable() : control.disable()"
                         ngbTooltip="not applicable"
                         i18n-ngbTooltip
+                        (click)="control.disabled ? control.enable() : control.disable()"
                       >
                         <span class="bi bi-trash" aria-hidden="true"></span>
                       </button>
@@ -65,19 +65,19 @@
                       <input
                         type="number"
                         class="form-control form-control-sm"
-                        [formControl]="control"
                         min="-2147483649"
                         max="2147483648"
+                        [formControl]="control"
                         [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
                       />
                     } @else if (control.attr.typeId === AttrAttributeTypeId.FLOAT) {
                       <input
                         type="number"
                         class="form-control form-control-sm"
-                        [formControl]="control"
-                        [step]="control.attr.step"
                         min="-2147483649"
                         max="2147483648"
+                        [formControl]="control"
+                        [step]="control.attr.step"
                         [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
                       />
                     } @else if (control.attr.typeId === AttrAttributeTypeId.STRING) {
@@ -89,7 +89,7 @@
                       />
                     }
                     @if (control.attr.unitId !== '0') {
-                      <span [title]="control.attr.unitName" class="unit input-group-text">{{
+                      <span class="unit input-group-text" [title]="control.attr.unitName">{{
                         control.attr.unitAbbr
                       }}</span>
                     }

@@ -20,9 +20,9 @@
     @for (corder of orders; track corder) {
       <li class="nav-item">
         <a
-          [class.active]="corder.value === order"
           class="nav-link"
           routerLink="."
+          [class.active]="corder.value === order"
           [queryParams]="{order: corder.value, page: null}"
           [textContent]="corder.name"
         ></a>

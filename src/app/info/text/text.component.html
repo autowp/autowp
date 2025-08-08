@@ -15,12 +15,12 @@
     @if (data.prev && data.prev.revision) {
       <span>
         <i class="bi bi-arrow-left" aria-hidden="true"></i>
-        <a routerLink="." [queryParams]="{revision: data.prev.revision}" i18n>Previous revision</a>
+        <a routerLink="." i18n [queryParams]="{revision: data.prev.revision}">Previous revision</a>
       </span>
     }
     @if (data.next && data.next.revision) {
       <span class="float-end">
-        <a routerLink="." [queryParams]="{revision: data.next.revision}" i18n>Next revision</a>
+        <a routerLink="." i18n [queryParams]="{revision: data.next.revision}">Next revision</a>
         <i class="bi bi-arrow-right" aria-hidden="true"></i>
       </span>
     }
@@ -54,5 +54,5 @@
     [options]="options"
     [originalModel]="data.prevModel"
     [modifiedModel]="data.currentModel"
-  ></ngx-monaco-diff-editor>
+  />
 }

@@ -8,10 +8,10 @@ import {LanguageService} from '@services/language';
 import {IndexFactoriesFactoryComponent} from './factory/factory.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, IndexFactoriesFactoryComponent, AsyncPipe],
   selector: 'app-index-factories',
+  imports: [RouterLink, IndexFactoriesFactoryComponent, AsyncPipe],
   templateUrl: './factories.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexFactoriesComponent {
   readonly #items = inject(ItemsClient);

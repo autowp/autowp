@@ -18,10 +18,10 @@ interface Crop {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
   selector: 'app-moder-pictures-item-crop',
+  imports: [RouterLink],
   templateUrl: './crop.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
   readonly #router = inject(Router);

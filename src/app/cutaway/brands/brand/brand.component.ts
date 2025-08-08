@@ -25,10 +25,10 @@ import {ThumbnailComponent} from '../../../thumbnail/thumbnail/thumbnail.compone
 import {ToastsService} from '../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-cutaway',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './brand.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CutawayBrandsBrandComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

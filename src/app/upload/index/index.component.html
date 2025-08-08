@@ -44,14 +44,14 @@
                     <label class="col-md-2 col-form-label" for="file" i18n>Image file</label>
                     <div class="col-md-10">
                       <input
+                        #input
                         type="file"
                         id="file"
-                        #input
                         name="file"
                         class="form-control"
-                        (change)="onChange($event)"
                         accept="image/*"
                         [multiple]="(replace$ | async) ? null : true"
+                        (change)="onChange($event)"
                       />
                       @if (files) {
                         <div class="mt-3">
@@ -70,7 +70,7 @@
                   </div>
                   <div class="row">
                     <div class="col-md-10 offset-md-2">
-                      <button name="submit" class="btn btn-primary" i18n [disabled]="!files">send</button>
+                      <button type="submit" name="submit" class="btn btn-primary" i18n [disabled]="!files">send</button>
                     </div>
                   </div>
                 </form>

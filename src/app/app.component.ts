@@ -27,7 +27,7 @@ import {ContainerComponent} from './toasts/container/container.component';
 import {UsersOnlineComponent} from './users/online/online.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-root',
   imports: [
     MenuComponent,
     RouterLink,
@@ -43,9 +43,9 @@ import {UsersOnlineComponent} from './users/online/online.component';
     ContainerComponent,
     AsyncPipe,
   ],
-  selector: 'app-root',
-  styleUrls: ['./app.component.scss'],
   templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   readonly #auth = inject(AuthService);

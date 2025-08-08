@@ -17,7 +17,7 @@
         <li>
           @if (article.previewUrl) {
             <a [routerLink]="article.routerLink">
-              <img alt="" [src]="article.previewUrl" style="float: left; margin: 0 10px 4px 0" loading="lazy" />
+              <img alt="" style="float: left; margin: 0 10px 4px 0" loading="lazy" [src]="article.previewUrl" />
             </a>
           }
           <p>
@@ -25,7 +25,7 @@
           </p>
           <p>
             {{ article.description }}
-            <a [routerLink]="article.routerLink" i18n>details</a>
+            <a i18n [routerLink]="article.routerLink">details</a>
           </p>
           <p>
             @if (article.author$ | async; as author) {

@@ -23,16 +23,16 @@
         </ng-template>
         <div class="input-group">
           <input
-            [ngbTypeahead]="usersDataSource"
             name="user"
-            [formControl]="userQuery"
-            [inputFormatter]="userFormatter"
-            (selectItem)="userOnSelect($event)"
-            [resultTemplate]="userTemplate"
             i18n-placeholder
             placeholder="User №"
             class="form-control"
+            [ngbTypeahead]="usersDataSource"
+            [formControl]="userQuery"
+            [inputFormatter]="userFormatter"
+            [resultTemplate]="userTemplate"
             [class.border-primary]="!!(userID$ | async)"
+            (selectItem)="userOnSelect($event)"
           />
           <button
             class="btn btn-outline-secondary"
@@ -51,12 +51,12 @@
           name="moderator_attention"
           class="form-select"
           [formControl]="moderatorAttention"
-          (change)="setModeratorAttention()"
           [class.border-primary]="moderatorAttention.value !== ModeratorAttention.NONE"
+          (change)="setModeratorAttention()"
         >
-          <option [ngValue]="ModeratorAttention.NONE" i18n>Not matters</option>
-          <option [ngValue]="ModeratorAttention.REQUIRED" i18n>Required</option>
-          <option [ngValue]="ModeratorAttention.COMPLETE" i18n>Resolved</option>
+          <option i18n [ngValue]="ModeratorAttention.NONE">Not matters</option>
+          <option i18n [ngValue]="ModeratorAttention.REQUIRED">Required</option>
+          <option i18n [ngValue]="ModeratorAttention.COMPLETE">Resolved</option>
         </select>
       </div>
       <div class="mb-3">
@@ -65,16 +65,16 @@
         </ng-template>
         <div class="input-group">
           <input
-            [ngbTypeahead]="itemsDataSource"
             name="item"
-            [formControl]="itemQuery"
-            [inputFormatter]="itemFormatter"
-            (selectItem)="itemOnSelect($event)"
-            [resultTemplate]="itemTemplate"
             i18n-placeholder
             placeholder="Item"
             class="form-control"
+            [ngbTypeahead]="itemsDataSource"
+            [formControl]="itemQuery"
+            [inputFormatter]="itemFormatter"
+            [resultTemplate]="itemTemplate"
             [class.border-primary]="itemID()"
+            (selectItem)="itemOnSelect($event)"
           />
           <button class="btn btn-outline-secondary" type="button" [disabled]="!itemID()" (click)="clearItem()">
             <span class="bi bi-x" aria-hidden="true"></span>

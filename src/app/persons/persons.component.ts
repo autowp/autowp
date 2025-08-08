@@ -30,10 +30,10 @@ import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {ToastsService} from '../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   selector: 'app-persons',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   templateUrl: './persons.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PersonsComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

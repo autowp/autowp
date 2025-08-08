@@ -47,10 +47,10 @@ export interface CatalogueListItemPicture {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe, UserComponent],
   selector: 'app-catalogue-list-item',
+  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe, UserComponent],
   templateUrl: './list-item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueListItemComponent {
   readonly #auth = inject(AuthService);

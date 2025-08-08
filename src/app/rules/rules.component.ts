@@ -4,10 +4,10 @@ import {PageEnvService} from '@services/page-env.service';
 import {Markdown2Component} from '@utils/markdown2/markdown2.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Markdown2Component],
   selector: 'app-rules',
+  imports: [RouterLink, Markdown2Component],
   templateUrl: './rules.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RulesComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

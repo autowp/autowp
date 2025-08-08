@@ -21,11 +21,11 @@ import {catchError, map, shareReplay, switchMap} from 'rxjs/operators';
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-donate-vod-select-item',
-  styleUrls: ['./styles.scss'],
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './item.component.html',
+  styleUrl: './styles.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DonateVodSelectItemComponent {
   readonly #toastService = inject(ToastsService);

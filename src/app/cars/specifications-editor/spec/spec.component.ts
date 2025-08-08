@@ -84,11 +84,11 @@ export class AttrFormControl<TValue> extends FormControl {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, NgStyle, ReactiveFormsModule, UserComponent, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
   selector: 'app-cars-specifications-editor-spec',
-  styleUrls: ['./spec.component.scss'],
+  imports: [FormsModule, NgStyle, ReactiveFormsModule, UserComponent, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
   templateUrl: './spec.component.html',
+  styleUrl: './spec.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsSpecificationsEditorSpecComponent {
   readonly #attrsService = inject(APIAttrsService);

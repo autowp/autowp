@@ -7,11 +7,11 @@ import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {MarkdownComponent} from '@utils/markdown/markdown.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe],
   selector: 'app-item',
-  styleUrls: ['./item.component.scss'],
+  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe],
   templateUrl: './item.component.html',
+  styleUrl: './item.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemComponent {
   readonly #auth = inject(AuthService);

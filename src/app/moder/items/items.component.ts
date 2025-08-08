@@ -87,10 +87,10 @@ function toPlainVehicleType(options: VehicleType[], deep: number): APIVehicleTyp
 const defaultOrder = ItemsRequest.Order.ID_DESC;
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, NgbTypeahead, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   selector: 'app-items',
+  imports: [RouterLink, FormsModule, NgbTypeahead, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   templateUrl: './items.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsComponent implements OnInit {
   readonly #vehicleTypeService = inject(VehicleTypeService);

@@ -24,10 +24,10 @@ import {map} from 'rxjs/operators';
 import {chunkBy} from '../chunk';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-categories-index',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './index.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesIndexComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

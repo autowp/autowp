@@ -40,7 +40,7 @@ interface Tab {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-moder-items-item',
   imports: [
     RouterLink,
     ModerItemsItemMetaComponent,
@@ -53,8 +53,8 @@ interface Tab {
     ModerItemsItemLinksComponent,
     AsyncPipe,
   ],
-  selector: 'app-moder-items-item',
   templateUrl: './item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemComponent {
   readonly #auth = inject(AuthService);

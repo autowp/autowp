@@ -13,7 +13,7 @@
 <div class="row">
   <div class="col-md-8 offset-md-2">
     <div class="card card-body mb-4">
-      <form class="form-horizontal" (submit)="submit()" [formGroup]="form">
+      <form class="form-horizontal" [formGroup]="form" (submit)="submit()">
         <fieldset>
           <legend i18n>Feedback</legend>
 
@@ -27,17 +27,17 @@
                   name="name"
                   size="80"
                   autocomplete="name"
-                  [class.is-invalid]="
-                    (control.invalid && (control.dirty || !control.untouched)) ||
-                    (invalidParams() && invalidParams()['name'])
-                  "
                   class="form-control"
                   placeholder="John"
                   i18n-placeholder
                   formControlName="name"
+                  [class.is-invalid]="
+                    (control.invalid && (control.dirty || !control.untouched)) ||
+                    (invalidParams() && invalidParams()['name'])
+                  "
                 />
                 @for (message of invalidParams() | invalidParams: 'name'; track message) {
-                  <p [textContent]="message" class="invalid-feedback"></p>
+                  <p class="invalid-feedback" [textContent]="message"></p>
                 }
               </div>
             </div>
@@ -52,17 +52,17 @@
                   name="email"
                   size="80"
                   autocomplete="email"
-                  [class.is-invalid]="
-                    (control.invalid && (control.dirty || !control.untouched)) ||
-                    (invalidParams() && invalidParams()['email'])
-                  "
                   class="form-control"
                   placeholder="john@example.com"
                   i18n-placeholder
                   formControlName="email"
+                  [class.is-invalid]="
+                    (control.invalid && (control.dirty || !control.untouched)) ||
+                    (invalidParams() && invalidParams()['email'])
+                  "
                 />
                 @for (message of invalidParams() | invalidParams: 'email'; track message) {
-                  <p [textContent]="message" class="invalid-feedback"></p>
+                  <p class="invalid-feedback" [textContent]="message"></p>
                 }
               </div>
             </div>
@@ -76,15 +76,15 @@
                   name="message"
                   cols="80"
                   rows="8"
+                  class="form-control"
+                  formControlName="message"
                   [class.is-invalid]="
                     (control.invalid && (control.dirty || !control.untouched)) ||
                     (invalidParams() && invalidParams()['message'])
                   "
-                  class="form-control"
-                  formControlName="message"
                 ></textarea>
                 @for (message of invalidParams() | invalidParams: 'message'; track message) {
-                  <p [textContent]="message" class="invalid-feedback"></p>
+                  <p class="invalid-feedback" [textContent]="message"></p>
                 }
               </div>
             </div>
@@ -93,10 +93,10 @@
             <div class="mb-3 row">
               <div class="col-md-10 offset-md-2">
                 @if (recaptchaKey$ | async; as recaptchaKey) {
-                  <re-captcha [siteKey]="recaptchaKey" (resolved)="resolved($event)"></re-captcha>
+                  <re-captcha [siteKey]="recaptchaKey" (resolved)="resolved($event)" />
                 }
                 @for (message of invalidParams() | invalidParams: 'captcha'; track message) {
-                  <p [textContent]="message" class="invalid-feedback"></p>
+                  <p class="invalid-feedback" [textContent]="message"></p>
                 }
               </div>
             </div>

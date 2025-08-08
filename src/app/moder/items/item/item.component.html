@@ -21,7 +21,7 @@
     <div class="col-md-2">
       @if (randomPicture$ | async; as randomPicture) {
         @if (randomPicture.thumbMedium) {
-          <img [src]="randomPicture.thumbMedium.src" alt="" class="mb-4 w-100 rounded border border-light" />
+          <img alt="" class="mb-4 w-100 rounded border border-light" [src]="randomPicture.thumbMedium.src" />
         }
       }
     </div>
@@ -31,7 +31,7 @@
         @if (canEditSpecifications$ | async; as canEditSpecifications) {
           @if (specsAllowed() && canEditSpecifications) {
             <p ngPreserveWhitespaces>
-              <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id}" i18n>edit specs</a>
+              <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
               @if (item.specificationsCount) {
                 <span class="badge rounded-pill text-bg-secondary" [textContent]="item.specificationsCount"></span>
               }
@@ -39,7 +39,7 @@
           }
         }
         <p>
-          <a routerLink="/log" [queryParams]="{item_id: item.id}" i18n>Log of events</a>
+          <a routerLink="/log" i18n [queryParams]="{item_id: item.id}">Log of events</a>
         </p>
       </div>
     </div>
@@ -48,6 +48,7 @@
         <p i18n>Changes notifications subscription</p>
         <p class="subscription">
           <button
+            type="button"
             class="btn"
             [class.btn-success]="item.subscription"
             [class.btn-secondary]="!item.subscription"
@@ -72,9 +73,9 @@
     <div class="nav nav-pills" style="margin-bottom: 10px">
       <a
         ngPreserveWhitespaces
-        [class.active]="activeTab === 'meta'"
         class="nav-link"
         routerLink="."
+        [class.active]="activeTab === 'meta'"
         [queryParams]="{tab: 'meta'}"
       >
         <span class="glyphicon glyphicon-pencil"></span>
@@ -85,9 +86,9 @@
       </a>
       <a
         ngPreserveWhitespaces
-        [class.active]="activeTab === 'name'"
         class="nav-link"
         routerLink="."
+        [class.active]="activeTab === 'name'"
         [queryParams]="{tab: 'name'}"
       >
         <span class="glyphicon glyphicon-align-left"></span>
@@ -99,9 +100,9 @@
       @if (logoTab.visible) {
         <a
           ngPreserveWhitespaces
-          [class.active]="activeTab === 'logo'"
           class="nav-link"
           routerLink="."
+          [class.active]="activeTab === 'logo'"
           [queryParams]="{tab: 'logo'}"
         >
           <span class="glyphicon glyphicon-align-left"></span>
@@ -114,9 +115,9 @@
       @if (catalogueTab.visible) {
         <a
           ngPreserveWhitespaces
-          [class.active]="activeTab === 'catalogue'"
           class="nav-link"
           routerLink="."
+          [class.active]="activeTab === 'catalogue'"
           [queryParams]="{tab: 'catalogue'}"
         >
           <span i18n>Catalogue</span>
@@ -128,9 +129,9 @@
       @if (vehiclesTab.visible) {
         <a
           ngPreserveWhitespaces
-          [class.active]="activeTab === 'vehicles'"
           class="nav-link"
           routerLink="."
+          [class.active]="activeTab === 'vehicles'"
           [queryParams]="{tab: 'vehicles'}"
         >
           <span i18n>Vehicles</span>
@@ -142,9 +143,9 @@
       @if (treeTab.visible) {
         <a
           ngPreserveWhitespaces
-          [class.active]="activeTab === 'tree'"
           class="nav-link"
           routerLink="."
+          [class.active]="activeTab === 'tree'"
           [queryParams]="{tab: 'tree'}"
         >
           <span class="bi bi-tree" aria-hidden="true"></span>
@@ -157,9 +158,9 @@
       @if (picturesTab.visible) {
         <a
           ngPreserveWhitespaces
-          [class.active]="activeTab === 'pictures'"
           class="nav-link"
           routerLink="."
+          [class.active]="activeTab === 'pictures'"
           [queryParams]="{tab: 'pictures'}"
         >
           <span class="glyphicon glyphicon-th"></span>
@@ -172,9 +173,9 @@
       @if (linksTab.visible) {
         <a
           ngPreserveWhitespaces
-          [class.active]="activeTab === 'links'"
           class="nav-link"
           routerLink="."
+          [class.active]="activeTab === 'links'"
           [queryParams]="{tab: 'links'}"
         >
           <span class="glyphicon glyphicon-globe"></span>

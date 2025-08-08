@@ -11,10 +11,10 @@ import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component'
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe, ThumbnailComponent],
   selector: 'app-index-pictures',
+  imports: [RouterLink, AsyncPipe, ThumbnailComponent],
   templateUrl: './pictures.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexPicturesComponent {
   readonly #picturesClient = inject(PicturesClient);

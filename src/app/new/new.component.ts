@@ -37,10 +37,10 @@ interface DayCount {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NewListItemComponent, PaginatorComponent, AsyncPipe, DatePipe, ThumbnailComponent],
   selector: 'app-new',
+  imports: [RouterLink, NewListItemComponent, PaginatorComponent, AsyncPipe, DatePipe, ThumbnailComponent],
   templateUrl: './new.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewComponent implements OnInit {
   readonly #router = inject(Router);

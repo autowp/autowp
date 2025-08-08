@@ -24,9 +24,9 @@
         @for (c of group; track c) {
           <a
             class="btn btn-secondary"
+            routerLink="."
             [class.active]="c === char"
             [textContent]="c"
-            routerLink="."
             [queryParams]="{char: c, page: null}"
           ></a>
         }

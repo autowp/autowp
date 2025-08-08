@@ -13,7 +13,7 @@ import {map, switchMap} from 'rxjs/operators';
 import {MarkdownEditComponent} from '../../../../markdown-edit/markdown-edit/markdown-edit.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-moder-items-item-name',
   imports: [
     NgbNav,
     NgbNavItem,
@@ -26,8 +26,8 @@ import {MarkdownEditComponent} from '../../../../markdown-edit/markdown-edit/mar
     NgbNavOutlet,
     AsyncPipe,
   ],
-  selector: 'app-moder-items-item-name',
   templateUrl: './name.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemNameComponent {
   readonly #contentLanguage = inject(ContentLanguageService);

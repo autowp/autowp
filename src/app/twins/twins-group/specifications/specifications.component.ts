@@ -10,10 +10,10 @@ import {EMPTY, Observable, of} from 'rxjs';
 import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AsyncPipe],
   selector: 'app-twins-group-specifications',
+  imports: [AsyncPipe],
   templateUrl: './specifications.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TwinsGroupSpecificationsComponent {
   readonly #route = inject(ActivatedRoute);

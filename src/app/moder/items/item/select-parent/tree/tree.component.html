@@ -4,8 +4,8 @@
       [item]="item"
       [typeID]="itemParent.type"
       [order]="order() || ItemParentsRequest.Order.NONE"
-      (selected)="onSelect($event)"
       [disableItemID]="disableItemID() || ''"
+      (selected)="onSelect($event)"
     />
   }
 }

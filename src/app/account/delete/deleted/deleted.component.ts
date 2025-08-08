@@ -3,10 +3,10 @@ import {PageEnvService} from '@services/page-env.service';
 import {MarkdownComponent} from '@utils/markdown/markdown.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MarkdownComponent],
   selector: 'app-account-delete-deleted',
+  imports: [MarkdownComponent],
   templateUrl: './deleted.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountDeletedComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

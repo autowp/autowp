@@ -30,7 +30,7 @@ import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-moder-items-item-catalogue',
   imports: [
     RouterLink,
     FormsModule,
@@ -41,8 +41,8 @@ import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'r
     AsyncPipe,
     ReactiveFormsModule,
   ],
-  selector: 'app-moder-items-item-catalogue',
   templateUrl: './catalogue.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemCatalogueComponent {
   readonly #auth = inject(AuthService);

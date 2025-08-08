@@ -82,7 +82,7 @@ function toPlainVehicleTypes(options: VehicleType[], deep: number): VehicleTypeI
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-moder-pictures',
   imports: [
     RouterLink,
     NgbDropdown,
@@ -95,8 +95,8 @@ function toPlainVehicleTypes(options: VehicleType[], deep: number): VehicleTypeI
     ThumbnailComponent,
     ReactiveFormsModule,
   ],
-  selector: 'app-moder-pictures',
   templateUrl: './pictures.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPicturesComponent implements OnDestroy, OnInit {
   readonly #perspectiveService = inject(APIPerspectiveService);

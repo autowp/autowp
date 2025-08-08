@@ -47,12 +47,14 @@
       }
       <div>
         @if (item.item.ban) {
-          <button class="btn btn-secondary" (click)="removeFromBlacklist(item.item.ip)" i18n>unban</button>
+          <button type="button" class="btn btn-secondary" i18n (click)="removeFromBlacklist(item.item.ip)">
+            unban
+          </button>
         } @else {
-          <button class="btn btn-danger" (click)="addToBlacklist(item.item.ip)" i18n>Ban</button>
+          <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(item.item.ip)">Ban</button>
         }
         @if (!item.item.inWhitelist) {
-          <button class="btn btn-success" (click)="addToWhitelist(item.item.ip)" i18n>Whitelist</button>
+          <button type="button" class="btn btn-success" i18n (click)="addToWhitelist(item.item.ip)">Whitelist</button>
         }
       </div>
     </div>

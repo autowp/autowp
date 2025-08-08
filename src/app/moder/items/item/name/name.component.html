@@ -1,6 +1,6 @@
 @if (data$ | async; as languages) {
   <div class="card card-body">
-    <ul ngbNav #nav="ngbNav" [activeId]="languages[0].language" class="nav-tabs">
+    <ul #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="languages[0].language">
       @for (language of languages; track language.language) {
         <li [ngbNavItem]="language.language">
           <a ngbNavLink>
@@ -8,9 +8,7 @@
             @if (language.name || language.text || language.fullText) {
               <span class="badge rounded-pill text-bg-secondary">
                 {{
-                  (language.name && language.name.length ? 1 : 0) +
-                    (language.text && language.text.length ? 1 : 0) +
-                    (language.fullText && language.fullText.length ? 1 : 0)
+                  (language.name.length ? 1 : 0) + (language.text.length ? 1 : 0) + (language.fullText.length ? 1 : 0)
                 }}
               </span>
             }
@@ -21,11 +19,11 @@
               <div class="col-md-10">
                 <input
                   type="text"
-                  [(ngModel)]="language.name"
                   name="name"
                   id="name"
                   maxlength="255"
                   class="form-control"
+                  [(ngModel)]="language.name"
                 />
               </div>
             </div>
@@ -35,7 +33,7 @@
                 <app-markdown-edit id="short_description" [(text)]="language.text" />
                 @if (language.textId) {
                   <p class="text-end">
-                    <a [routerLink]="['/info/text', language.textId]" i18n>History</a>
+                    <a i18n [routerLink]="['/info/text', language.textId]">History</a>
                   </p>
                 }
               </div>
@@ -46,7 +44,7 @@
                 <app-markdown-edit id="full_description" [(text)]="language.fullText" />
                 @if (language.fullTextId) {
                   <p class="text-end">
-                    <a [routerLink]="['/info/text', language.fullTextId]" i18n>History</a>
+                    <a i18n [routerLink]="['/info/text', language.fullTextId]">History</a>
                   </p>
                 }
               </div>
@@ -56,7 +54,7 @@
       }
     </ul>
     <div [ngbNavOutlet]="nav"></div>
-    <button type="submit" class="btn btn-primary" (click)="saveLanguages(languages)" [disabled]="loadingNumber()">
+    <button type="submit" class="btn btn-primary" [disabled]="loadingNumber()" (click)="saveLanguages(languages)">
       @if (loadingNumber()) {
         <span>
           <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>

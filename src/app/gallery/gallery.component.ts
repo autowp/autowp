@@ -159,11 +159,11 @@ class Gallery {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CarouselItemComponent, RouterLink, AsyncPipe],
   selector: 'app-gallery',
-  styleUrls: ['./gallery.component.scss'],
+  imports: [CarouselItemComponent, RouterLink, AsyncPipe],
   templateUrl: './gallery.component.html',
+  styleUrl: './gallery.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GalleryComponent {
   readonly #router = inject(Router);

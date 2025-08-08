@@ -3,11 +3,11 @@ import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, inject, P
 import showdown from 'showdown';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-markdown2',
   standalone: true,
-  styleUrls: ['markdown2.component.scss'],
   templateUrl: './markdown2.component.html',
+  styleUrl: 'markdown2.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Markdown2Component implements AfterViewInit {
   readonly #element = inject(ElementRef);

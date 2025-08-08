@@ -11,10 +11,10 @@ import {distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
 import {GalleryComponent} from '../../../gallery/gallery.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [GalleryComponent, AsyncPipe],
   selector: 'app-twins-group-gallery',
+  imports: [GalleryComponent, AsyncPipe],
   templateUrl: './twins-group-gallery.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TwinsGroupGalleryComponent {
   readonly #route = inject(ActivatedRoute);

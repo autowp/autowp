@@ -11,10 +11,10 @@ import {catchError, map, switchMap, tap} from 'rxjs/operators';
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, AsyncPipe],
   selector: 'app-moder-items-item-links',
+  imports: [FormsModule, AsyncPipe],
   templateUrl: './links.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemLinksComponent {
   readonly #auth = inject(AuthService);

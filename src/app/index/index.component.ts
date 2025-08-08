@@ -21,7 +21,7 @@ import {IndexSpecsCarsComponent} from './specs-cars/specs-cars.component';
 import {IndexTwinsComponent} from './twins/twins.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-index',
   imports: [
     ItemOfDayComponent,
     IndexDonateComponent,
@@ -35,8 +35,8 @@ import {IndexTwinsComponent} from './twins/twins.component';
     IndexSpecsCarsComponent,
     AsyncPipe,
   ],
-  selector: 'app-index',
   templateUrl: './index.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

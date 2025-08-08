@@ -31,11 +31,11 @@
             size="80"
             maxlength="100"
             class="form-control"
-            [(ngModel)]="form.name"
             [class.is-invalid]="invalidParams() && invalidParams()['name']"
+            [(ngModel)]="form.name"
           />
           @for (message of invalidParams() | invalidParams: 'name'; track message) {
-            <p [textContent]="message" class="invalid-feedback"></p>
+            <p class="invalid-feedback" [textContent]="message"></p>
           }
         </div>
       </div>
@@ -49,11 +49,11 @@
             rows="15"
             maxlength="4096"
             class="form-control"
-            [(ngModel)]="form.message"
             [class.is-invalid]="invalidParams() && invalidParams()['message']"
+            [(ngModel)]="form.message"
           ></textarea>
           @for (message of invalidParams() | invalidParams: 'message'; track message) {
-            <p [textContent]="message" class="invalid-feedback"></p>
+            <p class="invalid-feedback" [textContent]="message"></p>
           }
         </div>
       </div>
@@ -66,14 +66,14 @@
                 type="checkbox"
                 name="moderator_attention"
                 value="1"
-                [(ngModel)]="form.moderator_attention"
                 [class.is-invalid]="invalidParams() && invalidParams()['moderator_attention']"
+                [(ngModel)]="form.moderator_attention"
               />
               <ng-container i18n>It requires attention of moderators</ng-container>
             </label>
           </div>
           @for (message of invalidParams() | invalidParams: 'moderator_attention'; track message) {
-            <p [textContent]="message" class="invalid-feedback"></p>
+            <p class="invalid-feedback" [textContent]="message"></p>
           }
         </div>
       </div>
@@ -86,14 +86,14 @@
                 type="checkbox"
                 name="subscription"
                 value="1"
-                [(ngModel)]="form.subscription"
                 [class.is-invalid]="invalidParams() && invalidParams()['subscription']"
+                [(ngModel)]="form.subscription"
               />
               <ng-container i18n>Subscribe to new messages</ng-container>
             </label>
           </div>
           @for (message of invalidParams() | invalidParams: 'subscription'; track message) {
-            <p [textContent]="message" class="invalid-feedback"></p>
+            <p class="invalid-feedback" [textContent]="message"></p>
           }
         </div>
       </div>

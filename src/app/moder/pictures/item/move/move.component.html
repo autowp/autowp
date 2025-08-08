@@ -23,9 +23,11 @@
   <div class="nav nav-pills mb-3">
     @if (showBrands$ | async) {
       <a
-        [class.active]="brandsActive$ | async"
         class="nav-link"
         routerLink="."
+        queryParamsHandling="merge"
+        i18n
+        [class.active]="brandsActive$ | async"
         [queryParams]="{
           show_factories: null,
           show_museums: null,
@@ -34,16 +36,16 @@
           show_copyrights: null,
           brand_id: null,
         }"
-        queryParamsHandling="merge"
-        i18n
         >Brands</a
       >
     }
     @if (showFactories$ | async) {
       <a
-        [class.active]="factoriesActive$ | async"
         class="nav-link"
         routerLink="."
+        queryParamsHandling="merge"
+        i18n
+        [class.active]="factoriesActive$ | async"
         [queryParams]="{
           show_factories: 1,
           show_museums: null,
@@ -52,16 +54,16 @@
           show_copyrights: null,
           brand_id: null,
         }"
-        queryParamsHandling="merge"
-        i18n
         >Factories</a
       >
     }
     @if (showMuseums$ | async) {
       <a
-        [class.active]="museumsActive$ | async"
         class="nav-link"
         routerLink="."
+        queryParamsHandling="merge"
+        i18n
+        [class.active]="museumsActive$ | async"
         [queryParams]="{
           show_factories: null,
           show_museums: 1,
@@ -70,16 +72,15 @@
           show_copyrights: null,
           brand_id: null,
         }"
-        queryParamsHandling="merge"
-        i18n
         >Museums</a
       >
     }
     @if (showPersons$ | async) {
       <a
-        [class.active]="personsActive$ | async"
         class="nav-link"
         routerLink="."
+        queryParamsHandling="merge"
+        [class.active]="personsActive$ | async"
         [queryParams]="{
           show_factories: null,
           show_museums: null,
@@ -88,15 +89,15 @@
           show_copyrights: null,
           brand_id: null,
         }"
-        queryParamsHandling="merge"
         ><ng-container i18n>Persons</ng-container> (content)</a
       >
     }
     @if (showAuthors$ | async) {
       <a
-        [class.active]="authorsActive$ | async"
         class="nav-link"
         routerLink="."
+        queryParamsHandling="merge"
+        [class.active]="authorsActive$ | async"
         [queryParams]="{
           show_factories: null,
           show_museums: null,
@@ -105,15 +106,16 @@
           show_copyrights: null,
           brand_id: null,
         }"
-        queryParamsHandling="merge"
         ><ng-container i18n>Persons</ng-container> (author)</a
       >
     }
     @if (showCopyrights$ | async) {
       <a
-        [class.active]="copyrightsActive$ | async"
         class="nav-link"
         routerLink="."
+        queryParamsHandling="merge"
+        i18n
+        [class.active]="copyrightsActive$ | async"
         [queryParams]="{
           show_factories: null,
           show_museums: null,
@@ -122,8 +124,6 @@
           show_copyrights: 1,
           brand_id: null,
         }"
-        queryParamsHandling="merge"
-        i18n
         >Copyright blocks</a
       >
     }
@@ -136,9 +136,10 @@
       <div class="card card-body">
         @for (item of museums.items; track item) {
           <button
+            type="button"
             class="btn btn-link d-block text-start"
-            (click)="selectItem(item.selection)"
             [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
           ></button>
         }
       </div>
@@ -154,9 +155,10 @@
       <div class="card card-body">
         @for (item of factories.items; track item) {
           <button
+            type="button"
             class="btn btn-link d-block text-start"
-            (click)="selectItem(item.selection)"
             [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
           ></button>
         }
       </div>
@@ -172,18 +174,19 @@
       <div class="mb-3">
         <input
           type="text"
-          [formControl]="searchPersonControl"
           class="form-control"
           i18n-placeholder
           placeholder="Type to search …"
+          [formControl]="searchPersonControl"
         />
       </div>
       @if (persons$ | async; as persons) {
         @for (item of persons.items; track item) {
           <button
+            type="button"
             class="btn btn-link d-block text-start"
-            (click)="selectItem(item.selection)"
             [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
           ></button>
         }
         @if (persons.paginator) {
@@ -199,18 +202,19 @@
       <div class="mb-3">
         <input
           type="text"
-          [formControl]="searchAuthorControl"
           class="form-control"
           i18n-placeholder
           placeholder="Type to search …"
+          [formControl]="searchAuthorControl"
         />
       </div>
       @if (authors$ | async; as authors) {
         @for (item of authors.items; track item) {
           <button
+            type="button"
             class="btn btn-link d-block text-start"
-            (click)="selectItem(item.selection)"
             [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
           ></button>
         }
         @if (authors.paginator) {
@@ -226,9 +230,10 @@
       <div class="card card-body">
         @for (item of copyrights.items; track item) {
           <button
+            type="button"
             class="btn btn-link d-block text-start"
-            (click)="selectItem(item.selection)"
             [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
           ></button>
         }
       </div>
@@ -266,7 +271,7 @@
         @if (concepts$ | async; as concepts) {
           @if (concepts.items.length > 0) {
             <div class="my-1">
-              <button class="btn btn-link d-block text-start" (click)="toggleConcepts()">
+              <button class="btn btn-link d-block text-start" type="button" (click)="toggleConcepts()">
                 <i
                   class="bi me-1"
                   [class.bi-plus-circle]="!conceptsExpanded()"
@@ -278,9 +283,10 @@
                 <div class="mb-1 ms-4">
                   @for (item of concepts.items; track item) {
                     <button
+                      type="button"
                       class="btn btn-link d-block text-start"
-                      (click)="selectItem(item.selection)"
                       [innerHTML]="item.html"
+                      (click)="selectItem(item.selection)"
                     ></button>
                   }
                 </div>
@@ -293,37 +299,40 @@
         <div class="my-1">
           <button
             class="btn btn-link d-block text-start"
+            i18n
+            type="button"
             (click)="
               selectItem({
                 src,
                 selection: {itemId: brandId, perspectiveId: 22, type: PictureItemType.PICTURE_ITEM_CONTENT},
               })
             "
-            i18n
           >
             logotype
           </button>
           <button
             class="btn btn-link d-block text-start"
+            i18n
+            type="button"
             (click)="
               selectItem({
                 src,
                 selection: {itemId: brandId, perspectiveId: 25, type: PictureItemType.PICTURE_ITEM_CONTENT},
               })
             "
-            i18n
           >
             mixed (few vehicles on one picture)
           </button>
           <button
+            type="button"
             class="btn btn-link d-block text-start"
+            i18n
             (click)="
               selectItem({
                 src,
                 selection: {itemId: brandId, perspectiveId: 0, type: PictureItemType.PICTURE_ITEM_CONTENT},
               })
             "
-            i18n
           >
             unsorted (not existent vehicle or engine)
           </button>
@@ -334,10 +343,10 @@
         <div class="mb-3">
           <input
             type="text"
-            [formControl]="searchBrandControl"
             class="form-control"
             i18n-placeholder
             placeholder="Type to search …"
+            [formControl]="searchBrandControl"
           />
         </div>
         @if (brands$ | async; as brands) {
@@ -347,9 +356,9 @@
                 @for (item of chunk; track item) {
                   <a
                     class="btn btn-link d-block text-start"
+                    queryParamsHandling="merge"
                     [routerLink]="[]"
                     [queryParams]="{page: null, brand_id: item.id}"
-                    queryParamsHandling="merge"
                     [innerHTML]="item.nameHtml"
                   ></a>
                 }

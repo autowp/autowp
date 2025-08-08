@@ -6,11 +6,11 @@ import {PageEnvService} from '@services/page-env.service';
 import {MarkdownComponent} from '@utils/markdown/markdown.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, MarkdownComponent],
   selector: 'app-donate',
-  styleUrls: ['./donate.component.scss'],
+  imports: [RouterLink, MarkdownComponent],
   templateUrl: './donate.component.html',
+  styleUrl: './donate.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DonateComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

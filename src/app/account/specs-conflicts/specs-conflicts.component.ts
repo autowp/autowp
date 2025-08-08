@@ -54,10 +54,10 @@ function mapFilter(filter: null | string): AttrConflictsRequest.Filter {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, UserComponent, PaginatorComponent, AsyncPipe],
   selector: 'app-account-specs-conflicts',
+  imports: [RouterLink, UserComponent, PaginatorComponent, AsyncPipe],
   templateUrl: './specs-conflicts.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountSpecsConflictsComponent implements OnInit {
   readonly #languageService = inject(LanguageService);

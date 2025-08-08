@@ -7,10 +7,10 @@ import {LanguageService} from '@services/language';
 import {Observable} from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-twins-sidebar',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './sidebar.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TwinsSidebarComponent {
   readonly #itemsClient = inject(ItemsClient);

@@ -13,13 +13,13 @@
 <div>
   @if (parameters$ | async; as parameters) {
     <div class="nav nav-pills">
-      @for (param of parameters; track param.id; let idx = $index) {
+      @for (param of parameters; track param.id) {
         <a
-          [class.active]="idx === activeParameter()"
           class="nav-link"
           href="#"
-          (click)="selectParam(parameters, idx)"
+          [class.active]="$index === activeParameter()"
           [textContent]="param.name"
+          (click)="selectParam(parameters, $index)"
         ></a>
       }
     </div>
@@ -29,11 +29,11 @@
       baseChart
       width="400"
       height="250"
+      type="line"
       [datasets]="chart.data"
       [labels]="chart.labels"
       [options]="chartOptions"
       [legend]="true"
-      [type]="'line'"
     ></canvas>
   }
 </div>

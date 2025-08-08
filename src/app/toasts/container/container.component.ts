@@ -4,11 +4,11 @@ import {NgbToast} from '@ng-bootstrap/ng-bootstrap';
 import {ToastsService} from '../toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgbToast],
   selector: 'app-toasts',
-  styleUrls: ['./container.component.scss'],
+  imports: [NgbToast],
   templateUrl: './container.component.html',
+  styleUrl: './container.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContainerComponent {
   readonly toastService = inject(ToastsService);

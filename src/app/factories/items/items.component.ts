@@ -32,10 +32,10 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   selector: 'app-factory-items',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   templateUrl: './items.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FactoryItemsComponent {
   readonly #route = inject(ActivatedRoute);

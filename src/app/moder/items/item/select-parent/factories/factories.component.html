@@ -6,8 +6,8 @@
           <app-moder-items-item-select-parent-tree-item
             [item]="item"
             [order]="ItemParentsRequest.Order.AUTO"
-            (selected)="onSelect($event)"
             [disableItemID]="(itemID$ | async) || ''"
+            (selected)="onSelect($event)"
           />
         </li>
       }

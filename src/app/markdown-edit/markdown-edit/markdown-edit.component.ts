@@ -5,7 +5,7 @@ import {NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavLinkBase, NgbNavOut
 import {MarkdownComponent} from '@utils/markdown/markdown.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-markdown-edit',
   imports: [
     NgbNav,
     NgbNavItem,
@@ -18,8 +18,8 @@ import {MarkdownComponent} from '@utils/markdown/markdown.component';
     ReactiveFormsModule,
     CdkTextareaAutosize,
   ],
-  selector: 'app-markdown-edit',
   templateUrl: './markdown-edit.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarkdownEditComponent implements AfterViewInit {
   readonly text = input.required<string>();

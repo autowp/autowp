@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  computed,
   effect,
   inject,
   input,
@@ -57,7 +58,7 @@ import {UserComponent} from '../user/user/user.component';
 import {PicturePaginatorComponent} from './paginator.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-picture',
   imports: [
     RouterLink,
     ShareComponent,
@@ -78,9 +79,9 @@ import {PicturePaginatorComponent} from './paginator.component';
     PicturePaginatorComponent,
     PictureModerVoteComponent,
   ],
-  selector: 'app-picture',
-  styleUrls: ['./picture.component.scss'],
   templateUrl: './picture.component.html',
+  styleUrl: './picture.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PictureComponent {
   readonly #auth = inject(AuthService);
@@ -100,6 +101,24 @@ export class PictureComponent {
 
   readonly picture = input.required<Picture>();
   readonly picture$ = toObservable(this.picture);
+
+  protected readonly osmURL = computed(() => {
+    const point = this.picture().point;
+    if (!point) {
+      return null;
+    }
+
+    return (
+      'https://www.openstreetmap.org/?mlat=' +
+      point.latitude +
+      '&mlon=' +
+      point.longitude +
+      '#map=6/' +
+      point.latitude +
+      '/' +
+      point.longitude
+    );
+  });
 
   protected readonly owner$: Observable<APIUser | null> = this.picture$.pipe(
     switchMap((picture) => this.#userService.getUser$(picture?.ownerId)),

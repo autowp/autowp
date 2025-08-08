@@ -9,10 +9,10 @@ import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-moder-traffic-whitelist',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './whitelist.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerTrafficWhitelistComponent implements OnInit {
   readonly #grpc = inject(TrafficClient);

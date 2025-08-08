@@ -25,7 +25,7 @@
                   </label>
                 } @else {
                   <label class="radio inline">
-                    <input type="radio" name="variant" [(ngModel)]="selected" [value]="variant.id" /> {{ variant.name }}
+                    <input type="radio" name="variant" [value]="variant.id" [(ngModel)]="selected" /> {{ variant.name }}
                   </label>
                 }
                 @if (variant.text) {
@@ -34,7 +34,7 @@
               </li>
             }
           </ul>
-          <button type="submit" class="btn btn-primary" [disabled]="!isVariantSelected(voting)" i18n>Vote</button>
+          <button type="submit" class="btn btn-primary" i18n [disabled]="!isVariantSelected(voting)">Vote</button>
         </form>
       }
       @if (!voting.canVote) {

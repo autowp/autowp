@@ -10,10 +10,10 @@ import {catchError, map} from 'rxjs/operators';
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AsyncPipe],
   selector: 'app-account-email',
+  imports: [AsyncPipe],
   templateUrl: './email.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountEmailComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

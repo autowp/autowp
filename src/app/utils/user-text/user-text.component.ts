@@ -25,10 +25,10 @@ interface CommentTextLine {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [UserComponent, RouterLink, AsyncPipe],
   selector: 'app-user-text',
+  imports: [UserComponent, RouterLink, AsyncPipe],
   templateUrl: './user-text.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserTextComponent {
   readonly #userService = inject(UserService);

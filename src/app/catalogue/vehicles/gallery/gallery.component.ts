@@ -10,10 +10,10 @@ import {APIGalleryFilter, GalleryComponent} from '../../../gallery/gallery.compo
 import {CatalogueService} from '../../catalogue-service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [GalleryComponent, AsyncPipe],
   selector: 'app-catalogue-vehicles-gallery',
+  imports: [GalleryComponent, AsyncPipe],
   templateUrl: './gallery.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueVehiclesGalleryComponent {
   readonly #pageEnv = inject(PageEnvService);

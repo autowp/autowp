@@ -10,11 +10,11 @@ import {EMPTY} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgbPopover, AsyncPipe],
   selector: 'app-index-categories-category',
-  styleUrls: ['./category.component.scss'],
+  imports: [RouterLink, NgbPopover, AsyncPipe],
   templateUrl: './category.component.html',
+  styleUrl: './category.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexCategoriesCategoryComponent {
   readonly #itemsClient = inject(ItemsClient);

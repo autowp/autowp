@@ -4,10 +4,10 @@ import {ItemType} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
   selector: 'app-moder-index',
+  imports: [RouterLink],
   templateUrl: './index.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerIndexComponent implements AfterViewInit {
   readonly #pageEnv = inject(PageEnvService);

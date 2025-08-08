@@ -10,11 +10,11 @@ import {EMPTY} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgbPopover, AsyncPipe],
   selector: 'app-index-brands-brand',
-  styleUrls: ['./brand.component.scss'],
+  imports: [RouterLink, NgbPopover, AsyncPipe],
   templateUrl: './brand.component.html',
+  styleUrl: './brand.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexBrandsBrandComponent {
   readonly #itemsClient = inject(ItemsClient);

@@ -23,10 +23,10 @@ import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component'
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, DatePipe, ThumbnailComponent],
   selector: 'app-new-item',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, DatePipe, ThumbnailComponent],
   templateUrl: './item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewItemComponent {
   readonly #route = inject(ActivatedRoute);

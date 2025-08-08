@@ -27,10 +27,10 @@ import {CommentsComponent} from '../../../comments/comments/comments.component';
 import {TwinsItemComponent} from '../../item/item.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TwinsItemComponent, MarkdownComponent, CommentsComponent, AsyncPipe],
   selector: 'app-twins-group-items',
+  imports: [TwinsItemComponent, MarkdownComponent, CommentsComponent, AsyncPipe],
   templateUrl: './items.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TwinsGroupItemsComponent {
   readonly #route = inject(ActivatedRoute);

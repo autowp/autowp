@@ -10,8 +10,8 @@
         @if (item.isCompilesItemOfDay) {
           <a
             routerLink="/donate/vod"
-            [queryParams]="{item_id: itemParent.itemId, brand_id: null}"
             queryParamsHandling="merge"
+            [queryParams]="{item_id: itemParent.itemId, brand_id: null}"
             [innerHTML]="item.nameHtml"
           ></a>
         } @else {
@@ -30,10 +30,10 @@
         @if (item.isCompilesItemOfDay) {
           <a
             routerLink="/donate/vod"
-            [queryParams]="{item_id: itemParent.itemId, brand_id: null}"
             queryParamsHandling="merge"
             class="mx-2"
             i18n
+            [queryParams]="{item_id: itemParent.itemId, brand_id: null}"
             >[select]</a
           >
         }

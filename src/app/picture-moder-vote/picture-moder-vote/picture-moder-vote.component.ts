@@ -12,10 +12,10 @@ import {UserComponent} from '../../user/user/user.component';
 import {PictureModerVoteModalComponent} from './modal/modal.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, UserComponent, NgStyle, AsyncPipe],
   selector: 'app-picture-moder-vote',
+  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, UserComponent, NgStyle, AsyncPipe],
   templateUrl: './picture-moder-vote.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PictureModerVoteComponent {
   readonly #moderVoteService = inject(PictureModerVoteService);

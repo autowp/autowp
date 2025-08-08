@@ -36,8 +36,10 @@ const center = (lat: null | number | string, lng: null | number | string): LatLn
 };
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-map-point',
   imports: [FormsModule, LeafletModule],
+  templateUrl: './map-point.component.html',
+  styleUrl: './styles.scss',
   providers: [
     {
       multi: true,
@@ -45,9 +47,7 @@ const center = (lat: null | number | string, lng: null | number | string): LatLn
       useExisting: MapPointComponent,
     },
   ],
-  selector: 'app-map-point',
-  styleUrls: ['./styles.scss'],
-  templateUrl: 'map-point.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapPointComponent implements ControlValueAccessor {
   readonly #zone = inject(NgZone);

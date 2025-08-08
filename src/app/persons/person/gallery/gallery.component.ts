@@ -9,10 +9,10 @@ import {distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators'
 import {GalleryComponent} from '../../../gallery/gallery.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [GalleryComponent, AsyncPipe],
   selector: 'app-persons-person-gallery',
+  imports: [GalleryComponent, AsyncPipe],
   templateUrl: './gallery.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PersonsPersonGalleryComponent {
   readonly #pageEnv = inject(PageEnvService);

@@ -18,10 +18,10 @@ import {catchError, distinctUntilChanged, map, shareReplay, switchMap} from 'rxj
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-forums-move-topic',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './move-topic.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForumsMoveTopicComponent implements OnInit {
   readonly #router = inject(Router);

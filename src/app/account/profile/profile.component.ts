@@ -26,10 +26,10 @@ interface FormControls {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MarkdownComponent, FormsModule, AsyncPipe, InvalidParamsPipe, ReactiveFormsModule],
   selector: 'app-account-profile',
+  imports: [MarkdownComponent, FormsModule, AsyncPipe, InvalidParamsPipe, ReactiveFormsModule],
   templateUrl: './profile.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountProfileComponent implements OnInit {
   readonly #http = inject(HttpClient);
@@ -41,8 +41,8 @@ export class AccountProfileComponent implements OnInit {
   readonly #toastService = inject(ToastsService);
   readonly #usersClient = inject(UsersClient);
 
-  protected settingsInvalidParams = signal<InvalidParams>({});
-  protected photoInvalidParams = signal<InvalidParams>({});
+  protected readonly settingsInvalidParams = signal<InvalidParams>({});
+  protected readonly photoInvalidParams = signal<InvalidParams>({});
 
   private readonly input = viewChild<ElementRef<HTMLInputElement>>('input');
 

@@ -19,10 +19,10 @@ import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/opera
 import {TwinsSidebarComponent} from '../sidebar.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, TwinsSidebarComponent, AsyncPipe],
   selector: 'app-twins-group',
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, TwinsSidebarComponent, AsyncPipe],
   templateUrl: './twins-group.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TwinsGroupComponent {
   readonly #route = inject(ActivatedRoute);

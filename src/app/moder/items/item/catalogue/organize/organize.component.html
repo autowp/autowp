@@ -35,10 +35,10 @@
         class="mb-4"
         [disableIsGroup]="true"
         [item]="newItem"
-        (submitted)="submit(item, newItem.itemTypeId, $event)"
         [invalidParams]="invalidParams()"
         [vehicleTypeIDs]="(vehicleTypeIDs$ | async) || []"
         [items]="(childs$ | async) || []"
+        (submitted)="submit(item, newItem.itemTypeId, $event)"
       />
     }
   }

@@ -17,10 +17,10 @@ import {convertChildsCounts} from '../../catalogue/catalogue-service';
 import {chunkBy} from '../../chunk';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe, CatalogueListItemComponent],
   selector: 'app-index-specs-cars',
+  imports: [RouterLink, AsyncPipe, CatalogueListItemComponent],
   templateUrl: './specs-cars.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexSpecsCarsComponent {
   readonly #userService = inject(UserService);

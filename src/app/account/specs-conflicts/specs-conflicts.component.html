@@ -14,38 +14,38 @@
   <div class="nav nav-pills mb-3">
     <a
       class="nav-link"
-      [class.active]="filter.value === AttrConflictsRequest.Filter.ALL"
       routerLink="."
-      [queryParams]="{filter: undefined}"
       queryParamsHandling="merge"
       i18n
+      [class.active]="filter.value === AttrConflictsRequest.Filter.ALL"
+      [queryParams]="{filter: undefined}"
       >All</a
     >
     <a
       class="nav-link"
-      [class.active]="filter.value === AttrConflictsRequest.Filter.I_DISAGREE"
       routerLink="."
-      [queryParams]="{filter: '-1'}"
       queryParamsHandling="merge"
       i18n
+      [class.active]="filter.value === AttrConflictsRequest.Filter.I_DISAGREE"
+      [queryParams]="{filter: '-1'}"
       >I disagree</a
     >
     <a
       class="nav-link"
-      [class.active]="filter.value === AttrConflictsRequest.Filter.DO_NOT_AGREE_WITH_ME"
       routerLink="."
-      [queryParams]="{filter: '1'}"
       queryParamsHandling="merge"
       i18n
+      [class.active]="filter.value === AttrConflictsRequest.Filter.DO_NOT_AGREE_WITH_ME"
+      [queryParams]="{filter: '1'}"
       >Do not agree with me</a
     >
     <a
       class="nav-link"
-      [class.active]="filter.value === AttrConflictsRequest.Filter.MINUS_WEIGHT"
       routerLink="."
-      [queryParams]="{filter: 'minus-weight'}"
       queryParamsHandling="merge"
       i18n
+      [class.active]="filter.value === AttrConflictsRequest.Filter.MINUS_WEIGHT"
+      [queryParams]="{filter: 'minus-weight'}"
       >Errors</a
     >
   </div>

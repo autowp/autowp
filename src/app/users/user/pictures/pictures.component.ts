@@ -37,10 +37,10 @@ function addCSS(url: string) {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgClass, NgStyle, AsyncPipe],
   selector: 'app-users-user-pictures',
+  imports: [RouterLink, NgClass, NgStyle, AsyncPipe],
   templateUrl: './pictures.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersUserPicturesComponent implements OnInit {
   readonly #userService = inject(UserService);

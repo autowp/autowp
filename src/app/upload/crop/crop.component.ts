@@ -25,10 +25,11 @@ interface JcropCrop {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Default,
-  imports: [AsyncPipe],
   selector: 'app-upload-crop',
+  imports: [AsyncPipe],
   templateUrl: './crop.component.html',
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class UploadCropComponent implements OnDestroy, OnInit {
   protected readonly activeModal = inject(NgbActiveModal);

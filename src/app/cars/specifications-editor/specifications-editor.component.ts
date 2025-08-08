@@ -16,7 +16,7 @@ import {CarsSpecificationsEditorResultComponent} from './result/result.component
 import {CarsSpecificationsEditorSpecComponent} from './spec/spec.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-cars-specifications-editor',
   imports: [
     RouterLink,
     MarkdownComponent,
@@ -25,8 +25,8 @@ import {CarsSpecificationsEditorSpecComponent} from './spec/spec.component';
     CarsSpecificationsEditorResultComponent,
     AsyncPipe,
   ],
-  selector: 'app-cars-specifications-editor',
   templateUrl: './specifications-editor.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsSpecificationsEditorComponent {
   readonly #router = inject(Router);

@@ -55,8 +55,8 @@
         @for (chunkBrand of chunk; track chunkBrand.id) {
           <a
             routerLink="."
-            [queryParams]="{brand_id: chunkBrand.id}"
             queryParamsHandling="merge"
+            [queryParams]="{brand_id: chunkBrand.id}"
             [textContent]="chunkBrand.nameOnly"
           ></a>
           <br />

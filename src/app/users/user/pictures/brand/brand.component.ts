@@ -27,10 +27,10 @@ import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.comp
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-users-user-pictures-brand',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './brand.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersUserPicturesBrandComponent {
   readonly #userService = inject(UserService);

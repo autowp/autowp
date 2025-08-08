@@ -22,11 +22,11 @@
           maxlength="50"
           name="password_old"
           class="form-control"
-          [(ngModel)]="form.password_old"
           [class.is-invalid]="invalidParams() && invalidParams()['password_old']"
+          [(ngModel)]="form.password_old"
         />
         @for (message of invalidParams() | invalidParams: 'password_old'; track message) {
-          <p [textContent]="message" class="invalid-feedback"></p>
+          <p class="invalid-feedback" [textContent]="message"></p>
         }
       </div>
     </div>

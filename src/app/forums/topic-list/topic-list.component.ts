@@ -36,10 +36,10 @@ interface Topic {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PastTimeIndicatorComponent, UserComponent, AsyncPipe],
   selector: 'app-forums-topic-list',
+  imports: [RouterLink, PastTimeIndicatorComponent, UserComponent, AsyncPipe],
   templateUrl: './topic-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForumsTopicListComponent {
   readonly #comments = inject(CommentsClient);

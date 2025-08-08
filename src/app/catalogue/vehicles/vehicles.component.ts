@@ -43,7 +43,7 @@ import {CatalogueService, convertChildsCounts} from '../catalogue-service';
 import {CatalogueItemMenuComponent} from '../item-menu/item-menu.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-catalogue-vehicles',
   imports: [
     RouterLink,
     ItemHeaderComponent,
@@ -53,8 +53,8 @@ import {CatalogueItemMenuComponent} from '../item-menu/item-menu.component';
     AsyncPipe,
     CatalogueListItemComponent,
   ],
-  selector: 'app-catalogue-vehicles',
   templateUrl: './vehicles.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueVehiclesComponent {
   readonly #pageEnv = inject(PageEnvService);

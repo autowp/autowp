@@ -3,10 +3,10 @@ import {RouterLink} from '@angular/router';
 import {PicturesPages} from '@grpc/spec.pb';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
   selector: 'app-picture-paginator',
+  imports: [RouterLink],
   templateUrl: './paginator.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PicturePaginatorComponent {
   readonly paginator = input.required<PicturesPages>();

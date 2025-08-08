@@ -3,9 +3,9 @@
     @if (fullStyle(); as fullStyle) {
       <img
         alt=""
+        class="full"
         [src]="item.imageGalleryFull.src"
         [class.crop-mode]="cropModeAvailable() && cropMode()"
-        class="full"
         [ngStyle]="fullStyle"
         (load)="fullLoaded()"
       />
@@ -14,9 +14,9 @@
   @if (item.imageGallery) {
     <img
       alt=""
+      class="crop"
       [src]="item.imageGallery.src"
       [class.crop-mode]="cropModeAvailable() && cropMode()"
-      class="crop"
       [ngStyle]="cropStyle()"
       (load)="cropLoaded()"
     />
@@ -59,7 +59,7 @@
     </div>
   }
   @if (item.imageGallery && !cropLoading() && !fullLoading()) {
-    <span class="carousel-control-full" (click)="toggleCrop()" (keyup.enter)="toggleCrop()" tabindex="0"
+    <span class="carousel-control-full" tabindex="0" (click)="toggleCrop()" (keyup.enter)="toggleCrop()"
       ><i class="bi bi-arrows-fullscreen" aria-hidden="true"></i
     ></span>
   }

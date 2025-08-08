@@ -3,10 +3,10 @@ import {RouterLink} from '@angular/router';
 import {MapPoint} from '@grpc/spec.pb';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
   selector: 'app-map-popup',
+  imports: [RouterLink],
   templateUrl: './popup.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapPopupComponent {
   readonly item = input.required<MapPoint>();

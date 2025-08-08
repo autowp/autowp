@@ -11,10 +11,10 @@ import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc'
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, InvalidParamsPipe],
   selector: 'app-comments-form',
+  imports: [FormsModule, InvalidParamsPipe],
   templateUrl: './form.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentsFormComponent {
   readonly #comments = inject(CommentsClient);

@@ -4,10 +4,10 @@
       <div class="mb-3">
         @if (item && item.isGroup && canMove && item.childsCount > 0) {
           <a
-            [routerLink]="['/moder/items/item', item.id, 'organize']"
-            [queryParams]="{item_type_id: organizeTypeId$ | async}"
             class="btn btn-secondary"
             i18n
+            [routerLink]="['/moder/items/item', item.id, 'organize']"
+            [queryParams]="{item_type_id: organizeTypeId$ | async}"
             >Turbo group creator</a
           >
         }
@@ -40,17 +40,17 @@
                     <input
                       type="text"
                       name="parent"
-                      [ngbTypeahead]="itemsDataSource"
                       class="form-control item-autocomplete"
                       placeholder="Add parent …"
                       i18n-placeholder
                       autocomplete="off"
+                      [ngbTypeahead]="itemsDataSource"
                       [formControl]="itemQuery"
                       [inputFormatter]="itemFormatter"
-                      (selectItem)="itemOnSelect(item, $event)"
                       [resultTemplate]="itemTemplate"
+                      (selectItem)="itemOnSelect(item, $event)"
                     />
-                    <a class="btn btn-secondary" [routerLink]="['/moder/items/item', item.id, 'select-parent']" i18n
+                    <a class="btn btn-secondary" i18n [routerLink]="['/moder/items/item', item.id, 'select-parent']"
                       >Select …</a
                     >
                     <div ngbDropdown>
@@ -185,7 +185,7 @@
               </td>
               @if (canMove) {
                 <td>
-                  <button class="btn btn-sm btn-danger" (click)="deleteChild(item, childsItem.itemId)">
+                  <button type="button" class="btn btn-sm btn-danger" (click)="deleteChild(item, childsItem.itemId)">
                     <i class="bi bi-x" aria-hidden="true"></i>
                   </button>
                 </td>
@@ -199,8 +199,8 @@
                   <i class="bi bi-plus" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
-                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE, parent_id: item.id}"
                     i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE, parent_id: item.id}"
                     >add engine</a
                   >
                 </td>
@@ -212,8 +212,8 @@
                   <i class="bi bi-plus" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
-                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE, parent_id: item.id}"
                     i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE, parent_id: item.id}"
                     >add vehicle</a
                   >
                 </td>
@@ -226,8 +226,8 @@
                   <i class="bi bi-plus" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
-                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_CATEGORY, parent_id: item.id}"
                     i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_CATEGORY, parent_id: item.id}"
                     >add category</a
                   >
                 </td>
@@ -239,8 +239,8 @@
                   <i class="bi bi-plus" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
-                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE, parent_id: item.id}"
                     i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE, parent_id: item.id}"
                     >add engine</a
                   >
                 </td>
@@ -252,8 +252,8 @@
                   <i class="bi bi-plus" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
-                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE, parent_id: item.id}"
                     i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE, parent_id: item.id}"
                     >add vehicle</a
                   >
                 </td>

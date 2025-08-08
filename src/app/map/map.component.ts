@@ -32,11 +32,11 @@ function createMarker(lat: number, lng: number): Marker {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, LeafletModule],
   selector: 'app-map',
-  styleUrls: ['./styles.scss'],
+  imports: [RouterLink, LeafletModule],
   templateUrl: './map.component.html',
+  styleUrl: './styles.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

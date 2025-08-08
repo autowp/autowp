@@ -13,7 +13,7 @@
       } @else if (item.type === ItemParentType.ITEM_TYPE_DESIGN) {
         <span i18n>Design</span>
       }
-      <a href="#" class="toggle" (click)="toggle()" [innerHTML]="item.item?.nameHtml"></a>
+      <a href="#" class="toggle" [innerHTML]="item.item?.nameHtml" (click)="toggle()"></a>
       @if (open()) {
         <ul class="list-unstyled">
           @if (loading()) {
@@ -29,7 +29,7 @@
             }
           }
           <li style="margin-left: 16px">
-            <a href="#" (click)="selectEngine(item.itemId)" i18n>other modification</a>
+            <a href="#" i18n (click)="selectEngine(item.itemId)">other modification</a>
           </li>
         </ul>
       }
@@ -43,7 +43,7 @@
       } @else if (item.type === ItemParentType.ITEM_TYPE_DESIGN) {
         <span i18n>Design</span>
       }
-      <a href="#" (click)="selectEngine(item.itemId)" [innerHTML]="item.item?.nameHtml"></a>
+      <a href="#" [innerHTML]="item.item?.nameHtml" (click)="selectEngine(item.itemId)"></a>
     </span>
   }
 }

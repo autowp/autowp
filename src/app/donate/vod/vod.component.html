@@ -38,8 +38,8 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
               <span>
                 <a
                   routerLink="."
-                  [queryParams]="{date: date.value}"
                   queryParamsHandling="merge"
+                  [queryParams]="{date: date.value}"
                   [textContent]="date.name"
                 ></a>
               </span>
@@ -76,9 +76,9 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
 
   <a
     routerLink="/donate/vod/select"
-    [queryParams]="{date: date$ | async, anonymous: (anonymous$ | async) ? 1 : null}"
     class="btn btn-primary btn-lg"
     i18n
+    [queryParams]="{date: date$ | async, anonymous: (anonymous$ | async) ? 1 : null}"
     >Choose …</a
   >
 </div>
@@ -89,21 +89,21 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
   <div class="btn-group">
     <a
       routerLink="."
-      [queryParams]="{anonymous: '1'}"
       queryParamsHandling="merge"
       class="btn btn-secondary"
-      [class.active]="anonymous$ | async"
       i18n
+      [queryParams]="{anonymous: '1'}"
+      [class.active]="anonymous$ | async"
       >Anonymously</a
     >
     <a
       routerLink="."
-      [queryParams]="{anonymous: null}"
       queryParamsHandling="merge"
       class="btn btn-secondary"
+      i18n
+      [queryParams]="{anonymous: null}"
       [class.active]="(anonymous$ | async) === null"
       [class.disabled]="(userID$ | async) === null"
-      i18n
       >With the name (registration required)</a
     >
   </div>
@@ -119,8 +119,8 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
   ngNoForm
   method="post"
   action="https://yoomoney.ru/quickpay/confirm"
-  (submit)="submit($event)"
   class="card card-body mb-4"
+  (submit)="submit($event)"
 >
   @if ((date$ | async) && (item$ | async)) {
     <div>
@@ -164,11 +164,11 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
   }
   @if ((date$ | async) === null || (item$ | async) === null) {
     <div>
-      <button class="btn btn-secondary" disabled>
+      <button type="button" class="btn btn-secondary" disabled>
         <span class="bi bi-credit-card" aria-hidden="true"></span>
         <ng-container i18n>Credit card</ng-container>
       </button>
-      <button class="btn btn-secondary" disabled i18n>YooMoney</button>
+      <button type="button" class="btn btn-secondary" disabled i18n>YooMoney</button>
     </div>
   }
 </form>

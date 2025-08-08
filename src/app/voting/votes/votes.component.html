@@ -1,6 +1,6 @@
 <div class="modal-header">
   <h3 class="modal-title" i18n>Who voted?</h3>
-  <button class="btn-close" (click)="activeModal.dismiss()"></button>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
 </div>
 <div class="modal-body">
   @if (votes$ | async; as votes) {
@@ -14,5 +14,5 @@
   }
 </div>
 <div class="modal-footer">
-  <button type="button" (click)="activeModal.dismiss()" class="btn btn-secondary" i18n>Close</button>
+  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Close</button>
 </div>

@@ -46,10 +46,10 @@ interface PictureRoute {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MarkdownComponent, RouterLink, AsyncPipe, ThumbnailComponent],
   selector: 'app-catalogue-index',
+  imports: [MarkdownComponent, RouterLink, AsyncPipe, ThumbnailComponent],
   templateUrl: './index.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueIndexComponent {
   readonly #pageEnv = inject(PageEnvService);

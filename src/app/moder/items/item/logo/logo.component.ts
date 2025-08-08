@@ -10,10 +10,10 @@ import {EMPTY} from 'rxjs';
 import {catchError, switchMap} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MarkdownComponent, NgbProgressbar, AsyncPipe, InvalidParamsPipe],
   selector: 'app-moder-items-item-logo',
+  imports: [MarkdownComponent, NgbProgressbar, AsyncPipe, InvalidParamsPipe],
   templateUrl: './logo.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemLogoComponent {
   readonly #auth = inject(AuthService);

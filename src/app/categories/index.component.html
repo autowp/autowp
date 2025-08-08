@@ -19,7 +19,7 @@
             @if (category.picture$ | async; as picture) {
               @if (picture.thumbMedium) {
                 <a [routerLink]="['/category', category.item.catname]">
-                  <img alt="" [src]="picture.thumbMedium.src" class="card-img-top" loading="lazy" />
+                  <img alt="" class="card-img-top" loading="lazy" [src]="picture.thumbMedium.src" />
                 </a>
               }
             }

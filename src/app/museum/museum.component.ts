@@ -30,10 +30,10 @@ import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, LeafletModule, MarkdownComponent, CommentsComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-museum',
+  imports: [RouterLink, LeafletModule, MarkdownComponent, CommentsComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './museum.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MuseumComponent {
   readonly #auth = inject(AuthService);

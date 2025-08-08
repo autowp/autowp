@@ -11,7 +11,7 @@
       }
       @if (currentVehicleType$ | async) {
         <li class="breadcrumb-item">
-          <a [routerLink]="['/', brand.catname, 'cars']" i18n>In chronological order</a>
+          <a i18n [routerLink]="['/', brand.catname, 'cars']">In chronological order</a>
         </li>
       }
     } @else {
@@ -32,7 +32,7 @@
   <ul class="nav nav-pills mb-4">
     @for (item of vehicleTypeOptions; track item.id) {
       <li class="nav-item">
-        <a [routerLink]="item.route" class="nav-link" [class.active]="item.active">
+        <a class="nav-link" [routerLink]="item.route" [class.active]="item.active">
           {{ item.name }}
           <span class="badge text-bg-info text-dark">{{ item.itemsCount }}</span>
         </a>

@@ -7,9 +7,9 @@
       @if (vehicleTypeIDs$ | async; as vehicleTypeIDs) {
         <app-item-meta-form
           [item]="item"
-          (submitted)="saveMeta(item, $event)"
           [invalidParams]="invalidParams()"
           [vehicleTypeIDs]="vehicleTypeIDs"
+          (submitted)="saveMeta(item, $event)"
         />
       }
     }

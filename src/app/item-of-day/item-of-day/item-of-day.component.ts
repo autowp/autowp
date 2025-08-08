@@ -9,11 +9,11 @@ import {map, switchMap} from 'rxjs/operators';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [UserComponent, RouterLink, AsyncPipe],
   selector: 'app-item-of-day',
-  styleUrls: ['./item-of-day.component.scss'],
+  imports: [UserComponent, RouterLink, AsyncPipe],
   templateUrl: './item-of-day.component.html',
+  styleUrl: './item-of-day.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemOfDayComponent {
   readonly item$ = input.required<Observable<APIItem>>();

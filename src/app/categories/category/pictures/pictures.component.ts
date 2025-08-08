@@ -29,10 +29,10 @@ interface PictureRoute {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PaginatorComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-categories-category-pictures',
+  imports: [PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './pictures.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesCategoryPicturesComponent {
   readonly #pageEnv = inject(PageEnvService);

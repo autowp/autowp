@@ -18,13 +18,13 @@
           @for (picture of pictures.slice(0, 1); track picture) {
             <div class="col-12 col-lg-6">
               @if (picture.picture && picture.thumb) {
-                <a [routerLink]="picture.route" class="d-block rounded mb-4">
+                <a class="d-block rounded mb-4" [routerLink]="picture.route">
                   <img
+                    class="rounded w-100 border border-light"
+                    loading="lazy"
                     [src]="picture.thumb.src"
                     [alt]="picture.picture.nameText"
                     [title]="picture.picture.nameText"
-                    class="rounded w-100 border border-light"
-                    loading="lazy"
                   />
                 </a>
               }
@@ -38,13 +38,13 @@
               @for (picture of pictures.slice(1); track picture) {
                 <div class="col-6">
                   @if (picture.picture && picture.thumb) {
-                    <a [routerLink]="picture.route" class="d-block rounded mb-4">
+                    <a class="d-block rounded mb-4" [routerLink]="picture.route">
                       <img
+                        class="rounded w-100 border border-light"
+                        loading="lazy"
                         [src]="picture.thumb.src"
                         [alt]="picture.picture.nameText"
                         [title]="picture.picture.nameText"
-                        class="rounded w-100 border border-light"
-                        loading="lazy"
                       />
                     </a>
                   }
@@ -62,13 +62,13 @@
           @for (picture of pictures; track picture) {
             <div class="col-6 col-lg-3">
               @if (picture.picture && picture.thumb) {
-                <a [routerLink]="picture.route" class="d-block rounded mb-4">
+                <a class="d-block rounded mb-4" [routerLink]="picture.route">
                   <img
+                    class="rounded w-100 border border-light"
+                    loading="lazy"
                     [src]="picture.thumb.src"
                     [alt]="picture.picture.nameText"
                     [title]="picture.picture.nameText"
-                    class="rounded w-100 border border-light"
-                    loading="lazy"
                   />
                 </a>
               }
@@ -86,11 +86,11 @@
           <div class="no-photo rounded w-100 border border-light mb-4" title="No photos available" i18n-title>
             <a
               routerLink="/upload"
-              [queryParams]="{item_id: item.id}"
               title="Add photo"
               i18n-title
               class="bi bi-plus-circle text-success"
               aria-hidden="true"
+              [queryParams]="{item_id: item.id}"
             ></a>
             <span class="bi bi-camera fs-1" aria-hidden="true"></span>
           </div>
@@ -128,7 +128,7 @@
         @if (item.itemTypeId === ItemType.ITEM_TYPE_PERSON) {
           <li class="list-inline-item">
             <i class="bi bi-text-left me-1" aria-hidden="true"></i>
-            <a [routerLink]="['/persons', item.id]" i18n>details</a>
+            <a i18n [routerLink]="['/persons', item.id]">details</a>
           </li>
         } @else if (
           item.acceptedPicturesCount &&
@@ -156,13 +156,13 @@
         @if (isModer$ | async) {
           <li class="list-inline-item">
             <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
-            <a [routerLink]="['/moder/items/item', item.id]" i18n>edit</a>
+            <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
           </li>
         }
         @if (item.canEditSpecs) {
           <li class="list-inline-item">
             <i class="bi bi-pencil-fill me-1" aria-hidden="true"></i>
-            <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id}" i18n>edit specs</a>
+            <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
           </li>
         }
       </ul>

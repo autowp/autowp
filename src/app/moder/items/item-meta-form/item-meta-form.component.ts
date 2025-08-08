@@ -192,11 +192,11 @@ function specsToPlain(options: Spec[], deep: number): ItemMetaFormAPISpec[] {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ReactiveFormsModule, MapPointComponent, AsyncPipe, InvalidParamsPipe],
   selector: 'app-item-meta-form',
-  styleUrls: ['./styles.scss'],
+  imports: [FormsModule, ReactiveFormsModule, MapPointComponent, AsyncPipe, InvalidParamsPipe],
   templateUrl: './item-meta-form.component.html',
+  styleUrl: './styles.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemMetaFormComponent {
   readonly #specService = inject(SpecService);

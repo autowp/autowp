@@ -9,19 +9,19 @@
           <div class="align-self-start me-3">
             @if (!contact.user.deleted) {
               <a
-                [routerLink]="['/users', contact.user.identity ? contact.user.identity : 'user' + contact.user.id]"
                 class="photo"
+                [routerLink]="['/users', contact.user.identity ? contact.user.identity : 'user' + contact.user.id]"
               >
                 @if (contact.user.avatar) {
-                  <img alt="" [src]="contact.user.avatar.src" class="rounded" loading="lazy" />
+                  <img alt="" class="rounded" loading="lazy" [src]="contact.user.avatar.src" />
                 } @else if (contact.user.gravatar) {
-                  <img alt="" [src]="contact.user.gravatar" class="rounded" loading="lazy" />
+                  <img alt="" class="rounded" loading="lazy" [src]="contact.user.gravatar" />
                 }
               </a>
             }
           </div>
           <div class="flex-grow-1">
-            <button class="btn-close float-end" (click)="deleteContact(contact.user.id)"></button>
+            <button type="button" class="btn-close float-end" (click)="deleteContact(contact.user.id)"></button>
             <h4>
               <app-user [user]="contact.user" />
             </h4>

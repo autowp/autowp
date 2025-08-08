@@ -8,9 +8,9 @@
       <button
         class="navbar-toggler navbar-toggler-right"
         type="button"
-        (click)="isNavbarCollapsed.set(!isNavbarCollapsed())"
         aria-expanded="false"
         aria-label="Toggle navigation"
+        (click)="isNavbarCollapsed.set(!isNavbarCollapsed())"
       >
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -50,7 +50,7 @@
             @if (categories$ | async; as categories) {
               <div ngbDropdownMenu>
                 @for (category of categories.items; track category.id) {
-                  <a [routerLink]="['/category', category.catname]" class="dropdown-item" routerLinkActive="active">
+                  <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/category', category.catname]">
                     {{ category.nameText }}&#xa0;
                     <span class="count">
                       ({{ category.descendantsCount }})
@@ -90,7 +90,7 @@
             </li>
           } @else {
             <li class="nav-item">
-              <button class="btn nav-link" (click)="doLogin()">
+              <button type="button" class="btn nav-link" (click)="doLogin()">
                 <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
                 <ng-container i18n="@@login/sign-in">Sign in</ng-container>
               </button>
@@ -116,7 +116,7 @@
                 <i class="bi bi-chat-fill" aria-hidden="true"></i>
                 <ng-container i18n>Feedback</ng-container>
               </a>
-              <a href="#" (click)="showOnlineUsers()" class="dropdown-item">
+              <a href="#" class="dropdown-item" (click)="showOnlineUsers()">
                 <i class="bi bi-people-fill" aria-hidden="true"></i>
                 <ng-container i18n>Who is online?</ng-container>
               </a>
@@ -135,7 +135,7 @@
                 <ng-container i18n>About us</ng-container>
               </a>
               @if (authenticated$ | async) {
-                <a href="#" (click)="signOut()" class="dropdown-item">
+                <a href="#" class="dropdown-item" (click)="signOut()">
                   <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                   <ng-container i18n>Sign out</ng-container>
                 </a>
@@ -143,10 +143,10 @@
             </div>
           </li>
           <li class="nav-item" ngbDropdown placement="bottom-right">
-            <button href="#" class="nav-link" ngbDropdownToggle>
+            <button type="button" class="nav-link" ngbDropdownToggle>
               @for (lang of languages; track lang.code) {
                 @if (lang.code === language) {
-                  <i [ngClass]="lang.flag" aria-hidden="true"></i>
+                  <i aria-hidden="true" [ngClass]="lang.flag"></i>
                 }
               }
             </button>
@@ -158,7 +158,7 @@
                     [href]="'//' + lang.hostname + urlPath"
                     [class.active]="lang.code === language"
                   >
-                    <i [ngClass]="lang.flag" aria-hidden="true"></i>
+                    <i aria-hidden="true" [ngClass]="lang.flag"></i>
                     {{ lang.name }}
                   </a>
                 }
@@ -181,7 +181,7 @@
   [class.container]="!(layoutParams$ | async)?.isGalleryPage"
   [class.container-fluid]="(layoutParams$ | async)?.isGalleryPage"
 >
-  <router-outlet></router-outlet>
+  <router-outlet />
 
   @if (!(layoutParams$ | async)?.isAdminPage && !(layoutParams$ | async)?.isGalleryPage) {
     <div class="bottom-line">
@@ -251,7 +251,7 @@ All images are posted for educational purposes.
           @for (lang of languages; track lang.code) {
             @if (lang.code !== language) {
               <a [href]="'//' + lang.hostname + urlPath">
-                <i [ngClass]="lang.flag" aria-hidden="true"></i>
+                <i aria-hidden="true" [ngClass]="lang.flag"></i>
                 {{ lang.name }}
               </a>
             }

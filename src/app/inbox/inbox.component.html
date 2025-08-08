@@ -13,8 +13,8 @@
 @if (inbox$ | async; as data) {
   <div class="row">
     <div class="col-lg-4 col-md-4 offset-lg-4 offset-md-4 mb-4">
-      <select name="brand_id" [formControl]="brandID" class="form-select" (change)="changeBrand()">
-        <option [ngValue]="''" i18n>All brands</option>
+      <select name="brand_id" class="form-select" [formControl]="brandID" (change)="changeBrand()">
+        <option ngValue="" i18n>All brands</option>
         @for (brand of data.inbox.brands; track brand.id) {
           <option [ngValue]="brand.id">{{ brand.name }}</option>
         }

@@ -21,10 +21,10 @@ import {CommentsComponent} from '../comments/comments/comments.component';
 import {PictureComponent} from './picture.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, CommentsComponent, AsyncPipe, PictureComponent],
   selector: 'app-picture-page',
+  imports: [RouterLink, CommentsComponent, AsyncPipe, PictureComponent],
   templateUrl: './picture-page.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PicturePageComponent {
   readonly #route = inject(ActivatedRoute);

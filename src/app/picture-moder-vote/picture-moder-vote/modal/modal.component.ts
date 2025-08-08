@@ -6,10 +6,10 @@ import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {APIPictureModerVoteTemplateService} from '../../../api/picture-moder-vote-template/picture-moder-vote-template.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
   selector: 'app-picture-moder-vote-modal',
+  imports: [FormsModule],
   templateUrl: './modal.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PictureModerVoteModalComponent {
   protected readonly activeModal = inject(NgbActiveModal);

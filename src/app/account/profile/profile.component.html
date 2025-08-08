@@ -5,7 +5,7 @@
 <h2 i18n>Personal info</h2>
 @if (user$ | async; as user) {
   <div class="card card-body mb-4">
-    <p>{{ user.name }} (<a [href]="changeProfileUrl" i18n>Change</a>)</p>
+    <p>{{ user.name }} (<a i18n [href]="changeProfileUrl">Change</a>)</p>
   </div>
 
   <h2 i18n>Photo</h2>
@@ -13,14 +13,14 @@
     <app-markdown i18n-markdown markdown="You can upload photo or use [Gravatar](https://gravatar.com/)" />
     @if (photo$ | async; as photo) {
       <div>
-        <img alt="" [src]="photo.src" class="mb-4" />
+        <img alt="" class="mb-4" [src]="photo.src" />
       </div>
     }
     <div class="row">
       <div class="col-6">
-        <input type="file" accept="image/*" #input class="form-control" (change)="onChange(user, $event)" />
+        <input #input type="file" accept="image/*" class="form-control" (change)="onChange(user, $event)" />
         @for (message of photoInvalidParams() | invalidParams: 'photo'; track message) {
-          <p [textContent]="message" class="invalid-feedback d-block"></p>
+          <p class="invalid-feedback d-block" [textContent]="message"></p>
         }
       </div>
       <div class="col-6">
@@ -41,7 +41,7 @@
       <p><ng-container i18n>Votes left</ng-container>: {{ votesLeft$ | async }}</p>
     }
     @if (form$ | async; as form) {
-      <form method="post" class="form-horizontal" (ngSubmit)="sendSettings(form, user.id)" [formGroup]="form">
+      <form method="post" class="form-horizontal" [formGroup]="form" (ngSubmit)="sendSettings(form, user.id)">
         @if (form.controls.language; as control) {
           <div class="mb-3 row">
             <label class="col-md-3 col-form-label" for="language" i18n>Language</label>
@@ -58,7 +58,7 @@
                 }
               </select>
               @for (message of settingsInvalidParams() | invalidParams: 'language'; track message) {
-                <p [textContent]="message" class="invalid-feedback"></p>
+                <p class="invalid-feedback" [textContent]="message"></p>
               }
             </div>
           </div>
@@ -79,7 +79,7 @@
                 }
               </select>
               @for (message of settingsInvalidParams() | invalidParams: 'timezone'; track message) {
-                <p [textContent]="message" class="invalid-feedback"></p>
+                <p class="invalid-feedback" [textContent]="message"></p>
               }
             </div>
           </div>

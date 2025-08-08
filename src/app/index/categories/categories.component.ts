@@ -9,10 +9,10 @@ import {Markdown2Component} from '@utils/markdown2/markdown2.component';
 import {IndexCategoriesCategoryComponent} from './category/category.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, IndexCategoriesCategoryComponent, Markdown2Component, AsyncPipe],
   selector: 'app-index-categories',
+  imports: [RouterLink, IndexCategoriesCategoryComponent, Markdown2Component, AsyncPipe],
   templateUrl: './categories.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexCategoriesComponent {
   readonly #items = inject(ItemsClient);

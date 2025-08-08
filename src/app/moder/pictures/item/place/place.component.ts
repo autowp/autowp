@@ -45,10 +45,10 @@ function normalizeLng(lng: number) {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, ReactiveFormsModule, LeafletModule, AsyncPipe],
   selector: 'app-moder-pictures-place',
+  imports: [RouterLink, FormsModule, ReactiveFormsModule, LeafletModule, AsyncPipe],
   templateUrl: './place.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPicturesItemPlaceComponent implements OnInit {
   readonly #router = inject(Router);

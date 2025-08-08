@@ -37,10 +37,10 @@
                             @if (picture.thumbMedium; as thumb) {
                               <a [routerLink]="['/twins/group', group.item.id, 'pictures', picture.identity]">
                                 <img
+                                  class="card-img-top"
                                   [src]="thumb.src"
                                   [alt]="picture.nameText"
                                   [title]="picture.nameText"
-                                  class="card-img-top"
                                 />
                               </a>
                             } @else {
@@ -81,7 +81,7 @@
             @if (group.item.hasChildSpecs) {
               <li>
                 <i class="bi bi-card-list me-1" aria-hidden="true"></i>
-                <a [routerLink]="['/twins/group', group.item.id, 'specifications']" i18n>specifications</a>
+                <a i18n [routerLink]="['/twins/group', group.item.id, 'specifications']">specifications</a>
               </li>
             }
             @if (group.hasMoreImages) {
@@ -95,7 +95,7 @@
             @if (canEdit$ | async) {
               <li>
                 <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
-                <a [routerLink]="['/moder/items/item', group.item.id]" i18n>edit</a>
+                <a i18n [routerLink]="['/moder/items/item', group.item.id]">edit</a>
               </li>
             }
           </ul>

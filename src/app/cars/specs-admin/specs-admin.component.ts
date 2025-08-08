@@ -32,10 +32,10 @@ interface AttrUserValueListItem {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgbTooltip, UserComponent, FormsModule, AsyncPipe, DatePipe, TimeAgoPipe],
   selector: 'app-cars-specs-admin',
+  imports: [NgbTooltip, UserComponent, FormsModule, AsyncPipe, DatePipe, TimeAgoPipe],
   templateUrl: './specs-admin.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsSpecsAdminComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

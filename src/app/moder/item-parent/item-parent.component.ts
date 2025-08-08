@@ -33,10 +33,10 @@ interface LanguageItem {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, InvalidParamsPipe, AsyncPipe],
   selector: 'app-moder-item-parent',
+  imports: [RouterLink, FormsModule, InvalidParamsPipe, AsyncPipe],
   templateUrl: './item-parent.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemParentComponent {
   readonly #contentLanguage = inject(ContentLanguageService);

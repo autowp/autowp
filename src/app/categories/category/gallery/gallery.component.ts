@@ -10,10 +10,10 @@ import {GalleryComponent} from '../../../gallery/gallery.component';
 import {CategoriesService, CategoryPipeResult} from '../../service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [GalleryComponent, AsyncPipe],
   selector: 'app-category-gallery',
+  imports: [GalleryComponent, AsyncPipe],
   templateUrl: './gallery.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryGalleryComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

@@ -8,7 +8,7 @@
         <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]">{{ user.name }}</a>
       </li>
       <li class="breadcrumb-item">
-        <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id, 'pictures']" i18n
+        <a i18n [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id, 'pictures']"
           >User's pictures</a
         >
       </li>

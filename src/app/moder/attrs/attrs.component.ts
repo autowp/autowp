@@ -10,10 +10,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {ModerAttrsAttributeListComponent} from './attribute-list/attribute-list.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, ModerAttrsAttributeListComponent, AsyncPipe],
   selector: 'app-moder-attrs',
+  imports: [RouterLink, ModerAttrsAttributeListComponent, AsyncPipe],
   templateUrl: './attrs.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerAttrsComponent implements OnInit {
   readonly #attrsService = inject(APIAttrsService);

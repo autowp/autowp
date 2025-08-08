@@ -35,10 +35,10 @@ interface InboxData {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, PaginatorComponent, AsyncPipe, DatePipe, ThumbnailComponent, ReactiveFormsModule],
   selector: 'app-inbox',
+  imports: [RouterLink, FormsModule, PaginatorComponent, AsyncPipe, DatePipe, ThumbnailComponent, ReactiveFormsModule],
   templateUrl: './inbox.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InboxComponent implements OnInit {
   readonly #router = inject(Router);

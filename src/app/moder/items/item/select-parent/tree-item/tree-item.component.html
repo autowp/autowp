@@ -19,16 +19,16 @@
       @if (open()) {
         <ul>
           <li>
-            <a href="#" (click)="onSelect(item.id)" i18n>here</a>
+            <a href="#" i18n (click)="onSelect(item.id)">here</a>
           </li>
           @if (childs$ | async; as childs) {
             @for (child of childs; track child) {
               <li class="car-node">
                 <app-moder-items-item-select-parent-tree
                   [itemParent]="child"
-                  (selected)="onSelect($event)"
                   [disableItemID]="disableItemID()"
                   [order]="ItemParentsRequest.Order.AUTO"
+                  (selected)="onSelect($event)"
                 />
               </li>
             }
@@ -50,7 +50,7 @@
       } @else if (typeID() === ItemParentType.ITEM_TYPE_DESIGN) {
         <span i18n>Design</span>
       }
-      <a href="#" (click)="onSelect(item.id)" [innerHTML]="item.nameHtml"></a>
+      <a href="#" [innerHTML]="item.nameHtml" (click)="onSelect(item.id)"></a>
     </span>
   }
   @if (isDisabled(item)) {

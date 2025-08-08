@@ -5,8 +5,9 @@ const is = (interval: number, cycle: number) => (Math.abs(cycle) >= interval ? M
 
 @Pipe({
   name: 'timeAgo',
-  pure: false,
   standalone: true,
+  // eslint-disable-next-line @angular-eslint/no-pipe-impure
+  pure: false,
 })
 export class TimeAgoPipe implements OnDestroy, PipeTransform {
   readonly #cdRef = inject(ChangeDetectorRef);

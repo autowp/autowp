@@ -24,10 +24,10 @@ interface SidebarItem {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterOutlet, AsyncPipe],
   selector: 'app-account',
+  imports: [RouterLink, RouterOutlet, AsyncPipe],
   templateUrl: './account.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountComponent {
   readonly #messageService = inject(MessageService);

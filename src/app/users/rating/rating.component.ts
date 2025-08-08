@@ -21,10 +21,10 @@ enum Rating {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, UserComponent, AsyncPipe, DecimalPipe],
   selector: 'app-users-rating',
+  imports: [RouterLink, UserComponent, AsyncPipe, DecimalPipe],
   templateUrl: './rating.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersRatingComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

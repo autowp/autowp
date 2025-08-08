@@ -12,10 +12,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [UserComponent, AsyncPipe],
   selector: 'app-voting-votes',
+  imports: [UserComponent, AsyncPipe],
   templateUrl: './votes.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VotingVotesComponent {
   protected readonly activeModal = inject(NgbActiveModal);

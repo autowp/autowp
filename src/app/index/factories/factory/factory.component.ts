@@ -10,11 +10,11 @@ import {EMPTY} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgbPopover, AsyncPipe],
   selector: 'app-index-factories-factory',
-  styleUrls: ['./factory.component.scss'],
+  imports: [RouterLink, NgbPopover, AsyncPipe],
   templateUrl: './factory.component.html',
+  styleUrl: './factory.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexFactoriesFactoryComponent {
   readonly #itemsClient = inject(ItemsClient);

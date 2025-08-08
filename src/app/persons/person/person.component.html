@@ -17,7 +17,7 @@
     @if (isModer$ | async) {
       <p>
         <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
-        <a [routerLink]="['/moder/items/item', item.id]" i18n>edit</a>
+        <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
       </p>
     }
   }

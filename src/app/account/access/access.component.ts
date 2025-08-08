@@ -4,10 +4,10 @@ import {environment} from '@environment/environment';
 import {PageEnvService} from '@services/page-env.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
   selector: 'app-account-access',
+  imports: [RouterLink],
   templateUrl: './access.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountAccessComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

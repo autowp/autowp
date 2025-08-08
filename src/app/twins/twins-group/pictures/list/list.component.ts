@@ -24,10 +24,10 @@ import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.comp
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PaginatorComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-twins-group-pictures-list',
+  imports: [PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TwinsGroupPicturesListComponent {
   readonly #route = inject(ActivatedRoute);

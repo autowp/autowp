@@ -9,10 +9,10 @@
       <a [routerLink]="route()">
         <img
           class="card-img-top"
+          loading="lazy"
           [src]="picture.thumbMedium.src"
           [alt]="picture.nameText"
           [title]="picture.nameText"
-          loading="lazy"
         />
       </a>
     }
@@ -45,8 +45,8 @@
               class="bi bi-crop"
               aria-hidden="true"
               style="cursor: help"
-              i18n-title
               title="Thumbnail is cropped ({{ picture.cropResolution }})"
+              i18n-title
             ></i>
           }
         </span>
@@ -93,6 +93,7 @@
       @if (selectable()) {
         <button
           class="btn btn-sm float-start me-1 mb-2"
+          type="button"
           [class.btn-primary]="picture.selected"
           [class.btn-secondary]="!picture.selected"
           (click)="onPictureSelect(picture)"
@@ -102,10 +103,10 @@
       }
       @if (isModer$ | async) {
         <a
-          [routerLink]="['/moder/pictures', picture.id]"
-          [class.float-end]="selectable()"
           class="btn btn-secondary btn-sm settings mb-2"
           title="Settings"
+          [routerLink]="['/moder/pictures', picture.id]"
+          [class.float-end]="selectable()"
         >
           <i class="bi bi-gear-fill" aria-hidden="true"></i>
         </a>
@@ -113,7 +114,7 @@
       @if (picture.pictureItems?.items || []; as pictureItems) {
         <div style="clear: both">
           @for (pictureItem of pictureItems; track pictureItem.itemId) {
-            @if (pictureItems.length > 1) {
+            @if ($count > 1) {
               <div [innerHTML]="pictureItem.item?.nameHtml"></div>
             }
             <select
@@ -132,7 +133,7 @@
       @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
         <p class="alert alert-warning" role="alert">
           <span class="bi bi-file-earmark-image me-1" aria-hidden="true"></span>
-          <a [routerLink]="['/moder/pictures', dfDistance.dstPictureId]" ngPreserveWhitespaces i18n
+          <a ngPreserveWhitespaces i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
             >Similar picture: {{ dfDistance.distance }}</a
           >
         </p>

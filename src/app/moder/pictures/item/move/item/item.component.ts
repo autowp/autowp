@@ -23,17 +23,15 @@ interface ListItem {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AsyncPipe],
   selector: 'app-moder-picture-move-item',
-  styles: [
-    `
-      :host {
-        display: block;
-      }
-    `,
-  ],
+  imports: [AsyncPipe],
   templateUrl: './item.component.html',
+  styles: `
+    :host {
+      display: block;
+    }
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPictureMoveItemComponent {
   readonly #itemsClient = inject(ItemsClient);

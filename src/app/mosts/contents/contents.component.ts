@@ -38,11 +38,11 @@ function vehicleTypesToList(vehicleTypes: MostsVehicleType[]): MostsVehicleTypeT
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, MarkdownComponent, NgbTooltip, AsyncPipe],
   selector: 'app-mosts-contents',
-  styleUrls: ['./styles.scss'],
+  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, MarkdownComponent, NgbTooltip, AsyncPipe],
   templateUrl: './contents.component.html',
+  styleUrl: './styles.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MostsContentsComponent {
   readonly #mostsService = inject(MostsService);

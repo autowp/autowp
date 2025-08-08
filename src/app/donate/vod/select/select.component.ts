@@ -25,10 +25,10 @@ import {PaginatorComponent} from '../../../paginator/paginator/paginator.compone
 import {DonateVodSelectItemComponent} from './item/item.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DonateVodSelectItemComponent, PaginatorComponent],
   selector: 'app-donate-vod-select',
+  imports: [RouterLink, DonateVodSelectItemComponent, PaginatorComponent],
   templateUrl: './select.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DonateVodSelectComponent implements OnDestroy, OnInit {
   readonly #route = inject(ActivatedRoute);

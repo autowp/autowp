@@ -8,7 +8,15 @@ import {defineConfig, globalIgnores} from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['dist/**/*', '.scannerwork/**/*', 'node_modules/**/*', '.idea/**/*', '.angular/**/*']),
+  globalIgnores([
+    'dist/**/*',
+    '.scannerwork/**/*',
+    'node_modules/**/*',
+    '.idea/**/*',
+    '.angular/**/*',
+    'src/rest/**/*',
+    'src/grpc/**/*',
+  ]),
   {
     extends: [
       // Apply the recommended core rules
@@ -18,7 +26,7 @@ export default defineConfig([
       // Optionally apply stylistic rules from typescript-eslint that improve code consistency
       ...tseslint.configs.stylistic,
       // Apply the recommended Angular rules
-      ...angular.configs.tsRecommended,
+      ...angular.configs.tsAll,
     ],
     // Everything in this config object targets our TypeScript files (Components, Directives, Pipes etc)
     files: ['**/*.ts'],
@@ -27,6 +35,7 @@ export default defineConfig([
     processor: angular.processInlineTemplates,
     // Override specific rules for TypeScript files (these will take priority over the extended configs above)
     rules: {
+      '@angular-eslint/runtime-localize': 'off',
       '@angular-eslint/component-selector': [
         'error',
         {
@@ -46,17 +55,19 @@ export default defineConfig([
     },
   },
   {
-    extends: [
-      // Apply the recommended Angular template rules
-      ...angular.configs.templateRecommended,
-      // Apply the Angular template rules which focus on accessibility of our apps
-      ...angular.configs.templateAccessibility,
-    ],
+    extends: [...angular.configs.templateAll],
     // Everything in this config object targets our HTML files (external templates,
     // and inline templates as long as we have the `processor` set on our TypeScript config above)
     files: ['**/*.html'],
     rules: {
+      '@angular-eslint/template/prefer-template-literal': 'off',
+      '@angular-eslint/template/no-interpolation-in-attributes': ['error', {allowSubstringInterpolation: true}],
+      '@angular-eslint/template/no-call-expression': 'off',
+      '@angular-eslint/template/no-inline-styles': 'off',
+      '@angular-eslint/template/i18n': 'off',
       '@angular-eslint/template/elements-content': 'off',
+      '@angular-eslint/template/cyclomatic-complexity': 'off',
+      '@angular-eslint/template/prefer-ngsrc': 'off',
     },
   },
   {
@@ -71,6 +82,7 @@ export default defineConfig([
     rules: {
       ...perfectionist.configs['recommended-natural'].rules,
       'perfectionist/sort-classes': 'off',
+      'perfectionist/sort-objects': 'off',
     },
   },
   {

@@ -12,10 +12,10 @@ export interface ItemHeader {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
   selector: 'app-item-header',
+  imports: [RouterLink],
   templateUrl: './item-header.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemHeaderComponent {
   readonly item = input.required<ItemHeader>();

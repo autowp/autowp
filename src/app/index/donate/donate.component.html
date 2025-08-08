@@ -12,31 +12,31 @@
         <div class="progress" style="height: 10px; border-bottom-right-radius: 0; border-bottom-left-radius: 0">
           @for (operation of state.charges; track operation) {
             <div
-              class="progress-bar bg-danger"
-              [style.min-width]="operation.percent + '%'"
-              placement="top"
               ngbTooltip="{{ operation.sum | currency: operation.currency }}, {{ operation.purpose }}, {{
                 operation.date ? (operation.date | timeAgo) : ''
               }}"
+              class="progress-bar bg-danger"
+              placement="top"
+              [style.min-width]="operation.percent + '%'"
             ></div>
           }
           <div
-            class="progress-bar bg-warning"
-            [style.width]="state.monthlyChargePercent + '%'"
-            placement="top"
             ngbTooltip="{{ state.monthlyCharge | currency: 'EUR' }} required for the next month"
+            class="progress-bar bg-warning"
+            placement="top"
+            [style.width]="state.monthlyChargePercent + '%'"
           ></div>
         </div>
         <div class="progress mb-4" style="height: 30px; border-top-right-radius: 0; border-top-left-radius: 0">
-          @for (operation of state.donations; track operation; let i = $index) {
+          @for (operation of state.donations; track operation) {
             <div
-              class="progress-bar"
-              [style.background-color]="i % 2 ? '#28a745' : 'rgb(97, 202, 91)'"
-              [style.width]="operation.percent + '%'"
-              placement="top"
               ngbTooltip="{{ operation.sum | currency: operation.currency }} by {{ operation.contributor }}, {{
                 operation.date ? (operation.date | timeAgo) : ''
               }}"
+              class="progress-bar"
+              placement="top"
+              [style.background-color]="$odd ? '#28a745' : 'rgb(97, 202, 91)'"
+              [style.width]="operation.percent + '%'"
             ></div>
           }
         </div>

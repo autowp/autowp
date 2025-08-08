@@ -11,10 +11,10 @@ import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rx
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-articles-article',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './article.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticlesArticleComponent {
   readonly #router = inject(Router);

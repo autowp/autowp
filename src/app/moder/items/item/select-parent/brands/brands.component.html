@@ -1,18 +1,18 @@
 <div class="card card-body">
   <input
-    type="text"
     #brandsSearch
-    (input)="doSearch(brandsSearch.value)"
+    type="text"
     class="form-control mb-4"
     placeholder="Type to search …"
     i18n-placeholder
+    (input)="doSearch(brandsSearch.value)"
   />
   @if (brands$ | async; as response) {
     <div class="row">
       @for (chunk of response.items; track chunk) {
         <div class="col-2">
           @for (item of chunk; track item.id) {
-            <a href="" (click)="onSelect(item.id)" [innerHTML]="item.nameHtml"></a>
+            <a href="" [innerHTML]="item.nameHtml" (click)="onSelect(item.id)"></a>
             <br />
           }
         </div>

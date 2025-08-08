@@ -10,10 +10,10 @@ import {EMPTY} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgClass, NgStyle, NgbPopover, AsyncPipe],
   selector: 'app-brands-item',
+  imports: [RouterLink, NgClass, NgStyle, NgbPopover, AsyncPipe],
   templateUrl: './item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BrandsItemComponent {
   readonly #itemsClient = inject(ItemsClient);

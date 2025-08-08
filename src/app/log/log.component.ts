@@ -27,10 +27,10 @@ import {ToastsService} from '../toasts/toasts.service';
 import {UserComponent} from '../user/user/user.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, AsyncPipe, DatePipe, TimeAgoPipe],
   selector: 'app-log',
+  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, AsyncPipe, DatePipe, TimeAgoPipe],
   templateUrl: './log.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LogComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

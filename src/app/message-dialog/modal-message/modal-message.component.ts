@@ -6,10 +6,10 @@ import {MessageService} from '@services/message';
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ReactiveFormsModule],
   selector: 'app-modal-message',
+  imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './modal-message.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModalMessageComponent {
   protected readonly activeModal = inject(NgbActiveModal);

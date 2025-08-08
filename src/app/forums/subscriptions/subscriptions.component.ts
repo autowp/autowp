@@ -12,10 +12,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {ForumsTopicListComponent} from '../topic-list/topic-list.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ForumsTopicListComponent, PaginatorComponent, AsyncPipe],
   selector: 'app-forums-subscriptions',
+  imports: [ForumsTopicListComponent, PaginatorComponent, AsyncPipe],
   templateUrl: './subscriptions.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForumsSubscriptionsComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

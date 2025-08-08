@@ -36,10 +36,16 @@
           <td [textContent]="item.ip"></td>
           <td [textContent]="item.description"></td>
           <td>
-            <a [href]="'http://nic.ru/whois/?query=' + item.ip" i18n>whois</a>
+            <a i18n [href]="'http://nic.ru/whois/?query=' + item.ip">whois</a>
           </td>
           <td>
-            <button class="btn btn-danger" (click)="deleteItem(item)" style="margin: 0" aria-label="Delete">
+            <button
+              type="button"
+              class="btn btn-danger"
+              style="margin: 0"
+              aria-label="Delete"
+              (click)="deleteItem(item)"
+            >
               <i class="bi bi-x" aria-hidden="true"></i>
             </button>
           </td>

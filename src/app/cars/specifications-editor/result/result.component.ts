@@ -9,10 +9,10 @@ import {EMPTY} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AsyncPipe],
   selector: 'app-cars-specifications-editor-result',
+  imports: [AsyncPipe],
   templateUrl: './result.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsSpecificationsEditorResultComponent {
   readonly #attrsClient = inject(AttrsClient);

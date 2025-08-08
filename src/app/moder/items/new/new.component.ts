@@ -22,10 +22,10 @@ import {
 } from '../item-meta-form/item-meta-form.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe, ItemMetaFormComponent],
   selector: 'app-moder-items-new',
+  imports: [RouterLink, AsyncPipe, ItemMetaFormComponent],
   templateUrl: './new.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsNewComponent {
   readonly #itemService = inject(ItemService);

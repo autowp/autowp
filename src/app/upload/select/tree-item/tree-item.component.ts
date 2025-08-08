@@ -18,10 +18,10 @@ import {catchError, map, switchMap} from 'rxjs/operators';
 import {ToastsService} from '../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-upload-select-tree-item',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './tree-item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadSelectTreeItemComponent {
   readonly #toastService = inject(ToastsService);

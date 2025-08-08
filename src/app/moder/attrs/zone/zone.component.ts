@@ -11,10 +11,10 @@ import {APIAttrsService, AttrAttributeTreeItem} from '../../../api/attrs/attrs.s
 import {ModerAttrsZoneAttributeListComponent} from './attribute-list/attribute-list.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, ModerAttrsZoneAttributeListComponent, AsyncPipe],
   selector: 'app-moder-attrs-zone',
+  imports: [RouterLink, ModerAttrsZoneAttributeListComponent, AsyncPipe],
   templateUrl: './zone.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerAttrsZoneComponent {
   readonly #attrsService = inject(APIAttrsService);

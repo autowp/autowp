@@ -42,9 +42,9 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
       <li class="nav-item">
         <a
           routerLink="/cars/specifications-editor"
+          class="nav-link"
           [queryParams]="{item_id: item.id, tab: 'info'}"
           [class.active]="tab === 'info'"
-          class="nav-link"
         >
           <span class="bi bi-info" aria-hidden="true"></span>
           <ng-container i18n>Info</ng-container>
@@ -54,9 +54,9 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
         <li class="nav-item">
           <a
             routerLink="/cars/specifications-editor"
+            class="nav-link"
             [queryParams]="{item_id: item.id, tab: 'engine'}"
             [class.active]="tab === 'engine'"
-            class="nav-link"
           >
             <span class="glyphicon glyphicon-align-left"></span>
             <ng-container i18n>Engine</ng-container>
@@ -69,9 +69,9 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
       <li class="nav-item">
         <a
           routerLink="/cars/specifications-editor"
+          class="nav-link"
           [queryParams]="{item_id: item.id, tab: 'spec'}"
           [class.active]="tab === 'spec'"
-          class="nav-link"
         >
           <span class="bi bi-car-front" aria-hidden="true"></span>
           <ng-container i18n>Specifications</ng-container>
@@ -81,9 +81,9 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
         <li class="nav-item">
           <a
             routerLink="/cars/specifications-editor"
+            class="nav-link"
             [queryParams]="{item_id: item.id, tab: 'result'}"
             [class.active]="tab === 'result'"
-            class="nav-link"
           >
             <span class="bi bi-table" aria-hidden="true"></span>
             <ng-container i18n>Result</ng-container>
@@ -93,9 +93,9 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
           <li class="nav-item">
             <a
               routerLink="/cars/specifications-editor"
+              class="nav-link"
               [queryParams]="{item_id: item.id, tab: 'admin'}"
               [class.active]="tab === 'admin'"
-              class="nav-link"
             >
               <span class="bi bi-table" aria-hidden="true"></span>
               <ng-container i18n>Admin</ng-container>
@@ -139,10 +139,12 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
       } @else if (tab === 'admin' && (isSpecsAdmin$ | async)) {
         <div class="tab-pane active" id="admin">
           <p>
-            <a routerLink="/cars/specs-admin" [queryParams]="{item_id: item.id}" i18n>Admin</a>
+            <a routerLink="/cars/specs-admin" i18n [queryParams]="{item_id: item.id}">Admin</a>
           </p>
           <div>
-            <button class="btn btn-secondary" (click)="refreshInheritance(item)" i18n>Refresh inheritance</button>
+            <button type="button" class="btn btn-secondary" i18n (click)="refreshInheritance(item)">
+              Refresh inheritance
+            </button>
           </div>
         </div>
       }

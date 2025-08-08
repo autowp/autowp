@@ -15,10 +15,10 @@ const translateNames = (types: VehicleType[]): VehicleType[] => {
 };
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AsyncPipe],
   selector: 'app-vehicle-types-modal',
+  imports: [AsyncPipe],
   templateUrl: './vehicle-types-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VehicleTypesModalComponent {
   protected readonly activeModal = inject(NgbActiveModal);

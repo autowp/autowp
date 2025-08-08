@@ -17,10 +17,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, UserComponent, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
   selector: 'app-account-contacts',
+  imports: [RouterLink, UserComponent, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
   templateUrl: './contacts.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountContactsComponent implements OnInit {
   readonly #contactsService = inject(ContactsService);

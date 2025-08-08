@@ -1,11 +1,11 @@
 <div class="modal-header">
   <h3 class="modal-title" i18n>Custom reason</h3>
-  <button class="btn-close" (click)="activeModal.dismiss()"></button>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
 </div>
 <div class="modal-body">
   <div class="mb-3">
     <label for="reason">Reason</label>
-    <input maxlength="50" id="reason" required name="reason" [(ngModel)]="reason" class="form-control" />
+    <input maxlength="50" id="reason" required name="reason" class="form-control" [(ngModel)]="reason" />
   </div>
   <div class="checkbox">
     <label>
@@ -15,14 +15,14 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" (click)="activeModal.dismiss()" class="btn btn-secondary" i18n>Cancel</button>
+  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Cancel</button>
   <button
     type="button"
-    (click)="ok()"
     class="btn"
+    i18n
     [class.btn-danger]="vote() < 0"
     [class.btn-success]="vote() > 0"
-    i18n
+    (click)="ok()"
   >
     Send
   </button>

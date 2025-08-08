@@ -3,7 +3,7 @@
     <h5 [textContent]="item.name"></h5>
     @if (item.image) {
       <p>
-        <img alt="" [src]="item.image.src" style="max-width: 100%" />
+        <img alt="" style="max-width: 100%" [src]="item.image.src" />
       </p>
     }
     <p class="details">

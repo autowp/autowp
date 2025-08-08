@@ -12,7 +12,8 @@
   "private": true,
   "overrides": {
     "@angular/common": "$@angular/common",
-    "@angular/core": "$@angular/core"
+    "@angular/core": "$@angular/core",
+    "rxjs": "$rxjs"
   },
   "dependencies": {
     "@angular-devkit/architect": "^0.2001.3",
@@ -98,7 +99,7 @@
     "prettier-eslint": "^16.1.1",
     "showdown": "^2.1.0",
     "stylelint": "^16.2.1",
-    "stylelint-config-standard": "^38",
+    "stylelint-config-standard": "^39",
     "stylelint-config-standard-scss": "^14 || ^15",
     "ts-node": "^10.9.1",
     "typescript-eslint": "^8.19.1"

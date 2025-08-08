@@ -30,10 +30,10 @@ import {ToastsService} from '../../../../toasts/toasts.service';
 import {CarsSelectEngineTreeItemComponent} from './tree-item/tree-item.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, CarsSelectEngineTreeItemComponent, FormsModule, PaginatorComponent, AsyncPipe],
   selector: 'app-cars-engine-select',
+  imports: [RouterLink, CarsSelectEngineTreeItemComponent, FormsModule, PaginatorComponent, AsyncPipe],
   templateUrl: './select.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsEngineSelectComponent {
   readonly #itemsClient = inject(ItemsClient);

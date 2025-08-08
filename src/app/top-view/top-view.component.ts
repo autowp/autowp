@@ -13,10 +13,10 @@ import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-top-view',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './top-view.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopViewComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

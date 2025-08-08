@@ -21,13 +21,13 @@
             @if (!picture.picture) {
               <span>&#xa0;</span>
             } @else if (picture.picture.thumbLarge) {
-              <a [routerLink]="['/picture', picture.picture.identity]" class="d-block rounded mb-4">
+              <a class="d-block rounded mb-4" [routerLink]="['/picture', picture.picture.identity]">
                 <img
+                  class="rounded w-100 border border-light"
+                  loading="lazy"
                   [src]="picture.picture.thumbLarge.src"
                   [alt]="picture.picture.nameText"
                   [title]="picture.picture.nameText"
-                  class="rounded w-100 border border-light"
-                  loading="lazy"
                 />
               </a>
             }
@@ -40,13 +40,13 @@
                 @if (!picture.picture) {
                   <span>&#xa0;</span>
                 } @else if (picture.picture.thumbMedium) {
-                  <a [routerLink]="['/picture', picture.picture.identity]" class="d-block rounded mb-4">
+                  <a class="d-block rounded mb-4" [routerLink]="['/picture', picture.picture.identity]">
                     <img
+                      class="rounded w-100 border border-light"
+                      loading="lazy"
                       [src]="picture.picture.thumbMedium.src"
                       [alt]="picture.picture.nameText"
                       [title]="picture.picture.nameText"
-                      class="rounded w-100 border border-light"
-                      loading="lazy"
                     />
                   </a>
                 }
@@ -63,13 +63,13 @@
             @if (!picture.picture) {
               <span>&#xa0;</span>
             } @else if (picture.picture.thumbMedium) {
-              <a [routerLink]="['/picture', picture.picture.identity]" class="d-block rounded mb-4">
+              <a class="d-block rounded mb-4" [routerLink]="['/picture', picture.picture.identity]">
                 <img
+                  class="rounded w-100 border border-light"
+                  loading="lazy"
                   [src]="picture.picture.thumbMedium.src"
                   [alt]="picture.picture.nameText"
                   [title]="picture.picture.nameText"
-                  class="rounded w-100 border border-light"
-                  loading="lazy"
                 />
               </a>
             }
@@ -83,11 +83,11 @@
           <div class="no-photo rounded w-100 border border-light mb-4" title="No photos available" i18n-title>
             <a
               routerLink="/upload"
-              [queryParams]="{item_id: item.id}"
               title="Add photo"
               i18n-title
               class="bi bi-plus-circle text-success"
               aria-hidden="true"
+              [queryParams]="{item_id: item.id}"
             ></a>
             <span class="bi bi-camera fs-1" aria-hidden="true"></span>
           </div>
@@ -124,13 +124,13 @@
       @if (item.itemTypeId === ItemType.ITEM_TYPE_PERSON) {
         <li class="list-inline-item">
           <i class="bi bi-text-left me-1" aria-hidden="true"></i>
-          <a [routerLink]="['/persons', item.id]" i18n>details</a>
+          <a i18n [routerLink]="['/persons', item.id]">details</a>
         </li>
       }
       @for (twinsGroup of item.twins; track twinsGroup.id) {
         <li class="list-inline-item">
           <i class="bi bi-circle-half me-1" aria-hidden="true"></i>
-          <a [routerLink]="['/twins/group', twinsGroup.id]" i18n>twins</a>
+          <a i18n [routerLink]="['/twins/group', twinsGroup.id]">twins</a>
         </li>
       }
       @for (category of item.categories; track category.id) {
@@ -142,13 +142,13 @@
       @if (isModer$ | async) {
         <li class="list-inline-item">
           <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
-          <a [routerLink]="['/moder/items/item', item.id]" i18n>edit</a>
+          <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
         </li>
       }
       @if (item.canEditSpecs) {
         <li class="list-inline-item">
           <i class="bi bi-pencil-fill me-1" aria-hidden="true"></i>
-          <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id}" i18n>edit specs</a>
+          <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
         </li>
       }
     </ul>

@@ -3,9 +3,9 @@
   placeholder="Latitude"
   i18n-placeholder
   class="form-control"
-  (input)="coordsChanged()"
-  [(ngModel)]="lat"
   [disabled]="disabled"
+  [(ngModel)]="lat"
+  (input)="coordsChanged()"
 />
 <!--[class.is-invalid]="lat.invalid && (lat.dirty || lat.touched) || invalidParams && invalidParams.lat"-->
 <input
@@ -13,9 +13,9 @@
   placeholder="Longitude"
   i18n-placeholder
   class="form-control"
-  (input)="coordsChanged()"
-  [(ngModel)]="lng"
   [disabled]="disabled"
+  [(ngModel)]="lng"
+  (input)="coordsChanged()"
 />
 <!--[class.is-invalid]="lng.invalid && (lng.dirty || lng.touched) || invalidParams && invalidParams.lng" -->
 <div

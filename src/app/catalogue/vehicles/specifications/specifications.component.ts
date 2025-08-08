@@ -12,10 +12,10 @@ import {map, shareReplay, switchMap, tap} from 'rxjs/operators';
 import {CatalogueService} from '../../catalogue-service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-catalogue-vehicles-specifications',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './specifications.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueVehiclesSpecificationsComponent {
   readonly #pageEnv = inject(PageEnvService);

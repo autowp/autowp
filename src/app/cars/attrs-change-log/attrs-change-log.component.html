@@ -21,15 +21,15 @@
           </ng-template>
           <div class="input-group mb-3">
             <input
-              [ngbTypeahead]="usersDataSource"
               name="user"
+              class="form-control"
+              id="user_id"
+              [ngbTypeahead]="usersDataSource"
               [formControl]="userQuery"
               [inputFormatter]="userFormatter"
-              (selectItem)="userOnSelect($event)"
               [resultTemplate]="userTemplate"
-              class="form-control"
               [class.border-primary]="userID$ | async"
-              id="user_id"
+              (selectItem)="userOnSelect($event)"
             />
             <button
               class="btn btn-outline-secondary"
@@ -94,7 +94,7 @@
             }
           </td>
           <td class="link">
-            <a [routerLink]="['/cars/car-specifications-editor/item_id', row.userValue.itemId]" i18n>to editor</a>
+            <a i18n [routerLink]="['/cars/car-specifications-editor/item_id', row.userValue.itemId]">to editor</a>
           </td>
         </tr>
       }

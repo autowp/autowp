@@ -4,10 +4,10 @@ import {PageEnvService} from '@services/page-env.service';
 import {MarkdownComponent} from '@utils/markdown/markdown.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, MarkdownComponent],
   selector: 'app-telegram',
+  imports: [RouterLink, MarkdownComponent],
   templateUrl: './telegram.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TelegramComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

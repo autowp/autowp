@@ -21,12 +21,12 @@
     <div class="photo">
       @if (message.user$ | async; as user) {
         @if (!user.deleted) {
-          <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]" class="photo">
+          <a class="photo" [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]">
             @if (user.avatar) {
-              <img alt="" [src]="user.avatar.src" class="rounded" loading="lazy" />
+              <img alt="" class="rounded" loading="lazy" [src]="user.avatar.src" />
             }
             @if (user.gravatar && !user.avatar) {
-              <img alt="" [src]="user.gravatar" class="rounded" loading="lazy" />
+              <img alt="" class="rounded" loading="lazy" [src]="user.gravatar" />
             }
           </a>
         }
@@ -76,19 +76,20 @@
           </span>
         }
         @if ((authenticated$ | async) && ((deep$ | async) || 0) < 21 && !message.message.deleted) {
-          <button class="btn btn-sm btn-primary reply" (click)="reply(message.message, false)">
+          <button type="button" class="btn btn-sm btn-primary reply" (click)="reply(message.message, false)">
             <i class="bi bi-reply me-1" aria-hidden="true"></i>
             <span class="d-none d-md-inline" i18n>reply</span>
           </button>
         }
         @if (message.message.moderatorAttention === ModeratorAttention.REQUIRED && (isModer$ | async)) {
-          <button class="btn btn-sm btn-success resolve" (click)="reply(message.message, true)">
+          <button type="button" class="btn btn-sm btn-success resolve" (click)="reply(message.message, true)">
             <i class="bi bi-reply me-1" aria-hidden="true"></i>
             <ng-container i18n>reply & resolve</ng-container>
           </button>
         }
         @if (canRemoveComments$ | async) {
           <button
+            type="button"
             class="btn btn-danger btn-sm float-end comment-remove-button"
             (click)="setIsDeleted(message.message, true)"
           >
@@ -96,6 +97,7 @@
             <span class="d-none d-md-inline" i18n>Delete</span>
           </button>
           <button
+            type="button"
             class="btn btn-success btn-sm float-end comment-restore-button"
             (click)="setIsDeleted(message.message, false)"
           >
@@ -106,8 +108,8 @@
         @if ((typeID$ | async) === 5 && (canMoveMessage$ | async)) {
           <a
             routerLink="/forums/move-message"
-            [queryParams]="{message_id: message.message.id}"
             class="btn btn-secondary btn-sm float-end"
+            [queryParams]="{message_id: message.message.id}"
           >
             <i class="bi bi-arrows-move me-1" aria-hidden="true"></i>
             <span class="d-none d-md-inline" i18n>Move</span>
@@ -117,8 +119,8 @@
           <i
             class="float-end bi bi-eye"
             aria-hidden="true"
-            [ngbTooltip]="message.message.ip"
             style="margin-right: 20px"
+            [ngbTooltip]="message.message.ip"
           ></i>
         }
         @if (message.message.moderatorAttention === ModeratorAttention.REQUIRED) {
@@ -136,18 +138,18 @@
             <app-comments-list
               [itemID]="itemID"
               [typeID]="typeID"
-              (sent)="onSent($event)"
               [messages]="message.message.replies || []"
               [deep]="((deep$ | async) || 0) + 1"
+              (sent)="onSent($event)"
             />
             @if ((authenticated$ | async) && message.message.showReply) {
               <app-comments-form
                 [itemID]="itemID"
                 [typeID]="typeID"
-                (sent)="onSent($event)"
-                (canceled)="onCancel(message.message)"
                 [parentID]="message.message.id"
                 [resolve]="message.message.resolve || false"
+                (sent)="onSent($event)"
+                (canceled)="onCancel(message.message)"
               />
             }
           }

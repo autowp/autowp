@@ -15,10 +15,10 @@ import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc'
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MarkdownComponent, FormsModule, InvalidParamsPipe],
   selector: 'app-account-delete',
+  imports: [MarkdownComponent, FormsModule, InvalidParamsPipe],
   templateUrl: './delete.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountDeleteComponent implements OnInit {
   readonly #router = inject(Router);

@@ -7,11 +7,15 @@
     @if (data.paginator && data.paginator.totalItemCount) {
       @if (folder === 'sent') {
         <div class="mb-4">
-          <button class="btn btn-danger" (click)="clearFolder('sent')" i18n>Delete all sent messages</button>
+          <button type="button" class="btn btn-danger" i18n (click)="clearFolder('sent')">
+            Delete all sent messages
+          </button>
         </div>
       } @else if (folder === 'system') {
         <div class="mb-4">
-          <button class="btn btn-danger" (click)="clearFolder('system')" i18n>Delete all system notifications</button>
+          <button type="button" class="btn btn-danger" i18n (click)="clearFolder('system')">
+            Delete all system notifications
+          </button>
         </div>
       }
     }
@@ -28,10 +32,10 @@
                 @if (!author.deleted) {
                   <a [routerLink]="author.route">
                     @if (author.avatar) {
-                      <img alt="" [src]="author.avatar.src" class="rounded" loading="lazy" />
+                      <img alt="" class="rounded" loading="lazy" [src]="author.avatar.src" />
                     }
                     @if (author.gravatar && !author.avatar) {
-                      <img alt="" [src]="author.gravatar" class="rounded" loading="lazy" />
+                      <img alt="" class="rounded" loading="lazy" [src]="author.gravatar" />
                     }
                   </a>
                 }
@@ -57,7 +61,7 @@
                 <span class="badge text-bg-info text-dark" i18n>new</span>
               }
               @if (message.message.canDelete) {
-                <a href="#" class="float-end" (click)="deleteMessage(message.message.id)" ngPreserveWhitespaces>
+                <a href="#" class="float-end" ngPreserveWhitespaces (click)="deleteMessage(message.message.id)">
                   <i class="bi bi-trash" aria-hidden="true"></i>
                   <ng-container i18n>delete</ng-container>
                 </a>
@@ -65,7 +69,7 @@
               @if (message.message.canReply) {
                 <span ngPreserveWhitespaces>
                   <i class="bi bi-reply" aria-hidden="true"></i>
-                  <a href="#" (click)="openMessageForm(folder, message.message.authorId)" i18n>reply</a>
+                  <a href="#" i18n (click)="openMessageForm(folder, message.message.authorId)">reply</a>
                   &nbsp;
                 </span>
               }
@@ -74,8 +78,8 @@
                   <i class="bi bi-chat-text" aria-hidden="true"></i>
                   <a
                     routerLink="/account/messages"
-                    [queryParams]="{folder: 'dialog', user_id: message.message.dialogWithUserId}"
                     i18n
+                    [queryParams]="{folder: 'dialog', user_id: message.message.dialogWithUserId}"
                     >entire dialog</a
                   >
                   <small>({{ message.message.dialogCount }})</small>

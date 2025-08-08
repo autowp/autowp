@@ -17,7 +17,7 @@ import {ModerItemsItemSelectParentFactoriesComponent} from './factories/factorie
 import {ModerItemsItemSelectParentTwinsComponent} from './twins/twins.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-moder-items-item-select-parent',
   imports: [
     RouterLink,
     ModerItemsItemSelectParentCatalogueComponent,
@@ -27,8 +27,8 @@ import {ModerItemsItemSelectParentTwinsComponent} from './twins/twins.component'
     ModerItemsItemSelectParentFactoriesComponent,
     AsyncPipe,
   ],
-  selector: 'app-moder-items-item-select-parent',
   templateUrl: './select-parent.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemSelectParentComponent implements OnInit {
   readonly #router = inject(Router);

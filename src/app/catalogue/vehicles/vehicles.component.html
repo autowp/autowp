@@ -38,7 +38,7 @@
   @if (isModer$ | async) {
     <p>
       <i class="bi bi-gear-fill" aria-hidden="true"></i>
-      <a [routerLink]="['/moder/items/item', item.id]" i18n>edit</a>
+      <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
       @if (canAddItem$ | async; as canAddItem) {
         @if (canAddItem && item.isGroup) {
           <i class="bi bi-plus" aria-hidden="true"></i>
@@ -106,13 +106,13 @@
     @for (picture of otherPictures.pictures; track picture.id) {
       <div class="col-6 col-lg-3">
         @if (picture && picture.thumbMedium) {
-          <a [routerLink]="otherPictures.routerLink.concat(picture.identity)" class="d-block rounded mb-4">
+          <a class="d-block rounded mb-4" [routerLink]="otherPictures.routerLink.concat(picture.identity)">
             <img
+              class="rounded w-100 border border-light"
+              loading="lazy"
               [src]="picture.thumbMedium.src"
               [alt]="picture.nameText"
               [title]="picture.nameText"
-              class="rounded w-100 border border-light"
-              loading="lazy"
             />
           </a>
         }

@@ -34,7 +34,7 @@
   @if (isModer$ | async) {
     <p>
       <i class="bi bi-gear-fill" aria-hidden="true"></i>
-      <a [routerLink]="['/moder/items/item', item.id]" i18n>edit</a>
+      <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
       @if (canAddItem$ | async; as canAddItem) {
         @if (canAddItem && item.isGroup) {
           <i class="bi bi-plus" aria-hidden="true"></i>
@@ -63,11 +63,11 @@
     </p>
   }
   <app-catalogue-item-menu
+    active="pictures"
     [header]="{nameHTML: item.nameHtml, produced: {count: item.produced?.value || 0, exactly: item.producedExactly}}"
     [itemRouterLink]="(routerLink$ | async) || []"
     [picturesCount]="item.acceptedPicturesCount || 0"
     [childsCounts]="convertChildsCounts(item.childsCounts || [])"
-    [active]="'pictures'"
   />
 } @else {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>

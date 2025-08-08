@@ -6,10 +6,10 @@ import {RouterLink} from '@angular/router';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, ItemHeaderComponent],
   selector: 'app-catalogue-item-menu',
+  imports: [RouterLink, ItemHeaderComponent],
   templateUrl: './item-menu.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueItemMenuComponent {
   readonly itemRouterLink = input.required<string[]>();

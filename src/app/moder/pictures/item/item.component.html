@@ -24,23 +24,23 @@
       <div class="col-md-3">
         @if (picture.siblings.prevNew) {
           <a
+            i18n
             [routerLink]="['/moder/pictures', picture.siblings.prevNew.id]"
             [title]="picture.siblings.prevNew.nameText"
-            i18n
             ><< previous new</a
           >
         }
       </div>
       <div class="col-md-3 text-end">
         @if (picture.siblings.prev) {
-          <a [routerLink]="['/moder/pictures', picture.siblings.prev.id]" [title]="picture.siblings.prev.nameText" i18n
+          <a i18n [routerLink]="['/moder/pictures', picture.siblings.prev.id]" [title]="picture.siblings.prev.nameText"
             ><< previous</a
           >
         }
       </div>
       <div class="col-md-3">
         @if (picture.siblings.next) {
-          <a [routerLink]="['/moder/pictures', picture.siblings.next.id]" [title]="picture.siblings.next.nameText" i18n
+          <a i18n [routerLink]="['/moder/pictures', picture.siblings.next.id]" [title]="picture.siblings.next.nameText"
             >next >></a
           >
         }
@@ -48,9 +48,9 @@
       <div class="col-md-3 text-end">
         @if (picture.siblings.nextNew) {
           <a
+            i18n
             [routerLink]="['/moder/pictures', picture.siblings.nextNew.id]"
             [title]="picture.siblings.nextNew.nameText"
-            i18n
             >next new >></a
           >
         }
@@ -60,7 +60,7 @@
   <div class="row mb-4">
     <div class="col-md-2">
       @if (picture.thumbMedium) {
-        <img alt="" [src]="picture.thumbMedium.src" class="rounded border border-light w-100" />
+        <img alt="" class="rounded border border-light w-100" [src]="picture.thumbMedium.src" />
       }
     </div>
     <div class="col-md-6">
@@ -76,7 +76,7 @@
           </div>
         }
         <div>
-          <a routerLink="/log" [queryParams]="{picture_id: picture.id}" i18n>Log of events</a>
+          <a routerLink="/log" i18n [queryParams]="{picture_id: picture.id}">Log of events</a>
         </div>
         <div>
           <a [routerLink]="['/moder/pictures', picture.id, 'place']">
@@ -172,9 +172,9 @@
                 <td>
                   <div class="btn-group" style="white-space: nowrap">
                     <a
+                      class="btn btn-secondary"
                       [routerLink]="['/moder/pictures', picture.id, 'move']"
                       [queryParams]="{src_item_id: item.itemId, src_type: item.type}"
-                      class="btn btn-secondary"
                     >
                       <i class="bi bi-arrow-right" aria-hidden="true"></i>
                       <ng-container i18n>move to</ng-container> …
@@ -185,13 +185,14 @@
                         ((lastItem.item && !lastItem.hasItem) || (item.itemParentCacheAncestors?.items || []).length)
                       ) {
                         <div class="btn-group" ngbDropdown role="group" placement="bottom-right">
-                          <button class="btn btn-secondary" ngbDropdownToggle>
+                          <button type="button" class="btn btn-secondary" ngbDropdownToggle>
                             <span class="caret" aria-hidden="true"></span>
                             <span class="visually-hidden">Toggle Dropdown</span>
                           </button>
                           <div class="dropdown-menu" ngbDropdownMenu>
                             @if (lastItem.item && !lastItem.hasItem) {
                               <button
+                                type="button"
                                 class="dropdown-item"
                                 (click)="moveItem(picture.id + '', item.type, item.itemId, lastItem.item.id)"
                               >
@@ -226,10 +227,11 @@
                 </td>
                 <td>
                   <button
+                    type="button"
                     class="btn btn-danger"
-                    (click)="deletePictureItem(item)"
                     aria-label="Delete"
                     style="margin: 0"
+                    (click)="deletePictureItem(item)"
                   >
                     <span class="bi bi-x" aria-hidden="true"></span>
                   </button>
@@ -246,7 +248,7 @@
           @if (lastItem.item && !lastItem.hasItem) {
             @if (lastItem.item.itemTypeId !== ItemType.ITEM_TYPE_COPYRIGHT) {
               <div>
-                <button class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 1)">
+                <button type="button" class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 1)">
                   <i class="bi bi-plus" aria-hidden="true"></i>
                   <ng-container i18n>add to</ng-container> (content)
                   <span [innerHTML]="lastItem.item.nameHtml"></span>
@@ -255,7 +257,7 @@
             }
             @if (lastItem.item.itemTypeId === ItemType.ITEM_TYPE_PERSON) {
               <div>
-                <button class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 2)">
+                <button type="button" class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 2)">
                   <i class="bi bi-plus" aria-hidden="true"></i>
                   <ng-container i18n>add to</ng-container> (author)
                   <span [innerHTML]="lastItem.item.nameHtml"></span>
@@ -263,7 +265,7 @@
               </div>
             } @else if (lastItem.item.itemTypeId === ItemType.ITEM_TYPE_COPYRIGHT) {
               <div>
-                <button class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 3)">
+                <button type="button" class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 3)">
                   <i class="bi bi-plus" aria-hidden="true"></i>
                   <ng-container i18n>add to</ng-container> (copyrights)
                   <span [innerHTML]="lastItem.item.nameHtml"></span>
@@ -299,22 +301,22 @@
                       type="number"
                       name="taken_year"
                       id="taken_year"
-                      [(ngModel)]="picture.takenDate.year"
                       placeholder="Year"
                       i18n-placeholder
+                      class="form-control"
                       [min]="1800"
                       [max]="2030"
-                      class="form-control"
                       [attr.maxlength]="4"
+                      [(ngModel)]="picture.takenDate.year"
                     />
                   </div>
                   <div class="col-6">
                     <select
                       name="taken_month"
-                      [(ngModel)]="picture.takenDate.month"
                       title="Month"
                       i18n-title
                       class="form-select"
+                      [(ngModel)]="picture.takenDate.month"
                     >
                       @for (month of monthOptions; track month.value) {
                         <option [ngValue]="month.value">{{ month.name }}</option>
@@ -324,10 +326,10 @@
                   <div class="col-3">
                     <select
                       name="taken_day"
-                      [(ngModel)]="picture.takenDate.day"
                       title="Day"
                       i18n-title
                       class="form-select"
+                      [(ngModel)]="picture.takenDate.day"
                     >
                       @for (day of dayOptions; track day.value) {
                         <option [ngValue]="day.value">{{ day.name }}</option>
@@ -356,7 +358,7 @@
             />
           </div>
           <div>
-            <button class="btn btn-primary" (click)="saveSpecialName(picture)" i18n>Submit</button>
+            <button type="button" class="btn btn-primary" i18n (click)="saveSpecialName(picture)">Submit</button>
           </div>
           @if (specialNameLoading()) {
             <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
@@ -376,10 +378,10 @@
   Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*"
           />
           <app-markdown-edit [(text)]="picture.copyrights" />
-          <button class="btn btn-primary" (click)="saveCopyrights(picture)" i18n>Submit</button>
+          <button type="button" class="btn btn-primary" i18n (click)="saveCopyrights(picture)">Submit</button>
           @if (picture.copyrightsTextId) {
             <p>
-              <a [routerLink]="['/info/text', picture.copyrightsTextId]" i18n>History</a>
+              <a i18n [routerLink]="['/info/text', picture.copyrightsTextId]">History</a>
             </p>
           }
           @if (copyrightsLoading()) {
@@ -403,13 +405,13 @@
                 >
               </p>
               @if (picture.rights?.accept) {
-                <button class="btn btn-success" (click)="acceptReplace(picture.id + '')">
+                <button type="button" class="btn btn-success" (click)="acceptReplace(picture.id)">
                   <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
                   <ng-container i18n>Accept and remove double</ng-container>
                 </button>
               }
               @if (picture.rights?.accept) {
-                <button class="btn btn-warning" (click)="cancelReplace(picture.id + '')">
+                <button type="button" class="btn btn-warning" (click)="cancelReplace(picture.id)">
                   <i class="bi bi-x" aria-hidden="true"></i>
                   <ng-container i18n>Cancel replacement</ng-container>
                 </button>
@@ -431,10 +433,10 @@
                 <strong class="badge text-bg-warning text-dark" i18n>Not accepted</strong>
               </p>
               @if (picture.rights?.accept) {
-                <button class="btn btn-success" (click)="acceptPicture(picture.id)" i18n>Accept</button>
+                <button type="button" class="btn btn-success" i18n (click)="acceptPicture(picture.id)">Accept</button>
               }
               @if (picture.rights?.delete) {
-                <button class="btn btn-danger" (click)="deletePicture(picture.id)" i18n>Delete</button>
+                <button type="button" class="btn btn-danger" i18n (click)="deletePicture(picture.id)">Delete</button>
               }
             </div>
           } @else if (picture.status === PictureStatus.PICTURE_STATUS_ACCEPTED) {
@@ -443,7 +445,9 @@
                 <strong class="badge text-bg-success" i18n>Accepted</strong>
               </p>
               @if (picture.rights?.unaccept) {
-                <button class="btn btn-warning" (click)="unacceptPicture(picture.id)" i18n>Unaccept</button>
+                <button type="button" class="btn btn-warning" i18n (click)="unacceptPicture(picture.id)">
+                  Unaccept
+                </button>
               }
             </div>
           } @else if (picture.status === PictureStatus.PICTURE_STATUS_REMOVING) {
@@ -452,7 +456,7 @@
                 <strong class="badge text-bg-danger" i18n>In delete queue</strong>
               </p>
               @if (picture.rights?.restore) {
-                <button class="btn btn-warning" (click)="restorePicture(picture.id)" i18n>Restore</button>
+                <button type="button" class="btn btn-warning" i18n (click)="restorePicture(picture.id)">Restore</button>
               }
             </div>
           } @else if (picture.status === PictureStatus.PICTURE_STATUS_REMOVED) {
@@ -484,16 +488,22 @@
             <div>
               @if (picture.rights?.normalize) {
                 <button
+                  type="button"
                   class="btn btn-warning"
-                  (click)="normalizePicture('' + picture.id)"
                   [disabled]="repairLoading()"
+                  (click)="normalizePicture(picture.id)"
                 >
                   <i class="bi bi-reception-4" aria-hidden="true"></i>
                   <ng-container i18n>Normalize</ng-container>
                 </button>
               }
               @if (picture.rights?.flop) {
-                <button class="btn btn-warning" (click)="flopPicture('' + picture.id)" [disabled]="repairLoading()">
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  [disabled]="repairLoading()"
+                  (click)="flopPicture(picture.id)"
+                >
                   <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
                   <ng-container i18n>Flop</ng-container>
                 </button>
@@ -510,11 +520,21 @@
               }
             </div>
             <div>
-              <button class="btn btn-secondary" (click)="repairPicture(picture.id + '')" [disabled]="repairLoading()">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                [disabled]="repairLoading()"
+                (click)="repairPicture(picture.id)"
+              >
                 <i class="bi bi-wrench" aria-hidden="true"></i>
                 <ng-container i18n>Repair all files</ng-container>
               </button>
-              <button class="btn btn-secondary" (click)="correctFileNames(picture.id)" [disabled]="repairLoading()">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                [disabled]="repairLoading()"
+                (click)="correctFileNames(picture.id)"
+              >
                 <i class="bi bi-wrench" aria-hidden="true"></i>
                 <ng-container i18n>Rebuild files names</ng-container>
               </button>
@@ -530,16 +550,18 @@
             @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
               <p class="alert alert-warning" role="alert" ngPreserveWhitespaces>
                 <span class="bi bi-file-earmark-image" aria-hidden="true"></span>
-                <a [routerLink]="['/moder/pictures', dfDistance.dstPictureId]" i18n
+                <a i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
                   >Similar picture: {{ dfDistance.distance }}</a
                 >
               </p>
               <p>
                 <a [routerLink]="['/moder/pictures', dfDistance.dstPictureId]">
-                  <img alt="" [src]="dfDistance.dstPicture?.thumbMedium?.src" class="rounded border border-light" />
+                  <img alt="" class="rounded border border-light" [src]="dfDistance.dstPicture?.thumbMedium?.src" />
                 </a>
               </p>
-              <button (click)="cancelSimilar(dfDistance)" class="btn btn-warning">That is not similar</button>
+              <button type="button" class="btn btn-warning" (click)="cancelSimilar(dfDistance)">
+                That is not similar
+              </button>
             }
             @if (similarLoading()) {
               <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
@@ -574,13 +596,15 @@
                   </p>
                 }
                 @if (ip.blacklist && ip.rights?.removeFromBlacklist) {
-                  <button class="btn btn-success" (click)="removeFromBlacklist(ip.address)" i18n>unban</button>
+                  <button type="button" class="btn btn-success" i18n (click)="removeFromBlacklist(ip.address)">
+                    unban
+                  </button>
                 }
                 @if (!ip.blacklist && ip.rights?.addToBlacklist) {
                   <form class="form-vertical">
                     <div class="mb-3">
                       <label i18n for="period">For period</label>
-                      <select [(ngModel)]="banPeriod" name="period" id="period" class="form-select" required>
+                      <select name="period" id="period" class="form-select" required [(ngModel)]="banPeriod">
                         @for (period of banPeriods; track period.value) {
                           <option [value]="period.value">{{ period.name }}</option>
                         }
@@ -588,9 +612,9 @@
                     </div>
                     <div class="mb-3">
                       <label i18n for="reason">Reason</label>
-                      <input maxlength="50" class="form-control" [(ngModel)]="banReason" name="reason" id="reason" />
+                      <input maxlength="50" class="form-control" name="reason" id="reason" [(ngModel)]="banReason" />
                     </div>
-                    <button class="btn btn-danger" (click)="addToBlacklist(picture.ip)" i18n>Ban</button>
+                    <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(picture.ip)">Ban</button>
                   </form>
                 }
               </div>

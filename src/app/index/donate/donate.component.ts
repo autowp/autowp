@@ -16,11 +16,11 @@ const rates: Record<string, number> = {
 };
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgbTooltip, AsyncPipe, CurrencyPipe, TimeAgoPipe],
   selector: 'app-index-donate',
-  styleUrls: ['./donate.component.scss'],
+  imports: [NgbTooltip, AsyncPipe, CurrencyPipe, TimeAgoPipe],
   templateUrl: './donate.component.html',
+  styleUrl: './donate.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexDonateComponent {
   protected readonly languageService = inject(LanguageService);

@@ -21,7 +21,7 @@
 @if (factory$ | async; as factory) {
   <ul class="nav nav-pills mb-3">
     <a class="nav-link" [routerLink]="['/factories', factory.id]" [innerHTML]="factory.nameHtml"></a>
-    <a class="nav-link active" [routerLink]="['/factories', factory.id, 'items']" i18n>Products</a>
+    <a class="nav-link active" i18n [routerLink]="['/factories', factory.id, 'items']">Products</a>
     @if (isModer$ | async) {
       <a class="nav-link" [routerLink]="['/moder/items/item', factory.id]">
         <i class="bi bi-gear-fill" aria-hidden="true"></i>

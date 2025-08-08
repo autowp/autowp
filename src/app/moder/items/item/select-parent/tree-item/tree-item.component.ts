@@ -18,10 +18,11 @@ import {ToastsService} from '../../../../../toasts/toasts.service';
 import {ModerItemsItemSelectParentTreeComponent} from '../tree/tree.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [forwardRef(() => ModerItemsItemSelectParentTreeComponent), AsyncPipe],
   selector: 'app-moder-items-item-select-parent-tree-item',
+  // eslint-disable-next-line @angular-eslint/no-forward-ref
+  imports: [forwardRef(() => ModerItemsItemSelectParentTreeComponent), AsyncPipe],
   templateUrl: './tree-item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemSelectParentTreeItemComponent {
   readonly #toastService = inject(ToastsService);
@@ -38,7 +39,7 @@ export class ModerItemsItemSelectParentTreeItemComponent {
   readonly typeID = input<ItemParentType>(ItemParentType.ITEM_TYPE_DEFAULT);
   readonly selected = output<string>();
 
-  protected open = signal(false);
+  protected readonly open = signal(false);
 
   protected readonly childs$: Observable<ItemParent[]> = combineLatest([
     this.item$,

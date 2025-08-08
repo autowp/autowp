@@ -29,10 +29,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {UploadSelectTreeItemComponent} from './tree-item/tree-item.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink, PaginatorComponent, UploadSelectTreeItemComponent, AsyncPipe, ReactiveFormsModule],
   selector: 'app-upload-select',
+  imports: [FormsModule, RouterLink, PaginatorComponent, UploadSelectTreeItemComponent, AsyncPipe, ReactiveFormsModule],
   templateUrl: './select.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadSelectComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

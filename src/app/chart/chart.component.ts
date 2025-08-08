@@ -15,11 +15,11 @@ import {catchError, map} from 'rxjs/operators';
 import {ToastsService} from '../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, BaseChartDirective, AsyncPipe],
-  providers: [provideCharts(withDefaultRegisterables())],
   selector: 'app-chart',
+  imports: [RouterLink, BaseChartDirective, AsyncPipe],
   templateUrl: './chart.component.html',
+  providers: [provideCharts(withDefaultRegisterables())],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChartComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

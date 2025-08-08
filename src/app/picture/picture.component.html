@@ -37,12 +37,12 @@
           <span
             tabindex="0"
             class="d-block rounded mb-4"
+            style="cursor: pointer"
             (auxclick)="openSource(picture)"
             (click)="openGallery(picture, $event)"
             (keyup.enter)="openGallery(picture, $event)"
-            style="cursor: pointer"
           >
-            <img alt="" class="rounded border border-light w-100" [src]="picture.previewLarge.src" loading="lazy" />
+            <img alt="" class="rounded border border-light w-100" loading="lazy" [src]="picture.previewLarge.src" />
           </span>
           @if (pictureItems$ | async; as pictureItems) {
             @if (pictureItems.length === 1) {
@@ -192,12 +192,12 @@
       @for (pictureItem of contentItems$ | async; track pictureItem.itemId) {
         @if (pictureItem.item; as item) {
           @if (item.description) {
-            <app-markdown [markdown]="item.description" style="margin-bottom: 10px" />
+            <app-markdown style="margin-bottom: 10px" [markdown]="item.description" />
           }
           @if (item.hasText && item.route) {
             <p>
               <i class="bi bi-text-left" aria-hidden="true"></i>
-              <a [routerLink]="item.route" i18n>details</a>
+              <a i18n [routerLink]="item.route">details</a>
             </p>
           }
         }
@@ -241,23 +241,10 @@
         @if (takenDate$ | async; as takenDate) {
           <li><ng-container i18n>Date taken:</ng-container> {{ takenDate.date | date: takenDate.format }}</li>
         }
-        @if (picture.point) {
+        @if (osmURL(); as osmURL) {
           <li>
             <span class="bi bi-pin-map" aria-hidden="true"></span>
-            <a
-              [href]="
-                'https://www.openstreetmap.org/?mlat=' +
-                picture.point.latitude +
-                '&mlon=' +
-                picture.point.longitude +
-                '#map=6/' +
-                picture.point.latitude +
-                '/' +
-                picture.point.longitude
-              "
-              i18n="@@picture/location"
-              >Coordinates</a
-            >
+            <a i18n="@@picture/location" [href]="osmURL">Coordinates</a>
           </li>
         }
         <li>
@@ -282,7 +269,7 @@
       <ul class="unstyled">
         @for (link of links$ | async; track link) {
           <li>
-            <a [href]="link.url" target="_blank"><i class="bi bi-globe" aria-hidden="true"></i> {{ link.name }}</a>
+            <a target="_blank" [href]="link.url"><i class="bi bi-globe" aria-hidden="true"></i> {{ link.name }}</a>
           </li>
         }
         @for (category of categories$ | async; track category.id) {
@@ -347,7 +334,7 @@
           @if (contentItems$ | async; as items) {
             @if (items.length > 1) {
               <li ngbDropdown>
-                <button ngbDropdownToggle class="btn btn-link" style="padding: 0">
+                <button type="button" ngbDropdownToggle class="btn btn-link" style="padding: 0">
                   <ng-container i18n>Add picture</ng-container>
                   <span class="caret" aria-hidden="true"></span>
                 </button>
@@ -433,22 +420,26 @@
               @if (picture.status === PictureStatus.PICTURE_STATUS_INBOX) {
                 <div>
                   @if (picture.rights.accept) {
-                    <button class="btn btn-success" (click)="acceptPicture(picture)" i18n>Accept</button>
+                    <button type="button" class="btn btn-success" i18n (click)="acceptPicture(picture)">Accept</button>
                   }
                   @if (picture.rights.delete) {
-                    <button class="btn btn-danger" (click)="deletePicture(picture)" i18n>Delete</button>
+                    <button type="button" class="btn btn-danger" i18n (click)="deletePicture(picture)">Delete</button>
                   }
                 </div>
               } @else if (picture.status === PictureStatus.PICTURE_STATUS_ACCEPTED) {
                 <div>
                   @if (picture.rights.unaccept) {
-                    <button class="btn btn-warning" (click)="unacceptPicture(picture)" i18n>Unaccept</button>
+                    <button type="button" class="btn btn-warning" i18n (click)="unacceptPicture(picture)">
+                      Unaccept
+                    </button>
                   }
                 </div>
               } @else if (picture.status === PictureStatus.PICTURE_STATUS_REMOVING) {
                 <div>
                   @if (picture.rights.restore) {
-                    <button class="btn btn-warning" (click)="restorePicture(picture)" i18n>Restore</button>
+                    <button type="button" class="btn btn-warning" i18n (click)="restorePicture(picture)">
+                      Restore
+                    </button>
                   }
                 </div>
               }
@@ -477,7 +468,7 @@
           <div class="col-md-4">
             <p>
               <i class="bi bi-gear-fill" aria-hidden="true"></i>
-              <a [routerLink]="['/moder/pictures', picture.id]" i18n>Edit picture №{{ picture.id }}</a>
+              <a i18n [routerLink]="['/moder/pictures', picture.id]">Edit picture №{{ picture.id }}</a>
             </p>
             @if (pictureItems$ | async; as items) {
               @for (item of items; track item.itemId) {

@@ -14,10 +14,10 @@ import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component'
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PaginatorComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-account-inbox-pictures',
+  imports: [PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './inbox-pictures.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountInboxPicturesComponent implements OnInit {
   readonly #auth = inject(AuthService);

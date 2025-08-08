@@ -24,8 +24,8 @@
                   }
                   @for (child of item.childs; track child) {
                     <a
-                      [routerLink]="child.routerLink"
                       class="dropdown-item"
+                      [routerLink]="child.routerLink"
                       [class.active]="child.active"
                       [innerHTML]="child.nameHtml"
                     ></a>
@@ -55,7 +55,7 @@
         @if (isModer$ | async) {
           <p class="mb-4">
             <i class="bi bi-gear-fill" aria-hidden="true"></i>
-            <a [routerLink]="['/moder/items/item', current.id]" i18n>edit</a>
+            <a i18n [routerLink]="['/moder/items/item', current.id]">edit</a>
             @if (canAddCar$ | async) {
               <span>
                 <i class="bi bi-plus" aria-hidden="true"></i>
@@ -80,7 +80,7 @@
         </a>
       </li>
     </ul>
-    <router-outlet></router-outlet>
+    <router-outlet />
   </div>
 } @else {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>

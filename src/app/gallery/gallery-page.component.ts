@@ -8,10 +8,10 @@ import {distinctUntilChanged, map} from 'rxjs/operators';
 import {GalleryComponent} from './gallery.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [GalleryComponent, AsyncPipe],
   selector: 'app-gallery-page',
+  imports: [GalleryComponent, AsyncPipe],
   templateUrl: './gallery-page.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GalleryPageComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

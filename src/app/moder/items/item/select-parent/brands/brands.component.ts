@@ -12,10 +12,10 @@ import {PaginatorComponent} from '../../../../../paginator/paginator/paginator.c
 import {ToastsService} from '../../../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PaginatorComponent, AsyncPipe],
   selector: 'app-moder-items-item-select-parent-brands',
+  imports: [PaginatorComponent, AsyncPipe],
   templateUrl: './brands.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemSelectParentBrandsComponent {
   readonly #route = inject(ActivatedRoute);

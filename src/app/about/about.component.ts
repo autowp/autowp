@@ -81,11 +81,11 @@ You can support our project by [finances](/donate) or [moral](/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.`;
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
-  providers: [BytesPipe],
   selector: 'app-about',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './about.component.html',
+  providers: [BytesPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent implements OnInit {
   readonly #userService = inject(UserService);

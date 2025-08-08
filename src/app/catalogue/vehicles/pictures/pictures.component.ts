@@ -30,7 +30,7 @@ import {Breadcrumbs, CatalogueService, convertChildsCounts} from '../../catalogu
 import {CatalogueItemMenuComponent} from '../../item-menu/item-menu.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-catalogue-vehicles-pictures',
   imports: [
     RouterLink,
     ItemHeaderComponent,
@@ -39,8 +39,8 @@ import {CatalogueItemMenuComponent} from '../../item-menu/item-menu.component';
     AsyncPipe,
     ThumbnailComponent,
   ],
-  selector: 'app-catalogue-vehicles-pictures',
   templateUrl: './pictures.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueVehiclesPicturesComponent {
   readonly #pageEnv = inject(PageEnvService);

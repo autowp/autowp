@@ -9,9 +9,9 @@
           <app-comments-list
             [itemID]="itemID"
             [typeID]="typeID"
-            (sent)="onSent($event)"
             [messages]="data.messages"
             [deep]="0"
+            (sent)="onSent($event)"
           />
         }
         @if (data.paginator) {

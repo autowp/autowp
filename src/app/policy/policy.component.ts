@@ -3,10 +3,10 @@ import {RouterLink} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
   selector: 'app-policy',
+  imports: [RouterLink],
   templateUrl: './policy.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PolicyComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

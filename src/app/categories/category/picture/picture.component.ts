@@ -24,10 +24,10 @@ import {PictureComponent} from '../../../picture/picture.component';
 import {CategoriesService} from '../../service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommentsComponent, AsyncPipe, PictureComponent],
   selector: 'app-category-picture',
+  imports: [CommentsComponent, AsyncPipe, PictureComponent],
   templateUrl: './picture.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryPictureComponent {
   readonly #route = inject(ActivatedRoute);

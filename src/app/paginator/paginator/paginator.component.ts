@@ -3,10 +3,10 @@ import {RouterLink} from '@angular/router';
 import {Pages} from '@grpc/spec.pb';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
   selector: 'app-paginator',
+  imports: [RouterLink],
   templateUrl: './paginator.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaginatorComponent {
   readonly data = input.required<Pages>();

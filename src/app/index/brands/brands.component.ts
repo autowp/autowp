@@ -9,11 +9,11 @@ import {map} from 'rxjs/operators';
 import {IndexBrandsBrandComponent} from './brand/brand.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, IndexBrandsBrandComponent, AsyncPipe],
   selector: 'app-index-brands',
-  styleUrls: ['./brands.component.scss'],
+  imports: [RouterLink, IndexBrandsBrandComponent, AsyncPipe],
   templateUrl: './brands.component.html',
+  styleUrl: './brands.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexBrandsComponent {
   readonly #items = inject(ItemsClient);

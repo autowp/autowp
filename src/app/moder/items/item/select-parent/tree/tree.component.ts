@@ -10,10 +10,10 @@ import {switchMap} from 'rxjs/operators';
 import {ModerItemsItemSelectParentTreeItemComponent} from '../tree-item/tree-item.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ModerItemsItemSelectParentTreeItemComponent, AsyncPipe],
   selector: 'app-moder-items-item-select-parent-tree',
+  imports: [ModerItemsItemSelectParentTreeItemComponent, AsyncPipe],
   templateUrl: './tree.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemSelectParentTreeComponent {
   readonly #itemsClient = inject(ItemsClient);

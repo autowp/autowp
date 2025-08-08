@@ -7,11 +7,11 @@ import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {MarkdownComponent} from '@utils/markdown/markdown.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe],
   selector: 'app-twins-item',
-  styleUrls: ['./styles.scss'],
+  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe],
   templateUrl: './item.component.html',
+  styleUrl: './styles.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TwinsItemComponent {
   readonly #auth = inject(AuthService);

@@ -3,14 +3,14 @@
     <div>
       <p ngPreserveWhitespaces>
         @if (data.previous) {
-          <a routerLink="." [queryParams]="{page: data.previous}" queryParamsHandling="merge"
+          <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.previous}"
             >←<ng-container i18n>previous</ng-container></a
           >
         } @else {
           <span>←<ng-container i18n>previous</ng-container></span>
         }
         @if (data.next) {
-          <a routerLink="." [queryParams]="{page: data.next}" queryParamsHandling="merge"
+          <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.next}"
             ><ng-container i18n>next</ng-container>→</a
           >
         } @else {
@@ -19,7 +19,7 @@
       </p>
       <p ngPreserveWhitespaces>
         @if (data.first < data.firstPageInRange) {
-          <a routerLink="." [queryParams]="{page: data.first}" queryParamsHandling="merge">{{ padd(data.first) }}</a>
+          <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.first}">{{ padd(data.first) }}</a>
         }
         @if (data.first < data.firstPageInRange - 1) {
           <span>…</span>
@@ -27,7 +27,7 @@
         @for (page of pagesInRange(); track page) {
           <span>
             @if (page !== data.current) {
-              <a routerLink="." [queryParams]="{page: page}" queryParamsHandling="merge" [textContent]="padd(page)"></a>
+              <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: page}" [textContent]="padd(page)"></a>
             }
             @if (page === data.current) {
               <strong style="font-size: 20px; margin: 0 3px" [textContent]="padd(page)"></strong>
@@ -38,7 +38,7 @@
           <span>…</span>
         }
         @if (data.last > data.lastPageInRange) {
-          <a routerLink="." [queryParams]="{page: data.last}" queryParamsHandling="merge">{{ padd(data.last) }}</a>
+          <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.last}">{{ padd(data.last) }}</a>
         }
       </p>
     </div>

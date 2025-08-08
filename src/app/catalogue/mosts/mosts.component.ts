@@ -11,10 +11,10 @@ import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} fr
 import {MostsContentsComponent} from '../../mosts/contents/contents.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, MostsContentsComponent, AsyncPipe],
   selector: 'app-catalogue-mosts',
+  imports: [RouterLink, MostsContentsComponent, AsyncPipe],
   templateUrl: './mosts.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueMostsComponent {
   readonly #route = inject(ActivatedRoute);

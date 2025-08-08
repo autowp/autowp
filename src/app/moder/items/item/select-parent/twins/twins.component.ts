@@ -24,10 +24,10 @@ import {ToastsService} from '../../../../../toasts/toasts.service';
 import {ModerItemsItemSelectParentTreeItemComponent} from '../tree-item/tree-item.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, ModerItemsItemSelectParentTreeItemComponent, AsyncPipe],
   selector: 'app-moder-items-item-select-parent-twins',
+  imports: [RouterLink, PaginatorComponent, ModerItemsItemSelectParentTreeItemComponent, AsyncPipe],
   templateUrl: './twins.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemSelectParentTwinsComponent {
   readonly #route = inject(ActivatedRoute);

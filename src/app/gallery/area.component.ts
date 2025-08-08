@@ -4,11 +4,11 @@ import {PictureItem} from '@grpc/spec.pb';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgStyle, NgbTooltip],
   selector: 'app-gallery-carousel-item-area',
-  styleUrls: ['./area.component.scss'],
+  imports: [NgStyle, NgbTooltip],
   templateUrl: './area.component.html',
+  styleUrl: './area.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AreaComponent implements AfterViewInit {
   readonly styles = input.required<Record<string, number> | undefined>({});

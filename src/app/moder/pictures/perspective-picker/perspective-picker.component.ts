@@ -6,10 +6,10 @@ import {getPerspectiveTranslation} from '@utils/translations';
 import {APIPerspectiveService} from '../../../api/perspective/perspective.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, AsyncPipe, ReactiveFormsModule],
   selector: 'app-moder-pictures-perspective-picker',
+  imports: [FormsModule, AsyncPipe, ReactiveFormsModule],
   templateUrl: './perspective-picker.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPicturesPerspectivePickerComponent {
   readonly #perspectiveService = inject(APIPerspectiveService);

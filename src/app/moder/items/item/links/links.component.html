@@ -14,16 +14,16 @@
             </tr>
           </thead>
           <tbody>
-            @for (link of links; track link.id; let i = $index) {
+            @for (link of links; track link.id) {
               <tr>
                 <td>
-                  <input type="text" name="name{{ i }}" [(ngModel)]="link.name" class="form-control" />
+                  <input name="name{{ $index }}" type="text" class="form-control" [(ngModel)]="link.name" />
                 </td>
                 <td>
-                  <input type="text" name="url{{ i }}" [(ngModel)]="link.url" class="form-control" />
+                  <input name="url{{ $index }}" type="text" class="form-control" [(ngModel)]="link.url" />
                 </td>
                 <td>
-                  <select name="type{{ i }}" [(ngModel)]="link.type" class="form-select">
+                  <select name="type{{ $index }}" class="form-select" [(ngModel)]="link.type">
                     <option value="default" i18n>interest link</option>
                     <option value="official" i18n>official</option>
                     <option value="club" i18n>club</option>
@@ -33,13 +33,13 @@
             }
             <tr>
               <td>
-                <input type="text" name="name" [(ngModel)]="newLink.name" class="form-control" />
+                <input type="text" name="name" class="form-control" [(ngModel)]="newLink.name" />
               </td>
               <td>
-                <input type="text" name="url" [(ngModel)]="newLink.url" class="form-control" />
+                <input type="text" name="url" class="form-control" [(ngModel)]="newLink.url" />
               </td>
               <td>
-                <select name="type" [(ngModel)]="newLink.type" class="form-select">
+                <select name="type" class="form-select" [(ngModel)]="newLink.type">
                   <option value="default" i18n>interest link</option>
                   <option value="official" i18n>official</option>
                   <option value="club" i18n>club</option>

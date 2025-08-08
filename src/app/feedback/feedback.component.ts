@@ -19,7 +19,7 @@ import {ToastsService} from '../toasts/toasts.service';
 const CAPTCHA = 'captcha';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-feedback',
   imports: [
     RouterLink,
     FormsModule,
@@ -29,8 +29,8 @@ const CAPTCHA = 'captcha';
     InvalidParamsPipe,
     AsyncPipe,
   ],
-  selector: 'app-feedback',
   templateUrl: './feedback.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackComponent implements OnInit {
   readonly #grpc = inject(AutowpClient);

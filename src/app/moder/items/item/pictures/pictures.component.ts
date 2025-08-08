@@ -23,10 +23,10 @@ import {chunkBy} from '../../../../chunk';
 import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe, ThumbnailComponent],
   selector: 'app-moder-items-item-pictures',
+  imports: [RouterLink, AsyncPipe, ThumbnailComponent],
   templateUrl: './pictures.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemPicturesComponent {
   readonly #picturesClient = inject(PicturesClient);

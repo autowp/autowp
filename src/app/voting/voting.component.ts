@@ -16,10 +16,10 @@ import {ToastsService} from '../toasts/toasts.service';
 import {VotingVotesComponent} from './votes/votes.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, NgbProgressbar, CommentsComponent, AsyncPipe, DatePipe],
   selector: 'app-voting',
+  imports: [RouterLink, FormsModule, NgbProgressbar, CommentsComponent, AsyncPipe, DatePipe],
   templateUrl: './voting.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VotingComponent {
   readonly #route = inject(ActivatedRoute);

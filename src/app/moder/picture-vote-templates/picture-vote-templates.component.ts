@@ -8,10 +8,10 @@ import {PageEnvService} from '@services/page-env.service';
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, AsyncPipe],
   selector: 'app-moder-picture-vote-templates',
+  imports: [RouterLink, FormsModule, AsyncPipe],
   templateUrl: './picture-vote-templates.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPictureVoteTemplatesComponent implements OnInit {
   readonly #voteTemplateService = inject(APIPictureModerVoteTemplateService);

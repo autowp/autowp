@@ -31,12 +31,12 @@
       }
       @if (brand.concepts.length > 0) {
         <div>
-          <button class="btn btn-link" (click)="conceptsOpen.set(!conceptsOpen())">
+          <button type="button" class="btn btn-link" (click)="conceptsOpen.set(!conceptsOpen())">
             <i
               class="bi"
+              aria-hidden="true"
               [class.bi-folder2]="!conceptsOpen()"
               [class.bi-folder2-open]="conceptsOpen()"
-              aria-hidden="true"
             ></i>
             <ng-container i18n>Concepts & prototypes</ng-container>
           </button>
@@ -52,15 +52,15 @@
         </div>
       }
       <div class="my-1">
-        <a routerLink="/upload" [queryParams]="{item_id: brand.item.id, perspective_id: perspectiveIDLogotype}" i18n
+        <a routerLink="/upload" i18n [queryParams]="{item_id: brand.item.id, perspective_id: perspectiveIDLogotype}"
           >logotype</a
         >
         <br />
-        <a routerLink="/upload" [queryParams]="{item_id: brand.item.id, perspective_id: perspectiveIDMixed}" i18n
+        <a routerLink="/upload" i18n [queryParams]="{item_id: brand.item.id, perspective_id: perspectiveIDMixed}"
           >mixed (few vehicles on one picture)</a
         >
         <br />
-        <a routerLink="/upload" [queryParams]="{item_id: brand.item.id, perspective_id: null}" i18n
+        <a routerLink="/upload" i18n [queryParams]="{item_id: brand.item.id, perspective_id: null}"
           >unsorted (not existent vehicle or engine)</a
         >
       </div>
@@ -70,10 +70,10 @@
       <div class="mb-4">
         <input
           type="text"
-          [formControl]="search"
           class="form-control"
           placeholder="Type to search …"
           i18n-placeholder
+          [formControl]="search"
         />
       </div>
       @if (loading()) {

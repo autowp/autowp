@@ -34,7 +34,7 @@ interface Theme extends APIForumsTheme.AsObject {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-forums',
   imports: [
     RouterLink,
     PastTimeIndicatorComponent,
@@ -43,9 +43,9 @@ interface Theme extends APIForumsTheme.AsObject {
     PaginatorComponent,
     AsyncPipe,
   ],
-  selector: 'app-forums',
-  styles: ['app-forums {display:block}'],
   templateUrl: './forums.component.html',
+  styles: 'app-forums {display:block}',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForumsComponent {
   readonly #route = inject(ActivatedRoute);

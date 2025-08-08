@@ -2,11 +2,11 @@ import {HttpParams} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-share',
   standalone: true,
-  styleUrls: ['./share.component.scss'],
   templateUrl: './share.component.html',
+  styleUrl: './share.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShareComponent {
   readonly url = input.required<string>();

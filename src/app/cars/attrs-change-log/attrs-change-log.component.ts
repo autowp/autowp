@@ -36,7 +36,7 @@ interface AttrUserValueListItem {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-cars-attrs-change-log',
   imports: [
     RouterLink,
     FormsModule,
@@ -48,9 +48,9 @@ interface AttrUserValueListItem {
     TimeAgoPipe,
     ReactiveFormsModule,
   ],
-  selector: 'app-cars-attrs-change-log',
-  styleUrls: ['./attrs-change-log.component.scss'],
   templateUrl: './attrs-change-log.component.html',
+  styleUrl: './attrs-change-log.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsAttrsChangeLogComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

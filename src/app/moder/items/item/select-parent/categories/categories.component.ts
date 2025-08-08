@@ -13,10 +13,10 @@ import {ToastsService} from '../../../../../toasts/toasts.service';
 import {ModerItemsItemSelectParentTreeItemComponent} from '../tree-item/tree-item.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ModerItemsItemSelectParentTreeItemComponent, PaginatorComponent, AsyncPipe],
   selector: 'app-moder-items-item-select-parent-categories',
+  imports: [ModerItemsItemSelectParentTreeItemComponent, PaginatorComponent, AsyncPipe],
   templateUrl: './categories.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemSelectParentCategoriesComponent {
   readonly #route = inject(ActivatedRoute);

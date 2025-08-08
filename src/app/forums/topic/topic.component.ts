@@ -21,10 +21,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {MESSAGES_PER_PAGE} from '../forums.module';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, CommentsComponent, AsyncPipe],
   selector: 'app-forums-topic',
+  imports: [RouterLink, CommentsComponent, AsyncPipe],
   templateUrl: './topic.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForumsTopicComponent {
   readonly #route = inject(ActivatedRoute);

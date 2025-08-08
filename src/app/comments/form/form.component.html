@@ -9,11 +9,11 @@
           name="message"
           maxlength="16000"
           class="form-control"
-          [(ngModel)]="form.message"
           [class.is-invalid]="invalidParams() && invalidParams()['message']"
+          [(ngModel)]="form.message"
         ></textarea>
         @for (message of invalidParams() | invalidParams: 'message'; track message) {
-          <p [textContent]="message" class="invalid-feedback"></p>
+          <p class="invalid-feedback" [textContent]="message"></p>
         }
       </div>
     </div>

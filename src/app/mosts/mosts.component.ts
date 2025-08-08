@@ -8,10 +8,10 @@ import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
 import {MostsContentsComponent} from './contents/contents.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, MostsContentsComponent, AsyncPipe],
   selector: 'app-mosts',
+  imports: [RouterLink, MostsContentsComponent, AsyncPipe],
   templateUrl: './mosts.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MostsComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

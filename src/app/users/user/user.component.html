@@ -17,9 +17,9 @@
       <div class="col-md-6">
         <div class="user-photo">
           @if (user.photo) {
-            <img alt="" [src]="user.photo.src" loading="lazy" />
+            <img alt="" loading="lazy" [src]="user.photo.src" />
           } @else if (user.gravatarLarge) {
-            <img [src]="user.gravatarLarge" alt="" loading="lazy" />
+            <img alt="" loading="lazy" [src]="user.gravatarLarge" />
           }
         </div>
         <p>
@@ -48,7 +48,7 @@
         @if (user && isNotMe$ | async) {
           <p ngPreserveWhitespaces>
             <i class="bi bi-reply" aria-hidden="true"></i>
-            <a href="#" (click)="openMessageForm(user)" i18n>Send personal message</a>
+            <a href="#" i18n (click)="openMessageForm(user)">Send personal message</a>
           </p>
         }
         <!--      <p *ngFor="let account of user.accounts" ngPreserveWhitespaces>-->
@@ -71,7 +71,7 @@
                 </p>
               }
               <p>
-                <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id, 'pictures']" i18n
+                <a i18n [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id, 'pictures']"
                   >User's pictures</a
                 >
               </p>
@@ -81,7 +81,7 @@
           }
           @if (isModer$ | async) {
             <p>
-              <a routerLink="/log" [queryParams]="{user_id: user.id}" i18n>User's log</a>
+              <a routerLink="/log" i18n [queryParams]="{user_id: user.id}">User's log</a>
             </p>
           }
         </div>
@@ -94,8 +94,8 @@
                   @for (picture of pictures; track picture) {
                     <li>
                       <a
-                        [routerLink]="['/picture', picture.identity]"
                         class="picture-hover-preview"
+                        [routerLink]="['/picture', picture.identity]"
                         [innerHTML]="picture.nameHtml"
                       ></a>
                     </li>
@@ -113,7 +113,7 @@
               <h2>
                 <ng-container i18n>Recent comments</ng-container>
                 <small>
-                  <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id, 'comments']" i18n
+                  <a i18n [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id, 'comments']"
                     >all</a
                   >
                 </small>
@@ -179,7 +179,12 @@
             <div class="card card-body mb-4">
               @if ((canBan$ | async) && user.photo) {
                 <p>
-                  <button class="btn btn-warning btn-block btn-delete-photo" (click)="deletePhoto(user)" i18n>
+                  <button
+                    type="button"
+                    class="btn btn-warning btn-block btn-delete-photo"
+                    i18n
+                    (click)="deletePhoto(user)"
+                  >
                     Delete user photo
                   </button>
                 </p>
@@ -187,7 +192,12 @@
               @if (canDeleteUser$ | async; as canDeleteUser) {
                 @if (canDeleteUser) {
                   <p>
-                    <button class="btn btn-danger btn-block btn-delete-user" (click)="deleteUser(user)" i18n>
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-block btn-delete-user"
+                      i18n
+                      (click)="deleteUser(user)"
+                    >
                       Delete user
                     </button>
                   </p>
@@ -213,7 +223,9 @@
                     </p>
                     @if (canBan$ | async) {
                       <div style="margin: 10px 0">
-                        <button class="btn btn-success" i18n (click)="removeFromBlacklist(ip.address)">unban</button>
+                        <button type="button" class="btn btn-success" i18n (click)="removeFromBlacklist(ip.address)">
+                          unban
+                        </button>
                       </div>
                     }
                   </div>
@@ -222,7 +234,7 @@
                   <form class="form-vertical">
                     <div class="mb-3">
                       <label i18n for="period">For period</label>
-                      <select [(ngModel)]="banPeriod" id="period" name="period" class="form-select" required>
+                      <select id="period" name="period" class="form-select" required [(ngModel)]="banPeriod">
                         @for (period of banPeriods; track period.value) {
                           <option [value]="period.value">{{ period.name }}</option>
                         }
@@ -230,9 +242,9 @@
                     </div>
                     <div class="mb-3">
                       <label i18n for="reason">Reason</label>
-                      <input maxlength="50" class="form-control" [(ngModel)]="banReason" id="reason" name="reason" />
+                      <input maxlength="50" class="form-control" id="reason" name="reason" [(ngModel)]="banReason" />
                     </div>
-                    <button class="btn btn-danger" (click)="addToBlacklist(ip.address)" i18n>Ban</button>
+                    <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(ip.address)">Ban</button>
                   </form>
                 }
               } @else {

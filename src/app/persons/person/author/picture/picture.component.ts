@@ -21,10 +21,10 @@ import {CommentsComponent} from '../../../../comments/comments/comments.componen
 import {PictureComponent} from '../../../../picture/picture.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommentsComponent, AsyncPipe, PictureComponent],
   selector: 'app-persons-person-author-picture',
+  imports: [CommentsComponent, AsyncPipe, PictureComponent],
   templateUrl: './picture.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PersonsPersonAuthorPictureComponent {
   readonly #pageEnv = inject(PageEnvService);

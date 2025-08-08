@@ -17,10 +17,10 @@ import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc'
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, MarkdownComponent, AsyncPipe, InvalidParamsPipe],
   selector: 'app-forums-new-topic',
+  imports: [RouterLink, FormsModule, MarkdownComponent, AsyncPipe, InvalidParamsPipe],
   templateUrl: './new-topic.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForumsNewTopicComponent implements OnInit {
   readonly #router = inject(Router);

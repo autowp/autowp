@@ -1,15 +1,16 @@
 <div class="modal-header">
   <h3 class="modal-title" i18n>Vehicle type</h3>
-  <button class="btn-close" (click)="activeModal.dismiss()"></button>
+  <button class="btn-close" type="button" (click)="activeModal.dismiss()"></button>
 </div>
 <div class="modal-body">
   @for (type of types$ | async; track type.id) {
     <div class="mb-3">
       <button
+        type="button"
         class="btn d-block"
-        (click)="toggle(type.id)"
         [class.btn-success]="isActive(type.id)"
         [class.btn-outline-secondary]="!isActive(type.id)"
+        (click)="toggle(type.id)"
       >
         {{ type.name }}
       </button>
@@ -17,11 +18,12 @@
         <div class="mb-3 ms-4">
           @for (subtype of type.childs; track subtype.id) {
             <button
+              type="button"
               class="btn btn-sm"
               [class.d-block]="(subtype.childs || []).length > 0"
-              (click)="toggle(subtype.id)"
               [class.btn-success]="isActive(subtype.id)"
               [class.btn-outline-secondary]="!isActive(subtype.id)"
+              (click)="toggle(subtype.id)"
             >
               {{ subtype.name }}
             </button>
@@ -29,10 +31,11 @@
               <div class="mb-3 ms-4">
                 @for (subsubtype of subtype.childs; track subsubtype.id) {
                   <button
+                    type="button"
                     class="btn btn-sm"
-                    (click)="toggle(subsubtype.id)"
                     [class.btn-success]="isActive(subsubtype.id)"
                     [class.btn-outline-secondary]="!isActive(subsubtype.id)"
+                    (click)="toggle(subsubtype.id)"
                   >
                     {{ subsubtype.name }}
                   </button>
@@ -46,5 +49,5 @@
   }
 </div>
 <div class="modal-footer">
-  <button class="btn btn-primary" (click)="activeModal.close()" i18n>Close</button>
+  <button type="button" class="btn btn-primary" i18n (click)="activeModal.close()">Close</button>
 </div>

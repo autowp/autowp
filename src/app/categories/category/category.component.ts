@@ -22,10 +22,10 @@ export interface CategoryPathItem {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLinkActive, RouterOutlet, AsyncPipe],
   selector: 'app-categories-category',
+  imports: [RouterLink, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLinkActive, RouterOutlet, AsyncPipe],
   templateUrl: './category.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesCategoryComponent {
   readonly #pageEnv = inject(PageEnvService);

@@ -11,10 +11,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {InfoSpecRowComponent} from './row/row.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, InfoSpecRowComponent, AsyncPipe],
   selector: 'app-info-spec',
+  imports: [RouterLink, InfoSpecRowComponent, AsyncPipe],
   templateUrl: './spec.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InfoSpecComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

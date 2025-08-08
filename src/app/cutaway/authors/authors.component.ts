@@ -30,10 +30,10 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   selector: 'app-cutaway-authors',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   templateUrl: './authors.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CutawayAuthorsComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

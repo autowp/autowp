@@ -33,10 +33,10 @@ import {
 } from '../../../item-meta-form/item-meta-form.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, MarkdownComponent, AsyncPipe, ItemMetaFormComponent],
   selector: 'app-moder-items-item-pictures-organize',
+  imports: [RouterLink, MarkdownComponent, AsyncPipe, ItemMetaFormComponent],
   templateUrl: './organize.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   readonly #itemService = inject(ItemService);

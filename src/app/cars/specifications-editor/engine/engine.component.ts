@@ -14,10 +14,10 @@ import {shareReplay, switchMap} from 'rxjs/operators';
 import {ToastsService} from '../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-cars-specifications-editor-engine',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './engine.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsSpecificationsEditorEngineComponent {
   readonly #auth = inject(AuthService);

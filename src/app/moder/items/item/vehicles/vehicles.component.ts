@@ -9,10 +9,10 @@ import {EMPTY, Observable} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, AsyncPipe],
   selector: 'app-moder-items-item-vehicles',
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './vehicles.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemsItemVehiclesComponent {
   readonly #itemsClient = inject(ItemsClient);

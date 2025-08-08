@@ -19,11 +19,11 @@ import {catchError, map, switchMap, tap} from 'rxjs/operators';
 import {ToastsService} from '../../../../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AsyncPipe],
   selector: 'app-cars-select-engine-tree-item',
+  imports: [AsyncPipe],
   standalone: true,
   templateUrl: './tree-item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsSelectEngineTreeItemComponent {
   readonly #toastService = inject(ToastsService);

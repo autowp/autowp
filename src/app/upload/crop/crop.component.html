@@ -1,6 +1,6 @@
 <div class="modal-header">
   <h3 class="modal-title" i18n>Cropper</h3>
-  <button class="btn-close" (click)="activeModal.dismiss()"></button>
+  <button class="btn-close" type="button" (click)="activeModal.dismiss()"></button>
 </div>
 <div class="modal-body">
   @if (picture$ | async; as picture) {
@@ -20,8 +20,8 @@
   <button type="button" disabled class="btn btn-secondary float-start" i18n>
     {{ resolution }} (aspect is about {{ aspect }})
   </button>
-  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()" i18n>Close</button>
+  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Close</button>
   @if (picture$ | async; as picture) {
-    <button type="button" class="btn btn-primary" (click)="onSave(picture)" i18n>Save changes</button>
+    <button type="button" class="btn btn-primary" i18n (click)="onSave(picture)">Save changes</button>
   }
 </div>

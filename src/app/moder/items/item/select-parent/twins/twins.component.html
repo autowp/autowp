@@ -6,8 +6,8 @@
           @for (item of chunk; track item.id) {
             <a
               routerLink="."
-              [queryParams]="{brand_id: item.id}"
               queryParamsHandling="merge"
+              [queryParams]="{brand_id: item.id}"
               [innerHTML]="item.nameHtml"
             ></a>
             <br />
@@ -25,9 +25,9 @@
         <li class="car-node">
           <app-moder-items-item-select-parent-tree-item
             [item]="item"
-            (selected)="onSelect($event)"
             [disableItemID]="(itemID$ | async) || ''"
             [order]="ItemParentsRequest.Order.AUTO"
+            (selected)="onSelect($event)"
           />
         </li>
       }

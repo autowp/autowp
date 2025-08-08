@@ -65,7 +65,7 @@ interface LastItemInfo {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-moder-pictures-item',
   imports: [
     RouterLink,
     NgbTooltip,
@@ -85,8 +85,8 @@ interface LastItemInfo {
     TimeAgoPipe,
     PictureModerVoteComponent,
   ],
-  selector: 'app-moder-pictures-item',
   templateUrl: './item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPicturesItemComponent {
   readonly #route = inject(ActivatedRoute);

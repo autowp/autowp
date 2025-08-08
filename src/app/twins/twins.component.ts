@@ -35,10 +35,10 @@ interface ChunkedGroup {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, TwinsSidebarComponent, AsyncPipe],
   selector: 'app-twins',
+  imports: [RouterLink, PaginatorComponent, TwinsSidebarComponent, AsyncPipe],
   templateUrl: './twins.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TwinsComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

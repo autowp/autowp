@@ -33,7 +33,7 @@
           <td [textContent]="user.id"></td>
           <td>
             @if (user.photo) {
-              <img alt="" [src]="user.photo.src" style="max-width: 300px; max-height: 300px" />
+              <img alt="" style="max-width: 300px; max-height: 300px" [src]="user.photo.src" />
             }
           </td>
           <td [textContent]="user.login"></td>

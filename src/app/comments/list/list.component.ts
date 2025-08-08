@@ -31,7 +31,7 @@ export interface APICommentInList extends APICommentsMessage {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-comments-list',
   imports: [
     NgbTooltip,
     UserComponent,
@@ -42,8 +42,8 @@ export interface APICommentInList extends APICommentsMessage {
     DatePipe,
     TimeAgoPipe,
   ],
-  selector: 'app-comments-list',
   templateUrl: './list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentsListComponent {
   protected readonly auth = inject(AuthService);

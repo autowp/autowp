@@ -53,10 +53,10 @@ interface SrcSelection {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, FormsModule, ReactiveFormsModule, ModerPictureMoveItemComponent, AsyncPipe],
   selector: 'app-moder-pictures-item-move',
+  imports: [RouterLink, PaginatorComponent, FormsModule, ReactiveFormsModule, ModerPictureMoveItemComponent, AsyncPipe],
   templateUrl: './move.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPicturesItemMoveComponent implements OnInit {
   readonly #router = inject(Router);

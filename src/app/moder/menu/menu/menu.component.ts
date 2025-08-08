@@ -18,11 +18,11 @@ interface MenuItem {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, NgClass, AsyncPipe],
   selector: 'app-moder-menu',
-  styleUrls: ['./menu.component.scss'],
+  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, NgClass, AsyncPipe],
   templateUrl: './menu.component.html',
+  styleUrl: './menu.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuComponent {
   protected readonly auth = inject(AuthService);

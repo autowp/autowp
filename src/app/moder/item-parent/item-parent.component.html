@@ -39,15 +39,22 @@
   @if (languages$ | async; as languages) {
     <form method="post" class="form-horizontal" (submit)="save(itemParent, languages)">
       <div class="mb-3 row">
-        <label class="col-md-2 col-form-label" for="type_id">Catname</label>
+        <label class="col-md-2 col-form-label" for="catname">Catname</label>
         <div class="col-md-10">
-          <input type="text" name="catname" maxlength="150" [(ngModel)]="itemParent.catname" class="form-control" />
+          <input
+            type="text"
+            name="catname"
+            id="catname"
+            maxlength="150"
+            class="form-control"
+            [(ngModel)]="itemParent.catname"
+          />
         </div>
       </div>
       <div class="mb-3 row">
         <label class="col-md-2 col-form-label" for="type">Type</label>
         <div class="col-md-10">
-          <select name="type_id" id="type_id" class="form-select" [(ngModel)]="itemParent.type" id="type">
+          <select name="type_id" class="form-select" id="type" [(ngModel)]="itemParent.type">
             @for (option of typeOptions; track option.value) {
               <option [value]="option.value">{{ option.name }}</option>
             }
@@ -62,15 +69,15 @@
           <div class="col-md-10">
             <input
               type="text"
+              maxlength="255"
+              class="form-control"
               [class.is-invalid]="(language.invalidParams | invalidParams: 'name').length > 0"
               [id]="'name' + language.language"
               [name]="'name' + language.language"
-              maxlength="255"
-              class="form-control"
               [(ngModel)]="language.name"
             />
             @for (message of language.invalidParams | invalidParams: 'name'; track message) {
-              <p [textContent]="message" class="invalid-feedback"></p>
+              <p class="invalid-feedback" [textContent]="message"></p>
             }
           </div>
         </div>

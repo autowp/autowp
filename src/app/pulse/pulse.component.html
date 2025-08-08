@@ -14,11 +14,11 @@
   <div class="nav nav-pills mb-4">
     @for (period of periods; track period.value) {
       <a
-        [class.active]="period.active"
         class="nav-link"
         href="#"
-        (click)="selectPeriod(period)"
+        [class.active]="period.active"
         [textContent]="period.name"
+        (click)="selectPeriod(period)"
       ></a>
     }
   </div>
@@ -29,16 +29,16 @@
         baseChart
         width="400"
         height="150"
+        type="bar"
         [datasets]="gridData.data"
         [labels]="(labels$ | async) || undefined"
         [options]="chartOptions"
         [legend]="false"
-        [type]="'bar'"
       ></canvas>
     }
     @if (legend$ | async; as legend) {
       <p>
-        @for (item of legend; track item; let i = $index) {
+        @for (item of legend; track item) {
           <span>
             @if (item.user$ | async; as user) {
               <app-user [user]="user" />

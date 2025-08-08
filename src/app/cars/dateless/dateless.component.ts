@@ -22,10 +22,10 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, ItemComponent],
   selector: 'app-cars-deteless',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, ItemComponent],
   templateUrl: './dateless.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsDatelessComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

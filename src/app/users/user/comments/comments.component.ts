@@ -18,10 +18,10 @@ interface Order {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe],
   selector: 'app-users-user-comments',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe],
   templateUrl: './comments.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersUserCommentsComponent {
   readonly #userService = inject(UserService);

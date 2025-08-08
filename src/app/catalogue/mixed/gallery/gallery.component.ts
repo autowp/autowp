@@ -12,10 +12,10 @@ import {GalleryComponent} from '../../../gallery/gallery.component';
 import {BrandPerspectivePageData} from '../../catalogue.module';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [GalleryComponent, AsyncPipe],
   selector: 'app-catalogue-mixed-gallery',
+  imports: [GalleryComponent, AsyncPipe],
   templateUrl: './gallery.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueMixedGalleryComponent {
   readonly #pageEnv = inject(PageEnvService);

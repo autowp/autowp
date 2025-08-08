@@ -7,10 +7,10 @@ import {LanguageService} from '@services/language';
 import {MarkdownComponent} from '@utils/markdown/markdown.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, MarkdownComponent, AsyncPipe],
   selector: 'app-index-twins',
+  imports: [RouterLink, MarkdownComponent, AsyncPipe],
   templateUrl: './twins.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexTwinsComponent {
   readonly #items = inject(ItemsClient);

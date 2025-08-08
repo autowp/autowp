@@ -27,10 +27,10 @@ import {PictureComponent} from '../../../picture/picture.component';
 import {BrandPerspectivePageData} from '../../catalogue.module';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, CommentsComponent, AsyncPipe, PictureComponent],
   selector: 'app-catalogue-mixed-picture',
+  imports: [RouterLink, CommentsComponent, AsyncPipe, PictureComponent],
   templateUrl: './picture.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueMixedPictureComponent {
   readonly #route = inject(ActivatedRoute);

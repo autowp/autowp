@@ -33,10 +33,10 @@ interface PictureRoute {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   selector: 'app-catalogue-recent',
+  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './recent.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueRecentComponent {
   readonly #pageEnv = inject(PageEnvService);

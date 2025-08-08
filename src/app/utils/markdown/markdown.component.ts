@@ -5,11 +5,11 @@ import {map} from 'rxjs/operators';
 import showdown from 'showdown';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AsyncPipe],
   selector: 'app-markdown',
-  styleUrls: ['markdown.component.scss'],
+  imports: [AsyncPipe],
   templateUrl: './markdown.component.html',
+  styleUrl: 'markdown.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarkdownComponent {
   readonly markdown = input.required<null | string>();

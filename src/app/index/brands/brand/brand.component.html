@@ -3,7 +3,7 @@
     <div>
       @if ((response.items || []).length > 0) {
         @if (response.brand?.brandicon?.src) {
-          <img alt="" [src]="response.brand?.brandicon?.src" style="float: right; margin: 0 0 5px 5px" />
+          <img alt="" style="float: right; margin: 0 0 5px 5px" [src]="response.brand?.brandicon?.src" />
         }
         @for (item of response.items; track item.id) {
           <p [innerHTML]="item.nameHtml"></p>
@@ -22,10 +22,10 @@
       >({{ brand.itemsCount - brand.newItemsCount }}
       @if (brand.newItemsCount > 0) {
         <span
-          [ngbPopover]="popover"
           triggers="mouseenter:mouseleave"
           container="body"
           popoverTitle="New {{ brand.name }} vehicles"
+          [ngbPopover]="popover"
           i18n-popoverTitle
           >+{{ brand.newItemsCount }}</span
         >

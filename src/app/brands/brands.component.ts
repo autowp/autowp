@@ -27,10 +27,10 @@ function addCSS(url: string) {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, BrandsItemComponent, AsyncPipe],
   selector: 'app-brands',
+  imports: [RouterLink, BrandsItemComponent, AsyncPipe],
   templateUrl: './brands.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BrandsComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

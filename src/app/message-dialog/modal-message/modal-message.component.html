@@ -1,27 +1,28 @@
 <div class="modal-header">
   <h3 class="modal-title" i18n>Send personal message</h3>
-  <button class="btn-close" (click)="activeModal.dismiss()"></button>
+  <button class="btn-close" type="button" (click)="activeModal.dismiss()"></button>
 </div>
 <div class="modal-body">
   <textarea
     cols="65"
     rows="5"
     name="contents"
-    (keypress)="keypress()"
-    [formControl]="text"
     class="form-control"
-    [disabled]="sending()"
     placeholder="Message"
     i18n-placeholder
+    [formControl]="text"
+    [disabled]="sending()"
+    (keypress)="keypress()"
   ></textarea>
 </div>
 <div class="modal-footer">
   <button
+    type="button"
     class="btn"
-    (click)="send()"
     [disabled]="sending() || text.value.length <= 0"
     [class.btn-success]="sent()"
     [class.btn-primary]="!sent()"
+    (click)="send()"
   >
     @if (sending()) {
       <span i18n>sending …</span>
@@ -33,5 +34,7 @@
       <span i18n>send</span>
     }
   </button>
-  <button class="btn btn-secondary cancel" i18n (click)="activeModal.dismiss()" [disabled]="sending()">cancel</button>
+  <button type="button" class="btn btn-secondary cancel" i18n [disabled]="sending()" (click)="activeModal.dismiss()">
+    cancel
+  </button>
 </div>

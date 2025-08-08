@@ -22,7 +22,7 @@
       <i class="bi bi-hand-thumbs-down-fill text-danger" aria-hidden="true"></i>
     }
     <span [textContent]="template.message"></span>
-    <button class="btn btn-danger btn-sm" aria-label="Delete" (click)="deleteTemplate(template)">
+    <button type="button" class="btn btn-danger btn-sm" aria-label="Delete" (click)="deleteTemplate(template)">
       <span class="bi bi-x" aria-hidden="true"></span>
     </button>
   </p>
@@ -33,11 +33,11 @@
 
   <div class="mb-3">
     <label i18n for="name">Reason</label>
-    <input type="text" name="name" id="name" class="form-control" [(ngModel)]="name" required maxlength="50" />
+    <input type="text" name="name" id="name" class="form-control" required maxlength="50" [(ngModel)]="name" />
   </div>
   <div class="mb-3">
     <label i18n for="vote">Vote</label>
-    <select name="vote" id="vote" [(ngModel)]="vote" required class="form-select">
+    <select name="vote" id="vote" required class="form-select" [(ngModel)]="vote">
       <option value="-1" class="text-danger" i18n>Negative</option>
       <option value="1" class="text-success" i18n>Positive</option>
     </select>
