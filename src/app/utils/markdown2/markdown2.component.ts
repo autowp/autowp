@@ -1,6 +1,6 @@
 import {isPlatformBrowser} from '@angular/common';
 import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, inject, PLATFORM_ID} from '@angular/core';
-import showdown from 'showdown';
+import {marked} from 'marked';
 
 @Component({
   selector: 'app-markdown2',
@@ -25,7 +25,6 @@ export class Markdown2Component implements AfterViewInit {
   ngAfterViewInit() {
     const markdown = this.decodeHtml(this.#element.nativeElement.innerHTML);
 
-    const markdownConverter = new showdown.Converter({});
-    this.#element.nativeElement.innerHTML = markdownConverter.makeHtml(markdown);
+    this.#element.nativeElement.innerHTML = marked.parse(markdown, {async: false});
   }
 }

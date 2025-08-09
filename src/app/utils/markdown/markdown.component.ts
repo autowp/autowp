@@ -1,12 +1,8 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, input} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
-import {map} from 'rxjs/operators';
-import showdown from 'showdown';
+import {ChangeDetectionStrategy, Component, computed, input} from '@angular/core';
+import {marked} from 'marked';
 
 @Component({
   selector: 'app-markdown',
-  imports: [AsyncPipe],
   templateUrl: './markdown.component.html',
   styleUrl: 'markdown.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -14,9 +10,8 @@ import showdown from 'showdown';
 export class MarkdownComponent {
   readonly markdown = input.required<null | string>();
 
-  readonly #markdownConverter = new showdown.Converter({});
-
-  protected readonly html$ = toObservable(this.markdown).pipe(
-    map((markdown) => (markdown ? this.#markdownConverter.makeHtml(markdown) : '')),
-  );
+  protected readonly html = computed(() => {
+    const markdown = this.markdown();
+    return markdown ? marked.parse(markdown, {async: false}) : '';
+  });
 }

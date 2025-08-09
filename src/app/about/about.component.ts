@@ -7,9 +7,9 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import escapeStringRegexp from 'escape-string-regexp';
+import {marked} from 'marked';
 import {BytesPipe} from 'ngx-pipes';
 import {map, switchMap} from 'rxjs/operators';
-import showdown from 'showdown';
 
 import * as versionJson from '../../version.json';
 
@@ -124,8 +124,8 @@ export class AboutComponent implements OnInit {
           contributorsHtml.push(this.userHtml(data.users.get(id)));
         }
 
-        const markdownConverter = new showdown.Converter({});
-        return replacePairs(markdownConverter.makeHtml(data.aboutText), {
+        const html = marked.parse(data.aboutText, {async: false});
+        return replacePairs(html, {
           '%be-translator%': this.userHtml(data.users.get(data.about.beTranslator)),
           '%developer%': this.userHtml(data.users.get(data.about.developer)),
           '%fr-translator%': this.userHtml(data.users.get(data.about.frTranslator)),
