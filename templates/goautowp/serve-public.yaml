@@ -28,7 +28,8 @@ spec:
           imagePullPolicy: {{ .Values.goautowp.image.pullPolicy | quote }}
           args:
             - serve
-            - --public
+            - "--public"
+            - "--grpc"
           ports:
             - name: app-port
               containerPort: 8080
