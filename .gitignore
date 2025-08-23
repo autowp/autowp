@@ -49,4 +49,4 @@ crt/*.crt
 sonar-scanner-*
 /.scannerwork/
 /crowdin.yml
-/spec.swagger.json
+openapi.yaml

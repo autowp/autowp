@@ -1,8 +1,7 @@
 import {AsyncPipe, CurrencyPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {DonationsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
-import {Empty} from '@ngx-grpc/well-known-types';
+import {DonationsService} from '@rest/api/donations.service';
 import {LanguageService} from '@services/language';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {map} from 'rxjs/operators';
@@ -24,12 +23,12 @@ const rates: Record<string, number> = {
 })
 export class IndexDonateComponent {
   protected readonly languageService = inject(LanguageService);
-  readonly #donations = inject(DonationsClient);
+  readonly #donations = inject(DonationsService);
 
   protected readonly goal = 2500;
   readonly #monthlyCharge = 161.88;
 
-  protected readonly state$ = this.#donations.getTransactions(new Empty()).pipe(
+  protected readonly state$ = this.#donations.donationsGetTransactions().pipe(
     map((res) => {
       const operations = res.items || [];
       const donations = operations
@@ -37,7 +36,7 @@ export class IndexDonateComponent {
         .map((d) => ({
           contributor: d.contributor,
           currency: d.currency,
-          date: d.date?.toDate(),
+          date: d.date,
           normalizedSum: (rates[d.currency] * d.sum) / 100,
           purpose: d.purpose,
           sum: d.sum / 100,
@@ -51,7 +50,7 @@ export class IndexDonateComponent {
       return {
         charges: charges.map((o) => ({
           currency: o.currency,
-          date: o.date?.toDate(),
+          date: o.date,
           percent: (-100 * o.sum * rates[o.currency]) / 100 / total,
           purpose: o.purpose,
           sum: o.sum / 100,

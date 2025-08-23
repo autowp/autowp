@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+// @ts-nocheck
 //
 // THIS IS A GENERATED FILE
 // DO NOT MODIFY IT! YOUR CHANGES WILL BE LOST
@@ -91,8 +92,8 @@ export class Status implements GrpcMessage {
     }
   }
 
-  private _code?: number;
-  private _message?: string;
+  private _code: number;
+  private _message: string;
   private _details?: googleProtobuf000.Any[];
 
   /**
@@ -108,16 +109,16 @@ export class Status implements GrpcMessage {
     );
     Status.refineValues(this);
   }
-  get code(): number | undefined {
+  get code(): number {
     return this._code;
   }
-  set code(value: number | undefined) {
+  set code(value: number) {
     this._code = value;
   }
-  get message(): string | undefined {
+  get message(): string {
     return this._message;
   }
-  set message(value: string | undefined) {
+  set message(value: string) {
     this._message = value;
   }
   get details(): googleProtobuf000.Any[] | undefined {
@@ -176,8 +177,8 @@ export module Status {
    * Standard JavaScript object representation for Status
    */
   export interface AsObject {
-    code?: number;
-    message?: string;
+    code: number;
+    message: string;
     details?: googleProtobuf000.Any.AsObject[];
   }
 
@@ -185,8 +186,8 @@ export module Status {
    * Protobuf JSON representation for Status
    */
   export interface AsProtobufJSON {
-    code?: number;
-    message?: string;
-    details?: googleProtobuf000.Any.AsProtobufJSON[] | null;
+    code: number;
+    message: string;
+    details: googleProtobuf000.Any.AsProtobufJSON[] | null;
   }
 }

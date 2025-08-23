@@ -31,6 +31,7 @@
     "useDefineForClassFields": false,
     "baseUrl": "src",
     "paths": {
+      "@rest/*": ["rest/*"],
       "@grpc/*": ["grpc/*"],
       "@environment/*": ["environments/*"],
       "@services/*": ["app/services/*"],

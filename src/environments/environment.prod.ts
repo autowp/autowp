@@ -1,5 +1,5 @@
 export const environment = {
-  apiUrl: '/api/',
+  apiUrl: window.location.protocol + '//' + window.location.hostname,
   grpcHost: '',
   keycloak: {
     clientId: 'frontend',
