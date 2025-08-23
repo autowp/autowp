@@ -15,6 +15,7 @@ const ArticlesPreviewBaseURL = "/img/articles/preview/"
 
 type ArticlesGRPCServer struct {
 	UnimplementedArticlesServer
+
 	db *goqu.Database
 }
 

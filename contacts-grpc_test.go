@@ -12,11 +12,8 @@ func TestCreateDeleteContact(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-
 	client := NewContactsClient(conn)
-
 	cfg := config.LoadConfig(".")
-
 	kc := cnt.Keycloak()
 	usersClient := NewUsersClient(conn)
 

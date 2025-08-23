@@ -23,12 +23,14 @@ func NewRepository(db *goqu.Database) *Repository {
 
 type Voting struct {
 	schema.VotingRow
+
 	CanVote  bool
 	MaxVotes int32
 }
 
 type VotingVariant struct {
 	schema.VotingVariantRow
+
 	Percent float32
 	IsMax   bool
 	IsMin   bool
@@ -104,41 +106,6 @@ func (s *Repository) Voting(
 	}
 
 	return &st, vvRows, nil
-}
-
-func (s *Repository) canVote(
-	ctx context.Context,
-	voting *schema.VotingRow,
-	userID int64,
-) (bool, error) {
-	if userID == 0 || voting == nil {
-		return false, nil
-	}
-
-	now := time.Now()
-
-	if voting.BeginDate.After(now) {
-		return false, nil
-	}
-
-	if voting.EndDate.Before(now) {
-		return false, nil
-	}
-
-	var exists bool
-
-	success, err := s.db.Select(goqu.V(true)).
-		From(schema.VotingVariantVoteTable).
-		Join(schema.VotingVariantTable, goqu.On(
-			schema.VotingVariantVoteTableVotingVariantIDCol.Eq(schema.VotingVariantTableIDCol),
-		)).
-		Where(
-			schema.VotingVariantTableVotingIDCol.Eq(voting.ID),
-			schema.VotingVariantVoteTableUserIDCol.Eq(userID),
-		).
-		Limit(1).ScanValContext(ctx, &exists)
-
-	return !success, err
 }
 
 func (s *Repository) Votes(ctx context.Context, id int32) ([]int64, error) {
@@ -223,6 +190,41 @@ func (s *Repository) Vote(
 	}
 
 	return true, nil
+}
+
+func (s *Repository) canVote(
+	ctx context.Context,
+	voting *schema.VotingRow,
+	userID int64,
+) (bool, error) {
+	if userID == 0 || voting == nil {
+		return false, nil
+	}
+
+	now := time.Now()
+
+	if voting.BeginDate.After(now) {
+		return false, nil
+	}
+
+	if voting.EndDate.Before(now) {
+		return false, nil
+	}
+
+	var exists bool
+
+	success, err := s.db.Select(goqu.V(true)).
+		From(schema.VotingVariantVoteTable).
+		Join(schema.VotingVariantTable, goqu.On(
+			schema.VotingVariantVoteTableVotingVariantIDCol.Eq(schema.VotingVariantTableIDCol),
+		)).
+		Where(
+			schema.VotingVariantTableVotingIDCol.Eq(voting.ID),
+			schema.VotingVariantVoteTableUserIDCol.Eq(userID),
+		).
+		Limit(1).ScanValContext(ctx, &exists)
+
+	return !success, err
 }
 
 func (s *Repository) updateVariantVotesCount(ctx context.Context, variantID int32) error {

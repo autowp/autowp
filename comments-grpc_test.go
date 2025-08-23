@@ -16,7 +16,7 @@ func TestAddEmptyCommentShouldReturnError(t *testing.T) {
 	client := NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -43,7 +43,7 @@ func TestAddComment(t *testing.T) {
 	client := NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -120,7 +120,7 @@ func TestCommentReplyNotificationShouldBeDelivered(t *testing.T) { //nolint:para
 	client := NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, user1Token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -174,7 +174,7 @@ func TestSubscribeComment(t *testing.T) {
 	client := NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -206,7 +206,7 @@ func TestVoteComment(t *testing.T) {
 	client := NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -331,7 +331,7 @@ func TestCompleteComment(t *testing.T) {
 	client := NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -372,7 +372,7 @@ func TestMessagesByUserIdentity(t *testing.T) {
 	client := NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -397,7 +397,7 @@ func TestMoveComment(t *testing.T) {
 	forumsClient := NewForumsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -474,7 +474,7 @@ func TestAddCommentOfUnexpectedItemType(t *testing.T) {
 	client := NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -501,7 +501,7 @@ func TestAddCommentToDeletedOrNotExistentParent(t *testing.T) {
 	client := NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)

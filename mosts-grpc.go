@@ -10,6 +10,7 @@ import (
 
 type MostsGRPCServer struct {
 	UnimplementedMostsServer
+
 	auth       *Auth
 	extractor  *ItemExtractor
 	repository *mosts.Repository

@@ -52,27 +52,6 @@ func (s *PictureExtractor) Extract(
 	return result[0], nil
 }
 
-func (s *PictureExtractor) preloadTopicsStat(
-	ctx context.Context, itemIDs []int64, userID int64,
-) (map[int64]comments.TopicStat, error) {
-	commentsRepository, err := s.container.CommentsRepository()
-	if err != nil {
-		return nil, err
-	}
-
-	stats, err := commentsRepository.TopicsStatForUser(
-		ctx,
-		schema.CommentMessageTypeIDPictures,
-		itemIDs,
-		userID,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return stats, nil
-}
-
 func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	ctx context.Context,
 	rows []*schema.PictureRow,
@@ -93,7 +72,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		images    = make(map[int]*storage.Image)
 	)
 
-	picturesRepository, err := s.container.PicturesRepository()
+	picturesRepository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -103,12 +82,12 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		return nil, err
 	}
 
-	imageStorage, err := s.container.ImageStorage()
+	imageStorage, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	textstorageRepository, err := s.container.TextStorageRepository()
+	textstorageRepository, err := s.container.TextStorageRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -678,7 +657,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetSubscribed() && userCtx.UserID > 0 {
-			commentsRepo, err := s.container.CommentsRepository()
+			commentsRepo, err := s.container.CommentsRepository(ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -790,10 +769,31 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	return result, nil
 }
 
+func (s *PictureExtractor) preloadTopicsStat(
+	ctx context.Context, itemIDs []int64, userID int64,
+) (map[int64]comments.TopicStat, error) {
+	commentsRepository, err := s.container.CommentsRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	stats, err := commentsRepository.TopicsStatForUser(
+		ctx,
+		schema.CommentMessageTypeIDPictures,
+		itemIDs,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return stats, nil
+}
+
 func (s *PictureExtractor) path(
 	ctx context.Context, pictureID int64, targetItemID int64,
 ) ([]*PathTreePictureItem, error) {
-	picturesRepositury, err := s.container.PicturesRepository()
+	picturesRepositury, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -830,7 +830,7 @@ func (s *PictureExtractor) itemRoute(
 	itemID int64,
 	targetItemID int64,
 ) (*PathTreeItem, error) {
-	itemsRepository, err := s.container.ItemsRepository()
+	itemsRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -874,7 +874,7 @@ func (s *PictureExtractor) itemRoute(
 func (s *PictureExtractor) itemParentRoute(
 	ctx context.Context, itemID int64, targetItemID int64,
 ) ([]*PathTreeItemParent, error) {
-	itemsRepository, err := s.container.ItemsRepository()
+	itemsRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}

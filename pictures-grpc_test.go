@@ -128,7 +128,7 @@ func TestModerVote(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	kc := cnt.Keycloak()
@@ -250,7 +250,7 @@ func TestFlopNormalizeAndRepair(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	kc := cnt.Keycloak()
@@ -528,7 +528,7 @@ func TestPictureCropByOneAxis(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	imageStorage, err := cnt.ImageStorage()
+	imageStorage, err := cnt.ImageStorage(t.Context())
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
@@ -598,7 +598,7 @@ func TestInvalidPictureCrop(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	imageStorage, err := cnt.ImageStorage()
+	imageStorage, err := cnt.ImageStorage(t.Context())
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
@@ -686,7 +686,7 @@ func TestClearReplacePicture(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
@@ -844,7 +844,7 @@ func TestUpdatePicture(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
@@ -931,7 +931,7 @@ func TestSetPictureCopyrights(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	textStorageRepository := textstorage.New(goquDB)
@@ -1016,7 +1016,7 @@ func TestSetPictureStatus(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
@@ -1138,7 +1138,7 @@ func TestReplacePicture(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
@@ -1579,7 +1579,7 @@ func TestGetPictureIP(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1620,7 +1620,7 @@ func TestInbox(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()

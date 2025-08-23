@@ -228,6 +228,92 @@ func (s *Repository) CreateMessage(
 	return s.createMessageCallback(ctx, fromUserID, toUserID, text)
 }
 
+func (s *Repository) GetInbox(
+	ctx context.Context,
+	userID int64,
+	page int32,
+) ([]Message, *util.Pages, error) {
+	paginator := util.Paginator{
+		SQLSelect:         s.getInboxSelect(userID),
+		ItemCountPerPage:  MessagesPerPage,
+		CurrentPageNumber: page,
+	}
+
+	return s.getBox(ctx, userID, paginator, Options{AllMessagesLink: true})
+}
+
+func (s *Repository) GetSentbox(
+	ctx context.Context,
+	userID int64,
+	page int32,
+) ([]Message, *util.Pages, error) {
+	paginator := util.Paginator{
+		SQLSelect:         s.getSentSelect(userID),
+		ItemCountPerPage:  MessagesPerPage,
+		CurrentPageNumber: page,
+	}
+
+	return s.getBox(ctx, userID, paginator, Options{AllMessagesLink: true})
+}
+
+func (s *Repository) GetSystembox(
+	ctx context.Context,
+	userID int64,
+	page int32,
+) ([]Message, *util.Pages, error) {
+	paginator := util.Paginator{
+		SQLSelect:         s.getSystemSelect(userID),
+		ItemCountPerPage:  MessagesPerPage,
+		CurrentPageNumber: page,
+	}
+
+	return s.getBox(ctx, userID, paginator, Options{AllMessagesLink: false})
+}
+
+func (s *Repository) GetDialogbox(
+	ctx context.Context,
+	userID int64,
+	withUserID int64,
+	page int32,
+) ([]Message, *util.Pages, error) {
+	paginator := util.Paginator{
+		SQLSelect:         s.getDialogSelect(userID, withUserID),
+		ItemCountPerPage:  MessagesPerPage,
+		CurrentPageNumber: page,
+	}
+
+	return s.getBox(ctx, userID, paginator, Options{AllMessagesLink: false})
+}
+
+func (s *Repository) Recycle(ctx context.Context) (int64, error) {
+	res, err := s.db.Delete(schema.PersonalMessagesTable).Where(
+		schema.PersonalMessagesTableDeletedByToCol.IsTrue(),
+		goqu.Or(
+			schema.PersonalMessagesTableDeletedByFromCol.IsTrue(),
+			schema.PersonalMessagesTableFromUserIDCol.IsNull(),
+		),
+	).Executor().ExecContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
+}
+
+func (s *Repository) RecycleSystem(ctx context.Context) (int64, error) {
+	res, err := s.db.Delete(schema.PersonalMessagesTable).Where(
+		schema.PersonalMessagesTableFromUserIDCol.IsNull(),
+		schema.PersonalMessagesTableAddDatetimeCol.Lt(
+			goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL 6 MONTH")),
+		),
+	).Executor().ExecContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
+}
+
 func (s *Repository) markReaden(ctx context.Context, ids []int64) error {
 	var err error
 	if len(ids) > 0 {
@@ -292,63 +378,6 @@ func (s *Repository) getBox(
 	}
 
 	return list, pages, nil
-}
-
-func (s *Repository) GetInbox(
-	ctx context.Context,
-	userID int64,
-	page int32,
-) ([]Message, *util.Pages, error) {
-	paginator := util.Paginator{
-		SQLSelect:         s.getInboxSelect(userID),
-		ItemCountPerPage:  MessagesPerPage,
-		CurrentPageNumber: page,
-	}
-
-	return s.getBox(ctx, userID, paginator, Options{AllMessagesLink: true})
-}
-
-func (s *Repository) GetSentbox(
-	ctx context.Context,
-	userID int64,
-	page int32,
-) ([]Message, *util.Pages, error) {
-	paginator := util.Paginator{
-		SQLSelect:         s.getSentSelect(userID),
-		ItemCountPerPage:  MessagesPerPage,
-		CurrentPageNumber: page,
-	}
-
-	return s.getBox(ctx, userID, paginator, Options{AllMessagesLink: true})
-}
-
-func (s *Repository) GetSystembox(
-	ctx context.Context,
-	userID int64,
-	page int32,
-) ([]Message, *util.Pages, error) {
-	paginator := util.Paginator{
-		SQLSelect:         s.getSystemSelect(userID),
-		ItemCountPerPage:  MessagesPerPage,
-		CurrentPageNumber: page,
-	}
-
-	return s.getBox(ctx, userID, paginator, Options{AllMessagesLink: false})
-}
-
-func (s *Repository) GetDialogbox(
-	ctx context.Context,
-	userID int64,
-	withUserID int64,
-	page int32,
-) ([]Message, *util.Pages, error) {
-	paginator := util.Paginator{
-		SQLSelect:         s.getDialogSelect(userID, withUserID),
-		ItemCountPerPage:  MessagesPerPage,
-		CurrentPageNumber: page,
-	}
-
-	return s.getBox(ctx, userID, paginator, Options{AllMessagesLink: false})
 }
 
 func (s *Repository) getReceivedSelect(userID int64) *goqu.SelectDataset {
@@ -459,33 +488,4 @@ func (s *Repository) prepareList(
 	}
 
 	return messages, nil
-}
-
-func (s *Repository) Recycle(ctx context.Context) (int64, error) {
-	res, err := s.db.Delete(schema.PersonalMessagesTable).Where(
-		schema.PersonalMessagesTableDeletedByToCol.IsTrue(),
-		goqu.Or(
-			schema.PersonalMessagesTableDeletedByFromCol.IsTrue(),
-			schema.PersonalMessagesTableFromUserIDCol.IsNull(),
-		),
-	).Executor().ExecContext(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	return res.RowsAffected()
-}
-
-func (s *Repository) RecycleSystem(ctx context.Context) (int64, error) {
-	res, err := s.db.Delete(schema.PersonalMessagesTable).Where(
-		schema.PersonalMessagesTableFromUserIDCol.IsNull(),
-		schema.PersonalMessagesTableAddDatetimeCol.Lt(
-			goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL 6 MONTH")),
-		),
-	).Executor().ExecContext(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	return res.RowsAffected()
 }

@@ -14,7 +14,7 @@ import (
 func TestDuplicateFinder(t *testing.T) {
 	t.Parallel()
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	cfg := config.LoadConfig(".")
@@ -53,6 +53,7 @@ func TestDuplicateFinder(t *testing.T) {
 	require.NoError(t, err)
 
 	var hash1 uint64
+
 	success, err := goquDB.Select(schema.DfHashTableHashCol).
 		From(schema.DfHashTable).
 		Where(schema.DfHashTablePictureIDCol.Eq(id1)).
@@ -61,6 +62,7 @@ func TestDuplicateFinder(t *testing.T) {
 	require.True(t, success)
 
 	var hash2 uint64
+
 	success, err = goquDB.Select(schema.DfHashTableHashCol).
 		From(schema.DfHashTable).
 		Where(schema.DfHashTablePictureIDCol.Eq(id2)).

@@ -40,7 +40,7 @@ func TestStatisticsPulse(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	db, err := cnt.GoquDB()
+	db, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	kc := cnt.Keycloak()

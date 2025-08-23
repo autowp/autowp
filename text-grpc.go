@@ -12,6 +12,7 @@ import (
 
 type TextGRPCServer struct {
 	UnimplementedTextServer
+
 	db *goqu.Database
 }
 

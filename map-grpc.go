@@ -23,6 +23,7 @@ import (
 
 type MapGRPCServer struct {
 	UnimplementedMapServer
+
 	db           *goqu.Database
 	imageStorage *storage.Storage
 	i18n         *i18nbundle.I18n

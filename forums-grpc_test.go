@@ -17,7 +17,7 @@ func TestGetThemes(t *testing.T) {
 	client := NewForumsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -38,7 +38,7 @@ func TestGetTheme(t *testing.T) {
 	client := NewForumsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -60,7 +60,7 @@ func TestGetLastTopicAndLastMessage(t *testing.T) {
 	client := NewForumsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -108,7 +108,7 @@ func TestGetUserSummary(t *testing.T) {
 	client := NewForumsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
@@ -128,7 +128,7 @@ func TestCloseTopic(t *testing.T) {
 	client := NewForumsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)

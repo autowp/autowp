@@ -26,10 +26,10 @@ func TestHttpBanPost(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
-	trafficSrv, err := cnt.TrafficGRPCServer()
+	trafficSrv, err := cnt.TrafficGRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := metadata.NewIncomingContext(
@@ -85,7 +85,7 @@ func TestTop(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	srv, err := cnt.TrafficGRPCServer()
+	srv, err := cnt.TrafficGRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := metadata.NewIncomingContext(
@@ -115,7 +115,7 @@ func TestWhitelist(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	srv, err := cnt.TrafficGRPCServer()
+	srv, err := cnt.TrafficGRPCServer(t.Context())
 	require.NoError(t, err)
 
 	_, err = srv.AddToWhitelist(

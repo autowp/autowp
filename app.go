@@ -50,8 +50,8 @@ func NewApplication(cfg config.Config) *Application {
 	return app
 }
 
-func (s *Application) MigrateAutowp(_ context.Context) error {
-	_, err := s.container.AutowpDB()
+func (s *Application) MigrateAutowp(ctx context.Context) error {
+	_, err := s.container.GoquDB(ctx)
 	if err != nil {
 		return err
 	}
@@ -66,13 +66,15 @@ func (s *Application) MigrateAutowp(_ context.Context) error {
 	return nil
 }
 
-func (s *Application) ServeGRPC(quit chan bool) error {
-	grpcServer, err := s.container.GRPCServerWithServices()
+func (s *Application) ServeGRPC(ctx context.Context, quit chan bool) error {
+	grpcServer, err := s.container.GRPCServerWithServices(ctx)
 	if err != nil {
 		return err
 	}
 
-	lis, err := net.Listen("tcp", s.container.Config().GRPC.Listen)
+	var lc net.ListenConfig
+
+	lis, err := lc.Listen(ctx, "tcp", s.container.Config().GRPC.Listen)
 	if err != nil {
 		return err
 	}
@@ -129,7 +131,7 @@ func (s *Application) Serve(ctx context.Context, options ServeOptions, quit chan
 		wg.Add(1)
 
 		go func() {
-			err := s.ServeGRPC(quit)
+			err := s.ServeGRPC(ctx, quit)
 			if err != nil {
 				logrus.Errorln(err.Error())
 			}
@@ -253,7 +255,7 @@ func (s *Application) ServePublic(ctx context.Context, quit chan bool) error {
 }
 
 func (s *Application) ListenDuplicateFinderAMQP(ctx context.Context, quit chan bool) error {
-	df, err := s.container.DuplicateFinder()
+	df, err := s.container.DuplicateFinder(ctx)
 	if err != nil {
 		return err
 	}
@@ -314,8 +316,8 @@ func applyMigrations(config config.MigrationsConfig) error {
 	return nil
 }
 
-func (s *Application) MigratePostgres(_ context.Context) error {
-	_, err := s.container.GoquPostgresDB()
+func (s *Application) MigratePostgres(ctx context.Context) error {
+	_, err := s.container.GoquPostgresDB(ctx)
 	if err != nil {
 		return err
 	}
@@ -331,7 +333,7 @@ func (s *Application) MigratePostgres(_ context.Context) error {
 }
 
 func (s *Application) SchedulerHourly(ctx context.Context) error {
-	traffic, err := s.container.Traffic()
+	traffic, err := s.container.Traffic(ctx)
 	if err != nil {
 		return err
 	}
@@ -365,7 +367,7 @@ func (s *Application) SchedulerHourly(ctx context.Context) error {
 }
 
 func (s *Application) SchedulerDaily(ctx context.Context) error {
-	usersRep, err := s.container.UsersRepository()
+	usersRep, err := s.container.UsersRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -377,7 +379,7 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 		return err
 	}
 
-	commentsRep, err := s.container.CommentsRepository()
+	commentsRep, err := s.container.CommentsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -398,7 +400,7 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 		return err
 	}
 
-	messRepo, err := s.container.MessagingRepository()
+	messRepo, err := s.container.MessagingRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -452,7 +454,7 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 }
 
 func (s *Application) SchedulerMidnight(ctx context.Context) error {
-	ur, err := s.container.UsersRepository()
+	ur, err := s.container.UsersRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -473,7 +475,7 @@ func (s *Application) SchedulerMidnight(ctx context.Context) error {
 
 	logrus.Infof("Updated %d users vote limits", affected)
 
-	idr, err := s.container.ItemOfDayRepository()
+	idr, err := s.container.ItemOfDayRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -491,7 +493,7 @@ func (s *Application) SchedulerMidnight(ctx context.Context) error {
 }
 
 func (s *Application) Autoban(ctx context.Context, quit chan bool) error {
-	traffic, err := s.container.Traffic()
+	traffic, err := s.container.Traffic(ctx)
 	if err != nil {
 		return err
 	}
@@ -499,6 +501,7 @@ func (s *Application) Autoban(ctx context.Context, quit chan bool) error {
 	banTicker := time.NewTicker(time.Minute)
 
 	logrus.Info("AutoBan scheduler started")
+
 loop:
 	for {
 		select {
@@ -520,7 +523,7 @@ loop:
 }
 
 func (s *Application) GenerateIndexCache(ctx context.Context) error {
-	idx, err := s.container.Index()
+	idx, err := s.container.Index(ctx)
 	if err != nil {
 		return err
 	}
@@ -566,7 +569,7 @@ func (s *Application) GenerateIndexCache(ctx context.Context) error {
 }
 
 func (s *Application) SpecsRefreshConflictFlags(ctx context.Context) error {
-	repository, err := s.container.AttrsRepository()
+	repository, err := s.container.AttrsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -575,7 +578,7 @@ func (s *Application) SpecsRefreshConflictFlags(ctx context.Context) error {
 }
 
 func (s *Application) SpecsRefreshActualValues(ctx context.Context) error {
-	repository, err := s.container.AttrsRepository()
+	repository, err := s.container.AttrsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -586,7 +589,7 @@ func (s *Application) SpecsRefreshActualValues(ctx context.Context) error {
 func (s *Application) RefreshItemParentLanguage(
 	ctx context.Context, parentItemTypeID schema.ItemTableItemTypeID, limit uint,
 ) error {
-	repository, err := s.container.ItemsRepository()
+	repository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -595,7 +598,7 @@ func (s *Application) RefreshItemParentLanguage(
 }
 
 func (s *Application) RefreshItemParentAllAuto(ctx context.Context) error {
-	repository, err := s.container.ItemsRepository()
+	repository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -604,7 +607,7 @@ func (s *Application) RefreshItemParentAllAuto(ctx context.Context) error {
 }
 
 func (s *Application) RebuildItemOrderCache(ctx context.Context) error {
-	repository, err := s.container.ItemsRepository()
+	repository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -613,7 +616,7 @@ func (s *Application) RebuildItemOrderCache(ctx context.Context) error {
 }
 
 func (s *Application) PicturesDfIndex(ctx context.Context) error {
-	repository, err := s.container.PicturesRepository()
+	repository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -622,7 +625,7 @@ func (s *Application) PicturesDfIndex(ctx context.Context) error {
 }
 
 func (s *Application) PicturesFixFilenames(ctx context.Context) error {
-	repository, err := s.container.PicturesRepository()
+	repository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -631,7 +634,7 @@ func (s *Application) PicturesFixFilenames(ctx context.Context) error {
 }
 
 func (s *Application) PicturesClearQueue(ctx context.Context) error {
-	picturesRepo, err := s.container.PicturesRepository()
+	picturesRepo, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -640,12 +643,12 @@ func (s *Application) PicturesClearQueue(ctx context.Context) error {
 }
 
 func (s *Application) BuildBrandsSprite(ctx context.Context) error {
-	imageStorage, err := s.container.ImageStorage()
+	imageStorage, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return err
 	}
 
-	repository, err := s.container.ItemsRepository()
+	repository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -655,8 +658,8 @@ func (s *Application) BuildBrandsSprite(ctx context.Context) error {
 	return createIconsSprite(ctx, repository, imageStorage, cfg.FileStorage)
 }
 
-func (s *Application) TelegramWebhookInfo() error {
-	telegram, err := s.container.TelegramService()
+func (s *Application) TelegramWebhookInfo(ctx context.Context) error {
+	telegram, err := s.container.TelegramService(ctx)
 	if err != nil {
 		return err
 	}
@@ -664,8 +667,8 @@ func (s *Application) TelegramWebhookInfo() error {
 	return telegram.WebhookInfo()
 }
 
-func (s *Application) TelegramRegisterWebhook() error {
-	telegram, err := s.container.TelegramService()
+func (s *Application) TelegramRegisterWebhook(ctx context.Context) error {
+	telegram, err := s.container.TelegramService(ctx)
 	if err != nil {
 		return err
 	}
@@ -674,7 +677,7 @@ func (s *Application) TelegramRegisterWebhook() error {
 }
 
 func (s *Application) SpecsRefreshUsersConflicts(ctx context.Context) error {
-	repository, err := s.container.AttrsRepository()
+	repository, err := s.container.AttrsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -683,7 +686,7 @@ func (s *Application) SpecsRefreshUsersConflicts(ctx context.Context) error {
 }
 
 func (s *Application) SpecsRefreshUserConflicts(ctx context.Context, userID int64) error {
-	repository, err := s.container.AttrsRepository()
+	repository, err := s.container.AttrsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -692,7 +695,7 @@ func (s *Application) SpecsRefreshUserConflicts(ctx context.Context, userID int6
 }
 
 func (s *Application) SpecsRefreshItemConflictFlags(ctx context.Context, itemID int64) error {
-	repository, err := s.container.AttrsRepository()
+	repository, err := s.container.AttrsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -701,7 +704,7 @@ func (s *Application) SpecsRefreshItemConflictFlags(ctx context.Context, itemID 
 }
 
 func (s *Application) ExportUsersToKeycloak(ctx context.Context) error {
-	ur, err := s.container.UsersRepository()
+	ur, err := s.container.UsersRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -710,7 +713,7 @@ func (s *Application) ExportUsersToKeycloak(ctx context.Context) error {
 }
 
 func (s *Application) ListenMonitoringAMQP(ctx context.Context, quit chan bool) error {
-	traffic, err := s.container.Traffic()
+	traffic, err := s.container.Traffic(ctx)
 	if err != nil {
 		return err
 	}
@@ -732,7 +735,7 @@ func (s *Application) ListenMonitoringAMQP(ctx context.Context, quit chan bool) 
 }
 
 func (s *Application) AttrsUpdateValuesAMQP(ctx context.Context, quit chan bool) error {
-	repository, err := s.container.AttrsRepository()
+	repository, err := s.container.AttrsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -756,7 +759,7 @@ func (s *Application) AttrsUpdateValuesAMQP(ctx context.Context, quit chan bool)
 }
 
 func (s *Application) ImageStorageGetImage(ctx context.Context, imageID int) (*APIImage, error) {
-	is, err := s.container.ImageStorage()
+	is, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -774,7 +777,7 @@ func (s *Application) ImageStorageGetFormattedImage(
 	imageID int,
 	format string,
 ) (*APIImage, error) {
-	is, err := s.container.ImageStorage()
+	is, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -791,7 +794,7 @@ func (s *Application) ImageStorageFlushFormattedImages(
 	ctx context.Context,
 	options storage.FlushOptions,
 ) error {
-	is, err := s.container.ImageStorage()
+	is, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return err
 	}
@@ -804,7 +807,7 @@ func (s *Application) ImageStorageListBrokenImages(
 	dir string,
 	offset string,
 ) error {
-	is, err := s.container.ImageStorage()
+	is, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return err
 	}
@@ -815,7 +818,7 @@ func (s *Application) ImageStorageListBrokenImages(
 func (s *Application) ImageStorageListUnlinkedObjects(
 	ctx context.Context, dir string, moveToLostAndFound bool, offset string,
 ) error {
-	is, err := s.container.ImageStorage()
+	is, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return err
 	}

@@ -403,27 +403,6 @@ func (s *Repository) GetModerVoteTemplates(
 	return rows, err
 }
 
-func (s *Repository) updatePictureSummary(ctx context.Context, id int64) error {
-	_, err := s.db.Insert(schema.PictureVoteSummaryTable).Rows(goqu.Record{
-		schema.PictureVoteSummaryTablePictureIDColName: id,
-		schema.PictureVoteSummaryTablePositiveColName: s.db.Select(goqu.COUNT(goqu.Star())).
-			From(schema.PictureVoteTable).
-			Where(schema.PictureVoteTablePictureIDCol.Eq(id), schema.PictureVoteTableValueCol.Gt(0)),
-		schema.PictureVoteSummaryTableNegativeColName: s.db.Select(goqu.COUNT(goqu.Star())).
-			From(schema.PictureVoteTable).
-			Where(schema.PictureVoteTablePictureIDCol.Eq(id), schema.PictureVoteTableValueCol.Lt(0)),
-	}).OnConflict(goqu.DoUpdate(schema.PictureVoteSummaryTablePictureIDColName, goqu.Record{
-		schema.PictureVoteSummaryTablePositiveColName: goqu.Func(
-			"VALUES", goqu.C(schema.PictureVoteSummaryTablePositiveColName),
-		),
-		schema.PictureVoteSummaryTableNegativeColName: goqu.Func(
-			"VALUES", goqu.C(schema.PictureVoteSummaryTableNegativeColName),
-		),
-	})).Executor().ExecContext(ctx)
-
-	return err
-}
-
 func (s *Repository) Count(ctx context.Context, options *query.PictureListOptions) (int, error) {
 	var count int
 
@@ -448,6 +427,7 @@ func (s *Repository) TopLikes(ctx context.Context, limit uint) ([]RatingUser, er
 	rows := make([]RatingUser, 0)
 
 	const volumeAlias = "volume"
+
 	err := s.db.Select(schema.PictureTableOwnerIDCol, goqu.SUM(schema.PictureVoteTableValueCol).As(volumeAlias)).
 		From(schema.PictureTable).
 		Join(schema.PictureVoteTable, goqu.On(schema.PictureTableIDCol.Eq(schema.PictureVoteTablePictureIDCol))).
@@ -468,6 +448,7 @@ func (s *Repository) TopOwnerFans(
 	rows := make([]RatingFan, 0)
 
 	const volumeAlias = "volume"
+
 	err := s.db.Select(schema.PictureVoteTableUserIDCol, goqu.COUNT(goqu.Star()).As(volumeAlias)).
 		From(schema.PictureTable).
 		Join(schema.PictureVoteTable, goqu.On(schema.PictureTableIDCol.Eq(schema.PictureVoteTablePictureIDCol))).
@@ -575,304 +556,6 @@ func (s *Repository) HasModerVote(
 		ScanValContext(ctx, &res)
 
 	return success && res, err
-}
-
-func (s *Repository) orderBy( //nolint: maintidx
-	sqSelect *goqu.SelectDataset, options *query.PictureListOptions, order OrderBy, groupBy bool,
-) (*goqu.SelectDataset, bool, error) {
-	var (
-		alias      = query.PictureAlias
-		aliasTable = goqu.T(alias)
-	)
-
-	switch order {
-	case OrderByAddDateStrictDesc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAddDateColName).Desc())
-	case OrderByAddDateStrictAsc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAddDateColName).Asc())
-	case OrderByAddDateDesc:
-		sqSelect = sqSelect.Order(
-			aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
-			aliasTable.Col(schema.PictureTableIDColName).Desc(),
-		)
-	case OrderByAddDateAsc:
-		sqSelect = sqSelect.Order(
-			aliasTable.Col(schema.PictureTableAddDateColName).Asc(),
-			aliasTable.Col(schema.PictureTableIDColName).Asc(),
-		)
-	case OrderByResolutionDesc:
-		sqSelect = sqSelect.Order(
-			aliasTable.Col(schema.PictureTableWidthColName).Desc(),
-			aliasTable.Col(schema.PictureTableHeightColName).Desc(),
-			aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
-			aliasTable.Col(schema.PictureTableIDColName).Desc(),
-		)
-	case OrderByResolutionAsc:
-		sqSelect = sqSelect.Order(
-			aliasTable.Col(schema.PictureTableWidthColName).Asc(),
-			aliasTable.Col(schema.PictureTableHeightColName).Asc(),
-		)
-	case OrderByFilesizeDesc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableFilesizeColName).Desc())
-	case OrderByFilesizeAsc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableFilesizeColName).Asc())
-	case OrderByComments:
-		ctoAlias := alias + "cto"
-		sqSelect = sqSelect.
-			LeftJoin(schema.CommentTopicTable.As(ctoAlias), goqu.On(
-				aliasTable.Col(schema.PictureTableIDColName).Eq(
-					goqu.T(ctoAlias).Col(schema.CommentTopicTableItemIDColName),
-				),
-				goqu.T(ctoAlias).
-					Col(schema.CommentTopicTableTypeIDColName).
-					Eq(schema.CommentMessageTypeIDPictures),
-			)).
-			Order(goqu.T(ctoAlias).Col(schema.CommentTopicTableMessagesColName).Desc())
-	case OrderByViews:
-		pvoAlias := alias + "pvo"
-		sqSelect = sqSelect.
-			LeftJoin(schema.PictureViewTable.As(pvoAlias), goqu.On(
-				aliasTable.Col(schema.PictureTableIDColName).Eq(
-					goqu.T(pvoAlias).Col(schema.PictureViewTablePictureIDColName),
-				),
-			)).
-			Order(goqu.T(pvoAlias).Col(schema.PictureViewTableViewsColName).Desc())
-	case OrderByModerVotes:
-		if options.PictureModerVote == nil {
-			return nil, false, errJoinNeededToSortByPictureModerVote
-		}
-
-		pmvAlias := query.AppendPictureModerVoteAlias(alias)
-		sqSelect = sqSelect.Order(
-			goqu.MAX(goqu.T(pmvAlias).Col(schema.PictureModerVoteTableDayDateColName)).Asc(),
-		)
-	case OrderByRemovingDate:
-		sqSelect = sqSelect.Order(
-			aliasTable.Col(schema.PictureTableRemovingDateColName).Desc(),
-			aliasTable.Col(schema.PictureTableIDColName).Asc(),
-		)
-	case OrderByLikes:
-		pvsAlias := alias + "pvs"
-		sqSelect = sqSelect.
-			LeftJoin(schema.PictureVoteSummaryTable.As(pvsAlias), goqu.On(
-				aliasTable.Col(schema.PictureTableIDColName).Eq(
-					goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePictureIDColName),
-				),
-			)).
-			Order(
-				goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePositiveColName).Desc(),
-				aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
-				aliasTable.Col(schema.PictureTableIDColName).Desc(),
-			)
-	case OrderByDislikes:
-		pvsAlias := alias + "pvs"
-		sqSelect = sqSelect.
-			LeftJoin(schema.PictureVoteSummaryTable.As(pvsAlias), goqu.On(
-				aliasTable.Col(schema.PictureTableIDColName).Eq(
-					goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePictureIDColName),
-				),
-			)).
-			Order(
-				goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTableNegativeColName).Desc(),
-				aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
-				aliasTable.Col(schema.PictureTableIDColName).Desc(),
-			)
-	case OrderByStatus:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableStatusColName).Asc())
-	case OrderByAcceptDatetimeStrictAsc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Asc())
-	case OrderByAcceptDatetimeStrictDesc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Desc())
-	case OrderByAcceptDatetimeAsc:
-		sqSelect = sqSelect.Order(
-			aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Asc(),
-			aliasTable.Col(schema.PictureTableAddDateColName).Asc(),
-			aliasTable.Col(schema.PictureTableIDColName).Asc(),
-		)
-	case OrderByAcceptDatetimeDesc:
-		sqSelect = sqSelect.Order(
-			aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Desc(),
-			aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
-			aliasTable.Col(schema.PictureTableIDColName).Desc(),
-		)
-	case OrderByDfDistanceSimilarity:
-		if options.DfDistance == nil {
-			return nil, false, errJoinNeededToSortByDfDistanceSimilarity
-		}
-
-		dfDistanceAlias := query.AppendDfDistanceAlias(alias)
-		sqSelect = sqSelect.Order(
-			goqu.MIN(goqu.T(dfDistanceAlias).Col(schema.DfDistanceTableDistanceColName)).Asc(),
-		)
-	case OrderByVotesAndPerspectivesGroupPerspectives:
-		if options.PictureItem == nil || options.PictureItem.ItemParentCacheAncestor == nil ||
-			options.PictureItem.PerspectiveGroupPerspective == nil {
-			return nil, false, errJoinNeededToSortByPerspective
-		}
-
-		var (
-			piAlias                 = options.PictureItemAlias(alias, 0)
-			ipcaAlias               = options.PictureItem.ItemParentCacheAncestorAlias(piAlias)
-			pgpAlias                = query.AppendPerspectiveGroupPerspectiveAlias(piAlias)
-			col       exp.Orderable = goqu.T(pgpAlias).Col(schema.PerspectivesGroupsPerspectivesTablePositionColName)
-		)
-
-		if !options.IsIDUnique() {
-			col = goqu.MAX(col)
-		}
-
-		sqSelect = sqSelect.
-			Join(schema.PictureVoteSummaryTable, goqu.On(
-				aliasTable.Col(schema.PictureTableIDColName).
-					Eq(schema.PictureVoteSummaryTablePictureIDCol),
-			)).
-			Order(
-				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
-				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
-				col.Asc(),
-				schema.PictureVoteSummaryTablePositiveCol.Desc(),
-				aliasTable.Col(schema.PictureTableWidthColName).Desc(),
-				aliasTable.Col(schema.PictureTableHeightColName).Desc(),
-			)
-
-	case OrderByPerspectivesGroupPerspectives:
-		if options.PictureItem == nil {
-			return nil, false, errJoinNeededToSortByPerspective
-		}
-
-		var exps []exp.OrderedExpression
-
-		piAlias := options.PictureItemAlias(alias, 0)
-
-		if options.PictureItem.ItemID == 0 && options.PictureItem.ItemParentCacheAncestor != nil {
-			if options.PictureItem.ItemParentCacheAncestor.ItemsByItemID == nil {
-				return nil, false, errJoinNeededToSortByPerspective
-			}
-
-			ipcaAlias := options.PictureItem.ItemParentCacheAncestorAlias(piAlias)
-			iAlias := options.PictureItem.ItemParentCacheAncestor.ItemsByItemIDAlias(ipcaAlias)
-			exps = append(
-				exps,
-				goqu.MAX(goqu.T(iAlias).Col(schema.ItemTableIsConceptColName)).Asc(),
-			)
-			exps = append(
-				exps,
-				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
-			)
-			exps = append(
-				exps,
-				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
-			)
-		}
-
-		if options.PictureItem.PerspectiveGroupPerspective != nil {
-			var (
-				pgpAlias               = query.AppendPerspectiveGroupPerspectiveAlias(piAlias)
-				col      exp.Orderable = goqu.T(pgpAlias).Col(schema.PerspectivesGroupsPerspectivesTablePositionColName)
-			)
-
-			if !options.IsIDUnique() {
-				col = goqu.MAX(col)
-			}
-
-			exps = append(exps, col.Asc())
-		}
-
-		exps = append(
-			[]exp.OrderedExpression{aliasTable.Col(schema.PictureTableContentCountColName).Asc()},
-			exps...)
-		exps = append(exps,
-			aliasTable.Col(schema.PictureTableWidthColName).Desc(),
-			aliasTable.Col(schema.PictureTableHeightColName).Desc(),
-		)
-
-		sqSelect = sqSelect.Order(exps...)
-	case OrderByPerspectives:
-		if options.PictureItem == nil {
-			return nil, false, errJoinNeededToSortByPerspective
-		}
-
-		piAlias := options.PictureItemAlias(alias, 0)
-
-		groupBy = true
-		sqSelect = sqSelect.
-			LeftJoin(schema.PerspectivesTable, goqu.On(
-				goqu.T(piAlias).
-					Col(schema.PictureItemTablePerspectiveIDColName).
-					Eq(schema.PerspectivesTableIDCol),
-			)).
-			Order(
-				goqu.MIN(schema.PerspectivesTablePositionCol).Asc(),
-				aliasTable.Col(schema.PictureTableWidthColName).Desc(),
-				aliasTable.Col(schema.PictureTableHeightColName).Desc(),
-				aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
-				aliasTable.Col(schema.PictureTableIDColName).Desc(),
-			)
-	case OrderByTopPerspectives, OrderByBottomPerspectives, OrderByFrontPerspectives:
-		if options.PictureItem == nil {
-			return nil, false, errJoinNeededToSortByPerspective
-		}
-
-		var perspectives []int64
-
-		switch order {
-		case OrderByBottomPerspectives:
-			perspectives = specsBottomPerspectives
-		case OrderByFrontPerspectives:
-			perspectives = frontPerspectives
-		default:
-			perspectives = specsTopPerspectives
-		}
-
-		orderExprs := make([]exp.OrderedExpression, 0, len(perspectives))
-		piAlias := options.PictureItemAlias(alias, 0)
-
-		for _, pid := range perspectives {
-			var expr exp.Comparable = goqu.T(piAlias).Col(schema.PictureItemTablePerspectiveIDColName)
-
-			if groupBy {
-				expr = goqu.MAX(expr)
-			}
-
-			orderExprs = append(orderExprs, goqu.L("?", expr.Eq(pid)).Desc())
-		}
-
-		sqSelect = sqSelect.Order(orderExprs...)
-
-	case OrderByIDDesc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableIDColName).Desc())
-
-	case OrderByIDAsc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableIDColName).Asc())
-
-	case OrderByAncestorStockFrontFirst:
-		if options.PictureItem == nil || options.PictureItem.ItemParentCacheAncestor == nil ||
-			options.PictureItem.ItemParentCacheAncestor.ItemsByParentID == nil {
-			return nil, false, errJoinNeededToSortByPerspective
-		}
-
-		piAlias := options.PictureItemAlias(alias, 0)
-		ipcaAlias := options.PictureItem.ItemParentCacheAncestorAlias(piAlias)
-		iAlias := options.PictureItem.ItemParentCacheAncestor.ItemsByParentIDAlias(ipcaAlias)
-		perspectiveIDCol := goqu.MAX(
-			goqu.T(piAlias).Col(schema.PictureItemTablePerspectiveIDColName),
-		)
-
-		sqSelect = sqSelect.Order(
-			goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
-			goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
-			goqu.MAX(goqu.T(iAlias).Col(schema.ItemTableIsConceptColName)).Asc(),
-			goqu.L("?", perspectiveIDCol.Eq(schema.PerspectiveFrontStrict)).Desc(),
-			goqu.L("?", perspectiveIDCol.Eq(schema.PerspectiveFront)).Desc(),
-			goqu.L("?", perspectiveIDCol.Eq(schema.Perspective3Div4Left)).Desc(),
-			goqu.L("?", perspectiveIDCol.Eq(schema.Perspective3Div4Right)).Desc(),
-		)
-	case OrderByRandom:
-		sqSelect = sqSelect.Order(goqu.Func("RAND").Asc())
-	case OrderByNone:
-	}
-
-	return sqSelect, groupBy, nil
 }
 
 func (s *Repository) PictureSelect(
@@ -1244,54 +927,6 @@ func (s *Repository) SetPictureItemItemID(
 	return nil
 }
 
-func (s *Repository) isAllowedTypeByItemID(
-	ctx context.Context, itemID int64, pictureItemType schema.PictureItemType,
-) (bool, error) {
-	var itemTypeID schema.ItemTableItemTypeID
-
-	success, err := s.db.Select(schema.ItemTableItemTypeIDCol).
-		From(schema.ItemTable).Where(schema.ItemTableIDCol.Eq(itemID)).
-		ScanValContext(ctx, &itemTypeID)
-	if err != nil {
-		return false, err
-	}
-
-	if !success {
-		return false, sql.ErrNoRows
-	}
-
-	return s.isAllowedType(itemTypeID, pictureItemType), nil
-}
-
-func (s *Repository) isAllowedType(
-	itemTypeID schema.ItemTableItemTypeID,
-	pictureItemType schema.PictureItemType,
-) bool {
-	allowed := map[schema.ItemTableItemTypeID][]schema.PictureItemType{
-		schema.ItemTableItemTypeIDBrand: {
-			schema.PictureItemTypeContent,
-			schema.PictureItemTypeCopyrights,
-		},
-		schema.ItemTableItemTypeIDCategory: {schema.PictureItemTypeContent},
-		schema.ItemTableItemTypeIDEngine:   {schema.PictureItemTypeContent},
-		schema.ItemTableItemTypeIDFactory:  {schema.PictureItemTypeContent},
-		schema.ItemTableItemTypeIDVehicle:  {schema.PictureItemTypeContent},
-		schema.ItemTableItemTypeIDTwins:    {schema.PictureItemTypeContent},
-		schema.ItemTableItemTypeIDMuseum:   {schema.PictureItemTypeContent},
-		schema.ItemTableItemTypeIDPerson: {
-			schema.PictureItemTypeContent, schema.PictureItemTypeAuthor, schema.PictureItemTypeCopyrights,
-		},
-		schema.ItemTableItemTypeIDCopyright: {schema.PictureItemTypeCopyrights},
-	}
-
-	pictureItemTypes, ok := allowed[itemTypeID]
-	if !ok {
-		return false
-	}
-
-	return util.Contains(pictureItemTypes, pictureItemType)
-}
-
 func (s *Repository) DeletePictureItemsByPicture(
 	ctx context.Context,
 	pictureID int64,
@@ -1393,22 +1028,6 @@ func (s *Repository) CreatePictureItem(
 	}
 
 	return affected > 0, nil
-}
-
-func (s *Repository) updateContentCount(ctx context.Context, pictureID int64) error {
-	_, err := s.db.Update(schema.PictureTable).
-		Set(goqu.Record{
-			schema.PictureTableContentCountColName: s.db.Select(goqu.COUNT(goqu.Star())).
-				From(schema.PictureItemTable).
-				Where(
-					schema.PictureItemTablePictureIDCol.Eq(pictureID),
-					schema.PictureItemTableTypeCol.Eq(schema.PictureItemTypeContent),
-				),
-		}).
-		Where(schema.PictureTableIDCol.Eq(pictureID)).
-		Executor().ExecContext(ctx)
-
-	return err
 }
 
 func (s *Repository) SetPictureCrop(ctx context.Context, pictureID int64, area sampler.Crop) error {
@@ -1612,6 +1231,7 @@ func (s *Repository) PositiveVotesCount(ctx context.Context, pictureID int64) (i
 
 func (s *Repository) HasVote(ctx context.Context, pictureID int64, userID int64) (bool, error) {
 	var exists bool
+
 	success, err := s.db.Select(goqu.V(true)).From(schema.PictureModerVoteTable).Where(
 		schema.PictureModerVoteTablePictureIDCol.Eq(pictureID),
 		schema.PictureModerVoteTableUserIDCol.Eq(userID),
@@ -2023,43 +1643,6 @@ func (s *Repository) DfIndex(ctx context.Context) error {
 	return nil
 }
 
-func (s *Repository) queueIndexImage(ctx context.Context, id int64, url string) error {
-	rabbitMQ, err := util.ConnectRabbitMQ(s.dfConfig.RabbitMQ)
-	if err != nil {
-		logrus.Error(err)
-
-		return err
-	}
-
-	defer util.Close(rabbitMQ)
-
-	ch, err := rabbitMQ.Channel()
-	if err != nil {
-		return err
-	}
-	defer util.Close(ch)
-
-	return s.doQueueIndexImage(ctx, ch, id, url)
-}
-
-func (s *Repository) doQueueIndexImage(ctx context.Context, ch *amqp091.Channel, id int64, url string) error {
-	msg := DuplicateFinderInputMessage{
-		PictureID: id,
-		URL:       url,
-	}
-
-	body, err := json.Marshal(msg)
-	if err != nil {
-		return err
-	}
-
-	return ch.PublishWithContext(ctx, "", s.dfConfig.Queue, false, false, amqp091.Publishing{
-		DeliveryMode: amqp091.Persistent,
-		ContentType:  "application/json",
-		Body:         body,
-	})
-}
-
 func (s *Repository) DfDistanceSelect(
 	options *query.DfDistanceListOptions,
 ) (*goqu.SelectDataset, error) {
@@ -2115,20 +1698,6 @@ func (s *Repository) PictureModerVotes(
 	err := s.PictureModerVoteSelect(options).ScanStructsContext(ctx, &rows)
 
 	return rows, err
-}
-
-func (s *Repository) perspectivePageGroupIDs(
-	ctx context.Context, pageID int32,
-) ([]int32, error) {
-	var ids []int32
-
-	err := s.db.Select(schema.PerspectivesGroupsTableIDCol).
-		From(schema.PerspectivesGroupsTable).
-		Where(schema.PerspectivesGroupsTablePageIDCol.Eq(pageID)).
-		Order(schema.PerspectivesGroupsTablePositionCol.Asc()).
-		ScanValsContext(ctx, &ids)
-
-	return ids, err
 }
 
 func (s *Repository) PerspectivePageGroupIDs(ctx context.Context, pageID int32) ([]int32, error) {
@@ -2662,6 +2231,440 @@ func (s *Repository) AddPictureFromReader(
 	}
 
 	return pictureID, nil
+}
+
+func (s *Repository) updatePictureSummary(ctx context.Context, id int64) error {
+	_, err := s.db.Insert(schema.PictureVoteSummaryTable).Rows(goqu.Record{
+		schema.PictureVoteSummaryTablePictureIDColName: id,
+		schema.PictureVoteSummaryTablePositiveColName: s.db.Select(goqu.COUNT(goqu.Star())).
+			From(schema.PictureVoteTable).
+			Where(schema.PictureVoteTablePictureIDCol.Eq(id), schema.PictureVoteTableValueCol.Gt(0)),
+		schema.PictureVoteSummaryTableNegativeColName: s.db.Select(goqu.COUNT(goqu.Star())).
+			From(schema.PictureVoteTable).
+			Where(schema.PictureVoteTablePictureIDCol.Eq(id), schema.PictureVoteTableValueCol.Lt(0)),
+	}).OnConflict(goqu.DoUpdate(schema.PictureVoteSummaryTablePictureIDColName, goqu.Record{
+		schema.PictureVoteSummaryTablePositiveColName: goqu.Func(
+			"VALUES", goqu.C(schema.PictureVoteSummaryTablePositiveColName),
+		),
+		schema.PictureVoteSummaryTableNegativeColName: goqu.Func(
+			"VALUES", goqu.C(schema.PictureVoteSummaryTableNegativeColName),
+		),
+	})).Executor().ExecContext(ctx)
+
+	return err
+}
+
+func (s *Repository) orderBy( //nolint: maintidx
+	sqSelect *goqu.SelectDataset, options *query.PictureListOptions, order OrderBy, groupBy bool,
+) (*goqu.SelectDataset, bool, error) {
+	var (
+		alias      = query.PictureAlias
+		aliasTable = goqu.T(alias)
+	)
+
+	switch order {
+	case OrderByAddDateStrictDesc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAddDateColName).Desc())
+	case OrderByAddDateStrictAsc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAddDateColName).Asc())
+	case OrderByAddDateDesc:
+		sqSelect = sqSelect.Order(
+			aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
+			aliasTable.Col(schema.PictureTableIDColName).Desc(),
+		)
+	case OrderByAddDateAsc:
+		sqSelect = sqSelect.Order(
+			aliasTable.Col(schema.PictureTableAddDateColName).Asc(),
+			aliasTable.Col(schema.PictureTableIDColName).Asc(),
+		)
+	case OrderByResolutionDesc:
+		sqSelect = sqSelect.Order(
+			aliasTable.Col(schema.PictureTableWidthColName).Desc(),
+			aliasTable.Col(schema.PictureTableHeightColName).Desc(),
+			aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
+			aliasTable.Col(schema.PictureTableIDColName).Desc(),
+		)
+	case OrderByResolutionAsc:
+		sqSelect = sqSelect.Order(
+			aliasTable.Col(schema.PictureTableWidthColName).Asc(),
+			aliasTable.Col(schema.PictureTableHeightColName).Asc(),
+		)
+	case OrderByFilesizeDesc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableFilesizeColName).Desc())
+	case OrderByFilesizeAsc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableFilesizeColName).Asc())
+	case OrderByComments:
+		ctoAlias := alias + "cto"
+		sqSelect = sqSelect.
+			LeftJoin(schema.CommentTopicTable.As(ctoAlias), goqu.On(
+				aliasTable.Col(schema.PictureTableIDColName).Eq(
+					goqu.T(ctoAlias).Col(schema.CommentTopicTableItemIDColName),
+				),
+				goqu.T(ctoAlias).
+					Col(schema.CommentTopicTableTypeIDColName).
+					Eq(schema.CommentMessageTypeIDPictures),
+			)).
+			Order(goqu.T(ctoAlias).Col(schema.CommentTopicTableMessagesColName).Desc())
+	case OrderByViews:
+		pvoAlias := alias + "pvo"
+		sqSelect = sqSelect.
+			LeftJoin(schema.PictureViewTable.As(pvoAlias), goqu.On(
+				aliasTable.Col(schema.PictureTableIDColName).Eq(
+					goqu.T(pvoAlias).Col(schema.PictureViewTablePictureIDColName),
+				),
+			)).
+			Order(goqu.T(pvoAlias).Col(schema.PictureViewTableViewsColName).Desc())
+	case OrderByModerVotes:
+		if options.PictureModerVote == nil {
+			return nil, false, errJoinNeededToSortByPictureModerVote
+		}
+
+		pmvAlias := query.AppendPictureModerVoteAlias(alias)
+		sqSelect = sqSelect.Order(
+			goqu.MAX(goqu.T(pmvAlias).Col(schema.PictureModerVoteTableDayDateColName)).Asc(),
+		)
+	case OrderByRemovingDate:
+		sqSelect = sqSelect.Order(
+			aliasTable.Col(schema.PictureTableRemovingDateColName).Desc(),
+			aliasTable.Col(schema.PictureTableIDColName).Asc(),
+		)
+	case OrderByLikes:
+		pvsAlias := alias + "pvs"
+		sqSelect = sqSelect.
+			LeftJoin(schema.PictureVoteSummaryTable.As(pvsAlias), goqu.On(
+				aliasTable.Col(schema.PictureTableIDColName).Eq(
+					goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePictureIDColName),
+				),
+			)).
+			Order(
+				goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePositiveColName).Desc(),
+				aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
+				aliasTable.Col(schema.PictureTableIDColName).Desc(),
+			)
+	case OrderByDislikes:
+		pvsAlias := alias + "pvs"
+		sqSelect = sqSelect.
+			LeftJoin(schema.PictureVoteSummaryTable.As(pvsAlias), goqu.On(
+				aliasTable.Col(schema.PictureTableIDColName).Eq(
+					goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePictureIDColName),
+				),
+			)).
+			Order(
+				goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTableNegativeColName).Desc(),
+				aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
+				aliasTable.Col(schema.PictureTableIDColName).Desc(),
+			)
+	case OrderByStatus:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableStatusColName).Asc())
+	case OrderByAcceptDatetimeStrictAsc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Asc())
+	case OrderByAcceptDatetimeStrictDesc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Desc())
+	case OrderByAcceptDatetimeAsc:
+		sqSelect = sqSelect.Order(
+			aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Asc(),
+			aliasTable.Col(schema.PictureTableAddDateColName).Asc(),
+			aliasTable.Col(schema.PictureTableIDColName).Asc(),
+		)
+	case OrderByAcceptDatetimeDesc:
+		sqSelect = sqSelect.Order(
+			aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Desc(),
+			aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
+			aliasTable.Col(schema.PictureTableIDColName).Desc(),
+		)
+	case OrderByDfDistanceSimilarity:
+		if options.DfDistance == nil {
+			return nil, false, errJoinNeededToSortByDfDistanceSimilarity
+		}
+
+		dfDistanceAlias := query.AppendDfDistanceAlias(alias)
+		sqSelect = sqSelect.Order(
+			goqu.MIN(goqu.T(dfDistanceAlias).Col(schema.DfDistanceTableDistanceColName)).Asc(),
+		)
+	case OrderByVotesAndPerspectivesGroupPerspectives:
+		if options.PictureItem == nil || options.PictureItem.ItemParentCacheAncestor == nil ||
+			options.PictureItem.PerspectiveGroupPerspective == nil {
+			return nil, false, errJoinNeededToSortByPerspective
+		}
+
+		var (
+			piAlias                 = options.PictureItemAlias(alias, 0)
+			ipcaAlias               = options.PictureItem.ItemParentCacheAncestorAlias(piAlias)
+			pgpAlias                = query.AppendPerspectiveGroupPerspectiveAlias(piAlias)
+			col       exp.Orderable = goqu.T(pgpAlias).Col(schema.PerspectivesGroupsPerspectivesTablePositionColName)
+		)
+
+		if !options.IsIDUnique() {
+			col = goqu.MAX(col)
+		}
+
+		sqSelect = sqSelect.
+			Join(schema.PictureVoteSummaryTable, goqu.On(
+				aliasTable.Col(schema.PictureTableIDColName).
+					Eq(schema.PictureVoteSummaryTablePictureIDCol),
+			)).
+			Order(
+				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
+				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
+				col.Asc(),
+				schema.PictureVoteSummaryTablePositiveCol.Desc(),
+				aliasTable.Col(schema.PictureTableWidthColName).Desc(),
+				aliasTable.Col(schema.PictureTableHeightColName).Desc(),
+			)
+
+	case OrderByPerspectivesGroupPerspectives:
+		if options.PictureItem == nil {
+			return nil, false, errJoinNeededToSortByPerspective
+		}
+
+		var exps []exp.OrderedExpression
+
+		piAlias := options.PictureItemAlias(alias, 0)
+
+		if options.PictureItem.ItemID == 0 && options.PictureItem.ItemParentCacheAncestor != nil {
+			if options.PictureItem.ItemParentCacheAncestor.ItemsByItemID == nil {
+				return nil, false, errJoinNeededToSortByPerspective
+			}
+
+			ipcaAlias := options.PictureItem.ItemParentCacheAncestorAlias(piAlias)
+			iAlias := options.PictureItem.ItemParentCacheAncestor.ItemsByItemIDAlias(ipcaAlias)
+			exps = append(
+				exps,
+				goqu.MAX(goqu.T(iAlias).Col(schema.ItemTableIsConceptColName)).Asc(),
+			)
+			exps = append(
+				exps,
+				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
+			)
+			exps = append(
+				exps,
+				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
+			)
+		}
+
+		if options.PictureItem.PerspectiveGroupPerspective != nil {
+			var (
+				pgpAlias               = query.AppendPerspectiveGroupPerspectiveAlias(piAlias)
+				col      exp.Orderable = goqu.T(pgpAlias).Col(schema.PerspectivesGroupsPerspectivesTablePositionColName)
+			)
+
+			if !options.IsIDUnique() {
+				col = goqu.MAX(col)
+			}
+
+			exps = append(exps, col.Asc())
+		}
+
+		exps = append(
+			[]exp.OrderedExpression{aliasTable.Col(schema.PictureTableContentCountColName).Asc()},
+			exps...)
+		exps = append(exps,
+			aliasTable.Col(schema.PictureTableWidthColName).Desc(),
+			aliasTable.Col(schema.PictureTableHeightColName).Desc(),
+		)
+
+		sqSelect = sqSelect.Order(exps...)
+	case OrderByPerspectives:
+		if options.PictureItem == nil {
+			return nil, false, errJoinNeededToSortByPerspective
+		}
+
+		piAlias := options.PictureItemAlias(alias, 0)
+
+		groupBy = true
+		sqSelect = sqSelect.
+			LeftJoin(schema.PerspectivesTable, goqu.On(
+				goqu.T(piAlias).
+					Col(schema.PictureItemTablePerspectiveIDColName).
+					Eq(schema.PerspectivesTableIDCol),
+			)).
+			Order(
+				goqu.MIN(schema.PerspectivesTablePositionCol).Asc(),
+				aliasTable.Col(schema.PictureTableWidthColName).Desc(),
+				aliasTable.Col(schema.PictureTableHeightColName).Desc(),
+				aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
+				aliasTable.Col(schema.PictureTableIDColName).Desc(),
+			)
+	case OrderByTopPerspectives, OrderByBottomPerspectives, OrderByFrontPerspectives:
+		if options.PictureItem == nil {
+			return nil, false, errJoinNeededToSortByPerspective
+		}
+
+		var perspectives []int64
+
+		switch order {
+		case OrderByBottomPerspectives:
+			perspectives = specsBottomPerspectives
+		case OrderByFrontPerspectives:
+			perspectives = frontPerspectives
+		default:
+			perspectives = specsTopPerspectives
+		}
+
+		orderExprs := make([]exp.OrderedExpression, 0, len(perspectives))
+		piAlias := options.PictureItemAlias(alias, 0)
+
+		for _, pid := range perspectives {
+			var expr exp.Comparable = goqu.T(piAlias).Col(schema.PictureItemTablePerspectiveIDColName)
+
+			if groupBy {
+				expr = goqu.MAX(expr)
+			}
+
+			orderExprs = append(orderExprs, goqu.L("?", expr.Eq(pid)).Desc())
+		}
+
+		sqSelect = sqSelect.Order(orderExprs...)
+
+	case OrderByIDDesc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableIDColName).Desc())
+
+	case OrderByIDAsc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableIDColName).Asc())
+
+	case OrderByAncestorStockFrontFirst:
+		if options.PictureItem == nil || options.PictureItem.ItemParentCacheAncestor == nil ||
+			options.PictureItem.ItemParentCacheAncestor.ItemsByParentID == nil {
+			return nil, false, errJoinNeededToSortByPerspective
+		}
+
+		piAlias := options.PictureItemAlias(alias, 0)
+		ipcaAlias := options.PictureItem.ItemParentCacheAncestorAlias(piAlias)
+		iAlias := options.PictureItem.ItemParentCacheAncestor.ItemsByParentIDAlias(ipcaAlias)
+		perspectiveIDCol := goqu.MAX(
+			goqu.T(piAlias).Col(schema.PictureItemTablePerspectiveIDColName),
+		)
+
+		sqSelect = sqSelect.Order(
+			goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
+			goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
+			goqu.MAX(goqu.T(iAlias).Col(schema.ItemTableIsConceptColName)).Asc(),
+			goqu.L("?", perspectiveIDCol.Eq(schema.PerspectiveFrontStrict)).Desc(),
+			goqu.L("?", perspectiveIDCol.Eq(schema.PerspectiveFront)).Desc(),
+			goqu.L("?", perspectiveIDCol.Eq(schema.Perspective3Div4Left)).Desc(),
+			goqu.L("?", perspectiveIDCol.Eq(schema.Perspective3Div4Right)).Desc(),
+		)
+	case OrderByRandom:
+		sqSelect = sqSelect.Order(goqu.Func("RAND").Asc())
+	case OrderByNone:
+	}
+
+	return sqSelect, groupBy, nil
+}
+
+func (s *Repository) isAllowedTypeByItemID(
+	ctx context.Context, itemID int64, pictureItemType schema.PictureItemType,
+) (bool, error) {
+	var itemTypeID schema.ItemTableItemTypeID
+
+	success, err := s.db.Select(schema.ItemTableItemTypeIDCol).
+		From(schema.ItemTable).Where(schema.ItemTableIDCol.Eq(itemID)).
+		ScanValContext(ctx, &itemTypeID)
+	if err != nil {
+		return false, err
+	}
+
+	if !success {
+		return false, sql.ErrNoRows
+	}
+
+	return s.isAllowedType(itemTypeID, pictureItemType), nil
+}
+
+func (s *Repository) isAllowedType(
+	itemTypeID schema.ItemTableItemTypeID,
+	pictureItemType schema.PictureItemType,
+) bool {
+	allowed := map[schema.ItemTableItemTypeID][]schema.PictureItemType{
+		schema.ItemTableItemTypeIDBrand: {
+			schema.PictureItemTypeContent,
+			schema.PictureItemTypeCopyrights,
+		},
+		schema.ItemTableItemTypeIDCategory: {schema.PictureItemTypeContent},
+		schema.ItemTableItemTypeIDEngine:   {schema.PictureItemTypeContent},
+		schema.ItemTableItemTypeIDFactory:  {schema.PictureItemTypeContent},
+		schema.ItemTableItemTypeIDVehicle:  {schema.PictureItemTypeContent},
+		schema.ItemTableItemTypeIDTwins:    {schema.PictureItemTypeContent},
+		schema.ItemTableItemTypeIDMuseum:   {schema.PictureItemTypeContent},
+		schema.ItemTableItemTypeIDPerson: {
+			schema.PictureItemTypeContent, schema.PictureItemTypeAuthor, schema.PictureItemTypeCopyrights,
+		},
+		schema.ItemTableItemTypeIDCopyright: {schema.PictureItemTypeCopyrights},
+	}
+
+	pictureItemTypes, ok := allowed[itemTypeID]
+	if !ok {
+		return false
+	}
+
+	return util.Contains(pictureItemTypes, pictureItemType)
+}
+
+func (s *Repository) updateContentCount(ctx context.Context, pictureID int64) error {
+	_, err := s.db.Update(schema.PictureTable).
+		Set(goqu.Record{
+			schema.PictureTableContentCountColName: s.db.Select(goqu.COUNT(goqu.Star())).
+				From(schema.PictureItemTable).
+				Where(
+					schema.PictureItemTablePictureIDCol.Eq(pictureID),
+					schema.PictureItemTableTypeCol.Eq(schema.PictureItemTypeContent),
+				),
+		}).
+		Where(schema.PictureTableIDCol.Eq(pictureID)).
+		Executor().ExecContext(ctx)
+
+	return err
+}
+
+func (s *Repository) queueIndexImage(ctx context.Context, id int64, url string) error {
+	rabbitMQ, err := util.ConnectRabbitMQ(s.dfConfig.RabbitMQ)
+	if err != nil {
+		logrus.Error(err)
+
+		return err
+	}
+
+	defer util.Close(rabbitMQ)
+
+	ch, err := rabbitMQ.Channel()
+	if err != nil {
+		return err
+	}
+	defer util.Close(ch)
+
+	return s.doQueueIndexImage(ctx, ch, id, url)
+}
+
+func (s *Repository) doQueueIndexImage(ctx context.Context, ch *amqp091.Channel, id int64, url string) error {
+	msg := DuplicateFinderInputMessage{
+		PictureID: id,
+		URL:       url,
+	}
+
+	body, err := json.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	return ch.PublishWithContext(ctx, "", s.dfConfig.Queue, false, false, amqp091.Publishing{
+		DeliveryMode: amqp091.Persistent,
+		ContentType:  "application/json",
+		Body:         body,
+	})
+}
+
+func (s *Repository) perspectivePageGroupIDs(
+	ctx context.Context, pageID int32,
+) ([]int32, error) {
+	var ids []int32
+
+	err := s.db.Select(schema.PerspectivesGroupsTableIDCol).
+		From(schema.PerspectivesGroupsTable).
+		Where(schema.PerspectivesGroupsTablePageIDCol.Eq(pageID)).
+		Order(schema.PerspectivesGroupsTablePositionCol.Asc()).
+		ScanValsContext(ctx, &ids)
+
+	return ids, err
 }
 
 func (s *Repository) generateDefaultThumbnails(ctx context.Context, imageID int) error {

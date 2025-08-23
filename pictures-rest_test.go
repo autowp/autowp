@@ -27,7 +27,7 @@ func TestUploadPictureTooSmall(t *testing.T) {
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
-	picturesREST, err := cnt.PicturesREST()
+	picturesREST, err := cnt.PicturesREST(t.Context())
 	require.NoError(t, err)
 
 	router := gin.New()
@@ -78,7 +78,7 @@ func TestUploadPicture(t *testing.T) {
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
-	picturesREST, err := cnt.PicturesREST()
+	picturesREST, err := cnt.PicturesREST(t.Context())
 	require.NoError(t, err)
 
 	router := gin.New()

@@ -135,7 +135,7 @@ func CreatePicture(
 
 	resRecorder := httptest.NewRecorder()
 	router := gin.New()
-	picturesREST, err := cnt.PicturesREST()
+	picturesREST, err := cnt.PicturesREST(t.Context())
 	require.NoError(t, err)
 	picturesREST.SetupRouter(router)
 	router.ServeHTTP(resRecorder, req)
@@ -179,6 +179,7 @@ func CreatePictureRequest(
 
 	handle, err := os.OpenFile(file, os.O_RDONLY, 0)
 	require.NoError(t, err)
+
 	defer util.Close(handle)
 
 	fileBytes, err := io.ReadAll(handle)
@@ -210,7 +211,7 @@ func CreatePictureRequest(
 	err = multipartWriter.Close()
 	require.NoError(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "/api/picture", buf)
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, "/api/picture", buf)
 	require.NoError(t, err)
 
 	req.Header.Add("Content-Type", multipartWriter.FormDataContentType())

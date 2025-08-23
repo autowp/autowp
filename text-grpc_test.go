@@ -44,7 +44,7 @@ func TestGetText(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	res, err := goquDB.Insert(schema.TextstorageTextTable).Rows(goqu.Record{

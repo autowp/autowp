@@ -89,6 +89,7 @@ func (s Sampler) ConvertImage(
 	if background != "" {
 		pw := imagick.NewPixelWand()
 		defer pw.Destroy()
+
 		pw.SetColor(background)
 
 		err := decomposed.SetBackgroundColor(pw)
@@ -360,6 +361,7 @@ func (s Sampler) extendVertical(mw *imagick.MagickWand, format Format) error {
 		if topColor != nil {
 			draw := imagick.NewDrawingWand()
 			defer draw.Destroy()
+
 			draw.SetFillColor(topColor)
 			draw.SetStrokeColor(topColor)
 			draw.Rectangle(
@@ -378,6 +380,7 @@ func (s Sampler) extendVertical(mw *imagick.MagickWand, format Format) error {
 		if bottomColor != nil {
 			draw := imagick.NewDrawingWand()
 			defer draw.Destroy()
+
 			draw.SetFillColor(bottomColor)
 			draw.SetStrokeColor(bottomColor)
 			draw.Rectangle(
@@ -444,6 +447,7 @@ func (s Sampler) extendHorizontal(mw *imagick.MagickWand, format Format) error {
 		if leftColor != nil {
 			draw := imagick.NewDrawingWand()
 			defer draw.Destroy()
+
 			draw.SetFillColor(leftColor)
 			draw.SetStrokeColor(leftColor)
 			draw.Rectangle(
@@ -459,6 +463,7 @@ func (s Sampler) extendHorizontal(mw *imagick.MagickWand, format Format) error {
 		if rightColor != nil {
 			draw := imagick.NewDrawingWand()
 			defer draw.Destroy()
+
 			draw.SetFillColor(rightColor)
 			draw.SetStrokeColor(rightColor)
 			draw.Rectangle(

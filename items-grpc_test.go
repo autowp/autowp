@@ -559,7 +559,7 @@ func TestStats(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(ctx)
 	require.NoError(t, err)
 
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -579,7 +579,7 @@ func TestSetItemParentLanguage(t *testing.T) {
 	client := NewItemsClient(conn)
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(ctx)
 	require.NoError(t, err)
 
 	cases := []struct {
@@ -764,7 +764,7 @@ func TestNewItems(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -942,7 +942,7 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1066,7 +1066,7 @@ func TestDeleteItemParentNotDeletesSecondChild(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1158,7 +1158,7 @@ func TestUpdateItemParent(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1197,7 +1197,7 @@ func TestUpdateItemParent(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	rep, err := cnt.ItemsRepository()
+	rep, err := cnt.ItemsRepository(t.Context())
 	require.NoError(t, err)
 
 	row, err := rep.ItemParent(ctx, &query.ItemParentListOptions{
@@ -1268,7 +1268,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1455,7 +1455,7 @@ func TestSetUserItemSubscription(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1511,7 +1511,7 @@ func TestSetItemEngine(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1620,7 +1620,7 @@ func TestSetItemEngineInheritance(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1726,7 +1726,7 @@ func TestGetBrands(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1798,7 +1798,7 @@ func TestGetBrands(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			idx, err := cnt.Index()
+			idx, err := cnt.Index(t.Context()) //nolint: contextcheck
 			require.NoError(t, err)
 
 			err = idx.GenerateBrandsCache(ctx, testCase.Language)
@@ -1836,7 +1836,7 @@ func TestGetBrands(t *testing.T) {
 func TestBrandSections(t *testing.T) {
 	t.Parallel()
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -1844,6 +1844,7 @@ func TestBrandSections(t *testing.T) {
 	client := NewItemsClient(conn)
 
 	var ids []int64
+
 	err = goquDB.Select(schema.ItemTableIDCol).
 		From(schema.ItemTable).
 		Where(schema.ItemTableItemTypeIDCol.Eq(schema.ItemTableItemTypeIDBrand)).
@@ -1861,7 +1862,7 @@ func TestBrandSections2(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -2021,7 +2022,7 @@ func TestTwinsGroupBrands(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -2109,7 +2110,7 @@ func TestAutocomplete(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -2138,7 +2139,7 @@ func TestTooBig(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -2166,7 +2167,7 @@ func TestSuggestionsTo(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -2193,7 +2194,7 @@ func TestGetItemParents(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -2410,7 +2411,7 @@ func TestTwinsGroupPictures(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -2489,7 +2490,7 @@ func TestPersonPreviewPictures(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()
@@ -2570,7 +2571,7 @@ func TestCutawayAuthorsWithPreviewPictures(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()

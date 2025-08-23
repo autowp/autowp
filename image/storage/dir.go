@@ -13,14 +13,6 @@ type Dir struct {
 	namingStrategy NamingStrategy
 }
 
-func (d *Dir) Bucket() string {
-	return d.bucket
-}
-
-func (d *Dir) NamingStrategy() NamingStrategy { //nolint:ireturn
-	return d.namingStrategy
-}
-
 func NewDir(bucket string, config config.ImageStorageNamingStrategyConfig) (*Dir, error) {
 	var strategy NamingStrategy
 
@@ -41,4 +33,12 @@ func NewDir(bucket string, config config.ImageStorageNamingStrategyConfig) (*Dir
 		bucket:         bucket,
 		namingStrategy: strategy,
 	}, nil
+}
+
+func (d *Dir) Bucket() string {
+	return d.bucket
+}
+
+func (d *Dir) NamingStrategy() NamingStrategy { //nolint:ireturn
+	return d.namingStrategy
 }

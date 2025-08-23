@@ -83,23 +83,6 @@ func NewService(
 	}
 }
 
-func (s *Service) enableMockMode() {
-	s.mockModeEnabled = true
-}
-
-func (s *Service) getBotAPI() (*tgbotapi.BotAPI, error) {
-	if s.botAPI == nil {
-		bot, err := tgbotapi.NewBotAPI(s.config.AccessToken)
-		if err != nil {
-			return nil, fmt.Errorf("NewBotAPI(): %w", err)
-		}
-
-		s.botAPI = bot
-	}
-
-	return s.botAPI, nil
-}
-
 func (s *Service) NotifyMessage(
 	ctx context.Context,
 	fromID int64,
@@ -216,6 +199,190 @@ func (s *Service) NotifyPicture(
 	return nil
 }
 
+func (s *Service) WebhookInfo() error {
+	bot, err := s.getBotAPI()
+	if err != nil {
+		return err
+	}
+
+	wh, err := bot.GetWebhookInfo()
+	if err != nil {
+		return err
+	}
+
+	logrus.Info("URL: " + wh.URL)
+	logrus.Info("LastErrorMessage: " + wh.LastErrorMessage)
+	logrus.Infof("LastErrorDate: %d", wh.LastErrorDate)
+	logrus.Info("IPAddress: " + wh.IPAddress)
+	logrus.Infof("AllowedUpdates: %v", wh.AllowedUpdates)
+	logrus.Infof("HasCustomCertificate: %v", wh.HasCustomCertificate)
+	logrus.Infof("PendingUpdateCount: %d", wh.PendingUpdateCount)
+	logrus.Infof("MaxConnections: %d", wh.MaxConnections)
+
+	return nil
+}
+
+func (s *Service) RegisterWebhook() error {
+	bot, err := s.getBotAPI()
+	if err != nil {
+		return err
+	}
+
+	wh, err := tgbotapi.NewWebhook(s.config.WebHook)
+	if err != nil {
+		return err
+	}
+
+	res, err := bot.Request(wh)
+	if err != nil {
+		return err
+	}
+
+	if res.Ok {
+		logrus.Infof("Webhook successfully registered: %s", res.Description)
+	} else {
+		logrus.Errorf("Failed to register webhook: %d: %s", res.ErrorCode, res.Description)
+	}
+
+	return nil
+}
+
+func GenerateSecureToken(length int) string {
+	b := make([]byte, length)
+	if _, err := rand.Read(b); err != nil {
+		return ""
+	}
+
+	return hex.EncodeToString(b)
+}
+
+func (s *Service) SetupRouter(router *gin.Engine) {
+	router.POST("/telegram/webhook/token/:token", func(ctx *gin.Context) {
+		if ctx.Param("token") != s.config.WebhookToken {
+			ctx.Status(http.StatusForbidden)
+
+			return
+		}
+
+		bot, err := s.getBotAPI()
+		if err != nil {
+			ctx.String(http.StatusInternalServerError, err.Error())
+
+			return
+		}
+
+		update, err := bot.HandleUpdate(ctx.Request)
+		if err != nil {
+			ctx.String(http.StatusBadRequest, err.Error())
+
+			return
+		}
+
+		if update.Message == nil { // ignore any non-Message updates
+			ctx.String(http.StatusOK, "empty update")
+
+			return
+		}
+
+		if !update.Message.IsCommand() { // ignore any non-command Messages
+			ctx.String(http.StatusOK, "is not command")
+
+			return
+		}
+
+		err = s.handleUpdate(ctx, update)
+		if err != nil {
+			logrus.Errorf("telegram webhook error: %s", err.Error())
+			ctx.String(http.StatusInternalServerError, err.Error())
+
+			return
+		}
+
+		ctx.String(http.StatusOK, "success")
+	})
+}
+
+func (s *Service) NotifyInbox(ctx context.Context, pictureID int64) error {
+	if pictureID == 0 {
+		return nil
+	}
+
+	brandIDs, err := s.itemRepository.IDs(ctx, query.ItemListOptions{
+		TypeID: []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			PictureItemsByItemID: &query.PictureItemListOptions{
+				PictureID: pictureID,
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	if len(brandIDs) > 0 {
+		picture, err := s.picturesRepository.Picture(
+			ctx,
+			&query.PictureListOptions{ID: pictureID},
+			nil,
+			pictures.OrderByNone,
+		)
+		if err != nil {
+			return err
+		}
+
+		var chatIDs []int64
+
+		sqSelect := s.db.Select(schema.TelegramBrandTableChatIDCol).
+			From(schema.TelegramBrandTable).
+			Join(schema.TelegramChatTable, goqu.On(schema.TelegramBrandTableChatIDCol.Eq(schema.TelegramChatTableChatIDCol))).
+			Join(schema.UserTable, goqu.On(schema.TelegramChatTableUserIDCol.Eq(schema.UserTableIDCol))).
+			Where(
+				schema.TelegramBrandTableItemIDCol.In(brandIDs),
+				schema.TelegramBrandTableInboxCol.IsTrue(),
+				schema.UserTableDeletedCol.IsFalse(),
+			)
+		if picture.OwnerID.Valid {
+			sqSelect = sqSelect.Where(schema.UserTableIDCol.Neq(picture.OwnerID.Int64))
+		}
+
+		err = sqSelect.ScanValsContext(ctx, &chatIDs)
+		if err != nil {
+			return err
+		}
+
+		for _, chatID := range chatIDs {
+			uri, err := s.getURIByChatID(ctx, chatID)
+			if err != nil {
+				return err
+			}
+
+			err = s.sendMessage(ctx, frontend.PictureURL(uri, picture.Identity), chatID)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *Service) enableMockMode() {
+	s.mockModeEnabled = true
+}
+
+func (s *Service) getBotAPI() (*tgbotapi.BotAPI, error) {
+	if s.botAPI == nil {
+		bot, err := tgbotapi.NewBotAPI(s.config.AccessToken)
+		if err != nil {
+			return nil, fmt.Errorf("NewBotAPI(): %w", err)
+		}
+
+		s.botAPI = bot
+	}
+
+	return s.botAPI, nil
+}
+
 func (s *Service) getURIByChatID(ctx context.Context, chatID int64) (*url.URL, error) {
 	if chatID > 0 {
 		language := ""
@@ -278,54 +445,6 @@ func (s *Service) unsubscribeChat(ctx context.Context, chatID int64) error {
 	return err
 }
 
-func (s *Service) WebhookInfo() error {
-	bot, err := s.getBotAPI()
-	if err != nil {
-		return err
-	}
-
-	wh, err := bot.GetWebhookInfo()
-	if err != nil {
-		return err
-	}
-
-	logrus.Info("URL: " + wh.URL)
-	logrus.Info("LastErrorMessage: " + wh.LastErrorMessage)
-	logrus.Infof("LastErrorDate: %d", wh.LastErrorDate)
-	logrus.Info("IPAddress: " + wh.IPAddress)
-	logrus.Infof("AllowedUpdates: %v", wh.AllowedUpdates)
-	logrus.Infof("HasCustomCertificate: %v", wh.HasCustomCertificate)
-	logrus.Infof("PendingUpdateCount: %d", wh.PendingUpdateCount)
-	logrus.Infof("MaxConnections: %d", wh.MaxConnections)
-
-	return nil
-}
-
-func (s *Service) RegisterWebhook() error {
-	bot, err := s.getBotAPI()
-	if err != nil {
-		return err
-	}
-
-	wh, err := tgbotapi.NewWebhook(s.config.WebHook)
-	if err != nil {
-		return err
-	}
-
-	res, err := bot.Request(wh)
-	if err != nil {
-		return err
-	}
-
-	if res.Ok {
-		logrus.Infof("Webhook successfully registered: %s", res.Description)
-	} else {
-		logrus.Errorf("Failed to register webhook: %d: %s", res.ErrorCode, res.Description)
-	}
-
-	return nil
-}
-
 func (s *Service) replyWithMessage(update *tgbotapi.Update, text string) error {
 	if s.mockModeEnabled {
 		logrus.Debugf("Mock reply: `%s`", text)
@@ -347,15 +466,6 @@ func (s *Service) replyWithMessage(update *tgbotapi.Update, text string) error {
 	})
 
 	return err
-}
-
-func GenerateSecureToken(length int) string {
-	b := make([]byte, length)
-	if _, err := rand.Read(b); err != nil {
-		return ""
-	}
-
-	return hex.EncodeToString(b)
 }
 
 func (s *Service) handleInboxCommand(ctx context.Context, update *tgbotapi.Update) error {
@@ -798,116 +908,6 @@ func (s *Service) handleUpdate(ctx context.Context, update *tgbotapi.Update) err
 		return s.handleNewCommand(ctx, update)
 	case commandInbox:
 		return s.handleInboxCommand(ctx, update)
-	}
-
-	return nil
-}
-
-func (s *Service) SetupRouter(router *gin.Engine) {
-	router.POST("/telegram/webhook/token/:token", func(ctx *gin.Context) {
-		if ctx.Param("token") != s.config.WebhookToken {
-			ctx.Status(http.StatusForbidden)
-
-			return
-		}
-
-		bot, err := s.getBotAPI()
-		if err != nil {
-			ctx.String(http.StatusInternalServerError, err.Error())
-
-			return
-		}
-
-		update, err := bot.HandleUpdate(ctx.Request)
-		if err != nil {
-			ctx.String(http.StatusBadRequest, err.Error())
-
-			return
-		}
-
-		if update.Message == nil { // ignore any non-Message updates
-			ctx.String(http.StatusOK, "empty update")
-
-			return
-		}
-
-		if !update.Message.IsCommand() { // ignore any non-command Messages
-			ctx.String(http.StatusOK, "is not command")
-
-			return
-		}
-
-		err = s.handleUpdate(ctx, update)
-		if err != nil {
-			logrus.Errorf("telegram webhook error: %s", err.Error())
-			ctx.String(http.StatusInternalServerError, err.Error())
-
-			return
-		}
-
-		ctx.String(http.StatusOK, "success")
-	})
-}
-
-func (s *Service) NotifyInbox(ctx context.Context, pictureID int64) error {
-	if pictureID == 0 {
-		return nil
-	}
-
-	brandIDs, err := s.itemRepository.IDs(ctx, query.ItemListOptions{
-		TypeID: []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
-		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
-			PictureItemsByItemID: &query.PictureItemListOptions{
-				PictureID: pictureID,
-			},
-		},
-	})
-	if err != nil {
-		return err
-	}
-
-	if len(brandIDs) > 0 {
-		picture, err := s.picturesRepository.Picture(
-			ctx,
-			&query.PictureListOptions{ID: pictureID},
-			nil,
-			pictures.OrderByNone,
-		)
-		if err != nil {
-			return err
-		}
-
-		var chatIDs []int64
-
-		sqSelect := s.db.Select(schema.TelegramBrandTableChatIDCol).
-			From(schema.TelegramBrandTable).
-			Join(schema.TelegramChatTable, goqu.On(schema.TelegramBrandTableChatIDCol.Eq(schema.TelegramChatTableChatIDCol))).
-			Join(schema.UserTable, goqu.On(schema.TelegramChatTableUserIDCol.Eq(schema.UserTableIDCol))).
-			Where(
-				schema.TelegramBrandTableItemIDCol.In(brandIDs),
-				schema.TelegramBrandTableInboxCol.IsTrue(),
-				schema.UserTableDeletedCol.IsFalse(),
-			)
-		if picture.OwnerID.Valid {
-			sqSelect = sqSelect.Where(schema.UserTableIDCol.Neq(picture.OwnerID.Int64))
-		}
-
-		err = sqSelect.ScanValsContext(ctx, &chatIDs)
-		if err != nil {
-			return err
-		}
-
-		for _, chatID := range chatIDs {
-			uri, err := s.getURIByChatID(ctx, chatID)
-			if err != nil {
-				return err
-			}
-
-			err = s.sendMessage(ctx, frontend.PictureURL(uri, picture.Identity), chatID)
-			if err != nil {
-				return err
-			}
-		}
 	}
 
 	return nil

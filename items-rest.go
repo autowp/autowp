@@ -38,6 +38,12 @@ func NewItemsREST(auth *Auth, repository *items.Repository, events *Events) *Ite
 	}
 }
 
+func (s *ItemsREST) SetupRouter(router *gin.Engine) {
+	router.POST("/api/item/:id/logo", func(ctx *gin.Context) {
+		s.postLogoAction(ctx)
+	})
+}
+
 func (s *ItemsREST) postLogoAction(ctx *gin.Context) {
 	userCtx, err := s.auth.ValidateREST(ctx)
 	if err != nil {
@@ -172,10 +178,4 @@ func (s *ItemsREST) postLogoAction(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
-}
-
-func (s *ItemsREST) SetupRouter(router *gin.Engine) {
-	router.POST("/api/item/:id/logo", func(ctx *gin.Context) {
-		s.postLogoAction(ctx)
-	})
 }

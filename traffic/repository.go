@@ -175,7 +175,7 @@ func (s *Traffic) AutoWhitelistIP(ctx context.Context, ip net.IP) error {
 		return err
 	}
 
-	match, desc := s.Whitelist.MatchAuto(ip)
+	match, desc := s.Whitelist.MatchAuto(ctx, ip)
 
 	if !match {
 		return nil

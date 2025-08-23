@@ -53,61 +53,6 @@ func (s *Paginator) Count(ctx context.Context) (int32, error) {
 	return s.pageCount, nil
 }
 
-func (s *Paginator) calculatePageCount(ctx context.Context) (int32, error) {
-	count, err := s.GetTotalItemCount(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	if s.ItemCountPerPage <= 0 {
-		return 0, nil
-	}
-
-	return int32(math.Ceil(float64(count) / float64(s.ItemCountPerPage))), nil
-}
-
-func (s *Paginator) calculateCount(ctx context.Context) (int32, error) {
-	clauses := s.SQLSelect.GetClauses()
-	groupBy := clauses.GroupBy()
-
-	var (
-		res int64
-		err error
-	)
-
-	if groupBy == nil || groupBy.IsEmpty() {
-		res, err = s.SQLSelect.ClearOrder().
-			ClearOffset().
-			ClearLimit().
-			GroupBy().
-			ClearSelect().
-			Prepared(true).
-			CountContext(ctx)
-		if err != nil {
-			return 0, err
-		}
-	} else {
-		columns := groupBy.Columns()
-		if len(columns) > 1 {
-			return 0, errMultipleGroupByNotSupported
-		}
-
-		_, err = s.SQLSelect.ClearOrder().
-			ClearOffset().
-			ClearLimit().
-			GroupBy().
-			ClearSelect().
-			Select(goqu.COUNT(goqu.DISTINCT(columns[0]))).
-			Prepared(true).
-			ScanValContext(ctx, &res)
-		if err != nil {
-			return 0, err
-		}
-	}
-
-	return int32(res), nil //nolint: gosec
-}
-
 func MinMax(array []int32) (int32, int32) {
 	maxValue, minValue := array[0], array[0]
 
@@ -200,6 +145,101 @@ func (s *Paginator) GetPages(ctx context.Context) (*Pages, error) {
 	return &pages, nil
 }
 
+func (s *Paginator) GetItemsByPage(
+	ctx context.Context,
+	pageNumber int32,
+) (*goqu.SelectDataset, error) {
+	var err error
+
+	pageNumber, err = s.normalizePageNumber(ctx, pageNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	offset := (pageNumber - 1) * s.ItemCountPerPage
+	ds := *s.SQLSelect
+
+	return ds.Offset(uint(offset)).Limit(uint(s.ItemCountPerPage)), nil //nolint:gosec
+}
+
+func (s *Paginator) GetCurrentItems(ctx context.Context) (*goqu.SelectDataset, error) {
+	pageNumber, err := s.getCurrentPageNumber(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.GetItemsByPage(ctx, pageNumber)
+}
+
+func (s *Paginator) GetTotalItemCount(ctx context.Context) (int32, error) {
+	var err error
+	if !s.itemCountCalculated {
+		s.itemCount, err = s.calculateCount(ctx)
+		if err != nil {
+			return 0, err
+		}
+
+		s.itemCountCalculated = true
+	}
+
+	return s.itemCount, nil
+}
+
+func (s *Paginator) calculatePageCount(ctx context.Context) (int32, error) {
+	count, err := s.GetTotalItemCount(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	if s.ItemCountPerPage <= 0 {
+		return 0, nil
+	}
+
+	return int32(math.Ceil(float64(count) / float64(s.ItemCountPerPage))), nil
+}
+
+func (s *Paginator) calculateCount(ctx context.Context) (int32, error) {
+	clauses := s.SQLSelect.GetClauses()
+	groupBy := clauses.GroupBy()
+
+	var (
+		res int64
+		err error
+	)
+
+	if groupBy == nil || groupBy.IsEmpty() {
+		res, err = s.SQLSelect.ClearOrder().
+			ClearOffset().
+			ClearLimit().
+			GroupBy().
+			ClearSelect().
+			Prepared(true).
+			CountContext(ctx)
+		if err != nil {
+			return 0, err
+		}
+	} else {
+		columns := groupBy.Columns()
+		if len(columns) > 1 {
+			return 0, errMultipleGroupByNotSupported
+		}
+
+		_, err = s.SQLSelect.ClearOrder().
+			ClearOffset().
+			ClearLimit().
+			GroupBy().
+			ClearSelect().
+			Select(goqu.COUNT(goqu.DISTINCT(columns[0]))).
+			Prepared(true).
+			ScanValContext(ctx, &res)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return int32(res), nil //nolint: gosec
+}
+
 func (s *Paginator) getCurrentPageNumber(ctx context.Context) (int32, error) {
 	return s.normalizePageNumber(ctx, s.CurrentPageNumber)
 }
@@ -245,44 +285,4 @@ func (s *Paginator) normalizePageNumber(ctx context.Context, pageNumber int32) (
 	}
 
 	return pageNumber, nil
-}
-
-func (s *Paginator) GetItemsByPage(
-	ctx context.Context,
-	pageNumber int32,
-) (*goqu.SelectDataset, error) {
-	var err error
-
-	pageNumber, err = s.normalizePageNumber(ctx, pageNumber)
-	if err != nil {
-		return nil, err
-	}
-
-	offset := (pageNumber - 1) * s.ItemCountPerPage
-	ds := *s.SQLSelect
-
-	return ds.Offset(uint(offset)).Limit(uint(s.ItemCountPerPage)), nil //nolint:gosec
-}
-
-func (s *Paginator) GetCurrentItems(ctx context.Context) (*goqu.SelectDataset, error) {
-	pageNumber, err := s.getCurrentPageNumber(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.GetItemsByPage(ctx, pageNumber)
-}
-
-func (s *Paginator) GetTotalItemCount(ctx context.Context) (int32, error) {
-	var err error
-	if !s.itemCountCalculated {
-		s.itemCount, err = s.calculateCount(ctx)
-		if err != nil {
-			return 0, err
-		}
-
-		s.itemCountCalculated = true
-	}
-
-	return s.itemCount, nil
 }

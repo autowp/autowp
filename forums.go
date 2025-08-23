@@ -144,44 +144,6 @@ func (s *Forums) AddTopic(
 	return topicID, nil
 }
 
-func (s *Forums) updateThemeStat(ctx context.Context, themeID int64) error {
-	topicsSelect := s.db.Select(goqu.COUNT(goqu.Star())).
-		From(schema.ForumsTopicsTable).
-		Join(
-			schema.ForumsThemeParentTable,
-			goqu.On(schema.ForumsTopicsTableThemeIDCol.Eq(schema.ForumsThemeParentTableForumThemeIDCol)),
-		).
-		Where(
-			schema.ForumsThemeParentTableParentIDCol.Eq(schema.ForumsThemesTableIDCol),
-			schema.ForumsTopicsTableStatusCol.In([]string{TopicStatusNormal, TopicStatusClosed}),
-		)
-
-	messagesSelect := topicsSelect.
-		Join(
-			schema.CommentMessageTable,
-			goqu.On(schema.ForumsTopicsTableIDCol.Eq(schema.CommentMessageTableItemIDCol)),
-		).
-		Where(schema.CommentMessageTableTypeIDCol.Eq(schema.CommentMessageTypeIDForums))
-
-	_, err := s.db.Update(schema.ForumsThemesTable).Set(goqu.Record{
-		schema.ForumsThemesTableTopicsColName:   topicsSelect,
-		schema.ForumsThemesTableMessagesColName: messagesSelect,
-	}).
-		Where(schema.ForumsThemesTableIDCol.Eq(themeID)).
-		Executor().ExecContext(ctx)
-
-	return err
-}
-
-func (s *Forums) setStatus(ctx context.Context, id int64, status string) error {
-	_, err := s.db.Update(schema.ForumsTopicsTable).
-		Set(goqu.Record{schema.ForumsTopicsTableStatusColName: status}).
-		Where(schema.ForumsTopicsTableIDCol.Eq(id)).
-		Executor().ExecContext(ctx)
-
-	return err
-}
-
 func (s *Forums) Close(ctx context.Context, id int64) error {
 	return s.setStatus(ctx, id, TopicStatusClosed)
 }
@@ -331,73 +293,6 @@ func (s *Forums) Themes(
 	}
 
 	return rows, nil
-}
-
-func (s *Forums) prepareTopic(ctx context.Context, topic *ForumsTopic, userID int64) error {
-	if userID > 0 {
-		stat, err := s.commentsRepository.TopicStatForUser(
-			ctx, schema.CommentMessageTypeIDForums, topic.ID, userID,
-		)
-		if err != nil {
-			return err
-		}
-
-		topic.Messages = stat.Messages
-		topic.NewMessages = stat.NewMessages
-
-		topic.Subscription, err = s.commentsRepository.IsSubscribed(
-			ctx,
-			userID,
-			schema.CommentMessageTypeIDForums,
-			topic.ID,
-		)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	messages, err := s.commentsRepository.TopicStat(
-		ctx,
-		schema.CommentMessageTypeIDForums,
-		topic.ID,
-	)
-	if err != nil {
-		return err
-	}
-
-	topic.Messages = messages
-
-	return nil
-}
-
-func (s *Forums) topicsSelect(isModerator bool) *goqu.SelectDataset {
-	sqSelect := s.db.Select(
-		schema.ForumsTopicsTableIDCol,
-		schema.ForumsTopicsTableNameCol,
-		schema.ForumsTopicsTableStatusCol,
-		schema.ForumsTopicsTableAddDatetimeCol,
-		schema.ForumsTopicsTableAuthorIDCol,
-		schema.ForumsTopicsTableThemeIDCol,
-	).
-		From(schema.ForumsTopicsTable).
-		Join(schema.CommentTopicTable, goqu.On(
-			schema.ForumsTopicsTableIDCol.Eq(schema.CommentTopicTableItemIDCol),
-			schema.CommentTopicTableTypeIDCol.Eq(schema.CommentMessageTypeIDForums),
-		)).
-		Where(schema.ForumsTopicsTableStatusCol.In([]string{TopicStatusNormal, TopicStatusClosed}))
-
-	if !isModerator {
-		sqSelect = sqSelect.
-			Join(
-				schema.ForumsThemesTable,
-				goqu.On(schema.ForumsTopicsTableThemeIDCol.Eq(schema.ForumsThemesTableIDCol)),
-			).
-			Where(schema.ForumsThemesTableIsModeratorCol.IsFalse())
-	}
-
-	return sqSelect
 }
 
 func (s *Forums) Topic(
@@ -564,4 +459,109 @@ func (s *Forums) Topics(
 	}
 
 	return rows, pages, nil
+}
+
+func (s *Forums) updateThemeStat(ctx context.Context, themeID int64) error {
+	topicsSelect := s.db.Select(goqu.COUNT(goqu.Star())).
+		From(schema.ForumsTopicsTable).
+		Join(
+			schema.ForumsThemeParentTable,
+			goqu.On(schema.ForumsTopicsTableThemeIDCol.Eq(schema.ForumsThemeParentTableForumThemeIDCol)),
+		).
+		Where(
+			schema.ForumsThemeParentTableParentIDCol.Eq(schema.ForumsThemesTableIDCol),
+			schema.ForumsTopicsTableStatusCol.In([]string{TopicStatusNormal, TopicStatusClosed}),
+		)
+
+	messagesSelect := topicsSelect.
+		Join(
+			schema.CommentMessageTable,
+			goqu.On(schema.ForumsTopicsTableIDCol.Eq(schema.CommentMessageTableItemIDCol)),
+		).
+		Where(schema.CommentMessageTableTypeIDCol.Eq(schema.CommentMessageTypeIDForums))
+
+	_, err := s.db.Update(schema.ForumsThemesTable).Set(goqu.Record{
+		schema.ForumsThemesTableTopicsColName:   topicsSelect,
+		schema.ForumsThemesTableMessagesColName: messagesSelect,
+	}).
+		Where(schema.ForumsThemesTableIDCol.Eq(themeID)).
+		Executor().ExecContext(ctx)
+
+	return err
+}
+
+func (s *Forums) setStatus(ctx context.Context, id int64, status string) error {
+	_, err := s.db.Update(schema.ForumsTopicsTable).
+		Set(goqu.Record{schema.ForumsTopicsTableStatusColName: status}).
+		Where(schema.ForumsTopicsTableIDCol.Eq(id)).
+		Executor().ExecContext(ctx)
+
+	return err
+}
+
+func (s *Forums) prepareTopic(ctx context.Context, topic *ForumsTopic, userID int64) error {
+	if userID > 0 {
+		stat, err := s.commentsRepository.TopicStatForUser(
+			ctx, schema.CommentMessageTypeIDForums, topic.ID, userID,
+		)
+		if err != nil {
+			return err
+		}
+
+		topic.Messages = stat.Messages
+		topic.NewMessages = stat.NewMessages
+
+		topic.Subscription, err = s.commentsRepository.IsSubscribed(
+			ctx,
+			userID,
+			schema.CommentMessageTypeIDForums,
+			topic.ID,
+		)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	messages, err := s.commentsRepository.TopicStat(
+		ctx,
+		schema.CommentMessageTypeIDForums,
+		topic.ID,
+	)
+	if err != nil {
+		return err
+	}
+
+	topic.Messages = messages
+
+	return nil
+}
+
+func (s *Forums) topicsSelect(isModerator bool) *goqu.SelectDataset {
+	sqSelect := s.db.Select(
+		schema.ForumsTopicsTableIDCol,
+		schema.ForumsTopicsTableNameCol,
+		schema.ForumsTopicsTableStatusCol,
+		schema.ForumsTopicsTableAddDatetimeCol,
+		schema.ForumsTopicsTableAuthorIDCol,
+		schema.ForumsTopicsTableThemeIDCol,
+	).
+		From(schema.ForumsTopicsTable).
+		Join(schema.CommentTopicTable, goqu.On(
+			schema.ForumsTopicsTableIDCol.Eq(schema.CommentTopicTableItemIDCol),
+			schema.CommentTopicTableTypeIDCol.Eq(schema.CommentMessageTypeIDForums),
+		)).
+		Where(schema.ForumsTopicsTableStatusCol.In([]string{TopicStatusNormal, TopicStatusClosed}))
+
+	if !isModerator {
+		sqSelect = sqSelect.
+			Join(
+				schema.ForumsThemesTable,
+				goqu.On(schema.ForumsTopicsTableThemeIDCol.Eq(schema.ForumsThemesTableIDCol)),
+			).
+			Where(schema.ForumsThemesTableIsModeratorCol.IsFalse())
+	}
+
+	return sqSelect
 }

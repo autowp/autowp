@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/netip"
+	"strings"
 	"sync"
 	"time"
 
@@ -36,10 +37,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/realip"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -138,15 +141,13 @@ func (s *Container) Close() error {
 	return nil
 }
 
-func (s *Container) AutowpDB() (*sql.DB, error) {
+func (s *Container) AutowpDB(ctx context.Context) (*sql.DB, error) {
 	s.autowpDBMutex.Lock()
 	defer s.autowpDBMutex.Unlock()
 
 	if s.autowpDB != nil {
 		return s.autowpDB, nil
 	}
-
-	start := time.Now()
 
 	const (
 		connectionTimeout = 60 * time.Second
@@ -156,8 +157,9 @@ func (s *Container) AutowpDB() (*sql.DB, error) {
 	logrus.Info("Waiting for mysql")
 
 	var (
-		db  *sql.DB
-		err error
+		db    *sql.DB
+		err   error
+		start = time.Now()
 	)
 
 	for {
@@ -166,7 +168,7 @@ func (s *Container) AutowpDB() (*sql.DB, error) {
 			return nil, err
 		}
 
-		err = db.Ping()
+		err = db.PingContext(ctx)
 		if err == nil {
 			logrus.Info("Started.")
 
@@ -186,9 +188,9 @@ func (s *Container) AutowpDB() (*sql.DB, error) {
 	return s.autowpDB, nil
 }
 
-func (s *Container) GoquDB() (*goqu.Database, error) {
+func (s *Container) GoquDB(ctx context.Context) (*goqu.Database, error) {
 	if s.goquDB == nil {
-		db, err := s.AutowpDB()
+		db, err := s.AutowpDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -199,7 +201,7 @@ func (s *Container) GoquDB() (*goqu.Database, error) {
 	return s.goquDB, nil
 }
 
-func (s *Container) GoquPostgresDB() (*goqu.Database, error) {
+func (s *Container) GoquPostgresDB(ctx context.Context) (*goqu.Database, error) {
 	if s.goquPostgresDB != nil {
 		return s.goquPostgresDB, nil
 	}
@@ -224,7 +226,7 @@ func (s *Container) GoquPostgresDB() (*goqu.Database, error) {
 			return nil, err
 		}
 
-		err = db.Ping()
+		err = db.PingContext(ctx)
 		if err == nil {
 			logrus.Info("Started.")
 
@@ -244,9 +246,9 @@ func (s *Container) GoquPostgresDB() (*goqu.Database, error) {
 	return s.goquPostgresDB, nil
 }
 
-func (s *Container) BanRepository() (*ban.Repository, error) {
+func (s *Container) BanRepository(ctx context.Context) (*ban.Repository, error) {
 	if s.banRepository == nil {
-		db, err := s.GoquPostgresDB()
+		db, err := s.GoquPostgresDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -260,9 +262,9 @@ func (s *Container) BanRepository() (*ban.Repository, error) {
 	return s.banRepository, nil
 }
 
-func (s *Container) Catalogue() (*Catalogue, error) {
+func (s *Container) Catalogue(ctx context.Context) (*Catalogue, error) {
 	if s.catalogue == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -276,19 +278,19 @@ func (s *Container) Catalogue() (*Catalogue, error) {
 	return s.catalogue, nil
 }
 
-func (s *Container) CommentsRepository() (*comments.Repository, error) {
+func (s *Container) CommentsRepository(ctx context.Context) (*comments.Repository, error) {
 	if s.commentsRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		usersRepository, err := s.UsersRepository()
+		usersRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		messagingRepository, err := s.MessagingRepository()
+		messagingRepository, err := s.MessagingRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -304,19 +306,19 @@ func (s *Container) CommentsRepository() (*comments.Repository, error) {
 	return s.commentsRepository, nil
 }
 
-func (s *Container) MostsRepository() (*mosts.Repository, error) {
+func (s *Container) MostsRepository(ctx context.Context) (*mosts.Repository, error) {
 	if s.mostsRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		itemsRepository, err := s.ItemsRepository()
+		itemsRepository, err := s.ItemsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		attrsRepository, err := s.AttrsRepository()
+		attrsRepository, err := s.AttrsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -331,9 +333,9 @@ func (s *Container) Config() config.Config {
 	return s.config
 }
 
-func (s *Container) AttrsRepository() (*attrs.Repository, error) {
+func (s *Container) AttrsRepository(ctx context.Context) (*attrs.Repository, error) {
 	if s.attrsRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -343,17 +345,17 @@ func (s *Container) AttrsRepository() (*attrs.Repository, error) {
 			return nil, err
 		}
 
-		itemsRepository, err := s.ItemsRepository()
+		itemsRepository, err := s.ItemsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		picturesRepository, err := s.PicturesRepository()
+		picturesRepository, err := s.PicturesRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		is, err := s.ImageStorage()
+		is, err := s.ImageStorage(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -364,9 +366,9 @@ func (s *Container) AttrsRepository() (*attrs.Repository, error) {
 	return s.attrsRepository, nil
 }
 
-func (s *Container) ContactsRepository() (*ContactsRepository, error) {
+func (s *Container) ContactsRepository(ctx context.Context) (*ContactsRepository, error) {
 	if s.contactsRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -377,9 +379,9 @@ func (s *Container) ContactsRepository() (*ContactsRepository, error) {
 	return s.contactsRepository, nil
 }
 
-func (s *Container) DuplicateFinder() (*DuplicateFinder, error) {
+func (s *Container) DuplicateFinder(ctx context.Context) (*DuplicateFinder, error) {
 	if s.duplicateFinder == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -405,18 +407,18 @@ func (s *Container) Feedback() (*Feedback, error) {
 	return s.feedback, nil
 }
 
-func (s *Container) IPExtractor() (*IPExtractor, error) {
-	banRepository, err := s.BanRepository()
+func (s *Container) IPExtractor(ctx context.Context) (*IPExtractor, error) {
+	banRepository, err := s.BanRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	userRepository, err := s.UsersRepository()
+	userRepository, err := s.UsersRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	userExtractor, err := s.UserExtractor()
+	userExtractor, err := s.UserExtractor(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -432,9 +434,9 @@ func (s *Container) HostsManager() *hosts.Manager {
 	return s.hostsManager
 }
 
-func (s *Container) LogRepository() (*log.Repository, error) {
+func (s *Container) LogRepository(ctx context.Context) (*log.Repository, error) {
 	if s.logRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -445,29 +447,29 @@ func (s *Container) LogRepository() (*log.Repository, error) {
 	return s.logRepository, nil
 }
 
-func (s *Container) PicturesRepository() (*pictures.Repository, error) {
+func (s *Container) PicturesRepository(ctx context.Context) (*pictures.Repository, error) {
 	if s.picturesRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		is, err := s.ImageStorage()
+		is, err := s.ImageStorage(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		textStorageRepository, err := s.TextStorageRepository()
+		textStorageRepository, err := s.TextStorageRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		itemsRepository, err := s.ItemsRepository()
+		itemsRepository, err := s.ItemsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		commentsRepository, err := s.CommentsRepository()
+		commentsRepository, err := s.CommentsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -508,18 +510,18 @@ type TokenForm struct {
 	Password     string `json:"password"`
 }
 
-func (s *Container) ItemsREST() (*ItemsREST, error) {
-	itemsRepo, err := s.ItemsRepository()
+func (s *Container) ItemsREST(ctx context.Context) (*ItemsREST, error) {
+	itemsRepo, err := s.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	auth, err := s.Auth()
+	auth, err := s.Auth(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := s.Events()
+	events, err := s.Events(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -527,13 +529,13 @@ func (s *Container) ItemsREST() (*ItemsREST, error) {
 	return NewItemsREST(auth, itemsRepo, events), nil
 }
 
-func (s *Container) UsersREST() (*UsersREST, error) {
-	usersRepo, err := s.UsersRepository()
+func (s *Container) UsersREST(ctx context.Context) (*UsersREST, error) {
+	usersRepo, err := s.UsersRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	auth, err := s.Auth()
+	auth, err := s.Auth(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -541,28 +543,28 @@ func (s *Container) UsersREST() (*UsersREST, error) {
 	return NewUsersREST(auth, usersRepo), nil
 }
 
-func (s *Container) PicturesREST() (*PicturesREST, error) {
-	auth, err := s.Auth()
+func (s *Container) PicturesREST(ctx context.Context) (*PicturesREST, error) {
+	auth, err := s.Auth(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	picturesRepo, err := s.PicturesRepository()
+	picturesRepo, err := s.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	imageStorage, err := s.ImageStorage()
+	imageStorage, err := s.ImageStorage(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	itemOfDayRepo, err := s.ItemOfDayRepository()
+	itemOfDayRepo, err := s.ItemOfDayRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	itemsRepo, err := s.ItemsRepository()
+	itemsRepo, err := s.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -572,22 +574,22 @@ func (s *Container) PicturesREST() (*PicturesREST, error) {
 		return nil, err
 	}
 
-	usersRepo, err := s.UsersRepository()
+	usersRepo, err := s.UsersRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	commentsRepo, err := s.CommentsRepository()
+	commentsRepo, err := s.CommentsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	df, err := s.DuplicateFinder()
+	df, err := s.DuplicateFinder(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	ts, err := s.TelegramService()
+	ts, err := s.TelegramService(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -617,7 +619,7 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 		return s.publicRouter, nil
 	}
 
-	grpcServer, err := s.GRPCServerWithServices()
+	grpcServer, err := s.GRPCServerWithServices(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("GRPCServerWithServices(): %w", err)
 	}
@@ -627,12 +629,12 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 	}
 	wrappedGrpc := grpcweb.WrapServer(grpcServer, grpcweb.WithOriginFunc(originFunc))
 
-	yoomoney, err := s.YoomoneyHandler()
+	yoomoney, err := s.YoomoneyHandler(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	tg, err := s.TelegramService()
+	tg, err := s.TelegramService(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("TelegramService(): %w", err)
 	}
@@ -656,26 +658,34 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 
 	tg.SetupRouter(ginEngine) //nolint: contextcheck
 
-	picturesREST, err := s.PicturesREST()
+	picturesREST, err := s.PicturesREST(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("PicturesREST(): %w", err)
 	}
 
 	picturesREST.SetupRouter(ginEngine) //nolint: contextcheck
 
-	itemsREST, err := s.ItemsREST()
+	itemsREST, err := s.ItemsREST(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("ItemsREST(): %w", err)
 	}
 
 	itemsREST.SetupRouter(ginEngine) //nolint: contextcheck
 
-	usersREST, err := s.UsersREST()
+	usersREST, err := s.UsersREST(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("UsersREST(): %w", err)
 	}
 
 	usersREST.SetupRouter(ginEngine) //nolint: contextcheck
+
+	grpcGatewayHandler := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+
+	err = RegisterDonationsHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
+	if err != nil {
+		return nil, err
+	}
 
 	s.publicRouter = func(resp http.ResponseWriter, req *http.Request) {
 		if wrappedGrpc.IsAcceptableGrpcCorsRequest(req) || wrappedGrpc.IsGrpcWebRequest(req) {
@@ -683,6 +693,13 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 
 			return
 		}
+
+		if strings.HasPrefix(req.URL.Path, "/v3/") {
+			grpcGatewayHandler.ServeHTTP(resp, req)
+
+			return
+		}
+
 		// Fall back to gRPC+h2c server
 		ginEngine.ServeHTTP(resp, req)
 	}
@@ -692,97 +709,97 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 	return s.publicRouter, nil
 }
 
-func (s *Container) GRPCServerWithServices() (*grpc.Server, error) {
+func (s *Container) GRPCServerWithServices(ctx context.Context) (*grpc.Server, error) {
 	if s.grpcServerWithServices != nil {
 		return s.grpcServerWithServices, nil
 	}
 
-	srv, err := s.GRPCServer()
+	srv, err := s.GRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	articlesSrv, err := s.ArticlesGRPCServer()
+	articlesSrv, err := s.ArticlesGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	attrsSrv, err := s.AttrsGRPCServer()
+	attrsSrv, err := s.AttrsGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	commentsSrv, err := s.CommentsGRPCServer()
+	commentsSrv, err := s.CommentsGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	contactsSrv, err := s.ContactsGRPCServer()
+	contactsSrv, err := s.ContactsGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	donationsSrv, err := s.DonationsGRPCServer()
+	donationsSrv, err := s.DonationsGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	forumsSrv, err := s.ForumsGRPCServer()
+	forumsSrv, err := s.ForumsGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	itemsSrv, err := s.ItemsGRPCServer()
+	itemsSrv, err := s.ItemsGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	logSrv, err := s.LogGRPCServer()
+	logSrv, err := s.LogGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	mapSrv, err := s.MapGRPCServer()
+	mapSrv, err := s.MapGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	mostsSrv, err := s.MostsGRPCServer()
+	mostsSrv, err := s.MostsGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	textSrv, err := s.TextGRPCServer()
+	textSrv, err := s.TextGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	trafficSrv, err := s.TrafficGRPCServer()
+	trafficSrv, err := s.TrafficGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	picturesSrv, err := s.PicturesGRPCServer()
+	picturesSrv, err := s.PicturesGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	messagingSrv, err := s.MessagingGRPCServer()
+	messagingSrv, err := s.MessagingGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	usersSrv, err := s.UsersGRPCServer()
+	usersSrv, err := s.UsersGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	statSrv, err := s.StatisticsGRPCServer()
+	statSrv, err := s.StatisticsGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	ratingSrv, err := s.RatingGRPCServer()
+	ratingSrv, err := s.RatingGRPCServer(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -837,29 +854,29 @@ func (s *Container) GRPCServerWithServices() (*grpc.Server, error) {
 	return s.grpcServerWithServices, nil
 }
 
-func (s *Container) TelegramService() (*telegram.Service, error) {
+func (s *Container) TelegramService(ctx context.Context) (*telegram.Service, error) {
 	if s.telegramService == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userRepository, err := s.UsersRepository()
+		userRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		itemRepository, err := s.ItemsRepository()
+		itemRepository, err := s.ItemsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		messagingRepository, err := s.MessagingRepository()
+		messagingRepository, err := s.MessagingRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		picturesRepository, err := s.PicturesRepository()
+		picturesRepository, err := s.PicturesRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -878,19 +895,19 @@ func (s *Container) TelegramService() (*telegram.Service, error) {
 	return s.telegramService, nil
 }
 
-func (s *Container) Traffic() (*traffic.Traffic, error) {
+func (s *Container) Traffic(ctx context.Context) (*traffic.Traffic, error) {
 	if s.traffic == nil {
-		db, err := s.GoquPostgresDB()
+		db, err := s.GoquPostgresDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		autowpDB, err := s.GoquDB()
+		autowpDB, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		banRepository, err := s.BanRepository()
+		banRepository, err := s.BanRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -908,13 +925,13 @@ func (s *Container) Traffic() (*traffic.Traffic, error) {
 	return s.traffic, nil
 }
 
-func (s *Container) UserExtractor() (*UserExtractor, error) {
-	is, err := s.ImageStorage()
+func (s *Container) UserExtractor(ctx context.Context) (*UserExtractor, error) {
+	is, err := s.ImageStorage(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	picRepository, err := s.PicturesRepository()
+	picRepository, err := s.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -922,9 +939,9 @@ func (s *Container) UserExtractor() (*UserExtractor, error) {
 	return NewUserExtractor(is, picRepository), nil
 }
 
-func (s *Container) VotingsRepository() (*votings.Repository, error) {
+func (s *Container) VotingsRepository(ctx context.Context) (*votings.Repository, error) {
 	if s.votingsRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -935,21 +952,21 @@ func (s *Container) VotingsRepository() (*votings.Repository, error) {
 	return s.votingsRepository, nil
 }
 
-func (s *Container) UsersRepository() (*users.Repository, error) {
+func (s *Container) UsersRepository(ctx context.Context) (*users.Repository, error) {
 	if s.usersRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		postgresDB, err := s.GoquPostgresDB()
+		postgresDB, err := s.GoquPostgresDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
 		cfg := s.Config()
 
-		is, err := s.ImageStorage()
+		is, err := s.ImageStorage(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -982,21 +999,21 @@ func (s *Container) I18n() (*i18nbundle.I18n, error) {
 	return s.i18n, nil
 }
 
-func (s *Container) ItemsRepository() (*items.Repository, error) {
+func (s *Container) ItemsRepository(ctx context.Context) (*items.Repository, error) {
 	if s.itemsRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
 		cfg := s.Config()
 
-		textStorageRepository, err := s.TextStorageRepository()
+		textStorageRepository, err := s.TextStorageRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		imageStorage, err := s.ImageStorage()
+		imageStorage, err := s.ImageStorage(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1041,16 +1058,16 @@ func (s *Container) NewLinkExtractor() *LinkExtractor {
 	return NewLinkExtractor(s)
 }
 
-func (s *Container) Auth() (*Auth, error) {
+func (s *Container) Auth(ctx context.Context) (*Auth, error) {
 	if s.auth == nil {
 		cfg := s.Config()
 
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		rep, err := s.UsersRepository()
+		rep, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1061,16 +1078,16 @@ func (s *Container) Auth() (*Auth, error) {
 	return s.auth, nil
 }
 
-func (s *Container) GRPCServer() (*GRPCServer, error) {
+func (s *Container) GRPCServer(ctx context.Context) (*GRPCServer, error) {
 	if s.grpcServer == nil {
-		catalogue, err := s.Catalogue()
+		catalogue, err := s.Catalogue(ctx)
 		if err != nil {
 			return nil, err
 		}
 
 		cfg := s.Config()
 
-		commentsRepository, err := s.CommentsRepository()
+		commentsRepository, err := s.CommentsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1080,12 +1097,12 @@ func (s *Container) GRPCServer() (*GRPCServer, error) {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		ipExtractor, err := s.IPExtractor()
+		ipExtractor, err := s.IPExtractor(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1104,9 +1121,9 @@ func (s *Container) GRPCServer() (*GRPCServer, error) {
 	return s.grpcServer, nil
 }
 
-func (s *Container) StatisticsGRPCServer() (*StatisticsGRPCServer, error) {
+func (s *Container) StatisticsGRPCServer(ctx context.Context) (*StatisticsGRPCServer, error) {
 	if s.statisticsGrpcServer == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1117,9 +1134,9 @@ func (s *Container) StatisticsGRPCServer() (*StatisticsGRPCServer, error) {
 	return s.statisticsGrpcServer, nil
 }
 
-func (s *Container) TextGRPCServer() (*TextGRPCServer, error) {
+func (s *Container) TextGRPCServer(ctx context.Context) (*TextGRPCServer, error) {
 	if s.textGrpcServer == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1130,24 +1147,24 @@ func (s *Container) TextGRPCServer() (*TextGRPCServer, error) {
 	return s.textGrpcServer, nil
 }
 
-func (s *Container) TrafficGRPCServer() (*TrafficGRPCServer, error) {
+func (s *Container) TrafficGRPCServer(ctx context.Context) (*TrafficGRPCServer, error) {
 	if s.trafficGrpcServer == nil {
-		traf, err := s.Traffic()
+		traf, err := s.Traffic(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		usersRepo, err := s.UsersRepository()
+		usersRepo, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userExtractor, err := s.UserExtractor()
+		userExtractor, err := s.UserExtractor(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1158,31 +1175,31 @@ func (s *Container) TrafficGRPCServer() (*TrafficGRPCServer, error) {
 	return s.trafficGrpcServer, nil
 }
 
-func (s *Container) UsersGRPCServer() (*UsersGRPCServer, error) {
+func (s *Container) UsersGRPCServer(ctx context.Context) (*UsersGRPCServer, error) {
 	if s.usersGrpcServer == nil {
 		cfg := s.Config()
 
-		contactsRepository, err := s.ContactsRepository()
+		contactsRepository, err := s.ContactsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userRepository, err := s.UsersRepository()
+		userRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		events, err := s.Events()
+		events, err := s.Events(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userExtractor, err := s.UserExtractor()
+		userExtractor, err := s.UserExtractor(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1201,14 +1218,14 @@ func (s *Container) UsersGRPCServer() (*UsersGRPCServer, error) {
 	return s.usersGrpcServer, nil
 }
 
-func (s *Container) VotingsGRPCServer() (*VotingsGRPCServer, error) {
+func (s *Container) VotingsGRPCServer(ctx context.Context) (*VotingsGRPCServer, error) {
 	if s.votingsGrpcServer == nil {
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		votingsRepo, err := s.VotingsRepository()
+		votingsRepo, err := s.VotingsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1219,29 +1236,29 @@ func (s *Container) VotingsGRPCServer() (*VotingsGRPCServer, error) {
 	return s.votingsGrpcServer, nil
 }
 
-func (s *Container) RatingGRPCServer() (*RatingGRPCServer, error) {
+func (s *Container) RatingGRPCServer(ctx context.Context) (*RatingGRPCServer, error) {
 	if s.ratingGrpcServer == nil {
-		commentsRepository, err := s.CommentsRepository()
+		commentsRepository, err := s.CommentsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		itemsRepository, err := s.ItemsRepository()
+		itemsRepository, err := s.ItemsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userRepository, err := s.UsersRepository()
+		userRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		picturesRepository, err := s.PicturesRepository()
+		picturesRepository, err := s.PicturesRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		attrsRepository, err := s.AttrsRepository()
+		attrsRepository, err := s.AttrsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1258,24 +1275,24 @@ func (s *Container) RatingGRPCServer() (*RatingGRPCServer, error) {
 	return s.ratingGrpcServer, nil
 }
 
-func (s *Container) ItemsGRPCServer() (*ItemsGRPCServer, error) {
+func (s *Container) ItemsGRPCServer(ctx context.Context) (*ItemsGRPCServer, error) {
 	if s.itemsGrpcServer == nil {
-		repo, err := s.ItemsRepository()
+		repo, err := s.ItemsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		textStorageRepository, err := s.TextStorageRepository()
+		textStorageRepository, err := s.TextStorageRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1287,37 +1304,37 @@ func (s *Container) ItemsGRPCServer() (*ItemsGRPCServer, error) {
 			return nil, err
 		}
 
-		attrsRepository, err := s.AttrsRepository()
+		attrsRepository, err := s.AttrsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		picturesRepository, err := s.PicturesRepository()
+		picturesRepository, err := s.PicturesRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		idx, err := s.Index()
+		idx, err := s.Index(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		events, err := s.Events()
+		events, err := s.Events(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		usersRepository, err := s.UsersRepository()
+		usersRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		messagingRepository, err := s.MessagingRepository()
+		messagingRepository, err := s.MessagingRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		itemOfDayRepository, err := s.ItemOfDayRepository()
+		itemOfDayRepository, err := s.ItemOfDayRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1352,14 +1369,14 @@ func (s *Container) ItemsGRPCServer() (*ItemsGRPCServer, error) {
 	return s.itemsGrpcServer, nil
 }
 
-func (s *Container) MostsGRPCServer() (*MostsGRPCServer, error) {
+func (s *Container) MostsGRPCServer(ctx context.Context) (*MostsGRPCServer, error) {
 	if s.mostsGrpcServer == nil {
-		mostsRepository, err := s.MostsRepository()
+		mostsRepository, err := s.MostsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1374,29 +1391,29 @@ func (s *Container) MostsGRPCServer() (*MostsGRPCServer, error) {
 	return s.mostsGrpcServer, nil
 }
 
-func (s *Container) CommentsGRPCServer() (*CommentsGRPCServer, error) {
+func (s *Container) CommentsGRPCServer(ctx context.Context) (*CommentsGRPCServer, error) {
 	if s.commentsGrpcServer == nil {
-		commentsRepository, err := s.CommentsRepository()
+		commentsRepository, err := s.CommentsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		usersRepository, err := s.UsersRepository()
+		usersRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		picturesRepository, err := s.PicturesRepository()
+		picturesRepository, err := s.PicturesRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userExtractor, err := s.UserExtractor()
+		userExtractor, err := s.UserExtractor(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1413,9 +1430,9 @@ func (s *Container) CommentsGRPCServer() (*CommentsGRPCServer, error) {
 	return s.commentsGrpcServer, nil
 }
 
-func (s *Container) ArticlesGRPCServer() (*ArticlesGRPCServer, error) {
+func (s *Container) ArticlesGRPCServer(ctx context.Context) (*ArticlesGRPCServer, error) {
 	if s.articlesGRPCServer == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1426,14 +1443,14 @@ func (s *Container) ArticlesGRPCServer() (*ArticlesGRPCServer, error) {
 	return s.articlesGRPCServer, nil
 }
 
-func (s *Container) AttrsGRPCServer() (*AttrsGRPCServer, error) {
+func (s *Container) AttrsGRPCServer(ctx context.Context) (*AttrsGRPCServer, error) {
 	if s.attrsGRPCServer == nil {
-		repository, err := s.AttrsRepository()
+		repository, err := s.AttrsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1444,24 +1461,24 @@ func (s *Container) AttrsGRPCServer() (*AttrsGRPCServer, error) {
 	return s.attrsGRPCServer, nil
 }
 
-func (s *Container) ContactsGRPCServer() (*ContactsGRPCServer, error) {
+func (s *Container) ContactsGRPCServer(ctx context.Context) (*ContactsGRPCServer, error) {
 	if s.contactsGrpcServer == nil {
-		contactsRepository, err := s.ContactsRepository()
+		contactsRepository, err := s.ContactsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userRepository, err := s.UsersRepository()
+		userRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userExtractor, err := s.UserExtractor()
+		userExtractor, err := s.UserExtractor(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1477,14 +1494,14 @@ func (s *Container) ContactsGRPCServer() (*ContactsGRPCServer, error) {
 	return s.contactsGrpcServer, nil
 }
 
-func (s *Container) LogGRPCServer() (*LogGRPCServer, error) {
+func (s *Container) LogGRPCServer(ctx context.Context) (*LogGRPCServer, error) {
 	if s.LogGrpcServer == nil {
-		repository, err := s.LogRepository()
+		repository, err := s.LogRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1495,54 +1512,54 @@ func (s *Container) LogGRPCServer() (*LogGRPCServer, error) {
 	return s.LogGrpcServer, nil
 }
 
-func (s *Container) PicturesGRPCServer() (*PicturesGRPCServer, error) {
+func (s *Container) PicturesGRPCServer(ctx context.Context) (*PicturesGRPCServer, error) {
 	if s.picturesGrpcServer == nil {
-		repository, err := s.PicturesRepository()
+		repository, err := s.PicturesRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		events, err := s.Events()
+		events, err := s.Events(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		messagingRepository, err := s.MessagingRepository()
+		messagingRepository, err := s.MessagingRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userRepository, err := s.UsersRepository()
+		userRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		duplicateFinder, err := s.DuplicateFinder()
+		duplicateFinder, err := s.DuplicateFinder(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		textStorageRepository, err := s.TextStorageRepository()
+		textStorageRepository, err := s.TextStorageRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		tg, err := s.TelegramService()
+		tg, err := s.TelegramService(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		itemRepository, err := s.ItemsRepository()
+		itemRepository, err := s.ItemsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		commentsRepository, err := s.CommentsRepository()
+		commentsRepository, err := s.CommentsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1568,14 +1585,14 @@ func (s *Container) PicturesGRPCServer() (*PicturesGRPCServer, error) {
 	return s.picturesGrpcServer, nil
 }
 
-func (s *Container) MapGRPCServer() (*MapGRPCServer, error) {
+func (s *Container) MapGRPCServer(ctx context.Context) (*MapGRPCServer, error) {
 	if s.mapGrpcServer == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		imageStorage, err := s.ImageStorage()
+		imageStorage, err := s.ImageStorage(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1591,14 +1608,14 @@ func (s *Container) MapGRPCServer() (*MapGRPCServer, error) {
 	return s.mapGrpcServer, nil
 }
 
-func (s *Container) DonationsGRPCServer() (*DonationsGRPCServer, error) {
+func (s *Container) DonationsGRPCServer(ctx context.Context) (*DonationsGRPCServer, error) {
 	if s.donationsGrpcServer == nil {
-		repository, err := s.ItemOfDayRepository()
+		repository, err := s.ItemOfDayRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		db, err := s.GoquPostgresDB()
+		db, err := s.GoquPostgresDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1609,24 +1626,24 @@ func (s *Container) DonationsGRPCServer() (*DonationsGRPCServer, error) {
 	return s.donationsGrpcServer, nil
 }
 
-func (s *Container) ForumsGRPCServer() (*ForumsGRPCServer, error) {
+func (s *Container) ForumsGRPCServer(ctx context.Context) (*ForumsGRPCServer, error) {
 	if s.forumsGrpcServer == nil {
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		forums, err := s.Forums()
+		forums, err := s.Forums(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		commentsRepo, err := s.CommentsRepository()
+		commentsRepo, err := s.CommentsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		usersRepo, err := s.UsersRepository()
+		usersRepo, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1637,14 +1654,14 @@ func (s *Container) ForumsGRPCServer() (*ForumsGRPCServer, error) {
 	return s.forumsGrpcServer, nil
 }
 
-func (s *Container) MessagingGRPCServer() (*MessagingGRPCServer, error) {
+func (s *Container) MessagingGRPCServer(ctx context.Context) (*MessagingGRPCServer, error) {
 	if s.messagingGrpcServer == nil {
-		repository, err := s.MessagingRepository()
+		repository, err := s.MessagingRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		auth, err := s.Auth()
+		auth, err := s.Auth(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1655,14 +1672,14 @@ func (s *Container) MessagingGRPCServer() (*MessagingGRPCServer, error) {
 	return s.messagingGrpcServer, nil
 }
 
-func (s *Container) Forums() (*Forums, error) {
+func (s *Container) Forums(ctx context.Context) (*Forums, error) {
 	if s.forums == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		commentsRepository, err := s.CommentsRepository()
+		commentsRepository, err := s.CommentsRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1673,9 +1690,9 @@ func (s *Container) Forums() (*Forums, error) {
 	return s.forums, nil
 }
 
-func (s *Container) ItemOfDayRepository() (*itemofday.Repository, error) {
+func (s *Container) ItemOfDayRepository(ctx context.Context) (*itemofday.Repository, error) {
 	if s.itemOfDayRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1686,9 +1703,9 @@ func (s *Container) ItemOfDayRepository() (*itemofday.Repository, error) {
 	return s.itemOfDayRepository, nil
 }
 
-func (s *Container) MessagingRepository() (*messaging.Repository, error) {
+func (s *Container) MessagingRepository(ctx context.Context) (*messaging.Repository, error) {
 	if s.messagingRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1701,7 +1718,7 @@ func (s *Container) MessagingRepository() (*messaging.Repository, error) {
 		s.messagingRepository = messaging.NewRepository(
 			db,
 			func(ctx context.Context, fromUserID int64, toUserID int64, text string) error {
-				tg, err := s.TelegramService()
+				tg, err := s.TelegramService(ctx)
 				if err != nil {
 					return err
 				}
@@ -1743,9 +1760,9 @@ func (s *Container) SetEmailSender(emailSender email.Sender) {
 	s.emailSender = emailSender
 }
 
-func (s *Container) Events() (*Events, error) {
+func (s *Container) Events(ctx context.Context) (*Events, error) {
 	if s.events == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1756,9 +1773,9 @@ func (s *Container) Events() (*Events, error) {
 	return s.events, nil
 }
 
-func (s *Container) ImageStorage() (*storage.Storage, error) {
+func (s *Container) ImageStorage(ctx context.Context) (*storage.Storage, error) {
 	if s.imageStorage == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1787,13 +1804,13 @@ func (s *Container) Redis() (*redis.Client, error) {
 	return s.redis, nil
 }
 
-func (s *Container) Index() (*index.Index, error) {
+func (s *Container) Index(ctx context.Context) (*index.Index, error) {
 	redisClient, err := s.Redis()
 	if err != nil {
 		return nil, err
 	}
 
-	repository, err := s.ItemsRepository()
+	repository, err := s.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1801,9 +1818,9 @@ func (s *Container) Index() (*index.Index, error) {
 	return index.NewIndex(redisClient, repository), nil
 }
 
-func (s *Container) TextStorageRepository() (*textstorage.Repository, error) {
+func (s *Container) TextStorageRepository(ctx context.Context) (*textstorage.Repository, error) {
 	if s.textStorageRepository == nil {
-		db, err := s.GoquDB()
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1814,9 +1831,9 @@ func (s *Container) TextStorageRepository() (*textstorage.Repository, error) {
 	return s.textStorageRepository, nil
 }
 
-func (s *Container) YoomoneyHandler() (*YoomoneyHandler, error) {
+func (s *Container) YoomoneyHandler(ctx context.Context) (*YoomoneyHandler, error) {
 	if s.yoomoneyHandler == nil {
-		repository, err := s.ItemOfDayRepository()
+		repository, err := s.ItemOfDayRepository(ctx)
 		if err != nil {
 			return nil, err
 		}

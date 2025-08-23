@@ -15,6 +15,7 @@ import (
 
 type MessagingGRPCServer struct {
 	UnimplementedMessagingServer
+
 	repository *messaging.Repository
 	auth       *Auth
 }

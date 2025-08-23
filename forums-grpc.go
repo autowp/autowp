@@ -19,6 +19,7 @@ const MaxTopicNameLength = 100
 
 type ForumsGRPCServer struct {
 	UnimplementedForumsServer
+
 	auth               *Auth
 	forums             *Forums
 	commentsRepository *comments.Repository

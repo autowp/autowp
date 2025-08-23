@@ -16,6 +16,7 @@ import (
 
 type DonationsGRPCServer struct {
 	UnimplementedDonationsServer
+
 	itemOfDay         *itemofday.Repository
 	donationsVodPrice int32
 	db                *goqu.Database

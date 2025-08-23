@@ -434,11 +434,13 @@ type Repository struct {
 
 type ItemParent struct {
 	schema.ItemParentRow
+
 	Name string `db:"name"`
 }
 
 type Item struct {
 	schema.ItemRow
+
 	NameOnly                   string
 	NameDefault                string
 	DescendantsParentsCount    int32
@@ -685,147 +687,6 @@ func (s *Repository) LanguageName(ctx context.Context, itemID int64, lang string
 	return res, nil
 }
 
-func (s *Repository) columnsByFields(fields *ItemFields) map[string]Column {
-	columns := map[string]Column{
-		schema.ItemTableIDColName:               s.idColumn,
-		schema.ItemTableCatnameColName:          s.catnameColumn,
-		schema.ItemTableEngineItemIDColName:     s.engineItemIDColumn,
-		schema.ItemTableEngineInheritColName:    s.engineInheritColumn,
-		schema.ItemTableItemTypeIDColName:       s.itemTypeIDColumn,
-		schema.ItemTableIsConceptColName:        s.isConceptColumn,
-		schema.ItemTableIsConceptInheritColName: s.isConceptInheritColumn,
-		schema.ItemTableSpecIDColName:           s.specIDColumn,
-		schema.ItemTableSpecInheritColName:      s.specInheritColumn,
-		schema.ItemTableIsGroupColName:          s.isGroupColumn,
-		schema.ItemTableProducedColName:         s.producedColumn,
-		schema.ItemTableProducedExactlyColName:  s.producedExactlyColumn,
-		schema.ItemTableLogoIDColName:           s.logoColumn,
-	}
-
-	if fields == nil {
-		return columns
-	}
-
-	if fields.FullName || fields.Meta {
-		columns[schema.ItemTableFullNameColName] = s.fullNameColumn
-	}
-
-	if fields.Logo {
-		columns[schema.ItemTableLogoIDColName] = s.logoColumn
-	}
-
-	if fields.Meta {
-		columns[schema.ItemTableNameColName] = s.nameColumn
-	}
-
-	if fields.NameText || fields.NameHTML || fields.Meta {
-		columns[schema.ItemTableBeginYearColName] = s.beginYearColumn
-		columns[schema.ItemTableEndYearColName] = s.endYearColumn
-		columns[schema.ItemTableBeginMonthColName] = s.beginMonthColumn
-		columns[schema.ItemTableEndMonthColName] = s.endMonthColumn
-		columns[schema.ItemTableBeginModelYearColName] = s.beginModelYearColumn
-		columns[schema.ItemTableEndModelYearColName] = s.endModelYearColumn
-		columns[schema.ItemTableBeginModelYearFractionColName] = s.beginModelYearFractionColumn
-		columns[schema.ItemTableEndModelYearFractionColName] = s.endModelYearFractionColumn
-		columns[schema.ItemTableTodayColName] = s.todayColumn
-		columns[schema.ItemTableBodyColName] = s.bodyColumn
-
-		if fields.NameText || fields.NameHTML {
-			columns[colSpecShortName] = s.specShortNameColumn
-		}
-	}
-
-	if fields.NameHTML {
-		columns[colSpecName] = s.specNameColumn
-	}
-
-	if fields.Description {
-		columns[colDescription] = s.descriptionColumn
-	}
-
-	if fields.FullText {
-		columns[colFullText] = s.fullTextColumn
-	}
-
-	if fields.NameOnly || fields.NameText || fields.NameHTML || fields.Meta {
-		columns[colNameOnly] = s.nameOnlyColumn
-	}
-
-	if fields.NameDefault {
-		columns[colNameDefault] = s.nameDefaultColumn
-	}
-
-	if fields.ChildItemsCount {
-		columns[colChildItemsCount] = s.childItemsCountColumn
-	}
-
-	if fields.NewChildItemsCount {
-		columns[colNewChildItemsCount] = s.newChildItemsCountColumn
-	}
-
-	if fields.DescendantsParentsCount {
-		columns[colDescendantsParentsCount] = s.descendantsParentsCountColumn
-	}
-
-	if fields.NewDescendantsParentsCount {
-		columns[colNewDescendantsParentsCount] = s.newDescendantsParentsCountColumn
-	}
-
-	if fields.ChildsCount {
-		columns[colChildsCount] = s.childsCountColumn
-	}
-
-	if fields.ParentsCount {
-		columns[colParentsCount] = s.parentsCountColumn
-	}
-
-	if fields.DescendantsCount {
-		columns[colDescendantsCount] = s.descendantsCountColumn
-	}
-
-	if fields.NewDescendantsCount {
-		columns[colNewDescendantsCount] = s.newDescendantsCountColumn
-	}
-
-	if fields.DescendantTwinsGroupsCount {
-		columns[colDescendantTwinsGroupsCount] = s.descendantTwinsGroupsCountColumn
-	}
-
-	if fields.MostsActive {
-		columns[colMostsActive] = s.mostsActiveColumn
-	}
-
-	if fields.DescendantPicturesCount {
-		columns[colDescendantPicturesCount] = s.descendantPicturesCountColumn
-	}
-
-	if fields.InboxPicturesCount {
-		columns[colInboxPicturesCount] = s.inboxPicturesCountColumn
-	}
-
-	if fields.AcceptedPicturesCount {
-		columns[colAcceptedPicturesCount] = s.acceptedPicturesCountColumn
-	}
-
-	if fields.ExactPicturesCount {
-		columns[colExactPicturesCount] = s.exactPicturesCountColumn
-	}
-
-	if fields.CommentsAttentionsCount {
-		columns[colCommentsAttentionsCount] = s.commentsAttentionsCountColumn
-	}
-
-	if fields.HasChildSpecs {
-		columns[colHasChildSpecs] = s.hasChildSpecsColumn
-	}
-
-	if fields.HasSpecs {
-		columns[colHasSpecs] = s.hasSpecsColumn
-	}
-
-	return columns
-}
-
 func (s *Repository) IDsSelect(options query.ItemListOptions) (*goqu.SelectDataset, error) {
 	var (
 		err   error
@@ -938,248 +799,6 @@ func (s *Repository) Item(
 	}
 
 	return res[0], nil
-}
-
-func (s *Repository) isFieldsValid(
-	options *query.ItemListOptions,
-	fields *ItemFields,
-	orderBy OrderBy,
-) error {
-	if fields == nil {
-		return nil
-	}
-
-	if (fields.ChildItemsCount || fields.NewChildItemsCount) && options.ItemParentChild == nil {
-		return fmt.Errorf(
-			"%w: ChildItemsCount, NewChildItemsCount requires ItemParentChild",
-			errFieldRequires,
-		)
-	}
-
-	if fields.DescendantPicturesCount && (options.ItemParentCacheDescendant == nil ||
-		options.ItemParentCacheDescendant.PictureItemsByItemID == nil) {
-		return fmt.Errorf(
-			"%w: DescendantPicturesCount requires ItemParentCacheDescendant.PictureItemsByItemID",
-			errFieldRequires,
-		)
-	}
-
-	if (fields.DescendantsParentsCount || fields.NewDescendantsParentsCount) &&
-		(options.ItemParentCacheDescendant == nil || options.ItemParentCacheDescendant.ItemParentByItemID == nil) {
-		return fmt.Errorf(
-			"%w: (New)DescendantsParentsCount requires ItemParentCacheDescendant.ItemParentByItemID",
-			errFieldRequires,
-		)
-	}
-
-	if orderBy == OrderByAttrsUserValuesUpdateDate && options.AttrsUserValues == nil {
-		return fmt.Errorf(
-			"%w: OrderByAttrsUserValuesUpdateDate requires AttrsUserValues",
-			errFieldRequires,
-		)
-	}
-
-	return nil
-}
-
-func (s *Repository) orderBy(
-	alias string,
-	orderBy OrderBy,
-	lang string,
-) ([]exp.OrderedExpression, error) {
-	type columnOrder struct {
-		col Column
-		asc bool
-	}
-
-	var columns []columnOrder
-
-	switch orderBy {
-	case OrderByDescendantsCount:
-		columns = []columnOrder{{col: s.descendantsCountColumn, asc: false}}
-	case OrderByChildsCount:
-		columns = []columnOrder{{col: s.childsCountColumn, asc: false}}
-	case OrderByDescendantPicturesCount:
-		columns = []columnOrder{{col: s.descendantPicturesCountColumn, asc: false}}
-	case OrderByAddDatetime:
-		columns = []columnOrder{{col: s.addDatetimeColumn, asc: false}}
-	case OrderByName:
-		columns = []columnOrder{
-			{col: s.nameColumn, asc: true},
-			{col: s.bodyColumn, asc: true},
-			{col: s.specIDColumn, asc: true},
-			{col: s.beginOrderCacheColumn, asc: true},
-			{col: s.endOrderCacheColumn, asc: true},
-		}
-	case OrderByDescendantsParentsCount:
-		columns = []columnOrder{{col: s.descendantsParentsCountColumn, asc: false}}
-	case OrderByStarCount:
-		columns = []columnOrder{{col: s.starCountColumn, asc: false}}
-	case OrderByItemParentParentTimestamp:
-		columns = []columnOrder{{col: s.itemParentParentTimestampColumn, asc: false}}
-	case OrderByAge:
-		columns = []columnOrder{
-			{col: s.beginOrderCacheColumn, asc: true},
-			{col: s.endOrderCacheColumn, asc: true},
-			{col: s.nameColumn, asc: true},
-			{col: s.bodyColumn, asc: true},
-			{col: s.specIDColumn, asc: true},
-		}
-	case OrderByIDDesc:
-		columns = []columnOrder{{col: s.idColumn, asc: false}}
-	case OrderByIDAsc:
-		columns = []columnOrder{{col: s.idColumn, asc: true}}
-	case OrderByAttrsUserValuesUpdateDate:
-		columns = []columnOrder{{col: s.attrsUserValuesUpdateDateColumn, asc: false}}
-	case OrderByNone:
-	}
-
-	orderByExp := make([]exp.OrderedExpression, 0, len(columns))
-
-	for _, column := range columns {
-		expr, err := column.col.SelectExpr(alias, lang)
-		if err != nil {
-			return nil, err
-		}
-
-		ordExpr := expr.Desc()
-		if column.asc {
-			ordExpr = expr.Asc()
-		}
-
-		orderByExp = append(orderByExp, ordExpr)
-	}
-
-	return orderByExp, nil
-}
-
-func (s *Repository) wrapperOrderBy(
-	wrapperAlias string,
-	wrappedAlias string,
-	orderBy OrderBy,
-) []exp.OrderedExpression {
-	wrapperAliasTable := goqu.T(wrapperAlias)
-	wrappedAliasTable := goqu.T(wrappedAlias)
-
-	switch orderBy {
-	case OrderByDescendantsCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colDescendantsCount).Desc()}
-	case OrderByChildsCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colChildsCount).Desc()}
-	case OrderByDescendantPicturesCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colDescendantPicturesCount).Desc()}
-	case OrderByAddDatetime:
-		return []exp.OrderedExpression{
-			wrapperAliasTable.Col(schema.ItemTableAddDatetimeColName).Desc(),
-		}
-	case OrderByName:
-		return []exp.OrderedExpression{
-			wrapperAliasTable.Col(schema.ItemTableNameColName).Asc(),
-			wrapperAliasTable.Col(schema.ItemTableBodyColName).Asc(),
-			wrapperAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
-			wrapperAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
-			wrapperAliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-		}
-	case OrderByDescendantsParentsCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colDescendantsParentsCount).Desc()}
-	case OrderByStarCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colStarCount).Desc()}
-	case OrderByItemParentParentTimestamp:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colItemParentParentTimestamp).Desc()}
-	case OrderByAge:
-		return []exp.OrderedExpression{
-			wrapperAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
-			wrapperAliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-			wrapperAliasTable.Col(schema.ItemTableNameColName).Asc(),
-			wrapperAliasTable.Col(schema.ItemTableBodyColName).Asc(),
-			wrapperAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
-		}
-	case OrderByIDDesc:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(schema.ItemTableIDColName).Desc()}
-	case OrderByIDAsc:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(schema.ItemTableIDColName).Asc()}
-	case OrderByAttrsUserValuesUpdateDate:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colAttrsUserValuesUpdateDate).Desc()}
-	case OrderByNone:
-	}
-
-	return nil
-}
-
-func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy) []exp.OrderedExpression {
-	aliasTable := goqu.T(alias)
-
-	var orderByExp []exp.OrderedExpression
-
-	switch orderBy {
-	case OrderByDescendantsCount:
-		orderByExp = []exp.OrderedExpression{goqu.C(colDescendantsCount).Desc()}
-	case OrderByChildsCount:
-		orderByExp = []exp.OrderedExpression{goqu.C(colChildsCount).Desc()}
-	case OrderByDescendantPicturesCount:
-		orderByExp = []exp.OrderedExpression{goqu.C(colDescendantPicturesCount).Desc()}
-	case OrderByAddDatetime:
-		orderByExp = []exp.OrderedExpression{
-			aliasTable.Col(schema.ItemTableAddDatetimeColName).Desc(),
-		}
-	case OrderByName:
-		orderByExp = []exp.OrderedExpression{
-			aliasTable.Col(schema.ItemTableNameColName).Asc(),
-			aliasTable.Col(schema.ItemTableBodyColName).Asc(),
-			aliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
-			aliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
-			aliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-		}
-	case OrderByDescendantsParentsCount:
-		orderByExp = []exp.OrderedExpression{goqu.C(colDescendantsParentsCount).Desc()}
-	case OrderByStarCount:
-		orderByExp = []exp.OrderedExpression{goqu.C(colStarCount).Desc()}
-	case OrderByItemParentParentTimestamp:
-		orderByExp = []exp.OrderedExpression{goqu.C(colItemParentParentTimestamp).Desc()}
-	case OrderByAge:
-		orderByExp = []exp.OrderedExpression{
-			aliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
-			aliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-			aliasTable.Col(schema.ItemTableNameColName).Asc(),
-			aliasTable.Col(schema.ItemTableBodyColName).Asc(),
-			aliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
-		}
-	case OrderByIDDesc:
-		orderByExp = []exp.OrderedExpression{aliasTable.Col(schema.ItemTableIDColName).Desc()}
-	case OrderByIDAsc:
-		orderByExp = []exp.OrderedExpression{aliasTable.Col(schema.ItemTableIDColName).Asc()}
-	case OrderByAttrsUserValuesUpdateDate:
-		orderByExp = []exp.OrderedExpression{goqu.C(colAttrsUserValuesUpdateDate).Desc()}
-	case OrderByNone:
-	}
-
-	return orderByExp
-}
-
-func (s *Repository) wrappedSelectColumns(orderBy OrderBy) map[string]Column {
-	columns := map[string]Column{
-		schema.ItemTableIDColName: s.idColumn,
-	}
-
-	switch orderBy {
-	case OrderByDescendantsCount:
-		columns[colDescendantsCount] = s.descendantsCountColumn
-	case OrderByChildsCount:
-		columns[colChildsCount] = s.childsCountColumn
-	case OrderByDescendantPicturesCount:
-		columns[colDescendantPicturesCount] = s.descendantPicturesCountColumn
-	case OrderByDescendantsParentsCount:
-		columns[colDescendantsParentsCount] = s.descendantsParentsCountColumn
-	case OrderByStarCount:
-		columns[colStarCount] = s.starCountColumn
-	case OrderByItemParentParentTimestamp:
-		columns[colItemParentParentTimestamp] = s.itemParentParentTimestampColumn
-	case OrderByAttrsUserValuesUpdateDate:
-		columns[colAttrsUserValuesUpdateDate] = s.attrsUserValuesUpdateDateColumn
-	case OrderByName, OrderByAddDatetime, OrderByAge, OrderByIDDesc, OrderByIDAsc, OrderByNone:
-	}
-
-	return columns
 }
 
 func (s *Repository) List( //nolint:maintidx
@@ -1641,37 +1260,6 @@ func (s *Repository) RemoveItemVehicleType(
 	return nil
 }
 
-func (s *Repository) setItemVehicleTypeRow(
-	ctx context.Context,
-	itemID int64,
-	vehicleTypeID int64,
-	inherited bool,
-) (bool, error) {
-	res, err := s.db.Insert(schema.ItemVehicleTypeTable).Rows(goqu.Record{
-		schema.ItemVehicleTypeTableItemIDColName:        itemID,
-		schema.ItemVehicleTypeTableVehicleTypeIDColName: vehicleTypeID,
-		schema.ItemVehicleTypeTableInheritedColName:     inherited,
-	}).OnConflict(goqu.DoUpdate(
-		schema.ItemVehicleTypeTableItemIDColName+","+schema.ItemVehicleTypeTableVehicleTypeIDColName,
-		goqu.Record{
-			schema.ItemVehicleTypeTableInheritedColName: goqu.Func(
-				"VALUES",
-				goqu.C(schema.ItemVehicleTypeTableInheritedColName),
-			),
-		},
-	)).Executor().ExecContext(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	affected, err := res.RowsAffected()
-	if err != nil {
-		return false, err
-	}
-
-	return affected > 0, nil
-}
-
 func (s *Repository) RefreshItemVehicleTypeInheritanceFromParents(
 	ctx context.Context,
 	itemID int64,
@@ -1726,195 +1314,6 @@ func (s *Repository) RefreshItemVehicleTypeInheritanceFromParents(
 	}
 
 	return nil
-}
-
-func (s *Repository) refreshItemVehicleTypeInheritance(ctx context.Context, itemID int64) error {
-	var ids []int64
-
-	err := s.db.Select(schema.ItemParentTableItemIDCol).
-		From(schema.ItemParentTable).
-		Where(schema.ItemParentTableParentIDCol.Eq(itemID)).
-		ScanValsContext(ctx, &ids)
-	if err != nil {
-		return err
-	}
-
-	for _, childID := range ids {
-		err = s.RefreshItemVehicleTypeInheritanceFromParents(ctx, childID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (s *Repository) getItemVehicleTypeIDs(
-	ctx context.Context,
-	itemID int64,
-	inherited bool,
-) ([]int64, error) {
-	sqlSelect := s.db.From(schema.ItemVehicleTypeTable).
-		Select(schema.ItemVehicleTypeTableVehicleTypeIDCol).
-		Where(schema.ItemVehicleTypeTableItemIDCol.Eq(itemID))
-	if inherited {
-		sqlSelect = sqlSelect.Where(schema.ItemVehicleTypeTableInheritedCol.IsTrue())
-	} else {
-		sqlSelect = sqlSelect.Where(schema.ItemVehicleTypeTableInheritedCol.IsFalse())
-	}
-
-	res := make([]int64, 0)
-
-	err := sqlSelect.ScanValsContext(ctx, &res)
-
-	return res, err
-}
-
-func (s *Repository) getItemVehicleTypeInheritedIDs(
-	ctx context.Context,
-	itemID int64,
-) ([]int64, error) {
-	sqlSelect := s.db.From(schema.ItemVehicleTypeTable).
-		Select(schema.ItemVehicleTypeTableVehicleTypeIDCol).Distinct().
-		Join(
-			schema.ItemParentTable,
-			goqu.On(schema.ItemVehicleTypeTableItemIDCol.Eq(schema.ItemParentTableParentIDCol)),
-		).
-		Where(schema.ItemParentTableItemIDCol.Eq(itemID))
-
-	res := make([]int64, 0)
-
-	err := sqlSelect.ScanValsContext(ctx, &res)
-
-	return res, err
-}
-
-func (s *Repository) setItemVehicleTypeRows(
-	ctx context.Context,
-	itemID int64,
-	types []int64,
-	inherited bool,
-) (bool, error) {
-	changed := false
-	ctx = context.WithoutCancel(ctx)
-
-	for _, t := range types {
-		rowChanged, err := s.setItemVehicleTypeRow(ctx, itemID, t, inherited)
-		if err != nil {
-			return false, err
-		}
-
-		if rowChanged {
-			changed = true
-		}
-	}
-
-	sqlDelete := s.db.From(schema.ItemVehicleTypeTable).Delete().
-		Where(schema.ItemVehicleTypeTableItemIDCol.Eq(itemID))
-
-	if len(types) > 0 {
-		sqlDelete = sqlDelete.Where(schema.ItemVehicleTypeTableVehicleTypeIDCol.NotIn(types))
-	}
-
-	res, err := sqlDelete.Executor().ExecContext(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	deleted, err := res.RowsAffected()
-	if err != nil {
-		return false, err
-	}
-
-	if deleted > 0 {
-		changed = true
-	}
-
-	return changed, nil
-}
-
-type parentInfo struct {
-	Diff   int64
-	Tuning bool
-	Sport  bool
-	Design bool
-}
-
-func (s *Repository) collectParentInfo(
-	ctx context.Context,
-	id int64,
-	diff int64,
-) (map[int64]parentInfo, error) {
-	//nolint: sqlclosecheck
-	rows, err := s.db.Select(schema.ItemParentTableParentIDCol, schema.ItemParentTableTypeCol).
-		From(schema.ItemParentTable).
-		Where(schema.ItemParentTableItemIDCol.Eq(id)).
-		Executor().QueryContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer util.Close(rows)
-
-	result := make(map[int64]parentInfo, 0)
-
-	for rows.Next() {
-		var (
-			parentID int64
-			typeID   schema.ItemParentType
-		)
-
-		err = rows.Scan(&parentID, &typeID)
-		if err != nil {
-			return nil, err
-		}
-
-		isTuning := typeID == schema.ItemParentTypeTuning
-		isSport := typeID == schema.ItemParentTypeSport
-		isDesign := typeID == schema.ItemParentTypeDesign
-		result[parentID] = parentInfo{
-			Diff:   diff,
-			Tuning: isTuning,
-			Sport:  isSport,
-			Design: isDesign,
-		}
-
-		parentInfos, err := s.collectParentInfo(ctx, parentID, diff+1)
-		if err != nil {
-			return nil, err
-		}
-
-		for pid, info := range parentInfos {
-			val, ok := result[pid]
-
-			if !ok || info.Diff < val.Diff {
-				val = info
-				val.Tuning = result[pid].Tuning || isTuning
-				val.Sport = result[pid].Sport || isSport
-				val.Design = result[pid].Design || isDesign
-				result[pid] = val
-			}
-		}
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-func (s *Repository) getChildItemsIDs(ctx context.Context, parentID int64) ([]int64, error) {
-	vals := make([]int64, 0)
-
-	err := s.db.Select(schema.ItemParentTableItemIDCol).
-		From(schema.ItemParentTable).
-		Where(schema.ItemParentTableParentIDCol.Eq(parentID)).
-		Executor().ScanValsContext(ctx, &vals)
-	if err != nil {
-		return nil, err
-	}
-
-	return vals, nil
 }
 
 func (s *Repository) RebuildCache(ctx context.Context, itemID int64) (int64, error) {
@@ -2402,345 +1801,6 @@ func (s *Repository) SetItemParentLanguage(
 	return err
 }
 
-func (s *Repository) namePreferLanguage(
-	ctx context.Context,
-	parentID, itemID int64,
-	lang string,
-) (string, error) {
-	res := ""
-
-	success, err := s.db.Select(schema.ItemParentLanguageTableNameCol).
-		From(schema.ItemParentLanguageTable).
-		Where(
-			schema.ItemParentLanguageTableItemIDCol.Eq(itemID),
-			schema.ItemParentLanguageTableParentIDCol.Eq(parentID),
-			goqu.Func("LENGTH", schema.ItemParentLanguageTableNameCol).Gt(0),
-		).
-		Order(goqu.L("? > 0", schema.ItemParentLanguageTableLanguageCol.Eq(lang)).Desc()).
-		ScanValContext(ctx, &res)
-	if err != nil {
-		return "", err
-	}
-
-	if !success {
-		return "", nil
-	}
-
-	return res, nil
-}
-
-func (s *Repository) extractCatname(
-	ctx context.Context,
-	brandRow, vehicleRow schema.ItemRow,
-) (string, error) {
-	var err error
-
-	diffName, err := s.namePreferLanguage(ctx, brandRow.ID, vehicleRow.ID, "en")
-	if err != nil {
-		return "", err
-	}
-
-	if len(diffName) == 0 {
-		diffName, err = s.extractName(ctx, brandRow, vehicleRow, "en")
-		if err != nil {
-			return "", err
-		}
-	}
-
-	catnameTemplate := filter.SanitizeFilename(diffName)
-
-	i := 0
-	allowed := false
-	catname := ""
-
-	for !allowed {
-		catname = catnameTemplate
-		if i > 0 {
-			catname = catname + "_" + strconv.Itoa(i)
-		}
-
-		allowed, err = s.isAllowedCatname(ctx, vehicleRow.ID, brandRow.ID, catname)
-		if err != nil {
-			return "", err
-		}
-
-		i++
-	}
-
-	return catname, nil
-}
-
-func (s *Repository) extractName(
-	ctx context.Context, parentRow schema.ItemRow, vehicleRow schema.ItemRow, lang string,
-) (string, error) {
-	langName, err := s.getName(ctx, vehicleRow.ID, lang)
-	if err != nil {
-		return "", err
-	}
-
-	vehicleName := langName
-	if len(langName) == 0 {
-		vehicleName = vehicleRow.Name
-	}
-
-	aliases, err := s.getAliases(ctx, parentRow.ID)
-	if err != nil {
-		return "", err
-	}
-
-	name := vehicleName
-
-	for _, alias := range aliases {
-		patterns := []string{
-			"by The " + alias + " Company",
-			"by " + alias,
-			"di " + alias,
-			"par " + alias,
-			alias + "-",
-			"-" + alias,
-		}
-
-		for _, pattern := range patterns {
-			re := regexp.MustCompile(regexp.QuoteMeta(pattern))
-			name = re.ReplaceAllString(name, "")
-		}
-
-		re := regexp.MustCompile(`\b` + regexp.QuoteMeta(alias) + `\b`)
-		name = re.ReplaceAllString(name, "")
-	}
-
-	re := regexp.MustCompile("[[:space:]]+")
-	name = strings.TrimSpace(re.ReplaceAllString(name, " "))
-
-	name = strings.TrimLeft(name, "/")
-	if len(name) == 0 && len(vehicleRow.Body) > 0 && vehicleRow.Body != parentRow.Body {
-		name = vehicleRow.Body
-	}
-
-	vbmy := vehicleRow.BeginModelYear.Int32
-	vemy := vehicleRow.EndModelYear.Int32
-
-	if len(name) == 0 && vehicleRow.BeginModelYear.Valid && vbmy > 0 {
-		modelYearsDifferent := vbmy != parentRow.BeginModelYear.Int32 ||
-			vemy != parentRow.EndModelYear.Int32
-		if modelYearsDifferent {
-			name = yearsPrefix(vbmy, vemy)
-		}
-	}
-
-	vby := vehicleRow.BeginYear.Int32
-	vey := vehicleRow.EndYear.Int32
-
-	if len(name) == 0 && vehicleRow.BeginYear.Valid && vby > 0 {
-		yearsDifferent := vby != parentRow.BeginYear.Int32 || vey != parentRow.EndYear.Int32
-		if yearsDifferent {
-			name = yearsPrefix(vby, vey)
-		}
-	}
-
-	if len(name) == 0 && vehicleRow.SpecID.Valid {
-		specsDifferent := vehicleRow.SpecID.Int32 != parentRow.SpecID.Int32
-		if specsDifferent {
-			specShortName := ""
-
-			success, err := s.db.Select(schema.SpecTableShortNameCol).From(schema.SpecTable).
-				Where(schema.SpecTableIDCol.Eq(vehicleRow.SpecID.Int32)).
-				ScanValContext(ctx, &specShortName)
-			if err != nil {
-				return "", err
-			}
-
-			if success {
-				name = specShortName
-			}
-		}
-	}
-
-	if len(name) == 0 {
-		name = vehicleName
-	}
-
-	return name, nil
-}
-
-func (s *Repository) getAliases(ctx context.Context, itemID int64) ([]string, error) {
-	var aliases []string
-
-	err := s.db.Select(schema.BrandAliasTableNameCol).From(schema.BrandAliasTable).
-		Where(schema.BrandAliasTableItemIDCol.Eq(itemID)).ScanValsContext(ctx, &aliases)
-	if err != nil {
-		return nil, err
-	}
-
-	langNames, err := s.getNames(ctx, itemID)
-	if err != nil {
-		return nil, err
-	}
-
-	aliases = append(aliases, langNames...)
-
-	sort.Slice(aliases, func(i, j int) bool {
-		return len(aliases[i]) > len(aliases[j])
-	})
-
-	return aliases, nil
-}
-
-func (s *Repository) getName(ctx context.Context, itemID int64, lang string) (string, error) {
-	langPriority, ok := languagePriority[lang]
-	if !ok {
-		langPriority, ok = languagePriority[DefaultLanguageCode]
-	}
-
-	if !ok {
-		return "", fmt.Errorf("%w: `%s`", errLangNotFound, lang)
-	}
-
-	fieldParams := make([]interface{}, len(langPriority)+1)
-	fieldParams[0] = lang
-
-	for i, v := range langPriority {
-		fieldParams[i+1] = v
-	}
-
-	result := ""
-
-	success, err := s.db.Select(schema.ItemLanguageTableNameCol).
-		From(schema.ItemLanguageTable).
-		Where(
-			schema.ItemLanguageTableItemIDCol.Eq(itemID),
-			goqu.L("? > 0", goqu.Func("length", schema.ItemLanguageTableNameCol)),
-		).
-		Order(goqu.Func("FIELD", fieldParams...).Asc()).
-		Limit(1).
-		ScanValContext(ctx, &result)
-	if err != nil {
-		return "", err
-	}
-
-	if !success {
-		return "", nil
-	}
-
-	return result, nil
-}
-
-func (s *Repository) getNames(ctx context.Context, itemID int64) ([]string, error) {
-	var result []string
-
-	err := s.db.Select(schema.ItemLanguageTableNameCol).From(schema.ItemLanguageTable).
-		Where(
-			schema.ItemLanguageTableItemIDCol.Eq(itemID),
-			goqu.L("? > 0", goqu.Func("length", schema.ItemLanguageTableNameCol)),
-		).ScanValsContext(ctx, &result)
-
-	return result, err
-}
-
-type sortedColumnMapItem struct {
-	key string
-	col Column
-}
-
-func toSortedColumns(cols map[string]Column) []sortedColumnMapItem {
-	res := make([]sortedColumnMapItem, 0, len(cols))
-	for colName, col := range cols {
-		res = append(res, sortedColumnMapItem{key: colName, col: col})
-	}
-
-	sort.SliceStable(res, func(i, j int) bool {
-		return res[i].key < res[j].key
-	})
-
-	return res
-}
-
-func (s *Repository) isAllowedCombination(
-	itemTypeID, parentItemTypeID schema.ItemTableItemTypeID,
-) bool {
-	itemTypes, ok := schema.AllowedTypeCombinations[parentItemTypeID]
-	if !ok {
-		return false
-	}
-
-	return util.Contains(itemTypes, itemTypeID)
-}
-
-func (s *Repository) isAllowedCatname(
-	ctx context.Context,
-	itemID, parentID int64,
-	catname string,
-) (bool, error) {
-	if len(catname) == 0 {
-		return false, nil
-	}
-
-	if util.Contains(catnameBlacklist, catname) {
-		return false, nil
-	}
-
-	var exists bool
-
-	success, err := s.db.Select(goqu.V(true)).From(schema.ItemParentTable).Where(
-		schema.ItemParentTableParentIDCol.Eq(parentID),
-		schema.ItemParentTableCatnameCol.Eq(catname),
-		schema.ItemParentTableItemIDCol.Neq(itemID),
-	).ScanValContext(ctx, &exists)
-	if err != nil {
-		return false, err
-	}
-
-	return !success || !exists, nil
-}
-
-func (s *Repository) collectAncestorsIDs(ctx context.Context, id int64) ([]int64, error) {
-	var (
-		toCheck = []int64{id}
-		ids     []int64
-	)
-
-	for len(toCheck) > 0 {
-		ids = append(ids, toCheck...)
-
-		var res []int64
-
-		err := s.db.Select(schema.ItemParentTableParentIDCol).
-			From(schema.ItemParentTable).
-			Where(schema.ItemParentTableItemIDCol.In(toCheck)).
-			ScanValsContext(ctx, &res)
-		if err != nil {
-			return nil, err
-		}
-
-		toCheck = res
-	}
-
-	return util.RemoveDuplicate(ids), nil
-}
-
-func (s *Repository) setItemParentLanguages(
-	ctx context.Context,
-	parentID, itemID int64,
-	values map[string]schema.ItemParentLanguageRow,
-	forceIsAuto bool,
-) error {
-	ctx = context.WithoutCancel(ctx)
-
-	for _, lang := range s.contentLanguages {
-		name := ""
-		if _, ok := values[lang]; ok {
-			name = values[lang].Name
-		}
-
-		err := s.SetItemParentLanguage(ctx, parentID, itemID, lang, name, forceIsAuto)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (s *Repository) CreateItemParent(
 	ctx context.Context, itemID, parentID int64, typeID schema.ItemParentType, catname string,
 ) (bool, error) {
@@ -3022,133 +2082,6 @@ func (s *Repository) UpdateInheritance(ctx context.Context, itemID int64) error 
 	return s.updateItemInheritance(ctx, item)
 }
 
-func (s *Repository) updateItemInheritance(ctx context.Context, car schema.ItemRow) error {
-	var parents []schema.ItemRow
-
-	err := s.db.Select(
-		schema.ItemTableIsConceptCol, schema.ItemTableEngineItemIDCol, schema.ItemTableSpecIDCol,
-	).
-		From(schema.ItemTable).
-		Join(schema.ItemParentTable, goqu.On(schema.ItemTableIDCol.Eq(schema.ItemParentTableParentIDCol))).
-		Where(schema.ItemParentTableItemIDCol.Eq(car.ID)).
-		ScanStructsContext(ctx, &parents)
-	if err != nil {
-		return err
-	}
-
-	somethingChanged := false
-
-	set := goqu.Record{}
-
-	if car.IsConceptInherit {
-		isConcept := false
-
-		for _, parent := range parents {
-			if parent.IsConcept {
-				isConcept = true
-
-				break
-			}
-		}
-
-		if car.IsConcept != isConcept {
-			set[schema.ItemTableIsConceptColName] = isConcept
-			somethingChanged = true
-		}
-	}
-
-	if car.EngineInherit {
-		enginesMap := make(map[int64]int)
-
-		for _, parent := range parents {
-			engineID := parent.EngineItemID
-			if engineID.Valid {
-				enginesMap[engineID.Int64]++
-			}
-		}
-
-		// select top
-		selectedID := util.KeyOfMapMaxValue(enginesMap)
-
-		var oldEngineID int64
-		if car.EngineItemID.Valid {
-			oldEngineID = car.EngineItemID.Int64
-		}
-
-		if oldEngineID != selectedID {
-			set[schema.ItemTableEngineItemIDColName] = sql.NullInt64{
-				Int64: selectedID,
-				Valid: selectedID > 0,
-			}
-			somethingChanged = true
-		}
-	}
-
-	if car.SpecInherit {
-		specsMap := make(map[int32]int)
-
-		for _, parent := range parents {
-			specID := parent.SpecID
-			if specID.Valid {
-				specsMap[specID.Int32]++
-			}
-		}
-
-		// select top
-		selectedID := util.KeyOfMapMaxValue(specsMap)
-
-		var oldSpecID int32
-		if car.SpecID.Valid {
-			oldSpecID = car.SpecID.Int32
-		}
-
-		if oldSpecID != selectedID {
-			set[schema.ItemTableSpecIDColName] = sql.NullInt32{
-				Int32: selectedID,
-				Valid: selectedID > 0,
-			}
-			somethingChanged = true
-		}
-	}
-
-	if somethingChanged || !car.VehicleTypeInherit {
-		ctx = context.WithoutCancel(ctx)
-
-		if len(set) > 0 {
-			_, err = s.db.Update(schema.ItemTable).Set(set).
-				Where(schema.ItemTableIDCol.Eq(car.ID)).
-				Executor().ExecContext(ctx)
-			if err != nil {
-				return err
-			}
-		}
-
-		var childItems []schema.ItemRow
-
-		err = s.db.Select(
-			schema.ItemTableIDCol, schema.ItemTableIsConceptCol, schema.ItemTableIsConceptInheritCol,
-			schema.ItemTableEngineInheritCol, schema.ItemTableEngineItemIDCol, schema.ItemTableVehicleTypeInheritCol,
-			schema.ItemTableSpecInheritCol, schema.ItemTableSpecIDCol,
-		).
-			From(schema.ItemTable).
-			Join(schema.ItemParentTable, goqu.On(schema.ItemTableIDCol.Eq(schema.ItemParentTableItemIDCol))).
-			Where(schema.ItemParentTableParentIDCol.Eq(car.ID)).
-			ScanStructsContext(ctx, &childItems)
-		if err != nil {
-			return err
-		}
-
-		for _, child := range childItems {
-			err = s.updateItemInheritance(ctx, child)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
 func (s *Repository) MoveItemParent(
 	ctx context.Context,
 	itemID, parentID, newParentID int64,
@@ -3242,30 +2175,6 @@ func (s *Repository) MoveItemParent(
 	return true, nil
 }
 
-func (s *Repository) getParentRows(
-	ctx context.Context,
-	itemID int64,
-	stockFirst bool,
-) ([]schema.ItemParentRow, error) {
-	sqSelect := s.db.Select(schema.ItemParentTableParentIDCol).
-		From(schema.ItemParentTable).
-		Where(
-			schema.ItemParentTableItemIDCol.Eq(itemID),
-		)
-
-	if stockFirst {
-		sqSelect = sqSelect.Order(
-			goqu.L("?", schema.ItemParentTableTypeCol.Eq(schema.ItemParentTypeDefault)).Desc(),
-		)
-	}
-
-	var rows []schema.ItemParentRow
-
-	err := sqSelect.ScanStructsContext(ctx, &rows)
-
-	return rows, err
-}
-
 func (s *Repository) RefreshAutoByVehicle(ctx context.Context, itemID int64) (bool, error) {
 	rows, err := s.getParentRows(ctx, itemID, false)
 	if err != nil {
@@ -3286,107 +2195,6 @@ func (s *Repository) RefreshAutoByVehicle(ctx context.Context, itemID int64) (bo
 	}
 
 	return somethingChanged, nil
-}
-
-func (s *Repository) refreshItemParentLanguage(ctx context.Context, parentID, itemID int64) error {
-	logrus.Infof("refreshItemParentLanguage(%d, %d)", parentID, itemID)
-
-	var rows []schema.ItemParentLanguageRow
-
-	err := s.db.Select(
-		schema.ItemParentLanguageTableIsAutoCol,
-		schema.ItemParentLanguageTableNameCol,
-		schema.ItemParentLanguageTableLanguageCol,
-	).
-		From(schema.ItemParentLanguageTable).
-		Where(
-			schema.ItemParentLanguageTableItemIDCol.Eq(itemID),
-			schema.ItemParentLanguageTableParentIDCol.Eq(parentID),
-		).
-		ScanStructsContext(ctx, &rows)
-	if err != nil {
-		return err
-	}
-
-	values := make(map[string]schema.ItemParentLanguageRow)
-
-	for _, iplRow := range rows {
-		row := schema.ItemParentLanguageRow{}
-		if !iplRow.IsAuto {
-			row.Name = iplRow.Name
-		}
-
-		values[iplRow.Language] = row
-	}
-
-	return s.setItemParentLanguages(ctx, parentID, itemID, values, false)
-}
-
-func (s *Repository) refreshAuto(ctx context.Context, parentID, itemID int64) (bool, error) {
-	err := s.refreshItemParentLanguage(ctx, parentID, itemID)
-	if err != nil {
-		return false, err
-	}
-
-	var bvRow schema.ItemParentRow
-
-	success, err := s.db.Select(schema.ItemParentTableManualCatnameCol).
-		From(schema.ItemParentTable).
-		Where(
-			schema.ItemParentTableItemIDCol.Eq(itemID),
-			schema.ItemParentTableParentIDCol.Eq(parentID),
-		).
-		ScanStructContext(ctx, &bvRow)
-	if err != nil {
-		return false, err
-	}
-
-	if !success {
-		return false, nil
-	}
-
-	if bvRow.ManualCatname {
-		return true, nil
-	}
-
-	brandRow, err := s.Item(
-		ctx,
-		&query.ItemListOptions{ItemID: parentID},
-		&ItemFields{NameText: true},
-	)
-	if err != nil {
-		return false, err
-	}
-
-	vehicleRow, err := s.Item(
-		ctx,
-		&query.ItemListOptions{ItemID: itemID},
-		&ItemFields{NameText: true},
-	)
-	if err != nil {
-		return false, err
-	}
-
-	catname, err := s.extractCatname(ctx, brandRow.ItemRow, vehicleRow.ItemRow)
-	if err != nil {
-		return false, err
-	}
-
-	if len(catname) == 0 {
-		return false, nil
-	}
-
-	_, err = s.db.Update(schema.ItemParentTable).Set(goqu.Record{
-		schema.ItemParentTableCatnameColName: catname,
-	}).Where(
-		schema.ItemParentTableItemIDCol.Eq(itemID),
-		schema.ItemParentTableParentIDCol.Eq(parentID),
-	).Executor().ExecContext(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
 }
 
 func (s *Repository) ItemParentSelect(
@@ -3660,6 +2468,7 @@ func (s *Repository) VehicleTypeIDs(
 	}
 
 	var res []int64
+
 	err := sqSelect.ScanValsContext(ctx, &res)
 
 	return res, err
@@ -4913,36 +3722,6 @@ func (s *Repository) UpdateItem(
 	return nil
 }
 
-func (s *Repository) setItemLanguageName(
-	ctx context.Context,
-	itemID int64,
-	lang string,
-	name string,
-) error {
-	if itemID == 0 {
-		return ErrItemNotFound
-	}
-
-	_, err := s.db.Insert(schema.ItemLanguageTable).Rows(goqu.Record{
-		schema.ItemLanguageTableItemIDColName:   itemID,
-		schema.ItemLanguageTableLanguageColName: lang,
-		schema.ItemLanguageTableNameColName: sql.NullString{
-			String: name,
-			Valid:  len(name) > 0,
-		},
-	}).OnConflict(goqu.DoUpdate(
-		schema.ItemLanguageTableItemIDColName+","+schema.ItemLanguageTableLanguageColName,
-		goqu.Record{
-			schema.ItemLanguageTableNameColName: goqu.Func(
-				"VALUES",
-				goqu.C(schema.ItemLanguageTableNameColName),
-			),
-		},
-	)).Executor().ExecContext(ctx)
-
-	return err
-}
-
 func (s *Repository) Spec(ctx context.Context, id int32) (*schema.SpecRow, error) {
 	var st schema.SpecRow
 
@@ -5003,4 +3782,1228 @@ func (s *Repository) SetItemLogo(ctx context.Context, itemID int64, file io.Read
 	}
 
 	return nil
+}
+
+func (s *Repository) columnsByFields(fields *ItemFields) map[string]Column {
+	columns := map[string]Column{
+		schema.ItemTableIDColName:               s.idColumn,
+		schema.ItemTableCatnameColName:          s.catnameColumn,
+		schema.ItemTableEngineItemIDColName:     s.engineItemIDColumn,
+		schema.ItemTableEngineInheritColName:    s.engineInheritColumn,
+		schema.ItemTableItemTypeIDColName:       s.itemTypeIDColumn,
+		schema.ItemTableIsConceptColName:        s.isConceptColumn,
+		schema.ItemTableIsConceptInheritColName: s.isConceptInheritColumn,
+		schema.ItemTableSpecIDColName:           s.specIDColumn,
+		schema.ItemTableSpecInheritColName:      s.specInheritColumn,
+		schema.ItemTableIsGroupColName:          s.isGroupColumn,
+		schema.ItemTableProducedColName:         s.producedColumn,
+		schema.ItemTableProducedExactlyColName:  s.producedExactlyColumn,
+		schema.ItemTableLogoIDColName:           s.logoColumn,
+	}
+
+	if fields == nil {
+		return columns
+	}
+
+	if fields.FullName || fields.Meta {
+		columns[schema.ItemTableFullNameColName] = s.fullNameColumn
+	}
+
+	if fields.Logo {
+		columns[schema.ItemTableLogoIDColName] = s.logoColumn
+	}
+
+	if fields.Meta {
+		columns[schema.ItemTableNameColName] = s.nameColumn
+	}
+
+	if fields.NameText || fields.NameHTML || fields.Meta {
+		columns[schema.ItemTableBeginYearColName] = s.beginYearColumn
+		columns[schema.ItemTableEndYearColName] = s.endYearColumn
+		columns[schema.ItemTableBeginMonthColName] = s.beginMonthColumn
+		columns[schema.ItemTableEndMonthColName] = s.endMonthColumn
+		columns[schema.ItemTableBeginModelYearColName] = s.beginModelYearColumn
+		columns[schema.ItemTableEndModelYearColName] = s.endModelYearColumn
+		columns[schema.ItemTableBeginModelYearFractionColName] = s.beginModelYearFractionColumn
+		columns[schema.ItemTableEndModelYearFractionColName] = s.endModelYearFractionColumn
+		columns[schema.ItemTableTodayColName] = s.todayColumn
+		columns[schema.ItemTableBodyColName] = s.bodyColumn
+
+		if fields.NameText || fields.NameHTML {
+			columns[colSpecShortName] = s.specShortNameColumn
+		}
+	}
+
+	if fields.NameHTML {
+		columns[colSpecName] = s.specNameColumn
+	}
+
+	if fields.Description {
+		columns[colDescription] = s.descriptionColumn
+	}
+
+	if fields.FullText {
+		columns[colFullText] = s.fullTextColumn
+	}
+
+	if fields.NameOnly || fields.NameText || fields.NameHTML || fields.Meta {
+		columns[colNameOnly] = s.nameOnlyColumn
+	}
+
+	if fields.NameDefault {
+		columns[colNameDefault] = s.nameDefaultColumn
+	}
+
+	if fields.ChildItemsCount {
+		columns[colChildItemsCount] = s.childItemsCountColumn
+	}
+
+	if fields.NewChildItemsCount {
+		columns[colNewChildItemsCount] = s.newChildItemsCountColumn
+	}
+
+	if fields.DescendantsParentsCount {
+		columns[colDescendantsParentsCount] = s.descendantsParentsCountColumn
+	}
+
+	if fields.NewDescendantsParentsCount {
+		columns[colNewDescendantsParentsCount] = s.newDescendantsParentsCountColumn
+	}
+
+	if fields.ChildsCount {
+		columns[colChildsCount] = s.childsCountColumn
+	}
+
+	if fields.ParentsCount {
+		columns[colParentsCount] = s.parentsCountColumn
+	}
+
+	if fields.DescendantsCount {
+		columns[colDescendantsCount] = s.descendantsCountColumn
+	}
+
+	if fields.NewDescendantsCount {
+		columns[colNewDescendantsCount] = s.newDescendantsCountColumn
+	}
+
+	if fields.DescendantTwinsGroupsCount {
+		columns[colDescendantTwinsGroupsCount] = s.descendantTwinsGroupsCountColumn
+	}
+
+	if fields.MostsActive {
+		columns[colMostsActive] = s.mostsActiveColumn
+	}
+
+	if fields.DescendantPicturesCount {
+		columns[colDescendantPicturesCount] = s.descendantPicturesCountColumn
+	}
+
+	if fields.InboxPicturesCount {
+		columns[colInboxPicturesCount] = s.inboxPicturesCountColumn
+	}
+
+	if fields.AcceptedPicturesCount {
+		columns[colAcceptedPicturesCount] = s.acceptedPicturesCountColumn
+	}
+
+	if fields.ExactPicturesCount {
+		columns[colExactPicturesCount] = s.exactPicturesCountColumn
+	}
+
+	if fields.CommentsAttentionsCount {
+		columns[colCommentsAttentionsCount] = s.commentsAttentionsCountColumn
+	}
+
+	if fields.HasChildSpecs {
+		columns[colHasChildSpecs] = s.hasChildSpecsColumn
+	}
+
+	if fields.HasSpecs {
+		columns[colHasSpecs] = s.hasSpecsColumn
+	}
+
+	return columns
+}
+
+func (s *Repository) isFieldsValid(
+	options *query.ItemListOptions,
+	fields *ItemFields,
+	orderBy OrderBy,
+) error {
+	if fields == nil {
+		return nil
+	}
+
+	if (fields.ChildItemsCount || fields.NewChildItemsCount) && options.ItemParentChild == nil {
+		return fmt.Errorf(
+			"%w: ChildItemsCount, NewChildItemsCount requires ItemParentChild",
+			errFieldRequires,
+		)
+	}
+
+	if fields.DescendantPicturesCount && (options.ItemParentCacheDescendant == nil ||
+		options.ItemParentCacheDescendant.PictureItemsByItemID == nil) {
+		return fmt.Errorf(
+			"%w: DescendantPicturesCount requires ItemParentCacheDescendant.PictureItemsByItemID",
+			errFieldRequires,
+		)
+	}
+
+	if (fields.DescendantsParentsCount || fields.NewDescendantsParentsCount) &&
+		(options.ItemParentCacheDescendant == nil || options.ItemParentCacheDescendant.ItemParentByItemID == nil) {
+		return fmt.Errorf(
+			"%w: (New)DescendantsParentsCount requires ItemParentCacheDescendant.ItemParentByItemID",
+			errFieldRequires,
+		)
+	}
+
+	if orderBy == OrderByAttrsUserValuesUpdateDate && options.AttrsUserValues == nil {
+		return fmt.Errorf(
+			"%w: OrderByAttrsUserValuesUpdateDate requires AttrsUserValues",
+			errFieldRequires,
+		)
+	}
+
+	return nil
+}
+
+func (s *Repository) orderBy(
+	alias string,
+	orderBy OrderBy,
+	lang string,
+) ([]exp.OrderedExpression, error) {
+	type columnOrder struct {
+		col Column
+		asc bool
+	}
+
+	var columns []columnOrder
+
+	switch orderBy {
+	case OrderByDescendantsCount:
+		columns = []columnOrder{{col: s.descendantsCountColumn, asc: false}}
+	case OrderByChildsCount:
+		columns = []columnOrder{{col: s.childsCountColumn, asc: false}}
+	case OrderByDescendantPicturesCount:
+		columns = []columnOrder{{col: s.descendantPicturesCountColumn, asc: false}}
+	case OrderByAddDatetime:
+		columns = []columnOrder{{col: s.addDatetimeColumn, asc: false}}
+	case OrderByName:
+		columns = []columnOrder{
+			{col: s.nameColumn, asc: true},
+			{col: s.bodyColumn, asc: true},
+			{col: s.specIDColumn, asc: true},
+			{col: s.beginOrderCacheColumn, asc: true},
+			{col: s.endOrderCacheColumn, asc: true},
+		}
+	case OrderByDescendantsParentsCount:
+		columns = []columnOrder{{col: s.descendantsParentsCountColumn, asc: false}}
+	case OrderByStarCount:
+		columns = []columnOrder{{col: s.starCountColumn, asc: false}}
+	case OrderByItemParentParentTimestamp:
+		columns = []columnOrder{{col: s.itemParentParentTimestampColumn, asc: false}}
+	case OrderByAge:
+		columns = []columnOrder{
+			{col: s.beginOrderCacheColumn, asc: true},
+			{col: s.endOrderCacheColumn, asc: true},
+			{col: s.nameColumn, asc: true},
+			{col: s.bodyColumn, asc: true},
+			{col: s.specIDColumn, asc: true},
+		}
+	case OrderByIDDesc:
+		columns = []columnOrder{{col: s.idColumn, asc: false}}
+	case OrderByIDAsc:
+		columns = []columnOrder{{col: s.idColumn, asc: true}}
+	case OrderByAttrsUserValuesUpdateDate:
+		columns = []columnOrder{{col: s.attrsUserValuesUpdateDateColumn, asc: false}}
+	case OrderByNone:
+	}
+
+	orderByExp := make([]exp.OrderedExpression, 0, len(columns))
+
+	for _, column := range columns {
+		expr, err := column.col.SelectExpr(alias, lang)
+		if err != nil {
+			return nil, err
+		}
+
+		ordExpr := expr.Desc()
+		if column.asc {
+			ordExpr = expr.Asc()
+		}
+
+		orderByExp = append(orderByExp, ordExpr)
+	}
+
+	return orderByExp, nil
+}
+
+func (s *Repository) wrapperOrderBy(
+	wrapperAlias string,
+	wrappedAlias string,
+	orderBy OrderBy,
+) []exp.OrderedExpression {
+	wrapperAliasTable := goqu.T(wrapperAlias)
+	wrappedAliasTable := goqu.T(wrappedAlias)
+
+	switch orderBy {
+	case OrderByDescendantsCount:
+		return []exp.OrderedExpression{wrappedAliasTable.Col(colDescendantsCount).Desc()}
+	case OrderByChildsCount:
+		return []exp.OrderedExpression{wrappedAliasTable.Col(colChildsCount).Desc()}
+	case OrderByDescendantPicturesCount:
+		return []exp.OrderedExpression{wrappedAliasTable.Col(colDescendantPicturesCount).Desc()}
+	case OrderByAddDatetime:
+		return []exp.OrderedExpression{
+			wrapperAliasTable.Col(schema.ItemTableAddDatetimeColName).Desc(),
+		}
+	case OrderByName:
+		return []exp.OrderedExpression{
+			wrapperAliasTable.Col(schema.ItemTableNameColName).Asc(),
+			wrapperAliasTable.Col(schema.ItemTableBodyColName).Asc(),
+			wrapperAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
+			wrapperAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
+			wrapperAliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
+		}
+	case OrderByDescendantsParentsCount:
+		return []exp.OrderedExpression{wrappedAliasTable.Col(colDescendantsParentsCount).Desc()}
+	case OrderByStarCount:
+		return []exp.OrderedExpression{wrappedAliasTable.Col(colStarCount).Desc()}
+	case OrderByItemParentParentTimestamp:
+		return []exp.OrderedExpression{wrappedAliasTable.Col(colItemParentParentTimestamp).Desc()}
+	case OrderByAge:
+		return []exp.OrderedExpression{
+			wrapperAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
+			wrapperAliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
+			wrapperAliasTable.Col(schema.ItemTableNameColName).Asc(),
+			wrapperAliasTable.Col(schema.ItemTableBodyColName).Asc(),
+			wrapperAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
+		}
+	case OrderByIDDesc:
+		return []exp.OrderedExpression{wrappedAliasTable.Col(schema.ItemTableIDColName).Desc()}
+	case OrderByIDAsc:
+		return []exp.OrderedExpression{wrappedAliasTable.Col(schema.ItemTableIDColName).Asc()}
+	case OrderByAttrsUserValuesUpdateDate:
+		return []exp.OrderedExpression{wrappedAliasTable.Col(colAttrsUserValuesUpdateDate).Desc()}
+	case OrderByNone:
+	}
+
+	return nil
+}
+
+func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy) []exp.OrderedExpression {
+	aliasTable := goqu.T(alias)
+
+	var orderByExp []exp.OrderedExpression
+
+	switch orderBy {
+	case OrderByDescendantsCount:
+		orderByExp = []exp.OrderedExpression{goqu.C(colDescendantsCount).Desc()}
+	case OrderByChildsCount:
+		orderByExp = []exp.OrderedExpression{goqu.C(colChildsCount).Desc()}
+	case OrderByDescendantPicturesCount:
+		orderByExp = []exp.OrderedExpression{goqu.C(colDescendantPicturesCount).Desc()}
+	case OrderByAddDatetime:
+		orderByExp = []exp.OrderedExpression{
+			aliasTable.Col(schema.ItemTableAddDatetimeColName).Desc(),
+		}
+	case OrderByName:
+		orderByExp = []exp.OrderedExpression{
+			aliasTable.Col(schema.ItemTableNameColName).Asc(),
+			aliasTable.Col(schema.ItemTableBodyColName).Asc(),
+			aliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
+			aliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
+			aliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
+		}
+	case OrderByDescendantsParentsCount:
+		orderByExp = []exp.OrderedExpression{goqu.C(colDescendantsParentsCount).Desc()}
+	case OrderByStarCount:
+		orderByExp = []exp.OrderedExpression{goqu.C(colStarCount).Desc()}
+	case OrderByItemParentParentTimestamp:
+		orderByExp = []exp.OrderedExpression{goqu.C(colItemParentParentTimestamp).Desc()}
+	case OrderByAge:
+		orderByExp = []exp.OrderedExpression{
+			aliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
+			aliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
+			aliasTable.Col(schema.ItemTableNameColName).Asc(),
+			aliasTable.Col(schema.ItemTableBodyColName).Asc(),
+			aliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
+		}
+	case OrderByIDDesc:
+		orderByExp = []exp.OrderedExpression{aliasTable.Col(schema.ItemTableIDColName).Desc()}
+	case OrderByIDAsc:
+		orderByExp = []exp.OrderedExpression{aliasTable.Col(schema.ItemTableIDColName).Asc()}
+	case OrderByAttrsUserValuesUpdateDate:
+		orderByExp = []exp.OrderedExpression{goqu.C(colAttrsUserValuesUpdateDate).Desc()}
+	case OrderByNone:
+	}
+
+	return orderByExp
+}
+
+func (s *Repository) wrappedSelectColumns(orderBy OrderBy) map[string]Column {
+	columns := map[string]Column{
+		schema.ItemTableIDColName: s.idColumn,
+	}
+
+	switch orderBy {
+	case OrderByDescendantsCount:
+		columns[colDescendantsCount] = s.descendantsCountColumn
+	case OrderByChildsCount:
+		columns[colChildsCount] = s.childsCountColumn
+	case OrderByDescendantPicturesCount:
+		columns[colDescendantPicturesCount] = s.descendantPicturesCountColumn
+	case OrderByDescendantsParentsCount:
+		columns[colDescendantsParentsCount] = s.descendantsParentsCountColumn
+	case OrderByStarCount:
+		columns[colStarCount] = s.starCountColumn
+	case OrderByItemParentParentTimestamp:
+		columns[colItemParentParentTimestamp] = s.itemParentParentTimestampColumn
+	case OrderByAttrsUserValuesUpdateDate:
+		columns[colAttrsUserValuesUpdateDate] = s.attrsUserValuesUpdateDateColumn
+	case OrderByName, OrderByAddDatetime, OrderByAge, OrderByIDDesc, OrderByIDAsc, OrderByNone:
+	}
+
+	return columns
+}
+
+func (s *Repository) setItemVehicleTypeRow(
+	ctx context.Context,
+	itemID int64,
+	vehicleTypeID int64,
+	inherited bool,
+) (bool, error) {
+	res, err := s.db.Insert(schema.ItemVehicleTypeTable).Rows(goqu.Record{
+		schema.ItemVehicleTypeTableItemIDColName:        itemID,
+		schema.ItemVehicleTypeTableVehicleTypeIDColName: vehicleTypeID,
+		schema.ItemVehicleTypeTableInheritedColName:     inherited,
+	}).OnConflict(goqu.DoUpdate(
+		schema.ItemVehicleTypeTableItemIDColName+","+schema.ItemVehicleTypeTableVehicleTypeIDColName,
+		goqu.Record{
+			schema.ItemVehicleTypeTableInheritedColName: goqu.Func(
+				"VALUES",
+				goqu.C(schema.ItemVehicleTypeTableInheritedColName),
+			),
+		},
+	)).Executor().ExecContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	return affected > 0, nil
+}
+
+func (s *Repository) refreshItemVehicleTypeInheritance(ctx context.Context, itemID int64) error {
+	var ids []int64
+
+	err := s.db.Select(schema.ItemParentTableItemIDCol).
+		From(schema.ItemParentTable).
+		Where(schema.ItemParentTableParentIDCol.Eq(itemID)).
+		ScanValsContext(ctx, &ids)
+	if err != nil {
+		return err
+	}
+
+	for _, childID := range ids {
+		err = s.RefreshItemVehicleTypeInheritanceFromParents(ctx, childID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *Repository) getItemVehicleTypeIDs(
+	ctx context.Context,
+	itemID int64,
+	inherited bool,
+) ([]int64, error) {
+	sqlSelect := s.db.From(schema.ItemVehicleTypeTable).
+		Select(schema.ItemVehicleTypeTableVehicleTypeIDCol).
+		Where(schema.ItemVehicleTypeTableItemIDCol.Eq(itemID))
+	if inherited {
+		sqlSelect = sqlSelect.Where(schema.ItemVehicleTypeTableInheritedCol.IsTrue())
+	} else {
+		sqlSelect = sqlSelect.Where(schema.ItemVehicleTypeTableInheritedCol.IsFalse())
+	}
+
+	res := make([]int64, 0)
+
+	err := sqlSelect.ScanValsContext(ctx, &res)
+
+	return res, err
+}
+
+func (s *Repository) getItemVehicleTypeInheritedIDs(
+	ctx context.Context,
+	itemID int64,
+) ([]int64, error) {
+	sqlSelect := s.db.From(schema.ItemVehicleTypeTable).
+		Select(schema.ItemVehicleTypeTableVehicleTypeIDCol).Distinct().
+		Join(
+			schema.ItemParentTable,
+			goqu.On(schema.ItemVehicleTypeTableItemIDCol.Eq(schema.ItemParentTableParentIDCol)),
+		).
+		Where(schema.ItemParentTableItemIDCol.Eq(itemID))
+
+	res := make([]int64, 0)
+
+	err := sqlSelect.ScanValsContext(ctx, &res)
+
+	return res, err
+}
+
+func (s *Repository) setItemVehicleTypeRows(
+	ctx context.Context,
+	itemID int64,
+	types []int64,
+	inherited bool,
+) (bool, error) {
+	changed := false
+	ctx = context.WithoutCancel(ctx)
+
+	for _, t := range types {
+		rowChanged, err := s.setItemVehicleTypeRow(ctx, itemID, t, inherited)
+		if err != nil {
+			return false, err
+		}
+
+		if rowChanged {
+			changed = true
+		}
+	}
+
+	sqlDelete := s.db.From(schema.ItemVehicleTypeTable).Delete().
+		Where(schema.ItemVehicleTypeTableItemIDCol.Eq(itemID))
+
+	if len(types) > 0 {
+		sqlDelete = sqlDelete.Where(schema.ItemVehicleTypeTableVehicleTypeIDCol.NotIn(types))
+	}
+
+	res, err := sqlDelete.Executor().ExecContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	deleted, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	if deleted > 0 {
+		changed = true
+	}
+
+	return changed, nil
+}
+
+type parentInfo struct {
+	Diff   int64
+	Tuning bool
+	Sport  bool
+	Design bool
+}
+
+func (s *Repository) collectParentInfo(
+	ctx context.Context,
+	id int64,
+	diff int64,
+) (map[int64]parentInfo, error) {
+	//nolint: sqlclosecheck
+	rows, err := s.db.Select(schema.ItemParentTableParentIDCol, schema.ItemParentTableTypeCol).
+		From(schema.ItemParentTable).
+		Where(schema.ItemParentTableItemIDCol.Eq(id)).
+		Executor().QueryContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer util.Close(rows)
+
+	result := make(map[int64]parentInfo, 0)
+
+	for rows.Next() {
+		var (
+			parentID int64
+			typeID   schema.ItemParentType
+		)
+
+		err = rows.Scan(&parentID, &typeID)
+		if err != nil {
+			return nil, err
+		}
+
+		isTuning := typeID == schema.ItemParentTypeTuning
+		isSport := typeID == schema.ItemParentTypeSport
+		isDesign := typeID == schema.ItemParentTypeDesign
+		result[parentID] = parentInfo{
+			Diff:   diff,
+			Tuning: isTuning,
+			Sport:  isSport,
+			Design: isDesign,
+		}
+
+		parentInfos, err := s.collectParentInfo(ctx, parentID, diff+1)
+		if err != nil {
+			return nil, err
+		}
+
+		for pid, info := range parentInfos {
+			val, ok := result[pid]
+
+			if !ok || info.Diff < val.Diff {
+				val = info
+				val.Tuning = result[pid].Tuning || isTuning
+				val.Sport = result[pid].Sport || isSport
+				val.Design = result[pid].Design || isDesign
+				result[pid] = val
+			}
+		}
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (s *Repository) getChildItemsIDs(ctx context.Context, parentID int64) ([]int64, error) {
+	vals := make([]int64, 0)
+
+	err := s.db.Select(schema.ItemParentTableItemIDCol).
+		From(schema.ItemParentTable).
+		Where(schema.ItemParentTableParentIDCol.Eq(parentID)).
+		Executor().ScanValsContext(ctx, &vals)
+	if err != nil {
+		return nil, err
+	}
+
+	return vals, nil
+}
+
+func (s *Repository) namePreferLanguage(
+	ctx context.Context,
+	parentID, itemID int64,
+	lang string,
+) (string, error) {
+	res := ""
+
+	success, err := s.db.Select(schema.ItemParentLanguageTableNameCol).
+		From(schema.ItemParentLanguageTable).
+		Where(
+			schema.ItemParentLanguageTableItemIDCol.Eq(itemID),
+			schema.ItemParentLanguageTableParentIDCol.Eq(parentID),
+			goqu.Func("LENGTH", schema.ItemParentLanguageTableNameCol).Gt(0),
+		).
+		Order(goqu.L("? > 0", schema.ItemParentLanguageTableLanguageCol.Eq(lang)).Desc()).
+		ScanValContext(ctx, &res)
+	if err != nil {
+		return "", err
+	}
+
+	if !success {
+		return "", nil
+	}
+
+	return res, nil
+}
+
+func (s *Repository) extractCatname(
+	ctx context.Context,
+	brandRow, vehicleRow schema.ItemRow,
+) (string, error) {
+	var err error
+
+	diffName, err := s.namePreferLanguage(ctx, brandRow.ID, vehicleRow.ID, "en")
+	if err != nil {
+		return "", err
+	}
+
+	if len(diffName) == 0 {
+		diffName, err = s.extractName(ctx, brandRow, vehicleRow, "en")
+		if err != nil {
+			return "", err
+		}
+	}
+
+	catnameTemplate := filter.SanitizeFilename(diffName)
+
+	i := 0
+	allowed := false
+	catname := ""
+
+	for !allowed {
+		catname = catnameTemplate
+		if i > 0 {
+			catname = catname + "_" + strconv.Itoa(i)
+		}
+
+		allowed, err = s.isAllowedCatname(ctx, vehicleRow.ID, brandRow.ID, catname)
+		if err != nil {
+			return "", err
+		}
+
+		i++
+	}
+
+	return catname, nil
+}
+
+func (s *Repository) extractName(
+	ctx context.Context, parentRow schema.ItemRow, vehicleRow schema.ItemRow, lang string,
+) (string, error) {
+	langName, err := s.getName(ctx, vehicleRow.ID, lang)
+	if err != nil {
+		return "", err
+	}
+
+	vehicleName := langName
+	if len(langName) == 0 {
+		vehicleName = vehicleRow.Name
+	}
+
+	aliases, err := s.getAliases(ctx, parentRow.ID)
+	if err != nil {
+		return "", err
+	}
+
+	name := vehicleName
+
+	for _, alias := range aliases {
+		patterns := []string{
+			"by The " + alias + " Company",
+			"by " + alias,
+			"di " + alias,
+			"par " + alias,
+			alias + "-",
+			"-" + alias,
+		}
+
+		for _, pattern := range patterns {
+			re := regexp.MustCompile(regexp.QuoteMeta(pattern))
+			name = re.ReplaceAllString(name, "")
+		}
+
+		re := regexp.MustCompile(`\b` + regexp.QuoteMeta(alias) + `\b`)
+		name = re.ReplaceAllString(name, "")
+	}
+
+	re := regexp.MustCompile("[[:space:]]+")
+	name = strings.TrimSpace(re.ReplaceAllString(name, " "))
+
+	name = strings.TrimLeft(name, "/")
+	if len(name) == 0 && len(vehicleRow.Body) > 0 && vehicleRow.Body != parentRow.Body {
+		name = vehicleRow.Body
+	}
+
+	vbmy := vehicleRow.BeginModelYear.Int32
+	vemy := vehicleRow.EndModelYear.Int32
+
+	if len(name) == 0 && vehicleRow.BeginModelYear.Valid && vbmy > 0 {
+		modelYearsDifferent := vbmy != parentRow.BeginModelYear.Int32 ||
+			vemy != parentRow.EndModelYear.Int32
+		if modelYearsDifferent {
+			name = yearsPrefix(vbmy, vemy)
+		}
+	}
+
+	vby := vehicleRow.BeginYear.Int32
+	vey := vehicleRow.EndYear.Int32
+
+	if len(name) == 0 && vehicleRow.BeginYear.Valid && vby > 0 {
+		yearsDifferent := vby != parentRow.BeginYear.Int32 || vey != parentRow.EndYear.Int32
+		if yearsDifferent {
+			name = yearsPrefix(vby, vey)
+		}
+	}
+
+	if len(name) == 0 && vehicleRow.SpecID.Valid {
+		specsDifferent := vehicleRow.SpecID.Int32 != parentRow.SpecID.Int32
+		if specsDifferent {
+			specShortName := ""
+
+			success, err := s.db.Select(schema.SpecTableShortNameCol).From(schema.SpecTable).
+				Where(schema.SpecTableIDCol.Eq(vehicleRow.SpecID.Int32)).
+				ScanValContext(ctx, &specShortName)
+			if err != nil {
+				return "", err
+			}
+
+			if success {
+				name = specShortName
+			}
+		}
+	}
+
+	if len(name) == 0 {
+		name = vehicleName
+	}
+
+	return name, nil
+}
+
+func (s *Repository) getAliases(ctx context.Context, itemID int64) ([]string, error) {
+	var aliases []string
+
+	err := s.db.Select(schema.BrandAliasTableNameCol).From(schema.BrandAliasTable).
+		Where(schema.BrandAliasTableItemIDCol.Eq(itemID)).ScanValsContext(ctx, &aliases)
+	if err != nil {
+		return nil, err
+	}
+
+	langNames, err := s.getNames(ctx, itemID)
+	if err != nil {
+		return nil, err
+	}
+
+	aliases = append(aliases, langNames...)
+
+	sort.Slice(aliases, func(i, j int) bool {
+		return len(aliases[i]) > len(aliases[j])
+	})
+
+	return aliases, nil
+}
+
+func (s *Repository) getName(ctx context.Context, itemID int64, lang string) (string, error) {
+	langPriority, ok := languagePriority[lang]
+	if !ok {
+		langPriority, ok = languagePriority[DefaultLanguageCode]
+	}
+
+	if !ok {
+		return "", fmt.Errorf("%w: `%s`", errLangNotFound, lang)
+	}
+
+	fieldParams := make([]interface{}, len(langPriority)+1)
+	fieldParams[0] = lang
+
+	for i, v := range langPriority {
+		fieldParams[i+1] = v
+	}
+
+	result := ""
+
+	success, err := s.db.Select(schema.ItemLanguageTableNameCol).
+		From(schema.ItemLanguageTable).
+		Where(
+			schema.ItemLanguageTableItemIDCol.Eq(itemID),
+			goqu.L("? > 0", goqu.Func("length", schema.ItemLanguageTableNameCol)),
+		).
+		Order(goqu.Func("FIELD", fieldParams...).Asc()).
+		Limit(1).
+		ScanValContext(ctx, &result)
+	if err != nil {
+		return "", err
+	}
+
+	if !success {
+		return "", nil
+	}
+
+	return result, nil
+}
+
+func (s *Repository) getNames(ctx context.Context, itemID int64) ([]string, error) {
+	var result []string
+
+	err := s.db.Select(schema.ItemLanguageTableNameCol).From(schema.ItemLanguageTable).
+		Where(
+			schema.ItemLanguageTableItemIDCol.Eq(itemID),
+			goqu.L("? > 0", goqu.Func("length", schema.ItemLanguageTableNameCol)),
+		).ScanValsContext(ctx, &result)
+
+	return result, err
+}
+
+type sortedColumnMapItem struct {
+	key string
+	col Column
+}
+
+func toSortedColumns(cols map[string]Column) []sortedColumnMapItem {
+	res := make([]sortedColumnMapItem, 0, len(cols))
+	for colName, col := range cols {
+		res = append(res, sortedColumnMapItem{key: colName, col: col})
+	}
+
+	sort.SliceStable(res, func(i, j int) bool {
+		return res[i].key < res[j].key
+	})
+
+	return res
+}
+
+func (s *Repository) isAllowedCombination(
+	itemTypeID, parentItemTypeID schema.ItemTableItemTypeID,
+) bool {
+	itemTypes, ok := schema.AllowedTypeCombinations[parentItemTypeID]
+	if !ok {
+		return false
+	}
+
+	return util.Contains(itemTypes, itemTypeID)
+}
+
+func (s *Repository) isAllowedCatname(
+	ctx context.Context,
+	itemID, parentID int64,
+	catname string,
+) (bool, error) {
+	if len(catname) == 0 {
+		return false, nil
+	}
+
+	if util.Contains(catnameBlacklist, catname) {
+		return false, nil
+	}
+
+	var exists bool
+
+	success, err := s.db.Select(goqu.V(true)).From(schema.ItemParentTable).Where(
+		schema.ItemParentTableParentIDCol.Eq(parentID),
+		schema.ItemParentTableCatnameCol.Eq(catname),
+		schema.ItemParentTableItemIDCol.Neq(itemID),
+	).ScanValContext(ctx, &exists)
+	if err != nil {
+		return false, err
+	}
+
+	return !success || !exists, nil
+}
+
+func (s *Repository) collectAncestorsIDs(ctx context.Context, id int64) ([]int64, error) {
+	var (
+		toCheck = []int64{id}
+		ids     []int64
+	)
+
+	for len(toCheck) > 0 {
+		ids = append(ids, toCheck...)
+
+		var res []int64
+
+		err := s.db.Select(schema.ItemParentTableParentIDCol).
+			From(schema.ItemParentTable).
+			Where(schema.ItemParentTableItemIDCol.In(toCheck)).
+			ScanValsContext(ctx, &res)
+		if err != nil {
+			return nil, err
+		}
+
+		toCheck = res
+	}
+
+	return util.RemoveDuplicate(ids), nil
+}
+
+func (s *Repository) setItemParentLanguages(
+	ctx context.Context,
+	parentID, itemID int64,
+	values map[string]schema.ItemParentLanguageRow,
+	forceIsAuto bool,
+) error {
+	ctx = context.WithoutCancel(ctx)
+
+	for _, lang := range s.contentLanguages {
+		name := ""
+		if _, ok := values[lang]; ok {
+			name = values[lang].Name
+		}
+
+		err := s.SetItemParentLanguage(ctx, parentID, itemID, lang, name, forceIsAuto)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *Repository) updateItemInheritance(ctx context.Context, car schema.ItemRow) error {
+	var parents []schema.ItemRow
+
+	err := s.db.Select(
+		schema.ItemTableIsConceptCol, schema.ItemTableEngineItemIDCol, schema.ItemTableSpecIDCol,
+	).
+		From(schema.ItemTable).
+		Join(schema.ItemParentTable, goqu.On(schema.ItemTableIDCol.Eq(schema.ItemParentTableParentIDCol))).
+		Where(schema.ItemParentTableItemIDCol.Eq(car.ID)).
+		ScanStructsContext(ctx, &parents)
+	if err != nil {
+		return err
+	}
+
+	somethingChanged := false
+
+	set := goqu.Record{}
+
+	if car.IsConceptInherit {
+		isConcept := false
+
+		for _, parent := range parents {
+			if parent.IsConcept {
+				isConcept = true
+
+				break
+			}
+		}
+
+		if car.IsConcept != isConcept {
+			set[schema.ItemTableIsConceptColName] = isConcept
+			somethingChanged = true
+		}
+	}
+
+	if car.EngineInherit {
+		enginesMap := make(map[int64]int)
+
+		for _, parent := range parents {
+			engineID := parent.EngineItemID
+			if engineID.Valid {
+				enginesMap[engineID.Int64]++
+			}
+		}
+
+		// select top
+		selectedID := util.KeyOfMapMaxValue(enginesMap)
+
+		var oldEngineID int64
+		if car.EngineItemID.Valid {
+			oldEngineID = car.EngineItemID.Int64
+		}
+
+		if oldEngineID != selectedID {
+			set[schema.ItemTableEngineItemIDColName] = sql.NullInt64{
+				Int64: selectedID,
+				Valid: selectedID > 0,
+			}
+			somethingChanged = true
+		}
+	}
+
+	if car.SpecInherit {
+		specsMap := make(map[int32]int)
+
+		for _, parent := range parents {
+			specID := parent.SpecID
+			if specID.Valid {
+				specsMap[specID.Int32]++
+			}
+		}
+
+		// select top
+		selectedID := util.KeyOfMapMaxValue(specsMap)
+
+		var oldSpecID int32
+		if car.SpecID.Valid {
+			oldSpecID = car.SpecID.Int32
+		}
+
+		if oldSpecID != selectedID {
+			set[schema.ItemTableSpecIDColName] = sql.NullInt32{
+				Int32: selectedID,
+				Valid: selectedID > 0,
+			}
+			somethingChanged = true
+		}
+	}
+
+	if somethingChanged || !car.VehicleTypeInherit {
+		ctx = context.WithoutCancel(ctx)
+
+		if len(set) > 0 {
+			_, err = s.db.Update(schema.ItemTable).Set(set).
+				Where(schema.ItemTableIDCol.Eq(car.ID)).
+				Executor().ExecContext(ctx)
+			if err != nil {
+				return err
+			}
+		}
+
+		var childItems []schema.ItemRow
+
+		err = s.db.Select(
+			schema.ItemTableIDCol, schema.ItemTableIsConceptCol, schema.ItemTableIsConceptInheritCol,
+			schema.ItemTableEngineInheritCol, schema.ItemTableEngineItemIDCol, schema.ItemTableVehicleTypeInheritCol,
+			schema.ItemTableSpecInheritCol, schema.ItemTableSpecIDCol,
+		).
+			From(schema.ItemTable).
+			Join(schema.ItemParentTable, goqu.On(schema.ItemTableIDCol.Eq(schema.ItemParentTableItemIDCol))).
+			Where(schema.ItemParentTableParentIDCol.Eq(car.ID)).
+			ScanStructsContext(ctx, &childItems)
+		if err != nil {
+			return err
+		}
+
+		for _, child := range childItems {
+			err = s.updateItemInheritance(ctx, child)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *Repository) getParentRows(
+	ctx context.Context,
+	itemID int64,
+	stockFirst bool,
+) ([]schema.ItemParentRow, error) {
+	sqSelect := s.db.Select(schema.ItemParentTableParentIDCol).
+		From(schema.ItemParentTable).
+		Where(
+			schema.ItemParentTableItemIDCol.Eq(itemID),
+		)
+
+	if stockFirst {
+		sqSelect = sqSelect.Order(
+			goqu.L("?", schema.ItemParentTableTypeCol.Eq(schema.ItemParentTypeDefault)).Desc(),
+		)
+	}
+
+	var rows []schema.ItemParentRow
+
+	err := sqSelect.ScanStructsContext(ctx, &rows)
+
+	return rows, err
+}
+
+func (s *Repository) refreshItemParentLanguage(ctx context.Context, parentID, itemID int64) error {
+	logrus.Infof("refreshItemParentLanguage(%d, %d)", parentID, itemID)
+
+	var rows []schema.ItemParentLanguageRow
+
+	err := s.db.Select(
+		schema.ItemParentLanguageTableIsAutoCol,
+		schema.ItemParentLanguageTableNameCol,
+		schema.ItemParentLanguageTableLanguageCol,
+	).
+		From(schema.ItemParentLanguageTable).
+		Where(
+			schema.ItemParentLanguageTableItemIDCol.Eq(itemID),
+			schema.ItemParentLanguageTableParentIDCol.Eq(parentID),
+		).
+		ScanStructsContext(ctx, &rows)
+	if err != nil {
+		return err
+	}
+
+	values := make(map[string]schema.ItemParentLanguageRow)
+
+	for _, iplRow := range rows {
+		row := schema.ItemParentLanguageRow{}
+		if !iplRow.IsAuto {
+			row.Name = iplRow.Name
+		}
+
+		values[iplRow.Language] = row
+	}
+
+	return s.setItemParentLanguages(ctx, parentID, itemID, values, false)
+}
+
+func (s *Repository) refreshAuto(ctx context.Context, parentID, itemID int64) (bool, error) {
+	err := s.refreshItemParentLanguage(ctx, parentID, itemID)
+	if err != nil {
+		return false, err
+	}
+
+	var bvRow schema.ItemParentRow
+
+	success, err := s.db.Select(schema.ItemParentTableManualCatnameCol).
+		From(schema.ItemParentTable).
+		Where(
+			schema.ItemParentTableItemIDCol.Eq(itemID),
+			schema.ItemParentTableParentIDCol.Eq(parentID),
+		).
+		ScanStructContext(ctx, &bvRow)
+	if err != nil {
+		return false, err
+	}
+
+	if !success {
+		return false, nil
+	}
+
+	if bvRow.ManualCatname {
+		return true, nil
+	}
+
+	brandRow, err := s.Item(
+		ctx,
+		&query.ItemListOptions{ItemID: parentID},
+		&ItemFields{NameText: true},
+	)
+	if err != nil {
+		return false, err
+	}
+
+	vehicleRow, err := s.Item(
+		ctx,
+		&query.ItemListOptions{ItemID: itemID},
+		&ItemFields{NameText: true},
+	)
+	if err != nil {
+		return false, err
+	}
+
+	catname, err := s.extractCatname(ctx, brandRow.ItemRow, vehicleRow.ItemRow)
+	if err != nil {
+		return false, err
+	}
+
+	if len(catname) == 0 {
+		return false, nil
+	}
+
+	_, err = s.db.Update(schema.ItemParentTable).Set(goqu.Record{
+		schema.ItemParentTableCatnameColName: catname,
+	}).Where(
+		schema.ItemParentTableItemIDCol.Eq(itemID),
+		schema.ItemParentTableParentIDCol.Eq(parentID),
+	).Executor().ExecContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (s *Repository) setItemLanguageName(
+	ctx context.Context,
+	itemID int64,
+	lang string,
+	name string,
+) error {
+	if itemID == 0 {
+		return ErrItemNotFound
+	}
+
+	_, err := s.db.Insert(schema.ItemLanguageTable).Rows(goqu.Record{
+		schema.ItemLanguageTableItemIDColName:   itemID,
+		schema.ItemLanguageTableLanguageColName: lang,
+		schema.ItemLanguageTableNameColName: sql.NullString{
+			String: name,
+			Valid:  len(name) > 0,
+		},
+	}).OnConflict(goqu.DoUpdate(
+		schema.ItemLanguageTableItemIDColName+","+schema.ItemLanguageTableLanguageColName,
+		goqu.Record{
+			schema.ItemLanguageTableNameColName: goqu.Func(
+				"VALUES",
+				goqu.C(schema.ItemLanguageTableNameColName),
+			),
+		},
+	)).Executor().ExecContext(ctx)
+
+	return err
 }

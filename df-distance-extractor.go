@@ -21,7 +21,7 @@ func (s *DfDistanceExtractor) ExtractRows(
 ) ([]*DfDistance, error) {
 	result := make([]*DfDistance, 0, len(rows))
 
-	picturesRepository, err := s.container.PicturesRepository()
+	picturesRepository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}

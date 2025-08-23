@@ -109,6 +109,7 @@ func (s Brakes) Items(
 	unionSelect := selects[0].UnionAll(selects[1])
 
 	const unionAlias = "tbl"
+
 	unionAliasTable := goqu.T(unionAlias)
 
 	orderExpr := goqu.MAX(unionAliasTable.Col(sizeAlias)).Desc()

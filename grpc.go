@@ -42,6 +42,7 @@ func APIImageToGRPC(image *storage.Image) *APIImage {
 
 type GRPCServer struct {
 	UnimplementedAutowpServer
+
 	auth              *Auth
 	catalogue         *Catalogue
 	reCaptchaConfig   config.RecaptchaConfig

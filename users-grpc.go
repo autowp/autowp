@@ -36,6 +36,7 @@ func convertUserFields(fields *UserFields, currentUserRoles []string) users.User
 
 type UsersGRPCServer struct {
 	UnimplementedUsersServer
+
 	auth               *Auth
 	contactsRepository *ContactsRepository
 	userRepository     *users.Repository
@@ -358,28 +359,6 @@ func (s *UsersGRPCServer) GetAccounts(
 	}, nil
 }
 
-func (s *UsersGRPCServer) canRemoveAccount(
-	ctx context.Context,
-	userID int64,
-	id int64,
-) (bool, error) {
-	user, err := s.userRepository.User(
-		ctx,
-		&query.UserListOptions{ID: userID},
-		users.UserFields{},
-		users.OrderByNone,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if user.EMail != nil && len(*user.EMail) > 0 {
-		return true, nil
-	}
-
-	return s.userRepository.HaveAccountsForOtherServices(ctx, userID, id)
-}
-
 func (s *UsersGRPCServer) DeleteUserAccount(
 	ctx context.Context,
 	in *DeleteUserAccountRequest,
@@ -498,4 +477,26 @@ func (s *UsersGRPCServer) UpdateUser(
 	}
 
 	return &emptypb.Empty{}, nil
+}
+
+func (s *UsersGRPCServer) canRemoveAccount(
+	ctx context.Context,
+	userID int64,
+	id int64,
+) (bool, error) {
+	user, err := s.userRepository.User(
+		ctx,
+		&query.UserListOptions{ID: userID},
+		users.UserFields{},
+		users.OrderByNone,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	if user.EMail != nil && len(*user.EMail) > 0 {
+		return true, nil
+	}
+
+	return s.userRepository.HaveAccountsForOtherServices(ctx, userID, id)
 }

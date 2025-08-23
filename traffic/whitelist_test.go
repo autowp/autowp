@@ -34,7 +34,7 @@ func TestMatchAuto(t *testing.T) {
 	// match, _ := s.MatchAuto(net.IPv4(178, 154, 255, 146)) // yandex
 	// assert.True(t, match)
 
-	match, _ := svc.MatchAuto(net.IPv4(66, 249, 73, 139)) // google
+	match, _ := svc.MatchAuto(t.Context(), net.IPv4(66, 249, 73, 139)) // google
 	require.True(t, match)
 
 	// match, _ = s.MatchAuto(net.IPv4(157, 55, 39, 127)) // msn
@@ -58,11 +58,11 @@ func TestMatchAuto(t *testing.T) {
 		0x8e,
 		0xb7,
 	}
-	match, _ = svc.MatchAuto(ip) // yandex ipv6
+	match, _ = svc.MatchAuto(t.Context(), ip) // yandex ipv6
 	require.True(t, match)
 
-	match, _ = svc.MatchAuto(net.IPv4(127, 0, 0, 1)) // loopback
 	require.False(t, match)
+	svc.MatchAuto(t.Context(), net.IPv4(127, 0, 0, 1)) // loopback
 }
 
 func TestContains(t *testing.T) {

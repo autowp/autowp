@@ -46,6 +46,7 @@ var (
 
 type Claims struct {
 	jwx.Claims
+
 	Audience       interface{}    `json:"aud,omitempty"`
 	Locale         string         `json:"locale,omitempty"`
 	ResourceAccess ResourceAccess `json:"resource_access,omitempty"`
@@ -177,6 +178,7 @@ func (s *Repository) Users(
 	result := make([]schema.UsersRow, 0)
 
 	var row schema.UsersRow
+
 	valuePtrs := []interface{}{
 		&row.ID, &row.Name, &row.Deleted, &row.Identity, &row.LastOnline, &row.Green, &row.SpecsWeight, &row.Img,
 		&row.EMail, &row.PicturesTotal, &row.SpecsVolume, &row.Language, &row.UUID,
@@ -555,101 +557,6 @@ func (s *Repository) EnsureUserImported(
 	return userID, nil
 }
 
-func (s *Repository) ensureUserExportedToKeycloak(
-	ctx context.Context,
-	userID int64,
-) (string, error) {
-	logrus.Debugf("Ensure user `%d` exported to Keycloak", userID)
-
-	st := struct {
-		Deleted      bool           `db:"deleted"`
-		Email        sql.NullString `db:"e_mail"`
-		EmailToCheck sql.NullString `db:"email_to_check"`
-		Login        sql.NullString `db:"login"`
-		Name         string         `db:"name"`
-		GUID         string         `db:"guid"`
-	}{}
-
-	success, err := s.autowpDB.Select(
-		schema.UserTableDeletedCol,
-		schema.UserTableEmailCol,
-		schema.UserTableEmailToCheckCol,
-		schema.UserTableLoginCol,
-		schema.UserTableNameCol,
-		goqu.Func("IFNULL", goqu.Func("BIN_TO_UUID", schema.UserTableUUIDCol), "").As("guid"),
-	).
-		From(schema.UserTable).
-		Where(schema.UserTableIDCol.Eq(userID)).
-		ScanStructContext(ctx, &st)
-	if err != nil {
-		return "", err
-	}
-
-	if !success {
-		return "", sql.ErrNoRows
-	}
-
-	if len(st.GUID) > 0 {
-		return st.GUID, nil
-	}
-
-	token, err := s.keycloak.LoginClient(
-		ctx,
-		s.keycloakConfig.ClientID,
-		s.keycloakConfig.ClientSecret,
-		s.keycloakConfig.Realm,
-	)
-	if err != nil {
-		return "", err
-	}
-
-	var (
-		keyCloakEmail = &st.Email.String
-		emailVerified = true
-	)
-
-	if !st.Email.Valid || len(st.Email.String) == 0 {
-		keyCloakEmail = &st.EmailToCheck.String
-		emailVerified = false
-	}
-
-	username := st.Login.String
-	if (!st.Login.Valid || len(st.Login.String) == 0) && keyCloakEmail != nil &&
-		len(*keyCloakEmail) > 0 {
-		username = *keyCloakEmail
-	}
-
-	falseRef := false
-	enabled := !st.Deleted
-	ctx = context.WithoutCancel(ctx)
-
-	st.GUID, err = s.keycloak.CreateUser(
-		ctx,
-		token.AccessToken,
-		s.keycloakConfig.Realm,
-		gocloak.User{
-			Enabled:       &enabled,
-			Totp:          &falseRef,
-			EmailVerified: &emailVerified,
-			Username:      &username,
-			FirstName:     &st.Name,
-			Email:         keyCloakEmail,
-		},
-	)
-	if err != nil {
-		return "", err
-	}
-
-	_, err = s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
-		schema.UserTableUUIDColName: goqu.Func("UUID_TO_BIN", st.GUID),
-	}).Where(goqu.C("user_id").Eq(userID)).Executor().ExecContext(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	return st.GUID, err
-}
-
 func (s *Repository) PasswordMatch(
 	ctx context.Context,
 	userID int64,
@@ -915,13 +822,6 @@ func (s *Repository) UserPreferences(
 	return &row, err
 }
 
-func (s *Repository) incForumTopicsRecord() goqu.Record {
-	r := s.incForumMessagesRecord()
-	r[schema.UserTableForumsTopicsColName] = goqu.L(schema.UserTableForumsTopicsColName + " + 1")
-
-	return r
-}
-
 func (s *Repository) IncForumTopics(ctx context.Context, userID int64) error {
 	_, err := s.autowpDB.Update(schema.UserTable).
 		Set(s.incForumTopicsRecord()).
@@ -929,15 +829,6 @@ func (s *Repository) IncForumTopics(ctx context.Context, userID int64) error {
 		Executor().ExecContext(ctx)
 
 	return err
-}
-
-func (s *Repository) incForumMessagesRecord() goqu.Record {
-	r := s.touchLastMessageRecord()
-	r[schema.UserTableForumsMessagesColName] = goqu.L(
-		schema.UserTableForumsMessagesColName + " + 1",
-	)
-
-	return r
 }
 
 func (s *Repository) IncForumMessages(ctx context.Context, userID int64) error {
@@ -949,10 +840,6 @@ func (s *Repository) IncForumMessages(ctx context.Context, userID int64) error {
 	return err
 }
 
-func (s *Repository) touchLastMessageRecord() goqu.Record {
-	return goqu.Record{schema.UserTableLastMessageTimeColName: goqu.Func("NOW")}
-}
-
 func (s *Repository) TouchLastMessage(ctx context.Context, userID int64) error {
 	_, err := s.autowpDB.Update(schema.UserTable).
 		Set(s.touchLastMessageRecord()).
@@ -960,28 +847,6 @@ func (s *Repository) TouchLastMessage(ctx context.Context, userID int64) error {
 		Executor().ExecContext(ctx)
 
 	return err
-}
-
-func fullName(firstName, lastName, username string) string {
-	result := strings.TrimSpace(firstName + " " + lastName)
-	if len(result) == 0 {
-		result = username
-	}
-
-	return result
-}
-
-func (s *Repository) messagingInterval(regDate time.Time, messagingInterval int64) int64 {
-	if regDate.IsZero() {
-		return s.messageInterval
-	}
-
-	tenDaysBefore := time.Now().AddDate(0, 0, -10)
-	if tenDaysBefore.After(regDate) {
-		return messagingInterval
-	}
-
-	return util.Max(messagingInterval, s.messageInterval)
 }
 
 func (s *Repository) NextMessageTime(ctx context.Context, userID int64) (time.Time, error) {
@@ -1103,6 +968,7 @@ func (s *Repository) UserAccounts(
 	userID int64,
 ) ([]*schema.UserAccountRow, error) {
 	var rows []*schema.UserAccountRow
+
 	err := s.autowpDB.Select(goqu.Star()).
 		From(schema.UserAccountTable).
 		Where(schema.UserAccountTableUserIDCol.Eq(userID)).
@@ -1322,4 +1188,141 @@ func (s *Repository) IncrementUploads(ctx context.Context, id int64) error {
 		Executor().ExecContext(ctx)
 
 	return err
+}
+
+func (s *Repository) ensureUserExportedToKeycloak(
+	ctx context.Context,
+	userID int64,
+) (string, error) {
+	logrus.Debugf("Ensure user `%d` exported to Keycloak", userID)
+
+	st := struct {
+		Deleted      bool           `db:"deleted"`
+		Email        sql.NullString `db:"e_mail"`
+		EmailToCheck sql.NullString `db:"email_to_check"`
+		Login        sql.NullString `db:"login"`
+		Name         string         `db:"name"`
+		GUID         string         `db:"guid"`
+	}{}
+
+	success, err := s.autowpDB.Select(
+		schema.UserTableDeletedCol,
+		schema.UserTableEmailCol,
+		schema.UserTableEmailToCheckCol,
+		schema.UserTableLoginCol,
+		schema.UserTableNameCol,
+		goqu.Func("IFNULL", goqu.Func("BIN_TO_UUID", schema.UserTableUUIDCol), "").As("guid"),
+	).
+		From(schema.UserTable).
+		Where(schema.UserTableIDCol.Eq(userID)).
+		ScanStructContext(ctx, &st)
+	if err != nil {
+		return "", err
+	}
+
+	if !success {
+		return "", sql.ErrNoRows
+	}
+
+	if len(st.GUID) > 0 {
+		return st.GUID, nil
+	}
+
+	token, err := s.keycloak.LoginClient(
+		ctx,
+		s.keycloakConfig.ClientID,
+		s.keycloakConfig.ClientSecret,
+		s.keycloakConfig.Realm,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	var (
+		keyCloakEmail = &st.Email.String
+		emailVerified = true
+	)
+
+	if !st.Email.Valid || len(st.Email.String) == 0 {
+		keyCloakEmail = &st.EmailToCheck.String
+		emailVerified = false
+	}
+
+	username := st.Login.String
+	if (!st.Login.Valid || len(st.Login.String) == 0) && keyCloakEmail != nil &&
+		len(*keyCloakEmail) > 0 {
+		username = *keyCloakEmail
+	}
+
+	falseRef := false
+	enabled := !st.Deleted
+	ctx = context.WithoutCancel(ctx)
+
+	st.GUID, err = s.keycloak.CreateUser(
+		ctx,
+		token.AccessToken,
+		s.keycloakConfig.Realm,
+		gocloak.User{
+			Enabled:       &enabled,
+			Totp:          &falseRef,
+			EmailVerified: &emailVerified,
+			Username:      &username,
+			FirstName:     &st.Name,
+			Email:         keyCloakEmail,
+		},
+	)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
+		schema.UserTableUUIDColName: goqu.Func("UUID_TO_BIN", st.GUID),
+	}).Where(goqu.C("user_id").Eq(userID)).Executor().ExecContext(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return st.GUID, err
+}
+
+func (s *Repository) incForumTopicsRecord() goqu.Record {
+	r := s.incForumMessagesRecord()
+	r[schema.UserTableForumsTopicsColName] = goqu.L(schema.UserTableForumsTopicsColName + " + 1")
+
+	return r
+}
+
+func (s *Repository) incForumMessagesRecord() goqu.Record {
+	r := s.touchLastMessageRecord()
+	r[schema.UserTableForumsMessagesColName] = goqu.L(
+		schema.UserTableForumsMessagesColName + " + 1",
+	)
+
+	return r
+}
+
+func (s *Repository) touchLastMessageRecord() goqu.Record {
+	return goqu.Record{schema.UserTableLastMessageTimeColName: goqu.Func("NOW")}
+}
+
+func fullName(firstName, lastName, username string) string {
+	result := strings.TrimSpace(firstName + " " + lastName)
+	if len(result) == 0 {
+		result = username
+	}
+
+	return result
+}
+
+func (s *Repository) messagingInterval(regDate time.Time, messagingInterval int64) int64 {
+	if regDate.IsZero() {
+		return s.messageInterval
+	}
+
+	tenDaysBefore := time.Now().AddDate(0, 0, -10)
+	if tenDaysBefore.After(regDate) {
+		return messagingInterval
+	}
+
+	return util.Max(messagingInterval, s.messageInterval)
 }

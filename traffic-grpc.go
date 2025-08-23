@@ -23,6 +23,7 @@ const trafficTopLimit = 50
 
 type TrafficGRPCServer struct {
 	UnimplementedTrafficServer
+
 	auth            *Auth
 	usersRepository *users.Repository
 	userExtractor   *UserExtractor

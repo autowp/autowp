@@ -46,6 +46,7 @@ func TestServe(t *testing.T) {
 	app := NewApplication(cfg)
 
 	done := make(chan bool)
+
 	go func() {
 		time.Sleep(5 * time.Second)
 		close(done)
@@ -224,10 +225,10 @@ func TestBuildBrandsSprite(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	app := NewApplication(cfg)
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
-	imageStorage, err := cnt.ImageStorage()
+	imageStorage, err := cnt.ImageStorage(t.Context())
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec

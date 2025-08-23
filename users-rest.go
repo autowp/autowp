@@ -35,6 +35,12 @@ func NewUsersREST(auth *Auth, repository *users.Repository) *UsersREST {
 	}
 }
 
+func (s *UsersREST) SetupRouter(router *gin.Engine) {
+	router.POST("/api/user/:id/photo", func(ctx *gin.Context) {
+		s.postPhotoAction(ctx)
+	})
+}
+
 func (s *UsersREST) postPhotoAction(ctx *gin.Context) {
 	userCtx, err := s.auth.ValidateREST(ctx)
 	if err != nil {
@@ -179,10 +185,4 @@ func (s *UsersREST) postPhotoAction(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
-}
-
-func (s *UsersREST) SetupRouter(router *gin.Engine) {
-	router.POST("/api/user/:id/photo", func(ctx *gin.Context) {
-		s.postPhotoAction(ctx)
-	})
 }

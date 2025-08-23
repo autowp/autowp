@@ -31,7 +31,7 @@ func TestMain(m *testing.M) {
 
 	logrus.SetLevel(logrus.DebugLevel)
 
-	grpcServer, err := cnt.GRPCServerWithServices()
+	grpcServer, err := cnt.GRPCServerWithServices(context.TODO())
 	if err != nil {
 		panic(err)
 	}

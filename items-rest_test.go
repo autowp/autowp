@@ -24,7 +24,7 @@ func SetItemLogoRequest(t *testing.T, itemID int64, file string) *http.Request {
 
 	cfg := config.LoadConfig(".")
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	// admin
@@ -40,6 +40,7 @@ func SetItemLogoRequest(t *testing.T, itemID int64, file string) *http.Request {
 
 	handle, err := os.OpenFile(file, os.O_RDONLY, 0)
 	require.NoError(t, err)
+
 	defer util.Close(handle)
 
 	fileBytes, err := io.ReadAll(handle)
@@ -51,7 +52,7 @@ func SetItemLogoRequest(t *testing.T, itemID int64, file string) *http.Request {
 	err = multipartWriter.Close()
 	require.NoError(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("/api/item/%d/logo", itemID), buf)
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, fmt.Sprintf("/api/item/%d/logo", itemID), buf)
 	require.NoError(t, err)
 
 	req.Header.Add("Content-Type", multipartWriter.FormDataContentType())
@@ -72,7 +73,7 @@ func TestSetItemLogo(t *testing.T) {
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
-	itemsREST, err := cnt.ItemsREST()
+	itemsREST, err := cnt.ItemsREST(t.Context())
 	require.NoError(t, err)
 
 	router := gin.New()
@@ -110,7 +111,7 @@ func TestSetItemLogoInvalidFile(t *testing.T) {
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
-	itemsREST, err := cnt.ItemsREST()
+	itemsREST, err := cnt.ItemsREST(t.Context())
 	require.NoError(t, err)
 
 	router := gin.New()
@@ -137,7 +138,7 @@ func TestSetItemLogoInvalidFile2(t *testing.T) {
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
-	itemsREST, err := cnt.ItemsREST()
+	itemsREST, err := cnt.ItemsREST(t.Context())
 	require.NoError(t, err)
 
 	router := gin.New()
@@ -164,7 +165,7 @@ func TestSetItemLogoInvalidFile3(t *testing.T) {
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
-	itemsREST, err := cnt.ItemsREST()
+	itemsREST, err := cnt.ItemsREST(t.Context())
 	require.NoError(t, err)
 
 	router := gin.New()

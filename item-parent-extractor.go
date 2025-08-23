@@ -17,31 +17,6 @@ func NewItemParentExtractor(container *Container) *ItemParentExtractor {
 	return &ItemParentExtractor{container: container}
 }
 
-func (s *ItemParentExtractor) prefetchItems(
-	ctx context.Context, ids []int64, lang string, fields *items.ItemFields,
-) (map[int64]*items.Item, error) {
-	itemsRepository, err := s.container.ItemsRepository()
-	if err != nil {
-		return nil, err
-	}
-
-	itemRows, _, err := itemsRepository.List(ctx, &query.ItemListOptions{
-		ItemIDs:  ids,
-		Language: lang,
-	}, fields, items.OrderByNone, false)
-	if err != nil {
-		return nil, err
-	}
-
-	itemsMap := make(map[int64]*items.Item, len(itemRows))
-
-	for _, itemRow := range itemRows {
-		itemsMap[itemRow.ID] = itemRow
-	}
-
-	return itemsMap, nil
-}
-
 func (s *ItemParentExtractor) ExtractRow(
 	ctx context.Context,
 	row *items.ItemParent,
@@ -97,7 +72,7 @@ func (s *ItemParentExtractor) ExtractRows(
 
 	itemExtractor := s.container.ItemExtractor()
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -206,6 +181,31 @@ func (s *ItemParentExtractor) ExtractRows(
 	return res, nil
 }
 
+func (s *ItemParentExtractor) prefetchItems(
+	ctx context.Context, ids []int64, lang string, fields *items.ItemFields,
+) (map[int64]*items.Item, error) {
+	itemsRepository, err := s.container.ItemsRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	itemRows, _, err := itemsRepository.List(ctx, &query.ItemListOptions{
+		ItemIDs:  ids,
+		Language: lang,
+	}, fields, items.OrderByNone, false)
+	if err != nil {
+		return nil, err
+	}
+
+	itemsMap := make(map[int64]*items.Item, len(itemRows))
+
+	for _, itemRow := range itemRows {
+		itemsMap[itemRow.ID] = itemRow
+	}
+
+	return itemsMap, nil
+}
+
 func (s *ItemParentExtractor) extractChildDescendantPictures(
 	ctx context.Context,
 	row *items.ItemParent,
@@ -218,7 +218,7 @@ func (s *ItemParentExtractor) extractChildDescendantPictures(
 		return nil, nil //nolint: nilnil
 	}
 
-	picturesRepo, err := s.container.PicturesRepository()
+	picturesRepo, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}

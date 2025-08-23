@@ -40,7 +40,7 @@ func (s *IPExtractor) Extract(
 
 	_, ok := fields["hostname"]
 	if ok {
-		host, err := net.LookupAddr(ip.String())
+		host, err := net.DefaultResolver.LookupAddr(ctx, ip.String())
 		if err != nil {
 			logrus.Errorf("LookupAddr error: %v", err.Error())
 		}

@@ -108,29 +108,6 @@ func (s *Repository) Pick(ctx context.Context) (bool, error) {
 	return s.SetItemOfDay(ctx, time.Now(), itemID, 0)
 }
 
-func (s *Repository) candidate(ctx context.Context) (int64, error) {
-	sqSelect := s.CandidateQuery().
-		Where(goqu.L(
-			schema.ItemTableName + ".begin_year AND " + schema.ItemTableName + ".end_year OR " +
-				schema.ItemTableName + ".begin_model_year AND " + schema.ItemTableName + ".end_model_year",
-		)).
-		Order(goqu.Func("RAND").Desc()).
-		Limit(1)
-
-	rec := CandidateRecord{}
-
-	success, err := sqSelect.Executor().ScanStructContext(ctx, &rec)
-	if err != nil {
-		return 0, err
-	}
-
-	if !success {
-		return 0, nil
-	}
-
-	return rec.ItemID, nil
-}
-
 func (s *Repository) CandidateQuery() *goqu.SelectDataset {
 	const picturesCountAlias = "p_count"
 
@@ -256,4 +233,27 @@ func (s *Repository) Current(ctx context.Context) (*schema.OfDayRow, error) {
 	}
 
 	return &st, nil
+}
+
+func (s *Repository) candidate(ctx context.Context) (int64, error) {
+	sqSelect := s.CandidateQuery().
+		Where(goqu.L(
+			schema.ItemTableName + ".begin_year AND " + schema.ItemTableName + ".end_year OR " +
+				schema.ItemTableName + ".begin_model_year AND " + schema.ItemTableName + ".end_model_year",
+		)).
+		Order(goqu.Func("RAND").Desc()).
+		Limit(1)
+
+	rec := CandidateRecord{}
+
+	success, err := sqSelect.Executor().ScanStructContext(ctx, &rec)
+	if err != nil {
+		return 0, err
+	}
+
+	if !success {
+		return 0, nil
+	}
+
+	return rec.ItemID, nil
 }

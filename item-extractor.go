@@ -44,159 +44,6 @@ func NewItemExtractor(
 	return &ItemExtractor{container: container}
 }
 
-func (s *ItemExtractor) preloadItemParentChilds(
-	ctx context.Context, request *ItemParentsRequest, ids []int64, lang string, userCtx UserContext,
-) (map[int64][]*ItemParent, error) {
-	if request == nil {
-		return nil, nil //nolint: nilnil
-	}
-
-	result := make(map[int64][]*ItemParent, len(ids))
-
-	if len(ids) == 0 {
-		return result, nil
-	}
-
-	options, err := convertItemParentListOptions(request.GetOptions())
-	if err != nil {
-		return nil, err
-	}
-
-	if options == nil {
-		options = &query.ItemParentListOptions{}
-	}
-
-	itemsRepository, err := s.container.ItemsRepository()
-	if err != nil {
-		return nil, err
-	}
-
-	fields := convertItemParentFields(request.GetFields())
-	orderBy := convertItemParentOrder(request.GetOrder())
-
-	var rows []*items.ItemParent
-
-	limit := request.GetLimit()
-	if limit > 0 {
-		return nil, errPreloadNotImplemented
-	}
-
-	options.ParentIDs = ids
-
-	rows, _, err = itemsRepository.ItemParents(ctx, options, fields, orderBy)
-	if err != nil {
-		return nil, err
-	}
-
-	itemParentExtractor := s.container.ItemParentExtractor()
-
-	extractedRows, err := itemParentExtractor.ExtractRows(
-		ctx,
-		rows,
-		request.GetFields(),
-		lang,
-		userCtx,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, row := range extractedRows {
-		parentID := row.GetParentId()
-		if _, ok := result[parentID]; !ok {
-			result[parentID] = make([]*ItemParent, 0)
-		}
-
-		result[parentID] = append(result[parentID], row)
-	}
-
-	return result, nil
-}
-
-func (s *ItemExtractor) preloadPictureItems(
-	ctx context.Context,
-	request *PictureItemsRequest,
-	ids []int64,
-	lang string,
-	userCtx UserContext,
-) (map[int64][]*PictureItem, error) {
-	if request == nil {
-		return nil, nil //nolint: nilnil
-	}
-
-	result := make(map[int64][]*PictureItem, len(ids))
-
-	if len(ids) == 0 {
-		return result, nil
-	}
-
-	options, err := convertPictureItemListOptions(request.GetOptions())
-	if err != nil {
-		return nil, err
-	}
-
-	if options == nil {
-		options = &query.PictureItemListOptions{}
-	}
-
-	order := convertPictureItemsOrder(request.GetOrder())
-
-	picturesRepository, err := s.container.PicturesRepository()
-	if err != nil {
-		return nil, err
-	}
-
-	var rows []*schema.PictureItemRow
-
-	limit := request.GetLimit()
-	if limit > 0 {
-		optionsArr := make([]*query.PictureItemListOptions, 0, len(ids))
-
-		for _, id := range ids {
-			cOptions := *options
-			cOptions.ItemID = id
-
-			optionsArr = append(optionsArr, &cOptions)
-		}
-
-		rows, err = picturesRepository.PictureItemsBatch(ctx, optionsArr, limit)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		options.ItemIDs = ids
-
-		rows, err = picturesRepository.PictureItems(ctx, options, order, 0)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	pictureItemExtractor := s.container.PictureItemExtractor()
-
-	extractedRows, err := pictureItemExtractor.ExtractRows(
-		ctx,
-		rows,
-		request.GetFields(),
-		lang,
-		userCtx,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, row := range extractedRows {
-		itemID := row.GetItemId()
-		if _, ok := result[itemID]; !ok {
-			result[itemID] = make([]*PictureItem, 0)
-		}
-
-		result[itemID] = append(result[itemID], row)
-	}
-
-	return result, nil
-}
-
 func (s *ItemExtractor) ExtractRows(
 	ctx context.Context, rows []*items.Item, fields *ItemFields, lang string, userCtx UserContext,
 ) ([]*APIItem, error) {
@@ -237,7 +84,7 @@ func (s *ItemExtractor) ExtractRows(
 		return nil, err
 	}
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -343,6 +190,159 @@ func (s *ItemExtractor) Extract(
 	return result[0], nil
 }
 
+func (s *ItemExtractor) preloadItemParentChilds(
+	ctx context.Context, request *ItemParentsRequest, ids []int64, lang string, userCtx UserContext,
+) (map[int64][]*ItemParent, error) {
+	if request == nil {
+		return nil, nil //nolint: nilnil
+	}
+
+	result := make(map[int64][]*ItemParent, len(ids))
+
+	if len(ids) == 0 {
+		return result, nil
+	}
+
+	options, err := convertItemParentListOptions(request.GetOptions())
+	if err != nil {
+		return nil, err
+	}
+
+	if options == nil {
+		options = &query.ItemParentListOptions{}
+	}
+
+	itemsRepository, err := s.container.ItemsRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	fields := convertItemParentFields(request.GetFields())
+	orderBy := convertItemParentOrder(request.GetOrder())
+
+	var rows []*items.ItemParent
+
+	limit := request.GetLimit()
+	if limit > 0 {
+		return nil, errPreloadNotImplemented
+	}
+
+	options.ParentIDs = ids
+
+	rows, _, err = itemsRepository.ItemParents(ctx, options, fields, orderBy)
+	if err != nil {
+		return nil, err
+	}
+
+	itemParentExtractor := s.container.ItemParentExtractor()
+
+	extractedRows, err := itemParentExtractor.ExtractRows(
+		ctx,
+		rows,
+		request.GetFields(),
+		lang,
+		userCtx,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, row := range extractedRows {
+		parentID := row.GetParentId()
+		if _, ok := result[parentID]; !ok {
+			result[parentID] = make([]*ItemParent, 0)
+		}
+
+		result[parentID] = append(result[parentID], row)
+	}
+
+	return result, nil
+}
+
+func (s *ItemExtractor) preloadPictureItems(
+	ctx context.Context,
+	request *PictureItemsRequest,
+	ids []int64,
+	lang string,
+	userCtx UserContext,
+) (map[int64][]*PictureItem, error) {
+	if request == nil {
+		return nil, nil //nolint: nilnil
+	}
+
+	result := make(map[int64][]*PictureItem, len(ids))
+
+	if len(ids) == 0 {
+		return result, nil
+	}
+
+	options, err := convertPictureItemListOptions(request.GetOptions())
+	if err != nil {
+		return nil, err
+	}
+
+	if options == nil {
+		options = &query.PictureItemListOptions{}
+	}
+
+	order := convertPictureItemsOrder(request.GetOrder())
+
+	picturesRepository, err := s.container.PicturesRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var rows []*schema.PictureItemRow
+
+	limit := request.GetLimit()
+	if limit > 0 {
+		optionsArr := make([]*query.PictureItemListOptions, 0, len(ids))
+
+		for _, id := range ids {
+			cOptions := *options
+			cOptions.ItemID = id
+
+			optionsArr = append(optionsArr, &cOptions)
+		}
+
+		rows, err = picturesRepository.PictureItemsBatch(ctx, optionsArr, limit)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		options.ItemIDs = ids
+
+		rows, err = picturesRepository.PictureItems(ctx, options, order, 0)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	pictureItemExtractor := s.container.PictureItemExtractor()
+
+	extractedRows, err := pictureItemExtractor.ExtractRows(
+		ctx,
+		rows,
+		request.GetFields(),
+		lang,
+		userCtx,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, row := range extractedRows {
+		itemID := row.GetItemId()
+		if _, ok := result[itemID]; !ok {
+			result[itemID] = make([]*PictureItem, 0)
+		}
+
+		result[itemID] = append(result[itemID], row)
+	}
+
+	return result, nil
+}
+
 func (s *ItemExtractor) extractPlain( //nolint: maintidx
 	ctx context.Context,
 	fields *ItemFields,
@@ -355,12 +355,12 @@ func (s *ItemExtractor) extractPlain( //nolint: maintidx
 
 	var err error
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return err
 	}
 
-	attrsRepository, err := s.container.AttrsRepository()
+	attrsRepository, err := s.container.AttrsRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -534,7 +534,7 @@ func (s *ItemExtractor) extractSpecsContributors(
 		return nil, nil
 	}
 
-	attrsRepository, err := s.container.AttrsRepository()
+	attrsRepository, err := s.container.AttrsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -563,7 +563,7 @@ func (s *ItemExtractor) extractItemOfDayPictures(
 		return nil, nil
 	}
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -591,7 +591,7 @@ func (s *ItemExtractor) extractItemOfDayPictures(
 		}
 	}
 
-	imageStorage, err := s.container.ImageStorage()
+	imageStorage, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -617,7 +617,7 @@ func (s *ItemExtractor) extractItemOfDayPictures(
 		}
 	}
 
-	pictureRepository, err := s.container.PicturesRepository()
+	pictureRepository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -726,7 +726,7 @@ func (s *ItemExtractor) orientedPictureList(
 	result := make([]*schema.PictureRow, 0)
 	usedIDs := make([]int64, 0)
 
-	pictureRepository, err := s.container.PicturesRepository()
+	pictureRepository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -827,7 +827,7 @@ func (s *ItemExtractor) extractRelatedGroupsPictures(
 		return nil, nil
 	}
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -850,12 +850,12 @@ func (s *ItemExtractor) extractRelatedGroupsPictures(
 			return nil, err
 		}
 
-		pictureRepository, err := s.container.PicturesRepository()
+		pictureRepository, err := s.container.PicturesRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		imageStorage, err := s.container.ImageStorage()
+		imageStorage, err := s.container.ImageStorage(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -963,7 +963,7 @@ func (s *ItemExtractor) extractChildsCount(
 		return nil, nil
 	}
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -988,7 +988,7 @@ func (s *ItemExtractor) extractEngineVehicles(
 		return nil, nil
 	}
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1046,7 +1046,7 @@ func (s *ItemExtractor) extractEngineVehiclesCount(
 		return 0, nil
 	}
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -1068,7 +1068,7 @@ func (s *ItemExtractor) extractPreviewPictures(
 		return nil, nil //nolint: nilnil
 	}
 
-	pictureRepository, err := s.container.PicturesRepository()
+	pictureRepository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1158,7 +1158,7 @@ func (s *ItemExtractor) extractIsCompilesItemOfDay(
 		return false, nil
 	}
 
-	itemOfDayRepository, err := s.container.ItemOfDayRepository()
+	itemOfDayRepository, err := s.container.ItemOfDayRepository(ctx)
 	if err != nil {
 		return false, err
 	}
@@ -1175,7 +1175,7 @@ func (s *ItemExtractor) extractCommentsCount(
 		return 0, nil
 	}
 
-	commentsRepo, err := s.container.CommentsRepository()
+	commentsRepo, err := s.container.CommentsRepository(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -1196,7 +1196,7 @@ func (s *ItemExtractor) extractLogos(
 		brandicon *APIImage
 	)
 
-	imageStorage, err := s.container.ImageStorage()
+	imageStorage, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1238,7 +1238,7 @@ func (s *ItemExtractor) extractConnectedItems(
 	lang string,
 	userCtx UserContext,
 ) ([]*APIItem, error) {
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1317,7 +1317,7 @@ func (s *ItemExtractor) extractRoutes(
 	)
 
 	if extractSpecsRoute || extractRoute {
-		itemRepository, err := s.container.ItemsRepository()
+		itemRepository, err := s.container.ItemsRepository(ctx)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -1384,7 +1384,7 @@ func (s *ItemExtractor) extractDesignInfo(
 		return nil, nil //nolint: nilnil
 	}
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1464,7 +1464,7 @@ func (s *ItemExtractor) extractAltNames(
 	altNames := make(map[string][]string)
 	altNames2 := make(map[string][]string)
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1521,7 +1521,7 @@ func (s *ItemExtractor) extractOtherNames(
 		return nil, nil
 	}
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1548,7 +1548,7 @@ func (s *ItemExtractor) extractLocation(
 		return nil, nil //nolint: nilnil
 	}
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1606,7 +1606,7 @@ func (s *ItemExtractor) walkUpUntilBrand(
 ) ([]*PublicRoute, error) {
 	routes := make([]*PublicRoute, 0)
 
-	itemRepository, err := s.container.ItemsRepository()
+	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}

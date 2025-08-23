@@ -67,6 +67,7 @@ func unique(intSlice []string) []string {
 
 type StatisticsGRPCServer struct {
 	UnimplementedStatisticsServer
+
 	db          *goqu.Database
 	lastColor   int
 	aboutConfig config.AboutConfig
@@ -91,98 +92,6 @@ func NewStatisticsGRPCServer(
 		db:          db,
 		aboutConfig: aboutConfig,
 	}
-}
-
-func (s *StatisticsGRPCServer) randomColor() string {
-	idx := s.lastColor % len(colors)
-	s.lastColor++
-
-	return colors[idx]
-}
-
-func (s *StatisticsGRPCServer) totalUsers(ctx context.Context) (int32, error) {
-	result, err := s.db.From(schema.UserTable).
-		Where(schema.UserTableDeletedCol.IsFalse()).
-		CountContext(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	return roundTo(int32(result), thousands), nil //nolint: gosec
-}
-
-func (s *StatisticsGRPCServer) contributors(ctx context.Context) ([]string, error) {
-	contributors := make([]string, 0)
-
-	err := s.db.Select(schema.UserTableIDCol).
-		From(schema.UserTable).
-		Where(
-			schema.UserTableDeletedCol.IsFalse(),
-			schema.UserTableGreenCol.IsTrue(),
-			goqu.Or(
-				schema.UserTableIdentityCol.IsNull(),
-				schema.UserTableIdentityCol.Neq("autowp"),
-			),
-			schema.UserTableLastOnlineCol.Gt(goqu.L("DATE_SUB(CURDATE(), INTERVAL 6 MONTH)")),
-		).
-		ScanValsContext(ctx, &contributors)
-	if err != nil {
-		return nil, err
-	}
-
-	picturesUsers := make([]string, 0)
-
-	err = s.db.Select(schema.UserTableIDCol).
-		From(schema.UserTable).
-		Where(schema.UserTableDeletedCol.IsFalse()).
-		Order(schema.UserTablePicturesTotalCol.Desc()).
-		Limit(numberOfTopUploadersToShowInAboutUs).
-		ScanValsContext(ctx, &picturesUsers)
-	if err != nil {
-		return nil, err
-	}
-
-	return unique(append(contributors, picturesUsers...)), nil
-}
-
-func (s *StatisticsGRPCServer) picturesStat(ctx context.Context) (int32, int32, error) {
-	var picsStat picturesStat
-
-	success, err := s.db.Select(
-		goqu.COUNT(goqu.Star()).As("count"),
-		goqu.L("SUM(filesize) / 1024 / 1024").As("size"),
-	).
-		From(schema.PictureTable).
-		ScanStructContext(ctx, &picsStat)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	if !success {
-		return 0, 0, errFailedToFetchRow
-	}
-
-	return roundTo(picsStat.Count, tensOfThousands), int32(math.Round(picsStat.Size.Float64)), nil
-}
-
-func (s *StatisticsGRPCServer) totalItems(ctx context.Context) (int32, error) {
-	result, err := s.db.From(schema.ItemTable).CountContext(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	return roundTo(int32(result), thousands), nil //nolint: gosec
-}
-
-func (s *StatisticsGRPCServer) totalComments(ctx context.Context) (int32, error) {
-	result, err := s.db.From(schema.CommentMessageTable).
-		Where(schema.CommentMessageTableDeletedCol.IsFalse()).
-		CountContext(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	return roundTo(int32(result), thousands), nil //nolint: gosec
 }
 
 func (s *StatisticsGRPCServer) GetAboutData(
@@ -387,4 +296,96 @@ func (s *StatisticsGRPCServer) GetPulse(
 		Legend: legend,
 		Labels: labels,
 	}, nil
+}
+
+func (s *StatisticsGRPCServer) randomColor() string {
+	idx := s.lastColor % len(colors)
+	s.lastColor++
+
+	return colors[idx]
+}
+
+func (s *StatisticsGRPCServer) totalUsers(ctx context.Context) (int32, error) {
+	result, err := s.db.From(schema.UserTable).
+		Where(schema.UserTableDeletedCol.IsFalse()).
+		CountContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return roundTo(int32(result), thousands), nil //nolint: gosec
+}
+
+func (s *StatisticsGRPCServer) contributors(ctx context.Context) ([]string, error) {
+	contributors := make([]string, 0)
+
+	err := s.db.Select(schema.UserTableIDCol).
+		From(schema.UserTable).
+		Where(
+			schema.UserTableDeletedCol.IsFalse(),
+			schema.UserTableGreenCol.IsTrue(),
+			goqu.Or(
+				schema.UserTableIdentityCol.IsNull(),
+				schema.UserTableIdentityCol.Neq("autowp"),
+			),
+			schema.UserTableLastOnlineCol.Gt(goqu.L("DATE_SUB(CURDATE(), INTERVAL 6 MONTH)")),
+		).
+		ScanValsContext(ctx, &contributors)
+	if err != nil {
+		return nil, err
+	}
+
+	picturesUsers := make([]string, 0)
+
+	err = s.db.Select(schema.UserTableIDCol).
+		From(schema.UserTable).
+		Where(schema.UserTableDeletedCol.IsFalse()).
+		Order(schema.UserTablePicturesTotalCol.Desc()).
+		Limit(numberOfTopUploadersToShowInAboutUs).
+		ScanValsContext(ctx, &picturesUsers)
+	if err != nil {
+		return nil, err
+	}
+
+	return unique(append(contributors, picturesUsers...)), nil
+}
+
+func (s *StatisticsGRPCServer) picturesStat(ctx context.Context) (int32, int32, error) {
+	var picsStat picturesStat
+
+	success, err := s.db.Select(
+		goqu.COUNT(goqu.Star()).As("count"),
+		goqu.L("SUM(filesize) / 1024 / 1024").As("size"),
+	).
+		From(schema.PictureTable).
+		ScanStructContext(ctx, &picsStat)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	if !success {
+		return 0, 0, errFailedToFetchRow
+	}
+
+	return roundTo(picsStat.Count, tensOfThousands), int32(math.Round(picsStat.Size.Float64)), nil
+}
+
+func (s *StatisticsGRPCServer) totalItems(ctx context.Context) (int32, error) {
+	result, err := s.db.From(schema.ItemTable).CountContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return roundTo(int32(result), thousands), nil //nolint: gosec
+}
+
+func (s *StatisticsGRPCServer) totalComments(ctx context.Context) (int32, error) {
+	result, err := s.db.From(schema.CommentMessageTable).
+		Where(schema.CommentMessageTableDeletedCol.IsFalse()).
+		CountContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return roundTo(int32(result), thousands), nil //nolint: gosec
 }

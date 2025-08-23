@@ -33,7 +33,7 @@ func NewWhitelist(db *goqu.Database) (*Whitelist, error) {
 }
 
 // MatchAuto MatchAuto.
-func (s *Whitelist) MatchAuto(ip net.IP) (bool, string) {
+func (s *Whitelist) MatchAuto(ctx context.Context, ip net.IP) (bool, string) {
 	ipText := ip.String()
 	ipWithDashes := strings.ReplaceAll(ipText, ".", "-")
 
@@ -50,7 +50,7 @@ func (s *Whitelist) MatchAuto(ip net.IP) (bool, string) {
 		ip16[14:16],
 	) + ".spider.yandex.com."
 
-	hosts, err := net.LookupAddr(ipText)
+	hosts, err := net.DefaultResolver.LookupAddr(ctx, ipText)
 	if err != nil {
 		return false, ""
 	}

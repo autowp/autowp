@@ -165,6 +165,28 @@ func (s *DuplicateFinder) Index(ctx context.Context, id int64, url string) error
 	return s.updateDistance(ctx, id)
 }
 
+func (s *DuplicateFinder) HideSimilar(ctx context.Context, srcPictureID, dstPictureID int64) error {
+	_, err := s.db.Update(schema.DfDistanceTable).
+		Set(goqu.Record{
+			schema.DfDistanceTableHideColName: true,
+		}).
+		Where(
+			goqu.Or(
+				goqu.And(
+					schema.DfDistanceTableSrcPictureIDCol.Eq(srcPictureID),
+					schema.DfDistanceTableSrcPictureIDCol.Eq(dstPictureID),
+				),
+				goqu.And(
+					schema.DfDistanceTableSrcPictureIDCol.Eq(dstPictureID),
+					schema.DfDistanceTableSrcPictureIDCol.Eq(srcPictureID),
+				),
+			),
+		).
+		Executor().ExecContext(ctx)
+
+	return err
+}
+
 func getFileHash(reader io.Reader) (uint64, error) {
 	img, _, err := image.Decode(reader)
 	if err != nil {
@@ -248,28 +270,6 @@ func (s *DuplicateFinder) updateDistance(ctx context.Context, id int64) error {
 				),
 			},
 		)).
-		Executor().ExecContext(ctx)
-
-	return err
-}
-
-func (s *DuplicateFinder) HideSimilar(ctx context.Context, srcPictureID, dstPictureID int64) error {
-	_, err := s.db.Update(schema.DfDistanceTable).
-		Set(goqu.Record{
-			schema.DfDistanceTableHideColName: true,
-		}).
-		Where(
-			goqu.Or(
-				goqu.And(
-					schema.DfDistanceTableSrcPictureIDCol.Eq(srcPictureID),
-					schema.DfDistanceTableSrcPictureIDCol.Eq(dstPictureID),
-				),
-				goqu.And(
-					schema.DfDistanceTableSrcPictureIDCol.Eq(dstPictureID),
-					schema.DfDistanceTableSrcPictureIDCol.Eq(srcPictureID),
-				),
-			),
-		).
 		Executor().ExecContext(ctx)
 
 	return err

@@ -70,11 +70,11 @@ func TestCreateUpdateDeleteUser(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, me)
 
-	db, err := cnt.GoquDB()
+	db, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	// set avatar
-	imageStorage, err := cnt.ImageStorage()
+	imageStorage, err := cnt.ImageStorage(t.Context())
 	require.NoError(t, err)
 
 	imageID, err := imageStorage.AddImageFromFilepath(

@@ -11,7 +11,7 @@ import (
 func TestFeedbackNoBody(t *testing.T) {
 	t.Parallel()
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := peer.NewContext(t.Context(), &peer.Peer{Addr: &net.IPAddr{IP: net.IPv4(192, 168, 0, 1)}})
@@ -23,7 +23,7 @@ func TestFeedbackNoBody(t *testing.T) {
 func TestFeedbackEmptyValues(t *testing.T) {
 	t.Parallel()
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := peer.NewContext(t.Context(), &peer.Peer{Addr: &net.IPAddr{IP: net.IPv4(192, 168, 0, 1)}})
@@ -39,7 +39,7 @@ func TestFeedbackEmptyValues(t *testing.T) {
 func TestFeedbackEmptyName(t *testing.T) {
 	t.Parallel()
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := peer.NewContext(t.Context(), &peer.Peer{Addr: &net.IPAddr{IP: net.IPv4(192, 168, 0, 1)}})
@@ -55,7 +55,7 @@ func TestFeedbackEmptyName(t *testing.T) {
 func TestFeedbackEmptyEmail(t *testing.T) {
 	t.Parallel()
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := peer.NewContext(t.Context(), &peer.Peer{Addr: &net.IPAddr{IP: net.IPv4(192, 168, 0, 1)}})
@@ -71,7 +71,7 @@ func TestFeedbackEmptyEmail(t *testing.T) {
 func TestFeedbackEmptyMessage(t *testing.T) {
 	t.Parallel()
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := peer.NewContext(t.Context(), &peer.Peer{Addr: &net.IPAddr{IP: net.IPv4(192, 168, 0, 1)}})

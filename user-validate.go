@@ -7,7 +7,7 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 )
 
-func (s *APIUser) Validate(
+func (s *APIUser) Validate( //nolint: funlen
 	languages map[string]config.LanguageConfig, maskPaths []string,
 ) ([]*errdetails.BadRequest_FieldViolation, error) {
 	var (

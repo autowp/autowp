@@ -396,6 +396,7 @@ func TestAnimationPreservedDueResample(t *testing.T) {
 
 	mw := imagick.NewMagickWand()
 	defer mw.Destroy()
+
 	err := mw.ReadImage("./_files/icon-animation.gif")
 	require.NoError(t, err)
 
@@ -422,6 +423,7 @@ func TestResizeGif(t *testing.T) {
 
 	mw := imagick.NewMagickWand()
 	defer mw.Destroy()
+
 	err := mw.ReadImage("./_files/rudolp-jumping-rope.gif")
 	require.NoError(t, err)
 
@@ -449,6 +451,7 @@ func TestResizeGifWithProportionsConstraints(t *testing.T) {
 
 	mw := imagick.NewMagickWand()
 	defer mw.Destroy()
+
 	err := mw.ReadImage("./_files/rudolp-jumping-rope.gif")
 	require.NoError(t, err)
 

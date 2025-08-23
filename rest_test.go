@@ -16,7 +16,7 @@ const tokenWithInvalidSignature = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9." +
 func TestGetVehicleTypesInaccessibleAnonymously(t *testing.T) {
 	t.Parallel()
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	_, err = srv.GetVehicleTypes(t.Context(), &emptypb.Empty{})
@@ -26,7 +26,7 @@ func TestGetVehicleTypesInaccessibleAnonymously(t *testing.T) {
 func TestGetVehicleTypesInaccessibleWithEmptyToken(t *testing.T) {
 	t.Parallel()
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := metadata.NewIncomingContext(
@@ -41,7 +41,7 @@ func TestGetVehicleTypesInaccessibleWithEmptyToken(t *testing.T) {
 func TestGetVehicleTypesInaccessibleWithInvalidToken(t *testing.T) {
 	t.Parallel()
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := metadata.NewIncomingContext(
@@ -56,7 +56,7 @@ func TestGetVehicleTypesInaccessibleWithInvalidToken(t *testing.T) {
 func TestGetVehicleTypesInaccessibleWithWronglySignedToken(t *testing.T) {
 	t.Parallel()
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	ctx := metadata.NewIncomingContext(
@@ -82,7 +82,7 @@ func TestGetVehicleTypesInaccessibleWithoutModeratePrivilege(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	_, err = srv.GetVehicleTypes(
@@ -107,7 +107,7 @@ func TestGetVehicleTypes(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	srv, err := cnt.GRPCServer()
+	srv, err := cnt.GRPCServer(t.Context())
 	require.NoError(t, err)
 
 	result, err := srv.GetVehicleTypes(

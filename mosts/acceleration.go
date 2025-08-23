@@ -54,9 +54,11 @@ func (s Acceleration) Items(
 	}
 
 	const valueColumnAlias = "size_value"
+
 	valueColumnAliasCol := goqu.C(valueColumnAlias)
 
 	const alias = "axis"
+
 	aliasTable := goqu.T(alias)
 	iAliasTable := goqu.T(query.ItemAlias)
 	itemIDCol := iAliasTable.Col(schema.ItemTableIDColName)
@@ -108,6 +110,7 @@ func (s Acceleration) Items(
 	}
 
 	const tblAlias = "tbl"
+
 	tblValueCol := goqu.T(tblAlias).Col(valueColumnAlias)
 
 	orderExpr := tblValueCol.Desc()

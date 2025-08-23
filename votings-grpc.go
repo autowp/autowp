@@ -14,6 +14,7 @@ import (
 
 type VotingsGRPCServer struct {
 	UnimplementedVotingsServer
+
 	repository *votings.Repository
 	auth       *Auth
 }

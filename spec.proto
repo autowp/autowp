@@ -8,7 +8,10 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/field_mask.proto";
 import "google/type/latlng.proto";
 import "google/type/date.proto";
+import "google/rpc/status.proto";
 import "google/rpc/error_details.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 
 option go_package = "github.com/autowp/goautowp";
 
@@ -211,7 +214,11 @@ service Statistics {
 
 service Donations {
   rpc GetVODData(google.protobuf.Empty) returns (VODDataResponse) {}
-  rpc GetTransactions(google.protobuf.Empty) returns (DonationsTransactionsResponse) {}
+  rpc GetTransactions(google.protobuf.Empty) returns (DonationsTransactionsResponse) {
+    option (google.api.http) = {
+      get: "/v3/donations/transactions"
+    };
+  }
 }
 
 service Text {
@@ -2021,12 +2028,12 @@ message Pages {
 }
 
 message DonationsTransaction {
-  int32 sum = 1;
-  string currency = 2;
+  int32 sum = 1 [(google.api.field_behavior) = REQUIRED];
+  string currency = 2 [(google.api.field_behavior) = REQUIRED];
   google.protobuf.Timestamp date = 3;
-  string contributor = 4;
-  string purpose = 5;
-  int64 user_id = 6;
+  string contributor = 4 [(google.api.field_behavior) = REQUIRED];
+  string purpose = 5 [(google.api.field_behavior) = REQUIRED];
+  int64 user_id = 6 [(google.api.field_behavior) = REQUIRED];
 }
 
 message DonationsTransactionsResponse {

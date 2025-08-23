@@ -28,6 +28,7 @@ const MaxReplies = 500
 
 type CommentsGRPCServer struct {
 	UnimplementedCommentsServer
+
 	auth               *Auth
 	repository         *comments.Repository
 	usersRepository    *users.Repository

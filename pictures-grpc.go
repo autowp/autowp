@@ -44,6 +44,7 @@ const (
 
 type PicturesGRPCServer struct {
 	UnimplementedPicturesServer
+
 	repository            *pictures.Repository
 	auth                  *Auth
 	events                *Events
@@ -461,124 +462,6 @@ func (s *UpdateModerVoteRequest) Validate() ([]*errdetails.BadRequest_FieldViola
 	return result, nil
 }
 
-func (s *PicturesGRPCServer) restoreFromRemoving(
-	ctx context.Context,
-	pictureID int64,
-	userID int64,
-) error {
-	if pictureID == 0 {
-		return sql.ErrNoRows
-	}
-
-	pic, err := s.repository.Picture(
-		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
-	)
-	if err != nil {
-		return err
-	}
-
-	ctx = context.WithoutCancel(ctx)
-
-	err = s.repository.SetStatus(ctx, pic.ID, schema.PictureStatusInbox, userID)
-	if err != nil {
-		return err
-	}
-
-	err = s.events.Add(ctx, Event{
-		UserID:   userID,
-		Message:  fmt.Sprintf("Картинки `%d` восстановлена из очереди удаления", pic.ID),
-		Pictures: []int64{pic.ID},
-	})
-	if err != nil {
-		return err
-	}
-
-	if pic.OwnerID.Valid {
-		err = s.userRepository.RefreshPicturesCount(ctx, pic.OwnerID.Int64)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (s *PicturesGRPCServer) unaccept(ctx context.Context, pictureID int64, userID int64) error {
-	if pictureID == 0 {
-		return sql.ErrNoRows
-	}
-
-	picture, err := s.repository.Picture(
-		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
-	)
-	if err != nil {
-		return err
-	}
-
-	ctx = context.WithoutCancel(ctx)
-
-	err = s.repository.SetStatus(ctx, pictureID, schema.PictureStatusInbox, userID)
-	if err != nil {
-		return err
-	}
-
-	err = s.events.Add(ctx, Event{
-		UserID:   userID,
-		Message:  fmt.Sprintf(`С картинки %d снят статус "принято"`, pictureID),
-		Pictures: []int64{pictureID},
-	})
-	if err != nil {
-		return err
-	}
-
-	if picture.OwnerID.Valid {
-		err = s.userRepository.RefreshPicturesCount(ctx, picture.OwnerID.Int64)
-		if err != nil {
-			return err
-		}
-	}
-
-	return s.NotifyInboxed(ctx, picture, userID)
-}
-
-func (s *PicturesGRPCServer) notifyVote(
-	ctx context.Context, pictureID int64, vote bool, reason string, userID int64,
-) error {
-	if pictureID == 0 {
-		return sql.ErrNoRows
-	}
-
-	picture, err := s.repository.Picture(
-		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
-	)
-	if err != nil {
-		return err
-	}
-
-	if !picture.OwnerID.Valid || picture.OwnerID.Int64 == userID {
-		return nil
-	}
-
-	tpl := "pm/new-picture-%s-vote-%s/delete"
-	if vote {
-		tpl = "pm/new-picture-%s-vote-%s/accept"
-	}
-
-	return s.sendLocalizedMessage(
-		ctx, userID, picture.OwnerID, tpl,
-		func(lang string) (map[string]interface{}, error) {
-			uri, err := s.hostManager.URIByLanguage(lang)
-			if err != nil {
-				return nil, err
-			}
-
-			return map[string]interface{}{
-				"Picture": frontend.PictureURL(uri, picture.Identity),
-				"Reason":  reason,
-			}, nil
-		})
-}
-
 func (s *PicturesGRPCServer) GetUserSummary(
 	ctx context.Context,
 	_ *emptypb.Empty,
@@ -612,47 +495,6 @@ func (s *PicturesGRPCServer) GetUserSummary(
 		AcceptedCount: int32(acceptedCount), //nolint: gosec
 		InboxCount:    int32(inboxCount),    //nolint: gosec
 	}, nil
-}
-
-func (s *PicturesGRPCServer) enforcePictureImageOperation(
-	ctx context.Context,
-	pictureID int64,
-) (int64, error) {
-	if pictureID == 0 {
-		return 0, status.Error(codes.NotFound, "NotFound")
-	}
-
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return 0, status.Error(codes.Internal, err.Error())
-	}
-
-	if userCtx.UserID == 0 {
-		return 0, status.Errorf(codes.Unauthenticated, "Unauthenticated")
-	}
-
-	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return 0, status.Errorf(codes.PermissionDenied, "PermissionDenied")
-	}
-
-	pic, err := s.repository.Picture(
-		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
-	)
-	if err != nil {
-		return 0, status.Error(codes.Internal, err.Error())
-	}
-
-	if pic == nil {
-		return 0, status.Errorf(codes.NotFound, "NotFound")
-	}
-
-	canNormalize := pic.Status == schema.PictureStatusInbox &&
-		util.Contains(userCtx.Roles, users.RolePicturesModer)
-	if !canNormalize {
-		return 0, status.Errorf(codes.PermissionDenied, "PermissionDenied")
-	}
-
-	return userCtx.UserID, nil
 }
 
 func (s *PicturesGRPCServer) Normalize(
@@ -1391,84 +1233,6 @@ func (s *PicturesGRPCServer) SetPictureCopyrights(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *PicturesGRPCServer) notifyCopyrightsEdited(
-	ctx context.Context, pictureID int64, textID int32, userID int64,
-) error {
-	revUserIDs, err := s.textStorageRepository.TextUserIDs(ctx, textID)
-	if err != nil {
-		return err
-	}
-
-	revUserIDs = util.RemoveValueFromArray(revUserIDs, userID)
-	if len(revUserIDs) == 0 {
-		return nil
-	}
-
-	userRows, _, err := s.userRepository.Users(
-		ctx, &query.UserListOptions{IDs: revUserIDs}, users.UserFields{}, users.OrderByNone,
-	)
-	if err != nil {
-		return err
-	}
-
-	if pictureID == 0 {
-		return nil
-	}
-
-	picture, err := s.repository.Picture(
-		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
-	)
-	if err != nil {
-		return err
-	}
-
-	for _, userRow := range userRows {
-		pictureURL, err := s.pictureURL(picture.Identity, userRow.Language)
-		if err != nil {
-			return err
-		}
-
-		userURL, err := s.userURL(userRow.ID, userRow.Identity, userRow.Language)
-		if err != nil {
-			return err
-		}
-
-		err = s.messagingRepository.CreateMessageFromTemplate(
-			ctx, 0, userRow.ID, "pm/user-%s-edited-picture-copyrights-%s-%s",
-			map[string]interface{}{
-				"User":       userURL,
-				"PictureURL": pictureURL,
-			},
-			userRow.Language,
-		)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (s *PicturesGRPCServer) userURL(userID int64, identity *string, lang string) (string, error) {
-	userURL, err := s.hostManager.URIByLanguage(lang)
-	if err != nil {
-		return "", err
-	}
-
-	userURL.Path = frontend.UserPath(userID, identity)
-
-	return userURL.String(), nil
-}
-
-func (s *PicturesGRPCServer) pictureURL(identity string, lang string) (string, error) {
-	pictureURL, err := s.hostManager.URIByLanguage(lang)
-	if err != nil {
-		return "", err
-	}
-
-	return frontend.PictureURL(pictureURL, identity), nil
-}
-
 func (s *PicturesGRPCServer) SetPictureStatus(
 	ctx context.Context, in *SetPictureStatusRequest,
 ) (*emptypb.Empty, error) {
@@ -1605,123 +1369,6 @@ func (s *PicturesGRPCServer) SetPictureStatus(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *PicturesGRPCServer) sendMessage(
-	ctx context.Context,
-	userID int64,
-	receiverID sql.NullInt64,
-	messageFunc func(lang string) (string, error),
-) error {
-	if !receiverID.Valid || (receiverID.Int64 == userID) {
-		return nil
-	}
-
-	notDeleted := false
-
-	receiver, err := s.userRepository.User(
-		ctx,
-		&query.UserListOptions{ID: receiverID.Int64, Deleted: &notDeleted},
-		users.UserFields{},
-		users.OrderByNone,
-	)
-	if err != nil && !errors.Is(err, users.ErrUserNotFound) {
-		return err
-	}
-
-	if receiver == nil {
-		return nil
-	}
-
-	message, err := messageFunc(receiver.Language)
-	if err != nil {
-		return err
-	}
-
-	return s.messagingRepository.CreateMessage(ctx, 0, receiver.ID, message)
-}
-
-func (s *PicturesGRPCServer) sendLocalizedMessage(
-	ctx context.Context, userID int64, receiverID sql.NullInt64, messageID string,
-	templateDataFunc func(lang string) (map[string]interface{}, error),
-) error {
-	if !receiverID.Valid || (receiverID.Int64 == userID) {
-		return nil
-	}
-
-	notDeleted := false
-
-	receiver, err := s.userRepository.User(
-		ctx,
-		&query.UserListOptions{ID: receiverID.Int64, Deleted: &notDeleted},
-		users.UserFields{},
-		users.OrderByNone,
-	)
-	if err != nil && !errors.Is(err, users.ErrUserNotFound) {
-		return err
-	}
-
-	if receiver == nil {
-		return nil
-	}
-
-	templateData, err := templateDataFunc(receiver.Language)
-	if err != nil {
-		return err
-	}
-
-	return s.messagingRepository.CreateMessageFromTemplate(
-		ctx,
-		0,
-		receiver.ID,
-		messageID,
-		templateData,
-		receiver.Language,
-	)
-}
-
-func (s *PicturesGRPCServer) notifyAccepted(
-	ctx context.Context, pic *schema.PictureRow, userID int64, isFirstTimeAccepted bool,
-) error {
-	ctx = context.WithoutCancel(ctx)
-
-	if isFirstTimeAccepted {
-		err := s.sendLocalizedMessage(
-			ctx, userID, pic.OwnerID, "pm/your-picture-accepted-%s",
-			func(lang string) (map[string]interface{}, error) {
-				pictureURL, err := s.pictureURL(pic.Identity, lang)
-				if err != nil {
-					return nil, err
-				}
-
-				return map[string]interface{}{
-					"PictureURL": pictureURL,
-				}, nil
-			})
-		if err != nil {
-			return fmt.Errorf("sendLocalizedMessage: %w", err)
-		}
-
-		err = s.telegramService.NotifyPicture(ctx, pic, s.itemRepository)
-		if err != nil {
-			return fmt.Errorf("NotifyPicture: %w", err)
-		}
-	}
-
-	err := s.sendMessage(
-		ctx, userID, pic.ChangeStatusUserID, func(lang string) (string, error) {
-			pictureURL, err := s.pictureURL(pic.Identity, lang)
-			if err != nil {
-				return "", err
-			}
-
-			return "Принята картинка " + pictureURL, nil
-		})
-	if err != nil {
-		return fmt.Errorf("sendMessage: %w", err)
-	}
-
-	return nil
-}
-
 func (s *PicturesGRPCServer) NotifyInboxed(
 	ctx context.Context,
 	pic *schema.PictureRow,
@@ -1742,114 +1389,6 @@ func (s *PicturesGRPCServer) NotifyInboxed(
 			pictureURL,
 		), nil
 	})
-}
-
-func (s *PicturesGRPCServer) notifyRemoving(
-	ctx context.Context,
-	pic *schema.PictureRow,
-	userID int64,
-) error {
-	ctx = context.WithoutCancel(ctx)
-
-	return s.sendLocalizedMessage(
-		ctx, userID, pic.OwnerID, "pm/your-picture-%s-enqueued-to-remove-%s",
-		func(lang string) (map[string]interface{}, error) {
-			deleteRequests, err := s.repository.NegativeVotes(ctx, pic.ID)
-			if err != nil {
-				return nil, err
-			}
-
-			reasons := make([]string, 0, len(deleteRequests))
-
-			for _, request := range deleteRequests {
-				user, err := s.userRepository.User(
-					ctx,
-					&query.UserListOptions{ID: request.UserID},
-					users.UserFields{},
-					users.OrderByNone,
-				)
-				if err != nil {
-					return nil, err
-				}
-
-				userURL, err := s.userURL(user.ID, user.Identity, user.Language)
-				if err != nil {
-					return nil, err
-				}
-
-				reasons = append(reasons, userURL+" : "+request.Reason)
-			}
-
-			pictureURL, err := s.pictureURL(pic.Identity, lang)
-			if err != nil {
-				return nil, err
-			}
-
-			return map[string]interface{}{
-				"PictureURL": pictureURL,
-				"Reasons":    strings.Join(reasons, "\n"),
-			}, nil
-		})
-}
-
-func (s *PicturesGRPCServer) canAccept(
-	ctx context.Context,
-	picture *schema.PictureRow,
-	roles []string,
-) (bool, error) {
-	if !util.Contains(roles, users.RolePicturesModer) {
-		return false, nil
-	}
-
-	return s.repository.CanAccept(ctx, picture)
-}
-
-func (s *PicturesGRPCServer) pictureCanDelete(
-	ctx context.Context, picture *schema.PictureRow, roles []string, userID int64,
-) (bool, error) {
-	canDelete, err := s.repository.CanDelete(ctx, picture)
-	if err != nil {
-		return false, err
-	}
-
-	if !canDelete {
-		return false, nil
-	}
-
-	if util.Contains(roles, users.RolePicturesModer) {
-		hasVote, err := s.repository.HasVote(ctx, picture.ID, userID)
-		if err != nil {
-			return false, err
-		}
-
-		if hasVote {
-			acceptVotes, err := s.repository.PositiveVotesCount(ctx, picture.ID)
-			if err != nil {
-				return false, err
-			}
-
-			deleteVotes, err := s.repository.NegativeVotesCount(ctx, picture.ID)
-			if err != nil {
-				return false, err
-			}
-
-			return deleteVotes > acceptVotes, nil
-		}
-	}
-
-	return false, nil
-}
-
-func (s *PicturesGRPCServer) canReplace(
-	picture, replacedPicture *schema.PictureRow,
-	roles []string,
-) bool {
-	return (picture.Status == schema.PictureStatusAccepted ||
-		picture.Status == schema.PictureStatusInbox) &&
-		(replacedPicture.Status == schema.PictureStatusRemoving ||
-			replacedPicture.Status == schema.PictureStatusInbox ||
-			replacedPicture.Status == schema.PictureStatusAccepted) &&
-		util.Contains(roles, users.RolePicturesModer)
 }
 
 func (s *PicturesGRPCServer) GetPictureItem(
@@ -1997,87 +1536,6 @@ func (s *PicturesGRPCServer) LoadLocation(timezone string) (*time.Location, erro
 	}
 
 	return loc, nil
-}
-
-func (s *PicturesGRPCServer) resolveTimezone(
-	ctx context.Context,
-	userID int64,
-	lang string,
-) (*time.Location, error) {
-	var (
-		err      error
-		timezone = ""
-	)
-
-	if userID > 0 {
-		user, err := s.userRepository.User(
-			ctx,
-			&query.UserListOptions{ID: userID},
-			users.UserFields{Timezone: true},
-			users.OrderByNone,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		timezone = user.Timezone
-	}
-
-	if timezone == "" {
-		timezone, err = s.hostManager.TimezoneByLanguage(lang)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	loc, err := s.LoadLocation(timezone)
-	if err != nil {
-		return nil, err
-	}
-
-	return loc, nil
-}
-
-func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, userID int64) error {
-	const acceptedInDaysMax = 3
-
-	inOptions := in.GetOptions()
-	fields := in.GetFields()
-
-	if inOptions.GetStatus() == PictureStatus_PICTURE_STATUS_INBOX && userID == 0 {
-		return status.Error(codes.PermissionDenied, "inbox not allowed anonymously")
-	}
-
-	restricted := !isModer && inOptions.GetPictureItem().GetItemId() == 0 &&
-		inOptions.GetPictureItem().GetItemParentCacheAncestor().GetItemId() == 0 &&
-		inOptions.GetPictureItem().GetItemParentCacheAncestor().GetParentId() == 0 &&
-		inOptions.GetPictureItem().GetPerspectiveId() == 0 &&
-		inOptions.GetOwnerId() == 0 && inOptions.GetAcceptedInDays() < acceptedInDaysMax &&
-		inOptions.GetAddDate() == nil && inOptions.GetId() == 0 && inOptions.GetIdentity() == ""
-	if restricted {
-		return status.Error(
-			codes.PermissionDenied,
-			"PictureItem.ItemParentCacheAncestor.ItemID or OwnerID is required",
-		)
-	}
-
-	restricted = !isModer && (inOptions.GetHasNoComments() || inOptions.GetCommentTopic() != nil ||
-		inOptions.GetPictureItem().GetItemVehicleType() != nil || inOptions.GetHasSpecialName() ||
-		inOptions.GetDfDistance() != nil || inOptions.GetPictureModerVote() != nil ||
-		inOptions.GetHasNoPictureModerVote() || inOptions.GetHasNoReplacePicture() ||
-		inOptions.GetReplacePicture() != nil || inOptions.GetHasNoPictureItem() || inOptions.GetHasNoPoint() ||
-		inOptions.GetAddedFrom() != nil || inOptions.GetPictureItem().GetExcludeAncestorOrSelfId() != 0)
-	if restricted {
-		return status.Error(codes.PermissionDenied, "PermissionDenied")
-	}
-
-	restricted = !isModer && (fields.GetAcceptedCount() || fields.GetExif() || fields.GetIsLast() ||
-		fields.GetSpecialName() || fields.GetSiblings() != nil)
-	if restricted {
-		return status.Error(codes.PermissionDenied, "PermissionDenied")
-	}
-
-	return nil
 }
 
 func (s *PicturesGRPCServer) GetPictures(
@@ -2299,34 +1757,6 @@ func (s *PicturesGRPCServer) GetInbox(ctx context.Context, in *InboxRequest) (*I
 	}, nil
 }
 
-func (s *PicturesGRPCServer) inboxBrands(ctx context.Context, lang string) ([]*InboxBrand, error) {
-	rows, _, err := s.itemRepository.List(ctx, &query.ItemListOptions{
-		Language:   lang,
-		SortByName: true,
-		TypeID:     []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
-		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
-			PictureItemsByItemID: &query.PictureItemListOptions{
-				Pictures: &query.PictureListOptions{
-					Status: schema.PictureStatusInbox,
-				},
-			},
-		},
-	}, &items.ItemFields{NameOnly: true}, items.OrderByName, false)
-	if err != nil {
-		return nil, err
-	}
-
-	res := make([]*InboxBrand, 0, len(rows))
-	for _, row := range rows {
-		res = append(res, &InboxBrand{
-			Id:   row.ID,
-			Name: row.NameOnly,
-		})
-	}
-
-	return res, nil
-}
-
 func (s *PicturesGRPCServer) GetNewbox(ctx context.Context, in *NewboxRequest) (*Newbox, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -2425,245 +1855,11 @@ func (s *PicturesGRPCServer) GetNewbox(ctx context.Context, in *NewboxRequest) (
 	}, nil
 }
 
-func (s *PicturesGRPCServer) newboxGroups(
-	ctx context.Context,
-	acceptDate civil.Date,
-	page uint32,
-	timezone *time.Location,
-	lang string,
-	userCtx UserContext,
-) ([]*NewboxGroup, *util.Pages, error) {
-	pictureFields := PictureFields{
-		ThumbMedium:   true,
-		NameText:      true,
-		NameHtml:      true,
-		Votes:         true,
-		Views:         true,
-		CommentsCount: true,
-	}
-	repoPictureFields := convertPictureFields(&pictureFields)
-
-	itemPictureFields := PictureFields{
-		ThumbMedium: true,
-		NameText:    true,
-		NameHtml:    true,
-	}
-	repoItemPictureFields := convertPictureFields(&itemPictureFields)
-
-	itemFields := ItemFields{
-		NameHtml:    true,
-		NameDefault: true,
-		Description: true,
-		Design:      true,
-		SpecsRoute:  true,
-		Categories: &ItemsRequest{
-			Fields: &ItemFields{NameHtml: true},
-		},
-		Twins: &ItemsRequest{},
-	}
-	repoItemFields := convertItemFields(&itemFields)
-
-	rows, pages, err := s.repository.Pictures(ctx, &query.PictureListOptions{
-		Status:     schema.PictureStatusAccepted,
-		Limit:      newboxPicturesPerPage,
-		Page:       page,
-		AcceptDate: &acceptDate,
-		Timezone:   timezone,
-	}, repoPictureFields, pictures.OrderByAcceptDatetimeDesc, true)
-	if err != nil {
-		return nil, nil, fmt.Errorf("repository.Pictures(): %w", err)
-	}
-
-	groupsData, err := s.splitPictures(ctx, rows)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	groups := make([]*NewboxGroup, 0)
-
-	for _, groupData := range groupsData {
-		group := &NewboxGroup{
-			Type: groupData.Type,
-		}
-
-		if groupData.Type == newboxGroupTypeItem {
-			itemRow, err := s.itemRepository.Item(
-				ctx,
-				&query.ItemListOptions{ItemID: groupData.ItemID},
-				repoItemFields,
-			)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			group.Item, err = s.itemExtractor.Extract(ctx, itemRow, &itemFields, lang, userCtx)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			ids := make([]int64, 0)
-			for _, picture := range groupData.Pictures {
-				ids = append(ids, picture.ID)
-			}
-
-			pictureRows, _, err := s.repository.Pictures(ctx, &query.PictureListOptions{
-				IDs:    ids,
-				Status: schema.PictureStatusAccepted,
-				PictureItem: &query.PictureItemListOptions{
-					ItemID: groupData.ItemID,
-				},
-				Limit: newboxPicturesPerLine,
-			}, repoItemPictureFields, pictures.OrderByAcceptDatetimeDesc, false)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			group.Pictures, err = s.pictureExtractor.ExtractRows(
-				ctx,
-				pictureRows,
-				&itemPictureFields,
-				lang,
-				userCtx,
-			)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			totalPictures, err := s.repository.Count(ctx, &query.PictureListOptions{
-				Status: schema.PictureStatusAccepted,
-				PictureItem: &query.PictureItemListOptions{
-					ItemID: groupData.ItemID,
-					TypeID: schema.PictureItemTypeContent,
-				},
-				AcceptDate: &acceptDate,
-				Timezone:   timezone,
-			})
-			if err != nil {
-				return nil, nil, err
-			}
-
-			group.TotalPictures = int32(totalPictures) //nolint: gosec
-		} else {
-			group.Pictures, err = s.pictureExtractor.ExtractRows(ctx, groupData.Pictures, &pictureFields, lang, userCtx)
-			if err != nil {
-				return nil, nil, err
-			}
-		}
-
-		groups = append(groups, group)
-	}
-
-	return groups, pages, nil
-}
-
 type NewboxGroupDraft struct {
 	Type     string
 	Picture  *schema.PictureRow
 	ItemID   int64
 	Pictures []*schema.PictureRow
-}
-
-func (s *PicturesGRPCServer) splitPictures(
-	ctx context.Context, pictureRows []*schema.PictureRow,
-) ([]*NewboxGroupDraft, error) {
-	res := make([]*NewboxGroupDraft, 0)
-
-	for _, pictureRow := range pictureRows {
-		pictureItems, err := s.repository.PictureItems(ctx, &query.PictureItemListOptions{
-			PictureID: pictureRow.ID,
-			TypeID:    schema.PictureItemTypeContent,
-		}, pictures.PictureItemOrderByNone, 0)
-		if err != nil {
-			return nil, err
-		}
-
-		if len(pictureItems) != 1 {
-			res = append(res, &NewboxGroupDraft{
-				Type:    newboxGroupTypePicture,
-				Picture: pictureRow,
-			})
-		} else {
-			itemID := pictureItems[0].ItemID
-
-			found := false
-
-			for idx := range res {
-				if res[idx].Type == newboxGroupTypeItem && res[idx].ItemID == itemID {
-					res[idx].Pictures = append(res[idx].Pictures, pictureRow)
-					found = true
-
-					break
-				}
-			}
-
-			if !found {
-				res = append(res, &NewboxGroupDraft{
-					ItemID:   itemID,
-					Type:     newboxGroupTypeItem,
-					Pictures: []*schema.PictureRow{pictureRow},
-				})
-			}
-		}
-	}
-
-	// convert single picture items to picture record
-	// merge sibling single items
-	return s.mergeSiblings(s.expandSmallItems(res)), nil
-}
-
-func (s *PicturesGRPCServer) mergeSiblings(groups []*NewboxGroupDraft) []*NewboxGroupDraft {
-	result := make([]*NewboxGroupDraft, 0)
-	picturesBuffer := make([]*schema.PictureRow, 0)
-
-	for _, item := range groups {
-		if item.Type == newboxGroupTypeItem {
-			if len(picturesBuffer) > 0 {
-				result = append(result, &NewboxGroupDraft{
-					Type:     newboxGroupTypePictures,
-					Pictures: picturesBuffer,
-				})
-				picturesBuffer = make([]*schema.PictureRow, 0)
-			}
-
-			result = append(result, item)
-		} else {
-			picturesBuffer = append(picturesBuffer, item.Picture)
-		}
-	}
-
-	if len(picturesBuffer) > 0 {
-		result = append(result, &NewboxGroupDraft{
-			Type:     newboxGroupTypePictures,
-			Pictures: picturesBuffer,
-		})
-	}
-
-	return result
-}
-
-func (s *PicturesGRPCServer) expandSmallItems(items []*NewboxGroupDraft) []*NewboxGroupDraft {
-	result := make([]*NewboxGroupDraft, 0)
-
-	for _, item := range items {
-		if item.Type != newboxGroupTypeItem {
-			result = append(result, item)
-
-			continue
-		}
-
-		if len(item.Pictures) <= 2 {
-			for _, picture := range item.Pictures {
-				result = append(result, &NewboxGroupDraft{
-					Type:    newboxGroupTypePicture,
-					Picture: picture,
-				})
-			}
-		} else {
-			result = append(result, item)
-		}
-	}
-
-	return result
 }
 
 func (s *PicturesGRPCServer) GetCanonicalRoute(
@@ -2878,6 +2074,811 @@ func (s *PicturesGRPCServer) GetGallery(
 		Items:  gallery,
 		Status: extractPicturesStatus(repoOptions.Status),
 	}, nil
+}
+
+func (s *PicturesGRPCServer) restoreFromRemoving(
+	ctx context.Context,
+	pictureID int64,
+	userID int64,
+) error {
+	if pictureID == 0 {
+		return sql.ErrNoRows
+	}
+
+	pic, err := s.repository.Picture(
+		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
+	)
+	if err != nil {
+		return err
+	}
+
+	ctx = context.WithoutCancel(ctx)
+
+	err = s.repository.SetStatus(ctx, pic.ID, schema.PictureStatusInbox, userID)
+	if err != nil {
+		return err
+	}
+
+	err = s.events.Add(ctx, Event{
+		UserID:   userID,
+		Message:  fmt.Sprintf("Картинки `%d` восстановлена из очереди удаления", pic.ID),
+		Pictures: []int64{pic.ID},
+	})
+	if err != nil {
+		return err
+	}
+
+	if pic.OwnerID.Valid {
+		err = s.userRepository.RefreshPicturesCount(ctx, pic.OwnerID.Int64)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) unaccept(ctx context.Context, pictureID int64, userID int64) error {
+	if pictureID == 0 {
+		return sql.ErrNoRows
+	}
+
+	picture, err := s.repository.Picture(
+		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
+	)
+	if err != nil {
+		return err
+	}
+
+	ctx = context.WithoutCancel(ctx)
+
+	err = s.repository.SetStatus(ctx, pictureID, schema.PictureStatusInbox, userID)
+	if err != nil {
+		return err
+	}
+
+	err = s.events.Add(ctx, Event{
+		UserID:   userID,
+		Message:  fmt.Sprintf(`С картинки %d снят статус "принято"`, pictureID),
+		Pictures: []int64{pictureID},
+	})
+	if err != nil {
+		return err
+	}
+
+	if picture.OwnerID.Valid {
+		err = s.userRepository.RefreshPicturesCount(ctx, picture.OwnerID.Int64)
+		if err != nil {
+			return err
+		}
+	}
+
+	return s.NotifyInboxed(ctx, picture, userID)
+}
+
+func (s *PicturesGRPCServer) notifyVote(
+	ctx context.Context, pictureID int64, vote bool, reason string, userID int64,
+) error {
+	if pictureID == 0 {
+		return sql.ErrNoRows
+	}
+
+	picture, err := s.repository.Picture(
+		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
+	)
+	if err != nil {
+		return err
+	}
+
+	if !picture.OwnerID.Valid || picture.OwnerID.Int64 == userID {
+		return nil
+	}
+
+	tpl := "pm/new-picture-%s-vote-%s/delete"
+	if vote {
+		tpl = "pm/new-picture-%s-vote-%s/accept"
+	}
+
+	return s.sendLocalizedMessage(
+		ctx, userID, picture.OwnerID, tpl,
+		func(lang string) (map[string]interface{}, error) {
+			uri, err := s.hostManager.URIByLanguage(lang)
+			if err != nil {
+				return nil, err
+			}
+
+			return map[string]interface{}{
+				"Picture": frontend.PictureURL(uri, picture.Identity),
+				"Reason":  reason,
+			}, nil
+		})
+}
+
+func (s *PicturesGRPCServer) enforcePictureImageOperation(
+	ctx context.Context,
+	pictureID int64,
+) (int64, error) {
+	if pictureID == 0 {
+		return 0, status.Error(codes.NotFound, "NotFound")
+	}
+
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return 0, status.Error(codes.Internal, err.Error())
+	}
+
+	if userCtx.UserID == 0 {
+		return 0, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+	}
+
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
+		return 0, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+	}
+
+	pic, err := s.repository.Picture(
+		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
+	)
+	if err != nil {
+		return 0, status.Error(codes.Internal, err.Error())
+	}
+
+	if pic == nil {
+		return 0, status.Errorf(codes.NotFound, "NotFound")
+	}
+
+	canNormalize := pic.Status == schema.PictureStatusInbox &&
+		util.Contains(userCtx.Roles, users.RolePicturesModer)
+	if !canNormalize {
+		return 0, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+	}
+
+	return userCtx.UserID, nil
+}
+
+func (s *PicturesGRPCServer) notifyCopyrightsEdited(
+	ctx context.Context, pictureID int64, textID int32, userID int64,
+) error {
+	revUserIDs, err := s.textStorageRepository.TextUserIDs(ctx, textID)
+	if err != nil {
+		return err
+	}
+
+	revUserIDs = util.RemoveValueFromArray(revUserIDs, userID)
+	if len(revUserIDs) == 0 {
+		return nil
+	}
+
+	userRows, _, err := s.userRepository.Users(
+		ctx, &query.UserListOptions{IDs: revUserIDs}, users.UserFields{}, users.OrderByNone,
+	)
+	if err != nil {
+		return err
+	}
+
+	if pictureID == 0 {
+		return nil
+	}
+
+	picture, err := s.repository.Picture(
+		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
+	)
+	if err != nil {
+		return err
+	}
+
+	for _, userRow := range userRows {
+		pictureURL, err := s.pictureURL(picture.Identity, userRow.Language)
+		if err != nil {
+			return err
+		}
+
+		userURL, err := s.userURL(userRow.ID, userRow.Identity, userRow.Language)
+		if err != nil {
+			return err
+		}
+
+		err = s.messagingRepository.CreateMessageFromTemplate(
+			ctx, 0, userRow.ID, "pm/user-%s-edited-picture-copyrights-%s-%s",
+			map[string]interface{}{
+				"User":       userURL,
+				"PictureURL": pictureURL,
+			},
+			userRow.Language,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) userURL(userID int64, identity *string, lang string) (string, error) {
+	userURL, err := s.hostManager.URIByLanguage(lang)
+	if err != nil {
+		return "", err
+	}
+
+	userURL.Path = frontend.UserPath(userID, identity)
+
+	return userURL.String(), nil
+}
+
+func (s *PicturesGRPCServer) pictureURL(identity string, lang string) (string, error) {
+	pictureURL, err := s.hostManager.URIByLanguage(lang)
+	if err != nil {
+		return "", err
+	}
+
+	return frontend.PictureURL(pictureURL, identity), nil
+}
+
+func (s *PicturesGRPCServer) sendMessage(
+	ctx context.Context,
+	userID int64,
+	receiverID sql.NullInt64,
+	messageFunc func(lang string) (string, error),
+) error {
+	if !receiverID.Valid || (receiverID.Int64 == userID) {
+		return nil
+	}
+
+	notDeleted := false
+
+	receiver, err := s.userRepository.User(
+		ctx,
+		&query.UserListOptions{ID: receiverID.Int64, Deleted: &notDeleted},
+		users.UserFields{},
+		users.OrderByNone,
+	)
+	if err != nil && !errors.Is(err, users.ErrUserNotFound) {
+		return err
+	}
+
+	if receiver == nil {
+		return nil
+	}
+
+	message, err := messageFunc(receiver.Language)
+	if err != nil {
+		return err
+	}
+
+	return s.messagingRepository.CreateMessage(ctx, 0, receiver.ID, message)
+}
+
+func (s *PicturesGRPCServer) sendLocalizedMessage(
+	ctx context.Context, userID int64, receiverID sql.NullInt64, messageID string,
+	templateDataFunc func(lang string) (map[string]interface{}, error),
+) error {
+	if !receiverID.Valid || (receiverID.Int64 == userID) {
+		return nil
+	}
+
+	notDeleted := false
+
+	receiver, err := s.userRepository.User(
+		ctx,
+		&query.UserListOptions{ID: receiverID.Int64, Deleted: &notDeleted},
+		users.UserFields{},
+		users.OrderByNone,
+	)
+	if err != nil && !errors.Is(err, users.ErrUserNotFound) {
+		return err
+	}
+
+	if receiver == nil {
+		return nil
+	}
+
+	templateData, err := templateDataFunc(receiver.Language)
+	if err != nil {
+		return err
+	}
+
+	return s.messagingRepository.CreateMessageFromTemplate(
+		ctx,
+		0,
+		receiver.ID,
+		messageID,
+		templateData,
+		receiver.Language,
+	)
+}
+
+func (s *PicturesGRPCServer) notifyAccepted(
+	ctx context.Context, pic *schema.PictureRow, userID int64, isFirstTimeAccepted bool,
+) error {
+	ctx = context.WithoutCancel(ctx)
+
+	if isFirstTimeAccepted {
+		err := s.sendLocalizedMessage(
+			ctx, userID, pic.OwnerID, "pm/your-picture-accepted-%s",
+			func(lang string) (map[string]interface{}, error) {
+				pictureURL, err := s.pictureURL(pic.Identity, lang)
+				if err != nil {
+					return nil, err
+				}
+
+				return map[string]interface{}{
+					"PictureURL": pictureURL,
+				}, nil
+			})
+		if err != nil {
+			return fmt.Errorf("sendLocalizedMessage: %w", err)
+		}
+
+		err = s.telegramService.NotifyPicture(ctx, pic, s.itemRepository)
+		if err != nil {
+			return fmt.Errorf("NotifyPicture: %w", err)
+		}
+	}
+
+	err := s.sendMessage(
+		ctx, userID, pic.ChangeStatusUserID, func(lang string) (string, error) {
+			pictureURL, err := s.pictureURL(pic.Identity, lang)
+			if err != nil {
+				return "", err
+			}
+
+			return "Принята картинка " + pictureURL, nil
+		})
+	if err != nil {
+		return fmt.Errorf("sendMessage: %w", err)
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) notifyRemoving(
+	ctx context.Context,
+	pic *schema.PictureRow,
+	userID int64,
+) error {
+	ctx = context.WithoutCancel(ctx)
+
+	return s.sendLocalizedMessage(
+		ctx, userID, pic.OwnerID, "pm/your-picture-%s-enqueued-to-remove-%s",
+		func(lang string) (map[string]interface{}, error) {
+			deleteRequests, err := s.repository.NegativeVotes(ctx, pic.ID)
+			if err != nil {
+				return nil, err
+			}
+
+			reasons := make([]string, 0, len(deleteRequests))
+
+			for _, request := range deleteRequests {
+				user, err := s.userRepository.User(
+					ctx,
+					&query.UserListOptions{ID: request.UserID},
+					users.UserFields{},
+					users.OrderByNone,
+				)
+				if err != nil {
+					return nil, err
+				}
+
+				userURL, err := s.userURL(user.ID, user.Identity, user.Language)
+				if err != nil {
+					return nil, err
+				}
+
+				reasons = append(reasons, userURL+" : "+request.Reason)
+			}
+
+			pictureURL, err := s.pictureURL(pic.Identity, lang)
+			if err != nil {
+				return nil, err
+			}
+
+			return map[string]interface{}{
+				"PictureURL": pictureURL,
+				"Reasons":    strings.Join(reasons, "\n"),
+			}, nil
+		})
+}
+
+func (s *PicturesGRPCServer) canAccept(
+	ctx context.Context,
+	picture *schema.PictureRow,
+	roles []string,
+) (bool, error) {
+	if !util.Contains(roles, users.RolePicturesModer) {
+		return false, nil
+	}
+
+	return s.repository.CanAccept(ctx, picture)
+}
+
+func (s *PicturesGRPCServer) pictureCanDelete(
+	ctx context.Context, picture *schema.PictureRow, roles []string, userID int64,
+) (bool, error) {
+	canDelete, err := s.repository.CanDelete(ctx, picture)
+	if err != nil {
+		return false, err
+	}
+
+	if !canDelete {
+		return false, nil
+	}
+
+	if util.Contains(roles, users.RolePicturesModer) {
+		hasVote, err := s.repository.HasVote(ctx, picture.ID, userID)
+		if err != nil {
+			return false, err
+		}
+
+		if hasVote {
+			acceptVotes, err := s.repository.PositiveVotesCount(ctx, picture.ID)
+			if err != nil {
+				return false, err
+			}
+
+			deleteVotes, err := s.repository.NegativeVotesCount(ctx, picture.ID)
+			if err != nil {
+				return false, err
+			}
+
+			return deleteVotes > acceptVotes, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (s *PicturesGRPCServer) canReplace(
+	picture, replacedPicture *schema.PictureRow,
+	roles []string,
+) bool {
+	return (picture.Status == schema.PictureStatusAccepted ||
+		picture.Status == schema.PictureStatusInbox) &&
+		(replacedPicture.Status == schema.PictureStatusRemoving ||
+			replacedPicture.Status == schema.PictureStatusInbox ||
+			replacedPicture.Status == schema.PictureStatusAccepted) &&
+		util.Contains(roles, users.RolePicturesModer)
+}
+
+func (s *PicturesGRPCServer) resolveTimezone(
+	ctx context.Context,
+	userID int64,
+	lang string,
+) (*time.Location, error) {
+	var (
+		err      error
+		timezone = ""
+	)
+
+	if userID > 0 {
+		user, err := s.userRepository.User(
+			ctx,
+			&query.UserListOptions{ID: userID},
+			users.UserFields{Timezone: true},
+			users.OrderByNone,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		timezone = user.Timezone
+	}
+
+	if timezone == "" {
+		timezone, err = s.hostManager.TimezoneByLanguage(lang)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	loc, err := s.LoadLocation(timezone)
+	if err != nil {
+		return nil, err
+	}
+
+	return loc, nil
+}
+
+func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, userID int64) error {
+	const acceptedInDaysMax = 3
+
+	inOptions := in.GetOptions()
+	fields := in.GetFields()
+
+	if inOptions.GetStatus() == PictureStatus_PICTURE_STATUS_INBOX && userID == 0 {
+		return status.Error(codes.PermissionDenied, "inbox not allowed anonymously")
+	}
+
+	restricted := !isModer && inOptions.GetPictureItem().GetItemId() == 0 &&
+		inOptions.GetPictureItem().GetItemParentCacheAncestor().GetItemId() == 0 &&
+		inOptions.GetPictureItem().GetItemParentCacheAncestor().GetParentId() == 0 &&
+		inOptions.GetPictureItem().GetPerspectiveId() == 0 &&
+		inOptions.GetOwnerId() == 0 && inOptions.GetAcceptedInDays() < acceptedInDaysMax &&
+		inOptions.GetAddDate() == nil && inOptions.GetId() == 0 && inOptions.GetIdentity() == ""
+	if restricted {
+		return status.Error(
+			codes.PermissionDenied,
+			"PictureItem.ItemParentCacheAncestor.ItemID or OwnerID is required",
+		)
+	}
+
+	restricted = !isModer && (inOptions.GetHasNoComments() || inOptions.GetCommentTopic() != nil ||
+		inOptions.GetPictureItem().GetItemVehicleType() != nil || inOptions.GetHasSpecialName() ||
+		inOptions.GetDfDistance() != nil || inOptions.GetPictureModerVote() != nil ||
+		inOptions.GetHasNoPictureModerVote() || inOptions.GetHasNoReplacePicture() ||
+		inOptions.GetReplacePicture() != nil || inOptions.GetHasNoPictureItem() || inOptions.GetHasNoPoint() ||
+		inOptions.GetAddedFrom() != nil || inOptions.GetPictureItem().GetExcludeAncestorOrSelfId() != 0)
+	if restricted {
+		return status.Error(codes.PermissionDenied, "PermissionDenied")
+	}
+
+	restricted = !isModer && (fields.GetAcceptedCount() || fields.GetExif() || fields.GetIsLast() ||
+		fields.GetSpecialName() || fields.GetSiblings() != nil)
+	if restricted {
+		return status.Error(codes.PermissionDenied, "PermissionDenied")
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) inboxBrands(ctx context.Context, lang string) ([]*InboxBrand, error) {
+	rows, _, err := s.itemRepository.List(ctx, &query.ItemListOptions{
+		Language:   lang,
+		SortByName: true,
+		TypeID:     []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			PictureItemsByItemID: &query.PictureItemListOptions{
+				Pictures: &query.PictureListOptions{
+					Status: schema.PictureStatusInbox,
+				},
+			},
+		},
+	}, &items.ItemFields{NameOnly: true}, items.OrderByName, false)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]*InboxBrand, 0, len(rows))
+	for _, row := range rows {
+		res = append(res, &InboxBrand{
+			Id:   row.ID,
+			Name: row.NameOnly,
+		})
+	}
+
+	return res, nil
+}
+
+func (s *PicturesGRPCServer) newboxGroups(
+	ctx context.Context,
+	acceptDate civil.Date,
+	page uint32,
+	timezone *time.Location,
+	lang string,
+	userCtx UserContext,
+) ([]*NewboxGroup, *util.Pages, error) {
+	pictureFields := PictureFields{
+		ThumbMedium:   true,
+		NameText:      true,
+		NameHtml:      true,
+		Votes:         true,
+		Views:         true,
+		CommentsCount: true,
+	}
+	repoPictureFields := convertPictureFields(&pictureFields)
+
+	itemPictureFields := PictureFields{
+		ThumbMedium: true,
+		NameText:    true,
+		NameHtml:    true,
+	}
+	repoItemPictureFields := convertPictureFields(&itemPictureFields)
+
+	itemFields := ItemFields{
+		NameHtml:    true,
+		NameDefault: true,
+		Description: true,
+		Design:      true,
+		SpecsRoute:  true,
+		Categories: &ItemsRequest{
+			Fields: &ItemFields{NameHtml: true},
+		},
+		Twins: &ItemsRequest{},
+	}
+	repoItemFields := convertItemFields(&itemFields)
+
+	rows, pages, err := s.repository.Pictures(ctx, &query.PictureListOptions{
+		Status:     schema.PictureStatusAccepted,
+		Limit:      newboxPicturesPerPage,
+		Page:       page,
+		AcceptDate: &acceptDate,
+		Timezone:   timezone,
+	}, repoPictureFields, pictures.OrderByAcceptDatetimeDesc, true)
+	if err != nil {
+		return nil, nil, fmt.Errorf("repository.Pictures(): %w", err)
+	}
+
+	groupsData, err := s.splitPictures(ctx, rows)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	groups := make([]*NewboxGroup, 0)
+
+	for _, groupData := range groupsData {
+		group := &NewboxGroup{
+			Type: groupData.Type,
+		}
+
+		if groupData.Type == newboxGroupTypeItem {
+			itemRow, err := s.itemRepository.Item(
+				ctx,
+				&query.ItemListOptions{ItemID: groupData.ItemID},
+				repoItemFields,
+			)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			group.Item, err = s.itemExtractor.Extract(ctx, itemRow, &itemFields, lang, userCtx)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			ids := make([]int64, 0)
+			for _, picture := range groupData.Pictures {
+				ids = append(ids, picture.ID)
+			}
+
+			pictureRows, _, err := s.repository.Pictures(ctx, &query.PictureListOptions{
+				IDs:    ids,
+				Status: schema.PictureStatusAccepted,
+				PictureItem: &query.PictureItemListOptions{
+					ItemID: groupData.ItemID,
+				},
+				Limit: newboxPicturesPerLine,
+			}, repoItemPictureFields, pictures.OrderByAcceptDatetimeDesc, false)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			group.Pictures, err = s.pictureExtractor.ExtractRows(
+				ctx,
+				pictureRows,
+				&itemPictureFields,
+				lang,
+				userCtx,
+			)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			totalPictures, err := s.repository.Count(ctx, &query.PictureListOptions{
+				Status: schema.PictureStatusAccepted,
+				PictureItem: &query.PictureItemListOptions{
+					ItemID: groupData.ItemID,
+					TypeID: schema.PictureItemTypeContent,
+				},
+				AcceptDate: &acceptDate,
+				Timezone:   timezone,
+			})
+			if err != nil {
+				return nil, nil, err
+			}
+
+			group.TotalPictures = int32(totalPictures) //nolint: gosec
+		} else {
+			group.Pictures, err = s.pictureExtractor.ExtractRows(ctx, groupData.Pictures, &pictureFields, lang, userCtx)
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+
+		groups = append(groups, group)
+	}
+
+	return groups, pages, nil
+}
+
+func (s *PicturesGRPCServer) splitPictures(
+	ctx context.Context, pictureRows []*schema.PictureRow,
+) ([]*NewboxGroupDraft, error) {
+	res := make([]*NewboxGroupDraft, 0)
+
+	for _, pictureRow := range pictureRows {
+		pictureItems, err := s.repository.PictureItems(ctx, &query.PictureItemListOptions{
+			PictureID: pictureRow.ID,
+			TypeID:    schema.PictureItemTypeContent,
+		}, pictures.PictureItemOrderByNone, 0)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(pictureItems) != 1 {
+			res = append(res, &NewboxGroupDraft{
+				Type:    newboxGroupTypePicture,
+				Picture: pictureRow,
+			})
+		} else {
+			itemID := pictureItems[0].ItemID
+
+			found := false
+
+			for idx := range res {
+				if res[idx].Type == newboxGroupTypeItem && res[idx].ItemID == itemID {
+					res[idx].Pictures = append(res[idx].Pictures, pictureRow)
+					found = true
+
+					break
+				}
+			}
+
+			if !found {
+				res = append(res, &NewboxGroupDraft{
+					ItemID:   itemID,
+					Type:     newboxGroupTypeItem,
+					Pictures: []*schema.PictureRow{pictureRow},
+				})
+			}
+		}
+	}
+
+	// convert single picture items to picture record
+	// merge sibling single items
+	return s.mergeSiblings(s.expandSmallItems(res)), nil
+}
+
+func (s *PicturesGRPCServer) mergeSiblings(groups []*NewboxGroupDraft) []*NewboxGroupDraft {
+	result := make([]*NewboxGroupDraft, 0)
+	picturesBuffer := make([]*schema.PictureRow, 0)
+
+	for _, item := range groups {
+		if item.Type == newboxGroupTypeItem {
+			if len(picturesBuffer) > 0 {
+				result = append(result, &NewboxGroupDraft{
+					Type:     newboxGroupTypePictures,
+					Pictures: picturesBuffer,
+				})
+				picturesBuffer = make([]*schema.PictureRow, 0)
+			}
+
+			result = append(result, item)
+		} else {
+			picturesBuffer = append(picturesBuffer, item.Picture)
+		}
+	}
+
+	if len(picturesBuffer) > 0 {
+		result = append(result, &NewboxGroupDraft{
+			Type:     newboxGroupTypePictures,
+			Pictures: picturesBuffer,
+		})
+	}
+
+	return result
+}
+
+func (s *PicturesGRPCServer) expandSmallItems(items []*NewboxGroupDraft) []*NewboxGroupDraft {
+	result := make([]*NewboxGroupDraft, 0)
+
+	for _, item := range items {
+		if item.Type != newboxGroupTypeItem {
+			result = append(result, item)
+
+			continue
+		}
+
+		if len(item.Pictures) <= 2 {
+			for _, picture := range item.Pictures {
+				result = append(result, &NewboxGroupDraft{
+					Type:    newboxGroupTypePicture,
+					Picture: picture,
+				})
+			}
+		} else {
+			result = append(result, item)
+		}
+	}
+
+	return result
 }
 
 func (s *PicturesGRPCServer) getPicturePage(

@@ -13,6 +13,7 @@ import (
 
 type LogGRPCServer struct {
 	UnimplementedLogServer
+
 	repository *log.Repository
 	auth       *Auth
 }

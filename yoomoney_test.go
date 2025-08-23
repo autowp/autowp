@@ -15,7 +15,7 @@ import (
 func TestYoomoneyWebhookInvalidLabel(t *testing.T) {
 	t.Parallel()
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	itemOfDayRepository := itemofday.NewRepository(goquDB)
@@ -46,7 +46,7 @@ func TestYoomoneyWebhookInvalidLabel(t *testing.T) {
 func TestYoomoneyWebhookHappyPath(t *testing.T) {
 	t.Parallel()
 
-	goquDB, err := cnt.GoquDB()
+	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
 	ctx := t.Context()

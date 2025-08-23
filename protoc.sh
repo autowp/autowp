@@ -9,6 +9,13 @@
 #            -I=. \
 #            spec.proto
 
-protoc --proto_path=$GOPATH/pkg/mod/github.com/googleapis/googleapis@v0.0.0-20250317144420-2d314e62e3e9/ \
+protoc --proto_path="$GOPATH/pkg/mod/github.com/googleapis/googleapis@v0.0.0-20250317144420-2d314e62e3e9/" \
+       --proto_path="$GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-gateway/v2@v2.27.1" \
        --proto_path=. \
-       --go_out=. --go_opt=paths=source_relative  --go-grpc_out=. --go-grpc_opt=paths=source_relative spec.proto
+       --grpc-gateway_out=. \
+       --grpc-gateway_opt paths=source_relative \
+       --go_out=. \
+       --go_opt=paths=source_relative \
+       --go-grpc_out=. \
+       --go-grpc_opt=paths=source_relative \
+       spec.proto

@@ -24,6 +24,7 @@ const (
 
 type RatingGRPCServer struct {
 	UnimplementedRatingServer
+
 	picturesRepository *pictures.Repository
 	userRepository     *users.Repository
 	itemsRepository    *items.Repository

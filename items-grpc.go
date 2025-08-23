@@ -88,6 +88,7 @@ func (s *ItemParent) Validate() ([]*errdetails.BadRequest_FieldViolation, error)
 
 type ItemsGRPCServer struct {
 	UnimplementedItemsServer
+
 	repository            *items.Repository
 	db                    *goqu.Database
 	auth                  *Auth
@@ -1551,44 +1552,6 @@ func (s *ItemsGRPCServer) GetNewItems(
 	}, nil
 }
 
-func (s *ItemsGRPCServer) formatterOptions(row *items.Item) items.ItemNameFormatterOptions {
-	return items.ItemNameFormatterOptions{
-		BeginModelYear:         util.NullInt32ToScalar(row.BeginModelYear),
-		EndModelYear:           util.NullInt32ToScalar(row.EndModelYear),
-		BeginModelYearFraction: util.NullStringToString(row.BeginModelYearFraction),
-		EndModelYearFraction:   util.NullStringToString(row.EndModelYearFraction),
-		Spec:                   row.SpecShortName,
-		SpecFull:               row.SpecName,
-		Body:                   row.Body,
-		Name:                   row.NameOnly,
-		BeginYear:              util.NullInt32ToScalar(row.BeginYear),
-		EndYear:                util.NullInt32ToScalar(row.EndYear),
-		Today:                  util.NullBoolToBoolPtr(row.Today),
-		BeginMonth:             util.NullInt16ToScalar(row.BeginMonth),
-		EndMonth:               util.NullInt16ToScalar(row.EndMonth),
-	}
-}
-
-func (s *ItemsGRPCServer) formatItemNameText(row *items.Item, lang string) (string, error) {
-	if row == nil {
-		return "", nil
-	}
-
-	nameFormatter := items.NewItemNameFormatter(s.i18n)
-
-	return nameFormatter.FormatText(s.formatterOptions(row), lang)
-}
-
-func (s *ItemsGRPCServer) formatItemNameHTML(row *items.Item, lang string) (string, error) {
-	if row == nil {
-		return "", nil
-	}
-
-	nameFormatter := items.NewItemNameFormatter(s.i18n)
-
-	return nameFormatter.FormatHTML(s.formatterOptions(row), lang)
-}
-
 func (s *ItemsGRPCServer) CreateItemParent(
 	ctx context.Context,
 	in *ItemParent,
@@ -1819,70 +1782,6 @@ func (s *ItemsGRPCServer) DeleteItemParent(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *ItemsGRPCServer) notifyItemParentSubscribers(
-	ctx context.Context, item, parent *items.Item, userID int64, messageID string,
-) error {
-	falseRef := false
-
-	subscribers, _, err := s.usersRepository.Users(ctx, &query.UserListOptions{
-		Deleted: &falseRef,
-		ItemSubscribe: &query.UserItemSubscribeListOptions{
-			ItemIDs: []int64{item.ID, parent.ID},
-		},
-		ExcludeIDs: []int64{userID},
-	}, users.UserFields{}, users.OrderByNone)
-	if err != nil {
-		return err
-	}
-
-	author, err := s.usersRepository.User(
-		ctx,
-		&query.UserListOptions{ID: userID},
-		users.UserFields{},
-		users.OrderByNone,
-	)
-	if err != nil {
-		return err
-	}
-
-	for _, subscriber := range subscribers {
-		uri, err := s.hostManager.URIByLanguage(subscriber.Language)
-		if err != nil {
-			return err
-		}
-
-		itemNameText, err := s.formatItemNameText(item, subscriber.Language)
-		if err != nil {
-			return err
-		}
-
-		parentNameText, err := s.formatItemNameText(parent, subscriber.Language)
-		if err != nil {
-			return err
-		}
-
-		err = s.messagingRepository.CreateMessageFromTemplate(
-			ctx,
-			0,
-			subscriber.ID,
-			messageID,
-			map[string]interface{}{
-				"UserURL":            frontend.UserURL(uri, author.ID, author.Identity),
-				"ItemName":           itemNameText,
-				"ItemModerURL":       frontend.ItemModerURL(uri, item.ID),
-				"ParentItemName":     parentNameText,
-				"ParentItemModerURL": frontend.ItemModerURL(uri, parent.ID),
-			},
-			subscriber.Language,
-		)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (s *ItemsGRPCServer) MoveItemParent(
 	ctx context.Context,
 	in *MoveItemParentRequest,
@@ -2029,50 +1928,6 @@ func (s *ItemsGRPCServer) SetUserItemSubscription(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *ItemsGRPCServer) notifyItemSubscribers(
-	ctx context.Context, itemIDs []int64, excludeUserID int64, messageID string,
-	templateData func(*url.URL, string) (map[string]interface{}, error),
-) error {
-	falseRef := false
-
-	subscribers, _, err := s.usersRepository.Users(ctx, &query.UserListOptions{
-		Deleted: &falseRef,
-		ItemSubscribe: &query.UserItemSubscribeListOptions{
-			ItemIDs: itemIDs,
-		},
-		ExcludeIDs: []int64{excludeUserID},
-	}, users.UserFields{}, users.OrderByNone)
-	if err != nil {
-		return err
-	}
-
-	for _, subscriber := range subscribers {
-		uri, err := s.hostManager.URIByLanguage(subscriber.Language)
-		if err != nil {
-			return err
-		}
-
-		data, err := templateData(uri, subscriber.Language)
-		if err != nil {
-			return err
-		}
-
-		err = s.messagingRepository.CreateMessageFromTemplate(
-			ctx,
-			0,
-			subscriber.ID,
-			messageID,
-			data,
-			subscriber.Language,
-		)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (s *ItemsGRPCServer) GetBrandSections(
 	ctx context.Context, in *GetBrandSectionsRequest,
 ) (*APIBrandSections, error) {
@@ -2095,253 +1950,11 @@ func (s *ItemsGRPCServer) GetBrandSections(
 	}, nil
 }
 
-func (s *ItemsGRPCServer) brandSections(
-	ctx context.Context, lang string, brandID int64, brandCatname string,
-) ([]*APIBrandSection, error) {
-	// create groups array
-	sections, err := s.carSections(ctx, lang, brandID, brandCatname)
-	if err != nil {
-		return nil, fmt.Errorf("carSections(): %w", err)
-	}
-
-	otherGroups, err := s.otherGroups(ctx, brandID, brandCatname, lang)
-	if err != nil {
-		return nil, fmt.Errorf("otherGroups(): %w", err)
-	}
-
-	return append(
-		sections,
-		&APIBrandSection{
-			Name:       "Other",
-			RouterLink: nil,
-			Groups:     otherGroups,
-		},
-	), nil
-}
-
-func (s *ItemsGRPCServer) otherGroups(
-	ctx context.Context, brandID int64, brandCatname string, lang string,
-) ([]*APIBrandSection, error) {
-	var groups []*APIBrandSection
-
-	// concepts
-	hasConcepts, err := s.repository.Exists(ctx, query.ItemListOptions{
-		ItemParentCacheAncestor: &query.ItemParentCacheListOptions{
-			ParentID: brandID,
-		},
-		IsConcept: true,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	localizer := s.i18n.Localizer(lang)
-
-	if hasConcepts {
-		translated, err := localizer.Localize(&i18n.LocalizeConfig{
-			DefaultMessage: &i18n.Message{
-				ID: "concepts and prototypes",
-			},
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		groups = append(groups, &APIBrandSection{
-			RouterLink: frontend.BrandConceptsRoute(brandCatname),
-			Name:       translated,
-		})
-	}
-
-	groupTypes := []struct {
-		PerspectiveID        int32
-		ExcludePerspectiveID []int32
-		Catname              string
-		Name                 string
-	}{
-		{
-			PerspectiveID: items.PerspectiveIDLogo,
-			Catname:       frontend.BrandLogotypes,
-			Name:          "logotypes",
-		},
-		{
-			PerspectiveID: items.PerspectiveIDMixed,
-			Catname:       frontend.BrandMixed,
-			Name:          "mixed",
-		},
-		{
-			ExcludePerspectiveID: []int32{items.PerspectiveIDLogo, items.PerspectiveIDMixed},
-			Catname:              frontend.BrandOther,
-			Name:                 "unsorted",
-		},
-	}
-
-	for _, groupType := range groupTypes {
-		picturesCount, err := s.picturesRepository.Count(ctx, &query.PictureListOptions{
-			Status: schema.PictureStatusAccepted,
-			PictureItem: &query.PictureItemListOptions{
-				ItemID:               brandID,
-				PerspectiveID:        groupType.PerspectiveID,
-				ExcludePerspectiveID: groupType.ExcludePerspectiveID,
-			},
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		if picturesCount > 0 {
-			translated, err := localizer.Localize(&i18n.LocalizeConfig{
-				DefaultMessage: &i18n.Message{
-					ID: groupType.Name,
-				},
-			})
-			if err != nil {
-				return nil, err
-			}
-
-			groups = append(groups, &APIBrandSection{
-				RouterLink: frontend.BrandGroupRoute(brandCatname, groupType.Catname),
-				Name:       translated,
-				Count:      int32(picturesCount), //nolint: gosec
-			})
-		}
-	}
-
-	return groups, nil
-}
-
 type SectionPreset struct {
 	Name       string
 	CarTypeID  int64
 	ItemTypeID []schema.ItemTableItemTypeID
 	RouterLink []string
-}
-
-func (s *ItemsGRPCServer) carSections(
-	ctx context.Context, lang string, brandID int64, brandCatname string,
-) ([]*APIBrandSection, error) {
-	sectionsPresets := []SectionPreset{
-		{
-			ItemTypeID: []schema.ItemTableItemTypeID{
-				schema.ItemTableItemTypeIDVehicle,
-				schema.ItemTableItemTypeIDBrand,
-			},
-		},
-		{
-			Name:      "catalogue/section/moto",
-			CarTypeID: items.VehicleTypeIDMoto,
-			ItemTypeID: []schema.ItemTableItemTypeID{
-				schema.ItemTableItemTypeIDVehicle,
-				schema.ItemTableItemTypeIDBrand,
-			},
-		},
-		{
-			Name:      "catalogue/section/buses",
-			CarTypeID: items.VehicleTypeIDBus,
-			ItemTypeID: []schema.ItemTableItemTypeID{
-				schema.ItemTableItemTypeIDVehicle,
-				schema.ItemTableItemTypeIDBrand,
-			},
-		},
-		{
-			Name:      "catalogue/section/trucks",
-			CarTypeID: items.VehicleTypeIDTruck,
-			ItemTypeID: []schema.ItemTableItemTypeID{
-				schema.ItemTableItemTypeIDVehicle,
-				schema.ItemTableItemTypeIDBrand,
-			},
-		},
-		{
-			Name:      "catalogue/section/tractors",
-			CarTypeID: items.VehicleTypeIDTractor,
-			ItemTypeID: []schema.ItemTableItemTypeID{
-				schema.ItemTableItemTypeIDVehicle,
-				schema.ItemTableItemTypeIDBrand,
-			},
-		},
-		{
-			Name:       "catalogue/section/engines",
-			ItemTypeID: []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDEngine},
-			RouterLink: frontend.BrandEnginesRoute(brandCatname),
-		},
-	}
-
-	sections := make([]*APIBrandSection, 0, len(sectionsPresets))
-
-	for _, sectionsPreset := range sectionsPresets {
-		sectionGroups, err := s.carSectionGroups(
-			ctx,
-			lang,
-			brandID,
-			brandCatname,
-			sectionsPreset,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("carSectionGroups(): %w", err)
-		}
-
-		sections = append(sections, &APIBrandSection{
-			Name:       sectionsPreset.Name,
-			RouterLink: sectionsPreset.RouterLink,
-			Groups:     sectionGroups,
-		})
-	}
-
-	return sections, nil
-}
-
-func (s *ItemsGRPCServer) carSectionGroups(
-	ctx context.Context,
-	lang string,
-	brandID int64,
-	brandCatname string,
-	section SectionPreset,
-) ([]*APIBrandSection, error) {
-	var (
-		err  error
-		rows []*items.ItemParent
-	)
-
-	if section.CarTypeID > 0 {
-		rows, _, err = s.repository.ItemParents(ctx, &query.ItemParentListOptions{
-			ParentID: brandID,
-			ChildItems: &query.ItemListOptions{
-				TypeID:                section.ItemTypeID,
-				IsNotConcept:          true,
-				VehicleTypeAncestorID: section.CarTypeID,
-			},
-			Language: lang,
-		}, items.ItemParentFields{Name: true}, items.ItemParentOrderByName)
-		if err != nil {
-			return nil, fmt.Errorf("ItemParents(): %w", err)
-		}
-	} else {
-		rows, _, err = s.repository.ItemParents(ctx, &query.ItemParentListOptions{
-			ParentID: brandID,
-			ChildItems: &query.ItemListOptions{
-				TypeID:       section.ItemTypeID,
-				IsNotConcept: true,
-				ExcludeVehicleTypeAncestorID: []int64{
-					items.VehicleTypeIDMoto, items.VehicleTypeIDTractor, items.VehicleTypeIDTruck, items.VehicleTypeIDBus,
-				},
-			},
-			Language: lang,
-		}, items.ItemParentFields{Name: true}, items.ItemParentOrderByName)
-		if err != nil {
-			return nil, fmt.Errorf("ItemParents(): %w", err)
-		}
-	}
-
-	groups := make([]*APIBrandSection, 0, len(rows))
-
-	for _, row := range rows {
-		groups = append(groups, &APIBrandSection{
-			RouterLink: frontend.BrandItemRoute(brandCatname, row.Catname),
-			Name:       row.Name,
-		})
-	}
-
-	return groups, nil
 }
 
 func (s *ItemsGRPCServer) GetItemParent(
@@ -3284,6 +2897,425 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 	return &emptypb.Empty{}, nil
 }
 
+func (s *ItemsGRPCServer) GetTree(ctx context.Context, in *GetTreeRequest) (*APITreeItem, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
+		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+	}
+
+	if in.GetId() == 0 {
+		return nil, status.Error(codes.InvalidArgument, "id is zero")
+	}
+
+	item, err := s.repository.Item(ctx, &query.ItemListOptions{ItemID: in.GetId()}, nil)
+	if err != nil {
+		if errors.Is(err, items.ErrItemNotFound) {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	res, err := s.carTreeWalk(ctx, item, in.GetLanguage(), schema.ItemParentTypeDefault)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return res, nil
+}
+
+func (s *ItemsGRPCServer) formatterOptions(row *items.Item) items.ItemNameFormatterOptions {
+	return items.ItemNameFormatterOptions{
+		BeginModelYear:         util.NullInt32ToScalar(row.BeginModelYear),
+		EndModelYear:           util.NullInt32ToScalar(row.EndModelYear),
+		BeginModelYearFraction: util.NullStringToString(row.BeginModelYearFraction),
+		EndModelYearFraction:   util.NullStringToString(row.EndModelYearFraction),
+		Spec:                   row.SpecShortName,
+		SpecFull:               row.SpecName,
+		Body:                   row.Body,
+		Name:                   row.NameOnly,
+		BeginYear:              util.NullInt32ToScalar(row.BeginYear),
+		EndYear:                util.NullInt32ToScalar(row.EndYear),
+		Today:                  util.NullBoolToBoolPtr(row.Today),
+		BeginMonth:             util.NullInt16ToScalar(row.BeginMonth),
+		EndMonth:               util.NullInt16ToScalar(row.EndMonth),
+	}
+}
+
+func (s *ItemsGRPCServer) formatItemNameText(row *items.Item, lang string) (string, error) {
+	if row == nil {
+		return "", nil
+	}
+
+	nameFormatter := items.NewItemNameFormatter(s.i18n)
+
+	return nameFormatter.FormatText(s.formatterOptions(row), lang)
+}
+
+func (s *ItemsGRPCServer) formatItemNameHTML(row *items.Item, lang string) (string, error) {
+	if row == nil {
+		return "", nil
+	}
+
+	nameFormatter := items.NewItemNameFormatter(s.i18n)
+
+	return nameFormatter.FormatHTML(s.formatterOptions(row), lang)
+}
+
+func (s *ItemsGRPCServer) notifyItemParentSubscribers(
+	ctx context.Context, item, parent *items.Item, userID int64, messageID string,
+) error {
+	falseRef := false
+
+	subscribers, _, err := s.usersRepository.Users(ctx, &query.UserListOptions{
+		Deleted: &falseRef,
+		ItemSubscribe: &query.UserItemSubscribeListOptions{
+			ItemIDs: []int64{item.ID, parent.ID},
+		},
+		ExcludeIDs: []int64{userID},
+	}, users.UserFields{}, users.OrderByNone)
+	if err != nil {
+		return err
+	}
+
+	author, err := s.usersRepository.User(
+		ctx,
+		&query.UserListOptions{ID: userID},
+		users.UserFields{},
+		users.OrderByNone,
+	)
+	if err != nil {
+		return err
+	}
+
+	for _, subscriber := range subscribers {
+		uri, err := s.hostManager.URIByLanguage(subscriber.Language)
+		if err != nil {
+			return err
+		}
+
+		itemNameText, err := s.formatItemNameText(item, subscriber.Language)
+		if err != nil {
+			return err
+		}
+
+		parentNameText, err := s.formatItemNameText(parent, subscriber.Language)
+		if err != nil {
+			return err
+		}
+
+		err = s.messagingRepository.CreateMessageFromTemplate(
+			ctx,
+			0,
+			subscriber.ID,
+			messageID,
+			map[string]interface{}{
+				"UserURL":            frontend.UserURL(uri, author.ID, author.Identity),
+				"ItemName":           itemNameText,
+				"ItemModerURL":       frontend.ItemModerURL(uri, item.ID),
+				"ParentItemName":     parentNameText,
+				"ParentItemModerURL": frontend.ItemModerURL(uri, parent.ID),
+			},
+			subscriber.Language,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *ItemsGRPCServer) notifyItemSubscribers(
+	ctx context.Context, itemIDs []int64, excludeUserID int64, messageID string,
+	templateData func(*url.URL, string) (map[string]interface{}, error),
+) error {
+	falseRef := false
+
+	subscribers, _, err := s.usersRepository.Users(ctx, &query.UserListOptions{
+		Deleted: &falseRef,
+		ItemSubscribe: &query.UserItemSubscribeListOptions{
+			ItemIDs: itemIDs,
+		},
+		ExcludeIDs: []int64{excludeUserID},
+	}, users.UserFields{}, users.OrderByNone)
+	if err != nil {
+		return err
+	}
+
+	for _, subscriber := range subscribers {
+		uri, err := s.hostManager.URIByLanguage(subscriber.Language)
+		if err != nil {
+			return err
+		}
+
+		data, err := templateData(uri, subscriber.Language)
+		if err != nil {
+			return err
+		}
+
+		err = s.messagingRepository.CreateMessageFromTemplate(
+			ctx,
+			0,
+			subscriber.ID,
+			messageID,
+			data,
+			subscriber.Language,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *ItemsGRPCServer) brandSections(
+	ctx context.Context, lang string, brandID int64, brandCatname string,
+) ([]*APIBrandSection, error) {
+	// create groups array
+	sections, err := s.carSections(ctx, lang, brandID, brandCatname)
+	if err != nil {
+		return nil, fmt.Errorf("carSections(): %w", err)
+	}
+
+	otherGroups, err := s.otherGroups(ctx, brandID, brandCatname, lang)
+	if err != nil {
+		return nil, fmt.Errorf("otherGroups(): %w", err)
+	}
+
+	return append(
+		sections,
+		&APIBrandSection{
+			Name:       "Other",
+			RouterLink: nil,
+			Groups:     otherGroups,
+		},
+	), nil
+}
+
+func (s *ItemsGRPCServer) otherGroups(
+	ctx context.Context, brandID int64, brandCatname string, lang string,
+) ([]*APIBrandSection, error) {
+	var groups []*APIBrandSection
+
+	// concepts
+	hasConcepts, err := s.repository.Exists(ctx, query.ItemListOptions{
+		ItemParentCacheAncestor: &query.ItemParentCacheListOptions{
+			ParentID: brandID,
+		},
+		IsConcept: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	localizer := s.i18n.Localizer(lang)
+
+	if hasConcepts {
+		translated, err := localizer.Localize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID: "concepts and prototypes",
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		groups = append(groups, &APIBrandSection{
+			RouterLink: frontend.BrandConceptsRoute(brandCatname),
+			Name:       translated,
+		})
+	}
+
+	groupTypes := []struct {
+		PerspectiveID        int32
+		ExcludePerspectiveID []int32
+		Catname              string
+		Name                 string
+	}{
+		{
+			PerspectiveID: items.PerspectiveIDLogo,
+			Catname:       frontend.BrandLogotypes,
+			Name:          "logotypes",
+		},
+		{
+			PerspectiveID: items.PerspectiveIDMixed,
+			Catname:       frontend.BrandMixed,
+			Name:          "mixed",
+		},
+		{
+			ExcludePerspectiveID: []int32{items.PerspectiveIDLogo, items.PerspectiveIDMixed},
+			Catname:              frontend.BrandOther,
+			Name:                 "unsorted",
+		},
+	}
+
+	for _, groupType := range groupTypes {
+		picturesCount, err := s.picturesRepository.Count(ctx, &query.PictureListOptions{
+			Status: schema.PictureStatusAccepted,
+			PictureItem: &query.PictureItemListOptions{
+				ItemID:               brandID,
+				PerspectiveID:        groupType.PerspectiveID,
+				ExcludePerspectiveID: groupType.ExcludePerspectiveID,
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		if picturesCount > 0 {
+			translated, err := localizer.Localize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID: groupType.Name,
+				},
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			groups = append(groups, &APIBrandSection{
+				RouterLink: frontend.BrandGroupRoute(brandCatname, groupType.Catname),
+				Name:       translated,
+				Count:      int32(picturesCount), //nolint: gosec
+			})
+		}
+	}
+
+	return groups, nil
+}
+
+func (s *ItemsGRPCServer) carSections(
+	ctx context.Context, lang string, brandID int64, brandCatname string,
+) ([]*APIBrandSection, error) {
+	sectionsPresets := []SectionPreset{
+		{
+			ItemTypeID: []schema.ItemTableItemTypeID{
+				schema.ItemTableItemTypeIDVehicle,
+				schema.ItemTableItemTypeIDBrand,
+			},
+		},
+		{
+			Name:      "catalogue/section/moto",
+			CarTypeID: items.VehicleTypeIDMoto,
+			ItemTypeID: []schema.ItemTableItemTypeID{
+				schema.ItemTableItemTypeIDVehicle,
+				schema.ItemTableItemTypeIDBrand,
+			},
+		},
+		{
+			Name:      "catalogue/section/buses",
+			CarTypeID: items.VehicleTypeIDBus,
+			ItemTypeID: []schema.ItemTableItemTypeID{
+				schema.ItemTableItemTypeIDVehicle,
+				schema.ItemTableItemTypeIDBrand,
+			},
+		},
+		{
+			Name:      "catalogue/section/trucks",
+			CarTypeID: items.VehicleTypeIDTruck,
+			ItemTypeID: []schema.ItemTableItemTypeID{
+				schema.ItemTableItemTypeIDVehicle,
+				schema.ItemTableItemTypeIDBrand,
+			},
+		},
+		{
+			Name:      "catalogue/section/tractors",
+			CarTypeID: items.VehicleTypeIDTractor,
+			ItemTypeID: []schema.ItemTableItemTypeID{
+				schema.ItemTableItemTypeIDVehicle,
+				schema.ItemTableItemTypeIDBrand,
+			},
+		},
+		{
+			Name:       "catalogue/section/engines",
+			ItemTypeID: []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDEngine},
+			RouterLink: frontend.BrandEnginesRoute(brandCatname),
+		},
+	}
+
+	sections := make([]*APIBrandSection, 0, len(sectionsPresets))
+
+	for _, sectionsPreset := range sectionsPresets {
+		sectionGroups, err := s.carSectionGroups(
+			ctx,
+			lang,
+			brandID,
+			brandCatname,
+			sectionsPreset,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("carSectionGroups(): %w", err)
+		}
+
+		sections = append(sections, &APIBrandSection{
+			Name:       sectionsPreset.Name,
+			RouterLink: sectionsPreset.RouterLink,
+			Groups:     sectionGroups,
+		})
+	}
+
+	return sections, nil
+}
+
+func (s *ItemsGRPCServer) carSectionGroups(
+	ctx context.Context,
+	lang string,
+	brandID int64,
+	brandCatname string,
+	section SectionPreset,
+) ([]*APIBrandSection, error) {
+	var (
+		err  error
+		rows []*items.ItemParent
+	)
+
+	if section.CarTypeID > 0 {
+		rows, _, err = s.repository.ItemParents(ctx, &query.ItemParentListOptions{
+			ParentID: brandID,
+			ChildItems: &query.ItemListOptions{
+				TypeID:                section.ItemTypeID,
+				IsNotConcept:          true,
+				VehicleTypeAncestorID: section.CarTypeID,
+			},
+			Language: lang,
+		}, items.ItemParentFields{Name: true}, items.ItemParentOrderByName)
+		if err != nil {
+			return nil, fmt.Errorf("ItemParents(): %w", err)
+		}
+	} else {
+		rows, _, err = s.repository.ItemParents(ctx, &query.ItemParentListOptions{
+			ParentID: brandID,
+			ChildItems: &query.ItemListOptions{
+				TypeID:       section.ItemTypeID,
+				IsNotConcept: true,
+				ExcludeVehicleTypeAncestorID: []int64{
+					items.VehicleTypeIDMoto, items.VehicleTypeIDTractor, items.VehicleTypeIDTruck, items.VehicleTypeIDBus,
+				},
+			},
+			Language: lang,
+		}, items.ItemParentFields{Name: true}, items.ItemParentOrderByName)
+		if err != nil {
+			return nil, fmt.Errorf("ItemParents(): %w", err)
+		}
+	}
+
+	groups := make([]*APIBrandSection, 0, len(rows))
+
+	for _, row := range rows {
+		groups = append(groups, &APIBrandSection{
+			RouterLink: frontend.BrandItemRoute(brandCatname, row.Catname),
+			Name:       row.Name,
+		})
+	}
+
+	return groups, nil
+}
+
 func (s *ItemsGRPCServer) translateBool(value bool, lang string) (string, error) {
 	localizer := s.i18n.Localizer(lang)
 
@@ -3797,35 +3829,4 @@ func (s *ItemsGRPCServer) carTreeWalk(
 	}
 
 	return &data, nil
-}
-
-func (s *ItemsGRPCServer) GetTree(ctx context.Context, in *GetTreeRequest) (*APITreeItem, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
-	}
-
-	if in.GetId() == 0 {
-		return nil, status.Error(codes.InvalidArgument, "id is zero")
-	}
-
-	item, err := s.repository.Item(ctx, &query.ItemListOptions{ItemID: in.GetId()}, nil)
-	if err != nil {
-		if errors.Is(err, items.ErrItemNotFound) {
-			return nil, status.Error(codes.NotFound, err.Error())
-		}
-
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	res, err := s.carTreeWalk(ctx, item, in.GetLanguage(), schema.ItemParentTypeDefault)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return res, nil
 }

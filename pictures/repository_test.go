@@ -130,6 +130,7 @@ func TestImageExif(t *testing.T) {
 
 	handle, err := os.OpenFile("../test/test_exif.jpeg", os.O_RDONLY, 0)
 	require.NoError(t, err)
+
 	defer util.Close(handle)
 
 	pictureID, err := repo.AddPictureFromReader(ctx, handle, userID, "127.0.0.1", 0, 0, 0)
@@ -165,6 +166,7 @@ func TestImageExifGPS(t *testing.T) {
 
 	handle, err := os.OpenFile("../test/test_exif_gps.jpeg", os.O_RDONLY, 0)
 	require.NoError(t, err)
+
 	defer util.Close(handle)
 
 	pictureID, err := repo.AddPictureFromReader(ctx, handle, userID, "127.0.0.1", 0, 0, 0)
@@ -196,6 +198,7 @@ func TestImageBlackEdgeCrop(t *testing.T) {
 
 	handle, err := os.OpenFile("../test/black-edge.jpeg", os.O_RDONLY, 0)
 	require.NoError(t, err)
+
 	defer util.Close(handle)
 
 	pictureID, err := repo.AddPictureFromReader(ctx, handle, userID, "127.0.0.1", 0, 0, 0)

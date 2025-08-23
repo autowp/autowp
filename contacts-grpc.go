@@ -12,6 +12,7 @@ import (
 
 type ContactsGRPCServer struct {
 	UnimplementedContactsServer
+
 	auth               *Auth
 	contactsRepository *ContactsRepository
 	userRepository     *users.Repository

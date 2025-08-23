@@ -16,6 +16,7 @@ import (
 
 type AttrsGRPCServer struct {
 	UnimplementedAttrsServer
+
 	repository *attrs.Repository
 	auth       *Auth
 }

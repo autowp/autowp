@@ -26,10 +26,6 @@ type DayPictures struct {
 	column             string
 }
 
-func (s *DayPictures) HaveCurrentDate() bool {
-	return !s.currentDate.IsZero()
-}
-
 func NewDayPictures(
 	picturesRepository *pictures.Repository,
 	column string,
@@ -48,17 +44,8 @@ func NewDayPictures(
 	}, nil
 }
 
-func (s *DayPictures) haveCurrentDayPictures(ctx context.Context) (bool, error) {
-	if s.currentDate.IsZero() {
-		return false, nil
-	}
-
-	total, err := s.CurrentDateCount(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	return total > 0, nil
+func (s *DayPictures) HaveCurrentDate() bool {
+	return !s.currentDate.IsZero()
 }
 
 func (s *DayPictures) SetCurrentDateToLastIfEmptyDate(ctx context.Context) error {
@@ -91,15 +78,6 @@ func (s *DayPictures) SetCurrentDateToLastIfEmptyDate(ctx context.Context) error
 	return nil
 }
 
-func (s *DayPictures) reset() {
-	s.nextDate = civil.Date{}
-	s.prevDate = civil.Date{}
-}
-
-func (s *DayPictures) startOfDay(date time.Time) time.Time {
-	return time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
-}
-
 func (s *DayPictures) PrevDate(ctx context.Context) (civil.Date, error) {
 	err := s.calcPrevDate(ctx)
 	if err != nil {
@@ -116,6 +94,69 @@ func (s *DayPictures) NextDate(ctx context.Context) (civil.Date, error) {
 	}
 
 	return s.nextDate, nil
+}
+
+func (s *DayPictures) CurrentDate() civil.Date {
+	return s.currentDate
+}
+
+func (s *DayPictures) PrevDateCount(ctx context.Context) (int32, error) {
+	err := s.calcPrevDate(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("calcPrevDate(): %w", err)
+	}
+
+	count, err := s.dateCount(ctx, s.prevDate)
+	if err != nil {
+		return 0, fmt.Errorf("dateCount(%s): %w", s.prevDate.String(), err)
+	}
+
+	return count, nil
+}
+
+func (s *DayPictures) CurrentDateCount(ctx context.Context) (int32, error) {
+	count, err := s.dateCount(ctx, s.currentDate)
+	if err != nil {
+		return 0, fmt.Errorf("dateCount(%s): %w", s.currentDate.String(), err)
+	}
+
+	return count, nil
+}
+
+func (s *DayPictures) NextDateCount(ctx context.Context) (int32, error) {
+	err := s.calcNextDate(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("calcNextDate(): %w", err)
+	}
+
+	count, err := s.dateCount(ctx, s.nextDate)
+	if err != nil {
+		return 0, fmt.Errorf("dateCount(%s): %w", s.nextDate.String(), err)
+	}
+
+	return count, nil
+}
+
+func (s *DayPictures) haveCurrentDayPictures(ctx context.Context) (bool, error) {
+	if s.currentDate.IsZero() {
+		return false, nil
+	}
+
+	total, err := s.CurrentDateCount(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	return total > 0, nil
+}
+
+func (s *DayPictures) startOfDay(date time.Time) time.Time {
+	return time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+}
+
+func (s *DayPictures) reset() {
+	s.nextDate = civil.Date{}
+	s.prevDate = civil.Date{}
 }
 
 func (s *DayPictures) calcDate(
@@ -206,47 +247,6 @@ func (s *DayPictures) calcNextDate(ctx context.Context) error {
 	s.nextDate, err = s.calcDate(ctx, &listOptions, orderBy)
 
 	return err
-}
-
-func (s *DayPictures) CurrentDate() civil.Date {
-	return s.currentDate
-}
-
-func (s *DayPictures) PrevDateCount(ctx context.Context) (int32, error) {
-	err := s.calcPrevDate(ctx)
-	if err != nil {
-		return 0, fmt.Errorf("calcPrevDate(): %w", err)
-	}
-
-	count, err := s.dateCount(ctx, s.prevDate)
-	if err != nil {
-		return 0, fmt.Errorf("dateCount(%s): %w", s.prevDate.String(), err)
-	}
-
-	return count, nil
-}
-
-func (s *DayPictures) CurrentDateCount(ctx context.Context) (int32, error) {
-	count, err := s.dateCount(ctx, s.currentDate)
-	if err != nil {
-		return 0, fmt.Errorf("dateCount(%s): %w", s.currentDate.String(), err)
-	}
-
-	return count, nil
-}
-
-func (s *DayPictures) NextDateCount(ctx context.Context) (int32, error) {
-	err := s.calcNextDate(ctx)
-	if err != nil {
-		return 0, fmt.Errorf("calcNextDate(): %w", err)
-	}
-
-	count, err := s.dateCount(ctx, s.nextDate)
-	if err != nil {
-		return 0, fmt.Errorf("dateCount(%s): %w", s.nextDate.String(), err)
-	}
-
-	return count, nil
 }
 
 func (s *DayPictures) dateCount(ctx context.Context, date civil.Date) (int32, error) {

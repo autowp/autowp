@@ -18,10 +18,10 @@ import (
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/aws"             //nolint: staticcheck
+	"github.com/aws/aws-sdk-go/aws/credentials" //nolint: staticcheck
+	"github.com/aws/aws-sdk-go/aws/session"     //nolint: staticcheck
+	"github.com/aws/aws-sdk-go/service/s3"      //nolint: staticcheck
 	"github.com/sirupsen/logrus"
 	"gopkg.in/gographics/imagick.v3/imagick"
 )
