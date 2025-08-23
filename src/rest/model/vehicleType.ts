@@ -9,12 +9,9 @@
  */
 
 
-export interface DonationsTransaction { 
-    sum: number;
-    currency: string;
-    date?: Date;
-    contributor: string;
-    purpose: string;
-    userId: string;
+export interface VehicleType { 
+    id: string;
+    name: string;
+    childs?: Array<VehicleType>;
 }
 

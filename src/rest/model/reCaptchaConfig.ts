@@ -9,12 +9,7 @@
  */
 
 
-export interface DonationsTransaction { 
-    sum: number;
-    currency: string;
-    date?: Date;
-    contributor: string;
-    purpose: string;
-    userId: string;
+export interface ReCaptchaConfig { 
+    publicKey: string;
 }
 

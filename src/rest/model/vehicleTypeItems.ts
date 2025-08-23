@@ -7,14 +7,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { VehicleType } from './vehicleType';
 
 
-export interface DonationsTransaction { 
-    sum: number;
-    currency: string;
-    date?: Date;
-    contributor: string;
-    purpose: string;
-    userId: string;
+export interface VehicleTypeItems { 
+    items?: Array<VehicleType>;
 }
 

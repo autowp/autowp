@@ -17,7 +17,6 @@ import {
   PicturesRequest,
   PreviewPicturesRequest,
   Spec,
-  VehicleType,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
@@ -46,6 +45,7 @@ import {
 import {convertChildsCounts} from '../../catalogue/catalogue-service';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
+import {VehicleType} from '@rest/model/vehicleType';
 
 interface APISpecInItems extends Spec {
   deep?: number;

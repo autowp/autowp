@@ -12,8 +12,7 @@ import {
   PictureListOptions,
   PictureStatus,
 } from '@grpc/spec.pb';
-import {AutowpClient, ItemsClient} from '@grpc/spec.pbsc';
-import {Empty} from '@ngx-grpc/well-known-types';
+import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
@@ -21,6 +20,7 @@ import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
 import {ToastsService} from '../../../toasts/toasts.service';
+import {AutowpService} from '@rest/api/autowp.service';
 
 function addCSS(url: string) {
   const cssId = 'brands-css';
@@ -46,12 +46,12 @@ export class UsersUserPicturesComponent implements OnInit {
   readonly #userService = inject(UserService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #grpc = inject(AutowpClient);
+  readonly #autowp = inject(AutowpService);
   readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly icons$ = this.#grpc.getBrandIcons(new Empty()).pipe(
+  protected readonly icons$ = this.#autowp.autowpGetBrandIcons().pipe(
     tap((icons) => {
       addCSS(icons.css);
     }),

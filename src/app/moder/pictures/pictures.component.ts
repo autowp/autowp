@@ -28,7 +28,6 @@ import {
   PicturesRequest,
   PictureStatus,
   SetPictureStatusRequest,
-  VehicleType,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, UsersClient} from '@grpc/spec.pbsc';
 import {
@@ -54,6 +53,7 @@ import {chunkBy} from '../../chunk';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../../toasts/toasts.service';
+import {VehicleType} from '@rest/model/vehicleType';
 
 interface PerspectiveInList {
   name: string;

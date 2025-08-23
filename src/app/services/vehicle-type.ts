@@ -1,17 +1,16 @@
 import {inject, Injectable} from '@angular/core';
-import {VehicleType} from '@grpc/spec.pb';
-import {AutowpClient} from '@grpc/spec.pbsc';
-import {Empty} from '@ngx-grpc/well-known-types';
 import {Observable} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
+import {AutowpService} from '@rest/api/autowp.service';
+import {VehicleType} from '@rest/model/vehicleType';
 
 @Injectable({
   providedIn: 'root',
 })
 export class VehicleTypeService {
-  readonly #grpc = inject(AutowpClient);
+  readonly #autowp = inject(AutowpService);
 
-  readonly #types$: Observable<VehicleType[]> = this.#grpc.getVehicleTypes(new Empty()).pipe(
+  readonly #types$: Observable<VehicleType[]> = this.#autowp.autowpGetVehicleTypes().pipe(
     map((data) => (data.items ? data.items : [])),
     shareReplay({bufferSize: 1, refCount: false}),
   );

@@ -30,7 +30,6 @@ import {
   PictureListOptions,
   PicturesRequest,
   Spec,
-  VehicleType,
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -46,6 +45,7 @@ import {sprintf} from 'sprintf-js';
 
 import {VehicleTypesModalComponent} from '../../../components/vehicle-types-modal/vehicle-types-modal.component';
 import {MapPointComponent} from './map-point/map-point.component';
+import {VehicleType} from '@rest/model/vehicleType';
 
 type isConceptValue = 'inherited' | boolean;
 type specValue = 'inherited' | null | number;

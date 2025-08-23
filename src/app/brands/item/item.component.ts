@@ -2,12 +2,13 @@ import {AsyncPipe, NgClass, NgStyle} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APIBrandsListItem, BrandIcons, NewItemsRequest} from '@grpc/spec.pb';
+import {APIBrandsListItem, NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {EMPTY} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
+import {BrandIcons} from '@rest/model/brandIcons';
 
 @Component({
   selector: 'app-brands-item',
