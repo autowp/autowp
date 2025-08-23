@@ -17,7 +17,11 @@ option go_package = "github.com/autowp/goautowp";
 
 service Autowp {
   rpc CreateFeedback(APICreateFeedbackRequest) returns (google.protobuf.Empty) {}
-  rpc GetBrandIcons(google.protobuf.Empty) returns (BrandIcons) {}
+  rpc GetBrandIcons(google.protobuf.Empty) returns (BrandIcons) {
+    option (google.api.http) = {
+      get: "/v3/autowp/brand-icons"
+    };
+  }
   rpc GetBrandVehicleTypes(GetBrandVehicleTypesRequest) returns (BrandVehicleTypeItems) {}
   rpc GetIP(APIGetIPRequest) returns (APIIP) {}
   rpc GetPerspectives(google.protobuf.Empty) returns (PerspectivesItems) {}
@@ -25,7 +29,11 @@ service Autowp {
   rpc GetReCaptchaConfig(google.protobuf.Empty) returns (ReCaptchaConfig) {}
   rpc GetSpecs(google.protobuf.Empty) returns (SpecsItems) {}
   rpc GetVehicleTypes(google.protobuf.Empty) returns (VehicleTypeItems) {}
-  rpc GetTimezones(google.protobuf.Empty) returns (Timezones) {}
+  rpc GetTimezones(google.protobuf.Empty) returns (Timezones) {
+    option (google.api.http) = {
+      get: "/v3/autowp/timezones"
+    };
+  }
 }
 
 service Forums {
@@ -583,8 +591,8 @@ message ReCaptchaConfig {
 }
 
 message BrandIcons {
-  string image = 1;
-  string css = 2;
+  string image = 1 [(google.api.field_behavior) = REQUIRED];
+  string css = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 message VehicleType {
@@ -598,7 +606,7 @@ message VehicleTypeItems {
 }
 
 message Timezones {
-  repeated string timezones = 1;
+  repeated string timezones = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetBrandVehicleTypesRequest {

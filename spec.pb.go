@@ -22062,19 +22062,19 @@ const file_spec_proto_rawDesc = "" +
 	"\x05items\x18\x01 \x03(\v2\x19.goautowp.PerspectivePageR\x05items\"0\n" +
 	"\x0fReCaptchaConfig\x12\x1d\n" +
 	"\n" +
-	"public_key\x18\x01 \x01(\tR\tpublicKey\"4\n" +
+	"public_key\x18\x01 \x01(\tR\tpublicKey\">\n" +
 	"\n" +
-	"BrandIcons\x12\x14\n" +
-	"\x05image\x18\x01 \x01(\tR\x05image\x12\x10\n" +
-	"\x03css\x18\x02 \x01(\tR\x03css\"`\n" +
+	"BrandIcons\x12\x19\n" +
+	"\x05image\x18\x01 \x01(\tB\x03\xe0A\x02R\x05image\x12\x15\n" +
+	"\x03css\x18\x02 \x01(\tB\x03\xe0A\x02R\x03css\"`\n" +
 	"\vVehicleType\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12-\n" +
 	"\x06childs\x18\x04 \x03(\v2\x15.goautowp.VehicleTypeR\x06childs\"?\n" +
 	"\x10VehicleTypeItems\x12+\n" +
-	"\x05items\x18\x01 \x03(\v2\x15.goautowp.VehicleTypeR\x05items\")\n" +
-	"\tTimezones\x12\x1c\n" +
-	"\ttimezones\x18\x01 \x03(\tR\ttimezones\"8\n" +
+	"\x05items\x18\x01 \x03(\v2\x15.goautowp.VehicleTypeR\x05items\".\n" +
+	"\tTimezones\x12!\n" +
+	"\ttimezones\x18\x01 \x03(\tB\x03\xe0A\x02R\ttimezones\"8\n" +
 	"\x1bGetBrandVehicleTypesRequest\x12\x19\n" +
 	"\bbrand_id\x18\x01 \x01(\x05R\abrandId\"I\n" +
 	"\x15BrandVehicleTypeItems\x120\n" +
@@ -23588,18 +23588,18 @@ const file_spec_proto_rawDesc = "" +
 	"\x12ModeratorAttention\x12\b\n" +
 	"\x04NONE\x10\x00\x12\f\n" +
 	"\bREQUIRED\x10\x01\x12\f\n" +
-	"\bCOMPLETE\x10\x022\xdd\x05\n" +
+	"\bCOMPLETE\x10\x022\x97\x06\n" +
 	"\x06Autowp\x12N\n" +
-	"\x0eCreateFeedback\x12\".goautowp.APICreateFeedbackRequest\x1a\x16.google.protobuf.Empty\"\x00\x12?\n" +
-	"\rGetBrandIcons\x12\x16.google.protobuf.Empty\x1a\x14.goautowp.BrandIcons\"\x00\x12`\n" +
+	"\x0eCreateFeedback\x12\".goautowp.APICreateFeedbackRequest\x1a\x16.google.protobuf.Empty\"\x00\x12]\n" +
+	"\rGetBrandIcons\x12\x16.google.protobuf.Empty\x1a\x14.goautowp.BrandIcons\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/v3/autowp/brand-icons\x12`\n" +
 	"\x14GetBrandVehicleTypes\x12%.goautowp.GetBrandVehicleTypesRequest\x1a\x1f.goautowp.BrandVehicleTypeItems\"\x00\x125\n" +
 	"\x05GetIP\x12\x19.goautowp.APIGetIPRequest\x1a\x0f.goautowp.APIIP\"\x00\x12H\n" +
 	"\x0fGetPerspectives\x12\x16.google.protobuf.Empty\x1a\x1b.goautowp.PerspectivesItems\"\x00\x12P\n" +
 	"\x13GetPerspectivePages\x12\x16.google.protobuf.Empty\x1a\x1f.goautowp.PerspectivePagesItems\"\x00\x12I\n" +
 	"\x12GetReCaptchaConfig\x12\x16.google.protobuf.Empty\x1a\x19.goautowp.ReCaptchaConfig\"\x00\x12:\n" +
 	"\bGetSpecs\x12\x16.google.protobuf.Empty\x1a\x14.goautowp.SpecsItems\"\x00\x12G\n" +
-	"\x0fGetVehicleTypes\x12\x16.google.protobuf.Empty\x1a\x1a.goautowp.VehicleTypeItems\"\x00\x12=\n" +
-	"\fGetTimezones\x12\x16.google.protobuf.Empty\x1a\x13.goautowp.Timezones\"\x002\xad\a\n" +
+	"\x0fGetVehicleTypes\x12\x16.google.protobuf.Empty\x1a\x1a.goautowp.VehicleTypeItems\"\x00\x12Y\n" +
+	"\fGetTimezones\x12\x16.google.protobuf.Empty\x1a\x13.goautowp.Timezones\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v3/autowp/timezones2\xad\a\n" +
 	"\x06Forums\x12J\n" +
 	"\x0eGetUserSummary\x12\x16.google.protobuf.Empty\x1a\x1e.goautowp.APIForumsUserSummary\"\x00\x12R\n" +
 	"\vCreateTopic\x12\x1f.goautowp.APICreateTopicRequest\x1a .goautowp.APICreateTopicResponse\"\x00\x12J\n" +
