@@ -26,9 +26,17 @@ service Autowp {
   rpc GetIP(APIGetIPRequest) returns (APIIP) {}
   rpc GetPerspectives(google.protobuf.Empty) returns (PerspectivesItems) {}
   rpc GetPerspectivePages(google.protobuf.Empty) returns (PerspectivePagesItems) {}
-  rpc GetReCaptchaConfig(google.protobuf.Empty) returns (ReCaptchaConfig) {}
+  rpc GetReCaptchaConfig(google.protobuf.Empty) returns (ReCaptchaConfig) {
+    option (google.api.http) = {
+      get: "/v3/autowp/recaptcha-config"
+    };
+  }
   rpc GetSpecs(google.protobuf.Empty) returns (SpecsItems) {}
-  rpc GetVehicleTypes(google.protobuf.Empty) returns (VehicleTypeItems) {}
+  rpc GetVehicleTypes(google.protobuf.Empty) returns (VehicleTypeItems) {
+    option (google.api.http) = {
+      get: "/v3/autowp/vehicle-types"
+    };
+  }
   rpc GetTimezones(google.protobuf.Empty) returns (Timezones) {
     option (google.api.http) = {
       get: "/v3/autowp/timezones"
@@ -587,7 +595,7 @@ message PerspectivePagesItems {
 }
 
 message ReCaptchaConfig {
-  string public_key = 1;
+  string public_key = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message BrandIcons {
@@ -596,8 +604,8 @@ message BrandIcons {
 }
 
 message VehicleType {
-  int64 id = 1;
-  string name = 2;
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+  string name = 2 [(google.api.field_behavior) = REQUIRED];
   repeated VehicleType childs = 4;
 }
 
