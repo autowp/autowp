@@ -205,6 +205,13 @@ spec:
               name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
               port:
                 name: app-port
+        - path: "/v3/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              port:
+                name: app-port
         - path: /
           pathType: Prefix
           backend:
