@@ -61,8 +61,8 @@ func TestMatchAuto(t *testing.T) {
 	match, _ = svc.MatchAuto(t.Context(), ip) // yandex ipv6
 	require.True(t, match)
 
+	match, _ = svc.MatchAuto(t.Context(), net.IPv4(127, 0, 0, 1)) // loopback
 	require.False(t, match)
-	svc.MatchAuto(t.Context(), net.IPv4(127, 0, 0, 1)) // loopback
 }
 
 func TestContains(t *testing.T) {
