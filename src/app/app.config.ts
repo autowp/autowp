@@ -3,7 +3,6 @@ import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {ApplicationConfig, enableProdMode, importProvidersFrom} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
-import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideRouter, withInMemoryScrolling} from '@angular/router';
 import {environment} from '@environment/environment';
 import {NgbCollapseModule, NgbDropdownModule, NgbModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
@@ -97,7 +96,6 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideHttpClient(withInterceptors([authInterceptor$])),
-    provideAnimations(),
     provideApi({basePath: environment.apiUrl}),
   ],
 };
