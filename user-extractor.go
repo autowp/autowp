@@ -42,28 +42,31 @@ func (s *UserExtractor) Extract(
 	currentUserID int64,
 	currentUserRoles []string,
 ) (*APIUser, error) {
-	longAway := true
-
-	if row.LastOnline != nil {
-		date := time.Now().AddDate(0, -6, 0)
-		longAway = date.After(*row.LastOnline)
-	}
-
 	identity := ""
 	if row.Identity != nil {
 		identity = *row.Identity
 	}
 
 	user := APIUser{
-		Id:            row.ID,
-		Name:          row.Name,
-		Deleted:       row.Deleted,
-		LongAway:      longAway,
-		Green:         row.Green,
-		Route:         frontend.UserRoute(row.ID, row.Identity),
-		Identity:      identity,
-		SpecsWeight:   row.SpecsWeight,
-		PicturesAdded: int32(row.PicturesAdded), //nolint:gosec
+		Id:       row.ID,
+		Deleted:  row.Deleted,
+		Route:    frontend.UserRoute(row.ID, row.Identity),
+		Identity: identity,
+	}
+
+	if !row.Deleted || util.Contains(currentUserRoles, users.RoleAdmin) {
+		longAway := true
+
+		if row.LastOnline != nil {
+			date := time.Now().AddDate(0, -6, 0)
+			longAway = date.After(*row.LastOnline)
+		}
+
+		user.Name = row.Name
+		user.LongAway = longAway
+		user.Green = row.Green
+		user.SpecsWeight = row.SpecsWeight
+		user.PicturesAdded = int32(row.PicturesAdded) //nolint:gosec
 	}
 
 	if fields.GetRegDate() && row.RegDate != nil {
