@@ -54,6 +54,8 @@ func (s *UserExtractor) Extract(
 		Identity: identity,
 	}
 
+	isMe := row.ID == currentUserID
+
 	if !row.Deleted || util.Contains(currentUserRoles, users.RoleAdmin) {
 		longAway := true
 
@@ -67,48 +69,66 @@ func (s *UserExtractor) Extract(
 		user.Green = row.Green
 		user.SpecsWeight = row.SpecsWeight
 		user.PicturesAdded = int32(row.PicturesAdded) //nolint:gosec
-	}
 
-	if fields.GetRegDate() && row.RegDate != nil {
-		user.RegDate = timestamppb.New(*row.RegDate)
-	}
-
-	if row.LastOnline != nil {
-		user.LastOnline = timestamppb.New(*row.LastOnline)
-	}
-
-	if row.EMail != nil {
-		gr := gravatar.New(*row.EMail)
-		user.Gravatar = gr.Size(avatarSize).Rating(gravatar.G).AvatarURL()
-
-		if fields.GetGravatarLarge() {
-			user.GravatarLarge = gr.Size(avatarLargeSize).Rating(gravatar.G).AvatarURL()
-		}
-	}
-
-	if row.Img != nil {
-		avatar, err := s.imageStorage.FormattedImage(ctx, *row.Img, "avatar")
-		if err != nil {
-			return nil, err
+		if fields.GetRegDate() && row.RegDate != nil {
+			user.RegDate = timestamppb.New(*row.RegDate)
 		}
 
-		user.Avatar = APIImageToGRPC(avatar)
+		if row.LastOnline != nil {
+			user.LastOnline = timestamppb.New(*row.LastOnline)
+		}
 
-		if fields.GetPhoto() {
-			photo, err := s.imageStorage.FormattedImage(ctx, *row.Img, "photo")
+		if row.EMail != nil {
+			gr := gravatar.New(*row.EMail)
+			user.Gravatar = gr.Size(avatarSize).Rating(gravatar.G).AvatarURL()
+
+			if fields.GetGravatarLarge() {
+				user.GravatarLarge = gr.Size(avatarLargeSize).Rating(gravatar.G).AvatarURL()
+			}
+		}
+
+		if row.Img != nil {
+			avatar, err := s.imageStorage.FormattedImage(ctx, *row.Img, "avatar")
 			if err != nil {
 				return nil, err
 			}
 
-			user.Photo = APIImageToGRPC(photo)
+			user.Avatar = APIImageToGRPC(avatar)
+
+			if fields.GetPhoto() {
+				photo, err := s.imageStorage.FormattedImage(ctx, *row.Img, "photo")
+				if err != nil {
+					return nil, err
+				}
+
+				user.Photo = APIImageToGRPC(photo)
+			}
 		}
-	}
 
-	isMe := row.ID == currentUserID
+		if fields.GetEmail() && row.EMail != nil &&
+			(isMe || util.Contains(currentUserRoles, users.RoleModer)) {
+			user.Email = *row.EMail
+		}
 
-	if fields.GetEmail() && row.EMail != nil &&
-		(isMe || util.Contains(currentUserRoles, users.RoleModer)) {
-		user.Email = *row.EMail
+		if fields.GetPicturesAcceptedCount() {
+			count, err := s.picturesRepository.Count(ctx, &query.PictureListOptions{
+				Status:  schema.PictureStatusAccepted,
+				OwnerID: row.ID,
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			user.PicturesAcceptedCount = int32(count) //nolint:gosec
+		}
+
+		if fields.GetLastIp() && util.Contains(currentUserRoles, users.RoleModer) {
+			user.LastIp = row.LastIP
+		}
+
+		if fields.GetLogin() && row.Login != nil && util.Contains(currentUserRoles, users.RoleModer) {
+			user.Login = *row.Login
+		}
 	}
 
 	if isMe {
@@ -136,26 +156,6 @@ func (s *UserExtractor) Extract(
 
 			user.Img = APIImageToGRPC(img)
 		}
-	}
-
-	if fields.GetPicturesAcceptedCount() {
-		count, err := s.picturesRepository.Count(ctx, &query.PictureListOptions{
-			Status:  schema.PictureStatusAccepted,
-			OwnerID: row.ID,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		user.PicturesAcceptedCount = int32(count) //nolint:gosec
-	}
-
-	if fields.GetLastIp() && util.Contains(currentUserRoles, users.RoleModer) {
-		user.LastIp = row.LastIP
-	}
-
-	if fields.GetLogin() && row.Login != nil && util.Contains(currentUserRoles, users.RoleModer) {
-		user.Login = *row.Login
 	}
 
 	return &user, nil
