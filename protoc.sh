@@ -8,9 +8,10 @@ protoc --proto_path=node_modules/google-proto-files/ \
   --proto_path=$GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-gateway/v2@v2.27.1 \
   --proto_path=. \
   --plugin=protoc-gen-ng=./node_modules/.bin/protoc-gen-ng \
-  --plugin=protoc-gen-openapi=$GOPATH/bin/protoc-gen-openapi \
   --ng_out=src/grpc \
-  --openapi_out=. \
+  --openapiv2_out=. \
+  --openapiv2_opt allow_merge=true \
+  --openapiv2_opt use_proto3_field_semantics=true \
   -I ../goautowp spec.proto
 
-./node_modules/.bin/openapi-generator-cli generate -i openapi.yaml -g typescript-angular -o src/rest --type-mappings=DateTime=Date
+./node_modules/.bin/openapi-generator-cli generate -i apidocs.swagger.json -g typescript-angular -o src/rest --type-mappings=DateTime=Date

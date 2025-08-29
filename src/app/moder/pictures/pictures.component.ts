@@ -38,6 +38,7 @@ import {
   NgbTypeaheadSelectItemEvent,
 } from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
+import {GoautowpVehicleType} from '@rest/model/goautowpVehicleType';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
@@ -53,7 +54,6 @@ import {chunkBy} from '../../chunk';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../../toasts/toasts.service';
-import {VehicleType} from '@rest/model/vehicleType';
 
 interface PerspectiveInList {
   name: string;
@@ -66,7 +66,7 @@ interface VehicleTypeInPictures {
   value: null | string;
 }
 
-function toPlainVehicleTypes(options: VehicleType[], deep: number): VehicleTypeInPictures[] {
+function toPlainVehicleTypes(options: GoautowpVehicleType[], deep: number): VehicleTypeInPictures[] {
   const result: VehicleTypeInPictures[] = [];
   for (const item of options) {
     result.push({

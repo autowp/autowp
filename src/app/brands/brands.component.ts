@@ -3,6 +3,8 @@ import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core'
 import {RouterLink} from '@angular/router';
 import {APIBrandsListCharacter, GetBrandsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
+import {AutowpService} from '@rest/api/autowp.service';
+import {GoautowpBrandIcons} from '@rest/model/goautowpBrandIcons';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {EMPTY, Observable} from 'rxjs';
@@ -10,8 +12,6 @@ import {catchError, shareReplay, tap} from 'rxjs/operators';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {BrandsItemComponent} from './item/item.component';
-import {AutowpService} from '@rest/api/autowp.service';
-import {BrandIcons} from '@rest/model/brandIcons';
 
 function addCSS(url: string) {
   const cssId = 'brands-css';
@@ -53,7 +53,7 @@ export class BrandsComponent implements OnInit {
       }),
     );
 
-  protected readonly icons$: Observable<BrandIcons> = this.#autowp.autowpGetBrandIcons().pipe(
+  protected readonly icons$: Observable<GoautowpBrandIcons> = this.#autowp.autowpGetBrandIcons().pipe(
     tap((icons) => {
       addCSS(icons.css);
     }),

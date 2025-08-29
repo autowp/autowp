@@ -13,6 +13,7 @@ import {
   PictureStatus,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
+import {AutowpService} from '@rest/api/autowp.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
@@ -20,7 +21,6 @@ import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
 import {ToastsService} from '../../../toasts/toasts.service';
-import {AutowpService} from '@rest/api/autowp.service';
 
 function addCSS(url: string) {
   const cssId = 'brands-css';

@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
 import {AutowpService} from '@rest/api/autowp.service';
-import {ReCaptchaConfig} from '@rest/model/reCaptchaConfig';
+import {GoautowpReCaptchaConfig} from '@rest/model/goautowpReCaptchaConfig';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +9,7 @@ import {ReCaptchaConfig} from '@rest/model/reCaptchaConfig';
 export class ReCaptchaService {
   readonly #autowp = inject(AutowpService);
 
-  public get$(): Observable<ReCaptchaConfig> {
+  public get$(): Observable<GoautowpReCaptchaConfig> {
     return this.#autowp.autowpGetReCaptchaConfig();
   }
 }

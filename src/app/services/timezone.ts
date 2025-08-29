@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
+import {AutowpService} from '@rest/api/autowp.service';
 import {Observable} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
-import {AutowpService} from '@rest/api/autowp.service';
 
 @Injectable({
   providedIn: 'root',

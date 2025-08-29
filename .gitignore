@@ -50,3 +50,4 @@ sonar-scanner-*
 /.scannerwork/
 /crowdin.yml
 openapi.yaml
+/.eslintcache

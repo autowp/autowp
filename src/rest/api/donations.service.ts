@@ -1,5 +1,5 @@
 /**
- * 
+ * spec.proto
  *
  * 
  *
@@ -17,9 +17,9 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { DonationsTransactionsResponse } from '../model/donationsTransactionsResponse';
+import { GoautowpDonationsTransactionsResponse } from '../model/goautowpDonationsTransactionsResponse';
 // @ts-ignore
-import { Status } from '../model/status';
+import { RpcStatus } from '../model/rpcStatus';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -41,9 +41,9 @@ export class DonationsService extends BaseService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public donationsGetTransactions(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DonationsTransactionsResponse>;
-    public donationsGetTransactions(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DonationsTransactionsResponse>>;
-    public donationsGetTransactions(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DonationsTransactionsResponse>>;
+    public donationsGetTransactions(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpDonationsTransactionsResponse>;
+    public donationsGetTransactions(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpDonationsTransactionsResponse>>;
+    public donationsGetTransactions(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpDonationsTransactionsResponse>>;
     public donationsGetTransactions(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
@@ -73,7 +73,7 @@ export class DonationsService extends BaseService {
 
         let localVarPath = `/v3/donations/transactions`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<DonationsTransactionsResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<GoautowpDonationsTransactionsResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

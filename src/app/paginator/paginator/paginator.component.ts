@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {Pages} from '@grpc/spec.pb';
+import {GoautowpPages} from '@rest/model/goautowpPages';
 
 @Component({
   selector: 'app-paginator',
@@ -9,7 +10,7 @@ import {Pages} from '@grpc/spec.pb';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaginatorComponent {
-  readonly data = input.required<Pages>();
+  readonly data = input.required<Pages|GoautowpPages>();
 
   protected pagesInRange(): number[] {
     return Object.values(this.data().pagesInRange);

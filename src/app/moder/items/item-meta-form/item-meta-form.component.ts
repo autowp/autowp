@@ -34,6 +34,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {BoolValue, Int32Value} from '@ngx-grpc/well-known-types';
+import {GoautowpVehicleType} from '@rest/model/goautowpVehicleType';
 import {LanguageService} from '@services/language';
 import {SpecService} from '@services/spec';
 import {VehicleTypeService} from '@services/vehicle-type';
@@ -45,7 +46,6 @@ import {sprintf} from 'sprintf-js';
 
 import {VehicleTypesModalComponent} from '../../../components/vehicle-types-modal/vehicle-types-modal.component';
 import {MapPointComponent} from './map-point/map-point.component';
-import {VehicleType} from '@rest/model/vehicleType';
 
 type isConceptValue = 'inherited' | boolean;
 type specValue = 'inherited' | null | number;
@@ -242,7 +242,7 @@ export class ItemMetaFormComponent {
     ),
   );
 
-  readonly #vehicleTypes$: Observable<VehicleType[]> = this.#vehicleTypeService.getTypesPlain$().pipe(
+  readonly #vehicleTypes$: Observable<GoautowpVehicleType[]> = this.#vehicleTypeService.getTypesPlain$().pipe(
     map((types) =>
       types.map((type) => {
         type.name = getVehicleTypeTranslation(type.name);

@@ -91,7 +91,7 @@ export default defineConfig([
   },
   eslintPluginPrettierRecommended,
   {
-    ignores: ['src/grpc/**/*'],
+    ignores: ['src/grpc/**/*', 'src/rest/**/*'],
   },
   {
     files: ['**/*.ts'],
