@@ -41,7 +41,9 @@ func request_Autowp_GetBrandIcons_0(ctx context.Context, marshaler runtime.Marsh
 		protoReq emptypb.Empty
 		metadata runtime.ServerMetadata
 	)
-	io.Copy(io.Discard, req.Body)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
 	msg, err := client.GetBrandIcons(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
@@ -60,7 +62,9 @@ func request_Autowp_GetReCaptchaConfig_0(ctx context.Context, marshaler runtime.
 		protoReq emptypb.Empty
 		metadata runtime.ServerMetadata
 	)
-	io.Copy(io.Discard, req.Body)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
 	msg, err := client.GetReCaptchaConfig(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
@@ -79,7 +83,9 @@ func request_Autowp_GetVehicleTypes_0(ctx context.Context, marshaler runtime.Mar
 		protoReq emptypb.Empty
 		metadata runtime.ServerMetadata
 	)
-	io.Copy(io.Discard, req.Body)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
 	msg, err := client.GetVehicleTypes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
@@ -98,7 +104,9 @@ func request_Autowp_GetTimezones_0(ctx context.Context, marshaler runtime.Marsha
 		protoReq emptypb.Empty
 		metadata runtime.ServerMetadata
 	)
-	io.Copy(io.Discard, req.Body)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
 	msg, err := client.GetTimezones(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
@@ -112,12 +120,88 @@ func local_request_Autowp_GetTimezones_0(ctx context.Context, marshaler runtime.
 	return msg, metadata, err
 }
 
+var filter_Articles_GetList_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+
+func request_Articles_GetList_0(ctx context.Context, marshaler runtime.Marshaler, client ArticlesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq ArticlesRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Articles_GetList_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.GetList(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Articles_GetList_0(ctx context.Context, marshaler runtime.Marshaler, server ArticlesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq ArticlesRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Articles_GetList_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.GetList(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_Articles_GetItemByCatname_0(ctx context.Context, marshaler runtime.Marshaler, client ArticlesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq ArticleByCatnameRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	val, ok := pathParams["catname"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "catname")
+	}
+	protoReq.Catname, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "catname", err)
+	}
+	msg, err := client.GetItemByCatname(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Articles_GetItemByCatname_0(ctx context.Context, marshaler runtime.Marshaler, server ArticlesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq ArticleByCatnameRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["catname"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "catname")
+	}
+	protoReq.Catname, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "catname", err)
+	}
+	msg, err := server.GetItemByCatname(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 func request_Donations_GetTransactions_0(ctx context.Context, marshaler runtime.Marshaler, client DonationsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq emptypb.Empty
 		metadata runtime.ServerMetadata
 	)
-	io.Copy(io.Discard, req.Body)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
 	msg, err := client.GetTransactions(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
@@ -216,6 +300,56 @@ func RegisterAutowpHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 			return
 		}
 		forward_Autowp_GetTimezones_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+
+	return nil
+}
+
+// RegisterArticlesHandlerServer registers the http handlers for service Articles to "mux".
+// UnaryRPC     :call ArticlesServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterArticlesHandlerFromEndpoint instead.
+// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
+func RegisterArticlesHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ArticlesServer) error {
+	mux.Handle(http.MethodGet, pattern_Articles_GetList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Articles/GetList", runtime.WithHTTPPathPattern("/v3/articles"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Articles_GetList_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Articles_GetList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Articles_GetItemByCatname_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Articles/GetItemByCatname", runtime.WithHTTPPathPattern("/v3/articles/{catname}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Articles_GetItemByCatname_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Articles_GetItemByCatname_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -370,6 +504,89 @@ var (
 	forward_Autowp_GetReCaptchaConfig_0 = runtime.ForwardResponseMessage
 	forward_Autowp_GetVehicleTypes_0    = runtime.ForwardResponseMessage
 	forward_Autowp_GetTimezones_0       = runtime.ForwardResponseMessage
+)
+
+// RegisterArticlesHandlerFromEndpoint is same as RegisterArticlesHandler but
+// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
+func RegisterArticlesHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+	conn, err := grpc.NewClient(endpoint, opts...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+		}()
+	}()
+	return RegisterArticlesHandler(ctx, mux, conn)
+}
+
+// RegisterArticlesHandler registers the http handlers for service Articles to "mux".
+// The handlers forward requests to the grpc endpoint over "conn".
+func RegisterArticlesHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterArticlesHandlerClient(ctx, mux, NewArticlesClient(conn))
+}
+
+// RegisterArticlesHandlerClient registers the http handlers for service Articles
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ArticlesClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ArticlesClient"
+// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
+// "ArticlesClient" to call the correct interceptors. This client ignores the HTTP middlewares.
+func RegisterArticlesHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ArticlesClient) error {
+	mux.Handle(http.MethodGet, pattern_Articles_GetList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Articles/GetList", runtime.WithHTTPPathPattern("/v3/articles"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Articles_GetList_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Articles_GetList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Articles_GetItemByCatname_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Articles/GetItemByCatname", runtime.WithHTTPPathPattern("/v3/articles/{catname}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Articles_GetItemByCatname_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Articles_GetItemByCatname_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	return nil
+}
+
+var (
+	pattern_Articles_GetList_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v3", "articles"}, ""))
+	pattern_Articles_GetItemByCatname_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v3", "articles", "catname"}, ""))
+)
+
+var (
+	forward_Articles_GetList_0          = runtime.ForwardResponseMessage
+	forward_Articles_GetItemByCatname_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterDonationsHandlerFromEndpoint is same as RegisterDonationsHandler but
