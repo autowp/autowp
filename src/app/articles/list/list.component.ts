@@ -3,6 +3,7 @@ import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core'
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {APIUser} from '@grpc/spec.pb';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {ArticlesService} from '@rest/api/articles.service';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
@@ -12,7 +13,6 @@ import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rx
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
-import {ArticlesService} from '@rest/api/articles.service';
 
 interface Article {
   author$: Observable<APIUser>;
@@ -46,9 +46,7 @@ export class ListComponent implements OnInit {
     map((params) => parseInt(params.get('page') ?? '', 10) || 1),
     distinctUntilChanged(),
     debounceTime(30),
-    switchMap((page) =>
-      this.#articlesClient.articlesGetList('10', ''+page),
-    ),
+    switchMap((page) => this.#articlesClient.articlesGetList('10', '' + page)),
     catchError((response: unknown) => {
       console.error(response);
       this.#toastService.handleError(response);

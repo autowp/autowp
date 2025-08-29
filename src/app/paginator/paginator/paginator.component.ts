@@ -10,7 +10,7 @@ import {GoautowpPages} from '@rest/model/goautowpPages';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaginatorComponent {
-  readonly data = input.required<Pages|GoautowpPages>();
+  readonly data = input.required<GoautowpPages | Pages>();
 
   protected pagesInRange(): number[] {
     return Object.values(this.data().pagesInRange);

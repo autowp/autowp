@@ -2,12 +2,12 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
+import {ArticlesService} from '@rest/api/articles.service';
 import {PageEnvService} from '@services/page-env.service';
 import {EMPTY, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
 
 import {ToastsService} from '../../toasts/toasts.service';
-import {ArticlesService} from '@rest/api/articles.service';
 
 @Component({
   selector: 'app-articles-article',
