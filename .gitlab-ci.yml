@@ -16,7 +16,7 @@ test:
 
 trigger-release:
   image: $CI_REGISTRY/autowp/runner-base-image
-  stage: test
+  stage: release
   script:
     - npx semantic-release
   rules:
