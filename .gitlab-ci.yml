@@ -21,6 +21,7 @@ trigger-release:
     - npx semantic-release
   rules:
     - if: $CI_COMMIT_TAG !~ /^v\d.*/
+  when: manual
 
 publish:
   image: $CI_REGISTRY/autowp/runner-base-image
@@ -32,7 +33,6 @@ publish:
     - helm dependency build
   rules:
     - if: $CI_COMMIT_TAG =~ /^v\d.*/
-  when: manual
 
 deploy:
   image: $CI_REGISTRY/autowp/runner-base-image
