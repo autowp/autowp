@@ -36,24 +36,83 @@ var (
 	_ = metadata.Join
 )
 
-func request_Autowp_GetBrandIcons_0(ctx context.Context, marshaler runtime.Marshaler, client AutowpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_Autowp_CreateFeedback_0(ctx context.Context, marshaler runtime.Marshaler, client AutowpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq emptypb.Empty
+		protoReq CreateFeedbackRequest
 		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Feedback); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.CreateFeedback(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Autowp_CreateFeedback_0(ctx context.Context, marshaler runtime.Marshaler, server AutowpServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq CreateFeedbackRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Feedback); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.CreateFeedback(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+var filter_Autowp_GetIP_0 = &utilities.DoubleArray{Encoding: map[string]int{"ip": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+
+func request_Autowp_GetIP_0(ctx context.Context, marshaler runtime.Marshaler, client AutowpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetIPRequest
+		metadata runtime.ServerMetadata
+		err      error
 	)
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
 	}
-	msg, err := client.GetBrandIcons(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	val, ok := pathParams["ip"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ip")
+	}
+	protoReq.Ip, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ip", err)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Autowp_GetIP_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.GetIP(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_Autowp_GetBrandIcons_0(ctx context.Context, marshaler runtime.Marshaler, server AutowpServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_Autowp_GetIP_0(ctx context.Context, marshaler runtime.Marshaler, server AutowpServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq emptypb.Empty
+		protoReq GetIPRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
-	msg, err := server.GetBrandIcons(ctx, &protoReq)
+	val, ok := pathParams["ip"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ip")
+	}
+	protoReq.Ip, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ip", err)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Autowp_GetIP_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.GetIP(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -75,27 +134,6 @@ func local_request_Autowp_GetReCaptchaConfig_0(ctx context.Context, marshaler ru
 		metadata runtime.ServerMetadata
 	)
 	msg, err := server.GetReCaptchaConfig(ctx, &protoReq)
-	return msg, metadata, err
-}
-
-func request_Autowp_GetVehicleTypes_0(ctx context.Context, marshaler runtime.Marshaler, client AutowpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq emptypb.Empty
-		metadata runtime.ServerMetadata
-	)
-	if req.Body != nil {
-		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	msg, err := client.GetVehicleTypes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-}
-
-func local_request_Autowp_GetVehicleTypes_0(ctx context.Context, marshaler runtime.Marshaler, server AutowpServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq emptypb.Empty
-		metadata runtime.ServerMetadata
-	)
-	msg, err := server.GetVehicleTypes(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -194,6 +232,146 @@ func local_request_Articles_GetItemByCatname_0(ctx context.Context, marshaler ru
 	return msg, metadata, err
 }
 
+var filter_Items_GetBrandVehicleTypes_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+
+func request_Items_GetBrandVehicleTypes_0(ctx context.Context, marshaler runtime.Marshaler, client ItemsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetBrandVehicleTypesRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Items_GetBrandVehicleTypes_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.GetBrandVehicleTypes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Items_GetBrandVehicleTypes_0(ctx context.Context, marshaler runtime.Marshaler, server ItemsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetBrandVehicleTypesRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Items_GetBrandVehicleTypes_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.GetBrandVehicleTypes(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_Items_GetVehicleTypes_0(ctx context.Context, marshaler runtime.Marshaler, client ItemsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.GetVehicleTypes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Items_GetVehicleTypes_0(ctx context.Context, marshaler runtime.Marshaler, server ItemsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetVehicleTypes(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_Items_GetSpecs_0(ctx context.Context, marshaler runtime.Marshaler, client ItemsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.GetSpecs(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Items_GetSpecs_0(ctx context.Context, marshaler runtime.Marshaler, server ItemsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetSpecs(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_Items_GetBrandIcons_0(ctx context.Context, marshaler runtime.Marshaler, client ItemsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.GetBrandIcons(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Items_GetBrandIcons_0(ctx context.Context, marshaler runtime.Marshaler, server ItemsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetBrandIcons(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_Pictures_GetPerspectives_0(ctx context.Context, marshaler runtime.Marshaler, client PicturesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.GetPerspectives(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Pictures_GetPerspectives_0(ctx context.Context, marshaler runtime.Marshaler, server PicturesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetPerspectives(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_Pictures_GetPerspectivePages_0(ctx context.Context, marshaler runtime.Marshaler, client PicturesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.GetPerspectivePages(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Pictures_GetPerspectivePages_0(ctx context.Context, marshaler runtime.Marshaler, server PicturesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetPerspectivePages(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 func request_Donations_GetTransactions_0(ctx context.Context, marshaler runtime.Marshaler, client DonationsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq emptypb.Empty
@@ -221,25 +399,45 @@ func local_request_Donations_GetTransactions_0(ctx context.Context, marshaler ru
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterAutowpHandlerFromEndpoint instead.
 // GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterAutowpHandlerServer(ctx context.Context, mux *runtime.ServeMux, server AutowpServer) error {
-	mux.Handle(http.MethodGet, pattern_Autowp_GetBrandIcons_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_Autowp_CreateFeedback_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Autowp/GetBrandIcons", runtime.WithHTTPPathPattern("/v3/autowp/brand-icons"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Autowp/CreateFeedback", runtime.WithHTTPPathPattern("/v3/feedback"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Autowp_GetBrandIcons_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Autowp_CreateFeedback_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Autowp_GetBrandIcons_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Autowp_CreateFeedback_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Autowp_GetIP_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Autowp/GetIP", runtime.WithHTTPPathPattern("/v3/autowp/ip/{ip}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Autowp_GetIP_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Autowp_GetIP_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodGet, pattern_Autowp_GetReCaptchaConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -260,26 +458,6 @@ func RegisterAutowpHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 			return
 		}
 		forward_Autowp_GetReCaptchaConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodGet, pattern_Autowp_GetVehicleTypes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Autowp/GetVehicleTypes", runtime.WithHTTPPathPattern("/v3/autowp/vehicle-types"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_Autowp_GetVehicleTypes_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Autowp_GetVehicleTypes_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodGet, pattern_Autowp_GetTimezones_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -355,6 +533,146 @@ func RegisterArticlesHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 	return nil
 }
 
+// RegisterItemsHandlerServer registers the http handlers for service Items to "mux".
+// UnaryRPC     :call ItemsServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterItemsHandlerFromEndpoint instead.
+// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
+func RegisterItemsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ItemsServer) error {
+	mux.Handle(http.MethodGet, pattern_Items_GetBrandVehicleTypes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Items/GetBrandVehicleTypes", runtime.WithHTTPPathPattern("/v3/items/brand-vehicle-types"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Items_GetBrandVehicleTypes_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Items_GetBrandVehicleTypes_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Items_GetVehicleTypes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Items/GetVehicleTypes", runtime.WithHTTPPathPattern("/v3/items/vehicle-types"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Items_GetVehicleTypes_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Items_GetVehicleTypes_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Items_GetSpecs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Items/GetSpecs", runtime.WithHTTPPathPattern("/v3/items/specs"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Items_GetSpecs_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Items_GetSpecs_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Items_GetBrandIcons_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Items/GetBrandIcons", runtime.WithHTTPPathPattern("/v3/items/brand-icons"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Items_GetBrandIcons_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Items_GetBrandIcons_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+
+	return nil
+}
+
+// RegisterPicturesHandlerServer registers the http handlers for service Pictures to "mux".
+// UnaryRPC     :call PicturesServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterPicturesHandlerFromEndpoint instead.
+// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
+func RegisterPicturesHandlerServer(ctx context.Context, mux *runtime.ServeMux, server PicturesServer) error {
+	mux.Handle(http.MethodGet, pattern_Pictures_GetPerspectives_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Pictures/GetPerspectives", runtime.WithHTTPPathPattern("/v3/pictures/perspectives"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Pictures_GetPerspectives_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Pictures_GetPerspectives_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Pictures_GetPerspectivePages_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/goautowp.Pictures/GetPerspectivePages", runtime.WithHTTPPathPattern("/v3/pictures/perspective-pages"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Pictures_GetPerspectivePages_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Pictures_GetPerspectivePages_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+
+	return nil
+}
+
 // RegisterDonationsHandlerServer registers the http handlers for service Donations to "mux".
 // UnaryRPC     :call DonationsServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -421,22 +739,39 @@ func RegisterAutowpHandler(ctx context.Context, mux *runtime.ServeMux, conn *grp
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "AutowpClient" to call the correct interceptors. This client ignores the HTTP middlewares.
 func RegisterAutowpHandlerClient(ctx context.Context, mux *runtime.ServeMux, client AutowpClient) error {
-	mux.Handle(http.MethodGet, pattern_Autowp_GetBrandIcons_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_Autowp_CreateFeedback_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Autowp/GetBrandIcons", runtime.WithHTTPPathPattern("/v3/autowp/brand-icons"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Autowp/CreateFeedback", runtime.WithHTTPPathPattern("/v3/feedback"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Autowp_GetBrandIcons_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Autowp_CreateFeedback_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Autowp_GetBrandIcons_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Autowp_CreateFeedback_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Autowp_GetIP_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Autowp/GetIP", runtime.WithHTTPPathPattern("/v3/autowp/ip/{ip}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Autowp_GetIP_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Autowp_GetIP_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodGet, pattern_Autowp_GetReCaptchaConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -454,23 +789,6 @@ func RegisterAutowpHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 			return
 		}
 		forward_Autowp_GetReCaptchaConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodGet, pattern_Autowp_GetVehicleTypes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Autowp/GetVehicleTypes", runtime.WithHTTPPathPattern("/v3/autowp/vehicle-types"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_Autowp_GetVehicleTypes_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Autowp_GetVehicleTypes_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodGet, pattern_Autowp_GetTimezones_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -493,16 +811,16 @@ func RegisterAutowpHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 }
 
 var (
-	pattern_Autowp_GetBrandIcons_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "autowp", "brand-icons"}, ""))
+	pattern_Autowp_CreateFeedback_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v3", "feedback"}, ""))
+	pattern_Autowp_GetIP_0              = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"v3", "autowp", "ip"}, ""))
 	pattern_Autowp_GetReCaptchaConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "autowp", "recaptcha-config"}, ""))
-	pattern_Autowp_GetVehicleTypes_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "autowp", "vehicle-types"}, ""))
 	pattern_Autowp_GetTimezones_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "autowp", "timezones"}, ""))
 )
 
 var (
-	forward_Autowp_GetBrandIcons_0      = runtime.ForwardResponseMessage
+	forward_Autowp_CreateFeedback_0     = runtime.ForwardResponseMessage
+	forward_Autowp_GetIP_0              = runtime.ForwardResponseMessage
 	forward_Autowp_GetReCaptchaConfig_0 = runtime.ForwardResponseMessage
-	forward_Autowp_GetVehicleTypes_0    = runtime.ForwardResponseMessage
 	forward_Autowp_GetTimezones_0       = runtime.ForwardResponseMessage
 )
 
@@ -587,6 +905,210 @@ var (
 var (
 	forward_Articles_GetList_0          = runtime.ForwardResponseMessage
 	forward_Articles_GetItemByCatname_0 = runtime.ForwardResponseMessage
+)
+
+// RegisterItemsHandlerFromEndpoint is same as RegisterItemsHandler but
+// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
+func RegisterItemsHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+	conn, err := grpc.NewClient(endpoint, opts...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+		}()
+	}()
+	return RegisterItemsHandler(ctx, mux, conn)
+}
+
+// RegisterItemsHandler registers the http handlers for service Items to "mux".
+// The handlers forward requests to the grpc endpoint over "conn".
+func RegisterItemsHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterItemsHandlerClient(ctx, mux, NewItemsClient(conn))
+}
+
+// RegisterItemsHandlerClient registers the http handlers for service Items
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ItemsClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ItemsClient"
+// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
+// "ItemsClient" to call the correct interceptors. This client ignores the HTTP middlewares.
+func RegisterItemsHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ItemsClient) error {
+	mux.Handle(http.MethodGet, pattern_Items_GetBrandVehicleTypes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Items/GetBrandVehicleTypes", runtime.WithHTTPPathPattern("/v3/items/brand-vehicle-types"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Items_GetBrandVehicleTypes_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Items_GetBrandVehicleTypes_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Items_GetVehicleTypes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Items/GetVehicleTypes", runtime.WithHTTPPathPattern("/v3/items/vehicle-types"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Items_GetVehicleTypes_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Items_GetVehicleTypes_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Items_GetSpecs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Items/GetSpecs", runtime.WithHTTPPathPattern("/v3/items/specs"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Items_GetSpecs_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Items_GetSpecs_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Items_GetBrandIcons_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Items/GetBrandIcons", runtime.WithHTTPPathPattern("/v3/items/brand-icons"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Items_GetBrandIcons_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Items_GetBrandIcons_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	return nil
+}
+
+var (
+	pattern_Items_GetBrandVehicleTypes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "items", "brand-vehicle-types"}, ""))
+	pattern_Items_GetVehicleTypes_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "items", "vehicle-types"}, ""))
+	pattern_Items_GetSpecs_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "items", "specs"}, ""))
+	pattern_Items_GetBrandIcons_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "items", "brand-icons"}, ""))
+)
+
+var (
+	forward_Items_GetBrandVehicleTypes_0 = runtime.ForwardResponseMessage
+	forward_Items_GetVehicleTypes_0      = runtime.ForwardResponseMessage
+	forward_Items_GetSpecs_0             = runtime.ForwardResponseMessage
+	forward_Items_GetBrandIcons_0        = runtime.ForwardResponseMessage
+)
+
+// RegisterPicturesHandlerFromEndpoint is same as RegisterPicturesHandler but
+// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
+func RegisterPicturesHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+	conn, err := grpc.NewClient(endpoint, opts...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+		}()
+	}()
+	return RegisterPicturesHandler(ctx, mux, conn)
+}
+
+// RegisterPicturesHandler registers the http handlers for service Pictures to "mux".
+// The handlers forward requests to the grpc endpoint over "conn".
+func RegisterPicturesHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterPicturesHandlerClient(ctx, mux, NewPicturesClient(conn))
+}
+
+// RegisterPicturesHandlerClient registers the http handlers for service Pictures
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "PicturesClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "PicturesClient"
+// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
+// "PicturesClient" to call the correct interceptors. This client ignores the HTTP middlewares.
+func RegisterPicturesHandlerClient(ctx context.Context, mux *runtime.ServeMux, client PicturesClient) error {
+	mux.Handle(http.MethodGet, pattern_Pictures_GetPerspectives_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Pictures/GetPerspectives", runtime.WithHTTPPathPattern("/v3/pictures/perspectives"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Pictures_GetPerspectives_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Pictures_GetPerspectives_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Pictures_GetPerspectivePages_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/goautowp.Pictures/GetPerspectivePages", runtime.WithHTTPPathPattern("/v3/pictures/perspective-pages"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Pictures_GetPerspectivePages_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Pictures_GetPerspectivePages_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	return nil
+}
+
+var (
+	pattern_Pictures_GetPerspectives_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "pictures", "perspectives"}, ""))
+	pattern_Pictures_GetPerspectivePages_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v3", "pictures", "perspective-pages"}, ""))
+)
+
+var (
+	forward_Pictures_GetPerspectives_0     = runtime.ForwardResponseMessage
+	forward_Pictures_GetPerspectivePages_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterDonationsHandlerFromEndpoint is same as RegisterDonationsHandler but

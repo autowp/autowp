@@ -33,8 +33,8 @@ func NewIPExtractor(
 
 func (s *IPExtractor) Extract(
 	ctx context.Context, ip net.IP, fields map[string]bool, userID int64, roles []string,
-) (*APIIP, error) {
-	result := APIIP{
+) (*IP, error) {
+	result := IP{
 		Address: ip.String(),
 	}
 

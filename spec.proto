@@ -16,25 +16,20 @@ import "google/api/field_behavior.proto";
 option go_package = "github.com/autowp/goautowp";
 
 service Autowp {
-  rpc CreateFeedback(APICreateFeedbackRequest) returns (google.protobuf.Empty) {}
-  rpc GetBrandIcons(google.protobuf.Empty) returns (BrandIcons) {
+  rpc CreateFeedback(CreateFeedbackRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      get: "/v3/autowp/brand-icons"
+      post: "/v3/feedback"
+      body: "feedback"
     };
   }
-  rpc GetBrandVehicleTypes(GetBrandVehicleTypesRequest) returns (BrandVehicleTypeItems) {}
-  rpc GetIP(APIGetIPRequest) returns (APIIP) {}
-  rpc GetPerspectives(google.protobuf.Empty) returns (PerspectivesItems) {}
-  rpc GetPerspectivePages(google.protobuf.Empty) returns (PerspectivePagesItems) {}
+  rpc GetIP(GetIPRequest) returns (IP) {
+    option (google.api.http) = {
+      get: "/v3/autowp/ip/{ip}"
+    };
+  }
   rpc GetReCaptchaConfig(google.protobuf.Empty) returns (ReCaptchaConfig) {
     option (google.api.http) = {
       get: "/v3/autowp/recaptcha-config"
-    };
-  }
-  rpc GetSpecs(google.protobuf.Empty) returns (SpecsItems) {}
-  rpc GetVehicleTypes(google.protobuf.Empty) returns (VehicleTypeItems) {
-    option (google.api.http) = {
-      get: "/v3/autowp/vehicle-types"
     };
   }
   rpc GetTimezones(google.protobuf.Empty) returns (Timezones) {
@@ -156,6 +151,26 @@ service Items {
   rpc SetUserItemSubscription(SetUserItemSubscriptionRequest) returns (google.protobuf.Empty) {}
   rpc GetPath(PathRequest) returns (PathResponse) {}
   rpc GetAlpha(google.protobuf.Empty) returns (AlphaResponse) {}
+  rpc GetBrandVehicleTypes(GetBrandVehicleTypesRequest) returns (BrandVehicleTypeItems) {
+    option (google.api.http) = {
+      get: "/v3/items/brand-vehicle-types"
+    };
+  }
+  rpc GetVehicleTypes(google.protobuf.Empty) returns (VehicleTypeItems) {
+    option (google.api.http) = {
+      get: "/v3/items/vehicle-types"
+    };
+  }
+  rpc GetSpecs(google.protobuf.Empty) returns (SpecsItems) {
+    option (google.api.http) = {
+      get: "/v3/items/specs"
+    };
+  }
+  rpc GetBrandIcons(google.protobuf.Empty) returns (BrandIcons) {
+    option (google.api.http) = {
+      get: "/v3/items/brand-icons"
+    };
+  }
 }
 
 service Mosts {
@@ -220,6 +235,16 @@ service Pictures {
   rpc GetNewbox(NewboxRequest) returns (Newbox) {}
   rpc GetCanonicalRoute(CanonicalRouteRequest) returns (CanonicalRoute) {}
   rpc GetGallery(GalleryRequest) returns (GalleryResponse) {}
+  rpc GetPerspectives(google.protobuf.Empty) returns (PerspectivesItems) {
+    option (google.api.http) = {
+      get: "/v3/pictures/perspectives"
+    };
+  }
+  rpc GetPerspectivePages(google.protobuf.Empty) returns (PerspectivePagesItems) {
+    option (google.api.http) = {
+      get: "/v3/pictures/perspective-pages"
+    };
+  }
 }
 
 service Messaging {
@@ -736,7 +761,7 @@ message APITrafficTopResponse {
   repeated APITrafficTopItem items = 1;
 }
 
-message APIGetIPRequest {
+message GetIPRequest {
   string ip = 1;
   repeated string fields = 2;
 }
@@ -746,14 +771,18 @@ message APIIPRights {
   bool remove_from_blacklist = 2;
 }
 
-message APIIP {
+message IP {
   string address = 1;
   string hostname = 2;
   APIBanItem blacklist = 3;
   APIIPRights rights = 4;
 }
 
-message APICreateFeedbackRequest {
+message CreateFeedbackRequest {
+  Feedback feedback = 1;
+}
+
+message Feedback {
   string name = 1;
   string email = 2;
   string message = 3;

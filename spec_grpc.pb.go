@@ -20,31 +20,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Autowp_CreateFeedback_FullMethodName       = "/goautowp.Autowp/CreateFeedback"
-	Autowp_GetBrandIcons_FullMethodName        = "/goautowp.Autowp/GetBrandIcons"
-	Autowp_GetBrandVehicleTypes_FullMethodName = "/goautowp.Autowp/GetBrandVehicleTypes"
-	Autowp_GetIP_FullMethodName                = "/goautowp.Autowp/GetIP"
-	Autowp_GetPerspectives_FullMethodName      = "/goautowp.Autowp/GetPerspectives"
-	Autowp_GetPerspectivePages_FullMethodName  = "/goautowp.Autowp/GetPerspectivePages"
-	Autowp_GetReCaptchaConfig_FullMethodName   = "/goautowp.Autowp/GetReCaptchaConfig"
-	Autowp_GetSpecs_FullMethodName             = "/goautowp.Autowp/GetSpecs"
-	Autowp_GetVehicleTypes_FullMethodName      = "/goautowp.Autowp/GetVehicleTypes"
-	Autowp_GetTimezones_FullMethodName         = "/goautowp.Autowp/GetTimezones"
+	Autowp_CreateFeedback_FullMethodName     = "/goautowp.Autowp/CreateFeedback"
+	Autowp_GetIP_FullMethodName              = "/goautowp.Autowp/GetIP"
+	Autowp_GetReCaptchaConfig_FullMethodName = "/goautowp.Autowp/GetReCaptchaConfig"
+	Autowp_GetTimezones_FullMethodName       = "/goautowp.Autowp/GetTimezones"
 )
 
 // AutowpClient is the client API for Autowp service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AutowpClient interface {
-	CreateFeedback(ctx context.Context, in *APICreateFeedbackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	GetBrandIcons(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BrandIcons, error)
-	GetBrandVehicleTypes(ctx context.Context, in *GetBrandVehicleTypesRequest, opts ...grpc.CallOption) (*BrandVehicleTypeItems, error)
-	GetIP(ctx context.Context, in *APIGetIPRequest, opts ...grpc.CallOption) (*APIIP, error)
-	GetPerspectives(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PerspectivesItems, error)
-	GetPerspectivePages(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PerspectivePagesItems, error)
+	CreateFeedback(ctx context.Context, in *CreateFeedbackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetIP(ctx context.Context, in *GetIPRequest, opts ...grpc.CallOption) (*IP, error)
 	GetReCaptchaConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ReCaptchaConfig, error)
-	GetSpecs(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SpecsItems, error)
-	GetVehicleTypes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VehicleTypeItems, error)
 	GetTimezones(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Timezones, error)
 }
 
@@ -56,7 +44,7 @@ func NewAutowpClient(cc grpc.ClientConnInterface) AutowpClient {
 	return &autowpClient{cc}
 }
 
-func (c *autowpClient) CreateFeedback(ctx context.Context, in *APICreateFeedbackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *autowpClient) CreateFeedback(ctx context.Context, in *CreateFeedbackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Autowp_CreateFeedback_FullMethodName, in, out, cOpts...)
@@ -66,50 +54,10 @@ func (c *autowpClient) CreateFeedback(ctx context.Context, in *APICreateFeedback
 	return out, nil
 }
 
-func (c *autowpClient) GetBrandIcons(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BrandIcons, error) {
+func (c *autowpClient) GetIP(ctx context.Context, in *GetIPRequest, opts ...grpc.CallOption) (*IP, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BrandIcons)
-	err := c.cc.Invoke(ctx, Autowp_GetBrandIcons_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *autowpClient) GetBrandVehicleTypes(ctx context.Context, in *GetBrandVehicleTypesRequest, opts ...grpc.CallOption) (*BrandVehicleTypeItems, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BrandVehicleTypeItems)
-	err := c.cc.Invoke(ctx, Autowp_GetBrandVehicleTypes_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *autowpClient) GetIP(ctx context.Context, in *APIGetIPRequest, opts ...grpc.CallOption) (*APIIP, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(APIIP)
+	out := new(IP)
 	err := c.cc.Invoke(ctx, Autowp_GetIP_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *autowpClient) GetPerspectives(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PerspectivesItems, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PerspectivesItems)
-	err := c.cc.Invoke(ctx, Autowp_GetPerspectives_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *autowpClient) GetPerspectivePages(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PerspectivePagesItems, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PerspectivePagesItems)
-	err := c.cc.Invoke(ctx, Autowp_GetPerspectivePages_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -120,26 +68,6 @@ func (c *autowpClient) GetReCaptchaConfig(ctx context.Context, in *emptypb.Empty
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ReCaptchaConfig)
 	err := c.cc.Invoke(ctx, Autowp_GetReCaptchaConfig_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *autowpClient) GetSpecs(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SpecsItems, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SpecsItems)
-	err := c.cc.Invoke(ctx, Autowp_GetSpecs_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *autowpClient) GetVehicleTypes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VehicleTypeItems, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(VehicleTypeItems)
-	err := c.cc.Invoke(ctx, Autowp_GetVehicleTypes_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -160,15 +88,9 @@ func (c *autowpClient) GetTimezones(ctx context.Context, in *emptypb.Empty, opts
 // All implementations must embed UnimplementedAutowpServer
 // for forward compatibility.
 type AutowpServer interface {
-	CreateFeedback(context.Context, *APICreateFeedbackRequest) (*emptypb.Empty, error)
-	GetBrandIcons(context.Context, *emptypb.Empty) (*BrandIcons, error)
-	GetBrandVehicleTypes(context.Context, *GetBrandVehicleTypesRequest) (*BrandVehicleTypeItems, error)
-	GetIP(context.Context, *APIGetIPRequest) (*APIIP, error)
-	GetPerspectives(context.Context, *emptypb.Empty) (*PerspectivesItems, error)
-	GetPerspectivePages(context.Context, *emptypb.Empty) (*PerspectivePagesItems, error)
+	CreateFeedback(context.Context, *CreateFeedbackRequest) (*emptypb.Empty, error)
+	GetIP(context.Context, *GetIPRequest) (*IP, error)
 	GetReCaptchaConfig(context.Context, *emptypb.Empty) (*ReCaptchaConfig, error)
-	GetSpecs(context.Context, *emptypb.Empty) (*SpecsItems, error)
-	GetVehicleTypes(context.Context, *emptypb.Empty) (*VehicleTypeItems, error)
 	GetTimezones(context.Context, *emptypb.Empty) (*Timezones, error)
 	mustEmbedUnimplementedAutowpServer()
 }
@@ -180,32 +102,14 @@ type AutowpServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAutowpServer struct{}
 
-func (UnimplementedAutowpServer) CreateFeedback(context.Context, *APICreateFeedbackRequest) (*emptypb.Empty, error) {
+func (UnimplementedAutowpServer) CreateFeedback(context.Context, *CreateFeedbackRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFeedback not implemented")
 }
-func (UnimplementedAutowpServer) GetBrandIcons(context.Context, *emptypb.Empty) (*BrandIcons, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBrandIcons not implemented")
-}
-func (UnimplementedAutowpServer) GetBrandVehicleTypes(context.Context, *GetBrandVehicleTypesRequest) (*BrandVehicleTypeItems, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBrandVehicleTypes not implemented")
-}
-func (UnimplementedAutowpServer) GetIP(context.Context, *APIGetIPRequest) (*APIIP, error) {
+func (UnimplementedAutowpServer) GetIP(context.Context, *GetIPRequest) (*IP, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetIP not implemented")
-}
-func (UnimplementedAutowpServer) GetPerspectives(context.Context, *emptypb.Empty) (*PerspectivesItems, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPerspectives not implemented")
-}
-func (UnimplementedAutowpServer) GetPerspectivePages(context.Context, *emptypb.Empty) (*PerspectivePagesItems, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPerspectivePages not implemented")
 }
 func (UnimplementedAutowpServer) GetReCaptchaConfig(context.Context, *emptypb.Empty) (*ReCaptchaConfig, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetReCaptchaConfig not implemented")
-}
-func (UnimplementedAutowpServer) GetSpecs(context.Context, *emptypb.Empty) (*SpecsItems, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSpecs not implemented")
-}
-func (UnimplementedAutowpServer) GetVehicleTypes(context.Context, *emptypb.Empty) (*VehicleTypeItems, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetVehicleTypes not implemented")
 }
 func (UnimplementedAutowpServer) GetTimezones(context.Context, *emptypb.Empty) (*Timezones, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTimezones not implemented")
@@ -232,7 +136,7 @@ func RegisterAutowpServer(s grpc.ServiceRegistrar, srv AutowpServer) {
 }
 
 func _Autowp_CreateFeedback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(APICreateFeedbackRequest)
+	in := new(CreateFeedbackRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -244,49 +148,13 @@ func _Autowp_CreateFeedback_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: Autowp_CreateFeedback_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AutowpServer).CreateFeedback(ctx, req.(*APICreateFeedbackRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Autowp_GetBrandIcons_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AutowpServer).GetBrandIcons(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Autowp_GetBrandIcons_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AutowpServer).GetBrandIcons(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Autowp_GetBrandVehicleTypes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBrandVehicleTypesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AutowpServer).GetBrandVehicleTypes(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Autowp_GetBrandVehicleTypes_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AutowpServer).GetBrandVehicleTypes(ctx, req.(*GetBrandVehicleTypesRequest))
+		return srv.(AutowpServer).CreateFeedback(ctx, req.(*CreateFeedbackRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Autowp_GetIP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(APIGetIPRequest)
+	in := new(GetIPRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -298,43 +166,7 @@ func _Autowp_GetIP_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: Autowp_GetIP_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AutowpServer).GetIP(ctx, req.(*APIGetIPRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Autowp_GetPerspectives_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AutowpServer).GetPerspectives(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Autowp_GetPerspectives_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AutowpServer).GetPerspectives(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Autowp_GetPerspectivePages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AutowpServer).GetPerspectivePages(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Autowp_GetPerspectivePages_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AutowpServer).GetPerspectivePages(ctx, req.(*emptypb.Empty))
+		return srv.(AutowpServer).GetIP(ctx, req.(*GetIPRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -353,42 +185,6 @@ func _Autowp_GetReCaptchaConfig_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AutowpServer).GetReCaptchaConfig(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Autowp_GetSpecs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AutowpServer).GetSpecs(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Autowp_GetSpecs_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AutowpServer).GetSpecs(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Autowp_GetVehicleTypes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AutowpServer).GetVehicleTypes(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Autowp_GetVehicleTypes_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AutowpServer).GetVehicleTypes(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -423,36 +219,12 @@ var Autowp_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Autowp_CreateFeedback_Handler,
 		},
 		{
-			MethodName: "GetBrandIcons",
-			Handler:    _Autowp_GetBrandIcons_Handler,
-		},
-		{
-			MethodName: "GetBrandVehicleTypes",
-			Handler:    _Autowp_GetBrandVehicleTypes_Handler,
-		},
-		{
 			MethodName: "GetIP",
 			Handler:    _Autowp_GetIP_Handler,
 		},
 		{
-			MethodName: "GetPerspectives",
-			Handler:    _Autowp_GetPerspectives_Handler,
-		},
-		{
-			MethodName: "GetPerspectivePages",
-			Handler:    _Autowp_GetPerspectivePages_Handler,
-		},
-		{
 			MethodName: "GetReCaptchaConfig",
 			Handler:    _Autowp_GetReCaptchaConfig_Handler,
-		},
-		{
-			MethodName: "GetSpecs",
-			Handler:    _Autowp_GetSpecs_Handler,
-		},
-		{
-			MethodName: "GetVehicleTypes",
-			Handler:    _Autowp_GetVehicleTypes_Handler,
 		},
 		{
 			MethodName: "GetTimezones",
@@ -2524,6 +2296,10 @@ const (
 	Items_SetUserItemSubscription_FullMethodName  = "/goautowp.Items/SetUserItemSubscription"
 	Items_GetPath_FullMethodName                  = "/goautowp.Items/GetPath"
 	Items_GetAlpha_FullMethodName                 = "/goautowp.Items/GetAlpha"
+	Items_GetBrandVehicleTypes_FullMethodName     = "/goautowp.Items/GetBrandVehicleTypes"
+	Items_GetVehicleTypes_FullMethodName          = "/goautowp.Items/GetVehicleTypes"
+	Items_GetSpecs_FullMethodName                 = "/goautowp.Items/GetSpecs"
+	Items_GetBrandIcons_FullMethodName            = "/goautowp.Items/GetBrandIcons"
 )
 
 // ItemsClient is the client API for Items service.
@@ -2572,6 +2348,10 @@ type ItemsClient interface {
 	SetUserItemSubscription(ctx context.Context, in *SetUserItemSubscriptionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetPath(ctx context.Context, in *PathRequest, opts ...grpc.CallOption) (*PathResponse, error)
 	GetAlpha(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AlphaResponse, error)
+	GetBrandVehicleTypes(ctx context.Context, in *GetBrandVehicleTypesRequest, opts ...grpc.CallOption) (*BrandVehicleTypeItems, error)
+	GetVehicleTypes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VehicleTypeItems, error)
+	GetSpecs(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SpecsItems, error)
+	GetBrandIcons(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BrandIcons, error)
 }
 
 type itemsClient struct {
@@ -3002,6 +2782,46 @@ func (c *itemsClient) GetAlpha(ctx context.Context, in *emptypb.Empty, opts ...g
 	return out, nil
 }
 
+func (c *itemsClient) GetBrandVehicleTypes(ctx context.Context, in *GetBrandVehicleTypesRequest, opts ...grpc.CallOption) (*BrandVehicleTypeItems, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandVehicleTypeItems)
+	err := c.cc.Invoke(ctx, Items_GetBrandVehicleTypes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *itemsClient) GetVehicleTypes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VehicleTypeItems, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VehicleTypeItems)
+	err := c.cc.Invoke(ctx, Items_GetVehicleTypes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *itemsClient) GetSpecs(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SpecsItems, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SpecsItems)
+	err := c.cc.Invoke(ctx, Items_GetSpecs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *itemsClient) GetBrandIcons(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BrandIcons, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandIcons)
+	err := c.cc.Invoke(ctx, Items_GetBrandIcons_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ItemsServer is the server API for Items service.
 // All implementations must embed UnimplementedItemsServer
 // for forward compatibility.
@@ -3048,6 +2868,10 @@ type ItemsServer interface {
 	SetUserItemSubscription(context.Context, *SetUserItemSubscriptionRequest) (*emptypb.Empty, error)
 	GetPath(context.Context, *PathRequest) (*PathResponse, error)
 	GetAlpha(context.Context, *emptypb.Empty) (*AlphaResponse, error)
+	GetBrandVehicleTypes(context.Context, *GetBrandVehicleTypesRequest) (*BrandVehicleTypeItems, error)
+	GetVehicleTypes(context.Context, *emptypb.Empty) (*VehicleTypeItems, error)
+	GetSpecs(context.Context, *emptypb.Empty) (*SpecsItems, error)
+	GetBrandIcons(context.Context, *emptypb.Empty) (*BrandIcons, error)
 	mustEmbedUnimplementedItemsServer()
 }
 
@@ -3183,6 +3007,18 @@ func (UnimplementedItemsServer) GetPath(context.Context, *PathRequest) (*PathRes
 }
 func (UnimplementedItemsServer) GetAlpha(context.Context, *emptypb.Empty) (*AlphaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAlpha not implemented")
+}
+func (UnimplementedItemsServer) GetBrandVehicleTypes(context.Context, *GetBrandVehicleTypesRequest) (*BrandVehicleTypeItems, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBrandVehicleTypes not implemented")
+}
+func (UnimplementedItemsServer) GetVehicleTypes(context.Context, *emptypb.Empty) (*VehicleTypeItems, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVehicleTypes not implemented")
+}
+func (UnimplementedItemsServer) GetSpecs(context.Context, *emptypb.Empty) (*SpecsItems, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSpecs not implemented")
+}
+func (UnimplementedItemsServer) GetBrandIcons(context.Context, *emptypb.Empty) (*BrandIcons, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBrandIcons not implemented")
 }
 func (UnimplementedItemsServer) mustEmbedUnimplementedItemsServer() {}
 func (UnimplementedItemsServer) testEmbeddedByValue()               {}
@@ -3961,6 +3797,78 @@ func _Items_GetAlpha_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Items_GetBrandVehicleTypes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBrandVehicleTypesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ItemsServer).GetBrandVehicleTypes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Items_GetBrandVehicleTypes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ItemsServer).GetBrandVehicleTypes(ctx, req.(*GetBrandVehicleTypesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Items_GetVehicleTypes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ItemsServer).GetVehicleTypes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Items_GetVehicleTypes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ItemsServer).GetVehicleTypes(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Items_GetSpecs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ItemsServer).GetSpecs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Items_GetSpecs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ItemsServer).GetSpecs(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Items_GetBrandIcons_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ItemsServer).GetBrandIcons(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Items_GetBrandIcons_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ItemsServer).GetBrandIcons(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Items_ServiceDesc is the grpc.ServiceDesc for Items service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -4135,6 +4043,22 @@ var Items_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAlpha",
 			Handler:    _Items_GetAlpha_Handler,
+		},
+		{
+			MethodName: "GetBrandVehicleTypes",
+			Handler:    _Items_GetBrandVehicleTypes_Handler,
+		},
+		{
+			MethodName: "GetVehicleTypes",
+			Handler:    _Items_GetVehicleTypes_Handler,
+		},
+		{
+			MethodName: "GetSpecs",
+			Handler:    _Items_GetSpecs_Handler,
+		},
+		{
+			MethodName: "GetBrandIcons",
+			Handler:    _Items_GetBrandIcons_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -5002,6 +4926,8 @@ const (
 	Pictures_GetNewbox_FullMethodName                 = "/goautowp.Pictures/GetNewbox"
 	Pictures_GetCanonicalRoute_FullMethodName         = "/goautowp.Pictures/GetCanonicalRoute"
 	Pictures_GetGallery_FullMethodName                = "/goautowp.Pictures/GetGallery"
+	Pictures_GetPerspectives_FullMethodName           = "/goautowp.Pictures/GetPerspectives"
+	Pictures_GetPerspectivePages_FullMethodName       = "/goautowp.Pictures/GetPerspectivePages"
 )
 
 // PicturesClient is the client API for Pictures service.
@@ -5042,6 +4968,8 @@ type PicturesClient interface {
 	GetNewbox(ctx context.Context, in *NewboxRequest, opts ...grpc.CallOption) (*Newbox, error)
 	GetCanonicalRoute(ctx context.Context, in *CanonicalRouteRequest, opts ...grpc.CallOption) (*CanonicalRoute, error)
 	GetGallery(ctx context.Context, in *GalleryRequest, opts ...grpc.CallOption) (*GalleryResponse, error)
+	GetPerspectives(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PerspectivesItems, error)
+	GetPerspectivePages(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PerspectivePagesItems, error)
 }
 
 type picturesClient struct {
@@ -5392,6 +5320,26 @@ func (c *picturesClient) GetGallery(ctx context.Context, in *GalleryRequest, opt
 	return out, nil
 }
 
+func (c *picturesClient) GetPerspectives(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PerspectivesItems, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PerspectivesItems)
+	err := c.cc.Invoke(ctx, Pictures_GetPerspectives_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *picturesClient) GetPerspectivePages(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PerspectivePagesItems, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PerspectivePagesItems)
+	err := c.cc.Invoke(ctx, Pictures_GetPerspectivePages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PicturesServer is the server API for Pictures service.
 // All implementations must embed UnimplementedPicturesServer
 // for forward compatibility.
@@ -5430,6 +5378,8 @@ type PicturesServer interface {
 	GetNewbox(context.Context, *NewboxRequest) (*Newbox, error)
 	GetCanonicalRoute(context.Context, *CanonicalRouteRequest) (*CanonicalRoute, error)
 	GetGallery(context.Context, *GalleryRequest) (*GalleryResponse, error)
+	GetPerspectives(context.Context, *emptypb.Empty) (*PerspectivesItems, error)
+	GetPerspectivePages(context.Context, *emptypb.Empty) (*PerspectivePagesItems, error)
 	mustEmbedUnimplementedPicturesServer()
 }
 
@@ -5541,6 +5491,12 @@ func (UnimplementedPicturesServer) GetCanonicalRoute(context.Context, *Canonical
 }
 func (UnimplementedPicturesServer) GetGallery(context.Context, *GalleryRequest) (*GalleryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGallery not implemented")
+}
+func (UnimplementedPicturesServer) GetPerspectives(context.Context, *emptypb.Empty) (*PerspectivesItems, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPerspectives not implemented")
+}
+func (UnimplementedPicturesServer) GetPerspectivePages(context.Context, *emptypb.Empty) (*PerspectivePagesItems, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPerspectivePages not implemented")
 }
 func (UnimplementedPicturesServer) mustEmbedUnimplementedPicturesServer() {}
 func (UnimplementedPicturesServer) testEmbeddedByValue()                  {}
@@ -6175,6 +6131,42 @@ func _Pictures_GetGallery_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Pictures_GetPerspectives_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PicturesServer).GetPerspectives(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Pictures_GetPerspectives_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PicturesServer).GetPerspectives(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Pictures_GetPerspectivePages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PicturesServer).GetPerspectivePages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Pictures_GetPerspectivePages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PicturesServer).GetPerspectivePages(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Pictures_ServiceDesc is the grpc.ServiceDesc for Pictures service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -6317,6 +6309,14 @@ var Pictures_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetGallery",
 			Handler:    _Pictures_GetGallery_Handler,
+		},
+		{
+			MethodName: "GetPerspectives",
+			Handler:    _Pictures_GetPerspectives_Handler,
+		},
+		{
+			MethodName: "GetPerspectivePages",
+			Handler:    _Pictures_GetPerspectivePages_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

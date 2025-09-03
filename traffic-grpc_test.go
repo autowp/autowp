@@ -50,7 +50,7 @@ func TestHttpBanPost(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	ip, err := srv.GetIP(ctx, &APIGetIPRequest{
+	ip, err := srv.GetIP(ctx, &GetIPRequest{
 		Ip:     "127.0.0.1",
 		Fields: []string{"blacklist"},
 	})
@@ -63,7 +63,7 @@ func TestHttpBanPost(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	ip, err = srv.GetIP(ctx, &APIGetIPRequest{Ip: "127.0.0.1"})
+	ip, err = srv.GetIP(ctx, &GetIPRequest{Ip: "127.0.0.1"})
 	require.NoError(t, err)
 	require.Nil(t, ip.GetBlacklist())
 }

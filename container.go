@@ -16,6 +16,7 @@ import (
 	"github.com/autowp/goautowp/comments"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/email"
+	"github.com/autowp/goautowp/feedback"
 	"github.com/autowp/goautowp/hosts"
 	"github.com/autowp/goautowp/i18nbundle"
 	"github.com/autowp/goautowp/image/storage"
@@ -67,7 +68,7 @@ type Container struct {
 	donationsGrpcServer    *DonationsGRPCServer
 	emailSender            email.Sender
 	events                 *Events
-	feedback               *Feedback
+	feedback               *feedback.Repository
 	forums                 *Forums
 	goquDB                 *goqu.Database
 	goquPostgresDB         *goqu.Database
@@ -395,13 +396,9 @@ func (s *Container) DuplicateFinder(ctx context.Context) (*DuplicateFinder, erro
 	return s.duplicateFinder, nil
 }
 
-func (s *Container) Feedback() (*Feedback, error) {
+func (s *Container) Feedback() (*feedback.Repository, error) {
 	if s.feedback == nil {
-		cfg := s.Config()
-
-		emailSender := s.EmailSender()
-
-		s.feedback = NewFeedback(cfg.Feedback, cfg.Recaptcha, cfg.Captcha, emailSender)
+		s.feedback = feedback.NewRepository(s.Config().Feedback, s.EmailSender())
 	}
 
 	return s.feedback, nil
@@ -693,6 +690,16 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 	}
 
 	err = RegisterArticlesHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	err = RegisterItemsHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	err = RegisterPicturesHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -1090,11 +1097,6 @@ func (s *Container) Auth(ctx context.Context) (*Auth, error) {
 
 func (s *Container) GRPCServer(ctx context.Context) (*GRPCServer, error) {
 	if s.grpcServer == nil {
-		catalogue, err := s.Catalogue(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		cfg := s.Config()
 
 		commentsRepository, err := s.CommentsRepository(ctx)
@@ -1102,7 +1104,7 @@ func (s *Container) GRPCServer(ctx context.Context) (*GRPCServer, error) {
 			return nil, err
 		}
 
-		feedback, err := s.Feedback()
+		fb, err := s.Feedback()
 		if err != nil {
 			return nil, err
 		}
@@ -1119,12 +1121,11 @@ func (s *Container) GRPCServer(ctx context.Context) (*GRPCServer, error) {
 
 		s.grpcServer = NewGRPCServer(
 			auth,
-			catalogue,
 			cfg.Recaptcha,
-			cfg.FileStorage,
 			commentsRepository,
 			ipExtractor,
-			feedback,
+			fb,
+			cfg.Captcha,
 		)
 	}
 
@@ -1354,6 +1355,11 @@ func (s *Container) ItemsGRPCServer(ctx context.Context) (*ItemsGRPCServer, erro
 			return nil, err
 		}
 
+		catalogue, err := s.Catalogue(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.itemsGrpcServer = NewItemsGRPCServer(
 			repo,
 			db,
@@ -1373,6 +1379,8 @@ func (s *Container) ItemsGRPCServer(ctx context.Context) (*ItemsGRPCServer, erro
 			s.NewLinkExtractor(),
 			itemOfDayRepository,
 			redisClient,
+			catalogue,
+			s.Config().FileStorage,
 		)
 	}
 
@@ -1574,6 +1582,11 @@ func (s *Container) PicturesGRPCServer(ctx context.Context) (*PicturesGRPCServer
 			return nil, err
 		}
 
+		catalogue, err := s.Catalogue(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.picturesGrpcServer = NewPicturesGRPCServer(
 			repository,
 			auth,
@@ -1589,6 +1602,7 @@ func (s *Container) PicturesGRPCServer(ctx context.Context) (*PicturesGRPCServer
 			s.PictureExtractor(),
 			s.PictureItemExtractor(),
 			s.ItemExtractor(),
+			catalogue,
 		)
 	}
 

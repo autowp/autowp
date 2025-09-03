@@ -1982,3 +1982,71 @@ func TestGetGallery(t *testing.T) {
 	)
 	require.NoError(t, err)
 }
+
+func TestGetPerspectives(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+
+	grpcClient := NewPicturesClient(conn)
+
+	cfg := config.LoadConfig(".")
+
+	kc := cnt.Keycloak()
+
+	// tester
+	testerToken, err := kc.Login(
+		ctx,
+		"frontend",
+		"",
+		cfg.Keycloak.Realm,
+		testUsername,
+		testPassword,
+	)
+	require.NoError(t, err)
+	require.NotNil(t, testerToken)
+
+	_, err = grpcClient.GetPerspectives(
+		metadata.AppendToOutgoingContext(
+			ctx,
+			authorizationHeader,
+			bearerPrefix+testerToken.AccessToken,
+		),
+		&emptypb.Empty{},
+	)
+	require.NoError(t, err)
+}
+
+func TestGetPerspectivePages(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+
+	grpcClient := NewPicturesClient(conn)
+
+	cfg := config.LoadConfig(".")
+
+	kc := cnt.Keycloak()
+
+	// tester
+	testerToken, err := kc.Login(
+		ctx,
+		"frontend",
+		"",
+		cfg.Keycloak.Realm,
+		testUsername,
+		testPassword,
+	)
+	require.NoError(t, err)
+	require.NotNil(t, testerToken)
+
+	_, err = grpcClient.GetPerspectivePages(
+		metadata.AppendToOutgoingContext(
+			ctx,
+			authorizationHeader,
+			bearerPrefix+testerToken.AccessToken,
+		),
+		&emptypb.Empty{},
+	)
+	require.NoError(t, err)
+}

@@ -61,6 +61,7 @@ type PicturesGRPCServer struct {
 	pictureExtractor      *PictureExtractor
 	pictureItemExtractor  *PictureItemExtractor
 	itemExtractor         *ItemExtractor
+	catalogue             *Catalogue
 }
 
 func NewPicturesGRPCServer(
@@ -78,6 +79,7 @@ func NewPicturesGRPCServer(
 	pictureExtractor *PictureExtractor,
 	pictureItemExtractor *PictureItemExtractor,
 	itemExtractor *ItemExtractor,
+	catalogue *Catalogue,
 ) *PicturesGRPCServer {
 	return &PicturesGRPCServer{
 		repository:            repository,
@@ -96,6 +98,7 @@ func NewPicturesGRPCServer(
 		pictureExtractor:      pictureExtractor,
 		pictureItemExtractor:  pictureItemExtractor,
 		itemExtractor:         itemExtractor,
+		catalogue:             catalogue,
 	}
 }
 
@@ -2073,6 +2076,34 @@ func (s *PicturesGRPCServer) GetGallery(
 		Count:  pages.TotalItemCount,
 		Items:  gallery,
 		Status: extractPicturesStatus(repoOptions.Status),
+	}, nil
+}
+
+func (s *PicturesGRPCServer) GetPerspectives(
+	ctx context.Context,
+	_ *emptypb.Empty,
+) (*PerspectivesItems, error) {
+	res, err := s.catalogue.getPerspectives(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PerspectivesItems{ //nolint:exhaustruct
+		Items: res,
+	}, nil
+}
+
+func (s *PicturesGRPCServer) GetPerspectivePages(
+	ctx context.Context,
+	_ *emptypb.Empty,
+) (*PerspectivePagesItems, error) {
+	res, err := s.catalogue.getPerspectivePages(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PerspectivePagesItems{ //nolint:exhaustruct
+		Items: res,
 	}, nil
 }
 

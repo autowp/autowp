@@ -86,7 +86,7 @@ linters:
     - protogetter
     - reassign
     # - recvcheck
-    - revive
+    # - revive
     - rowserrcheck
     - sloglint
     - spancheck

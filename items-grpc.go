@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/autowp/goautowp/attrs"
+	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/frontend"
 	"github.com/autowp/goautowp/hosts"
 	"github.com/autowp/goautowp/i18nbundle"
@@ -107,6 +108,8 @@ type ItemsGRPCServer struct {
 	linkExtractor         *LinkExtractor
 	itemOfDayRepository   *itemofday.Repository
 	redis                 *redis.Client
+	catalogue             *Catalogue
+	fileStorageConfig     config.FileStorageConfig
 }
 
 func NewItemsGRPCServer(
@@ -128,6 +131,8 @@ func NewItemsGRPCServer(
 	linkExtractor *LinkExtractor,
 	itemOfDayRepository *itemofday.Repository,
 	redis *redis.Client,
+	catalogue *Catalogue,
+	fileStorageConfig config.FileStorageConfig,
 ) *ItemsGRPCServer {
 	return &ItemsGRPCServer{
 		repository:            repository,
@@ -148,6 +153,8 @@ func NewItemsGRPCServer(
 		linkExtractor:         linkExtractor,
 		itemOfDayRepository:   itemOfDayRepository,
 		redis:                 redis,
+		catalogue:             catalogue,
+		fileStorageConfig:     fileStorageConfig,
 	}
 }
 
@@ -2926,6 +2933,80 @@ func (s *ItemsGRPCServer) GetTree(ctx context.Context, in *GetTreeRequest) (*API
 	}
 
 	return res, nil
+}
+
+func (s *ItemsGRPCServer) GetVehicleTypes(
+	ctx context.Context,
+	_ *emptypb.Empty,
+) (*VehicleTypeItems, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
+		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+	}
+
+	rows, err := s.catalogue.getVehicleTypesTree(ctx, 0)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &VehicleTypeItems{
+		Items: rows,
+	}, nil
+}
+
+func (s *ItemsGRPCServer) GetBrandVehicleTypes(
+	ctx context.Context,
+	in *GetBrandVehicleTypesRequest,
+) (*BrandVehicleTypeItems, error) {
+	rows, err := s.catalogue.getBrandVehicleTypes(ctx, in.GetBrandId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &BrandVehicleTypeItems{
+		Items: rows,
+	}, nil
+}
+
+func (s *ItemsGRPCServer) GetSpecs(ctx context.Context, _ *emptypb.Empty) (*SpecsItems, error) {
+	rows, err := s.catalogue.getSpecs(ctx, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SpecsItems{ //nolint:exhaustruct
+		Items: rows,
+	}, nil
+}
+
+func (s *ItemsGRPCServer) GetBrandIcons(context.Context, *emptypb.Empty) (*BrandIcons, error) {
+	if len(s.fileStorageConfig.S3.Endpoint) == 0 {
+		return nil, errNoEndpointProvided
+	}
+
+	parsedURL, err := url.Parse(s.fileStorageConfig.S3.Endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	parsedURL.Path = "/" + url.PathEscape(
+		s.fileStorageConfig.Bucket,
+	) + "/" + brandsSpriteImageFilename
+	imageURL := parsedURL.String()
+
+	parsedURL.Path = "/" + url.PathEscape(
+		s.fileStorageConfig.Bucket,
+	) + "/" + brandsSpriteCSSFilename
+	cssURL := parsedURL.String()
+
+	return &BrandIcons{ //nolint:exhaustruct
+		Image: imageURL,
+		Css:   cssURL,
+	}, nil
 }
 
 func (s *ItemsGRPCServer) formatterOptions(row *items.Item) items.ItemNameFormatterOptions {

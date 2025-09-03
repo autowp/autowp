@@ -5,13 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"net/url"
 
 	"github.com/autowp/goautowp/comments"
 	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/feedback"
 	"github.com/autowp/goautowp/image/storage"
-	"github.com/autowp/goautowp/users"
-	"github.com/autowp/goautowp/util"
+	"github.com/autowp/goautowp/validation"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
@@ -43,72 +42,30 @@ func APIImageToGRPC(image *storage.Image) *APIImage {
 type GRPCServer struct {
 	UnimplementedAutowpServer
 
-	auth              *Auth
-	catalogue         *Catalogue
-	reCaptchaConfig   config.RecaptchaConfig
-	fileStorageConfig config.FileStorageConfig
-	comments          *comments.Repository
-	ipExtractor       *IPExtractor
-	feedback          *Feedback
+	auth            *Auth
+	reCaptchaConfig config.RecaptchaConfig
+	comments        *comments.Repository
+	ipExtractor     *IPExtractor
+	feedback        *feedback.Repository
+	captchaEnabled  bool
 }
 
 func NewGRPCServer(
 	auth *Auth,
-	catalogue *Catalogue,
 	reCaptchaConfig config.RecaptchaConfig,
-	fileStorageConfig config.FileStorageConfig,
 	comments *comments.Repository,
 	ipExtractor *IPExtractor,
-	feedback *Feedback,
+	feedback *feedback.Repository,
+	captchaEnabled bool,
 ) *GRPCServer {
 	return &GRPCServer{ //nolint:exhaustruct
-		auth:              auth,
-		catalogue:         catalogue,
-		reCaptchaConfig:   reCaptchaConfig,
-		fileStorageConfig: fileStorageConfig,
-		comments:          comments,
-		ipExtractor:       ipExtractor,
-		feedback:          feedback,
+		auth:            auth,
+		reCaptchaConfig: reCaptchaConfig,
+		comments:        comments,
+		ipExtractor:     ipExtractor,
+		feedback:        feedback,
+		captchaEnabled:  captchaEnabled,
 	}
-}
-
-func (s *GRPCServer) GetSpecs(ctx context.Context, _ *emptypb.Empty) (*SpecsItems, error) {
-	items, err := s.catalogue.getSpecs(ctx, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	return &SpecsItems{ //nolint:exhaustruct
-		Items: items,
-	}, nil
-}
-
-func (s *GRPCServer) GetPerspectives(
-	ctx context.Context,
-	_ *emptypb.Empty,
-) (*PerspectivesItems, error) {
-	items, err := s.catalogue.getPerspectives(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return &PerspectivesItems{ //nolint:exhaustruct
-		Items: items,
-	}, nil
-}
-
-func (s *GRPCServer) GetPerspectivePages(
-	ctx context.Context,
-	_ *emptypb.Empty,
-) (*PerspectivePagesItems, error) {
-	items, err := s.catalogue.getPerspectivePages(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &PerspectivePagesItems{ //nolint:exhaustruct
-		Items: items,
-	}, nil
 }
 
 func (s *GRPCServer) GetReCaptchaConfig(context.Context, *emptypb.Empty) (*ReCaptchaConfig, error) {
@@ -117,70 +74,7 @@ func (s *GRPCServer) GetReCaptchaConfig(context.Context, *emptypb.Empty) (*ReCap
 	}, nil
 }
 
-func (s *GRPCServer) GetBrandIcons(context.Context, *emptypb.Empty) (*BrandIcons, error) {
-	if len(s.fileStorageConfig.S3.Endpoint) == 0 {
-		return nil, errNoEndpointProvided
-	}
-
-	parsedURL, err := url.Parse(s.fileStorageConfig.S3.Endpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	parsedURL.Path = "/" + url.PathEscape(
-		s.fileStorageConfig.Bucket,
-	) + "/" + brandsSpriteImageFilename
-	imageURL := parsedURL.String()
-
-	parsedURL.Path = "/" + url.PathEscape(
-		s.fileStorageConfig.Bucket,
-	) + "/" + brandsSpriteCSSFilename
-	cssURL := parsedURL.String()
-
-	return &BrandIcons{ //nolint:exhaustruct
-		Image: imageURL,
-		Css:   cssURL,
-	}, nil
-}
-
-func (s *GRPCServer) GetVehicleTypes(
-	ctx context.Context,
-	_ *emptypb.Empty,
-) (*VehicleTypeItems, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
-	}
-
-	items, err := s.catalogue.getVehicleTypesTree(ctx, 0)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &VehicleTypeItems{
-		Items: items,
-	}, nil
-}
-
-func (s *GRPCServer) GetBrandVehicleTypes(
-	ctx context.Context,
-	in *GetBrandVehicleTypesRequest,
-) (*BrandVehicleTypeItems, error) {
-	items, err := s.catalogue.getBrandVehicleTypes(ctx, in.GetBrandId())
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &BrandVehicleTypeItems{
-		Items: items,
-	}, nil
-}
-
-func (s *GRPCServer) GetIP(ctx context.Context, in *APIGetIPRequest) (*APIIP, error) {
+func (s *GRPCServer) GetIP(ctx context.Context, in *GetIPRequest) (*IP, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -206,26 +100,33 @@ func (s *GRPCServer) GetIP(ctx context.Context, in *APIGetIPRequest) (*APIIP, er
 
 func (s *GRPCServer) CreateFeedback(
 	ctx context.Context,
-	in *APICreateFeedbackRequest,
+	in *CreateFeedbackRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	fv, err := s.feedback.Create(CreateFeedbackRequest{
-		Name:    in.GetName(),
-		Email:   in.GetEmail(),
-		Message: in.GetMessage(),
-		Captcha: in.GetCaptcha(),
-		IP:      userCtx.IP.String(),
-	})
+	fb := in.GetFeedback()
+
+	fv, err := fb.Validate(s.captchaEnabled, userCtx.IP.String())
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
 	if len(fv) > 0 {
 		return nil, wrapFieldViolations(fv)
+	}
+
+	err = s.feedback.Create(feedback.CreateFeedbackRequest{
+		Name:    fb.GetName(),
+		Email:   fb.GetEmail(),
+		Message: fb.GetMessage(),
+		Captcha: fb.GetCaptcha(),
+		IP:      userCtx.IP.String(),
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil
@@ -276,4 +177,95 @@ func InterceptorLogger(fieldLogger logrus.FieldLogger) logging.Logger {
 			}
 		},
 	)
+}
+
+func (s *Feedback) Validate(
+	captchaEnabled bool,
+	ip string,
+) ([]*errdetails.BadRequest_FieldViolation, error) {
+	var (
+		result   = make([]*errdetails.BadRequest_FieldViolation, 0)
+		problems []string
+		err      error
+	)
+
+	nameInputFilter := validation.InputFilter{
+		Filters:    []validation.FilterInterface{&validation.StringTrimFilter{}},
+		Validators: []validation.ValidatorInterface{&validation.NotEmpty{}},
+	}
+
+	s.Name, problems, err = nameInputFilter.IsValidString(s.GetName())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fv := range problems {
+		result = append(result, &errdetails.BadRequest_FieldViolation{
+			Field:       "name",
+			Description: fv,
+		})
+	}
+
+	emailInputFilter := validation.InputFilter{
+		Filters: []validation.FilterInterface{&validation.StringTrimFilter{}},
+		Validators: []validation.ValidatorInterface{
+			&validation.NotEmpty{},
+			&validation.EmailAddress{},
+		},
+	}
+
+	s.Email, problems, err = emailInputFilter.IsValidString(s.GetEmail())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fv := range problems {
+		result = append(result, &errdetails.BadRequest_FieldViolation{
+			Field:       "email",
+			Description: fv,
+		})
+	}
+
+	messageInputFilter := validation.InputFilter{
+		Filters:    []validation.FilterInterface{&validation.StringTrimFilter{}},
+		Validators: []validation.ValidatorInterface{&validation.NotEmpty{}},
+	}
+
+	s.Message, problems, err = messageInputFilter.IsValidString(s.GetMessage())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fv := range problems {
+		result = append(result, &errdetails.BadRequest_FieldViolation{
+			Field:       "message",
+			Description: fv,
+		})
+	}
+
+	if captchaEnabled {
+		captchaInputFilter := validation.InputFilter{
+			Filters: []validation.FilterInterface{&validation.StringTrimFilter{}},
+			Validators: []validation.ValidatorInterface{
+				&validation.NotEmpty{},
+				&validation.Recaptcha{
+					ClientIP: ip,
+				},
+			},
+		}
+
+		s.Captcha, problems, err = captchaInputFilter.IsValidString(s.GetCaptcha())
+		if err != nil {
+			return nil, err
+		}
+
+		for _, fv := range problems {
+			result = append(result, &errdetails.BadRequest_FieldViolation{
+				Field:       "captcha",
+				Description: fv,
+			})
+		}
+	}
+
+	return result, nil
 }

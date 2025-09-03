@@ -20,14 +20,14 @@ require (
 	github.com/dsoprea/go-png-image-structure/v2 v2.0.0-20210512210324-29b889a6093d
 	github.com/dsoprea/go-utility/v2 v2.0.0-20221003172846-a3e1774ef349
 	github.com/fiam/gounidecode v0.0.0-20150629112515-8deddbd03fec
-	github.com/gabriel-vasile/mimetype v1.4.9
+	github.com/gabriel-vasile/mimetype v1.4.10
 	github.com/gen2brain/avif v0.4.4
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-mysql/errors v0.0.0-20180603193453-03314bea68e0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
-	github.com/golang-migrate/migrate/v4 v4.18.3
+	github.com/golang-migrate/migrate/v4 v4.19.0
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.2
@@ -40,18 +40,18 @@ require (
 	github.com/paulmach/orb v0.11.1
 	github.com/prometheus/client_golang v1.23.0
 	github.com/rabbitmq/amqp091-go v1.10.0
-	github.com/redis/go-redis/v9 v9.12.1
+	github.com/redis/go-redis/v9 v9.13.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.20.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.3.8
 	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
 	golang.org/x/image v0.30.0
 	golang.org/x/text v0.28.0
-	google.golang.org/genproto v0.0.0-20250818200422-3122310a409c
-	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c
+	google.golang.org/genproto v0.0.0-20250826171959-ef028d996bc1
+	google.golang.org/genproto/googleapis/api v0.0.0-20250826171959-ef028d996bc1
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250826171959-ef028d996bc1
 	google.golang.org/grpc v1.75.0
 	google.golang.org/protobuf v1.36.8
 	gopkg.in/gographics/imagick.v3 v3.7.2
@@ -62,7 +62,8 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytedance/sonic v1.14.0 // indirect
+	github.com/bytedance/gopkg v0.1.3 // indirect
+	github.com/bytedance/sonic v1.14.1 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -85,7 +86,8 @@ require (
 	github.com/go-xmlfmt/xmlfmt v1.1.3 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
-	github.com/golang/geo v0.0.0-20250821133510-ecfc33a939ac // indirect
+	github.com/golang/geo v0.0.0-20250902123317-522ac1fc691f // indirect
+	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -104,7 +106,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.65.0 // indirect
+	github.com/prometheus/common v0.66.0 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect
@@ -113,12 +115,11 @@ require (
 	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
 	github.com/spf13/afero v1.14.0 // indirect
 	github.com/spf13/cast v1.9.2 // indirect
-	github.com/spf13/pflag v1.0.7 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.0 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
 	golang.org/x/arch v0.20.0 // indirect
