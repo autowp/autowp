@@ -13765,21 +13765,18 @@ export module APITrafficTopResponse {
 }
 
 /**
- * Message implementation for goautowp.APIGetIPRequest
+ * Message implementation for goautowp.GetIPRequest
  */
-export class APIGetIPRequest implements GrpcMessage {
-  static id = 'goautowp.APIGetIPRequest';
+export class GetIPRequest implements GrpcMessage {
+  static id = 'goautowp.GetIPRequest';
 
   /**
    * Deserialize binary data to message
    * @param instance message instance
    */
   static deserializeBinary(bytes: ByteSource) {
-    const instance = new APIGetIPRequest();
-    APIGetIPRequest.deserializeBinaryFromReader(
-      instance,
-      new BinaryReader(bytes)
-    );
+    const instance = new GetIPRequest();
+    GetIPRequest.deserializeBinaryFromReader(instance, new BinaryReader(bytes));
     return instance;
   }
 
@@ -13787,7 +13784,7 @@ export class APIGetIPRequest implements GrpcMessage {
    * Check all the properties and set default protobuf values if necessary
    * @param _instance message instance
    */
-  static refineValues(_instance: APIGetIPRequest) {
+  static refineValues(_instance: GetIPRequest) {
     _instance.ip = _instance.ip || '';
     _instance.fields = _instance.fields || [];
   }
@@ -13798,7 +13795,7 @@ export class APIGetIPRequest implements GrpcMessage {
    * @param _reader binary reader instance
    */
   static deserializeBinaryFromReader(
-    _instance: APIGetIPRequest,
+    _instance: GetIPRequest,
     _reader: BinaryReader
   ) {
     while (_reader.nextField()) {
@@ -13818,7 +13815,7 @@ export class APIGetIPRequest implements GrpcMessage {
       }
     }
 
-    APIGetIPRequest.refineValues(_instance);
+    GetIPRequest.refineValues(_instance);
   }
 
   /**
@@ -13827,7 +13824,7 @@ export class APIGetIPRequest implements GrpcMessage {
    * @param _writer binary writer instance
    */
   static serializeBinaryToWriter(
-    _instance: APIGetIPRequest,
+    _instance: GetIPRequest,
     _writer: BinaryWriter
   ) {
     if (_instance.ip) {
@@ -13843,13 +13840,13 @@ export class APIGetIPRequest implements GrpcMessage {
 
   /**
    * Message constructor. Initializes the properties and applies default Protobuf values if necessary
-   * @param _value initial values object or instance of APIGetIPRequest to deeply clone from
+   * @param _value initial values object or instance of GetIPRequest to deeply clone from
    */
-  constructor(_value?: RecursivePartial<APIGetIPRequest.AsObject>) {
+  constructor(_value?: RecursivePartial<GetIPRequest.AsObject>) {
     _value = _value || {};
     this.ip = _value.ip;
     this.fields = (_value.fields || []).slice();
-    APIGetIPRequest.refineValues(this);
+    GetIPRequest.refineValues(this);
   }
   get ip(): string {
     return this._ip;
@@ -13870,14 +13867,14 @@ export class APIGetIPRequest implements GrpcMessage {
    */
   serializeBinary() {
     const writer = new BinaryWriter();
-    APIGetIPRequest.serializeBinaryToWriter(this, writer);
+    GetIPRequest.serializeBinaryToWriter(this, writer);
     return writer.getResultBuffer();
   }
 
   /**
    * Cast message to standard JavaScript object (all non-primitive values are deeply cloned)
    */
-  toObject(): APIGetIPRequest.AsObject {
+  toObject(): GetIPRequest.AsObject {
     return {
       ip: this.ip,
       fields: (this.fields || []).slice()
@@ -13899,16 +13896,16 @@ export class APIGetIPRequest implements GrpcMessage {
   toProtobufJSON(
     // @ts-ignore
     options?: ToProtobufJSONOptions
-  ): APIGetIPRequest.AsProtobufJSON {
+  ): GetIPRequest.AsProtobufJSON {
     return {
       ip: this.ip,
       fields: (this.fields || []).slice()
     };
   }
 }
-export module APIGetIPRequest {
+export module GetIPRequest {
   /**
-   * Standard JavaScript object representation for APIGetIPRequest
+   * Standard JavaScript object representation for GetIPRequest
    */
   export interface AsObject {
     ip: string;
@@ -13916,7 +13913,7 @@ export module APIGetIPRequest {
   }
 
   /**
-   * Protobuf JSON representation for APIGetIPRequest
+   * Protobuf JSON representation for GetIPRequest
    */
   export interface AsProtobufJSON {
     ip: string;
@@ -14080,18 +14077,18 @@ export module APIIPRights {
 }
 
 /**
- * Message implementation for goautowp.APIIP
+ * Message implementation for goautowp.IP
  */
-export class APIIP implements GrpcMessage {
-  static id = 'goautowp.APIIP';
+export class IP implements GrpcMessage {
+  static id = 'goautowp.IP';
 
   /**
    * Deserialize binary data to message
    * @param instance message instance
    */
   static deserializeBinary(bytes: ByteSource) {
-    const instance = new APIIP();
-    APIIP.deserializeBinaryFromReader(instance, new BinaryReader(bytes));
+    const instance = new IP();
+    IP.deserializeBinaryFromReader(instance, new BinaryReader(bytes));
     return instance;
   }
 
@@ -14099,7 +14096,7 @@ export class APIIP implements GrpcMessage {
    * Check all the properties and set default protobuf values if necessary
    * @param _instance message instance
    */
-  static refineValues(_instance: APIIP) {
+  static refineValues(_instance: IP) {
     _instance.address = _instance.address || '';
     _instance.hostname = _instance.hostname || '';
     _instance.blacklist = _instance.blacklist || undefined;
@@ -14111,7 +14108,7 @@ export class APIIP implements GrpcMessage {
    * @param _instance message instance
    * @param _reader binary reader instance
    */
-  static deserializeBinaryFromReader(_instance: APIIP, _reader: BinaryReader) {
+  static deserializeBinaryFromReader(_instance: IP, _reader: BinaryReader) {
     while (_reader.nextField()) {
       if (_reader.isEndGroup()) break;
 
@@ -14141,7 +14138,7 @@ export class APIIP implements GrpcMessage {
       }
     }
 
-    APIIP.refineValues(_instance);
+    IP.refineValues(_instance);
   }
 
   /**
@@ -14149,7 +14146,7 @@ export class APIIP implements GrpcMessage {
    * @param _instance message instance
    * @param _writer binary writer instance
    */
-  static serializeBinaryToWriter(_instance: APIIP, _writer: BinaryWriter) {
+  static serializeBinaryToWriter(_instance: IP, _writer: BinaryWriter) {
     if (_instance.address) {
       _writer.writeString(1, _instance.address);
     }
@@ -14179,9 +14176,9 @@ export class APIIP implements GrpcMessage {
 
   /**
    * Message constructor. Initializes the properties and applies default Protobuf values if necessary
-   * @param _value initial values object or instance of APIIP to deeply clone from
+   * @param _value initial values object or instance of IP to deeply clone from
    */
-  constructor(_value?: RecursivePartial<APIIP.AsObject>) {
+  constructor(_value?: RecursivePartial<IP.AsObject>) {
     _value = _value || {};
     this.address = _value.address;
     this.hostname = _value.hostname;
@@ -14189,7 +14186,7 @@ export class APIIP implements GrpcMessage {
       ? new APIBanItem(_value.blacklist)
       : undefined;
     this.rights = _value.rights ? new APIIPRights(_value.rights) : undefined;
-    APIIP.refineValues(this);
+    IP.refineValues(this);
   }
   get address(): string {
     return this._address;
@@ -14222,14 +14219,14 @@ export class APIIP implements GrpcMessage {
    */
   serializeBinary() {
     const writer = new BinaryWriter();
-    APIIP.serializeBinaryToWriter(this, writer);
+    IP.serializeBinaryToWriter(this, writer);
     return writer.getResultBuffer();
   }
 
   /**
    * Cast message to standard JavaScript object (all non-primitive values are deeply cloned)
    */
-  toObject(): APIIP.AsObject {
+  toObject(): IP.AsObject {
     return {
       address: this.address,
       hostname: this.hostname,
@@ -14253,7 +14250,7 @@ export class APIIP implements GrpcMessage {
   toProtobufJSON(
     // @ts-ignore
     options?: ToProtobufJSONOptions
-  ): APIIP.AsProtobufJSON {
+  ): IP.AsProtobufJSON {
     return {
       address: this.address,
       hostname: this.hostname,
@@ -14262,9 +14259,9 @@ export class APIIP implements GrpcMessage {
     };
   }
 }
-export module APIIP {
+export module IP {
   /**
-   * Standard JavaScript object representation for APIIP
+   * Standard JavaScript object representation for IP
    */
   export interface AsObject {
     address: string;
@@ -14274,7 +14271,7 @@ export module APIIP {
   }
 
   /**
-   * Protobuf JSON representation for APIIP
+   * Protobuf JSON representation for IP
    */
   export interface AsProtobufJSON {
     address: string;
@@ -14285,18 +14282,18 @@ export module APIIP {
 }
 
 /**
- * Message implementation for goautowp.APICreateFeedbackRequest
+ * Message implementation for goautowp.CreateFeedbackRequest
  */
-export class APICreateFeedbackRequest implements GrpcMessage {
-  static id = 'goautowp.APICreateFeedbackRequest';
+export class CreateFeedbackRequest implements GrpcMessage {
+  static id = 'goautowp.CreateFeedbackRequest';
 
   /**
    * Deserialize binary data to message
    * @param instance message instance
    */
   static deserializeBinary(bytes: ByteSource) {
-    const instance = new APICreateFeedbackRequest();
-    APICreateFeedbackRequest.deserializeBinaryFromReader(
+    const instance = new CreateFeedbackRequest();
+    CreateFeedbackRequest.deserializeBinaryFromReader(
       instance,
       new BinaryReader(bytes)
     );
@@ -14307,7 +14304,151 @@ export class APICreateFeedbackRequest implements GrpcMessage {
    * Check all the properties and set default protobuf values if necessary
    * @param _instance message instance
    */
-  static refineValues(_instance: APICreateFeedbackRequest) {
+  static refineValues(_instance: CreateFeedbackRequest) {
+    _instance.feedback = _instance.feedback || undefined;
+  }
+
+  /**
+   * Deserializes / reads binary message into message instance using provided binary reader
+   * @param _instance message instance
+   * @param _reader binary reader instance
+   */
+  static deserializeBinaryFromReader(
+    _instance: CreateFeedbackRequest,
+    _reader: BinaryReader
+  ) {
+    while (_reader.nextField()) {
+      if (_reader.isEndGroup()) break;
+
+      switch (_reader.getFieldNumber()) {
+        case 1:
+          _instance.feedback = new Feedback();
+          _reader.readMessage(
+            _instance.feedback,
+            Feedback.deserializeBinaryFromReader
+          );
+          break;
+        default:
+          _reader.skipField();
+      }
+    }
+
+    CreateFeedbackRequest.refineValues(_instance);
+  }
+
+  /**
+   * Serializes a message to binary format using provided binary reader
+   * @param _instance message instance
+   * @param _writer binary writer instance
+   */
+  static serializeBinaryToWriter(
+    _instance: CreateFeedbackRequest,
+    _writer: BinaryWriter
+  ) {
+    if (_instance.feedback) {
+      _writer.writeMessage(
+        1,
+        _instance.feedback as any,
+        Feedback.serializeBinaryToWriter
+      );
+    }
+  }
+
+  private _feedback?: Feedback;
+
+  /**
+   * Message constructor. Initializes the properties and applies default Protobuf values if necessary
+   * @param _value initial values object or instance of CreateFeedbackRequest to deeply clone from
+   */
+  constructor(_value?: RecursivePartial<CreateFeedbackRequest.AsObject>) {
+    _value = _value || {};
+    this.feedback = _value.feedback ? new Feedback(_value.feedback) : undefined;
+    CreateFeedbackRequest.refineValues(this);
+  }
+  get feedback(): Feedback | undefined {
+    return this._feedback;
+  }
+  set feedback(value: Feedback | undefined) {
+    this._feedback = value;
+  }
+
+  /**
+   * Serialize message to binary data
+   * @param instance message instance
+   */
+  serializeBinary() {
+    const writer = new BinaryWriter();
+    CreateFeedbackRequest.serializeBinaryToWriter(this, writer);
+    return writer.getResultBuffer();
+  }
+
+  /**
+   * Cast message to standard JavaScript object (all non-primitive values are deeply cloned)
+   */
+  toObject(): CreateFeedbackRequest.AsObject {
+    return {
+      feedback: this.feedback ? this.feedback.toObject() : undefined
+    };
+  }
+
+  /**
+   * Convenience method to support JSON.stringify(message), replicates the structure of toObject()
+   */
+  toJSON() {
+    return this.toObject();
+  }
+
+  /**
+   * Cast message to JSON using protobuf JSON notation: https://developers.google.com/protocol-buffers/docs/proto3#json
+   * Attention: output differs from toObject() e.g. enums are represented as names and not as numbers, Timestamp is an ISO Date string format etc.
+   * If the message itself or some of descendant messages is google.protobuf.Any, you MUST provide a message pool as options. If not, the messagePool is not required
+   */
+  toProtobufJSON(
+    // @ts-ignore
+    options?: ToProtobufJSONOptions
+  ): CreateFeedbackRequest.AsProtobufJSON {
+    return {
+      feedback: this.feedback ? this.feedback.toProtobufJSON(options) : null
+    };
+  }
+}
+export module CreateFeedbackRequest {
+  /**
+   * Standard JavaScript object representation for CreateFeedbackRequest
+   */
+  export interface AsObject {
+    feedback?: Feedback.AsObject;
+  }
+
+  /**
+   * Protobuf JSON representation for CreateFeedbackRequest
+   */
+  export interface AsProtobufJSON {
+    feedback: Feedback.AsProtobufJSON | null;
+  }
+}
+
+/**
+ * Message implementation for goautowp.Feedback
+ */
+export class Feedback implements GrpcMessage {
+  static id = 'goautowp.Feedback';
+
+  /**
+   * Deserialize binary data to message
+   * @param instance message instance
+   */
+  static deserializeBinary(bytes: ByteSource) {
+    const instance = new Feedback();
+    Feedback.deserializeBinaryFromReader(instance, new BinaryReader(bytes));
+    return instance;
+  }
+
+  /**
+   * Check all the properties and set default protobuf values if necessary
+   * @param _instance message instance
+   */
+  static refineValues(_instance: Feedback) {
     _instance.name = _instance.name || '';
     _instance.email = _instance.email || '';
     _instance.message = _instance.message || '';
@@ -14320,7 +14461,7 @@ export class APICreateFeedbackRequest implements GrpcMessage {
    * @param _reader binary reader instance
    */
   static deserializeBinaryFromReader(
-    _instance: APICreateFeedbackRequest,
+    _instance: Feedback,
     _reader: BinaryReader
   ) {
     while (_reader.nextField()) {
@@ -14344,7 +14485,7 @@ export class APICreateFeedbackRequest implements GrpcMessage {
       }
     }
 
-    APICreateFeedbackRequest.refineValues(_instance);
+    Feedback.refineValues(_instance);
   }
 
   /**
@@ -14352,10 +14493,7 @@ export class APICreateFeedbackRequest implements GrpcMessage {
    * @param _instance message instance
    * @param _writer binary writer instance
    */
-  static serializeBinaryToWriter(
-    _instance: APICreateFeedbackRequest,
-    _writer: BinaryWriter
-  ) {
+  static serializeBinaryToWriter(_instance: Feedback, _writer: BinaryWriter) {
     if (_instance.name) {
       _writer.writeString(1, _instance.name);
     }
@@ -14377,15 +14515,15 @@ export class APICreateFeedbackRequest implements GrpcMessage {
 
   /**
    * Message constructor. Initializes the properties and applies default Protobuf values if necessary
-   * @param _value initial values object or instance of APICreateFeedbackRequest to deeply clone from
+   * @param _value initial values object or instance of Feedback to deeply clone from
    */
-  constructor(_value?: RecursivePartial<APICreateFeedbackRequest.AsObject>) {
+  constructor(_value?: RecursivePartial<Feedback.AsObject>) {
     _value = _value || {};
     this.name = _value.name;
     this.email = _value.email;
     this.message = _value.message;
     this.captcha = _value.captcha;
-    APICreateFeedbackRequest.refineValues(this);
+    Feedback.refineValues(this);
   }
   get name(): string {
     return this._name;
@@ -14418,14 +14556,14 @@ export class APICreateFeedbackRequest implements GrpcMessage {
    */
   serializeBinary() {
     const writer = new BinaryWriter();
-    APICreateFeedbackRequest.serializeBinaryToWriter(this, writer);
+    Feedback.serializeBinaryToWriter(this, writer);
     return writer.getResultBuffer();
   }
 
   /**
    * Cast message to standard JavaScript object (all non-primitive values are deeply cloned)
    */
-  toObject(): APICreateFeedbackRequest.AsObject {
+  toObject(): Feedback.AsObject {
     return {
       name: this.name,
       email: this.email,
@@ -14449,7 +14587,7 @@ export class APICreateFeedbackRequest implements GrpcMessage {
   toProtobufJSON(
     // @ts-ignore
     options?: ToProtobufJSONOptions
-  ): APICreateFeedbackRequest.AsProtobufJSON {
+  ): Feedback.AsProtobufJSON {
     return {
       name: this.name,
       email: this.email,
@@ -14458,9 +14596,9 @@ export class APICreateFeedbackRequest implements GrpcMessage {
     };
   }
 }
-export module APICreateFeedbackRequest {
+export module Feedback {
   /**
-   * Standard JavaScript object representation for APICreateFeedbackRequest
+   * Standard JavaScript object representation for Feedback
    */
   export interface AsObject {
     name: string;
@@ -14470,7 +14608,7 @@ export module APICreateFeedbackRequest {
   }
 
   /**
-   * Protobuf JSON representation for APICreateFeedbackRequest
+   * Protobuf JSON representation for Feedback
    */
   export interface AsProtobufJSON {
     name: string;

@@ -482,7 +482,7 @@
             <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
           }
         </div>
-        @if (picture.rights?.normalize || picture.rights?.flop || picture.rights?.crop) {
+        @if (picture && (picture.rights?.normalize || picture.rights?.flop || picture.rights?.crop)) {
           <h3 i18n>Edit and repair</h3>
           <div class="card card-body mb-4">
             <div>
@@ -588,7 +588,7 @@
                       <app-user [user]="ip.blacklist.byUser" />
                     }
                     @if (ip.blacklist.until) {
-                      <ng-container i18n>until</ng-container> {{ ip.blacklist.until.toDate() | date }}
+                      <ng-container i18n>until</ng-container> {{ ip.blacklist.until | date }}
                     }
                     @if (ip.blacklist.reason) {
                       <span [textContent]="ip.blacklist.reason"></span>

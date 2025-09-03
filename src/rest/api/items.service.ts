@@ -17,13 +17,13 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { GoautowpFeedback } from '../model/goautowpFeedback';
+import { GoautowpBrandIcons } from '../model/goautowpBrandIcons';
 // @ts-ignore
-import { GoautowpIP } from '../model/goautowpIP';
+import { GoautowpBrandVehicleTypeItems } from '../model/goautowpBrandVehicleTypeItems';
 // @ts-ignore
-import { GoautowpReCaptchaConfig } from '../model/goautowpReCaptchaConfig';
+import { GoautowpSpecsItems } from '../model/goautowpSpecsItems';
 // @ts-ignore
-import { GoautowpTimezones } from '../model/goautowpTimezones';
+import { GoautowpVehicleTypeItems } from '../model/goautowpVehicleTypeItems';
 // @ts-ignore
 import { RpcStatus } from '../model/rpcStatus';
 
@@ -37,24 +37,20 @@ import { BaseService } from '../api.base.service';
 @Injectable({
   providedIn: 'root'
 })
-export class AutowpService extends BaseService {
+export class ItemsService extends BaseService {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
-     * @param feedback 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public autowpCreateFeedback(feedback: GoautowpFeedback, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<object>;
-    public autowpCreateFeedback(feedback: GoautowpFeedback, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<object>>;
-    public autowpCreateFeedback(feedback: GoautowpFeedback, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<object>>;
-    public autowpCreateFeedback(feedback: GoautowpFeedback, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (feedback === null || feedback === undefined) {
-            throw new Error('Required parameter feedback was null or undefined when calling autowpCreateFeedback.');
-        }
+    public itemsGetBrandIcons(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpBrandIcons>;
+    public itemsGetBrandIcons(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpBrandIcons>>;
+    public itemsGetBrandIcons(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpBrandIcons>>;
+    public itemsGetBrandIcons(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -70,15 +66,6 @@ export class AutowpService extends BaseService {
         const localVarTransferCache: boolean = options?.transferCache ?? true;
 
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-        }
-
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
             if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
@@ -90,12 +77,11 @@ export class AutowpService extends BaseService {
             }
         }
 
-        let localVarPath = `/v3/feedback`;
+        let localVarPath = `/v3/items/brand-icons`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<object>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<GoautowpBrandIcons>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: feedback,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -107,29 +93,21 @@ export class AutowpService extends BaseService {
     }
 
     /**
-     * @param ip 
-     * @param fields 
+     * @param brandId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public autowpGetIP(ip: string, fields: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpIP>;
-    public autowpGetIP(ip: string, fields: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpIP>>;
-    public autowpGetIP(ip: string, fields: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpIP>>;
-    public autowpGetIP(ip: string, fields: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (ip === null || ip === undefined) {
-            throw new Error('Required parameter ip was null or undefined when calling autowpGetIP.');
-        }
-        if (fields === null || fields === undefined) {
-            throw new Error('Required parameter fields was null or undefined when calling autowpGetIP.');
+    public itemsGetBrandVehicleTypes(brandId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpBrandVehicleTypeItems>;
+    public itemsGetBrandVehicleTypes(brandId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpBrandVehicleTypeItems>>;
+    public itemsGetBrandVehicleTypes(brandId: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpBrandVehicleTypeItems>>;
+    public itemsGetBrandVehicleTypes(brandId: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (brandId === null || brandId === undefined) {
+            throw new Error('Required parameter brandId was null or undefined when calling itemsGetBrandVehicleTypes.');
         }
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
-        if (fields) {
-            fields.forEach((element) => {
-                localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
-                  <any>element, 'fields');
-            })
-        }
+        localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+          <any>brandId, 'brandId');
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -156,9 +134,9 @@ export class AutowpService extends BaseService {
             }
         }
 
-        let localVarPath = `/v3/autowp/ip/${this.configuration.encodeParam({name: "ip", value: ip, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        let localVarPath = `/v3/items/brand-vehicle-types`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<GoautowpIP>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<GoautowpBrandVehicleTypeItems>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,
@@ -176,10 +154,10 @@ export class AutowpService extends BaseService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public autowpGetReCaptchaConfig(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpReCaptchaConfig>;
-    public autowpGetReCaptchaConfig(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpReCaptchaConfig>>;
-    public autowpGetReCaptchaConfig(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpReCaptchaConfig>>;
-    public autowpGetReCaptchaConfig(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public itemsGetSpecs(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpSpecsItems>;
+    public itemsGetSpecs(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpSpecsItems>>;
+    public itemsGetSpecs(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpSpecsItems>>;
+    public itemsGetSpecs(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -206,9 +184,9 @@ export class AutowpService extends BaseService {
             }
         }
 
-        let localVarPath = `/v3/autowp/recaptcha-config`;
+        let localVarPath = `/v3/items/specs`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<GoautowpReCaptchaConfig>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<GoautowpSpecsItems>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -225,10 +203,10 @@ export class AutowpService extends BaseService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public autowpGetTimezones(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpTimezones>;
-    public autowpGetTimezones(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpTimezones>>;
-    public autowpGetTimezones(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpTimezones>>;
-    public autowpGetTimezones(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public itemsGetVehicleTypes(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpVehicleTypeItems>;
+    public itemsGetVehicleTypes(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpVehicleTypeItems>>;
+    public itemsGetVehicleTypes(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpVehicleTypeItems>>;
+    public itemsGetVehicleTypes(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -255,9 +233,9 @@ export class AutowpService extends BaseService {
             }
         }
 
-        let localVarPath = `/v3/autowp/timezones`;
+        let localVarPath = `/v3/items/vehicle-types`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<GoautowpTimezones>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<GoautowpVehicleTypeItems>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

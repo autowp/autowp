@@ -3,8 +3,6 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   APIItem,
-  BrandVehicleType,
-  GetBrandVehicleTypesRequest,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -19,7 +17,9 @@ import {
   PictureStatus,
   PreviewPicturesRequest,
 } from '@grpc/spec.pb';
-import {AutowpClient, ItemsClient} from '@grpc/spec.pbsc';
+import {ItemsClient} from '@grpc/spec.pbsc';
+import {ItemsService} from '@rest/api/items.service';
+import {GoautowpBrandVehicleType} from '@rest/model/goautowpBrandVehicleType';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {
@@ -43,8 +43,8 @@ import {convertChildsCounts} from '../catalogue-service';
 export class CatalogueCarsComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
-  readonly #grpc = inject(AutowpClient);
   readonly #itemsClient = inject(ItemsClient);
+  readonly #itemsService = inject(ItemsService);
   readonly #languageService = inject(LanguageService);
 
   protected readonly brand$: Observable<APIItem> = this.#route.paramMap.pipe(
@@ -74,21 +74,15 @@ export class CatalogueCarsComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly vehicleTypes$: Observable<BrandVehicleType[]> = this.brand$.pipe(
-    switchMap((brand) =>
-      this.#grpc.getBrandVehicleTypes(
-        new GetBrandVehicleTypesRequest({
-          brandId: +brand.id,
-        }),
-      ),
-    ),
+  readonly #vehicleTypes$: Observable<GoautowpBrandVehicleType[]> = this.brand$.pipe(
+    switchMap((brand) => this.#itemsService.itemsGetBrandVehicleTypes(+brand.id)),
     map((vehicleTypes) => (vehicleTypes.items ? vehicleTypes.items : [])),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly currentVehicleType$: Observable<BrandVehicleType | undefined> = combineLatest([
+  protected readonly currentVehicleType$: Observable<GoautowpBrandVehicleType | undefined> = combineLatest([
     this.brand$,
-    this.vehicleTypes$,
+    this.#vehicleTypes$,
     this.#route.paramMap.pipe(
       map((params) => params.get('vehicle_type')),
       distinctUntilChanged(),
@@ -132,7 +126,7 @@ export class CatalogueCarsComponent {
       name: string;
       route: string[];
     }[]
-  > = combineLatest([this.vehicleTypes$, this.currentVehicleType$, this.brand$]).pipe(
+  > = combineLatest([this.#vehicleTypes$, this.currentVehicleType$, this.brand$]).pipe(
     map(([types, current, brand]) =>
       types.map((t) => ({
         active: !!(current && t.id === current.id),

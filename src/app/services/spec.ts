@@ -1,7 +1,6 @@
 import {inject, Injectable} from '@angular/core';
-import {Spec} from '@grpc/spec.pb';
-import {AutowpClient} from '@grpc/spec.pbsc';
-import {Empty} from '@ngx-grpc/well-known-types';
+import {ItemsService} from '@rest/api/items.service';
+import {GoautowpSpec} from '@rest/model/goautowpSpec';
 import {Observable} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 
@@ -9,9 +8,9 @@ import {map, shareReplay} from 'rxjs/operators';
   providedIn: 'root',
 })
 export class SpecService {
-  readonly #grpc = inject(AutowpClient);
+  readonly #itemsService = inject(ItemsService);
 
-  public readonly specs$: Observable<Spec[]> = this.#grpc.getSpecs(new Empty()).pipe(
+  public readonly specs$: Observable<GoautowpSpec[]> = this.#itemsService.itemsGetSpecs().pipe(
     map((response) => (response.items ? response.items : [])),
     shareReplay({bufferSize: 1, refCount: false}),
   );

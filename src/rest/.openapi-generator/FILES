@@ -6,6 +6,8 @@ api/api.ts
 api/articles.service.ts
 api/autowp.service.ts
 api/donations.service.ts
+api/items.service.ts
+api/pictures.service.ts
 configuration.ts
 encoder.ts
 git_push.sh
@@ -37,7 +39,6 @@ model/goautowpAPIForumsTopics.ts
 model/goautowpAPIForumsUserSummary.ts
 model/goautowpAPIGetItemVehicleTypesResponse.ts
 model/goautowpAPIGetTextResponse.ts
-model/goautowpAPIIP.ts
 model/goautowpAPIIPRights.ts
 model/goautowpAPIImage.ts
 model/goautowpAPIItem.ts
@@ -122,10 +123,12 @@ model/goautowpDfDistanceRequest.ts
 model/goautowpDfDistances.ts
 model/goautowpDonationsTransaction.ts
 model/goautowpDonationsTransactionsResponse.ts
+model/goautowpFeedback.ts
 model/goautowpGalleryResponse.ts
 model/goautowpGetMessagesRequestOrder.ts
 model/goautowpGetSpecificationsResponse.ts
 model/goautowpGetUserRatingFansResponse.ts
+model/goautowpIP.ts
 model/goautowpInbox.ts
 model/goautowpInboxBrand.ts
 model/goautowpItemFields.ts

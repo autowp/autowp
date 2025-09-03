@@ -30,7 +30,7 @@
                   class="form-control"
                   placeholder="John"
                   i18n-placeholder
-                  formControlName="name"
+                  [formControl]="control"
                   [class.is-invalid]="
                     (control.invalid && (control.dirty || !control.untouched)) ||
                     (invalidParams() && invalidParams()['name'])
@@ -55,7 +55,7 @@
                   class="form-control"
                   placeholder="john@example.com"
                   i18n-placeholder
-                  formControlName="email"
+                  [formControl]="control"
                   [class.is-invalid]="
                     (control.invalid && (control.dirty || !control.untouched)) ||
                     (invalidParams() && invalidParams()['email'])
@@ -77,7 +77,7 @@
                   cols="80"
                   rows="8"
                   class="form-control"
-                  formControlName="message"
+                  [formControl]="control"
                   [class.is-invalid]="
                     (control.invalid && (control.dirty || !control.untouched)) ||
                     (invalidParams() && invalidParams()['message'])
@@ -89,7 +89,7 @@
               </div>
             </div>
           }
-          @if (form.controls.captcha; as control) {
+          @if (form.controls.captcha) {
             <div class="mb-3 row">
               <div class="col-md-10 offset-md-2">
                 @if (recaptchaKey$ | async; as recaptchaKey) {

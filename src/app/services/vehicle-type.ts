@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {AutowpService} from '@rest/api/autowp.service';
+import {ItemsService} from '@rest/api/items.service';
 import {GoautowpVehicleType} from '@rest/model/goautowpVehicleType';
 import {Observable} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
@@ -8,9 +8,9 @@ import {map, shareReplay} from 'rxjs/operators';
   providedIn: 'root',
 })
 export class VehicleTypeService {
-  readonly #autowp = inject(AutowpService);
+  readonly #itemsService = inject(ItemsService);
 
-  readonly #types$: Observable<GoautowpVehicleType[]> = this.#autowp.autowpGetVehicleTypes().pipe(
+  readonly #types$: Observable<GoautowpVehicleType[]> = this.#itemsService.itemsGetVehicleTypes().pipe(
     map((data) => (data.items ? data.items : [])),
     shareReplay({bufferSize: 1, refCount: false}),
   );

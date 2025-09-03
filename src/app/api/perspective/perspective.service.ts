@@ -1,7 +1,6 @@
 import {inject, Injectable} from '@angular/core';
-import {Perspective} from '@grpc/spec.pb';
-import {AutowpClient} from '@grpc/spec.pbsc';
-import {Empty} from '@ngx-grpc/well-known-types';
+import {PicturesService} from '@rest/api/pictures.service';
+import {GoautowpPerspective} from '@rest/model/goautowpPerspective';
 import {Observable} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 
@@ -9,14 +8,14 @@ import {map, shareReplay} from 'rxjs/operators';
   providedIn: 'root',
 })
 export class APIPerspectiveService {
-  readonly #grpc = inject(AutowpClient);
+  readonly #picturesService = inject(PicturesService);
 
-  readonly #perspectives$: Observable<Perspective[]> = this.#grpc.getPerspectives(new Empty()).pipe(
+  readonly #perspectives$: Observable<GoautowpPerspective[]> = this.#picturesService.picturesGetPerspectives().pipe(
     map((response) => (response.items ? response.items : [])),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  public getPerspectives$(): Observable<Perspective[]> {
+  public getPerspectives$(): Observable<GoautowpPerspective[]> {
     return this.#perspectives$;
   }
 }

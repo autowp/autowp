@@ -77,7 +77,7 @@ export class AutowpClient {
      * @returns Observable<GrpcEvent<googleProtobuf004.Empty>>
      */
     createFeedback: (
-      requestData: thisProto.APICreateFeedbackRequest,
+      requestData: thisProto.CreateFeedbackRequest,
       requestMetadata = new GrpcMetadata()
     ): Observable<GrpcEvent<googleProtobuf004.Empty>> => {
       return this.handler.handle({
@@ -86,50 +86,8 @@ export class AutowpClient {
         path: '/goautowp.Autowp/CreateFeedback',
         requestData,
         requestMetadata,
-        requestClass: thisProto.APICreateFeedbackRequest,
+        requestClass: thisProto.CreateFeedbackRequest,
         responseClass: googleProtobuf004.Empty
-      });
-    },
-    /**
-     * Unary call: /goautowp.Autowp/GetBrandIcons
-     *
-     * @param requestMessage Request message
-     * @param requestMetadata Request metadata
-     * @returns Observable<GrpcEvent<thisProto.BrandIcons>>
-     */
-    getBrandIcons: (
-      requestData: googleProtobuf004.Empty,
-      requestMetadata = new GrpcMetadata()
-    ): Observable<GrpcEvent<thisProto.BrandIcons>> => {
-      return this.handler.handle({
-        type: GrpcCallType.unary,
-        client: this.client,
-        path: '/goautowp.Autowp/GetBrandIcons',
-        requestData,
-        requestMetadata,
-        requestClass: googleProtobuf004.Empty,
-        responseClass: thisProto.BrandIcons
-      });
-    },
-    /**
-     * Unary call: /goautowp.Autowp/GetBrandVehicleTypes
-     *
-     * @param requestMessage Request message
-     * @param requestMetadata Request metadata
-     * @returns Observable<GrpcEvent<thisProto.BrandVehicleTypeItems>>
-     */
-    getBrandVehicleTypes: (
-      requestData: thisProto.GetBrandVehicleTypesRequest,
-      requestMetadata = new GrpcMetadata()
-    ): Observable<GrpcEvent<thisProto.BrandVehicleTypeItems>> => {
-      return this.handler.handle({
-        type: GrpcCallType.unary,
-        client: this.client,
-        path: '/goautowp.Autowp/GetBrandVehicleTypes',
-        requestData,
-        requestMetadata,
-        requestClass: thisProto.GetBrandVehicleTypesRequest,
-        responseClass: thisProto.BrandVehicleTypeItems
       });
     },
     /**
@@ -137,62 +95,20 @@ export class AutowpClient {
      *
      * @param requestMessage Request message
      * @param requestMetadata Request metadata
-     * @returns Observable<GrpcEvent<thisProto.APIIP>>
+     * @returns Observable<GrpcEvent<thisProto.IP>>
      */
     getIP: (
-      requestData: thisProto.APIGetIPRequest,
+      requestData: thisProto.GetIPRequest,
       requestMetadata = new GrpcMetadata()
-    ): Observable<GrpcEvent<thisProto.APIIP>> => {
+    ): Observable<GrpcEvent<thisProto.IP>> => {
       return this.handler.handle({
         type: GrpcCallType.unary,
         client: this.client,
         path: '/goautowp.Autowp/GetIP',
         requestData,
         requestMetadata,
-        requestClass: thisProto.APIGetIPRequest,
-        responseClass: thisProto.APIIP
-      });
-    },
-    /**
-     * Unary call: /goautowp.Autowp/GetPerspectives
-     *
-     * @param requestMessage Request message
-     * @param requestMetadata Request metadata
-     * @returns Observable<GrpcEvent<thisProto.PerspectivesItems>>
-     */
-    getPerspectives: (
-      requestData: googleProtobuf004.Empty,
-      requestMetadata = new GrpcMetadata()
-    ): Observable<GrpcEvent<thisProto.PerspectivesItems>> => {
-      return this.handler.handle({
-        type: GrpcCallType.unary,
-        client: this.client,
-        path: '/goautowp.Autowp/GetPerspectives',
-        requestData,
-        requestMetadata,
-        requestClass: googleProtobuf004.Empty,
-        responseClass: thisProto.PerspectivesItems
-      });
-    },
-    /**
-     * Unary call: /goautowp.Autowp/GetPerspectivePages
-     *
-     * @param requestMessage Request message
-     * @param requestMetadata Request metadata
-     * @returns Observable<GrpcEvent<thisProto.PerspectivePagesItems>>
-     */
-    getPerspectivePages: (
-      requestData: googleProtobuf004.Empty,
-      requestMetadata = new GrpcMetadata()
-    ): Observable<GrpcEvent<thisProto.PerspectivePagesItems>> => {
-      return this.handler.handle({
-        type: GrpcCallType.unary,
-        client: this.client,
-        path: '/goautowp.Autowp/GetPerspectivePages',
-        requestData,
-        requestMetadata,
-        requestClass: googleProtobuf004.Empty,
-        responseClass: thisProto.PerspectivePagesItems
+        requestClass: thisProto.GetIPRequest,
+        responseClass: thisProto.IP
       });
     },
     /**
@@ -214,48 +130,6 @@ export class AutowpClient {
         requestMetadata,
         requestClass: googleProtobuf004.Empty,
         responseClass: thisProto.ReCaptchaConfig
-      });
-    },
-    /**
-     * Unary call: /goautowp.Autowp/GetSpecs
-     *
-     * @param requestMessage Request message
-     * @param requestMetadata Request metadata
-     * @returns Observable<GrpcEvent<thisProto.SpecsItems>>
-     */
-    getSpecs: (
-      requestData: googleProtobuf004.Empty,
-      requestMetadata = new GrpcMetadata()
-    ): Observable<GrpcEvent<thisProto.SpecsItems>> => {
-      return this.handler.handle({
-        type: GrpcCallType.unary,
-        client: this.client,
-        path: '/goautowp.Autowp/GetSpecs',
-        requestData,
-        requestMetadata,
-        requestClass: googleProtobuf004.Empty,
-        responseClass: thisProto.SpecsItems
-      });
-    },
-    /**
-     * Unary call: /goautowp.Autowp/GetVehicleTypes
-     *
-     * @param requestMessage Request message
-     * @param requestMetadata Request metadata
-     * @returns Observable<GrpcEvent<thisProto.VehicleTypeItems>>
-     */
-    getVehicleTypes: (
-      requestData: googleProtobuf004.Empty,
-      requestMetadata = new GrpcMetadata()
-    ): Observable<GrpcEvent<thisProto.VehicleTypeItems>> => {
-      return this.handler.handle({
-        type: GrpcCallType.unary,
-        client: this.client,
-        path: '/goautowp.Autowp/GetVehicleTypes',
-        requestData,
-        requestMetadata,
-        requestClass: googleProtobuf004.Empty,
-        responseClass: thisProto.VehicleTypeItems
       });
     },
     /**
@@ -297,7 +171,7 @@ export class AutowpClient {
    * @returns Observable<googleProtobuf004.Empty>
    */
   createFeedback(
-    requestData: thisProto.APICreateFeedbackRequest,
+    requestData: thisProto.CreateFeedbackRequest,
     requestMetadata = new GrpcMetadata()
   ): Observable<googleProtobuf004.Empty> {
     return this.$raw
@@ -306,82 +180,18 @@ export class AutowpClient {
   }
 
   /**
-   * Unary call @/goautowp.Autowp/GetBrandIcons
-   *
-   * @param requestMessage Request message
-   * @param requestMetadata Request metadata
-   * @returns Observable<thisProto.BrandIcons>
-   */
-  getBrandIcons(
-    requestData: googleProtobuf004.Empty,
-    requestMetadata = new GrpcMetadata()
-  ): Observable<thisProto.BrandIcons> {
-    return this.$raw
-      .getBrandIcons(requestData, requestMetadata)
-      .pipe(throwStatusErrors(), takeMessages());
-  }
-
-  /**
-   * Unary call @/goautowp.Autowp/GetBrandVehicleTypes
-   *
-   * @param requestMessage Request message
-   * @param requestMetadata Request metadata
-   * @returns Observable<thisProto.BrandVehicleTypeItems>
-   */
-  getBrandVehicleTypes(
-    requestData: thisProto.GetBrandVehicleTypesRequest,
-    requestMetadata = new GrpcMetadata()
-  ): Observable<thisProto.BrandVehicleTypeItems> {
-    return this.$raw
-      .getBrandVehicleTypes(requestData, requestMetadata)
-      .pipe(throwStatusErrors(), takeMessages());
-  }
-
-  /**
    * Unary call @/goautowp.Autowp/GetIP
    *
    * @param requestMessage Request message
    * @param requestMetadata Request metadata
-   * @returns Observable<thisProto.APIIP>
+   * @returns Observable<thisProto.IP>
    */
   getIP(
-    requestData: thisProto.APIGetIPRequest,
+    requestData: thisProto.GetIPRequest,
     requestMetadata = new GrpcMetadata()
-  ): Observable<thisProto.APIIP> {
+  ): Observable<thisProto.IP> {
     return this.$raw
       .getIP(requestData, requestMetadata)
-      .pipe(throwStatusErrors(), takeMessages());
-  }
-
-  /**
-   * Unary call @/goautowp.Autowp/GetPerspectives
-   *
-   * @param requestMessage Request message
-   * @param requestMetadata Request metadata
-   * @returns Observable<thisProto.PerspectivesItems>
-   */
-  getPerspectives(
-    requestData: googleProtobuf004.Empty,
-    requestMetadata = new GrpcMetadata()
-  ): Observable<thisProto.PerspectivesItems> {
-    return this.$raw
-      .getPerspectives(requestData, requestMetadata)
-      .pipe(throwStatusErrors(), takeMessages());
-  }
-
-  /**
-   * Unary call @/goautowp.Autowp/GetPerspectivePages
-   *
-   * @param requestMessage Request message
-   * @param requestMetadata Request metadata
-   * @returns Observable<thisProto.PerspectivePagesItems>
-   */
-  getPerspectivePages(
-    requestData: googleProtobuf004.Empty,
-    requestMetadata = new GrpcMetadata()
-  ): Observable<thisProto.PerspectivePagesItems> {
-    return this.$raw
-      .getPerspectivePages(requestData, requestMetadata)
       .pipe(throwStatusErrors(), takeMessages());
   }
 
@@ -398,38 +208,6 @@ export class AutowpClient {
   ): Observable<thisProto.ReCaptchaConfig> {
     return this.$raw
       .getReCaptchaConfig(requestData, requestMetadata)
-      .pipe(throwStatusErrors(), takeMessages());
-  }
-
-  /**
-   * Unary call @/goautowp.Autowp/GetSpecs
-   *
-   * @param requestMessage Request message
-   * @param requestMetadata Request metadata
-   * @returns Observable<thisProto.SpecsItems>
-   */
-  getSpecs(
-    requestData: googleProtobuf004.Empty,
-    requestMetadata = new GrpcMetadata()
-  ): Observable<thisProto.SpecsItems> {
-    return this.$raw
-      .getSpecs(requestData, requestMetadata)
-      .pipe(throwStatusErrors(), takeMessages());
-  }
-
-  /**
-   * Unary call @/goautowp.Autowp/GetVehicleTypes
-   *
-   * @param requestMessage Request message
-   * @param requestMetadata Request metadata
-   * @returns Observable<thisProto.VehicleTypeItems>
-   */
-  getVehicleTypes(
-    requestData: googleProtobuf004.Empty,
-    requestMetadata = new GrpcMetadata()
-  ): Observable<thisProto.VehicleTypeItems> {
-    return this.$raw
-      .getVehicleTypes(requestData, requestMetadata)
       .pipe(throwStatusErrors(), takeMessages());
   }
 
@@ -3072,6 +2850,90 @@ export class ItemsClient {
         requestClass: googleProtobuf004.Empty,
         responseClass: thisProto.AlphaResponse
       });
+    },
+    /**
+     * Unary call: /goautowp.Items/GetBrandVehicleTypes
+     *
+     * @param requestMessage Request message
+     * @param requestMetadata Request metadata
+     * @returns Observable<GrpcEvent<thisProto.BrandVehicleTypeItems>>
+     */
+    getBrandVehicleTypes: (
+      requestData: thisProto.GetBrandVehicleTypesRequest,
+      requestMetadata = new GrpcMetadata()
+    ): Observable<GrpcEvent<thisProto.BrandVehicleTypeItems>> => {
+      return this.handler.handle({
+        type: GrpcCallType.unary,
+        client: this.client,
+        path: '/goautowp.Items/GetBrandVehicleTypes',
+        requestData,
+        requestMetadata,
+        requestClass: thisProto.GetBrandVehicleTypesRequest,
+        responseClass: thisProto.BrandVehicleTypeItems
+      });
+    },
+    /**
+     * Unary call: /goautowp.Items/GetVehicleTypes
+     *
+     * @param requestMessage Request message
+     * @param requestMetadata Request metadata
+     * @returns Observable<GrpcEvent<thisProto.VehicleTypeItems>>
+     */
+    getVehicleTypes: (
+      requestData: googleProtobuf004.Empty,
+      requestMetadata = new GrpcMetadata()
+    ): Observable<GrpcEvent<thisProto.VehicleTypeItems>> => {
+      return this.handler.handle({
+        type: GrpcCallType.unary,
+        client: this.client,
+        path: '/goautowp.Items/GetVehicleTypes',
+        requestData,
+        requestMetadata,
+        requestClass: googleProtobuf004.Empty,
+        responseClass: thisProto.VehicleTypeItems
+      });
+    },
+    /**
+     * Unary call: /goautowp.Items/GetSpecs
+     *
+     * @param requestMessage Request message
+     * @param requestMetadata Request metadata
+     * @returns Observable<GrpcEvent<thisProto.SpecsItems>>
+     */
+    getSpecs: (
+      requestData: googleProtobuf004.Empty,
+      requestMetadata = new GrpcMetadata()
+    ): Observable<GrpcEvent<thisProto.SpecsItems>> => {
+      return this.handler.handle({
+        type: GrpcCallType.unary,
+        client: this.client,
+        path: '/goautowp.Items/GetSpecs',
+        requestData,
+        requestMetadata,
+        requestClass: googleProtobuf004.Empty,
+        responseClass: thisProto.SpecsItems
+      });
+    },
+    /**
+     * Unary call: /goautowp.Items/GetBrandIcons
+     *
+     * @param requestMessage Request message
+     * @param requestMetadata Request metadata
+     * @returns Observable<GrpcEvent<thisProto.BrandIcons>>
+     */
+    getBrandIcons: (
+      requestData: googleProtobuf004.Empty,
+      requestMetadata = new GrpcMetadata()
+    ): Observable<GrpcEvent<thisProto.BrandIcons>> => {
+      return this.handler.handle({
+        type: GrpcCallType.unary,
+        client: this.client,
+        path: '/goautowp.Items/GetBrandIcons',
+        requestData,
+        requestMetadata,
+        requestClass: googleProtobuf004.Empty,
+        responseClass: thisProto.BrandIcons
+      });
     }
   };
 
@@ -3752,6 +3614,70 @@ export class ItemsClient {
   ): Observable<thisProto.AlphaResponse> {
     return this.$raw
       .getAlpha(requestData, requestMetadata)
+      .pipe(throwStatusErrors(), takeMessages());
+  }
+
+  /**
+   * Unary call @/goautowp.Items/GetBrandVehicleTypes
+   *
+   * @param requestMessage Request message
+   * @param requestMetadata Request metadata
+   * @returns Observable<thisProto.BrandVehicleTypeItems>
+   */
+  getBrandVehicleTypes(
+    requestData: thisProto.GetBrandVehicleTypesRequest,
+    requestMetadata = new GrpcMetadata()
+  ): Observable<thisProto.BrandVehicleTypeItems> {
+    return this.$raw
+      .getBrandVehicleTypes(requestData, requestMetadata)
+      .pipe(throwStatusErrors(), takeMessages());
+  }
+
+  /**
+   * Unary call @/goautowp.Items/GetVehicleTypes
+   *
+   * @param requestMessage Request message
+   * @param requestMetadata Request metadata
+   * @returns Observable<thisProto.VehicleTypeItems>
+   */
+  getVehicleTypes(
+    requestData: googleProtobuf004.Empty,
+    requestMetadata = new GrpcMetadata()
+  ): Observable<thisProto.VehicleTypeItems> {
+    return this.$raw
+      .getVehicleTypes(requestData, requestMetadata)
+      .pipe(throwStatusErrors(), takeMessages());
+  }
+
+  /**
+   * Unary call @/goautowp.Items/GetSpecs
+   *
+   * @param requestMessage Request message
+   * @param requestMetadata Request metadata
+   * @returns Observable<thisProto.SpecsItems>
+   */
+  getSpecs(
+    requestData: googleProtobuf004.Empty,
+    requestMetadata = new GrpcMetadata()
+  ): Observable<thisProto.SpecsItems> {
+    return this.$raw
+      .getSpecs(requestData, requestMetadata)
+      .pipe(throwStatusErrors(), takeMessages());
+  }
+
+  /**
+   * Unary call @/goautowp.Items/GetBrandIcons
+   *
+   * @param requestMessage Request message
+   * @param requestMetadata Request metadata
+   * @returns Observable<thisProto.BrandIcons>
+   */
+  getBrandIcons(
+    requestData: googleProtobuf004.Empty,
+    requestMetadata = new GrpcMetadata()
+  ): Observable<thisProto.BrandIcons> {
+    return this.$raw
+      .getBrandIcons(requestData, requestMetadata)
       .pipe(throwStatusErrors(), takeMessages());
   }
 }
@@ -5128,6 +5054,48 @@ export class PicturesClient {
         requestClass: thisProto.GalleryRequest,
         responseClass: thisProto.GalleryResponse
       });
+    },
+    /**
+     * Unary call: /goautowp.Pictures/GetPerspectives
+     *
+     * @param requestMessage Request message
+     * @param requestMetadata Request metadata
+     * @returns Observable<GrpcEvent<thisProto.PerspectivesItems>>
+     */
+    getPerspectives: (
+      requestData: googleProtobuf004.Empty,
+      requestMetadata = new GrpcMetadata()
+    ): Observable<GrpcEvent<thisProto.PerspectivesItems>> => {
+      return this.handler.handle({
+        type: GrpcCallType.unary,
+        client: this.client,
+        path: '/goautowp.Pictures/GetPerspectives',
+        requestData,
+        requestMetadata,
+        requestClass: googleProtobuf004.Empty,
+        responseClass: thisProto.PerspectivesItems
+      });
+    },
+    /**
+     * Unary call: /goautowp.Pictures/GetPerspectivePages
+     *
+     * @param requestMessage Request message
+     * @param requestMetadata Request metadata
+     * @returns Observable<GrpcEvent<thisProto.PerspectivePagesItems>>
+     */
+    getPerspectivePages: (
+      requestData: googleProtobuf004.Empty,
+      requestMetadata = new GrpcMetadata()
+    ): Observable<GrpcEvent<thisProto.PerspectivePagesItems>> => {
+      return this.handler.handle({
+        type: GrpcCallType.unary,
+        client: this.client,
+        path: '/goautowp.Pictures/GetPerspectivePages',
+        requestData,
+        requestMetadata,
+        requestClass: googleProtobuf004.Empty,
+        responseClass: thisProto.PerspectivePagesItems
+      });
     }
   };
 
@@ -5680,6 +5648,38 @@ export class PicturesClient {
   ): Observable<thisProto.GalleryResponse> {
     return this.$raw
       .getGallery(requestData, requestMetadata)
+      .pipe(throwStatusErrors(), takeMessages());
+  }
+
+  /**
+   * Unary call @/goautowp.Pictures/GetPerspectives
+   *
+   * @param requestMessage Request message
+   * @param requestMetadata Request metadata
+   * @returns Observable<thisProto.PerspectivesItems>
+   */
+  getPerspectives(
+    requestData: googleProtobuf004.Empty,
+    requestMetadata = new GrpcMetadata()
+  ): Observable<thisProto.PerspectivesItems> {
+    return this.$raw
+      .getPerspectives(requestData, requestMetadata)
+      .pipe(throwStatusErrors(), takeMessages());
+  }
+
+  /**
+   * Unary call @/goautowp.Pictures/GetPerspectivePages
+   *
+   * @param requestMessage Request message
+   * @param requestMetadata Request metadata
+   * @returns Observable<thisProto.PerspectivePagesItems>
+   */
+  getPerspectivePages(
+    requestData: googleProtobuf004.Empty,
+    requestMetadata = new GrpcMetadata()
+  ): Observable<thisProto.PerspectivePagesItems> {
+    return this.$raw
+      .getPerspectivePages(requestData, requestMetadata)
       .pipe(throwStatusErrors(), takeMessages());
   }
 }

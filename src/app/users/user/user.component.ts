@@ -6,7 +6,6 @@ import {
   AddToTrafficBlacklistRequest,
   APICommentsMessage,
   APIDeleteUserRequest,
-  APIIP,
   APIUser,
   APIUserPreferencesRequest,
   CommentMessageFields,
@@ -23,6 +22,7 @@ import {
 } from '@grpc/spec.pb';
 import {CommentsClient, ContactsClient, PicturesClient, TrafficClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {GoautowpIP} from '@rest/model/goautowpIP';
 import {AuthService, Role} from '@services/auth.service';
 import {ContactsService} from '@services/contacts';
 import {IpService} from '@services/ip';
@@ -165,7 +165,7 @@ export class UsersUserComponent {
 
   readonly #ipChange$ = new BehaviorSubject<void>(void 0);
 
-  protected readonly ip$: Observable<APIIP | null> = combineLatest([this.user$, this.#ipChange$]).pipe(
+  protected readonly ip$: Observable<GoautowpIP | null> = combineLatest([this.user$, this.#ipChange$]).pipe(
     switchMap(([user]) => {
       if (!user.lastIp) {
         return of(null);

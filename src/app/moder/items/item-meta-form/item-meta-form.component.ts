@@ -29,11 +29,11 @@ import {
   PictureItem,
   PictureListOptions,
   PicturesRequest,
-  Spec,
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {BoolValue, Int32Value} from '@ngx-grpc/well-known-types';
+import {GoautowpSpec} from '@rest/model/goautowpSpec';
 import {GoautowpVehicleType} from '@rest/model/goautowpVehicleType';
 import {LanguageService} from '@services/language';
 import {SpecService} from '@services/spec';
@@ -176,7 +176,7 @@ function localizeInherited(parentIsConcept: null | ParentIsConcept) {
   return parentIsConcept.isConcept ? $localize`inherited (yes)` : $localize`inherited (no)`;
 }
 
-function specsToPlain(options: Spec[], deep: number): ItemMetaFormAPISpec[] {
+function specsToPlain(options: GoautowpSpec[], deep: number): ItemMetaFormAPISpec[] {
   const result: ItemMetaFormAPISpec[] = [];
   for (const item of options) {
     result.push({

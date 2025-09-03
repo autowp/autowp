@@ -1,10 +1,9 @@
 import {AsyncPipe} from '@angular/common';
+import {HttpErrorResponse} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
-import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
-import {APICreateFeedbackRequest} from '@grpc/spec.pb';
-import {AutowpClient} from '@grpc/spec.pbsc';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
+import {AutowpService} from '@rest/api/autowp.service';
 import {PageEnvService} from '@services/page-env.service';
 import {ReCaptchaService} from '@services/recaptcha';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
@@ -13,7 +12,7 @@ import {RecaptchaModule} from 'ng-recaptcha-2';
 import {EMPTY, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
-import {extractFieldViolations, fieldViolations2InvalidParams} from '../grpc';
+import {invalidParamsFromError} from '../gateway';
 import {ToastsService} from '../toasts/toasts.service';
 
 const CAPTCHA = 'captcha';
@@ -33,12 +32,11 @@ const CAPTCHA = 'captcha';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackComponent implements OnInit {
-  readonly #grpc = inject(AutowpClient);
+  readonly #autowpService = inject(AutowpService);
   readonly #router = inject(Router);
   readonly #reCaptchaService = inject(ReCaptchaService);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #fb = inject(NonNullableFormBuilder);
 
   protected readonly recaptchaKey$: Observable<string> = this.#reCaptchaService.get$().pipe(
     catchError((response: unknown) => {
@@ -49,11 +47,20 @@ export class FeedbackComponent implements OnInit {
   );
   protected readonly invalidParams = signal<InvalidParams>({});
 
-  protected readonly form = this.#fb.group({
-    captcha: '',
-    email: ['', [Validators.required, Validators.maxLength(255), Validators.email]],
-    message: ['', [Validators.required, Validators.maxLength(65536)]],
-    name: ['', [Validators.required, Validators.maxLength(255)]],
+  protected readonly form = new FormGroup({
+    captcha: new FormControl<string>('', {nonNullable: true}),
+    email: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(255), Validators.email],
+    }),
+    message: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(65536)],
+    }),
+    name: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(255)],
+    }),
   });
 
   ngOnInit(): void {
@@ -63,33 +70,33 @@ export class FeedbackComponent implements OnInit {
   }
 
   protected submit() {
-    const formValue = this.form.value;
-    this.#grpc
-      .createFeedback(
-        new APICreateFeedbackRequest({
-          captcha: formValue.captcha,
-          email: formValue.email,
-          message: formValue.message,
-          name: formValue.name,
-        }),
-      )
+    const formValue = this.form.getRawValue();
+    this.#autowpService
+      .autowpCreateFeedback({
+        captcha: formValue.captcha,
+        email: formValue.email,
+        message: formValue.message,
+        name: formValue.name,
+      })
       .subscribe({
-        error: (response: unknown) => {
-          if (response instanceof GrpcStatusEvent) {
-            const fieldViolations = extractFieldViolations(response);
-            this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
+        error: (error: HttpErrorResponse) => {
+          const invalidParams = invalidParamsFromError(error);
+          if (invalidParams) {
+            this.invalidParams.set(invalidParams);
 
-            if (this.invalidParams()['captcha']) {
+            if (invalidParams['captcha']) {
               if (!this.form.get(CAPTCHA)) {
-                const control = this.#fb.control('', Validators.required);
+                const control = new FormControl('', {nonNullable: true, validators: Validators.required});
                 this.form.addControl(CAPTCHA, control);
               }
             } else {
               this.form.removeControl(CAPTCHA as never);
             }
-          } else {
-            this.#toastService.handleError(response);
+
+            return;
           }
+
+          this.#toastService.handleError(error);
         },
         next: () => {
           this.#router.navigate(['/feedback/sent']);

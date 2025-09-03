@@ -14,4 +14,5 @@ protoc --proto_path=node_modules/google-proto-files/ \
   --openapiv2_opt use_proto3_field_semantics=true \
   -I ../goautowp spec.proto
 
+rm -rf src/rest/*
 ./node_modules/.bin/openapi-generator-cli generate -i apidocs.swagger.json -g typescript-angular -o src/rest --type-mappings=DateTime=Date

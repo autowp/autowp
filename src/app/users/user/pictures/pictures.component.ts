@@ -13,7 +13,7 @@ import {
   PictureStatus,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {AutowpService} from '@rest/api/autowp.service';
+import {ItemsService} from '@rest/api/items.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
@@ -46,12 +46,12 @@ export class UsersUserPicturesComponent implements OnInit {
   readonly #userService = inject(UserService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #autowp = inject(AutowpService);
+  readonly #itemsService = inject(ItemsService);
   readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly icons$ = this.#autowp.autowpGetBrandIcons().pipe(
+  protected readonly icons$ = this.#itemsService.itemsGetBrandIcons().pipe(
     tap((icons) => {
       addCSS(icons.css);
     }),

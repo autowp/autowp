@@ -14,7 +14,7 @@
 </div>
 
 <ul>
-  @for (page of pages$ | async; track page) {
+  @for (page of pages$ | async; track page.id) {
     <li>
       [{{ page.id }}] {{ page.name }}
       <div class="mb-4 row">

@@ -16,10 +16,10 @@ import {
   PictureListOptions,
   PicturesRequest,
   PreviewPicturesRequest,
-  Spec,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import {GoautowpSpec} from '@rest/model/goautowpSpec';
 import {GoautowpVehicleType} from '@rest/model/goautowpVehicleType';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -47,7 +47,7 @@ import {convertChildsCounts} from '../../catalogue/catalogue-service';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
 
-interface APISpecInItems extends Spec {
+interface APISpecInItems extends GoautowpSpec {
   deep?: number;
 }
 

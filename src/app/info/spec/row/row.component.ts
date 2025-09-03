@@ -1,6 +1,6 @@
 import {NgStyle} from '@angular/common';
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
-import {Spec} from '@grpc/spec.pb';
+import {GoautowpSpec} from '@rest/model/goautowpSpec';
 
 @Component({
   selector: 'app-info-spec-row',
@@ -9,6 +9,6 @@ import {Spec} from '@grpc/spec.pb';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InfoSpecRowComponent {
-  readonly row = input.required<Spec>();
+  readonly row = input.required<GoautowpSpec>();
   readonly deep = input.required<number>();
 }

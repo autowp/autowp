@@ -4,7 +4,6 @@ import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   AddToTrafficBlacklistRequest,
-  APIIP,
   APIItem,
   APIUser,
   CreatePictureItemRequest,
@@ -42,6 +41,7 @@ import {
 import {ItemsClient, PicturesClient, TrafficClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
+import {GoautowpIP} from '@rest/model/goautowpIP';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -195,7 +195,7 @@ export class ModerPicturesItemComponent {
     switchMap((picture) => this.#userService.getUser$(picture.ownerId)),
   );
 
-  protected readonly ip$: Observable<APIIP | null> = this.picture$.pipe(
+  protected readonly ip$: Observable<GoautowpIP | null> = this.picture$.pipe(
     switchMap((picture) => {
       if (!picture.ip) {
         return of(null);

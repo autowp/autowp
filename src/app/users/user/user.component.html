@@ -214,7 +214,7 @@
                       }
                       @if (ip.blacklist.until) {
                         <span>
-                          <ng-container i18n>until</ng-container> {{ ip.blacklist.until.toDate() | date: 'medium' }}
+                          <ng-container i18n>until</ng-container> {{ ip.blacklist.until | date: 'medium' }}
                           @if (ip.blacklist.reason) {
                             <span> ({{ ip.blacklist.reason }}) </span>
                           }

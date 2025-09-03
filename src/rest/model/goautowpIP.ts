@@ -11,7 +11,7 @@ import { GoautowpAPIBanItem } from './goautowpAPIBanItem';
 import { GoautowpAPIIPRights } from './goautowpAPIIPRights';
 
 
-export interface GoautowpAPIIP { 
+export interface GoautowpIP { 
     address: string;
     hostname: string;
     blacklist: GoautowpAPIBanItem;

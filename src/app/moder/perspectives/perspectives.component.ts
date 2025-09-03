@@ -1,9 +1,8 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {PerspectivePage} from '@grpc/spec.pb';
-import {AutowpClient} from '@grpc/spec.pbsc';
-import {Empty} from '@ngx-grpc/well-known-types';
+import {PicturesService} from '@rest/api/pictures.service';
+import {GoautowpPerspectivePage} from '@rest/model/goautowpPerspectivePage';
 import {PageEnvService} from '@services/page-env.service';
 import {getPerspectiveTranslation} from '@utils/translations';
 import {EMPTY, Observable} from 'rxjs';
@@ -18,17 +17,19 @@ import {ToastsService} from '../../toasts/toasts.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerPerspectivesComponent implements OnInit {
-  readonly #grpc = inject(AutowpClient);
+  readonly #picturesService = inject(PicturesService);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
 
-  protected readonly pages$: Observable<PerspectivePage[]> = this.#grpc.getPerspectivePages(new Empty()).pipe(
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    map((response) => (response.items ? response.items : [])),
-  );
+  protected readonly pages$: Observable<GoautowpPerspectivePage[]> = this.#picturesService
+    .picturesGetPerspectivePages()
+    .pipe(
+      catchError((response: unknown) => {
+        this.#toastService.handleError(response);
+        return EMPTY;
+      }),
+      map((response) => (response.items ? response.items : [])),
+    );
 
   ngOnInit(): void {
     setTimeout(
