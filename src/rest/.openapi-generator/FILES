@@ -8,6 +8,8 @@ api/autowp.service.ts
 api/donations.service.ts
 api/items.service.ts
 api/pictures.service.ts
+api/statistics.service.ts
+api/votings.service.ts
 configuration.ts
 encoder.ts
 git_push.sh
@@ -234,6 +236,7 @@ model/goautowpVODDataDate.ts
 model/goautowpVODDataResponse.ts
 model/goautowpVehicleType.ts
 model/goautowpVehicleTypeItems.ts
+model/goautowpVote.ts
 model/goautowpVoting.ts
 model/goautowpVotingVariant.ts
 model/goautowpVotingVariantVotes.ts

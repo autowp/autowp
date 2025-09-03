@@ -63,8 +63,8 @@
 
   @if (voting) {
     <p i18n>
-      Voting during {{ voting.beginDate?.toDate() | date: 'mediumDate' }} to
-      {{ voting.endDate?.toDate() | date: 'mediumDate' }}
+      Voting during {{ voting.beginDate | date: 'mediumDate' }} to
+      {{ voting.endDate | date: 'mediumDate' }}
     </p>
   }
   <app-comments [itemID]="voting.id + ''" [typeID]="CommentsType.VOTINGS_TYPE_ID" />

@@ -1032,18 +1032,21 @@ export module ChartParameters {
 }
 
 /**
- * Message implementation for goautowp.VoteRequest
+ * Message implementation for goautowp.CreateVoteRequest
  */
-export class VoteRequest implements GrpcMessage {
-  static id = 'goautowp.VoteRequest';
+export class CreateVoteRequest implements GrpcMessage {
+  static id = 'goautowp.CreateVoteRequest';
 
   /**
    * Deserialize binary data to message
    * @param instance message instance
    */
   static deserializeBinary(bytes: ByteSource) {
-    const instance = new VoteRequest();
-    VoteRequest.deserializeBinaryFromReader(instance, new BinaryReader(bytes));
+    const instance = new CreateVoteRequest();
+    CreateVoteRequest.deserializeBinaryFromReader(
+      instance,
+      new BinaryReader(bytes)
+    );
     return instance;
   }
 
@@ -1051,7 +1054,148 @@ export class VoteRequest implements GrpcMessage {
    * Check all the properties and set default protobuf values if necessary
    * @param _instance message instance
    */
-  static refineValues(_instance: VoteRequest) {
+  static refineValues(_instance: CreateVoteRequest) {
+    _instance.vote = _instance.vote || undefined;
+  }
+
+  /**
+   * Deserializes / reads binary message into message instance using provided binary reader
+   * @param _instance message instance
+   * @param _reader binary reader instance
+   */
+  static deserializeBinaryFromReader(
+    _instance: CreateVoteRequest,
+    _reader: BinaryReader
+  ) {
+    while (_reader.nextField()) {
+      if (_reader.isEndGroup()) break;
+
+      switch (_reader.getFieldNumber()) {
+        case 1:
+          _instance.vote = new Vote();
+          _reader.readMessage(_instance.vote, Vote.deserializeBinaryFromReader);
+          break;
+        default:
+          _reader.skipField();
+      }
+    }
+
+    CreateVoteRequest.refineValues(_instance);
+  }
+
+  /**
+   * Serializes a message to binary format using provided binary reader
+   * @param _instance message instance
+   * @param _writer binary writer instance
+   */
+  static serializeBinaryToWriter(
+    _instance: CreateVoteRequest,
+    _writer: BinaryWriter
+  ) {
+    if (_instance.vote) {
+      _writer.writeMessage(
+        1,
+        _instance.vote as any,
+        Vote.serializeBinaryToWriter
+      );
+    }
+  }
+
+  private _vote?: Vote;
+
+  /**
+   * Message constructor. Initializes the properties and applies default Protobuf values if necessary
+   * @param _value initial values object or instance of CreateVoteRequest to deeply clone from
+   */
+  constructor(_value?: RecursivePartial<CreateVoteRequest.AsObject>) {
+    _value = _value || {};
+    this.vote = _value.vote ? new Vote(_value.vote) : undefined;
+    CreateVoteRequest.refineValues(this);
+  }
+  get vote(): Vote | undefined {
+    return this._vote;
+  }
+  set vote(value: Vote | undefined) {
+    this._vote = value;
+  }
+
+  /**
+   * Serialize message to binary data
+   * @param instance message instance
+   */
+  serializeBinary() {
+    const writer = new BinaryWriter();
+    CreateVoteRequest.serializeBinaryToWriter(this, writer);
+    return writer.getResultBuffer();
+  }
+
+  /**
+   * Cast message to standard JavaScript object (all non-primitive values are deeply cloned)
+   */
+  toObject(): CreateVoteRequest.AsObject {
+    return {
+      vote: this.vote ? this.vote.toObject() : undefined
+    };
+  }
+
+  /**
+   * Convenience method to support JSON.stringify(message), replicates the structure of toObject()
+   */
+  toJSON() {
+    return this.toObject();
+  }
+
+  /**
+   * Cast message to JSON using protobuf JSON notation: https://developers.google.com/protocol-buffers/docs/proto3#json
+   * Attention: output differs from toObject() e.g. enums are represented as names and not as numbers, Timestamp is an ISO Date string format etc.
+   * If the message itself or some of descendant messages is google.protobuf.Any, you MUST provide a message pool as options. If not, the messagePool is not required
+   */
+  toProtobufJSON(
+    // @ts-ignore
+    options?: ToProtobufJSONOptions
+  ): CreateVoteRequest.AsProtobufJSON {
+    return {
+      vote: this.vote ? this.vote.toProtobufJSON(options) : null
+    };
+  }
+}
+export module CreateVoteRequest {
+  /**
+   * Standard JavaScript object representation for CreateVoteRequest
+   */
+  export interface AsObject {
+    vote?: Vote.AsObject;
+  }
+
+  /**
+   * Protobuf JSON representation for CreateVoteRequest
+   */
+  export interface AsProtobufJSON {
+    vote: Vote.AsProtobufJSON | null;
+  }
+}
+
+/**
+ * Message implementation for goautowp.Vote
+ */
+export class Vote implements GrpcMessage {
+  static id = 'goautowp.Vote';
+
+  /**
+   * Deserialize binary data to message
+   * @param instance message instance
+   */
+  static deserializeBinary(bytes: ByteSource) {
+    const instance = new Vote();
+    Vote.deserializeBinaryFromReader(instance, new BinaryReader(bytes));
+    return instance;
+  }
+
+  /**
+   * Check all the properties and set default protobuf values if necessary
+   * @param _instance message instance
+   */
+  static refineValues(_instance: Vote) {
     _instance.id = _instance.id || 0;
     _instance.votingVariantVoteIds = _instance.votingVariantVoteIds || [];
   }
@@ -1061,10 +1205,7 @@ export class VoteRequest implements GrpcMessage {
    * @param _instance message instance
    * @param _reader binary reader instance
    */
-  static deserializeBinaryFromReader(
-    _instance: VoteRequest,
-    _reader: BinaryReader
-  ) {
+  static deserializeBinaryFromReader(_instance: Vote, _reader: BinaryReader) {
     while (_reader.nextField()) {
       if (_reader.isEndGroup()) break;
 
@@ -1083,7 +1224,7 @@ export class VoteRequest implements GrpcMessage {
       }
     }
 
-    VoteRequest.refineValues(_instance);
+    Vote.refineValues(_instance);
   }
 
   /**
@@ -1091,10 +1232,7 @@ export class VoteRequest implements GrpcMessage {
    * @param _instance message instance
    * @param _writer binary writer instance
    */
-  static serializeBinaryToWriter(
-    _instance: VoteRequest,
-    _writer: BinaryWriter
-  ) {
+  static serializeBinaryToWriter(_instance: Vote, _writer: BinaryWriter) {
     if (_instance.id) {
       _writer.writeInt32(1, _instance.id);
     }
@@ -1111,13 +1249,13 @@ export class VoteRequest implements GrpcMessage {
 
   /**
    * Message constructor. Initializes the properties and applies default Protobuf values if necessary
-   * @param _value initial values object or instance of VoteRequest to deeply clone from
+   * @param _value initial values object or instance of Vote to deeply clone from
    */
-  constructor(_value?: RecursivePartial<VoteRequest.AsObject>) {
+  constructor(_value?: RecursivePartial<Vote.AsObject>) {
     _value = _value || {};
     this.id = _value.id;
     this.votingVariantVoteIds = (_value.votingVariantVoteIds || []).slice();
-    VoteRequest.refineValues(this);
+    Vote.refineValues(this);
   }
   get id(): number {
     return this._id;
@@ -1138,14 +1276,14 @@ export class VoteRequest implements GrpcMessage {
    */
   serializeBinary() {
     const writer = new BinaryWriter();
-    VoteRequest.serializeBinaryToWriter(this, writer);
+    Vote.serializeBinaryToWriter(this, writer);
     return writer.getResultBuffer();
   }
 
   /**
    * Cast message to standard JavaScript object (all non-primitive values are deeply cloned)
    */
-  toObject(): VoteRequest.AsObject {
+  toObject(): Vote.AsObject {
     return {
       id: this.id,
       votingVariantVoteIds: (this.votingVariantVoteIds || []).slice()
@@ -1167,16 +1305,16 @@ export class VoteRequest implements GrpcMessage {
   toProtobufJSON(
     // @ts-ignore
     options?: ToProtobufJSONOptions
-  ): VoteRequest.AsProtobufJSON {
+  ): Vote.AsProtobufJSON {
     return {
       id: this.id,
       votingVariantVoteIds: (this.votingVariantVoteIds || []).slice()
     };
   }
 }
-export module VoteRequest {
+export module Vote {
   /**
-   * Standard JavaScript object representation for VoteRequest
+   * Standard JavaScript object representation for Vote
    */
   export interface AsObject {
     id: number;
@@ -1184,7 +1322,7 @@ export module VoteRequest {
   }
 
   /**
-   * Protobuf JSON representation for VoteRequest
+   * Protobuf JSON representation for Vote
    */
   export interface AsProtobufJSON {
     id: number;

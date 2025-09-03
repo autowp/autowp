@@ -1,9 +1,9 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {APIUser, VotingRequest} from '@grpc/spec.pb';
-import {VotingsClient} from '@grpc/spec.pbsc';
+import {APIUser} from '@grpc/spec.pb';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {VotingsService} from '@rest/api/votings.service';
 import {UserService} from '@services/user';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
@@ -20,7 +20,7 @@ import {UserComponent} from '../../user/user/user.component';
 export class VotingVotesComponent {
   protected readonly activeModal = inject(NgbActiveModal);
   readonly #toastService = inject(ToastsService);
-  readonly #votingsClient = inject(VotingsClient);
+  readonly #votingService = inject(VotingsService);
   readonly #userService = inject(UserService);
 
   readonly votingID = input.required<number>();
@@ -31,7 +31,7 @@ export class VotingVotesComponent {
     toObservable(this.variantID),
   ]).pipe(
     switchMap(([votingID, variantID]) =>
-      votingID && variantID ? this.#votingsClient.getVotingVariantVotes(new VotingRequest({id: variantID})) : of(null),
+      votingID && variantID ? this.#votingService.votingsGetVotingVariantVotes(variantID) : of(null),
     ),
     catchError((response: unknown) => {
       this.#toastService.handleError(response);

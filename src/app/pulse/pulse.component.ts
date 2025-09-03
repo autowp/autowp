@@ -1,8 +1,8 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {PulseRequest} from '@grpc/spec.pb';
-import {StatisticsClient} from '@grpc/spec.pbsc';
+import {StatisticsService} from '@rest/api/statistics.service';
+import {PulseRequestPeriod} from '@rest/model/pulseRequestPeriod';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {ChartConfiguration} from 'chart.js';
@@ -16,7 +16,7 @@ import {UserComponent} from '../user/user/user.component';
 interface Period {
   active: boolean;
   name: string;
-  value: PulseRequest.Period;
+  value: PulseRequestPeriod;
 }
 
 @Component({
@@ -28,28 +28,28 @@ interface Period {
 export class PulseComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #grpc = inject(StatisticsClient);
+  readonly #statisticsService = inject(StatisticsService);
   readonly #usersService = inject(UserService);
 
   protected readonly periods: Period[] = [
     {
       active: true,
       name: 'Day',
-      value: PulseRequest.Period.DEFAULT,
+      value: PulseRequestPeriod.Default,
     },
     {
       active: false,
       name: 'Month',
-      value: PulseRequest.Period.MONTH,
+      value: PulseRequestPeriod.Month,
     },
     {
       active: false,
       name: 'Year',
-      value: PulseRequest.Period.YEAR,
+      value: PulseRequestPeriod.Year,
     },
   ];
 
-  readonly #period$ = new BehaviorSubject<PulseRequest.Period>(PulseRequest.Period.DEFAULT);
+  readonly #period$ = new BehaviorSubject<PulseRequestPeriod>(PulseRequestPeriod.Default);
 
   protected readonly chartOptions: ChartConfiguration<'bar', never, never>['options'] = {
     responsive: true,
@@ -66,7 +66,7 @@ export class PulseComponent implements OnInit {
   protected readonly data$ = this.#period$.pipe(
     debounceTime(10),
     distinctUntilChanged(),
-    switchMap((period) => this.#grpc.getPulse(new PulseRequest({period}))),
+    switchMap((period) => this.#statisticsService.statisticsGetPulse(period)),
     catchError((response: unknown) => {
       this.#toastService.handleError(response);
       return EMPTY;

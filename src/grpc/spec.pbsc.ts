@@ -6897,7 +6897,7 @@ export class VotingsClient {
      * @returns Observable<GrpcEvent<googleProtobuf004.Empty>>
      */
     vote: (
-      requestData: thisProto.VoteRequest,
+      requestData: thisProto.CreateVoteRequest,
       requestMetadata = new GrpcMetadata()
     ): Observable<GrpcEvent<googleProtobuf004.Empty>> => {
       return this.handler.handle({
@@ -6906,7 +6906,7 @@ export class VotingsClient {
         path: '/goautowp.Votings/Vote',
         requestData,
         requestMetadata,
-        requestClass: thisProto.VoteRequest,
+        requestClass: thisProto.CreateVoteRequest,
         responseClass: googleProtobuf004.Empty
       });
     }
@@ -6960,7 +6960,7 @@ export class VotingsClient {
    * @returns Observable<googleProtobuf004.Empty>
    */
   vote(
-    requestData: thisProto.VoteRequest,
+    requestData: thisProto.CreateVoteRequest,
     requestMetadata = new GrpcMetadata()
   ): Observable<googleProtobuf004.Empty> {
     return this.$raw

@@ -220,6 +220,7 @@ export * from './goautowpVODDataDate';
 export * from './goautowpVODDataResponse';
 export * from './goautowpVehicleType';
 export * from './goautowpVehicleTypeItems';
+export * from './goautowpVote';
 export * from './goautowpVoting';
 export * from './goautowpVotingVariant';
 export * from './goautowpVotingVariantVotes';

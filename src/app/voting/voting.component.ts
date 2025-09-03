@@ -1,11 +1,13 @@
 import {AsyncPipe, DatePipe} from '@angular/common';
+import {HttpErrorResponse} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, ComponentRef, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {CommentsType, VoteRequest, Voting, VotingRequest, VotingVariant} from '@grpc/spec.pb';
-import {VotingsClient} from '@grpc/spec.pbsc';
+import {CommentsType} from '@grpc/spec.pb';
 import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
+import {VotingsService} from '@rest/api/votings.service';
+import {GoautowpVoting} from '@rest/model/goautowpVoting';
+import {GoautowpVotingVariant} from '@rest/model/goautowpVotingVariant';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {BehaviorSubject, EMPTY} from 'rxjs';
@@ -28,16 +30,16 @@ export class VotingComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #modalService = inject(NgbModal);
   readonly #toastService = inject(ToastsService);
-  readonly #votingsClient = inject(VotingsClient);
+  readonly #votingService = inject(VotingsService);
 
   readonly #reload$ = new BehaviorSubject<void>(void 0);
   protected readonly voting$ = this.#route.paramMap.pipe(
     map((params) => parseInt(params.get('id') ?? '', 10)),
     distinctUntilChanged(),
     debounceTime(10),
-    switchMap((id) => this.#reload$.pipe(switchMap(() => this.#votingsClient.getVoting(new VotingRequest({id}))))),
+    switchMap((id) => this.#reload$.pipe(switchMap(() => this.#votingService.votingsGetVoting(id)))),
     catchError((response: unknown) => {
-      if (response instanceof GrpcStatusEvent && response.statusCode === 5) {
+      if (response instanceof HttpErrorResponse && response.status === 404) {
         this.#router.navigate(['/error-404'], {
           skipLocationChange: true,
         });
@@ -58,7 +60,7 @@ export class VotingComponent {
 
   protected readonly CommentsType = CommentsType;
 
-  protected vote(voting: Voting) {
+  protected vote(voting: GoautowpVoting) {
     const ids: number[] = [];
 
     if (!voting.multivariant) {
@@ -74,13 +76,11 @@ export class VotingComponent {
       }
     }
 
-    this.#votingsClient
-      .vote(
-        new VoteRequest({
-          id: voting.id,
-          votingVariantVoteIds: ids,
-        }),
-      )
+    this.#votingService
+      .votingsVote({
+        id: voting.id,
+        votingVariantVoteIds: ids,
+      })
       .subscribe({
         error: (response: unknown) => this.#toastService.handleError(response),
         next: () => {
@@ -91,7 +91,7 @@ export class VotingComponent {
     return false;
   }
 
-  protected isVariantSelected(voting: Voting): boolean {
+  protected isVariantSelected(voting: GoautowpVoting): boolean {
     if (!voting.multivariant) {
       return this.selected > 0;
     }
@@ -106,7 +106,7 @@ export class VotingComponent {
     return count > 0;
   }
 
-  protected showWhoVoted(voting: Voting, variant: VotingVariant) {
+  protected showWhoVoted(voting: GoautowpVoting, variant: GoautowpVotingVariant) {
     const modalRef = this.#modalService.open(VotingVotesComponent, {
       centered: true,
       size: 'lg',
