@@ -7719,7 +7719,7 @@ const (
 type VotingsClient interface {
 	GetVoting(ctx context.Context, in *VotingRequest, opts ...grpc.CallOption) (*Voting, error)
 	GetVotingVariantVotes(ctx context.Context, in *VotingRequest, opts ...grpc.CallOption) (*VotingVariantVotes, error)
-	Vote(ctx context.Context, in *VoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Vote(ctx context.Context, in *CreateVoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type votingsClient struct {
@@ -7750,7 +7750,7 @@ func (c *votingsClient) GetVotingVariantVotes(ctx context.Context, in *VotingReq
 	return out, nil
 }
 
-func (c *votingsClient) Vote(ctx context.Context, in *VoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *votingsClient) Vote(ctx context.Context, in *CreateVoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Votings_Vote_FullMethodName, in, out, cOpts...)
@@ -7766,7 +7766,7 @@ func (c *votingsClient) Vote(ctx context.Context, in *VoteRequest, opts ...grpc.
 type VotingsServer interface {
 	GetVoting(context.Context, *VotingRequest) (*Voting, error)
 	GetVotingVariantVotes(context.Context, *VotingRequest) (*VotingVariantVotes, error)
-	Vote(context.Context, *VoteRequest) (*emptypb.Empty, error)
+	Vote(context.Context, *CreateVoteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedVotingsServer()
 }
 
@@ -7783,7 +7783,7 @@ func (UnimplementedVotingsServer) GetVoting(context.Context, *VotingRequest) (*V
 func (UnimplementedVotingsServer) GetVotingVariantVotes(context.Context, *VotingRequest) (*VotingVariantVotes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVotingVariantVotes not implemented")
 }
-func (UnimplementedVotingsServer) Vote(context.Context, *VoteRequest) (*emptypb.Empty, error) {
+func (UnimplementedVotingsServer) Vote(context.Context, *CreateVoteRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Vote not implemented")
 }
 func (UnimplementedVotingsServer) mustEmbedUnimplementedVotingsServer() {}
@@ -7844,7 +7844,7 @@ func _Votings_GetVotingVariantVotes_Handler(srv interface{}, ctx context.Context
 }
 
 func _Votings_Vote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VoteRequest)
+	in := new(CreateVoteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -7856,7 +7856,7 @@ func _Votings_Vote_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: Votings_Vote_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VotingsServer).Vote(ctx, req.(*VoteRequest))
+		return srv.(VotingsServer).Vote(ctx, req.(*CreateVoteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

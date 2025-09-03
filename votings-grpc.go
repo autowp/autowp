@@ -84,15 +84,16 @@ func (s *VotingsGRPCServer) GetVotingVariantVotes(
 	}, nil
 }
 
-func (s *VotingsGRPCServer) Vote(ctx context.Context, in *VoteRequest) (*emptypb.Empty, error) {
+func (s *VotingsGRPCServer) Vote(ctx context.Context, in *CreateVoteRequest) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	id := in.GetId()
+	vote := in.GetVote()
+	id := vote.GetId()
 
-	success, err := s.repository.Vote(ctx, id, in.GetVotingVariantVoteIds(), userCtx.UserID)
+	success, err := s.repository.Vote(ctx, id, vote.GetVotingVariantVoteIds(), userCtx.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, status.Error(codes.NotFound, "Voting not found")

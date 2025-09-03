@@ -257,8 +257,16 @@ service Messaging {
 }
 
 service Statistics {
-  rpc GetPulse(PulseRequest) returns (PulseResponse) {}
-  rpc GetAboutData(google.protobuf.Empty) returns (AboutDataResponse) {}
+  rpc GetPulse(PulseRequest) returns (PulseResponse) {
+    option (google.api.http) = {
+      get: "/v3/statistics/pulse"
+    };
+  }
+  rpc GetAboutData(google.protobuf.Empty) returns (AboutDataResponse) {
+    option (google.api.http) = {
+      get: "/v3/statistics/about-data"
+    };
+  }
 }
 
 service Donations {
@@ -295,9 +303,22 @@ service Attrs {
 }
 
 service Votings {
-  rpc GetVoting(VotingRequest) returns (Voting) {}
-  rpc GetVotingVariantVotes(VotingRequest) returns (VotingVariantVotes) {}
-  rpc Vote(VoteRequest) returns (google.protobuf.Empty) {}
+  rpc GetVoting(VotingRequest) returns (Voting) {
+    option (google.api.http) = {
+      get: "/v3/votings/{id}"
+    };
+  }
+  rpc GetVotingVariantVotes(VotingRequest) returns (VotingVariantVotes) {
+    option (google.api.http) = {
+      get: "/v3/votings/{id}/variant-votes"
+    };
+  }
+  rpc Vote(CreateVoteRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v3/votings/vote"
+      body: "vote"
+    };
+  }
 }
 
 message ChartDataRequest {
@@ -322,7 +343,11 @@ message ChartParameters {
   repeated ChartParameter parameters = 1;
 }
 
-message VoteRequest {
+message CreateVoteRequest {
+  Vote vote = 1;
+}
+
+message Vote {
   int32 id = 1;
   repeated int32 voting_variant_vote_ids = 2;
 }
