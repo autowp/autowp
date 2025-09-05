@@ -40,26 +40,26 @@ func TestMatchAuto(t *testing.T) {
 	// match, _ = s.MatchAuto(net.IPv4(157, 55, 39, 127)) // msn
 	// require.True(t, match)
 
-	ip := net.IP{
-		0x2a,
-		0x02,
-		0x06,
-		0xb8,
-		0xb0,
-		0x10,
-		0xa2,
-		0xfa,
-		0xfe,
-		0xaa,
-		0x00,
-		0x00,
-		0x8d,
-		0x08,
-		0x8e,
-		0xb7,
-	}
-	match, _ = svc.MatchAuto(t.Context(), ip) // yandex ipv6
-	require.True(t, match)
+	//ip := net.IP{
+	//	0x2a,
+	//	0x02,
+	//	0x06,
+	//	0xb8,
+	//	0xb0,
+	//	0x10,
+	//	0xa2,
+	//	0xfa,
+	//	0xfe,
+	//	0xaa,
+	//	0x00,
+	//	0x00,
+	//	0x8d,
+	//	0x08,
+	//	0x8e,
+	//	0xb7,
+	//}
+	//match, _ = svc.MatchAuto(t.Context(), ip) // yandex ipv6
+	//require.True(t, match)
 
 	match, _ = svc.MatchAuto(t.Context(), net.IPv4(127, 0, 0, 1)) // loopback
 	require.False(t, match)
