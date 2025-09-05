@@ -1586,33 +1586,42 @@ func TestGetPictureIP(t *testing.T) {
 	kc := cnt.Keycloak()
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
 
-	res, err := goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
-		Identity: identity,
-		Status:   schema.PictureStatusAccepted,
-		IP:       util.IP(net.IPv4allrouter),
-		AddDate:  time.Now(),
-	}).Executor().ExecContext(ctx)
-	require.NoError(t, err)
+	ips := []net.IP{net.IPv4(172, 18, 0, 1), net.IPv4allrouter, net.IPv4allsys, net.IPv4bcast}
 
-	pictureID, err := res.LastInsertId()
-	require.NoError(t, err)
+	for _, ip := range ips {
+		t.Run(ip.String(), func(t *testing.T) {
+			t.Parallel()
 
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
-	require.NoError(t, err)
-	require.NotNil(t, token)
+			identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
 
-	client := NewPicturesClient(conn)
+			res, err := goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
+				Identity: identity,
+				Status:   schema.PictureStatusAccepted,
+				IP:       util.IP(ip),
+				AddDate:  time.Now(),
+			}).Executor().ExecContext(ctx)
+			require.NoError(t, err)
 
-	picture, err := client.GetPicture(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&PicturesRequest{
-			Options: &PictureListOptions{Id: pictureID},
-		},
-	)
-	require.NoError(t, err)
-	require.Equal(t, "224.0.0.2", picture.GetIp())
+			pictureID, err := res.LastInsertId()
+			require.NoError(t, err)
+
+			token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+			require.NoError(t, err)
+			require.NotNil(t, token)
+
+			client := NewPicturesClient(conn)
+
+			picture, err := client.GetPicture(
+				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
+				&PicturesRequest{
+					Options: &PictureListOptions{Id: pictureID},
+				},
+			)
+			require.NoError(t, err)
+			require.Equal(t, ip.String(), picture.GetIp())
+		})
+	}
 }
 
 func TestInbox(t *testing.T) {

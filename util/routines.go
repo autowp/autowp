@@ -4,11 +4,9 @@ import (
 	"cmp"
 	"context"
 	"database/sql"
-	"database/sql/driver"
 	"errors"
 	"html/template"
 	"io"
-	"net"
 	"strings"
 	"time"
 	"unicode"
@@ -394,39 +392,4 @@ func TitleCase(str string, tag language.Tag) string {
 	r, n := utf8.DecodeRuneInString(str)
 
 	return string(unicode.ToUpper(r)) + str[n:]
-}
-
-var errUnsupportedIPType = errors.New("unsupported type for IP")
-
-type IP net.IP
-
-func (n IP) ToIP() net.IP {
-	return net.IP(n)
-}
-
-// Scan implements the [Scanner] interface.
-func (n *IP) Scan(value interface{}) error {
-	if value == nil {
-		*n = nil
-
-		return nil
-	}
-
-	v, ok := value.([]byte)
-	if !ok {
-		return errUnsupportedIPType
-	}
-
-	*n = v
-
-	return nil
-}
-
-// Value implements the [driver.Valuer] interface.
-func (n IP) Value() (driver.Value, error) {
-	if n == nil {
-		return nil, nil //nolint: nilnil
-	}
-
-	return goqu.Func("INET6_ATON", n.ToIP().String()), nil
 }
