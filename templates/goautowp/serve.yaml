@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "autowp.goautowp.serve-attrs-update-values-amqp.fullname" . | quote }}
+  name: {{ include "autowp.goautowp.serve.fullname" . | quote }}
 spec:
   selector:
     matchLabels: {{ include "common.labels.matchLabels" . | nindent 6 }}
-      app.kubernetes.io/component: goautowp-serve-attrs-update-values-amqp
-  replicas: 1
+      app.kubernetes.io/component: goautowp-serve
+  replicas: 2
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
-        app.kubernetes.io/component: goautowp-serve-attrs-update-values-amqp
+        app.kubernetes.io/component: goautowp-serve
       annotations:
         checksum/config: {{ (tpl (.Files.Glob "configs/goautowp/*").AsConfig . ) | sha256sum }}
     spec:
@@ -23,13 +23,22 @@ spec:
         - name: tmp
           emptyDir: {}
       containers:
-        - name: goautowp-serve-attrs-update-values-amqp
+        - name: goautowp-serve
           image: {{ include "autowp.goautowp.image" . }}
           imagePullPolicy: {{ .Values.goautowp.image.pullPolicy | quote }}
           args:
             - serve
+            - --grpc
             - --attrs-update-values-amqp
+            - --df-amqp
+            - --monitoring-amqp
+            - --autoban
+            - --public
           ports:
+            - name: app-port
+              containerPort: 8080
+            - name: grpc-port
+              containerPort: 8082
             - name: metrics
               containerPort: 2112
           volumeMounts:
@@ -50,6 +59,14 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 101
+          readinessProbe:
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 3
+          livenessProbe:
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 3
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -60,5 +77,5 @@ spec:
                     - key: app.kubernetes.io/component
                       operator: In
                       values:
-                        - goautowp-serve-attrs-update-values-amqp
+                        - goautowp-serve
               weight: 100

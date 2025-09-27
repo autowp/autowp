@@ -26,22 +26,6 @@
 {{- printf "%s-goautowp" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "autowp.goautowp.autoban.fullname" -}}
-{{- printf "%s-autoban" (include "autowp.goautowp.fullname" .) | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "autowp.goautowp.serve-df-amqp.fullname" -}}
-{{- printf "%s-serve-df-amqp" (include "autowp.goautowp.fullname" .) | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "autowp.goautowp.serve-monitoring-amqp.fullname" -}}
-{{- printf "%s-serve-monitoring-amqp" (include "autowp.goautowp.fullname" .) | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "autowp.goautowp.serve-attrs-update-values-amqp.fullname" -}}
-{{- printf "%s-serve-attrs-update-values-amqp" (include "autowp.goautowp.fullname" .) | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
 {{- define "autowp.goautowp.scheduler-daily.fullname" -}}
 {{- printf "%s-scheduler-daily" (include "autowp.goautowp.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
@@ -62,12 +46,8 @@
 {{- printf "%s-scheduler-generate-index-cache" (include "autowp.goautowp.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "autowp.goautowp.serve-public.fullname" -}}
-{{- printf "%s-serve-public" (include "autowp.goautowp.fullname" .) | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "autowp.goautowp.serve-grpc.fullname" -}}
-{{- printf "%s-serve-grpc" (include "autowp.goautowp.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- define "autowp.goautowp.serve.fullname" -}}
+{{- printf "%s-serve" (include "autowp.goautowp.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "autowp.goautowp.image" -}}

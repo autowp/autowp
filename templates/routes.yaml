@@ -62,126 +62,126 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Traffic/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Users/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Items/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Comments/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Map/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Messaging/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Pictures/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Donations/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Forums/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Text/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Attrs/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Rating/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Log/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Mosts/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/yoomoney/informing"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/telegram/webhook/token/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/v3/"
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: /
@@ -217,6 +217,6 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-grpc.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
-                name: app-port
+                name: grpc-port

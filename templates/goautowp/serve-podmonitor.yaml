@@ -3,7 +3,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: {{ include "autowp.goautowp.serve-df-amqp.fullname" . | quote }}
+  name: {{ include "autowp.goautowp.serve.fullname" . | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     release: kube-prometheus-stack
 spec:
@@ -20,5 +20,5 @@ spec:
       {{- end }}
   selector:
     matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 6 }}
-      app.kubernetes.io/component: goautowp-serve-df-amqp
+      app.kubernetes.io/component: goautowp-serve
 {{- end }}
