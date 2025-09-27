@@ -100,8 +100,8 @@ export class MessageService {
           dialogCount: 0,
           date: new Date(),
           allMessagesLink: false,
-          authorId: '',
-          dialogWithUserId: '',
+          authorId: '0',
+          dialogWithUserId: '0',
         },
       })
       .pipe(tap(() => this.#sent$.next()));
