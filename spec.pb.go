@@ -23238,11 +23238,11 @@ const file_spec_proto_rawDesc = "" +
 	" \x01(\x03B\x03\xe0A\x02R\btoUserId\x122\n" +
 	"\x13dialog_with_user_id\x18\v \x01(\x03B\x03\xe0A\x03R\x10dialogWithUserId\"C\n" +
 	"\x14CreateMessageRequest\x12+\n" +
-	"\amessage\x18\x01 \x01(\v2\x11.goautowp.MessageR\amessage\"b\n" +
-	"\x1bMessagingGetMessagesRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x16\n" +
-	"\x06folder\x18\x02 \x01(\tR\x06folder\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page\"v\n" +
+	"\amessage\x18\x01 \x01(\v2\x11.goautowp.MessageR\amessage\"q\n" +
+	"\x1bMessagingGetMessagesRequest\x12\x1c\n" +
+	"\auser_id\x18\x01 \x01(\x03B\x03\xe0A\x01R\x06userId\x12\x1b\n" +
+	"\x06folder\x18\x02 \x01(\tB\x03\xe0A\x01R\x06folder\x12\x17\n" +
+	"\x04page\x18\x03 \x01(\x05B\x03\xe0A\x01R\x04page\"v\n" +
 	"\x1cMessagingGetMessagesResponse\x12'\n" +
 	"\x05items\x18\x01 \x03(\v2\x11.goautowp.MessageR\x05items\x12-\n" +
 	"\tpaginator\x18\x02 \x01(\v2\x0f.goautowp.PagesR\tpaginator\"\xbb\x02\n" +

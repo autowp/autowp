@@ -2121,9 +2121,9 @@ message CreateMessageRequest {
 }
 
 message MessagingGetMessagesRequest {
-  int64 user_id = 1;
-  string folder = 2;
-  int32 page = 3;
+  int64 user_id = 1 [(google.api.field_behavior) = OPTIONAL];
+  string folder = 2 [(google.api.field_behavior) = OPTIONAL];
+  int32 page = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message MessagingGetMessagesResponse {
