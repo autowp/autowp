@@ -1,0 +1,34 @@
+@if (textPrepared$ | async; as textPrepared) {
+  @for (line of textPrepared; track line) {
+    <p>
+      @for (element of line.elements; track element) {
+        @switch (element.type) {
+          @case ('a') {
+            <a [href]="element.url">{{ element.url }}</a>
+          }
+          @case ('user') {
+            @if (element.user) {
+              <app-user [user]="element.user" />
+            }
+          }
+          @case ('picture') {
+            @if (element.picture) {
+              <a class="thumbnail-inline" [routerLink]="['/picture', element.picture.identity]">
+                <img
+                  class="card-img-top"
+                  loading="lazy"
+                  [src]="element.picture.thumbMedium?.src"
+                  [alt]="element.picture.nameText"
+                  [title]="element.picture.nameText"
+                />
+              </a>
+            }
+          }
+          @case ('text') {
+            {{ element.text }}
+          }
+        }
+      }
+    </p>
+  }
+}

@@ -1,0 +1,48 @@
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import './variables';
+
+.language-picker {
+  font-size: 90%;
+  margin-top: 15px;
+
+  a {
+    margin-right: 15px;
+  }
+}
+
+footer .links {
+  font-size: $h2-font-size;
+
+  a {
+    margin-right: 20px;
+
+    &:link,
+    &:visited {
+      color: $body-color;
+    }
+  }
+}
+
+.bottom-line {
+  border-top: 1px solid #d1cab8;
+  margin: 50px 0;
+
+  > p {
+    text-align: center;
+    margin-top: -0.7em;
+
+    strong {
+      background-color: #ede9de;
+      padding: 0 50px;
+    }
+  }
+}
+
+.copyrights {
+  background-color: #d1cab8;
+
+  p {
+    margin-bottom: 0.25rem;
+  }
+}

@@ -1,0 +1,29 @@
+<div class="modal-header">
+  <h3 class="modal-title" i18n>Custom reason</h3>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  <div class="mb-3">
+    <label for="reason">Reason</label>
+    <input maxlength="50" id="reason" required name="reason" class="form-control" [(ngModel)]="reason" />
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="save" [(ngModel)]="save" />
+      <ng-container i18n>Save as template</ng-container>
+    </label>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Cancel</button>
+  <button
+    type="button"
+    class="btn"
+    i18n
+    [class.btn-danger]="vote() < 0"
+    [class.btn-success]="vote() > 0"
+    (click)="ok()"
+  >
+    Send
+  </button>
+</div>

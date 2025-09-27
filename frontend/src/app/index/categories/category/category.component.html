@@ -1,0 +1,29 @@
+<ng-template #popover>
+  @if (response$ | async; as response) {
+    <div>
+      @if ((response.items || []).length > 0) {
+        @if (response.brand?.brandicon?.src) {
+          <img alt="" style="float: right; margin: 0 0 5px 5px" [src]="response.brand?.brandicon?.src" />
+        }
+        @for (item of response.items; track item.id) {
+          <p [innerHTML]="item.nameHtml"></p>
+        }
+        <br style="clear: both" />
+      }
+    </div>
+  } @else {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  }
+</ng-template>
+@if (category$ | async; as category) {
+  <span>
+    <a [routerLink]="['/category', category.catname]">{{ category.name }}</a>
+    <span class="count"
+      >({{ category.count - category.newCount }}
+      @if (category.newCount > 0) {
+        <span triggers="mouseenter:mouseleave" container="body" [ngbPopover]="popover">+{{ category.newCount }}</span>
+      }
+      )</span
+    >
+  </span>
+}

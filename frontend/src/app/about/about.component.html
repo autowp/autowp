@@ -1,0 +1,19 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header mb-4">
+  <h1 i18n>About us</h1>
+</div>
+
+@if (html$ | async; as html) {
+  <div class="card card-body mb-3" [innerHTML]="html"></div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+<p>Version: {{ version.release }}</p>

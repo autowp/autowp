@@ -1,0 +1,9 @@
+:host {
+  display: block;
+
+  .form-control {
+    display: inline-block;
+    margin-bottom: 20px;
+    max-width: 200px;
+  }
+}

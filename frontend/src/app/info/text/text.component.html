@@ -1,0 +1,58 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Text history</h1>
+</div>
+
+@if (data$ | async; as data) {
+  <p>
+    @if (data.prev && data.prev.revision) {
+      <span>
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+        <a routerLink="." i18n [queryParams]="{revision: data.prev.revision}">Previous revision</a>
+      </span>
+    }
+    @if (data.next && data.next.revision) {
+      <span class="float-end">
+        <a routerLink="." i18n [queryParams]="{revision: data.next.revision}">Next revision</a>
+        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+      </span>
+    }
+  </p>
+  <div class="row">
+    @if (data.prev) {
+      <div class="col-md-6">
+        @if (data.prev.revision) {
+          <h3>
+            <ng-container i18n>Revision {{ data.prev.revision }}</ng-container>
+            @if (data.prev.user$ | async; as user) {
+              <small><app-user [user]="user" /></small>
+            }
+          </h3>
+        }
+      </div>
+    }
+    @if (data.current) {
+      <div class="col-md-6">
+        <h3>
+          <ng-container i18n>Revision {{ data.current.revision }}</ng-container>
+          @if (data.current.user$ | async; as user) {
+            <small><app-user [user]="user" /></small>
+          }
+        </h3>
+      </div>
+    }
+  </div>
+  <ngx-monaco-diff-editor
+    style="min-height: 400px"
+    [options]="options"
+    [originalModel]="data.prevModel"
+    [modifiedModel]="data.currentModel"
+  />
+}

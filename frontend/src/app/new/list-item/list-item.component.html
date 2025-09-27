@@ -1,0 +1,81 @@
+@if (item(); as item) {
+  <div class="car item-list-item">
+    <h3>
+      <app-item-header
+        [item]="{
+          nameHTML: item.nameHtml,
+          design: item.design || null,
+          produced: {count: item.produced?.value || 0, exactly: item.producedExactly},
+        }"
+      />
+    </h3>
+    @if (item.nameDefault) {
+      <h4 [textContent]="item.nameDefault"></h4>
+    }
+    <div class="row">
+      @for (picture of pictures(); track picture) {
+        <div class="col-6 col-sm-4 col-lg-2">
+          @if (picture.thumbMedium) {
+            <a class="d-block rounded mb-4" [routerLink]="['/picture', picture.identity]">
+              <img
+                class="rounded w-100 border border-light"
+                loading="lazy"
+                [src]="picture.thumbMedium.src"
+                [alt]="picture.nameText"
+                [title]="picture.nameText"
+              />
+            </a>
+          }
+          @if (!picture) {
+            <span>&#xa0;</span>
+          }
+        </div>
+      }
+    </div>
+    @if (item.description && item.description.length) {
+      <app-markdown class="text" [markdown]="item.description" />
+    }
+    <ul class="list-inline">
+      @if (totalPictures() > 6) {
+        <li class="list-inline-item">
+          <span class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></span>
+          <a [routerLink]="['/new', date(), 'item', item.id]"
+            ><ng-container i18n>all pictures</ng-container> ({{ totalPictures() }})</a
+          >
+        </li>
+      }
+      @if (item.specsRoute.length > 0) {
+        <li class="list-inline-item">
+          <i class="bi bi-card-list me-1" aria-hidden="true"></i>
+          <a i18n [routerLink]="item.specsRoute">specifications</a>
+        </li>
+      }
+      @for (twinsGroup of item.twins; track twinsGroup.id) {
+        <li class="list-inline-item">
+          <i class="bi bi-circle-half me-1" aria-hidden="true"></i>
+          <a i18n [routerLink]="['/twins/group', twinsGroup.id]">twins</a>
+        </li>
+      }
+      @for (category of item.categories; track category.id) {
+        <li class="list-inline-item">
+          <i class="bi bi-tag-fill me-1" aria-hidden="true"></i>
+          <a [routerLink]="['/category', category.catname]" [innerHTML]="category.nameHtml"></a>
+        </li>
+      }
+      @if (isModer$ | async; as isModer) {
+        @if (isModer) {
+          <li class="list-inline-item">
+            <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
+            <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
+          </li>
+        }
+      }
+      @if (item.canEditSpecs) {
+        <li class="list-inline-item">
+          <i class="bi bi-pencil-fill me-1" aria-hidden="true"></i>
+          <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
+        </li>
+      }
+    </ul>
+  </div>
+}

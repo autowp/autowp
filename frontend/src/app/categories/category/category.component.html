@@ -1,0 +1,87 @@
+@if (!(layoutParams$ | async)?.isGalleryPage) {
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a routerLink="/" i18n>Index page</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a routerLink="/category" i18n>Categories</a>
+      </li>
+      @for (item of path$ | async; track item; let last = $last) {
+        @if (!last) {
+          <li class="breadcrumb-item">
+            @if (item.item.itemTypeId !== ItemType.ITEM_TYPE_CATEGORY) {
+              <a [routerLink]="item.routerLink" [innerHtml]="item.item.nameHtml"></a>
+            } @else {
+              <div ngbDropdown class="d-inline-block" placement="bottom-right" (openChange)="dropdownOpenChange(item)">
+                <a [routerLink]="item.routerLink" [innerHtml]="item.item.nameHtml"></a>
+                <a ngbDropdownToggle style="cursor: pointer"></a>
+                <div ngbDropdownMenu>
+                  @if (!item.loaded) {
+                    <div class="dropdown-item">
+                      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+                    </div>
+                  }
+                  @for (child of item.childs; track child) {
+                    <a
+                      class="dropdown-item"
+                      [routerLink]="child.routerLink"
+                      [class.active]="child.active"
+                      [innerHTML]="child.nameHtml"
+                    ></a>
+                  }
+                </div>
+              </div>
+            }
+          </li>
+        }
+      }
+    </ol>
+  </nav>
+}
+
+@if (!(layoutParams$ | async)?.isGalleryPage) {
+  @if (current$ | async; as current) {
+    <div class="page-header">
+      <h1 [innerHtml]="current.nameHtml"></h1>
+    </div>
+  }
+}
+
+@if (current$ | async; as current) {
+  <div>
+    @if (!(layoutParams$ | async)?.isGalleryPage) {
+      @if (category$ | async; as category) {
+        @if (isModer$ | async) {
+          <p class="mb-4">
+            <i class="bi bi-gear-fill" aria-hidden="true"></i>
+            <a i18n [routerLink]="['/moder/items/item', current.id]">edit</a>
+            @if (canAddCar$ | async) {
+              <span>
+                <i class="bi bi-plus" aria-hidden="true"></i>
+                <a routerLink="/moder/items/new" [queryParams]="category.queryParams">{{ category.title }}</a>
+              </span>
+            }
+          </p>
+        }
+      }
+    }
+    <ul class="nav nav-pills mb-4">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="." routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <i class="bi bi-sort-down-alt" aria-hidden="true"></i>
+          <ng-container i18n>details</ng-container>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="pictures" routerLinkActive="active">
+          <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+          <ng-container i18n>all pictures</ng-container>
+        </a>
+      </li>
+    </ul>
+    <router-outlet />
+  </div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

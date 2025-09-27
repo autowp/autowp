@@ -1,0 +1,21 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/feedback" i18n>Feedback</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Message sent</h1>
+</div>
+
+<div class="p-5 mb-4 rounded-3 bg-light">
+  <h1>
+    <i class="bi bi-check" aria-hidden="true"></i>
+  </h1>
+  <app-markdown i18n-markdown markdown="Your message was sent" />
+</div>

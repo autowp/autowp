@@ -1,0 +1,52 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Articles</h1>
+</div>
+
+@if (articles$ | async; as response) {
+  <div class="card card-body">
+    <ul class="article-list">
+      @for (article of response.articles; track article.id) {
+        <li>
+          @if (article.previewUrl) {
+            <a [routerLink]="article.routerLink">
+              <img alt="" style="float: left; margin: 0 10px 4px 0" loading="lazy" [src]="article.previewUrl" />
+            </a>
+          }
+          <p>
+            <a [routerLink]="article.routerLink" [textContent]="article.name"></a>
+          </p>
+          <p>
+            {{ article.description }}
+            <a i18n [routerLink]="article.routerLink">details</a>
+          </p>
+          <p>
+            @if (article.author$ | async; as author) {
+              <app-user [user]="author" />
+            }
+            @if (article.date) {
+              <span
+                class="date"
+                [textContent]="article.date | timeAgo"
+                [ngbTooltip]="article.date | date: 'medium'"
+              ></span>
+            }
+          </p>
+        </li>
+      }
+    </ul>
+
+    @if (response.paginator) {
+      <app-paginator [data]="response.paginator" />
+    }
+  </div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

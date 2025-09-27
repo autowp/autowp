@@ -1,0 +1,44 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/forums" i18n>Forums</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Move</h1>
+</div>
+
+@if (messageID$ | async; as messageID) {
+  @if (themeID$ | async) {
+    <div>
+      @for (topic of topics$ | async; track topic.id) {
+        <p>
+          <button
+            type="button"
+            class="btn btn-link"
+            [textContent]="topic.name"
+            (click)="selectTopic(messageID + '', topic)"
+          ></button>
+        </p>
+      }
+    </div>
+  } @else {
+    <ul>
+      @for (theme of themes$ | async; track theme.id) {
+        <li>
+          <a
+            queryParamsHandling="merge"
+            [routerLink]="['.']"
+            [queryParams]="{theme_id: theme.id}"
+            [textContent]="getForumsThemeTranslation(theme.name)"
+          ></a>
+        </li>
+      }
+    </ul>
+  }
+}

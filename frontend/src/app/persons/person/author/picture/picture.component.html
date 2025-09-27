@@ -1,0 +1,15 @@
+@if (picture$ | async; as picture) {
+  @if (picturesRouterLink$ | async; as picturesRouterLink) {
+    @if (galleryRouterLink$ | async; as galleryRouterLink) {
+      <app-picture
+        [picture]="picture"
+        [prefix]="picturesRouterLink"
+        [galleryRoute]="galleryRouterLink"
+        (changed)="reloadPicture()"
+      />
+    }
+  }
+  <div id="comments">
+    <app-comments [typeID]="CommentsType.PICTURES_TYPE_ID" [itemID]="picture.id" [limit]="null" />
+  </div>
+}

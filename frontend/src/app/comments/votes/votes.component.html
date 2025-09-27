@@ -1,0 +1,33 @@
+<div class="modal-header">
+  <h3 class="modal-title" i18n>Votes</h3>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+@if (votes$ | async; as votes) {
+  <div class="modal-body">
+    @if (votes) {
+      @if (votes.positive.length) {
+        <p>
+          <strong>+1</strong>:
+          @for (vote of votes.positive; track vote) {
+            @if (vote.user) {
+              <app-user [user]="vote.user" />
+            }
+          }
+        </p>
+      }
+      @if (votes.negative.length) {
+        <p>
+          <strong>-1</strong>:
+          @for (vote of votes.negative; track vote) {
+            @if (vote.user) {
+              <app-user [user]="vote.user" />
+            }
+          }
+        </p>
+      }
+    }
+  </div>
+}
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Close</button>
+</div>

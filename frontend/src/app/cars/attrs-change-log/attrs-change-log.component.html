@@ -1,0 +1,103 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n id="header">History</h1>
+</div>
+
+<div class="card card-body">
+  @if (userQuery$ | async; as userQuery) {
+    <form class="form-horizontal">
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="user_id" i18n>User</label>
+        <div class="col-md-10">
+          <ng-template #userTemplate let-model="result">
+            <span [innerHTML]="model.name"></span>
+          </ng-template>
+          <div class="input-group mb-3">
+            <input
+              name="user"
+              class="form-control"
+              id="user_id"
+              [ngbTypeahead]="usersDataSource"
+              [formControl]="userQuery"
+              [inputFormatter]="userFormatter"
+              [resultTemplate]="userTemplate"
+              [class.border-primary]="userID$ | async"
+              (selectItem)="userOnSelect($event)"
+            />
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              [disabled]="(userID$ | async) === null"
+              (click)="clearUser(userQuery)"
+            >
+              <span class="bi bi-x" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  }
+  <table class="specs-log table table-stripped" aria-describedby="header">
+    <thead>
+      <tr>
+        <th i18n scope="col">Date</th>
+        <th i18n scope="col">User</th>
+        <th i18n scope="col">Object</th>
+        <th i18n scope="col">Attribute</th>
+        <th i18n scope="col">Value</th>
+        <th i18n scope="col">Editor</th>
+      </tr>
+    </thead>
+    @if (items$ | async; as items) {
+      @for (row of items.items; track row) {
+        <tr>
+          <td>
+            @if (row.userValue.updateDate?.toDate(); as date) {
+              <p [textContent]="date | timeAgo" [ngbTooltip]="date | date: 'medium'"></p>
+            }
+          </td>
+          <td>
+            @if (row.user$ | async; as user) {
+              <app-user [user]="user" />
+            }
+          </td>
+          <td>
+            @if (row.item$ | async; as item) {
+              @if (isModer$ | async) {
+                <a [routerLink]="['/moder/items/item', row.userValue.itemId]" [innerHTML]="item.nameHtml"></a>
+              } @else {
+                <span [innerHTML]="item.nameHtml"></span>
+              }
+            }
+          </td>
+          <td class="attribute text-center">
+            @if (row.path$ | async; as path) {
+              @for (node of path; track node; let last = $last) {
+                <span>{{ node }}</span>
+                @if (!last) {
+                  <span> / </span>
+                }
+              }
+            }
+          </td>
+          <td style="text-align: center">
+            {{ row.userValue.valueText }}
+            @if (row.unitAbbr$ | async; as unitAbbr) {
+              <span class="unit">{{ unitAbbr }}</span>
+            }
+          </td>
+          <td class="link">
+            <a i18n [routerLink]="['/cars/car-specifications-editor/item_id', row.userValue.itemId]">to editor</a>
+          </td>
+        </tr>
+      }
+    }
+  </table>
+</div>

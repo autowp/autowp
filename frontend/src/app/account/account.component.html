@@ -1,0 +1,68 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+@if (items$ | async; as items) {
+  <div class="row">
+    <div class="col-lg-8 mb-4 order-2" [class.col-lg-12]="items.length === 0">
+      <router-outlet />
+    </div>
+    @if (items.length > 0) {
+      <div class="col-lg-4 mb-4 order-1">
+        <div class="card card-body">
+          <div class="nav flex-column nav-pills">
+            @for (item of items; track item) {
+              @if (item.routerLink) {
+                <a
+                  class="nav-link"
+                  [routerLink]="item.routerLink"
+                  [queryParams]="item.routerLinkParams"
+                  [class.active]="item.active"
+                >
+                  @if (item.count !== undefined) {
+                    <span
+                      class="badge rounded-pill float-end"
+                      [class.text-bg-secondary]="(item.newCount || 0) <= 0"
+                      [class.text-bg-danger]="(item.newCount || 0) > 0"
+                    >
+                      @if (item.count <= 0) {
+                        <span i18n="@@count-zero">none</span>
+                      } @else {
+                        @if (item.newCount === undefined) {
+                          <span>{{ item.count }}</span>
+                        } @else {
+                          @if (item.newCount <= 0) {
+                            <span>{{ item.count }}</span>
+                          } @else {
+                            <span>{{ item.count - item.newCount }}+{{ item.newCount }}</span>
+                          }
+                        }
+                      }
+                    </span>
+                  }
+                  @if (item.icon) {
+                    <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+                  }
+                  {{ item.name }}
+                </a>
+              } @else {
+                <span class="nav-link">
+                  @if (item.icon) {
+                    <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+                  }
+                  {{ item.name }}
+                </span>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

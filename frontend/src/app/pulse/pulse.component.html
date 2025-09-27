@@ -1,0 +1,51 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Pulse</h1>
+</div>
+
+<div>
+  <div class="nav nav-pills mb-4">
+    @for (period of periods; track period.value) {
+      <a
+        class="nav-link"
+        href="#"
+        [class.active]="period.active"
+        [textContent]="period.name"
+        (click)="selectPeriod(period)"
+      ></a>
+    }
+  </div>
+
+  @if (data$ | async; as data) {
+    @if (gridData$ | async; as gridData) {
+      <canvas
+        baseChart
+        width="400"
+        height="150"
+        type="bar"
+        [datasets]="gridData.data"
+        [labels]="(labels$ | async) || undefined"
+        [options]="chartOptions"
+        [legend]="false"
+      ></canvas>
+    }
+    @if (legend$ | async; as legend) {
+      <p>
+        @for (item of legend; track item) {
+          <span>
+            @if (item.user$ | async; as user) {
+              <app-user [user]="user" />
+            }
+          </span>
+        }
+      </p>
+    }
+  }
+</div>

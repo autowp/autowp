@@ -1,0 +1,60 @@
+@if (item$ | async; as item) {
+  @if ((item.item?.childsCount || 0) > 0) {
+    <div>
+      <button type="button" class="btn btn-link toggle" (click)="open = !open">
+        @if (!open) {
+          <i class="bi bi-folder2" aria-hidden="true"></i>
+        } @else {
+          <i class="bi bi-folder2-open" aria-hidden="true"></i>
+        }
+        @if (item.type === ItemParentType.ITEM_TYPE_TUNING) {
+          <span i18n>Related</span>
+        } @else if (item.type === ItemParentType.ITEM_TYPE_SPORT) {
+          <span i18n>Sport</span>
+        } @else if (item.type === ItemParentType.ITEM_TYPE_DESIGN) {
+          <span i18n>Design</span>
+        }
+        <span [innerHTML]="item.item?.nameHtml"></span>
+      </button>
+      @if (open) {
+        <ul class="list-unstyled">
+          @if (childs$ | async; as childs) {
+            @for (child of childs; track child) {
+              <li class="ms-4">
+                <app-upload-select-tree-item [item]="child" />
+              </li>
+            }
+          } @else {
+            <li class="ms-4">
+              <span>
+                <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+              </span>
+            </li>
+          }
+          <li class="ms-4">
+            <a
+              class="btn btn-link"
+              routerLink="/upload"
+              i18n
+              [queryParams]="{item_id: item.itemId, perspective_id: null}"
+              >other modification</a
+            >
+          </li>
+        </ul>
+      }
+    </div>
+  } @else {
+    <span>
+      <a class="btn btn-link" routerLink="/upload" [queryParams]="{item_id: item.itemId, perspective_id: null}">
+        @if (item.type === ItemParentType.ITEM_TYPE_TUNING) {
+          <span i18n>Related</span>
+        } @else if (item.type === ItemParentType.ITEM_TYPE_SPORT) {
+          <span i18n>Sport</span>
+        } @else if (item.type === ItemParentType.ITEM_TYPE_DESIGN) {
+          <span i18n>Design</span>
+        }
+        <span [innerHTML]="item.item?.nameHtml"></span>
+      </a>
+    </span>
+  }
+}

@@ -1,0 +1,82 @@
+<app-item-of-day class="d-block mb-4" [item$]="itemOfDayItem$" [user$]="itemOfDayUser$" />
+
+<app-index-donate />
+
+<app-index-brands />
+
+<app-index-pictures />
+
+<div class="row">
+  <div class="col-md-6">
+    <app-index-twins />
+  </div>
+  <div class="col-md-6">
+    <app-index-categories />
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <h4>
+      <ng-container i18n>Mostly</ng-container> <small><a routerLink="/mosts" i18n>all</a></small>
+    </h4>
+    <p>
+      @for (most of mosts; track most) {
+        <a [routerLink]="most.route">{{ most.name }}</a
+        >,
+      }
+      …
+    </p>
+    <app-markdown
+      i18n-markdown
+      markdown="Want to know which car was the fastest? Do you want to know how much the most powerful mining truck weighs? Come and find out."
+    />
+  </div>
+
+  <div class="col-md-6">
+    <app-index-factories />
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <h4>
+      <ng-container i18n>Persons on photo</ng-container> <small><a routerLink="/persons" i18n>all</a></small>
+    </h4>
+    @if (contentPersons$ | async; as persons) {
+      <p>
+        @for (person of persons.items; track person.id) {
+          <a [routerLink]="['/persons', person.id]">{{ person.name }}</a
+          >,
+        }
+        …
+      </p>
+    } @else {
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    }
+  </div>
+
+  <div class="col-md-6">
+    <h4>
+      <ng-container i18n>Authors</ng-container> <small><a routerLink="/persons/authors" i18n>all</a></small>
+    </h4>
+    @if (authorPersons$ | async; as persons) {
+      <p>
+        @for (person of persons.items; track person.id) {
+          <a [routerLink]="['/persons', person.id]">{{ person.name }}</a
+          >,
+        }
+        …
+      </p>
+    } @else {
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    }
+  </div>
+</div>
+
+<app-index-specs-cars />
+
+<div>
+  <h4 class="mb-4" i18n>Also</h4>
+  <p><a routerLink="/mascots" i18n>Mascots</a> and <a routerLink="/cutaway/authors" i18n>Cutaway</a></p>
+</div>

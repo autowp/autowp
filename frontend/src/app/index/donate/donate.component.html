@@ -1,0 +1,82 @@
+<h4 i18n>Help the project</h4>
+<div class="row">
+  <div class="col-md-6" i18n>
+    Due to financial restrictions and difficult economy situation in regions where most of our contributors live, we are
+    forced to open a fundraiser to pay the hosting for our website. This project is aimed to remain free to use and
+    fully advertising free in the future.
+  </div>
+  <div class="col-md-6">
+    <p i18n>Our goal is to cover {{ goal | currency: 'EUR' }} that is the cost of 1 year of website existence.</p>
+    @if (state$ | async; as state) {
+      <div style="position: relative">
+        <div class="progress" style="height: 10px; border-bottom-right-radius: 0; border-bottom-left-radius: 0">
+          @for (operation of state.charges; track operation) {
+            <div
+              ngbTooltip="{{ operation.sum | currency: operation.currency }}, {{ operation.purpose }}, {{
+                operation.date ? (operation.date | timeAgo) : ''
+              }}"
+              class="progress-bar bg-danger"
+              placement="top"
+              [style.min-width]="operation.percent + '%'"
+            ></div>
+          }
+          <div
+            ngbTooltip="{{ state.monthlyCharge | currency: 'EUR' }} required for the next month"
+            class="progress-bar bg-warning"
+            placement="top"
+            [style.width]="state.monthlyChargePercent + '%'"
+          ></div>
+        </div>
+        <div class="progress mb-4" style="height: 30px; border-top-right-radius: 0; border-top-left-radius: 0">
+          @for (operation of state.donations; track operation) {
+            <div
+              ngbTooltip="{{ operation.sum | currency: operation.currency }} by {{ operation.contributor }}, {{
+                operation.date ? (operation.date | timeAgo) : ''
+              }}"
+              class="progress-bar"
+              placement="top"
+              [style.background-color]="$odd ? '#28a745' : 'rgb(97, 202, 91)'"
+              [style.width]="operation.percent + '%'"
+            ></div>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="row">
+      <div class="col-lg-3">
+        <form action="https://www.paypal.com/donate" method="post" target="_top" ngNoForm class="text-center mb-2">
+          <input type="hidden" name="hosted_button_id" value="JND8ZMAHY63VQ" />
+          @if (languageService.language === 'ru') {
+            <input
+              type="image"
+              src="https://www.paypalobjects.com/ru_RU/RU/i/btn/btn_donateCC_LG.gif"
+              name="submit"
+              alt="PayPal"
+            />
+          } @else {
+            <input
+              type="image"
+              src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif"
+              name="submit"
+              alt="PayPal"
+            />
+          }
+          <img alt="" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+        </form>
+      </div>
+      <div class="col-lg-9">
+        <h5 i18n>Cryptocurrencies</h5>
+        <p class="crypto-wallets">
+          BTC: 1MWvxGbj5F5mT4cysuKH6jZrR1UXN6rgmA<br />
+          BCH: qrssh8d7kycs4rvknqzkyejlp5xqkvgmv5rj0v0vrh<br />
+          ETH: 0xc809dba4CDA380555a993E1dD45f7715d4503aC2
+        </p>
+      </div>
+    </div>
+    <p class="boosty">
+      <ng-container i18n>Donate with</ng-container>
+      <a href="https://boosty.to/autowp/donate"><img src="assets/boosty.svg" alt="Boosty" /></a>
+    </p>
+  </div>
+</div>

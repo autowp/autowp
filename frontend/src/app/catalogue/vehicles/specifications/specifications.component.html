@@ -1,0 +1,31 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (brand$ | async; as brand) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/', brand.catname]" [innerHTML]="brand.nameHtml"></a>
+      </li>
+    }
+    @if (breadcrumbs$ | async; as breadcrumbs) {
+      @for (node of breadcrumbs; track node) {
+        <li class="breadcrumb-item">
+          <a [routerLink]="node.routerLink" [innerHTML]="node.html"></a>
+        </li>
+      }
+    }
+  </ol>
+</nav>
+
+@if (item$ | async; as item) {
+  <div class="page-header">
+    <h1><ng-container i18n>Specifications of</ng-container> <span [innerHTML]="item.nameHtml"></span></h1>
+  </div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (html$ | async; as html) {
+  <div [innerHtml]="html"></div>
+}

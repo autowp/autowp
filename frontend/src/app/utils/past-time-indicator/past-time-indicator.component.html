@@ -1,0 +1,4 @@
+<span [ngbTooltip]="date() | date: 'medium'">
+  <i class="bi" aria-hidden="true" [class.bi-calendar]="past()" [class.bi-clock]="!past()"></i>
+  {{ date() | timeAgo }}
+</span>

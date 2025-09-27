@@ -1,0 +1,15 @@
+@if (data$ | async; as data) {
+  @if (data.current && data.category) {
+    <app-gallery
+      [filter]="{itemID: '' + data.current.id}"
+      [current]="(identity$ | async) || null"
+      [galleryPrefix]="
+        (currentRouterLinkPrefix(data.category, data.current, data.pathCatnames) || []).concat(['gallery'])
+      "
+      [picturePrefix]="
+        (currentRouterLinkPrefix(data.category, data.current, data.pathCatnames) || []).concat(['pictures'])
+      "
+      (pictureSelected)="pictureSelected($event)"
+    />
+  }
+}

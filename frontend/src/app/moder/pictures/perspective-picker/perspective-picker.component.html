@@ -1,0 +1,8 @@
+<select class="form-select" name="perspective_id" style="max-width: 10em" [formControl]="select" (change)="change()">
+  <option [ngValue]="0">--</option>
+  @for (perspective of perspectives$ | async; track perspective.id) {
+    <option [ngValue]="perspective.id">
+      {{ getPerspectiveTranslation(perspective.name) }}
+    </option>
+  }
+</select>

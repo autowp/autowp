@@ -1,0 +1,47 @@
+<div class="card card-body">
+  <input
+    #catalogueSearch
+    type="text"
+    class="form-control mb-4"
+    placeholder="Type to search …"
+    i18n-placeholder
+    (input)="doSearch(catalogueSearch.value)"
+  />
+  @if (catalogueBrands$ | async; as response) {
+    <div class="row">
+      @for (chunk of response.brands; track chunk) {
+        <div class="col-2">
+          @for (item of chunk; track item.id) {
+            <a
+              routerLink="."
+              queryParamsHandling="merge"
+              [queryParams]="{brand_id: item.id}"
+              [innerHTML]="item.nameHtml"
+            ></a>
+            <br />
+          }
+        </div>
+      }
+    </div>
+    @if (response.paginator) {
+      <app-paginator [data]="response.paginator" />
+    }
+  }
+  @if (catalogueItems$ | async; as response) {
+    <ul>
+      @for (item of response.items; track item) {
+        <li class="car-node">
+          <app-moder-items-item-select-parent-tree
+            [itemParent]="item"
+            [order]="ItemParentsRequest.Order.AUTO"
+            [disableItemID]="(itemID$ | async) || ''"
+            (selected)="onSelect($event)"
+          />
+        </li>
+      }
+    </ul>
+    @if (response.paginator) {
+      <app-paginator [data]="response.paginator" />
+    }
+  }
+</div>

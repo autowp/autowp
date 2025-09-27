@@ -1,0 +1,49 @@
+@if (item(); as item) {
+  @if ((item.item?.childsCount || 0) > 0) {
+    <div>
+      @if (open()) {
+        <i class="bi bi-folder2-open me-1" aria-hidden="true"></i>
+      } @else {
+        <i class="bi bi-folder2 me-1" aria-hidden="true"></i>
+      }
+      @if (item.type === ItemParentType.ITEM_TYPE_TUNING) {
+        <span i18n>Related</span>
+      } @else if (item.type === ItemParentType.ITEM_TYPE_SPORT) {
+        <span i18n>Sport</span>
+      } @else if (item.type === ItemParentType.ITEM_TYPE_DESIGN) {
+        <span i18n>Design</span>
+      }
+      <a href="#" class="toggle" [innerHTML]="item.item?.nameHtml" (click)="toggle()"></a>
+      @if (open()) {
+        <ul class="list-unstyled">
+          @if (loading()) {
+            <li style="margin-left: 16px">
+              <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+            </li>
+          }
+          @if (childs$ | async; as childs) {
+            @for (child of childs; track child.itemId) {
+              <li style="margin-left: 16px">
+                <app-cars-select-engine-tree-item [item]="child" (selected)="selectEngine($event)" />
+              </li>
+            }
+          }
+          <li style="margin-left: 16px">
+            <a href="#" i18n (click)="selectEngine(item.itemId)">other modification</a>
+          </li>
+        </ul>
+      }
+    </div>
+  } @else {
+    <span>
+      @if (item.type === ItemParentType.ITEM_TYPE_TUNING) {
+        <span i18n>Related</span>
+      } @else if (item.type === ItemParentType.ITEM_TYPE_SPORT) {
+        <span i18n>Sport</span>
+      } @else if (item.type === ItemParentType.ITEM_TYPE_DESIGN) {
+        <span i18n>Design</span>
+      }
+      <a href="#" [innerHTML]="item.item?.nameHtml" (click)="selectEngine(item.itemId)"></a>
+    </span>
+  }
+}

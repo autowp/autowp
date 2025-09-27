@@ -1,0 +1,59 @@
+@if (!(layoutParams$ | async)?.isGalleryPage) {
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a routerLink="/" i18n>Index page</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a routerLink="/twins" i18n>Twins</a>
+      </li>
+    </ol>
+  </nav>
+}
+
+<div class="row">
+  @if (group$ | async; as group) {
+    <div class="col-sm-8 order-2">
+      @if (!(layoutParams$ | async)?.isGalleryPage) {
+        @if (group) {
+          <div class="page-header mb-4">
+            <h1 [innerHTML]="group.nameHtml"></h1>
+          </div>
+        }
+        <ul class="nav nav-pills mb-4">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="." routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+              <i class="bi bi-sort-down-alt" aria-hidden="true"></i>
+              <ng-container i18n>group</ng-container>
+            </a>
+          </li>
+          @if (group.acceptedPicturesCount > 0) {
+            <li class="nav-item">
+              <a class="nav-link" routerLink="pictures" routerLinkActive="active">
+                <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+                <ng-container i18n>all pictures</ng-container>
+                <span class="badge rounded-pill bg-secondary">{{ group.acceptedPicturesCount }}</span>
+              </a>
+            </li>
+          }
+          @if (group.hasChildSpecs) {
+            <li class="nav-item">
+              <a class="nav-link" routerLink="specifications" routerLinkActive="active">
+                <i class="bi bi-card-list" aria-hidden="true"></i>
+                <ng-container i18n>specifications</ng-container>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+      <router-outlet />
+    </div>
+  }
+  @if (!(layoutParams$ | async)?.isGalleryPage) {
+    <div class="col-sm-4 order-1">
+      @if (selectedBrands$ | async; as selectedBrands) {
+        <app-twins-sidebar [selected]="selectedBrands" />
+      }
+    </div>
+  }
+</div>

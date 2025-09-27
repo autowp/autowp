@@ -1,0 +1,225 @@
+@if (brand$ | async; as brand) {
+  <header class="mb-4">
+    <div class="p-5 mb-4 rounded-3 brand-hero-unit clearfix">
+      <!-- [translate-attr-alt]="''"  sprintf($this->translate('catalogue/brand/logo-of-%s'), $this->brand['name']) 'format' => 'logo', -->
+      @if (brand.logo120) {
+        <img alt="" class="logo" loading="lazy" [src]="brand.logo120.src" />
+      }
+      <div class="content">
+        <h1 class="display-4">{{ brand.nameText }}</h1>
+        @if (brand.fullName && brand.fullName !== brand.nameOnly) {
+          <p class="lead">({{ brand.fullName }})</p>
+        }
+        @if (brand.description) {
+          <hr class="my-4" />
+          <app-markdown [markdown]="brand.description" />
+        }
+      </div>
+    </div>
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/', brand.catname, 'cars']">
+          <i class="bi bi-sort-down-alt" aria-hidden="true"></i>
+          <ng-container i18n>Chronological</ng-container>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/', brand.catname, 'recent']">
+          <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+          <ng-container i18n>New pictures</ng-container>
+        </a>
+      </li>
+      @if (brand.descendantTwinsGroupsCount) {
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/twins', brand.catname]">
+            <i class="bi bi-circle-half" aria-hidden="true"></i> <ng-container i18n>Twins</ng-container>
+            <span class="badge rounded-pill text-bg-secondary">{{ brand.descendantTwinsGroupsCount }}</span>
+          </a>
+        </li>
+      }
+      @if (brand.mostsActive) {
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/', brand.catname, 'mosts']">
+            <i class="bi bi-sort-down" aria-hidden="true"></i> <ng-container i18n>Mostly</ng-container>
+          </a>
+        </li>
+      }
+      @if (brand.inboxPicturesCount) {
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/moder/pictures" [queryParams]="{status: 'inbox', item_id: brand.id}">
+            <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+            <ng-container i18n>Brand inbox</ng-container>
+            <span class="badge rounded-pill text-bg-secondary">{{ brand.inboxPicturesCount }}</span>
+          </a>
+        </li>
+      }
+      @if (brand.commentsAttentionsCount) {
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/moder/comments"
+            [queryParams]="{moderator_attention: '1', pictures_of_item_id: brand.id}"
+          >
+            <i class="bi bi-chat-fill" aria-hidden="true"></i>
+            <ng-container i18n>comments</ng-container>
+            <span class="badge rounded-pill text-bg-secondary">{{ brand.commentsAttentionsCount }}</span>
+          </a>
+        </li>
+      }
+      @if (isModer$ | async) {
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/moder/items/item', brand.id]">
+            <i class="bi bi-gear-fill" aria-hidden="true"></i>
+            <ng-container i18n>edit</ng-container>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/moder/items/new"
+            [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE, parent_id: brand.id}"
+          >
+            <i class="bi bi-plus" aria-hidden="true"></i>
+            <ng-container i18n>add vehicle</ng-container>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/moder/items/new"
+            [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE, parent_id: brand.id}"
+          >
+            <i class="bi bi-plus" aria-hidden="true"></i>
+            <ng-container i18n>add engine</ng-container>
+          </a>
+        </li>
+      }
+    </ul>
+  </header>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (sections$ | async) {
+  @for (section of sections$ | async; track section) {
+    @if (section.halfChunks.length) {
+      <div class="card mb-4">
+        <div class="card-body">
+          @if (section.name) {
+            <h5 class="card-title">{{ section.name }}</h5>
+          }
+          <div class="row">
+            @for (halfChunk of section.halfChunks; track halfChunk) {
+              <div class="col-12 col-md-6">
+                <div class="row">
+                  @for (chunk of halfChunk; track chunk) {
+                    <div class="col-12 col-lg-6 nav">
+                      @for (group of chunk; track group) {
+                        <a class="nav-link w-100" [routerLink]="group.routerLink">
+                          {{ group.name }}
+                          @if (group.count) {
+                            <span class="badge rounded-pill text-bg-secondary">{{ group.count }}</span>
+                          }
+                        </a>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          @if (section.routerLink.length > 0 && section.name) {
+            <a i18n [routerLink]="section.routerLink">details</a>
+          }
+        </div>
+      </div>
+    }
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (factories$ | async; as factories) {
+  @if (factories.length) {
+    <section>
+      <h2 i18n>Factories</h2>
+      <div class="row">
+        @for (factory of factories; track factory.item.id) {
+          <div class="col-6 col-lg-3">
+            @if (factory.picture$ | async; as picture) {
+              @if (picture.thumbMedium) {
+                <a class="d-block rounded mb-4" [routerLink]="['/factories', factory.item.id]">
+                  <img
+                    class="rounded w-100 border border-light"
+                    alt=""
+                    loading="lazy"
+                    [src]="picture.thumbMedium.src"
+                  />
+                </a>
+              }
+            }
+            <p><a [routerLink]="['/factories', factory.item.id]" [innerHTML]="factory.item.nameHtml"></a></p>
+          </div>
+        }
+      </div>
+    </section>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (pictures$ | async; as pictures) {
+  @if (pictures.length) {
+    <section>
+      <h2 i18n>Popular images</h2>
+      @for (chunk of pictures; track chunk) {
+        <div class="row">
+          @for (item of chunk; track item) {
+            <div class="col-sm-3">
+              <app-thumbnail [picture]="item.picture" [route]="item.route || []" />
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (links$ | async; as links) {
+  @if (links.official.length + links.club.length + links.other.length > 0) {
+    <section>
+      <h2 i18n>Links</h2>
+      @if (links.official.length > 0) {
+        <p>
+          <strong i18n>Official websites</strong><br />
+          @for (link of links.official; track link.id) {
+            <a [href]="link.url">{{ link.name ? link.name : link.url }}</a
+            ><br />
+          }
+        </p>
+      }
+      @if (links.club.length > 0) {
+        <p>
+          <strong i18n>Car clubs</strong><br />
+          @for (link of links.club; track link.id) {
+            <a [href]="link.url">{{ link.name ? link.name : link.url }}</a
+            ><br />
+          }
+        </p>
+      }
+      @if (links.other.length > 0) {
+        <p>
+          <strong i18n>Other</strong><br />
+          @for (link of links.other; track link.id) {
+            <a [href]="link.url">{{ link.name ? link.name : link.url }}</a
+            ><br />
+          }
+        </p>
+      }
+    </section>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

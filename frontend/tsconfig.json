@@ -1,0 +1,50 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc",
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "sourceMap": true,
+    "declaration": false,
+    "esModuleInterop": true,
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "importHelpers": true,
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "target": "ES2022",
+    "resolveJsonModule": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
+    "types": [
+      "@angular/localize"
+    ],
+    "useDefineForClassFields": false,
+    "baseUrl": "src",
+    "paths": {
+      "@rest/*": ["rest/*"],
+      "@grpc/*": ["grpc/*"],
+      "@environment/*": ["environments/*"],
+      "@services/*": ["app/services/*"],
+      "@utils/*": ["app/utils/*"]
+    },
+    "strictNullChecks": true,
+    "strict": true
+  },
+  "angularCompilerOptions": {
+    "preserveWhitespaces": true,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true,
+    "strictMetadataEmit": true,
+  }
+}

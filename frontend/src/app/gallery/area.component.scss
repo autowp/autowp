@@ -1,0 +1,21 @@
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import '../variables';
+@import 'bootstrap/scss/mixins';
+
+.area {
+  position: absolute;
+  border: 2px dashed transparent;
+
+  @include transition(
+    0.6s ease-in-out width,
+    0.6s ease-in-out height,
+    0.6s ease-in-out left,
+    0.6s ease-in-out top,
+    0.3s ease-in-out border-color
+  );
+
+  &:hover {
+    border-color: #000;
+  }
+}

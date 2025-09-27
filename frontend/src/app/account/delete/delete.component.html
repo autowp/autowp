@@ -1,0 +1,39 @@
+<div class="page-header">
+  <h1 i18n>Account delete</h1>
+</div>
+<div class="card card-body">
+  <app-markdown
+    i18n-markdown
+    markdown="Мы сожалем, что вам пришлось оказаться на этой странице, и вы планируете покинуть наш сайт навсегда, но не можем вам в этом отказать.
+
+Нажав на красную кнопку, все данные, касающиеся вас, будут обезличены или удалены.
+
+Этот процесс необратим, поэтому хорошенько подумайте и не принимайте поспешных решений."
+  />
+  <hr />
+  <form class="form-horizontal" (submit)="submit()">
+    <div class="mb-3 row">
+      <label class="col-md-2 col-form-label" for="password_old" i18n="@@user/password">Password</label>
+      <div class="col-md-10">
+        <input
+          id="password_old"
+          type="password"
+          size="50"
+          maxlength="50"
+          name="password_old"
+          class="form-control"
+          [class.is-invalid]="invalidParams() && invalidParams()['password_old']"
+          [(ngModel)]="form.password_old"
+        />
+        @for (message of invalidParams() | invalidParams: 'password_old'; track message) {
+          <p class="invalid-feedback" [textContent]="message"></p>
+        }
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-10 offset-md-2">
+        <button type="submit" class="btn btn-primary" i18n>send</button>
+      </div>
+    </div>
+  </form>
+</div>

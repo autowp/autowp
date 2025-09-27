@@ -1,0 +1,14 @@
+<div class="page-header">
+  <h1 i18n>My e-mail</h1>
+</div>
+<div class="card card-body">
+  <p>
+    <ng-container i18n>Your current e-mail address:</ng-container>
+    @if (email$ | async; as email) {
+      <a [href]="email" [textContent]="email"></a>
+    } @else {
+      <span i18n>none</span>
+    }
+    (<a i18n [href]="changeEmailUrl">Change</a>)
+  </p>
+</div>

@@ -1,0 +1,45 @@
+@if (paginator(); as paginator) {
+  @if (paginator.pageCount > 1) {
+    <div>
+      <h4 class="text-end" i18n>Other photos</h4>
+      <div id="pager" class="clearfix text-end">
+        <div class="nearLinks">
+          @if (paginator.previous) {
+            <a [routerLink]="prefix().concat([paginator.previous])">
+              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              <ng-container i18n>previous</ng-container>
+            </a>
+          } @else {
+            <span>
+              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              <ng-container i18n>previous</ng-container>
+            </span>
+          }
+          @if (paginator.next) {
+            <a [routerLink]="prefix().concat([paginator.next])">
+              <ng-container i18n>next</ng-container>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </a>
+          } @else {
+            <span>
+              <ng-container i18n>next</ng-container>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </span>
+          }
+        </div>
+        <div class="numberLinks">
+          @for (item of paginator.pagesInRange; track item) {
+            @if (item.identity !== paginator.current) {
+              <a [routerLink]="prefix().concat([item.identity])">
+                {{ format(item.page, paginator.pageCount) }}
+              </a>
+            }
+            @if (item.identity === paginator.current) {
+              <strong style="font-size: 1.5em">{{ format(item.page, paginator.pageCount) }}</strong>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+}

@@ -1,0 +1,46 @@
+<ng-template #popover>
+  @if (response$ | async; as response) {
+    <div>
+      @if ((response.items || []).length > 0) {
+        @if (response.brand?.brandicon?.src) {
+          <img alt="" style="float: right; margin: 0 0 5px 5px" [src]="response.brand?.brandicon?.src" />
+        }
+        @for (item of response.items; track item.id) {
+          <p [innerHTML]="item.nameHtml"></p>
+        }
+        <br style="clear: both" />
+      }
+    </div>
+  } @else {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  }
+</ng-template>
+
+@if (brand$ | async; as brand) {
+  <a
+    class="brandicon"
+    [routerLink]="['/', brand.catname]"
+    [ngClass]="'brandicon-' + cssClass(brand)"
+    [ngStyle]="{'background-image': 'url(' + icons()?.image + ')'}"
+  ></a>
+  <h4>
+    <a [routerLink]="['/', brand.catname]" [textContent]="brand.name"></a>
+    <small class="badge bg-secondary-subtle text-secondary-emphasis">
+      {{ brand.itemsCount - brand.newItemsCount }}
+      @if (brand.newItemsCount > 0) {
+        <span
+          triggers="mouseenter:mouseleave"
+          popoverTitle="New {{ brand.name }} vehicles"
+          [ngbPopover]="popover"
+          i18n-popoverTitle
+          >+{{ brand.newItemsCount }}</span
+        >
+      }
+    </small>
+  </h4>
+  <p>
+    <small><ng-container i18n>pictures:</ng-container> {{ brand.acceptedPicturesCount }}</small>
+  </p>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

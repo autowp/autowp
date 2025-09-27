@@ -1,0 +1,289 @@
+@if (item$ | async; as item) {
+  <div class="card card-body">
+    @if (canMove$ | async; as canMove) {
+      <div class="mb-3">
+        @if (item && item.isGroup && canMove && item.childsCount > 0) {
+          <a
+            class="btn btn-secondary"
+            i18n
+            [routerLink]="['/moder/items/item', item.id, 'organize']"
+            [queryParams]="{item_type_id: organizeTypeId$ | async}"
+            >Turbo group creator</a
+          >
+        }
+      </div>
+    }
+    @if (canMove$ | async; as canMove) {
+      <table class="table">
+        <caption i18n>
+          Catalogue
+        </caption>
+        <thead>
+          <tr>
+            <th i18n scope="col">Name</th>
+            <th i18n scope="col">Link</th>
+            <th i18n scope="col">Public</th>
+            @if (canMove) {
+              <th i18n scope="col">Del</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @if ((canHaveParents$ | async) || !canMove) {
+            <tr>
+              <td colspan="4">
+                <form class="car-add-parent" method="post">
+                  <div class="input-group" style="max-width: 400px">
+                    <ng-template #itemTemplate let-model="result">
+                      <span [innerHTML]="model.nameHtml"></span>
+                    </ng-template>
+                    <input
+                      type="text"
+                      name="parent"
+                      class="form-control item-autocomplete"
+                      placeholder="Add parent …"
+                      i18n-placeholder
+                      autocomplete="off"
+                      [ngbTypeahead]="itemsDataSource"
+                      [formControl]="itemQuery"
+                      [inputFormatter]="itemFormatter"
+                      [resultTemplate]="itemTemplate"
+                      (selectItem)="itemOnSelect(item, $event)"
+                    />
+                    <a class="btn btn-secondary" i18n [routerLink]="['/moder/items/item', item.id, 'select-parent']"
+                      >Select …</a
+                    >
+                    <div ngbDropdown>
+                      <button type="button" ngbDropdownToggle class="btn btn-secondary"></button>
+                      @if (canHaveParentBrand$ | async) {
+                        <div ngbDropdownMenu>
+                          <ng-container>
+                            <a
+                              class="dropdown-item"
+                              [routerLink]="['/moder/items/item', item.id, 'select-parent']"
+                              [queryParams]="{tab: 'brands'}"
+                            >
+                              <i class="bi bi-plus" aria-hidden="true"></i>
+                              <ng-container i18n>Brand …</ng-container>
+                            </a>
+                            @for (brand of suggestions$ | async; track brand.id) {
+                              <a class="dropdown-item" href="#" (click)="addParent(item, brand.id)">
+                                <i class="bi bi-plus" aria-hidden="true"></i>
+                                <span i18n>Brand {{ brand.nameText }}</span>
+                              </a>
+                            }
+                          </ng-container>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </form>
+              </td>
+            </tr>
+          }
+          @for (parentsItem of parents$ | async; track parentsItem) {
+            <tr>
+              <td ngPreserveWhitespaces>
+                <i class="bi bi-arrow-up" aria-hidden="true"></i>
+                <a
+                  [routerLink]="['/moder/items/item', parentsItem.parentId]"
+                  [queryParams]="{tab: 'catalogue'}"
+                  [innerHTML]="parentsItem.parent?.nameHtml"
+                ></a>
+                @if (parentsItem.duplicateParent) {
+                  <div class="text-warning">
+                    <small>
+                      <ng-container i18n>Possible duplicate: vehicle already inherited via:</ng-container>
+                      <a
+                        [routerLink]="['/moder/items/item', parentsItem.duplicateParent.id]"
+                        [innerHTML]="parentsItem.duplicateParent.nameHtml"
+                      ></a>
+                    </small>
+                  </div>
+                }
+              </td>
+              <td>
+                <a [routerLink]="['/moder/item-parent', parentsItem.itemId, parentsItem.parentId]">
+                  {{ item.name }}
+                  <span class="bi bi-pencil-fill" aria-hidden="true"></span>
+                </a>
+              </td>
+              <td class="urls">
+                @for (route of parentsItem.parent?.publicRoutes || []; track route) {
+                  <a [routerLink]="route.route" [textContent]="route.route.join('/')"></a>
+                  <br />
+                }
+              </td>
+              @if (canMove) {
+                <td>
+                  <button
+                    type="submit"
+                    class="btn btn-sm btn-danger"
+                    (click)="deleteParent(item, parentsItem.parentId)"
+                  >
+                    <i class="bi bi-x" aria-hidden="true"></i>
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+          <tr class="success">
+            <td colspan="2" ngPreserveWhitespaces>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <i class="bi bi-arrow-right" aria-hidden="true"></i>
+              <span [innerHTML]="item.nameHtml"></span>
+            </td>
+            <td class="urls">
+              <!--ng-container *ngFor="let url of item.parent.publicUrls">
+                  <a [href]="url" [textContent]="url"></a>
+                  <br />
+                </ng-container-->
+            </td>
+            @if (canMove) {
+              <td></td>
+            }
+          </tr>
+          @for (childsItem of childs$ | async; track childsItem) {
+            <tr>
+              <td>
+                <i class="bi bi-arrow-down" aria-hidden="true"></i>
+                @if (childsItem.type === ItemParentType.ITEM_TYPE_TUNING) {
+                  <span i18n>Related:</span>
+                } @else if (childsItem.type === ItemParentType.ITEM_TYPE_DESIGN) {
+                  <span i18n>Design:</span>
+                } @else if (childsItem.type === ItemParentType.ITEM_TYPE_SPORT) {
+                  <span i18n>Sport:</span>
+                }
+                <a
+                  [routerLink]="['/moder/items/item', childsItem.itemId]"
+                  [queryParams]="{tab: 'catalogue'}"
+                  [innerHTML]="childsItem.item?.nameHtml"
+                ></a>
+                @if (childsItem.duplicateChild) {
+                  <div class="text-warning">
+                    <small>
+                      <ng-container i18n>Possible duplicate: vehicle already in submodel:</ng-container>
+                      <a
+                        [routerLink]="['/moder/items/item', childsItem.duplicateChild.id]"
+                        [innerHTML]="childsItem.duplicateChild.nameHtml"
+                      ></a>
+                    </small>
+                  </div>
+                }
+              </td>
+              <td>
+                <a [routerLink]="['/moder/item-parent', childsItem.itemId, childsItem.parentId]">
+                  {{ item.name }}
+                  <span class="bi bi-pencil-fill" aria-hidden="true"></span>
+                </a>
+              </td>
+              <td class="urls">
+                @for (route of childsItem.item?.publicRoutes; track route) {
+                  <a [routerLink]="route.route" [textContent]="route.route.join('/')"></a>
+                  <br />
+                }
+              </td>
+              @if (canMove) {
+                <td>
+                  <button type="button" class="btn btn-sm btn-danger" (click)="deleteChild(item, childsItem.itemId)">
+                    <i class="bi bi-x" aria-hidden="true"></i>
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+          @if (item.isGroup && canMove) {
+            @if (item.itemTypeId === ItemType.ITEM_TYPE_BRAND) {
+              <tr>
+                <td colspan="2">
+                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <a
+                    routerLink="/moder/items/new"
+                    i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE, parent_id: item.id}"
+                    >add engine</a
+                  >
+                </td>
+                <td class="urls"></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <a
+                    routerLink="/moder/items/new"
+                    i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE, parent_id: item.id}"
+                    >add vehicle</a
+                  >
+                </td>
+                <td class="urls"></td>
+                <td></td>
+              </tr>
+            } @else if (item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
+              <tr>
+                <td colspan="2">
+                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <a
+                    routerLink="/moder/items/new"
+                    i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_CATEGORY, parent_id: item.id}"
+                    >add category</a
+                  >
+                </td>
+                <td class="urls"></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <a
+                    routerLink="/moder/items/new"
+                    i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE, parent_id: item.id}"
+                    >add engine</a
+                  >
+                </td>
+                <td class="urls"></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <a
+                    routerLink="/moder/items/new"
+                    i18n
+                    [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE, parent_id: item.id}"
+                    >add vehicle</a
+                  >
+                </td>
+                <td class="urls"></td>
+                <td></td>
+              </tr>
+            }
+            @if (
+              item.itemTypeId !== ItemType.ITEM_TYPE_TWINS &&
+              item.itemTypeId !== ItemType.ITEM_TYPE_FACTORY &&
+              item.itemTypeId !== ItemType.ITEM_TYPE_CATEGORY
+            ) {
+              <tr>
+                <td colspan="2">
+                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <a routerLink="/moder/items/new" [queryParams]="{item_type_id: item.itemTypeId, parent_id: item.id}">
+                    @if (item.itemTypeId === ItemType.ITEM_TYPE_ENGINE) {
+                      <ng-container i18n>add engine</ng-container>
+                    } @else {
+                      <ng-container i18n>add vehicle</ng-container>
+                    }
+                  </a>
+                </td>
+                <td class="urls"></td>
+                <td></td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+}

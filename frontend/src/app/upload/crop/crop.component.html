@@ -1,0 +1,27 @@
+<div class="modal-header">
+  <h3 class="modal-title" i18n>Cropper</h3>
+  <button class="btn-close" type="button" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  @if (picture$ | async; as picture) {
+    @if (picture && picture.imageGalleryFull) {
+      <img alt="" [src]="picture.imageGalleryFull.src" (load)="onLoad($event)" />
+    }
+  }
+</div>
+<div class="modal-footer">
+  @if (picture$ | async; as picture) {
+    <button type="button" class="btn btn-secondary float-start select-all" (click)="selectAll(picture)">
+      <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
+      <span i18n>Select all</span>
+    </button>
+  }
+  <span></span>
+  <button type="button" disabled class="btn btn-secondary float-start" i18n>
+    {{ resolution }} (aspect is about {{ aspect }})
+  </button>
+  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Close</button>
+  @if (picture$ | async; as picture) {
+    <button type="button" class="btn btn-primary" i18n (click)="onSave(picture)">Save changes</button>
+  }
+</div>

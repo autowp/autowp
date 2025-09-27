@@ -1,0 +1,235 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "wheelsage": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "i18n": {
+        "sourceLocale": {
+          "code": "en-GB",
+          "baseHref": "/"
+        },
+        "locales": {
+          "ru": {
+            "translation": "src/locale/messages.ru-RU.xlf",
+            "baseHref": "/"
+          },
+          "uk": {
+            "translation": "src/locale/messages.uk-UA.xlf",
+            "baseHref": "/"
+          },
+          "be": {
+            "translation": "src/locale/messages.be-BY.xlf",
+            "baseHref": "/"
+          },
+          "fr": {
+            "translation": "src/locale/messages.fr-FR.xlf",
+            "baseHref": "/"
+          },
+          "pt-BR": {
+            "translation": "src/locale/messages.pt-BR.xlf",
+            "baseHref": "/"
+          },
+          "zh-CN": {
+            "translation": "src/locale/messages.zh-CN.xlf",
+            "baseHref": "/"
+          },
+          "es-ES": {
+            "translation": "src/locale/messages.es-ES.xlf",
+            "baseHref": "/"
+          },
+          "it": {
+            "translation": "src/locale/messages.it-IT.xlf",
+            "baseHref": "/"
+          },
+          "he": {
+            "translation": "src/locale/messages.he-IL.xlf",
+            "baseHref": "/"
+          }
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": {
+              "base": "dist"
+            },
+            "index": "src/index.html",
+            "tsConfig": "src/tsconfig.app.json",
+            "polyfills": [
+              "src/polyfills.ts",
+              "@angular/localize/init"
+            ],
+            "allowedCommonJsDependencies": [
+              "jquery",
+              "sprintf-js",
+              "showdown",
+              "url-parse",
+              "chart.js",
+              "keycloak-js"
+            ],
+            "assets": [
+              "src/assets",
+              "src/favicon.ico",
+              "src/browserconfig.xml",
+              "src/manifest.json",
+              "src/manifest.webapp",
+              "src/yandex-browser-manifest.json",
+              {
+                "glob": "**/*",
+                "input": "src/favicons",
+                "output": "./favicons/"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/languages",
+                "output": "/i18n"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/leaflet/dist/images",
+                "output": "./assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/monaco-editor",
+                "output": "/assets/monaco/"
+              }
+            ],
+            "styles": [
+              "node_modules/leaflet/dist/leaflet.css",
+              "src/app/styles.scss",
+              "src/app/brandicon.scss",
+              "src/app/jcrop/jquery.Jcrop.scss",
+              "src/assets/flags/flags.scss"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js"
+            ],
+            "localize": [
+              "be",
+              "en-GB",
+              "fr",
+              "pt-BR",
+              "ru",
+              "uk",
+              "zh-CN",
+              "es-ES",
+              "it",
+              "he"
+            ],
+            "browser": "src/main.ts"
+          },
+          "configurations": {
+            "serve": {
+              "optimization": false,
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ],
+              "localize": [
+                "en-GB"
+              ]
+            },
+            "development": {
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ]
+            },
+            "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "browserTarget": "wheelsage:build"
+          },
+          "configurations": {
+            "serve": {
+              "browserTarget": "wheelsage:build:serve"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n",
+          "options": {
+            "buildTarget": "wheelsage:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ],
+    "analytics": "c1011e93-556a-4ca6-b2c1-2fdae8095785"
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
+    }
+  }
+}

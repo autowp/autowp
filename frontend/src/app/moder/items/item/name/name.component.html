@@ -1,0 +1,68 @@
+@if (data$ | async; as languages) {
+  <div class="card card-body">
+    <ul #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="languages[0].language">
+      @for (language of languages; track language.language) {
+        <li [ngbNavItem]="language.language">
+          <a ngbNavLink>
+            {{ language.language.toUpperCase() }}
+            @if (language.name || language.text || language.fullText) {
+              <span class="badge rounded-pill text-bg-secondary">
+                {{
+                  (language.name.length ? 1 : 0) + (language.text.length ? 1 : 0) + (language.fullText.length ? 1 : 0)
+                }}
+              </span>
+            }
+          </a>
+          <ng-template ngbNavContent>
+            <div class="mb-3 row mt-4">
+              <label class="col-md-2 col-form-label" for="name" i18n>Name</label>
+              <div class="col-md-10">
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  maxlength="255"
+                  class="form-control"
+                  [(ngModel)]="language.name"
+                />
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label class="col-md-2 col-form-label" for="short_description" i18n>Short description</label>
+              <div class="col-md-10">
+                <app-markdown-edit id="short_description" [(text)]="language.text" />
+                @if (language.textId) {
+                  <p class="text-end">
+                    <a i18n [routerLink]="['/info/text', language.textId]">History</a>
+                  </p>
+                }
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label class="col-md-2 col-form-label" for="full_description" i18n>Full description</label>
+              <div class="col-md-10">
+                <app-markdown-edit id="full_description" [(text)]="language.fullText" />
+                @if (language.fullTextId) {
+                  <p class="text-end">
+                    <a i18n [routerLink]="['/info/text', language.fullTextId]">History</a>
+                  </p>
+                }
+              </div>
+            </div>
+          </ng-template>
+        </li>
+      }
+    </ul>
+    <div [ngbNavOutlet]="nav"></div>
+    <button type="submit" class="btn btn-primary" [disabled]="loadingNumber()" (click)="saveLanguages(languages)">
+      @if (loadingNumber()) {
+        <span>
+          <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+        </span>
+      }
+      <ng-container i18n>Submit</ng-container>
+    </button>
+  </div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

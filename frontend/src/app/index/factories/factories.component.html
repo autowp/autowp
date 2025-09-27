@@ -1,0 +1,12 @@
+<h4>
+  <ng-container i18n>Factories</ng-container> <small><a routerLink="/map" i18n>all</a></small>
+</h4>
+@if (factories$ | async; as factories) {
+  <p>
+    @for (factory of factories.items; track factory.id) {
+      <app-index-factories-factory [factory]="factory" />
+    }
+  </p>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

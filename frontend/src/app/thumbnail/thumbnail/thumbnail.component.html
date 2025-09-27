@@ -1,0 +1,143 @@
+@if (picture$ | async; as picture) {
+  <div
+    class="card mb-4"
+    [class.vote-accept]="picture.moderVoteVote > 0"
+    [class.vote-remove]="picture.moderVoteVote < 0"
+    [class.vote-neutral]="picture.moderVoteVote > 0 && picture.moderVoteVote === 0"
+  >
+    @if (route() && picture.thumbMedium) {
+      <a [routerLink]="route()">
+        <img
+          class="card-img-top"
+          loading="lazy"
+          [src]="picture.thumbMedium.src"
+          [alt]="picture.nameText"
+          [title]="picture.nameText"
+        />
+      </a>
+    }
+    <div class="card-body">
+      <h6 class="card-title">
+        @if (route()) {
+          <a [routerLink]="route()" [innerHtml]="picture.nameHtml"></a>
+        }
+      </h6>
+      <p class="picture-behaviour clearfix">
+        @if (isModer$ | async) {
+          @if (picture.status) {
+            <span title="Status">
+              @if (picture.status === PictureStatus.PICTURE_STATUS_ACCEPTED) {
+                <i class="bi bi-check text-success" aria-hidden="true"></i>
+              } @else if (picture.status === PictureStatus.PICTURE_STATUS_INBOX) {
+                <i class="bi bi-hourglass text-warning" aria-hidden="true"></i>
+              } @else if (picture.status === PictureStatus.PICTURE_STATUS_REMOVED) {
+                <i class="bi bi-trash text-danger" aria-hidden="true"></i>
+              } @else if (picture.status === PictureStatus.PICTURE_STATUS_REMOVING) {
+                <i class="bi bi-trash text-danger" aria-hidden="true"></i>
+              }
+            </span>
+          }
+        }
+        <span i18n-title title="Resolution" class="text-nowrap me-2" ngPreserveWhitespaces>
+          {{ picture.resolution }}
+          @if ((isModer$ | async) && picture.cropped) {
+            <i
+              class="bi bi-crop"
+              aria-hidden="true"
+              style="cursor: help"
+              title="Thumbnail is cropped ({{ picture.cropResolution }})"
+              i18n-title
+            ></i>
+          }
+        </span>
+        @if (picture.views > 0) {
+          <span i18n-title title="Views" class="text-nowrap me-2" ngPreserveWhitespaces>
+            <i class="bi bi-eye" aria-hidden="true"></i>
+            @if (picture.views >= 1000) {
+              <span>{{ picture.views / 1000 | number: '1.0-1' }}K</span>
+            } @else {
+              <span>{{ picture.views | number: '1.0-0' }}</span>
+            }
+          </span>
+        }
+        @if (picture.votes && picture.votes.positive > 0) {
+          <span class="text-nowrap me-2" ngPreserveWhitespaces>
+            <i class="bi bi-hand-thumbs-up-fill" aria-hidden="true"></i>
+            {{ picture.votes.positive }}
+          </span>
+        }
+        @if (picture.commentsCountTotal > 0) {
+          <span i18n-title title="Comments" class="text-nowrap me-2">
+            @if (route()) {
+              <a [routerLink]="route()">
+                @if (picture.commentsCountNew > 0) {
+                  {{
+                    picture.commentsCountTotal > picture.commentsCountNew
+                      ? picture.commentsCountTotal - picture.commentsCountNew
+                      : ''
+                  }}<span class="text-danger">+{{ picture.commentsCountNew }}</span
+                  ><i class="bi bi-chat-fill text-danger" aria-hidden="true"></i>
+                } @else {
+                  {{ picture.commentsCountTotal }}
+                  <i class="bi bi-chat-fill" aria-hidden="true"></i>
+                }
+              </a>
+            }
+          </span>
+        }
+        @if (owner$ | async; as owner) {
+          <br />
+          <app-user [user]="owner" />
+        }
+      </p>
+      @if (selectable()) {
+        <button
+          class="btn btn-sm float-start me-1 mb-2"
+          type="button"
+          [class.btn-primary]="picture.selected"
+          [class.btn-secondary]="!picture.selected"
+          (click)="onPictureSelect(picture)"
+        >
+          <i class="bi bi-check" aria-hidden="true"></i>
+        </button>
+      }
+      @if (isModer$ | async) {
+        <a
+          class="btn btn-secondary btn-sm settings mb-2"
+          title="Settings"
+          [routerLink]="['/moder/pictures', picture.id]"
+          [class.float-end]="selectable()"
+        >
+          <i class="bi bi-gear-fill" aria-hidden="true"></i>
+        </a>
+      }
+      @if (picture.pictureItems?.items || []; as pictureItems) {
+        <div style="clear: both">
+          @for (pictureItem of pictureItems; track pictureItem.itemId) {
+            @if ($count > 1) {
+              <div [innerHTML]="pictureItem.item?.nameHtml"></div>
+            }
+            <select
+              class="form-select form-select-sm me-1 mb-2"
+              [(ngModel)]="pictureItem.perspectiveId"
+              (change)="savePerspective(pictureItem)"
+            >
+              <option [ngValue]="0">--</option>
+              @for (item of perspectiveOptions$ | async; track item.id) {
+                <option [ngValue]="item.id">{{ item.name }}</option>
+              }
+            </select>
+          }
+        </div>
+      }
+      @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
+        <p class="alert alert-warning" role="alert">
+          <span class="bi bi-file-earmark-image me-1" aria-hidden="true"></span>
+          <a ngPreserveWhitespaces i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
+            >Similar picture: {{ dfDistance.distance }}</a
+          >
+        </p>
+      }
+    </div>
+  </div>
+}

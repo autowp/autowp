@@ -1,0 +1,155 @@
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import '../variables';
+@import 'bootstrap/scss/mixins';
+
+:host {
+  text-align: center;
+  height: 100%;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  margin: 0;
+
+  &.previous {
+    margin-left: -100%;
+  }
+
+  &.next {
+    margin-right: -100%;
+  }
+
+  &.active {
+    display: block;
+  }
+
+  img {
+    margin: 0 auto;
+    max-height: none;
+    max-width: none;
+    position: absolute;
+
+    @include transition(
+      0.6s ease-in-out width,
+      0.6s ease-in-out height,
+      0.6s ease-in-out left,
+      0.6s ease-in-out top,
+      0.6s ease-in-out opacity
+    );
+
+    &.full {
+      opacity: 1;
+
+      &.crop-mode {
+        opacity: 0;
+      }
+    }
+
+    &.crop {
+      opacity: 0;
+
+      &.crop-mode {
+        opacity: 1;
+      }
+    }
+  }
+
+  .carousel-control-full {
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    text-align: center;
+    color: #fff;
+    inset: 50% auto auto 50%;
+    width: 20px;
+    margin-left: -10px;
+    margin-top: -10px;
+    opacity: 1;
+  }
+
+  &:hover {
+    .carousel-control-full {
+      display: block;
+    }
+  }
+
+  .loading-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -20px;
+    font-size: 40px;
+    color: #fff;
+    line-height: 0.7;
+  }
+}
+
+$control-width: 7.5%;
+
+.carousel-control {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 15%;
+  text-align: center;
+  background-color: transparent;
+
+  &.download,
+  &.details,
+  &.comments {
+    top: auto;
+    bottom: 20px;
+    height: auto;
+    width: $control-width;
+    opacity: 1;
+    text-shadow: 0 0 4px #000;
+    color: #fff;
+    font-size: 1.5rem;
+
+    .badge {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      margin-top: -6px;
+      font-size: 10px;
+      padding: 2px 5px;
+
+      span {
+        color: #c00;
+      }
+    }
+  }
+
+  &:visited {
+    color: #fff;
+  }
+
+  &.download {
+    /* stylelint-disable-next-line declaration-property-value-no-unknown */
+    left: 50% - $control-width * 1.5;
+  }
+
+  &.details {
+    /* stylelint-disable-next-line declaration-property-value-no-unknown */
+    left: 50% - $control-width * 0.5;
+  }
+
+  &.comments {
+    /* stylelint-disable-next-line declaration-property-value-no-unknown */
+    left: 50% + $control-width * 0.5;
+  }
+}
+
+.carousel-caption {
+  text-shadow: 0 0 4px #000;
+  opacity: 1;
+  margin-bottom: 30px;
+  padding-bottom: 0;
+  padding-top: 0;
+
+  h3 {
+    margin-top: 0;
+  }
+}

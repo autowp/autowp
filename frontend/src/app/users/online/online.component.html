@@ -1,0 +1,13 @@
+<div class="modal-header">
+  <h3 class="modal-title" i18n>Online</h3>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  @for (user of users$ | async; track user.id) {
+    <app-user [user]="user" />
+  }
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" i18n (click)="load()">Refresh</button>
+  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Close</button>
+</div>

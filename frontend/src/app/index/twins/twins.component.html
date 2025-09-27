@@ -1,0 +1,30 @@
+<h4>
+  <ng-container i18n>Twins</ng-container> <small><a routerLink="/twins" i18n>all</a></small>
+</h4>
+@if (items$ | async; as items) {
+  <p>
+    @for (brand of items.items; track brand.id) {
+      <a [routerLink]="['/twins', brand.catname]">{{ brand.name }}</a
+      >&#xa0;<span class="count"
+        >({{ brand.count - brand.newCount }}
+        @if (brand.newCount > 0) {
+          <span>+{{ brand.newCount }}</span>
+        }
+        )</span
+      >
+    }
+    @if (items.count > (items.items?.length || 0)) {
+      <ng-container i18n>… and</ng-container>
+      <a routerLink="/twins" i18n="@@more-n-companies">{items.count - (items.items?.length||0), plural,
+        one {more {{ items.count - (items.items?.length || 0) }} company}
+        other {more {{ items.count - (items.items?.length || 0) }} companies}
+      }</a>
+    }
+  </p>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+<app-markdown
+  i18n-markdown
+  markdown="Do you know that Daewoo Matiz has as many as [six clones](/twins/group/118812)? And you know what [common in Lotus and Kia](/twins/group/118750)? We are sure that you will find this section interesting."
+/>

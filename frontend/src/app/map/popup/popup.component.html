@@ -1,0 +1,13 @@
+@if (item(); as item) {
+  <div class="map-infowindow">
+    <h5 [textContent]="item.name"></h5>
+    @if (item.image) {
+      <p>
+        <img alt="" style="max-width: 100%" [src]="item.image.src" />
+      </p>
+    }
+    <p class="details">
+      <a [routerLink]="item.url">подробнее…</a>
+    </p>
+  </div>
+}

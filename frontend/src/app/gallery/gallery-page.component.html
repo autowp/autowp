@@ -1,0 +1,9 @@
+@if (identity$ | async; as identity) {
+  <app-gallery
+    [filter]="{}"
+    [current]="identity"
+    [galleryPrefix]="['/picture', identity, 'gallery']"
+    [picturePrefix]="['/picture']"
+    (pictureSelected)="pictureSelected($event)"
+  />
+}

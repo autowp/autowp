@@ -1,0 +1,19 @@
+@if (categories$ | async; as response) {
+  <div class="card card-body">
+    <ul>
+      @for (item of response.items; track item.id) {
+        <li class="car-node">
+          <app-moder-items-item-select-parent-tree-item
+            [item]="item"
+            [order]="ItemParentsRequest.Order.CATEGORIES_FIRST"
+            [disableItemID]="(itemID$ | async) || ''"
+            (selected)="onSelect($event)"
+          />
+        </li>
+      }
+    </ul>
+    @if (response.paginator) {
+      <app-paginator [data]="response.paginator" />
+    }
+  </div>
+}

@@ -1,0 +1,43 @@
+@if (item$ | async; as item) {
+  @if (item.row.type === ItemParentType.ITEM_TYPE_TUNING) {
+    <span class="text-muted" i18n>Related</span>
+  } @else if (item.row.type === ItemParentType.ITEM_TYPE_SPORT) {
+    <span class="text-muted" i18n>Sport</span>
+  }
+  @if ((item.row.item?.childsCount || 0) <= 0) {
+    <button
+      type="button"
+      class="btn btn-link d-block text-start"
+      [innerHTML]="item.row.item?.nameHtml"
+      (click)="selectItem({itemId: item.row.itemId, perspectiveId: 0, type: PictureItemType.PICTURE_ITEM_CONTENT})"
+    ></button>
+  } @else {
+    <div>
+      <button class="btn btn-link d-block text-start" type="button" (click)="toggleItem(item)">
+        <i class="bi me-1" [class.bi-plus-circle]="!item.expanded" [class.bi-dash-circle]="item.expanded"></i>
+        <span [innerHTML]="item.row.item?.nameHtml"></span>
+      </button>
+      @if (item.expanded) {
+        <div class="mb-1 ms-4">
+          @if (childs$ | async; as childs) {
+            @for (child of childs; track child) {
+              <app-moder-picture-move-item [item]="child" (selected)="selectItem($event)" />
+            }
+          } @else {
+            <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+          }
+          <button
+            type="button"
+            class="btn btn-link d-block text-start"
+            i18n
+            (click)="
+              selectItem({itemId: item.row.itemId, perspectiveId: 0, type: PictureItemType.PICTURE_ITEM_CONTENT})
+            "
+          >
+            other modification
+          </button>
+        </div>
+      }
+    </div>
+  }
+}

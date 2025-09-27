@@ -1,0 +1,118 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Feedback</h1>
+</div>
+
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <div class="card card-body mb-4">
+      <form class="form-horizontal" [formGroup]="form" (submit)="submit()">
+        <fieldset>
+          <legend i18n>Feedback</legend>
+
+          @if (form.controls.name; as control) {
+            <div class="mb-3 row">
+              <label class="col-md-2 col-form-label" for="name" i18n>Your name</label>
+              <div class="col-md-10">
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  size="80"
+                  autocomplete="name"
+                  class="form-control"
+                  placeholder="John"
+                  i18n-placeholder
+                  [formControl]="control"
+                  [class.is-invalid]="
+                    (control.invalid && (control.dirty || !control.untouched)) ||
+                    (invalidParams() && invalidParams()['name'])
+                  "
+                />
+                @for (message of invalidParams() | invalidParams: 'name'; track message) {
+                  <p class="invalid-feedback" [textContent]="message"></p>
+                }
+              </div>
+            </div>
+          }
+          @if (form.controls.email; as control) {
+            <div class="mb-3 row">
+              <label class="col-md-2 col-form-label" for="email" i18n>E-mail</label>
+              <div class="col-md-10">
+                <input
+                  type="text"
+                  id="email"
+                  name="email"
+                  size="80"
+                  autocomplete="email"
+                  class="form-control"
+                  placeholder="john@example.com"
+                  i18n-placeholder
+                  [formControl]="control"
+                  [class.is-invalid]="
+                    (control.invalid && (control.dirty || !control.untouched)) ||
+                    (invalidParams() && invalidParams()['email'])
+                  "
+                />
+                @for (message of invalidParams() | invalidParams: 'email'; track message) {
+                  <p class="invalid-feedback" [textContent]="message"></p>
+                }
+              </div>
+            </div>
+          }
+          @if (form.controls.message; as control) {
+            <div class="mb-3 row">
+              <label class="col-md-2 col-form-label" for="message" i18n>Message</label>
+              <div class="col-md-10">
+                <textarea
+                  id="message"
+                  name="message"
+                  cols="80"
+                  rows="8"
+                  class="form-control"
+                  [formControl]="control"
+                  [class.is-invalid]="
+                    (control.invalid && (control.dirty || !control.untouched)) ||
+                    (invalidParams() && invalidParams()['message'])
+                  "
+                ></textarea>
+                @for (message of invalidParams() | invalidParams: 'message'; track message) {
+                  <p class="invalid-feedback" [textContent]="message"></p>
+                }
+              </div>
+            </div>
+          }
+          @if (form.controls.captcha) {
+            <div class="mb-3 row">
+              <div class="col-md-10 offset-md-2">
+                @if (recaptchaKey$ | async; as recaptchaKey) {
+                  <re-captcha [siteKey]="recaptchaKey" (resolved)="resolved($event)" />
+                }
+                @for (message of invalidParams() | invalidParams: 'captcha'; track message) {
+                  <p class="invalid-feedback" [textContent]="message"></p>
+                }
+              </div>
+            </div>
+          }
+          <div class="mb-3 row">
+            <div class="col-md-2"></div>
+            <div class="col-md-10">
+              <button type="submit" class="btn btn-primary" i18n [disabled]="!form.valid">Submit</button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <app-markdown
+      i18n-markdown
+      markdown="If you have come here to express words of support, it is possible to [express it in hard currency](/donate)"
+    />
+  </div>
+</div>

@@ -1,0 +1,71 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+@if (voting$ | async; as voting) {
+  <div class="page-header">
+    <h1>{{ voting.name }}</h1>
+  </div>
+  @if (voting) {
+    <div class="card card-body mb-4">
+      <p style="white-space: pre-line" [textContent]="voting.text"></p>
+      <hr />
+      @if (voting.canVote) {
+        <form (ngSubmit)="vote(voting)">
+          <ul class="unstyled">
+            @for (variant of voting.variants; track variant.id) {
+              <li>
+                @if (voting.multivariant) {
+                  <label class="checkbox inline">
+                    <input type="checkbox" name="variant" [(ngModel)]="selectedMulti[variant.id]" /> {{ variant.name }}
+                  </label>
+                } @else {
+                  <label class="radio inline">
+                    <input type="radio" name="variant" [value]="variant.id" [(ngModel)]="selected" /> {{ variant.name }}
+                  </label>
+                }
+                @if (variant.text) {
+                  <p class="text-info" [textContent]="variant.text"></p>
+                }
+              </li>
+            }
+          </ul>
+          <button type="submit" class="btn btn-primary" i18n [disabled]="!isVariantSelected(voting)">Vote</button>
+        </form>
+      }
+      @if (!voting.canVote) {
+        @for (variant of voting.variants; track variant.id) {
+          <div class="mb-3">
+            @if (variant.votes > 0) {
+              <p class="float-end">
+                <a class="who-vote" href="#" i18n (click)="showWhoVoted(voting, variant)">Who voted?</a>
+              </p>
+            }
+            {{ variant.name }}
+            @if (variant.text) {
+              <p class="text-info" [textContent]="variant.text"></p>
+            }
+            <ngb-progressbar
+              style="clear: both"
+              [type]="variant.isMax ? 'success' : variant.isMin ? 'danger' : 'primary'"
+              [value]="variant.percent"
+              >{{ variant.votes > 0 ? variant.votes : '' }}</ngb-progressbar
+            >
+          </div>
+        }
+      }
+    </div>
+  }
+
+  @if (voting) {
+    <p i18n>
+      Voting during {{ voting.beginDate | date: 'mediumDate' }} to
+      {{ voting.endDate | date: 'mediumDate' }}
+    </p>
+  }
+  <app-comments [itemID]="voting.id + ''" [typeID]="CommentsType.VOTINGS_TYPE_ID" />
+}

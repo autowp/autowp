@@ -1,0 +1,24 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (brand$ | async; as brand) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/', brand.catname]" [innerHTML]="brand.nameHtml"></a>
+      </li>
+    }
+  </ol>
+</nav>
+
+@if (brand$ | async; as brand) {
+  <app-mosts-contents
+    [prefix]="['/', brand.catname, 'mosts']"
+    [ratingCatname]="ratingCatname$ | async"
+    [typeCatname]="(typeCatname$ | async) || null"
+    [yearsCatname]="(yearsCatname$ | async) || null"
+    [brandID]="brand.id"
+  />
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

@@ -1,0 +1,17 @@
+@if (group$ | async; as group) {
+  <div class="page-header">
+    <h2 i18n>All pictures of {{ group.nameText }}</h2>
+  </div>
+  @if (data$ | async; as data) {
+    <div class="row">
+      @for (picture of data.items || []; track picture) {
+        <div class="col-lg-3 col-md-3">
+          <app-thumbnail [picture]="picture" [route]="['/twins/group', group.id + '', 'pictures', picture.identity]" />
+        </div>
+      }
+    </div>
+    @if (data.paginator) {
+      <app-paginator [data]="data.paginator" />
+    }
+  }
+}

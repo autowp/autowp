@@ -1,0 +1,95 @@
+<div class="page-header">
+  <h1 i18n>Profile</h1>
+</div>
+
+<h2 i18n>Personal info</h2>
+@if (user$ | async; as user) {
+  <div class="card card-body mb-4">
+    <p>{{ user.name }} (<a i18n [href]="changeProfileUrl">Change</a>)</p>
+  </div>
+
+  <h2 i18n>Photo</h2>
+  <div class="card card-body mb-4">
+    <app-markdown i18n-markdown markdown="You can upload photo or use [Gravatar](https://gravatar.com/)" />
+    @if (photo$ | async; as photo) {
+      <div>
+        <img alt="" class="mb-4" [src]="photo.src" />
+      </div>
+    }
+    <div class="row">
+      <div class="col-6">
+        <input #input type="file" accept="image/*" class="form-control" (change)="onChange(user, $event)" />
+        @for (message of photoInvalidParams() | invalidParams: 'photo'; track message) {
+          <p class="invalid-feedback d-block" [textContent]="message"></p>
+        }
+      </div>
+      <div class="col-6">
+        @if (photo$ | async) {
+          <button type="submit" class="btn btn-danger" (click)="resetPhoto(user.id)">
+            <i class="bi bi-x" aria-hidden="true"></i>
+            <ng-container i18n>Delete photo</ng-container>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <h2 i18n>Other</h2>
+  <div class="card card-body mb-4">
+    @if (votesLeft$ | async) {
+      <p><ng-container i18n>Votes per day</ng-container>: {{ votesPerDay$ | async }}</p>
+      <p><ng-container i18n>Votes left</ng-container>: {{ votesLeft$ | async }}</p>
+    }
+    @if (form$ | async; as form) {
+      <form method="post" class="form-horizontal" [formGroup]="form" (ngSubmit)="sendSettings(form, user.id)">
+        @if (form.controls.language; as control) {
+          <div class="mb-3 row">
+            <label class="col-md-3 col-form-label" for="language" i18n>Language</label>
+            <div class="col-md-9">
+              <select
+                name="language"
+                id="language"
+                class="form-select"
+                [formControl]="control"
+                [class.is-invalid]="settingsInvalidParams()['language']"
+              >
+                @for (language of languages; track language.value) {
+                  <option [value]="language.value">{{ language.name }}</option>
+                }
+              </select>
+              @for (message of settingsInvalidParams() | invalidParams: 'language'; track message) {
+                <p class="invalid-feedback" [textContent]="message"></p>
+              }
+            </div>
+          </div>
+        }
+        @if (form.controls.timezone; as control) {
+          <div class="mb-3 row">
+            <label class="col-md-3 col-form-label" for="timezone" i18n>Timezone</label>
+            <div class="col-md-9">
+              <select
+                name="timezone"
+                id="timezone"
+                class="form-select"
+                [formControl]="control"
+                [class.is-invalid]="settingsInvalidParams()['timezone']"
+              >
+                @for (timezone of timezones$ | async; track timezone) {
+                  <option [value]="timezone">{{ timezone }}</option>
+                }
+              </select>
+              @for (message of settingsInvalidParams() | invalidParams: 'timezone'; track message) {
+                <p class="invalid-feedback" [textContent]="message"></p>
+              }
+            </div>
+          </div>
+        }
+        <div class="row">
+          <div class="col-md-9 offset-md-3">
+            <button type="submit" class="btn btn-primary" i18n>send</button>
+          </div>
+        </div>
+      </form>
+    }
+  </div>
+}

@@ -1,0 +1,30 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (brand$ | async; as brand) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/', brand.catname]" [innerHTML]="brand.nameHtml"></a>
+      </li>
+    }
+  </ol>
+</nav>
+
+@if (title$ | async; as title) {
+  <div class="page-header">
+    <h1>{{ title }}</h1>
+  </div>
+}
+
+@if (data$ | async; as data) {
+  @for (item of data.items; track item.id) {
+    <app-catalogue-list-item [item]="item" />
+  }
+
+  @if (data.paginator) {
+    <app-paginator [data]="data.paginator" />
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

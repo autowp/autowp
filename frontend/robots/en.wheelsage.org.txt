@@ -1,0 +1,5 @@
+User-Agent: *
+Disallow: /registration/
+Disallow: /account/
+Disallow: /inbox/
+Host: en.wheelsage.org

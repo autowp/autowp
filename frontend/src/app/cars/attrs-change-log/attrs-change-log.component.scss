@@ -1,0 +1,23 @@
+.specs-log {
+  thead th {
+      text-align:center
+  }
+
+  tr td {
+      vertical-align: middle;
+  }
+
+  td.attribute {
+      span {
+          white-space: nowrap;
+      }
+  }
+
+  td.link a {
+      white-space: nowrap;
+  }
+
+  tr.odd td {
+      background-color: #f8f8f8;
+  }
+}

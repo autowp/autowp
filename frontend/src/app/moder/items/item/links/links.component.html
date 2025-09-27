@@ -1,0 +1,91 @@
+@if (links$ | async; as links) {
+  @if (item$ | async; as item) {
+    @if (canEditMeta$ | async) {
+      <form method="post" (submit)="saveLinks(item.id, links)">
+        <table class="table table-condensed table-striped">
+          <caption i18n>
+            Links
+          </caption>
+          <thead>
+            <tr>
+              <th i18n scope="col">Text</th>
+              <th i18n scope="col">Address</th>
+              <th i18n scope="col">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (link of links; track link.id) {
+              <tr>
+                <td>
+                  <input name="name{{ $index }}" type="text" class="form-control" [(ngModel)]="link.name" />
+                </td>
+                <td>
+                  <input name="url{{ $index }}" type="text" class="form-control" [(ngModel)]="link.url" />
+                </td>
+                <td>
+                  <select name="type{{ $index }}" class="form-select" [(ngModel)]="link.type">
+                    <option value="default" i18n>interest link</option>
+                    <option value="official" i18n>official</option>
+                    <option value="club" i18n>club</option>
+                  </select>
+                </td>
+              </tr>
+            }
+            <tr>
+              <td>
+                <input type="text" name="name" class="form-control" [(ngModel)]="newLink.name" />
+              </td>
+              <td>
+                <input type="text" name="url" class="form-control" [(ngModel)]="newLink.url" />
+              </td>
+              <td>
+                <select name="type" class="form-select" [(ngModel)]="newLink.type">
+                  <option value="default" i18n>interest link</option>
+                  <option value="official" i18n>official</option>
+                  <option value="club" i18n>club</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3">
+                <button class="btn btn-primary" type="submit" [disabled]="loadingNumber()">
+                  @if (loadingNumber()) {
+                    <span>
+                      <span class="spinner-border" role="status"
+                        ><span class="visually-hidden" i18n>Loading…</span></span
+                      >
+                    </span>
+                  }
+                  <ng-container i18n>Submit</ng-container>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    }
+  }
+  @if ((canEditMeta$ | async) === false) {
+    <table class="table table-condensed table-stripped">
+      <caption i18n>
+        Links
+      </caption>
+      <tbody>
+        <tr>
+          <th i18n scope="col">Text</th>
+          <th i18n scope="col">Address</th>
+          <th i18n scope="col">Type</th>
+        </tr>
+        @for (link of links; track link.id) {
+          <tr>
+            <td [textContent]="link.name"></td>
+            <td [textContent]="link.url"></td>
+            <td [textContent]="link.type"></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

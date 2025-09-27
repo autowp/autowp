@@ -1,0 +1,65 @@
+@if (data$ | async; as data) {
+  <table class="table table-stripped">
+    <caption i18n>
+      Attribute values
+    </caption>
+    <thead>
+      <tr>
+        <th i18n scope="col">Date</th>
+        <th i18n scope="col">User</th>
+        <th i18n scope="col">Parameter</th>
+        <th i18n scope="col">Value</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of data.items; track row) {
+        <tr>
+          <td>
+            @if (row.userValue.updateDate?.toDate(); as date) {
+              <span [textContent]="date | timeAgo" [ngbTooltip]="date | date: 'medium'"></span>
+            }
+          </td>
+          <td>
+            @if (row.user$ | async; as user) {
+              <app-user [user]="user" />
+            }
+          </td>
+          <td>
+            @if (row.path$ | async; as path) {
+              @for (node of path; track node; let last = $last) {
+                <span>{{ node }}</span>
+                @if (!last) {
+                  <span> / </span>
+                }
+              }
+            }
+            @if (row.unitAbbr$ | async; as unitAbbr) {
+              <span class="unit">{{ unitAbbr }}</span>
+            }
+          </td>
+          <td>{{ row.userValue.valueText }}</td>
+          <td>
+            <button type="submit" class="btn btn-danger btn-sm" (click)="deleteValue(row)">
+              <i class="bi bi-x" aria-hidden="true"></i>
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (itemID$ | async; as itemID) {
+    <form (submit)="moveValues(itemID)">
+      <input
+        type="text"
+        name="item_id"
+        placeholder="id"
+        class="form-control"
+        style="max-width: 200px"
+        [(ngModel)]="move.item_id"
+      />
+      <button type="submit" class="btn btn-secondary" i18n>Move</button>
+    </form>
+  }
+}

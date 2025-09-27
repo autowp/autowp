@@ -1,0 +1,48 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/forums" i18n>Forums</a>
+    </li>
+    @if (theme$ | async; as theme) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/forums', theme.id]">{{ getForumsThemeTranslation(theme.name) }}</a>
+      </li>
+    }
+  </ol>
+</nav>
+
+@if (topic$ | async; as topic) {
+  <div class="page-header">
+    <h1>{{ topic.name }}</h1>
+  </div>
+  <section class="forum-topic-page comments">
+    <app-comments
+      [itemID]="topic.id"
+      [typeID]="CommentsType.FORUMS_TYPE_ID"
+      [limit]="limit"
+      [page]="(page$ | async) || 0"
+    />
+    @if (authenticated$ | async) {
+      <div class="text-end mb-3">
+        @if (!topic.subscription) {
+          <button type="button" class="btn btn-link subscription" (click)="subscribe(topic)">
+            <i class="bi bi-envelope" aria-hidden="true"></i>
+            <ng-container i18n>Subscribe to new replies notifications</ng-container>
+          </button>
+        }
+        @if (topic.subscription) {
+          <button type="button" class="btn btn-link subscription" (click)="unsubscribe(topic)">
+            <i class="bi bi-envelope" aria-hidden="true"></i>
+            <ng-container i18n>Unsubscribe from notifications</ng-container>
+          </button>
+        }
+      </div>
+    }
+    @if (topic.status === 'closed') {
+      <p class="alert alert-block alert-error" i18n>Topic is closed by site administration</p>
+    }
+  </section>
+}

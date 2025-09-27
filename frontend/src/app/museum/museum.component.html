@@ -1,0 +1,66 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/map" i18n>Map</a>
+    </li>
+  </ol>
+</nav>
+
+@if (item$ | async; as item) {
+  <div class="page-header">
+    <h1 [innerHTML]="item.nameHtml"></h1>
+  </div>
+  @if (museumModer$ | async) {
+    <p>
+      <i class="bi bi-gear-fill" aria-hidden="true"></i>
+      <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
+    </p>
+  }
+  @if (map$ | async; as map) {
+    <div
+      style="height: 300px"
+      class="mb-4 w-100"
+      leaflet
+      [leafletOptions]="map.options"
+      [leafletLayers]="map.markers"
+    ></div>
+  }
+  @if (links$ | async; as links) {
+    @if (item && ((links.items && links.items.length > 0) || item.description)) {
+      <div class="card card-body">
+        <app-markdown [markdown]="item.description" />
+        @if (links.items && links.items.length > 0) {
+          <p>
+            <ng-container i18n>Web-site:</ng-container>
+            @for (link of links.items; track link.id) {
+              <a [href]="link.url" [textContent]="link.name ? link.name : link.url"></a>
+              <br />
+            }
+          </p>
+        }
+      </div>
+    }
+  }
+}
+
+@if (pictures$ | async; as data) {
+  @if ((data.items || []).length > 0) {
+    <div>
+      <h3 i18n>Pictures</h3>
+      <div class="row">
+        @for (picture of data.items || []; track picture) {
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" />
+          </div>
+        }
+      </div>
+    </div>
+  }
+}
+
+@if (item$ | async; as item) {
+  <app-comments [itemID]="item.id" [typeID]="CommentsType.ITEM_TYPE_ID" />
+}

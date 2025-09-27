@@ -1,0 +1,119 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (data$ | async; as data) {
+      @if (data.theme) {
+        <li class="breadcrumb-item">
+          <a routerLink="/forums" i18n>Forums</a>
+        </li>
+      }
+    }
+  </ol>
+</nav>
+
+@if (data$ | async; as data) {
+  <div class="page-header">
+    @if (data.theme) {
+      <h1>{{ getForumsThemeTranslation(data.theme.name) }}</h1>
+    } @else {
+      <h1 i18n id="header">Forums</h1>
+    }
+  </div>
+  @for (theme of data.themes; track theme.id) {
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card card-body mb-4">
+          <p>
+            <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+            <strong>
+              <a [routerLink]="['/forums', theme.id]" [textContent]="getForumsThemeTranslation(theme.name)"></a>
+            </strong>
+          </p>
+          @if (theme.description) {
+            <p [textContent]="getForumsThemeDescriptionTranslation(theme.description)"></p>
+          }
+          <p>
+            <ng-container i18n="@@n-topics">{theme.topicsCount, plural,
+              one {{{theme.topicsCount}} topic}
+              other {{{theme.topicsCount}} topics}
+            }</ng-container
+            >,
+            <ng-container i18n="@@n-messages">{theme.messagesCount, plural,
+              one {{{theme.messagesCount}} message}
+              other {{{theme.messagesCount}} messages}
+            }</ng-container>
+          </p>
+          @if (theme.themes$ | async; as themes) {
+            @if ((themes.items || []).length > 0) {
+              <div>
+                <ng-container i18n>Subforums</ng-container>
+                @for (subtheme of themes.items; track subtheme.id; let last = $last) {
+                  <a [routerLink]="['/forums', subtheme.id]">{{ getForumsThemeTranslation(subtheme.name) }}</a>
+                  @if (!last) {
+                    <span>, </span>
+                  }
+                }
+              </div>
+            } @else {
+              <p>
+                <a i18n [routerLink]="['/forums', theme.id]">Go to forum …</a>
+              </p>
+            }
+          }
+        </div>
+      </div>
+      @if (theme.lastTopic$ | async; as lastTopic) {
+        <div class="col-md-6">
+          <div class="m-4 transparent">
+            <p>
+              <i class="bi bi-chat-fill" aria-hidden="true"></i>
+              <a i18n [routerLink]="['/forums/topic', lastTopic.id]">Last message in topic «{{ lastTopic.name }}»</a>
+            </p>
+            @if (theme.lastMessage$ | async; as lastMessage) {
+              <p>
+                @if (lastMessage.createdAt) {
+                  <app-past-time-indicator [date]="lastMessage.createdAt.toDate()" />
+                }
+                @if (theme.lastMessageAuthor$ | async; as lastMessageAuthor) {
+                  <app-user [user]="lastMessageAuthor" />
+                }
+                <a i18n-title title="Go to last message" [routerLink]="['/forums/message', lastMessage.id]">
+                  <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
+                </a>
+              </p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+  @if (data.theme && !data.theme.disableTopics) {
+    <div>
+      <a class="btn btn-primary mb-3" [routerLink]="['/forums/new-topic', data.theme.id]">
+        <i class="bi bi-chat-fill" aria-hidden="true"></i>
+        <ng-container i18n>Create new topic</ng-container>
+      </a>
+      @if (topics$ | async; as topics) {
+        <app-forums-topic-list [topics]="topics.items || []" (reload)="reload()" />
+        @if (topics.paginator) {
+          <app-paginator [data]="topics.paginator" />
+        }
+      }
+    </div>
+  }
+  @if (data.theme; as theme) {
+    <p class="text-end small">
+      <ng-container i18n="@@n-topics">{theme.topicsCount, plural,
+        one {{{theme.topicsCount}} topic}
+        other {{{theme.topicsCount}} topics}
+      }</ng-container
+      >,
+      <ng-container i18n="@@n-messages">{theme.messagesCount, plural,
+        one {{{theme.messagesCount}} message}
+        other {{{theme.messagesCount}} messages}
+      }</ng-container>
+    </p>
+  }
+}

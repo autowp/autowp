@@ -1,0 +1,18 @@
+<div class="page-header">
+  <h2 i18n>Pictures</h2>
+</div>
+
+@if (data$ | async; as data) {
+  @for (chunk of data.pictures; track chunk) {
+    <div class="row">
+      @for (i of chunk; track i) {
+        <div class="col-sm-3">
+          <app-thumbnail [picture]="i.picture" [route]="i.route" />
+        </div>
+      }
+    </div>
+  }
+  @if (data.paginator) {
+    <app-paginator [data]="data.paginator" />
+  }
+}

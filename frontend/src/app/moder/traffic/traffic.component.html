@@ -1,0 +1,62 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Traffic</h1>
+</div>
+
+<div class="nav nav-pills">
+  <a class="nav-link active" routerLink="/moder/traffic">Traffic</a>
+  <a class="nav-link" routerLink="/moder/traffic/whitelist">Whitelist</a>
+</div>
+
+@for (item of items$ | async; track item) {
+  <div class="row">
+    <div class="col-sm-2">
+      <h3 [textContent]="item.item.count"></h3>
+    </div>
+    <div class="col-sm-4">
+      <h3>
+        {{ item.item.ip }}
+        <a [href]="item.item.whoisUrl">whois</a>
+      </h3>
+      <p>{{ item.hostname$ | async }}</p>
+    </div>
+    <div class="col-sm-6">
+      @if (item.item.ban) {
+        <div>
+          <ng-container i18n>until</ng-container> {{ item.item.ban.until?.toDate() | date: 'fullDate' }}
+          @if (item.item.ban.byUser) {
+            <span>
+              by
+              <app-user [user]="item.item.ban.byUser" />
+              @if (item.item.ban.reason) {
+                <span> <ng-container i18n>Reason</ng-container> {{ item.item.ban.reason }} </span>
+              }
+            </span>
+          }
+        </div>
+      }
+      <div>
+        @if (item.item.ban) {
+          <button type="button" class="btn btn-secondary" i18n (click)="removeFromBlacklist(item.item.ip)">
+            unban
+          </button>
+        } @else {
+          <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(item.item.ip)">Ban</button>
+        }
+        @if (!item.item.inWhitelist) {
+          <button type="button" class="btn btn-success" i18n (click)="addToWhitelist(item.item.ip)">Whitelist</button>
+        }
+      </div>
+    </div>
+  </div>
+}

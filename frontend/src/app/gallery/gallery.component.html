@@ -1,0 +1,66 @@
+<div class="gallery">
+  @if (gallery$ | async; as gallery) {
+    <div class="carousel slide">
+      @if (gallery.useCircleIndicator) {
+        <ol class="carousel-indicators">
+          @for (item of gallery.items; track $index) {
+            <li
+              tabindex="0"
+              [class.active]="gallery.current === $index"
+              (click)="navigateToIndex($index, gallery)"
+              (keyup.enter)="navigateToIndex($index, gallery)"
+            ></li>
+          }
+        </ol>
+      } @else {
+        <div class="carousel-numbers">{{ gallery.current + 1 }} of {{ gallery.items.length }}</div>
+      }
+      <div class="carousel-inner">
+        @for (item of gallery.items; track $index) {
+          @if (item && $index >= gallery.current - 1 && gallery.current + 1 >= $index) {
+            <app-gallery-carousel-item
+              class="carousel-item"
+              [class.active]="(current$ | async) === item.identity"
+              [class.previous]="gallery.current > $index"
+              [class.next]="$index > gallery.current"
+              [item]="item"
+              [prefix]="picturePrefix()"
+            />
+          }
+        }
+      </div>
+      @if (gallery.current > 0) {
+        <button
+          type="button"
+          class="carousel-control-prev"
+          href="#"
+          role="button"
+          (click)="navigateToIndex(gallery.current - 1, gallery)"
+        >
+          <i class="bi bi-chevron-left glyphicon glyphicon-chevron-left fs-1" aria-hidden="true"></i>
+        </button>
+      }
+      @if (gallery.items.length - 1 > gallery.current) {
+        <button
+          type="button"
+          class="carousel-control-next"
+          href="#"
+          role="button"
+          (click)="navigateToIndex(gallery.current + 1, gallery)"
+        >
+          <i class="bi bi-chevron-right glyphicon glyphicon-chevron-right fs-1" aria-hidden="true"></i>
+        </button>
+      }
+      @if (identity$ | async; as identity) {
+        <button
+          type="button"
+          class="carousel-control-close"
+          role="button"
+          [routerLink]="picturePrefix().concat([identity])"
+        >
+          <i class="bi bi-x fs-1" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+  }
+</div>

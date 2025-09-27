@@ -1,0 +1,34 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Cutaway</h1>
+</div>
+
+<ul class="nav nav-pills mb-4">
+  <li class="nav-item">
+    <a class="nav-link" routerLink="/cutaway/authors" i18n>Authors</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" routerLink="/cutaway/brands" i18n>Brands</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" routerLink="/cutaway" i18n>Pictures</a>
+  </li>
+</ul>
+
+@if (query$ | async; as response) {
+  @for (item of response.items; track item.id) {
+    <app-catalogue-list-item [item]="item" />
+  }
+  @if (response.paginator) {
+    <app-paginator [data]="response.paginator" />
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

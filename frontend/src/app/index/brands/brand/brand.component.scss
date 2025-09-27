@@ -1,0 +1,11 @@
+:host > span {
+  white-space: nowrap;
+
+  .count span {
+    cursor: help;
+  }
+}
+
+a {
+  white-space: nowrap;
+}

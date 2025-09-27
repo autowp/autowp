@@ -1,0 +1,133 @@
+<div class="page-header">
+  <h1 i18n id="header">Conflicts</h1>
+</div>
+
+@if (user$ | async; as user) {
+  @if (user.specsWeight !== 0) {
+    <p class="float-end"><ng-container i18n>Weight</ng-container>: {{ user.specsWeight.toFixed(2) }}</p>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if ({value: filter$ | async}; as filter) {
+  <div class="nav nav-pills mb-3">
+    <a
+      class="nav-link"
+      routerLink="."
+      queryParamsHandling="merge"
+      i18n
+      [class.active]="filter.value === AttrConflictsRequest.Filter.ALL"
+      [queryParams]="{filter: undefined}"
+      >All</a
+    >
+    <a
+      class="nav-link"
+      routerLink="."
+      queryParamsHandling="merge"
+      i18n
+      [class.active]="filter.value === AttrConflictsRequest.Filter.I_DISAGREE"
+      [queryParams]="{filter: '-1'}"
+      >I disagree</a
+    >
+    <a
+      class="nav-link"
+      routerLink="."
+      queryParamsHandling="merge"
+      i18n
+      [class.active]="filter.value === AttrConflictsRequest.Filter.DO_NOT_AGREE_WITH_ME"
+      [queryParams]="{filter: '1'}"
+      >Do not agree with me</a
+    >
+    <a
+      class="nav-link"
+      routerLink="."
+      queryParamsHandling="merge"
+      i18n
+      [class.active]="filter.value === AttrConflictsRequest.Filter.MINUS_WEIGHT"
+      [queryParams]="{filter: 'minus-weight'}"
+      >Errors</a
+    >
+  </div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (data$ | async; as data) {
+  <table class="table" aria-describedby="header">
+    <thead>
+      <tr>
+        <th i18n scope="col">Object</th>
+        <th i18n scope="col">Parameter</th>
+        <th i18n scope="col">My value</th>
+        <th i18n scope="col">Other values</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (conflict of data.conflicts; track conflict) {
+        <tr>
+          <td>
+            @if (conflict.item$ | async; as item) {
+              {{ item.nameHtml }}
+            }
+          </td>
+          <td>
+            @if (conflict.attribute$ | async; as attribute) {
+              {{ attribute.name }}
+            }
+          </td>
+          <td>
+            @for (value of conflict.values; track value) {
+              @if (!value.user$) {
+                <div>
+                  @if (value.value.valueIsEmpty) {
+                    <em i18n>none</em>
+                  } @else {
+                    <span>
+                      {{ value.value.value }}
+                      @if (conflict.unitName$ | async; as unitName) {
+                        <span>{{ unitName }}</span>
+                      }
+                    </span>
+                  }
+                  <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: conflict.conflict.itemId}">
+                    <i class="bi bi-pencil-fill" aria-hidden="true"></i>
+                  </a>
+                </div>
+              }
+            }
+          </td>
+          <td>
+            @for (value of conflict.values; track value) {
+              @if (value.user$) {
+                <div>
+                  @if (value.value.valueIsEmpty) {
+                    <em i18n>none</em>
+                  } @else {
+                    <span>
+                      {{ value.value.value }}
+                      @if (conflict.unitName$ | async; as unitName) {
+                        <span>{{ unitName }}</span>
+                      }
+                    </span>
+                  }
+                  @if (value.user$ | async; as user) {
+                    <app-user [user]="user" />
+                  } @else {
+                    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+                  }
+                </div>
+              }
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (data.paginator) {
+    <app-paginator [data]="data.paginator" />
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

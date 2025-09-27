@@ -1,0 +1,35 @@
+<form class="add-message" method="post" (submit)="sendMessage()">
+  <fieldset>
+    <legend i18n>Add comment</legend>
+    <div class="mb-3">
+      <div class="controls">
+        <textarea
+          cols="80"
+          rows="5"
+          name="message"
+          maxlength="16000"
+          class="form-control"
+          [class.is-invalid]="invalidParams() && invalidParams()['message']"
+          [(ngModel)]="form.message"
+        ></textarea>
+        @for (message of invalidParams() | invalidParams: 'message'; track message) {
+          <p class="invalid-feedback" [textContent]="message"></p>
+        }
+      </div>
+    </div>
+    <div class="mb-3">
+      <div class="controls checkbox">
+        <div class="float-end cancel">
+          <button type="button" class="btn btn-sm btn-warning" i18n (click)="cancel()">Cancel</button>
+        </div>
+        <label>
+          <input type="checkbox" name="moderator_attention" value="1" [(ngModel)]="form.moderator_attention" />
+          <ng-container i18n>It requires attention of moderators</ng-container>
+        </label>
+      </div>
+    </div>
+    <div>
+      <button type="submit" class="btn btn-primary" i18n>Send</button>
+    </div>
+  </fieldset>
+</form>

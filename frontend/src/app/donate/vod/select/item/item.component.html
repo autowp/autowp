@@ -1,0 +1,54 @@
+@if (itemParent$ | async; as itemParent) {
+  <div>
+    @if (itemParent.type === ItemParentType.ITEM_TYPE_TUNING) {
+      <span class="text-muted" i18n>Related</span>
+    } @else if (itemParent.type === ItemParentType.ITEM_TYPE_SPORT) {
+      <span class="text-muted" i18n>Sport</span>
+    }
+    @if (item$ | async; as item) {
+      @if (!item.childsCount) {
+        @if (item.isCompilesItemOfDay) {
+          <a
+            routerLink="/donate/vod"
+            queryParamsHandling="merge"
+            [queryParams]="{item_id: itemParent.itemId, brand_id: null}"
+            [innerHTML]="item.nameHtml"
+          ></a>
+        } @else {
+          <span class="text-muted" [innerHTML]="item.nameHtml"></span>
+        }
+      } @else {
+        <a href="" class="arrow" (click)="toggleItem()">
+          <i
+            class="bi me-1"
+            aria-hidden="true"
+            [class.bi-plus-circle]="!expanded()"
+            [class.bi-dash-circle]="expanded()"
+          ></i>
+          <span [innerHTML]="item.nameHtml"></span>
+        </a>
+        @if (item.isCompilesItemOfDay) {
+          <a
+            routerLink="/donate/vod"
+            queryParamsHandling="merge"
+            class="mx-2"
+            i18n
+            [queryParams]="{item_id: itemParent.itemId, brand_id: null}"
+            >[select]</a
+          >
+        }
+        @if (expanded()) {
+          <div class="mb-1 ms-4">
+            @if (childs$ | async; as childs) {
+              @for (child of childs; track child) {
+                <app-donate-vod-select-item [itemParent]="child" />
+              }
+            } @else {
+              <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+            }
+          </div>
+        }
+      }
+    }
+  </div>
+}

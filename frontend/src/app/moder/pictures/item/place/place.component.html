@@ -1,0 +1,71 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder/pictures" i18n>Pictures</a>
+    </li>
+    @if (picture$ | async; as picture) {
+      <li class="breadcrumb-item">
+        <a i18n [routerLink]="['/moder/pictures', picture.id]">Picture №{{ picture.id }}</a>
+      </li>
+    }
+  </ol>
+</nav>
+
+@if (picture$ | async; as picture) {
+  <div class="page-header">
+    <h1 i18n>Location</h1>
+  </div>
+
+  @if (form$ | async; as form) {
+    <form method="post" class="form-horizontal" [formGroup]="form" (ngSubmit)="doSubmit(form, picture)">
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="lat" i18n>Point</label>
+        <div class="col-md-10 coords mb-3">
+          <input
+            type="text"
+            id="lat"
+            name="lat"
+            maxlength="20"
+            size="20"
+            placeholder="Latitude"
+            i18n-placeholder
+            class="form-control"
+            [formControl]="form.controls.lat"
+          />
+          <input
+            type="text"
+            name="lng"
+            maxlength="20"
+            size="20"
+            placeholder="Longitude"
+            i18n-placeholder
+            class="form-control"
+            [formControl]="form.controls.lng"
+          />
+        </div>
+      </div>
+      @if (map$ | async; as map) {
+        <div
+          style="height: 500px"
+          class="mb-4 w-100"
+          leaflet
+          [leafletCenter]="map.center"
+          [leafletOptions]="map.leafletOptions"
+          [leafletLayers]="map.markers"
+          (leafletMapReady)="onMapReady(map, $event, form)"
+        ></div>
+      }
+      <div class="mb-3 row">
+        <div class="col-md-10 offset-md-2">
+          <button type="submit" name="submit" class="btn btn-primary" i18n>Submit</button>
+        </div>
+      </div>
+    </form>
+  }
+}

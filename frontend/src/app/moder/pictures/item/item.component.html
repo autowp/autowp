@@ -1,0 +1,627 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder/pictures" i18n>Pictures</a>
+    </li>
+  </ol>
+</nav>
+
+@if (id$ | async; as id) {
+  <div class="page-header">
+    <h1 i18n>Picture №{{ id }}</h1>
+  </div>
+}
+
+@if (picture$ | async; as picture) {
+  @if (picture.siblings) {
+    <div class="row mb-4">
+      <div class="col-md-3">
+        @if (picture.siblings.prevNew) {
+          <a
+            i18n
+            [routerLink]="['/moder/pictures', picture.siblings.prevNew.id]"
+            [title]="picture.siblings.prevNew.nameText"
+            ><< previous new</a
+          >
+        }
+      </div>
+      <div class="col-md-3 text-end">
+        @if (picture.siblings.prev) {
+          <a i18n [routerLink]="['/moder/pictures', picture.siblings.prev.id]" [title]="picture.siblings.prev.nameText"
+            ><< previous</a
+          >
+        }
+      </div>
+      <div class="col-md-3">
+        @if (picture.siblings.next) {
+          <a i18n [routerLink]="['/moder/pictures', picture.siblings.next.id]" [title]="picture.siblings.next.nameText"
+            >next >></a
+          >
+        }
+      </div>
+      <div class="col-md-3 text-end">
+        @if (picture.siblings.nextNew) {
+          <a
+            i18n
+            [routerLink]="['/moder/pictures', picture.siblings.nextNew.id]"
+            [title]="picture.siblings.nextNew.nameText"
+            >next new >></a
+          >
+        }
+      </div>
+    </div>
+  }
+  <div class="row mb-4">
+    <div class="col-md-2">
+      @if (picture.thumbMedium) {
+        <img alt="" class="rounded border border-light w-100" [src]="picture.thumbMedium.src" />
+      }
+    </div>
+    <div class="col-md-6">
+      <div class="card card-body">
+        <div>
+          <ng-container i18n>Public URL:</ng-container>
+          <a [routerLink]="['/picture', picture.identity]" [textContent]="'/picture/' + picture.identity"></a>
+        </div>
+        @if (picture.image) {
+          <div style="overflow: hidden; text-overflow: ellipsis">
+            <ng-container i18n>Image:</ng-container>
+            <a [href]="picture.image.src" [textContent]="picture.image.src"></a>
+          </div>
+        }
+        <div>
+          <a routerLink="/log" i18n [queryParams]="{picture_id: picture.id}">Log of events</a>
+        </div>
+        <div>
+          <a [routerLink]="['/moder/pictures', picture.id, 'place']">
+            <span class="bi bi-pin-map" aria-hidden="true"></span>
+            Location
+            @if (picture.point) {
+              <span>: {{ picture.point.latitude }},{{ picture.point.longitude }}</span>
+            }
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card card-body">
+        <div i18n>Database id: {{ picture.id }}</div>
+        <div>
+          <ng-container i18n>Resolution:</ng-container>
+          <strong>{{ picture.width }}×{{ picture.height }}</strong>
+        </div>
+        @if (picture.dpiX || picture.dpiY) {
+          <div>
+            DPI:
+            <strong>{{ picture.dpiX }}×{{ picture.dpiY }}</strong>
+          </div>
+        }
+        @if (picture.image) {
+          <div>
+            <ng-container i18n>File size:</ng-container>
+            <strong [textContent]="picture.image.filesize | bytes: 2"></strong>
+          </div>
+        }
+        @if (picture.addDate) {
+          <div>
+            <ng-container i18n>Upload date:</ng-container>
+            <strong
+              [textContent]="picture.addDate.toDate() | timeAgo"
+              [ngbTooltip]="picture.addDate.toDate() | date: 'medium'"
+            ></strong>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+  <div class="card card-body mb-4">
+    @if ((picture.pictureItems?.items || []).length) {
+      <table class="table">
+        <caption i18n>
+          Catalogue
+        </caption>
+        <thead>
+          <tr>
+            <th i18n>Item</th>
+            <th i18n>Perspective</th>
+            @if (picture.rights?.crop) {
+              <th i18n>Area</th>
+            }
+            @if (picture.rights?.move) {
+              <th i18n>Move</th>
+              <th></th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of picture.pictureItems?.items || []; track item.itemId) {
+            <tr>
+              <td>
+                <a [routerLink]="['/moder/items/item', item.itemId]" [innerHTML]="item.item?.nameHtml"></a>
+              </td>
+              <td>
+                @if (item.type === PictureItemType.PICTURE_ITEM_CONTENT) {
+                  <app-moder-pictures-perspective-picker
+                    [perspectiveID]="item.perspectiveId"
+                    (perspectiveChanged)="savePerspective($event, item)"
+                  />
+                }
+              </td>
+              @if (picture.rights?.crop) {
+                <td>
+                  @if (item.type === PictureItemType.PICTURE_ITEM_CONTENT) {
+                    <a
+                      class="btn btn-secondary m-0"
+                      [class.btn-success]="item.cropWidth > 0 && item.cropHeight > 0"
+                      [routerLink]="['/moder/pictures', picture.id, 'area']"
+                      [queryParams]="{item_id: item.itemId, type: item.type}"
+                    >
+                      <i class="bi bi-crop" aria-hidden="true"></i>
+                      <ng-container i18n>Pick item area</ng-container>
+                    </a>
+                  }
+                </td>
+              }
+              @if (picture.rights?.move) {
+                <td>
+                  <div class="btn-group" style="white-space: nowrap">
+                    <a
+                      class="btn btn-secondary"
+                      [routerLink]="['/moder/pictures', picture.id, 'move']"
+                      [queryParams]="{src_item_id: item.itemId, src_type: item.type}"
+                    >
+                      <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                      <ng-container i18n>move to</ng-container> …
+                    </a>
+                    @if (lastItem$ | async; as lastItem) {
+                      @if (
+                        item.type === PictureItemType.PICTURE_ITEM_CONTENT &&
+                        ((lastItem.item && !lastItem.hasItem) || (item.itemParentCacheAncestors?.items || []).length)
+                      ) {
+                        <div class="btn-group" ngbDropdown role="group" placement="bottom-right">
+                          <button type="button" class="btn btn-secondary" ngbDropdownToggle>
+                            <span class="caret" aria-hidden="true"></span>
+                            <span class="visually-hidden">Toggle Dropdown</span>
+                          </button>
+                          <div class="dropdown-menu" ngbDropdownMenu>
+                            @if (lastItem.item && !lastItem.hasItem) {
+                              <button
+                                type="button"
+                                class="dropdown-item"
+                                (click)="moveItem(picture.id + '', item.type, item.itemId, lastItem.item.id)"
+                              >
+                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                                <ng-container i18n>move to</ng-container>
+                                <span [innerHTML]="lastItem.item.nameHtml"></span>
+                              </button>
+                            }
+                            @for (
+                              itemParentCache of item.itemParentCacheAncestors?.items || [];
+                              track itemParentCache.parentId
+                            ) {
+                              <a
+                                class="dropdown-item"
+                                [routerLink]="['/moder/pictures', picture.id, 'move']"
+                                [queryParams]="{
+                                  src_item_id: item.itemId,
+                                  src_type: item.type,
+                                  brand_id: itemParentCache.parentId,
+                                }"
+                              >
+                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                                <ng-container i18n>move to</ng-container>
+                                <span [innerHTML]="itemParentCache.parentItem?.nameHtml"></span> …
+                              </a>
+                            }
+                          </div>
+                        </div>
+                      }
+                    }
+                  </div>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    aria-label="Delete"
+                    style="margin: 0"
+                    (click)="deletePictureItem(item)"
+                  >
+                    <span class="bi bi-x" aria-hidden="true"></span>
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    @if (picture.rights?.move) {
+      <div>
+        @if (lastItem$ | async; as lastItem) {
+          @if (lastItem.item && !lastItem.hasItem) {
+            @if (lastItem.item.itemTypeId !== ItemType.ITEM_TYPE_COPYRIGHT) {
+              <div>
+                <button type="button" class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 1)">
+                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <ng-container i18n>add to</ng-container> (content)
+                  <span [innerHTML]="lastItem.item.nameHtml"></span>
+                </button>
+              </div>
+            }
+            @if (lastItem.item.itemTypeId === ItemType.ITEM_TYPE_PERSON) {
+              <div>
+                <button type="button" class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 2)">
+                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <ng-container i18n>add to</ng-container> (author)
+                  <span [innerHTML]="lastItem.item.nameHtml"></span>
+                </button>
+              </div>
+            } @else if (lastItem.item.itemTypeId === ItemType.ITEM_TYPE_COPYRIGHT) {
+              <div>
+                <button type="button" class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 3)">
+                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <ng-container i18n>add to</ng-container> (copyrights)
+                  <span [innerHTML]="lastItem.item.nameHtml"></span>
+                </button>
+              </div>
+            }
+          }
+        }
+        <div>
+          <a class="btn btn-success" [routerLink]="['/moder/pictures', picture.id, 'move']">
+            <i class="bi bi-plus" aria-hidden="true"></i>
+            <ng-container i18n>add to</ng-container> …
+          </a>
+        </div>
+      </div>
+    }
+    @if (pictureItemLoading()) {
+      <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+    }
+  </div>
+  @if (picture) {
+    <div class="row">
+      <div class="col-md-6">
+        <h3 i18n>Settings</h3>
+        <form class="card card-body form-vertical mb-4">
+          @if (picture.takenDate) {
+            <div class="mb-3 row">
+              <label class="col-md-3 col-form-label" i18n for="taken_year">Date of photo</label>
+              <div class="col-md-9">
+                <div class="row">
+                  <div class="col-3">
+                    <input
+                      type="number"
+                      name="taken_year"
+                      id="taken_year"
+                      placeholder="Year"
+                      i18n-placeholder
+                      class="form-control"
+                      [min]="1800"
+                      [max]="2030"
+                      [attr.maxlength]="4"
+                      [(ngModel)]="picture.takenDate.year"
+                    />
+                  </div>
+                  <div class="col-6">
+                    <select
+                      name="taken_month"
+                      title="Month"
+                      i18n-title
+                      class="form-select"
+                      [(ngModel)]="picture.takenDate.month"
+                    >
+                      @for (month of monthOptions; track month.value) {
+                        <option [ngValue]="month.value">{{ month.name }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="col-3">
+                    <select
+                      name="taken_day"
+                      title="Day"
+                      i18n-title
+                      class="form-select"
+                      [(ngModel)]="picture.takenDate.day"
+                    >
+                      @for (day of dayOptions; track day.value) {
+                        <option [ngValue]="day.value">{{ day.name }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+          <div>
+            <p class="text-danger">Achtung! High Voltage! Ты сюда не ходи!</p>
+            <p class="text-danger">
+              Поле использовать в ИСКЛЮЧИТЕЛЬНЫХ случаях. А лучше вообще никогда не использовать.
+            </p>
+          </div>
+          <div class="mb-3">
+            <label i18n for="special_name">Special name</label>
+            <input
+              type="text"
+              class="form-control"
+              maxlength="255"
+              name="special_name"
+              id="special_name"
+              [(ngModel)]="picture.specialName"
+            />
+          </div>
+          <div>
+            <button type="button" class="btn btn-primary" i18n (click)="saveSpecialName(picture)">Submit</button>
+          </div>
+          @if (specialNameLoading()) {
+            <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+          }
+        </form>
+        <h3 i18n>Copyrights</h3>
+        <div class="card card-body mb-4">
+          <app-markdown
+            i18n-markdown
+            markdown="Markdown syntax.
+
+  Few manuals:
+  [1](https://en.wikipedia.org/wiki/Markdown),
+  [2](https://guides.github.com/features/mastering-markdown/),
+  [3](https://daringfireball.net/projects/markdown/basics),
+
+  Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*"
+          />
+          <app-markdown-edit [(text)]="picture.copyrights" />
+          <button type="button" class="btn btn-primary" i18n (click)="saveCopyrights(picture)">Submit</button>
+          @if (picture.copyrightsTextId) {
+            <p>
+              <a i18n [routerLink]="['/info/text', picture.copyrightsTextId]">History</a>
+            </p>
+          }
+          @if (copyrightsLoading()) {
+            <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+          }
+        </div>
+        @if (picture.exif) {
+          <h3>EXIF</h3>
+          <div class="card card-body small mb-4" style="overflow: auto" [innerHTML]="picture.exif"></div>
+        }
+      </div>
+      <div class="col-md-6">
+        @if (picture.replaceable) {
+          <h3 i18n>Replacement</h3>
+          <div class="card card-body mb-4">
+            <div>
+              <p>
+                <ng-container i18n>Photo suggested to replace</ng-container>
+                <a [routerLink]="['/picture', picture.replaceable.identity]"
+                  >/picture/{{ picture.replaceable.identity }}</a
+                >
+              </p>
+              @if (picture.rights?.accept) {
+                <button type="button" class="btn btn-success" (click)="acceptReplace(picture.id)">
+                  <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                  <ng-container i18n>Accept and remove double</ng-container>
+                </button>
+              }
+              @if (picture.rights?.accept) {
+                <button type="button" class="btn btn-warning" (click)="cancelReplace(picture.id)">
+                  <i class="bi bi-x" aria-hidden="true"></i>
+                  <ng-container i18n>Cancel replacement</ng-container>
+                </button>
+              }
+            </div>
+            @if (replaceLoading()) {
+              <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+            }
+          </div>
+        }
+        <h3 i18n>Status/Delete/Accept</h3>
+        <div class="card card-body mb-4">
+          @if (changeStatusUser$ | async; as user) {
+            <app-user [user]="user" />
+          }
+          @if (picture.status === PictureStatus.PICTURE_STATUS_INBOX) {
+            <div>
+              <p>
+                <strong class="badge text-bg-warning text-dark" i18n>Not accepted</strong>
+              </p>
+              @if (picture.rights?.accept) {
+                <button type="button" class="btn btn-success" i18n (click)="acceptPicture(picture.id)">Accept</button>
+              }
+              @if (picture.rights?.delete) {
+                <button type="button" class="btn btn-danger" i18n (click)="deletePicture(picture.id)">Delete</button>
+              }
+            </div>
+          } @else if (picture.status === PictureStatus.PICTURE_STATUS_ACCEPTED) {
+            <div>
+              <p>
+                <strong class="badge text-bg-success" i18n>Accepted</strong>
+              </p>
+              @if (picture.rights?.unaccept) {
+                <button type="button" class="btn btn-warning" i18n (click)="unacceptPicture(picture.id)">
+                  Unaccept
+                </button>
+              }
+            </div>
+          } @else if (picture.status === PictureStatus.PICTURE_STATUS_REMOVING) {
+            <div>
+              <p>
+                <strong class="badge text-bg-danger" i18n>In delete queue</strong>
+              </p>
+              @if (picture.rights?.restore) {
+                <button type="button" class="btn btn-warning" i18n (click)="restorePicture(picture.id)">Restore</button>
+              }
+            </div>
+          } @else if (picture.status === PictureStatus.PICTURE_STATUS_REMOVED) {
+            <div>
+              <p>
+                <strong class="badge text-bg-danger" i18n>Deleted</strong>
+              </p>
+            </div>
+          }
+          <app-picture-moder-vote [picture]="picture" (changed)="pictureVoted()" />
+          @if (picture.isLast) {
+            <p>
+              <span class="badge text-bg-warning text-dark" i18n>That is single picture of that vehicle</span>
+            </p>
+          } @else if (picture.acceptedCount <= 4) {
+            <p>
+              <span class="badge text-bg-warning text-dark" i18n
+                >Accepted pictures count still {{ picture.acceptedCount }}</span
+              >
+            </p>
+          }
+          @if (statusLoading()) {
+            <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+          }
+        </div>
+        @if (picture && (picture.rights?.normalize || picture.rights?.flop || picture.rights?.crop)) {
+          <h3 i18n>Edit and repair</h3>
+          <div class="card card-body mb-4">
+            <div>
+              @if (picture.rights?.normalize) {
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  [disabled]="repairLoading()"
+                  (click)="normalizePicture(picture.id)"
+                >
+                  <i class="bi bi-reception-4" aria-hidden="true"></i>
+                  <ng-container i18n>Normalize</ng-container>
+                </button>
+              }
+              @if (picture.rights?.flop) {
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  [disabled]="repairLoading()"
+                  (click)="flopPicture(picture.id)"
+                >
+                  <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                  <ng-container i18n>Flop</ng-container>
+                </button>
+              }
+              @if (picture.rights?.crop) {
+                <a
+                  class="btn btn-secondary"
+                  [routerLink]="['/moder/pictures', picture.id, 'crop']"
+                  [class.disabled]="repairLoading()"
+                >
+                  <i class="bi bi-crop" aria-hidden="true"></i>
+                  <ng-container i18n>Crop area</ng-container>
+                </a>
+              }
+            </div>
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                [disabled]="repairLoading()"
+                (click)="repairPicture(picture.id)"
+              >
+                <i class="bi bi-wrench" aria-hidden="true"></i>
+                <ng-container i18n>Repair all files</ng-container>
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                [disabled]="repairLoading()"
+                (click)="correctFileNames(picture.id)"
+              >
+                <i class="bi bi-wrench" aria-hidden="true"></i>
+                <ng-container i18n>Rebuild files names</ng-container>
+              </button>
+            </div>
+            @if (repairLoading()) {
+              <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+            }
+          </div>
+        }
+        @if ((picture.dfDistances?.items || []).length) {
+          <h3>Similar picture</h3>
+          <div class="card card-body mb-4">
+            @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
+              <p class="alert alert-warning" role="alert" ngPreserveWhitespaces>
+                <span class="bi bi-file-earmark-image" aria-hidden="true"></span>
+                <a i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
+                  >Similar picture: {{ dfDistance.distance }}</a
+                >
+              </p>
+              <p>
+                <a [routerLink]="['/moder/pictures', dfDistance.dstPictureId]">
+                  <img alt="" class="rounded border border-light" [src]="dfDistance.dstPicture?.thumbMedium?.src" />
+                </a>
+              </p>
+              <button type="button" class="btn btn-warning" (click)="cancelSimilar(dfDistance)">
+                That is not similar
+              </button>
+            }
+            @if (similarLoading()) {
+              <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+            }
+          </div>
+        }
+        <h3 i18n>Uploader</h3>
+        <div class="card card-body mb-4">
+          @if (owner$ | async; as owner) {
+            <app-user [user]="owner" />
+          } @else {
+            <span i18n>Unknown</span>
+          }
+          @if (ip$ | async; as ip) {
+            @if (ip.address) {
+              <div>
+                <ng-container i18n>IP-address of uploader:</ng-container>
+                <strong [textContent]="ip.address"></strong>
+                <br />
+                @if (ip.blacklist) {
+                  <p>
+                    <ng-container i18n>That address is banned</ng-container>
+                    @if (ip.blacklist.byUser) {
+                      <app-user [user]="ip.blacklist.byUser" />
+                    }
+                    @if (ip.blacklist.until) {
+                      <ng-container i18n>until</ng-container> {{ ip.blacklist.until | date }}
+                    }
+                    @if (ip.blacklist.reason) {
+                      <span [textContent]="ip.blacklist.reason"></span>
+                    }
+                  </p>
+                }
+                @if (ip.blacklist && ip.rights?.removeFromBlacklist) {
+                  <button type="button" class="btn btn-success" i18n (click)="removeFromBlacklist(ip.address)">
+                    unban
+                  </button>
+                }
+                @if (!ip.blacklist && ip.rights?.addToBlacklist) {
+                  <form class="form-vertical">
+                    <div class="mb-3">
+                      <label i18n for="period">For period</label>
+                      <select name="period" id="period" class="form-select" required [(ngModel)]="banPeriod">
+                        @for (period of banPeriods; track period.value) {
+                          <option [value]="period.value">{{ period.name }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label i18n for="reason">Reason</label>
+                      <input maxlength="50" class="form-control" name="reason" id="reason" [(ngModel)]="banReason" />
+                    </div>
+                    <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(picture.ip)">Ban</button>
+                  </form>
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+}

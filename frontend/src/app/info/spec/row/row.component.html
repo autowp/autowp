@@ -1,0 +1,11 @@
+@if (row(); as row) {
+  <div class="row">
+    <div class="col-sm-4">
+      <div [ngStyle]="{'margin-left': deep() * 40 + 'px'}" [textContent]="row.shortName"></div>
+    </div>
+    <div class="col-sm-8" [textContent]="row.name"></div>
+  </div>
+  @for (row of row.childs; track row) {
+    <app-info-spec-row [row]="row" [deep]="deep() + 1" />
+  }
+}

@@ -1,0 +1,157 @@
+<div class="page-header">
+  <h1 i18n>Add picture</h1>
+</div>
+
+@if (authenticated$ | async) {
+  <div>
+    @if (selection$ | async; as selection) {
+      @if (selection.selected) {
+        <div>
+          <div class="card card-body mb-4">
+            <app-markdown
+              i18n-markdown
+              markdown="Если у вас есть изображения, которых вы не нашли на этом сайте и они соответствуют тематике сайта, то вы можете добавить их в наш каталог, воспользовавшись формой, расположенной ниже.
+
+Было бы здорово, если бы вы указали, что за автомобиль изображён на картинке, чтобы облегчить её добавление и избежать ошибки.
+
+Требования, предъявляемые к добавляемым картинкам:
+
+* [JPEG](https://ru.wikipedia.org/wiki/JPEG) or [PNG](https://ru.wikipedia.org/wiki/PNG) format. Resolution from  640×360 up to 10000×10000.
+* Изображение должно по возможности быть максимально доступного качества, не содержать различных артефактов изменения размера или компрессии (размытия, нечёткости, расплытия цветов, ребристости прямых линий и т.д.). Исключение составляют редкие фото(производителя), сканы из проспектов. Решение об оставлении такого фото на сайте принимает модераторский состав.
+* Отсутствие надписей и логотипов посторонних сайтов, нанесенных не авторами/владельцами материала.
+* Автомобиль должен иметь первоначальный вид как при выходе с завода. Не должны присутствовать признаки <em>самодельного тюнинга</em>, желательно отсутствие изменений, связанных со старением автомобиля.
+* Основной и единственной темой изображения должен являться автомобиль, двигатель, логотип автокомпании, автомобильный завод или музей. Наличие в кадре посторонних предметов или людей - нежелательно.
+* Любительские фотографии вашего автомобиля, автомобиля ваших друзей или любого другого, встретившегося вам на улице, а также фотографии с выставок - не будут приняты на сайт 100%. Если только вы не профессионал.
+* Для первых фотографий автомобиля возможны пониженные требования.
+
+**Убедительная просьба**, перед добавлением изображений, убедиться в их отсутствии в каталоге.
+
+Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта."
+            />
+            <div class="mv-3">
+              @if (!formHidden()) {
+                <form class="form-horizontal" (submit)="submit()">
+                  <div class="mb-3 row">
+                    <div class="col-md-2 col-form-label" i18n>Selection</div>
+                    <div class="col-md-10">
+                      <div class="form-control-plaintext">
+                        <strong [innerHTML]="selection.name"></strong>
+                        [<a routerLink="/upload/select" i18n>select another catalogue</a>]
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-3 row">
+                    <label class="col-md-2 col-form-label" for="file" i18n>Image file</label>
+                    <div class="col-md-10">
+                      <input
+                        #input
+                        type="file"
+                        id="file"
+                        name="file"
+                        class="form-control"
+                        accept="image/*"
+                        [multiple]="(replace$ | async) ? null : true"
+                        (change)="onChange($event)"
+                      />
+                      @if (files) {
+                        <div class="mt-3">
+                          @for (file of files; track file) {
+                            <p [textContent]="file.name"></p>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <div class="mb-3 row">
+                    <label class="col-md-2 col-form-label" for="note" i18n>Note</label>
+                    <div class="col-md-10">
+                      <textarea name="note" id="note" rows="3" class="form-control" [formControl]="note"></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-10 offset-md-2">
+                      <button type="submit" name="submit" class="btn btn-primary" i18n [disabled]="!files">send</button>
+                    </div>
+                  </div>
+                </form>
+              }
+            </div>
+            <div class="progress-area">
+              @for (p of progress; track p) {
+                @if (!p.success) {
+                  <ngb-progressbar
+                    class="mb-2"
+                    [type]="p.success ? 'success' : p.failed ? 'danger' : 'info'"
+                    [value]="p.percentage"
+                  >
+                    <div>
+                      <span class="d-inline file-name">{{ p.filename }}: </span>
+                      @if (p.percentage < 100) {
+                        <span class="d-inline percentage">{{ p.percentage }}%</span>
+                      }
+                      @for (message of p.invalidParams | invalidParams: 'file'; track message) {
+                        <span class="d-inline">{{ message }} </span>
+                      }
+                    </div>
+                  </ngb-progressbar>
+                }
+              }
+            </div>
+          </div>
+          <div class="pictures row">
+            @for (picture of pictures; track picture) {
+              <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                <app-thumbnail [picture]="picture.picture" [route]="['/picture', picture.picture.identity]" />
+                <p>
+                  <button type="button" class="btn btn-link btn-sm" (click)="crop(picture)">
+                    <i class="bi bi-crop" aria-hidden="true"></i>
+                    @if (picture.cropTitle) {
+                      <span>{{ picture.cropTitle }}</span>
+                    } @else {
+                      <span i18n>crop</span>
+                    }
+                  </button>
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      @if (!selection.selected) {
+        <div class="card card-body">
+          <app-markdown
+            i18n-markdown
+            markdown="Если у вас есть изображения, которых вы не нашли на этом сайте и они соответствуют тематике сайта, то вы можете добавить их в наш каталог, воспользовавшись формой, расположенной ниже.
+
+Было бы здорово, если бы вы указали, что за автомобиль изображён на картинке, чтобы облегчить её добавление и избежать ошибки.
+
+Требования, предъявляемые к добавляемым картинкам:
+
+* [JPEG](http://ru.wikipedia.org/wiki/JPEG) or [PNG](http://ru.wikipedia.org/wiki/PNG) format. Resolution from  640×360 up to 10000×10000.
+* Изображение должно по возможности быть максимально доступного качества, не содержать различных артефактов изменения размера или компрессии (размытия, нечёткости, расплытия цветов, ребристости прямых линий и т.д.). Исключение составляют редкие фото(производителя), сканы из проспектов. Решение об оставлении такого фото на сайте принимает модераторский состав.
+* Отсутствие надписей и логотипов посторонних сайтов, нанесенных не авторами/владельцами материала.
+* Автомобиль должен иметь первоначальный вид как при выходе с завода. Не должны присутствовать признаки <em>самодельного тюнинга</em>, желательно отстутвие изменений, связанных со старением автомобиля.
+* Основной и единственной темой изображения должен являться автомобиль, двигатель, логотип автокомпании, автомобильный завод или музей. Наличие в кадре посторонних предметов или людей - нежелательно.
+* Любительские фотографии вашего автомобиля, автомобиля ваших друзей или любого другого, встретившегося вам на улице, а также фотографии с выставок - не будут приняты на сайт 100%. Если только вы не профессионал.
+* Для первых фотографий автомобиля возможны пониженные требования.
+
+**Убедительная просьба**, перед добавлением изображений, убедиться в их отсутствии в каталоге.
+
+Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта."
+          />
+          <p style="margin: 10px">
+            <a routerLink="/upload/select" class="btn btn-primary btn-lg">
+              <i class="bi bi-upload" aria-hidden="true"></i>
+              <ng-container i18n>Add picture</ng-container>
+            </a>
+          </p>
+        </div>
+      }
+    }
+  </div>
+} @else {
+  <div class="alert alert-warning">
+    <p i18n>Only registered users can upload pictures</p>
+    <button type="submit" class="btn btn-primary" i18n="@@login/sign-in" (click)="doLogin()">Sign in</button>
+  </div>
+}

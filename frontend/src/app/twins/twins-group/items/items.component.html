@@ -1,0 +1,19 @@
+@if (groupId$ | async; as groupId) {
+  @if (childs$ | async; as childs) {
+    @for (item of childs.items; track item.id) {
+      <app-twins-item [groupId]="groupId" [item]="item" />
+    }
+  }
+
+  @if (group$ | async; as group) {
+    @if (group.description) {
+      <div>
+        <h3 i18n>Description</h3>
+        <div class="card card-body">
+          <app-markdown [markdown]="group.description" />
+        </div>
+      </div>
+    }
+  }
+  <app-comments [itemID]="groupId" [typeID]="CommentsType.ITEM_TYPE_ID" />
+}

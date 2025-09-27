@@ -1,0 +1,137 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (brand$ | async; as brand) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/', brand.catname]" [innerHTML]="brand.nameHtml"></a>
+      </li>
+    }
+    @if (breadcrumbs$ | async; as breadcrumbs) {
+      @for (node of breadcrumbs.slice(0, breadcrumbs.length - 1); track node) {
+        <li class="breadcrumb-item">
+          <a [routerLink]="node.routerLink" [innerHTML]="node.html"></a>
+        </li>
+      }
+    }
+  </ol>
+</nav>
+
+@if (item$ | async; as item) {
+  <div class="page-header">
+    <h1>
+      <app-item-header
+        [item]="{
+          nameHTML: item.nameHtml,
+          design: item.design || null,
+          produced: {count: item.produced?.value || 0, exactly: item.producedExactly},
+        }"
+      />
+    </h1>
+  </div>
+  @if (item.otherNames) {
+    @for (name of item.otherNames; track name) {
+      <p>{{ name }}</p>
+    }
+  }
+  @if (isModer$ | async) {
+    <p>
+      <i class="bi bi-gear-fill" aria-hidden="true"></i>
+      <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
+      @if (canAddItem$ | async; as canAddItem) {
+        @if (canAddItem && item.isGroup) {
+          <i class="bi bi-plus" aria-hidden="true"></i>
+          <a
+            style="text-transform: lowercase"
+            routerLink="/moder/items/new"
+            [queryParams]="{item_type_id: item.itemTypeId, parent_id: item.id}"
+            >{{ getItemTypeTranslation(item.itemTypeId, 'add-sub-item') }}</a
+          >
+        }
+      }
+      @if (canAcceptPicture$ | async; as canAcceptPicture) {
+        @if (canAcceptPicture && item.inboxPicturesCount && item.inboxPicturesCount > 0) {
+          <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+          <a routerLink="/moder/pictures" [queryParams]="{item_id: item.id, status: 'inbox'}">
+            <ng-container i18n>inbox</ng-container> ({{ item.inboxPicturesCount }})
+          </a>
+        }
+      }
+      @if (item.commentsAttentionsCount) {
+        <i class="bi bi-chat-fill" aria-hidden="true"></i>
+        <a routerLink="/moder/comments" [queryParams]="{pictures_of_item_id: item.id, moderator_attention: 1}">
+          <ng-container i18n>comments</ng-container> ({{ item.commentsAttentionsCount }})
+        </a>
+      }
+    </p>
+  }
+  @if (menu$ | async; as menu) {
+    <app-catalogue-item-menu
+      [header]="{nameHTML: item.nameHtml, produced: {count: item.produced?.value || 0, exactly: item.producedExactly}}"
+      [itemRouterLink]="menu.routerLink"
+      [picturesCount]="item.acceptedPicturesCount || 0"
+      [childsCounts]="item.childsCounts ? convertChildsCounts(item.childsCounts) : undefined"
+      [active]="menu.type"
+    />
+  } @else {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  }
+  @if (item.fullText) {
+    <div class="text">
+      <app-markdown [markdown]="item.fullText" />
+    </div>
+  } @else if (item.description) {
+    <div class="text">
+      <app-markdown [markdown]="item.description" />
+    </div>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (items$ | async; as items) {
+  @for (item of items.items; track item.id) {
+    <app-catalogue-list-item [item]="item" />
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (otherPictures$ | async; as otherPictures) {
+  @if (item$ | async; as item) {
+    <h3><ng-container i18n>Other pictures of</ng-container> <span [innerHTML]="item.nameHtml"></span></h3>
+  }
+  <div class="row">
+    @for (picture of otherPictures.pictures; track picture.id) {
+      <div class="col-6 col-lg-3">
+        @if (picture && picture.thumbMedium) {
+          <a class="d-block rounded mb-4" [routerLink]="otherPictures.routerLink.concat(picture.identity)">
+            <img
+              class="rounded w-100 border border-light"
+              loading="lazy"
+              [src]="picture.thumbMedium.src"
+              [alt]="picture.nameText"
+              [title]="picture.nameText"
+            />
+          </a>
+        }
+        @if (!picture) {
+          <span>&#xa0;</span>
+        }
+      </div>
+    }
+  </div>
+  @if (otherPictures.count > otherPictures.pictures.length) {
+    <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+    <a [routerLink]="otherPictures.routerLink">
+      <ng-container i18n>all pictures</ng-container> ({{ otherPictures.count }})
+    </a>
+  }
+}
+
+@if (items$ | async; as items) {
+  @if (items.paginator) {
+    <app-paginator [data]="items.paginator" />
+  }
+}

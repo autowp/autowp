@@ -1,0 +1,25 @@
+<div class="card card-body">
+  <input
+    #brandsSearch
+    type="text"
+    class="form-control mb-4"
+    placeholder="Type to search …"
+    i18n-placeholder
+    (input)="doSearch(brandsSearch.value)"
+  />
+  @if (brands$ | async; as response) {
+    <div class="row">
+      @for (chunk of response.items; track chunk) {
+        <div class="col-2">
+          @for (item of chunk; track item.id) {
+            <a href="" [innerHTML]="item.nameHtml" (click)="onSelect(item.id)"></a>
+            <br />
+          }
+        </div>
+      }
+    </div>
+    @if (response.paginator) {
+      <app-paginator [data]="response.paginator" />
+    }
+  }
+</div>

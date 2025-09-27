@@ -1,0 +1,71 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/donate" i18n>Donate</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/donate/vod" i18n>Theme of the day</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Select</h1>
+</div>
+
+@if (brand) {
+  <div class="select-in-brand">
+    @if (vehicles.length > 0) {
+      <div class="my-1">
+        @for (item of vehicles; track item) {
+          <app-donate-vod-select-item [itemParent]="item" />
+        }
+      </div>
+    }
+    @if (concepts.length > 0) {
+      <div class="my-1">
+        <a href="#" class="arrow" (click)="toggleConcepts()">
+          <i
+            class="bi me-1"
+            aria-hidden="true"
+            [class.bi-plus-circle]="!conceptsExpanded"
+            [class.bi-dash-circle]="conceptsExpanded"
+          ></i>
+          <ng-container i18n>Concepts & prototypes</ng-container>
+        </a>
+        @if (conceptsExpanded) {
+          <div class="mb-1 ms-4">
+            @for (item of concepts; track item) {
+              <app-donate-vod-select-item [itemParent]="item" />
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+
+@if (!brand) {
+  <div class="row">
+    @for (chunk of brands; track chunk) {
+      <div class="col-md-2">
+        @for (chunkBrand of chunk; track chunkBrand.id) {
+          <a
+            routerLink="."
+            queryParamsHandling="merge"
+            [queryParams]="{brand_id: chunkBrand.id}"
+            [textContent]="chunkBrand.nameOnly"
+          ></a>
+          <br />
+        }
+      </div>
+    }
+  </div>
+}
+
+@if (paginator) {
+  <app-paginator [data]="paginator" />
+}

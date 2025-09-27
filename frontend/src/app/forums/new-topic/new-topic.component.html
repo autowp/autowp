@@ -1,0 +1,117 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/forums" i18n>Forums</a>
+    </li>
+    @if (theme$ | async; as theme) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/forums', theme.id]">{{ getForumsThemeTranslation(theme.name) }}</a>
+      </li>
+    }
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>New topic</h1>
+</div>
+
+@if (authenticated$ | async) {
+  @if (theme$ | async; as theme) {
+    <form method="post" class="form-horizontal" (submit)="submit(theme)">
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="name" i18n>Subject</label>
+        <div class="col-md-10">
+          <input
+            type="text"
+            id="name"
+            name="name"
+            size="80"
+            maxlength="100"
+            class="form-control"
+            [class.is-invalid]="invalidParams() && invalidParams()['name']"
+            [(ngModel)]="form.name"
+          />
+          @for (message of invalidParams() | invalidParams: 'name'; track message) {
+            <p class="invalid-feedback" [textContent]="message"></p>
+          }
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="message" i18n>Message</label>
+        <div class="col-md-10">
+          <textarea
+            id="message"
+            name="message"
+            cols="140"
+            rows="15"
+            maxlength="4096"
+            class="form-control"
+            [class.is-invalid]="invalidParams() && invalidParams()['message']"
+            [(ngModel)]="form.message"
+          ></textarea>
+          @for (message of invalidParams() | invalidParams: 'message'; track message) {
+            <p class="invalid-feedback" [textContent]="message"></p>
+          }
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <div class="col-md-2"></div>
+        <div class="col-md-10">
+          <div class="checkbox">
+            <label>
+              <input
+                type="checkbox"
+                name="moderator_attention"
+                value="1"
+                [class.is-invalid]="invalidParams() && invalidParams()['moderator_attention']"
+                [(ngModel)]="form.moderator_attention"
+              />
+              <ng-container i18n>It requires attention of moderators</ng-container>
+            </label>
+          </div>
+          @for (message of invalidParams() | invalidParams: 'moderator_attention'; track message) {
+            <p class="invalid-feedback" [textContent]="message"></p>
+          }
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <div class="col-md-2"></div>
+        <div class="col-md-10">
+          <div class="checkbox">
+            <label>
+              <input
+                type="checkbox"
+                name="subscription"
+                value="1"
+                [class.is-invalid]="invalidParams() && invalidParams()['subscription']"
+                [(ngModel)]="form.subscription"
+              />
+              <ng-container i18n>Subscribe to new messages</ng-container>
+            </label>
+          </div>
+          @for (message of invalidParams() | invalidParams: 'subscription'; track message) {
+            <p class="invalid-feedback" [textContent]="message"></p>
+          }
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-10 offset-md-2">
+          <button type="submit" class="btn btn-primary" i18n>send</button>
+        </div>
+      </div>
+    </form>
+  }
+} @else {
+  <app-markdown
+    class="alert alert-block alert-error"
+    i18n-markdown
+    markdown="Only registered users can add topics.
+
+If you are already registered on the site, then you need to sign in to the site.
+
+If you are not registered yet, please do so now [on the registration page](/signup)."
+  />
+}

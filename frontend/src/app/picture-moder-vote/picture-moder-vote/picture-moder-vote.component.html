@@ -1,0 +1,65 @@
+@if (picture$ | async; as picture) {
+  <div class="btn-group mb-3">
+    @if (!picture.moderVoted) {
+      <div ngbDropdown>
+        <button class="btn btn-success" type="button" ngbDropdownToggle i18n>Want accept</button>
+        <div ngbDropdownMenu>
+          @for (template of moderVoteTemplateOptions$ | async; track template.id) {
+            @if (template.vote > 0) {
+              <button
+                type="button"
+                class="dropdown-item"
+                [textContent]="template.message"
+                (click)="votePicture(picture, template.vote, template.message)"
+              ></button>
+            }
+          }
+          <div class="dropdown-divider"></div>
+          <button type="button" class="dropdown-item" i18n (click)="showCustomDialog(picture, 1)">Custom …</button>
+        </div>
+      </div>
+      <div ngbDropdown>
+        <button class="btn btn-danger" type="button" ngbDropdownToggle i18n>Want delete</button>
+        <div ngbDropdownMenu>
+          @for (template of moderVoteTemplateOptions$ | async; track template.id) {
+            @if (template.vote < 0) {
+              <button
+                type="button"
+                class="dropdown-item"
+                [textContent]="template.message"
+                (click)="votePicture(picture, template.vote, template.message)"
+              ></button>
+            }
+          }
+          <div class="dropdown-divider"></div>
+          <button type="button" class="dropdown-item" i18n (click)="showCustomDialog(picture, -1)">Custom …</button>
+        </div>
+      </div>
+    } @else {
+      <button type="button" class="btn btn-secondary" i18n (click)="cancelVotePicture(picture)">Cancel my vote</button>
+    }
+  </div>
+}
+
+@if (votes$ | async; as votes) {
+  @if (votes.length) {
+    <div>
+      <ng-container i18n>Already voted:</ng-container>
+      <ul class="list-unstyled">
+        @for (moder_vote of votes; track moder_vote) {
+          <li>
+            @if (moder_vote.vote > 0) {
+              <i class="bi bi-hand-thumbs-up-fill text-success" aria-hidden="true"></i>
+            } @else {
+              <i class="bi bi-hand-thumbs-down-fill text-danger" aria-hidden="true"></i>
+            }
+            @if (moder_vote.user$ | async; as user) {
+              <app-user [user]="user" />
+            }
+            <span [ngStyle]="{color: moder_vote.vote > 0 ? 'green' : 'red'}" [textContent]="moder_vote.reason"></span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+}

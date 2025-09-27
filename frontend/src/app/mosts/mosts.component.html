@@ -1,0 +1,14 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<app-mosts-contents
+  [prefix]="['/mosts']"
+  [ratingCatname]="ratingCatname$ | async"
+  [typeCatname]="(typeCatname$ | async) || ''"
+  [yearsCatname]="(yearsCatname$ | async) || ''"
+/>

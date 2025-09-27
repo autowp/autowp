@@ -1,0 +1,42 @@
+@if (canLogo$ | async; as canLogo) {
+  @if (item(); as item) {
+    <div class="card card-body">
+      @if (canLogo) {
+        <app-markdown
+          i18n-markdown
+          markdown="* Logotypes must be in PNG format.
+* All transparent regions must be transparent but not white!
+* Logotype must be close to edges. Margin not required
+* Upload images in maximum resolution - thats give quality and ability to use it in future. On website logo scaled automatically"
+        />
+      }
+      @if (item.logo) {
+        <img alt="" style="max-width: 100%" [src]="item.logo.src" />
+      }
+      @if (canLogo) {
+        <div>
+          <div class="mb-3">
+            <input #input type="file" name="file" class="form-control" accept="image/*" (change)="onChange($event)" />
+          </div>
+          @if (progress && !progress.success) {
+            <ngb-progressbar
+              class="d-block mb-2"
+              [type]="progress.success ? 'success' : progress.failed ? 'danger' : 'info'"
+              [value]="progress.percentage"
+            >
+              <div>
+                <span class="d-inline file-name" [textContent]="progress.filename">: </span>
+                @if (progress.percentage < 100) {
+                  <span class="d-inline percentage" [textContent]="progress.percentage + '% '"></span>
+                }
+                @for (message of progress.invalidParams | invalidParams: 'file'; track message) {
+                  <span class="d-inline" [textContent]="message + ' '"></span>
+                }
+              </div>
+            </ngb-progressbar>
+          }
+        </div>
+      }
+    </div>
+  }
+}

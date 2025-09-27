@@ -1,0 +1,57 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (user$ | async; as user) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]">{{ user.name }}</a>
+      </li>
+    }
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Comments</h1>
+</div>
+
+@if (order$ | async; as order) {
+  <ul class="nav nav-pills mb-3">
+    @for (corder of orders; track corder) {
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="."
+          [class.active]="corder.value === order"
+          [queryParams]="{order: corder.value, page: null}"
+          [textContent]="corder.name"
+        ></a>
+      </li>
+    }
+  </ul>
+}
+
+@if (comments$ | async; as data) {
+  <ul>
+    @for (comment of data.items; track comment) {
+      <li>
+        @if (comment.vote > 0) {
+          <strong
+            >+{{ comment.vote }}
+            <span class="bi bi-hand-thumbs-up" aria-hidden="true"></span>
+          </strong>
+        }
+        @if (comment.vote < 0) {
+          <strong
+            >{{ comment.vote }}
+            <span class="bi bi-hand-thumbs-down" aria-hidden="true"></span>
+          </strong>
+        }
+        <a [routerLink]="comment.route" [textContent]="comment.preview"></a>
+      </li>
+    }
+  </ul>
+  @if (data.paginator) {
+    <app-paginator [data]="data.paginator" />
+  }
+}

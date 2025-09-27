@@ -1,0 +1,19 @@
+@if (items$ | async; as items) {
+  @if (items && items.length > 0) {
+    <h4>
+      <ng-container i18n>Specifications</ng-container>
+      <small><a routerLink="/users/rating" i18n>Statistics</a></small>
+    </h4>
+    @for (chunk of items; track chunk) {
+      <div class="row">
+        @for (item of chunk; track item.id) {
+          <div class="col-md-6">
+            <app-catalogue-list-item [item]="item" />
+          </div>
+        }
+      </div>
+    }
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

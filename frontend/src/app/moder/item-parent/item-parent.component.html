@@ -1,0 +1,92 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder/items" i18n>Items</a>
+    </li>
+    @if (item$ | async; as item) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
+      </li>
+    }
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1>Item parent</h1>
+</div>
+
+<p>
+  @if (parent$ | async; as parent) {
+    <a
+      [routerLink]="['/moder/items/item', parent.id]"
+      [queryParams]="{tab: 'catalogue'}"
+      [innerHTML]="parent.nameHtml"
+    ></a>
+  }
+  @if (item$ | async; as item) {
+    &rarr;
+    <a [routerLink]="['/moder/items/item', item.id]" [queryParams]="{tab: 'catalogue'}" [innerHTML]="item.nameHtml"></a>
+  }
+</p>
+
+@if (itemParent$ | async; as itemParent) {
+  @if (languages$ | async; as languages) {
+    <form method="post" class="form-horizontal" (submit)="save(itemParent, languages)">
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="catname">Catname</label>
+        <div class="col-md-10">
+          <input
+            type="text"
+            name="catname"
+            id="catname"
+            maxlength="150"
+            class="form-control"
+            [(ngModel)]="itemParent.catname"
+          />
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="type">Type</label>
+        <div class="col-md-10">
+          <select name="type_id" class="form-select" id="type" [(ngModel)]="itemParent.type">
+            @for (option of typeOptions; track option.value) {
+              <option [value]="option.value">{{ option.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      @for (language of languages; track language.language) {
+        <div class="mb-3 row">
+          <label class="col-md-2 col-form-label" [for]="'name' + language.language"
+            >{{ language.language.toUpperCase() }} Name</label
+          >
+          <div class="col-md-10">
+            <input
+              type="text"
+              maxlength="255"
+              class="form-control"
+              [class.is-invalid]="(language.invalidParams | invalidParams: 'name').length > 0"
+              [id]="'name' + language.language"
+              [name]="'name' + language.language"
+              [(ngModel)]="language.name"
+            />
+            @for (message of language.invalidParams | invalidParams: 'name'; track message) {
+              <p class="invalid-feedback" [textContent]="message"></p>
+            }
+          </div>
+        </div>
+      }
+      <div class="row">
+        <div class="col-md-10 offset-md-2">
+          <input type="submit" name="submit" class="btn btn-primary" value="Отправить" />
+        </div>
+      </div>
+    </form>
+  }
+}

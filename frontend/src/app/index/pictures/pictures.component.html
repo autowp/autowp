@@ -1,0 +1,39 @@
+<div class="page-header-small mb-4">
+  <h4>
+    <ng-container i18n>New pictures</ng-container> <small><a routerLink="/new" i18n>all</a></small>
+  </h4>
+</div>
+
+@if (items$ | async; as items) {
+  <div class="row">
+    @for (picture of items; track picture) {
+      <div class="col-6 col-sm-6 col-md-3 col-lg-3">
+        <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" />
+      </div>
+    }
+  </div>
+} @else {
+  <div class="row placeholder-glow">
+    @for (_ of [].constructor(4).keys(); track _) {
+      <div class="col-6 col-sm-6 col-md-3 col-lg-3">
+        <div class="card mb-4">
+          <div class="placeholder ratio ratio-4x3 card-img-top"></div>
+          <div class="card-body">
+            <h6 class="card-title">
+              <span class="placeholder w-50"></span>
+            </h6>
+            <p class="picture-behaviour clearfix">
+              <span class="placeholder w-50"></span>
+              <span class="placeholder w-25"></span>
+            </p>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<p>
+  <span class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></span>
+  <a routerLink="/new" i18n>All new pictures …</a>
+</p>

@@ -1,0 +1,156 @@
+@if (item(); as item) {
+  <div class="car item-list-item">
+    @if (!disableTitle()) {
+      <h3>
+        <app-item-header
+          [item]="{
+            nameHTML: item.nameHtml,
+            design: item.design || null,
+            produced: {count: item.produced?.value || 0, exactly: item.producedExactly},
+          }"
+        />
+      </h3>
+    }
+    @if (item.nameDefault) {
+      <h4 [textContent]="item.nameDefault"></h4>
+    }
+    @if (havePhoto(item) && (item.previewPictures?.pictures || []).length > 4) {
+      <div class="row">
+        @for (picture of (item.previewPictures?.pictures || []).slice(0, 1); track picture) {
+          <div class="col-12 col-lg-6">
+            @if (!picture.picture) {
+              <span>&#xa0;</span>
+            } @else if (picture.picture.thumbLarge) {
+              <a class="d-block rounded mb-4" [routerLink]="['/picture', picture.picture.identity]">
+                <img
+                  class="rounded w-100 border border-light"
+                  loading="lazy"
+                  [src]="picture.picture.thumbLarge.src"
+                  [alt]="picture.picture.nameText"
+                  [title]="picture.picture.nameText"
+                />
+              </a>
+            }
+          </div>
+        }
+        <div class="col-12 col-lg-6">
+          <div class="row">
+            @for (picture of (item.previewPictures?.pictures || []).slice(1); track picture) {
+              <div class="col-6">
+                @if (!picture.picture) {
+                  <span>&#xa0;</span>
+                } @else if (picture.picture.thumbMedium) {
+                  <a class="d-block rounded mb-4" [routerLink]="['/picture', picture.picture.identity]">
+                    <img
+                      class="rounded w-100 border border-light"
+                      loading="lazy"
+                      [src]="picture.picture.thumbMedium.src"
+                      [alt]="picture.picture.nameText"
+                      [title]="picture.picture.nameText"
+                    />
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+    @if (havePhoto(item) && (item.previewPictures?.pictures || []).length <= 4) {
+      <div class="row">
+        @for (picture of item.previewPictures?.pictures || []; track picture) {
+          <div [class]="thumbnailColClass()">
+            @if (!picture.picture) {
+              <span>&#xa0;</span>
+            } @else if (picture.picture.thumbMedium) {
+              <a class="d-block rounded mb-4" [routerLink]="['/picture', picture.picture.identity]">
+                <img
+                  class="rounded w-100 border border-light"
+                  loading="lazy"
+                  [src]="picture.picture.thumbMedium.src"
+                  [alt]="picture.picture.nameText"
+                  [title]="picture.picture.nameText"
+                />
+              </a>
+            }
+          </div>
+        }
+      </div>
+    }
+    @if (!havePhoto(item) && canHavePhoto(item)) {
+      <div class="row">
+        <div [class]="thumbnailColClass()">
+          <div class="no-photo rounded w-100 border border-light mb-4" title="No photos available" i18n-title>
+            <a
+              routerLink="/upload"
+              title="Add photo"
+              i18n-title
+              class="bi bi-plus-circle text-success"
+              aria-hidden="true"
+              [queryParams]="{item_id: item.id}"
+            ></a>
+            <span class="bi bi-camera fs-1" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    }
+    @if (item.description && item.description.length) {
+      <app-markdown class="text" [markdown]="item.description" />
+    }
+    @if ((item.engineVehicles || []).length > 0) {
+      <div>
+        <p i18n>Mounted on:</p>
+        <ul>
+          @for (vehicle of item.engineVehicles; track vehicle.id) {
+            <li>
+              <a [routerLink]="vehicle.route" [innerHTML]="vehicle.nameHtml"></a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+    <ul class="list-inline" ngPreserveWhitespaces>
+      @if ((item.hasText || item.childsCount) && item.route.length) {
+        <li class="list-inline-item">
+          <i class="bi bi-text-left me-1" aria-hidden="true"></i>
+          <a [routerLink]="item.route"
+            ><ng-container i18n>details</ng-container>
+            @if (item.childsCount > 1) {
+              <span> ({{ item.childsCount }})</span>
+            }
+          </a>
+        </li>
+      }
+      @if (item.itemTypeId === ItemType.ITEM_TYPE_PERSON) {
+        <li class="list-inline-item">
+          <i class="bi bi-text-left me-1" aria-hidden="true"></i>
+          <a i18n [routerLink]="['/persons', item.id]">details</a>
+        </li>
+      }
+      @for (twinsGroup of item.twins; track twinsGroup.id) {
+        <li class="list-inline-item">
+          <i class="bi bi-circle-half me-1" aria-hidden="true"></i>
+          <a i18n [routerLink]="['/twins/group', twinsGroup.id]">twins</a>
+        </li>
+      }
+      @for (category of item.categories; track category.id) {
+        <li class="list-inline-item">
+          <i class="bi bi-tag-fill me-1" aria-hidden="true"></i>
+          <a [routerLink]="['/category', category.catname]" [innerHTML]="category.nameHtml"></a>
+        </li>
+      }
+      @if (isModer$ | async) {
+        <li class="list-inline-item">
+          <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
+          <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
+        </li>
+      }
+      @if (item.canEditSpecs) {
+        <li class="list-inline-item">
+          <i class="bi bi-pencil-fill me-1" aria-hidden="true"></i>
+          <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
+        </li>
+      }
+    </ul>
+  </div>
+}

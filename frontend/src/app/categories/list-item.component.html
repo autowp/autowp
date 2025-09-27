@@ -1,0 +1,173 @@
+@if (item$ | async; as item) {
+  <div class="car item-list-item">
+    <h3>
+      <app-item-header
+        [item]="{
+          nameHTML: item.nameHtml,
+          design: item.design || null,
+          produced: {count: item.produced?.value || 0, exactly: item.producedExactly},
+        }"
+      />
+    </h3>
+    @if (item.nameDefault) {
+      <h4 [textContent]="item.nameDefault"></h4>
+    }
+    @if (pictures$ | async; as pictures) {
+      @if ((havePhoto$ | async) && pictures.length > 4) {
+        <div class="row">
+          @for (picture of pictures.slice(0, 1); track picture) {
+            <div class="col-12 col-lg-6">
+              @if (picture.picture && picture.thumb) {
+                <a class="d-block rounded mb-4" [routerLink]="picture.route">
+                  <img
+                    class="rounded w-100 border border-light"
+                    loading="lazy"
+                    [src]="picture.thumb.src"
+                    [alt]="picture.picture.nameText"
+                    [title]="picture.picture.nameText"
+                  />
+                </a>
+              }
+              @if (!picture) {
+                <span>&#xa0;</span>
+              }
+            </div>
+          }
+          <div class="col-12 col-lg-6">
+            <div class="row">
+              @for (picture of pictures.slice(1); track picture) {
+                <div class="col-6">
+                  @if (picture.picture && picture.thumb) {
+                    <a class="d-block rounded mb-4" [routerLink]="picture.route">
+                      <img
+                        class="rounded w-100 border border-light"
+                        loading="lazy"
+                        [src]="picture.thumb.src"
+                        [alt]="picture.picture.nameText"
+                        [title]="picture.picture.nameText"
+                      />
+                    </a>
+                  }
+                  @if (!picture) {
+                    <span>&#xa0;</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      @if ((havePhoto$ | async) && pictures.length <= 4) {
+        <div class="row">
+          @for (picture of pictures; track picture) {
+            <div class="col-6 col-lg-3">
+              @if (picture.picture && picture.thumb) {
+                <a class="d-block rounded mb-4" [routerLink]="picture.route">
+                  <img
+                    class="rounded w-100 border border-light"
+                    loading="lazy"
+                    [src]="picture.thumb.src"
+                    [alt]="picture.picture.nameText"
+                    [title]="picture.picture.nameText"
+                  />
+                </a>
+              }
+              @if (!picture) {
+                <span>&#xa0;</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+    @if ((havePhoto$ | async) === false && (canHavePhoto$ | async)) {
+      <div class="row">
+        <div class="col-6 col-lg-3">
+          <div class="no-photo rounded w-100 border border-light mb-4" title="No photos available" i18n-title>
+            <a
+              routerLink="/upload"
+              title="Add photo"
+              i18n-title
+              class="bi bi-plus-circle text-success"
+              aria-hidden="true"
+              [queryParams]="{item_id: item.id}"
+            ></a>
+            <span class="bi bi-camera fs-1" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    }
+    @if (item.description && item.description.length) {
+      <app-markdown class="text" [markdown]="item.description" />
+    }
+    @if (item.engineVehicles && item.engineVehicles.length) {
+      <div>
+        <p i18n>Mounted on:</p>
+        <ul>
+          @for (vehicle of item.engineVehicles; track vehicle) {
+            <li>
+              <a [routerLink]="vehicle.route" [innerHTML]="vehicle.nameHtml"></a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+    @if (parentRouterLink$ | async; as parentRouterLink) {
+      <ul class="list-inline" ngPreserveWhitespaces>
+        @if (item.hasText || item.childsCount) {
+          <li class="list-inline-item">
+            <i class="bi bi-text-left me-1" aria-hidden="true"></i>
+            <a [routerLink]="parentRouterLink">
+              <ng-container i18n>details</ng-container>
+              @if (item.childsCount > 1) {
+                <span> ({{ item.childsCount }})</span>
+              }
+            </a>
+          </li>
+        }
+        @if (item.itemTypeId === ItemType.ITEM_TYPE_PERSON) {
+          <li class="list-inline-item">
+            <i class="bi bi-text-left me-1" aria-hidden="true"></i>
+            <a i18n [routerLink]="['/persons', item.id]">details</a>
+          </li>
+        } @else if (
+          item.acceptedPicturesCount &&
+          item.acceptedPicturesCount > 4 &&
+          item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY
+        ) {
+          <li class="list-inline-item">
+            <span class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></span>
+            <a [routerLink]="parentRouterLink.concat(['pictures'])"
+              ><ng-container i18n>all pictures</ng-container> ({{ item.acceptedPicturesCount }})</a
+            >
+          </li>
+        } @else if (
+          item.acceptedPicturesCount &&
+          item.acceptedPicturesCount > 4 &&
+          item.itemTypeId !== ItemType.ITEM_TYPE_CATEGORY
+        ) {
+          <li class="list-inline-item">
+            <span class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></span>
+            <a [routerLink]="parentRouterLink.concat(['pictures'])"
+              ><ng-container i18n>all pictures</ng-container> ({{ item.acceptedPicturesCount }})</a
+            >
+          </li>
+        }
+        @if (isModer$ | async) {
+          <li class="list-inline-item">
+            <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
+            <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
+          </li>
+        }
+        @if (item.canEditSpecs) {
+          <li class="list-inline-item">
+            <i class="bi bi-pencil-fill me-1" aria-hidden="true"></i>
+            <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

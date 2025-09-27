@@ -1,0 +1,23 @@
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import '../../variables';
+@import 'bootstrap/scss/mixins';
+
+.crypto-wallets {
+  font-size: 0.9rem;
+
+  @include media-breakpoint-down(lg) {
+    font-size: 0.7rem;
+  }
+
+  @include media-breakpoint-down(sm) {
+    font-size: 1rem;
+  }
+}
+
+.boosty {
+  img {
+    max-width: 87px;
+    margin-bottom: 3px;
+  }
+}

@@ -1,0 +1,146 @@
+@if (_item$ | async; as item) {
+  <h2>
+    <span [innerHtml]="item.nameHtml"></span>
+    <small>
+      @if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE) {
+        <span i18n>vehicle of the day</span>
+      }
+      @if (item.itemTypeId !== ItemType.ITEM_TYPE_VEHICLE) {
+        <span i18n>theme of the day</span>
+      }
+      @if (user$() | async; as user) {
+        <span>
+          <span class="text-nowrap">by <app-user [user]="user" /></span>
+        </span>
+      }
+    </small>
+  </h2>
+} @else {
+  <h2 class="placeholder-glow">
+    <span class="placeholder w-25"></span>
+    <small>
+      <span class="placeholder" style="width: 10%"></span>
+    </small>
+  </h2>
+}
+
+@if (itemOfDayPictures$ | async; as pictures) {
+  <div class="row">
+    <div class="col-sm-6">
+      @for (picture of pictures.first; track picture) {
+        @if (picture && picture.thumb) {
+          <a class="d-block rounded mb-4" [routerLink]="picture.route">
+            <img
+              class="rounded w-100 border border-light"
+              [src]="picture.thumb.src"
+              [alt]="picture.name"
+              [title]="picture.name"
+            />
+          </a>
+        }
+      }
+    </div>
+    <div class="col-sm-6">
+      <div class="row">
+        @for (picture of pictures.others; track picture) {
+          @if (picture && picture.thumb) {
+            <a class="d-block rounded mb-3 col-6" [routerLink]="picture.route">
+              <img
+                class="rounded w-100 border border-light"
+                [src]="picture.thumb.src"
+                [alt]="picture.name"
+                [title]="picture.name"
+              />
+            </a>
+          }
+        }
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="row placeholder-glow">
+    <div class="col-sm-6">
+      <div class="rounded ratio ratio-4x3 border border-light placeholder d-block rounded mb-4"></div>
+    </div>
+    <div class="col-sm-6">
+      <div class="row">
+        <div class="d-block rounded mb-3 col-6">
+          <div class="rounded ratio ratio-4x3 border border-light placeholder"></div>
+        </div>
+        <div class="d-block rounded mb-3 col-6">
+          <div class="rounded ratio ratio-4x3 border border-light placeholder"></div>
+        </div>
+        <div class="d-block rounded mb-3 col-6">
+          <div class="rounded ratio ratio-4x3 border border-light placeholder"></div>
+        </div>
+        <div class="d-block rounded mb-3 col-6">
+          <div class="rounded ratio ratio-4x3 border border-light placeholder"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (_item$ | async; as item) {
+  <p>
+    @if (item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
+      <span>
+        <span class="bi bi-text-left" aria-hidden="true"></span>
+        <a i18n [routerLink]="['/category', item.catname]">details</a>
+      </span>
+      @if (item.acceptedPicturesCount && item.acceptedPicturesCount > 6) {
+        <span>
+          <span class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></span>
+          <a [routerLink]="['/category', item.catname, 'pictures']"
+            ><ng-container i18n>all pictures</ng-container> ({{ item.acceptedPicturesCount }})</a
+          >
+        </span>
+      }
+    }
+    @if (
+      item.itemTypeId === ItemType.ITEM_TYPE_BRAND &&
+      item.acceptedPicturesCount &&
+      item.acceptedPicturesCount > 6 &&
+      item.route.length
+    ) {
+      <span>
+        <span class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></span>
+        <a [routerLink]="item.route"><ng-container i18n>details</ng-container> ({{ item.acceptedPicturesCount }})</a>
+      </span>
+    }
+    @if (
+      item.itemTypeId !== ItemType.ITEM_TYPE_CATEGORY &&
+      item.itemTypeId !== ItemType.ITEM_TYPE_BRAND &&
+      item.acceptedPicturesCount &&
+      item.acceptedPicturesCount > 6 &&
+      item.route.length
+    ) {
+      <span>
+        <span class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></span>
+        <a [routerLink]="item.route"
+          ><ng-container i18n>all pictures</ng-container> ({{ item.acceptedPicturesCount }})</a
+        >
+      </span>
+    }
+    @if (item.twins) {
+      @for (group of item.twins; track group.id) {
+        <span>
+          <span class="bi bi-circle-half" aria-hidden="true"></span>
+          <a i18n [routerLink]="['/twins/group', group.id]">twins</a>
+        </span>
+      }
+    }
+    @if (item.categories) {
+      @for (category of item.categories; track category.id) {
+        <span>
+          <span class="bi bi-tag-fill" aria-hidden="true"></span>
+          <a [routerLink]="['/category', category.catname]" [innerHTML]="category.nameHtml"></a>
+        </span>
+      }
+    }
+    <span>
+      <span class="bi bi-trophy" aria-hidden="true"></span>
+      <a routerLink="/donate/vod" i18n>Want to choose next?</a>
+    </span>
+  </p>
+}

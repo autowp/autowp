@@ -1,0 +1,133 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Moderator page</h1>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3 i18n>Items</h3>
+    <div class="card card-body mb-4">
+      <ul class="list-unstyled" ngPreserveWhitespaces>
+        <li>
+          <i class="bi bi-text-left" aria-hidden="true"></i>
+          <a routerLink="/moder/items" i18n>Items</a>
+        </li>
+        <li>
+          <i class="bi bi-sort-alpha-up" aria-hidden="true"></i>
+          <a routerLink="/moder/items/alpha" i18n>Alphabetical vehicles list</a>
+        </li>
+        <li>
+          <i class="bi bi-plus" aria-hidden="true"></i>
+          <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE}"
+            >New vehicle</a
+          >
+        </li>
+        <li>
+          <i class="bi bi-plus" aria-hidden="true"></i>
+          <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE}">New engine</a>
+        </li>
+        <li>
+          <i class="bi bi-plus" aria-hidden="true"></i>
+          <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_TWINS}"
+            >New twins group</a
+          >
+        </li>
+        <li>
+          <i class="bi bi-plus" aria-hidden="true"></i>
+          <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_BRAND}">New brand</a>
+        </li>
+        <li>
+          <i class="bi bi-plus" aria-hidden="true"></i>
+          <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_FACTORY}"
+            >New factory</a
+          >
+        </li>
+        <li>
+          <i class="bi bi-plus" aria-hidden="true"></i>
+          <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_MUSEUM}">New museum</a>
+        </li>
+        <li>
+          <i class="bi bi-plus" aria-hidden="true"></i>
+          <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_PERSON}">New person</a>
+        </li>
+        <li>
+          <i class="bi bi-plus" aria-hidden="true"></i>
+          <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_COPYRIGHT}"
+            >New copyright block</a
+          >
+        </li>
+      </ul>
+    </div>
+
+    <h3>Task list</h3>
+    <ul>
+      <li>
+        Clear pictures
+        <a routerLink="/moder/pictures" [queryParams]="{special_name: 1}">special names</a>
+      </li>
+      <li>
+        "
+        <a routerLink="/moder/pictures" [queryParams]="{status: 'custom1', perspective_id: 25}">Mixed</a>" to pictures
+        with few cars
+      </li>
+      <li>
+        Split
+        <a routerLink="/moder/items/too-big">too big cars</a>
+      </li>
+      <li>Move years to model years in North America</li>
+      <li>
+        Dash in soviet vehicle names, e.g
+        <a routerLink="/moder/cars/index/name/%D0%92%D0%90%D0%97/no_name/%D0%92%D0%90%D0%97-/no_parent/0/order/1"
+          >ВАЗ</a
+        >
+      </li>
+      <li>
+        Missed type in sidebar menu of
+        <a routerLink="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/17/item_type_id/1">Trucks</a>
+        and
+        <a routerLink="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/19/item_type_id/1">Buses</a>
+      </li>
+    </ul>
+  </div>
+  <div class="col-md-6">
+    <h2 i18n>Other tools</h2>
+    <div class="card card-body mb-4">
+      <ul class="list-unstyled">
+        <li>
+          <a routerLink="/moder/comments" i18n>Comments</a>
+        </li>
+        <li>
+          <a routerLink="/moder/users" i18n>Users</a>
+        </li>
+        <li>
+          <a routerLink="/moder/pictures" i18n>Pictures</a>
+        </li>
+        <li>
+          <a routerLink="/moder/perspectives" i18n>Perspectives</a>
+        </li>
+        <li>
+          <a routerLink="/moder/stat" i18n>Statistics</a>
+        </li>
+        <li>
+          <a routerLink="/moder/hotlinks" i18n>Hotlinks</a>
+        </li>
+        <li>
+          <a routerLink="/moder/picture-vote-templates" i18n>Picture vote templates</a>
+        </li>
+        <li>
+          <a routerLink="/pulse" i18n>Pulse</a>
+        </li>
+        <li>
+          <a routerLink="/info/spec" i18n>Specs</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

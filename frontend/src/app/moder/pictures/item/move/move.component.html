@@ -1,0 +1,377 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder/pictures" i18n>Pictures</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink=".." i18n>Picture №{{ id$ | async }}</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Move picture</h1>
+</div>
+
+@if (showTabBar$ | async) {
+  <div class="nav nav-pills mb-3">
+    @if (showBrands$ | async) {
+      <a
+        class="nav-link"
+        routerLink="."
+        queryParamsHandling="merge"
+        i18n
+        [class.active]="brandsActive$ | async"
+        [queryParams]="{
+          show_factories: null,
+          show_museums: null,
+          show_persons: null,
+          show_authors: null,
+          show_copyrights: null,
+          brand_id: null,
+        }"
+        >Brands</a
+      >
+    }
+    @if (showFactories$ | async) {
+      <a
+        class="nav-link"
+        routerLink="."
+        queryParamsHandling="merge"
+        i18n
+        [class.active]="factoriesActive$ | async"
+        [queryParams]="{
+          show_factories: 1,
+          show_museums: null,
+          show_persons: null,
+          show_authors: null,
+          show_copyrights: null,
+          brand_id: null,
+        }"
+        >Factories</a
+      >
+    }
+    @if (showMuseums$ | async) {
+      <a
+        class="nav-link"
+        routerLink="."
+        queryParamsHandling="merge"
+        i18n
+        [class.active]="museumsActive$ | async"
+        [queryParams]="{
+          show_factories: null,
+          show_museums: 1,
+          show_persons: null,
+          show_authors: null,
+          show_copyrights: null,
+          brand_id: null,
+        }"
+        >Museums</a
+      >
+    }
+    @if (showPersons$ | async) {
+      <a
+        class="nav-link"
+        routerLink="."
+        queryParamsHandling="merge"
+        [class.active]="personsActive$ | async"
+        [queryParams]="{
+          show_factories: null,
+          show_museums: null,
+          show_persons: 1,
+          show_authors: null,
+          show_copyrights: null,
+          brand_id: null,
+        }"
+        ><ng-container i18n>Persons</ng-container> (content)</a
+      >
+    }
+    @if (showAuthors$ | async) {
+      <a
+        class="nav-link"
+        routerLink="."
+        queryParamsHandling="merge"
+        [class.active]="authorsActive$ | async"
+        [queryParams]="{
+          show_factories: null,
+          show_museums: null,
+          show_persons: null,
+          show_authors: 1,
+          show_copyrights: null,
+          brand_id: null,
+        }"
+        ><ng-container i18n>Persons</ng-container> (author)</a
+      >
+    }
+    @if (showCopyrights$ | async) {
+      <a
+        class="nav-link"
+        routerLink="."
+        queryParamsHandling="merge"
+        i18n
+        [class.active]="copyrightsActive$ | async"
+        [queryParams]="{
+          show_factories: null,
+          show_museums: null,
+          show_persons: null,
+          show_authors: null,
+          show_copyrights: 1,
+          brand_id: null,
+        }"
+        >Copyright blocks</a
+      >
+    }
+  </div>
+}
+
+@if (src$ | async; as src) {
+  @if (museumsActive$ | async) {
+    @if (museums$ | async; as museums) {
+      <div class="card card-body">
+        @for (item of museums.items; track item) {
+          <button
+            type="button"
+            class="btn btn-link d-block text-start"
+            [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
+          ></button>
+        }
+      </div>
+      @if (museums.paginator) {
+        <app-paginator [data]="museums.paginator" />
+      }
+    } @else {
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    }
+  }
+  @if (factoriesActive$ | async) {
+    @if (factories$ | async; as factories) {
+      <div class="card card-body">
+        @for (item of factories.items; track item) {
+          <button
+            type="button"
+            class="btn btn-link d-block text-start"
+            [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
+          ></button>
+        }
+      </div>
+      @if (factories.paginator) {
+        <app-paginator [data]="factories.paginator" />
+      }
+    } @else {
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    }
+  }
+  @if (personsActive$ | async) {
+    <div class="card card-body">
+      <div class="mb-3">
+        <input
+          type="text"
+          class="form-control"
+          i18n-placeholder
+          placeholder="Type to search …"
+          [formControl]="searchPersonControl"
+        />
+      </div>
+      @if (persons$ | async; as persons) {
+        @for (item of persons.items; track item) {
+          <button
+            type="button"
+            class="btn btn-link d-block text-start"
+            [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
+          ></button>
+        }
+        @if (persons.paginator) {
+          <app-paginator [data]="persons.paginator" />
+        }
+      } @else {
+        <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+      }
+    </div>
+  }
+  @if (authorsActive$ | async) {
+    <div class="card card-body">
+      <div class="mb-3">
+        <input
+          type="text"
+          class="form-control"
+          i18n-placeholder
+          placeholder="Type to search …"
+          [formControl]="searchAuthorControl"
+        />
+      </div>
+      @if (authors$ | async; as authors) {
+        @for (item of authors.items; track item) {
+          <button
+            type="button"
+            class="btn btn-link d-block text-start"
+            [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
+          ></button>
+        }
+        @if (authors.paginator) {
+          <app-paginator [data]="authors.paginator" />
+        }
+      } @else {
+        <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+      }
+    </div>
+  }
+  @if (copyrightsActive$ | async) {
+    @if (copyrights$ | async; as copyrights) {
+      <div class="card card-body">
+        @for (item of copyrights.items; track item) {
+          <button
+            type="button"
+            class="btn btn-link d-block text-start"
+            [innerHTML]="item.html"
+            (click)="selectItem(item.selection)"
+          ></button>
+        }
+      </div>
+      @if (copyrights.paginator) {
+        <app-paginator [data]="copyrights.paginator" />
+      }
+    } @else {
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    }
+  }
+  @if (brandsActive$ | async) {
+    @if (brandId$ | async; as brandId) {
+      <div class="select-in-brand">
+        @if (vehicles$ | async; as vehicles) {
+          <div class="my-1">
+            @for (item of vehicles; track item) {
+              <app-moder-picture-move-item [item]="item" (selected)="selectItem({src, selection: $event})" />
+            }
+          </div>
+        } @else {
+          <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+        }
+        @if (engines$ | async; as engines) {
+          @if (engines.length > 0) {
+            <h5 i18n>Engines</h5>
+          }
+          <div class="my-1">
+            @for (item of engines; track item) {
+              <app-moder-picture-move-item [item]="item" (selected)="selectItem({src, selection: $event})" />
+            }
+          </div>
+        } @else {
+          <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+        }
+        @if (concepts$ | async; as concepts) {
+          @if (concepts.items.length > 0) {
+            <div class="my-1">
+              <button class="btn btn-link d-block text-start" type="button" (click)="toggleConcepts()">
+                <i
+                  class="bi me-1"
+                  [class.bi-plus-circle]="!conceptsExpanded()"
+                  [class.bi-dash-circle]="conceptsExpanded()"
+                ></i>
+                <ng-container i18n>Concepts & prototypes</ng-container>
+              </button>
+              @if (conceptsExpanded()) {
+                <div class="mb-1 ms-4">
+                  @for (item of concepts.items; track item) {
+                    <button
+                      type="button"
+                      class="btn btn-link d-block text-start"
+                      [innerHTML]="item.html"
+                      (click)="selectItem(item.selection)"
+                    ></button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+        }
+        <div class="my-1">
+          <button
+            class="btn btn-link d-block text-start"
+            i18n
+            type="button"
+            (click)="
+              selectItem({
+                src,
+                selection: {itemId: brandId, perspectiveId: 22, type: PictureItemType.PICTURE_ITEM_CONTENT},
+              })
+            "
+          >
+            logotype
+          </button>
+          <button
+            class="btn btn-link d-block text-start"
+            i18n
+            type="button"
+            (click)="
+              selectItem({
+                src,
+                selection: {itemId: brandId, perspectiveId: 25, type: PictureItemType.PICTURE_ITEM_CONTENT},
+              })
+            "
+          >
+            mixed (few vehicles on one picture)
+          </button>
+          <button
+            type="button"
+            class="btn btn-link d-block text-start"
+            i18n
+            (click)="
+              selectItem({
+                src,
+                selection: {itemId: brandId, perspectiveId: 0, type: PictureItemType.PICTURE_ITEM_CONTENT},
+              })
+            "
+          >
+            unsorted (not existent vehicle or engine)
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="card card-body">
+        <div class="mb-3">
+          <input
+            type="text"
+            class="form-control"
+            i18n-placeholder
+            placeholder="Type to search …"
+            [formControl]="searchBrandControl"
+          />
+        </div>
+        @if (brands$ | async; as brands) {
+          <div class="row">
+            @for (chunk of brands.items; track chunk) {
+              <div class="col-2">
+                @for (item of chunk; track item) {
+                  <a
+                    class="btn btn-link d-block text-start"
+                    queryParamsHandling="merge"
+                    [routerLink]="[]"
+                    [queryParams]="{page: null, brand_id: item.id}"
+                    [innerHTML]="item.nameHtml"
+                  ></a>
+                }
+              </div>
+            }
+          </div>
+          @if (brands.paginator) {
+            <app-paginator [data]="brands.paginator" />
+          }
+        } @else {
+          <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+        }
+      </div>
+    }
+  }
+}

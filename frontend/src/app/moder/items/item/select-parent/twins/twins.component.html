@@ -1,0 +1,39 @@
+<div class="card card-body">
+  @if (twinsBrands$ | async; as response) {
+    <div class="row">
+      @for (chunk of response.brands; track chunk) {
+        <div class="col-2">
+          @for (item of chunk; track item.id) {
+            <a
+              routerLink="."
+              queryParamsHandling="merge"
+              [queryParams]="{brand_id: item.id}"
+              [innerHTML]="item.nameHtml"
+            ></a>
+            <br />
+          }
+        </div>
+      }
+    </div>
+    @if (response.paginator) {
+      <app-paginator [data]="response.paginator" />
+    }
+  }
+  @if (twins$ | async; as response) {
+    <ul>
+      @for (item of response.items; track item) {
+        <li class="car-node">
+          <app-moder-items-item-select-parent-tree-item
+            [item]="item"
+            [disableItemID]="(itemID$ | async) || ''"
+            [order]="ItemParentsRequest.Order.AUTO"
+            (selected)="onSelect($event)"
+          />
+        </li>
+      }
+    </ul>
+    @if (response.paginator) {
+      <app-paginator [data]="response.paginator" />
+    }
+  }
+</div>

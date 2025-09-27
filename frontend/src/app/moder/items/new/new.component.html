@@ -1,0 +1,37 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder/items" i18n>Items</a>
+    </li>
+  </ol>
+</nav>
+
+@if (itemType$ | async; as itemTypeName) {
+  <div class="page-header">
+    <h1>{{ itemTypeName }}</h1>
+  </div>
+}
+
+@if (parent$ | async; as parent) {
+  <p>
+    <ng-container i18n>As submodel</ng-container>
+    <span [innerHTML]="parent.nameHtml"></span>
+  </p>
+}
+
+@if (formParams$ | async; as formParams) {
+  <app-item-meta-form
+    class="d-block mb-4"
+    [item]="formParams.item"
+    [parentIsConcept]="formParams.parentIsConcept"
+    [vehicleTypeIDs]="formParams.vehicleTypeIDs"
+    [invalidParams]="invalidParams()"
+    (submitted)="submit(formParams.item.itemTypeId, $event)"
+  />
+}

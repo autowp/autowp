@@ -1,0 +1,261 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+@if (user$ | async; as user) {
+  @if (user) {
+    <div class="page-header">
+      <h1>{{ user.name }}</h1>
+    </div>
+  }
+  @if (user) {
+    <div class="row">
+      <div class="col-md-6">
+        <div class="user-photo">
+          @if (user.photo) {
+            <img alt="" loading="lazy" [src]="user.photo.src" />
+          } @else if (user.gravatarLarge) {
+            <img alt="" loading="lazy" [src]="user.gravatarLarge" />
+          }
+        </div>
+        <p>
+          <ng-container i18n>Known as:</ng-container>
+          <strong>«{{ user.name }}»</strong>
+        </p>
+        @if (user.regDate) {
+          <p>
+            <ng-container i18n>Registration date</ng-container>
+            <strong
+              [textContent]="user.regDate.toDate() | timeAgo"
+              [ngbTooltip]="user.regDate.toDate() | date: 'fullDate'"
+            ></strong>
+          </p>
+        }
+        @if (user.lastOnline) {
+          <p>
+            <ng-container i18n>Last visited</ng-container>:
+            <strong
+              [textContent]="user.lastOnline.toDate() | timeAgo"
+              [ngbTooltip]="user.lastOnline.toDate() | date: 'medium'"
+            ></strong>
+          </p>
+        }
+        <p i18n>Database id: {{ user.id }}</p>
+        @if (user && isNotMe$ | async) {
+          <p ngPreserveWhitespaces>
+            <i class="bi bi-reply" aria-hidden="true"></i>
+            <a href="#" i18n (click)="openMessageForm(user)">Send personal message</a>
+          </p>
+        }
+        <!--      <p *ngFor="let account of user.accounts" ngPreserveWhitespaces>-->
+        <!--        <i class="{{ account.icon }}" aria-hidden="true"></i>-->
+        <!--        <a [href]="account.link" *ngIf="account.link" [textContent]="account.name"></a>-->
+        <!--        <span *ngIf="!account.link" [textContent]="account.name"></span>-->
+        <!--      </p>-->
+        <h2 i18n>Recent activity</h2>
+        <div class="card card-body mb-4">
+          @if (user.picturesAdded > 0) {
+            <div>
+              <p>
+                <ng-container i18n>Images uploaded:</ng-container>
+                <strong>{{ user.picturesAdded }}</strong>
+              </p>
+              @if (user.picturesAcceptedCount < user.picturesAdded) {
+                <p>
+                  <ng-container i18n>left on site:</ng-container>
+                  <strong>{{ user.picturesAcceptedCount }}</strong>
+                </p>
+              }
+              <p>
+                <a i18n [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id, 'pictures']"
+                  >User's pictures</a
+                >
+              </p>
+            </div>
+          } @else {
+            <p i18n>Not upload pictures</p>
+          }
+          @if (isModer$ | async) {
+            <p>
+              <a routerLink="/log" i18n [queryParams]="{user_id: user.id}">User's log</a>
+            </p>
+          }
+        </div>
+        @if (pictures$ | async; as pictures) {
+          @if (pictures && pictures.length) {
+            <div>
+              <h2 i18n>Recent uploads</h2>
+              <div class="card card-body mb-4">
+                <ul>
+                  @for (picture of pictures; track picture) {
+                    <li>
+                      <a
+                        class="picture-hover-preview"
+                        [routerLink]="['/picture', picture.identity]"
+                        [innerHTML]="picture.nameHtml"
+                      ></a>
+                    </li>
+                  }
+                </ul>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+        }
+        @if (comments$ | async; as comments) {
+          @if (comments && comments.length > 0) {
+            <div>
+              <h2>
+                <ng-container i18n>Recent comments</ng-container>
+                <small>
+                  <a i18n [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id, 'comments']"
+                    >all</a
+                  >
+                </small>
+              </h2>
+              <div class="card card-body mb-4">
+                <ul>
+                  @for (comment of comments; track comment.id) {
+                    <li>
+                      <a [routerLink]="comment.route" [textContent]="comment.preview"></a>
+                    </li>
+                  }
+                  <li>&#xa0;…</li>
+                </ul>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+        }
+      </div>
+      <div class="col-md-6">
+        @if ((authenticated$ | async) && !user.deleted && (isNotMe$ | async)) {
+          <div class="card card-body mb-4">
+            <div class="row">
+              <div class="col-6">
+                @if ((inContacts$ | async) === false) {
+                  <button type="submit" class="btn btn-lg btn-contact btn-primary" (click)="setInContacts(user, true)">
+                    <span class="bi bi-plus-circle me-1" aria-hidden="true"></span>
+                    <ng-container i18n>Add to contacts</ng-container>
+                  </button>
+                }
+                @if (inContacts$ | async) {
+                  <button type="submit" class="btn btn-lg btn-contact btn-danger" (click)="setInContacts(user, false)">
+                    <span class="bi bi-dash-circle me-1" aria-hidden="true"></span>
+                    <ng-container i18n>Remove from contacts</ng-container>
+                  </button>
+                }
+              </div>
+              @if (disableCommentsNotifications$ | async; as disableCommentsNotifications) {
+                <div class="col-6">
+                  <button
+                    type="submit"
+                    class="btn btn-lg btn-contact"
+                    [class.btn-primary]="disableCommentsNotifications"
+                    [class.btn-danger]="!disableCommentsNotifications"
+                    (click)="setCommentNotificationsDisabled(user, !disableCommentsNotifications)"
+                  >
+                    <span class="bi bi-envelope me-1" aria-hidden="true"></span>
+                    @if (disableCommentsNotifications) {
+                      <ng-container i18n>Enable comments notifications</ng-container>
+                    } @else {
+                      <ng-container i18n>Disable comments notifications</ng-container>
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+        @if (canViewIp$ | async) {
+          <div>
+            <h2 i18n>For moderators</h2>
+            <div class="card card-body mb-4">
+              @if ((canBan$ | async) && user.photo) {
+                <p>
+                  <button
+                    type="button"
+                    class="btn btn-warning btn-block btn-delete-photo"
+                    i18n
+                    (click)="deletePhoto(user)"
+                  >
+                    Delete user photo
+                  </button>
+                </p>
+              }
+              @if (canDeleteUser$ | async; as canDeleteUser) {
+                @if (canDeleteUser) {
+                  <p>
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-block btn-delete-user"
+                      i18n
+                      (click)="deleteUser(user)"
+                    >
+                      Delete user
+                    </button>
+                  </p>
+                }
+              }
+              <p><ng-container i18n>Last visit fom IP-address:</ng-container> {{ user.lastIp }}</p>
+              @if (ip$ | async; as ip) {
+                @if (ip && ip.blacklist) {
+                  <div>
+                    <p>
+                      <ng-container i18n>That address is banned</ng-container>
+                      @if (ip.blacklist.byUser) {
+                        <app-user [user]="ip.blacklist.byUser" />
+                      }
+                      @if (ip.blacklist.until) {
+                        <span>
+                          <ng-container i18n>until</ng-container> {{ ip.blacklist.until | date: 'medium' }}
+                          @if (ip.blacklist.reason) {
+                            <span> ({{ ip.blacklist.reason }}) </span>
+                          }
+                        </span>
+                      }
+                    </p>
+                    @if (canBan$ | async) {
+                      <div style="margin: 10px 0">
+                        <button type="button" class="btn btn-success" i18n (click)="removeFromBlacklist(ip.address)">
+                          unban
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (ip && !ip.blacklist && ip.rights?.addToBlacklist) {
+                  <form class="form-vertical">
+                    <div class="mb-3">
+                      <label i18n for="period">For period</label>
+                      <select id="period" name="period" class="form-select" required [(ngModel)]="banPeriod">
+                        @for (period of banPeriods; track period.value) {
+                          <option [value]="period.value">{{ period.name }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label i18n for="reason">Reason</label>
+                      <input maxlength="50" class="form-control" id="reason" name="reason" [(ngModel)]="banReason" />
+                    </div>
+                    <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(ip.address)">Ban</button>
+                  </form>
+                }
+              } @else {
+                <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

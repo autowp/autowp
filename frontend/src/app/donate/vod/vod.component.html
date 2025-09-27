@@ -1,0 +1,174 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/donate" i18n>Donate</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Theme of the day</h1>
+</div>
+
+<app-markdown
+  i18n-markdown
+  markdown='The little that we can offer in return for financial assistance of the site - it is an opportunity to choose the next "vehicle of the day".
+
+Follow the instructions below.
+
+We will be happy if you want to [perform selfless donation](/donate) to an arbitrary amount.'
+/>
+
+<h1 i18n>1. Choose a date</h1>
+<div class="card card-body mb-4">
+  <ul>
+    @for (date of dates$ | async; track date) {
+      <li>
+        @if (date.free) {
+          <span>
+            @if (date.active) {
+              <span>
+                <strong [textContent]="date.name"></strong>
+                <span class="bi bi-check" aria-hidden="true"></span>
+              </span>
+            } @else {
+              <span>
+                <a
+                  routerLink="."
+                  queryParamsHandling="merge"
+                  [queryParams]="{date: date.value}"
+                  [textContent]="date.name"
+                ></a>
+              </span>
+            }
+          </span>
+        }
+        @if (!date.free) {
+          <span>
+            <span class="muted" [textContent]="date.name"></span>
+            (<ng-container i18n>busy</ng-container>)
+          </span>
+        }
+      </li>
+    }
+  </ul>
+</div>
+
+<h1 i18n>2. Choose vehicle</h1>
+<div class="card card-body mb-4">
+  <app-markdown
+    i18n-markdown
+    markdown='Almost any vehicle can be "Vehicle of the day", but there are some limitations:
+
+- the vehicle must be selected for the first time
+- the vehicle must have at least 3 photos'
+  />
+
+  @if (item$ | async; as item) {
+    <p>
+      <ng-container i18n>Selection:</ng-container>
+      <strong [innerHTML]="item.nameHtml"></strong>
+    </p>
+  }
+
+  <a
+    routerLink="/donate/vod/select"
+    class="btn btn-primary btn-lg"
+    i18n
+    [queryParams]="{date: date$ | async, anonymous: (anonymous$ | async) ? 1 : null}"
+    >Choose …</a
+  >
+</div>
+
+<h1 i18n>3. Preview</h1>
+
+<div class="card card-body mb-4">
+  <div class="btn-group">
+    <a
+      routerLink="."
+      queryParamsHandling="merge"
+      class="btn btn-secondary"
+      i18n
+      [queryParams]="{anonymous: '1'}"
+      [class.active]="anonymous$ | async"
+      >Anonymously</a
+    >
+    <a
+      routerLink="."
+      queryParamsHandling="merge"
+      class="btn btn-secondary"
+      i18n
+      [queryParams]="{anonymous: null}"
+      [class.active]="(anonymous$ | async) === null"
+      [class.disabled]="(userID$ | async) === null"
+      >With the name (registration required)</a
+    >
+  </div>
+</div>
+
+@if (itemSelected$ | async) {
+  <app-item-of-day [item$]="itemOfDayItem$" [user$]="itemOfDayUser$" />
+}
+
+<h1 i18n>4. Make a donation</h1>
+
+<form
+  ngNoForm
+  method="post"
+  action="https://yoomoney.ru/quickpay/confirm"
+  class="card card-body mb-4"
+  (submit)="submit($event)"
+>
+  @if ((date$ | async) && (item$ | async)) {
+    <div>
+      @for (param of formParams$ | async; track param) {
+        <input type="hidden" [name]="param.name" [value]="param.value" />
+      }
+      <div class="mb-3">
+        <textarea
+          name="comment"
+          i18n-placeholder
+          placeholder="Your wishes"
+          class="form-control"
+          maxlength="200"
+        ></textarea>
+      </div>
+    </div>
+  }
+  @if (vod$ | async; as vod) {
+    <p>
+      <ng-container i18n>Price:</ng-container>
+      <strong>{{ vod.sum }}<ng-container i18n>rubles</ng-container></strong>
+      (<span i18n>about {{ '$' + (vod.sum / usdToRub).toFixed(2) }}</span
+      >)
+    </p>
+  }
+  @if ((date$ | async) && (item$ | async)) {
+    <div>
+      <div class="btn-group mb-3" role="group">
+        <input type="radio" class="btn-check" name="paymentType" value="AC" autocomplete="off" checked id="btn1" />
+        <label class="btn btn-secondary" for="btn1">
+          <span class="bi bi-credit-card" aria-hidden="true"></span>
+          <ng-container i18n>Credit card</ng-container>
+        </label>
+        <input type="radio" class="btn-check" name="paymentType" value="PC" autocomplete="off" id="btn3" />
+        <label class="btn btn-secondary" for="btn3" i18n>YooMoney</label>
+      </div>
+      <div>
+        <button type="submit" class="btn btn-primary" i18n>Pay</button>
+      </div>
+    </div>
+  }
+  @if ((date$ | async) === null || (item$ | async) === null) {
+    <div>
+      <button type="button" class="btn btn-secondary" disabled>
+        <span class="bi bi-credit-card" aria-hidden="true"></span>
+        <ng-container i18n>Credit card</ng-container>
+      </button>
+      <button type="button" class="btn btn-secondary" disabled i18n>YooMoney</button>
+    </div>
+  }
+</form>

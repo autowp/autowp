@@ -1,0 +1,20 @@
+@if (canUseTurboGroupCreator$ | async) {
+  <p class="btn-group">
+    @if (item$ | async; as item) {
+      <a class="btn btn-secondary" i18n [routerLink]="['/moder/items/item', item.id, 'organize-pictures']"
+        >Turbo group creator from pictures</a
+      >
+    }
+  </p>
+}
+@for (chunk of picturesChunks$ | async; track chunk) {
+  <div class="row">
+    @for (picture of chunk; track picture) {
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+        <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" />
+      </div>
+    }
+  </div>
+} @empty {
+  <h3 i18n>No pictures</h3>
+}

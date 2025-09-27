@@ -1,0 +1,235 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Items</h1>
+</div>
+
+<div class="nav nav-pills mb-4">
+  <a class="nav-link" routerLink="." i18n [queryParams]="{vehicle_type_id: 'empty', vehicle_childs_type_id: 19}"
+    >Buses without type</a
+  >
+  <a class="nav-link" routerLink="." i18n [queryParams]="{vehicle_type_id: 'empty', vehicle_childs_type_id: 17}"
+    >Truck without type</a
+  >
+</div>
+<div class="row">
+  <div class="col-lg-4 col-md-4">
+    <h2 i18n>Filter</h2>
+    <form class="card card-body form-vertical">
+      <div class="mb-3">
+        <label i18n for="name">Name</label>
+        <input
+          placeholder="% - any characters"
+          i18n-placeholder
+          type="text"
+          name="name"
+          id="name"
+          class="form-control"
+          [(ngModel)]="name"
+          (input)="onNameChanged()"
+        />
+      </div>
+      <div class="mb-3">
+        <label i18n for="name_exclude">Name (exclude)</label>
+        <input
+          placeholder="_ - any single character"
+          i18n-placeholder
+          type="text"
+          id="name_exclude"
+          name="name_exclude"
+          class="form-control"
+          [(ngModel)]="nameExclude"
+          (input)="onNameExcludeChanged()"
+        />
+      </div>
+      <div class="mb-3">
+        <label i18n for="item_type_id">Item type</label>
+        <select
+          name="item_type_id"
+          id="item_type_id"
+          class="form-select"
+          [(ngModel)]="itemTypeID"
+          (change)="onItemTypeChanged()"
+        >
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_UNKNOWN">Any</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_VEHICLE">Vehicle</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_ENGINE">Engine</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_CATEGORY">Category</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_TWINS">Twins</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_BRAND">Brand</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_FACTORY">Factory</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_MUSEUM">Museum</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_PERSON">Person</option>
+          <option i18n [ngValue]="ItemType.ITEM_TYPE_COPYRIGHT">Copyright block</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label i18n for="vehicle_type_id">Vehicle type</label>
+        <select
+          id="vehicle_type_id"
+          name="vehicle_type_id"
+          class="form-select"
+          [(ngModel)]="vehicleTypeID"
+          (change)="onVehicleTypeChanged()"
+        >
+          <option i18n [ngValue]="null">Any</option>
+          <option ngValue="empty" i18n>Empty</option>
+          @for (item of vehicleTypeOptions$ | async; track item.id) {
+            <option [ngValue]="item.id">{{ '...'.repeat(item.deep || 0) }}{{ item.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="mb-3">
+        <label i18n for="vehicle_childs_type_id">Have childs with type</label>
+        <select
+          id="vehicle_childs_type_id"
+          name="vehicle_childs_type_id"
+          class="form-select"
+          [(ngModel)]="vehicleChildsTypeID"
+          (change)="onVehicleChildsTypeChanged()"
+        >
+          <option i18n [ngValue]="null">Any</option>
+          @for (item of vehicleTypeOptions$ | async; track item.id) {
+            <option [ngValue]="item.id">{{ '...'.repeat(item.deep || 0) }}{{ item.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="mb-3">
+        <label i18n for="spec">Spec</label>
+        <select name="spec" id="spec" class="form-select" [(ngModel)]="specID" (change)="onSpecChanged()">
+          <option i18n [ngValue]="null">Any</option>
+          @for (item of specOptions$ | async; track item.id) {
+            <option [ngValue]="item.id">{{ '...'.repeat(item.deep || 0) }}{{ item.shortName }}</option>
+          }
+        </select>
+      </div>
+      <div class="mb-3">
+        <label i18n for="from_year">Year from</label>
+        <input
+          type="text"
+          id="from_year"
+          name="from_year"
+          class="form-control"
+          maxlength="4"
+          [(ngModel)]="fromYear"
+          (input)="onFromYearChanged()"
+        />
+      </div>
+      <div class="mb-3">
+        <label i18n for="to_year">Year to</label>
+        <input
+          type="text"
+          id="to_year"
+          name="to_year"
+          class="form-control"
+          maxlength="4"
+          [(ngModel)]="toYear"
+          (input)="onToYearChanged()"
+        />
+      </div>
+      <div class="mb-3">
+        <label i18n for="ancestor">Parent</label>
+        <ng-template #ancestorTemplate let-model="result">
+          <span [innerHTML]="model.nameHtml"></span>
+        </ng-template>
+        <div class="input-group mb-3">
+          <input
+            name="ancestor"
+            id="ancestor"
+            class="form-control"
+            [ngbTypeahead]="ancestorsDataSource"
+            [inputFormatter]="ancestorFormatter"
+            [resultTemplate]="ancestorTemplate"
+            [class.border-primary]="ancestorID"
+            [(ngModel)]="ancestorQuery"
+            (selectItem)="ancestorOnSelect($event)"
+          />
+          <button class="btn btn-outline-secondary" type="button" [disabled]="!ancestorID" (click)="clearAncestor()">
+            <span class="bi bi-x" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label i18n for="text">Text</label>
+        <input type="text" id="text" name="text" class="form-control" [(ngModel)]="text" (input)="onTextChanged()" />
+      </div>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" name="no_parent" value="1" [(ngModel)]="noParent" (change)="onNoParentChanged()" />
+          <ng-container i18n>Without parents</ng-container>
+        </label>
+      </div>
+      <div class="mb-3">
+        <label i18n for="order">Order</label>
+        <select name="order" id="order" class="form-select" [(ngModel)]="order" (change)="onOrderChanged()">
+          <option i18n [value]="ItemsRequest.Order.ID_DESC">id desc</option>
+          <option i18n [value]="ItemsRequest.Order.ID_ASC">id asc</option>
+          <option i18n [value]="ItemsRequest.Order.CHILDS_COUNT">childs count</option>
+          <option i18n [value]="ItemsRequest.Order.NAME">name</option>
+        </select>
+      </div>
+    </form>
+  </div>
+  <div class="col-lg-8 col-md-8">
+    @if (data$ | async; as data) {
+      <div class="btn-group float-end">
+        <a
+          routerLink="."
+          queryParamsHandling="merge"
+          class="btn btn-outline-secondary"
+          [queryParams]="{list: null}"
+          [class.active]="!data.listMode"
+        >
+          <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+        </a>
+        <a
+          routerLink="."
+          queryParamsHandling="merge"
+          class="btn btn-outline-secondary"
+          [queryParams]="{list: '1', order: 'name'}"
+          [class.active]="data.listMode"
+        >
+          <i class="bi bi-list" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <h2>
+        <ng-container i18n>Items</ng-container>
+        @if (data.loading) {
+          <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+        }
+        @if (data.paginator; as paginator) {
+          <small i18n="@@n-items">{paginator.totalItemCount, plural,
+            one {{{paginator.totalItemCount}} item}
+            other {{{paginator.totalItemCount}} items}
+          }</small>
+        }
+      </h2>
+
+      <div>
+        @for (item of data.items; track item.id) {
+          @if (data.listMode) {
+            <div>
+              <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
+            </div>
+          } @else {
+            <app-catalogue-list-item [item]="item" />
+          }
+        }
+      </div>
+
+      @if (data.paginator) {
+        <app-paginator [data]="data.paginator" />
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,9 @@
+@if (filter$ | async; as filter) {
+  <app-gallery
+    [filter]="filter"
+    [current]="(identity$ | async) || null"
+    [galleryPrefix]="(galleryRouterLink$ | async) || []"
+    [picturePrefix]="(picturesRouterLink$ | async) || []"
+    (pictureSelected)="pictureSelected($event)"
+  />
+}

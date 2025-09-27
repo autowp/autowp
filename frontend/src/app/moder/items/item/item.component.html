@@ -1,0 +1,221 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder/items" i18n>Items</a>
+    </li>
+  </ol>
+</nav>
+
+@if (item$ | async; as item) {
+  <div class="page-header">
+    <h1>{{ getItemTypeTranslation(item.itemTypeId, 'name') }}: <span [innerHTML]="item.nameHtml"></span></h1>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-2">
+      @if (randomPicture$ | async; as randomPicture) {
+        @if (randomPicture.thumbMedium) {
+          <img alt="" class="mb-4 w-100 rounded border border-light" [src]="randomPicture.thumbMedium.src" />
+        }
+      }
+    </div>
+    <div class="col-md-5">
+      <div class="card card-body mb-4">
+        <p i18n>Database id: {{ item.id }}</p>
+        @if (canEditSpecifications$ | async; as canEditSpecifications) {
+          @if (specsAllowed() && canEditSpecifications) {
+            <p ngPreserveWhitespaces>
+              <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
+              @if (item.specificationsCount) {
+                <span class="badge rounded-pill text-bg-secondary" [textContent]="item.specificationsCount"></span>
+              }
+            </p>
+          }
+        }
+        <p>
+          <a routerLink="/log" i18n [queryParams]="{item_id: item.id}">Log of events</a>
+        </p>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card card-body mb-4">
+        <p i18n>Changes notifications subscription</p>
+        <p class="subscription">
+          <button
+            type="button"
+            class="btn"
+            [class.btn-success]="item.subscription"
+            [class.btn-secondary]="!item.subscription"
+            (click)="toggleSubscription(item)"
+          >
+            <span>
+              @if (item.subscription) {
+                <i class="bi bi-check" aria-hidden="true"></i>
+                <ng-container i18n>Subscribed</ng-container>
+              } @else {
+                <i class="bi bi-x" aria-hidden="true"></i>
+                <ng-container i18n>Not subscribed</ng-container>
+              }
+            </span>
+          </button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if (activeTab$ | async; as activeTab) {
+    <div class="nav nav-pills" style="margin-bottom: 10px">
+      <a
+        ngPreserveWhitespaces
+        class="nav-link"
+        routerLink="."
+        [class.active]="activeTab === 'meta'"
+        [queryParams]="{tab: 'meta'}"
+      >
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span i18n>Meta</span>
+        @if (metaTab.count) {
+          <span class="badge rounded-pill text-bg-secondary" [textContent]="metaTab.count"></span>
+        }
+      </a>
+      <a
+        ngPreserveWhitespaces
+        class="nav-link"
+        routerLink="."
+        [class.active]="activeTab === 'name'"
+        [queryParams]="{tab: 'name'}"
+      >
+        <span class="glyphicon glyphicon-align-left"></span>
+        <span i18n>Name and description</span>
+        @if (nameTab.count) {
+          <span class="badge rounded-pill text-bg-secondary" [textContent]="nameTab.count"></span>
+        }
+      </a>
+      @if (logoTab.visible) {
+        <a
+          ngPreserveWhitespaces
+          class="nav-link"
+          routerLink="."
+          [class.active]="activeTab === 'logo'"
+          [queryParams]="{tab: 'logo'}"
+        >
+          <span class="glyphicon glyphicon-align-left"></span>
+          <span i18n>Logotype</span>
+          @if (logoTab.count) {
+            <span class="badge rounded-pill text-bg-secondary" [textContent]="logoTab.count"></span>
+          }
+        </a>
+      }
+      @if (catalogueTab.visible) {
+        <a
+          ngPreserveWhitespaces
+          class="nav-link"
+          routerLink="."
+          [class.active]="activeTab === 'catalogue'"
+          [queryParams]="{tab: 'catalogue'}"
+        >
+          <span i18n>Catalogue</span>
+          @if (catalogueTab.count) {
+            <span class="badge rounded-pill text-bg-secondary" [textContent]="catalogueTab.count"></span>
+          }
+        </a>
+      }
+      @if (vehiclesTab.visible) {
+        <a
+          ngPreserveWhitespaces
+          class="nav-link"
+          routerLink="."
+          [class.active]="activeTab === 'vehicles'"
+          [queryParams]="{tab: 'vehicles'}"
+        >
+          <span i18n>Vehicles</span>
+          @if (vehiclesTab.count) {
+            <span class="badge rounded-pill text-bg-secondary" [textContent]="vehiclesTab.count"></span>
+          }
+        </a>
+      }
+      @if (treeTab.visible) {
+        <a
+          ngPreserveWhitespaces
+          class="nav-link"
+          routerLink="."
+          [class.active]="activeTab === 'tree'"
+          [queryParams]="{tab: 'tree'}"
+        >
+          <span class="bi bi-tree" aria-hidden="true"></span>
+          <span i18n>Tree</span>
+          @if (treeTab.count) {
+            <span class="badge rounded-pill text-bg-secondary" [textContent]="treeTab.count"></span>
+          }
+        </a>
+      }
+      @if (picturesTab.visible) {
+        <a
+          ngPreserveWhitespaces
+          class="nav-link"
+          routerLink="."
+          [class.active]="activeTab === 'pictures'"
+          [queryParams]="{tab: 'pictures'}"
+        >
+          <span class="glyphicon glyphicon-th"></span>
+          <span i18n>Pictures</span>
+          @if (picturesTab.count) {
+            <span class="badge rounded-pill text-bg-secondary" [textContent]="picturesTab.count"></span>
+          }
+        </a>
+      }
+      @if (linksTab.visible) {
+        <a
+          ngPreserveWhitespaces
+          class="nav-link"
+          routerLink="."
+          [class.active]="activeTab === 'links'"
+          [queryParams]="{tab: 'links'}"
+        >
+          <span class="glyphicon glyphicon-globe"></span>
+          <span i18n>Links</span>
+          @if (linksTab.count) {
+            <span class="badge rounded-pill text-bg-secondary" [textContent]="linksTab.count"></span>
+          }
+        </a>
+      }
+    </div>
+
+    @if (metaTab.visible && activeTab === 'meta') {
+      <app-moder-items-item-meta [item]="item" />
+    }
+    @if (nameTab.visible && activeTab === 'name') {
+      <app-moder-items-item-name [item]="item" />
+    }
+    @if (logoTab.visible && activeTab === 'logo') {
+      <app-moder-items-item-logo [item]="item" (itemUpdated)="reloadItem$.next()" />
+    }
+    @if (catalogueTab.visible && activeTab === 'catalogue') {
+      <app-moder-items-item-catalogue [item]="item" />
+    }
+    @if (vehiclesTab.visible && activeTab === 'vehicles') {
+      <app-moder-items-item-vehicles [itemId]="item.id" />
+    }
+
+    @if (treeTab.visible && activeTab === 'tree') {
+      <div class="tree card card-body">
+        @if (tree$ | async; as tree) {
+          <app-moder-items-item-tree [item]="tree" />
+        }
+      </div>
+    }
+
+    @if (picturesTab.visible && activeTab === 'pictures') {
+      <app-moder-items-item-pictures [item]="item" />
+    }
+    @if (linksTab.visible && activeTab === 'links') {
+      <app-moder-items-item-links [item]="item" />
+    }
+  }
+}

@@ -1,0 +1,61 @@
+<h2 i18n>Engine from catalogue</h2>
+
+@if (item$ | async; as item) {
+  @if (isAllowedEditEngine$ | async) {
+    <div>
+      @if (engine$ | async; as engine) {
+        <div>
+          <p>
+            <a [routerLink]="['/moder/items/item', engine.id]" [innerHTML]="engine.nameHtml"></a>
+          </p>
+          @if (item.engineInherit) {
+            <!--TODO: h6 *ngFor="let car of engineInheritedFrom">
+            <em>
+              <ng-container i18n>Inherited from</ng-container>
+              <a [href]="car.url" [innerHTML]="car.name_html"></a>
+            </em>
+          </h6-->
+          }
+          <a routerLink="/cars/select-engine" class="btn btn-primary" i18n [queryParams]="{item_id: item.id}"
+            >Select another engine</a
+          >
+          @if (item.engineItemId) {
+            <button type="button" class="btn btn-warning" i18n (click)="cancelInheritance(item)">Cancel engine</button>
+          }
+          @if (!item.engineInherit) {
+            <button type="button" class="btn btn-warning" i18n (click)="inheritEngine(item)">Inherit engine</button>
+          }
+        </div>
+      } @else {
+        <p i18n>[not selected]</p>
+        <a routerLink="/cars/select-engine" class="btn btn-primary" i18n [queryParams]="{item_id: item.id}"
+          >Select engine</a
+        >
+        @if (!item.engineInherit) {
+          <button type="button" class="btn btn-warning" i18n (click)="inheritEngine(item)">Inherit engine</button>
+        } @else {
+          <button type="button" class="btn btn-warning" i18n (click)="cancelInheritance(item)">
+            Don't inherit engine
+          </button>
+        }
+      }
+    </div>
+  }
+  @if (engine$ | async; as engine) {
+    @if (engine && (isAllowedEditEngine$ | async) === false) {
+      <div>
+        <p [innerHTML]="engine.nameHtml"></p>
+        @if (item.engineInherit) {
+          <!--TODO: h6 *ngFor="let car of engineInheritedFrom">
+            <em>
+              <ng-container i18n>Inherited from</ng-container>
+              <span [innerHTML]="car.name_html"></span>
+            </em>
+          </h6-->
+        }
+      </div>
+    }
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

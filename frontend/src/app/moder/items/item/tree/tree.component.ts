@@ -1,0 +1,15 @@
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {RouterLink} from '@angular/router';
+import {APITreeItem, ItemParentType} from '@grpc/spec.pb';
+
+@Component({
+  selector: 'app-moder-items-item-tree',
+  imports: [RouterLink],
+  templateUrl: './tree.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ModerItemsItemTreeComponent {
+  readonly item = input.required<APITreeItem>();
+
+  protected readonly ItemParentType = ItemParentType;
+}

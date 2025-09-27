@@ -1,0 +1,6 @@
+@if (data$ | async; as data) {
+  <app-forums-topic-list [topics]="data.items || []" [showSubscribe]="true" (reload)="reload()" />
+  @if (data.paginator) {
+    <app-paginator [data]="data.paginator" />
+  }
+}

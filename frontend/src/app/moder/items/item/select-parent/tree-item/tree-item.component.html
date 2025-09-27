@@ -1,0 +1,68 @@
+@if (item$ | async; as item) {
+  @if (item.childsCount > 0) {
+    <div>
+      @if (open()) {
+        <i class="bi bi-folder2-open" aria-hidden="true"></i>
+      } @else {
+        <i class="bi bi-folder2" aria-hidden="true"></i>
+      }
+      @if (typeID() === ItemParentType.ITEM_TYPE_TUNING) {
+        <span i18n>Related</span>
+      } @else if (typeID() === ItemParentType.ITEM_TYPE_SPORT) {
+        <span i18n>Sport</span>
+      } @else if (typeID() === ItemParentType.ITEM_TYPE_DESIGN) {
+        <span i18n>Design</span>
+      }
+      <a href="#" class="toggle" (click)="toggle()">
+        <span [innerHTML]="item.nameHtml"></span>
+      </a>
+      @if (open()) {
+        <ul>
+          <li>
+            <a href="#" i18n (click)="onSelect(item.id)">here</a>
+          </li>
+          @if (childs$ | async; as childs) {
+            @for (child of childs; track child) {
+              <li class="car-node">
+                <app-moder-items-item-select-parent-tree
+                  [itemParent]="child"
+                  [disableItemID]="disableItemID()"
+                  [order]="ItemParentsRequest.Order.AUTO"
+                  (selected)="onSelect($event)"
+                />
+              </li>
+            }
+          } @else {
+            <li>
+              <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+  @if ((!item.childsCount || item.childsCount <= 0) && !isDisabled(item)) {
+    <span>
+      @if (typeID() === ItemParentType.ITEM_TYPE_TUNING) {
+        <span i18n>Related</span>
+      } @else if (typeID() === ItemParentType.ITEM_TYPE_SPORT) {
+        <span i18n>Sport</span>
+      } @else if (typeID() === ItemParentType.ITEM_TYPE_DESIGN) {
+        <span i18n>Design</span>
+      }
+      <a href="#" [innerHTML]="item.nameHtml" (click)="onSelect(item.id)"></a>
+    </span>
+  }
+  @if (isDisabled(item)) {
+    <span>
+      @if (typeID() === ItemParentType.ITEM_TYPE_TUNING) {
+        <span i18n>Related</span>
+      } @else if (typeID() === ItemParentType.ITEM_TYPE_SPORT) {
+        <span i18n>Sport</span>
+      } @else if (typeID() === ItemParentType.ITEM_TYPE_DESIGN) {
+        <span i18n>Design</span>
+      }
+      <span class="text-muted" [innerHTML]="item.nameHtml"></span>
+    </span>
+  }
+}

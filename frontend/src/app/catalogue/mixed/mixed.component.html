@@ -1,0 +1,39 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (brand$ | async; as brand) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/', brand.catname]" [innerHTML]="brand.nameHtml"></a>
+      </li>
+    }
+  </ol>
+</nav>
+
+@if (data$ | async; as data) {
+  <div class="page-header">
+    <h1>{{ data.title }}</h1>
+  </div>
+}
+
+@if (pictures$ | async; as pictures) {
+  @if (data$ | async; as data) {
+    @if (brand$ | async; as brand) {
+      @for (chunk of pictures.pictures; track chunk) {
+        <div class="row">
+          @for (picture of chunk; track picture) {
+            <div class="col-sm-3">
+              <app-thumbnail [picture]="picture" [route]="['/', brand.catname, data.catname, picture.identity]" />
+            </div>
+          }
+        </div>
+      }
+    }
+  }
+  @if (pictures.paginator) {
+    <app-paginator [data]="pictures.paginator" />
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

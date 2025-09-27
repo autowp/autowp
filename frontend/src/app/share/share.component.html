@@ -1,0 +1,68 @@
+<div class="share">
+  <a
+    rel="noopener"
+    target="_blank"
+    class="btn btn-sm bi bi-twitter"
+    aria-hidden="true"
+    title="Twitter"
+    [href]="buildURL('https://twitter.com/intent/tweet/?', {url: url(), text: text()})"
+  ></a>
+  <a
+    rel="noopener"
+    target="_blank"
+    class="btn btn-sm bi bi-google"
+    aria-hidden="true"
+    title="Google"
+    [href]="buildURL('https://plus.google.com/share?', {url: url()})"
+  ></a>
+  <a
+    rel="noopener"
+    target="_blank"
+    class="btn btn-sm bi bi-linkedin"
+    aria-hidden="true"
+    title="LinkedIn"
+    [href]="
+      buildURL('https://www.linkedin.com/shareArticle?', {mini: 'true', url: url(), title: text(), source: url()})
+    "
+  ></a>
+  <a
+    rel="noopener"
+    target="_blank"
+    class="btn btn-sm bi bi-reddit"
+    aria-hidden="true"
+    title="Reddit"
+    [href]="buildURL('https://reddit.com/submit/?', {url: url()})"
+  ></a>
+  <a
+    rel="noopener"
+    target="_blank"
+    class="btn btn-sm bi bi-pinterest"
+    aria-hidden="true"
+    title="Pinterest"
+    [href]="buildURL('https://pinterest.com/pin/create/button/?', {url: url(), media: url(), description: text()})"
+  ></a>
+  <a
+    rel="noopener"
+    target="_blank"
+    class="btn btn-sm bi bi-whatsapp"
+    aria-hidden="true"
+    title="Whatsapp"
+    [href]="buildURL('whatsapp://send?', {url: url(), text: text() + ' ' + url()})"
+  ></a>
+  <a
+    rel="noopener"
+    target="_blank"
+    class="btn btn-sm bi bi-telegram"
+    aria-hidden="true"
+    title="Telegram"
+    [href]="buildURL('https://telegram.me/share/url?', {text: text(), url: url()})"
+  ></a>
+  <a
+    rel="noopener"
+    target="_blank"
+    class="btn btn-sm bi bi-envelope-open"
+    aria-hidden="true"
+    title="E-mail"
+    [href]="buildURL('mailto:?', {subject: text(), body: url()})"
+  ></a>
+</div>

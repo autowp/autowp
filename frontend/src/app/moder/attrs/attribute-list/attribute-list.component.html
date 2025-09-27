@@ -1,0 +1,15 @@
+@if (attributes(); as attributes) {
+  @if (attributes.length > 0) {
+    <ul class="list-unstyled" style="padding-left: 24px">
+      @for (attribute of attributes; track attribute.id) {
+        <li>
+          <a
+            [routerLink]="['/moder/attrs/attribute', attribute.id]"
+            [textContent]="getAttrsTranslation(attribute.name)"
+          ></a>
+          <app-moder-attrs-attribute-list [attributes]="attribute.childs" />
+        </li>
+      }
+    </ul>
+  }
+}

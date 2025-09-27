@@ -1,0 +1,43 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Categories</h1>
+</div>
+
+@if (items$ | async; as chunks) {
+  @for (chunk of chunks; track chunk) {
+    <div class="row">
+      @for (category of chunk; track category.item.id) {
+        <div class="col-md-3">
+          <div class="card mb-4">
+            @if (category.picture$ | async; as picture) {
+              @if (picture.thumbMedium) {
+                <a [routerLink]="['/category', category.item.catname]">
+                  <img alt="" class="card-img-top" loading="lazy" [src]="picture.thumbMedium.src" />
+                </a>
+              }
+            }
+            <div class="card-body">
+              <h5 class="card-title">
+                <a [routerLink]="['/category', category.item.catname]" [innerHTML]="category.item.nameHtml"></a>
+              </h5>
+              @if (category.item.descendantsCount; as descendantsCount) {
+                <p i18n="@@n-vehicles">
+                  {descendantsCount, plural, one {{{descendantsCount}} vehicle} other {{{descendantsCount}} vehicles}}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

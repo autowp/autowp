@@ -1,0 +1,29 @@
+<input
+  type="text"
+  placeholder="Latitude"
+  i18n-placeholder
+  class="form-control"
+  [disabled]="disabled"
+  [(ngModel)]="lat"
+  (input)="coordsChanged()"
+/>
+<!--[class.is-invalid]="lat.invalid && (lat.dirty || lat.touched) || invalidParams && invalidParams.lat"-->
+<input
+  type="text"
+  placeholder="Longitude"
+  i18n-placeholder
+  class="form-control"
+  [disabled]="disabled"
+  [(ngModel)]="lng"
+  (input)="coordsChanged()"
+/>
+<!--[class.is-invalid]="lng.invalid && (lng.dirty || lng.touched) || invalidParams && invalidParams.lng" -->
+<div
+  style="width: 100%; height: 300px"
+  class="mb-4"
+  leaflet
+  [leafletCenter]="center"
+  [leafletOptions]="mapOptions"
+  [leafletLayers]="markers"
+  (leafletMapReady)="onMapReady($event)"
+></div>

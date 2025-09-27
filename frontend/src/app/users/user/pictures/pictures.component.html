@@ -1,0 +1,36 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (user$ | async; as user) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/users', user.identity]">{{ user.name }}</a>
+      </li>
+    }
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>User's pictures</h1>
+</div>
+
+@if (user$ | async; as user) {
+  <div class="brand-icons row">
+    @for (brand of brands$ | async; track brand.id) {
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        @if (icons$ | async; as icons) {
+          <a
+            [routerLink]="['/users', user.identity, 'pictures', brand.catname]"
+            [ngClass]="'brandicon brandicon-' + cssClass(brand)"
+            [ngStyle]="{'background-image': 'url(' + icons.image + ')'}"
+          ></a>
+        }
+        <h4 ngPreserveWhitespaces>
+          <a [routerLink]="['/users', user.identity, 'pictures', brand.catname]" [textContent]="brand.nameOnly"></a>
+          <small>({{ brand.descendantPicturesCount }})</small>
+        </h4>
+      </div>
+    }
+  </div>
+}

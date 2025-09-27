@@ -1,0 +1,98 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>New pictures</h1>
+</div>
+
+@if (data$ | async; as data) {
+  <div class="row mb-4">
+    <div class="col-lg-4 col-md-4">
+      @if (data.prev && data.prev.date) {
+        <h3 class="text-start">
+          &#x2190;
+          <a
+            [routerLink]="['/new', formatDate(data.prev.date)]"
+            [textContent]="data.prev.date | date: 'mediumDate'"
+          ></a>
+          <br />
+          <small
+            >(<span i18n="@@n-pictures">{data.prev.count, plural,
+              one {{{data.prev.count}} picture}
+              other {{{data.prev.count}} pictures}
+            }</span
+            >)</small
+          >
+        </h3>
+      }
+    </div>
+    <div class="col-lg-4 col-md-4">
+      @if (data.current) {
+        <h3 class="text-center">
+          <span [textContent]="data.current.date | date: 'mediumDate'"></span>
+          <br />
+          <small
+            >(<span i18n="@@n-pictures">{data.current.count, plural,
+              one {{{data.current.count}} picture}
+              other {{{data.current.count}} pictures}
+            }</span
+            >)</small
+          >
+        </h3>
+      }
+    </div>
+    <div class="col-lg-4 col-md-4">
+      @if (data.next && data.next.date) {
+        <h3 class="text-end">
+          <a
+            [routerLink]="['/new', formatDate(data.next.date)]"
+            [textContent]="data.next.date | date: 'mediumDate'"
+          ></a>
+          <br />
+          <small
+            >(<span i18n="@@n-pictures">{data.next.count, plural,
+              one {{{data.next.count}} picture}
+              other {{{data.next.count}} pictures}
+            }</span
+            >)</small
+          >
+          &#x2192;
+        </h3>
+      }
+    </div>
+  </div>
+  @for (group of data.groups; track group) {
+    @if (group) {
+      <div>
+        @if (group.type === 'item' && group.item && group.pictures) {
+          <app-new-list-item
+            [item]="group.item"
+            [pictures]="group.pictures"
+            [totalPictures]="group.totalPictures || 0"
+            [date]="(date$ | async) || ''"
+          />
+        } @else {
+          @for (chunk of group.chunks; track chunk) {
+            <div class="row">
+              @for (picture of chunk; track picture) {
+                <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                  <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" />
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+  }
+  @if (data.paginator) {
+    <app-paginator [data]="data.paginator" />
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

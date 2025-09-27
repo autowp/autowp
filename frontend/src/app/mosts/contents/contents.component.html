@@ -1,0 +1,154 @@
+@if (ratingCatnameNormalized$ | async; as ratingCatname) {
+  <h1 class="mb-4 mosts-header" ngPreserveWhitespaces>
+    <span i18n>Most</span>
+    @if (ratings$ | async; as ratings) {
+      <div class="d-inline-block" ngbDropdown>
+        <a href="#" ngbDropdownToggle (click)="(false)">
+          @for (rating of ratings; track rating) {
+            @if (rating.catname === ratingCatname) {
+              <span [textContent]="getMostsRatingsTranslation(rating.name)"> </span>
+            }
+          }
+          <i class="bi bi-caret-down" aria-hidden="true"></i>
+        </a>
+        <div ngbDropdownMenu style="max-height: 200px; overflow-x: hidden">
+          @for (rating of ratings; track rating) {
+            <a
+              class="dropdown-item"
+              [class.active]="rating.catname === ratingCatname"
+              [routerLink]="prefix().concat([rating.catname])"
+              [textContent]="getMostsRatingsTranslation(rating.name)"
+            >
+            </a>
+          }
+        </div>
+      </div>
+    }
+    <span i18n>among</span>
+    @if (vehicleTypes$ | async; as vehicleTypes) {
+      <div class="d-inline-block" ngbDropdown>
+        <a href="#" ngbDropdownToggle (click)="(false)">
+          @if (typeCatname$ | async; as typeCatname) {
+            @for (type of vehicleTypes; track type) {
+              @if (type.catname === typeCatname) {
+                <span [textContent]="type.nameTranslated"></span>
+              }
+            }
+          } @else {
+            <span i18n>Vehicle</span>
+          }
+          <i class="bi bi-caret-down" aria-hidden="true"></i>
+        </a>
+        <div ngbDropdownMenu style="max-height: 200px; overflow-x: hidden">
+          @for (type of vehicleTypes; track type) {
+            <a
+              class="dropdown-item"
+              [class.active]="type.catname === (typeCatname$ | async)"
+              [routerLink]="prefix().concat([ratingCatname, type.catname])"
+              [textContent]="type.nameTranslated"
+            ></a>
+          }
+        </div>
+      </div>
+    }
+
+    @let yearsCatname = yearsCatname$ | async;
+
+    @if (years$ | async; as years) {
+      <div class="d-inline-block" ngbDropdown>
+        <a href="#" ngbDropdownToggle (click)="(false)">
+          @for (year of years; track year) {
+            @if (year.catname ? year.catname === yearsCatname : !yearsCatname) {
+              <span [textContent]="getMostsPeriodsTranslation(year.name)"></span>
+            }
+          }
+          <i class="bi bi-caret-down" aria-hidden="true"></i>
+        </a>
+        @if (defaultTypeCatname$ | async; as defaultTypeCatname) {
+          <div ngbDropdownMenu style="max-height: 200px; overflow-x: hidden">
+            @if (typeCatname$ | async; as typeCatname) {
+              @for (year of years; track year) {
+                <a
+                  class="dropdown-item"
+                  [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
+                  [routerLink]="prefix().concat([ratingCatname, typeCatname, year.catname ? year.catname : ''])"
+                  [textContent]="getMostsPeriodsTranslation(year.name)"
+                >
+                </a>
+              }
+            } @else {
+              @for (year of years; track year) {
+                <a
+                  class="dropdown-item"
+                  [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
+                  [routerLink]="prefix().concat([ratingCatname, defaultTypeCatname, year.catname ? year.catname : ''])"
+                  [textContent]="getMostsPeriodsTranslation(year.name)"
+                >
+                </a>
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+  </h1>
+  @if (items$ | async; as items) {
+    @for (item of items; track item; let first = $first) {
+      <div class="row">
+        <div class="col-md-9">
+          <h3 [innerHTML]="item.item?.nameHtml"></h3>
+        </div>
+        <div class="col-md-3">
+          @if (first) {
+            <h3 [textContent]="getMostsRatingParamsTranslation('most/' + ratingCatname + '/param')"></h3>
+          }
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-md-9">
+          <div class="row">
+            @for (picture of item.item?.previewPictures?.pictures || []; track picture) {
+              <div class="col-md-4">
+                @if (picture.picture; as pic) {
+                  <a class="rounded d-block mb-4" [routerLink]="item.item?.route">
+                    @if (pic.thumbMedium) {
+                      <img
+                        class="rounded w-100 border border-light"
+                        loading="lazy"
+                        [src]="pic.thumbMedium.src"
+                        [alt]="pic.nameText"
+                        [title]="pic.nameText"
+                      />
+                    }
+                  </a>
+                } @else {
+                  <span>&#xa0;</span>
+                }
+              </div>
+            }
+          </div>
+          @if (item.item?.description) {
+            <app-markdown [markdown]="item.item?.description || null" />
+          }
+        </div>
+        <div class="col-md-3">
+          <h3 ngPreserveWhitespaces>
+            @if (item.valueHtml) {
+              <span [innerHTML]="item.valueHtml"></span>
+            }
+            @if (item.unitId && item.unitId !== '0') {
+              <small
+                class="unit"
+                placement="top"
+                [textContent]="getUnitAbbrTranslation(item.unitId)"
+                [ngbTooltip]="getUnitNameTranslation(item.unitId)"
+              ></small>
+            }
+          </h3>
+        </div>
+      </div>
+    }
+  } @else {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  }
+}

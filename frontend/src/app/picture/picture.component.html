@@ -1,0 +1,496 @@
+@if (picture$ | async; as picture) {
+  <div class="page-header">
+    @if (h2()) {
+      <h2>
+        <span [innerHTML]="picture.nameHtml"></span>
+        @if (pictureItems$ | async; as items) {
+          @if (items.length === 1 && items[0].item?.design) {
+            @if (items[0].item?.design; as design) {
+              <sup class="design-brand">
+                <ng-container i18n>designed by</ng-container>
+                <a [routerLink]="design.route" [textContent]="design.name"></a>
+              </sup>
+            }
+          }
+        }
+      </h2>
+    } @else {
+      <h1>
+        <span [innerHTML]="picture.nameHtml"></span>
+        @if (pictureItems$ | async; as items) {
+          @if (items.length === 1 && items[0].item?.design) {
+            @if (items[0].item?.design; as design) {
+              <sup class="design-brand">
+                <ng-container i18n>designed by</ng-container>
+                <a [routerLink]="design.route" [textContent]="design.name"></a>
+              </sup>
+            }
+          }
+        }
+      </h1>
+    }
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      @if (picture.previewLarge) {
+        <div class="picture-preview-medium">
+          <span
+            tabindex="0"
+            class="d-block rounded mb-4"
+            style="cursor: pointer"
+            (auxclick)="openSource(picture)"
+            (click)="openGallery(picture, $event)"
+            (keyup.enter)="openGallery(picture, $event)"
+          >
+            <img alt="" class="rounded border border-light w-100" loading="lazy" [src]="picture.previewLarge.src" />
+          </span>
+          @if (pictureItems$ | async; as pictureItems) {
+            @if (pictureItems.length === 1) {
+              @if (pictureItems[0].item; as item) {
+                @if (item.altNames && item.altNames.length > 0) {
+                  <div class="languages">
+                    <p i18n>In other languages</p>
+                    <ul class="list-unstyled">
+                      @for (altName of item.altNames; track altName.name) {
+                        <li>
+                          @for (code of altName.languages; track code) {
+                            <sup class="text-uppercase">{{ code }}</sup>
+                          }
+                          {{ altName.name }}
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              }
+            }
+          }
+        </div>
+      }
+      <div class="row">
+        <div class="col-6">
+          @if (picture.votes; as votes) {
+            <div class="picture-vote">
+              @if (authenticated$ | async) {
+                <button type="button" class="btn btn-link position-relative p-0 me-2" (click)="vote(picture, 1)">
+                  <i
+                    class="bi fs-1 vote-up"
+                    aria-hidden="true"
+                    [class.bi-hand-thumbs-up-fill]="votes.value > 0"
+                    [class.bi-hand-thumbs-up]="votes.value <= 0"
+                  ></i>
+                  @if (votes.positive > 0) {
+                    <span
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-success"
+                      >{{ votes.positive }}</span
+                    >
+                  }
+                </button>
+              } @else {
+                <button type="button" class="btn btn-link position-relative p-0 me-2" disabled>
+                  <i class="bi fs-1 bi-hand-thumbs-up" aria-hidden="true"></i>
+                  @if (votes.positive > 0) {
+                    <span
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-success"
+                      >{{ votes.positive }}</span
+                    >
+                  }
+                </button>
+              }
+              @if (authenticated$ | async) {
+                <button type="button" class="btn btn-link position-relative p-0" (click)="vote(picture, -1)">
+                  <i
+                    class="bi fs-1 vote-down"
+                    aria-hidden="true"
+                    [class.bi-hand-thumbs-down-fill]="votes.value < 0"
+                    [class.bi-hand-thumbs-down]="votes.value >= 0"
+                  ></i>
+                  @if (votes.negative > 0) {
+                    <span
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger"
+                      >{{ votes.negative }}</span
+                    >
+                  }
+                </button>
+              } @else {
+                <button type="button" class="btn btn-link position-relative p-0" disabled>
+                  <i class="bi fs-1 bi-hand-thumbs-down" aria-hidden="true"></i>
+                  @if (votes.negative > 0) {
+                    <span
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger"
+                      >{{ votes.negative }}</span
+                    >
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <div class="col-6 text-end">
+          @if (authenticated$ | async) {
+            @if (!picture.subscribed) {
+              <button
+                type="button"
+                class="btn btn-link p-0"
+                i18n-title
+                title="Subscribe to new replies notifications"
+                (click)="setSubscribed(picture, true)"
+              >
+                <i class="bi bi-envelope-open fs-1" aria-hidden="true"></i>
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="btn btn-link p-0"
+                i18n-title
+                title="Unsubscribe from notifications"
+                (click)="setSubscribed(picture, false)"
+              >
+                <i class="bi bi-envelope fs-1" aria-hidden="true"></i>
+              </button>
+            }
+          }
+          <button
+            type="button"
+            class="btn btn-link p-0 btn-share-dialog"
+            aria-hidden="true"
+            title="Share …"
+            i18n-title
+            (click)="toggleShareDialog()"
+          >
+            <i class="bi bi-share-fill fs-1" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      @if (showShareDialog()) {
+        <app-share [url]="location.href" [text]="picture.nameText" />
+      }
+      @if (pictureItems$ | async; as items) {
+        @for (item of items; track item.itemId) {
+          @if (item.type === PictureItemType.PICTURE_ITEM_AUTHOR) {
+            <p>
+              <ng-container i18n>Author:</ng-container>
+              <a [routerLink]="['/persons', item.item?.id]" [innerHTML]="item.item?.nameHtml"></a>
+            </p>
+          }
+        }
+      }
+      @if (picture.copyrights) {
+        <div>
+          <app-markdown [markdown]="picture.copyrights" />
+        </div>
+      }
+      @if (pictureItems$ | async; as pictureItems) {
+        @for (pictureItem of pictureItems; track pictureItem.itemId) {
+          @if (pictureItem.item; as item) {
+            @if (pictureItem.type === PictureItemType.PICTURE_ITEM_COPYRIGHTS && item.description) {
+              <app-markdown [markdown]="item.description" />
+            }
+          }
+        }
+      }
+      @for (pictureItem of contentItems$ | async; track pictureItem.itemId) {
+        @if (pictureItem.item; as item) {
+          @if (item.description) {
+            <app-markdown style="margin-bottom: 10px" [markdown]="item.description" />
+          }
+          @if (item.hasText && item.route) {
+            <p>
+              <i class="bi bi-text-left" aria-hidden="true"></i>
+              <a i18n [routerLink]="item.route">details</a>
+            </p>
+          }
+        }
+      }
+      @if (picture.replaceable) {
+        <p>
+          <ng-container i18n>Picture suggested to replace</ng-container>
+          <a [routerLink]="['/picture', picture.replaceable.identity]" [innerHTML]="picture.replaceable.nameHtml"></a>
+        </p>
+      }
+    </div>
+    <div class="col-md-6">
+      <p i18n>Image specifications:</p>
+      <ul>
+        <li>
+          <ng-container i18n>Resolution</ng-container>: <strong>{{ picture.width + '×' + picture.height }}</strong>
+          @if (picture.dpiX || picture.dpiY) {
+            &#64; <strong>{{ picture.dpiX + '×' + picture.dpiY }}</strong>
+            <a href="https://en.wikipedia.org/wiki/Dots_per_inch"><abbr title="Dots Per Inch">DPI</abbr></a>
+            @if (picture.dpiX > 0 && picture.dpiY > 0) {
+              {{ (2.54 * picture.width) / picture.dpiX | number: '1.2-2' }}×{{
+                (2.54 * picture.height) / picture.dpiY | number: '1.2-2'
+              }}cm
+            }
+          }
+        </li>
+        @if (picture.image && picture.image.filesize) {
+          <li>
+            <ng-container i18n>Filesize</ng-container>: <strong>{{ picture.image.filesize | bytes: 2 }}</strong>
+          </li>
+        }
+        @if (owner$ | async; as owner) {
+          <li>
+            <ng-container i18n>Added by:</ng-container>
+            <app-user [user]="owner" />,
+            @if (picture.addDate?.toDate(); as date) {
+              <span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span>
+            }
+          </li>
+        }
+        @if (takenDate$ | async; as takenDate) {
+          <li><ng-container i18n>Date taken:</ng-container> {{ takenDate.date | date: takenDate.format }}</li>
+        }
+        @if (osmURL(); as osmURL) {
+          <li>
+            <span class="bi bi-pin-map" aria-hidden="true"></span>
+            <a i18n="@@picture/location" [href]="osmURL">Coordinates</a>
+          </li>
+        }
+        <li>
+          <ng-container i18n>Picture status:</ng-container>
+          @if (picture.status === PictureStatus.PICTURE_STATUS_INBOX) {
+            <ng-container i18n>Undecided</ng-container>
+          } @else if (picture.status === PictureStatus.PICTURE_STATUS_ACCEPTED) {
+            <ng-container i18n>Accepted</ng-container>
+          } @else if (picture.status === PictureStatus.PICTURE_STATUS_REMOVING) {
+            <span class="text-danger" i18n>Removing</span>
+          }
+        </li>
+      </ul>
+      <app-markdown
+        i18n-markdown
+        markdown="All images have their owners.
+
+  If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
+
+  Discuss anything and just talk about cars and not only can you on [the forum](/forums/)."
+      />
+      <ul class="unstyled">
+        @for (link of links$ | async; track link) {
+          <li>
+            <a target="_blank" [href]="link.url"><i class="bi bi-globe" aria-hidden="true"></i> {{ link.name }}</a>
+          </li>
+        }
+        @for (category of categories$ | async; track category.id) {
+          <li>
+            <a [routerLink]="['/category', category.catname]">
+              <i class="bi bi-tag-fill" aria-hidden="true"></i> <span [innerHTML]="category.nameHtml"></span>
+            </a>
+          </li>
+        }
+        @for (group of twins$ | async; track group.id) {
+          <li>
+            <a [routerLink]="['/twins/group', group.id]">
+              <i class="bi bi-circle-half" aria-hidden="true"></i> <span [innerHTML]="group.nameHtml"></span>
+            </a>
+          </li>
+        }
+        @for (factory of factories$ | async; track factory.id) {
+          <li>
+            <a [routerLink]="['/factories', factory.id]">
+              <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>
+              <span [innerHTML]="factory.nameHtml"></span>
+            </a>
+          </li>
+        }
+        @if (canEditSpecs$ | async; as canEditSpecs) {
+          @if (pictureItems$ | async; as pictureItems) {
+            @for (pictureItem of pictureItems; track pictureItem.itemId) {
+              @if (pictureItem.item; as item) {
+                @if (
+                  canEditSpecs &&
+                  (item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY ||
+                    item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE ||
+                    item.itemTypeId === ItemType.ITEM_TYPE_ENGINE ||
+                    item.itemTypeId === ItemType.ITEM_TYPE_TWINS)
+                ) {
+                  <li>
+                    <a [routerLink]="['/cars/specifications-editor']" [queryParams]="{item_id: pictureItem.itemId}"
+                      ><i class="bi bi-pencil-fill" aria-hidden="true"></i>
+                      <ng-container i18n>edit specs</ng-container></a
+                    >
+                  </li>
+                }
+                @if (item.hasSpecs && item.specsRoute) {
+                  <li>
+                    <a [routerLink]="item.specsRoute">
+                      <i class="bi bi-card-list" aria-hidden="true"></i>
+                      <span i18n>Specifications of</span>
+                      <span [innerHTML]="item.nameHtml"></span>
+                    </a>
+                  </li>
+                }
+                @if (item.design; as design) {
+                  <li>
+                    <a [routerLink]="design.route"><ng-container i18n>designed by</ng-container> {{ design.name }}</a>
+                  </li>
+                }
+              }
+            }
+          }
+        }
+        @if (authenticated$ | async) {
+          @if (contentItems$ | async; as items) {
+            @if (items.length > 1) {
+              <li ngbDropdown>
+                <button type="button" ngbDropdownToggle class="btn btn-link" style="padding: 0">
+                  <ng-container i18n>Add picture</ng-container>
+                  <span class="caret" aria-hidden="true"></span>
+                </button>
+                <div ngbDropdownMenu>
+                  @for (item of items; track item.itemId) {
+                    <a class="dropdown-item" routerLink="/upload" [queryParams]="{item_id: item.itemId}">
+                      <i class="bi bi-upload" aria-hidden="true"></i>
+                      <ng-container i18n>Add picture</ng-container>
+                      <span [innerHTML]="item.item?.nameHtml"></span>
+                    </a>
+                  }
+                </div>
+              </li>
+            } @else if (items.length === 1) {
+              @for (item of items; track item.itemId) {
+                <li>
+                  <a routerLink="/upload" [queryParams]="{item_id: item.itemId}">
+                    <i class="bi bi-upload" aria-hidden="true"></i>
+                    <ng-container i18n>Add picture</ng-container>
+                    <span [innerHTML]="item.item?.nameHtml"></span>
+                  </a>
+                </li>
+              }
+            }
+          }
+        }
+        @if (authenticated$ | async) {
+          @if (pictureItems$ | async; as pictureItems) {
+            @if (pictureItems.length > 0) {
+              <li>
+                <a routerLink="/upload" [queryParams]="{replace: picture.id}">
+                  <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                  <ng-container i18n="@@picture/propose-image-replacement">Propose image replacement</ng-container>
+                </a>
+              </li>
+            }
+          }
+        }
+      </ul>
+      @if (picture.paginator) {
+        <app-picture-paginator [paginator]="picture.paginator" [prefix]="prefix()" />
+      }
+    </div>
+  </div>
+  @if (moderVotes$ | async; as votes) {
+    @if (votes.length > 0) {
+      <div>
+        <p i18n>Moderators about this picture:</p>
+        <ul class="list-unstyled">
+          @for (moderVote of votes; track moderVote) {
+            <li>
+              @if (moderVote.vote) {
+                <span>
+                  <i style="color: green" class="bi bi-hand-thumbs-up-fill" aria-hidden="true"></i>
+                  @if (moderVote.user$ | async; as user) {
+                    <app-user [user]="user" />
+                  }
+                  <span style="color: green">{{ moderVote.reason }}</span>
+                </span>
+              }
+              @if (!moderVote.vote) {
+                <span>
+                  <i style="color: red" class="bi bi-hand-thumbs-down-fill" aria-hidden="true"></i>
+                  @if (moderVote.user$ | async; as user) {
+                    <app-user [user]="user" />
+                  }
+                  <span style="color: red">{{ moderVote.reason }}</span>
+                </span>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  }
+  @if ((isModer$ | async) && picture) {
+    <div>
+      <h3><a routerLink="/moder" i18n>Moderator page</a></h3>
+      <div class="card card-body mb-4">
+        <div class="row">
+          @if (picture.rights) {
+            <div class="col-md-4">
+              @if (picture.status === PictureStatus.PICTURE_STATUS_INBOX) {
+                <div>
+                  @if (picture.rights.accept) {
+                    <button type="button" class="btn btn-success" i18n (click)="acceptPicture(picture)">Accept</button>
+                  }
+                  @if (picture.rights.delete) {
+                    <button type="button" class="btn btn-danger" i18n (click)="deletePicture(picture)">Delete</button>
+                  }
+                </div>
+              } @else if (picture.status === PictureStatus.PICTURE_STATUS_ACCEPTED) {
+                <div>
+                  @if (picture.rights.unaccept) {
+                    <button type="button" class="btn btn-warning" i18n (click)="unacceptPicture(picture)">
+                      Unaccept
+                    </button>
+                  }
+                </div>
+              } @else if (picture.status === PictureStatus.PICTURE_STATUS_REMOVING) {
+                <div>
+                  @if (picture.rights.restore) {
+                    <button type="button" class="btn btn-warning" i18n (click)="restorePicture(picture)">
+                      Restore
+                    </button>
+                  }
+                </div>
+              }
+              <app-picture-moder-vote [picture]="picture" (changed)="pictureVoted()" />
+              @if (statusLoading()) {
+                <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+              }
+            </div>
+          }
+          @if (contentItems$ | async; as items) {
+            @if (items.length > 0) {
+              <div class="col-md-4">
+                <div class="d-block" i18n>Perspective</div>
+                @for (item of items; track item.itemId) {
+                  <div>
+                    <span [innerHTML]="item.item?.nameHtml"></span>
+                    <app-moder-pictures-perspective-picker
+                      [perspectiveID]="item.perspectiveId"
+                      (perspectiveChanged)="savePerspective($event, item)"
+                    />
+                  </div>
+                }
+              </div>
+            }
+          }
+          <div class="col-md-4">
+            <p>
+              <i class="bi bi-gear-fill" aria-hidden="true"></i>
+              <a i18n [routerLink]="['/moder/pictures', picture.id]">Edit picture №{{ picture.id }}</a>
+            </p>
+            @if (pictureItems$ | async; as items) {
+              @for (item of items; track item.itemId) {
+                <p>
+                  <i class="bi bi-gear-fill" aria-hidden="true"></i>
+                  <a [routerLink]="['/moder/items/item', item.itemId]">
+                    <ng-container i18n>Edit item</ng-container> <span [innerHTML]="item.item?.nameHtml"></span>
+                  </a>
+                </p>
+              }
+              @for (brand of brands$ | async; track brand.id) {
+                <p>
+                  <i class="bi bi-gear-fill" aria-hidden="true"></i>
+                  <a [routerLink]="['/moder/items/item', brand.id]">
+                    <ng-container i18n>Edit item</ng-container> <span [innerHTML]="brand.nameHtml"></span>
+                  </a>
+                </p>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}

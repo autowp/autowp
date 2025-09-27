@@ -1,0 +1,15 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Specs</h1>
+</div>
+
+@for (row of specs$ | async; track row) {
+  <app-info-spec-row [row]="row" [deep]="0" />
+}

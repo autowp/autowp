@@ -1,0 +1,152 @@
+@if (item$ | async; as item) {
+  @if (form$ | async; as form) {
+    <form class="spec-editor-form" (submit)="saveSpecs(item, form)">
+      <table class="table table-condensed">
+        <caption i18n>
+          Attributes
+        </caption>
+        <thead>
+          <tr>
+            <th i18n scope="col">Parameter</th>
+            <th i18n scope="col">Your value</th>
+            <th i18n scope="col">Current value</th>
+            <th i18n scope="col">All values</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (control of form.controls; track control) {
+            <tr [class.subform-header]="!!control.attr.childs.length">
+              @if (control.attr.childs.length > 0) {
+                <td colspan="4" [ngStyle]="{'padding-left': control.attr.deep * 20 + 'px'}">
+                  <h4>{{ control.attr.name }}</h4>
+                </td>
+              } @else {
+                <td>
+                  <div [ngStyle]="{'padding-left': control.attr.deep * 20 + 'px'}">{{ control.attr.name }}</div>
+                </td>
+                <td>
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <button
+                        type="button"
+                        class="btn btn-secondary btn-sm"
+                        ngbTooltip="not applicable"
+                        i18n-ngbTooltip
+                        (click)="control.disabled ? control.enable() : control.disable()"
+                      >
+                        <span class="bi bi-trash" aria-hidden="true"></span>
+                      </button>
+                    </div>
+                    @if (
+                      control.attr.typeId === AttrAttributeTypeId.LIST ||
+                      control.attr.typeId === AttrAttributeTypeId.TREE
+                    ) {
+                      <select
+                        class="form-select form-select-sm"
+                        [formControl]="control"
+                        [multiple]="control.attr.isMultiple"
+                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
+                      >
+                        @for (option of control.attr.options$ | async; track option.id) {
+                          <option [ngValue]="option.id">{{ option.name }}</option>
+                        }
+                      </select>
+                    } @else if (control.attr.typeId === AttrAttributeTypeId.BOOLEAN) {
+                      <select
+                        class="form-select form-select-sm"
+                        [formControl]="control"
+                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
+                      >
+                        @for (option of control.attr.options$ | async; track option.id) {
+                          <option [ngValue]="option.id">{{ option.name }}</option>
+                        }
+                      </select>
+                    } @else if (control.attr.typeId === AttrAttributeTypeId.INTEGER) {
+                      <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        min="-2147483649"
+                        max="2147483648"
+                        [formControl]="control"
+                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
+                      />
+                    } @else if (control.attr.typeId === AttrAttributeTypeId.FLOAT) {
+                      <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        min="-2147483649"
+                        max="2147483648"
+                        [formControl]="control"
+                        [step]="control.attr.step"
+                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
+                      />
+                    } @else if (control.attr.typeId === AttrAttributeTypeId.STRING) {
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        [formControl]="control"
+                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
+                      />
+                    }
+                    @if (control.attr.unitId !== '0') {
+                      <span class="unit input-group-text" [title]="control.attr.unitName">{{
+                        control.attr.unitAbbr
+                      }}</span>
+                    }
+                  </div>
+                  @if (control.attr.description) {
+                    <small>{{ control.attr.description }}</small>
+                  }
+                </td>
+                <td class="actual">
+                  @if (values$ | async; as values) {
+                    @if (values.get(control.attr.id); as value) {
+                      <div>
+                        @if (value.value?.isEmpty) {
+                          <em i18n>none</em>
+                        } @else {
+                          <span>
+                            {{ value.valueText }}
+                            @if (control.attr.unitId !== '0') {
+                              <span class="unit" [title]="control.attr.unitName">{{ control.attr.unitAbbr }}</span>
+                            }
+                          </span>
+                        }
+                      </div>
+                    }
+                  }
+                </td>
+                <td>
+                  @if (userValues$ | async; as userValues) {
+                    @for (value of userValues.get(control.attr.id); track value) {
+                      <div>
+                        @if (value.userValue.value?.isEmpty) {
+                          <em i18n>none</em>
+                        } @else {
+                          <span [textContent]="value.userValue.valueText"></span>
+                        }
+                        @if (value.user$ | async; as user) {
+                          <app-user [user]="user" />
+                        }
+                        @if (value.userValue.updateDate?.toDate(); as date) {
+                          <span class="date"
+                            >[<span [textContent]="date | timeAgo" [ngbTooltip]="date | date: 'medium'"></span>]</span
+                          >
+                        }
+                      </div>
+                    }
+                  }
+                </td>
+              }
+            </tr>
+          }
+          <tr>
+            <td>
+              <button type="submit" class="btn btn-success" i18n>Save</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  }
+}

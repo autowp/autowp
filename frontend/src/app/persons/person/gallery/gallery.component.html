@@ -1,0 +1,11 @@
+@if (itemID$ | async; as itemID) {
+  @if (identity$ | async; as identity) {
+    <app-gallery
+      [filter]="{exactItemID: itemID, exactItemLinkType: 1}"
+      [current]="identity"
+      [galleryPrefix]="['/persons', itemID, 'gallery']"
+      [picturePrefix]="['/persons', itemID]"
+      (pictureSelected)="pictureSelected($event)"
+    />
+  }
+}

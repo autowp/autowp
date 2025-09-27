@@ -1,0 +1,66 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (item$ | async; as item) {
+      <li class="breadcrumb-item">
+        <a routerLink="/" i18n>Specs editor of {{ item.nameText }}</a>
+      </li>
+    }
+  </ol>
+</nav>
+
+@if (item$ | async) {
+  <div class="page-header">
+    <h1 i18n>Select</h1>
+  </div>
+}
+
+@if (brandID$ | async) {
+  @if (items$ | async; as items) {
+    @for (item of items; track item.itemId) {
+      <div>
+        @if (itemID$ | async; as itemID) {
+          <app-cars-select-engine-tree-item [item]="item" (selected)="selectEngine(itemID, $event)" />
+        }
+      </div>
+    }
+  } @else {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  }
+} @else {
+  <div class="mb-3">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Type to search …"
+      i18n-placeholder
+      [(ngModel)]="search"
+      (input)="onInput()"
+    />
+  </div>
+
+  @if (brands$ | async; as brands) {
+    <div class="row">
+      @for (chunk of brands.items; track chunk) {
+        <div class="col-md-2">
+          @for (brand of chunk; track brand.id) {
+            <a
+              routerLink="/cars/select-engine"
+              [queryParams]="{item_id: itemID$ | async, brand_id: brand.id}"
+              [textContent]="brand.nameOnly"
+            ></a>
+            <br />
+          }
+        </div>
+      }
+    </div>
+
+    @if (brands.paginator) {
+      <app-paginator [data]="brands.paginator" />
+    }
+  } @else {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  }
+}

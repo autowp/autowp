@@ -1,0 +1,23 @@
+<div class="card card-body">
+  @if (brands$ | async; as brands) {
+    <ul class="nav flex-column nav-pills">
+      @for (item of brands.items; track item) {
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/twins', item.catname]" [class.active]="active(item)">
+            {{ item.name }}
+            @if (item.newCount <= 0) {
+              <span class="count">({{ item.count }})</span>
+            } @else {
+              <span class="count"
+                >({{ item.count - item.newCount }}+<span>{{ item.newCount }}</span
+                >)</span
+              >
+            }
+          </a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  }
+</div>

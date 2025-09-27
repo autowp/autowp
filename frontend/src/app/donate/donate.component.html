@@ -1,0 +1,81 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Donate</h1>
+</div>
+
+<app-markdown
+  i18n-markdown
+  markdown="Despite the fact that we always try to work as non-commercial project, it is absolutely impossible to support encyclopedia without money.
+
+Support and site development requires a permanent costs.
+
+If you want to help to our everyday work, you can send us some money through PayPal or Yandex.Money.
+
+With a money donation you can send us your vision about the future of the encyclopedia and the way it must move and we'll be much more obligated and grateful for your words.
+
+We do not collect information about our donators, however, if you wish, we can mark your contribution.
+
+In addition, we can offer in return to [choose the next vehicle of the day](/donate/vod)"
+/>
+<br />
+
+<div class="row">
+  <div class="col-6 mb-3">
+    <p class="text-center">
+      <i class="bi bi-paypal fs-1" aria-hidden="true"></i>
+    </p>
+
+    @if (language === 'ru') {
+      <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="text-center" ngNoForm>
+        <input type="hidden" name="cmd" value="_s-xclick" />
+        <input type="hidden" name="hosted_button_id" value="JND8ZMAHY63VQ" />
+        <input
+          type="image"
+          src="https://www.paypalobjects.com/ru_RU/RU/i/btn/btn_donateCC_LG.gif"
+          name="submit"
+          alt="PayPal"
+        />
+        <img alt="" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+      </form>
+    } @else if (language === 'fr') {
+      <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="text-center" ngNoForm>
+        <input type="hidden" name="cmd" value="_s-xclick" />
+        <input type="hidden" name="hosted_button_id" value="JND8ZMAHY63VQ" />
+        <input
+          type="image"
+          src="https://www.paypalobjects.com/fr_FR/FR/i/btn/btn_donateCC_LG.gif"
+          name="submit"
+          alt="PayPal"
+        />
+        <img alt="" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+      </form>
+    } @else {
+      <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="text-center" ngNoForm>
+        <input type="hidden" name="cmd" value="_s-xclick" />
+        <input type="hidden" name="hosted_button_id" value="JND8ZMAHY63VQ" />
+        <input
+          type="image"
+          src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif"
+          name="submit"
+          alt="PayPal"
+        />
+        <img alt="" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+      </form>
+    }
+  </div>
+  <div class="col-6 mb-3">
+    <p class="boosty">
+      <ng-container i18n>Donate with</ng-container>
+      <a href="https://boosty.to/autowp/donate"><img src="assets/boosty.svg" alt="Boosty" /></a>
+    </p>
+  </div>
+</div>
+
+<iframe width="100%" height="318" title="YooMoney" [src]="frameUrl"></iframe>

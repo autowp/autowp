@@ -1,0 +1,29 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Persons</h1>
+</div>
+
+<ul class="nav nav-pills mb-4">
+  <li class="nav-item">
+    <a class="nav-link" routerLink="/persons" i18n [class.active]="(authors$ | async) === false">Persons on photo</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" routerLink="/persons/authors" i18n [class.active]="authors$ | async">Authors</a>
+  </li>
+</ul>
+
+@if (data$ | async; as data) {
+  @for (item of data.items; track item.id) {
+    <app-catalogue-list-item [item]="item" />
+  }
+  @if (data.paginator) {
+    <app-paginator [data]="data.paginator" />
+  }
+}

@@ -1,0 +1,57 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder/items" i18n>Items</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Alphabetical vehicles list</h1>
+</div>
+
+<div class="card card-body">
+  @if (groups$ | async; as groups) {
+    @let char = char$ | async;
+    @for (group of [groups.latin, groups.cyrillic, groups.han, groups.numbers, groups.other]; track group) {
+      <div class="btn-group">
+        @for (c of group; track c) {
+          <a
+            class="btn btn-secondary"
+            routerLink="."
+            [class.active]="c === char"
+            [textContent]="c"
+            [queryParams]="{char: c, page: null}"
+          ></a>
+        }
+      </div>
+    }
+  } @else {
+    <span>
+      <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+    </span>
+  }
+</div>
+
+@if (items$ | async; as items) {
+  <div class="card card-body">
+    @for (item of items.items; track item) {
+      <div>
+        <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
+      </div>
+    }
+    @if (items.paginator) {
+      <app-paginator [data]="items.paginator" />
+    }
+  </div>
+} @else {
+  <span>
+    <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+  </span>
+}

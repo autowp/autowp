@@ -1,0 +1,39 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (brand$ | async; as brand) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/', brand.catname]" [innerHTML]="brand.nameHtml"></a>
+      </li>
+    }
+    @if (breadcrumbs$ | async; as breadcrumbs) {
+      @for (node of breadcrumbs; track node) {
+        <li class="breadcrumb-item">
+          <a [routerLink]="node.routerLink" [innerHTML]="node.html"></a>
+        </li>
+      }
+    }
+    @if (picturesRouterLink$ | async; as picturesRouterLink) {
+      <li class="breadcrumb-item">
+        <a i18n [routerLink]="picturesRouterLink">All pictures</a>
+      </li>
+    }
+  </ol>
+</nav>
+
+@if (picture$ | async; as picture) {
+  <app-picture
+    [picture]="picture"
+    [prefix]="(picturesRouterLink$ | async) || []"
+    [galleryRoute]="(galleryPictureRouterLink$ | async) || []"
+    (changed)="reloadPicture()"
+  />
+
+  <div id="comments">
+    <app-comments [typeID]="CommentsType.PICTURES_TYPE_ID" [itemID]="picture.id" [limit]="null" />
+  </div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

@@ -1,0 +1,74 @@
+@if (current$ | async; as current) {
+  @if (current.description && current.description.length > 0) {
+    <app-markdown [markdown]="current.description" />
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (itemParents$ | async; as itemParents) {
+  @for (itemParent of itemParents.items; track itemParent) {
+    @if (itemParent.item.item) {
+      <app-categories-list-item [item]="itemParent.item.item" [parentRouterLink]="itemParent.parentRouterLink" />
+    }
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (item$ | async; as item) {
+  <app-categories-list-item [item]="item" [parentRouterLink]="(currentRouterLinkPrefix$ | async) || []" />
+}
+
+@if (pictures$ | async; as pictures) {
+  @if (pictures.length > 0) {
+    <div class="twins row">
+      @for (i of pictures; track i) {
+        <div class="col-lg-3 col-md-3">
+          <div class="card mb-4">
+            <a [routerLink]="i.route">
+              <img
+                alt=""
+                class="card-img-top"
+                loading="lazy"
+                [src]="i.picture.thumbMedium?.src"
+                [title]="i.picture.nameText"
+              />
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+<!--div *ngIf="otherItemsCount > 0">
+<h3 i18n>Other</h3>
+<div class="row">
+  <div class="col-md-3" *ngFor="let picture of otherPictures">
+    <a [href]="picture.url" class="d-block rounded mb-4">
+      <img [src]="picture.src" [title]="picure.name_text" class="rounded w-100 border border-light" />
+    </a>
+  </div>
+</div>
+<span class="canAddCar">
+  <i class="bi bi-text-left" aria-hidden="true"></i>
+  <a [routerLink]="['/category', category.catname, 'other']">details ({{otherItemsCount}})</a>
+</span>
+</div>-->
+
+@if (itemParents$ | async; as itemParents) {
+  @if (itemParents.paginator) {
+    <app-paginator [data]="itemParents.paginator" />
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+<!--
+<p *ngIf="contributors.length > 0">
+  <ng-container i18n>Contributors:</ng-container>
+  <app-user [user]="user" *ngFor="let user of contributors" />
+</p>
+-->

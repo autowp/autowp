@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <h3 class="modal-title" i18n>Who voted?</h3>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  @if (votes$ | async; as votes) {
+    @for (user$ of votes; track user$) {
+      @if (user$ | async; as user) {
+        <app-user [user]="user" />
+      }
+    }
+  } @else {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  }
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Close</button>
+</div>

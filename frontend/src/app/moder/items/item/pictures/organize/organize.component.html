@@ -1,0 +1,41 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder/items" i18n>Items</a>
+    </li>
+    @if (item$ | async; as item) {
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
+      </li>
+    }
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1>Organize pictures</h1>
+</div>
+
+<app-markdown i18n-markdown markdown="Turbo group creator from pictures" />
+
+@if (item$ | async; as item) {
+  @if (newItem$ | async; as newItem) {
+    @if (pictures$ | async; as pictures) {
+      @if (!loading()) {
+        <app-item-meta-form
+          class="mb-4"
+          [item]="newItem"
+          [vehicleTypeIDs]="(vehicleTypeIDs$ | async) || []"
+          [invalidParams]="invalidParams()"
+          [pictures]="pictures"
+          (submitted)="submit(item, $event, pictures)"
+        />
+      }
+    }
+  }
+}

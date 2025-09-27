@@ -1,0 +1,17 @@
+@if (data$ | async; as data) {
+  @if (brand$ | async; as brand) {
+    <app-gallery
+      [filter]="{
+        exactItemID: brand.id,
+        perspectiveID: data.perspective_id || 0,
+        perspectiveExclude: data.perspective_exclude_id || [],
+      }"
+      [current]="identity$ | async"
+      [galleryPrefix]="['/', brand.catname, data.catname, 'gallery']"
+      [picturePrefix]="['/', brand.catname, data.catname]"
+      (pictureSelected)="pictureSelected(data, $event)"
+    />
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

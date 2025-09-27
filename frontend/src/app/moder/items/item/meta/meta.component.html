@@ -1,0 +1,50 @@
+@if (item$ | async; as item) {
+  <div class="card card-body">
+    @if (loadingNumber()) {
+      <ngb-progressbar type="success" class="mb-2" [striped]="true" [animated]="true" [value]="100" />
+    }
+    @if (canEditMeta$ | async) {
+      @if (vehicleTypeIDs$ | async; as vehicleTypeIDs) {
+        <app-item-meta-form
+          [item]="item"
+          [invalidParams]="invalidParams()"
+          [vehicleTypeIDs]="vehicleTypeIDs"
+          (submitted)="saveMeta(item, $event)"
+        />
+      }
+    }
+    @if ((canEditMeta$ | async) === false) {
+      <div class="row">
+        <div class="col-3 mb-4"><ng-container i18n>Name</ng-container>:</div>
+        <div class="col9 mb-4" [innerHTML]="item.nameHtml"></div>
+        <div class="col-3 mb-4"><ng-container i18n>Body number</ng-container>:</div>
+        <div class="col9 mb-4" [textContent]="item.body"></div>
+        <div class="col-3 mb-4"><ng-container i18n>Begin</ng-container>:</div>
+        <div class="col9 mb-4">
+          {{ item.beginYear > 0 ? item.beginYear : '????' }} {{ item.beginMonth > 0 ? item.beginMonth : '??' }}
+        </div>
+        <div class="col-3 mb-4"><ng-container i18n>End</ng-container>:</div>
+        <div class="col9 mb-4">
+          {{ item.endYear > 0 ? item.endYear : '????' }} {{ item.endMonth > 0 ? item.endMonth : '??' }}
+          @if (item.today?.value === true) {
+            <span i18n>continue in pr.</span>
+          }
+          @if (item.today?.value === false) {
+            <span i18n>ended</span>
+          }
+        </div>
+        <div class="col-3 mb-4"><ng-container i18n>Produced</ng-container>:</div>
+        <div class="col9 mb-4">
+          {{ item.produced?.value }}
+          @if (item.producedExactly) {
+            <span i18n>exactly</span>
+          } @else {
+            <span i18n>about</span>
+          }
+        </div>
+        <div class="col-3 mb-4"><ng-container i18n>Concept (prototype)</ng-container>:</div>
+        <div class="col9 mb-4">{{ item.isConcept ? 'Yes' : 'No' }}</div>
+      </div>
+    }
+  </div>
+}

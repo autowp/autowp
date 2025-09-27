@@ -1,0 +1,66 @@
+@if (item(); as item) {
+  @if (item.imageGalleryFull) {
+    @if (fullStyle(); as fullStyle) {
+      <img
+        alt=""
+        class="full"
+        [src]="item.imageGalleryFull.src"
+        [class.crop-mode]="cropModeAvailable() && cropMode()"
+        [ngStyle]="fullStyle"
+        (load)="fullLoaded()"
+      />
+    }
+  }
+  @if (item.imageGallery) {
+    <img
+      alt=""
+      class="crop"
+      [src]="item.imageGallery.src"
+      [class.crop-mode]="cropModeAvailable() && cropMode()"
+      [ngStyle]="cropStyle()"
+      (load)="cropLoaded()"
+    />
+  }
+
+  @for (area of areas(); track area) {
+    <app-gallery-carousel-item-area [area]="area.pictureItem" [styles]="area.styles" />
+  }
+
+  <div class="carousel-caption">
+    <h3 [innerHTML]="nameHtml()"></h3>
+  </div>
+
+  @if (item.image) {
+    <a class="download carousel-control" role="button" [href]="item.image.src">
+      <i class="bi bi-download" aria-hidden="true"></i>
+      <div class="badge rounded-pill text-bg-info text-dark">{{ item.image.filesize | bytes: 2 }}</div>
+    </a>
+  }
+
+  <a class="comments carousel-control" role="button" [routerLink]="prefix().concat([item.identity])">
+    <i class="bi bi-chat-fill" aria-hidden="true"></i>
+    @if (item.commentsCountTotal) {
+      <div class="badge rounded-pill text-bg-info text-dark">
+        {{ item.commentsCountTotal - item.commentsCountNew }}
+        @if (item.commentsCountNew) {
+          <span>+{{ item.commentsCountNew }}</span>
+        }
+      </div>
+    }
+  </a>
+
+  <a class="details carousel-control" role="button" [routerLink]="prefix().concat([item.identity])">
+    <i class="bi bi-card-image" aria-hidden="true"></i>
+  </a>
+
+  @if ((item.imageGallery && cropLoading()) || (item.imageGalleryFull && fullLoading())) {
+    <div class="loading-icon">
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    </div>
+  }
+  @if (item.imageGallery && !cropLoading() && !fullLoading()) {
+    <span class="carousel-control-full" tabindex="0" (click)="toggleCrop()" (keyup.enter)="toggleCrop()"
+      ><i class="bi bi-arrows-fullscreen" aria-hidden="true"></i
+    ></span>
+  }
+}

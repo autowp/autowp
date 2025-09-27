@@ -1,0 +1,128 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Comments</h1>
+</div>
+
+<div class="row">
+  <div class="col-md-4">
+    <h2 i18n>Filter</h2>
+    <form class="card card-body form-vertical">
+      <div class="mb-3">
+        <ng-template #userTemplate let-model="result">
+          <span [innerHTML]="model.name"></span>
+        </ng-template>
+        <div class="input-group">
+          <input
+            name="user"
+            i18n-placeholder
+            placeholder="User №"
+            class="form-control"
+            [ngbTypeahead]="usersDataSource"
+            [formControl]="userQuery"
+            [inputFormatter]="userFormatter"
+            [resultTemplate]="userTemplate"
+            [class.border-primary]="!!(userID$ | async)"
+            (selectItem)="userOnSelect($event)"
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            [disabled]="(userID$ | async) === null"
+            (click)="clearUser()"
+          >
+            <span class="bi bi-x" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label i18n for="moderator_attention">Moderator attention</label>
+        <select
+          id="moderator_attention"
+          name="moderator_attention"
+          class="form-select"
+          [formControl]="moderatorAttention"
+          [class.border-primary]="moderatorAttention.value !== ModeratorAttention.NONE"
+          (change)="setModeratorAttention()"
+        >
+          <option i18n [ngValue]="ModeratorAttention.NONE">Not matters</option>
+          <option i18n [ngValue]="ModeratorAttention.REQUIRED">Required</option>
+          <option i18n [ngValue]="ModeratorAttention.COMPLETE">Resolved</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <ng-template #itemTemplate let-model="result">
+          <span [innerHTML]="model.nameHtml"></span>
+        </ng-template>
+        <div class="input-group">
+          <input
+            name="item"
+            i18n-placeholder
+            placeholder="Item"
+            class="form-control"
+            [ngbTypeahead]="itemsDataSource"
+            [formControl]="itemQuery"
+            [inputFormatter]="itemFormatter"
+            [resultTemplate]="itemTemplate"
+            [class.border-primary]="itemID()"
+            (selectItem)="itemOnSelect($event)"
+          />
+          <button class="btn btn-outline-secondary" type="button" [disabled]="!itemID()" (click)="clearItem()">
+            <span class="bi bi-x" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-md-8">
+    @if (data$ | async; as data) {
+      <h2>
+        <ng-container i18n>Comments</ng-container>
+        @if (data.paginator; as paginator) {
+          @if (paginator && paginator.totalItemCount) {
+            <small i18n="@@n-comments">{paginator.totalItemCount, plural,
+              one {{{paginator.totalItemCount}} comment}
+              other {{{paginator.totalItemCount}} comments}
+            }</small>
+          }
+        }
+      </h2>
+      <ul class="comments">
+        @for (comment of data.comments; track comment.comment.id) {
+          <li ngPreserveWhitespaces>
+            @if (comment.comment.isNew) {
+              <span class="badge text-bg-warning text-dark" i18n>not readed</span>
+            }
+            @if (comment.comment.pictureStatus; as s) {
+              @if (s === PictureStatus.PICTURE_STATUS_ACCEPTED) {
+                <span class="badge text-bg-success" i18n>Accepted</span>
+              } @else if (s === PictureStatus.PICTURE_STATUS_INBOX) {
+                <span class="badge text-bg-warning" i18n>Inbox</span>
+              } @else if (s === PictureStatus.PICTURE_STATUS_REMOVED) {
+                <span class="badge text-bg-danger" i18n>Deleted</span>
+              } @else if (s === PictureStatus.PICTURE_STATUS_REMOVING) {
+                <span class="badge text-bg-danger" i18n>Deleting</span>
+              }
+            }
+            <a [routerLink]="comment.comment.route" [textContent]="comment.comment.preview"></a>
+            @if (comment.user$ | async; as user) {
+              <app-user [user]="user" />
+            }
+          </li>
+        }
+      </ul>
+      @if (data.paginator) {
+        <app-paginator [data]="data.paginator" />
+      }
+    }
+  </div>
+</div>

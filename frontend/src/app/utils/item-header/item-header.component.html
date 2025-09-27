@@ -1,0 +1,28 @@
+@if (item(); as item) {
+  <span [innerHTML]="item.nameHTML"></span>
+  @if (item.design) {
+    <sup class="design-brand mx-2"
+      ><ng-container i18n>designed by</ng-container>
+      <a [routerLink]="item.design.route" [textContent]="item.design.name"></a>
+    </sup>
+  }
+  @if (item.produced; as p) {
+    @if (p.count > 1) {
+      <small class="ms-2">
+        @if (p.exactly) {
+          <span i18n="@@n-produced">{p.count, plural,
+            one {Produced in {{ p.count }} copy}
+            other {Produced in {{ p.count }} copies}
+          }</span>
+        } @else {
+          <span i18n="@@n-produced-about">{p.count, plural,
+            one {Produced in about {{ p.count }} copy}
+            other {Produced in about {{ p.count }} copies}
+          }</span>
+        }
+      </small>
+    } @else if (p.count === 1) {
+      <small i18n class="ms-2">Produced in a single copy</small>
+    }
+  }
+}

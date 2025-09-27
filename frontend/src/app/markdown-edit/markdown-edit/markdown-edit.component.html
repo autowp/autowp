@@ -1,0 +1,27 @@
+<ul #nav="ngbNav" ngbNav class="nav-tabs">
+  <li ngbNavItem>
+    <a ngbNavLink i18n>Edit</a>
+    <ng-template ngbNavContent>
+      @if (control(); as control) {
+        <textarea
+          class="form-control"
+          maxlength="65536"
+          rows="1"
+          aria-label="Text"
+          cdkTextareaAutosize
+          [formControl]="control"
+          (change)="onChange(control.value)"
+        ></textarea>
+      }
+    </ng-template>
+  </li>
+  <li ngbNavItem [disabled]="!text() || !text().length">
+    <a ngbNavLink i18n>Preview</a>
+    <ng-template ngbNavContent>
+      <div class="card card-body">
+        <app-markdown [markdown]="text()" />
+      </div>
+    </ng-template>
+  </li>
+</ul>
+<div [ngbNavOutlet]="nav"></div>

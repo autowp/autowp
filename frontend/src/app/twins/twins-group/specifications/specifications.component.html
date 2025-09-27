@@ -1,0 +1,13 @@
+@if (group$ | async; as group) {
+  <div class="page-header">
+    <h2 i18n>Specifications of {{ group.nameText }}</h2>
+  </div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}
+
+@if (html$ | async; as html) {
+  <div [innerHtml]="html"></div>
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

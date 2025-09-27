@@ -1,0 +1,155 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+  </ol>
+</nav>
+
+@if (data$ | async; as item) {
+  <div class="page-header">
+    <h1 i18n>Specs editor of {{ item.nameText }}</h1>
+  </div>
+
+  <div class="nav nav-pills mb-3">
+    @if (isModer$ | async; as isModer) {
+      <a class="nav-link" [routerLink]="['/moder/items/item', item.id]">
+        <i class="bi bi-gear-fill" aria-hidden="true"></i>
+        <ng-container i18n>edit</ng-container>
+        <span [innerHTML]="item.nameHtml"></span>
+      </a>
+    }
+    <a class="nav-link" routerLink="/cars/attrs-change-log" [queryParams]="{item_id: item.id}">
+      <i class="bi bi-list" aria-hidden="true"></i>
+      <ng-container i18n>Log of values</ng-container>
+    </a>
+  </div>
+
+  @if (user$ | async; as user) {
+    @if (user.specsWeight < 1) {
+      <app-markdown
+        class="d-block alert alert-danger"
+        i18n-markdown
+        markdown="**Attention!** You probably have accumulated a significant number of errors.
+
+Some of them discovered by other visitors can be found [here](/account/specs-conflicts)"
+      />
+    }
+  }
+
+  @if (tab$ | async; as tab) {
+    <ul class="nav nav-tabs" id="myTab">
+      <li class="nav-item">
+        <a
+          routerLink="/cars/specifications-editor"
+          class="nav-link"
+          [queryParams]="{item_id: item.id, tab: 'info'}"
+          [class.active]="tab === 'info'"
+        >
+          <span class="bi bi-info" aria-hidden="true"></span>
+          <ng-container i18n>Info</ng-container>
+        </a>
+      </li>
+      @if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE) {
+        <li class="nav-item">
+          <a
+            routerLink="/cars/specifications-editor"
+            class="nav-link"
+            [queryParams]="{item_id: item.id, tab: 'engine'}"
+            [class.active]="tab === 'engine'"
+          >
+            <span class="glyphicon glyphicon-align-left"></span>
+            <ng-container i18n>Engine</ng-container>
+            @if (item.engineItemId) {
+              <span class="badge rounded-pill text-bg-secondary">1</span>
+            }
+          </a>
+        </li>
+      }
+      <li class="nav-item">
+        <a
+          routerLink="/cars/specifications-editor"
+          class="nav-link"
+          [queryParams]="{item_id: item.id, tab: 'spec'}"
+          [class.active]="tab === 'spec'"
+        >
+          <span class="bi bi-car-front" aria-hidden="true"></span>
+          <ng-container i18n>Specifications</ng-container>
+        </a>
+      </li>
+      @if (item) {
+        <li class="nav-item">
+          <a
+            routerLink="/cars/specifications-editor"
+            class="nav-link"
+            [queryParams]="{item_id: item.id, tab: 'result'}"
+            [class.active]="tab === 'result'"
+          >
+            <span class="bi bi-table" aria-hidden="true"></span>
+            <ng-container i18n>Result</ng-container>
+          </a>
+        </li>
+        @if (isSpecsAdmin$ | async) {
+          <li class="nav-item">
+            <a
+              routerLink="/cars/specifications-editor"
+              class="nav-link"
+              [queryParams]="{item_id: item.id, tab: 'admin'}"
+              [class.active]="tab === 'admin'"
+            >
+              <span class="bi bi-table" aria-hidden="true"></span>
+              <ng-container i18n>Admin</ng-container>
+            </a>
+          </li>
+        }
+      }
+    </ul>
+    <div class="tab-content card card-body">
+      @if (tab === 'info') {
+        <div class="tab-pane active" id="info">
+          <app-markdown
+            i18n-markdown
+            markdown='Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.
+
+
+О структуре самих характеристик.
+
+Все характеристики организованы в виде дерева элементов "параметр - значение". Значения могут быть числовыми и текстовыми.
+
+Важной особенностью является тот факт, что каждая характеристика может быть задана одновременно несколькими пользователями. В этом случае актуальным (используемым) значением является то, которое система сочтет приоритетным по ряду признаков.
+
+Если вы столкнулись с ситуацией, когда вам не удаётся перекрыть введенное кем-то ранее значение, то вы можете просто написать об этом автору. Впрочем в процессе реализации система автоматического уведомления автором о том, что с его значением кто-то не согласен.
+
+
+Все значения, которые здесь вводятся - отображаются на сайте, в характеристиках, используются в построении разделы "самые-самые", а также отображаются в некоторых других местах сайта.'
+          />
+        </div>
+      } @else if (tab === 'engine' && item && item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE) {
+        <div class="tab-pane active" id="engine">
+          <app-cars-specifications-editor-engine [item]="item" (changed)="onEngineChanged()" />
+        </div>
+      } @else if (tab === 'spec' && item) {
+        <div class="tab-pane active" id="spec">
+          <app-cars-specifications-editor-spec [item]="item" />
+        </div>
+      } @else if (tab === 'result' && item) {
+        <div class="tab-pane active" id="result">
+          <app-cars-specifications-editor-result [item]="item" />
+        </div>
+      } @else if (tab === 'admin' && (isSpecsAdmin$ | async)) {
+        <div class="tab-pane active" id="admin">
+          <p>
+            <a routerLink="/cars/specs-admin" i18n [queryParams]="{item_id: item.id}">Admin</a>
+          </p>
+          <div>
+            <button type="button" class="btn btn-secondary" i18n (click)="refreshInheritance(item)">
+              Refresh inheritance
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

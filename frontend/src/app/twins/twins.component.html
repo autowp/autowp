@@ -1,0 +1,112 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    @if (brand$ | async) {
+      <li class="breadcrumb-item">
+        <a routerLink="/twins" i18n>Twins</a>
+      </li>
+    }
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-sm-8 order-2">
+    <div class="page-header mb-4">
+      @if (brand$ | async; as brand) {
+        <h1>{{ brand.nameOnly }}</h1>
+      } @else {
+        <h1 i18n>Twins</h1>
+      }
+    </div>
+
+    @if (data$ | async; as data) {
+      @for (group of data.groups; track group) {
+        <div>
+          <h3 [innerHtml]="group.item.nameHtml"></h3>
+          @if (group.childs) {
+            <div>
+              @for (ch of group.childs; track ch) {
+                <div class="twins row">
+                  @for (itemParent of ch; track itemParent.itemId) {
+                    @if (itemParent.item; as item) {
+                      <div class="col-lg-4 col-md-4">
+                        <div class="card mb-4">
+                          @if ((itemParent.childDescendantPictures?.items || [])[0]; as picture) {
+                            @if (picture.thumbMedium; as thumb) {
+                              <a [routerLink]="['/twins/group', group.item.id, 'pictures', picture.identity]">
+                                <img
+                                  class="card-img-top"
+                                  [src]="thumb.src"
+                                  [alt]="picture.nameText"
+                                  [title]="picture.nameText"
+                                />
+                              </a>
+                            } @else {
+                              <span>&#xa0;</span>
+                            }
+                          } @else {
+                            <span>&#xa0;</span>
+                          }
+                          <div class="card-body">
+                            <p class="card-title" [innerHtml]="item.nameHtml"></p>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              }
+            </div>
+          }
+          <ul class="car-links">
+            <li>
+              <i class="bi bi-text-left me-1" aria-hidden="true"></i>
+              <a [routerLink]="['/twins/group', group.item.id]">
+                <ng-container i18n>details</ng-container> …
+                @if (group.item.commentsCount) {
+                  @if (group.item.commentsCount > 0) {
+                    <span
+                      >(<span i18n="@@n-comments">{group.item.commentsCount, plural,
+                        one {{{group.item.commentsCount}} comment}
+                        other {{{group.item.commentsCount}} comments}
+                      }</span
+                      >)</span
+                    >
+                  }
+                }
+              </a>
+            </li>
+            @if (group.item.hasChildSpecs) {
+              <li>
+                <i class="bi bi-card-list me-1" aria-hidden="true"></i>
+                <a i18n [routerLink]="['/twins/group', group.item.id, 'specifications']">specifications</a>
+              </li>
+            }
+            @if (group.hasMoreImages) {
+              <li>
+                <span class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></span>
+                <a [routerLink]="['/twins/group', group.item.id, 'pictures']"
+                  ><ng-container i18n>all pictures</ng-container> ({{ group.item.acceptedPicturesCount }})</a
+                >
+              </li>
+            }
+            @if (canEdit$ | async) {
+              <li>
+                <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
+                <a i18n [routerLink]="['/moder/items/item', group.item.id]">edit</a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+      @if (data.paginator) {
+        <app-paginator [data]="data.paginator" />
+      }
+    }
+  </div>
+  <div class="col-sm-4 order-1">
+    <app-twins-sidebar [selected]="[(currentBrandCatname$ | async) || '']" />
+  </div>
+</div>

@@ -1,0 +1,160 @@
+@for (message of messages$ | async; track message) {
+  <div
+    class="message"
+    [class.moderator-attention]="message.message.moderatorAttention"
+    [class.deleted]="message.message.deleted"
+  >
+    <div>
+      @if (message.message.createdAt) {
+        <div
+          class="float-end"
+          [textContent]="message.message.createdAt.toDate() | timeAgo"
+          [ngbTooltip]="message.message.createdAt.toDate() | date: 'medium'"
+        ></div>
+      }
+      @if (message.user$ | async; as user) {
+        <app-user [user]="user" />
+      } @else {
+        <span i18n>Anonymous</span>
+      }
+    </div>
+    <div class="photo">
+      @if (message.user$ | async; as user) {
+        @if (!user.deleted) {
+          <a class="photo" [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]">
+            @if (user.avatar) {
+              <img alt="" class="rounded" loading="lazy" [src]="user.avatar.src" />
+            }
+            @if (user.gravatar && !user.avatar) {
+              <img alt="" class="rounded" loading="lazy" [src]="user.gravatar" />
+            }
+          </a>
+        }
+      }
+    </div>
+    <div class="content">
+      @if (((canRemoveComments$ | async) || !message.message.deleted) && message.message.text) {
+        <div class="text">
+          <app-user-text [text]="message.message.text" />
+        </div>
+      }
+      @if ((canRemoveComments$ | async) || message.message.deleted) {
+        <p class="alert alert-warning deleted-message" i18n>Message deleted by site administration</p>
+      }
+      <div>
+        @if (message.canVote$ | async) {
+          <span class="vote">
+            <a
+              href="#"
+              class="vote-up d-inline-block"
+              [class.active]="message.message.userVote > 0"
+              (click)="vote(message.message, 1)"
+              (keyup.enter)="vote(message.message, 1)"
+            >
+              <i class="bi bi-hand-thumbs-up-fill" aria-hidden="true"></i>
+            </a>
+            <a href="#" class="value" [class.zero]="message.message.vote === 0" (click)="showVotes(message.message)">
+              {{ (message.message.vote > 0 ? '+' : '') + message.message.vote }}
+            </a>
+            <a
+              href="#"
+              class="vote-down d-inline-block"
+              [class.active]="message.message.userVote < 0"
+              (click)="vote(message.message, -1)"
+              (keyup.enter)="vote(message.message, -1)"
+            >
+              <i class="bi bi-hand-thumbs-down-fill" aria-hidden="true"></i>
+            </a>
+          </span>
+        } @else if (message.message.vote !== 0) {
+          <span class="vote">
+            <i class="bi bi-hand-thumbs-up" aria-hidden="true"></i>
+            <a href="#" class="value" (click)="showVotes(message.message)" (keyup.enter)="showVotes(message.message)">{{
+              message.message.vote
+            }}</a>
+            <i class="bi bi-hand-thumbs-down" aria-hidden="true"></i>
+          </span>
+        }
+        @if ((authenticated$ | async) && ((deep$ | async) || 0) < 21 && !message.message.deleted) {
+          <button type="button" class="btn btn-sm btn-primary reply" (click)="reply(message.message, false)">
+            <i class="bi bi-reply me-1" aria-hidden="true"></i>
+            <span class="d-none d-md-inline" i18n>reply</span>
+          </button>
+        }
+        @if (message.message.moderatorAttention === ModeratorAttention.REQUIRED && (isModer$ | async)) {
+          <button type="button" class="btn btn-sm btn-success resolve" (click)="reply(message.message, true)">
+            <i class="bi bi-reply me-1" aria-hidden="true"></i>
+            <ng-container i18n>reply & resolve</ng-container>
+          </button>
+        }
+        @if (canRemoveComments$ | async) {
+          <button
+            type="button"
+            class="btn btn-danger btn-sm float-end comment-remove-button"
+            (click)="setIsDeleted(message.message, true)"
+          >
+            <i class="bi bi-trash me-1" aria-hidden="true"></i>
+            <span class="d-none d-md-inline" i18n>Delete</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn-success btn-sm float-end comment-restore-button"
+            (click)="setIsDeleted(message.message, false)"
+          >
+            <i class="bi bi-arrow-up me-1" aria-hidden="true"></i>
+            <ng-container i18n>Restore</ng-container>
+          </button>
+        }
+        @if ((typeID$ | async) === 5 && (canMoveMessage$ | async)) {
+          <a
+            routerLink="/forums/move-message"
+            class="btn btn-secondary btn-sm float-end"
+            [queryParams]="{message_id: message.message.id}"
+          >
+            <i class="bi bi-arrows-move me-1" aria-hidden="true"></i>
+            <span class="d-none d-md-inline" i18n>Move</span>
+          </a>
+        }
+        @if (message.message.ip) {
+          <i
+            class="float-end bi bi-eye"
+            aria-hidden="true"
+            style="margin-right: 20px"
+            [ngbTooltip]="message.message.ip"
+          ></i>
+        }
+        @if (message.message.moderatorAttention === ModeratorAttention.REQUIRED) {
+          <div class="moderator-attention-sign">
+            <i class="bi bi-info-circle-fill me-1" aria-hidden="true"></i>
+            <ng-container i18n>It requires attention of moderators</ng-container>
+          </div>
+        }
+      </div>
+    </div>
+    @if (((deep$ | async) || 0) < 21) {
+      <div class="replies">
+        @if (typeID$ | async; as typeID) {
+          @if (itemID$ | async; as itemID) {
+            <app-comments-list
+              [itemID]="itemID"
+              [typeID]="typeID"
+              [messages]="message.message.replies || []"
+              [deep]="((deep$ | async) || 0) + 1"
+              (sent)="onSent($event)"
+            />
+            @if ((authenticated$ | async) && message.message.showReply) {
+              <app-comments-form
+                [itemID]="itemID"
+                [typeID]="typeID"
+                [parentID]="message.message.id"
+                [resolve]="message.message.resolve || false"
+                (sent)="onSent($event)"
+                (canceled)="onCancel(message.message)"
+              />
+            }
+          }
+        }
+      </div>
+    }
+  </div>
+}

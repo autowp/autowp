@@ -1,0 +1,25 @@
+<h4>
+  <ng-container i18n>Brands</ng-container>
+  <small><a routerLink="/brands" i18n>all</a></small>
+</h4>
+
+@if (result$ | async; as result) {
+  <p class="index-brands">
+    @for (brand of result.brands; track brand.id) {
+      <app-index-brands-brand [brand]="brand" />
+    }
+    @if (result.more > 0) {
+      <ng-container i18n>… and</ng-container>&#xa0;<a
+        routerLink="/brands"
+        i18n="@@more-n-companies"
+        >{result.more, plural, one {more {{ result.more }} company} other {more {{ result.more }} companies}}</a
+      >
+    }
+  </p>
+} @else {
+  <p class="index-brands placeholder-glow">
+    @for (item of placeholderItems; track item) {
+      <span class="placeholder me-1" [style.width]="item.width + 'rem'"></span>
+    }
+  </p>
+}

@@ -1,0 +1,84 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/map" i18n>Map</a>
+    </li>
+  </ol>
+</nav>
+
+@if (item$ | async; as factory) {
+  <div class="page-header">
+    <h1 [innerHTML]="factory.nameHtml"></h1>
+  </div>
+  <div class="nav nav-pills mb-3">
+    <a class="nav-link active" routerLink="." [innerHTML]="factory.nameHtml"></a>
+    <a class="nav-link" i18n [routerLink]="['/factories', factory.id, 'items']">Products</a>
+    @if (isModer$ | async) {
+      <a class="nav-link" [routerLink]="['/moder/items/item', factory.id]">
+        <i class="bi bi-gear-fill" aria-hidden="true"></i>
+        <ng-container i18n>edit</ng-container>
+      </a>
+    }
+  </div>
+
+  @if (map$ | async; as map) {
+    <div
+      style="height: 300px"
+      class="mb-4 w-100"
+      leaflet
+      [leafletOptions]="map.options"
+      [leafletLayers]="map.markers"
+    ></div>
+  }
+
+  @if (factory.fullText) {
+    <app-markdown class="card card-body" [markdown]="factory.fullText" />
+  } @else if (factory.description) {
+    <app-markdown class="card card-body" [markdown]="factory.description" />
+  }
+}
+
+@if (pictures$ | async; as pictures) {
+  @if ((pictures.items || []).length > 0) {
+    <div>
+      <h3 i18n>Pictures</h3>
+      <div class="row">
+        @for (picture of pictures.items || []; track picture) {
+          <div class="col-6 col-md-4 col-lg-3">
+            <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" />
+          </div>
+        }
+      </div>
+    </div>
+  }
+}
+
+@if (item$ | async; as factory) {
+  @if (factory.relatedGroupPictures && factory.relatedGroupPictures.length > 0) {
+    <div>
+      <h3 i18n>Products</h3>
+      <div class="row">
+        @for (item of factory.relatedGroupPictures || []; track item) {
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="card mb-4">
+              <a [routerLink]="item.route">
+                <img class="card-img-top" alt="" loading="lazy" [src]="item.src" />
+              </a>
+              <div class="card-body">
+                <h5 class="card-title">
+                  <a [routerLink]="item.route" [innerHTML]="item.nameHtml"></a>
+                </h5>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      <p>
+        <a i18n [routerLink]="['/factories', factory.id, 'items']">details</a>
+      </p>
+    </div>
+  }
+}

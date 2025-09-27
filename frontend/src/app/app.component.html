@@ -1,0 +1,269 @@
+@if (!(layoutParams$ | async)?.isGalleryPage) {
+  <app-moder-menu />
+}
+
+@if (!(layoutParams$ | async)?.isGalleryPage) {
+  <div class="navbar navbar-expand-md navbar-dark bg-dark">
+    <div class="container">
+      <button
+        class="navbar-toggler navbar-toggler-right"
+        type="button"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+        (click)="isNavbarCollapsed.set(!isNavbarCollapsed())"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" routerLink="/" title="Encyclopedia of cars in pictures. WheelsAge.org" i18n-title>
+        <svg>
+          <path
+            d="M 25.084186,6.42508 A 23.373101,22.952514 0 0 0 2.3045258,24.36829 l 4.6649949,0.69665 a 18.670109,18.165696 0 0 1 2.2157068,-5.22461 l 8.1363055,5.87817 a 8.7994987,8.2394148 0 0 0 -0.720458,1.77407 c 3.39102,1.47331 6.006412,3.38159 8.53766,5.33717 2.128107,-1.62945 4.12335,-3.67705 8.512342,-5.40515 a 8.7994987,8.2394148 0 0 0 -0.720899,-1.75241 l 8.091717,-5.84614 a 18.670109,18.165696 0 0 1 2.236046,5.25665 l 4.636644,-0.63755 A 23.373101,22.952514 0 0 0 25.084186,6.42508 Z m 0.0279,4.67475 a 18.670109,18.165696 0 0 1 13.156976,5.31682 l -8.46016,6.07776 a 8.7994987,8.2394148 0 0 0 -4.668675,-1.27227 8.7994987,8.2394148 0 0 0 -4.717385,1.30345 l -8.475101,-6.0886 A 18.670109,18.165696 0 0 1 25.112086,11.09983 Z M 0.06,25.71092 0.1719214,32.42839 c 11.5620876,0.30579 19.0486266,4.79308 24.8875546,10.9705 l 0,-8.9e-4 8.91e-4,0.002 4.4e-4,-10e-4 0,6.7e-4 C 30.899734,37.22225 38.386273,32.73517 49.94836,32.42938 l 0.111922,-6.71769 -0.0359,0.063 c -15.908438,1.59268 -20.550853,5.31075 -24.963965,9.39343 l -4.5e-4,0 C 20.646834,31.08557 16.004418,27.36749 0.0959807,25.77482 l -0.0359,-0.063 z"
+          />
+        </svg>
+      </a>
+
+      <div class="collapse navbar-collapse" [ngbCollapse]="isNavbarCollapsed()">
+        <ul class="navbar-nav me-auto mt-2 mt-lg-0">
+          <li class="nav-item d-md-none d-lg-block">
+            <a class="nav-link" routerLink="/twins" routerLinkActive="active" i18n>Twins</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/mosts" routerLinkActive="active" i18n>Mostly</a>
+          </li>
+          <li class="nav-item" ngbDropdown>
+            <button
+              type="button"
+              class="btn btn-link nav-link"
+              ngbDropdownToggle
+              [class.active]="
+                router.isActive('/category', {
+                  paths: 'subset',
+                  queryParams: 'ignored',
+                  matrixParams: 'ignored',
+                  fragment: 'ignored',
+                })
+              "
+            >
+              <ng-container i18n>Categories</ng-container>
+              <b class="caret" aria-hidden="true"></b>
+            </button>
+            @if (categories$ | async; as categories) {
+              <div ngbDropdownMenu>
+                @for (category of categories.items; track category.id) {
+                  <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/category', category.catname]">
+                    {{ category.nameText }}&#xa0;
+                    <span class="count">
+                      ({{ category.descendantsCount }})
+                      <!--<span *ngIf="category.new_cars_count > 0">+{{category.new_cars_count}}</span> -->
+                    </span>
+                  </a>
+                }
+              </div>
+            }
+          </li>
+          <li class="nav-item d-md-none d-lg-block">
+            <a class="nav-link" routerLink="/map" routerLinkActive="active" i18n>Map</a>
+          </li>
+          <li class="nav-item d-sm-none d-lg-none d-xl-block">
+            <a class="nav-link" routerLink="/forums" routerLinkActive="active" i18n>Forums</a>
+          </li>
+        </ul>
+        @if (searchHostname) {
+          <form action="//www.google.com/search" method="get" class="form-inline my-2 my-lg-0 me-4" ngNoForm>
+            <input type="hidden" name="ie" value="utf-8" />
+            <input type="hidden" name="domains" [value]="searchHostname" />
+            <input type="hidden" name="sitesearch" [value]="searchHostname" />
+            <input type="text" class="form-control" placeholder="Search" i18n-placeholder="@@layout/search" name="q" />
+          </form>
+        }
+        <ul class="nav navbar-nav navbar-right">
+          @if (authenticated$ | async) {
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/account/messages" routerLinkActive="active">
+                <i class="bi bi-chat-fill" aria-hidden="true"></i>
+                @if (newPersonalMessages$ | async; as newPersonalMessages) {
+                  @if (newPersonalMessages > 0) {
+                    <span class="badge rounded-pill text-bg-secondary" [textContent]="newPersonalMessages"></span>
+                  }
+                }
+              </a>
+            </li>
+          } @else {
+            <li class="nav-item">
+              <button type="button" class="btn nav-link" (click)="doLogin()">
+                <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+                <ng-container i18n="@@login/sign-in">Sign in</ng-container>
+              </button>
+            </li>
+          }
+          <li class="nav-item btn-group" ngbDropdown>
+            <button type="button" class="btn btn-link nav-link" ngbDropdownToggle>
+              <ng-container i18n>More</ng-container>
+              <b class="caret" aria-hidden="true"></b>
+            </button>
+            <div ngbDropdownMenu>
+              <a class="dropdown-item d-lg-none" routerLinkActive="active" routerLink="/twins" i18n>Twins</a>
+              <a class="dropdown-item d-lg-none" routerLinkActive="active" routerLink="/map" i18n>Map</a>
+              <a class="dropdown-item d-xl-none" routerLinkActive="active" routerLink="/forums" i18n>Forums</a>
+
+              <div class="dropdown-divider d-block d-sm-block d-md-block d-lg-block d-xl-none"></div>
+
+              <a routerLink="/upload" class="dropdown-item" routerLinkActive="active">
+                <i class="bi bi-upload" aria-hidden="true"></i>
+                <ng-container i18n>Add picture</ng-container>
+              </a>
+              <a routerLink="/feedback" class="dropdown-item" routerLinkActive="active">
+                <i class="bi bi-chat-fill" aria-hidden="true"></i>
+                <ng-container i18n>Feedback</ng-container>
+              </a>
+              <a href="#" class="dropdown-item" (click)="showOnlineUsers()">
+                <i class="bi bi-people-fill" aria-hidden="true"></i>
+                <ng-container i18n>Who is online?</ng-container>
+              </a>
+              @if (authenticated$ | async) {
+                <a routerLink="/account/contacts" class="dropdown-item" routerLinkActive="active">
+                  <i class="bi bi-people-fill" aria-hidden="true"></i>
+                  <ng-container i18n>Contacts</ng-container>
+                </a>
+                <a routerLink="/account/profile" class="dropdown-item" routerLinkActive="active">
+                  <i class="bi bi-person-fill" aria-hidden="true"></i>
+                  <ng-container i18n>Cabinet</ng-container>
+                </a>
+              }
+              <a routerLink="/about" class="dropdown-item" routerLinkActive="active">
+                <i class="bi bi-info" aria-hidden="true"></i>
+                <ng-container i18n>About us</ng-container>
+              </a>
+              @if (authenticated$ | async) {
+                <a href="#" class="dropdown-item" (click)="signOut()">
+                  <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                  <ng-container i18n>Sign out</ng-container>
+                </a>
+              }
+            </div>
+          </li>
+          <li class="nav-item" ngbDropdown placement="bottom-right">
+            <button type="button" class="nav-link" ngbDropdownToggle>
+              @for (lang of languages; track lang.code) {
+                @if (lang.code === language) {
+                  <i aria-hidden="true" [ngClass]="lang.flag"></i>
+                }
+              }
+            </button>
+            <div ngbDropdownMenu>
+              @if (urlPath$ | async; as urlPath) {
+                @for (lang of languages; track lang.code) {
+                  <a
+                    class="dropdown-item"
+                    [href]="'//' + lang.hostname + urlPath"
+                    [class.active]="lang.code === language"
+                  >
+                    <i aria-hidden="true" [ngClass]="lang.flag"></i>
+                    {{ lang.name }}
+                  </a>
+                }
+              }
+              <a
+                class="dropdown-item"
+                href="https://github.com/autowp/autowp-frontend/tree/master/src/locale"
+                i18n="@@layout/language-contributing"
+                >Want to contribute?</a
+              >
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+}
+
+<div
+  [class.container]="!(layoutParams$ | async)?.isGalleryPage"
+  [class.container-fluid]="(layoutParams$ | async)?.isGalleryPage"
+>
+  <router-outlet />
+
+  @if (!(layoutParams$ | async)?.isAdminPage && !(layoutParams$ | async)?.isGalleryPage) {
+    <div class="bottom-line">
+      <p>
+        <strong>
+          <ng-container i18n="@@layout/brand">WheelsAge.org</ng-container> '2005&ndash;<ng-container i18n
+            >pr.</ng-container
+          >
+        </strong>
+      </p>
+    </div>
+  }
+
+  @if (!(layoutParams$ | async)?.isAdminPage && !(layoutParams$ | async)?.isGalleryPage) {
+    <footer class="footer">
+      <div class="row">
+        <div class="col-md-6">
+          <p class="links">
+            <a href="https://twitter.com/autowp_ru" placement="top" ngbTooltip="Twitter" class="d-inline-block">
+              <i class="bi bi-twitter" aria-hidden="true"></i>
+            </a>
+            @if (language !== 'ru') {
+              <a href="https://www.facebook.com/WheelsAge" placement="top" ngbTooltip="Facebook" class="d-inline-block">
+                <i class="bi bi-facebook" aria-hidden="true"></i>
+              </a>
+            }
+            <a href="https://github.com/autowp/autowp" placement="top" ngbTooltip="GitHub" class="d-inline-block">
+              <i class="bi bi-github" aria-hidden="true"></i>
+            </a>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.autowp.wallpaper"
+              placement="top"
+              ngbTooltip="Android wallpaper"
+              class="d-inline-block"
+            >
+              <i class="bi bi-android2" aria-hidden="true"></i>
+            </a>
+            <a routerLink="/telegram" placement="top" ngbTooltip="Telegram" class="d-inline-block">
+              <i class="bi bi-telegram" aria-hidden="true"></i>
+            </a>
+            <a routerLink="/feedback" placement="top" ngbTooltip="Feedback" i18n-ngbTooltip class="d-inline-block">
+              <i class="bi bi-chat-fill" aria-hidden="true"></i>
+            </a>
+          </p>
+          <p>
+            <a routerLink="/about" i18n>About us</a>
+            •
+            <a routerLink="/donate" i18n>Donate</a>
+          </p>
+        </div>
+        <div class="col-md-6">
+          <app-markdown
+            class="card card-body copyrights"
+            markdown="Please note that all material on this server autowp.ru, added visitors.
+
+The site administration does not have information on the legality of the publication of these materials.
+
+All images are posted for educational purposes.
+
+[Report copyright violation](mailto:autowp@yandex.ru)"
+            i18n-markdown
+          />
+        </div>
+      </div>
+      <p class="language-picker">
+        @if (urlPath$ | async; as urlPath) {
+          @for (lang of languages; track lang.code) {
+            @if (lang.code !== language) {
+              <a [href]="'//' + lang.hostname + urlPath">
+                <i aria-hidden="true" [ngClass]="lang.flag"></i>
+                {{ lang.name }}
+              </a>
+            }
+          }
+        }
+        <a href="https://github.com/autowp/autowp-frontend/tree/master/src/locale" i18n="@@layout/language-contributing"
+          >Want to contribute?</a
+        >
+        <a routerLink="/policy" i18n>Privacy Policy</a>
+      </p>
+    </footer>
+  }
+</div>
+
+<app-toasts aria-live="polite" aria-atomic="true" />

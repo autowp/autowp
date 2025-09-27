@@ -1,0 +1,28 @@
+@if (items$ | async; as items) {
+  <div class="moderator-menu-container">
+    <div class="btn-group" ngbDropdown placement="top-right">
+      <button type="button" ngbDropdownToggle class="btn btn-secondary">
+        <ng-container i18n>Moderator menu</ng-container>
+        <span class="caret" aria-hidden="true"></span>
+      </button>
+      <div class="dropdown-menu-right" ngbDropdownMenu>
+        @for (item of items; track item) {
+          <a class="dropdown-item" [routerLink]="item.routerLink" [queryParams]="item.queryParams">
+            @if (item.icon) {
+              <i aria-hidden="true" [ngClass]="item.icon"></i>
+            }
+            {{ item.label }}
+            @if (item.count$ | async; as count) {
+              <span class="badge rounded-pill text-bg-secondary" [textContent]="count"></span>
+            }
+          </a>
+        }
+        <div class="dropdown-divider"></div>
+        <a routerLink="/moder" class="dropdown-item">
+          <i class="bi bi-gear-fill" aria-hidden="true"></i>
+          <ng-container i18n>Moderator page</ng-container>
+        </a>
+      </div>
+    </div>
+  </div>
+}
