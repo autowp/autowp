@@ -1,8 +1,6 @@
 module github.com/autowp/goautowp
 
-go 1.24.0
-
-toolchain go1.24.5
+go 1.25.1
 
 replace github.com/doug-martin/goqu/v9 v9.19.0 => github.com/autowp/goqu/v9 v9.20.0
 
@@ -56,7 +54,6 @@ require (
 	google.golang.org/protobuf v1.36.9
 	gopkg.in/gographics/imagick.v3 v3.7.2
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
-
 )
 
 require (

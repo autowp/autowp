@@ -10,3 +10,6 @@ cov.out
 coverage.xml
 /app
 im7/*
+/spec.pb.go
+/spec.pb.gw.go
+/spec_grpc.pb.go

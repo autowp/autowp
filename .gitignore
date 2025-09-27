@@ -8,3 +8,4 @@
 /cache
 /.idea/
 /localhost.*
+/apidocs.swagger.json

@@ -1,0 +1,25 @@
+{
+  "$schema": "./frontend/node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.15.0",
+    "generators": {
+      "angular": {
+        "generatorName": "typescript-angular",
+        "output": "#{cwd}/frontend/src/rest",
+        "glob": "apidocs.swagger.json",
+        "additionalProperties": {
+          "ngVersion": "20.1.3",
+          "npmName": "restClient",
+          "supportsES6": "true",
+          "npmVersion": "11.3.0",
+          "withInterfaces": true,
+          "useSingleRequestParameter": true
+        },
+        "typeMappings": {
+          "DateTime": "Date"
+        }
+      }
+    }
+  }
+}

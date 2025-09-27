@@ -51,3 +51,5 @@ sonar-scanner-*
 /crowdin.yml
 openapi.yaml
 /.eslintcache
+/src/rest/*
+/src/grpc/*
