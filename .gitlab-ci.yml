@@ -43,4 +43,3 @@ deploy:
   environment:
     name: production
     url: https://www.wheelsage.org/
-  when: manual
