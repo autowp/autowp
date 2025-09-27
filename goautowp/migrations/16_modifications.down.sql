@@ -1,0 +1,1 @@
+DROP TABLE modification_value, modification_picture, modification_group, modification;

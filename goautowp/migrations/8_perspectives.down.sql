@@ -1,0 +1,1 @@
+DROP TABLE perspectives_groups_perspectives, perspectives_groups, `perspectives`, perspectives_pages;

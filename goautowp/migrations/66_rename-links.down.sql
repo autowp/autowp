@@ -1,0 +1,1 @@
+ALTER TABLE item_link RENAME links, CHANGE COLUMN id id int unsigned auto_increment;

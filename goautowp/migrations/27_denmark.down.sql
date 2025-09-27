@@ -1,0 +1,1 @@
+DELETE FROM `spec` WHERE id=50;

@@ -1,0 +1,1 @@
+DROP TABLE log_events_user, log_events_pictures, log_events_item, log_events_articles, log_events;

@@ -1,0 +1,1 @@
+ALTER TABLE image DROP COLUMN exif;

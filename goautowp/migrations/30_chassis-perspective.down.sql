@@ -1,0 +1,1 @@
+delete from perspectives where id=28;

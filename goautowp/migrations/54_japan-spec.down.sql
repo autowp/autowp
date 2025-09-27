@@ -1,0 +1,1 @@
+UPDATE spec SET short_name='JP-spec' WHERE id=4;

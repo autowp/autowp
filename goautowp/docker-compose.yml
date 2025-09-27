@@ -1,0 +1,154 @@
+services:
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: goautowp_rabbitmq_test
+    restart: always
+    ports:
+    - "5672:5672"
+    - "15672:15672"
+
+  mysql:
+    image: mysql:8
+    container_name: goautowp_mysql_test
+    restart: always
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_DATABASE=autowp
+    ports:
+    - "3306:3306"
+    volumes:
+    - "./test/dump.sql:/dump.sql:ro"
+
+  nginx:
+    image: nginx
+    container_name: goautowp_nginx_test
+    restart: always
+    ports:
+    - "80:80"
+    volumes:
+    - "./test:/usr/share/nginx/html:ro"
+
+  postgres:
+    image: postgres:13-alpine
+    container_name: goautowp_postgres_test
+    restart: always
+    environment:
+      - POSTGRES_DB=traffic
+      - POSTGRES_USER=traffic
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 8G
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  keycloak:
+    image: bitnami/keycloak:25
+    container_name: goautowp_keycloak_test
+    restart: always
+    environment:
+      KEYCLOAK_ADMIN_USER: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+      KEYCLOAK_MANAGEMENT_USER: manager
+      KEYCLOAK_MANAGEMENT_PASSWORD: password
+      KEYCLOAK_DATABASE_HOST: postgres-keycloak
+      KEYCLOAK_DATABASE_NAME: keycloak
+      KEYCLOAK_DATABASE_USER: keycloak
+      KEYCLOAK_DATABASE_PASSWORD: password
+      KC_HTTP_RELATIVE_PATH: /auth
+      KEYCLOAK_EXTRA_ARGS: -Dkeycloak.import=/opt/keycloak/data/import/
+    volumes:
+      - ./test/realm.json:/opt/keycloak/data/import/realm.json
+    ports:
+      - "8081:8080"
+
+  postgres-keycloak:
+    image: postgres:13-alpine
+    container_name: goautowp_postgres_keycloak_test
+    restart: always
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5433:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 8G
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  redis:
+    image: redis:alpine
+    container_name: goautowp_test_redis
+    restart: always
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 8G
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z
+    container_name: goautowp_test_minio
+    restart: always
+    privileged: true
+    environment:
+      MINIO_ROOT_USER: "AKIAIOSFODNN7EXAMPLE"
+      MINIO_ROOT_PASSWORD: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    ports:
+      - "19000:9000"
+      - "9001:9001"
+    volumes:
+      - "./minio/data:/data"
+    command: server --console-address ":9001" /data
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 8G
+        reservations:
+          cpus: "0.25"
+          memory: 16M
+
+  createbuckets:
+    image: minio/mc:RELEASE.2025-04-08T15-39-49Z
+    container_name: autowp_test_createbuckets
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      while ! /usr/bin/mc config host add autowp http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
+        do echo 'Wait minio to startup...' && sleep 1;
+      done;
+      /usr/bin/mc mb autowp/format;
+      /usr/bin/mc anonymous set download autowp/format;
+      /usr/bin/mc mb autowp/user;
+      /usr/bin/mc anonymous set download autowp/user;
+      /usr/bin/mc mb autowp/brand;
+      /usr/bin/mc anonymous set download autowp/brand;
+      /usr/bin/mc mb autowp/picture;
+      /usr/bin/mc anonymous set download autowp/picture;
+      /usr/bin/mc mb autowp/files;
+      /usr/bin/mc anonymous set download autowp/files;
+      /usr/bin/mc mb autowp/test;
+      /usr/bin/mc anonymous set download autowp/test;
+      /usr/bin/mc mb autowp/naming;
+      /usr/bin/mc anonymous set download autowp/naming;
+      exit 0;
+      "

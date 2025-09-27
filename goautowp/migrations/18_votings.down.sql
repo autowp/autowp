@@ -1,0 +1,1 @@
+DROP TABLE voting_variant_vote, voting_variant, voting;

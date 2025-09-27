@@ -1,0 +1,55 @@
+public-rest:
+  cors:
+    origin:
+      - http://localhost
+image-storage:
+  src-override:
+    host: 127.0.0.1:19000
+    scheme: http
+  s3:
+    region: "us-east-1"
+    endpoint: http://127.0.0.1:19000
+    credentials:
+      key: "AKIAIOSFODNN7EXAMPLE"
+      secret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  dirs:
+    test:
+      naming-strategy:
+        strategy: 'serial'
+        options:
+          deep: 2
+      bucket: 'test'
+    naming:
+      naming-strategy:
+        strategy: 'pattern'
+      bucket: 'naming'
+  formats:
+    test:
+      fitType: 0
+      width: 160
+      height: 120
+      background: '#fff'
+      strip: true
+#    picture-gallery:
+#      fitType: 2
+#      width: 1024
+#      height: 768
+#      reduceOnly: true
+#      strip: true
+#      format: 'jpeg'
+#    with-processor:
+#      fitType: 0
+#      width: 160
+#      height: 120
+#      background: '#fff'
+#      strip: true
+redis: redis://127.0.0.1:6379
+captcha: false
+message-interval: 0
+file-storage:
+  s3:
+    region: "us-east-1"
+    endpoint: http://127.0.0.1:19000
+    credentials:
+      key: "AKIAIOSFODNN7EXAMPLE"
+      secret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"

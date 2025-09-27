@@ -1,0 +1,1 @@
+DROP TABLE picture_vote_summary, picture_vote;

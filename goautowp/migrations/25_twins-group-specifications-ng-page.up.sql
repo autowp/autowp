@@ -1,0 +1,1 @@
+UPDATE pages SET url="/ng/twins/group/%TWINS_GROUP_ID%/specifications" WHERE id=27;

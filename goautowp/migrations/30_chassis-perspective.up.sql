@@ -1,0 +1,1 @@
+insert into perspectives(id, name, position) values (28, 'perspective/chassis', 30);

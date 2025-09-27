@@ -1,0 +1,57 @@
+<table class="table table-condensed table-striped table-bordered">
+  <thead>
+    <tr>
+      <th></th>
+      {{- range .Items }}
+        <th class="text-center">{{ .NameHTML }}</th>
+      {{- end }}
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      {{- range .Items }}
+        <td class="p-0 text-center">
+          {{- if and .TopPictureURL .TopPictureImage }}
+            <a href="{{ .TopPictureURL }}">
+              <img src="{{ .TopPictureImage.Src }}" width="{{ .TopPictureImage.Width }}" height="{{ .TopPictureImage.Height }}" />
+            </a>
+          {{- end }}
+        </td>
+      {{- end }}
+    </tr>
+    <tr>
+      <td></td>
+      {{- range .Items }}
+        <td class="text-center">{{ .YearsHTML }}</td>
+      {{- end }}
+    </tr>
+    {{- range .Attrs }}
+      <tr>
+        {{- if .HasChilds }}
+          <th style="padding-left:{{ .Padding }}px"{{ if not .HasValues }} colspan="{{ $.ItemsLenPlusOne }}"{{- end }}>{{ .Name }}</th>
+        {{- end }}
+        {{- if or (not .HasChilds) .HasValues }}
+          {{- if not .HasChilds }}
+            <td style="padding-left:{{ .Padding }}px">{{ .Name }}</td>
+          {{- end }}
+          {{- range .Cells }}
+            <td class="text-center" colspan="{{ .Colspan }}">{{ .Value }}</td>
+          {{- end }}
+        {{- end }}
+      </tr>
+    {{- end }}
+    <tr>
+      <td></td>
+      {{- range .Items }}
+        <td class="p-0 text-center">
+          {{- if and .BottomPictureURL .BottomPictureImage }}
+            <a href="{{ .BottomPictureURL }}">
+              <img src="{{ .BottomPictureImage.Src }}" width="{{ .BottomPictureImage.Width }}" height="{{ .BottomPictureImage.Height }}" />
+            </a>
+          {{- end }}
+        </td>
+      {{- end }}
+    </tr>
+  </tbody>
+</table>

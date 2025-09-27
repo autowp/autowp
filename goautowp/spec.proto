@@ -1,0 +1,2630 @@
+syntax = "proto3";
+package goautowp;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/field_mask.proto";
+import "google/type/latlng.proto";
+import "google/type/date.proto";
+import "google/rpc/status.proto";
+import "google/rpc/error_details.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/autowp/goautowp";
+
+service Autowp {
+  rpc CreateFeedback(CreateFeedbackRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v3/feedback"
+      body: "feedback"
+    };
+  }
+  rpc GetIP(GetIPRequest) returns (IP) {
+    option (google.api.http) = {
+      get: "/v3/autowp/ip/{ip}"
+    };
+  }
+  rpc GetReCaptchaConfig(google.protobuf.Empty) returns (ReCaptchaConfig) {
+    option (google.api.http) = {
+      get: "/v3/autowp/recaptcha-config"
+    };
+  }
+  rpc GetTimezones(google.protobuf.Empty) returns (Timezones) {
+    option (google.api.http) = {
+      get: "/v3/autowp/timezones"
+    };
+  }
+}
+
+service Forums {
+  rpc GetUserSummary(google.protobuf.Empty) returns (APIForumsUserSummary) {}
+  rpc CreateTopic(APICreateTopicRequest) returns (APICreateTopicResponse) {}
+  rpc CloseTopic(APISetTopicStatusRequest) returns (google.protobuf.Empty) {}
+  rpc OpenTopic(APISetTopicStatusRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteTopic(APISetTopicStatusRequest) returns (google.protobuf.Empty) {}
+  rpc MoveTopic(APIMoveTopicRequest) returns (google.protobuf.Empty) {}
+  rpc GetTheme(APIGetForumsThemeRequest) returns (APIForumsTheme) {}
+  rpc GetThemes(APIGetForumsThemesRequest) returns (APIForumsThemes) {}
+  rpc GetTopic(APIGetForumsTopicRequest) returns (APIForumsTopic) {}
+  rpc GetLastTopic(APIGetForumsThemeRequest) returns (APIForumsTopic) {}
+  rpc GetLastMessage(APIGetForumsTopicRequest) returns (APICommentMessage) {}
+  rpc GetTopics(APIGetForumsTopicsRequest) returns (APIForumsTopics) {}
+}
+
+service Articles {
+  rpc GetList(ArticlesRequest) returns (ArticlesResponse) {
+    option (google.api.http) = {
+      get: "/v3/articles"
+    };
+  }
+  rpc GetItemByCatname(ArticleByCatnameRequest) returns (Article) {
+    option (google.api.http) = {
+      get: "/v3/articles/{catname}"
+    };
+  }
+}
+
+service Traffic {
+  rpc AddToBlacklist(AddToTrafficBlacklistRequest) returns (google.protobuf.Empty) {}
+  rpc AddToWhitelist(AddToTrafficWhitelistRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteFromBlacklist(DeleteFromTrafficBlacklistRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteFromWhitelist(DeleteFromTrafficWhitelistRequest) returns (google.protobuf.Empty) {}
+  rpc GetTop(google.protobuf.Empty) returns (APITrafficTopResponse) {}
+  rpc GetWhitelist(google.protobuf.Empty) returns (APITrafficWhitelistItems) {}
+}
+
+service Contacts {
+  rpc CreateContact(CreateContactRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v3/contacts"
+      body: "contact"
+    };
+  }
+  rpc DeleteContact(DeleteContactRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v3/contacts/{user_id}"
+    };
+  }
+  rpc GetContact(GetContactRequest) returns (Contact) {
+    option (google.api.http) = {
+      get: "/v3/contacts/{user_id}"
+    };
+  }
+  rpc GetContacts(google.protobuf.Empty) returns (ContactItems) {
+    option (google.api.http) = {
+      get: "/v3/contacts"
+    };
+  }
+}
+
+service Users {
+  rpc DeleteUser(APIDeleteUserRequest) returns (google.protobuf.Empty) {}
+  rpc GetUser(APIGetUserRequest) returns (APIUser) {}
+  rpc Me(APIMeRequest) returns (APIUser) {}
+  rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty) {}
+  rpc GetUserPreferences(APIUserPreferencesRequest) returns (APIUserPreferencesResponse) {}
+  rpc DisableUserCommentsNotifications(APIUserPreferencesRequest) returns (google.protobuf.Empty) {}
+  rpc EnableUserCommentsNotifications(APIUserPreferencesRequest) returns (google.protobuf.Empty) {}
+  rpc GetUsers(APIUsersRequest) returns (APIUsersResponse) {}
+  rpc GetAccounts(google.protobuf.Empty) returns (APIAccountsResponse) {}
+  rpc DeleteUserAccount(DeleteUserAccountRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteUserPhoto(DeleteUserPhotoRequest) returns (google.protobuf.Empty) {}
+}
+
+service Rating {
+  rpc GetUserPicturesRating(google.protobuf.Empty) returns (APIUsersRatingResponse) {}
+  rpc GetUserPicturesRatingBrands(UserRatingDetailsRequest) returns (UserRatingBrandsResponse) {}
+  rpc GetUserCommentsRating(google.protobuf.Empty) returns (APIUsersRatingResponse) {}
+  rpc GetUserCommentsRatingFans(UserRatingDetailsRequest) returns (GetUserRatingFansResponse) {}
+  rpc GetUserPictureLikesRating(google.protobuf.Empty) returns (APIUsersRatingResponse) {}
+  rpc GetUserPictureLikesRatingFans(UserRatingDetailsRequest) returns (GetUserRatingFansResponse) {}
+  rpc GetUserSpecsRating(google.protobuf.Empty) returns (APIUsersRatingResponse) {}
+  rpc GetUserSpecsRatingBrands(UserRatingDetailsRequest) returns (UserRatingBrandsResponse) {}
+}
+
+service Items {
+  rpc GetItemOfDay(ItemOfDayRequest) returns (ItemOfDay) {}
+  rpc GetBrands(GetBrandsRequest) returns (APIBrandsList) {}
+  rpc GetBrandSections(GetBrandSectionsRequest) returns (APIBrandSections) {}
+  rpc GetTopBrandsList(GetTopBrandsListRequest) returns (APITopBrandsList) {}
+  rpc GetTopPersonsList(GetTopPersonsListRequest) returns (APITopPersonsList) {}
+  rpc GetTopFactoriesList(GetTopFactoriesListRequest) returns (APITopFactoriesList) {}
+  rpc GetTopCategoriesList(GetTopCategoriesListRequest) returns (APITopCategoriesList) {}
+  rpc GetTwinsBrandsList(GetTwinsBrandsListRequest) returns (APITwinsBrandsList) {}
+  rpc GetTopTwinsBrandsList(GetTopTwinsBrandsListRequest) returns (APITopTwinsBrandsList) {}
+  rpc GetTopSpecsContributions(TopSpecsContributionsRequest) returns (TopSpecsContributions) {}
+  rpc CreateItem(APIItem) returns (ItemID) {}
+  rpc UpdateItem(UpdateItemRequest) returns (google.protobuf.Empty) {}
+  rpc Item(ItemRequest) returns (APIItem) {}
+  rpc List(ItemsRequest) returns (APIItemList) {}
+  rpc GetTree(GetTreeRequest) returns (APITreeItem) {}
+  rpc GetContentLanguages(google.protobuf.Empty) returns (APIContentLanguages) {}
+  rpc GetItemLink(ItemLinksRequest) returns (APIItemLink) {}
+  rpc GetItemLinks(ItemLinksRequest) returns (ItemLinks) {}
+  rpc DeleteItemLink(APIItemLinkRequest) returns (google.protobuf.Empty) {}
+  rpc CreateItemLink(APIItemLink) returns (APICreateItemLinkResponse) {}
+  rpc UpdateItemLink(APIItemLink) returns (google.protobuf.Empty) {}
+  rpc GetItemVehicleTypes(APIGetItemVehicleTypesRequest) returns (APIGetItemVehicleTypesResponse) {}
+  rpc GetItemVehicleType(APIItemVehicleTypeRequest) returns (APIItemVehicleType) {}
+  rpc CreateItemVehicleType(APIItemVehicleType) returns (google.protobuf.Empty) {}
+  rpc DeleteItemVehicleType(APIItemVehicleTypeRequest) returns (google.protobuf.Empty) {}
+  rpc GetItemLanguages(APIGetItemLanguagesRequest) returns (ItemLanguages) {}
+  rpc UpdateItemLanguage(ItemLanguage) returns (google.protobuf.Empty) {}
+  rpc GetItemParentLanguages(APIGetItemParentLanguagesRequest) returns (ItemParentLanguages) {}
+  rpc SetItemParentLanguage(ItemParentLanguage) returns (google.protobuf.Empty) {}
+  rpc GetStats(google.protobuf.Empty) returns (StatsResponse) {}
+  rpc GetBrandNewItems(NewItemsRequest) returns (NewItemsResponse) {}
+  rpc GetNewItems(NewItemsRequest) returns (NewItemsResponse) {}
+  rpc GetItemParent(ItemParentsRequest) returns (ItemParent) {}
+  rpc GetItemParents(ItemParentsRequest) returns (ItemParents) {}
+  rpc CreateItemParent(ItemParent) returns (google.protobuf.Empty) {}
+  rpc UpdateItemParent(ItemParent) returns (google.protobuf.Empty) {}
+  rpc DeleteItemParent(DeleteItemParentRequest) returns (google.protobuf.Empty) {}
+  rpc MoveItemParent(MoveItemParentRequest) returns (google.protobuf.Empty) {}
+  rpc RefreshInheritance(RefreshInheritanceRequest) returns (google.protobuf.Empty) {}
+  rpc SetUserItemSubscription(SetUserItemSubscriptionRequest) returns (google.protobuf.Empty) {}
+  rpc GetPath(PathRequest) returns (PathResponse) {}
+  rpc GetAlpha(google.protobuf.Empty) returns (AlphaResponse) {}
+  rpc GetBrandVehicleTypes(GetBrandVehicleTypesRequest) returns (BrandVehicleTypeItems) {
+    option (google.api.http) = {
+      get: "/v3/items/brand-vehicle-types"
+    };
+  }
+  rpc GetVehicleTypes(google.protobuf.Empty) returns (VehicleTypeItems) {
+    option (google.api.http) = {
+      get: "/v3/items/vehicle-types"
+    };
+  }
+  rpc GetSpecs(google.protobuf.Empty) returns (SpecsItems) {
+    option (google.api.http) = {
+      get: "/v3/items/specs"
+    };
+  }
+  rpc GetBrandIcons(google.protobuf.Empty) returns (BrandIcons) {
+    option (google.api.http) = {
+      get: "/v3/items/brand-icons"
+    };
+  }
+}
+
+service Mosts {
+  rpc GetItems(MostsItemsRequest) returns (MostsItems) {}
+  rpc GetMenu(MostsMenuRequest) returns (MostsMenu) {}
+}
+
+service Comments {
+  rpc GetCommentVotes(GetCommentVotesRequest) returns (CommentVoteItems) {}
+  rpc Subscribe(CommentsSubscribeRequest) returns (google.protobuf.Empty) {}
+  rpc UnSubscribe(CommentsUnSubscribeRequest) returns (google.protobuf.Empty) {}
+  rpc View(CommentsViewRequest) returns (google.protobuf.Empty) {}
+  rpc SetDeleted(CommentsSetDeletedRequest) returns (google.protobuf.Empty) {}
+  rpc MoveComment(CommentsMoveCommentRequest) returns (google.protobuf.Empty) {}
+  rpc VoteComment(CommentsVoteCommentRequest) returns (CommentsVoteCommentResponse) {}
+  rpc Add(AddCommentRequest) returns (AddCommentResponse) {}
+  rpc GetMessagePage(GetMessagePageRequest) returns (APICommentsMessagePage) {}
+  rpc GetMessage(GetMessageRequest) returns (APICommentsMessage) {}
+  rpc GetMessages(GetMessagesRequest) returns (APICommentsMessages) {}
+}
+
+service Log {
+  rpc GetEvents(LogEventsRequest) returns (LogEvents) {}
+}
+
+service Map {
+  rpc GetPoints(MapGetPointsRequest) returns (MapPoints) {}
+}
+
+service Pictures {
+  rpc View(PicturesViewRequest) returns (google.protobuf.Empty) {}
+  rpc Vote(PicturesVoteRequest) returns (PicturesVoteSummary) {}
+  rpc CreateModerVoteTemplate(ModerVoteTemplate) returns (ModerVoteTemplate) {}
+  rpc DeleteModerVoteTemplate(DeleteModerVoteTemplateRequest) returns (google.protobuf.Empty) {}
+  rpc GetModerVoteTemplates(google.protobuf.Empty) returns (ModerVoteTemplates) {}
+  rpc DeleteModerVote(DeleteModerVoteRequest) returns (google.protobuf.Empty) {}
+  rpc UpdateModerVote(UpdateModerVoteRequest) returns (google.protobuf.Empty) {}
+  rpc GetUserSummary(google.protobuf.Empty) returns (PicturesUserSummary) {}
+  rpc Normalize(PictureIDRequest) returns (google.protobuf.Empty) {}
+  rpc Flop(PictureIDRequest) returns (google.protobuf.Empty) {}
+  rpc CorrectFileNames(PictureIDRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteSimilar(DeleteSimilarRequest) returns (google.protobuf.Empty) {}
+  rpc Repair(PictureIDRequest) returns (google.protobuf.Empty) {}
+  rpc GetPicture(PicturesRequest) returns (Picture) {}
+  rpc GetPictures(PicturesRequest) returns (PicturesList) {}
+  rpc GetPicturesPaginator(PicturesRequest) returns (Pages) {}
+  rpc GetPictureItem(PictureItemsRequest) returns (PictureItem) {}
+  rpc GetPictureItems(PictureItemsRequest) returns (PictureItems) {}
+  rpc SetPictureItemArea(SetPictureItemAreaRequest) returns (google.protobuf.Empty) {}
+  rpc SetPictureItemPerspective(SetPictureItemPerspectiveRequest) returns (google.protobuf.Empty) {}
+  rpc SetPictureItemItemID(SetPictureItemItemIDRequest) returns (google.protobuf.Empty) {}
+  rpc DeletePictureItem(DeletePictureItemRequest) returns (google.protobuf.Empty) {}
+  rpc CreatePictureItem(CreatePictureItemRequest) returns (google.protobuf.Empty) {}
+  rpc SetPictureCrop(SetPictureCropRequest) returns (google.protobuf.Empty) {}
+  rpc ClearReplacePicture(PictureIDRequest) returns (google.protobuf.Empty) {}
+  rpc AcceptReplacePicture(PictureIDRequest) returns (google.protobuf.Empty) {}
+  rpc SetPicturePoint(SetPicturePointRequest) returns (google.protobuf.Empty) {}
+  rpc UpdatePicture(UpdatePictureRequest) returns (google.protobuf.Empty) {}
+  rpc SetPictureCopyrights(SetPictureCopyrightsRequest) returns (google.protobuf.Empty) {}
+  rpc SetPictureStatus(SetPictureStatusRequest) returns (google.protobuf.Empty) {}
+  rpc GetInbox(InboxRequest) returns (Inbox) {}
+  rpc GetNewbox(NewboxRequest) returns (Newbox) {}
+  rpc GetCanonicalRoute(CanonicalRouteRequest) returns (CanonicalRoute) {}
+  rpc GetGallery(GalleryRequest) returns (GalleryResponse) {}
+  rpc GetPerspectives(google.protobuf.Empty) returns (PerspectivesItems) {
+    option (google.api.http) = {
+      get: "/v3/pictures/perspectives"
+    };
+  }
+  rpc GetPerspectivePages(google.protobuf.Empty) returns (PerspectivePagesItems) {
+    option (google.api.http) = {
+      get: "/v3/pictures/perspective-pages"
+    };
+  }
+}
+
+service Messaging {
+  rpc GetMessagesNewCount(google.protobuf.Empty) returns (MessageNewCount) {
+    option (google.api.http) = {
+      get: "/v3/messaging/messages-new-count"
+    };
+  }
+  rpc GetMessagesSummary(google.protobuf.Empty) returns (MessageSummary) {
+    option (google.api.http) = {
+      get: "/v3/messaging/messages-summary"
+    };
+  }
+  rpc DeleteMessage(MessagingDeleteMessage) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v3/messaging/messages/{message_id}"
+    };
+  }
+  rpc ClearFolder(MessagingClearFolder) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v3/messaging/clear-folder"
+    };
+  }
+  rpc CreateMessage(CreateMessageRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v3/messaging/messages"
+      body: "message"
+    };
+  }
+  rpc GetMessages(MessagingGetMessagesRequest) returns (MessagingGetMessagesResponse) {
+    option (google.api.http) = {
+      get: "/v3/messaging/messages"
+    };
+  }
+}
+
+service Statistics {
+  rpc GetPulse(PulseRequest) returns (PulseResponse) {
+    option (google.api.http) = {
+      get: "/v3/statistics/pulse"
+    };
+  }
+  rpc GetAboutData(google.protobuf.Empty) returns (AboutDataResponse) {
+    option (google.api.http) = {
+      get: "/v3/statistics/about-data"
+    };
+  }
+}
+
+service Donations {
+  rpc GetVODData(google.protobuf.Empty) returns (VODDataResponse) {}
+  rpc GetTransactions(google.protobuf.Empty) returns (DonationsTransactionsResponse) {
+    option (google.api.http) = {
+      get: "/v3/donations/transactions"
+    };
+  }
+}
+
+service Text {
+  rpc GetText(APIGetTextRequest) returns (APIGetTextResponse) {}
+}
+
+service Attrs {
+  rpc GetAttribute(AttrAttributeID) returns (AttrAttribute) {}
+  rpc GetAttributes(AttrAttributesRequest) returns (AttrAttributesResponse) {}
+  rpc GetAttributeTypes(google.protobuf.Empty) returns (AttrAttributeTypesResponse) {}
+  rpc GetListOptions(AttrListOptionsRequest) returns (AttrListOptionsResponse) {}
+  rpc GetUnits(google.protobuf.Empty) returns (AttrUnitsResponse) {}
+  rpc GetZoneAttributes(AttrZoneAttributesRequest) returns (AttrZoneAttributesResponse) {}
+  rpc GetZones(google.protobuf.Empty) returns (AttrZonesResponse) {}
+  rpc GetValues(AttrValuesRequest) returns (AttrValuesResponse) {}
+  rpc GetUserValues(AttrUserValuesRequest) returns (AttrUserValuesResponse) {}
+  rpc SetUserValues(AttrSetUserValuesRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteUserValues(DeleteAttrUserValuesRequest) returns (google.protobuf.Empty) {}
+  rpc MoveUserValues(MoveAttrUserValuesRequest) returns (google.protobuf.Empty) {}
+  rpc GetConflicts(AttrConflictsRequest) returns (AttrConflictsResponse) {}
+  rpc GetSpecifications(GetSpecificationsRequest) returns (GetSpecificationsResponse) {}
+  rpc GetChildSpecifications(GetSpecificationsRequest) returns (GetSpecificationsResponse) {}
+  rpc GetChartParameters(google.protobuf.Empty) returns (ChartParameters) {}
+  rpc GetChartData(ChartDataRequest) returns (ChartData) {}
+}
+
+service Votings {
+  rpc GetVoting(VotingRequest) returns (Voting) {
+    option (google.api.http) = {
+      get: "/v3/votings/{id}"
+    };
+  }
+  rpc GetVotingVariantVotes(VotingRequest) returns (VotingVariantVotes) {
+    option (google.api.http) = {
+      get: "/v3/votings/{id}/variant-votes"
+    };
+  }
+  rpc Vote(CreateVoteRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v3/votings/vote"
+      body: "vote"
+    };
+  }
+}
+
+message ChartDataRequest {
+  int64 id = 1;
+}
+
+message ChartDataDataset {
+  string name = 1;
+  map<int32, AttrValueValue> values = 3;
+}
+
+message ChartData {
+  repeated ChartDataDataset datasets = 1;
+}
+
+message ChartParameter {
+  int64 id = 1;
+  string name = 2;
+}
+
+message ChartParameters {
+  repeated ChartParameter parameters = 1;
+}
+
+message CreateVoteRequest {
+  Vote vote = 1;
+}
+
+message Vote {
+  int32 id = 1;
+  repeated int32 voting_variant_vote_ids = 2;
+}
+
+message VotingRequest {
+  int32 id = 1;
+}
+
+message Voting {
+  int32 id = 1;
+  google.protobuf.Timestamp begin_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+  bool can_vote = 4;
+  bool multivariant = 5;
+  string name = 6;
+  string text = 7;
+  repeated VotingVariant variants = 8;
+}
+
+message VotingVariant {
+  int32 id = 1;
+  bool is_max = 2;
+  bool is_min = 3;
+  string name = 4;
+  float percent = 5;
+  string text = 6;
+  int32 votes = 7;
+}
+
+message VotingVariantVotes {
+  repeated int64 user_ids = 1;
+}
+
+message ErrorDetails {
+  google.rpc.RetryInfo retryInfo = 1;
+  google.rpc.DebugInfo debugInfo = 2;
+  google.rpc.QuotaFailure quotaFailure = 3;
+  google.rpc.PreconditionFailure preconditionFailure = 4;
+  google.rpc.BadRequest badRequest = 5;
+  google.rpc.RequestInfo requestInfo = 6;
+  google.rpc.Help help = 7;
+  google.rpc.LocalizedMessage localizedMessage = 8;
+}
+
+message AttrAttributeID {
+  int64 id = 1;
+}
+
+message AttrAttributesRequest {
+  int64 zone_id = 1;
+  int64 parent_id = 2;
+}
+
+message AttrAttributesResponse {
+  repeated AttrAttribute items = 1;
+}
+
+message AttrAttribute {
+  int64 id = 1;
+  int64 parent_id = 2;
+  string name = 3;
+  string description = 4;
+  AttrAttributeType.ID type_id = 5;
+  int64 unit_id = 6;
+  bool is_multiple = 7;
+  int32 precision = 8;
+}
+
+message AttrListOptionsRequest {
+  int64 attribute_id = 1;
+}
+
+message AttrListOptionsResponse {
+  repeated AttrListOption items = 1;
+}
+
+message AttrListOption {
+  int64 id = 1;
+  string name = 2;
+  int64 attribute_id = 3;
+  int64 parent_id = 4;
+}
+
+message AttrZoneAttributesRequest {
+  int64 zone_id = 1;
+}
+
+message AttrZoneAttributesResponse {
+  repeated AttrZoneAttribute items = 1;
+}
+
+message AttrZoneAttribute {
+  int64 zone_id = 1;
+  int64 attribute_id = 2;
+}
+
+message AttrAttributeTypesResponse {
+  repeated AttrAttributeType items = 1;
+}
+
+message AttrAttributeType {
+  enum ID {
+    UNKNOWN = 0;
+    STRING = 1;
+    INTEGER = 2;
+    FLOAT = 3;
+    TEXT = 4;
+    BOOLEAN = 5;
+    LIST = 6;
+    TREE = 7;
+  }
+
+  ID id = 1;
+  string name = 2;
+}
+
+message AttrUnitsResponse {
+  repeated AttrUnit items = 1;
+}
+
+message AttrUnit {
+  int64 id = 1;
+  string name = 2;
+  string abbr = 3;
+}
+
+message AttrZonesResponse {
+  repeated AttrZone items = 1;
+}
+
+message AttrZone {
+  int64 id = 1;
+  string name = 2;
+}
+
+message MoveAttrUserValuesRequest {
+  int64 src_item_id = 1;
+  int64 dest_item_id = 2;
+}
+
+message DeleteAttrUserValuesRequest {
+  int64 attribute_id = 1;
+  int64 item_id = 2;
+  int64 user_id = 3;
+}
+
+message AttrUserValuesFields {
+  bool value_text = 1;
+}
+
+message AttrUserValuesRequest {
+  int64 zone_id = 1;
+  int64 user_id = 2;
+  int64 exclude_user_id = 3;
+  int64 item_id = 4;
+  string language = 5;
+  AttrUserValuesFields fields = 6;
+}
+
+message AttrSetUserValuesRequest {
+  repeated AttrUserValue items = 1;
+}
+
+message AttrConflictsRequest {
+  enum Filter {
+    ALL = 0;
+    DO_NOT_AGREE_WITH_ME = 1;
+    I_DISAGREE = 2;
+    MINUS_WEIGHT = 3;
+  }
+  Filter filter = 1;
+  int32 page = 2;
+  string language = 3;
+}
+
+message AttrConflictValue {
+  string value = 1;
+  bool value_is_empty = 2;
+  int64 user_id = 3;
+}
+
+message AttrConflict {
+  int64 item_id = 1;
+  int64 attribute_id = 2;
+  repeated AttrConflictValue values = 5;
+}
+
+message AttrConflictsResponse {
+  repeated AttrConflict items = 1;
+  Pages paginator = 2;
+}
+
+message GetSpecificationsRequest {
+  int64 item_id = 1;
+  string language = 2;
+}
+
+message GetSpecificationsResponse {
+  string html = 1;
+}
+
+message AttrUserValue {
+  int64 attribute_id = 1;
+  int64 item_id = 2;
+  int64 user_id = 3;
+  AttrValueValue value = 4;
+  string value_text = 5;
+  google.protobuf.Timestamp update_date = 6;
+}
+
+message AttrUserValuesResponse {
+  repeated AttrUserValue items = 1;
+}
+
+message AttrValuesRequest {
+  int64 zone_id = 1;
+  int64 item_id = 2;
+  string language = 5;
+}
+
+message AttrValuesResponse {
+  repeated AttrValue items = 1;
+}
+
+message AttrValueValue {
+  bool valid = 1;
+  int32 int_value = 2;
+  double float_value = 3;
+  string string_value = 4;
+  bool bool_value = 5;
+  repeated int64 list_value = 6;
+  AttrAttributeType.ID type = 7;
+  bool is_empty = 8;
+}
+
+message AttrValue {
+  int64 attribute_id = 1;
+  int64 item_id = 2;
+  AttrValueValue value = 3;
+  string value_text = 4;
+}
+
+message PulseRequest {
+  enum Period {
+    DEFAULT = 0;
+    YEAR = 1;
+    MONTH = 2;
+  }
+  Period period = 1;
+}
+
+message PulseGrid {
+  repeated float line = 1;
+  string color = 2;
+  int64 user_id = 3;
+}
+
+message PulseLegend {
+  int64 user_id = 1;
+  string color = 2;
+}
+
+message PulseResponse {
+  repeated PulseGrid grid = 1;
+  repeated PulseLegend legend = 2;
+  repeated string labels = 3;
+}
+
+message Spec {
+  int32 id = 1;
+  string name = 2;
+  string short_name = 3;
+  repeated Spec childs = 4;
+}
+
+message SpecsItems {
+  repeated Spec items = 1;
+}
+
+message Perspective {
+  int32 id = 1;
+  string name = 2;
+}
+
+message PerspectivesItems {
+  repeated Perspective items = 1;
+}
+
+message PerspectiveGroup {
+  int32 id = 1;
+  string name = 2;
+  repeated Perspective perspectives = 3;
+}
+
+message PerspectivePage {
+  int32 id = 1;
+  string name = 2;
+  repeated PerspectiveGroup groups = 3;
+}
+
+message PerspectivePagesItems {
+  repeated PerspectivePage items = 1;
+}
+
+message ReCaptchaConfig {
+  string public_key = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message BrandIcons {
+  string image = 1 [(google.api.field_behavior) = REQUIRED];
+  string css = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message VehicleType {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+  string name = 2 [(google.api.field_behavior) = REQUIRED];
+  repeated VehicleType childs = 4;
+}
+
+message VehicleTypeItems {
+  repeated VehicleType items = 1;
+}
+
+message Timezones {
+  repeated string timezones = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetBrandVehicleTypesRequest {
+  int32 brand_id = 1;
+}
+
+message BrandVehicleTypeItems {
+  repeated BrandVehicleType items = 1;
+}
+
+message BrandVehicleType {
+  int32 id = 1;
+  string name = 2;
+  string catname = 3;
+  string items_count = 4;
+}
+
+message DeleteContactRequest {
+  int64 user_id = 1;
+}
+
+message GetContactRequest {
+  int64 user_id = 1;
+}
+
+message APIImage {
+  int32 id = 1;
+  string src = 2;
+  int32 width = 3;
+  int32 height = 4;
+  int32 filesize = 5;
+  int32 crop_left = 6;
+  int32 crop_top = 7;
+  int32 crop_width = 8;
+  int32 crop_height = 9;
+}
+
+message APIUser {
+  int64 id = 1;
+  string name = 2;
+  bool deleted = 3;
+  bool long_away = 4;
+  bool green = 5;
+  repeated string route = 6;
+  string identity = 7;
+  APIImage avatar = 8;
+  string gravatar = 9;
+  google.protobuf.Timestamp last_online = 10;
+  double specs_weight = 11;
+  string email = 12;
+  string timezone = 13;
+  string language = 14;
+  int64 votes_per_day = 15;
+  int64 votes_left = 16;
+  APIImage img = 17;
+  string gravatar_large = 18;
+  APIImage photo = 19;
+  google.protobuf.Timestamp reg_date = 21;
+  int32 pictures_added = 23;
+  int32 pictures_accepted_count = 24;
+  string last_ip = 25;
+  string login = 26;
+}
+
+message Contact {
+  int64 contact_user_id = 1 [(google.api.field_behavior) = REQUIRED];
+  APIUser user = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+message ContactItems {
+  repeated Contact items = 1;
+}
+
+message CreateContactRequest {
+  Contact contact = 1;
+}
+
+message CommentVoteItems {
+  repeated CommentVote items  = 1;
+}
+
+message CommentVote {
+  enum VoteValue {
+    UNKNOWN = 0;
+    POSITIVE = -1;
+    NEGATIVE = 1;
+  }
+  VoteValue value = 1;
+  APIUser user = 2;
+}
+
+message APIBanItem {
+  google.protobuf.Timestamp until = 1;
+  int64 by_user_id = 2;
+  APIUser by_user = 3;
+  string reason = 4;
+}
+
+message APITrafficTopItem {
+  string ip = 1;
+  int32 count = 2;
+  APIBanItem ban = 3;
+  bool in_whitelist = 4;
+  string whois_url = 5;
+}
+
+message APITrafficTopResponse {
+  repeated APITrafficTopItem items = 1;
+}
+
+message GetIPRequest {
+  string ip = 1;
+  repeated string fields = 2;
+}
+
+message APIIPRights {
+  bool add_to_blacklist = 1;
+  bool remove_from_blacklist = 2;
+}
+
+message IP {
+  string address = 1;
+  string hostname = 2;
+  APIBanItem blacklist = 3;
+  APIIPRights rights = 4;
+}
+
+message CreateFeedbackRequest {
+  Feedback feedback = 1;
+}
+
+message Feedback {
+  string name = 1;
+  string email = 2;
+  string message = 3;
+  string captcha = 4;
+}
+
+message DeleteFromTrafficWhitelistRequest {
+  string ip = 1;
+}
+
+message DeleteFromTrafficBlacklistRequest {
+  string ip = 1;
+}
+
+message AddToTrafficBlacklistRequest {
+  string ip = 1;
+  int32 period = 2;
+  string reason = 3;
+}
+
+message AddToTrafficWhitelistRequest {
+  string ip = 1;
+}
+
+message APITrafficWhitelistItem {
+  string ip = 1;
+  string description = 2;
+}
+
+message APITrafficWhitelistItems {
+  repeated APITrafficWhitelistItem items = 1;
+}
+
+message APIForumsUserSummary {
+  int32 subscriptionsCount = 1;
+}
+
+message APIGetForumsThemeRequest {
+  int64 id = 1;
+}
+
+message APIGetForumsTopicsRequest {
+  int64 theme_id = 1;
+  int32 page = 2;
+  bool subscription = 3;
+}
+
+message APIGetForumsTopicRequest {
+  int64 id = 1;
+}
+
+message APIGetForumsThemesRequest {
+  int64 theme_id = 1;
+}
+
+message APIForumsTheme {
+  int64 id = 1;
+  string name = 2;
+  int32 topics_count = 3;
+  int32 messages_count = 4;
+  bool disable_topics = 5;
+  string description = 6;
+}
+
+message APIForumsThemes {
+  repeated APIForumsTheme items = 1;
+}
+
+message APIForumsTopic {
+  int64 id = 1;
+  string name = 2;
+  string status = 3;
+  int32 old_messages = 4;
+  int32 new_messages = 5;
+  google.protobuf.Timestamp created_at = 6;
+  int64 user_id = 7;
+  int64 theme_id = 8;
+  bool subscription = 9;
+}
+
+message APIForumsTopics {
+  repeated APIForumsTopic items = 1;
+  Pages paginator = 2;
+}
+
+message APICommentMessage {
+  int64 id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  int64 user_id = 3;
+}
+
+message APICreateTopicRequest {
+  int64 theme_id = 1;
+  string name = 2;
+  string message = 3;
+  bool moderator_attention = 4;
+  bool subscription = 5;
+}
+
+message APICreateTopicResponse {
+  int64 id = 1;
+}
+
+message APISetTopicStatusRequest {
+  int64 id = 1;
+}
+
+message APIMoveTopicRequest {
+  int64 id = 1;
+  int64 theme_id = 2;
+}
+
+message MessageNewCount {
+  int32 count = 1;
+}
+
+message MessageSummary {
+  int32 inbox_count = 1;
+  int32 inbox_new_count = 2;
+  int32 sent_count = 3;
+  int32 system_count = 4;
+  int32 system_new_count = 5;
+}
+
+message APIDeleteUserRequest {
+  int64 user_id = 1;
+  string password = 2;
+}
+
+message UpdateUserRequest {
+  APIUser user = 1;
+
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message APIMeRequest {
+  UserFields fields = 1;
+}
+
+message APIGetUserRequest {
+  int64 user_id = 1;
+  string identity = 3;
+  UserFields fields = 2;
+}
+
+message UserFields {
+  bool email = 1;
+  bool timezone = 3;
+  bool language = 4;
+  bool votes_per_day = 5;
+  bool votes_left = 6;
+  bool img = 7;
+  bool gravatar_large = 8;
+  bool photo = 9;
+  bool reg_date = 11;
+  bool pictures_added = 14;
+  bool pictures_accepted_count = 15;
+  bool last_ip = 16;
+  bool last_online = 17;
+  bool login = 18;
+}
+
+message APIBrandSection {
+  string name = 1;
+  repeated string routerLink = 3;
+  int32 count = 4;
+  repeated APIBrandSection groups = 5;
+}
+
+message APIBrandSections {
+  repeated APIBrandSection sections = 1;
+}
+
+message GetBrandSectionsRequest {
+  int64 item_id = 1;
+  string language = 2;
+}
+
+message GetTopBrandsListRequest {
+  string language = 1;
+}
+
+message GetBrandsRequest {
+  string language = 1;
+}
+
+message APIBrandsListItem {
+  int64 id = 1;
+  string catname = 2;
+  string name = 3;
+  int32 items_count = 4;
+  int32 new_items_count = 5;
+  int32 accepted_pictures_count = 6;
+}
+
+message APIBrandsListCharacter {
+  string character = 1;
+  string id = 2;
+  repeated APIBrandsListItem items = 3;
+}
+
+message APIBrandsListLine {
+  enum Category {
+    DEFAULT = 0;
+    NUMBER = 1;
+    CYRILLIC = 2;
+    LATIN = 3;
+  }
+  Category category = 1;
+  repeated APIBrandsListCharacter characters = 2;
+}
+
+message APIBrandsList {
+  repeated APIBrandsListLine lines = 1;
+}
+
+message APITopBrandsList {
+  repeated APITopBrandsListItem brands = 1;
+  int32 total = 2;
+}
+
+message APITopBrandsListItem {
+  int64 id = 1;
+  string catname = 2;
+  string name = 3;
+  int32 items_count = 4;
+  int32 new_items_count = 5;
+}
+
+enum PictureItemType {
+  PICTURE_ITEM_UNKNOWN = 0;
+  PICTURE_ITEM_CONTENT = 1;
+  PICTURE_ITEM_AUTHOR = 2;
+  PICTURE_ITEM_COPYRIGHTS = 3;
+}
+
+enum ItemType {
+  ITEM_TYPE_UNKNOWN    = 0;
+  ITEM_TYPE_VEHICLE    = 1;
+  ITEM_TYPE_ENGINE     = 2;
+  ITEM_TYPE_CATEGORY   = 3;
+  ITEM_TYPE_TWINS      = 4;
+  ITEM_TYPE_BRAND      = 5;
+  ITEM_TYPE_FACTORY    = 6;
+  ITEM_TYPE_MUSEUM     = 7;
+  ITEM_TYPE_PERSON     = 8;
+  ITEM_TYPE_COPYRIGHT  = 9;
+}
+
+enum ItemParentType {
+  ITEM_TYPE_DEFAULT = 0;
+  ITEM_TYPE_TUNING  = 1;
+  ITEM_TYPE_SPORT   = 2;
+  ITEM_TYPE_DESIGN  = 3;
+}
+
+enum PictureStatus {
+  PICTURE_STATUS_UNKNOWN  = 0;
+  PICTURE_STATUS_ACCEPTED = 1;
+  PICTURE_STATUS_REMOVING = 2;
+  PICTURE_STATUS_REMOVED  = 3;
+  PICTURE_STATUS_INBOX    = 4;
+}
+
+message GetTopPersonsListRequest {
+  string language = 1;
+  PictureItemType picture_item_type = 2;
+}
+
+message GetTwinsBrandsListRequest {
+  string language = 1;
+}
+
+message GetTopTwinsBrandsListRequest {
+  string language = 1;
+}
+
+message TopSpecsContributionsRequest {
+  string language = 1;
+}
+
+message TopSpecsContributions {
+  repeated APIItem items = 1;
+}
+
+message GetTopCategoriesListRequest {
+  string language = 1;
+}
+
+message GetTopFactoriesListRequest {
+  string language = 1;
+}
+
+message APITopPersonsList {
+  repeated APITopPersonsListItem items = 1;
+}
+
+message APITopPersonsListItem {
+  int64 id = 1;
+  string name = 3;
+}
+
+message APITwinsBrandsListItem {
+  int64 id = 1;
+  string name = 2;
+  string catname = 3;
+  int32 count = 4;
+  int32 new_count = 5;
+}
+
+message APITwinsBrandsList {
+  repeated APITwinsBrandsListItem items = 1;
+}
+
+message APITopTwinsBrandsList {
+  repeated APITwinsBrandsListItem items = 1;
+  int32 count = 2;
+}
+
+message APITopCategoriesList {
+  repeated APITopCategoriesListItem items = 1;
+}
+
+message APITopCategoriesListItem {
+  int64 id = 1;
+  string name = 2;
+  string catname = 3;
+  int32 count = 4;
+  int32 new_count = 5;
+}
+
+message APITopFactoriesList {
+  repeated APITopFactoriesListItem items = 1;
+}
+
+message APITopFactoriesListItem {
+  int64 id = 1;
+  string name = 2;
+  int32 count = 3;
+  int32 new_count = 4;
+}
+
+message PictureListOptions {
+  int64 id = 4;
+  string identity = 8;
+  PictureStatus status = 1;
+  repeated PictureStatus statuses = 9;
+  PictureItemListOptions picture_item = 2;
+  int64 owner_id = 3;
+  int32 accepted_in_days = 5;
+  google.type.Date add_date = 6;
+  google.type.Date accept_date = 7;
+  google.type.Date added_from = 10;
+  CommentTopicListOptions comment_topic = 11;
+  bool has_no_comments = 12;
+  bool has_point = 13;
+  bool has_no_point = 14;
+  bool has_no_picture_item = 15;
+  PictureListOptions replace_picture = 16;
+  bool has_no_replace_picture = 17;
+  PictureModerVoteListOptions picture_moder_vote = 18;
+  bool has_no_picture_moder_vote = 19;
+  DfDistanceListOptions df_distance = 20;
+  bool has_special_name = 21;
+}
+
+message DfDistanceListOptions {
+  PictureListOptions dst_picture = 1;
+}
+
+message PictureModerVoteListOptions {
+  bool vote_gt_zero = 1;
+  bool vote_lte_zero = 2;
+}
+
+message PathTreeItem {
+  string catname = 1;
+  ItemType item_type_id = 2;
+  repeated PathTreeItemParent parents = 3;
+}
+
+message PathTreeItemParent {
+  string catname = 1;
+  PathTreeItem item = 2;
+}
+
+message PathTreePictureItem {
+  PathTreeItem item = 1;
+  int32 perspective_id = 2;
+}
+
+message PictureFields {
+  bool name_text = 1;
+  bool name_html = 4;
+  bool image = 2;
+  bool thumb_medium = 3;
+  bool thumb_large = 28;
+  bool views = 5;
+  bool votes = 6;
+  bool comments_count = 7;
+  bool moder_vote = 8;
+  PicturePathRequest path = 10;
+  PictureItemsRequest picture_item = 11;
+  bool image_gallery_full = 12;
+  bool image_gallery = 29;
+  DfDistanceRequest df_distance = 13;
+  bool accepted_count = 14;
+  bool copyrights = 15;
+  bool exif = 16;
+  bool is_last = 17;
+  bool moder_voted = 18;
+  PictureModerVoteRequest picture_moder_votes = 19;
+  PicturesRequest replaceable = 20;
+  bool rights = 21;
+  PicturesRequest siblings = 22;
+  bool special_name = 23;
+  bool taken = 24;
+  bool preview_large = 25;
+  bool subscribed = 26;
+  PicturesRequest paginator = 27;
+}
+
+message PictureSiblings {
+  Picture prev = 1;
+  Picture next = 2;
+  Picture prev_new = 3;
+  Picture next_new = 4;
+}
+
+message PictureModerVote {
+  int64 picture_id = 1;
+  int64 user_id = 2;
+  int32 vote = 3;
+  string reason = 4;
+}
+
+message PictureModerVotes {
+  repeated PictureModerVote items = 1;
+}
+
+message PictureModerVoteRequest {
+  PictureModerVoteListOptions options = 1;
+}
+
+message DfDistanceFields {
+  PicturesRequest dst_picture = 1;
+}
+
+message DfDistanceRequest {
+  uint32 limit = 1;
+  DfDistanceListOptions options = 2;
+  DfDistanceFields fields = 3;
+}
+
+message PicturePathRequest {
+  int64 parent_id = 1;
+}
+
+message PreviewPicturesRequest {
+  int32 perspective_page_id = 4;
+  PicturesRequest pictures = 7;
+  bool only_exactly_pictures = 8;
+}
+
+message ItemFields {
+  bool name_only = 1;
+  bool name_default = 2;
+  bool name_html = 3;
+  bool name_text = 4;
+  bool description = 5;
+  bool full_text = 25;
+  bool has_text = 6;
+  PreviewPicturesRequest preview_pictures = 7;
+  bool descendants_count = 9;
+  bool descendant_pictures_count = 10;
+  bool childs_count = 11;
+  bool descendant_twins_groups_count = 12;
+  bool inbox_pictures_count = 13;
+  bool full_name = 14;
+  bool logo120 = 15;
+  bool mosts_active = 16;
+  bool comments_attentions_count = 17;
+  bool is_compiles_item_of_day = 18;
+  bool brandicon = 19;
+  bool attr_zone_id = 20;
+  bool location = 21;
+  bool accepted_pictures_count = 22;
+  bool has_child_specs = 23;
+  bool has_specs = 24;
+  bool other_names = 26;
+  bool design = 27;
+  bool specs_route = 28;
+  bool childs_counts = 29;
+  bool public_routes = 30;
+  PictureItemsRequest picture_items = 31;
+  bool alt_names = 32;
+  bool route = 33;
+  ItemLinksRequest links = 34;
+  ItemsRequest categories = 35;
+  ItemsRequest twins = 36;
+  bool can_edit_specs = 37;
+  ItemParentsRequest item_parent_childs = 38;
+  bool comments_count = 39;
+  ItemsRequest engine_vehicles = 40;
+  int64 route_brand_id = 41;
+  bool related_group_pictures = 42;
+  bool item_of_day_pictures = 43;
+  bool meta = 44;
+  bool engine_vehicles_count = 45;
+  bool item_language_count = 46;
+  bool links_count = 47;
+  bool logo = 48;
+  bool parents_count = 49;
+  bool exact_pictures_count = 50;
+  bool specifications_count = 51;
+  bool subscription = 52;
+  bool specs_contributors = 53;
+}
+
+message AltName {
+  repeated string languages = 1;
+  string name = 2;
+}
+
+message ItemID {
+  int64 id = 1;
+}
+
+message UpdateItemRequest {
+  APIItem item = 1;
+
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message ItemRequest {
+  string language = 1;
+  int64 id = 2;
+  ItemFields fields = 3;
+}
+
+message ItemsRequest {
+  enum Order {
+    DEFAULT = 0;
+    NAME_NAT = 1;
+    NAME = 2;
+    CHILDS_COUNT = 3;
+    AGE = 4;
+    ID_DESC = 5;
+    ID_ASC = 6;
+  }
+  string language = 1;
+  ItemFields fields = 2;
+  ItemListOptions options = 3;
+  uint32 limit = 6;
+  Order order = 9;
+  uint32 page = 11;
+}
+
+message PictureItemListOptions {
+  int64 picture_id = 7;
+  int64 item_id = 4;
+  PictureItemType type_id = 1;
+  PictureListOptions pictures = 2;
+  int32 perspective_id = 3;
+  repeated int32 exclude_perspective_id = 6;
+  int64 exclude_ancestor_or_self_id = 10;
+  ItemListOptions item = 8;
+  ItemParentCacheListOptions item_parent_cache_ancestor = 5;
+  ItemVehicleTypeListOptions item_vehicle_type = 9;
+  bool has_no_perspective_id = 11;
+  PictureItemListOptions picture_item_by_picture_id = 12;
+  bool has_area = 13;
+}
+
+message CommentTopicListOptions {
+  bool messages_gt_zero = 1;
+}
+
+message ItemParentListOptions {
+  int64 parent_id = 1;
+  ItemListOptions parent = 2;
+  ItemParentListOptions item_parent_parent_by_child = 3;
+  int64 item_id = 4;
+  ItemParentType type = 5;
+  bool strict_type = 9;
+  ItemListOptions item = 6;
+  ItemParentCacheListOptions item_parent_cache_item_by_child = 7;
+  string catname = 8;
+}
+
+message ItemParentCacheListOptions {
+  int64 item_id = 1;
+  int64 parent_id = 2;
+  ItemListOptions items_by_item_id = 3;
+  ItemListOptions items_by_parent_id = 6;
+  PictureItemListOptions picture_items_by_item_id = 4;
+  PictureItemListOptions picture_items_by_parent_id = 8;
+  ItemParentListOptions item_parent_by_item_id = 5;
+  ItemParentCacheListOptions item_parent_cache_ancestor_by_item_id = 7;
+  ItemVehicleTypeListOptions item_vehicle_type_by_item_id = 9;
+}
+
+message ItemParentCacheRequest {
+  ItemParentCacheFields fields = 1;
+  ItemParentCacheListOptions options = 2;
+}
+
+message ItemParentCacheFields {
+  ItemsRequest parentItem = 1;
+}
+
+message ItemParentCaches {
+  repeated ItemParentCache items = 1;
+}
+
+message ItemParentCache {
+  int64 item_id = 1;
+  int64 parent_id = 2;
+  APIItem parent_item = 3;
+}
+
+message ItemListOptions {
+  ItemType type_id = 3;
+  PictureItemListOptions preview_pictures = 5;
+  bool no_parent = 7;
+  string catname = 8;
+  string name = 10;
+  int64 id = 12;
+  bool is_concept = 14;
+  bool is_not_concept = 24;
+  bool is_not_concept_inherited = 37;
+  ItemParentCacheListOptions descendant = 15;
+  ItemParentCacheListOptions ancestor = 13;
+  ItemParentListOptions parent = 16;
+  int64 engine_id = 17;
+  ItemParentListOptions child = 18;
+  ItemType parent_types_of = 19;
+  bool is_group = 20;
+  int64 exclude_self_and_childs = 21;
+  string autocomplete = 22;
+  int64 suggestions_to = 23;
+  repeated ItemType type_ids = 25;
+  PictureItemListOptions picture_items = 26;
+  bool dateless = 27;
+  bool dateful = 36;
+  int64 related_groups_of = 28;
+  string name_exclude = 29;
+  int64 spec_id = 30;
+  int32 begin_year = 31;
+  int32 end_year = 32;
+  string text = 33;
+  bool no_vehicle_type = 34;
+  ItemVehicleTypeListOptions item_vehicle_type = 35;
+}
+
+message ItemVehicleTypeListOptions {
+  int64 vehicle_type_id = 1;
+}
+
+message GetTreeRequest {
+  int64 id = 1;
+  string language = 2;
+}
+
+message APITreeItem {
+  int64 id = 1;
+  string name_html = 2;
+  repeated APITreeItem childs = 3;
+  ItemParentType type = 4;
+}
+
+message APIItem {
+  int64 id = 1;
+  string catname = 2;
+  string name_only = 3;
+  string name_text = 4;
+  string name_html = 5;
+  string name_default = 38;
+  int32 descendants_count = 6;
+  int64 engine_item_id = 7;
+  ItemType item_type_id = 8;
+  string description = 9;
+  bool is_concept = 10;
+  bool is_concept_inherit = 11;
+  int32 spec_id = 12;
+  bool spec_inherit = 72;
+  string full_text = 13;
+  int32 descendant_pictures_count = 14;
+  int32 inbox_pictures_count = 17;
+  int32 accepted_pictures_count = 27;
+  int32 exact_pictures_count = 69;
+  int32 childs_count = 15;
+  int32 parents_count = 68;
+  int32 descendant_twins_groups_count = 16;
+  string full_name = 18;
+  APIImage logo = 67;
+  APIImage logo120 = 19;
+  bool mosts_active = 20;
+  int32 comments_attentions_count = 21;
+  bool is_compiles_item_of_day = 22;
+  APIImage brandicon = 23;
+  int64 attr_zone_id = 24;
+  bool engine_inherit = 25;
+  google.type.LatLng location = 26;
+  bool has_child_specs = 28;
+  bool has_specs = 29;
+  google.protobuf.Int32Value produced = 74;
+  bool produced_exactly = 31;
+  repeated string other_names = 32;
+  Design design = 33;
+  repeated string specs_route = 34;
+  bool is_group = 35;
+  repeated ChildsCount childs_counts = 36;
+  repeated PublicRoute public_routes = 37;
+  PictureItems picture_items = 39;
+  repeated AltName alt_names = 40;
+  repeated string route = 41;
+  ItemLinks links = 42;
+  bool has_text = 43;
+  repeated APIItem categories = 44;
+  repeated APIItem twins = 45;
+  bool can_edit_specs = 46;
+  ItemParents item_parent_childs = 47;
+  int32 comments_count = 48;
+  PreviewPictures preview_pictures = 49;
+  repeated APIItem engine_vehicles = 50;
+  repeated RelatedGroupPicture related_group_pictures = 51;
+  repeated ItemOfDayPicture item_of_day_pictures = 52;
+  int32 begin_year = 53;
+  int32 end_year = 54;
+  int32 begin_month = 55;
+  int32 end_month = 56;
+  int32 begin_model_year = 57;
+  int32 end_model_year = 58;
+  string begin_model_year_fraction = 59;
+  string end_model_year_fraction = 60;
+  string body = 61;
+  string name = 62;
+  google.protobuf.BoolValue today = 63;
+  int32 engine_vehicles_count = 64;
+  int32 item_language_count = 65;
+  int32 links_count = 66;
+  int32 specifications_count = 70;
+  bool subscription = 71;
+  repeated SpecsContributor specs_contributors = 73;
+}
+
+message SpecsContributor {
+  int64 user_id = 1;
+  int32 count = 2;
+}
+
+message ItemOfDayPicture {
+  string name = 1;
+  APIImage thumb = 2;
+  repeated string route = 3;
+}
+
+message ItemOfDayRequest {
+  string language = 1;
+}
+
+message ItemOfDay {
+  APIItem item = 1;
+  int64 user_id = 2;
+}
+
+message RelatedGroupPicture {
+  string name_html = 1;
+  string src = 2;
+  repeated string route = 3;
+}
+
+message NullPicture {
+  oneof kind {
+    google.protobuf.NullValue null = 1;
+    Picture picture = 2;
+  }
+}
+
+message PreviewPictures {
+  bool large_format = 1;
+  repeated NullPicture pictures = 2;
+  int32 total_pictures = 3;
+}
+
+message PublicRoute {
+  repeated string route = 1;
+}
+
+message ChildsCount {
+  ItemParentType type = 1;
+  int32 count = 2;
+}
+
+message Design {
+  string name = 1;
+  repeated string route = 2;
+}
+
+message APIItemList {
+  repeated APIItem items = 1;
+  Pages paginator = 2;
+}
+
+enum CommentsType {
+  UNKNOWN = 0;
+  PICTURES_TYPE_ID = 1;
+  ITEM_TYPE_ID = 2;
+  VOTINGS_TYPE_ID = 3;
+  ARTICLES_TYPE_ID = 4;
+  FORUMS_TYPE_ID = 5;
+}
+
+message CommentsSubscribeRequest {
+  int64 item_id = 1;
+  CommentsType type_id = 2;
+}
+
+message CommentsUnSubscribeRequest {
+  int64 item_id = 1;
+  CommentsType type_id = 2;
+}
+
+message GetCommentVotesRequest {
+  int64 comment_id = 1;
+}
+
+message CommentsViewRequest {
+  int64 item_id = 1;
+  CommentsType type_id = 2;
+}
+
+message CommentsSetDeletedRequest {
+  int64 comment_id = 1;
+  bool deleted = 2;
+}
+
+message CommentsMoveCommentRequest {
+  int64 comment_id = 1;
+  int64 item_id = 2;
+  CommentsType type_id = 3;
+}
+
+message CommentsVoteCommentRequest {
+  int64 comment_id = 1;
+  int32 vote = 2;
+}
+
+message CommentsVoteCommentResponse {
+  int32 votes = 1;
+}
+
+message LogEventsRequest {
+  int64 article_id = 1;
+  int64 item_id = 2;
+  int64 picture_id = 3;
+  int64 user_id = 4;
+  uint32 page = 5;
+}
+
+message LogEvents {
+  repeated LogEvent items = 1;
+  Pages paginator = 2;
+}
+
+message LogEvent {
+  google.protobuf.Timestamp created_at = 1;
+  string description = 2;
+  int64 user_id = 3;
+  repeated int64 pictures = 4;
+  repeated int64 items = 5;
+}
+
+message MapGetPointsRequest {
+  bool PointsOnly = 1;
+  string bounds = 2;
+  string language = 3;
+}
+
+message MapPoints {
+  repeated MapPoint points = 1;
+}
+
+message MapPoint {
+  google.type.LatLng location = 1;
+  string id = 2;
+  string name = 3;
+  repeated string url = 4;
+  APIImage image = 5;
+}
+
+message PicturesViewRequest {
+  int64 picture_id = 1;
+}
+
+message PicturesVoteRequest {
+  int64 picture_id = 1;
+  int32 value = 2;
+}
+
+message PicturesVoteSummary {
+  int32 value = 1;
+  int32 positive = 2;
+  int32 negative = 3;
+}
+
+message ModerVoteTemplate {
+  int64 id = 1;
+  int64 user_id = 2;
+  string message = 3;
+  int32 vote = 4;
+}
+
+message ModerVoteTemplates {
+  repeated ModerVoteTemplate items = 1;
+}
+
+message DeleteModerVoteTemplateRequest {
+  int64 id = 1;
+}
+
+message UpdateModerVoteRequest {
+  int64 picture_id = 1;
+  string reason = 2;
+  int32 vote = 3;
+  bool save = 4;
+}
+
+message PicturesUserSummary {
+    int32 inbox_count = 1;
+    int32 accepted_count = 2;
+}
+
+message PictureIDRequest {
+  int64 id = 1;
+}
+
+message PicturesRequest {
+  enum Order {
+    ORDER_NONE = 0;
+    ORDER_ADD_DATE_DESC = 1;
+    ORDER_ADD_DATE_ASC = 2;
+    ORDER_RESOLUTION_DESC = 3;
+    ORDER_RESOLUTION_ASC = 4;
+    ORDER_FILESIZE_DESC = 5;
+    ORDER_FILESIZE_ASC = 6;
+    ORDER_COMMENTS = 7;
+    ORDER_VIEWS = 8;
+    ORDER_MODER_VOTES = 9;
+    ORDER_DF_DISTANCE_SIMILARITY = 10;
+    ORDER_REMOVING_DATE = 11;
+    ORDER_LIKES = 12;
+    ORDER_DISLIKES = 13;
+    ORDER_STATUS = 14;
+    ORDER_ACCEPT_DATETIME_DESC = 15;
+    ORDER_PERSPECTIVES = 16;
+    ORDER_FRONT_PERSPECTIVES = 17;
+  }
+
+  PictureListOptions options = 1;
+  uint32 limit = 2;
+  uint32 page = 3;
+  bool paginator = 4;
+  PictureFields fields = 5;
+  string language = 6;
+  Order order = 7;
+}
+
+message Picture {
+  int64 id = 1;
+  string identity = 8;
+  uint32 width = 2;
+  uint32 height = 3;
+  APIImage image = 4;
+  google.type.LatLng point = 5;
+  int32 copyrights_text_id = 6;
+  APIImage thumb_medium = 7;
+  APIImage thumb_large = 46;
+  string name_text = 9;
+  string name_html = 10;
+  int64 owner_id = 11;
+  PictureStatus status = 12;
+  bool cropped = 13;
+  string crop_resolution = 14;
+  string resolution = 15;
+  int32 views = 16;
+  PicturesVoteSummary votes = 17;
+  int32 comments_count_total = 18;
+  int32 comments_count_new = 19;
+  int32 moder_vote_vote = 20;
+  int32 moder_vote_count = 21;
+  repeated PathTreePictureItem path = 23;
+  PictureItems picture_items = 24;
+  APIImage image_gallery = 47;
+  APIImage image_gallery_full = 25;
+  DfDistances df_distances = 26;
+  int32 accepted_count = 27;
+  google.protobuf.Timestamp add_date = 28;
+  string copyrights = 29;
+  string exif = 30;
+  bool is_last = 31;
+  bool moder_voted = 32;
+  PictureModerVotes picture_moder_votes = 33;
+  Picture replaceable = 34;
+  PictureRights rights = 35;
+  PictureSiblings siblings = 36;
+  string special_name = 37;
+  google.type.Date taken_date = 38;
+  int64 change_status_user_id = 39;
+  string ip = 40;
+  int32 dpi_x = 41;
+  int32 dpi_y = 42;
+  APIImage preview_large = 43;
+  bool subscribed = 44;
+  PicturesPages paginator = 45;
+}
+
+message PicturesPages {
+  int32 pageCount = 1;
+  string first = 2;
+  string current = 3;
+  string next = 5;
+  string previous = 6;
+  repeated PicturesPagesPage pagesInRange = 9;
+  int32 totalItemCount = 10;
+  string last = 11;
+}
+
+message PicturesPagesPage {
+  int32 page = 1;
+  string identity = 2;
+}
+
+message PictureRights {
+  bool move = 1;
+  bool accept = 2;
+  bool unaccept = 3;
+  bool restore = 4;
+  bool normalize = 5;
+  bool flop = 6;
+  bool crop = 7;
+  bool delete = 8;
+}
+
+message DfDistances {
+  repeated DfDistance items = 1;
+}
+
+message DfDistance {
+  int64 src_picture_id = 1;
+  int64 dst_picture_id = 2;
+  int32 distance = 3;
+  Picture dst_picture = 4;
+}
+
+message PicturesList {
+  repeated Picture items = 1;
+  Pages paginator = 2;
+}
+
+message PictureItemsRequest {
+  enum Order {
+    NONE = 0;
+    FRONT_PERSPECTIVES_FIRST = 1;
+  }
+
+  PictureItemListOptions options = 1;
+  PictureItemFields fields = 2;
+  string language = 3;
+  uint32 limit = 4;
+  Order order = 5;
+}
+
+message PictureItemFields {
+  ItemsRequest item = 1;
+  ItemParentCacheRequest item_parent_cache_ancestor = 2;
+  PicturesRequest picture = 3;
+}
+
+message PictureItems {
+  repeated PictureItem items = 1;
+}
+
+message PictureItem {
+  int64 picture_id = 1;
+  int64 item_id = 2;
+  PictureItemType type = 3;
+  uint32 crop_left = 4;
+  uint32 crop_top = 5;
+  uint32 crop_width = 6;
+  uint32 crop_height = 7;
+  int32 perspective_id = 8;
+  APIItem item = 9;
+  ItemParentCaches item_parent_cache_ancestors = 10;
+  Picture picture = 11;
+}
+
+message SetPictureItemAreaRequest {
+  int64 picture_id = 1;
+  int64 item_id = 2;
+  PictureItemType type = 3;
+  uint32 crop_left = 4;
+  uint32 crop_top = 5;
+  uint32 crop_width = 6;
+  uint32 crop_height = 7;
+}
+
+message SetPictureItemPerspectiveRequest {
+  int64 picture_id = 1;
+  int64 item_id = 2;
+  PictureItemType type = 3;
+  int32 perspective_id = 4;
+}
+
+message SetPictureItemItemIDRequest {
+  int64 picture_id = 1;
+  int64 item_id = 2;
+  PictureItemType type = 3;
+  int64 new_item_id = 4;
+}
+
+message DeletePictureItemRequest {
+  int64 picture_id = 1;
+  int64 item_id = 2;
+  PictureItemType type = 3;
+}
+
+message CreatePictureItemRequest {
+  int64 picture_id = 1;
+  int64 item_id = 2;
+  PictureItemType type = 3;
+  int32 perspective_id = 4;
+}
+
+message SetPictureCropRequest {
+  int64 picture_id = 1;
+  uint32 crop_left = 4;
+  uint32 crop_top = 5;
+  uint32 crop_width = 6;
+  uint32 crop_height = 7;
+}
+
+message SetPicturePointRequest {
+  int64 picture_id = 1;
+  google.type.LatLng point = 2;
+}
+
+message UpdatePictureRequest {
+  int64 id = 1;
+  google.type.Date taken_date = 2;
+  string name = 3;
+}
+
+message SetPictureCopyrightsRequest {
+  int64 id = 1;
+  string copyrights = 2;
+}
+
+message SetPictureStatusRequest {
+  int64 id = 1;
+  PictureStatus status = 2;
+}
+
+message NewboxRequest {
+  google.type.Date date = 1;
+  string language = 2;
+  uint32 page = 3;
+}
+
+message NewboxGroup {
+  APIItem item = 1;
+  repeated Picture pictures = 2;
+  int32 total_pictures = 3;
+  string type = 4;
+}
+
+message Newbox {
+  repeated NewboxGroup groups = 1;
+  google.type.Date prev_date = 2;
+  int32 prev_count = 3;
+  google.type.Date current_date = 4;
+  int32 current_count = 5;
+  google.type.Date next_date = 6;
+  int32 next_count = 7;
+  Pages paginator = 8;
+}
+
+message InboxRequest {
+  int64 brand_id = 1;
+  google.type.Date date = 2;
+  string language = 3;
+}
+
+message InboxBrand {
+  int64 id = 1;
+  string name = 2;
+}
+
+message Inbox {
+  repeated InboxBrand brands = 1;
+  google.type.Date prev_date = 2;
+  int32 prev_count = 3;
+  google.type.Date current_date = 4;
+  int32 current_count = 5;
+  google.type.Date next_date = 6;
+  int32 next_count = 7;
+}
+
+message CanonicalRouteRequest {
+  string identity = 1;
+}
+
+message CanonicalRoute {
+  repeated string route = 1;
+}
+
+message GalleryRequest {
+  PicturesRequest request = 1;
+  string picture_identity = 2;
+}
+
+message GalleryResponse {
+  int32 count = 1;
+  repeated Picture items = 2;
+  int32 page = 3;
+  int32 pages = 4;
+  PictureStatus status = 5;
+}
+
+message Rectangle {
+  int32 left = 1;
+  int32 top = 2;
+  int32 width = 3;
+  int32 height = 4;
+}
+
+message DeleteSimilarRequest {
+  int64 id = 1;
+  int64 similar_picture_id = 2;
+}
+
+message DeleteModerVoteRequest {
+  int64 picture_id = 1;
+}
+
+message MessagingDeleteMessage {
+  int64 message_id = 1;
+}
+
+message MessagingClearFolder {
+  string folder = 1;
+}
+
+message Message {
+  int64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string text = 2 [(google.api.field_behavior) = REQUIRED];
+  bool is_new = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+  bool can_delete = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+  bool can_reply = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp date = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+  bool all_messages_link = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+  int32 dialog_count = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+  int64 author_id = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+  int64 to_user_id = 10 [(google.api.field_behavior) = REQUIRED];
+  int64 dialog_with_user_id = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message CreateMessageRequest {
+  Message message = 1;
+}
+
+message MessagingGetMessagesRequest {
+  int64 user_id = 1 [(google.api.field_behavior) = OPTIONAL];
+  string folder = 2 [(google.api.field_behavior) = OPTIONAL];
+  int32 page = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+message MessagingGetMessagesResponse {
+  repeated Message items = 1;
+  Pages paginator = 2;
+}
+
+message Pages {
+  int32 pageCount = 1;
+  int32 first = 2;
+  int32 current = 3;
+  int32 next = 5;
+  int32 previous = 6;
+  int32 firstPageInRange = 7;
+  int32 lastPageInRange = 8;
+  repeated int32 pagesInRange = 9;
+  int32 totalItemCount = 10;
+  int32 last = 11;
+}
+
+message DonationsTransaction {
+  int32 sum = 1 [(google.api.field_behavior) = REQUIRED];
+  string currency = 2 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.Timestamp date = 3;
+  string contributor = 4 [(google.api.field_behavior) = REQUIRED];
+  string purpose = 5 [(google.api.field_behavior) = REQUIRED];
+  int64 user_id = 6 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DonationsTransactionsResponse {
+  repeated DonationsTransaction items = 1;
+}
+
+message VODDataResponse {
+  repeated VODDataDate dates = 1;
+  int32 sum = 2;
+}
+
+message VODDataDate {
+  google.protobuf.Timestamp date = 1;
+  bool free = 2;
+}
+
+message AboutDataResponse {
+  string developer = 1;
+  string fr_translator = 2;
+  string zh_translator = 3;
+  string be_translator = 4;
+  string pt_br_translator = 5;
+  repeated string contributors = 6;
+  int32 total_pictures = 7;
+  int32 pictures_size = 8;
+  int32 total_users = 9;
+  int32 total_items = 10;
+  int32 total_comments = 11;
+}
+
+message APIUserPreferencesRequest {
+  int64 user_id = 1;
+}
+
+message APIUserPreferencesResponse {
+  bool disable_comments_notifications = 1;
+}
+
+message APIUsersRequest {
+  bool is_online = 2;
+  uint64 limit = 3;
+  uint64 page = 4;
+  UserFields fields = 5;
+  string search = 6;
+  repeated int64 id = 7;
+}
+
+message APIUsersResponse {
+  repeated APIUser items = 1;
+  Pages paginator = 2;
+}
+
+message APIAccountsResponse {
+  repeated APIAccountsAccount items = 1;
+}
+
+message APIAccountsAccount {
+  bool can_remove = 1;
+  string icon = 2;
+  int64 id = 3;
+  string link = 4;
+  string name = 5;
+}
+
+message DeleteUserAccountRequest {
+  int64 id = 1;
+}
+
+message DeleteUserPhotoRequest {
+  int64 id = 1;
+}
+
+message APIUsersRatingUserBrand {
+  string name = 1;
+  repeated string route = 2;
+  int64 volume = 3;
+}
+
+message APIUsersRatingUserFan {
+  int64 user_id = 1;
+  int64 volume = 2;
+}
+
+message APIUsersRatingUser {
+  int64 user_id = 1;
+  int64 volume = 2;
+  double weight = 3;
+}
+
+message APIUsersRatingResponse {
+  repeated APIUsersRatingUser users = 1;
+}
+
+message UserRatingDetailsRequest {
+  int64 user_id = 1;
+  string language = 2;
+}
+
+message UserRatingBrandsResponse {
+  repeated APIUsersRatingUserBrand brands = 1;
+}
+
+message GetUserRatingFansResponse {
+  repeated APIUsersRatingUserFan fans = 1;
+}
+
+message ArticlesRequest {
+  uint64 limit = 1;
+  uint64 page = 2;
+}
+
+message ArticlesResponse {
+  repeated Article items = 1;
+  Pages paginator = 2;
+}
+
+message Article {
+  int64 id = 1;
+  string name = 2;
+  int64 author_id = 3;
+  string catname = 4;
+  google.protobuf.Timestamp date = 5;
+  string html = 6;
+  string preview_url = 7;
+  string description = 8;
+}
+
+message ArticleByCatnameRequest {
+  string catname = 1;
+}
+
+message APIContentLanguages {
+  repeated string languages = 1;
+}
+
+message APIItemLinkRequest {
+  int64 id = 1;
+}
+
+message ItemLinkListOptions {
+  int64 id = 1;
+  int64 item_id = 2;
+  string type = 3;
+  ItemParentCacheListOptions item_parent_cache_descendant = 4;
+}
+
+message ItemLinksRequest {
+  ItemLinkListOptions options = 1;
+}
+
+message ItemLinks {
+  repeated APIItemLink items = 1;
+}
+
+message APIItemLink {
+  int64 id = 1;
+  string name = 2;
+  string url = 3;
+  string type = 4;
+  int64 item_id = 5;
+}
+
+message APICreateItemLinkResponse {
+  int64 id = 1;
+}
+
+message APIGetItemVehicleTypesRequest {
+  int64 item_id = 1;
+  int64 vehicle_type_id = 2;
+}
+
+message APIItemVehicleType {
+  int64 item_id = 1;
+  int64 vehicle_type_id = 2;
+}
+
+message APIGetItemVehicleTypesResponse {
+  repeated APIItemVehicleType items = 1;
+}
+
+message APIItemVehicleTypeRequest {
+  int64 item_id = 1;
+  int64 vehicle_type_id = 2;
+}
+
+message APIGetItemLanguagesRequest {
+  int64 item_id = 1;
+}
+
+message ItemLanguages {
+  repeated ItemLanguage items = 1;
+}
+
+message ItemLanguage {
+  int64 item_id = 1;
+  string language = 2;
+  string name = 3;
+  int32 text_id = 4;
+  string text = 5;
+  int32 full_text_id = 6;
+  string full_text = 7;
+}
+
+message APIGetItemParentLanguagesRequest {
+  int64 item_id = 1;
+  int64 parent_id = 2;
+}
+
+message ItemParentLanguages {
+  repeated ItemParentLanguage items = 1;
+}
+
+message ItemParentLanguage {
+  int64 item_id = 1;
+  int64 parent_id = 2;
+  string name = 3;
+  string language = 4;
+}
+
+message StatsResponse {
+  repeated StatsValue values = 1;
+}
+
+message StatsValue {
+  string name = 1;
+  int32 total = 2;
+  int32 value = 3;
+}
+
+message NewItemsRequest {
+  int64 item_id = 1;
+  string language = 2;
+}
+
+message NewItemsResponse {
+  APIItem brand = 1;
+  repeated APIItem items = 2;
+}
+
+message ItemParentFields {
+  ItemFields item = 1;
+  ItemFields parent = 2;
+  ItemFields duplicate_parent = 3;
+  ItemFields duplicate_child = 4;
+  PicturesRequest child_descendant_pictures = 5;
+}
+
+message ItemParentsRequest {
+  enum Order {
+    NONE = 0;
+    AUTO = 1;
+    CATEGORIES_FIRST = 2;
+  }
+
+  ItemParentListOptions options = 1;
+  Order order = 2;
+  uint32 limit = 3;
+  uint32 page = 4;
+  ItemParentFields fields = 5;
+  string language = 6;
+}
+
+message ItemParents {
+  repeated ItemParent items = 1;
+  Pages paginator = 2;
+}
+
+message ItemParent {
+  int64 item_id = 1;
+  int64 parent_id = 2;
+  ItemParentType type = 3;
+  string catname = 4;
+  APIItem item = 5;
+  APIItem parent = 8;
+  APIItem duplicate_parent = 6;
+  APIItem duplicate_child = 7;
+  PicturesList child_descendant_pictures = 9;
+}
+
+message DeleteItemParentRequest {
+  int64 item_id = 1;
+  int64 parent_id = 2;
+}
+
+message MoveItemParentRequest {
+  int64 item_id = 1;
+  int64 parent_id = 2;
+  int64 dest_parent_id = 3;
+}
+
+message RefreshInheritanceRequest {
+  int64 item_id = 1;
+}
+
+message SetUserItemSubscriptionRequest {
+  int64 item_id = 1;
+  bool subscribed = 2;
+}
+
+message PathRequest {
+  string catname = 1;
+  string path = 2;
+  string language = 3;
+}
+
+message PathResponse {
+  repeated PathItem path = 1;
+}
+
+message AlphaResponse {
+  repeated string numbers = 1;
+  repeated string latin = 2;
+  repeated string cyrillic = 3;
+  repeated string han = 4;
+  repeated string other = 5;
+}
+
+message PathItem {
+  string catname = 1;
+  APIItem item = 2;
+  int64 parent_id = 3;
+}
+
+message MostsMenuRequest {
+  int64 brand_id = 1;
+}
+
+message YearsRange {
+  string name = 1;
+  string catname = 2;
+}
+
+message MostsRating {
+  string name = 1;
+  string catname = 2;
+}
+
+message MostsVehicleType {
+  string name_rp = 1;
+  string catname = 2;
+  repeated MostsVehicleType childs = 3;
+}
+
+message MostsMenu {
+  repeated YearsRange years = 1;
+  repeated MostsRating ratings = 2;
+  repeated MostsVehicleType vehicle_types = 3;
+}
+
+message MostsItemsRequest {
+  string language = 1;
+  string years_catname = 2;
+  string type_catname = 3;
+  string rating_catname = 4;
+  int64 brand_id = 5;
+}
+
+message MostsItem {
+  APIItem item = 1;
+  string value_html = 2;
+  int64 unit_id = 3;
+}
+
+message MostsItems {
+  repeated MostsItem items = 1;
+}
+
+message AddCommentRequest {
+  int64 item_id = 1;
+  CommentsType type_id = 2;
+  string message = 3;
+  bool moderator_attention = 4;
+  int64 parent_id = 5;
+  bool resolve = 6;
+}
+
+message GetMessagePageRequest {
+  int64 message_id = 1;
+  int32 per_page = 2;
+}
+
+message CommentMessageFields {
+  bool preview = 1;
+  bool route = 2;
+  bool text = 3;
+  bool vote = 4;
+  bool user_vote = 5;
+  bool replies = 6;
+  bool status = 7;
+  bool is_new = 8;
+}
+
+message GetMessageRequest {
+  int64 id = 1;
+  CommentMessageFields fields = 2;
+}
+
+message GetMessagesRequest {
+  enum Order {
+    DEFAULT = 0;
+    VOTE_DESC = 1;
+    VOTE_ASC = 2;
+    DATE_DESC = 3;
+    DATE_ASC = 4;
+  }
+
+  CommentMessageFields fields = 1;
+  int64 item_id = 2;
+  CommentsType type_id = 3;
+  int64 parent_id = 4;
+  bool no_parents = 5;
+  int64 user_id = 6;
+  Order order = 7;
+  string user_identity = 8;
+  ModeratorAttention moderator_attention = 9;
+  int64 pictures_of_item_id = 10;
+  int32 limit = 11;
+  int32 page = 12;
+}
+
+message APICommentsMessagePage {
+  CommentsType type_id = 1;
+  int64 item_id = 2;
+  int32 page = 3;
+}
+
+message APICommentsMessages {
+  repeated APICommentsMessage items = 1;
+  Pages paginator = 2;
+}
+
+enum ModeratorAttention {
+  NONE = 0;
+  REQUIRED = 1;
+  COMPLETE = 2;
+}
+
+message APICommentsMessage {
+  int64 id = 1;
+  CommentsType type_id = 2;
+  int64 item_id = 3;
+  int64 parent_id = 4;
+  google.protobuf.Timestamp created_at = 5;
+  bool deleted = 6;
+  ModeratorAttention moderator_attention = 7;
+  bool is_new = 8;
+  int64 author_id = 9;
+  string ip = 10;
+  string text = 11;
+  int32 vote = 12;
+  string preview = 13;
+  repeated string route = 14;
+  int32 userVote = 15;
+  repeated APICommentsMessage replies = 16;
+  PictureStatus picture_status = 17;
+}
+
+message AddCommentResponse {
+  int64 id = 1;
+}
+
+message APIGetTextRequest {
+  int64 id = 1;
+  int64 revision = 2;
+}
+
+message TextRevision {
+  string text = 1;
+  int64 revision = 2;
+  int64 user_id = 3;
+}
+
+message APIGetTextResponse {
+  TextRevision current = 1;
+  TextRevision prev = 2;
+  TextRevision next = 3;
+}

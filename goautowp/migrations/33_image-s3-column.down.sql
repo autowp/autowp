@@ -1,0 +1,1 @@
+alter table image drop column s3;

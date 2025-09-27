@@ -1,0 +1,1 @@
+UPDATE spec SET short_name='Italia' WHERE id=39;

@@ -1,0 +1,268 @@
+gin-mode: "debug"
+public-rest:
+  listen: ":8080"
+grpc:
+  listen: ":8082"
+sentry:
+  dsn: ""
+  environment: development
+metrics:
+  listen: ":2112"
+autowp-migrations:
+  dir: ./migrations
+  dsn: mysql://root:password@tcp(127.0.0.1)/autowp?charset=utf8mb4&collation=utf8mb4_0900_ai_ci&parseTime=true&loc=UTC
+duplicate_finder:
+  rabbitmq: amqp://guest:guest@localhost:5672/
+  queue: duplicate_finder
+attrs:
+  update_values_queue: attrs_update_values
+autowp-dsn: root:password@tcp(127.0.0.1:3306)/autowp?charset=utf8mb4&collation=utf8mb4_0900_ai_ci&parseTime=true&loc=UTC
+file-storage:
+  bucket: files
+  srcOverride:
+    host: '127.0.0.1'
+    port: '19000'
+  s3:
+    credentials:
+      key: AKIAIOSFODNN7EXAMPLE
+      secret: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    region: ""
+    endpoint: http://minio:19000
+    use_path_style_endpoint: true
+
+rabbitmq: amqp://guest:guest@127.0.0.1:5672/
+monitoring_queue: input
+postgres-dsn: postgres://traffic:password@127.0.0.1:5432/traffic?sslmode=disable
+postgres-migrations:
+  dsn: postgres://traffic:password@127.0.0.1/traffic?sslmode=disable
+  dir: ./postgres-migrations
+recaptcha:
+  public-key: public
+  private-key: private
+smtp:
+  username: username
+  password: password
+  hostname: localhost
+  port: 465
+feedback:
+  from: Robot autowp.ru <no-reply@autowp.ru>
+  to:
+  - autowp@gmail.com
+  subject: AutoWP Feedback
+keycloak:
+  url: http://127.0.0.1:8081/auth
+  realm: autowp
+  client-id: autowp
+  client-secret: c0fce0df-6105-4d1e-bc23-8e67239f7640
+email-salt: "salt"
+users-salt: "users-salt"
+languages:
+  en:
+    hostname: en.localhost
+    timezone: Europe/London
+    name    : English
+    flag    : flag-icon flag-icon-gb
+    aliases : []
+  zh:
+    hostname: zh.localhost
+    timezone: Asia/Shanghai
+    name    : 中文
+    flag    : flag-icon flag-icon-cn
+    aliases : []
+  ru:
+    hostname: ru.localhost
+    timezone: Europe/Moscow
+    name    : Русский
+    flag    : flag-icon flag-icon-ru
+    aliases : []
+  pt-br:
+    hostname: br.localhost
+    timezone: Brazil/West
+    name    : Português brasileiro
+    flag    : flag-icon flag-icon-br
+    aliases : []
+  fr:
+    hostname: fr.localhost
+    timezone: Europe/Paris
+    name    : Français
+    flag    : flag-icon flag-icon-fr
+    aliases : []
+  be:
+    hostname: be.localhost
+    timezone: Europe/Minsk
+    name    : Беларуская
+    flag    : flag-icon flag-icon-by
+    aliases : []
+  uk:
+    hostname: uk.localhost
+    timezone: Europe/Kiev
+    name    : Українська
+    flag    : flag-icon flag-icon-ua
+    aliases : []
+  es:
+    hostname: es.localhost
+    timezone: Europe/Madrid
+    name    : Español
+    flag    : flag-icon flag-icon-es
+    aliases : []
+  it:
+    hostname: it.localhost
+    timezone: Europe/Rome
+    name    : Italiano
+    flag    : flag-icon flag-icon-it
+    aliases : []
+  he:
+    hostname: he.localhost
+    timezone: Asia/Jerusalem
+    name    : עִברִית
+    flag    : flag-icon flag-icon-he
+    aliases : []
+captcha: true
+mock-email-sender: true
+image-storage:
+  dirs:
+    format:
+      naming-strategy:
+        strategy: pattern
+      bucket: format
+    user:
+      naming-strategy:
+        strategy: serial
+        options:
+          deep: 2
+      bucket: user
+    brand:
+      naming-strategy:
+        strategy: pattern
+      bucket: brand
+    picture:
+      naming-strategy:
+        strategy: pattern
+      bucket: picture
+    museum:
+      naming-strategy:
+        strategy: serial
+      bucket: museum
+  formats:
+    icon:
+      fit-type: 0
+      width: 70
+      height: 70
+      background: transparent
+      strip: true
+    logo:
+      fit-type: 1
+      width: 120
+      height: 120
+      background: "#F5F5F5"
+      strip: true
+    photo:
+      fit-type: 2
+      width: 555
+      height: 400
+      background: transparent
+      reduce-only: true
+      strip: true
+    avatar:
+      fit-type: 0
+      width: 70
+      height: 70
+      background: transparent
+      strip: true
+    brandicon:
+      fit-type: 1
+      width: 70
+      height: 70
+      background: "#EDE9DE"
+      strip: true
+      format: avif
+      quality: 60
+    brandicon2:
+      fit-type: 2
+      width: 70
+      height: 70
+      background: transparent
+      strip: true
+    picture-thumb-medium:
+      fit-type: 0
+      width: 350
+      height: 270
+      strip: true
+      format: avif
+      quality: 60
+      proportional-crop: true
+    picture-thumb-large:
+      fit-type: 0
+      width: 635
+      height: 476
+      strip: true
+      format: avif
+      quality: 60
+      proportional-crop: true
+    picture-medium:
+      fit-type: 0
+      width: 350
+      strip: true
+      format: avif
+      quality: 60
+    picture-preview-large:
+      fit-type: 0
+      width: 635
+      strip: true
+      format: avif
+      quality: 60
+    picture-gallery:
+      fit-type: 2
+      width: 1024
+      height: 768
+      reduce-only: true
+      strip: true
+      format: avif
+      quality: 60
+    picture-gallery-full:
+      fit-type: 2
+      width: 1024
+      height: 768
+      reduce-only: true
+      ignore-crop: true
+      strip: true
+      format: avif
+      quality: 60
+  s3:
+    region: ""
+    #version: latest
+    endpoint: http://minio:19000
+    credentials:
+      key: key
+      secret: secret
+    use_path_style_endpoint: true
+  srcOverride: []
+telegram:
+  access-token: "example"
+  webhook: "http://localhost/api/telegram/webhook/token/example"
+donations-vod-price: 100
+about:
+  developer: "1"
+  fr-translator: "1"
+  zh-translator: "1"
+  be-translator: "1"
+  pt-br-translator: "1"
+content-languages:
+  - en
+  - ru
+  - uk
+  - be
+  - fr
+  - it
+  - zh
+  - pt
+  - de
+  - es
+  - jp
+  - he
+message-interval: 300
+mosts-min-cars-count: 200
+yoomoney:
+  secret: "secret"
+  price: "999"
+trusted-network: "10.244.0.0/16"

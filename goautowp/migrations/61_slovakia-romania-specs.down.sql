@@ -1,0 +1,1 @@
+DELETE FROM `spec` WHERE id IN (68, 69);

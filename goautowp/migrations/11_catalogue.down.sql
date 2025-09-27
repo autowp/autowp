@@ -1,0 +1,1 @@
+DROP TABLE item_point, user_item_subscribe, picture_item, vehicle_vehicle_type, links, item_parent_cache, item_parent_language, item_parent, item_language, brand_alias, item, car_types_parents, car_types, item_type;

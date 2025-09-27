@@ -1,0 +1,17 @@
+build
+.github
+.idea
+.hadolint.yaml
+README.md
+sonar-project.properties
+LICENSE
+goland.svg
+goautowp
+cov.out
+coverage.xml
+app
+minio
+.releaserc.yaml
+.golangci.yml
+.gitlab-ci.yml
+.gitignore

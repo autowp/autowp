@@ -1,0 +1,386 @@
+{
+    "id": "autowp",
+    "realm": "autowp",
+    "displayName": "WheelsAge.org",
+    "notBefore": 0,
+    "defaultSignatureAlgorithm": "RS256",
+    "revokeRefreshToken": false,
+    "refreshTokenMaxReuse": 0,
+    "accessTokenLifespan": 300,
+    "accessTokenLifespanForImplicitFlow": 900,
+    "ssoSessionIdleTimeout": 1800,
+    "ssoSessionMaxLifespan": 36000,
+    "ssoSessionIdleTimeoutRememberMe": 0,
+    "ssoSessionMaxLifespanRememberMe": 0,
+    "offlineSessionIdleTimeout": 2592000,
+    "offlineSessionMaxLifespanEnabled": false,
+    "offlineSessionMaxLifespan": 5184000,
+    "clientSessionIdleTimeout": 0,
+    "clientSessionMaxLifespan": 0,
+    "clientOfflineSessionIdleTimeout": 0,
+    "clientOfflineSessionMaxLifespan": 0,
+    "accessCodeLifespan": 60,
+    "accessCodeLifespanUserAction": 300,
+    "accessCodeLifespanLogin": 1800,
+    "actionTokenGeneratedByAdminLifespan": 43200,
+    "actionTokenGeneratedByUserLifespan": 300,
+    "oauth2DeviceCodeLifespan": 600,
+    "oauth2DevicePollingInterval": 5,
+    "enabled": true,
+    "sslRequired": "external",
+    "registrationAllowed": true,
+    "registrationEmailAsUsername": false,
+    "rememberMe": true,
+    "verifyEmail": false,
+    "loginWithEmailAllowed": true,
+    "duplicateEmailsAllowed": false,
+    "resetPasswordAllowed": true,
+    "editUsernameAllowed": false,
+    "bruteForceProtected": false,
+    "permanentLockout": false,
+    "maxFailureWaitSeconds": 900,
+    "minimumQuickLoginWaitSeconds": 60,
+    "waitIncrementSeconds": 60,
+    "quickLoginCheckMilliSeconds": 1000,
+    "maxDeltaTimeSeconds": 43200,
+    "failureFactor": 30,
+    "defaultRole": {
+        "id": "2eabc599-ed21-4ea7-979a-169bbb1ada72",
+        "name": "default-roles-autowp",
+        "description": "${role_default-roles}",
+        "composite": true,
+        "clientRole": false,
+        "containerId": "autowp"
+    },
+    "requiredCredentials": [
+        "password"
+    ],
+    "otpPolicyType": "totp",
+    "otpPolicyAlgorithm": "HmacSHA1",
+    "otpPolicyInitialCounter": 0,
+    "otpPolicyDigits": 6,
+    "otpPolicyLookAheadWindow": 1,
+    "otpPolicyPeriod": 30,
+    "otpSupportedApplications": [
+        "FreeOTP",
+        "Google Authenticator"
+    ],
+    "webAuthnPolicyRpEntityName": "keycloak",
+    "webAuthnPolicySignatureAlgorithms": [
+        "ES256"
+    ],
+    "webAuthnPolicyRpId": "",
+    "webAuthnPolicyAttestationConveyancePreference": "not specified",
+    "webAuthnPolicyAuthenticatorAttachment": "not specified",
+    "webAuthnPolicyRequireResidentKey": "not specified",
+    "webAuthnPolicyUserVerificationRequirement": "not specified",
+    "webAuthnPolicyCreateTimeout": 0,
+    "webAuthnPolicyAvoidSameAuthenticatorRegister": false,
+    "webAuthnPolicyAcceptableAaguids": [],
+    "webAuthnPolicyPasswordlessRpEntityName": "keycloak",
+    "webAuthnPolicyPasswordlessSignatureAlgorithms": [
+        "ES256"
+    ],
+    "webAuthnPolicyPasswordlessRpId": "",
+    "webAuthnPolicyPasswordlessAttestationConveyancePreference": "not specified",
+    "webAuthnPolicyPasswordlessAuthenticatorAttachment": "not specified",
+    "webAuthnPolicyPasswordlessRequireResidentKey": "not specified",
+    "webAuthnPolicyPasswordlessUserVerificationRequirement": "not specified",
+    "webAuthnPolicyPasswordlessCreateTimeout": 0,
+    "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister": false,
+    "webAuthnPolicyPasswordlessAcceptableAaguids": [],
+    "users": [
+        {
+            "id": "02be87b1-7ca3-4f0d-ad75-3df52831e768",
+            "createdTimestamp": 1628199088724,
+            "username": "service-account-autowp",
+            "enabled": true,
+            "totp": false,
+            "emailVerified": false,
+            "serviceAccountClientId": "autowp",
+            "disableableCredentialTypes": [],
+            "requiredActions": [],
+            "clientRoles": {
+                "realm-management": [
+                    "view-users",
+                    "manage-users"
+                ]
+            },
+            "notBefore": 0
+        },
+        {
+            "id": "02be87b1-7ca3-4f0d-ad75-3df52831e769",
+            "createdTimestamp": 1628199088724,
+            "username": "admin",
+            "firstName": "Admin",
+            "lastName": "Admin",
+            "email": "admin@example.com",
+            "enabled": true,
+            "totp": false,
+            "emailVerified": true,
+            "disableableCredentialTypes": [],
+            "requiredActions": [],
+            "notBefore": 0,
+            "credentials": [
+                {
+                    "temporary": false,
+                    "type": "password",
+                    "value": "123123"
+                }
+            ],
+            "clientRoles": {
+                "autowp": [ "admin" ]
+            },
+            "realmRoles": [
+                "default-roles-autowp"
+            ]
+        },
+        {
+            "id": "02be87b1-7ca3-4f0d-ad75-3df52831e770",
+            "createdTimestamp": 1628199088724,
+            "username": "tester",
+            "firstName": "Tester",
+            "lastName": "Tester",
+            "email": "tester@example.com",
+            "enabled": true,
+            "totp": false,
+            "emailVerified": true,
+            "disableableCredentialTypes": [],
+            "requiredActions": [],
+            "notBefore": 0,
+            "credentials": [
+                {
+                    "temporary": false,
+                    "type": "password",
+                    "value": "123123"
+                }
+            ],
+            "realmRoles": [
+                "default-roles-autowp"
+            ]
+        }
+    ],
+    "clients": [
+        {
+            "id": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200",
+            "clientId": "autowp",
+            "baseUrl": "http://localhost/",
+            "surrogateAuthRequired": false,
+            "enabled": true,
+            "alwaysDisplayInConsole": false,
+            "clientAuthenticatorType": "client-secret",
+            "secret": "c0fce0df-6105-4d1e-bc23-8e67239f7640",
+            "redirectUris": [
+                "*"
+            ],
+            "webOrigins": [],
+            "notBefore": 0,
+            "bearerOnly": false,
+            "consentRequired": false,
+            "standardFlowEnabled": true,
+            "implicitFlowEnabled": false,
+            "directAccessGrantsEnabled": true,
+            "serviceAccountsEnabled": true,
+            "authorizationServicesEnabled": true,
+            "publicClient": false,
+            "frontchannelLogout": false,
+            "protocol": "openid-connect"
+        },
+        {
+            "id": "5a9e54e3-33cc-4ea7-b3f6-ac6c34ec47c4",
+            "clientId": "frontend",
+            "surrogateAuthRequired": false,
+            "enabled": true,
+            "alwaysDisplayInConsole": false,
+            "clientAuthenticatorType": "client-secret",
+            "redirectUris": [
+                "http://br.localhost/*",
+                "http://be.localhost/*",
+                "http://ru.localhost/*",
+                "http://es.localhost/*",
+                "http://en.localhost/*",
+                "http://uk.localhost/*",
+                "http://zh.localhost/*",
+                "http://fr.localhost/*",
+                "http://it.localhost/*",
+                "http://he.localhost/*"
+            ],
+            "webOrigins": [
+                "+"
+            ],
+            "notBefore": 0,
+            "bearerOnly": false,
+            "consentRequired": false,
+            "standardFlowEnabled": true,
+            "implicitFlowEnabled": true,
+            "directAccessGrantsEnabled": true,
+            "serviceAccountsEnabled": false,
+            "publicClient": true,
+            "protocol": "openid-connect"
+        }
+    ],
+    "internationalizationEnabled": true,
+    "supportedLocales": [
+        "ru",
+        "pt-BR",
+        "en",
+        "fr",
+        "zh-CN",
+        "es",
+        "be",
+        "uk",
+        "it",
+        "he"
+    ],
+    "roles": {
+        "client": {
+            "autowp": [
+                {
+                    "id": "7fc49f48-73c5-43bf-8747-cfd8aaba6dfd",
+                    "name": "pages-admin",
+                    "composite": false,
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "764a9029-2d16-4911-b835-a0f2d21991a9",
+                    "name": "admin",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "comments-moder",
+                                "forums-moder",
+                                "cars-moder",
+                                "moder",
+                                "pictures-moder",
+                                "brands-moder",
+                                "full-moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "25890ef3-a9cf-47d0-85e8-f335464ac08a",
+                    "name": "comments-moder",
+                    "composite": false,
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "4e3feb7c-44b4-4ecf-9976-a68418312e72",
+                    "name": "users-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "3951694a-f701-4d2e-a283-47d02041d9e1",
+                    "name": "forums-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "809d7ba7-3db3-4048-9ed7-d7ecd6c91a5c",
+                    "name": "cars-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "3db0860c-c7c2-42d2-aa5e-a209f4a64b1f",
+                    "name": "green-user",
+                    "composite": false,
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "c8195fc8-a45d-4ad2-a1b9-b8220493c27b",
+                    "name": "moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "green-user"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "eec0152c-783c-4ccb-b0ef-dc3ddf957ed3",
+                    "name": "pictures-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "eb9ce68a-d397-492a-bceb-61855858e576",
+                    "name": "brands-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "4b0c0528-7e09-497b-a142-d8f0260a7737",
+                    "name": "full-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "comments-moder",
+                                "users-moder",
+                                "forums-moder",
+                                "cars-moder",
+                                "moder",
+                                "pictures-moder",
+                                "brands-moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                }
+            ]
+        }
+    }
+}

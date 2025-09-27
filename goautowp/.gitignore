@@ -1,0 +1,12 @@
+/cmd/goautowp/debug
+/goautowp
+/build/package/goautowp
+/build/package/migrations
+/vendor
+/images/*
+/.idea
+/minio
+cov.out
+coverage.xml
+/app
+im7/*
