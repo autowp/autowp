@@ -93,7 +93,7 @@ export class MessageService {
         message: {
           text: text,
           toUserId: userId,
-          id: '',
+          id: '0',
           isNew: false,
           canDelete: false,
           canReply: false,
