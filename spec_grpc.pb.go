@@ -1201,7 +1201,7 @@ type ContactsClient interface {
 	CreateContact(ctx context.Context, in *CreateContactRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteContact(ctx context.Context, in *DeleteContactRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetContact(ctx context.Context, in *GetContactRequest, opts ...grpc.CallOption) (*Contact, error)
-	GetContacts(ctx context.Context, in *GetContactsRequest, opts ...grpc.CallOption) (*ContactItems, error)
+	GetContacts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ContactItems, error)
 }
 
 type contactsClient struct {
@@ -1242,7 +1242,7 @@ func (c *contactsClient) GetContact(ctx context.Context, in *GetContactRequest, 
 	return out, nil
 }
 
-func (c *contactsClient) GetContacts(ctx context.Context, in *GetContactsRequest, opts ...grpc.CallOption) (*ContactItems, error) {
+func (c *contactsClient) GetContacts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ContactItems, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ContactItems)
 	err := c.cc.Invoke(ctx, Contacts_GetContacts_FullMethodName, in, out, cOpts...)
@@ -1259,7 +1259,7 @@ type ContactsServer interface {
 	CreateContact(context.Context, *CreateContactRequest) (*emptypb.Empty, error)
 	DeleteContact(context.Context, *DeleteContactRequest) (*emptypb.Empty, error)
 	GetContact(context.Context, *GetContactRequest) (*Contact, error)
-	GetContacts(context.Context, *GetContactsRequest) (*ContactItems, error)
+	GetContacts(context.Context, *emptypb.Empty) (*ContactItems, error)
 	mustEmbedUnimplementedContactsServer()
 }
 
@@ -1279,7 +1279,7 @@ func (UnimplementedContactsServer) DeleteContact(context.Context, *DeleteContact
 func (UnimplementedContactsServer) GetContact(context.Context, *GetContactRequest) (*Contact, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContact not implemented")
 }
-func (UnimplementedContactsServer) GetContacts(context.Context, *GetContactsRequest) (*ContactItems, error) {
+func (UnimplementedContactsServer) GetContacts(context.Context, *emptypb.Empty) (*ContactItems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContacts not implemented")
 }
 func (UnimplementedContactsServer) mustEmbedUnimplementedContactsServer() {}
@@ -1358,7 +1358,7 @@ func _Contacts_GetContact_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Contacts_GetContacts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetContactsRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1370,7 +1370,7 @@ func _Contacts_GetContacts_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: Contacts_GetContacts_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContactsServer).GetContacts(ctx, req.(*GetContactsRequest))
+		return srv.(ContactsServer).GetContacts(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -6336,11 +6336,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessagingClient interface {
-	GetMessagesNewCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*APIMessageNewCount, error)
-	GetMessagesSummary(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*APIMessageSummary, error)
+	GetMessagesNewCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MessageNewCount, error)
+	GetMessagesSummary(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MessageSummary, error)
 	DeleteMessage(ctx context.Context, in *MessagingDeleteMessage, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ClearFolder(ctx context.Context, in *MessagingClearFolder, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	CreateMessage(ctx context.Context, in *MessagingCreateMessage, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CreateMessage(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetMessages(ctx context.Context, in *MessagingGetMessagesRequest, opts ...grpc.CallOption) (*MessagingGetMessagesResponse, error)
 }
 
@@ -6352,9 +6352,9 @@ func NewMessagingClient(cc grpc.ClientConnInterface) MessagingClient {
 	return &messagingClient{cc}
 }
 
-func (c *messagingClient) GetMessagesNewCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*APIMessageNewCount, error) {
+func (c *messagingClient) GetMessagesNewCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MessageNewCount, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(APIMessageNewCount)
+	out := new(MessageNewCount)
 	err := c.cc.Invoke(ctx, Messaging_GetMessagesNewCount_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -6362,9 +6362,9 @@ func (c *messagingClient) GetMessagesNewCount(ctx context.Context, in *emptypb.E
 	return out, nil
 }
 
-func (c *messagingClient) GetMessagesSummary(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*APIMessageSummary, error) {
+func (c *messagingClient) GetMessagesSummary(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MessageSummary, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(APIMessageSummary)
+	out := new(MessageSummary)
 	err := c.cc.Invoke(ctx, Messaging_GetMessagesSummary_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -6392,7 +6392,7 @@ func (c *messagingClient) ClearFolder(ctx context.Context, in *MessagingClearFol
 	return out, nil
 }
 
-func (c *messagingClient) CreateMessage(ctx context.Context, in *MessagingCreateMessage, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *messagingClient) CreateMessage(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Messaging_CreateMessage_FullMethodName, in, out, cOpts...)
@@ -6416,11 +6416,11 @@ func (c *messagingClient) GetMessages(ctx context.Context, in *MessagingGetMessa
 // All implementations must embed UnimplementedMessagingServer
 // for forward compatibility.
 type MessagingServer interface {
-	GetMessagesNewCount(context.Context, *emptypb.Empty) (*APIMessageNewCount, error)
-	GetMessagesSummary(context.Context, *emptypb.Empty) (*APIMessageSummary, error)
+	GetMessagesNewCount(context.Context, *emptypb.Empty) (*MessageNewCount, error)
+	GetMessagesSummary(context.Context, *emptypb.Empty) (*MessageSummary, error)
 	DeleteMessage(context.Context, *MessagingDeleteMessage) (*emptypb.Empty, error)
 	ClearFolder(context.Context, *MessagingClearFolder) (*emptypb.Empty, error)
-	CreateMessage(context.Context, *MessagingCreateMessage) (*emptypb.Empty, error)
+	CreateMessage(context.Context, *CreateMessageRequest) (*emptypb.Empty, error)
 	GetMessages(context.Context, *MessagingGetMessagesRequest) (*MessagingGetMessagesResponse, error)
 	mustEmbedUnimplementedMessagingServer()
 }
@@ -6432,10 +6432,10 @@ type MessagingServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMessagingServer struct{}
 
-func (UnimplementedMessagingServer) GetMessagesNewCount(context.Context, *emptypb.Empty) (*APIMessageNewCount, error) {
+func (UnimplementedMessagingServer) GetMessagesNewCount(context.Context, *emptypb.Empty) (*MessageNewCount, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMessagesNewCount not implemented")
 }
-func (UnimplementedMessagingServer) GetMessagesSummary(context.Context, *emptypb.Empty) (*APIMessageSummary, error) {
+func (UnimplementedMessagingServer) GetMessagesSummary(context.Context, *emptypb.Empty) (*MessageSummary, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMessagesSummary not implemented")
 }
 func (UnimplementedMessagingServer) DeleteMessage(context.Context, *MessagingDeleteMessage) (*emptypb.Empty, error) {
@@ -6444,7 +6444,7 @@ func (UnimplementedMessagingServer) DeleteMessage(context.Context, *MessagingDel
 func (UnimplementedMessagingServer) ClearFolder(context.Context, *MessagingClearFolder) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ClearFolder not implemented")
 }
-func (UnimplementedMessagingServer) CreateMessage(context.Context, *MessagingCreateMessage) (*emptypb.Empty, error) {
+func (UnimplementedMessagingServer) CreateMessage(context.Context, *CreateMessageRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMessage not implemented")
 }
 func (UnimplementedMessagingServer) GetMessages(context.Context, *MessagingGetMessagesRequest) (*MessagingGetMessagesResponse, error) {
@@ -6544,7 +6544,7 @@ func _Messaging_ClearFolder_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _Messaging_CreateMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MessagingCreateMessage)
+	in := new(CreateMessageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -6556,7 +6556,7 @@ func _Messaging_CreateMessage_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: Messaging_CreateMessage_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MessagingServer).CreateMessage(ctx, req.(*MessagingCreateMessage))
+		return srv.(MessagingServer).CreateMessage(ctx, req.(*CreateMessageRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

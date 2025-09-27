@@ -46,7 +46,9 @@ func (s *ContactsGRPCServer) CreateContact(
 		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
 	}
 
-	if in.GetUserId() == userCtx.UserID {
+	contact := in.GetContact()
+
+	if contact.GetContactUserId() == userCtx.UserID {
 		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
 	}
 
@@ -54,7 +56,7 @@ func (s *ContactsGRPCServer) CreateContact(
 
 	user, err := s.userRepository.User(
 		ctx,
-		&query.UserListOptions{ID: in.GetUserId(), Deleted: &deleted},
+		&query.UserListOptions{ID: contact.GetContactUserId(), Deleted: &deleted},
 		users.UserFields{},
 		users.OrderByNone,
 	)
@@ -66,7 +68,7 @@ func (s *ContactsGRPCServer) CreateContact(
 		return nil, status.Error(codes.NotFound, "NotFound")
 	}
 
-	err = s.contactsRepository.create(ctx, userCtx.UserID, in.GetUserId())
+	err = s.contactsRepository.create(ctx, userCtx.UserID, contact.GetContactUserId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -128,7 +130,7 @@ func (s *ContactsGRPCServer) GetContact(
 
 func (s *ContactsGRPCServer) GetContacts(
 	ctx context.Context,
-	_ *GetContactsRequest,
+	_ *emptypb.Empty,
 ) (*ContactItems, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {

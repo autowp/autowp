@@ -30,7 +30,7 @@ func NewMessagingGRPCServer(repository *messaging.Repository, auth *Auth) *Messa
 func (s *MessagingGRPCServer) GetMessagesNewCount(
 	ctx context.Context,
 	_ *emptypb.Empty,
-) (*APIMessageNewCount, error) {
+) (*MessageNewCount, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -45,7 +45,7 @@ func (s *MessagingGRPCServer) GetMessagesNewCount(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &APIMessageNewCount{
+	return &MessageNewCount{
 		Count: count,
 	}, nil
 }
@@ -53,7 +53,7 @@ func (s *MessagingGRPCServer) GetMessagesNewCount(
 func (s *MessagingGRPCServer) GetMessagesSummary(
 	ctx context.Context,
 	_ *emptypb.Empty,
-) (*APIMessageSummary, error) {
+) (*MessageSummary, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -88,7 +88,7 @@ func (s *MessagingGRPCServer) GetMessagesSummary(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &APIMessageSummary{
+	return &MessageSummary{
 		InboxCount:     inbox,
 		InboxNewCount:  inboxNew,
 		SentCount:      sent,
@@ -152,7 +152,7 @@ func (s *MessagingGRPCServer) ClearFolder(
 
 func (s *MessagingGRPCServer) CreateMessage(
 	ctx context.Context,
-	in *MessagingCreateMessage,
+	in *CreateMessageRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -168,14 +168,15 @@ func (s *MessagingGRPCServer) CreateMessage(
 		problems []string
 	)
 
-	message := in.GetText()
+	message := in.GetMessage()
+	messageText := message.GetText()
 
 	messageInputFilter := validation.InputFilter{
 		Filters:    []validation.FilterInterface{&validation.StringTrimFilter{}},
 		Validators: []validation.ValidatorInterface{&validation.NotEmpty{}},
 	}
 
-	message, problems, err = messageInputFilter.IsValidString(message)
+	messageText, problems, err = messageInputFilter.IsValidString(messageText)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +192,7 @@ func (s *MessagingGRPCServer) CreateMessage(
 		return nil, wrapFieldViolations(fvs)
 	}
 
-	err = s.repository.CreateMessage(ctx, userCtx.UserID, in.GetUserId(), message)
+	err = s.repository.CreateMessage(ctx, userCtx.UserID, message.GetToUserId(), messageText)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -239,10 +240,10 @@ func (s *MessagingGRPCServer) GetMessages(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	items := make([]*APIMessage, len(messages))
+	items := make([]*Message, len(messages))
 
 	for idx, msg := range messages {
-		item := APIMessage{
+		item := Message{
 			Id:              msg.ID,
 			Text:            msg.Text,
 			IsNew:           msg.IsNew,

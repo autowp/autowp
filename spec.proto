@@ -12,6 +12,7 @@ import "google/rpc/status.proto";
 import "google/rpc/error_details.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/autowp/goautowp";
 
@@ -77,10 +78,27 @@ service Traffic {
 }
 
 service Contacts {
-  rpc CreateContact(CreateContactRequest) returns (google.protobuf.Empty) {}
-  rpc DeleteContact(DeleteContactRequest) returns (google.protobuf.Empty) {}
-  rpc GetContact(GetContactRequest) returns (Contact) {}
-  rpc GetContacts(GetContactsRequest) returns (ContactItems) {}
+  rpc CreateContact(CreateContactRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v3/contacts"
+      body: "contact"
+    };
+  }
+  rpc DeleteContact(DeleteContactRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v3/contacts/{user_id}"
+    };
+  }
+  rpc GetContact(GetContactRequest) returns (Contact) {
+    option (google.api.http) = {
+      get: "/v3/contacts/{user_id}"
+    };
+  }
+  rpc GetContacts(google.protobuf.Empty) returns (ContactItems) {
+    option (google.api.http) = {
+      get: "/v3/contacts"
+    };
+  }
 }
 
 service Users {
@@ -248,12 +266,37 @@ service Pictures {
 }
 
 service Messaging {
-  rpc GetMessagesNewCount(google.protobuf.Empty) returns (APIMessageNewCount) {}
-  rpc GetMessagesSummary(google.protobuf.Empty) returns (APIMessageSummary) {}
-  rpc DeleteMessage(MessagingDeleteMessage) returns (google.protobuf.Empty) {}
-  rpc ClearFolder(MessagingClearFolder) returns (google.protobuf.Empty) {}
-  rpc CreateMessage(MessagingCreateMessage) returns (google.protobuf.Empty) {}
-  rpc GetMessages(MessagingGetMessagesRequest) returns (MessagingGetMessagesResponse) {}
+  rpc GetMessagesNewCount(google.protobuf.Empty) returns (MessageNewCount) {
+    option (google.api.http) = {
+      get: "/v3/messaging/messages-new-count"
+    };
+  }
+  rpc GetMessagesSummary(google.protobuf.Empty) returns (MessageSummary) {
+    option (google.api.http) = {
+      get: "/v3/messaging/messages-summary"
+    };
+  }
+  rpc DeleteMessage(MessagingDeleteMessage) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v3/messaging/messages/{message_id}"
+    };
+  }
+  rpc ClearFolder(MessagingClearFolder) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v3/messaging/clear-folder"
+    };
+  }
+  rpc CreateMessage(CreateMessageRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v3/messaging/messages"
+      body: "message"
+    };
+  }
+  rpc GetMessages(MessagingGetMessagesRequest) returns (MessagingGetMessagesResponse) {
+    option (google.api.http) = {
+      get: "/v3/messaging/messages"
+    };
+  }
 }
 
 service Statistics {
@@ -690,10 +733,6 @@ message BrandVehicleType {
   string items_count = 4;
 }
 
-message CreateContactRequest {
-  int64 user_id = 1;
-}
-
 message DeleteContactRequest {
   int64 user_id = 1;
 }
@@ -742,15 +781,16 @@ message APIUser {
 }
 
 message Contact {
-  int64 contact_user_id = 1;
-  APIUser user = 2;
+  int64 contact_user_id = 1 [(google.api.field_behavior) = REQUIRED];
+  APIUser user = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message ContactItems {
   repeated Contact items = 1;
 }
 
-message GetContactsRequest {
+message CreateContactRequest {
+  Contact contact = 1;
 }
 
 message CommentVoteItems {
@@ -920,11 +960,11 @@ message APIMoveTopicRequest {
   int64 theme_id = 2;
 }
 
-message APIMessageNewCount {
+message MessageNewCount {
   int32 count = 1;
 }
 
-message APIMessageSummary {
+message MessageSummary {
   int32 inbox_count = 1;
   int32 inbox_new_count = 2;
   int32 sent_count = 3;
@@ -2062,23 +2102,22 @@ message MessagingClearFolder {
   string folder = 1;
 }
 
-message MessagingCreateMessage {
-  int64 user_id = 1;
-  string text = 2;
+message Message {
+  int64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string text = 2 [(google.api.field_behavior) = REQUIRED];
+  bool is_new = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+  bool can_delete = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+  bool can_reply = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp date = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+  bool all_messages_link = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+  int32 dialog_count = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+  int64 author_id = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+  int64 to_user_id = 10 [(google.api.field_behavior) = REQUIRED];
+  int64 dialog_with_user_id = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
-message APIMessage {
-  int64 id = 1;
-  string text = 2;
-  bool is_new = 3;
-  bool can_delete = 4;
-  bool can_reply = 5;
-  google.protobuf.Timestamp date = 6;
-  bool all_messages_link = 7;
-  int32 dialog_count = 8;
-  int64 author_id = 9;
-  int64 to_user_id = 10;
-  int64 dialog_with_user_id = 11;
+message CreateMessageRequest {
+  Message message = 1;
 }
 
 message MessagingGetMessagesRequest {
@@ -2088,7 +2127,7 @@ message MessagingGetMessagesRequest {
 }
 
 message MessagingGetMessagesResponse {
-  repeated APIMessage items = 1;
+  repeated Message items = 1;
   Pages paginator = 2;
 }
 
