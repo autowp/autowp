@@ -1,3 +1,5 @@
+image: $CI_REGISTRY/autowp/runner-base-image
+
 stages:
   - test
   - release
@@ -5,9 +7,9 @@ stages:
   - deploy
 
 test:
-  image: $CI_REGISTRY/autowp/runner-base-image
   stage: test
   script:
+    - cd chart
     - helm dependency update
     - helm lint
     - kube-linter lint .
@@ -15,7 +17,6 @@ test:
     - if: $CI_COMMIT_TAG !~ /^v\d.*/
 
 trigger-release:
-  image: $CI_REGISTRY/autowp/runner-base-image
   stage: release
   script:
     - npx semantic-release
@@ -24,18 +25,18 @@ trigger-release:
   when: manual
 
 publish:
-  image: $CI_REGISTRY/autowp/runner-base-image
   stage: publish
   script:
-    - helm repo add --username helm --password "$DEPLOY_TOKEN" gitlab https://gitlab.pereslegin.ru/api/v4/projects/26/packages/helm/stable
+    - cd chart
+    - helm repo add --username helm --password "$DEPLOY_TOKEN" gitlab https://gitlab.pereslegin.ru/api/v4/projects/$CI_PROJECT_ID/packages/helm/stable
     - helm cm-push ./ --version="$CI_COMMIT_TAG" gitlab
   rules:
     - if: $CI_COMMIT_TAG =~ /^v\d.*/
 
 deploy:
-  image: $CI_REGISTRY/autowp/runner-base-image
   stage: deploy
   script:
+    - cd chart
     - helm dependency build
     - helm -n autowp upgrade autowp . -f "$VALUES"
   rules:
