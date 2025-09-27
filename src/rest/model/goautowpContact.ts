@@ -12,6 +12,6 @@ import { GoautowpAPIUser } from './goautowpAPIUser';
 
 export interface GoautowpContact { 
     contactUserId: string;
-    user: GoautowpAPIUser;
+    user?: GoautowpAPIUser;
 }
 

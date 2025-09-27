@@ -27,8 +27,8 @@
             </h4>
             @if (contact.user.lastOnline) {
               <p
-                [textContent]="contact.user.lastOnline.toDate() | timeAgo"
-                [ngbTooltip]="contact.user.lastOnline.toDate() | date: 'medium'"
+                [textContent]="contact.user.lastOnline | timeAgo"
+                [ngbTooltip]="contact.user.lastOnline | date: 'medium'"
               ></p>
             }
           </div>

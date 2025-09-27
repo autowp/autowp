@@ -66,7 +66,7 @@ export class PulseComponent implements OnInit {
   protected readonly data$ = this.#period$.pipe(
     debounceTime(10),
     distinctUntilChanged(),
-    switchMap((period) => this.#statisticsService.statisticsGetPulse(period)),
+    switchMap((period) => this.#statisticsService.statisticsGetPulse({period})),
     catchError((response: unknown) => {
       this.#toastService.handleError(response);
       return EMPTY;

@@ -1,13 +1,7 @@
 import {inject, Injectable} from '@angular/core';
-import {
-  APIMessage,
-  APIMessageSummary,
-  MessagingClearFolder,
-  MessagingCreateMessage,
-  MessagingDeleteMessage,
-} from '@grpc/spec.pb';
-import {MessagingClient} from '@grpc/spec.pbsc';
-import {Empty} from '@ngx-grpc/well-known-types';
+import {MessagingService} from '@rest/api/messaging.service';
+import {GoautowpMessage} from '@rest/model/goautowpMessage';
+import {GoautowpMessageSummary} from '@rest/model/goautowpMessageSummary';
 import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
 import {catchError, debounceTime, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -20,7 +14,7 @@ import {AuthService} from './auth.service';
 export class MessageService {
   readonly #auth = inject(AuthService);
   readonly #toasts = inject(ToastsService);
-  readonly #messagingClient = inject(MessagingClient);
+  readonly #messagingService = inject(MessagingService);
 
   readonly #deleted$ = new BehaviorSubject<void>(void 0);
   readonly #sent$ = new BehaviorSubject<void>(void 0);
@@ -37,7 +31,7 @@ export class MessageService {
         return of(null);
       }
 
-      return this.#messagingClient.getMessagesNewCount(new Empty());
+      return this.#messagingService.messagingGetMessagesNewCount();
     }),
     catchError((response: unknown) => {
       this.#toasts.handleError(response);
@@ -46,7 +40,7 @@ export class MessageService {
     map((response) => (response ? response.count : null)),
   );
 
-  readonly #summary$: Observable<APIMessageSummary | null> = combineLatest([
+  readonly #summary$: Observable<GoautowpMessageSummary | null> = combineLatest([
     this.#deleted$,
     this.#sent$,
     this.#seen$,
@@ -59,12 +53,12 @@ export class MessageService {
         return of(null);
       }
 
-      return this.#messagingClient.getMessagesSummary(new Empty());
+      return this.#messagingService.messagingGetMessagesSummary();
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  public seen(messages: APIMessage[]) {
+  public seen(messages: GoautowpMessage[]) {
     let newFound = false;
     for (const message of messages) {
       if (message.isNew) {
@@ -77,23 +71,15 @@ export class MessageService {
     }
   }
 
-  public clearFolder$(folder: string): Observable<Empty> {
-    return this.#messagingClient
-      .clearFolder(new MessagingClearFolder({folder: folder}))
-      .pipe(tap(() => this.#deleted$.next()));
+  public clearFolder$(folder: string): Observable<object> {
+    return this.#messagingService.messagingClearFolder({folder}).pipe(tap(() => this.#deleted$.next()));
   }
 
-  public deleteMessage$(id: string): Observable<Empty> {
-    return this.#messagingClient
-      .deleteMessage(
-        new MessagingDeleteMessage({
-          messageId: id,
-        }),
-      )
-      .pipe(tap(() => this.#deleted$.next()));
+  public deleteMessage$(messageId: string): Observable<object> {
+    return this.#messagingService.messagingDeleteMessage({messageId}).pipe(tap(() => this.#deleted$.next()));
   }
 
-  public getSummary$(): Observable<APIMessageSummary | null> {
+  public getSummary$(): Observable<GoautowpMessageSummary | null> {
     return this.#summary$;
   }
 
@@ -101,14 +87,23 @@ export class MessageService {
     return this.#new$;
   }
 
-  public send$(userId: string, text: string): Observable<Empty> {
-    return this.#messagingClient
-      .createMessage(
-        new MessagingCreateMessage({
+  public send$(userId: string, text: string): Observable<object> {
+    return this.#messagingService
+      .messagingCreateMessage({
+        message: {
           text: text,
-          userId: userId,
-        }),
-      )
+          toUserId: userId,
+          id: '',
+          isNew: false,
+          canDelete: false,
+          canReply: false,
+          dialogCount: 0,
+          date: new Date(),
+          allMessagesLink: false,
+          authorId: '',
+          dialogWithUserId: '',
+        },
+      })
       .pipe(tap(() => this.#sent$.next()));
   }
 }

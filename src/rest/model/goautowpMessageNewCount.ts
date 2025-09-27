@@ -9,7 +9,7 @@
  */
 
 
-export interface GoautowpAPIMessageNewCount { 
+export interface GoautowpMessageNewCount { 
     count: number;
 }
 

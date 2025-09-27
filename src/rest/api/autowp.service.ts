@@ -31,27 +31,33 @@ import { RpcStatus } from '../model/rpcStatus';
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    AutowpServiceInterface,
+    AutowpCreateFeedbackRequestParams,
+    AutowpGetIPRequestParams
+} from './autowp.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class AutowpService extends BaseService {
+export class AutowpService extends BaseService implements AutowpServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
-     * @param feedback 
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public autowpCreateFeedback(feedback: GoautowpFeedback, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<object>;
-    public autowpCreateFeedback(feedback: GoautowpFeedback, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<object>>;
-    public autowpCreateFeedback(feedback: GoautowpFeedback, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<object>>;
-    public autowpCreateFeedback(feedback: GoautowpFeedback, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public autowpCreateFeedback(requestParameters: AutowpCreateFeedbackRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<object>;
+    public autowpCreateFeedback(requestParameters: AutowpCreateFeedbackRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<object>>;
+    public autowpCreateFeedback(requestParameters: AutowpCreateFeedbackRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<object>>;
+    public autowpCreateFeedback(requestParameters: AutowpCreateFeedbackRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const feedback = requestParameters?.feedback;
         if (feedback === null || feedback === undefined) {
             throw new Error('Required parameter feedback was null or undefined when calling autowpCreateFeedback.');
         }
@@ -107,18 +113,19 @@ export class AutowpService extends BaseService {
     }
 
     /**
-     * @param ip 
-     * @param fields 
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public autowpGetIP(ip: string, fields: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpIP>;
-    public autowpGetIP(ip: string, fields: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpIP>>;
-    public autowpGetIP(ip: string, fields: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpIP>>;
-    public autowpGetIP(ip: string, fields: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public autowpGetIP(requestParameters: AutowpGetIPRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpIP>;
+    public autowpGetIP(requestParameters: AutowpGetIPRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpIP>>;
+    public autowpGetIP(requestParameters: AutowpGetIPRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpIP>>;
+    public autowpGetIP(requestParameters: AutowpGetIPRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ip = requestParameters?.ip;
         if (ip === null || ip === undefined) {
             throw new Error('Required parameter ip was null or undefined when calling autowpGetIP.');
         }
+        const fields = requestParameters?.fields;
         if (fields === null || fields === undefined) {
             throw new Error('Required parameter fields was null or undefined when calling autowpGetIP.');
         }

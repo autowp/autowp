@@ -27,13 +27,17 @@ import { RpcStatus } from '../model/rpcStatus';
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    StatisticsServiceInterface,
+    StatisticsGetPulseRequestParams
+} from './statistics.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class StatisticsService extends BaseService {
+export class StatisticsService extends BaseService implements StatisticsServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
@@ -89,14 +93,15 @@ export class StatisticsService extends BaseService {
     }
 
     /**
-     * @param period 
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public statisticsGetPulse(period: 'DEFAULT' | 'YEAR' | 'MONTH', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpPulseResponse>;
-    public statisticsGetPulse(period: 'DEFAULT' | 'YEAR' | 'MONTH', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpPulseResponse>>;
-    public statisticsGetPulse(period: 'DEFAULT' | 'YEAR' | 'MONTH', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpPulseResponse>>;
-    public statisticsGetPulse(period: 'DEFAULT' | 'YEAR' | 'MONTH', observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public statisticsGetPulse(requestParameters: StatisticsGetPulseRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpPulseResponse>;
+    public statisticsGetPulse(requestParameters: StatisticsGetPulseRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpPulseResponse>>;
+    public statisticsGetPulse(requestParameters: StatisticsGetPulseRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpPulseResponse>>;
+    public statisticsGetPulse(requestParameters: StatisticsGetPulseRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const period = requestParameters?.period;
         if (period === null || period === undefined) {
             throw new Error('Required parameter period was null or undefined when calling statisticsGetPulse.');
         }

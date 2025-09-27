@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
-import {ContactItems, GetContactRequest, GetContactsRequest} from '@grpc/spec.pb';
-import {ContactsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
+import {ContactsService} from '@rest/api/contacts.service';
+import {GoautowpContactItems} from '@rest/model/goautowpContactItems';
 import {Observable, of, throwError} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
 
@@ -10,12 +10,12 @@ import {AuthService} from './auth.service';
 @Injectable({
   providedIn: 'root',
 })
-export class ContactsService {
+export class AppContactsService {
   readonly #auth = inject(AuthService);
-  readonly #contactsClient = inject(ContactsClient);
+  readonly #contactsService = inject(ContactsService);
 
   public isInContacts$(userId: string): Observable<boolean> {
-    return this.#contactsClient.getContact(new GetContactRequest({userId})).pipe(
+    return this.#contactsService.contactsGetContact({userId}).pipe(
       map((response) => !!response.contactUserId),
       catchError((err: unknown) => {
         if (err instanceof GrpcStatusEvent && err.statusCode === 5) {
@@ -27,9 +27,7 @@ export class ContactsService {
     );
   }
 
-  public getContacts$(): Observable<ContactItems> {
-    return this.#auth.authenticated$.pipe(
-      switchMap(() => this.#contactsClient.getContacts(new GetContactsRequest({}))),
-    );
+  public getContacts$(): Observable<GoautowpContactItems> {
+    return this.#auth.authenticated$.pipe(switchMap(() => this.#contactsService.contactsGetContacts()));
   }
 }

@@ -8,11 +8,11 @@
  * Do not edit the class manually.
  */
 import { GoautowpPages } from './goautowpPages';
-import { GoautowpAPIMessage } from './goautowpAPIMessage';
+import { GoautowpMessage } from './goautowpMessage';
 
 
 export interface GoautowpMessagingGetMessagesResponse { 
-    items: Array<GoautowpAPIMessage>;
+    items: Array<GoautowpMessage>;
     paginator: GoautowpPages;
 }
 

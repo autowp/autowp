@@ -31,7 +31,7 @@ export class VotingVotesComponent {
     toObservable(this.variantID),
   ]).pipe(
     switchMap(([votingID, variantID]) =>
-      votingID && variantID ? this.#votingService.votingsGetVotingVariantVotes(variantID) : of(null),
+      votingID && variantID ? this.#votingService.votingsGetVotingVariantVotes({id: variantID}) : of(null),
     ),
     catchError((response: unknown) => {
       this.#toastService.handleError(response);

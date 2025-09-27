@@ -37,7 +37,7 @@ export class VotingComponent {
     map((params) => parseInt(params.get('id') ?? '', 10)),
     distinctUntilChanged(),
     debounceTime(10),
-    switchMap((id) => this.#reload$.pipe(switchMap(() => this.#votingService.votingsGetVoting(id)))),
+    switchMap((id) => this.#reload$.pipe(switchMap(() => this.#votingService.votingsGetVoting({id})))),
     catchError((response: unknown) => {
       if (response instanceof HttpErrorResponse && response.status === 404) {
         this.#router.navigate(['/error-404'], {
@@ -56,7 +56,7 @@ export class VotingComponent {
     }),
   );
   protected selected = 0;
-  protected selectedMulti: Record<number, number> = {};
+  protected readonly selectedMulti: Record<number, number> = {};
 
   protected readonly CommentsType = CommentsType;
 
@@ -78,8 +78,10 @@ export class VotingComponent {
 
     this.#votingService
       .votingsVote({
-        id: voting.id,
-        votingVariantVoteIds: ids,
+        vote: {
+          id: voting.id,
+          votingVariantVoteIds: ids,
+        },
       })
       .subscribe({
         error: (response: unknown) => this.#toastService.handleError(response),

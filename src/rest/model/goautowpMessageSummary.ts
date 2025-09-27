@@ -9,7 +9,7 @@
  */
 
 
-export interface GoautowpAPIMessageSummary { 
+export interface GoautowpMessageSummary { 
     inboxCount: number;
     inboxNewCount: number;
     sentCount: number;

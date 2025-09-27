@@ -35,7 +35,7 @@ export class ArticlesArticleComponent {
       }
       return of(catname);
     }),
-    switchMap((catname) => this.#articlesClient.articlesGetItemByCatname(catname)),
+    switchMap((catname) => this.#articlesClient.articlesGetItemByCatname({catname})),
     map((article) => {
       this.#pageEnv.set({
         pageId: 32,

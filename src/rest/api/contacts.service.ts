@@ -17,13 +17,9 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { GoautowpBrandIcons } from '../model/goautowpBrandIcons';
+import { GoautowpContact } from '../model/goautowpContact';
 // @ts-ignore
-import { GoautowpBrandVehicleTypeItems } from '../model/goautowpBrandVehicleTypeItems';
-// @ts-ignore
-import { GoautowpSpecsItems } from '../model/goautowpSpecsItems';
-// @ts-ignore
-import { GoautowpVehicleTypeItems } from '../model/goautowpVehicleTypeItems';
+import { GoautowpContactItems } from '../model/goautowpContactItems';
 // @ts-ignore
 import { RpcStatus } from '../model/rpcStatus';
 
@@ -32,29 +28,100 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables'
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
 import {
-    ItemsServiceInterface,
-    ItemsGetBrandVehicleTypesRequestParams
-} from './items.serviceInterface';
+    ContactsServiceInterface,
+    ContactsCreateContactRequestParams,
+    ContactsDeleteContactRequestParams,
+    ContactsGetContactRequestParams
+} from './contacts.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class ItemsService extends BaseService implements ItemsServiceInterface {
+export class ContactsService extends BaseService implements ContactsServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public itemsGetBrandIcons(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpBrandIcons>;
-    public itemsGetBrandIcons(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpBrandIcons>>;
-    public itemsGetBrandIcons(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpBrandIcons>>;
-    public itemsGetBrandIcons(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public contactsCreateContact(requestParameters: ContactsCreateContactRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<object>;
+    public contactsCreateContact(requestParameters: ContactsCreateContactRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<object>>;
+    public contactsCreateContact(requestParameters: ContactsCreateContactRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<object>>;
+    public contactsCreateContact(requestParameters: ContactsCreateContactRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const contact = requestParameters?.contact;
+        if (contact === null || contact === undefined) {
+            throw new Error('Required parameter contact was null or undefined when calling contactsCreateContact.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/v3/contacts`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<object>('post', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: contact,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public contactsDeleteContact(requestParameters: ContactsDeleteContactRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<object>;
+    public contactsDeleteContact(requestParameters: ContactsDeleteContactRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<object>>;
+    public contactsDeleteContact(requestParameters: ContactsDeleteContactRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<object>>;
+    public contactsDeleteContact(requestParameters: ContactsDeleteContactRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const userId = requestParameters?.userId;
+        if (userId === null || userId === undefined) {
+            throw new Error('Required parameter userId was null or undefined when calling contactsDeleteContact.');
+        }
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -81,9 +148,9 @@ export class ItemsService extends BaseService implements ItemsServiceInterface {
             }
         }
 
-        let localVarPath = `/v3/items/brand-icons`;
+        let localVarPath = `/v3/contacts/${this.configuration.encodeParam({name: "userId", value: userId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<GoautowpBrandIcons>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<object>('delete', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -101,18 +168,14 @@ export class ItemsService extends BaseService implements ItemsServiceInterface {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public itemsGetBrandVehicleTypes(requestParameters: ItemsGetBrandVehicleTypesRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpBrandVehicleTypeItems>;
-    public itemsGetBrandVehicleTypes(requestParameters: ItemsGetBrandVehicleTypesRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpBrandVehicleTypeItems>>;
-    public itemsGetBrandVehicleTypes(requestParameters: ItemsGetBrandVehicleTypesRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpBrandVehicleTypeItems>>;
-    public itemsGetBrandVehicleTypes(requestParameters: ItemsGetBrandVehicleTypesRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        const brandId = requestParameters?.brandId;
-        if (brandId === null || brandId === undefined) {
-            throw new Error('Required parameter brandId was null or undefined when calling itemsGetBrandVehicleTypes.');
+    public contactsGetContact(requestParameters: ContactsGetContactRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpContact>;
+    public contactsGetContact(requestParameters: ContactsGetContactRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpContact>>;
+    public contactsGetContact(requestParameters: ContactsGetContactRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpContact>>;
+    public contactsGetContact(requestParameters: ContactsGetContactRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const userId = requestParameters?.userId;
+        if (userId === null || userId === undefined) {
+            throw new Error('Required parameter userId was null or undefined when calling contactsGetContact.');
         }
-
-        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
-        localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
-          <any>brandId, 'brandId');
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -139,59 +202,9 @@ export class ItemsService extends BaseService implements ItemsServiceInterface {
             }
         }
 
-        let localVarPath = `/v3/items/brand-vehicle-types`;
+        let localVarPath = `/v3/contacts/${this.configuration.encodeParam({name: "userId", value: userId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<GoautowpBrandVehicleTypeItems>('get', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                params: localVarQueryParameters,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                transferCache: localVarTransferCache,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public itemsGetSpecs(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpSpecsItems>;
-    public itemsGetSpecs(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpSpecsItems>>;
-    public itemsGetSpecs(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpSpecsItems>>;
-    public itemsGetSpecs(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-
-        let localVarHeaders = this.defaultHeaders;
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            'application/json'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/v3/items/specs`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<GoautowpSpecsItems>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<GoautowpContact>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -208,10 +221,10 @@ export class ItemsService extends BaseService implements ItemsServiceInterface {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public itemsGetVehicleTypes(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpVehicleTypeItems>;
-    public itemsGetVehicleTypes(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpVehicleTypeItems>>;
-    public itemsGetVehicleTypes(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpVehicleTypeItems>>;
-    public itemsGetVehicleTypes(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public contactsGetContacts(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpContactItems>;
+    public contactsGetContacts(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpContactItems>>;
+    public contactsGetContacts(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpContactItems>>;
+    public contactsGetContacts(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -238,9 +251,9 @@ export class ItemsService extends BaseService implements ItemsServiceInterface {
             }
         }
 
-        let localVarPath = `/v3/items/vehicle-types`;
+        let localVarPath = `/v3/contacts`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<GoautowpVehicleTypeItems>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<GoautowpContactItems>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

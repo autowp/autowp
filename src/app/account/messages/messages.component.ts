@@ -1,8 +1,10 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIMessage, APIUser, MessagingGetMessagesRequest, Pages} from '@grpc/spec.pb';
-import {MessagingClient} from '@grpc/spec.pbsc';
+import {APIUser} from '@grpc/spec.pb';
+import {MessagingService} from '@rest/api/messaging.service';
+import {GoautowpMessage} from '@rest/model/goautowpMessage';
+import {GoautowpPages} from '@rest/model/goautowpPages';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
@@ -28,7 +30,7 @@ export class AccountMessagesComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #messagingClient = inject(MessagingClient);
+  readonly #messagingService = inject(MessagingService);
   readonly #userService = inject(UserService);
 
   readonly #change$ = new BehaviorSubject<void>(void 0);
@@ -54,8 +56,8 @@ export class AccountMessagesComponent {
   );
 
   protected readonly messages$: Observable<{
-    items: {author$: Observable<APIUser | null>; message: APIMessage}[];
-    paginator: Pages | undefined;
+    items: {author$: Observable<APIUser | null>; message: GoautowpMessage}[];
+    paginator: GoautowpPages | undefined;
   }> = combineLatest([this.folder$, this.page$, this.userId$, this.#change$]).pipe(
     switchMap(([folder, page, userId]) => {
       let pageId = 0;
@@ -84,13 +86,7 @@ export class AccountMessagesComponent {
         title: this.pageName(),
       });
 
-      return this.#messagingClient.getMessages(
-        new MessagingGetMessagesRequest({
-          folder,
-          page: page || 1,
-          userId: userId || undefined,
-        }),
-      );
+      return this.#messagingService.messagingGetMessages({userId, folder, page: page || 1});
     }),
     catchError((err: unknown) => {
       this.#toastService.handleError(err);
@@ -98,7 +94,7 @@ export class AccountMessagesComponent {
     }),
     tap((response) => {
       if (response.items) {
-        this.#messageService.seen(response.items);
+        this.#messageService.seen(response.items ?? []);
       }
     }),
     map((response) => ({

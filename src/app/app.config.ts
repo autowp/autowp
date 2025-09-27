@@ -11,7 +11,7 @@ import {GrpcWebClientModule} from '@ngx-grpc/grpc-web-client';
 import {provideApi} from '@rest/provide-api';
 import {authInterceptor$, GrpcAuthInterceptor, GrpcLogInterceptor} from '@services/api.service';
 import {AuthService} from '@services/auth.service';
-import {ContactsService} from '@services/contacts';
+import {AppContactsService} from '@services/contacts';
 import {ContentLanguageService} from '@services/content-language';
 import {IpService} from '@services/ip';
 import {ItemService} from '@services/item';
@@ -83,7 +83,7 @@ export const appConfig: ApplicationConfig = {
     PictureModerVoteService,
     VehicleTypeService,
     SpecService,
-    ContactsService,
+    AppContactsService,
     PageEnvService,
     ContentLanguageService,
     LanguageService,

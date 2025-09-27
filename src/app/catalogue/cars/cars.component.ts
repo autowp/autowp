@@ -75,7 +75,7 @@ export class CatalogueCarsComponent {
   );
 
   readonly #vehicleTypes$: Observable<GoautowpBrandVehicleType[]> = this.brand$.pipe(
-    switchMap((brand) => this.#itemsService.itemsGetBrandVehicleTypes(+brand.id)),
+    switchMap((brand) => this.#itemsService.itemsGetBrandVehicleTypes({brandId: +brand.id})),
     map((vehicleTypes) => (vehicleTypes.items ? vehicleTypes.items : [])),
     shareReplay({bufferSize: 1, refCount: false}),
   );

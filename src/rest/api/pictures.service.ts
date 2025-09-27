@@ -27,13 +27,16 @@ import { RpcStatus } from '../model/rpcStatus';
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    PicturesServiceInterface
+} from './pictures.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class PicturesService extends BaseService {
+export class PicturesService extends BaseService implements PicturesServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);

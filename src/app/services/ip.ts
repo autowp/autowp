@@ -26,6 +26,6 @@ export class IpService {
   }
 
   public getIp$(ip: string, fields: string[]): Observable<GoautowpIP> {
-    return this.#autowp.autowpGetIP(ip, fields);
+    return this.#autowp.autowpGetIP({ip, fields});
   }
 }

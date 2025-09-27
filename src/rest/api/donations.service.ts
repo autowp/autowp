@@ -25,13 +25,16 @@ import { RpcStatus } from '../model/rpcStatus';
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    DonationsServiceInterface
+} from './donations.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class DonationsService extends BaseService {
+export class DonationsService extends BaseService implements DonationsServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);

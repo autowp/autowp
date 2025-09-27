@@ -9,8 +9,6 @@ import {
   APIUser,
   APIUserPreferencesRequest,
   CommentMessageFields,
-  CreateContactRequest,
-  DeleteContactRequest,
   DeleteFromTrafficBlacklistRequest,
   DeleteUserPhotoRequest,
   GetMessagesRequest,
@@ -20,11 +18,12 @@ import {
   PicturesRequest,
   UserFields,
 } from '@grpc/spec.pb';
-import {CommentsClient, ContactsClient, PicturesClient, TrafficClient, UsersClient} from '@grpc/spec.pbsc';
+import {CommentsClient, PicturesClient, TrafficClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {ContactsService} from '@rest/api/contacts.service';
 import {GoautowpIP} from '@rest/model/goautowpIP';
 import {AuthService, Role} from '@services/auth.service';
-import {ContactsService} from '@services/contacts';
+import {AppContactsService} from '@services/contacts';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -45,7 +44,7 @@ import {UserComponent} from '../../user/user/user.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersUserComponent {
-  readonly #contacts = inject(ContactsService);
+  readonly #appContactsService = inject(AppContactsService);
   readonly #messageDialogService = inject(MessageDialogService);
   readonly #router = inject(Router);
   readonly #userService = inject(UserService);
@@ -54,7 +53,7 @@ export class UsersUserComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #ipService = inject(IpService);
-  readonly #contactsClient = inject(ContactsClient);
+  readonly #contactsService = inject(ContactsService);
   readonly #usersGrpc = inject(UsersClient);
   readonly #trafficClient = inject(TrafficClient);
   readonly #commentsClient = inject(CommentsClient);
@@ -196,7 +195,7 @@ export class UsersUserComponent {
         return of(false);
       }
 
-      return this.#contacts.isInContacts$(user.id);
+      return this.#appContactsService.isInContacts$(user.id);
     }),
     catchError((response: unknown) => {
       this.#toastService.handleError(response);
@@ -236,13 +235,13 @@ export class UsersUserComponent {
 
   protected setInContacts(user: APIUser, value: boolean) {
     if (value) {
-      this.#contactsClient.createContact(new CreateContactRequest({userId: user.id})).subscribe(() => {
+      this.#contactsService.contactsCreateContact({contact: {contactUserId: user.id}}).subscribe(() => {
         this.#inContactsChange$.next();
       });
       return;
     }
 
-    this.#contactsClient.deleteContact(new DeleteContactRequest({userId: user.id})).subscribe(() => {
+    this.#contactsService.contactsDeleteContact({userId: user.id}).subscribe(() => {
       this.#inContactsChange$.next();
     });
   }

@@ -27,27 +27,33 @@ import { RpcStatus } from '../model/rpcStatus';
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    ArticlesServiceInterface,
+    ArticlesGetItemByCatnameRequestParams,
+    ArticlesGetListRequestParams
+} from './articles.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class ArticlesService extends BaseService {
+export class ArticlesService extends BaseService implements ArticlesServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
-     * @param catname 
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public articlesGetItemByCatname(catname: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpArticle>;
-    public articlesGetItemByCatname(catname: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpArticle>>;
-    public articlesGetItemByCatname(catname: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpArticle>>;
-    public articlesGetItemByCatname(catname: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public articlesGetItemByCatname(requestParameters: ArticlesGetItemByCatnameRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpArticle>;
+    public articlesGetItemByCatname(requestParameters: ArticlesGetItemByCatnameRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpArticle>>;
+    public articlesGetItemByCatname(requestParameters: ArticlesGetItemByCatnameRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpArticle>>;
+    public articlesGetItemByCatname(requestParameters: ArticlesGetItemByCatnameRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const catname = requestParameters?.catname;
         if (catname === null || catname === undefined) {
             throw new Error('Required parameter catname was null or undefined when calling articlesGetItemByCatname.');
         }
@@ -93,18 +99,19 @@ export class ArticlesService extends BaseService {
     }
 
     /**
-     * @param limit 
-     * @param page 
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public articlesGetList(limit: string, page: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpArticlesResponse>;
-    public articlesGetList(limit: string, page: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpArticlesResponse>>;
-    public articlesGetList(limit: string, page: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpArticlesResponse>>;
-    public articlesGetList(limit: string, page: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public articlesGetList(requestParameters: ArticlesGetListRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpArticlesResponse>;
+    public articlesGetList(requestParameters: ArticlesGetListRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpArticlesResponse>>;
+    public articlesGetList(requestParameters: ArticlesGetListRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpArticlesResponse>>;
+    public articlesGetList(requestParameters: ArticlesGetListRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const limit = requestParameters?.limit;
         if (limit === null || limit === undefined) {
             throw new Error('Required parameter limit was null or undefined when calling articlesGetList.');
         }
+        const page = requestParameters?.page;
         if (page === null || page === undefined) {
             throw new Error('Required parameter page was null or undefined when calling articlesGetList.');
         }

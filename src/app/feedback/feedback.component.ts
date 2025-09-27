@@ -73,10 +73,12 @@ export class FeedbackComponent implements OnInit {
     const formValue = this.form.getRawValue();
     this.#autowpService
       .autowpCreateFeedback({
-        captcha: formValue.captcha,
-        email: formValue.email,
-        message: formValue.message,
-        name: formValue.name,
+        feedback: {
+          captcha: formValue.captcha,
+          email: formValue.email,
+          message: formValue.message,
+          name: formValue.name,
+        },
       })
       .subscribe({
         error: (error: HttpErrorResponse) => {
