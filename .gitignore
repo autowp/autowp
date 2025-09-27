@@ -1,12 +1,7 @@
 /mysql
-/composer.phar
-/node_modules
-/bower_components
-/vendor
 /.buildpath
 /data
 /logs
-/goautowp/logs
 /cc-test-reporter
 /sonar-scanner
 /minio

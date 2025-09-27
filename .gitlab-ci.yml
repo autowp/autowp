@@ -12,8 +12,8 @@ stages:
 test-chart:
   stage: test
   script:
-    - sonar-scanner -Dsonar.login=$SONAR_TOKEN
     - cd chart
+    - sonar-scanner -Dsonar.login=$SONAR_TOKEN
     - helm dependency update
     - helm lint
     - kube-linter lint .
@@ -30,6 +30,7 @@ test-frontend:
       - frontend/node_modules/
   script:
     - cd frontend/
+    - sonar-scanner -Dsonar.login=$SONAR_TOKEN
     - hadolint Dockerfile
     - npm ci || npm cache clear --force && npm ci
     - npx ng lint
