@@ -8,9 +8,9 @@
 
 # Wheelsage.org / AutoWP.ru website sources
 
-<http://wheelsage.org/>
+<https://wheelsage.org/>
 
-<http://autowp.ru/>
+<https://autowp.ru/>
 
 ======
 
