@@ -49,8 +49,8 @@ export class AccountMessagesComponent {
     debounceTime(30),
   );
 
-  protected readonly userId$: Observable<string> = this.#route.queryParamMap.pipe(
-    map((params) => params.get('user_id') ?? ''),
+  protected readonly userId$: Observable<string|undefined> = this.#route.queryParamMap.pipe(
+    map((params) => params.get('user_id') ?? undefined),
     distinctUntilChanged(),
     debounceTime(30),
   );

@@ -232,22 +232,13 @@ export class MessagingService extends BaseService implements MessagingServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public messagingGetMessages(requestParameters: MessagingGetMessagesRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpMessagingGetMessagesResponse>;
-    public messagingGetMessages(requestParameters: MessagingGetMessagesRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpMessagingGetMessagesResponse>>;
-    public messagingGetMessages(requestParameters: MessagingGetMessagesRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpMessagingGetMessagesResponse>>;
-    public messagingGetMessages(requestParameters: MessagingGetMessagesRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public messagingGetMessages(requestParameters?: MessagingGetMessagesRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GoautowpMessagingGetMessagesResponse>;
+    public messagingGetMessages(requestParameters?: MessagingGetMessagesRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GoautowpMessagingGetMessagesResponse>>;
+    public messagingGetMessages(requestParameters?: MessagingGetMessagesRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GoautowpMessagingGetMessagesResponse>>;
+    public messagingGetMessages(requestParameters?: MessagingGetMessagesRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         const userId = requestParameters?.userId;
-        if (userId === null || userId === undefined) {
-            throw new Error('Required parameter userId was null or undefined when calling messagingGetMessages.');
-        }
         const folder = requestParameters?.folder;
-        if (folder === null || folder === undefined) {
-            throw new Error('Required parameter folder was null or undefined when calling messagingGetMessages.');
-        }
         const page = requestParameters?.page;
-        if (page === null || page === undefined) {
-            throw new Error('Required parameter page was null or undefined when calling messagingGetMessages.');
-        }
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
         localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,

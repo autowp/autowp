@@ -34,9 +34,9 @@ export interface MessagingDeleteMessageRequestParams {
 }
 
 export interface MessagingGetMessagesRequestParams {
-    userId: string;
-    folder: string;
-    page: number;
+    userId?: string;
+    folder?: string;
+    page?: number;
 }
 
 
