@@ -40,7 +40,7 @@ services:
     - "3306:3306"
 
   frontend:
-    image: registry.pereslegin.ru/autowp/frontend:v1.141.0
+    image: registry.pereslegin.ru/autowp/frontend:v1.239.0
     container_name: autowp_test_frontend
     restart: always
     volumes:
@@ -79,10 +79,14 @@ services:
       - POSTGRES_DB=traffic
       - POSTGRES_USER=traffic
       - POSTGRES_PASSWORD=password
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
 
   goautowp-serve:
     user: "0"
-    image: registry.pereslegin.ru/autowp/goautowp:v5.6.2
+    image: registry.pereslegin.ru/autowp/goautowp:v6.12.0
     container_name: autowp_test_goautowp_serve
     restart: always
     command: serve --df-amqp --monitoring-amqp --grpc --public --autoban --attrs-update-values-amqp --loglevel=debug
@@ -101,7 +105,7 @@ services:
       - "2113:8080"
 
   goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/goautowp:v5.6.2
+    image: registry.pereslegin.ru/autowp/goautowp:v6.12.0
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     restart: always
     command: scheduler-generate-index-cache --loglevel=debug
@@ -117,7 +121,7 @@ services:
       - "./module/Application/config/policy.csv:/policy.csv:ro"
 
   minio:
-    image: quay.io/minio/minio
+    image: quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z
     container_name: autowp_test_minio
     restart: always
     environment:

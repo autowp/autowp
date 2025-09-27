@@ -255,12 +255,149 @@
         "client": {
             "autowp": [
                 {
-                    "id": "105ec479-9032-4c1f-8685-7a35cececb9a",
-                    "name": "admin",
+                    "id": "7fc49f48-73c5-43bf-8747-cfd8aaba6dfd",
+                    "name": "pages-admin",
                     "composite": false,
                     "clientRole": true,
-                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200",
-                    "attributes": {}
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "764a9029-2d16-4911-b835-a0f2d21991a9",
+                    "name": "admin",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "comments-moder",
+                                "forums-moder",
+                                "cars-moder",
+                                "moder",
+                                "pictures-moder",
+                                "brands-moder",
+                                "full-moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "25890ef3-a9cf-47d0-85e8-f335464ac08a",
+                    "name": "comments-moder",
+                    "composite": false,
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "4e3feb7c-44b4-4ecf-9976-a68418312e72",
+                    "name": "users-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "3951694a-f701-4d2e-a283-47d02041d9e1",
+                    "name": "forums-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "809d7ba7-3db3-4048-9ed7-d7ecd6c91a5c",
+                    "name": "cars-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "3db0860c-c7c2-42d2-aa5e-a209f4a64b1f",
+                    "name": "green-user",
+                    "composite": false,
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "c8195fc8-a45d-4ad2-a1b9-b8220493c27b",
+                    "name": "moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "green-user"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "eec0152c-783c-4ccb-b0ef-dc3ddf957ed3",
+                    "name": "pictures-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "eb9ce68a-d397-492a-bceb-61855858e576",
+                    "name": "brands-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
+                },
+                {
+                    "id": "4b0c0528-7e09-497b-a142-d8f0260a7737",
+                    "name": "full-moder",
+                    "composite": true,
+                    "composites": {
+                        "client": {
+                            "autowp": [
+                                "comments-moder",
+                                "users-moder",
+                                "forums-moder",
+                                "cars-moder",
+                                "moder",
+                                "pictures-moder",
+                                "brands-moder"
+                            ]
+                        }
+                    },
+                    "clientRole": true,
+                    "containerId": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200"
                 }
             ]
         }

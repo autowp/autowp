@@ -4,6 +4,10 @@ public-rest:
   cors:
     origin:
       - http://localhost:4200
+      - http://en.localhost:4200
+      - https://en.localhost:4200
+      - http://en.localhost
+      - https://en.localhost
 autowp-migrations:
   dsn: mysql://root:password@tcp(mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
 duplicate_finder:
