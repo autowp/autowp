@@ -1,0 +1,244 @@
+global:
+  imageRegistry: ""
+  ## E.g.
+  ## imagePullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  imagePullSecrets:
+    - docker.io
+    - gitlab-registry
+hostnames:
+  - www.autowp.ru
+  - be.wheelsage.org
+  - br.wheelsage.org
+  - en.wheelsage.org
+  - es.wheelsage.org
+  - fr.wheelsage.org
+  - uk.wheelsage.org
+  - zh.wheelsage.org
+  - it.wheelsage.org
+  - he.wheelsage.org
+grpcHostname: grpc.wheelsage.org
+auth:
+  sentry:
+    dsn: https://1234567890abcdef1234567890abcdef@sentry.example.com/1
+  secret: 1234567890abcdef1234567890abcdef
+  postgres:
+    username: auth
+    password: password
+redirects:
+  - from:
+      - autowp.ru
+    to: www.autowp.ru
+  - from:
+      - www.wheelsage.org
+      - wheelsage.org
+    to: en.wheelsage.org
+emailSalt: salt
+usersSalt: salt
+google:
+  clientId: "1234567890.apps.googleusercontent.com"
+  clientSecret: "secret"
+facebook:
+  clientId: "1234567890"
+  clientSecret: "secret"
+  pageAccessToken: "access_token"
+vk:
+  clientId: "1234567890"
+  clientSecret: "secret"
+  token: "token"
+  ownerId: "-1234567890"
+smtp:
+  hostname: "example.com"
+  port: 465
+  username: "no-reply@autowp.ru"
+  password: "password"
+telegram:
+  webhookToken: "token"
+  accessToken: "1234567890:token"
+twitter:
+  username: "autowp_ru"
+  key: "key"
+  secret: "secret"
+  oauthToken: "1234567890-token"
+  oauthSecret: "secret"
+yoomoney:
+  secret: "secret"
+  price: "999"
+reCaptcha:
+  publicKey: "publicKey"
+  privateKey: "privateKey"
+frontend:
+  image:
+    registry: registry.pereslegin.ru
+    repository: autowp/frontend
+    tag: v1.245.3
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+backend:
+  sentry:
+    dsn: https://1234567890abcdef1234567890abcdef@sentry.example.com/1
+  image:
+    registry: registry.pereslegin.ru
+    repository: autowp/backend
+    tag: v1.14.0
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  nginx:
+    image:
+      registry: registry.pereslegin.ru
+      repository: autowp/backend
+      tag: nginx-v1.14.0
+      digest: ""
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+s3:
+  key: "key"
+  secret: "secret"
+  endpoints:
+    - name: n1
+      hostname: n1.example.com
+      address: 192.168.0.1
+      visible: true
+    - name: n2
+      hostname: n1.example.com
+      address: 192.168.0.2
+      visible: true
+    - name: n3
+      hostname: n1.example.com
+      address: 192.168.0.3
+      visible: false
+goautowp:
+  image:
+    registry: registry.pereslegin.ru
+    repository: autowp/goautowp
+    tag: v6.21.2
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  sentry:
+    dsn: https://1234567890abcdef1234567890abcdef@sentry.example.com/1
+  postgres:
+    password: password
+  podMonitor:
+    ## @param metrics.podMonitor.enabled Create PodMonitor Resource for scraping metrics using PrometheusOperator
+    ##
+    enabled: true
+    ## @param metrics.podMonitor.interval Specify the interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## @param metrics.podMonitor.scrapeTimeout Specify the timeout after which the scrape is ended
+    ## e.g:
+    ## scrapeTimeout: 30s
+    ##
+    scrapeTimeout: ""
+    ## @param metrics.serviceMonitor.path Define the path used by ServiceMonitor to scrap metrics
+    ## Could be /metrics for aggregated metrics or /metrics/per-object for more details
+    ##
+    path: "/metrics"
+traffic:
+  postgres:
+    username: traffic
+    password: password
+rabbitmq:
+  enabled: true
+  replicaCount: 1
+  persistence:
+    enabled: true
+    storageClass: autowp-rabbitmq
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: kube-prometheus-stack
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 5Gi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+  commonAnnotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "The variable RABBITMQ_COMBINED_CERT_PATH must be set to either an existant file or a non-existant file in a writable directory."
+    ignore-check.kube-linter.io/pdb-unhealthy-pod-eviction-policy: "pdb-unhealthy-pod-eviction-policy"
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 101
+postgres:
+  hostname: 127.0.0.1
+  port: 5432
+feedback:
+  to: autowp@gmail.com
+keycloak:
+  clientSecret: secret
+mysql:
+  host: host
+  database: database
+  username: username
+  password: password
+imageCredentials:
+  registry: quay.io
+  username: someone
+  password: sillyness
+  email: someone@host.com
+redis:
+  enabled: true
+  commonAnnotations:
+    ignore-check.kube-linter.io/pdb-unhealthy-pod-eviction-policy: "pdb-unhealthy-pod-eviction-policy"
+  auth:
+    enabled: false
+    usePasswordFiles: false
+  master:
+    resources:
+      limits:
+        cpu: "1"
+        memory: "1024Mi"
+      requests:
+        cpu: 100m
+        memory: "100Mi"
+    persistence:
+      enabled: false
+    containerSecurityContext:
+      readOnlyRootFilesystem: true
+  replica:
+    replicaCount: 2
+    resources:
+      limits:
+        cpu: "1"
+        memory: "1024Mi"
+      requests:
+        cpu: 100m
+        memory: "100Mi"
+    persistence:
+      enabled: false
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 5
+    containerSecurityContext:
+      readOnlyRootFilesystem: true
+  metrics:
+    enabled: true
+    resources:
+      limits:
+        cpu: "1"
+        memory: "1024Mi"
+      requests:
+        cpu: 10m
+        memory: "10Mi"
+    serviceMonitor:
+      enabled: true
+    containerSecurityContext:
+      readOnlyRootFilesystem: true
+static:
+  image:
+    registry: docker.io
+    repository: nginxinc/nginx-unprivileged
+    tag: 1-alpine
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+mostsMinVehiclesCount: 200

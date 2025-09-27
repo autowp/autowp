@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "autowp.goautowp.scheduler-midnight.fullname" . | quote }}
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            checksum/config: {{ (tpl (.Files.Glob "configs/goautowp/*").AsConfig . ) | sha256sum }}
+        spec:
+          {{- include "autowp.imagePullSecrets" . | nindent 10 }}
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: {{ include "autowp.goautowp.fullname" . | quote }}
+              name: config
+            - name: tmp
+              emptyDir: {}
+          containers:
+            - name: goautowp-scheduler-midnight
+              image: {{ include "autowp.goautowp.image" . }}
+              imagePullPolicy: {{ .Values.goautowp.image.pullPolicy | quote }}
+              args:
+                - scheduler-midnight
+                - "--loglevel=info"
+              volumeMounts:
+                - mountPath: /config.yaml
+                  name: config
+                  subPath: config.yaml
+                  readOnly: true
+                - mountPath: /tmp
+                  name: tmp
+              resources:
+                limits:
+                  memory: 5Gi
+                  cpu: 4000m
+                requests:
+                  memory: 10M
+                  cpu: 50m
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 101
+          restartPolicy: OnFailure
+  concurrencyPolicy: Forbid

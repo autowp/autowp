@@ -1,0 +1,12 @@
+dependencies:
+- name: rabbitmq
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 14.7.0
+- name: common
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 2.30.0
+- name: redis
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 20.10.0
+digest: sha256:41a0229557432be5a3c1d86b70198ff8b1750b8c3d5a5ea4982ba5e9df169bbb
+generated: "2025-03-02T00:41:53.932715926+03:00"

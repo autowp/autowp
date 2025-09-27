@@ -1,0 +1,100 @@
+gin-mode: "release"
+log-level: "warn"
+public-rest:
+  listen: ":8080"
+grpc:
+  listen: ":8082"
+sentry:
+  dsn: {{ .Values.goautowp.sentry.dsn | quote }}
+  environment: production
+autowp-migrations:
+  dir: ./migrations
+  dsn: "mysql://{{ .Values.mysql.username }}:{{ .Values.mysql.password }}@tcp({{ .Values.mysql.host }})/{{ .Values.mysql.database }}?charset=utf8mb4&parseTime=true&loc=UTC"
+duplicate_finder:
+  rabbitmq: amqp://guest:guest@{{ include "common.names.fullname" .Subcharts.rabbitmq }}:5672/
+  queue: duplicate_finder
+autowp-dsn: "{{ .Values.mysql.username }}:{{ .Values.mysql.password }}@tcp({{ .Values.mysql.host }}:3306)/{{ .Values.mysql.database }}?charset=utf8mb4&parseTime=true&loc=UTC"
+file-storage:
+  bucket: files
+  s3:
+    region: "US-East"
+    endpoint: https://s3.wheelsage.org
+    credentials:
+      key: {{ .Values.s3.key | quote }}
+      secret: {{ .Values.s3.secret | quote }}
+    use_path_style_endpoint: true
+rabbitmq: amqp://guest:guest@{{ include "common.names.fullname" .Subcharts.rabbitmq }}:5672/
+postgres-dsn: postgres://{{ .Values.traffic.postgres.username }}:{{ .Values.traffic.postgres.password }}@{{ .Values.postgres.hostname }}:{{ .Values.postgres.port }}/traffic?sslmode=disable
+postgres-migrations:
+  dsn: postgres://{{ .Values.traffic.postgres.username }}:{{ .Values.traffic.postgres.password }}@{{ .Values.postgres.hostname }}/traffic?sslmode=disable
+recaptcha:
+  public-key: {{ .Values.reCaptcha.publicKey }}
+  private-key: {{ .Values.reCaptcha.privateKey }}
+smtp:
+  username: {{ .Values.smtp.username | quote }}
+  password: {{ .Values.smtp.password | quote }}
+  hostname: {{ .Values.smtp.hostname | quote }}
+  port: {{ .Values.smtp.port }}
+feedback:
+  captcha: true
+  from: Robot autowp.ru <no-reply@autowp.ru>
+  to:
+    - {{ .Values.feedback.to | quote}}
+  subject: AutoWP Feedback
+keycloak:
+  url: "https://auth.wheelsage.org/auth"
+  realm: "autowp"
+  client-id: "autowp"
+  client-secret: {{ .Values.keycloak.clientSecret | quote }}
+email-salt: {{ .Values.emailSalt | quote }}
+users-salt: {{ .Values.usersSalt | quote }}
+languages:
+  en:
+    hostname: en.wheelsage.org
+    aliases :
+      - wheelsage.org
+      - www.wheelsage.org
+  zh:
+    hostname: zh.wheelsage.org
+  ru:
+    hostname: www.autowp.ru
+  pt-br:
+    hostname: br.wheelsage.org
+  fr:
+    hostname: fr.wheelsage.org
+  be:
+    hostname: be.wheelsage.org
+  uk:
+    hostname: uk.wheelsage.org
+  es:
+    hostname: es.wheelsage.org
+  it:
+    hostname: it.wheelsage.org
+  he:
+    hostname: he.wheelsage.org
+captcha: true
+mock-email-sender: false
+image-storage:
+  s3:
+    region: "US-East"
+    endpoint: https://s3.wheelsage.org
+    credentials:
+      key: {{ .Values.s3.key | quote }}
+      secret: {{ .Values.s3.secret | quote }}
+    use_path_style_endpoint: true
+redis: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:{{ .Values.redis.master.service.ports.redis }}
+telegram:
+  access-token: {{ .Values.telegram.accessToken | quote }}
+  webhook: {{ (printf "https://www.autowp.ru/telegram/webhook/token/%s" .Values.telegram.webhookToken) | quote }}
+  webhook-token: {{ .Values.telegram.webhookToken | quote }}
+donations-vod-price: {{ .Values.yoomoney.price }}
+about:
+  developer: "1"
+  fr-translator: "3282"
+  zh-translator: "25155"
+  be-translator: "15603"
+  pt-br-translator: "17322"
+mosts-min-cars-count: {{ .Values.mostsMinVehiclesCount }}
+yoomoney:
+  secret: {{ .Values.yoomoney.secret | quote }}
+  price: {{ .Values.yoomoney.price | quote }}

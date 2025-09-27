@@ -1,0 +1,24 @@
+{{- if .Values.goautowp.podMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "autowp.goautowp.serve.fullname" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    release: kube-prometheus-stack
+spec:
+  podMetricsEndpoints:
+    - port: metrics
+      {{- if .Values.goautowp.podMonitor.path }}
+      path: {{ .Values.goautowp.podMonitor.path }}
+      {{- end }}
+      {{- if .Values.goautowp.podMonitor.interval }}
+      interval: {{ .Values.goautowp.podMonitor.interval }}
+      {{- end }}
+      {{- if .Values.goautowp.podMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.goautowp.podMonitor.scrapeTimeout }}
+      {{- end }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: goautowp-serve
+{{- end }}

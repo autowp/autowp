@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  name: {{ include "autowp.frontend.fullname" . | quote }}
+spec:
+  ports:
+    - name: app-port
+      port: 8080
+      protocol: TCP
+      targetPort: app-port
+  selector: {{ include "common.labels.matchLabels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+  sessionAffinity: None
+  type: ClusterIP

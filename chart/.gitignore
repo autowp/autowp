@@ -1,0 +1,6 @@
+.idea
+values.production.yaml
+charts/*.tgz
+/cluster-user-config.yaml
+/cluster-user.yaml
+/cluster-user.sh

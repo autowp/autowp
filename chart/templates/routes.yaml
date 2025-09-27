@@ -1,0 +1,222 @@
+{{- range .Values.redirects }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redirect-{{ .to }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/permanent-redirect: $scheme://{{ .to }}$request_uri
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        {{- range .from }}
+        - {{ . }}
+        {{- end }}
+      secretName: tls-redirect-{{ .to }}
+  rules:
+    {{- range .from }}
+    - host: {{ . }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "autowp.frontend.fullname" $ | quote }}
+                port:
+                  name: app-port
+    {{- end }}
+{{- end }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        {{- range .Values.hostnames }}
+        - {{ . }}
+        {{- end }}
+      secretName: tls
+  rules:
+  {{- range .Values.hostnames }}
+  - host: {{ . }}
+    http:
+      paths:
+        - path: /img/
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.static.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: /api/
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Traffic/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Users/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Items/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Comments/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Map/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Messaging/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Pictures/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Donations/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Forums/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Text/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Attrs/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Rating/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Log/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/goautowp.Mosts/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/yoomoney/informing"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/telegram/webhook/token/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: "/v3/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.frontend.fullname" $ | quote }}
+              port:
+                name: app-port
+  {{- end }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grpc
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - {{ .Values.grpcHostname | quote }}
+      secretName: grpc-tls
+  rules:
+  - host: {{ .Values.grpcHostname | quote }}
+    http:
+      paths:
+        - path: "/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: grpc-port

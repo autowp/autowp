@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "autowp.static.fullname" . | quote }}
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "nginx required temporary files for buffering"
+spec:
+  selector:
+    matchLabels: {{ include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: static
+  replicas: 1
+  template:
+    metadata:
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: static
+    spec:
+      {{- include "autowp.imagePullSecrets" . | nindent 6 }}
+      volumes:
+        - name: img
+          persistentVolumeClaim:
+            claimName: img
+      containers:
+        - name: static
+          image: {{ include "autowp.static.image" . }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy | quote }}
+          ports:
+            - name: app-port
+              containerPort: 8080
+          env:
+            - name: NGINX_ENTRYPOINT_QUIET_LOGS
+              value: "1"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: app-port
+            initialDelaySeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: app-port
+            initialDelaySeconds: 5
+          volumeMounts:
+            - mountPath: "/usr/share/nginx/html/img"
+              name: img
+              readOnly: true
+          resources:
+            limits:
+              memory: 5Gi
+              cpu: 4000m
+            requests:
+              memory: 10M
+              cpu: 50m
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 101
+        runAsUser: 101
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/component
+                      operator: In
+                      values:
+                        - static
+              weight: 100

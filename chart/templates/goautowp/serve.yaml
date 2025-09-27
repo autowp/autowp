@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "autowp.goautowp.serve.fullname" . | quote }}
+spec:
+  selector:
+    matchLabels: {{ include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: goautowp-serve
+  replicas: 3
+  template:
+    metadata:
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: goautowp-serve
+      annotations:
+        checksum/config: {{ (tpl (.Files.Glob "configs/goautowp/*").AsConfig . ) | sha256sum }}
+    spec:
+      {{- include "autowp.imagePullSecrets" . | nindent 6 }}
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: {{ include "autowp.goautowp.fullname" . | quote }}
+          name: config
+        - name: tmp
+          emptyDir: {}
+      containers:
+        - name: goautowp-serve
+          image: {{ include "autowp.goautowp.image" . }}
+          imagePullPolicy: {{ .Values.goautowp.image.pullPolicy | quote }}
+          args:
+            - serve
+            - --grpc
+            - --attrs-update-values-amqp
+            - --df-amqp
+            - --monitoring-amqp
+            - --autoban
+            - --public
+          ports:
+            - name: app-port
+              containerPort: 8080
+            - name: grpc-port
+              containerPort: 8082
+            - name: metrics
+              containerPort: 2112
+          volumeMounts:
+            - mountPath: /config.yaml
+              name: config
+              subPath: config.yaml
+              readOnly: true
+            - mountPath: /tmp
+              name: tmp
+          resources:
+            limits:
+              memory: 5Gi
+              cpu: 4000m
+            requests:
+              memory: 10M
+              cpu: 50m
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 101
+          readinessProbe:
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 3
+          livenessProbe:
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 3
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/component
+                      operator: In
+                      values:
+                        - goautowp-serve
+              weight: 100
