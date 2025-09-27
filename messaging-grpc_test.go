@@ -63,10 +63,10 @@ func TestMessaging(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&MessagingCreateMessage{
-			UserId: tester.GetId(),
-			Text:   "Test message",
-		},
+		&CreateMessageRequest{Message: &Message{
+			ToUserId: tester.GetId(),
+			Text:     "Test message",
+		}},
 	)
 	require.NoError(t, err)
 

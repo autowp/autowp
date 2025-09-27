@@ -7,7 +7,7 @@ toolchain go1.24.5
 replace github.com/doug-martin/goqu/v9 v9.19.0 => github.com/autowp/goqu/v9 v9.20.0
 
 require (
-	cloud.google.com/go v0.121.6
+	cloud.google.com/go v0.123.0
 	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/aws/aws-sdk-go v1.55.8
 	github.com/corona10/goimagehash v1.1.0
@@ -23,7 +23,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.10
 	github.com/gen2brain/avif v0.4.4
 	github.com/gin-contrib/cors v1.7.6
-	github.com/gin-gonic/gin v1.10.1
+	github.com/gin-gonic/gin v1.11.0
 	github.com/go-mysql/errors v0.0.0-20180603193453-03314bea68e0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
@@ -37,23 +37,23 @@ require (
 	github.com/mozillazg/go-unidecode v0.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.6.0
 	github.com/paulmach/go.geo v0.0.0-20180829195134-22b514266d33
-	github.com/paulmach/orb v0.11.1
-	github.com/prometheus/client_golang v1.23.0
+	github.com/paulmach/orb v0.12.0
+	github.com/prometheus/client_golang v1.23.2
 	github.com/rabbitmq/amqp091-go v1.10.0
-	github.com/redis/go-redis/v9 v9.13.0
+	github.com/redis/go-redis/v9 v9.15.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/viper v1.20.1
+	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.3.8
-	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
-	golang.org/x/image v0.30.0
-	golang.org/x/text v0.28.0
-	google.golang.org/genproto v0.0.0-20250826171959-ef028d996bc1
-	google.golang.org/genproto/googleapis/api v0.0.0-20250826171959-ef028d996bc1
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250826171959-ef028d996bc1
-	google.golang.org/grpc v1.75.0
-	google.golang.org/protobuf v1.36.8
+	golang.org/x/exp v0.0.0-20250911091902-df9299821621
+	golang.org/x/image v0.31.0
+	golang.org/x/text v0.29.0
+	google.golang.org/genproto v0.0.0-20250922171735-9219d122eba9
+	google.golang.org/genproto/googleapis/api v0.0.0-20250922171735-9219d122eba9
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250922171735-9219d122eba9
+	google.golang.org/grpc v1.75.1
+	google.golang.org/protobuf v1.36.9
 	gopkg.in/gographics/imagick.v3 v3.7.2
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 
@@ -74,7 +74,7 @@ require (
 	github.com/dsoprea/go-iptc v0.0.0-20200610044640-bc9ca208b413 // indirect
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
 	github.com/dsoprea/go-photoshop-info-format v0.0.0-20200610045659-121dd752914d // indirect
-	github.com/ebitengine/purego v0.8.4 // indirect
+	github.com/ebitengine/purego v0.9.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gin-contrib/sse v1.1.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
@@ -85,9 +85,9 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/go-xmlfmt/xmlfmt v1.1.3 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
+	github.com/goccy/go-yaml v1.18.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
-	github.com/golang/geo v0.0.0-20250902123317-522ac1fc691f // indirect
-	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc // indirect
+	github.com/golang/geo v0.0.0-20250917161122-64cb148137c6 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -106,26 +106,32 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.66.0 // indirect
+	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
+	github.com/quic-go/qpack v0.5.1 // indirect
+	github.com/quic-go/quic-go v0.54.1 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect
-	github.com/sagikazarmark/locafero v0.10.0 // indirect
+	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
-	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
-	github.com/spf13/afero v1.14.0 // indirect
-	github.com/spf13/cast v1.9.2 // indirect
+	github.com/spf13/afero v1.15.0 // indirect
+	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.0 // indirect
+	go.uber.org/mock v0.6.0 // indirect
+	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/arch v0.20.0 // indirect
-	golang.org/x/crypto v0.41.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/arch v0.21.0 // indirect
+	golang.org/x/crypto v0.42.0 // indirect
+	golang.org/x/mod v0.28.0 // indirect
+	golang.org/x/net v0.44.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/tools v0.37.0 // indirect
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

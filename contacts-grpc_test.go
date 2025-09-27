@@ -6,6 +6,7 @@ import (
 	"github.com/autowp/goautowp/config"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func TestCreateDeleteContact(t *testing.T) {
@@ -59,7 +60,7 @@ func TestCreateDeleteContact(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&CreateContactRequest{UserId: tester.GetId()},
+		&CreateContactRequest{Contact: &Contact{ContactUserId: tester.GetId()}},
 	)
 	require.NoError(t, err)
 
@@ -81,7 +82,7 @@ func TestCreateDeleteContact(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&GetContactsRequest{},
+		&emptypb.Empty{},
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, items)
