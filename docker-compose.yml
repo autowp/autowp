@@ -97,9 +97,7 @@ services:
       - keycloak
       - redis
     volumes:
-      - "./goautowp/config.yaml:/config.yaml:ro"
-      - "./module/Application/config/model.conf:/model.conf:ro"
-      - "./module/Application/config/policy.csv:/policy.csv:ro"
+      - "./goautowp-config.yaml:/config.yaml:ro"
     ports:
       - "2112:2112"
       - "2113:8080"
@@ -116,9 +114,7 @@ services:
       - keycloak
       - redis
     volumes:
-      - "./goautowp/config.yaml:/config.yaml:ro"
-      - "./module/Application/config/model.conf:/model.conf:ro"
-      - "./module/Application/config/policy.csv:/policy.csv:ro"
+      - "./goautowp-config.yaml:/config.yaml:ro"
 
   minio:
     image: quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z

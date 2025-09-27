@@ -6,8 +6,7 @@
 /.buildpath
 /data
 /logs
-/goautowp/goautowp
-/frontend
+/frontend/*
 /goautowp/logs
 /cc-test-reporter
 /sonar-scanner
