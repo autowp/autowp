@@ -72,13 +72,6 @@ spec:
               name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
               port:
                 name: app-port
-        - path: "/goautowp.Contacts/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
-              port:
-                name: app-port
         - path: "/goautowp.Users/"
           pathType: Prefix
           backend:
