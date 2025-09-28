@@ -156,6 +156,7 @@ deploy:
   stage: deploy
   script:
     - cd chart
+    - echo "$DOCKER_PASSWORD" | helm registry login -u="$DOCKER_USERNAME" --password-stdin docker.io
     - helm dependency build
     - helm -n autowp upgrade autowp . -f "$VALUES" --set frontend.image.tag=$CI_COMMIT_TAG --set goautowp.image.tag=$CI_COMMIT_TAG
   rules:
