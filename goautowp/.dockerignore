@@ -6,7 +6,6 @@ README.md
 sonar-project.properties
 LICENSE
 goland.svg
-goautowp
 cov.out
 coverage.xml
 app
