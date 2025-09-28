@@ -69,12 +69,38 @@ service Articles {
 }
 
 service Traffic {
-  rpc AddToBlacklist(AddToTrafficBlacklistRequest) returns (google.protobuf.Empty) {}
-  rpc AddToWhitelist(AddToTrafficWhitelistRequest) returns (google.protobuf.Empty) {}
-  rpc DeleteFromBlacklist(DeleteFromTrafficBlacklistRequest) returns (google.protobuf.Empty) {}
-  rpc DeleteFromWhitelist(DeleteFromTrafficWhitelistRequest) returns (google.protobuf.Empty) {}
-  rpc GetTop(google.protobuf.Empty) returns (APITrafficTopResponse) {}
-  rpc GetWhitelist(google.protobuf.Empty) returns (APITrafficWhitelistItems) {}
+  rpc CreateTrafficBlacklistItem(CreateTrafficBlacklistItemRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v3/traffic/blacklist"
+      body: "item"
+    };
+  }
+  rpc CreateTrafficWhitelistItem(CreateTrafficWhitelistItemRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v3/traffic/whitelist"
+      body: "item"
+    };
+  }
+  rpc DeleteTrafficBlacklistItem(DeleteTrafficBlacklistItemRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v3/traffic/blacklist/{ip}"
+    };
+  }
+  rpc DeleteTrafficWhitelistItem(DeleteTrafficWhitelistItemRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v3/traffic/whitelist/{ip}"
+    };
+  }
+  rpc GetTrafficTop(google.protobuf.Empty) returns (TrafficTopResponse) {
+    option (google.api.http) = {
+      get: "/v3/traffic/top"
+    };
+  }
+  rpc GetWhitelistItems(google.protobuf.Empty) returns (TrafficWhitelistItems) {
+    option (google.api.http) = {
+      get: "/v3/traffic/whitelist"
+    };
+  }
 }
 
 service Contacts {
@@ -818,7 +844,7 @@ message APIBanItem {
   string reason = 4;
 }
 
-message APITrafficTopItem {
+message TrafficTopItem {
   string ip = 1;
   int32 count = 2;
   APIBanItem ban = 3;
@@ -826,8 +852,8 @@ message APITrafficTopItem {
   string whois_url = 5;
 }
 
-message APITrafficTopResponse {
-  repeated APITrafficTopItem items = 1;
+message TrafficTopResponse {
+  repeated TrafficTopItem items = 1;
 }
 
 message GetIPRequest {
@@ -858,31 +884,35 @@ message Feedback {
   string captcha = 4;
 }
 
-message DeleteFromTrafficWhitelistRequest {
+message DeleteTrafficWhitelistItemRequest {
   string ip = 1;
 }
 
-message DeleteFromTrafficBlacklistRequest {
+message DeleteTrafficBlacklistItemRequest {
   string ip = 1;
 }
 
-message AddToTrafficBlacklistRequest {
+message CreateTrafficBlacklistItemRequest {
+  TrafficBlacklistItem item = 1;
+}
+
+message CreateTrafficWhitelistItemRequest {
+  TrafficWhitelistItem item = 1;
+}
+
+message TrafficWhitelistItem {
+  string ip = 1;
+  string description = 2;
+}
+
+message TrafficBlacklistItem {
   string ip = 1;
   int32 period = 2;
   string reason = 3;
 }
 
-message AddToTrafficWhitelistRequest {
-  string ip = 1;
-}
-
-message APITrafficWhitelistItem {
-  string ip = 1;
-  string description = 2;
-}
-
-message APITrafficWhitelistItems {
-  repeated APITrafficWhitelistItem items = 1;
+message TrafficWhitelistItems {
+  repeated TrafficWhitelistItem items = 1;
 }
 
 message APIForumsUserSummary {

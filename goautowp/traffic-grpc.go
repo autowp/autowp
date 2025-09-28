@@ -44,10 +44,10 @@ func NewTrafficGRPCServer(
 	}
 }
 
-func (s *TrafficGRPCServer) GetTop(
+func (s *TrafficGRPCServer) GetTrafficTop(
 	ctx context.Context,
 	_ *emptypb.Empty,
-) (*APITrafficTopResponse, error) {
+) (*TrafficTopResponse, error) {
 	var err error
 
 	userCtx, err := s.auth.ValidateGRPC(ctx)
@@ -60,7 +60,7 @@ func (s *TrafficGRPCServer) GetTop(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APITrafficTopItem, len(items))
+	result := make([]*TrafficTopItem, len(items))
 
 	for idx, item := range items {
 		banItem, banErr := s.traffic.Ban.Get(ctx, item.IP)
@@ -111,7 +111,7 @@ func (s *TrafficGRPCServer) GetTop(
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 
-		result[idx] = &APITrafficTopItem{
+		result[idx] = &TrafficTopItem{
 			Ip:          item.IP.String(),
 			Count:       int32(item.Count), //nolint: gosec
 			Ban:         topItemBan,
@@ -120,14 +120,14 @@ func (s *TrafficGRPCServer) GetTop(
 		}
 	}
 
-	return &APITrafficTopResponse{
+	return &TrafficTopResponse{
 		Items: result,
 	}, nil
 }
 
-func (s *TrafficGRPCServer) DeleteFromBlacklist(
+func (s *TrafficGRPCServer) DeleteTrafficBlacklistItem(
 	ctx context.Context,
-	in *DeleteFromTrafficBlacklistRequest,
+	in *DeleteTrafficBlacklistItemRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -151,9 +151,9 @@ func (s *TrafficGRPCServer) DeleteFromBlacklist(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *TrafficGRPCServer) DeleteFromWhitelist(
+func (s *TrafficGRPCServer) DeleteTrafficWhitelistItem(
 	ctx context.Context,
-	in *DeleteFromTrafficWhitelistRequest,
+	in *DeleteTrafficWhitelistItemRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -177,9 +177,9 @@ func (s *TrafficGRPCServer) DeleteFromWhitelist(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *TrafficGRPCServer) AddToBlacklist(
+func (s *TrafficGRPCServer) CreateTrafficBlacklistItem(
 	ctx context.Context,
-	in *AddToTrafficBlacklistRequest,
+	in *CreateTrafficBlacklistItemRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -190,14 +190,16 @@ func (s *TrafficGRPCServer) AddToBlacklist(
 		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
 	}
 
-	ip := net.ParseIP(in.GetIp())
+	item := in.GetItem()
+
+	ip := net.ParseIP(item.GetIp())
 	if ip == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
 	}
 
-	duration := time.Hour * time.Duration(in.GetPeriod())
+	duration := time.Hour * time.Duration(item.GetPeriod())
 
-	err = s.traffic.Ban.Add(ctx, ip, duration, userCtx.UserID, in.GetReason())
+	err = s.traffic.Ban.Add(ctx, ip, duration, userCtx.UserID, item.GetReason())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -205,9 +207,9 @@ func (s *TrafficGRPCServer) AddToBlacklist(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *TrafficGRPCServer) AddToWhitelist(
+func (s *TrafficGRPCServer) CreateTrafficWhitelistItem(
 	ctx context.Context,
-	in *AddToTrafficWhitelistRequest,
+	in *CreateTrafficWhitelistItemRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -218,7 +220,9 @@ func (s *TrafficGRPCServer) AddToWhitelist(
 		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
 	}
 
-	ip := net.ParseIP(in.GetIp())
+	item := in.GetItem()
+
+	ip := net.ParseIP(item.GetIp())
 	if ip == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
 	}
@@ -238,10 +242,10 @@ func (s *TrafficGRPCServer) AddToWhitelist(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *TrafficGRPCServer) GetTrafficWhitelist(
+func (s *TrafficGRPCServer) GetTrafficWhitelistItems(
 	ctx context.Context,
 	_ *emptypb.Empty,
-) (*APITrafficWhitelistItems, error) {
+) (*TrafficWhitelistItems, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -256,15 +260,15 @@ func (s *TrafficGRPCServer) GetTrafficWhitelist(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APITrafficWhitelistItem, len(list))
+	result := make([]*TrafficWhitelistItem, len(list))
 	for idx, i := range list {
-		result[idx] = &APITrafficWhitelistItem{
+		result[idx] = &TrafficWhitelistItem{
 			Ip:          i.IP.String(),
 			Description: i.Description,
 		}
 	}
 
-	return &APITrafficWhitelistItems{
+	return &TrafficWhitelistItems{
 		Items: result,
 	}, nil
 }

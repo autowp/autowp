@@ -1,9 +1,8 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
-import {APITrafficWhitelistItem, DeleteFromTrafficWhitelistRequest} from '@grpc/spec.pb';
-import {TrafficClient} from '@grpc/spec.pbsc';
-import {Empty} from '@ngx-grpc/well-known-types';
+import {TrafficService} from '@rest/api/traffic.service';
+import {GoautowpTrafficWhitelistItem} from '@rest/model/goautowpTrafficWhitelistItem';
 import {PageEnvService} from '@services/page-env.service';
 import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
@@ -15,14 +14,14 @@ import {catchError, map} from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerTrafficWhitelistComponent implements OnInit {
-  readonly #grpc = inject(TrafficClient);
+  readonly #trafficService = inject(TrafficService);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
 
   readonly #reload$ = new BehaviorSubject<void>(void 0);
 
-  protected readonly items$: Observable<APITrafficWhitelistItem[]> = combineLatest([
-    this.#grpc.getWhitelist(new Empty()),
+  protected readonly items$: Observable<GoautowpTrafficWhitelistItem[]> = combineLatest([
+    this.#trafficService.trafficGetWhitelistItems(),
     this.#reload$,
   ]).pipe(
     map(([response]) => (response.items ? response.items : [])),
@@ -34,8 +33,8 @@ export class ModerTrafficWhitelistComponent implements OnInit {
     }),
   );
 
-  protected deleteItem(item: APITrafficWhitelistItem) {
-    this.#grpc.deleteFromWhitelist(new DeleteFromTrafficWhitelistRequest({ip: item.ip})).subscribe(() => {
+  protected deleteItem(item: GoautowpTrafficWhitelistItem) {
+    this.#trafficService.trafficDeleteTrafficWhitelistItem({ip: item.ip}).subscribe(() => {
       this.#reload$.next();
     });
   }

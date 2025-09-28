@@ -724,6 +724,11 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 		return nil, err
 	}
 
+	err = RegisterTrafficHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
+	if err != nil {
+		return nil, err
+	}
+
 	s.publicRouter = func(resp http.ResponseWriter, req *http.Request) {
 		if wrappedGrpc.IsAcceptableGrpcCorsRequest(req) || wrappedGrpc.IsGrpcWebRequest(req) {
 			wrappedGrpc.ServeHTTP(resp, req)

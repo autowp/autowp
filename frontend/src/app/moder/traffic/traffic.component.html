@@ -33,7 +33,7 @@
     <div class="col-sm-6">
       @if (item.item.ban) {
         <div>
-          <ng-container i18n>until</ng-container> {{ item.item.ban.until?.toDate() | date: 'fullDate' }}
+          <ng-container i18n>until</ng-container> {{ item.item.ban.until | date: 'fullDate' }}
           @if (item.item.ban.byUser) {
             <span>
               by

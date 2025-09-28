@@ -37,16 +37,18 @@ func TestHttpBanPost(t *testing.T) {
 		metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
 	)
 
-	_, err = trafficSrv.DeleteFromBlacklist(
+	_, err = trafficSrv.DeleteTrafficBlacklistItem(
 		ctx,
-		&DeleteFromTrafficBlacklistRequest{Ip: "127.0.0.1"},
+		&DeleteTrafficBlacklistItemRequest{Ip: "127.0.0.1"},
 	)
 	require.NoError(t, err)
 
-	_, err = trafficSrv.AddToBlacklist(ctx, &AddToTrafficBlacklistRequest{
-		Ip:     "127.0.0.1",
-		Period: 3,
-		Reason: "Test",
+	_, err = trafficSrv.CreateTrafficBlacklistItem(ctx, &CreateTrafficBlacklistItemRequest{
+		Item: &TrafficBlacklistItem{
+			Ip:     "127.0.0.1",
+			Period: 3,
+			Reason: "Test",
+		},
 	})
 	require.NoError(t, err)
 
@@ -57,9 +59,9 @@ func TestHttpBanPost(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, ip.GetBlacklist())
 
-	_, err = trafficSrv.DeleteFromBlacklist(
+	_, err = trafficSrv.DeleteTrafficBlacklistItem(
 		ctx,
-		&DeleteFromTrafficBlacklistRequest{Ip: "127.0.0.1"},
+		&DeleteTrafficBlacklistItemRequest{Ip: "127.0.0.1"},
 	)
 	require.NoError(t, err)
 
@@ -93,7 +95,7 @@ func TestTop(t *testing.T) {
 		metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
 	)
 
-	_, err = srv.GetTop(ctx, &emptypb.Empty{})
+	_, err = srv.GetTrafficTop(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
 }
 
@@ -118,16 +120,18 @@ func TestWhitelist(t *testing.T) {
 	srv, err := cnt.TrafficGRPCServer(t.Context())
 	require.NoError(t, err)
 
-	_, err = srv.AddToWhitelist(
+	_, err = srv.CreateTrafficWhitelistItem(
 		metadata.NewIncomingContext(
 			ctx,
 			metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
 		),
-		&AddToTrafficWhitelistRequest{Ip: "192.168.0.1"},
+		&CreateTrafficWhitelistItemRequest{Item: &TrafficWhitelistItem{
+			Ip: "192.168.0.1",
+		}},
 	)
 	require.NoError(t, err)
 
-	_, err = srv.GetTrafficWhitelist(
+	_, err = srv.GetTrafficWhitelistItems(
 		metadata.NewIncomingContext(
 			ctx,
 			metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
@@ -136,12 +140,12 @@ func TestWhitelist(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	_, err = srv.DeleteFromWhitelist(
+	_, err = srv.DeleteTrafficWhitelistItem(
 		metadata.NewIncomingContext(
 			ctx,
 			metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
 		),
-		&DeleteFromTrafficWhitelistRequest{Ip: "192.168.0.1"},
+		&DeleteTrafficWhitelistItemRequest{Ip: "192.168.0.1"},
 	)
 	require.NoError(t, err)
 }

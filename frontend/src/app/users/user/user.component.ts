@@ -3,13 +3,11 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  AddToTrafficBlacklistRequest,
   APICommentsMessage,
   APIDeleteUserRequest,
   APIUser,
   APIUserPreferencesRequest,
   CommentMessageFields,
-  DeleteFromTrafficBlacklistRequest,
   DeleteUserPhotoRequest,
   GetMessagesRequest,
   Picture,
@@ -18,9 +16,10 @@ import {
   PicturesRequest,
   UserFields,
 } from '@grpc/spec.pb';
-import {CommentsClient, PicturesClient, TrafficClient, UsersClient} from '@grpc/spec.pbsc';
+import {CommentsClient, PicturesClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {ContactsService} from '@rest/api/contacts.service';
+import {TrafficService} from '@rest/api/traffic.service';
 import {GoautowpIP} from '@rest/model/goautowpIP';
 import {AuthService, Role} from '@services/auth.service';
 import {AppContactsService} from '@services/contacts';
@@ -55,7 +54,7 @@ export class UsersUserComponent {
   readonly #ipService = inject(IpService);
   readonly #contactsService = inject(ContactsService);
   readonly #usersGrpc = inject(UsersClient);
-  readonly #trafficClient = inject(TrafficClient);
+  readonly #trafficService = inject(TrafficService);
   readonly #commentsClient = inject(CommentsClient);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
@@ -293,7 +292,7 @@ export class UsersUserComponent {
   }
 
   protected removeFromBlacklist(ip: string) {
-    this.#trafficClient.deleteFromBlacklist(new DeleteFromTrafficBlacklistRequest({ip})).subscribe({
+    this.#trafficService.trafficDeleteTrafficBlacklistItem({ip}).subscribe({
       error: (response: unknown) => this.#toastService.handleError(response),
       next: () => {
         this.#ipChange$.next();
@@ -302,14 +301,14 @@ export class UsersUserComponent {
   }
 
   protected addToBlacklist(ip: string) {
-    this.#trafficClient
-      .addToBlacklist(
-        new AddToTrafficBlacklistRequest({
+    this.#trafficService
+      .trafficCreateTrafficBlacklistItem({
+        item: {
           ip,
           period: this.banPeriod,
-          reason: this.banReason ? this.banReason : '',
-        }),
-      )
+          reason: this.banReason ?? '',
+        },
+      })
       .subscribe({
         error: (response: unknown) => this.#toastService.handleError(response),
         next: () => {

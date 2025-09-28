@@ -3,11 +3,9 @@ import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core'
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  AddToTrafficBlacklistRequest,
   APIItem,
   APIUser,
   CreatePictureItemRequest,
-  DeleteFromTrafficBlacklistRequest,
   DeletePictureItemRequest,
   DfDistance,
   DfDistanceFields,
@@ -37,10 +35,11 @@ import {
   SetPictureStatusRequest,
   UpdatePictureRequest,
 } from '@grpc/spec.pb';
-import {ItemsClient, PicturesClient, TrafficClient} from '@grpc/spec.pbsc';
+import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {PicturesService} from '@rest/api/pictures.service';
+import {TrafficService} from '@rest/api/traffic.service';
 import {GoautowpIP} from '@rest/model/goautowpIP';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
@@ -99,7 +98,7 @@ export class ModerPicturesItemComponent {
   readonly #picturesClient = inject(PicturesClient);
   readonly #picturessService = inject(PicturesService);
   readonly #toastService = inject(ToastsService);
-  readonly #trafficGrpc = inject(TrafficClient);
+  readonly #trafficService = inject(TrafficService);
 
   protected readonly replaceLoading = signal(false);
   protected readonly pictureItemLoading = signal(false);
@@ -627,20 +626,18 @@ export class ModerPicturesItemComponent {
   }
 
   protected removeFromBlacklist(ip: string) {
-    this.#trafficGrpc
-      .deleteFromBlacklist(new DeleteFromTrafficBlacklistRequest({ip}))
-      .subscribe(() => this.#change$.next());
+    this.#trafficService.trafficDeleteTrafficBlacklistItem({ip}).subscribe(() => this.#change$.next());
   }
 
   protected addToBlacklist(ip: string) {
-    this.#trafficGrpc
-      .addToBlacklist(
-        new AddToTrafficBlacklistRequest({
+    this.#trafficService
+      .trafficCreateTrafficBlacklistItem({
+        item: {
           ip: ip,
           period: this.banPeriod,
-          reason: this.banReason || undefined,
-        }),
-      )
+          reason: this.banReason || '',
+        },
+      })
       .subscribe(() => this.#change$.next());
   }
 
