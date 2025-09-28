@@ -58,7 +58,7 @@ test-goautowp:
     - hadolint ./build/package/Dockerfile
     - go mod download
     - go mod verify
-    - golangci-lint run ./... -v --timeout 2m
+    - golangci-lint run ./... -v --timeout 5m
 
     - waitforit -address=tcp://docker:2375 -timeout=30
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u="$CI_REGISTRY_USER" --password-stdin
@@ -162,4 +162,3 @@ deploy:
   environment:
     name: production
     url: https://www.wheelsage.org/
-  when: manual
