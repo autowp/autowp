@@ -21,7 +21,7 @@ export class ModerTrafficWhitelistComponent implements OnInit {
   readonly #reload$ = new BehaviorSubject<void>(void 0);
 
   protected readonly items$: Observable<GoautowpTrafficWhitelistItem[]> = combineLatest([
-    this.#trafficService.trafficGetWhitelistItems(),
+    this.#trafficService.trafficGetTrafficWhitelistItems(),
     this.#reload$,
   ]).pipe(
     map(([response]) => (response.items ? response.items : [])),
