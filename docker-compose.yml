@@ -1,137 +1,7 @@
+name: autowp
 services:
-  router:
-    image: nginx:1-alpine
-    container_name: autowp_test_router
-    restart: always
-    volumes:
-    - ./router.conf:/etc/nginx/nginx.conf:ro
-    - ./localhost.crt:/localhost.crt
-    - ./localhost.key:/localhost.key
-    depends_on:
-    - frontend
-    - goautowp-serve
-    - keycloak
-    ports:
-    - "80:80"
-    - "443:443"
-
-  redis:
-    image: redis:alpine
-    container_name: autowp_test_redis
-    restart: always
-    expose:
-    - "6379"
-
-  mysql:
-    image: mysql:8
-    container_name: autowp_test_mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: autowp_test
-      MYSQL_USER: autowp_test
-      MYSQL_PASSWORD: test
-    volumes:
-    - "./mysql:/var/lib/mysql"
-    - "./mysql.conf.d:/etc/mysql/conf.d"
-    expose:
-    - "3306"
-    ports:
-    - "3306:3306"
-
-  frontend:
-    image: registry.pereslegin.ru/autowp/frontend:v1.239.0
-    container_name: autowp_test_frontend
-    restart: always
-    volumes:
-    - "./frontend/dist/browser/be-BY:/usr/share/nginx/html/be-BY"
-    - "./frontend/dist/browser/en-GB:/usr/share/nginx/html/en-GB"
-    - "./frontend/dist/browser/fr:/usr/share/nginx/html/fr"
-    - "./frontend/dist/browser/pt-BR:/usr/share/nginx/html/pt-BR"
-    - "./frontend/dist/browser/ru:/usr/share/nginx/html/ru"
-    - "./frontend/dist/browser/uk:/usr/share/nginx/html/uk"
-    - "./frontend/dist/browser/zh-CN:/usr/share/nginx/html/zh-CN"
-    - "./frontend/dist/browser/es:/usr/share/nginx/html/es"
-    - "./frontend/dist/browser/it:/usr/share/nginx/html/it"
-    - "./frontend/dist/browser/he:/usr/share/nginx/html/he"
-    - "./frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
-    - "./hostmap:/etc/nginx/hostmap:ro"
-    user: "101:101"
-
-  rabbitmq:
-    image: rabbitmq:management-alpine
-    container_name: autowp_test_rabbitmq
-    ports:
-    - "4369:4369"
-    - "5671:5671"
-    - "5672:5672"
-    - "15671:15671"
-    - "15672:15672"
-    - "15691:15691"
-    - "15692:15692"
-    - "25672:25672"
-
-  traffic-postgres:
-    image: postgres:13-alpine
-    container_name: autowp_test_traffic_postgres
-    restart: always
-    environment:
-      - POSTGRES_DB=traffic
-      - POSTGRES_USER=traffic
-      - POSTGRES_PASSWORD=password
-    expose:
-      - "5432"
-    ports:
-      - "5432:5432"
-
-  goautowp-serve:
-    user: "0"
-    image: registry.pereslegin.ru/autowp/goautowp:v6.12.0
-    container_name: autowp_test_goautowp_serve
-    restart: always
-    command: serve --df-amqp --monitoring-amqp --grpc --public --autoban --attrs-update-values-amqp --loglevel=debug
-    depends_on:
-      - rabbitmq
-      - mysql
-      - traffic-postgres
-      - keycloak
-      - redis
-    volumes:
-      - "./goautowp-config.yaml:/config.yaml:ro"
-    ports:
-      - "2112:2112"
-      - "2113:8080"
-
-  goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/goautowp:v6.12.0
-    container_name: autowp_test_goautowp_scheduler_generate_index_cache
-    restart: always
-    command: scheduler-generate-index-cache --loglevel=debug
-    depends_on:
-      - rabbitmq
-      - mysql
-      - traffic-postgres
-      - keycloak
-      - redis
-    volumes:
-      - "./goautowp-config.yaml:/config.yaml:ro"
-
-  minio:
-    image: quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z
-    container_name: autowp_test_minio
-    restart: always
-    environment:
-      MINIO_ROOT_USER: "AKIAIOSFODNN7EXAMPLE"
-      MINIO_ROOT_PASSWORD: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - "./minio/data:/data"
-    command: server --console-address ":9001" /data
-
   createbuckets:
-    image: minio/mc
+    image: minio/mc:RELEASE.2025-04-08T15-41-24Z
     container_name: autowp_test_createbuckets
     depends_on:
       - minio
@@ -153,10 +23,64 @@ services:
       exit 0;
       "
 
+  frontend:
+    image: registry.pereslegin.ru/autowp/frontend:v1.239.0
+    container_name: autowp_test_frontend
+    volumes:
+      - ./frontend/dist/browser/be-BY:/usr/share/nginx/html/be-BY
+      - ./frontend/dist/browser/en-GB:/usr/share/nginx/html/en-GB
+      - ./frontend/dist/browser/fr:/usr/share/nginx/html/fr
+      - ./frontend/dist/browser/pt-BR:/usr/share/nginx/html/pt-BR
+      - ./frontend/dist/browser/ru:/usr/share/nginx/html/ru
+      - ./frontend/dist/browser/uk:/usr/share/nginx/html/uk
+      - ./frontend/dist/browser/zh-CN:/usr/share/nginx/html/zh-CN
+      - ./frontend/dist/browser/es:/usr/share/nginx/html/es
+      - ./frontend/dist/browser/it:/usr/share/nginx/html/it
+      - ./frontend/dist/browser/he:/usr/share/nginx/html/he
+      - ./frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./hostmap:/etc/nginx/hostmap:ro
+    restart: always
+    user: "101:101"
+
+  goautowp-scheduler-generate-index-cache:
+    image: registry.pereslegin.ru/autowp/goautowp:v6.12.0
+    container_name: autowp_test_goautowp_scheduler_generate_index_cache
+    depends_on:
+      - keycloak
+      - mysql
+      - rabbitmq
+      - redis
+      - traffic-postgres
+    volumes:
+      - ./goautowp-config.yaml:/config.yaml:ro
+    command: scheduler-generate-index-cache --loglevel=debug
+    restart: always
+
+  goautowp-serve:
+    image: registry.pereslegin.ru/autowp/goautowp:v6.12.0
+    container_name: autowp_test_goautowp_serve
+    depends_on:
+      - keycloak
+      - mysql
+      - rabbitmq
+      - redis
+      - traffic-postgres
+    volumes:
+      - ./goautowp-config.yaml:/config.yaml:ro
+    ports:
+      - '0.0.0.0:2112:2112'
+      - '0.0.0.0:2113:8080'
+    command: serve --df-amqp --monitoring-amqp --grpc --public --autoban --attrs-update-values-amqp --loglevel=debug
+    restart: always
+    user: "0"
+
   keycloak:
     image: bitnami/keycloak:25
     container_name: autowp_test_keycloak
-    restart: always
+    depends_on:
+      - postgres-keycloak
+    volumes:
+      - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
     environment:
       KEYCLOAK_ADMIN_USER: admin
       KEYCLOAK_ADMIN_PASSWORD: password
@@ -168,20 +92,96 @@ services:
       KEYCLOAK_DATABASE_PASSWORD: password
       KC_HTTP_RELATIVE_PATH: /auth
       KEYCLOAK_EXTRA_ARGS: -Dkeycloak.import=/opt/keycloak/data/import/
-    volumes:
-      - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
     ports:
-      - "8081:8080"
-    depends_on:
-      - postgres-keycloak
+      - '0.0.0.0:8081:8080'
+    restart: always
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z
+    container_name: autowp_test_minio
+    volumes:
+      - ./minio/data:/data
+    environment:
+      MINIO_ROOT_USER: "AKIAIOSFODNN7EXAMPLE"
+      MINIO_ROOT_PASSWORD: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    ports:
+      - '0.0.0.0:9000:9000'
+      - '0.0.0.0:9001:9001'
+    command: server --console-address ":9001" /data
+    restart: always
+
+  mysql:
+    image: mysql:8
+    container_name: autowp_test_mysql
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./mysql.conf.d:/etc/mysql/conf.d
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: autowp_test
+      MYSQL_USER: autowp_test
+      MYSQL_PASSWORD: test
+    ports:
+      - '0.0.0.0:3306:3306'
+    restart: always
+    expose:
+      - '3306'
 
   postgres-keycloak:
     image: postgres:13-alpine
     container_name: autowp_test_postgres_keycloak
-    restart: always
     environment:
       - POSTGRES_DB=keycloak
       - POSTGRES_USER=keycloak
       - POSTGRES_PASSWORD=password
     ports:
-      - "5433:5432"
+      - '0.0.0.0:5433:5432'
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: autowp_test_rabbitmq
+    ports:
+      - '0.0.0.0:4369:4369'
+      - '0.0.0.0:5671:5671'
+      - '0.0.0.0:5672:5672'
+      - '0.0.0.0:15671:15671'
+      - '0.0.0.0:15672:15672'
+      - '0.0.0.0:15691:15691'
+      - '0.0.0.0:15692:15692'
+      - '0.0.0.0:25672:25672'
+
+  redis:
+    image: redis:alpine
+    container_name: autowp_test_redis
+    restart: always
+    expose:
+      - '6379'
+  router:
+    image: nginx:1-alpine
+    container_name: autowp_test_router
+    depends_on:
+      - frontend
+      - goautowp-serve
+      - keycloak
+    volumes:
+      - ./router.conf:/etc/nginx/nginx.conf:ro
+      - ./localhost.crt:/localhost.crt
+      - ./localhost.key:/localhost.key
+    ports:
+      - '0.0.0.0:80:80'
+      - '0.0.0.0:443:443'
+    restart: always
+
+  traffic-postgres:
+    image: postgres:13-alpine
+    container_name: autowp_test_traffic_postgres
+    environment:
+      - POSTGRES_DB=traffic
+      - POSTGRES_USER=traffic
+      - POSTGRES_PASSWORD=password
+    ports:
+      - '0.0.0.0:5432:5432'
+    restart: always
+    expose:
+      - '5432'
