@@ -71,7 +71,7 @@ reCaptcha:
 frontend:
   image:
     registry: registry.pereslegin.ru
-    repository: autowp/frontend
+    repository: autowp/autowp/frontend
     tag: v1.245.3
     digest: ""
     pullPolicy: IfNotPresent
@@ -113,7 +113,7 @@ s3:
 goautowp:
   image:
     registry: registry.pereslegin.ru
-    repository: autowp/goautowp
+    repository: autowp/autowp/goautowp
     tag: v6.21.2
     digest: ""
     pullPolicy: IfNotPresent
