@@ -17,6 +17,7 @@ test-chart:
   script:
     - cd chart
     - sonar-scanner -Dsonar.login=$SONAR_TOKEN
+    - echo "$DOCKER_PASSWORD" | helm registry login -u="$DOCKER_USERNAME" --password-stdin docker.io
     - helm dependency update
     - helm lint
     - kube-linter lint .
