@@ -96,7 +96,7 @@ service Traffic {
       get: "/v3/traffic/top"
     };
   }
-  rpc GetWhitelistItems(google.protobuf.Empty) returns (TrafficWhitelistItems) {
+  rpc GetTrafficWhitelistItems(google.protobuf.Empty) returns (TrafficWhitelistItems) {
     option (google.api.http) = {
       get: "/v3/traffic/whitelist"
     };
