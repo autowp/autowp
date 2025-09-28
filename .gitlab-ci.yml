@@ -62,6 +62,7 @@ test-goautowp:
 
     - waitforit -address=tcp://docker:2375 -timeout=30
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u="$CI_REGISTRY_USER" --password-stdin
+    - echo "$DOCKER_PASSWORD" | docker login -u="$DOCKER_USERNAME" --password-stdin docker.io
     - docker compose up -d --quiet-pull
 
     - ./tools/wait.sh
