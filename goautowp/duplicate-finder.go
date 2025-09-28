@@ -174,11 +174,11 @@ func (s *DuplicateFinder) HideSimilar(ctx context.Context, srcPictureID, dstPict
 			goqu.Or(
 				goqu.And(
 					schema.DfDistanceTableSrcPictureIDCol.Eq(srcPictureID),
-					schema.DfDistanceTableSrcPictureIDCol.Eq(dstPictureID),
+					schema.DfDistanceTableDstPictureIDCol.Eq(dstPictureID),
 				),
 				goqu.And(
 					schema.DfDistanceTableSrcPictureIDCol.Eq(dstPictureID),
-					schema.DfDistanceTableSrcPictureIDCol.Eq(srcPictureID),
+					schema.DfDistanceTableDstPictureIDCol.Eq(srcPictureID),
 				),
 			),
 		).

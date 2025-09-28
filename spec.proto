@@ -230,7 +230,11 @@ service Pictures {
   rpc Normalize(PictureIDRequest) returns (google.protobuf.Empty) {}
   rpc Flop(PictureIDRequest) returns (google.protobuf.Empty) {}
   rpc CorrectFileNames(PictureIDRequest) returns (google.protobuf.Empty) {}
-  rpc DeleteSimilar(DeleteSimilarRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteSimilar(DeleteSimilarRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v3/pictures/{id}/similar/{similar_picture_id}"
+    };
+  }
   rpc Repair(PictureIDRequest) returns (google.protobuf.Empty) {}
   rpc GetPicture(PicturesRequest) returns (Picture) {}
   rpc GetPictures(PicturesRequest) returns (PicturesList) {}

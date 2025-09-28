@@ -9,7 +9,6 @@ import {
   CreatePictureItemRequest,
   DeleteFromTrafficBlacklistRequest,
   DeletePictureItemRequest,
-  DeleteSimilarRequest,
   DfDistance,
   DfDistanceFields,
   DfDistanceRequest,
@@ -41,6 +40,7 @@ import {
 import {ItemsClient, PicturesClient, TrafficClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
+import {PicturesService} from '@rest/api/pictures.service';
 import {GoautowpIP} from '@rest/model/goautowpIP';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
@@ -97,6 +97,7 @@ export class ModerPicturesItemComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #userService = inject(UserService);
   readonly #picturesClient = inject(PicturesClient);
+  readonly #picturessService = inject(PicturesService);
   readonly #toastService = inject(ToastsService);
   readonly #trafficGrpc = inject(TrafficClient);
 
@@ -544,8 +545,8 @@ export class ModerPicturesItemComponent {
 
   protected cancelSimilar(dfDistance: DfDistance) {
     this.similarLoading.set(true);
-    this.#picturesClient
-      .deleteSimilar(new DeleteSimilarRequest({id: dfDistance.srcPictureId, similarPictureId: dfDistance.dstPictureId}))
+    this.#picturessService
+      .picturesDeleteSimilar({id: dfDistance.srcPictureId, similarPictureId: dfDistance.dstPictureId})
       .pipe(
         catchError((error: unknown) => {
           this.similarLoading.set(false);
