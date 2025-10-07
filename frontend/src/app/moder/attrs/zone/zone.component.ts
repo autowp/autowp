@@ -1,8 +1,8 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {AttrZone, AttrZoneAttributesRequest} from '@grpc/spec.pb';
-import {AttrsClient} from '@grpc/spec.pbsc';
+import {AttrsService} from '@rest/api/attrs.service';
+import {GoautowpAttrZone} from '@rest/model/goautowpAttrZone';
 import {PageEnvService} from '@services/page-env.service';
 import {EMPTY, Observable, of} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
@@ -20,7 +20,7 @@ export class ModerAttrsZoneComponent {
   readonly #attrsService = inject(APIAttrsService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #attrsClient = inject(AttrsClient);
+  readonly #attrsServiceRest = inject(AttrsService);
   readonly #router = inject(Router);
 
   readonly #zoneID$ = this.#route.paramMap.pipe(
@@ -30,7 +30,7 @@ export class ModerAttrsZoneComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly zone$: Observable<AttrZone> = this.#zoneID$.pipe(
+  protected readonly zone$: Observable<GoautowpAttrZone> = this.#zoneID$.pipe(
     switchMap((id) => (id ? this.#attrsService.getZone$(id) : of(null))),
     switchMap((zone) => {
       if (!zone) {
@@ -54,9 +54,7 @@ export class ModerAttrsZoneComponent {
   protected readonly attributes$: Observable<AttrAttributeTreeItem[]> = this.#attrsService.getAttributes$(null, null);
 
   protected readonly zoneAttributes$ = this.#zoneID$.pipe(
-    switchMap((zoneID) =>
-      zoneID ? this.#attrsClient.getZoneAttributes(new AttrZoneAttributesRequest({zoneId: zoneID})) : EMPTY,
-    ),
+    switchMap((zoneID) => (zoneID ? this.#attrsServiceRest.attrsGetZoneAttributes({zoneId: zoneID}) : EMPTY)),
     map((zoneAttributes) => {
       const zoneAttribute: Record<string, boolean> = {};
       for (const item of zoneAttributes.items ? zoneAttributes.items : []) {

@@ -121,13 +121,6 @@ spec:
               name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
-        - path: "/goautowp.Text/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
         - path: "/goautowp.Attrs/"
           pathType: Prefix
           backend:

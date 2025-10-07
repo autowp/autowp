@@ -1,13 +1,13 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {AttrAttribute} from '@grpc/spec.pb';
+import {GoautowpAttrAttribute} from '@rest/model/goautowpAttrAttribute';
 import {PageEnvService} from '@services/page-env.service';
 import {getAttrListOptionsTranslation, getAttrsTranslation, getUnitNameTranslation} from '@utils/translations';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
-import {APIAttrsService} from '../../../api/attrs/attrs.service';
+import {APIAttrsService, AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
 
 @Component({
   selector: 'app-moder-attrs-attribute',
@@ -24,11 +24,20 @@ export class ModerAttrsAttributeComponent {
   readonly #attributeID$ = this.#route.paramMap.pipe(
     map((params) => params.get('id')),
     distinctUntilChanged(),
+    switchMap((id) => {
+      if (!id) {
+        this.#router.navigate(['/error-404'], {
+          skipLocationChange: true,
+        });
+        return EMPTY;
+      }
+      return of(id);
+    }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly attribute$: Observable<AttrAttribute> = this.#attributeID$.pipe(
-    switchMap((id) => (id ? this.#attrsService.getAttribute$(id) : of(null))),
+  protected readonly attribute$: Observable<GoautowpAttrAttribute> = this.#attributeID$.pipe(
+    switchMap((id) => this.#attrsService.getAttribute$(id)),
     switchMap((attribute) => {
       if (!attribute) {
         this.#router.navigate(['/error-404'], {
@@ -48,7 +57,7 @@ export class ModerAttrsAttributeComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly attributes$ = this.#attributeID$.pipe(
+  protected readonly attributes$: Observable<AttrAttributeTreeItem[]> = this.#attributeID$.pipe(
     switchMap((attributeID) => this.#attrsService.getAttributes$(null, attributeID)),
   );
 

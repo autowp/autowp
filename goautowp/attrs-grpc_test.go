@@ -86,9 +86,9 @@ func TestGetAttributes(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	_, err = client.GetAttributes(
+	_, err = client.ListAttributes(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrAttributesRequest{ZoneId: 1},
+		&ListAttributesRequest{ZoneId: 1},
 	)
 	require.NoError(t, err)
 }

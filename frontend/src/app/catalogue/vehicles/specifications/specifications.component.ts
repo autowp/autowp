@@ -2,8 +2,8 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {APIItem, GetSpecificationsRequest, ItemFields} from '@grpc/spec.pb';
-import {AttrsClient} from '@grpc/spec.pbsc';
+import {APIItem, ItemFields} from '@grpc/spec.pb';
+import {AttrsService} from '@rest/api/attrs.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {EMPTY, Observable, of} from 'rxjs';
@@ -22,7 +22,7 @@ export class CatalogueVehiclesSpecificationsComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #catalogueService = inject(CatalogueService);
   readonly #router = inject(Router);
-  readonly #attrsClient = inject(AttrsClient);
+  readonly #attrsService = inject(AttrsService);
   readonly #sanitizer = inject(DomSanitizer);
   readonly #languageService = inject(LanguageService);
 
@@ -70,15 +70,14 @@ export class CatalogueVehiclesSpecificationsComponent {
   protected readonly html$ = this.item$.pipe(
     switchMap((item) => {
       if (item?.hasChildSpecs) {
-        return this.#attrsClient.getChildSpecifications(
-          new GetSpecificationsRequest({itemId: item.id, language: this.#languageService.language}),
-        );
+        return this.#attrsService.attrsGetChildSpecifications({
+          itemId: item.id,
+          language: this.#languageService.language,
+        });
       }
 
       if (item?.hasSpecs) {
-        return this.#attrsClient.getSpecifications(
-          new GetSpecificationsRequest({itemId: item.id, language: this.#languageService.language}),
-        );
+        return this.#attrsService.attrsGetSpecifications({itemId: item.id, language: this.#languageService.language});
       }
 
       this.#router.navigate(['/error-404'], {

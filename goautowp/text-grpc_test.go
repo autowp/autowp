@@ -75,7 +75,7 @@ func TestGetText(t *testing.T) {
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
-	text, err := client.GetText(ctx, &APIGetTextRequest{Id: id})
+	text, err := client.GetText(ctx, &GetTextRequest{Id: id})
 	require.NoError(t, err)
 	require.Equal(t, "Text 2", text.GetCurrent().GetText())
 	require.Equal(t, tester.GetId(), text.GetCurrent().GetUserId())

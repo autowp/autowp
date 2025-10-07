@@ -94,7 +94,7 @@ func convertAttribute(row *schema.AttrsAttributeRow) *AttrAttribute {
 
 func (s *AttrsGRPCServer) GetAttribute(
 	ctx context.Context,
-	in *AttrAttributeID,
+	in *GetAttributeRequest,
 ) (*AttrAttribute, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -117,9 +117,9 @@ func (s *AttrsGRPCServer) GetAttribute(
 	return convertAttribute(row), nil
 }
 
-func (s *AttrsGRPCServer) GetAttributes(
-	ctx context.Context, in *AttrAttributesRequest,
-) (*AttrAttributesResponse, error) {
+func (s *AttrsGRPCServer) ListAttributes(
+	ctx context.Context, in *ListAttributesRequest,
+) (*ListAttributesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -143,7 +143,7 @@ func (s *AttrsGRPCServer) GetAttributes(
 		res[idx] = convertAttribute(row)
 	}
 
-	return &AttrAttributesResponse{
+	return &ListAttributesResponse{
 		Items: res,
 	}, nil
 }

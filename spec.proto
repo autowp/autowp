@@ -352,25 +352,65 @@ service Donations {
 }
 
 service Text {
-  rpc GetText(APIGetTextRequest) returns (APIGetTextResponse) {}
+  rpc GetText(GetTextRequest) returns (GetTextResponse) {
+    option (google.api.http) = {
+      get: "/v3/text/{id}"
+    };
+  }
 }
 
 service Attrs {
-  rpc GetAttribute(AttrAttributeID) returns (AttrAttribute) {}
-  rpc GetAttributes(AttrAttributesRequest) returns (AttrAttributesResponse) {}
-  rpc GetAttributeTypes(google.protobuf.Empty) returns (AttrAttributeTypesResponse) {}
-  rpc GetListOptions(AttrListOptionsRequest) returns (AttrListOptionsResponse) {}
-  rpc GetUnits(google.protobuf.Empty) returns (AttrUnitsResponse) {}
-  rpc GetZoneAttributes(AttrZoneAttributesRequest) returns (AttrZoneAttributesResponse) {}
-  rpc GetZones(google.protobuf.Empty) returns (AttrZonesResponse) {}
+  rpc GetAttribute(GetAttributeRequest) returns (AttrAttribute) {
+    option (google.api.http) = {
+      get: "/v3/attrs/attributes/{id}"
+    };
+  }
+  rpc ListAttributes(ListAttributesRequest) returns (ListAttributesResponse) {
+    option (google.api.http) = {
+      get: "/v3/attrs/attributes"
+    };
+  }
+  rpc GetAttributeTypes(google.protobuf.Empty) returns (AttrAttributeTypesResponse) {
+    option (google.api.http) = {
+      get: "/v3/attrs/attribute-types"
+    };
+  }
+  rpc GetListOptions(AttrListOptionsRequest) returns (AttrListOptionsResponse) {
+    option (google.api.http) = {
+      get: "/v3/attrs/list-options"
+    };
+  }
+  rpc GetUnits(google.protobuf.Empty) returns (AttrUnitsResponse) {
+    option (google.api.http) = {
+      get: "/v3/attrs/units"
+    };
+  }
+  rpc GetZoneAttributes(AttrZoneAttributesRequest) returns (AttrZoneAttributesResponse) {
+    option (google.api.http) = {
+      get: "/v3/attrs/zone-attributes"
+    };
+  }
+  rpc GetZones(google.protobuf.Empty) returns (AttrZonesResponse) {
+    option (google.api.http) = {
+      get: "/v3/attrs/zones"
+    };
+  }
   rpc GetValues(AttrValuesRequest) returns (AttrValuesResponse) {}
   rpc GetUserValues(AttrUserValuesRequest) returns (AttrUserValuesResponse) {}
   rpc SetUserValues(AttrSetUserValuesRequest) returns (google.protobuf.Empty) {}
   rpc DeleteUserValues(DeleteAttrUserValuesRequest) returns (google.protobuf.Empty) {}
   rpc MoveUserValues(MoveAttrUserValuesRequest) returns (google.protobuf.Empty) {}
   rpc GetConflicts(AttrConflictsRequest) returns (AttrConflictsResponse) {}
-  rpc GetSpecifications(GetSpecificationsRequest) returns (GetSpecificationsResponse) {}
-  rpc GetChildSpecifications(GetSpecificationsRequest) returns (GetSpecificationsResponse) {}
+  rpc GetSpecifications(GetSpecificationsRequest) returns (GetSpecificationsResponse) {
+    option (google.api.http) = {
+      get: "/v3/attrs/specifications"
+    };
+  }
+  rpc GetChildSpecifications(GetSpecificationsRequest) returns (GetSpecificationsResponse) {
+    option (google.api.http) = {
+      get: "/v3/attrs/child-specifications"
+    };
+  }
   rpc GetChartParameters(google.protobuf.Empty) returns (ChartParameters) {}
   rpc GetChartData(ChartDataRequest) returns (ChartData) {}
 }
@@ -465,16 +505,16 @@ message ErrorDetails {
   google.rpc.LocalizedMessage localizedMessage = 8;
 }
 
-message AttrAttributeID {
+message GetAttributeRequest {
   int64 id = 1;
 }
 
-message AttrAttributesRequest {
-  int64 zone_id = 1;
-  int64 parent_id = 2;
+message ListAttributesRequest {
+  int64 zone_id = 1 [(google.api.field_behavior) = OPTIONAL];
+  int64 parent_id = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
-message AttrAttributesResponse {
+message ListAttributesResponse {
   repeated AttrAttribute items = 1;
 }
 
@@ -490,7 +530,7 @@ message AttrAttribute {
 }
 
 message AttrListOptionsRequest {
-  int64 attribute_id = 1;
+  int64 attribute_id = 1 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message AttrListOptionsResponse {
@@ -2646,7 +2686,7 @@ message AddCommentResponse {
   int64 id = 1;
 }
 
-message APIGetTextRequest {
+message GetTextRequest {
   int64 id = 1;
   int64 revision = 2;
 }
@@ -2657,7 +2697,7 @@ message TextRevision {
   int64 user_id = 3;
 }
 
-message APIGetTextResponse {
+message GetTextResponse {
   TextRevision current = 1;
   TextRevision prev = 2;
   TextRevision next = 3;

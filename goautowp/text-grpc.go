@@ -26,8 +26,8 @@ func NewTextGRPCServer(
 
 func (s *TextGRPCServer) GetText(
 	ctx context.Context,
-	in *APIGetTextRequest,
-) (*APIGetTextResponse, error) {
+	in *GetTextRequest,
+) (*GetTextResponse, error) {
 	var (
 		lastRevision    int64
 		currentRevision = in.GetRevision()
@@ -99,7 +99,7 @@ func (s *TextGRPCServer) GetText(
 		nextRevision = currentRevision + 1
 	}
 
-	return &APIGetTextResponse{
+	return &GetTextResponse{
 		Current: &TextRevision{
 			Text:     stCurrent.Text,
 			Revision: currentRevision,

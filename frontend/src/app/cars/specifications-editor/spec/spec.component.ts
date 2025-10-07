@@ -322,12 +322,11 @@ export class CarsSpecificationsEditorSpecComponent {
     });
   }
 
-  #listOptions$: Observable<{attributeId: string; id: string; name: string; parentId: string}[]> = this.#attrsService
-    .getListOptions$(undefined)
-    .pipe(
+  readonly #listOptions$: Observable<{attributeId: string; id: string; name: string; parentId: string}[]> =
+    this.#attrsService.getListOptions$(undefined).pipe(
       map((response) =>
         (response.items ? response.items : []).map((i) => ({
-          ...i.toObject(),
+          ...i,
           name: getAttrListOptionsTranslation(i.name),
         })),
       ),

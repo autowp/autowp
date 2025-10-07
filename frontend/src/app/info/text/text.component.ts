@@ -1,12 +1,12 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIGetTextRequest, APIUser} from '@grpc/spec.pb';
-import {TextClient} from '@grpc/spec.pbsc';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {APIUser} from '@grpc/spec.pb';
+import {TextService} from '@rest/api/text.service';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {DiffEditorComponent, DiffEditorModel} from 'ngx-monaco-editor-v2';
-import {combineLatest, EMPTY, Observable} from 'rxjs';
+import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
 
 import {ToastsService} from '../../toasts/toasts.service';
@@ -39,9 +39,10 @@ interface InfoText {
 export class InfoTextComponent implements OnInit {
   readonly #userService = inject(UserService);
   readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #textClient = inject(TextClient);
+  readonly #textService = inject(TextService);
 
   protected readonly options = {
     originalEditable: false,
@@ -53,23 +54,25 @@ export class InfoTextComponent implements OnInit {
     map((params) => params.get('id')),
     distinctUntilChanged(),
     debounceTime(10),
+    switchMap((id) => {
+      if (!id) {
+        void this.#router.navigate(['/error-404'], {
+          skipLocationChange: true,
+        });
+        return EMPTY;
+      }
+      return of(id);
+    }),
   );
 
   readonly #revision$ = this.#route.queryParamMap.pipe(
-    map((params) => params.get('revision')),
+    map((params) => params.get('revision') ?? ''),
     distinctUntilChanged(),
     debounceTime(10),
   );
 
   protected readonly data$: Observable<InfoText> = combineLatest([this.#id$, this.#revision$]).pipe(
-    switchMap(([id, revision]) =>
-      this.#textClient.getText(
-        new APIGetTextRequest({
-          id: id ? id : undefined,
-          revision: revision ? revision : undefined,
-        }),
-      ),
-    ),
+    switchMap(([id, revision]) => this.#textService.textGetText({id, revision})),
     catchError((response: unknown) => {
       this.#toastService.handleError(response);
       return EMPTY;
