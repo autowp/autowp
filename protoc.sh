@@ -12,7 +12,7 @@ set -e
 #            spec.proto
 
 protoc --proto_path="/usr/local/include" \
-       --proto_path="$GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-gateway/v2@v2.27.2" \
+       --proto_path="$GOPATH/pkg/mod/github.com/grpc-ecosystem/grpc-gateway/v2@v2.27.3" \
        --proto_path=. \
        --grpc-gateway_out=goautowp \
        --grpc-gateway_opt paths=source_relative \
