@@ -9,7 +9,7 @@ export const environment = {
   keycloak: {
     clientId: 'frontend',
     realm: 'autowp',
-    url: 'http://localhost:8081/auth/',
+    url: 'http://localhost:8081/',
   },
   languages: [
     {

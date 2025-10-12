@@ -21,12 +21,12 @@ file-storage:
       key: "AKIAIOSFODNN7EXAMPLE"
       secret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
     endpoint: http://minio:9000
-rabbitmq: amqp://guest:guest@autowp_test_rabbitmq:5672/
-postgres-dsn: postgres://traffic:password@autowp_test_traffic_postgres:5432/traffic?sslmode=disable
+rabbitmq: "amqp://guest:guest@autowp_test_rabbitmq:5672/"
+postgres-dsn: "postgres://traffic:password@autowp_test_traffic_postgres:5432/traffic?sslmode=disable"
 postgres-migrations:
-  dsn: postgres://traffic:password@autowp_test_traffic_postgres/traffic?sslmode=disable
+  dsn: "postgres://traffic:password@autowp_test_traffic_postgres/traffic?sslmode=disable"
 keycloak:
-  url: http://keycloak:8080/auth
+  url: "http://keycloak:8080"
   realm: autowp
   client-id: autowp
   client-secret: c0fce0df-6105-4d1e-bc23-8e67239f7640
@@ -37,11 +37,11 @@ image-storage:
     credentials:
       key: "AKIAIOSFODNN7EXAMPLE"
       secret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-    endpoint: http://minio:9000
+    endpoint: "http://minio:9000"
   src-override:
     host: localhost:9000
     scheme: http
-redis: redis://redis:6379
+redis: "redis://redis:6379"
 donations-vod-price: 100
 about:
   developer: "3"

@@ -79,12 +79,12 @@ services:
     command:
       - "start"
       - "--import-realm"
-      - --hostname=localhost
-      - --http-enabled=true
-      - --db=postgres
-      - --db-url=jdbc:postgresql://postgres-keycloak:5432/keycloak
-      - --db-username=keycloak
-      - --db-password=password
+      - "--hostname=localhost"
+      - "--http-enabled=true"
+      - "--db=postgres"
+      - "--db-url=jdbc:postgresql://postgres-keycloak:5432/keycloak"
+      - "--db-username=keycloak"
+      - "--db-password=password"
     depends_on:
       - postgres-keycloak
     volumes:
@@ -92,14 +92,6 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: password
-      KEYCLOAK_MANAGEMENT_USER: manager
-      KEYCLOAK_MANAGEMENT_PASSWORD: password
-      KEYCLOAK_DATABASE_HOST: postgres-keycloak
-      KEYCLOAK_DATABASE_NAME: keycloak
-      KEYCLOAK_DATABASE_USER: keycloak
-      KEYCLOAK_DATABASE_PASSWORD: password
-      KC_HTTP_RELATIVE_PATH: /auth
-      KEYCLOAK_EXTRA_ARGS: -Dkeycloak.import=/opt/keycloak/data/import/
     ports:
       - '0.0.0.0:8081:8080'
     restart: always
