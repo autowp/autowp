@@ -46,7 +46,7 @@ func TestStatisticsPulse(t *testing.T) {
 	kc := cnt.Keycloak()
 	token, err := kc.Login(
 		ctxTimeout,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,

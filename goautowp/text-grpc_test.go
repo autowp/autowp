@@ -24,7 +24,7 @@ func TestGetText(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,

@@ -80,7 +80,7 @@ func TestGetAttributes(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -112,7 +112,7 @@ func TestGetListOptions(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -254,7 +254,7 @@ func TestGetValues(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -384,7 +384,7 @@ func TestGetEmptyValues(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -550,7 +550,7 @@ func TestConflicts(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -625,7 +625,7 @@ func TestValuesInherits(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -647,7 +647,7 @@ func TestValuesInherits(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -730,7 +730,7 @@ func TestEngineValuesApplied(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -810,7 +810,7 @@ func TestSetUserValuesList(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -922,7 +922,7 @@ func TestSetValuesRaceConditions(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1144,7 +1144,7 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1180,7 +1180,7 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -1308,7 +1308,7 @@ func TestInheritedValueOverridden(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1441,7 +1441,7 @@ func TestMoveValues(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1538,7 +1538,7 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1691,7 +1691,7 @@ func TestNonMultipleValuesFiltered(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1752,7 +1752,7 @@ func TestEmptyListValueConsiderAsNonValid(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1805,7 +1805,7 @@ func TestEmptyStringValueConsiderAsNonValid(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1857,7 +1857,7 @@ func TestSpecifications(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -2098,7 +2098,7 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -2373,7 +2373,7 @@ func TestLocalizedFormat(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -2440,7 +2440,7 @@ func TestSetUserValuesIsEmpty(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 

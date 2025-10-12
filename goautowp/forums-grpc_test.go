@@ -137,7 +137,7 @@ func TestCloseTopic(t *testing.T) {
 
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,

@@ -32,7 +32,7 @@ func TestView(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -61,7 +61,7 @@ func TestVote(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -96,7 +96,7 @@ func TestModerVoteTemplate(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -132,7 +132,7 @@ func TestModerVote(t *testing.T) {
 	require.NoError(t, err)
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -230,7 +230,7 @@ func TestUserSummary(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -254,7 +254,7 @@ func TestFlopNormalizeAndRepair(t *testing.T) {
 	require.NoError(t, err)
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -301,7 +301,7 @@ func TestDeleteSimilar(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -333,7 +333,7 @@ func TestPictureItemAreaAndPerspective(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -407,7 +407,7 @@ func TestPictureItemSetPictureItemItemID(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -468,7 +468,7 @@ func TestPictureCrop(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -524,7 +524,7 @@ func TestPictureCropByOneAxis(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -594,7 +594,7 @@ func TestInvalidPictureCrop(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -682,7 +682,7 @@ func TestClearReplacePicture(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -733,7 +733,7 @@ func TestSetPicturePoint(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -840,7 +840,7 @@ func TestUpdatePicture(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -927,7 +927,7 @@ func TestSetPictureCopyrights(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1012,7 +1012,7 @@ func TestSetPictureStatus(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1134,7 +1134,7 @@ func TestReplacePicture(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1155,7 +1155,7 @@ func TestReplacePicture(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,
@@ -1257,7 +1257,7 @@ func TestGetPictures(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1292,7 +1292,7 @@ func TestGetPictureWithPerspectivePrefix(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1375,7 +1375,7 @@ func TestGetPicturePath(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1453,7 +1453,7 @@ func TestGetPicturesOrders(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1524,7 +1524,7 @@ func TestGetPicturesFilters(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1606,7 +1606,7 @@ func TestGetPictureIP(t *testing.T) {
 			pictureID, err := res.LastInsertId()
 			require.NoError(t, err)
 
-			token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+			token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 			require.NoError(t, err)
 			require.NotNil(t, token)
 
@@ -1646,7 +1646,7 @@ func TestInbox(t *testing.T) {
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1697,7 +1697,7 @@ func TestNewbox(t *testing.T) {
 	kc := cnt.Keycloak()
 	client := NewPicturesClient(conn)
 
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1741,7 +1741,7 @@ func TestInboxCount(t *testing.T) {
 	ctx := t.Context()
 	kc := cnt.Keycloak()
 
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1766,7 +1766,7 @@ func TestCorrectFileNamesVote(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -1941,7 +1941,7 @@ func TestGetGallery(t *testing.T) {
 	client := NewPicturesClient(conn)
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -2006,7 +2006,7 @@ func TestGetPerspectives(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,
@@ -2040,7 +2040,7 @@ func TestGetPerspectivePages(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,

@@ -38,7 +38,7 @@ func TestUploadPictureTooSmall(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -89,7 +89,7 @@ func TestUploadPicture(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,

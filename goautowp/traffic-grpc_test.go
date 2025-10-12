@@ -17,7 +17,7 @@ func TestHttpBanPost(t *testing.T) {
 	kc := cnt.Keycloak()
 	token, err := kc.Login(
 		t.Context(),
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -78,7 +78,7 @@ func TestTop(t *testing.T) {
 	kc := cnt.Keycloak()
 	token, err := kc.Login(
 		t.Context(),
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -108,7 +108,7 @@ func TestWhitelist(t *testing.T) {
 	kc := cnt.Keycloak()
 	token, err := kc.Login(
 		t.Context(),
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,

@@ -30,7 +30,10 @@ const (
 	adminPassword = "123123"
 )
 
-const bearerPrefix = "Bearer "
+const (
+	bearerPrefix     = "Bearer "
+	keycloakClientID = "frontend"
+)
 
 func addPicture(
 	t *testing.T,
@@ -73,7 +76,7 @@ func getUserWithCleanHistory(
 	ctx := t.Context()
 	kc := gocloak.NewClient(cfg.Keycloak.URL)
 
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, username, password)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, username, password)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -104,7 +107,7 @@ func createItem(t *testing.T, conn *grpc.ClientConn, cnt *Container, row *APIIte
 
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 

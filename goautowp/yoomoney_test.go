@@ -52,7 +52,7 @@ func TestYoomoneyWebhookHappyPath(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 

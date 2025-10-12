@@ -16,7 +16,7 @@ func TestGetEvents(t *testing.T) {
 	kc := cnt.Keycloak()
 	token, err := kc.Login(
 		t.Context(),
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -45,7 +45,7 @@ func TestGetEventsWithFilters(t *testing.T) {
 	kc := cnt.Keycloak()
 	token, err := kc.Login(
 		t.Context(),
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,

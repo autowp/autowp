@@ -24,7 +24,7 @@ func TestMessaging(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -36,7 +36,7 @@ func TestMessaging(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,

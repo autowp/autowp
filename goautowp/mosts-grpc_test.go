@@ -39,7 +39,7 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,

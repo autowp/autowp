@@ -59,7 +59,7 @@ func TestCreateUpdateDeleteUser(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, userEmail, password)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, userEmail, password)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -100,7 +100,7 @@ func TestCreateUpdateDeleteUser(t *testing.T) {
 
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -133,7 +133,7 @@ func TestSetDisabledUserCommentsNotifications(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -145,7 +145,7 @@ func TestSetDisabledUserCommentsNotifications(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,
@@ -223,7 +223,7 @@ func TestGetOnlineUsers(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,
@@ -287,7 +287,7 @@ func TestGetUsersSearch(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,
@@ -331,7 +331,7 @@ func TestUpdateUser(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,

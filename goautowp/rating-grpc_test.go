@@ -42,7 +42,7 @@ func TestPictureLikesRating(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,
@@ -54,7 +54,7 @@ func TestPictureLikesRating(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,

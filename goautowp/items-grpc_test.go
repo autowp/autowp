@@ -81,7 +81,7 @@ func TestGetTwinsBrandsList(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -235,7 +235,7 @@ func TestItemLinks(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -327,7 +327,7 @@ func TestItemVehicleTypes(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -459,7 +459,7 @@ func TestItemParentLanguages(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -496,7 +496,7 @@ func TestItemLanguages(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -840,7 +840,7 @@ func TestInboxPicturesCount(t *testing.T) {
 	// login with admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -2289,7 +2289,7 @@ func TestItemFields(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -2366,7 +2366,7 @@ func TestItemParentFields(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -2685,7 +2685,7 @@ func TestItemOfDayPicture(t *testing.T) {
 	// admin
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -2734,7 +2734,7 @@ func TestGetTopSpecsContributions(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -2859,7 +2859,7 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -3009,7 +3009,7 @@ func TestBrandSectionLanguageName(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3108,7 +3108,7 @@ func TestAlpha(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3141,7 +3141,7 @@ func TestUpdateItemName(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3199,7 +3199,7 @@ func TestUpdateItemBody(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3259,7 +3259,7 @@ func TestUpdateItemBeginYear(t *testing.T) { //nolint: dupl
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3322,7 +3322,7 @@ func TestUpdateItemEndYear(t *testing.T) { //nolint: dupl
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3385,7 +3385,7 @@ func TestUpdateItemBeginModelYear(t *testing.T) { //nolint: dupl
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3448,7 +3448,7 @@ func TestUpdateItemEndModelYear(t *testing.T) { //nolint: dupl
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3511,7 +3511,7 @@ func TestUpdateItemBeginMonth(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3574,7 +3574,7 @@ func TestUpdateItemEndMonth(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3637,7 +3637,7 @@ func TestUpdateItemBeginModelYearFraction(t *testing.T) { //nolint: dupl
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3700,7 +3700,7 @@ func TestUpdateItemEndModelYearFraction(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3763,7 +3763,7 @@ func TestUpdateItemSpecID(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3826,7 +3826,7 @@ func TestUpdateItemIsConcept(t *testing.T) { //nolint: dupl
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3889,7 +3889,7 @@ func TestUpdateItemSpecInherit(t *testing.T) { //nolint: dupl
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -3952,7 +3952,7 @@ func TestUpdateItemIsConceptInherit(t *testing.T) { //nolint: dupl
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -4015,7 +4015,7 @@ func TestUpdateItemIsGroup(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -4078,7 +4078,7 @@ func TestUpdateItemProduced(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -4141,7 +4141,7 @@ func TestUpdateItemProducedExactly(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -4204,7 +4204,7 @@ func TestUpdateItemToday(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -4268,7 +4268,7 @@ func TestUpdateItemCatname(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -4328,7 +4328,7 @@ func TestUpdateItemFullname(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -4400,7 +4400,7 @@ func TestGetTree(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -4441,7 +4441,7 @@ func TestCreatedBrandIsGroup(t *testing.T) {
 	kc := cnt.Keycloak()
 	adminToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		adminUsername,
@@ -4485,7 +4485,7 @@ func TestGetBrandVehicleTypes(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,
@@ -4521,7 +4521,7 @@ func TestGetSpecs(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		"frontend",
+		keycloakClientID,
 		"",
 		cfg.Keycloak.Realm,
 		testUsername,
@@ -4549,7 +4549,7 @@ func TestGetVehicleTypes(t *testing.T) {
 	ctx := t.Context()
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
@@ -4632,7 +4632,7 @@ func TestGetVehicleTypesInaccessibleWithoutModeratePrivilege(t *testing.T) {
 	ctx := t.Context()
 
 	kc := cnt.Keycloak()
-	token, err := kc.Login(ctx, "frontend", "", cfg.Keycloak.Realm, testUsername, testPassword)
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, testUsername, testPassword)
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
