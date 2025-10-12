@@ -1,13 +1,13 @@
 name: autowp
 services:
   createbuckets:
-    image: minio/mc:RELEASE.2025-04-08T15-41-24Z
+    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
     container_name: autowp_test_createbuckets
     depends_on:
       - minio
     entrypoint: >
       /bin/sh -c "
-      while ! /usr/bin/mc config host add autowp http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
+      while ! /usr/bin/mc alias set autowp http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
         do echo 'Wait minio to startup...' && sleep 1;
       done;
       /usr/bin/mc mb autowp/format;
@@ -43,7 +43,7 @@ services:
     user: "101:101"
 
   goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/goautowp:v6.12.0
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v7.1.1
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     depends_on:
       - keycloak
@@ -54,10 +54,9 @@ services:
     volumes:
       - ./goautowp-config.yaml:/config.yaml:ro
     command: scheduler-generate-index-cache --loglevel=debug
-    restart: always
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/goautowp:v6.12.0
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v7.1.1
     container_name: autowp_test_goautowp_serve
     depends_on:
       - keycloak
@@ -75,15 +74,24 @@ services:
     user: "0"
 
   keycloak:
-    image: bitnami/keycloak:25
+    image: quay.io/keycloak/keycloak:26.4
     container_name: autowp_test_keycloak
+    command:
+      - "start"
+      - "--import-realm"
+      - --hostname=localhost
+      - --http-enabled=true
+      - --db=postgres
+      - --db-url=jdbc:postgresql://postgres-keycloak:5432/keycloak
+      - --db-username=keycloak
+      - --db-password=password
     depends_on:
       - postgres-keycloak
     volumes:
       - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
     environment:
-      KEYCLOAK_ADMIN_USER: admin
-      KEYCLOAK_ADMIN_PASSWORD: password
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: password
       KEYCLOAK_MANAGEMENT_USER: manager
       KEYCLOAK_MANAGEMENT_PASSWORD: password
       KEYCLOAK_DATABASE_HOST: postgres-keycloak
@@ -97,7 +105,7 @@ services:
     restart: always
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z
+    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
     container_name: autowp_test_minio
     volumes:
       - ./minio/data:/data
