@@ -23,11 +23,11 @@ import (
 	"github.com/autowp/goautowp/image/sampler"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
-	"github.com/aws/aws-sdk-go/aws"                   //nolint: staticcheck
-	"github.com/aws/aws-sdk-go/aws/credentials"       //nolint: staticcheck
-	"github.com/aws/aws-sdk-go/aws/session"           //nolint: staticcheck
-	"github.com/aws/aws-sdk-go/private/protocol/rest" //nolint: staticcheck
-	"github.com/aws/aws-sdk-go/service/s3"            //nolint: staticcheck
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/gen2brain/avif" // AVIF support
 	my "github.com/go-mysql/errors"
@@ -60,8 +60,6 @@ var (
 	errInvalidImageID          = errors.New("invalid image id provided")
 	errFileSizeDetectionFailed = errors.New("failed to determine file size")
 )
-
-var publicRead = "public-read"
 
 type Storage struct {
 	config                config.ImageStorageConfig
@@ -163,7 +161,7 @@ func (s *Storage) Images(ctx context.Context, ids []int) (map[int]*Image, error)
 			cropHeight: st.CropHeight,
 		}
 
-		err = s.populateSrc(&img)
+		err = s.populateSrc(ctx, &img)
 		if err != nil {
 			return nil, err
 		}
@@ -201,7 +199,7 @@ func (s *Storage) FormattedImage(ctx context.Context, id int, formatName string)
 		img.filepath = row.Filepath
 		img.dir = row.Dir
 
-		err = s.populateSrc(&img)
+		err = s.populateSrc(ctx, &img)
 		if err != nil {
 			return nil, err
 		}
@@ -244,7 +242,12 @@ func (s *Storage) ImageBlob(ctx context.Context, imageID int) (io.ReadCloser, er
 
 	bucket := dir.Bucket()
 
-	object, err := s.s3Client().GetObjectWithContext(ctx, &s3.GetObjectInput{
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	object, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: &bucket,
 		Key:    &iRow.Filepath,
 	})
@@ -305,7 +308,11 @@ func (s *Storage) AddImageFromImagick(
 		width,
 		height,
 		func(fileName string) error {
-			s3c := s.s3Client()
+			s3Client, err := s.s3Client(ctx)
+			if err != nil {
+				return err
+			}
+
 			blobReader := bytes.NewReader(blob)
 			bucket := dir.Bucket()
 
@@ -314,11 +321,11 @@ func (s *Storage) AddImageFromImagick(
 				return err
 			}
 
-			_, err = s3c.PutObjectWithContext(ctx, &s3.PutObjectInput{
+			_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
 				Key:         &fileName,
 				Body:        blobReader,
 				Bucket:      &bucket,
-				ACL:         &publicRead,
+				ACL:         types.ObjectCannedACLPublicRead,
 				ContentType: &contentType,
 			})
 
@@ -331,9 +338,9 @@ func (s *Storage) AddImageFromImagick(
 
 	filesize := len(blob)
 	/*exif := s.extractEXIF(id)
-	if exif {
-		exif = json_encode(exif, JSON_INVALID_UTF8_SUBSTITUTE|JSON_THROW_ON_ERROR)
-	}*/
+	  if exif {
+	  	exif = json_encode(exif, JSON_INVALID_UTF8_SUBSTITUTE|JSON_THROW_ON_ERROR)
+	  }*/
 
 	_, err = s.db.Update(schema.ImageTable).
 		Set(goqu.Record{schema.ImageTableFilesizeColName: filesize}).
@@ -394,12 +401,15 @@ func (s *Storage) RemoveImage(ctx context.Context, imageID int) error {
 		return fmt.Errorf("%w: `%s`", errDirNotFound, row.Dir)
 	}
 
-	s3c := s.s3Client()
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return err
+	}
 
 	bucket := dir.Bucket()
 	key := row.Filepath
 
-	_, err = s3c.DeleteObjectWithContext(ctx, &s3.DeleteObjectInput{
+	_, err = s3Client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: &bucket,
 		Key:    &key,
 	})
@@ -502,7 +512,11 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 
 	var insertAttemptException error
 
-	s3c := s.s3Client()
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return err
+	}
+
 	ctx = context.WithoutCancel(ctx)
 
 	for attemptIndex := range maxInsertAttempts {
@@ -525,11 +539,11 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 			bucket := dir.Bucket()
 			copySource := dir.Bucket() + "/" + img.Filepath
 
-			_, err = s3c.CopyObject(&s3.CopyObjectInput{
+			_, err = s3Client.CopyObject(ctx, &s3.CopyObjectInput{
 				Bucket:     &bucket,
 				CopySource: &copySource,
 				Key:        &destFileName,
-				ACL:        &publicRead,
+				ACL:        types.ObjectCannedACLPublicRead,
 			})
 			if err != nil {
 				return err
@@ -537,7 +551,7 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 
 			fpath := img.Filepath
 
-			_, err = s3c.DeleteObjectWithContext(ctx, &s3.DeleteObjectInput{
+			_, err = s3Client.DeleteObject(ctx, &s3.DeleteObjectInput{
 				Bucket: &bucket,
 				Key:    &fpath,
 			})
@@ -622,18 +636,23 @@ func (s *Storage) AddImageFromReader(
 				return err
 			}
 
-			_, err = s.s3Client().PutObjectWithContext(ctx, &s3.PutObjectInput{
+			s3Client, err := s.s3Client(ctx)
+			if err != nil {
+				return err
+			}
+
+			_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
 				Key:         &fileName,
 				Body:        handle,
 				Bucket:      &bucket,
-				ACL:         &publicRead,
+				ACL:         types.ObjectCannedACLPublicRead,
 				ContentType: &contentType,
 			})
 			if err != nil {
 				return err
 			}
 
-			res, err := s.s3Client().HeadObjectWithContext(ctx, &s3.HeadObjectInput{
+			res, err := s3Client.HeadObject(ctx, &s3.HeadObjectInput{
 				Key:    &fileName,
 				Bucket: &bucket,
 			})
@@ -655,9 +674,9 @@ func (s *Storage) AddImageFromReader(
 	}
 
 	/*$exif = $this->extractEXIF($id);
-	if ($exif) {
-		$exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
-	}*/
+	  if ($exif) {
+	  	$exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+	  }*/
 
 	_, err = s.db.Update(schema.ImageTable).
 		Set(goqu.Record{schema.ImageTableFilesizeColName: filesize}).
@@ -847,7 +866,7 @@ func (s *Storage) FormattedImages(
 			return nil, err
 		}
 
-		err = s.populateSrc(&img)
+		err = s.populateSrc(ctx, &img)
 		if err != nil {
 			return nil, err
 		}
@@ -916,7 +935,7 @@ func (s *Storage) ListBrokenImages(ctx context.Context, dirName string, lastKey 
 		for _, st := range sts {
 			lastKey = st.Filepath
 
-			err = s.isKeyExists(dir, st.Filepath)
+			err = s.isKeyExists(ctx, dir, st.Filepath)
 			if err != nil {
 				fmt.Println(st.Filepath) //nolint:forbidigo
 			}
@@ -926,7 +945,7 @@ func (s *Storage) ListBrokenImages(ctx context.Context, dirName string, lastKey 
 	return nil
 }
 
-func (s *Storage) ListUnlinkedObjects(
+func (s *Storage) ListUnlinkedObjects( //nolint: maintidx
 	ctx context.Context, dirName string, moveToLostAndFound bool, offset string,
 ) error {
 	dir := s.dir(dirName)
@@ -934,7 +953,11 @@ func (s *Storage) ListUnlinkedObjects(
 		return fmt.Errorf("%w: `%s`", errDirNotFound, dirName)
 	}
 
-	s3Client := s.s3Client()
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return err
+	}
+
 	bucket := dir.Bucket()
 
 	foundLostImages := make(map[int64][]string)
@@ -944,13 +967,21 @@ func (s *Storage) ListUnlinkedObjects(
 		marker = &offset
 	}
 
-	err := s3Client.ListObjectsPages(&s3.ListObjectsInput{
-		Bucket: &bucket,
-		Marker: marker,
-	}, func(list *s3.ListObjectsOutput, _ bool) bool {
+	paginator := s3.NewListObjectsV2Paginator(s3Client, &s3.ListObjectsV2Input{
+		Bucket:            &bucket,
+		ContinuationToken: marker,
+	})
+
+PAGINATION:
+	for paginator.HasMorePages() {
 		var id int64
 
-		for _, item := range list.Contents {
+		output, err := paginator.NextPage(ctx)
+		if err != nil {
+			return err
+		}
+
+		for _, item := range output.Contents {
 			var itemBytes []byte
 
 			success, err := s.db.Select(schema.ImageTableIDCol).
@@ -963,7 +994,7 @@ func (s *Storage) ListUnlinkedObjects(
 			if err != nil {
 				logrus.Error(err.Error())
 
-				return false
+				break PAGINATION
 			}
 
 			if !success {
@@ -993,11 +1024,11 @@ func (s *Storage) ListUnlinkedObjects(
 				if err != nil {
 					logrus.Error(err.Error())
 
-					return false
+					break PAGINATION
 				}
 
 				for _, sameSizeKey := range sameSizeKeys {
-					err = s.isKeyExists(dir, sameSizeKey)
+					err = s.isKeyExists(ctx, dir, sameSizeKey)
 					if err != nil {
 						lostSameSizeKeys[sameSizeKey] = err.Error()
 					} else {
@@ -1006,7 +1037,7 @@ func (s *Storage) ListUnlinkedObjects(
 							if err != nil {
 								fmt.Printf("getObjectBytes(%s, %s): %v\n", bucket, *item.Key, err.Error()) //nolint:forbidigo
 
-								return false
+								break PAGINATION
 							}
 						}
 
@@ -1014,7 +1045,7 @@ func (s *Storage) ListUnlinkedObjects(
 						if err != nil {
 							fmt.Printf("isObjectBytesEqual(%s, %s): %v\n", bucket, sameSizeKey, err.Error()) //nolint:forbidigo
 
-							return false
+							break PAGINATION
 						}
 
 						if equal {
@@ -1044,9 +1075,12 @@ func (s *Storage) ListUnlinkedObjects(
 						if moveToLostAndFound && !strings.HasPrefix(*item.Key, prefix) {
 							err = s.moveWithPrefix(ctx, bucket, *item.Key, prefix)
 							if err != nil {
-								fmt.Printf("moveWithPrefix(%s, %s, %s): %v\n", bucket, *item.Key, prefix, err.Error()) //nolint:forbidigo
+								fmt.Printf( //nolint:forbidigo
+									"moveWithPrefix(%s, %s, %s): %v\n",
+									bucket, *item.Key, prefix, err.Error(),
+								)
 
-								return false
+								break PAGINATION
 							}
 						}
 
@@ -1058,7 +1092,7 @@ func (s *Storage) ListUnlinkedObjects(
 							if err != nil {
 								fmt.Printf("getObjectBytes(%s, %s): %v\n", bucket, *item.Key, err.Error()) //nolint:forbidigo
 
-								return false
+								break PAGINATION
 							}
 						}
 
@@ -1068,7 +1102,7 @@ func (s *Storage) ListUnlinkedObjects(
 								if err != nil {
 									fmt.Printf("isObjectBytesEqual(%s, %s): %v\n", bucket, key, err.Error()) //nolint:forbidigo
 
-									return false
+									break PAGINATION
 								}
 
 								if equal {
@@ -1089,18 +1123,19 @@ func (s *Storage) ListUnlinkedObjects(
 						if moveToLostAndFound && !strings.HasPrefix(*item.Key, prefix) {
 							err = s.moveWithPrefix(ctx, bucket, *item.Key, prefix)
 							if err != nil {
-								fmt.Printf("moveWithPrefix(%s, %s, %s): %v\n", bucket, *item.Key, prefix, err.Error()) //nolint:forbidigo
+								fmt.Printf( //nolint:forbidigo
+									"moveWithPrefix(%s, %s, %s): %v\n",
+									bucket, *item.Key, prefix, err.Error(),
+								)
 
-								return false
+								break PAGINATION
 							}
 						}
 					}
 				}
 			}
 		}
-
-		return true
-	})
+	}
 
 	return err
 }
@@ -1143,7 +1178,7 @@ func (s *Storage) Sampler() *sampler.Sampler {
 	return s.sampler
 }
 
-func (s *Storage) populateSrc(img *Image) error {
+func (s *Storage) populateSrc(ctx context.Context, img *Image) error {
 	dir := s.dir(img.dir)
 	if dir == nil {
 		return fmt.Errorf("%w: `%s`", errDirNotFound, img.dir)
@@ -1151,15 +1186,25 @@ func (s *Storage) populateSrc(img *Image) error {
 
 	bucket := dir.Bucket()
 
-	s3Client := s.s3Client()
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return err
+	}
 
-	req, _ := s3Client.GetObjectRequest(&s3.GetObjectInput{
-		Bucket: &bucket,
-		Key:    &img.filepath,
+	opts := s3Client.Options()
+
+	endpoint, err := s3Client.Options().EndpointResolverV2.ResolveEndpoint(ctx, s3.EndpointParameters{
+		Bucket:         &bucket,
+		Region:         aws.String(opts.Region),
+		ForcePathStyle: aws.Bool(opts.UsePathStyle),
 	})
-	rest.Build(req)
+	if err != nil {
+		return err
+	}
 
-	url := req.HTTPRequest.URL
+	url := endpoint.URI
+
+	url.Path += "/" + img.filepath
 
 	if len(s.config.SrcOverride.Host) > 0 {
 		url.Host = s.config.SrcOverride.Host
@@ -1183,18 +1228,24 @@ func (s *Storage) dir(dirName string) *Dir {
 	return nil
 }
 
-func (s *Storage) s3Client() *s3.S3 {
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:           &s.config.S3.Region,
-		Endpoint:         &s.config.S3.Endpoint,
-		S3ForcePathStyle: &s.config.S3.UsePathStyleEndpoint,
-		Credentials: credentials.NewStaticCredentials(
-			s.config.S3.Credentials.Key, s.config.S3.Credentials.Secret, "",
-		),
-	}))
-	svc := s3.New(sess)
+func (s *Storage) s3Client(ctx context.Context) (*s3.Client, error) {
+	cfg, err := awsconfig.LoadDefaultConfig(ctx, awsconfig.WithRegion(s.config.S3.Region))
+	if err != nil {
+		return nil, err
+	}
 
-	return svc
+	return s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.UsePathStyle = s.config.S3.UsePathStyleEndpoint
+		o.BaseEndpoint = aws.String(s.config.S3.Endpoint)
+		o.Region = s.config.S3.Region
+		o.Credentials = aws.NewCredentialsCache(
+			credentials.NewStaticCredentialsProvider(
+				s.config.S3.Credentials.Key,
+				s.config.S3.Credentials.Secret,
+				"",
+			),
+		)
+	}), nil
 }
 
 func getCropSuffix(i schema.ImageRow) string {
@@ -1258,9 +1309,12 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 
 	bucket := dir.Bucket()
 
-	s3Client := s.s3Client()
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return 0, err
+	}
 
-	object, err := s3Client.GetObjectWithContext(ctx, &s3.GetObjectInput{
+	object, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: &bucket,
 		Key:    &iRow.Filepath,
 	})
@@ -1621,12 +1675,15 @@ func (s *Storage) doImagickOperation(
 	mw := imagick.NewMagickWand()
 	defer mw.Destroy()
 
-	s3c := s.s3Client()
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return err
+	}
 
 	bucket := dir.Bucket()
 	fpath := img.Filepath
 
-	object, err := s3c.GetObjectWithContext(ctx, &s3.GetObjectInput{
+	object, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: &bucket,
 		Key:    &fpath,
 	})
@@ -1663,11 +1720,11 @@ func (s *Storage) doImagickOperation(
 
 	ctx = context.WithoutCancel(ctx)
 
-	_, err = s3c.PutObjectWithContext(ctx, &s3.PutObjectInput{
+	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
 		Key:         &fpath,
 		Body:        blobBytes,
 		Bucket:      &bucket,
-		ACL:         &publicRead,
+		ACL:         types.ObjectCannedACLPublicRead,
 		ContentType: &contentType,
 	})
 	if err != nil {
@@ -1706,7 +1763,7 @@ func (s *Storage) images(ctx context.Context, imageIDs []int) (map[int]Image, er
 			return nil, err
 		}
 
-		err = s.populateSrc(&img)
+		err = s.populateSrc(ctx, &img)
 		if err != nil {
 			return nil, err
 		}
@@ -1721,9 +1778,14 @@ func (s *Storage) images(ctx context.Context, imageIDs []int) (map[int]Image, er
 	return result, nil
 }
 
-func (s *Storage) isKeyExists(dir *Dir, key string) error {
+func (s *Storage) isKeyExists(ctx context.Context, dir *Dir, key string) error {
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return err
+	}
+
 	bucket := dir.Bucket()
-	_, err := s.s3Client().HeadObject(&s3.HeadObjectInput{
+	_, err = s3Client.HeadObject(ctx, &s3.HeadObjectInput{
 		Bucket: &bucket,
 		Key:    &key,
 	})
@@ -1732,7 +1794,12 @@ func (s *Storage) isKeyExists(dir *Dir, key string) error {
 }
 
 func (s *Storage) getObjectBytes(ctx context.Context, bucket string, key string) ([]byte, error) {
-	object, err := s.s3Client().GetObjectWithContext(ctx, &s3.GetObjectInput{
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	object, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: &bucket,
 		Key:    &key,
 	})
@@ -1770,17 +1837,22 @@ func (s *Storage) moveWithPrefix(
 
 	ctx = context.WithoutCancel(ctx)
 
-	_, err := s.s3Client().CopyObjectWithContext(ctx, &s3.CopyObjectInput{
+	s3Client, err := s.s3Client(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = s3Client.CopyObject(ctx, &s3.CopyObjectInput{
 		Bucket:     &bucket,
 		CopySource: &copySource,
 		Key:        &dest,
-		ACL:        &publicRead,
+		ACL:        types.ObjectCannedACLPublicRead,
 	})
 	if err != nil {
 		return err
 	}
 
-	_, err = s.s3Client().DeleteObjectWithContext(ctx, &s3.DeleteObjectInput{
+	_, err = s3Client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: &bucket,
 		Key:    &key,
 	})

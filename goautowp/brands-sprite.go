@@ -18,10 +18,11 @@ import (
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
-	"github.com/aws/aws-sdk-go/aws"             //nolint: staticcheck
-	"github.com/aws/aws-sdk-go/aws/credentials" //nolint: staticcheck
-	"github.com/aws/aws-sdk-go/aws/session"     //nolint: staticcheck
-	"github.com/aws/aws-sdk-go/service/s3"      //nolint: staticcheck
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/gographics/imagick.v3/imagick"
 )
@@ -194,18 +195,24 @@ func createIconsSprite(
 
 	logrus.Info("Upload results ...")
 
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:           &fileStorageConfig.S3.Region,
-		Endpoint:         &fileStorageConfig.S3.Endpoint,
-		S3ForcePathStyle: &fileStorageConfig.S3.UsePathStyleEndpoint,
-		Credentials: credentials.NewStaticCredentials(
-			fileStorageConfig.S3.Credentials.Key, fileStorageConfig.S3.Credentials.Secret, "",
-		),
-	}))
-	svc := s3.New(sess)
+	cfg, err := awsconfig.LoadDefaultConfig(ctx, awsconfig.WithRegion(fileStorageConfig.S3.Region))
+	if err != nil {
+		return err
+	}
+
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.UsePathStyle = fileStorageConfig.S3.UsePathStyleEndpoint
+		o.BaseEndpoint = aws.String(fileStorageConfig.S3.Endpoint)
+		o.Credentials = aws.NewCredentialsCache(
+			credentials.NewStaticCredentialsProvider(
+				fileStorageConfig.S3.Credentials.Key,
+				fileStorageConfig.S3.Credentials.Secret,
+				"",
+			),
+		)
+	})
 
 	var (
-		publicRead     = "public-read"
 		imageKey       = brandsSpriteImageFilename
 		cssKey         = brandsSpriteCSSFilename
 		cssContentType = "text/css"
@@ -223,22 +230,22 @@ func createIconsSprite(
 
 	defer util.Close(handle)
 
-	_, err = svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
+	_, err = client.PutObject(ctx, &s3.PutObjectInput{
 		Key:         &imageKey,
 		Body:        handle,
 		Bucket:      &fileStorageConfig.Bucket,
-		ACL:         &publicRead,
+		ACL:         types.ObjectCannedACLPublicRead,
 		ContentType: &imageContentType,
 	})
 	if err != nil {
 		return err
 	}
 
-	_, err = svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
+	_, err = client.PutObject(ctx, &s3.PutObjectInput{
 		Key:         &cssKey,
 		Body:        bytes.NewReader([]byte(strings.Join(css, "\n"))),
 		Bucket:      &fileStorageConfig.Bucket,
-		ACL:         &publicRead,
+		ACL:         types.ObjectCannedACLPublicRead,
 		ContentType: &cssContentType,
 	})
 	if err != nil {
