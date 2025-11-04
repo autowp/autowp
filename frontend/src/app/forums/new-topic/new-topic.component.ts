@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {APICreateTopicRequest, APIForumsTheme, APIGetForumsThemeRequest} from '@grpc/spec.pb';
+import {CreateTopicRequest, GetThemeRequest, Theme, Topic} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
@@ -41,7 +41,7 @@ export class ForumsNewTopicComponent implements OnInit {
   protected readonly theme$ = this.#route.paramMap.pipe(
     map((params) => params.get('theme_id')),
     distinctUntilChanged(),
-    switchMap((themeID) => (themeID ? this.#grpc.getTheme(new APIGetForumsThemeRequest({id: themeID})) : EMPTY)),
+    switchMap((themeID) => (themeID ? this.#grpc.getTheme(new GetThemeRequest({id: themeID})) : EMPTY)),
     catchError(() => {
       this.#router.navigate(['/error-404'], {
         skipLocationChange: true,
@@ -58,17 +58,19 @@ export class ForumsNewTopicComponent implements OnInit {
     }, 0);
   }
 
-  protected submit(theme: APIForumsTheme) {
+  protected submit(theme: Theme) {
     this.invalidParams.set({});
 
     this.#forums
       .createTopic(
-        new APICreateTopicRequest({
+        new CreateTopicRequest({
           message: this.form.message,
           moderatorAttention: this.form.moderator_attention,
-          name: this.form.name,
-          subscription: this.form.subscription,
-          themeId: '' + theme.id,
+          topic: new Topic({
+            name: this.form.name,
+            subscription: this.form.subscription,
+            themeId: theme.id,
+          }),
         }),
       )
       .subscribe({

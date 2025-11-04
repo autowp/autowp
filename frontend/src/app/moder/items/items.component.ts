@@ -16,11 +16,11 @@ import {
   PictureListOptions,
   PicturesRequest,
   PreviewPicturesRequest,
+  Spec,
+  VehicleType,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
-import {GoautowpSpec} from '@rest/model/goautowpSpec';
-import {GoautowpVehicleType} from '@rest/model/goautowpVehicleType';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {SpecService} from '@services/spec';
@@ -47,7 +47,7 @@ import {convertChildsCounts} from '../../catalogue/catalogue-service';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
 
-interface APISpecInItems extends GoautowpSpec {
+interface APISpecInItems extends Spec {
   deep?: number;
 }
 
@@ -69,7 +69,7 @@ function toPlainSpec(options: APISpecInItems[], deep: number): APISpecInItems[] 
   return result;
 }
 
-function toPlainVehicleType(options: GoautowpVehicleType[], deep: number): APIVehicleTypeInItems[] {
+function toPlainVehicleType(options: VehicleType[], deep: number): APIVehicleTypeInItems[] {
   const result: APIVehicleTypeInItems[] = [];
   for (const item of options) {
     result.push({

@@ -4,8 +4,7 @@
     <small>
       @if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE) {
         <span i18n>vehicle of the day</span>
-      }
-      @if (item.itemTypeId !== ItemType.ITEM_TYPE_VEHICLE) {
+      } @else {
         <span i18n>theme of the day</span>
       }
       @if (user$() | async; as user) {

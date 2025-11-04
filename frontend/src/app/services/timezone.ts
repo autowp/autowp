@@ -1,5 +1,6 @@
 import {inject, Injectable} from '@angular/core';
-import {AutowpService} from '@rest/api/autowp.service';
+import {AutowpClient} from '@grpc/spec.pbsc';
+import {Empty} from '@ngx-grpc/well-known-types';
 import {Observable} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 
@@ -7,9 +8,9 @@ import {map, shareReplay} from 'rxjs/operators';
   providedIn: 'root',
 })
 export class TimezoneService {
-  readonly #autowp = inject(AutowpService);
+  readonly #autowp = inject(AutowpClient);
 
-  public readonly timezones$: Observable<string[]> = this.#autowp.autowpGetTimezones().pipe(
+  public readonly timezones$: Observable<string[]> = this.#autowp.getTimezones(new Empty()).pipe(
     map((response) => response.timezones),
     shareReplay({bufferSize: 1, refCount: false}),
   );

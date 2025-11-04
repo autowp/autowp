@@ -36,8 +36,7 @@
           </ul>
           <button type="submit" class="btn btn-primary" i18n [disabled]="!isVariantSelected(voting)">Vote</button>
         </form>
-      }
-      @if (!voting.canVote) {
+      } @else {
         @for (variant of voting.variants; track variant.id) {
           <div class="mb-3">
             @if (variant.votes > 0) {
@@ -61,10 +60,10 @@
     </div>
   }
 
-  @if (voting) {
+  @if (voting && voting.beginDate && voting.endDate) {
     <p i18n>
-      Voting during {{ voting.beginDate | date: 'mediumDate' }} to
-      {{ voting.endDate | date: 'mediumDate' }}
+      Voting during {{ voting.beginDate.toDate() | date: 'mediumDate' }} to
+      {{ voting.endDate.toDate() | date: 'mediumDate' }}
     </p>
   }
   <app-comments [itemID]="voting.id + ''" [typeID]="CommentsType.VOTINGS_TYPE_ID" />

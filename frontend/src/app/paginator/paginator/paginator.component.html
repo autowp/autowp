@@ -28,8 +28,7 @@
           <span>
             @if (page !== data.current) {
               <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: page}" [textContent]="padd(page)"></a>
-            }
-            @if (page === data.current) {
+            } @else {
               <strong style="font-size: 20px; margin: 0 3px" [textContent]="padd(page)"></strong>
             }
           </span>

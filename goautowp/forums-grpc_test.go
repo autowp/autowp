@@ -22,9 +22,9 @@ func TestGetThemes(t *testing.T) {
 
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 
-	themes, err := client.GetThemes(
+	themes, err := client.ListThemes(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&APIGetForumsThemesRequest{},
+		&ListThemesRequest{},
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, themes.GetItems())
@@ -45,7 +45,7 @@ func TestGetTheme(t *testing.T) {
 
 	theme, err := client.GetTheme(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&APIGetForumsThemeRequest{Id: 2},
+		&GetThemeRequest{Id: 2},
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, theme)
@@ -67,12 +67,14 @@ func TestGetLastTopicAndLastMessage(t *testing.T) {
 
 	topicID, err := client.CreateTopic(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&APICreateTopicRequest{
-			ThemeId:            2,
-			Name:               "Topic name",
+		&CreateTopicRequest{
 			Message:            "Test message",
 			ModeratorAttention: false,
-			Subscription:       true,
+			Topic: &Topic{
+				ThemeId:      2,
+				Name:         "Topic name",
+				Subscription: true,
+			},
 		},
 	)
 	require.NoError(t, err)
@@ -80,21 +82,21 @@ func TestGetLastTopicAndLastMessage(t *testing.T) {
 
 	topic, err := client.GetLastTopic(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&APIGetForumsThemeRequest{Id: 2},
+		&GetThemeRequest{Id: 2},
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, topic)
 
 	message, err := client.GetLastMessage(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&APIGetForumsTopicRequest{Id: topic.GetId()},
+		&GetTopicRequest{Id: topic.GetId()},
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, message)
 
-	topics, err := client.GetTopics(
+	topics, err := client.ListTopics(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&APIGetForumsTopicsRequest{ThemeId: 2, Page: 1},
+		&ListTopicsRequest{ThemeId: 2, Page: 1},
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, topics.GetItems())
@@ -148,12 +150,14 @@ func TestCloseTopic(t *testing.T) {
 
 	topic, err := client.CreateTopic(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&APICreateTopicRequest{
-			ThemeId:            2,
-			Name:               "Topic name",
+		&CreateTopicRequest{
 			Message:            "Test message",
 			ModeratorAttention: false,
-			Subscription:       true,
+			Topic: &Topic{
+				ThemeId:      2,
+				Name:         "Topic name",
+				Subscription: true,
+			},
 		},
 	)
 	require.NoError(t, err)
@@ -165,7 +169,7 @@ func TestCloseTopic(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APISetTopicStatusRequest{
+		&SetTopicStatusRequest{
 			Id: topic.GetId(),
 		},
 	)
@@ -177,7 +181,7 @@ func TestCloseTopic(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APISetTopicStatusRequest{
+		&SetTopicStatusRequest{
 			Id: topic.GetId(),
 		},
 	)
@@ -189,7 +193,7 @@ func TestCloseTopic(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APISetTopicStatusRequest{
+		&SetTopicStatusRequest{
 			Id: topic.GetId(),
 		},
 	)

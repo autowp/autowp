@@ -1,8 +1,9 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
-import {TrafficService} from '@rest/api/traffic.service';
-import {GoautowpTrafficWhitelistItem} from '@rest/model/goautowpTrafficWhitelistItem';
+import {DeleteTrafficWhitelistItemRequest, TrafficWhitelistItem} from '@grpc/spec.pb';
+import {TrafficClient} from '@grpc/spec.pbsc';
+import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
@@ -14,14 +15,14 @@ import {catchError, map} from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerTrafficWhitelistComponent implements OnInit {
-  readonly #trafficService = inject(TrafficService);
+  readonly #trafficClient = inject(TrafficClient);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
 
   readonly #reload$ = new BehaviorSubject<void>(void 0);
 
-  protected readonly items$: Observable<GoautowpTrafficWhitelistItem[]> = combineLatest([
-    this.#trafficService.trafficGetTrafficWhitelistItems(),
+  protected readonly items$: Observable<TrafficWhitelistItem[]> = combineLatest([
+    this.#trafficClient.getTrafficWhitelistItems(new Empty()),
     this.#reload$,
   ]).pipe(
     map(([response]) => (response.items ? response.items : [])),
@@ -33,10 +34,12 @@ export class ModerTrafficWhitelistComponent implements OnInit {
     }),
   );
 
-  protected deleteItem(item: GoautowpTrafficWhitelistItem) {
-    this.#trafficService.trafficDeleteTrafficWhitelistItem({ip: item.ip}).subscribe(() => {
-      this.#reload$.next();
-    });
+  protected deleteItem(item: TrafficWhitelistItem) {
+    this.#trafficClient
+      .deleteTrafficWhitelistItem(new DeleteTrafficWhitelistItemRequest({ip: item.ip}))
+      .subscribe(() => {
+        this.#reload$.next();
+      });
   }
 
   ngOnInit(): void {

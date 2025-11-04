@@ -87,7 +87,7 @@
                 </span>
               }
               @if (message.message.date; as date) {
-                <app-past-time-indicator [date]="date" />
+                <app-past-time-indicator [date]="date.toDate()" />
               }
             </div>
           </div>

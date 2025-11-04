@@ -1,10 +1,9 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {APIBrandsListCharacter, GetBrandsRequest} from '@grpc/spec.pb';
+import {APIBrandsListCharacter, BrandIcons, GetBrandsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {ItemsService} from '@rest/api/items.service';
-import {GoautowpBrandIcons} from '@rest/model/goautowpBrandIcons';
+import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {EMPTY, Observable} from 'rxjs';
@@ -36,7 +35,6 @@ function addCSS(url: string) {
 export class BrandsComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #itemsService = inject(ItemsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
@@ -53,7 +51,7 @@ export class BrandsComponent implements OnInit {
       }),
     );
 
-  protected readonly icons$: Observable<GoautowpBrandIcons> = this.#itemsService.itemsGetBrandIcons().pipe(
+  protected readonly icons$: Observable<BrandIcons> = this.#itemsClient.getBrandIcons(new Empty()).pipe(
     tap((icons) => {
       addCSS(icons.css);
     }),

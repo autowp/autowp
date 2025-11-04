@@ -6,10 +6,14 @@ import {
   APIItem,
   APIUser,
   CreatePictureItemRequest,
+  CreateTrafficBlacklistItemRequest,
   DeletePictureItemRequest,
+  DeleteSimilarRequest,
+  DeleteTrafficBlacklistItemRequest,
   DfDistance,
   DfDistanceFields,
   DfDistanceRequest,
+  IP,
   ItemFields,
   ItemListOptions,
   ItemParentCacheFields,
@@ -35,12 +39,9 @@ import {
   SetPictureStatusRequest,
   UpdatePictureRequest,
 } from '@grpc/spec.pb';
-import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
+import {ItemsClient, PicturesClient, TrafficClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
-import {PicturesService} from '@rest/api/pictures.service';
-import {TrafficService} from '@rest/api/traffic.service';
-import {GoautowpIP} from '@rest/model/goautowpIP';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -96,9 +97,8 @@ export class ModerPicturesItemComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #userService = inject(UserService);
   readonly #picturesClient = inject(PicturesClient);
-  readonly #picturessService = inject(PicturesService);
   readonly #toastService = inject(ToastsService);
-  readonly #trafficService = inject(TrafficService);
+  readonly #trafficClient = inject(TrafficClient);
 
   protected readonly replaceLoading = signal(false);
   protected readonly pictureItemLoading = signal(false);
@@ -195,7 +195,7 @@ export class ModerPicturesItemComponent {
     switchMap((picture) => this.#userService.getUser$(picture.ownerId)),
   );
 
-  protected readonly ip$: Observable<GoautowpIP | null> = this.picture$.pipe(
+  protected readonly ip$: Observable<IP | null> = this.picture$.pipe(
     switchMap((picture) => {
       if (!picture.ip) {
         return of(null);
@@ -544,8 +544,8 @@ export class ModerPicturesItemComponent {
 
   protected cancelSimilar(dfDistance: DfDistance) {
     this.similarLoading.set(true);
-    this.#picturessService
-      .picturesDeleteSimilar({id: dfDistance.srcPictureId, similarPictureId: dfDistance.dstPictureId})
+    this.#picturesClient
+      .deleteSimilar(new DeleteSimilarRequest({id: dfDistance.srcPictureId, similarPictureId: dfDistance.dstPictureId}))
       .pipe(
         catchError((error: unknown) => {
           this.similarLoading.set(false);
@@ -626,18 +626,22 @@ export class ModerPicturesItemComponent {
   }
 
   protected removeFromBlacklist(ip: string) {
-    this.#trafficService.trafficDeleteTrafficBlacklistItem({ip}).subscribe(() => this.#change$.next());
+    this.#trafficClient
+      .deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ip}))
+      .subscribe(() => this.#change$.next());
   }
 
   protected addToBlacklist(ip: string) {
-    this.#trafficService
-      .trafficCreateTrafficBlacklistItem({
-        item: {
-          ip: ip,
-          period: this.banPeriod,
-          reason: this.banReason || '',
-        },
-      })
+    this.#trafficClient
+      .createTrafficBlacklistItem(
+        new CreateTrafficBlacklistItemRequest({
+          item: {
+            ip: ip,
+            period: this.banPeriod,
+            reason: this.banReason || '',
+          },
+        }),
+      )
       .subscribe(() => this.#change$.next());
   }
 

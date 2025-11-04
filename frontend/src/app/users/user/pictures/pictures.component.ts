@@ -13,7 +13,7 @@ import {
   PictureStatus,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {ItemsService} from '@rest/api/items.service';
+import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
@@ -46,12 +46,11 @@ export class UsersUserPicturesComponent implements OnInit {
   readonly #userService = inject(UserService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #itemsService = inject(ItemsService);
   readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly icons$ = this.#itemsService.itemsGetBrandIcons().pipe(
+  protected readonly icons$ = this.#itemsClient.getBrandIcons(new Empty()).pipe(
     tap((icons) => {
       addCSS(icons.css);
     }),

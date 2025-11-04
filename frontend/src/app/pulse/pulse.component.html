@@ -23,29 +23,27 @@
     }
   </div>
 
-  @if (data$ | async; as data) {
-    @if (gridData$ | async; as gridData) {
-      <canvas
-        baseChart
-        width="400"
-        height="150"
-        type="bar"
-        [datasets]="gridData.data"
-        [labels]="(labels$ | async) || undefined"
-        [options]="chartOptions"
-        [legend]="false"
-      ></canvas>
-    }
-    @if (legend$ | async; as legend) {
-      <p>
-        @for (item of legend; track item) {
-          <span>
-            @if (item.user$ | async; as user) {
-              <app-user [user]="user" />
-            }
-          </span>
-        }
-      </p>
-    }
+  @if (gridData$ | async; as gridData) {
+    <canvas
+      baseChart
+      width="400"
+      height="150"
+      type="bar"
+      [datasets]="gridData.data"
+      [labels]="(labels$ | async) || undefined"
+      [options]="chartOptions"
+      [legend]="false"
+    ></canvas>
+  }
+  @if (legend$ | async; as legend) {
+    <p>
+      @for (item of legend; track item) {
+        <span>
+          @if (item.user$ | async; as user) {
+            <app-user [user]="user" />
+          }
+        </span>
+      }
+    </p>
   }
 </div>

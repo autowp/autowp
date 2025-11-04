@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
-import {AutowpService} from '@rest/api/autowp.service';
-import {GoautowpIP} from '@rest/model/goautowpIP';
+import {GetIPRequest, IP} from '@grpc/spec.pb';
+import {AutowpClient} from '@grpc/spec.pbsc';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 
@@ -8,7 +8,7 @@ import {map} from 'rxjs/operators';
   providedIn: 'root',
 })
 export class IpService {
-  readonly #autowp = inject(AutowpService);
+  readonly #autowp = inject(AutowpClient);
 
   #hostnames = new Map<string, Observable<string>>();
 
@@ -25,7 +25,7 @@ export class IpService {
     return o$;
   }
 
-  public getIp$(ip: string, fields: string[]): Observable<GoautowpIP> {
-    return this.#autowp.autowpGetIP({ip, fields});
+  public getIp$(ip: string, fields: string[]): Observable<IP> {
+    return this.#autowp.getIP(new GetIPRequest({ip, fields}));
   }
 }

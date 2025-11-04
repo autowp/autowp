@@ -7,8 +7,6 @@ import {provideRouter, withInMemoryScrolling} from '@angular/router';
 import {environment} from '@environment/environment';
 import {NgbCollapseModule, NgbDropdownModule, NgbModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {GRPC_INTERCEPTORS, GrpcCoreModule} from '@ngx-grpc/core';
-import {GrpcWebClientModule} from '@ngx-grpc/grpc-web-client';
-import {provideApi} from '@rest/provide-api';
 import {authInterceptor$, GrpcAuthInterceptor, GrpcLogInterceptor} from '@services/api.service';
 import {AuthService} from '@services/auth.service';
 import {AppContactsService} from '@services/contacts';
@@ -31,6 +29,7 @@ import {AutoRefreshTokenService, provideKeycloak, UserActivityService, withAutoR
 import {provideMonacoEditor} from 'ngx-monaco-editor-v2';
 import {NgPipesModule} from 'ngx-pipes';
 
+import {NgGrpcWebClientModule} from '../grpc-web-client/grpc-web-client.module';
 import {routes} from './app.routes';
 
 if (environment.production) {
@@ -48,7 +47,7 @@ export const appConfig: ApplicationConfig = {
       NgbCollapseModule,
       NgbDropdownModule,
       GrpcCoreModule.forRoot(),
-      GrpcWebClientModule.forRoot({
+      NgGrpcWebClientModule.forRoot({
         settings: {host: environment.grpcHost},
       }),
       Angulartics2Module.forRoot(),
@@ -96,6 +95,5 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideHttpClient(withInterceptors([authInterceptor$])),
-    provideApi({basePath: environment.apiUrl}),
   ],
 };

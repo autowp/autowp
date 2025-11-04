@@ -28,6 +28,7 @@ import {
   PicturesRequest,
   PictureStatus,
   SetPictureStatusRequest,
+  VehicleType,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, UsersClient} from '@grpc/spec.pbsc';
 import {
@@ -38,7 +39,6 @@ import {
   NgbTypeaheadSelectItemEvent,
 } from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {GoautowpVehicleType} from '@rest/model/goautowpVehicleType';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
@@ -66,7 +66,7 @@ interface VehicleTypeInPictures {
   value: null | string;
 }
 
-function toPlainVehicleTypes(options: GoautowpVehicleType[], deep: number): VehicleTypeInPictures[] {
+function toPlainVehicleTypes(options: VehicleType[], deep: number): VehicleTypeInPictures[] {
   const result: VehicleTypeInPictures[] = [];
   for (const item of options) {
     result.push({

@@ -3,15 +3,15 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   APICommentMessage,
-  APIForumsTheme,
-  APIForumsThemes,
-  APIForumsTopic,
-  APIGetForumsThemeRequest,
-  APIGetForumsThemesRequest,
-  APIGetForumsTopicRequest,
-  APIGetForumsTopicsRequest,
   APIUser,
+  GetThemeRequest,
+  GetTopicRequest,
+  ListThemesRequest,
+  ListThemesResponse,
+  ListTopicsRequest,
   Pages,
+  Theme,
+  Topic,
 } from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
@@ -26,11 +26,11 @@ import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {UserComponent} from '../user/user/user.component';
 import {ForumsTopicListComponent} from './topic-list/topic-list.component';
 
-interface Theme extends APIForumsTheme.AsObject {
+interface ThemeItem extends Theme.AsObject {
   lastMessage$: Observable<APICommentMessage | null>;
   lastMessageAuthor$: Observable<APIUser | null>;
-  lastTopic$: Observable<APIForumsTopic | null>;
-  themes$: Observable<APIForumsThemes>;
+  lastTopic$: Observable<null | Topic>;
+  themes$: Observable<ListThemesResponse>;
 }
 
 @Component({
@@ -63,10 +63,10 @@ export class ForumsComponent {
     distinctUntilChanged(),
   );
 
-  protected readonly data$: Observable<{theme: APIForumsTheme | null; themes: Theme[]}> = this.#themeID$.pipe(
+  protected readonly data$: Observable<{theme: null | Theme; themes: ThemeItem[]}> = this.#themeID$.pipe(
     switchMap((themeID) => {
       if (!themeID) {
-        return this.#grpc.getThemes(new APIGetForumsThemesRequest({})).pipe(
+        return this.#grpc.listThemes(new ListThemesRequest({})).pipe(
           map((response) => ({
             theme: null,
             themes: response.items,
@@ -74,8 +74,8 @@ export class ForumsComponent {
         );
       } else {
         return combineLatest([
-          this.#grpc.getTheme(new APIGetForumsThemeRequest({id: themeID})),
-          this.#grpc.getThemes(new APIGetForumsThemesRequest({themeId: themeID})),
+          this.#grpc.getTheme(new GetThemeRequest({id: themeID})),
+          this.#grpc.listThemes(new ListThemesRequest({themeId: themeID})),
         ]).pipe(
           map(([theme, themes]) => ({
             theme,
@@ -88,7 +88,7 @@ export class ForumsComponent {
       return {
         theme: data.theme,
         themes: (data.themes ? data.themes : []).map((theme) => {
-          const lastTopic$ = this.#grpc.getLastTopic(new APIGetForumsThemeRequest({id: theme.id})).pipe(
+          const lastTopic$ = this.#grpc.getLastTopic(new GetThemeRequest({id: theme.id})).pipe(
             catchError((error: unknown) => {
               if (error instanceof GrpcStatusEvent && error.statusCode === 5) {
                 return of(null);
@@ -103,7 +103,7 @@ export class ForumsComponent {
                 return of(null);
               }
 
-              return this.#grpc.getLastMessage(new APIGetForumsTopicRequest({id: topic.id}));
+              return this.#grpc.getLastMessage(new GetTopicRequest({id: topic.id}));
             }),
             catchError((error: unknown) => {
               if (error instanceof GrpcStatusEvent && error.statusCode === 5) {
@@ -126,8 +126,8 @@ export class ForumsComponent {
             lastMessage$,
             lastMessageAuthor$,
             lastTopic$,
-            themes$: this.#grpc.getThemes(
-              new APIGetForumsThemesRequest({
+            themes$: this.#grpc.listThemes(
+              new ListThemesRequest({
                 themeId: theme.id,
               }),
             ),
@@ -150,13 +150,13 @@ export class ForumsComponent {
 
   readonly #reloadTopics$ = new BehaviorSubject<void>(void 0);
 
-  protected readonly topics$: Observable<{items?: APIForumsTopic[]; paginator?: Pages}> = combineLatest([
+  protected readonly topics$: Observable<{items?: Topic[]; paginator?: Pages}> = combineLatest([
     this.#themeID$,
     this.#page$,
     this.#reloadTopics$,
   ]).pipe(
     switchMap(([themeId, page]) =>
-      this.#grpc.getTopics(new APIGetForumsTopicsRequest({page, themeId: themeId ? themeId : undefined})),
+      this.#grpc.listTopics(new ListTopicsRequest({page, themeId: themeId ? themeId : undefined})),
     ),
   );
 

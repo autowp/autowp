@@ -13,7 +13,7 @@
           @for (operation of state.charges; track operation) {
             <div
               ngbTooltip="{{ operation.sum | currency: operation.currency }}, {{ operation.purpose }}, {{
-                operation.date ? (operation.date | timeAgo) : ''
+                operation.date ? (operation.date.toDate() | timeAgo) : ''
               }}"
               class="progress-bar bg-danger"
               placement="top"
@@ -31,7 +31,7 @@
           @for (operation of state.donations; track operation) {
             <div
               ngbTooltip="{{ operation.sum | currency: operation.currency }} by {{ operation.contributor }}, {{
-                operation.date ? (operation.date | timeAgo) : ''
+                operation.date ? (operation.date.toDate() | timeAgo) : ''
               }}"
               class="progress-bar"
               placement="top"

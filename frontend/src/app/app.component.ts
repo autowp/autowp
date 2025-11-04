@@ -19,11 +19,12 @@ import {LayoutParams, PageEnvService} from '@services/page-env.service';
 import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import {Angulartics2GoogleAnalytics} from 'angulartics2';
 import Keycloak from 'keycloak-js';
-import {Observable} from 'rxjs';
-import {map, shareReplay} from 'rxjs/operators';
+import {EMPTY, Observable} from 'rxjs';
+import {catchError, map, shareReplay} from 'rxjs/operators';
 
 import {MenuComponent} from './moder/menu/menu/menu.component';
 import {ContainerComponent} from './toasts/container/container.component';
+import {ToastsService} from './toasts/toasts.service';
 import {UsersOnlineComponent} from './users/online/online.component';
 
 @Component({
@@ -57,6 +58,7 @@ export class AppComponent {
   readonly #renderer = inject(Renderer2);
   readonly #keycloak = inject(Keycloak);
   readonly #itemsClient = inject(ItemsClient);
+  readonly #toastService = inject(ToastsService);
 
   protected readonly languages: Language[] = environment.languages;
   protected readonly layoutParams$: Observable<LayoutParams> = this.#pageEnv.layoutParams$.asObservable();
@@ -65,20 +67,28 @@ export class AppComponent {
     .getNew$()
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
   protected readonly searchHostname: string;
-  protected readonly categories$ = this.#itemsClient.list(
-    new ItemsRequest({
-      fields: new ItemFields({
-        descendantsCount: true,
-        nameText: true,
+  protected readonly categories$ = this.#itemsClient
+    .list(
+      new ItemsRequest({
+        fields: new ItemFields({
+          descendantsCount: true,
+          nameText: true,
+        }),
+        language: this.#languageService.language,
+        limit: 20,
+        options: new ItemListOptions({
+          noParent: true,
+          typeId: ItemType.ITEM_TYPE_CATEGORY,
+        }),
       }),
-      language: this.#languageService.language,
-      limit: 20,
-      options: new ItemListOptions({
-        noParent: true,
-        typeId: ItemType.ITEM_TYPE_CATEGORY,
+    )
+    .pipe(
+      catchError((err: unknown) => {
+        this.#toastService.handleError(err);
+        return EMPTY;
       }),
-    }),
-  );
+    );
+
   protected readonly language: string = this.#languageService.language;
   protected readonly urlPath$ = this.router.events.pipe(
     map((val) => (val instanceof NavigationStart ? val.url : '/')),

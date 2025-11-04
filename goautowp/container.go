@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/netip"
-	"strings"
 	"sync"
 	"time"
 
@@ -38,12 +37,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/realip"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -676,68 +673,9 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 
 	usersREST.SetupRouter(ginEngine) //nolint: contextcheck
 
-	grpcGatewayHandler := runtime.NewServeMux()
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-
-	err = RegisterDonationsHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	err = RegisterAutowpHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	err = RegisterArticlesHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	err = RegisterItemsHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	err = RegisterPicturesHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	err = RegisterVotingsHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	err = RegisterStatisticsHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	err = RegisterContactsHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	err = RegisterMessagingHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	err = RegisterTrafficHandlerFromEndpoint(ctx, grpcGatewayHandler, s.config.GRPC.Listen, opts)
-	if err != nil {
-		return nil, err
-	}
-
 	s.publicRouter = func(resp http.ResponseWriter, req *http.Request) {
 		if wrappedGrpc.IsAcceptableGrpcCorsRequest(req) || wrappedGrpc.IsGrpcWebRequest(req) {
 			wrappedGrpc.ServeHTTP(resp, req)
-
-			return
-		}
-
-		if strings.HasPrefix(req.URL.Path, "/v3/") {
-			grpcGatewayHandler.ServeHTTP(resp, req)
 
 			return
 		}

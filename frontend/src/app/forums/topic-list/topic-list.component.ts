@@ -4,12 +4,12 @@ import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
   APICommentMessage,
-  APIForumsTopic,
-  APIGetForumsTopicRequest,
-  APISetTopicStatusRequest,
   APIUser,
   CommentsType,
   CommentsUnSubscribeRequest,
+  GetTopicRequest,
+  SetTopicStatusRequest,
+  Topic,
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
@@ -22,7 +22,7 @@ import {catchError, map, shareReplay, switchMap} from 'rxjs/operators';
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
-interface Topic {
+interface TopicItem {
   author$: Observable<APIUser | null>;
   createdAt: Date | undefined;
   id: string;
@@ -48,7 +48,7 @@ export class ForumsTopicListComponent {
   readonly #grpc = inject(ForumsClient);
   readonly #auth = inject(AuthService);
 
-  readonly topics = input.required<APIForumsTopic[]>();
+  readonly topics = input.required<Topic[]>();
 
   readonly showSubscribe = input(false);
 
@@ -56,10 +56,10 @@ export class ForumsTopicListComponent {
 
   protected readonly forumAdmin$ = this.#auth.hasRole$(Role.FORUMS_MODER);
 
-  protected readonly list$: Observable<Topic[]> = toObservable(this.topics).pipe(
+  protected readonly list$: Observable<TopicItem[]> = toObservable(this.topics).pipe(
     map((topics) =>
       topics.map((topic) => {
-        const lastMessage$ = this.#grpc.getLastMessage(new APIGetForumsTopicRequest({id: topic.id})).pipe(
+        const lastMessage$ = this.#grpc.getLastMessage(new GetTopicRequest({id: topic.id})).pipe(
           catchError((error: unknown) => {
             if (error instanceof GrpcStatusEvent && error.statusCode === 5) {
               return of(null);
@@ -92,7 +92,7 @@ export class ForumsTopicListComponent {
     ),
   );
 
-  protected unsubscribe(topic: Topic) {
+  protected unsubscribe(topic: TopicItem) {
     this.#comments
       .unSubscribe(
         new CommentsUnSubscribeRequest({
@@ -108,8 +108,8 @@ export class ForumsTopicListComponent {
       });
   }
 
-  protected openTopic(topic: Topic) {
-    this.#grpc.openTopic(new APISetTopicStatusRequest({id: topic.id})).subscribe({
+  protected openTopic(topic: TopicItem) {
+    this.#grpc.openTopic(new SetTopicStatusRequest({id: topic.id})).subscribe({
       error: (response: unknown) => this.#toastService.handleError(response),
       next: () => {
         topic.status = 'normal';
@@ -117,8 +117,8 @@ export class ForumsTopicListComponent {
     });
   }
 
-  protected closeTopic(topic: Topic) {
-    this.#grpc.closeTopic(new APISetTopicStatusRequest({id: topic.id})).subscribe({
+  protected closeTopic(topic: TopicItem) {
+    this.#grpc.closeTopic(new SetTopicStatusRequest({id: topic.id})).subscribe({
       error: (response: unknown) => this.#toastService.handleError(response),
       next: () => {
         topic.status = 'closed';
@@ -126,8 +126,8 @@ export class ForumsTopicListComponent {
     });
   }
 
-  protected deleteTopic(topic: Topic) {
-    this.#grpc.deleteTopic(new APISetTopicStatusRequest({id: topic.id})).subscribe({
+  protected deleteTopic(topic: TopicItem) {
+    this.#grpc.deleteTopic(new SetTopicStatusRequest({id: topic.id})).subscribe({
       error: (response: unknown) => this.#toastService.handleError(response),
       next: () => {
         this.reload.emit(void 0);

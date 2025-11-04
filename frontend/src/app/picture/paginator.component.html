@@ -33,8 +33,7 @@
               <a [routerLink]="prefix().concat([item.identity])">
                 {{ format(item.page, paginator.pageCount) }}
               </a>
-            }
-            @if (item.identity === paginator.current) {
+            } @else {
               <strong style="font-size: 1.5em">{{ format(item.page, paginator.pageCount) }}</strong>
             }
           }

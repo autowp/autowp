@@ -1,12 +1,12 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
+import {VehicleType} from '@grpc/spec.pb';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {GoautowpVehicleType} from '@rest/model/goautowpVehicleType';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {getVehicleTypeTranslation} from '@utils/translations';
 import {map, shareReplay} from 'rxjs/operators';
 
-const translateNames = (types: GoautowpVehicleType[]): GoautowpVehicleType[] => {
+const translateNames = (types: VehicleType[]): VehicleType[] => {
   types.forEach((type) => {
     type.name = getVehicleTypeTranslation(type.name);
     type.childs = translateNames(type.childs ? type.childs : []);

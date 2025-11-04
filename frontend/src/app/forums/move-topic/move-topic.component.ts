@@ -1,15 +1,9 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {
-  APIForumsTheme,
-  APIForumsTopic,
-  APIGetForumsThemeRequest,
-  APIGetForumsThemesRequest,
-  APIGetForumsTopicRequest,
-  APIMoveTopicRequest,
-} from '@grpc/spec.pb';
+import {GetThemeRequest, GetTopicRequest, ListThemesRequest, Theme, Topic, UpdateTopicRequest} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
 import {EMPTY, Observable, of} from 'rxjs';
@@ -30,20 +24,18 @@ export class ForumsMoveTopicComponent implements OnInit {
   readonly #toastService = inject(ToastsService);
   readonly #grpc = inject(ForumsClient);
 
-  protected readonly themes$: Observable<APIForumsTheme[]> = this.#grpc
-    .getThemes(new APIGetForumsThemesRequest({}))
-    .pipe(
-      catchError((response: unknown) => {
-        this.#toastService.handleError(response);
-        return EMPTY;
-      }),
-      map((response) => (response.items ? response.items : [])),
-    );
+  protected readonly themes$: Observable<Theme[]> = this.#grpc.listThemes(new ListThemesRequest({})).pipe(
+    catchError((response: unknown) => {
+      this.#toastService.handleError(response);
+      return EMPTY;
+    }),
+    map((response) => (response.items ? response.items : [])),
+  );
 
   protected readonly topic$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('topic_id')),
     distinctUntilChanged(),
-    switchMap((topicID) => (topicID ? this.#grpc.getTopic(new APIGetForumsTopicRequest({id: topicID})) : of(null))),
+    switchMap((topicID) => (topicID ? this.#grpc.getTopic(new GetTopicRequest({id: topicID})) : of(null))),
     catchError(() => {
       this.#router.navigate(['/error-404'], {
         skipLocationChange: true,
@@ -54,21 +46,22 @@ export class ForumsMoveTopicComponent implements OnInit {
   );
 
   protected readonly theme$ = this.topic$.pipe(
-    switchMap((topic) =>
-      topic?.themeId ? this.#grpc.getTheme(new APIGetForumsThemeRequest({id: topic.themeId})) : of(null),
-    ),
+    switchMap((topic) => (topic?.themeId ? this.#grpc.getTheme(new GetThemeRequest({id: topic.themeId})) : of(null))),
   );
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 83});
   }
 
-  protected selectTheme(topic: APIForumsTopic, theme: APIForumsTheme) {
+  protected selectTheme(topic: Topic, theme: Theme) {
     this.#grpc
-      .moveTopic(
-        new APIMoveTopicRequest({
-          id: topic.id,
-          themeId: theme.id,
+      .updateTopic(
+        new UpdateTopicRequest({
+          updateMask: new FieldMask({paths: ['theme_id']}),
+          topic: new Topic({
+            id: topic.id,
+            themeId: theme.id,
+          }),
         }),
       )
       .subscribe({

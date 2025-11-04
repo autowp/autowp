@@ -29,12 +29,12 @@ import {
   PictureItem,
   PictureListOptions,
   PicturesRequest,
+  Spec,
+  VehicleType,
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {BoolValue, Int32Value} from '@ngx-grpc/well-known-types';
-import {GoautowpSpec} from '@rest/model/goautowpSpec';
-import {GoautowpVehicleType} from '@rest/model/goautowpVehicleType';
 import {LanguageService} from '@services/language';
 import {SpecService} from '@services/spec';
 import {VehicleTypeService} from '@services/vehicle-type';
@@ -176,7 +176,7 @@ function localizeInherited(parentIsConcept: null | ParentIsConcept) {
   return parentIsConcept.isConcept ? $localize`inherited (yes)` : $localize`inherited (no)`;
 }
 
-function specsToPlain(options: GoautowpSpec[], deep: number): ItemMetaFormAPISpec[] {
+function specsToPlain(options: Spec[], deep: number): ItemMetaFormAPISpec[] {
   const result: ItemMetaFormAPISpec[] = [];
   for (const item of options) {
     result.push({
@@ -242,7 +242,7 @@ export class ItemMetaFormComponent {
     ),
   );
 
-  readonly #vehicleTypes$: Observable<GoautowpVehicleType[]> = this.#vehicleTypeService.getTypesPlain$().pipe(
+  readonly #vehicleTypes$: Observable<VehicleType[]> = this.#vehicleTypeService.getTypesPlain$().pipe(
     map((types) =>
       types.map((type) => {
         type.name = getVehicleTypeTranslation(type.name);

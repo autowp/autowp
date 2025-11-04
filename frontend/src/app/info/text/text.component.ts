@@ -1,8 +1,8 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {APIUser} from '@grpc/spec.pb';
-import {TextService} from '@rest/api/text.service';
+import {APIUser, GetTextRequest} from '@grpc/spec.pb';
+import {TextClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {DiffEditorComponent, DiffEditorModel} from 'ngx-monaco-editor-v2';
@@ -42,7 +42,7 @@ export class InfoTextComponent implements OnInit {
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #textService = inject(TextService);
+  readonly #textClient = inject(TextClient);
 
   protected readonly options = {
     originalEditable: false,
@@ -72,7 +72,7 @@ export class InfoTextComponent implements OnInit {
   );
 
   protected readonly data$: Observable<InfoText> = combineLatest([this.#id$, this.#revision$]).pipe(
-    switchMap(([id, revision]) => this.#textService.textGetText({id, revision})),
+    switchMap(([id, revision]) => this.#textClient.getText(new GetTextRequest({id, revision}))),
     catchError((response: unknown) => {
       this.#toastService.handleError(response);
       return EMPTY;

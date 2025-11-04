@@ -18,7 +18,7 @@ RUN apt-get update -qqy && \
         adduser \
         ca-certificates \
         libaom3 \
-        imagemagick \
+        imagemagick-7.q16hdri \
         libheif-plugin-aomdec \
         libheif-plugin-aomenc \
         libheif-plugin-dav1d \

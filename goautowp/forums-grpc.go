@@ -43,7 +43,7 @@ func NewForumsGRPCServer(
 func (s *ForumsGRPCServer) GetUserSummary(
 	ctx context.Context,
 	_ *emptypb.Empty,
-) (*APIForumsUserSummary, error) {
+) (*ForumsUserSummary, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -58,15 +58,15 @@ func (s *ForumsGRPCServer) GetUserSummary(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &APIForumsUserSummary{
+	return &ForumsUserSummary{
 		SubscriptionsCount: int32(subscriptionsCount), //nolint: gosec
 	}, nil
 }
 
 func (s *ForumsGRPCServer) CreateTopic(
 	ctx context.Context,
-	in *APICreateTopicRequest,
-) (*APICreateTopicResponse, error) {
+	in *CreateTopicRequest,
+) (*CreateTopicResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -89,8 +89,8 @@ func (s *ForumsGRPCServer) CreateTopic(
 
 	topicID, err := s.forums.AddTopic(
 		ctx,
-		in.GetThemeId(),
-		in.GetName(),
+		in.GetTopic().GetThemeId(),
+		in.GetTopic().GetName(),
 		userCtx.UserID,
 		userCtx.IP.String(),
 	)
@@ -112,7 +112,7 @@ func (s *ForumsGRPCServer) CreateTopic(
 		return nil, err
 	}
 
-	if in.GetSubscription() {
+	if in.GetTopic().GetSubscription() {
 		err = s.commentsRepository.Subscribe(
 			ctx,
 			userCtx.UserID,
@@ -129,12 +129,12 @@ func (s *ForumsGRPCServer) CreateTopic(
 		return nil, err
 	}
 
-	return &APICreateTopicResponse{
+	return &CreateTopicResponse{
 		Id: topicID,
 	}, nil
 }
 
-func (s *APICreateTopicRequest) Validate(
+func (s *CreateTopicRequest) Validate(
 	ctx context.Context,
 	commentsRepository *comments.Repository,
 	userID int64,
@@ -153,7 +153,11 @@ func (s *APICreateTopicRequest) Validate(
 		},
 	}
 
-	s.Name, problems, err = nameInputFilter.IsValidString(s.GetName())
+	if s.GetTopic() == nil {
+		s.Topic = &Topic{}
+	}
+
+	s.Topic.Name, problems, err = nameInputFilter.IsValidString(s.GetTopic().GetName())
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +206,7 @@ func (s *APICreateTopicRequest) Validate(
 
 func (s *ForumsGRPCServer) CloseTopic(
 	ctx context.Context,
-	in *APISetTopicStatusRequest,
+	in *SetTopicStatusRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -228,7 +232,7 @@ func (s *ForumsGRPCServer) CloseTopic(
 
 func (s *ForumsGRPCServer) OpenTopic(
 	ctx context.Context,
-	in *APISetTopicStatusRequest,
+	in *SetTopicStatusRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -254,7 +258,7 @@ func (s *ForumsGRPCServer) OpenTopic(
 
 func (s *ForumsGRPCServer) DeleteTopic(
 	ctx context.Context,
-	in *APISetTopicStatusRequest,
+	in *SetTopicStatusRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -278,9 +282,9 @@ func (s *ForumsGRPCServer) DeleteTopic(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *ForumsGRPCServer) MoveTopic(
+func (s *ForumsGRPCServer) UpdateTopic(
 	ctx context.Context,
-	in *APIMoveTopicRequest,
+	in *UpdateTopicRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -296,7 +300,7 @@ func (s *ForumsGRPCServer) MoveTopic(
 		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
 	}
 
-	err = s.forums.MoveTopic(ctx, in.GetId(), in.GetThemeId())
+	err = s.forums.MoveTopic(ctx, in.GetTopic().GetId(), in.GetTopic().GetThemeId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -304,8 +308,8 @@ func (s *ForumsGRPCServer) MoveTopic(
 	return &emptypb.Empty{}, nil
 }
 
-func convertTheme(theme *ForumsTheme) *APIForumsTheme {
-	return &APIForumsTheme{
+func convertTheme(theme *ForumsTheme) *Theme {
+	return &Theme{
 		Id:            theme.ID,
 		Name:          theme.Name,
 		TopicsCount:   theme.TopicsCount,
@@ -315,8 +319,8 @@ func convertTheme(theme *ForumsTheme) *APIForumsTheme {
 	}
 }
 
-func convertTopic(topic *ForumsTopic) *APIForumsTopic {
-	return &APIForumsTopic{
+func convertTopic(topic *ForumsTopic) *Topic {
+	return &Topic{
 		Id:           topic.ID,
 		Name:         topic.Name,
 		Status:       topic.Status,
@@ -331,8 +335,8 @@ func convertTopic(topic *ForumsTopic) *APIForumsTopic {
 
 func (s *ForumsGRPCServer) GetTheme(
 	ctx context.Context,
-	in *APIGetForumsThemeRequest,
-) (*APIForumsTheme, error) {
+	in *GetThemeRequest,
+) (*Theme, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -352,10 +356,10 @@ func (s *ForumsGRPCServer) GetTheme(
 	return convertTheme(theme), nil
 }
 
-func (s *ForumsGRPCServer) GetThemes(
+func (s *ForumsGRPCServer) ListThemes(
 	ctx context.Context,
-	in *APIGetForumsThemesRequest,
-) (*APIForumsThemes, error) {
+	in *ListThemesRequest,
+) (*ListThemesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -368,20 +372,20 @@ func (s *ForumsGRPCServer) GetThemes(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIForumsTheme, len(themes))
+	result := make([]*Theme, len(themes))
 	for idx, theme := range themes {
 		result[idx] = convertTheme(theme)
 	}
 
-	return &APIForumsThemes{
+	return &ListThemesResponse{
 		Items: result,
 	}, nil
 }
 
 func (s *ForumsGRPCServer) GetLastTopic(
 	ctx context.Context,
-	in *APIGetForumsThemeRequest,
-) (*APIForumsTopic, error) {
+	in *GetThemeRequest,
+) (*Topic, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -403,7 +407,7 @@ func (s *ForumsGRPCServer) GetLastTopic(
 
 func (s *ForumsGRPCServer) GetLastMessage(
 	ctx context.Context,
-	in *APIGetForumsTopicRequest,
+	in *GetTopicRequest,
 ) (*APICommentMessage, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -433,10 +437,10 @@ func (s *ForumsGRPCServer) GetLastMessage(
 	}, nil
 }
 
-func (s *ForumsGRPCServer) GetTopics(
+func (s *ForumsGRPCServer) ListTopics(
 	ctx context.Context,
-	in *APIGetForumsTopicsRequest,
-) (*APIForumsTopics, error) {
+	in *ListTopicsRequest,
+) (*ListTopicsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -456,12 +460,12 @@ func (s *ForumsGRPCServer) GetTopics(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIForumsTopic, len(topics))
+	result := make([]*Topic, len(topics))
 	for idx, topic := range topics {
 		result[idx] = convertTopic(topic)
 	}
 
-	return &APIForumsTopics{
+	return &ListTopicsResponse{
 		Items: result,
 		Paginator: &Pages{
 			PageCount:        pages.PageCount,
@@ -480,8 +484,8 @@ func (s *ForumsGRPCServer) GetTopics(
 
 func (s *ForumsGRPCServer) GetTopic(
 	ctx context.Context,
-	in *APIGetForumsTopicRequest,
-) (*APIForumsTopic, error) {
+	in *GetTopicRequest,
+) (*Topic, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())

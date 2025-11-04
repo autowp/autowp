@@ -1,10 +1,8 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIUser} from '@grpc/spec.pb';
-import {MessagingService} from '@rest/api/messaging.service';
-import {GoautowpMessage} from '@rest/model/goautowpMessage';
-import {GoautowpPages} from '@rest/model/goautowpPages';
+import {APIUser, Message, MessagingGetMessagesRequest, Pages} from '@grpc/spec.pb';
+import {MessagingClient} from '@grpc/spec.pbsc';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
@@ -30,7 +28,7 @@ export class AccountMessagesComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #messagingService = inject(MessagingService);
+  readonly #messagingClient = inject(MessagingClient);
   readonly #userService = inject(UserService);
 
   readonly #change$ = new BehaviorSubject<void>(void 0);
@@ -56,8 +54,8 @@ export class AccountMessagesComponent {
   );
 
   protected readonly messages$: Observable<{
-    items: {author$: Observable<APIUser | null>; message: GoautowpMessage}[];
-    paginator: GoautowpPages | undefined;
+    items: {author$: Observable<APIUser | null>; message: Message}[];
+    paginator: Pages | undefined;
   }> = combineLatest([this.folder$, this.page$, this.userId$, this.#change$]).pipe(
     switchMap(([folder, page, userId]) => {
       let pageId = 0;
@@ -86,7 +84,7 @@ export class AccountMessagesComponent {
         title: this.pageName(),
       });
 
-      return this.#messagingService.messagingGetMessages({userId, folder, page: page || 1});
+      return this.#messagingClient.getMessages(new MessagingGetMessagesRequest({userId, folder, page: page || 1}));
     }),
     catchError((err: unknown) => {
       this.#toastService.handleError(err);

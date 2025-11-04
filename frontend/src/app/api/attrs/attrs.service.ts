@@ -1,10 +1,14 @@
 import {inject, Injectable} from '@angular/core';
-import {AttrAttribute} from '@grpc/spec.pb';
-import {AttrsService} from '@rest/api/attrs.service';
-import {GoautowpAttrAttribute} from '@rest/model/goautowpAttrAttribute';
-import {GoautowpAttrAttributeType} from '@rest/model/goautowpAttrAttributeType';
-import {GoautowpAttrListOptionsResponse} from '@rest/model/goautowpAttrListOptionsResponse';
-import {GoautowpAttrZone} from '@rest/model/goautowpAttrZone';
+import {
+  AttrAttribute,
+  AttrAttributeType,
+  AttrListOptionsRequest,
+  AttrListOptionsResponse,
+  AttrZone,
+  ListAttributesRequest,
+} from '@grpc/spec.pb';
+import {AttrsClient} from '@grpc/spec.pbsc';
+import {Empty} from '@ngx-grpc/well-known-types';
 import {getAttrsTranslation} from '@utils/translations';
 import {Observable, of} from 'rxjs';
 import {map, shareReplay, switchMap} from 'rxjs/operators';
@@ -13,12 +17,12 @@ export interface AttrAttributeTreeItem extends AttrAttribute.AsObject {
   childs: AttrAttributeTreeItem[];
 }
 
-function toTree(items: GoautowpAttrAttribute[], parentID: string): AttrAttributeTreeItem[] {
+function toTree(items: AttrAttribute[], parentID: string): AttrAttributeTreeItem[] {
   return items
     .filter((i) => i.parentId === parentID)
     .map((i) => {
       const o = i;
-      return {...o, childs: toTree(items, o.id)};
+      return {...o.toObject(), childs: toTree(items, o.id)};
     });
 }
 
@@ -26,26 +30,26 @@ function toTree(items: GoautowpAttrAttribute[], parentID: string): AttrAttribute
   providedIn: 'root',
 })
 export class APIAttrsService {
-  readonly #attrsService = inject(AttrsService);
+  readonly #attrsClient = inject(AttrsClient);
 
-  readonly #attrs$: Observable<GoautowpAttrAttribute[]> = this.#attrsService.attrsListAttributes({}).pipe(
-    map((response) => response.items),
+  readonly #attrs$: Observable<AttrAttribute[]> = this.#attrsClient.listAttributes(new ListAttributesRequest()).pipe(
+    map((response) => response.items ?? []),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  public readonly attributeTypes$: Observable<GoautowpAttrAttributeType[]> = this.#attrsService
-    .attrsGetAttributeTypes()
+  public readonly attributeTypes$: Observable<AttrAttributeType[]> = this.#attrsClient
+    .getAttributeTypes(new Empty())
     .pipe(
       map((response) => (response.items ? response.items : [])),
       shareReplay({bufferSize: 1, refCount: false}),
     );
 
-  public readonly zones$: Observable<GoautowpAttrZone[]> = this.#attrsService.attrsGetZones().pipe(
+  public readonly zones$: Observable<AttrZone[]> = this.#attrsClient.getZones(new Empty()).pipe(
     map((response) => (response.items ? response.items : [])),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  public getZone$(id: string): Observable<GoautowpAttrZone | null> {
+  public getZone$(id: string): Observable<AttrZone | null> {
     return this.zones$.pipe(
       map((zones) => {
         for (const zone of zones) {
@@ -58,18 +62,18 @@ export class APIAttrsService {
     );
   }
 
-  public getAttribute$(id: string): Observable<GoautowpAttrAttribute | undefined> {
+  public getAttribute$(id: string): Observable<AttrAttribute | undefined> {
     return this.#attrs$.pipe(map((attrs) => attrs?.find((attr) => attr.id === id)));
   }
 
   public getAttributes$(zoneID: null | string, parentID: null | string): Observable<AttrAttributeTreeItem[]> {
-    return this.#attrsService
-      .attrsListAttributes({parentId: parentID ?? undefined, zoneId: zoneID ?? undefined})
+    return this.#attrsClient
+      .listAttributes(new ListAttributesRequest({parentId: parentID ?? undefined, zoneId: zoneID ?? undefined}))
       .pipe(map((response) => toTree(response.items ?? [], parentID ? parentID : '0')));
   }
 
-  public getListOptions$(attributeId: string | undefined): Observable<GoautowpAttrListOptionsResponse> {
-    return this.#attrsService.attrsGetListOptions({attributeId});
+  public getListOptions$(attributeId: string | undefined): Observable<AttrListOptionsResponse> {
+    return this.#attrsClient.getListOptions(new AttrListOptionsRequest({attributeId}));
   }
 
   public getPath$(id: string): Observable<string[]> {

@@ -1,8 +1,8 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {StatisticsService} from '@rest/api/statistics.service';
-import {PulseRequestPeriod} from '@rest/model/pulseRequestPeriod';
+import {PulseRequest} from '@grpc/spec.pb';
+import {StatisticsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {ChartConfiguration} from 'chart.js';
@@ -16,7 +16,7 @@ import {UserComponent} from '../user/user/user.component';
 interface Period {
   active: boolean;
   name: string;
-  value: PulseRequestPeriod;
+  value: PulseRequest.Period;
 }
 
 @Component({
@@ -28,28 +28,28 @@ interface Period {
 export class PulseComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #statisticsService = inject(StatisticsService);
+  readonly #statisticsClient = inject(StatisticsClient);
   readonly #usersService = inject(UserService);
 
   protected readonly periods: Period[] = [
     {
       active: true,
       name: 'Day',
-      value: PulseRequestPeriod.Default,
+      value: PulseRequest.Period.DEFAULT,
     },
     {
       active: false,
       name: 'Month',
-      value: PulseRequestPeriod.Month,
+      value: PulseRequest.Period.MONTH,
     },
     {
       active: false,
       name: 'Year',
-      value: PulseRequestPeriod.Year,
+      value: PulseRequest.Period.YEAR,
     },
   ];
 
-  readonly #period$ = new BehaviorSubject<PulseRequestPeriod>(PulseRequestPeriod.Default);
+  readonly #period$ = new BehaviorSubject<PulseRequest.Period>(PulseRequest.Period.DEFAULT);
 
   protected readonly chartOptions: ChartConfiguration<'bar', never, never>['options'] = {
     responsive: true,
@@ -63,10 +63,10 @@ export class PulseComponent implements OnInit {
     },
   };
 
-  protected readonly data$ = this.#period$.pipe(
+  readonly #data$ = this.#period$.pipe(
     debounceTime(10),
     distinctUntilChanged(),
-    switchMap((period) => this.#statisticsService.statisticsGetPulse({period})),
+    switchMap((period) => this.#statisticsClient.getPulse(new PulseRequest({period}))),
     catchError((response: unknown) => {
       this.#toastService.handleError(response);
       return EMPTY;
@@ -74,7 +74,7 @@ export class PulseComponent implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly legend$ = this.data$.pipe(
+  protected readonly legend$ = this.#data$.pipe(
     map((response) => {
       return (response.legend ? response.legend : []).map((item) => ({
         color: item.color,
@@ -83,9 +83,9 @@ export class PulseComponent implements OnInit {
     }),
   );
 
-  protected readonly labels$ = this.data$.pipe(map((response) => response.labels));
+  protected readonly labels$ = this.#data$.pipe(map((response) => response.labels));
 
-  protected readonly gridData$ = this.data$.pipe(
+  protected readonly gridData$ = this.#data$.pipe(
     switchMap((response) =>
       combineLatest(
         (response.grid ? response.grid : []).map((dataset) =>

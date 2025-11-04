@@ -1,7 +1,8 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {ItemsService} from '@rest/api/items.service';
+import {ItemsClient} from '@grpc/spec.pbsc';
+import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {EMPTY} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
@@ -18,9 +19,9 @@ import {InfoSpecRowComponent} from './row/row.component';
 export class InfoSpecComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #itemsService = inject(ItemsService);
+  readonly #itemsClient = inject(ItemsClient);
 
-  protected readonly specs$ = this.#itemsService.itemsGetSpecs().pipe(
+  protected readonly specs$ = this.#itemsClient.getSpecs(new Empty()).pipe(
     catchError((response: unknown) => {
       this.#toastService.handleError(response);
       return EMPTY;

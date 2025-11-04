@@ -2,7 +2,8 @@ import {AsyncPipe, DecimalPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {APIUser} from '@grpc/spec.pb';
-import {StatisticsService} from '@rest/api/statistics.service';
+import {StatisticsClient} from '@grpc/spec.pbsc';
+import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import escapeStringRegexp from 'escape-string-regexp';
@@ -92,12 +93,12 @@ export class AboutComponent implements OnInit {
   readonly #decimalPipe = inject(DecimalPipe);
   readonly #bytesPipe = inject(BytesPipe);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #statisticsService = inject(StatisticsService);
+  readonly #statisticsClient = inject(StatisticsClient);
 
   protected readonly version = versionJson;
 
-  protected readonly html$ = this.#statisticsService
-    .statisticsGetAboutData()
+  protected readonly html$ = this.#statisticsClient
+    .getAboutData(new Empty())
     .pipe(
       switchMap((about) => {
         const ids: string[] = about.contributors;

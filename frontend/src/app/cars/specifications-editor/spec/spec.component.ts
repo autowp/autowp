@@ -326,7 +326,7 @@ export class CarsSpecificationsEditorSpecComponent {
     this.#attrsService.getListOptions$(undefined).pipe(
       map((response) =>
         (response.items ? response.items : []).map((i) => ({
-          ...i,
+          ...i.toObject(),
           name: getAttrListOptionsTranslation(i.name),
         })),
       ),

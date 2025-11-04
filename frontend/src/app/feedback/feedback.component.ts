@@ -1,9 +1,7 @@
 import {AsyncPipe} from '@angular/common';
-import {HttpErrorResponse} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
-import {AutowpService} from '@rest/api/autowp.service';
 import {PageEnvService} from '@services/page-env.service';
 import {ReCaptchaService} from '@services/recaptcha';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
@@ -12,8 +10,11 @@ import {RecaptchaModule} from 'ng-recaptcha-2';
 import {EMPTY, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
-import {invalidParamsFromError} from '../gateway';
 import {ToastsService} from '../toasts/toasts.service';
+import {AutowpClient} from "@grpc/spec.pbsc";
+import {CreateFeedbackRequest} from "@grpc/spec.pb";
+import {GrpcStatusEvent} from "@ngx-grpc/common";
+import {extractFieldViolations, fieldViolations2InvalidParams} from "../grpc";
 
 const CAPTCHA = 'captcha';
 
@@ -32,7 +33,7 @@ const CAPTCHA = 'captcha';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackComponent implements OnInit {
-  readonly #autowpService = inject(AutowpService);
+  readonly #autowpClient = inject(AutowpClient);
   readonly #router = inject(Router);
   readonly #reCaptchaService = inject(ReCaptchaService);
   readonly #pageEnv = inject(PageEnvService);
@@ -51,7 +52,7 @@ export class FeedbackComponent implements OnInit {
     captcha: new FormControl<string>('', {nonNullable: true}),
     email: new FormControl<string>('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(255), Validators.email],
+      validators: [Validators.required, Validators.maxLength(255)], // , Validators.email
     }),
     message: new FormControl<string>('', {
       nonNullable: true,
@@ -71,22 +72,22 @@ export class FeedbackComponent implements OnInit {
 
   protected submit() {
     const formValue = this.form.getRawValue();
-    this.#autowpService
-      .autowpCreateFeedback({
+    this.#autowpClient
+      .createFeedback(new CreateFeedbackRequest({
         feedback: {
           captcha: formValue.captcha,
           email: formValue.email,
           message: formValue.message,
           name: formValue.name,
         },
-      })
+      }))
       .subscribe({
-        error: (error: HttpErrorResponse) => {
-          const invalidParams = invalidParamsFromError(error);
-          if (invalidParams) {
-            this.invalidParams.set(invalidParams);
+        error: (response: unknown) => {
+          if (response instanceof GrpcStatusEvent) {
+            const fieldViolations = extractFieldViolations(response);
+            this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
 
-            if (invalidParams['captcha']) {
+            if (this.invalidParams()['captcha']) {
               if (!this.form.get(CAPTCHA)) {
                 const control = new FormControl('', {nonNullable: true, validators: Validators.required});
                 this.form.addControl(CAPTCHA, control);
@@ -94,11 +95,9 @@ export class FeedbackComponent implements OnInit {
             } else {
               this.form.removeControl(CAPTCHA as never);
             }
-
-            return;
+          } else {
+            this.#toastService.handleError(response);
           }
-
-          this.#toastService.handleError(error);
         },
         next: () => {
           this.#router.navigate(['/feedback/sent']);

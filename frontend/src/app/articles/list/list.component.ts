@@ -1,9 +1,9 @@
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIUser} from '@grpc/spec.pb';
+import {APIUser, ArticlesRequest} from '@grpc/spec.pb';
+import {ArticlesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
-import {ArticlesService} from '@rest/api/articles.service';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
@@ -35,7 +35,7 @@ export class ListComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
-  readonly #articlesClient = inject(ArticlesService);
+  readonly #articlesClient = inject(ArticlesClient);
   readonly #userService = inject(UserService);
 
   ngOnInit(): void {
@@ -46,7 +46,7 @@ export class ListComponent implements OnInit {
     map((params) => parseInt(params.get('page') ?? '', 10) || 1),
     distinctUntilChanged(),
     debounceTime(30),
-    switchMap((page) => this.#articlesClient.articlesGetList({limit: '10', page: '' + page})),
+    switchMap((page) => this.#articlesClient.getList(new ArticlesRequest({limit: '10', page: '' + page}))),
     catchError((response: unknown) => {
       console.error(response);
       this.#toastService.handleError(response);
@@ -55,7 +55,7 @@ export class ListComponent implements OnInit {
     map((response) => ({
       articles: (response.items || []).map((article) => ({
         author$: article.authorId !== '0' ? this.#userService.getUser$(article.authorId) : of(null),
-        date: article.date,
+        date: article.date?.toDate(),
         description: article.description,
         id: article.id,
         name: article.name,

@@ -405,12 +405,14 @@ func TestMoveComment(t *testing.T) {
 
 	topic, err := forumsClient.CreateTopic(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&APICreateTopicRequest{
-			ThemeId:            2,
-			Name:               "Topic name",
+		&CreateTopicRequest{
+			Topic: &Topic{
+				ThemeId:      2,
+				Name:         "Topic name",
+				Subscription: true,
+			},
 			Message:            "Test message",
 			ModeratorAttention: false,
-			Subscription:       true,
 		},
 	)
 	require.NoError(t, err)
@@ -444,12 +446,14 @@ func TestMoveComment(t *testing.T) {
 
 	topic2, err := forumsClient.CreateTopic(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&APICreateTopicRequest{
-			ThemeId:            2,
-			Name:               "Topic 2 name",
+		&CreateTopicRequest{
 			Message:            "Test 2 message",
 			ModeratorAttention: false,
-			Subscription:       true,
+			Topic: &Topic{
+				ThemeId:      2,
+				Name:         "Topic 2 name",
+				Subscription: true,
+			},
 		},
 	)
 	require.NoError(t, err)

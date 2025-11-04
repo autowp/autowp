@@ -8,19 +8,21 @@ import {
   APIUser,
   APIUserPreferencesRequest,
   CommentMessageFields,
+  CreateContactRequest,
+  CreateTrafficBlacklistItemRequest,
+  DeleteContactRequest,
+  DeleteTrafficBlacklistItemRequest,
   DeleteUserPhotoRequest,
   GetMessagesRequest,
+  IP,
   Picture,
   PictureFields,
   PictureListOptions,
   PicturesRequest,
   UserFields,
 } from '@grpc/spec.pb';
-import {CommentsClient, PicturesClient, UsersClient} from '@grpc/spec.pbsc';
+import {CommentsClient, ContactsClient, PicturesClient, TrafficClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
-import {ContactsService} from '@rest/api/contacts.service';
-import {TrafficService} from '@rest/api/traffic.service';
-import {GoautowpIP} from '@rest/model/goautowpIP';
 import {AuthService, Role} from '@services/auth.service';
 import {AppContactsService} from '@services/contacts';
 import {IpService} from '@services/ip';
@@ -52,9 +54,9 @@ export class UsersUserComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #ipService = inject(IpService);
-  readonly #contactsService = inject(ContactsService);
+  readonly #contactsClient = inject(ContactsClient);
   readonly #usersGrpc = inject(UsersClient);
-  readonly #trafficService = inject(TrafficService);
+  readonly #trafficClient = inject(TrafficClient);
   readonly #commentsClient = inject(CommentsClient);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
@@ -163,7 +165,7 @@ export class UsersUserComponent {
 
   readonly #ipChange$ = new BehaviorSubject<void>(void 0);
 
-  protected readonly ip$: Observable<GoautowpIP | null> = combineLatest([this.user$, this.#ipChange$]).pipe(
+  protected readonly ip$: Observable<IP | null> = combineLatest([this.user$, this.#ipChange$]).pipe(
     switchMap(([user]) => {
       if (!user.lastIp) {
         return of(null);
@@ -234,13 +236,15 @@ export class UsersUserComponent {
 
   protected setInContacts(user: APIUser, value: boolean) {
     if (value) {
-      this.#contactsService.contactsCreateContact({contact: {contactUserId: user.id}}).subscribe(() => {
-        this.#inContactsChange$.next();
-      });
+      this.#contactsClient
+        .createContact(new CreateContactRequest({contact: {contactUserId: user.id}}))
+        .subscribe(() => {
+          this.#inContactsChange$.next();
+        });
       return;
     }
 
-    this.#contactsService.contactsDeleteContact({userId: user.id}).subscribe(() => {
+    this.#contactsClient.deleteContact(new DeleteContactRequest({userId: user.id})).subscribe(() => {
       this.#inContactsChange$.next();
     });
   }
@@ -292,7 +296,7 @@ export class UsersUserComponent {
   }
 
   protected removeFromBlacklist(ip: string) {
-    this.#trafficService.trafficDeleteTrafficBlacklistItem({ip}).subscribe({
+    this.#trafficClient.deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ip})).subscribe({
       error: (response: unknown) => this.#toastService.handleError(response),
       next: () => {
         this.#ipChange$.next();
@@ -301,14 +305,16 @@ export class UsersUserComponent {
   }
 
   protected addToBlacklist(ip: string) {
-    this.#trafficService
-      .trafficCreateTrafficBlacklistItem({
-        item: {
-          ip,
-          period: this.banPeriod,
-          reason: this.banReason ?? '',
-        },
-      })
+    this.#trafficClient
+      .createTrafficBlacklistItem(
+        new CreateTrafficBlacklistItemRequest({
+          item: {
+            ip,
+            period: this.banPeriod,
+            reason: this.banReason ?? '',
+          },
+        }),
+      )
       .subscribe({
         error: (response: unknown) => this.#toastService.handleError(response),
         next: () => {

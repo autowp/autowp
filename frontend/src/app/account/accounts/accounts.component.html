@@ -22,8 +22,7 @@
             <i aria-hidden="true" [class]="account.icon"></i>
             @if (account.link) {
               <a [href]="account.link" [textContent]="account.name"></a>
-            }
-            @if (!account.link) {
+            } @else {
               <span [textContent]="account.name"></span>
             }
           </p>

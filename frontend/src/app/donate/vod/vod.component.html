@@ -45,8 +45,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
               </span>
             }
           </span>
-        }
-        @if (!date.free) {
+        } @else {
           <span>
             <span class="muted" [textContent]="date.name"></span>
             (<ng-container i18n>busy</ng-container>)

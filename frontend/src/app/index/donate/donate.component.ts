@@ -1,7 +1,8 @@
 import {AsyncPipe, CurrencyPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {DonationsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
-import {DonationsService} from '@rest/api/donations.service';
+import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {map} from 'rxjs/operators';
@@ -23,12 +24,12 @@ const rates: Record<string, number> = {
 })
 export class IndexDonateComponent {
   protected readonly languageService = inject(LanguageService);
-  readonly #donations = inject(DonationsService);
+  readonly #donations = inject(DonationsClient);
 
   protected readonly goal = 2500;
   readonly #monthlyCharge = 161.88;
 
-  protected readonly state$ = this.#donations.donationsGetTransactions().pipe(
+  protected readonly state$ = this.#donations.getTransactions(new Empty()).pipe(
     map((res) => {
       const operations = res.items || [];
       const donations = operations

@@ -587,8 +587,8 @@
                     @if (ip.blacklist.byUser) {
                       <app-user [user]="ip.blacklist.byUser" />
                     }
-                    @if (ip.blacklist.until) {
-                      <ng-container i18n>until</ng-container> {{ ip.blacklist.until | date }}
+                    @if (ip.blacklist.until; as date) {
+                      <ng-container i18n>until</ng-container> {{ date.toDate() | date }}
                     }
                     @if (ip.blacklist.reason) {
                       <span [textContent]="ip.blacklist.reason"></span>

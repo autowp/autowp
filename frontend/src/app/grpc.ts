@@ -3,17 +3,9 @@ import {Status} from '@grpc/google/rpc/status.pb';
 import {ErrorDetails} from '@grpc/spec.pb';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {InvalidParams} from '@utils/invalid-params.pipe';
+import {base64ToUint8Array, stringToUint8Array} from 'uint8array-extras';
 
 import FieldViolation = BadRequest.FieldViolation;
-
-const stringToUint8Array = (str: string): Uint8Array => {
-  const buf = new ArrayBuffer(str.length);
-  const bufView = new Uint8Array(buf);
-  for (let i = 0; i < str.length; i++) {
-    bufView[i] = str.charCodeAt(i);
-  }
-  return bufView;
-};
 
 export const extractFieldViolations = (response: GrpcStatusEvent): FieldViolation[] => {
   if (!(response instanceof GrpcStatusEvent)) {
@@ -25,7 +17,7 @@ export const extractFieldViolations = (response: GrpcStatusEvent): FieldViolatio
     return [];
   }
 
-  const statusDecoded = stringToUint8Array(atob(statusEncoded));
+  const statusDecoded = base64ToUint8Array(statusEncoded);
   const status = Status.deserializeBinary(statusDecoded);
 
   const fieldViolations: FieldViolation[] = [];

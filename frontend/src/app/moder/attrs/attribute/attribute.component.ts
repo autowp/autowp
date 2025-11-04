@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {GoautowpAttrAttribute} from '@rest/model/goautowpAttrAttribute';
+import {AttrAttribute} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 import {getAttrListOptionsTranslation, getAttrsTranslation, getUnitNameTranslation} from '@utils/translations';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
@@ -36,7 +36,7 @@ export class ModerAttrsAttributeComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly attribute$: Observable<GoautowpAttrAttribute> = this.#attributeID$.pipe(
+  protected readonly attribute$: Observable<AttrAttribute> = this.#attributeID$.pipe(
     switchMap((id) => this.#attrsService.getAttribute$(id)),
     switchMap((attribute) => {
       if (!attribute) {

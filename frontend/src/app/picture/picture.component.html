@@ -394,8 +394,7 @@
                   }
                   <span style="color: green">{{ moderVote.reason }}</span>
                 </span>
-              }
-              @if (!moderVote.vote) {
+              } @else {
                 <span>
                   <i style="color: red" class="bi bi-hand-thumbs-down-fill" aria-hidden="true"></i>
                   @if (moderVote.user$ | async; as user) {

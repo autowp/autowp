@@ -1,8 +1,9 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ArticleByCatnameRequest} from '@grpc/spec.pb';
+import {ArticlesClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
-import {ArticlesService} from '@rest/api/articles.service';
 import {PageEnvService} from '@services/page-env.service';
 import {EMPTY, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
@@ -18,7 +19,7 @@ import {ToastsService} from '../../toasts/toasts.service';
 export class ArticlesArticleComponent {
   readonly #router = inject(Router);
   readonly #route = inject(ActivatedRoute);
-  readonly #articlesClient = inject(ArticlesService);
+  readonly #articlesClient = inject(ArticlesClient);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
 
@@ -35,7 +36,7 @@ export class ArticlesArticleComponent {
       }
       return of(catname);
     }),
-    switchMap((catname) => this.#articlesClient.articlesGetItemByCatname({catname})),
+    switchMap((catname) => this.#articlesClient.getItemByCatname(new ArticleByCatnameRequest({catname}))),
     map((article) => {
       this.#pageEnv.set({
         pageId: 32,

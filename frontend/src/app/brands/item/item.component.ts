@@ -2,10 +2,9 @@ import {AsyncPipe, NgClass, NgStyle} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APIBrandsListItem, NewItemsRequest} from '@grpc/spec.pb';
+import {APIBrandsListItem, BrandIcons, NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
-import {GoautowpBrandIcons} from '@rest/model/goautowpBrandIcons';
 import {LanguageService} from '@services/language';
 import {EMPTY} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
@@ -23,7 +22,7 @@ export class BrandsItemComponent {
   readonly brand = input.required<APIBrandsListItem>();
   protected readonly brand$ = toObservable(this.brand);
 
-  readonly icons = input.required<GoautowpBrandIcons>();
+  readonly icons = input.required<BrandIcons>();
 
   protected readonly response$ = this.brand$.pipe(
     switchMap((brand) =>

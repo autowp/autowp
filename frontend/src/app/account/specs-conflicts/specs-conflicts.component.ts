@@ -4,6 +4,7 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   APIItem,
   APIUser,
+  AttrAttribute,
   AttrConflict,
   AttrConflictsRequest,
   AttrConflictValue,
@@ -12,7 +13,6 @@ import {
   Pages,
 } from '@grpc/spec.pb';
 import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
-import {GoautowpAttrAttribute} from '@rest/model/goautowpAttrAttribute';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -26,7 +26,7 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
 import {UserComponent} from '../../user/user/user.component';
 
 interface APIAttrConflictInList {
-  attribute$: Observable<GoautowpAttrAttribute | undefined>;
+  attribute$: Observable<AttrAttribute | undefined>;
   conflict: AttrConflict;
   item$: Observable<APIItem | null>;
   unitName$: Observable<null | string>;

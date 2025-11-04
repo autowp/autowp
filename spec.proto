@@ -12,7 +12,7 @@ import "google/rpc/status.proto";
 import "google/rpc/error_details.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
+// #import "google/api/client.proto";
 
 option go_package = "github.com/autowp/goautowp";
 
@@ -41,18 +41,18 @@ service Autowp {
 }
 
 service Forums {
-  rpc GetUserSummary(google.protobuf.Empty) returns (APIForumsUserSummary) {}
-  rpc CreateTopic(APICreateTopicRequest) returns (APICreateTopicResponse) {}
-  rpc CloseTopic(APISetTopicStatusRequest) returns (google.protobuf.Empty) {}
-  rpc OpenTopic(APISetTopicStatusRequest) returns (google.protobuf.Empty) {}
-  rpc DeleteTopic(APISetTopicStatusRequest) returns (google.protobuf.Empty) {}
-  rpc MoveTopic(APIMoveTopicRequest) returns (google.protobuf.Empty) {}
-  rpc GetTheme(APIGetForumsThemeRequest) returns (APIForumsTheme) {}
-  rpc GetThemes(APIGetForumsThemesRequest) returns (APIForumsThemes) {}
-  rpc GetTopic(APIGetForumsTopicRequest) returns (APIForumsTopic) {}
-  rpc GetLastTopic(APIGetForumsThemeRequest) returns (APIForumsTopic) {}
-  rpc GetLastMessage(APIGetForumsTopicRequest) returns (APICommentMessage) {}
-  rpc GetTopics(APIGetForumsTopicsRequest) returns (APIForumsTopics) {}
+  rpc GetUserSummary(google.protobuf.Empty) returns (ForumsUserSummary) {}
+  rpc CreateTopic(CreateTopicRequest) returns (CreateTopicResponse) {}
+  rpc CloseTopic(SetTopicStatusRequest) returns (google.protobuf.Empty) {}
+  rpc OpenTopic(SetTopicStatusRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteTopic(SetTopicStatusRequest) returns (google.protobuf.Empty) {}
+  rpc UpdateTopic(UpdateTopicRequest) returns (google.protobuf.Empty) {}
+  rpc GetTheme(GetThemeRequest) returns (Theme) {}
+  rpc ListThemes(ListThemesRequest) returns (ListThemesResponse) {}
+  rpc GetTopic(GetTopicRequest) returns (Topic) {}
+  rpc GetLastTopic(GetThemeRequest) returns (Topic) {}
+  rpc GetLastMessage(GetTopicRequest) returns (APICommentMessage) {}
+  rpc ListTopics(ListTopicsRequest) returns (ListTopicsResponse) {}
 }
 
 service Articles {
@@ -129,7 +129,11 @@ service Contacts {
 
 service Users {
   rpc DeleteUser(APIDeleteUserRequest) returns (google.protobuf.Empty) {}
-  rpc GetUser(APIGetUserRequest) returns (APIUser) {}
+  rpc GetUser(APIGetUserRequest) returns (APIUser) {
+    option (google.api.http) = {
+      get: "/v3/users/{user_id}"
+    };
+  }
   rpc Me(APIMeRequest) returns (APIUser) {}
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty) {}
   rpc GetUserPreferences(APIUserPreferencesRequest) returns (APIUserPreferencesResponse) {}
@@ -955,29 +959,29 @@ message TrafficWhitelistItems {
   repeated TrafficWhitelistItem items = 1;
 }
 
-message APIForumsUserSummary {
+message ForumsUserSummary {
   int32 subscriptionsCount = 1;
 }
 
-message APIGetForumsThemeRequest {
+message GetThemeRequest {
   int64 id = 1;
 }
 
-message APIGetForumsTopicsRequest {
-  int64 theme_id = 1;
-  int32 page = 2;
-  bool subscription = 3;
+message ListTopicsRequest {
+  int64 theme_id = 1 [(google.api.field_behavior) = OPTIONAL];
+  int32 page = 2 [(google.api.field_behavior) = OPTIONAL];
+  bool subscription = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
-message APIGetForumsTopicRequest {
+message GetTopicRequest {
   int64 id = 1;
 }
 
-message APIGetForumsThemesRequest {
-  int64 theme_id = 1;
+message ListThemesRequest {
+  int64 theme_id = 1 [(google.api.field_behavior) = OPTIONAL];
 }
 
-message APIForumsTheme {
+message Theme {
   int64 id = 1;
   string name = 2;
   int32 topics_count = 3;
@@ -986,11 +990,11 @@ message APIForumsTheme {
   string description = 6;
 }
 
-message APIForumsThemes {
-  repeated APIForumsTheme items = 1;
+message ListThemesResponse {
+  repeated Theme items = 1;
 }
 
-message APIForumsTopic {
+message Topic {
   int64 id = 1;
   string name = 2;
   string status = 3;
@@ -1002,8 +1006,8 @@ message APIForumsTopic {
   bool subscription = 9;
 }
 
-message APIForumsTopics {
-  repeated APIForumsTopic items = 1;
+message ListTopicsResponse {
+  repeated Topic items = 1;
   Pages paginator = 2;
 }
 
@@ -1013,25 +1017,23 @@ message APICommentMessage {
   int64 user_id = 3;
 }
 
-message APICreateTopicRequest {
-  int64 theme_id = 1;
-  string name = 2;
-  string message = 3;
-  bool moderator_attention = 4;
-  bool subscription = 5;
+message CreateTopicRequest {
+  Topic topic = 1;
+  string message = 2;
+  bool moderator_attention = 3;
 }
 
-message APICreateTopicResponse {
+message CreateTopicResponse {
   int64 id = 1;
 }
 
-message APISetTopicStatusRequest {
+message SetTopicStatusRequest {
   int64 id = 1;
 }
 
-message APIMoveTopicRequest {
-  int64 id = 1;
-  int64 theme_id = 2;
+message UpdateTopicRequest {
+  Topic topic = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2;
 }
 
 message MessageNewCount {
@@ -1062,26 +1064,26 @@ message APIMeRequest {
 }
 
 message APIGetUserRequest {
-  int64 user_id = 1;
-  string identity = 3;
-  UserFields fields = 2;
+  int64 user_id = 1 [(google.api.field_behavior) = OPTIONAL];
+  string identity = 3 [(google.api.field_behavior) = OPTIONAL];
+  UserFields fields = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message UserFields {
-  bool email = 1;
-  bool timezone = 3;
-  bool language = 4;
-  bool votes_per_day = 5;
-  bool votes_left = 6;
-  bool img = 7;
-  bool gravatar_large = 8;
-  bool photo = 9;
-  bool reg_date = 11;
-  bool pictures_added = 14;
-  bool pictures_accepted_count = 15;
-  bool last_ip = 16;
-  bool last_online = 17;
-  bool login = 18;
+  bool email = 1 [(google.api.field_behavior) = OPTIONAL];
+  bool timezone = 3 [(google.api.field_behavior) = OPTIONAL];
+  bool language = 4 [(google.api.field_behavior) = OPTIONAL];
+  bool votes_per_day = 5 [(google.api.field_behavior) = OPTIONAL];
+  bool votes_left = 6 [(google.api.field_behavior) = OPTIONAL];
+  bool img = 7 [(google.api.field_behavior) = OPTIONAL];
+  bool gravatar_large = 8 [(google.api.field_behavior) = OPTIONAL];
+  bool photo = 9 [(google.api.field_behavior) = OPTIONAL];
+  bool reg_date = 11 [(google.api.field_behavior) = OPTIONAL];
+  bool pictures_added = 14 [(google.api.field_behavior) = OPTIONAL];
+  bool pictures_accepted_count = 15 [(google.api.field_behavior) = OPTIONAL];
+  bool last_ip = 16 [(google.api.field_behavior) = OPTIONAL];
+  bool last_online = 17 [(google.api.field_behavior) = OPTIONAL];
+  bool login = 18 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message APIBrandSection {

@@ -32,8 +32,7 @@
             <i class="bi bi-envelope" aria-hidden="true"></i>
             <ng-container i18n>Subscribe to new replies notifications</ng-container>
           </button>
-        }
-        @if (topic.subscription) {
+        } @else {
           <button type="button" class="btn btn-link subscription" (click)="unsubscribe(topic)">
             <i class="bi bi-envelope" aria-hidden="true"></i>
             <ng-container i18n>Unsubscribe from notifications</ng-container>

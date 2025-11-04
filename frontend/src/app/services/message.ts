@@ -1,7 +1,13 @@
 import {inject, Injectable} from '@angular/core';
-import {MessagingService} from '@rest/api/messaging.service';
-import {GoautowpMessage} from '@rest/model/goautowpMessage';
-import {GoautowpMessageSummary} from '@rest/model/goautowpMessageSummary';
+import {
+  CreateMessageRequest,
+  Message,
+  MessageSummary,
+  MessagingClearFolder,
+  MessagingDeleteMessage,
+} from '@grpc/spec.pb';
+import {MessagingClient} from '@grpc/spec.pbsc';
+import {Empty} from '@ngx-grpc/well-known-types';
 import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
 import {catchError, debounceTime, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -14,7 +20,7 @@ import {AuthService} from './auth.service';
 export class MessageService {
   readonly #auth = inject(AuthService);
   readonly #toasts = inject(ToastsService);
-  readonly #messagingService = inject(MessagingService);
+  readonly #messagingClient = inject(MessagingClient);
 
   readonly #deleted$ = new BehaviorSubject<void>(void 0);
   readonly #sent$ = new BehaviorSubject<void>(void 0);
@@ -31,7 +37,7 @@ export class MessageService {
         return of(null);
       }
 
-      return this.#messagingService.messagingGetMessagesNewCount();
+      return this.#messagingClient.getMessagesNewCount(new Empty());
     }),
     catchError((response: unknown) => {
       this.#toasts.handleError(response);
@@ -40,7 +46,7 @@ export class MessageService {
     map((response) => (response ? response.count : null)),
   );
 
-  readonly #summary$: Observable<GoautowpMessageSummary | null> = combineLatest([
+  readonly #summary$: Observable<MessageSummary | null> = combineLatest([
     this.#deleted$,
     this.#sent$,
     this.#seen$,
@@ -53,12 +59,12 @@ export class MessageService {
         return of(null);
       }
 
-      return this.#messagingService.messagingGetMessagesSummary();
+      return this.#messagingClient.getMessagesSummary(new Empty());
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  public seen(messages: GoautowpMessage[]) {
+  public seen(messages: Message[]) {
     let newFound = false;
     for (const message of messages) {
       if (message.isNew) {
@@ -72,14 +78,16 @@ export class MessageService {
   }
 
   public clearFolder$(folder: string): Observable<object> {
-    return this.#messagingService.messagingClearFolder({folder}).pipe(tap(() => this.#deleted$.next()));
+    return this.#messagingClient.clearFolder(new MessagingClearFolder({folder})).pipe(tap(() => this.#deleted$.next()));
   }
 
   public deleteMessage$(messageId: string): Observable<object> {
-    return this.#messagingService.messagingDeleteMessage({messageId}).pipe(tap(() => this.#deleted$.next()));
+    return this.#messagingClient
+      .deleteMessage(new MessagingDeleteMessage({messageId}))
+      .pipe(tap(() => this.#deleted$.next()));
   }
 
-  public getSummary$(): Observable<GoautowpMessageSummary | null> {
+  public getSummary$(): Observable<MessageSummary | null> {
     return this.#summary$;
   }
 
@@ -88,22 +96,15 @@ export class MessageService {
   }
 
   public send$(userId: string, text: string): Observable<object> {
-    return this.#messagingService
-      .messagingCreateMessage({
-        message: {
-          text: text,
-          toUserId: userId,
-          id: '0',
-          isNew: false,
-          canDelete: false,
-          canReply: false,
-          dialogCount: 0,
-          date: new Date(),
-          allMessagesLink: false,
-          authorId: '0',
-          dialogWithUserId: '0',
-        },
-      })
+    return this.#messagingClient
+      .createMessage(
+        new CreateMessageRequest({
+          message: new Message({
+            text: text,
+            toUserId: userId,
+          }),
+        }),
+      )
       .pipe(tap(() => this.#sent$.next()));
   }
 }

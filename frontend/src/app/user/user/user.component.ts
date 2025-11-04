@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {APIUser} from '@grpc/spec.pb';
-import {GoautowpAPIUser} from '@rest/model/goautowpAPIUser';
 
 @Component({
   selector: 'app-user',
@@ -10,5 +9,5 @@ import {GoautowpAPIUser} from '@rest/model/goautowpAPIUser';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent {
-  readonly user = input.required<APIUser | GoautowpAPIUser>();
+  readonly user = input.required<APIUser>();
 }

@@ -2,13 +2,13 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIForumsTheme,
-  APIForumsTopic,
-  APIGetForumsThemesRequest,
-  APIGetForumsTopicsRequest,
   CommentsMoveCommentRequest,
   CommentsType,
   GetMessagePageRequest,
+  ListThemesRequest,
+  ListTopicsRequest,
+  Theme,
+  Topic,
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
@@ -43,12 +43,12 @@ export class ForumsMoveMessageComponent implements OnInit {
     distinctUntilChanged(),
   );
 
-  protected readonly topics$: Observable<APIForumsTopic[]> = this.themeID$.pipe(
+  protected readonly topics$: Observable<Topic[]> = this.themeID$.pipe(
     switchMap((themeID) => {
       if (!themeID) {
-        return of([] as APIForumsTopic[]);
+        return of([] as Topic[]);
       }
-      return this.#grpc.getTopics(new APIGetForumsTopicsRequest({themeId: themeID})).pipe(
+      return this.#grpc.listTopics(new ListTopicsRequest({themeId: themeID})).pipe(
         catchError((response: unknown) => {
           this.#toastService.handleError(response);
           return EMPTY;
@@ -58,21 +58,19 @@ export class ForumsMoveMessageComponent implements OnInit {
     }),
   );
 
-  protected readonly themes$: Observable<APIForumsTheme[]> = this.#grpc
-    .getThemes(new APIGetForumsThemesRequest({}))
-    .pipe(
-      catchError((response: unknown) => {
-        this.#toastService.handleError(response);
-        return EMPTY;
-      }),
-      map((response) => (response.items ? response.items : [])),
-    );
+  protected readonly themes$: Observable<Theme[]> = this.#grpc.listThemes(new ListThemesRequest({})).pipe(
+    catchError((response: unknown) => {
+      this.#toastService.handleError(response);
+      return EMPTY;
+    }),
+    map((response) => (response.items ? response.items : [])),
+  );
 
   ngOnInit(): void {
     setTimeout(() => this.#pageEnv.set({pageId: 83}), 0);
   }
 
-  protected selectTopic(messageId: string, topic: APIForumsTopic) {
+  protected selectTopic(messageId: string, topic: Topic) {
     this.#commentsClient
       .moveComment(
         new CommentsMoveCommentRequest({
