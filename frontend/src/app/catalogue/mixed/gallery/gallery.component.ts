@@ -78,13 +78,11 @@ export class CatalogueMixedGalleryComponent {
 
   protected pictureSelected(data: BrandPerspectivePageData, item: null | Picture) {
     if (item) {
-      setTimeout(() => {
-        this.#pageEnv.set({
-          layout: {isGalleryPage: true},
-          pageId: data.picture_page.id,
-          title: item.nameText,
-        });
-      }, 0);
+      this.#pageEnv.set({
+        layout: {isGalleryPage: true},
+        pageId: data.picture_page.id,
+        title: item.nameText,
+      });
     }
   }
 }

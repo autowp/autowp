@@ -22,6 +22,7 @@ import {getForumsThemeDescriptionTranslation, getForumsThemeTranslation} from '@
 import {BehaviorSubject, combineLatest, Observable, of, throwError} from 'rxjs';
 import {catchError, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
+import {StatusCode} from '../../grpc-web-client/statuscode';
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {UserComponent} from '../user/user/user.component';
 import {ForumsTopicListComponent} from './topic-list/topic-list.component';
@@ -90,7 +91,7 @@ export class ForumsComponent {
         themes: (data.themes ? data.themes : []).map((theme) => {
           const lastTopic$ = this.#grpc.getLastTopic(new GetThemeRequest({id: theme.id})).pipe(
             catchError((error: unknown) => {
-              if (error instanceof GrpcStatusEvent && error.statusCode === 5) {
+              if (error instanceof GrpcStatusEvent && error.statusCode === StatusCode.NOT_FOUND) {
                 return of(null);
               }
               return throwError(() => error);
@@ -106,7 +107,7 @@ export class ForumsComponent {
               return this.#grpc.getLastMessage(new GetTopicRequest({id: topic.id}));
             }),
             catchError((error: unknown) => {
-              if (error instanceof GrpcStatusEvent && error.statusCode === 5) {
+              if (error instanceof GrpcStatusEvent && error.statusCode === StatusCode.NOT_FOUND) {
                 return of(null);
               }
               return throwError(() => error);

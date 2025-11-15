@@ -35,6 +35,6 @@ export class DonateLogComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 196}), 0);
+    this.#pageEnv.set({pageId: 196});
   }
 }

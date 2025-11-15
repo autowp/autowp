@@ -19,7 +19,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable, of} from 'rxjs';
 import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -28,7 +28,7 @@ import {TwinsItemComponent} from '../../item/item.component';
 
 @Component({
   selector: 'app-twins-group-items',
-  imports: [TwinsItemComponent, MarkdownComponent, CommentsComponent, AsyncPipe],
+  imports: [TwinsItemComponent, CommentsComponent, AsyncPipe, RemarkModule],
   templateUrl: './items.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -64,14 +64,10 @@ export class TwinsGroupItemsComponent {
       );
     }),
     tap((group) => {
-      setTimeout(
-        () =>
-          this.#pageEnv.set({
-            pageId: 25,
-            title: group ? group.nameText : '',
-          }),
-        0,
-      );
+      this.#pageEnv.set({
+        pageId: 25,
+        title: group ? group.nameText : '',
+      });
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );

@@ -56,7 +56,7 @@
       </div>
     }
     @if (item.description && item.description.length) {
-      <app-markdown class="text" [markdown]="item.description" />
+      <remark class="text" [markdown]="item.description" />
     }
     @if ((item.engineVehicles || []).length) {
       <div>
@@ -70,7 +70,7 @@
         </ul>
       </div>
     }
-    <ul class="list-inline" ngPreserveWhitespaces>
+    <ul class="list-inline">
       @for (category of item.categories; track category.id) {
         <li class="list-inline-item">
           <i class="bi bi-tag-fill me-1" aria-hidden="true"></i>

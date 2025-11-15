@@ -19,7 +19,7 @@ import {allowedItemTypeCombinations, ItemService} from '@services/item';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams} from '@utils/invalid-params.pipe';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {combineLatest, EMPTY, forkJoin, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
 
@@ -33,7 +33,7 @@ import {
 
 @Component({
   selector: 'app-moder-items-item-organize',
-  imports: [RouterLink, MarkdownComponent, AsyncPipe, ItemMetaFormComponent],
+  imports: [RouterLink, AsyncPipe, ItemMetaFormComponent, RemarkModule],
   templateUrl: './organize.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -148,12 +148,10 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.#pageEnv.set({
-        layout: {isAdminPage: true},
-        pageId: 215,
-      });
-    }, 0);
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 215,
+    });
   }
 
   protected submit(item: APIItem, itemTypeID: number, event: ItemMetaFormResult) {

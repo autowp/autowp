@@ -23,13 +23,11 @@ export class GalleryPageComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.#pageEnv.set({
-        layout: {isGalleryPage: true},
-        pageId: 187,
-        title: '', // data.picture.name_text,
-      });
-    }, 0);
+    this.#pageEnv.set({
+      layout: {isGalleryPage: true},
+      pageId: 187,
+      title: '', // data.picture.name_text,
+    });
   }
 
   protected pictureSelected(item: null | Picture) {

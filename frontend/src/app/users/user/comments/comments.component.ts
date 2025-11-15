@@ -71,7 +71,7 @@ export class UsersUserCommentsComponent {
 
   protected readonly comments$ = combineLatest([this.user$, this.#page$, this.order$]).pipe(
     tap(() => {
-      setTimeout(() => this.#pageEnv.set({pageId: 205}), 0);
+      this.#pageEnv.set({pageId: 205});
     }),
     switchMap(([user, page, order]) =>
       this.#commentsClient.getMessages(

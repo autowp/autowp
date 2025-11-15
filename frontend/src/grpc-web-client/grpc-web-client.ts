@@ -1,5 +1,5 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, Provider} from '@angular/core';
 import {
   GrpcClient,
   GrpcClientFactory,
@@ -9,11 +9,11 @@ import {
   GrpcMessageClass,
   GrpcMetadata,
   GrpcStatusEvent,
-  uint8ArrayToBase64,
 } from '@ngx-grpc/common';
+import {GRPC_CLIENT_FACTORY} from '@ngx-grpc/core';
 import {EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, switchMap} from 'rxjs/operators';
-import {base64ToUint8Array, concatUint8Arrays} from 'uint8array-extras';
+import {base64ToUint8Array, concatUint8Arrays, uint8ArrayToBase64} from 'uint8array-extras';
 
 import {ErrorCode, getDebugMessage} from '../../keep/include/goog.net.ErrorCode';
 import {FrameType, GrpcWebStreamParser} from './grpcwebstreamparser';
@@ -27,6 +27,10 @@ export const GRPC_STATUS_MESSAGE = 'grpc-message';
 
 const EXCLUDED_RESPONSE_HEADERS = ['content-type', GRPC_STATUS, GRPC_STATUS_MESSAGE];
 
+export interface NgGrpcWebClientRootOptions {
+  settings?: NgGrpcWebClientSettings;
+}
+
 /**
  * Settings for the chosen implementation of GrpcClient
  */
@@ -34,6 +38,27 @@ export interface NgGrpcWebClientSettings {
   host: string;
   suppressCorsPreflight?: boolean;
   withCredentials?: boolean;
+}
+
+/**
+ * GrpcClientFactory implementation based on grpc-web
+ */
+@Injectable({providedIn: 'root'})
+export class NgGrpcWebClientFactory implements GrpcClientFactory<NgGrpcWebClientSettings> {
+  readonly #httpClient = inject(HttpClient);
+  readonly #defaultSettings: NgGrpcWebClientSettings | null = inject(NG_GRPC_WEB_CLIENT_DEFAULT_SETTINGS, {
+    optional: true,
+  });
+
+  createClient(serviceId: string, customSettings: NgGrpcWebClientSettings) {
+    const settings = customSettings || this.#defaultSettings;
+
+    if (!settings) {
+      throw new Error(`grpc-web client factory: no settings provided for ${serviceId}`);
+    }
+
+    return new NgGrpcWebClient(settings, this.#httpClient);
+  }
 }
 
 /**
@@ -103,6 +128,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
         responseType: 'text',
       })
       .pipe(
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         switchMap((response): Observable<GrpcEvent<S>> => {
           let contentType = response.headers.get('Content-Type');
           if (!contentType) {
@@ -247,15 +273,9 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
     return new GrpcStatusEvent(error.code, decodeURIComponent(error.message || ''), new GrpcMetadata(error.metadata));
   }
 
-  public serverStream<Q extends GrpcMessage, S extends GrpcMessage>(
-    path: string,
-    req: Q,
-    metadata: GrpcMetadata,
-    reqclss: GrpcMessageClass<Q>,
-    resclss: GrpcMessageClass<S>,
-  ): Observable<GrpcEvent<S>> {
+  public serverStream = () => {
     throw new Error('Server streaming not supported');
-  }
+  };
 
   public clientStream = () => {
     throw new Error('Client streaming not supported');
@@ -286,6 +306,16 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
   }
 }
 
+export function provideGrpcWebClient(options?: NgGrpcWebClientRootOptions): Provider[] {
+  const providers: Provider[] = [{provide: GRPC_CLIENT_FACTORY, useClass: NgGrpcWebClientFactory}];
+
+  if (options?.settings) {
+    providers.push({provide: NG_GRPC_WEB_CLIENT_DEFAULT_SETTINGS, useValue: options.settings});
+  }
+
+  return providers;
+}
+
 function decodeGrpcWebTextResponse(input: string): Uint8Array<ArrayBuffer> {
   const eqIndex = input.lastIndexOf('=');
   if (eqIndex > 0) {
@@ -295,25 +325,4 @@ function decodeGrpcWebTextResponse(input: string): Uint8Array<ArrayBuffer> {
   }
 
   return base64ToUint8Array(input);
-}
-
-/**
- * GrpcClientFactory implementation based on grpc-web
- */
-@Injectable({providedIn: 'root'})
-export class NgGrpcWebClientFactory implements GrpcClientFactory<NgGrpcWebClientSettings> {
-  readonly #httpClient = inject(HttpClient);
-  readonly #defaultSettings: NgGrpcWebClientSettings | null = inject(NG_GRPC_WEB_CLIENT_DEFAULT_SETTINGS, {
-    optional: true,
-  });
-
-  createClient(serviceId: string, customSettings: NgGrpcWebClientSettings) {
-    const settings = customSettings || this.#defaultSettings;
-
-    if (!settings) {
-      throw new Error(`grpc-web client factory: no settings provided for ${serviceId}`);
-    }
-
-    return new NgGrpcWebClient(settings, this.#httpClient);
-  }
 }

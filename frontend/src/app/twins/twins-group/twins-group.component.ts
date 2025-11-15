@@ -26,7 +26,7 @@ import {TwinsSidebarComponent} from '../sidebar.component';
 })
 export class TwinsGroupComponent {
   readonly #route = inject(ActivatedRoute);
-  readonly #pageEnv = inject(PageEnvService);
+  protected readonly pageEnv = inject(PageEnvService);
   readonly #router = inject(Router);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
@@ -60,14 +60,10 @@ export class TwinsGroupComponent {
       return of(group);
     }),
     tap((group) => {
-      setTimeout(
-        () =>
-          this.#pageEnv.set({
-            pageId: 25,
-            title: group.nameText,
-          }),
-        0,
-      );
+      this.pageEnv.set({
+        pageId: 25,
+        title: group.nameText,
+      });
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
@@ -89,6 +85,4 @@ export class TwinsGroupComponent {
     ),
     map((response) => (response.items || []).map((item) => item.catname)),
   );
-
-  protected readonly layoutParams$ = this.#pageEnv.layoutParams$.asObservable();
 }

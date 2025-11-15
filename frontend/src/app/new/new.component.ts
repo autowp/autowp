@@ -80,7 +80,6 @@ export class NewComponent implements OnInit {
           }),
           switchMap((response) => {
             const currentDateStr = response.currentDate ? formatGrpcDate(response.currentDate) : '';
-            console.log('date !== currentDateStr', date, currentDateStr, date !== currentDateStr);
             if (date !== currentDateStr) {
               this.#router.navigate(['/new', currentDateStr]);
               return EMPTY;
@@ -126,7 +125,7 @@ export class NewComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 51}), 0);
+    this.#pageEnv.set({pageId: 51});
   }
 
   protected readonly formatDate = formatDate;

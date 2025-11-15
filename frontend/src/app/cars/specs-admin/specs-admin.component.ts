@@ -91,7 +91,7 @@ export class CarsSpecsAdminComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 103}), 0);
+    this.#pageEnv.set({pageId: 103});
   }
 
   protected deleteValue(value: AttrUserValueListItem) {

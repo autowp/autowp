@@ -1,11 +1,29 @@
-import {DecimalPipe} from '@angular/common';
-import {provideHttpClient, withInterceptors} from '@angular/common/http';
-import {ApplicationConfig, enableProdMode, importProvidersFrom} from '@angular/core';
+import {DecimalPipe, isPlatformBrowser} from '@angular/common';
+import {provideHttpClient, withFetch, withInterceptors} from '@angular/common/http';
+import {
+  ApplicationConfig,
+  enableProdMode,
+  EnvironmentInjector,
+  EnvironmentProviders,
+  importProvidersFrom,
+  inject,
+  makeEnvironmentProviders,
+  PLATFORM_ID,
+  provideAppInitializer,
+  Provider,
+  runInInjectionContext,
+} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {BrowserModule} from '@angular/platform-browser';
+import {BrowserModule, provideClientHydration, withEventReplay, withI18nSupport} from '@angular/platform-browser';
 import {provideRouter, withInMemoryScrolling} from '@angular/router';
 import {environment} from '@environment/environment';
-import {NgbCollapseModule, NgbDropdownModule, NgbModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbCollapseModule,
+  NgbDropdownModule,
+  NgbModule,
+  NgbToastConfig,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {GRPC_INTERCEPTORS, GrpcCoreModule} from '@ngx-grpc/core';
 import {authInterceptor$, GrpcAuthInterceptor, GrpcLogInterceptor} from '@services/api.service';
 import {AuthService} from '@services/auth.service';
@@ -25,15 +43,69 @@ import {TimezoneService} from '@services/timezone';
 import {UserService} from '@services/user';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {Angulartics2Module} from 'angulartics2';
-import {AutoRefreshTokenService, provideKeycloak, UserActivityService, withAutoRefreshToken} from 'keycloak-angular';
+import {
+  AutoRefreshTokenService,
+  createKeycloakSignal,
+  KEYCLOAK_EVENT_SIGNAL,
+  ProvideKeycloakOptions,
+  UserActivityService,
+  withAutoRefreshToken,
+} from 'keycloak-angular';
+import Keycloak from 'keycloak-js';
 import {provideMonacoEditor} from 'ngx-monaco-editor-v2';
 import {NgPipesModule} from 'ngx-pipes';
 
-import {NgGrpcWebClientModule} from '../grpc-web-client/grpc-web-client.module';
+import {provideGrpcWebClient} from '../grpc-web-client/grpc-web-client';
 import {routes} from './app.routes';
 
 if (environment.production) {
   enableProdMode();
+}
+
+const provideKeycloakInAppInitializer = (
+  keycloak: Keycloak,
+  options: ProvideKeycloakOptions,
+  // eslint-disable-next-line sonarjs/function-return-type
+): EnvironmentProviders | Provider[] => {
+  const {initOptions, features = []} = options;
+
+  if (!initOptions) {
+    return [] as Provider[];
+  }
+
+  return provideAppInitializer(async () => {
+    const platform = inject(PLATFORM_ID);
+
+    // 👇 browser guard: only init keycloak in the browser
+    if (isPlatformBrowser(platform)) {
+      const injector = inject(EnvironmentInjector);
+      runInInjectionContext(injector, () => features.forEach((feature) => feature.configure()));
+
+      await keycloak.init(initOptions).catch((error) => console.error('Keycloak initialization failed', error));
+    } else {
+      console.log('Keycloak initialization skipped on server side');
+    }
+  });
+};
+
+export function provideKeycloakSSR(options: ProvideKeycloakOptions): EnvironmentProviders {
+  const keycloak = new Keycloak(options.config);
+
+  const providers = options.providers ?? [];
+  const keycloakSignal = createKeycloakSignal(keycloak);
+
+  return makeEnvironmentProviders([
+    {
+      provide: KEYCLOAK_EVENT_SIGNAL,
+      useValue: keycloakSignal,
+    },
+    {
+      provide: Keycloak,
+      useValue: keycloak,
+    },
+    ...providers,
+    provideKeycloakInAppInitializer(keycloak, options),
+  ]);
 }
 
 export const appConfig: ApplicationConfig = {
@@ -47,15 +119,15 @@ export const appConfig: ApplicationConfig = {
       NgbCollapseModule,
       NgbDropdownModule,
       GrpcCoreModule.forRoot(),
-      NgGrpcWebClientModule.forRoot({
-        settings: {host: environment.grpcHost},
-      }),
       Angulartics2Module.forRoot(),
       NgbModule,
     ),
+    provideGrpcWebClient({
+      settings: {host: environment.grpcHost},
+    }),
     {multi: true, provide: GRPC_INTERCEPTORS, useClass: GrpcLogInterceptor},
     {multi: true, provide: GRPC_INTERCEPTORS, useClass: GrpcAuthInterceptor},
-    provideKeycloak({
+    provideKeycloakSSR({
       config: environment.keycloak,
       features: [
         withAutoRefreshToken({
@@ -64,9 +136,10 @@ export const appConfig: ApplicationConfig = {
         }),
       ],
       initOptions: {
-        enableLogging: !environment.production,
+        enableLogging: false, // !environment.production,
         onLoad: 'check-sso',
-        silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
+        silentCheckSsoRedirectUri:
+          (typeof window !== 'undefined' ? window.location.origin : '') + '/assets/silent-check-sso.html',
       },
     }),
     AutoRefreshTokenService,
@@ -94,6 +167,13 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: 'enabled',
       }),
     ),
-    provideHttpClient(withInterceptors([authInterceptor$])),
+    provideHttpClient(withInterceptors([authInterceptor$]), withFetch()),
+    provideClientHydration(withEventReplay(), withI18nSupport()),
+    provideAppInitializer(async () => {
+      const platform = inject(PLATFORM_ID);
+      const config = inject(NgbToastConfig);
+
+      config.animation = isPlatformBrowser(platform);
+    }),
   ],
 };

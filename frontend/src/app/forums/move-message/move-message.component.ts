@@ -67,7 +67,7 @@ export class ForumsMoveMessageComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 83}), 0);
+    this.#pageEnv.set({pageId: 83});
   }
 
   protected selectTopic(messageId: string, topic: Topic) {

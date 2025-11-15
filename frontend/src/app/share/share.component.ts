@@ -1,5 +1,6 @@
+import {DOCUMENT} from '@angular/common';
 import {HttpParams} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 
 @Component({
   selector: 'app-share',
@@ -11,6 +12,7 @@ import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 export class ShareComponent {
   readonly url = input.required<string>();
   readonly text = input.required<string>();
+  readonly #document = inject(DOCUMENT);
 
   buildURL(url: string, params: Record<string, string>): string {
     let p = new HttpParams();
@@ -22,11 +24,13 @@ export class ShareComponent {
   }
 
   protected share(href: string) {
-    window.open(
-      href,
-      undefined,
-      'height=600,width=600,resizable=yes,scrollbars=no,status=no,toolbar=no,location=no,directories=no',
-    );
+    if (this.#document.defaultView) {
+      this.#document.defaultView.open(
+        href,
+        undefined,
+        'height=600,width=600,resizable=yes,scrollbars=no,status=no,toolbar=no,location=no,directories=no',
+      );
+    }
 
     return false;
   }

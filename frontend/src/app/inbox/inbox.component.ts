@@ -1,4 +1,4 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -49,14 +49,17 @@ export class InboxComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #picturesClient = inject(PicturesClient);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly inbox$: Observable<InboxData> = this.#auth.authenticated$.pipe(
     switchMap((authenticated) => {
       if (!authenticated) {
-        this.#keycloak.login({
-          locale: this.#languageService.language,
-          redirectUri: window.location.href,
-        });
+        if (this.#document.defaultView) {
+          this.#keycloak.login({
+            locale: this.#languageService.language,
+            redirectUri: this.#document.defaultView.location.href,
+          });
+        }
         return EMPTY;
       }
 
@@ -159,7 +162,7 @@ export class InboxComponent implements OnInit {
   protected readonly brandID = new FormControl<string>('', {nonNullable: true});
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 76}), 0);
+    this.#pageEnv.set({pageId: 76});
   }
 
   protected changeBrand() {

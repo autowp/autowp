@@ -24,7 +24,7 @@
       @if (authenticated$ | async) {
         <app-comments-form [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" />
       } @else {
-        <app-markdown
+        <remark
           class="alert alert-block alert-info"
           i18n-markdown
           markdown="To be able to post a comment, you must [create an account or sign in using social networks account](/login)"

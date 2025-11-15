@@ -1,7 +1,7 @@
 @if (data(); as data) {
   @if (data.pageCount > 1) {
     <div>
-      <p ngPreserveWhitespaces>
+      <p>
         @if (data.previous) {
           <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.previous}"
             >←<ng-container i18n>previous</ng-container></a
@@ -17,7 +17,7 @@
           <span><ng-container i18n>next</ng-container>→</span>
         }
       </p>
-      <p ngPreserveWhitespaces>
+      <p>
         @if (data.first < data.firstPageInRange) {
           <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.first}">{{ padd(data.first) }}</a>
         }

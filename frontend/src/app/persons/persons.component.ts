@@ -107,7 +107,7 @@ export class PersonsComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 214}), 0);
+    this.#pageEnv.set({pageId: 214});
   }
 
   private prepareItems(items: APIItem[], authors: boolean): CatalogueListItem[] {

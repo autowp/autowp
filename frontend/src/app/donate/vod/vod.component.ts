@@ -1,4 +1,4 @@
-import {AsyncPipe, formatDate} from '@angular/common';
+import {AsyncPipe, DOCUMENT, formatDate} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, LOCALE_ID, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {APIItem, APIUser, ItemFields, ItemRequest} from '@grpc/spec.pb';
@@ -6,7 +6,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
 
@@ -18,7 +18,7 @@ const VOD_TIMEZONE = 'UTC';
 
 @Component({
   selector: 'app-donate-vod',
-  imports: [RouterLink, MarkdownComponent, ItemOfDayComponent, AsyncPipe],
+  imports: [RouterLink, ItemOfDayComponent, AsyncPipe, RemarkModule],
   templateUrl: './vod.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,6 +30,7 @@ export class DonateVodComponent implements OnInit {
   protected readonly locale = inject(LOCALE_ID);
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
+  readonly #document = inject(DOCUMENT);
 
   readonly #user$ = this.auth.user$;
 
@@ -130,13 +131,13 @@ export class DonateVodComponent implements OnInit {
         {name: 'label', value: label},
         {name: 'quickpay-form', value: 'donate'},
         {name: 'targets', value: $localize`Order ${label}`},
-        {name: 'successURL', value: 'https://' + window.location.host + '/donate/vod/success'},
+        {name: 'successURL', value: 'https://' + this.#document.defaultView?.location.host + '/donate/vod/success'},
       ];
     }),
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 196}), 0);
+    this.#pageEnv.set({pageId: 196});
   }
 
   protected submit(e: Event) {

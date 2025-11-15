@@ -92,7 +92,7 @@ export class UploadSelectComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 30}), 0);
+    this.#pageEnv.set({pageId: 30});
   }
 
   private brandsObservable$(page: number, search: string): Observable<APIItemList> {

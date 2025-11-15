@@ -193,14 +193,10 @@ export class ModerCommentsComponent implements OnInit {
   protected readonly ModeratorAttention = ModeratorAttention;
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 110,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 110,
+    });
   }
 
   protected setModeratorAttention() {

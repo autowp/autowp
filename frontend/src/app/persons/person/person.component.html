@@ -1,4 +1,4 @@
-@if (!(layoutParams$ | async)?.isGalleryPage) {
+@if (!pageEnv.layoutParams().isGalleryPage) {
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item">

@@ -4,8 +4,9 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  apiUrl: window.location.protocol + '//' + window.location.hostname,
+  apiUrl: '',
   grpcHost: '',
+  ssrGrpcHost: 'goautowp-serve',
   keycloak: {
     clientId: 'frontend',
     realm: 'autowp',

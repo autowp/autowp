@@ -56,25 +56,25 @@
             <div class="text">
               <app-user-text [text]="message.message.text" />
             </div>
-            <div ngPreserveWhitespaces>
+            <div>
               @if (message.message.isNew) {
                 <span class="badge text-bg-info text-dark" i18n>new</span>
               }
               @if (message.message.canDelete) {
-                <a href="#" class="float-end" ngPreserveWhitespaces (click)="deleteMessage(message.message.id)">
+                <a href="#" class="float-end" (click)="deleteMessage(message.message.id)">
                   <i class="bi bi-trash" aria-hidden="true"></i>
                   <ng-container i18n>delete</ng-container>
                 </a>
               }
               @if (message.message.canReply) {
-                <span ngPreserveWhitespaces>
+                <span>
                   <i class="bi bi-reply" aria-hidden="true"></i>
                   <a href="#" i18n (click)="openMessageForm(folder, message.message.authorId)">reply</a>
                   &nbsp;
                 </span>
               }
               @if (message.message.allMessagesLink && message.message.dialogWithUserId !== '0') {
-                <span ngPreserveWhitespaces>
+                <span>
                   <i class="bi bi-chat-text" aria-hidden="true"></i>
                   <a
                     routerLink="/account/messages"

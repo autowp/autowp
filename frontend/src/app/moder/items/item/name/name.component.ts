@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, UpperCasePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
@@ -25,6 +25,7 @@ import {MarkdownEditComponent} from '../../../../markdown-edit/markdown-edit/mar
     RouterLink,
     NgbNavOutlet,
     AsyncPipe,
+    UpperCasePipe,
   ],
   templateUrl: './name.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

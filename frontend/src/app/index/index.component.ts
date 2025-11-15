@@ -6,7 +6,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, shareReplay, switchMap} from 'rxjs/operators';
 
@@ -30,10 +30,10 @@ import {IndexTwinsComponent} from './twins/twins.component';
     IndexTwinsComponent,
     IndexCategoriesComponent,
     RouterLink,
-    MarkdownComponent,
     IndexFactoriesComponent,
     IndexSpecsCarsComponent,
     AsyncPipe,
+    RemarkModule,
   ],
   templateUrl: './index.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,8 +95,6 @@ export class IndexComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.#pageEnv.set({pageId: 1});
-    }, 0);
+    this.#pageEnv.set({pageId: 1});
   }
 }

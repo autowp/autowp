@@ -35,13 +35,9 @@ export class ModerAttrsComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 100,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 100,
+    });
   }
 }

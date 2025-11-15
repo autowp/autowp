@@ -16,6 +16,6 @@ export class AccountAccessComponent implements OnInit {
     environment.keycloak.url + '/realms/' + environment.keycloak.realm + '/account/#/security/device-activity';
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 133}), 0);
+    this.#pageEnv.set({pageId: 133});
   }
 }

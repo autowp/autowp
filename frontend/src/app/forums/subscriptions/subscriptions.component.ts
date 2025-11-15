@@ -40,7 +40,7 @@ export class ForumsSubscriptionsComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 42}), 0);
+    this.#pageEnv.set({pageId: 42});
   }
 
   protected reload() {

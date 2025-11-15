@@ -134,6 +134,6 @@ export class AccountSpecsConflictsComponent implements OnInit {
   protected readonly AttrConflictsRequest = AttrConflictsRequest;
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 188}), 0);
+    this.#pageEnv.set({pageId: 188});
   }
 }

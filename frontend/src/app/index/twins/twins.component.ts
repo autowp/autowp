@@ -4,11 +4,11 @@ import {RouterLink} from '@angular/router';
 import {GetTopTwinsBrandsListRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 
 @Component({
   selector: 'app-index-twins',
-  imports: [RouterLink, MarkdownComponent, AsyncPipe],
+  imports: [RouterLink, AsyncPipe, RemarkModule],
   templateUrl: './twins.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

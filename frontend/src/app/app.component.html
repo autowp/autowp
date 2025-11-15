@@ -1,8 +1,8 @@
-@if (!(layoutParams$ | async)?.isGalleryPage) {
+@if (!pageEnv.layoutParams().isGalleryPage) {
   <app-moder-menu />
 }
 
-@if (!(layoutParams$ | async)?.isGalleryPage) {
+@if (!pageEnv.layoutParams().isGalleryPage) {
   <div class="navbar navbar-expand-md navbar-dark bg-dark">
     <div class="container">
       <button
@@ -178,12 +178,12 @@
 }
 
 <div
-  [class.container]="!(layoutParams$ | async)?.isGalleryPage"
-  [class.container-fluid]="(layoutParams$ | async)?.isGalleryPage"
+  [class.container]="!pageEnv.layoutParams().isGalleryPage"
+  [class.container-fluid]="pageEnv.layoutParams().isGalleryPage"
 >
   <router-outlet />
 
-  @if (!(layoutParams$ | async)?.isAdminPage && !(layoutParams$ | async)?.isGalleryPage) {
+  @if (!pageEnv.layoutParams().isAdminPage && !pageEnv.layoutParams().isGalleryPage) {
     <div class="bottom-line">
       <p>
         <strong>
@@ -195,7 +195,7 @@
     </div>
   }
 
-  @if (!(layoutParams$ | async)?.isAdminPage && !(layoutParams$ | async)?.isGalleryPage) {
+  @if (!pageEnv.layoutParams().isAdminPage && !pageEnv.layoutParams().isGalleryPage) {
     <footer class="footer">
       <div class="row">
         <div class="col-md-6">
@@ -233,7 +233,7 @@
           </p>
         </div>
         <div class="col-md-6">
-          <app-markdown
+          <remark
             class="card card-body copyrights"
             markdown="Please note that all material on this server autowp.ru, added visitors.
 

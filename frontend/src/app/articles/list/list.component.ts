@@ -39,7 +39,7 @@ export class ListComponent implements OnInit {
   readonly #userService = inject(UserService);
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 31}), 0);
+    this.#pageEnv.set({pageId: 31});
   }
 
   protected readonly articles$ = this.#route.queryParamMap.pipe(

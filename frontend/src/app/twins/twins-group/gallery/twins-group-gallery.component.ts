@@ -51,15 +51,11 @@ export class TwinsGroupGalleryComponent {
       return of(group);
     }),
     tap((group) => {
-      setTimeout(
-        () =>
-          this.#pageEnv.set({
-            layout: {isGalleryPage: true},
-            pageId: 28,
-            title: group ? group.nameText : '',
-          }),
-        0,
-      );
+      this.#pageEnv.set({
+        layout: {isGalleryPage: true},
+        pageId: 28,
+        title: group ? group.nameText : '',
+      });
     }),
   );
 
@@ -70,12 +66,10 @@ export class TwinsGroupGalleryComponent {
 
   protected pictureSelected(item: null | Picture) {
     if (item) {
-      setTimeout(() => {
-        this.#pageEnv.set({
-          layout: {isGalleryPage: true},
-          pageId: 28,
-          title: item.nameText,
-        });
+      this.#pageEnv.set({
+        layout: {isGalleryPage: true},
+        pageId: 28,
+        title: item.nameText,
       });
     }
   }

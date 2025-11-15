@@ -5,13 +5,13 @@ import {APIItem} from '@grpc/spec.pb';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY} from 'rxjs';
 import {catchError, switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-moder-items-item-logo',
-  imports: [MarkdownComponent, NgbProgressbar, AsyncPipe, InvalidParamsPipe],
+  imports: [NgbProgressbar, AsyncPipe, InvalidParamsPipe, RemarkModule],
   templateUrl: './logo.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

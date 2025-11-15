@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {HttpClient, HttpErrorResponse, HttpEventType} from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
@@ -35,8 +35,8 @@ import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import Keycloak from 'keycloak-js';
+import {RemarkModule} from 'ngx-remark';
 import {combineLatest, concat, EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap, take, tap} from 'rxjs/operators';
 
@@ -68,7 +68,6 @@ const cropTitle = (image: APIImage | undefined): string => {
 @Component({
   selector: 'app-upload-index',
   imports: [
-    MarkdownComponent,
     FormsModule,
     RouterLink,
     NgbProgressbar,
@@ -76,6 +75,7 @@ const cropTitle = (image: APIImage | undefined): string => {
     InvalidParamsPipe,
     ThumbnailComponent,
     ReactiveFormsModule,
+    RemarkModule,
   ],
   templateUrl: './index.component.html',
   // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
@@ -93,6 +93,7 @@ export class UploadIndexComponent implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #cdr = inject(ChangeDetectorRef);
+  readonly #document = inject(DOCUMENT);
 
   protected files: File[] | undefined;
   protected readonly note = new FormControl<string>('', {nonNullable: true});
@@ -165,13 +166,13 @@ export class UploadIndexComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 29}), 0);
+    this.#pageEnv.set({pageId: 29});
   }
 
   protected doLogin() {
     this.#keycloak.login({
       locale: this.#languageService.language,
-      redirectUri: window.location.href,
+      redirectUri: this.#document.defaultView?.location.href,
     });
   }
 

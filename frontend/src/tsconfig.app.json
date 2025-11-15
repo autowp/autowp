@@ -4,7 +4,9 @@
     "outDir": "../out-tsc/app",
     "baseUrl": "./",
     "module": "esnext",
-    "types": [ "node" ],
+    "types": [
+      "node",
+    ],
     "typeRoots": [ "../node_modules/@types" ],
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
@@ -14,5 +16,11 @@
     "test.ts",
     "environments/*.ts",
     "**/*.spec.ts"
+  ],
+  "files": [
+    "main.server.ts",
+    "server.ts",
+    "main.ts",
+    "polyfills.ts"
   ]
 }

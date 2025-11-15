@@ -10,12 +10,8 @@
 {{- end }}
 {{- end }}
 
-{{- define "autowp.frontend.fullname" -}}
-{{- printf "%s-frontend" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
 {{- define "autowp.imagePullSecrets" -}}
-{{- include "common.images.pullSecrets" (dict "images" (list .Values.frontend.image) "global" .Values.global) -}}
+{{- include "common.images.pullSecrets" (dict "images" (list .Values.frontend.image .Values.goautowp.image) "global" .Values.global) -}}
 {{- end -}}
 
 {{- define "autowp.frontend.image" -}}

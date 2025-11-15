@@ -21,7 +21,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -31,7 +31,7 @@ import {ToastsService} from '../../../toasts/toasts.service';
 
 @Component({
   selector: 'app-persons-person-info',
-  imports: [MarkdownComponent, PaginatorComponent, AsyncPipe, ThumbnailComponent],
+  imports: [PaginatorComponent, AsyncPipe, ThumbnailComponent, RemarkModule],
   templateUrl: './info.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

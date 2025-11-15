@@ -50,13 +50,9 @@ export class ModerUsersComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 203,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 203,
+    });
   }
 }

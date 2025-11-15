@@ -154,6 +154,6 @@ export class UsersRatingComponent implements OnInit {
   protected readonly Rating = Rating;
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 173}), 0);
+    this.#pageEnv.set({pageId: 173});
   }
 }

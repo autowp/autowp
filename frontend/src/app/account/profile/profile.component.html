@@ -10,7 +10,7 @@
 
   <h2 i18n>Photo</h2>
   <div class="card card-body mb-4">
-    <app-markdown i18n-markdown markdown="You can upload photo or use [Gravatar](https://gravatar.com/)" />
+    <remark i18n-markdown markdown="You can upload photo or use [Gravatar](https://gravatar.com/)" />
     @if (photo$ | async; as photo) {
       <div>
         <img alt="" class="mb-4" [src]="photo.src" />

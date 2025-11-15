@@ -1,4 +1,4 @@
-import {AsyncPipe, DatePipe, DecimalPipe} from '@angular/common';
+import {AsyncPipe, DatePipe, DecimalPipe, DOCUMENT} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -44,9 +44,9 @@ import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTool
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable} from 'rxjs';
 import {catchError, filter, map, shareReplay, switchMap} from 'rxjs/operators';
 
@@ -62,7 +62,6 @@ import {PicturePaginatorComponent} from './paginator.component';
   imports: [
     RouterLink,
     ShareComponent,
-    MarkdownComponent,
     UserComponent,
     NgbTooltip,
     NgbDropdown,
@@ -78,6 +77,7 @@ import {PicturePaginatorComponent} from './paginator.component';
     TimeAgoPipe,
     PicturePaginatorComponent,
     PictureModerVoteComponent,
+    RemarkModule,
   ],
   templateUrl: './picture.component.html',
   styleUrl: './picture.component.scss',
@@ -93,6 +93,7 @@ export class PictureComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
   readonly #cdr = inject(ChangeDetectorRef);
+  readonly #document = inject(DOCUMENT);
 
   readonly prefix = input.required<string[]>();
   readonly galleryRoute = input.required<string[]>();
@@ -137,7 +138,7 @@ export class PictureComponent {
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
   protected readonly canEditSpecs$ = this.#auth.authenticated$;
   protected readonly showShareDialog = signal(false);
-  protected readonly location = location;
+  protected readonly location = document.defaultView?.location;
   protected readonly statusLoading = signal(false);
 
   protected readonly authenticated$ = this.#auth.authenticated$;
@@ -212,8 +213,8 @@ export class PictureComponent {
   }
 
   protected openSource(picture: Picture) {
-    if (picture.image) {
-      window.open(picture.image.src);
+    if (picture.image && this.#document.defaultView) {
+      this.#document.defaultView.open(picture.image.src);
     }
   }
 

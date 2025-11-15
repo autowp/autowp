@@ -136,14 +136,10 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 72,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 72,
+    });
   }
 
   protected onMapReady(mapOptions: MapOptions, lmap: Map, form: FormGroup<PointForm>) {

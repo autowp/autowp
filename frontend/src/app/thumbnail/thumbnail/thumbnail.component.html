@@ -38,7 +38,7 @@
             </span>
           }
         }
-        <span i18n-title title="Resolution" class="text-nowrap me-2" ngPreserveWhitespaces>
+        <span i18n-title title="Resolution" class="text-nowrap me-2">
           {{ picture.resolution }}
           @if ((isModer$ | async) && picture.cropped) {
             <i
@@ -51,7 +51,7 @@
           }
         </span>
         @if (picture.views > 0) {
-          <span i18n-title title="Views" class="text-nowrap me-2" ngPreserveWhitespaces>
+          <span i18n-title title="Views" class="text-nowrap me-2">
             <i class="bi bi-eye" aria-hidden="true"></i>
             @if (picture.views >= 1000) {
               <span>{{ picture.views / 1000 | number: '1.0-1' }}K</span>
@@ -61,7 +61,7 @@
           </span>
         }
         @if (picture.votes && picture.votes.positive > 0) {
-          <span class="text-nowrap me-2" ngPreserveWhitespaces>
+          <span class="text-nowrap me-2">
             <i class="bi bi-hand-thumbs-up-fill" aria-hidden="true"></i>
             {{ picture.votes.positive }}
           </span>
@@ -133,7 +133,7 @@
       @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
         <p class="alert alert-warning" role="alert">
           <span class="bi bi-file-earmark-image me-1" aria-hidden="true"></span>
-          <a ngPreserveWhitespaces i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
+          <a i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
             >Similar picture: {{ dfDistance.distance }}</a
           >
         </p>

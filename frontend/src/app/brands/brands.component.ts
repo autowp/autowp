@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {APIBrandsListCharacter, BrandIcons, GetBrandsRequest} from '@grpc/spec.pb';
@@ -12,7 +12,7 @@ import {catchError, shareReplay, tap} from 'rxjs/operators';
 import {ToastsService} from '../toasts/toasts.service';
 import {BrandsItemComponent} from './item/item.component';
 
-function addCSS(url: string) {
+function addCSS(document: Document, url: string) {
   const cssId = 'brands-css';
   if (!document.getElementById(cssId)) {
     const head = document.getElementsByTagName('head')[0];
@@ -37,6 +37,7 @@ export class BrandsComponent implements OnInit {
   readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly items$ = this.#itemsClient
     .getBrands(
@@ -53,17 +54,17 @@ export class BrandsComponent implements OnInit {
 
   protected readonly icons$: Observable<BrandIcons> = this.#itemsClient.getBrandIcons(new Empty()).pipe(
     tap((icons) => {
-      addCSS(icons.css);
+      addCSS(this.#document, icons.css);
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 61}), 0);
+    this.#pageEnv.set({pageId: 61});
   }
 
   protected scrollTo(info: APIBrandsListCharacter) {
-    const element = document.getElementById('char' + info.id);
+    const element = this.#document.getElementById('char' + info.id);
     if (element) {
       element.scrollIntoView({behavior: 'smooth'});
     }

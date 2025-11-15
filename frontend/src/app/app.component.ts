@@ -1,5 +1,6 @@
-import {AsyncPipe, NgClass} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, Renderer2, signal} from '@angular/core';
+import {AsyncPipe, DOCUMENT, NgClass} from '@angular/common';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, Renderer2, signal} from '@angular/core';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {environment} from '@environment/environment';
 import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
@@ -15,10 +16,10 @@ import {
 import {AuthService} from '@services/auth.service';
 import {Language, LanguageService} from '@services/language';
 import {MessageService} from '@services/message';
-import {LayoutParams, PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {PageEnvService} from '@services/page-env.service';
 import {Angulartics2GoogleAnalytics} from 'angulartics2';
 import Keycloak from 'keycloak-js';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable} from 'rxjs';
 import {catchError, map, shareReplay} from 'rxjs/operators';
 
@@ -40,9 +41,9 @@ import {UsersOnlineComponent} from './users/online/online.component';
     NgClass,
     RouterOutlet,
     NgbTooltip,
-    MarkdownComponent,
     ContainerComponent,
     AsyncPipe,
+    RemarkModule,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -52,16 +53,17 @@ export class AppComponent {
   readonly #auth = inject(AuthService);
   protected readonly router = inject(Router);
   readonly #messageService = inject(MessageService);
-  readonly #pageEnv = inject(PageEnvService);
+  protected readonly pageEnv = inject(PageEnvService);
   readonly #languageService = inject(LanguageService);
   readonly #modalService = inject(NgbModal);
   readonly #renderer = inject(Renderer2);
   readonly #keycloak = inject(Keycloak);
   readonly #itemsClient = inject(ItemsClient);
   readonly #toastService = inject(ToastsService);
+  readonly #document = inject(DOCUMENT);
+  readonly #destroyRef = inject(DestroyRef);
 
   protected readonly languages: Language[] = environment.languages;
-  protected readonly layoutParams$: Observable<LayoutParams> = this.#pageEnv.layoutParams$.asObservable();
   protected readonly authenticated$: Observable<boolean> = this.#auth.authenticated$;
   protected readonly newPersonalMessages$ = this.#messageService
     .getNew$()
@@ -99,13 +101,15 @@ export class AppComponent {
   constructor() {
     const angulartics2GoogleAnalytics = inject(Angulartics2GoogleAnalytics);
 
-    this.layoutParams$.subscribe((params) => {
-      if (params.isGalleryPage) {
-        this.#renderer.addClass(document.body, 'gallery');
-      } else {
-        this.#renderer.removeClass(document.body, 'gallery');
-      }
-    });
+    toObservable(this.pageEnv.layoutParams)
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe((params) => {
+        if (params.isGalleryPage) {
+          this.#renderer.addClass(this.#document.body, 'gallery');
+        } else {
+          this.#renderer.removeClass(this.#document.body, 'gallery');
+        }
+      });
 
     let searchHostname = 'wheelsage.org';
     for (const itemLanguage of this.languages) {
@@ -122,10 +126,12 @@ export class AppComponent {
   }
 
   protected doLogin() {
-    this.#keycloak.login({
-      locale: this.#languageService.language,
-      redirectUri: window.location.href,
-    });
+    if (this.#document.defaultView) {
+      this.#keycloak.login({
+        locale: this.#languageService.language,
+        redirectUri: this.#document.defaultView.location.href,
+      });
+    }
   }
 
   protected signOut() {

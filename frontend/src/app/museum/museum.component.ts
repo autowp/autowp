@@ -20,8 +20,8 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import {icon, latLng, marker, tileLayer} from 'leaflet';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -31,7 +31,7 @@ import {ToastsService} from '../toasts/toasts.service';
 
 @Component({
   selector: 'app-museum',
-  imports: [RouterLink, LeafletModule, MarkdownComponent, CommentsComponent, AsyncPipe, ThumbnailComponent],
+  imports: [RouterLink, LeafletModule, CommentsComponent, AsyncPipe, ThumbnailComponent, RemarkModule],
   templateUrl: './museum.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -17,8 +17,8 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import {icon, latLng, Marker, marker, tileLayer} from 'leaflet';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -27,7 +27,7 @@ import {ToastsService} from '../toasts/toasts.service';
 
 @Component({
   selector: 'app-factories',
-  imports: [RouterLink, LeafletModule, MarkdownComponent, AsyncPipe, ThumbnailComponent],
+  imports: [RouterLink, LeafletModule, AsyncPipe, ThumbnailComponent, RemarkModule],
   templateUrl: './factories.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

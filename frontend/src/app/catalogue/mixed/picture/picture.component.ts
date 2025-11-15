@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   APIItem,
@@ -22,6 +23,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
+import {StatusCode} from '../../../../grpc-web-client/statuscode';
 import {CommentsComponent} from '../../../comments/comments/comments.component';
 import {PictureComponent} from '../../../picture/picture.component';
 import {BrandPerspectivePageData} from '../../catalogue.module';
@@ -35,6 +37,7 @@ import {BrandPerspectivePageData} from '../../catalogue.module';
 export class CatalogueMixedPictureComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
+  readonly #meta = inject(Meta);
   readonly #router = inject(Router);
   readonly #itemsClient = inject(ItemsClient);
   readonly #picturesClient = inject(PicturesClient);
@@ -52,6 +55,7 @@ export class CatalogueMixedPictureComponent {
       if (!catname) {
         return EMPTY;
       }
+
       return this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({
@@ -148,7 +152,7 @@ export class CatalogueMixedPictureComponent {
         )
         .pipe(
           catchError((error: unknown) => {
-            if (error instanceof GrpcStatusEvent && error.statusCode == 5) {
+            if (error instanceof GrpcStatusEvent && error.statusCode == StatusCode.NOT_FOUND) {
               // NOT_FOUND
               return of(null);
             }
@@ -165,6 +169,10 @@ export class CatalogueMixedPictureComponent {
             return of(picture);
           }),
           tap((picture) => {
+            this.#meta.addTag({property: 'og:title', content: picture.nameText});
+            if (picture.previewLarge) {
+              this.#meta.addTag({property: 'og:image', content: picture.previewLarge.src});
+            }
             this.#pageEnv.set({
               pageId: data.picture_page.id,
               title: picture.nameText,

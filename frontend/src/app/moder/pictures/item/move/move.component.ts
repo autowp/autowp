@@ -391,12 +391,10 @@ export class ModerPicturesItemMoveComponent implements OnInit {
   protected readonly PictureItemType = PictureItemType;
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.#pageEnv.set({
-        layout: {isAdminPage: true},
-        pageId: 149,
-      });
-    }, 0);
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 149,
+    });
   }
 
   protected selectItem({selection, src: {id, srcItemID, srcType}}: SelectItemParams) {

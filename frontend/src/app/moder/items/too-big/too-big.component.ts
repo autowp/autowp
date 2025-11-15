@@ -31,13 +31,9 @@ export class ModerItemsTooBigComponent implements OnInit {
     .pipe(map((response) => response.items || []));
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 131,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 131,
+    });
   }
 }

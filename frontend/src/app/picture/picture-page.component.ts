@@ -1,6 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CanonicalRouteRequest,
@@ -29,6 +30,7 @@ import {PictureComponent} from './picture.component';
 export class PicturePageComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
+  readonly #meta = inject(Meta);
   readonly #router = inject(Router);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
@@ -102,6 +104,10 @@ export class PicturePageComponent {
       );
     }),
     tap((picture) => {
+      this.#meta.addTag({property: 'og:title', content: picture.nameText});
+      if (picture.previewLarge) {
+        this.#meta.addTag({property: 'og:image', content: picture.previewLarge.src});
+      }
       this.#pageEnv.set({
         pageId: 187,
         title: picture ? picture.nameText : '',

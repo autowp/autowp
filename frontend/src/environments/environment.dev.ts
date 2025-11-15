@@ -1,6 +1,8 @@
 export const environment = {
-  apiUrl: window.location.protocol + '//' + window.location.hostname,
+  apiUrl: '',
   grpcHost: '',
+  // eslint-disable-next-line sonarjs/no-clear-text-protocols
+  ssrGrpcHost: 'http://goautowp-serve:8080',
   keycloak: {
     clientId: 'frontend',
     realm: 'autowp',

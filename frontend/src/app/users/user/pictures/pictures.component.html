@@ -26,7 +26,7 @@
             [ngStyle]="{'background-image': 'url(' + icons.image + ')'}"
           ></a>
         }
-        <h4 ngPreserveWhitespaces>
+        <h4>
           <a [routerLink]="['/users', user.identity, 'pictures', brand.catname]" [textContent]="brand.nameOnly"></a>
           <small>({{ brand.descendantPicturesCount }})</small>
         </h4>

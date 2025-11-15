@@ -2,7 +2,7 @@
   @if (links$ | async; as links) {
     @if (links.length > 0 || item.description) {
       <div class="card card-body mb-4">
-        <app-markdown [markdown]="item.description" />
+        <remark [markdown]="item.description" />
         @if (links.length > 0) {
           <p>
             <ng-container i18n>Web-site:</ng-container>

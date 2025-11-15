@@ -1,4 +1,4 @@
-@if (!(layoutParams$ | async)?.isGalleryPage) {
+@if (!pageEnv.layoutParams().isGalleryPage) {
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item">
@@ -14,7 +14,7 @@
 <div class="row">
   @if (group$ | async; as group) {
     <div class="col-sm-8 order-2">
-      @if (!(layoutParams$ | async)?.isGalleryPage) {
+      @if (!pageEnv.layoutParams().isGalleryPage) {
         @if (group) {
           <div class="page-header mb-4">
             <h1 [innerHTML]="group.nameHtml"></h1>
@@ -49,7 +49,7 @@
       <router-outlet />
     </div>
   }
-  @if (!(layoutParams$ | async)?.isGalleryPage) {
+  @if (!pageEnv.layoutParams().isGalleryPage) {
     <div class="col-sm-4 order-1">
       @if (selectedBrands$ | async; as selectedBrands) {
         <app-twins-sidebar [selected]="selectedBrands" />

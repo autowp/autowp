@@ -46,13 +46,14 @@ import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
+import {RemarkModule} from 'ngx-remark';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 import {sprintf} from 'sprintf-js';
 
+import {StatusCode} from '../../../../grpc-web-client/statuscode';
 import {MarkdownEditComponent} from '../../../markdown-edit/markdown-edit/markdown-edit.component';
 import {PictureModerVoteComponent} from '../../../picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
 import {ToastsService} from '../../../toasts/toasts.service';
@@ -75,7 +76,6 @@ interface LastItemInfo {
     NgbDropdownMenu,
     NgbProgressbar,
     FormsModule,
-    MarkdownComponent,
     MarkdownEditComponent,
     UserComponent,
     AsyncPipe,
@@ -84,6 +84,7 @@ interface LastItemInfo {
     NgDatePipesModule,
     TimeAgoPipe,
     PictureModerVoteComponent,
+    RemarkModule,
   ],
   templateUrl: './item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -114,12 +115,10 @@ export class ModerPicturesItemComponent {
     map((params) => params.get('id') ?? ''),
     distinctUntilChanged(),
     tap((id) => {
-      setTimeout(() => {
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 72,
-          title: $localize`Picture №${id}`,
-        });
+      this.#pageEnv.set({
+        layout: {isAdminPage: true},
+        pageId: 72,
+        title: $localize`Picture №${id}`,
       });
     }),
     shareReplay({bufferSize: 1, refCount: false}),
@@ -225,8 +224,7 @@ export class ModerPicturesItemComponent {
         )
         .pipe(
           catchError((error: unknown) => {
-            if (error instanceof GrpcStatusEvent && error.statusCode == 5) {
-              // NOT_FOUND
+            if (error instanceof GrpcStatusEvent && error.statusCode == StatusCode.NOT_FOUND) {
               return of(null);
             }
             console.error(error);

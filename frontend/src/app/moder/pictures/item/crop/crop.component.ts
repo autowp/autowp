@@ -1,3 +1,4 @@
+import {DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Picture, PictureFields, PictureListOptions, PicturesRequest, SetPictureCropRequest} from '@grpc/spec.pb';
@@ -30,6 +31,7 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
   readonly #cdr = inject(ChangeDetectorRef);
+  readonly #document = inject(DOCUMENT);
 
   #routeSub?: Subscription;
   protected aspect = '';
@@ -46,14 +48,10 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
   protected readonly img$ = new BehaviorSubject<HTMLImageElement | null>(null);
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 148,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 148,
+    });
     this.#routeSub = this.#route.paramMap
       .pipe(
         map((params) => params.get('id') ?? ''),
@@ -95,8 +93,9 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
             };
           }
 
-          const styles = window.getComputedStyle(body, null);
-          const bWidth = body.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight) || 1;
+          const styles = this.#document.defaultView?.getComputedStyle(body, null);
+          const bWidth =
+            body.clientWidth - parseFloat(styles?.paddingLeft ?? '0') - parseFloat(styles?.paddingRight ?? '0') || 1;
 
           const scale = this.picture.width / bWidth;
           const width = this.picture.width / scale;

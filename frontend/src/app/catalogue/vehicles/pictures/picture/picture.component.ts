@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   APIItem,
@@ -32,6 +33,7 @@ import {CatalogueService} from '../../../catalogue-service';
 })
 export class CatalogueVehiclesPicturesPictureComponent {
   readonly #pageEnv = inject(PageEnvService);
+  readonly #meta = inject(Meta);
   readonly #route = inject(ActivatedRoute);
   readonly #catalogueService = inject(CatalogueService);
   readonly #router = inject(Router);
@@ -162,6 +164,10 @@ export class CatalogueVehiclesPicturesPictureComponent {
       return of(picture);
     }),
     tap((picture) => {
+      this.#meta.addTag({property: 'og:title', content: picture.nameText});
+      if (picture.previewLarge) {
+        this.#meta.addTag({property: 'og:image', content: picture.previewLarge.src});
+      }
       this.#pageEnv.set({
         pageId: 34,
         title: picture.nameText,

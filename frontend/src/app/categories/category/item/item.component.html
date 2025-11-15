@@ -1,6 +1,6 @@
 @if (current$ | async; as current) {
   @if (current.description && current.description.length > 0) {
-    <app-markdown [markdown]="current.description" />
+    <remark [markdown]="current.description" />
   }
 } @else {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>

@@ -7,7 +7,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
@@ -16,7 +16,7 @@ import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
   selector: 'app-account-delete',
-  imports: [MarkdownComponent, FormsModule, InvalidParamsPipe],
+  imports: [FormsModule, InvalidParamsPipe, RemarkModule],
   templateUrl: './delete.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,7 +33,7 @@ export class AccountDeleteComponent implements OnInit {
   protected readonly invalidParams = signal<InvalidParams>({});
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 137}), 0);
+    this.#pageEnv.set({pageId: 137});
   }
 
   protected submit() {

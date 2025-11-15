@@ -34,6 +34,6 @@ export class AccountEmailComponent implements OnInit {
     environment.keycloak.url + '/realms/' + environment.keycloak.realm + '/account/#/personal-info';
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 55}), 0);
+    this.#pageEnv.set({pageId: 55});
   }
 }

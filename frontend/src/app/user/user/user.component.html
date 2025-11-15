@@ -1,11 +1,5 @@
 @if (user(); as user) {
-  <span
-    class="user"
-    ngPreserveWhitespaces
-    [class.muted]="user.deleted"
-    [class.long-away]="user.longAway"
-    [class.green-man]="user.green"
-  >
+  <span class="user" [class.muted]="user.deleted" [class.long-away]="user.longAway" [class.green-man]="user.green">
     <i class="bi bi-person-fill" aria-hidden="true"></i>
     @if (user.deleted) {
       <span i18n>deleted user</span>

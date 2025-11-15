@@ -1,4 +1,4 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -60,6 +60,7 @@ export class UsersUserComponent {
   readonly #commentsClient = inject(CommentsClient);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly banPeriods = [
     {name: $localize`hour`, value: 1},
@@ -107,14 +108,10 @@ export class UsersUserComponent {
         return EMPTY;
       }
 
-      setTimeout(
-        () =>
-          this.#pageEnv.set({
-            pageId: 62,
-            title: user.name,
-          }),
-        0,
-      );
+      this.#pageEnv.set({
+        pageId: 62,
+        title: user.name,
+      });
 
       return of(user);
     }),
@@ -265,7 +262,7 @@ export class UsersUserComponent {
   }
 
   protected deletePhoto(user: APIUser) {
-    if (!window.confirm('Are you sure?')) {
+    if (!this.#document.defaultView?.confirm('Are you sure?')) {
       return;
     }
 
@@ -278,7 +275,7 @@ export class UsersUserComponent {
   }
 
   protected deleteUser(user: APIUser) {
-    if (!window.confirm('Are you sure?')) {
+    if (!this.#document.defaultView?.confirm('Are you sure?')) {
       return;
     }
     this.#usersGrpc

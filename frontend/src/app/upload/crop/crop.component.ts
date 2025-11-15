@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -34,6 +34,7 @@ interface JcropCrop {
 export class UploadCropComponent implements OnDestroy, OnInit {
   protected readonly activeModal = inject(NgbActiveModal);
   readonly #cdr = inject(ChangeDetectorRef);
+  readonly #document = inject(DOCUMENT);
 
   readonly changed = output<void>();
 
@@ -80,8 +81,9 @@ export class UploadCropComponent implements OnDestroy, OnInit {
           };
         }
 
-        const styles = window.getComputedStyle(body, null);
-        const bWidth = body.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight) || 1;
+        const styles = this.#document.defaultView?.getComputedStyle(body, null);
+        const bWidth =
+          body.clientWidth - parseFloat(styles?.paddingLeft ?? '0') - parseFloat(styles?.paddingRight ?? '0') || 1;
 
         const scale = picture.width / bWidth;
         const width = picture.width / scale;

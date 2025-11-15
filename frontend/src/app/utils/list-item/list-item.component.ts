@@ -5,11 +5,11 @@ import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {APIImage, APIItem, APIUser, Design, ItemType, Picture} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
+import {RemarkModule} from 'ngx-remark';
 import {Observable} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 import {ItemHeaderComponent} from '../item-header/item-header.component';
-import {MarkdownComponent} from '../markdown/markdown.component';
 
 export interface CatalogueListItem {
   acceptedPicturesCount: number | undefined;
@@ -48,7 +48,7 @@ export interface CatalogueListItemPicture {
 
 @Component({
   selector: 'app-catalogue-list-item',
-  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe, UserComponent],
+  imports: [ItemHeaderComponent, RouterLink, AsyncPipe, UserComponent, RemarkModule],
   templateUrl: './list-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

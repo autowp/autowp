@@ -24,6 +24,7 @@ import {getItemTypeTranslation} from '@utils/translations';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
+import {StatusCode} from '../../../../grpc-web-client/statuscode';
 import {ToastsService} from '../../../toasts/toasts.service';
 import {ModerItemsItemCatalogueComponent} from './catalogue/catalogue.component';
 import {ModerItemsItemLinksComponent} from './links/links.component';
@@ -224,8 +225,7 @@ export class ModerItemsItemComponent {
       ),
     ),
     catchError((error: unknown) => {
-      if (error instanceof GrpcStatusEvent && error.statusCode == 5) {
-        // NOT_FOUND
+      if (error instanceof GrpcStatusEvent && error.statusCode == StatusCode.NOT_FOUND) {
         return of(undefined);
       }
       console.error(error);

@@ -4,7 +4,7 @@
       @for (language of languages; track language.language) {
         <li [ngbNavItem]="language.language">
           <a ngbNavLink>
-            {{ language.language.toUpperCase() }}
+            {{ language.language | uppercase }}
             @if (language.name || language.text || language.fullText) {
               <span class="badge rounded-pill text-bg-secondary">
                 {{

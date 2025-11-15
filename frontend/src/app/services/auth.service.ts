@@ -1,3 +1,4 @@
+import {DOCUMENT} from '@angular/common';
 import {inject, Injectable} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {APIMeRequest, APIUser} from '@grpc/spec.pb';
@@ -24,7 +25,7 @@ export enum Role {
 export class AuthService {
   readonly #keycloak = inject(Keycloak);
   readonly #usersClient = inject(UsersClient);
-
+  readonly #document = inject(DOCUMENT);
   readonly #keycloakSignal = inject(KEYCLOAK_EVENT_SIGNAL);
 
   readonly #token$ = toObservable(this.#keycloakSignal).pipe(
@@ -77,7 +78,7 @@ export class AuthService {
   );
 
   public signOut$(): Observable<void> {
-    return from(this.#keycloak.logout({redirectUri: window.location.href}));
+    return from(this.#keycloak.logout({redirectUri: this.#document.defaultView?.location.href}));
   }
 
   public hasRole$(role: Role): Observable<boolean> {

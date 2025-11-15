@@ -23,6 +23,30 @@ spec:
         - name: tmp
           emptyDir: {}
       containers:
+        - name: frontend
+          image: {{ include "autowp.frontend.image" . }}
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy | quote }}
+          ports:
+            - name: frontend-port
+              containerPort: 4000
+          livenessProbe:
+            tcpSocket:
+              port: frontend-port
+            initialDelaySeconds: 3
+          readinessProbe:
+            tcpSocket:
+              port: frontend-port
+            initialDelaySeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+          resources:
+            limits:
+              memory: 5Gi
+              cpu: 4000m
+            requests:
+              memory: 10M
+              cpu: 50m
         - name: goautowp-serve
           image: {{ include "autowp.goautowp.image" . }}
           imagePullPolicy: {{ .Values.goautowp.image.pullPolicy | quote }}
@@ -61,11 +85,11 @@ spec:
             runAsUser: 101
           readinessProbe:
             tcpSocket:
-              port: 8082
+              port: grpc-port
             initialDelaySeconds: 3
           livenessProbe:
             tcpSocket:
-              port: 8082
+              port: grpc-port
             initialDelaySeconds: 3
       affinity:
         podAntiAffinity:

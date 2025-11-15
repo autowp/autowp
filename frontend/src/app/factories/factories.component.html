@@ -35,9 +35,9 @@
   }
 
   @if (factory.fullText) {
-    <app-markdown class="card card-body" [markdown]="factory.fullText" />
+    <remark class="card card-body" [markdown]="factory.fullText" />
   } @else if (factory.description) {
-    <app-markdown class="card card-body" [markdown]="factory.description" />
+    <remark class="card card-body" [markdown]="factory.description" />
   }
 }
 

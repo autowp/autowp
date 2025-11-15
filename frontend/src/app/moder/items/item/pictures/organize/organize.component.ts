@@ -20,7 +20,7 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {ItemService} from '@services/item';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams} from '@utils/invalid-params.pipe';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY, forkJoin, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
 
@@ -34,7 +34,7 @@ import {
 
 @Component({
   selector: 'app-moder-items-item-pictures-organize',
-  imports: [RouterLink, MarkdownComponent, AsyncPipe, ItemMetaFormComponent],
+  imports: [RouterLink, AsyncPipe, ItemMetaFormComponent, RemarkModule],
   templateUrl: './organize.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -120,12 +120,10 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.#pageEnv.set({
-        layout: {isAdminPage: true},
-        pageId: 78,
-      });
-    }, 0);
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 78,
+    });
   }
 
   protected submit(item: APIItem, event: ItemMetaFormResult, pictures: PictureItem[]) {

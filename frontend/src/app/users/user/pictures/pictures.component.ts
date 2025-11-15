@@ -1,4 +1,4 @@
-import {AsyncPipe, NgClass, NgStyle} from '@angular/common';
+import {AsyncPipe, DOCUMENT, NgClass, NgStyle} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -22,7 +22,7 @@ import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switch
 
 import {ToastsService} from '../../../toasts/toasts.service';
 
-function addCSS(url: string) {
+function addCSS(document: Document, url: string) {
   const cssId = 'brands-css';
   if (!document.getElementById(cssId)) {
     const head = document.getElementsByTagName('head')[0];
@@ -49,10 +49,11 @@ export class UsersUserPicturesComponent implements OnInit {
   readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly icons$ = this.#itemsClient.getBrandIcons(new Empty()).pipe(
     tap((icons) => {
-      addCSS(icons.css);
+      addCSS(this.#document, icons.css);
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
@@ -113,9 +114,7 @@ export class UsersUserPicturesComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.#pageEnv.set({pageId: 63});
-    }, 0);
+    this.#pageEnv.set({pageId: 63});
   }
 
   protected cssClass(item: APIItem) {

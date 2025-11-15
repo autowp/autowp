@@ -30,6 +30,6 @@ export class InfoSpecComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 174}), 0);
+    this.#pageEnv.set({pageId: 174});
   }
 }

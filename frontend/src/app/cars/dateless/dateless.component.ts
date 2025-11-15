@@ -80,6 +80,6 @@ export class CarsDatelessComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 1}), 0);
+    this.#pageEnv.set({pageId: 1});
   }
 }

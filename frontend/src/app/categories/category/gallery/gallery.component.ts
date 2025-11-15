@@ -50,13 +50,11 @@ export class CategoryGalleryComponent implements OnInit {
     );
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.#pageEnv.set({
-        layout: {isGalleryPage: true},
-        pageId: 187,
-        title: '', // data.picture.name_text,
-      });
-    }, 0);
+    this.#pageEnv.set({
+      layout: {isGalleryPage: true},
+      pageId: 187,
+      title: '', // data.picture.name_text,
+    });
   }
 
   protected currentRouterLinkPrefix(
@@ -77,13 +75,11 @@ export class CategoryGalleryComponent implements OnInit {
 
   protected pictureSelected(item: null | Picture) {
     if (item) {
-      setTimeout(() => {
-        this.#pageEnv.set({
-          layout: {isGalleryPage: true},
-          pageId: 187,
-          title: item.nameText,
-        });
-      }, 0);
+      this.#pageEnv.set({
+        layout: {isGalleryPage: true},
+        pageId: 187,
+        title: item.nameText,
+      });
     }
   }
 }

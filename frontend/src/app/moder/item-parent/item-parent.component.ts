@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, UpperCasePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -34,7 +34,7 @@ interface LanguageItem {
 
 @Component({
   selector: 'app-moder-item-parent',
-  imports: [RouterLink, FormsModule, InvalidParamsPipe, AsyncPipe],
+  imports: [RouterLink, FormsModule, InvalidParamsPipe, AsyncPipe, UpperCasePipe],
   templateUrl: './item-parent.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

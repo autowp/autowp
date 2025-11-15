@@ -1,5 +1,5 @@
 @if (ratingCatnameNormalized$ | async; as ratingCatname) {
-  <h1 class="mb-4 mosts-header" ngPreserveWhitespaces>
+  <h1 class="mb-4 mosts-header">
     <span i18n>Most</span>
     @if (ratings$ | async; as ratings) {
       <div class="d-inline-block" ngbDropdown>
@@ -127,12 +127,12 @@
               </div>
             }
           </div>
-          @if (item.item?.description) {
-            <app-markdown [markdown]="item.item?.description || null" />
+          @if (item.item?.description; as description) {
+            <remark [markdown]="description" />
           }
         </div>
         <div class="col-md-3">
-          <h3 ngPreserveWhitespaces>
+          <h3>
             @if (item.valueHtml) {
               <span [innerHTML]="item.valueHtml"></span>
             }

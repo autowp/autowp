@@ -31,14 +31,10 @@ export class ModerPerspectivesComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 202,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 202,
+    });
   }
 
   protected getPerspectiveTranslation(id: string): string {

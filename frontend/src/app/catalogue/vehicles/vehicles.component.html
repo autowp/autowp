@@ -79,11 +79,11 @@
   }
   @if (item.fullText) {
     <div class="text">
-      <app-markdown [markdown]="item.fullText" />
+      <remark [markdown]="item.fullText" />
     </div>
   } @else if (item.description) {
     <div class="text">
-      <app-markdown [markdown]="item.description" />
+      <remark [markdown]="item.description" />
     </div>
   }
 } @else {

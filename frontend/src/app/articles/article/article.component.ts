@@ -8,6 +8,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {EMPTY, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
 
+import {StatusCode} from '../../../grpc-web-client/statuscode';
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
@@ -46,7 +47,7 @@ export class ArticlesArticleComponent {
       return article;
     }),
     catchError((response: unknown) => {
-      if (response instanceof GrpcStatusEvent && response.statusCode === 5) {
+      if (response instanceof GrpcStatusEvent && response.statusCode === StatusCode.NOT_FOUND) {
         this.#router.navigate(['/error-404'], {
           skipLocationChange: true,
         });

@@ -5,7 +5,6 @@ import {
   Component,
   computed,
   ElementRef,
-  HostListener,
   inject,
   input,
   signal,
@@ -76,6 +75,9 @@ function maxBounds(bounds: Dimension, max: Dimension): Dimension {
   templateUrl: './carousel-item.component.html',
   styleUrl: './carousel-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(window:resize)': 'onResize()',
+  },
 })
 export class CarouselItemComponent implements AfterViewInit {
   readonly #el: ElementRef<HTMLElement> = inject(ElementRef);
@@ -284,7 +286,6 @@ export class CarouselItemComponent implements AfterViewInit {
     this.onResize();
   }
 
-  @HostListener('window:resize')
   protected onResize() {
     if (!this.#el) {
       console.debug('this.el is undefined', this.#el);

@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
   CommentsType,
@@ -30,6 +31,7 @@ import {PictureComponent} from '../../../../picture/picture.component';
 export class TwinsGroupPictureComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
+  readonly #meta = inject(Meta);
   readonly #router = inject(Router);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
@@ -113,14 +115,14 @@ export class TwinsGroupPictureComponent {
       return of(picture);
     }),
     tap((picture) => {
-      setTimeout(
-        () =>
-          this.#pageEnv.set({
-            pageId: 28,
-            title: picture.nameText,
-          }),
-        0,
-      );
+      this.#meta.addTag({property: 'og:title', content: picture.nameText});
+      if (picture.previewLarge) {
+        this.#meta.addTag({property: 'og:image', content: picture.previewLarge.src});
+      }
+      this.#pageEnv.set({
+        pageId: 28,
+        title: picture.nameText,
+      });
     }),
   );
 

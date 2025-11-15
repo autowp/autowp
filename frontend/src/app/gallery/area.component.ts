@@ -1,5 +1,5 @@
-import {NgStyle} from '@angular/common';
-import {AfterViewInit, ChangeDetectionStrategy, Component, computed, HostListener, input, signal} from '@angular/core';
+import {DOCUMENT, NgStyle} from '@angular/common';
+import {AfterViewInit, ChangeDetectionStrategy, Component, computed, inject, input, signal} from '@angular/core';
 import {PictureItem} from '@grpc/spec.pb';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 
@@ -9,8 +9,13 @@ import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './area.component.html',
   styleUrl: './area.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(window:resize)': 'onResize()',
+  },
 })
 export class AreaComponent implements AfterViewInit {
+  readonly #document = inject(DOCUMENT);
+
   readonly styles = input.required<Record<string, number> | undefined>({});
   readonly area = input.required<PictureItem>();
 
@@ -31,8 +36,7 @@ export class AreaComponent implements AfterViewInit {
     this.onResize();
   }
 
-  @HostListener('window:resize')
   protected onResize() {
-    this.#windowHeight.set(window.innerHeight);
+    this.#windowHeight.set(this.#document.defaultView?.innerHeight ?? 0);
   }
 }

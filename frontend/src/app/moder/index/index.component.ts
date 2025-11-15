@@ -15,13 +15,9 @@ export class ModerIndexComponent implements AfterViewInit {
   protected readonly ItemType = ItemType;
 
   ngAfterViewInit() {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 67,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 67,
+    });
   }
 }

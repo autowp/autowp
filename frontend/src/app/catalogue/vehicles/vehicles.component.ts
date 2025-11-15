@@ -32,8 +32,8 @@ import {
   CatalogueListItemComponent,
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import {getItemTypeTranslation} from '@utils/translations';
+import {RemarkModule} from 'ngx-remark';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -48,10 +48,10 @@ import {CatalogueItemMenuComponent} from '../item-menu/item-menu.component';
     RouterLink,
     ItemHeaderComponent,
     CatalogueItemMenuComponent,
-    MarkdownComponent,
     PaginatorComponent,
     AsyncPipe,
     CatalogueListItemComponent,
+    RemarkModule,
   ],
   templateUrl: './vehicles.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

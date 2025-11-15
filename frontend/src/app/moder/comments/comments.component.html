@@ -98,7 +98,7 @@
       </h2>
       <ul class="comments">
         @for (comment of data.comments; track comment.comment.id) {
-          <li ngPreserveWhitespaces>
+          <li>
             @if (comment.comment.isNew) {
               <span class="badge text-bg-warning text-dark" i18n>not readed</span>
             }

@@ -8,8 +8,8 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import {getForumsThemeTranslation} from '@utils/translations';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable} from 'rxjs';
 import {catchError, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
 
@@ -18,7 +18,7 @@ import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
   selector: 'app-forums-new-topic',
-  imports: [RouterLink, FormsModule, MarkdownComponent, AsyncPipe, InvalidParamsPipe],
+  imports: [RouterLink, FormsModule, AsyncPipe, InvalidParamsPipe, RemarkModule],
   templateUrl: './new-topic.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -53,9 +53,7 @@ export class ForumsNewTopicComponent implements OnInit {
   protected readonly authenticated$: Observable<boolean> = this.auth.authenticated$;
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.#pageEnv.set({pageId: 45});
-    }, 0);
+    this.#pageEnv.set({pageId: 45});
   }
 
   protected submit(theme: Theme) {

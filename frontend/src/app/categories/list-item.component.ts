@@ -5,7 +5,7 @@ import {RouterLink} from '@angular/router';
 import {APIImage, APIItem, ItemType, Picture} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 
@@ -17,7 +17,7 @@ interface PictureThumbRoute {
 
 @Component({
   selector: 'app-categories-list-item',
-  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe],
+  imports: [ItemHeaderComponent, RouterLink, AsyncPipe, RemarkModule],
   templateUrl: './list-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

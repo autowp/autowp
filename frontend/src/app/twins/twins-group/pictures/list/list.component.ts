@@ -64,14 +64,10 @@ export class TwinsGroupPicturesListComponent {
       );
     }),
     tap((group) => {
-      setTimeout(
-        () =>
-          this.#pageEnv.set({
-            pageId: 28,
-            title: $localize`All pictures of ${group.nameText}`,
-          }),
-        0,
-      );
+      this.#pageEnv.set({
+        pageId: 28,
+        title: $localize`All pictures of ${group.nameText}`,
+      });
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );

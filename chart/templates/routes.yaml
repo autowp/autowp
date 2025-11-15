@@ -24,9 +24,9 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "autowp.frontend.fullname" $ | quote }}
+                name: {{ include "autowp.goautowp.serve.fullname" . | quote }}
                 port:
-                  name: app-port
+                  name: frontend-port
     {{- end }}
 {{- end }}
 
@@ -174,7 +174,7 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.frontend.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" . | quote }}
               port:
                 name: app-port
   {{- end }}

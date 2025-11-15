@@ -85,16 +85,14 @@ export class TwinsComponent implements OnInit {
         .pipe(map((response) => (response?.items && response.items.length > 0 ? response.items[0] : null)));
     }),
     tap((brand) => {
-      setTimeout(() => {
-        if (brand) {
-          this.#pageEnv.set({
-            pageId: 153,
-            title: brand.nameOnly,
-          });
-        } else {
-          this.#pageEnv.set({pageId: 25});
-        }
-      }, 0);
+      if (brand) {
+        this.#pageEnv.set({
+          pageId: 153,
+          title: brand.nameOnly,
+        });
+      } else {
+        this.#pageEnv.set({pageId: 25});
+      }
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
@@ -168,12 +166,6 @@ export class TwinsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          pageId: 25,
-        }),
-      0,
-    );
+    this.#pageEnv.set({pageId: 25});
   }
 }

@@ -14,7 +14,7 @@ import {
 } from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap, take, tap} from 'rxjs/operators';
 
@@ -25,7 +25,7 @@ import {CommentsListComponent} from '../list/list.component';
 
 @Component({
   selector: 'app-comments',
-  imports: [CommentsListComponent, PaginatorComponent, CommentsFormComponent, MarkdownComponent, AsyncPipe],
+  imports: [CommentsListComponent, PaginatorComponent, CommentsFormComponent, AsyncPipe, RemarkModule],
   templateUrl: './comments.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

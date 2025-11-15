@@ -62,14 +62,10 @@ export class TwinsGroupSpecificationsComponent {
       ),
     ),
     tap((group) => {
-      setTimeout(
-        () =>
-          this.#pageEnv.set({
-            pageId: 27,
-            title: $localize`Specifications of ${group.nameText}`,
-          }),
-        0,
-      );
+      this.#pageEnv.set({
+        pageId: 27,
+        title: $localize`Specifications of ${group.nameText}`,
+      });
     }),
   );
 }

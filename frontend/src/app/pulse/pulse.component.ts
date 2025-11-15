@@ -102,7 +102,7 @@ export class PulseComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 161}), 0);
+    this.#pageEnv.set({pageId: 161});
   }
 
   protected selectPeriod(period: Period) {

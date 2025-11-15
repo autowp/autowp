@@ -6,6 +6,7 @@
     "wheelsage": {
       "root": "",
       "sourceRoot": "src",
+      "prefix": "app",
       "projectType": "application",
       "i18n": {
         "sourceLocale": {
@@ -122,7 +123,12 @@
               "it",
               "he"
             ],
-            "browser": "src/main.ts"
+            "browser": "src/main.ts",
+            "server": "src/main.server.ts",
+            "outputMode": "server",
+            "ssr": {
+              "entry": "src/server.ts"
+            }
           },
           "configurations": {
             "serve": {

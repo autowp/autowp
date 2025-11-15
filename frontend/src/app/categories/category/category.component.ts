@@ -28,7 +28,7 @@ export interface CategoryPathItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesCategoryComponent {
-  readonly #pageEnv = inject(PageEnvService);
+  protected pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
   readonly #auth = inject(AuthService);
   readonly #categoriesService = inject(CategoriesService);
@@ -40,12 +40,10 @@ export class CategoriesCategoryComponent {
 
   readonly #categoryData$ = this.#categoriesService.categoryPipe$(this.#route).pipe(
     tap(({current}) => {
-      setTimeout(() => {
-        this.#pageEnv.set({
-          pageId: 22,
-          title: current?.nameText,
-        });
-      }, 0);
+      this.pageEnv.set({
+        pageId: 22,
+        title: current?.nameText,
+      });
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
@@ -78,8 +76,6 @@ export class CategoriesCategoryComponent {
     ),
     shareReplay({bufferSize: 1, refCount: false}),
   );
-
-  protected readonly layoutParams$ = this.#pageEnv.layoutParams$.asObservable();
 
   protected dropdownOpenChange(item: CategoryPathItem) {
     if (!item.loaded) {

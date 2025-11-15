@@ -162,7 +162,7 @@
           </button>
         </div>
       </div>
-      @if (showShareDialog()) {
+      @if (showShareDialog() && location) {
         <app-share [url]="location.href" [text]="picture.nameText" />
       }
       @if (pictureItems$ | async; as items) {
@@ -177,14 +177,14 @@
       }
       @if (picture.copyrights) {
         <div>
-          <app-markdown [markdown]="picture.copyrights" />
+          <remark [markdown]="picture.copyrights" />
         </div>
       }
       @if (pictureItems$ | async; as pictureItems) {
         @for (pictureItem of pictureItems; track pictureItem.itemId) {
           @if (pictureItem.item; as item) {
             @if (pictureItem.type === PictureItemType.PICTURE_ITEM_COPYRIGHTS && item.description) {
-              <app-markdown [markdown]="item.description" />
+              <remark [markdown]="item.description" />
             }
           }
         }
@@ -192,7 +192,7 @@
       @for (pictureItem of contentItems$ | async; track pictureItem.itemId) {
         @if (pictureItem.item; as item) {
           @if (item.description) {
-            <app-markdown style="margin-bottom: 10px" [markdown]="item.description" />
+            <remark style="margin-bottom: 10px" [markdown]="item.description" />
           }
           @if (item.hasText && item.route) {
             <p>
@@ -258,7 +258,7 @@
           }
         </li>
       </ul>
-      <app-markdown
+      <remark
         i18n-markdown
         markdown="All images have their owners.
 

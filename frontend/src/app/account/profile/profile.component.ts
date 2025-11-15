@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, viewChild} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -12,8 +12,8 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {TimezoneService} from '@services/timezone';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import Keycloak from 'keycloak-js';
+import {RemarkModule} from 'ngx-remark';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -27,7 +27,7 @@ interface FormControls {
 
 @Component({
   selector: 'app-account-profile',
-  imports: [MarkdownComponent, FormsModule, AsyncPipe, InvalidParamsPipe, ReactiveFormsModule],
+  imports: [FormsModule, AsyncPipe, InvalidParamsPipe, ReactiveFormsModule, RemarkModule],
   templateUrl: './profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -40,6 +40,7 @@ export class AccountProfileComponent implements OnInit {
   readonly #timezone = inject(TimezoneService);
   readonly #toastService = inject(ToastsService);
   readonly #usersClient = inject(UsersClient);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly settingsInvalidParams = signal<InvalidParams>({});
   protected readonly photoInvalidParams = signal<InvalidParams>({});
@@ -61,10 +62,12 @@ export class AccountProfileComponent implements OnInit {
   protected readonly user$ = combineLatest([this.#auth.user$, this.#reload$]).pipe(
     switchMap(([user]) => {
       if (!user) {
-        this.#keycloak.login({
-          locale: this.#languageService.language,
-          redirectUri: window.location.href,
-        });
+        if (this.#document.defaultView) {
+          this.#keycloak.login({
+            locale: this.#languageService.language,
+            redirectUri: this.#document.defaultView.location.href,
+          });
+        }
         return EMPTY;
       }
 
@@ -105,7 +108,7 @@ export class AccountProfileComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 129}), 0);
+    this.#pageEnv.set({pageId: 129});
   }
 
   private showSavedMessage() {
@@ -169,9 +172,7 @@ export class AccountProfileComponent implements OnInit {
           if (input) {
             input.nativeElement.value = '';
           }
-          console.log(response);
           if (response instanceof HttpErrorResponse && response.status === 400) {
-            console.log('ZZZZZZZZZZZ');
             this.photoInvalidParams.set(response.error.invalid_params);
             return EMPTY;
           }

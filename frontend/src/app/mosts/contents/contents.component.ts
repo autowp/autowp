@@ -7,7 +7,6 @@ import {MostsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import {
   getMostsPeriodsTranslation,
   getMostsRatingParamsTranslation,
@@ -16,6 +15,7 @@ import {
   getUnitNameTranslation,
   getVehicleTypeRpTranslation,
 } from '@utils/translations';
+import {RemarkModule} from 'ngx-remark';
 import {combineLatest, Observable} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -39,7 +39,7 @@ function vehicleTypesToList(vehicleTypes: MostsVehicleType[]): MostsVehicleTypeT
 
 @Component({
   selector: 'app-mosts-contents',
-  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, MarkdownComponent, NgbTooltip, AsyncPipe],
+  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, NgbTooltip, AsyncPipe, RemarkModule],
   templateUrl: './contents.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

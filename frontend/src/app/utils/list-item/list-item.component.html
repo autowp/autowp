@@ -98,7 +98,7 @@
       </div>
     }
     @if (item.description && item.description.length) {
-      <app-markdown class="text" [markdown]="item.description" />
+      <remark class="text" [markdown]="item.description" />
     }
     @if (item.engineVehicles && item.engineVehicles.length) {
       <div>
@@ -112,7 +112,7 @@
         </ul>
       </div>
     }
-    <ul class="list-inline" ngPreserveWhitespaces>
+    <ul class="list-inline">
       @if (item.hasText || item.details.count || item.itemTypeId === ItemType.ITEM_TYPE_PERSON) {
         <li class="list-inline-item">
           <i class="bi bi-text-left me-1" aria-hidden="true"></i>

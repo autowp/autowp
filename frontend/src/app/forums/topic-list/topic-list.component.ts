@@ -19,6 +19,7 @@ import {PastTimeIndicatorComponent} from '@utils/past-time-indicator/past-time-i
 import {Observable, of, throwError} from 'rxjs';
 import {catchError, map, shareReplay, switchMap} from 'rxjs/operators';
 
+import {StatusCode} from '../../../grpc-web-client/statuscode';
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
@@ -61,7 +62,7 @@ export class ForumsTopicListComponent {
       topics.map((topic) => {
         const lastMessage$ = this.#grpc.getLastMessage(new GetTopicRequest({id: topic.id})).pipe(
           catchError((error: unknown) => {
-            if (error instanceof GrpcStatusEvent && error.statusCode === 5) {
+            if (error instanceof GrpcStatusEvent && error.statusCode === StatusCode.NOT_FOUND) {
               return of(null);
             }
             return throwError(() => error);

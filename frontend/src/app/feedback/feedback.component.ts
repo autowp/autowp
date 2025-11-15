@@ -2,33 +2,25 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
+import {CreateFeedbackRequest} from '@grpc/spec.pb';
+import {AutowpClient} from '@grpc/spec.pbsc';
+import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {PageEnvService} from '@services/page-env.service';
 import {ReCaptchaService} from '@services/recaptcha';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
 import {RecaptchaModule} from 'ng-recaptcha-2';
+import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
+import {extractFieldViolations, fieldViolations2InvalidParams} from '../grpc';
 import {ToastsService} from '../toasts/toasts.service';
-import {AutowpClient} from "@grpc/spec.pbsc";
-import {CreateFeedbackRequest} from "@grpc/spec.pb";
-import {GrpcStatusEvent} from "@ngx-grpc/common";
-import {extractFieldViolations, fieldViolations2InvalidParams} from "../grpc";
 
 const CAPTCHA = 'captcha';
 
 @Component({
   selector: 'app-feedback',
-  imports: [
-    RouterLink,
-    FormsModule,
-    ReactiveFormsModule,
-    RecaptchaModule,
-    MarkdownComponent,
-    InvalidParamsPipe,
-    AsyncPipe,
-  ],
+  imports: [RouterLink, FormsModule, ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe, AsyncPipe, RemarkModule],
   templateUrl: './feedback.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -67,20 +59,22 @@ export class FeedbackComponent implements OnInit {
   ngOnInit(): void {
     this.form.removeControl(CAPTCHA as never);
 
-    setTimeout(() => this.#pageEnv.set({pageId: 89}), 0);
+    this.#pageEnv.set({pageId: 89});
   }
 
   protected submit() {
     const formValue = this.form.getRawValue();
     this.#autowpClient
-      .createFeedback(new CreateFeedbackRequest({
-        feedback: {
-          captcha: formValue.captcha,
-          email: formValue.email,
-          message: formValue.message,
-          name: formValue.name,
-        },
-      }))
+      .createFeedback(
+        new CreateFeedbackRequest({
+          feedback: {
+            captcha: formValue.captcha,
+            email: formValue.email,
+            message: formValue.message,
+            name: formValue.name,
+          },
+        }),
+      )
       .subscribe({
         error: (response: unknown) => {
           if (response instanceof GrpcStatusEvent) {

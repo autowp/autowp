@@ -4,11 +4,11 @@ import {RouterLink} from '@angular/router';
 import {APIItem, ItemType} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 
 @Component({
   selector: 'app-twins-item',
-  imports: [ItemHeaderComponent, RouterLink, MarkdownComponent, AsyncPipe],
+  imports: [ItemHeaderComponent, RouterLink, AsyncPipe, RemarkModule],
   templateUrl: './item.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

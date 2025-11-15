@@ -6,7 +6,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {BehaviorSubject, EMPTY, Observable, of} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
 
@@ -19,11 +19,11 @@ import {CarsSpecificationsEditorSpecComponent} from './spec/spec.component';
   selector: 'app-cars-specifications-editor',
   imports: [
     RouterLink,
-    MarkdownComponent,
     CarsSpecificationsEditorEngineComponent,
     CarsSpecificationsEditorSpecComponent,
     CarsSpecificationsEditorResultComponent,
     AsyncPipe,
+    RemarkModule,
   ],
   templateUrl: './specifications-editor.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -27,7 +27,7 @@
 
   @if (user$ | async; as user) {
     @if (user.specsWeight < 1) {
-      <app-markdown
+      <remark
         class="d-block alert alert-danger"
         i18n-markdown
         markdown="**Attention!** You probably have accumulated a significant number of errors.
@@ -107,7 +107,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
     <div class="tab-content card card-body">
       @if (tab === 'info') {
         <div class="tab-pane active" id="info">
-          <app-markdown
+          <remark
             i18n-markdown
             markdown='Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.
 

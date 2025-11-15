@@ -1,3 +1,4 @@
+import {DOCUMENT} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -45,6 +46,7 @@ export class MapComponent implements OnInit {
   readonly #toastService = inject(ToastsService);
   readonly #mapClient = inject(MapClient);
   readonly #cdr = inject(ChangeDetectorRef);
+  readonly #document = inject(DOCUMENT);
 
   #compRef?: ComponentRef<MapPopupComponent>;
   protected markers: Marker[] = [];
@@ -66,7 +68,7 @@ export class MapComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 117}), 0);
+    this.#pageEnv.set({pageId: 117});
 
     this.#bounds$
       .pipe(
@@ -126,7 +128,7 @@ export class MapComponent implements OnInit {
             this.#compRef = this.#viewContainerRef.createComponent(MapPopupComponent);
             this.#compRef.setInput('item', item);
 
-            const div = document.createElement('div');
+            const div = this.#document.createElement('div');
             div.appendChild(this.#compRef.location.nativeElement);
 
             popup.setContent(div);

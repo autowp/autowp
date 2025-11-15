@@ -536,14 +536,10 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 73,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 73,
+    });
 
     this.#addedFromSub = this.addedFrom.valueChanges
       .pipe(distinctUntilChanged(), debounceTime(30))

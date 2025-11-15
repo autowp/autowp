@@ -1,13 +1,5 @@
 import {AsyncPipe} from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  HostListener,
-  inject,
-  input,
-  output,
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {Router, RouterLink} from '@angular/router';
 import {
@@ -32,6 +24,7 @@ import {LanguageService} from '@services/language';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, tap} from 'rxjs/operators';
 
+import {StatusCode} from '../../grpc-web-client/statuscode';
 import {ToastsService} from '../toasts/toasts.service';
 import {CarouselItemComponent} from './carousel-item.component';
 
@@ -164,6 +157,11 @@ class Gallery {
   templateUrl: './gallery.component.html',
   styleUrl: './gallery.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:keydown.escape)': 'onKeydownHandler()',
+    '(document:keydown.arrowright)': 'onRightKeydownHandler()',
+    '(document:keydown.arrowleft)': 'onLeftKeydownHandler()',
+  },
 })
 export class GalleryComponent {
   readonly #router = inject(Router);
@@ -208,7 +206,7 @@ export class GalleryComponent {
           )
           .pipe(
             catchError((response: unknown) => {
-              if (response instanceof GrpcStatusEvent && response.statusCode === 5) {
+              if (response instanceof GrpcStatusEvent && response.statusCode === StatusCode.NOT_FOUND) {
                 this.#router.navigate(['/error-404'], {
                   skipLocationChange: true,
                 });
@@ -236,7 +234,6 @@ export class GalleryComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  @HostListener('document:keydown.escape')
   onKeydownHandler() {
     this.current$
       .pipe(
@@ -246,7 +243,6 @@ export class GalleryComponent {
       .subscribe();
   }
 
-  @HostListener('document:keydown.arrowright')
   onRightKeydownHandler() {
     this.gallery$.pipe(take(1)).subscribe((gallery) => {
       if (gallery.current + 1 < gallery.items.length) {
@@ -255,7 +251,6 @@ export class GalleryComponent {
     });
   }
 
-  @HostListener('document:keydown.arrowleft')
   onLeftKeydownHandler() {
     this.gallery$.pipe(take(1)).subscribe((gallery) => {
       if (gallery.current > 0) {
@@ -271,7 +266,7 @@ export class GalleryComponent {
 
     return this.#picturesClient.getGallery(new GalleryRequest({request})).pipe(
       catchError((response: unknown) => {
-        if (response instanceof GrpcStatusEvent && response.statusCode === 5) {
+        if (response instanceof GrpcStatusEvent && response.statusCode === StatusCode.NOT_FOUND) {
           this.#router.navigate(['/error-404'], {
             skipLocationChange: true,
           });

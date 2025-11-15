@@ -2,7 +2,7 @@ import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {AfterViewInit, ChangeDetectionStrategy, Component, computed, input, output, viewChild} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavLinkBase, NgbNavOutlet} from '@ng-bootstrap/ng-bootstrap';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 
 @Component({
   selector: 'app-markdown-edit',
@@ -13,10 +13,10 @@ import {MarkdownComponent} from '@utils/markdown/markdown.component';
     NgbNavLinkBase,
     NgbNavContent,
     FormsModule,
-    MarkdownComponent,
     NgbNavOutlet,
     ReactiveFormsModule,
     CdkTextareaAutosize,
+    RemarkModule,
   ],
   templateUrl: './markdown-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,9 +30,7 @@ export class MarkdownEditComponent implements AfterViewInit {
   readonly autosize = viewChild(CdkTextareaAutosize);
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.autosize()!.resizeToFitContent(true);
-    }, 400);
+    this.autosize()!.resizeToFitContent(true);
   }
 
   protected onChange(value: string) {

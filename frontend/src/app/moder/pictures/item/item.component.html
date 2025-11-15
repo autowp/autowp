@@ -366,7 +366,7 @@
         </form>
         <h3 i18n>Copyrights</h3>
         <div class="card card-body mb-4">
-          <app-markdown
+          <remark
             i18n-markdown
             markdown="Markdown syntax.
 
@@ -548,7 +548,7 @@
           <h3>Similar picture</h3>
           <div class="card card-body mb-4">
             @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
-              <p class="alert alert-warning" role="alert" ngPreserveWhitespaces>
+              <p class="alert alert-warning" role="alert">
                 <span class="bi bi-file-earmark-image" aria-hidden="true"></span>
                 <a i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
                   >Similar picture: {{ dfDistance.distance }}</a

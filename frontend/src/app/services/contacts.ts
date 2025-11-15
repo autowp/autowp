@@ -5,6 +5,8 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {Observable, of, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
+import {StatusCode} from '../../grpc-web-client/statuscode';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -15,7 +17,7 @@ export class AppContactsService {
     return this.#contactsClient.getContact(new GetContactRequest({userId})).pipe(
       map((response) => !!response.contactUserId),
       catchError((err: unknown) => {
-        if (err instanceof GrpcStatusEvent && err.statusCode === 5) {
+        if (err instanceof GrpcStatusEvent && err.statusCode === StatusCode.NOT_FOUND) {
           return of(false);
         }
 

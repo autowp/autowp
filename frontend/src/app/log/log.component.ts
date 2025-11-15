@@ -112,6 +112,6 @@ export class LogComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 75}), 0);
+    this.#pageEnv.set({pageId: 75});
   }
 }

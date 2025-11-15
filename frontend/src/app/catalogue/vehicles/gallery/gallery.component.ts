@@ -81,13 +81,11 @@ export class CatalogueVehiclesGalleryComponent {
 
   protected pictureSelected(item: null | Picture) {
     if (item) {
-      setTimeout(() => {
-        this.#pageEnv.set({
-          layout: {isGalleryPage: true},
-          pageId: 34,
-          title: item.nameText,
-        });
-      }, 0);
+      this.#pageEnv.set({
+        layout: {isGalleryPage: true},
+        pageId: 34,
+        title: item.nameText,
+      });
     }
   }
 }

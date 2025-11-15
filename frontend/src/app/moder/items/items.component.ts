@@ -337,14 +337,10 @@ export class ModerItemsComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 131,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 131,
+    });
   }
 
   protected ancestorFormatter(x: APIItem) {

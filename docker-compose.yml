@@ -24,22 +24,10 @@ services:
       "
 
   frontend:
-    image: registry.pereslegin.ru/autowp/frontend:v1.239.0
+    image: registry.pereslegin.ru/autowp/frontend:v2.239.0
     container_name: autowp_test_frontend
     volumes:
-      - ./frontend/dist/browser:/usr/share/nginx/html
-#      - ./frontend/dist/browser/be-BY:/usr/share/nginx/html/be-BY
-#      - ./frontend/dist/browser/en-GB:/usr/share/nginx/html/en-GB
-#      - ./frontend/dist/browser/fr:/usr/share/nginx/html/fr
-#      - ./frontend/dist/browser/pt-BR:/usr/share/nginx/html/pt-BR
-#      - ./frontend/dist/browser/ru:/usr/share/nginx/html/ru
-#      - ./frontend/dist/browser/uk:/usr/share/nginx/html/uk
-#      - ./frontend/dist/browser/zh-CN:/usr/share/nginx/html/zh-CN
-#      - ./frontend/dist/browser/es:/usr/share/nginx/html/es
-#      - ./frontend/dist/browser/it:/usr/share/nginx/html/it
-#      - ./frontend/dist/browser/he:/usr/share/nginx/html/he
-      - ./frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./hostmap:/etc/nginx/hostmap:ro
+      - ./frontend/dist:/app
     restart: always
     user: "101:101"
 

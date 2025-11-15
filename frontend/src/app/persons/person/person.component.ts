@@ -5,7 +5,7 @@ import {APIItem, ItemFields, ItemRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
-import {LayoutParams, PageEnvService} from '@services/page-env.service';
+import {PageEnvService} from '@services/page-env.service';
 import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
@@ -21,7 +21,7 @@ export class PersonsPersonComponent {
   readonly #router = inject(Router);
   readonly #route = inject(ActivatedRoute);
   readonly #auth = inject(AuthService);
-  readonly #pageEnv = inject(PageEnvService);
+  protected readonly pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
@@ -64,13 +64,11 @@ export class PersonsPersonComponent {
       return of(item);
     }),
     tap((item) => {
-      this.#pageEnv.set({
+      this.pageEnv.set({
         pageId: 213,
         title: item.nameText,
       });
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
-
-  protected readonly layoutParams$: Observable<LayoutParams> = this.#pageEnv.layoutParams$.asObservable();
 }

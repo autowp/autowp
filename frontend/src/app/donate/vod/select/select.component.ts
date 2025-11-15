@@ -121,7 +121,7 @@ export class DonateVodSelectComponent implements OnDestroy, OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 196}), 0);
+    this.#pageEnv.set({pageId: 196});
 
     this.#querySub = this.#select$.subscribe((r) => {
       const brand = r?.brand;

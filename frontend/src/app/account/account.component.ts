@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
@@ -36,6 +37,7 @@ export class AccountComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #forumsClient = inject(ForumsClient);
+  readonly #destroyRef = inject(DestroyRef);
 
   protected readonly items$: Observable<SidebarItem[]> = combineLatest([
     this.#auth.user$,
@@ -148,12 +150,15 @@ export class AccountComponent {
 
       for (const item of items) {
         if (item.pageId) {
-          this.#pageEnv.isActive$(item.pageId).subscribe({
-            error: (response: unknown) => this.#toastService.handleError(response),
-            next: (active) => {
-              item.active = active;
-            },
-          });
+          this.#pageEnv
+            .isActive$(item.pageId)
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe({
+              error: (response: unknown) => this.#toastService.handleError(response),
+              next: (active) => {
+                item.active = active;
+              },
+            });
         }
       }
       return items;

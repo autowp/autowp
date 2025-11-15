@@ -1,13 +1,14 @@
+import {DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {RouterLink} from '@angular/router';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 
 @Component({
   selector: 'app-donate',
-  imports: [RouterLink, MarkdownComponent],
+  imports: [RouterLink, RemarkModule],
   templateUrl: './donate.component.html',
   styleUrl: './donate.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -16,6 +17,7 @@ export class DonateComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #languageService = inject(LanguageService);
   readonly #domSanitizer = inject(DomSanitizer);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly frameUrl: SafeResourceUrl;
   protected readonly language: string = this.#languageService.language;
@@ -30,9 +32,9 @@ export class DonateComponent implements OnInit {
       'mobile-payment-type-choice': 'on',
       'payment-type-choice': 'on',
       'project-name': $localize`WheelsAge.org`,
-      'project-site': 'https://' + window.location.host + '/',
+      'project-site': 'https://' + this.#document.defaultView?.location.host + '/',
       quickpay: 'shop',
-      successURL: 'https://' + window.location.host + '/donate/success',
+      successURL: 'https://' + this.#document.defaultView?.location.host + '/donate/success',
       'target-visibility': 'on',
       targets: $localize`For website work`,
       'targets-hint': $localize`Your wish`,
@@ -49,6 +51,6 @@ export class DonateComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 196}), 0);
+    this.#pageEnv.set({pageId: 196});
   }
 }

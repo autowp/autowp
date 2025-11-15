@@ -13,6 +13,10 @@ spec:
       port: 8082
       protocol: TCP
       targetPort: app-port
+    - name: frontend-port
+      port: 4000
+      protocol: TCP
+      targetPort: frontend-port
   selector: {{ include "common.labels.matchLabels" . | nindent 4 }}
     app.kubernetes.io/component: goautowp-serve
   type: ClusterIP

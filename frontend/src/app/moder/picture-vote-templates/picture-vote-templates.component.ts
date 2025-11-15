@@ -22,14 +22,10 @@ export class ModerPictureVoteTemplatesComponent implements OnInit {
   protected name = '';
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.#pageEnv.set({
-          layout: {isAdminPage: true},
-          pageId: 212,
-        }),
-      0,
-    );
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 212,
+    });
   }
 
   protected deleteTemplate(template: ModerVoteTemplate) {

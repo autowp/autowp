@@ -62,6 +62,6 @@ export class MascotsComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 201}), 0);
+    this.#pageEnv.set({pageId: 201});
   }
 }

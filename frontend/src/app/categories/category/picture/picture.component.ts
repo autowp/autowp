@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
   CommentsType,
@@ -32,6 +33,7 @@ import {CategoriesService} from '../../service';
 export class CategoryPictureComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
+  readonly #meta = inject(Meta);
   readonly #router = inject(Router);
   readonly #categoriesService = inject(CategoriesService);
   readonly #picturesClient = inject(PicturesClient);
@@ -141,6 +143,10 @@ export class CategoryPictureComponent {
       return of(picture);
     }),
     tap((picture) => {
+      this.#meta.addTag({property: 'og:title', content: picture.nameText});
+      if (picture.previewLarge) {
+        this.#meta.addTag({property: 'og:image', content: picture.previewLarge.src});
+      }
       this.#pageEnv.set({
         pageId: 187,
         title: picture.nameText,

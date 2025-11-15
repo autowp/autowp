@@ -4,13 +4,13 @@ import {RouterLink} from '@angular/router';
 import {GetTopCategoriesListRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {Markdown2Component} from '@utils/markdown2/markdown2.component';
+import {RemarkModule} from 'ngx-remark';
 
 import {IndexCategoriesCategoryComponent} from './category/category.component';
 
 @Component({
   selector: 'app-index-categories',
-  imports: [RouterLink, IndexCategoriesCategoryComponent, Markdown2Component, AsyncPipe],
+  imports: [RouterLink, IndexCategoriesCategoryComponent, AsyncPipe, RemarkModule],
   templateUrl: './categories.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

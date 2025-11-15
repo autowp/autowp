@@ -93,12 +93,10 @@ export class ModerItemsItemSelectParentComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.#pageEnv.set({
-        layout: {isAdminPage: true},
-        pageId: 144,
-      });
-    }, 0);
+    this.#pageEnv.set({
+      layout: {isAdminPage: true},
+      pageId: 144,
+    });
   }
 
   protected select(itemID: string, parentID: string) {

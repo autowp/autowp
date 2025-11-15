@@ -1,4 +1,4 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {Contact, DeleteContactRequest} from '@grpc/spec.pb';
@@ -29,16 +29,19 @@ export class AccountContactsComponent implements OnInit {
   readonly #contactsClient = inject(ContactsClient);
   readonly #languageService = inject(LanguageService);
   readonly #keycloak = inject(Keycloak);
+  readonly #document = inject(DOCUMENT);
 
   readonly #reload$ = new BehaviorSubject<void>(void 0);
 
   protected readonly items$: Observable<Contact[]> = this.#auth.authenticated$.pipe(
     switchMap((authenticated) => {
       if (!authenticated) {
-        this.#keycloak.login({
-          locale: this.#languageService.language,
-          redirectUri: window.location.href,
-        });
+        if (this.#document.defaultView) {
+          this.#keycloak.login({
+            locale: this.#languageService.language,
+            redirectUri: this.#document.defaultView.location.href,
+          });
+        }
         return EMPTY;
       }
       return of(authenticated);
@@ -53,7 +56,7 @@ export class AccountContactsComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 198}), 0);
+    this.#pageEnv.set({pageId: 198});
   }
 
   protected deleteContact(userId: string) {

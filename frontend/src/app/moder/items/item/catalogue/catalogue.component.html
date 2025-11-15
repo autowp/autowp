@@ -83,7 +83,7 @@
           }
           @for (parentsItem of parents$ | async; track parentsItem) {
             <tr>
-              <td ngPreserveWhitespaces>
+              <td>
                 <i class="bi bi-arrow-up" aria-hidden="true"></i>
                 <a
                   [routerLink]="['/moder/items/item', parentsItem.parentId]"
@@ -128,7 +128,7 @@
             </tr>
           }
           <tr class="success">
-            <td colspan="2" ngPreserveWhitespaces>
+            <td colspan="2">
               &nbsp;&nbsp;&nbsp;&nbsp;
               <i class="bi bi-arrow-right" aria-hidden="true"></i>
               <span [innerHTML]="item.nameHtml"></span>

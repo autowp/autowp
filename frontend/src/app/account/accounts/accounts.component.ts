@@ -4,7 +4,7 @@ import {APIAccountsAccount, DeleteUserAccountRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
-import {MarkdownComponent} from '@utils/markdown/markdown.component';
+import {RemarkModule} from 'ngx-remark';
 import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
@@ -12,7 +12,7 @@ import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
   selector: 'app-account-accounts',
-  imports: [MarkdownComponent, AsyncPipe],
+  imports: [AsyncPipe, RemarkModule],
   templateUrl: './accounts.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -36,7 +36,7 @@ export class AccountAccountsComponent implements OnInit {
   protected readonly disconnectFailed = signal(false);
 
   ngOnInit(): void {
-    setTimeout(() => this.#pageEnv.set({pageId: 123}), 0);
+    this.#pageEnv.set({pageId: 123});
   }
 
   protected remove(account: APIAccountsAccount) {

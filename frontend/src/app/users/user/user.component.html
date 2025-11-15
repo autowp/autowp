@@ -46,12 +46,12 @@
         }
         <p i18n>Database id: {{ user.id }}</p>
         @if (user && isNotMe$ | async) {
-          <p ngPreserveWhitespaces>
+          <p>
             <i class="bi bi-reply" aria-hidden="true"></i>
             <a href="#" i18n (click)="openMessageForm(user)">Send personal message</a>
           </p>
         }
-        <!--      <p *ngFor="let account of user.accounts" ngPreserveWhitespaces>-->
+        <!--      <p *ngFor="let account of user.accounts">-->
         <!--        <i class="{{ account.icon }}" aria-hidden="true"></i>-->
         <!--        <a [href]="account.link" *ngIf="account.link" [textContent]="account.name"></a>-->
         <!--        <span *ngIf="!account.link" [textContent]="account.name"></span>-->
