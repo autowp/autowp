@@ -15,7 +15,6 @@ import {EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, switchMap} from 'rxjs/operators';
 import {base64ToUint8Array, concatUint8Arrays, uint8ArrayToBase64} from 'uint8array-extras';
 
-import {ErrorCode, getDebugMessage} from '../../keep/include/goog.net.ErrorCode';
 import {FrameType, GrpcWebStreamParser} from './grpcwebstreamparser';
 import {Metadata} from './metadata';
 import {RpcError} from './rpcerror';
@@ -246,7 +245,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
             if (grpcStatusCode == StatusCode.ABORTED) {
               return EMPTY;
             }
-            let errorMessage = getDebugMessage(ErrorCode.HTTP_ERROR);
+            let errorMessage = 'Http response at 400 or 500 level';
             if (xhrStatusCode != -1) {
               errorMessage += ', http status code: ' + xhrStatusCode;
             }
