@@ -30,6 +30,15 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.4
     container_name: goautowp_keycloak_test
+    depends_on:
+      - postgres-keycloak
+    volumes:
+      - ./test/realm.json:/opt/keycloak/data/import/realm.json
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: password
+    ports:
+      - '0.0.0.0:8081:8080'
     command:
       - "start"
       - "--import-realm"
@@ -39,16 +48,7 @@ services:
       - --db-url=jdbc:postgresql://postgres-keycloak:5432/keycloak
       - --db-username=keycloak
       - --db-password=password
-    volumes:
-      - ./test/realm.json:/opt/keycloak/data/import/realm.json
-    environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: password
-    ports:
-      - '0.0.0.0:8081:8080'
     restart: always
-    depends_on:
-      - postgres-keycloak
 
   minio:
     image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z

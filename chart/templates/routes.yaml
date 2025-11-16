@@ -176,7 +176,7 @@ spec:
             service:
               name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
-                name: app-port
+                name: frontend-port
   {{- end }}
 
 ---

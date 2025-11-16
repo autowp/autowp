@@ -26,11 +26,11 @@ services:
   frontend:
     image: registry.pereslegin.ru/autowp/frontend:v2.239.0
     container_name: autowp_test_frontend
-    read_only: true
     volumes:
       - ./frontend/dist:/app
     restart: always
     user: "101:101"
+    read_only: true
 
   goautowp-scheduler-generate-index-cache:
     image: registry.pereslegin.ru/autowp/autowp/goautowp:v7.1.1
@@ -66,15 +66,6 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.4
     container_name: autowp_test_keycloak
-    command:
-      - "start"
-      - "--import-realm"
-      - "--hostname=localhost"
-      - "--http-enabled=true"
-      - "--db=postgres"
-      - "--db-url=jdbc:postgresql://postgres-keycloak:5432/keycloak"
-      - "--db-username=keycloak"
-      - "--db-password=password"
     depends_on:
       - postgres-keycloak
     volumes:
@@ -84,6 +75,15 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: password
     ports:
       - '0.0.0.0:8081:8080'
+    command:
+      - "start"
+      - "--import-realm"
+      - "--hostname=localhost"
+      - "--http-enabled=true"
+      - "--db=postgres"
+      - "--db-url=jdbc:postgresql://postgres-keycloak:5432/keycloak"
+      - "--db-username=keycloak"
+      - "--db-password=password"
     restart: always
 
   minio:
