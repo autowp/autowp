@@ -191,6 +191,11 @@ localImageCredentials:
   email: someone@host.com
 redis:
   enabled: true
+  image:
+    repository: bitnamilegacy/redis
+  sentinel:
+    image:
+     repository: bitnamilegacy/redis-sentinel
   commonAnnotations:
     ignore-check.kube-linter.io/pdb-unhealthy-pod-eviction-policy: "pdb-unhealthy-pod-eviction-policy"
   auth:
@@ -227,6 +232,8 @@ redis:
       readOnlyRootFilesystem: true
   metrics:
     enabled: true
+    image:
+      repository: bitnamilegacy/redis-exporter
     resources:
       limits:
         cpu: "1"
@@ -238,6 +245,15 @@ redis:
       enabled: true
     containerSecurityContext:
       readOnlyRootFilesystem: true
+  volumePermissions:
+    image:
+      repository: bitnamilegacy/os-shell
+  kubectl:
+    image:
+      repository: bitnamilegacy/kubectl
+  sysctl:
+    image:
+      repository: bitnamilegacy/os-shell
 static:
   image:
     registry: docker.io
