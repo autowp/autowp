@@ -69,7 +69,7 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Traffic/"
@@ -188,7 +188,7 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: {{ include "autowp.goautowp.serve-public.fullname" $ | quote }}
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
         - path: "/goautowp.Votings/"
