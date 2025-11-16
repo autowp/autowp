@@ -144,6 +144,8 @@ traffic:
     password: password
 rabbitmq:
   enabled: true
+  image:
+    repository: bitnamilegacy/rabbitmq
   replicaCount: 1
   persistence:
     enabled: true
@@ -167,6 +169,9 @@ rabbitmq:
   podSecurityContext:
     runAsNonRoot: true
     runAsUser: 101
+  volumePermissions:
+    image:
+      repository: bitnamilegacy/os-shell
 postgres:
   hostname: 127.0.0.1
   port: 5432
