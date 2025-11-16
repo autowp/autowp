@@ -43,13 +43,13 @@ const appEngine = angularApp.angularAppEngine;
 appEngine.handle = handle.bind(appEngine);
 appEngine.getAngularServerAppForRequest = getAngularServerAppForRequest.bind(appEngine);
 
-/**
- * Serve static files from /browser
- */
 for (const lang of environment.languages) {
   const vhostApp = express();
   const browserDistFolder = join(import.meta.dirname, '../browser/' + lang.locale);
 
+  /**
+   * Serve static files from /browser
+   */
   vhostApp.use(
     express.static(browserDistFolder, {
       maxAge: '1y',

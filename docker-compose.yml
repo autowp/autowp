@@ -26,6 +26,7 @@ services:
   frontend:
     image: registry.pereslegin.ru/autowp/frontend:v2.239.0
     container_name: autowp_test_frontend
+    read_only: true
     volumes:
       - ./frontend/dist:/app
     restart: always

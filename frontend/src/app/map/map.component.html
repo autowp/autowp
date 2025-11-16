@@ -10,11 +10,13 @@
   <h1><ng-container i18n>Map</ng-container> <small i18n>Museums and factories</small></h1>
 </div>
 
-<div
-  style="width: 100%; height: 600px"
-  class="mb-4"
-  leaflet
-  [leafletOptions]="options"
-  [leafletLayers]="markers"
-  (leafletMapReady)="onMapReady($event)"
-></div>
+@defer {
+  <div
+    style="width: 100%; height: 600px"
+    class="mb-4"
+    leaflet
+    [leafletOptions]="options"
+    [leafletLayers]="markers"
+    (leafletMapReady)="onMapReady($event)"
+  ></div>
+}
