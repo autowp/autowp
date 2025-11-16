@@ -38,6 +38,7 @@ spec:
               port: frontend-port
             initialDelaySeconds: 5
           securityContext:
+            readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 101
           resources:
