@@ -14,6 +14,7 @@ import (
 	"io"
 	"math"
 	"math/rand"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -1202,19 +1203,19 @@ func (s *Storage) populateSrc(ctx context.Context, img *Image) error {
 		return err
 	}
 
-	url := endpoint.URI
+	uri := endpoint.URI
 
-	url.Path += "/" + img.filepath
+	uri.Path += "/" + img.filepath
 
 	if len(s.config.SrcOverride.Host) > 0 {
-		url.Host = s.config.SrcOverride.Host
+		uri.Host = s.config.SrcOverride.Host
 	}
 
 	if len(s.config.SrcOverride.Scheme) > 0 {
-		url.Scheme = s.config.SrcOverride.Scheme
+		uri.Scheme = s.config.SrcOverride.Scheme
 	}
 
-	img.src = url.String()
+	img.src = uri.String()
 
 	return nil
 }
@@ -1234,17 +1235,22 @@ func (s *Storage) s3Client(ctx context.Context) (*s3.Client, error) {
 		return nil, err
 	}
 
+	endpointURL, err := url.Parse(s.config.S3.Endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.Credentials = aws.NewCredentialsCache(
+		credentials.NewStaticCredentialsProvider(
+			s.config.S3.Credentials.Key,
+			s.config.S3.Credentials.Secret,
+			"",
+		),
+	)
+
 	return s3.NewFromConfig(cfg, func(o *s3.Options) {
 		o.UsePathStyle = s.config.S3.UsePathStyleEndpoint
-		o.BaseEndpoint = aws.String(s.config.S3.Endpoint)
-		o.Region = s.config.S3.Region
-		o.Credentials = aws.NewCredentialsCache(
-			credentials.NewStaticCredentialsProvider(
-				s.config.S3.Credentials.Key,
-				s.config.S3.Credentials.Secret,
-				"",
-			),
-		)
+		o.EndpointResolverV2 = &Resolver{URL: endpointURL}
 	}), nil
 }
 

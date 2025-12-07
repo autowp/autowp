@@ -8,6 +8,7 @@ import (
 	"io"
 	"math"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -23,6 +24,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	transport "github.com/aws/smithy-go/endpoints"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/gographics/imagick.v3/imagick"
 )
@@ -38,6 +40,19 @@ var (
 	errEmptyMagickWand = errors.New("empty magickWand returned")
 	errNoBrands        = errors.New("no brands found to generate sprite")
 )
+
+type Resolver struct {
+	URL *url.URL
+}
+
+func (r *Resolver) ResolveEndpoint(_ context.Context, params s3.EndpointParameters) (transport.Endpoint, error) {
+	u := *r.URL
+	u.Path += "/" + *params.Bucket
+
+	return transport.Endpoint{
+		URI: u,
+	}, nil
+}
 
 func downloadFile(ctx context.Context, filepath string, url string) error {
 	// Create the file
@@ -200,16 +215,22 @@ func createIconsSprite(
 		return err
 	}
 
+	endpointURL, err := url.Parse(fileStorageConfig.S3.Endpoint)
+	if err != nil {
+		return err
+	}
+
+	cfg.Credentials = aws.NewCredentialsCache(
+		credentials.NewStaticCredentialsProvider(
+			fileStorageConfig.S3.Credentials.Key,
+			fileStorageConfig.S3.Credentials.Secret,
+			"",
+		),
+	)
+
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.EndpointResolverV2 = &Resolver{URL: endpointURL}
 		o.UsePathStyle = fileStorageConfig.S3.UsePathStyleEndpoint
-		o.BaseEndpoint = aws.String(fileStorageConfig.S3.Endpoint)
-		o.Credentials = aws.NewCredentialsCache(
-			credentials.NewStaticCredentialsProvider(
-				fileStorageConfig.S3.Credentials.Key,
-				fileStorageConfig.S3.Credentials.Secret,
-				"",
-			),
-		)
 	})
 
 	var (
