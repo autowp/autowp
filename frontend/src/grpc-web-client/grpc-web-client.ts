@@ -207,7 +207,10 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
                 } catch (err) {
                   return of(
                     this.handleError_(
-                      new RpcError(StatusCode.INTERNAL, `Error when deserializing response data from ${url}; error: ${err}`),
+                      new RpcError(
+                        StatusCode.INTERNAL,
+                        `Error when deserializing response data from ${url}; error: ${err}`,
+                      ),
                     ),
                   );
                 }
