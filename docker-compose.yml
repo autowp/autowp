@@ -23,17 +23,8 @@ services:
       exit 0;
       "
 
-  frontend:
-    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.1.0
-    container_name: autowp_test_frontend
-    volumes:
-      - ./frontend/dist:/app
-    restart: always
-    user: "101:101"
-    read_only: true
-
   goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.1.0
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.1.1
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     depends_on:
       - keycloak
@@ -46,7 +37,7 @@ services:
     command: scheduler-generate-index-cache --loglevel=debug
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.1.0
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.1.1
     container_name: autowp_test_goautowp_serve
     depends_on:
       - keycloak
@@ -62,6 +53,18 @@ services:
     command: serve --df-amqp --monitoring-amqp --grpc --public --autoban --attrs-update-values-amqp --loglevel=debug
     restart: always
     user: "0"
+
+  frontend:
+    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.1.1
+    container_name: autowp_test_frontend
+    depends_on:
+      - goautowp-serve
+    network_mode: "service:goautowp-serve"
+    volumes:
+      - ./frontend/dist:/app
+    restart: always
+    user: "101:101"
+    read_only: true
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.4

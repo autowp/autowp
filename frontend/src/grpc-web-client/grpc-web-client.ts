@@ -205,7 +205,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
                 try {
                   result = resclss.deserializeBinary(data);
                 } catch (err) {
-                  console.error(err);
+                  console.error('Error when deserializing response data from ', url, ' error: ', err);
 
                   return of(
                     this.handleError_(
