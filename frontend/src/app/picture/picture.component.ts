@@ -138,7 +138,7 @@ export class PictureComponent {
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
   protected readonly canEditSpecs$ = this.#auth.authenticated$;
   protected readonly showShareDialog = signal(false);
-  protected readonly location = document.defaultView?.location;
+  protected readonly location = this.#document.defaultView?.location;
   protected readonly statusLoading = signal(false);
 
   protected readonly authenticated$ = this.#auth.authenticated$;
