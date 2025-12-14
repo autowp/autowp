@@ -6,6 +6,7 @@
 export const environment = {
   apiUrl: '',
   grpcHost: '',
+  // eslint-disable-next-line sonarjs/no-clear-text-protocols
   ssrGrpcHost: 'http://goautowp-serve:8080',
   keycloak: {
     clientId: 'frontend',

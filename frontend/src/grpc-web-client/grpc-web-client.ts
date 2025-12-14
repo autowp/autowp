@@ -205,6 +205,8 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
                 try {
                   result = resclss.deserializeBinary(data);
                 } catch (err) {
+                  console.error(err);
+
                   return of(
                     this.handleError_(
                       new RpcError(
@@ -244,6 +246,8 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
         }),
         catchError((error: unknown) => {
           if (error instanceof HttpErrorResponse) {
+            console.error(error);
+
             const xhrStatusCode = error.status;
             const grpcStatusCode = fromHttpStatus(xhrStatusCode);
             if (grpcStatusCode == StatusCode.ABORTED) {

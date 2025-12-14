@@ -1,6 +1,7 @@
 export const environment = {
   apiUrl: '',
   grpcHost: '',
+
   ssrGrpcHost: 'http://localhost:8080',
   keycloak: {
     clientId: 'frontend',
