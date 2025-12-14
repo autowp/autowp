@@ -116,9 +116,10 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
 
     const serialized = req.serializeBinary();
     const payload = this.encodeRequest_(serialized);
+    const url = this.settings.host + path;
 
     return this.httpClient
-      .request('POST', this.settings.host + path, {
+      .request('POST', url, {
         withCredentials: this.#withCredentials,
         headers,
         timeout: requestTimeout,
@@ -206,7 +207,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
                 } catch (err) {
                   return of(
                     this.handleError_(
-                      new RpcError(StatusCode.INTERNAL, `Error when deserializing response data; error: ${err}`),
+                      new RpcError(StatusCode.INTERNAL, `Error when deserializing response data from ${url}; error: ${err}`),
                     ),
                   );
                 }

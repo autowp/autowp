@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"html"
+	"strings"
 
 	"github.com/autowp/goautowp/comments"
 	"github.com/autowp/goautowp/image/storage"
@@ -434,7 +435,8 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 				return nil, err
 			}
 
-			exifStr := ""
+			var exifStr strings.Builder
+
 			skipSections := []string{"FILE", "COMPUTED"}
 
 			if len(exif) > 0 {
@@ -443,21 +445,23 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 						continue
 					}
 
-					exifStr += "<p>[" + html.EscapeString(key) + "]"
+					exifStr.WriteString("<p>[" + html.EscapeString(key) + "]")
+
+					var exifStrSb strings.Builder
 					for name, val := range section {
-						exifStr += "<br />" + html.EscapeString(
-							name,
-						) + ": " + fmt.Sprintf(
-							"%v",
-							val,
+						exifStrSb.WriteString("<br />" + html.EscapeString(
+							fmt.Sprintf(
+								"%s: %v",
+								name, val,
+							)),
 						)
 					}
 
-					exifStr += "</p>"
+					exifStrSb.WriteString("</p>")
 				}
 			}
 
-			resultRow.Exif = exifStr
+			resultRow.Exif = exifStr.String()
 		}
 
 		if fields.GetIsLast() {

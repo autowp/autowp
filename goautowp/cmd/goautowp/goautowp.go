@@ -56,6 +56,7 @@ func mainReturnWithCode() int { //nolint: maintidx
 	logrus.SetLevel(logrus.WarnLevel)
 
 	imagick.Initialize()
+
 	defer imagick.Terminate()
 
 	cfg := config.LoadConfig(".")
@@ -94,7 +95,7 @@ func mainReturnWithCode() int { //nolint: maintidx
 			&cli.StringFlag{
 				Name:     ginmodeFlag,
 				Value:    "release",
-				Usage:    "debug|test|release",
+				Usage:    gin.DebugMode + "|" + gin.TestMode + "|" + gin.ReleaseMode,
 				Required: false,
 				Action: func(_ context.Context, _ *cli.Command, value string) error {
 					gin.SetMode(value)

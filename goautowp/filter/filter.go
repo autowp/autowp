@@ -36,18 +36,18 @@ var specialCharacters = map[rune]string{
 }
 
 func replaceSpecialCharacters(s string) string {
-	str := ""
+	var sb strings.Builder
 
 	for _, c := range s {
 		d, ok := specialCharacters[c]
 		if ok {
-			str += d
+			sb.WriteString(d)
 		} else {
-			str += string(c)
+			sb.WriteRune(c)
 		}
 	}
 
-	return str
+	return sb.String()
 }
 
 func SanitizeFilename(filename string) string {
