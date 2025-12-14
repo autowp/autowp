@@ -1,7 +1,7 @@
 export const environment = {
   apiUrl: '',
   grpcHost: '',
-  ssrGrpcHost: 'localhost:8080',
+  ssrGrpcHost: 'http://localhost:8080',
   keycloak: {
     clientId: 'frontend',
     realm: 'autowp',

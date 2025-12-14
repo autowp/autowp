@@ -6,7 +6,7 @@
 export const environment = {
   apiUrl: '',
   grpcHost: '',
-  ssrGrpcHost: 'goautowp-serve',
+  ssrGrpcHost: 'http://goautowp-serve:8080',
   keycloak: {
     clientId: 'frontend',
     realm: 'autowp',
