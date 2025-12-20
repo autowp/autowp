@@ -1,9 +1,8 @@
 import type {APIItemChildsCounts} from '@services/item';
-import type {ItemHeader} from '@utils/item-header/item-header.component';
 
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
+import {ItemHeader, ItemHeaderComponent} from '@utils/item-header/item-header.component';
 
 @Component({
   selector: 'app-catalogue-item-menu',

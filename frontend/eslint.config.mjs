@@ -35,6 +35,8 @@ export default defineConfig([
     processor: angular.processInlineTemplates,
     // Override specific rules for TypeScript files (these will take priority over the extended configs above)
     rules: {
+      'no-duplicate-imports': 'error',
+      'no-restricted-globals': ['error', {globals: ['window', 'document', 'event']}],
       '@angular-eslint/runtime-localize': 'off',
       '@angular-eslint/component-selector': [
         'error',

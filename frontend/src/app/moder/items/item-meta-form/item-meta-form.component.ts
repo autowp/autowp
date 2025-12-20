@@ -1,5 +1,3 @@
-import type {InvalidParams} from '@utils/invalid-params.pipe';
-
 import {AsyncPipe} from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -38,7 +36,7 @@ import {BoolValue, Int32Value} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {SpecService} from '@services/spec';
 import {VehicleTypeService} from '@services/vehicle-type';
-import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getVehicleTypeTranslation} from '@utils/translations';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {map, shareReplay, switchMap} from 'rxjs/operators';

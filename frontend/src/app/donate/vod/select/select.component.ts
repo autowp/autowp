@@ -10,10 +10,11 @@ import {
   ItemParentListOptions,
   ItemParents,
   ItemParentsRequest,
+  ItemRequest,
   ItemsRequest,
+  ItemType,
   Pages,
 } from '@grpc/spec.pb';
-import {ItemRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';

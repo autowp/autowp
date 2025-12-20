@@ -139,6 +139,7 @@ export const appConfig: ApplicationConfig = {
         enableLogging: false, // !environment.production,
         onLoad: 'check-sso',
         silentCheckSsoRedirectUri:
+          // eslint-disable-next-line no-restricted-globals
           (typeof window !== 'undefined' ? window.location.origin : '') + '/assets/silent-check-sso.html',
       },
     }),
