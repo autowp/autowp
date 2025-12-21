@@ -143,9 +143,9 @@ export class CategoryPictureComponent {
       return of(picture);
     }),
     tap((picture) => {
-      this.#meta.addTag({property: 'og:title', content: picture.nameText});
+      this.#meta.updateTag({property: 'og:title', content: picture.nameText});
       if (picture.previewLarge) {
-        this.#meta.addTag({property: 'og:image', content: picture.previewLarge.src});
+        this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
       }
       this.#pageEnv.set({
         pageId: 187,

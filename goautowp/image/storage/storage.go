@@ -1240,6 +1240,7 @@ func (s *Storage) s3Client(ctx context.Context) (*s3.Client, error) {
 		return nil, err
 	}
 
+	cfg.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
 	cfg.Credentials = aws.NewCredentialsCache(
 		credentials.NewStaticCredentialsProvider(
 			s.config.S3.Credentials.Key,
@@ -1717,7 +1718,7 @@ func (s *Storage) doImagickOperation(
 		return err
 	}
 
-	blobBytes := bytes.NewReader(blob)
+	blobReader := bytes.NewReader(blob)
 
 	contentType, err := sampler.ImagickFormatContentType(mw.GetImageFormat())
 	if err != nil {
@@ -1728,7 +1729,7 @@ func (s *Storage) doImagickOperation(
 
 	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
 		Key:         &fpath,
-		Body:        blobBytes,
+		Body:        blobReader,
 		Bucket:      &bucket,
 		ACL:         types.ObjectCannedACLPublicRead,
 		ContentType: &contentType,

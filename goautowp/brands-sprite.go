@@ -220,6 +220,7 @@ func createIconsSprite(
 		return err
 	}
 
+	cfg.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
 	cfg.Credentials = aws.NewCredentialsCache(
 		credentials.NewStaticCredentialsProvider(
 			fileStorageConfig.S3.Credentials.Key,
