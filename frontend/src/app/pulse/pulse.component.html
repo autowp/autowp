@@ -13,13 +13,7 @@
 <div>
   <div class="nav nav-pills mb-4">
     @for (period of periods; track period.value) {
-      <a
-        class="nav-link"
-        href="#"
-        [class.active]="period.active"
-        [textContent]="period.name"
-        (click)="selectPeriod(period)"
-      ></a>
+      <a class="nav-link" href="#" [class.active]="period.active" (click)="selectPeriod(period)">{{ period.name }}</a>
     }
   </div>
 

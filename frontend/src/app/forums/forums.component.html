@@ -28,11 +28,11 @@
           <p>
             <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
             <strong>
-              <a [routerLink]="['/forums', theme.id]" [textContent]="getForumsThemeTranslation(theme.name)"></a>
+              <a [routerLink]="['/forums', theme.id]">{{ getForumsThemeTranslation(theme.name) }}</a>
             </strong>
           </p>
           @if (theme.description) {
-            <p [textContent]="getForumsThemeDescriptionTranslation(theme.description)"></p>
+            <p>{{ getForumsThemeDescriptionTranslation(theme.description) }}</p>
           }
           <p>
             <ng-container i18n="@@n-topics">{theme.topicsCount, plural,

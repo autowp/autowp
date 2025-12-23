@@ -35,7 +35,7 @@
             [(ngModel)]="form.name"
           />
           @for (message of invalidParams() | invalidParams: 'name'; track message) {
-            <p class="invalid-feedback" [textContent]="message"></p>
+            <p class="invalid-feedback">{{ message }}</p>
           }
         </div>
       </div>
@@ -53,7 +53,7 @@
             [(ngModel)]="form.message"
           ></textarea>
           @for (message of invalidParams() | invalidParams: 'message'; track message) {
-            <p class="invalid-feedback" [textContent]="message"></p>
+            <p class="invalid-feedback">{{ message }}</p>
           }
         </div>
       </div>
@@ -73,7 +73,7 @@
             </label>
           </div>
           @for (message of invalidParams() | invalidParams: 'moderator_attention'; track message) {
-            <p class="invalid-feedback" [textContent]="message"></p>
+            <p class="invalid-feedback">{{ message }}</p>
           }
         </div>
       </div>
@@ -93,7 +93,7 @@
             </label>
           </div>
           @for (message of invalidParams() | invalidParams: 'subscription'; track message) {
-            <p class="invalid-feedback" [textContent]="message"></p>
+            <p class="invalid-feedback">{{ message }}</p>
           }
         </div>
       </div>

@@ -78,9 +78,9 @@
         </tr>
         @for (link of links; track link.id) {
           <tr>
-            <td [textContent]="link.name"></td>
-            <td [textContent]="link.url"></td>
-            <td [textContent]="link.type"></td>
+            <td>{{ link.name }}</td>
+            <td>{{ link.url }}</td>
+            <td>{{ link.type }}</td>
           </tr>
         }
       </tbody>

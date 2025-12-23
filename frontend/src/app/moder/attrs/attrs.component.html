@@ -20,7 +20,7 @@
       <ul>
         @for (zone of zones$ | async; track zone.id) {
           <li>
-            <a [routerLink]="['/moder/attrs/zone', zone.id]" [textContent]="zone.name"></a>
+            <a [routerLink]="['/moder/attrs/zone', zone.id]">{{ zone.name }}</a>
           </li>
         }
       </ul>

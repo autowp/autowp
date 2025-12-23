@@ -16,10 +16,7 @@
       @if (data.prev && data.prev.date) {
         <h3 class="text-start">
           &#x2190;
-          <a
-            [routerLink]="['/new', formatDate(data.prev.date)]"
-            [textContent]="data.prev.date | date: 'mediumDate'"
-          ></a>
+          <a [routerLink]="['/new', formatDate(data.prev.date)]">{{ data.prev.date | date: 'mediumDate' }}</a>
           <br />
           <small
             >(<span i18n="@@n-pictures">{data.prev.count, plural,
@@ -34,7 +31,7 @@
     <div class="col-lg-4 col-md-4">
       @if (data.current) {
         <h3 class="text-center">
-          <span [textContent]="data.current.date | date: 'mediumDate'"></span>
+          <span>{{ data.current.date | date: 'mediumDate' }}</span>
           <br />
           <small
             >(<span i18n="@@n-pictures">{data.current.count, plural,
@@ -49,10 +46,7 @@
     <div class="col-lg-4 col-md-4">
       @if (data.next && data.next.date) {
         <h3 class="text-end">
-          <a
-            [routerLink]="['/new', formatDate(data.next.date)]"
-            [textContent]="data.next.date | date: 'mediumDate'"
-          ></a>
+          <a [routerLink]="['/new', formatDate(data.next.date)]">{{ data.next.date | date: 'mediumDate' }}</a>
           <br />
           <small
             >(<span i18n="@@n-pictures">{data.next.count, plural,

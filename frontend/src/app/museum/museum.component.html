@@ -36,7 +36,7 @@
           <p>
             <ng-container i18n>Web-site:</ng-container>
             @for (link of links.items; track link.id) {
-              <a [href]="link.url" [textContent]="link.name ? link.name : link.url"></a>
+              <a [href]="link.url">{{ link.name ? link.name : link.url }}</a>
               <br />
             }
           </p>

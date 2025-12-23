@@ -113,7 +113,7 @@
                 <span class="badge text-bg-danger" i18n>Deleting</span>
               }
             }
-            <a [routerLink]="comment.comment.route" [textContent]="comment.comment.preview"></a>
+            <a [routerLink]="comment.comment.route">{{ comment.comment.preview }}</a>
             @if (comment.user$ | async; as user) {
               <app-user [user]="user" />
             }

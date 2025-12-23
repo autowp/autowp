@@ -24,8 +24,8 @@
           routerLink="."
           [class.active]="corder.value === order"
           [queryParams]="{order: corder.value, page: null}"
-          [textContent]="corder.name"
-        ></a>
+          >{{ corder.name }}</a
+        >
       </li>
     }
   </ul>
@@ -47,7 +47,7 @@
             <span class="bi bi-hand-thumbs-down" aria-hidden="true"></span>
           </strong>
         }
-        <a [routerLink]="comment.route" [textContent]="comment.preview"></a>
+        <a [routerLink]="comment.route">{{ comment.preview }}</a>
       </li>
     }
   </ul>

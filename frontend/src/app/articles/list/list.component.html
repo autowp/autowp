@@ -21,7 +21,7 @@
             </a>
           }
           <p>
-            <a [routerLink]="article.routerLink" [textContent]="article.name"></a>
+            <a [routerLink]="article.routerLink">{{ article.name }}</a>
           </p>
           <p>
             {{ article.description }}
@@ -32,11 +32,7 @@
               <app-user [user]="author" />
             }
             @if (article.date) {
-              <span
-                class="date"
-                [textContent]="article.date | timeAgo"
-                [ngbTooltip]="article.date | date: 'medium'"
-              ></span>
+              <span class="date" [ngbTooltip]="article.date | date: 'medium'">{{ article.date | timeAgo }}</span>
             }
           </p>
         </li>

@@ -17,7 +17,7 @@
         <tr>
           <td>
             @if (row.userValue.updateDate?.toDate(); as date) {
-              <span [textContent]="date | timeAgo" [ngbTooltip]="date | date: 'medium'"></span>
+              <span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span>
             }
           </td>
           <td>

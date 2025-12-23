@@ -1,511 +1,508 @@
 @if (form$ | async; as form) {
-  @if (item$ | async; as item) {
-    <form method="post" class="form-horizontal" [formGroup]="form" (ngSubmit)="doSubmit(form)">
-      @if (form.controls.name; as name) {
-        <div class="mb-3 row">
-          <label class="col-md-2 col-form-label" for="name" i18n>Name</label>
-          <div class="col-md-10">
-            <input
-              type="text"
-              id="name"
-              name="name"
-              class="form-control"
-              required
-              [class.is-invalid]="
-                (name.invalid && (name.dirty || !name.untouched)) || (invalidParams() && invalidParams()['name'])
-              "
-              [formControl]="name"
-            />
-            @for (message of invalidParams() | invalidParams: 'name'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.full_name; as fullName) {
-        <div class="mb-3 row">
-          <label class="col-md-2 col-form-label" for="full_name" i18n>Full name</label>
-          <div class="col-md-10">
-            <input
-              type="text"
-              id="full_name"
-              name="full_name"
-              class="form-control"
-              [class.is-invalid]="
-                (fullName.invalid && (fullName.dirty || !fullName.untouched)) ||
-                (invalidParams() && invalidParams()['full_name'])
-              "
-              [formControl]="fullName"
-            />
-            @for (message of invalidParams() | invalidParams: 'full_name'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.catname; as catname) {
-        <div class="mb-3 row">
-          <label class="col-md-2 col-form-label" for="catname" i18n>Catname</label>
-          <div class="col-md-10">
-            <input
-              type="text"
-              id="catname"
-              name="catname"
-              class="form-control"
-              [class.is-invalid]="
-                (catname.invalid && (catname.dirty || !catname.untouched)) ||
-                (invalidParams() && invalidParams()['catname'])
-              "
-              [formControl]="catname"
-            />
-            @for (message of invalidParams() | invalidParams: 'catname'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.body; as body) {
-        <div class="mb-3 row">
-          <label class="col-md-2 col-form-label" for="body" i18n>Body number</label>
-          <div class="col-md-10">
-            <input
-              type="text"
-              id="body"
-              name="body"
-              style="width: 30%"
-              class="form-control"
-              [class.is-invalid]="
-                (body.invalid && (body.dirty || !body.untouched)) || (invalidParams() && invalidParams()['body'])
-              "
-              [formControl]="body"
-            />
-            @for (message of invalidParams() | invalidParams: 'body'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.spec_id; as specID) {
-        <div class="mb-3 row">
-          <label class="col-md-2 col-form-label" for="spec_id" i18n>Spec</label>
-          <div class="col-md-10">
-            <select
-              id="spec_id"
-              name="spec_id"
-              style="width: 30%"
-              class="form-select"
-              [class.is-invalid]="
-                (specID.invalid && (specID.dirty || !specID.untouched)) ||
-                (invalidParams() && invalidParams()['spec_id'])
-              "
-              [formControl]="specID"
-            >
-              @for (spec of specs$ | async; track spec.id) {
-                <option [ngValue]="spec.id">
-                  {{ '…'.repeat(spec.deep || 0) + spec.short_name }}
-                </option>
-              }
-            </select>
-            @for (message of invalidParams() | invalidParams: 'spec_id'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.vehicle_type_id; as vehicleTypeID) {
-        <div class="mb-3 row">
-          <label class="col-md-2 col-form-label" for="vehicle_type_id" i18n>Type</label>
-          <div class="col-md-10">
-            @for (typeID of vehicleTypeID.value; track typeID) {
-              <input
-                type="checkbox"
-                id="vehicle_type_id"
-                name="vehicle_type_id"
-                class="d-none"
-                [formControl]="vehicleTypeID"
-                [value]="typeID"
-              />
-              <button class="btn btn-sm btn-info" type="button" (click)="showVehicleTypesModal(vehicleTypeID)">
-                {{ vehicleTypeName$(typeID) | async }}
-              </button>
-            }
-            <button class="btn btn-sm btn-success" type="button" (click)="showVehicleTypesModal(vehicleTypeID)">
-              <span class="bi bi-plus" aria-hidden="true"></span>
-            </button>
-          </div>
-          <script type="text/ng-template" id="vehicle-type-tag-template">
-            <div>{{data.nameTranslated}} <a class="remove-button" (click)="$removeTag()">&#10006;</a></div>
-          </script>
-          <script type="text/ng-template" id="vehicle-type-list-template">
-            <div>{{'...'.repeat(data.deep)}}{{data.nameTranslated}}</div>
-          </script>
-        </div>
-      }
-      @if (form.controls.model_years; as modelYears) {
-        <div class="mb-3 row" formGroupName="model_years">
-          <label class="col-md-2 col-form-label" for="begin_model_year" i18n>Model years</label>
-          <div class="col-md-10">
-            <div class="row">
-              @if (modelYears.controls.begin_year; as beginYear) {
-                <div class="col-md-2 col-sm-4 mb-0">
-                  <input
-                    type="number"
-                    id="begin_model_year"
-                    name="begin_model_year"
-                    placeholder="from"
-                    i18n-placeholder
-                    class="form-control"
-                    maxlength="4"
-                    [class.is-invalid]="
-                      (beginYear.invalid && (beginYear.dirty || !beginYear.untouched)) ||
-                      (invalidParams() && invalidParams()['begin_model_year'])
-                    "
-                    [formControl]="beginYear"
-                  />
-                </div>
-              }
-              @if (modelYears.controls.begin_year_fraction; as beginYearFraction) {
-                <div class="col-md-1 col-sm-2 mb-0">
-                  <select
-                    class="form-select"
-                    name="begin_model_year_fraction"
-                    [class.is-invalid]="
-                      (beginYearFraction.invalid && (beginYearFraction.dirty || !beginYearFraction.untouched)) ||
-                      (invalidParams() && invalidParams()['begin_model_year_fraction'])
-                    "
-                    [formControl]="beginYearFraction"
-                  >
-                    @for (option of modelYearFractionOptions; track option.value) {
-                      <option [ngValue]="option.value">
-                        {{ option.name }}
-                      </option>
-                    }
-                  </select>
-                </div>
-              }
-              @if (modelYears.controls.end_year; as endYear) {
-                <div class="col-md-2 col-sm-4 mb-0">
-                  <input
-                    type="number"
-                    name="end_model_year"
-                    placeholder="to"
-                    i18n-placeholder
-                    class="form-control"
-                    maxlength="4"
-                    [class.is-invalid]="
-                      (endYear.invalid && (endYear.dirty || !endYear.untouched)) ||
-                      (invalidParams() && invalidParams()['end_model_year'])
-                    "
-                    [formControl]="endYear"
-                  />
-                </div>
-              }
-              @if (modelYears.controls.end_year_fraction; as endYearFraction) {
-                <div class="col-md-1 col-sm-2 mb-0">
-                  <select
-                    class="form-select"
-                    name="end_model_year_fraction"
-                    [class.is-invalid]="
-                      (endYearFraction.invalid && (endYearFraction.dirty || !endYearFraction.untouched)) ||
-                      (invalidParams() && invalidParams()['end_model_year_fraction'])
-                    "
-                    [formControl]="endYearFraction"
-                  >
-                    @for (option of modelYearFractionOptions; track option.value) {
-                      <option [ngValue]="option.value">
-                        {{ option.name }}
-                      </option>
-                    }
-                  </select>
-                </div>
-              }
-            </div>
-            @for (message of invalidParams() | invalidParams: 'begin_model_year'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-            @for (message of invalidParams() | invalidParams: 'end_model_year'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.begin; as begin) {
-        <div class="mb-3 row" formGroupName="begin">
-          <label class="col-md-2 col-form-label" for="begin_year" i18n>Begin</label>
-          <div class="col-md-10">
-            <div class="row">
-              @if (begin.controls.year; as beginYear) {
-                <div class="col-md-2 col-sm-2 mb-0">
-                  <input
-                    type="number"
-                    id="begin_year"
-                    name="begin_year"
-                    placeholder="year"
-                    i18n-placeholder
-                    class="form-control"
-                    [class.is-invalid]="
-                      (beginYear.invalid && (beginYear.dirty || !beginYear.untouched)) ||
-                      (invalidParams() && invalidParams()['begin_year'])
-                    "
-                    [attr.maxlength]="4"
-                    [formControl]="beginYear"
-                  />
-                </div>
-              }
-              @if (begin.controls.month; as beginMonth) {
-                <div class="col-md-4 col-sm-7 mb-0">
-                  <select
-                    name="begin_month"
-                    title="month"
-                    i18n-title
-                    class="form-select"
-                    [class.is-invalid]="
-                      (beginMonth.invalid && (beginMonth.dirty || !beginMonth.untouched)) ||
-                      (invalidParams() && invalidParams()['begin_month'])
-                    "
-                    [formControl]="beginMonth"
-                  >
-                    @for (month of monthOptions; track month.value) {
-                      <option [ngValue]="month.value">{{ month.name }}</option>
-                    }
-                  </select>
-                </div>
-              }
-            </div>
-            @for (message of invalidParams() | invalidParams: 'begin_year'; track message) {
-              <p class="invalid-feedback d-block" [textContent]="message"></p>
-            }
-            @for (message of invalidParams() | invalidParams: 'begin_month'; track message) {
-              <p class="invalid-feedback d-block" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.end; as end) {
-        <div class="mb-3 row" formGroupName="end">
-          <label class="col-md-2 col-form-label" for="end_year" i18n>End</label>
-          <div class="col-md-10">
-            <div class="row">
-              @if (end.controls.year; as endYear) {
-                <div class="col-md-2 col-sm-2 mb-0">
-                  <input
-                    type="number"
-                    id="end_year"
-                    name="end_year"
-                    placeholder="year"
-                    i18n-placeholder
-                    class="form-control"
-                    maxlength="4"
-                    [class.is-invalid]="
-                      (endYear.invalid && (endYear.dirty || !endYear.untouched)) ||
-                      (invalidParams() && invalidParams()['end_year'])
-                    "
-                    [formControl]="endYear"
-                  />
-                </div>
-              }
-              @if (end.controls.month; as endMonth) {
-                <div class="col-md-4 col-sm-7 mb-0">
-                  <select
-                    name="end_month"
-                    title="month"
-                    i18n-title
-                    class="form-select"
-                    [class.is-invalid]="
-                      (endMonth.invalid && (endMonth.dirty || !endMonth.untouched)) ||
-                      (invalidParams() && invalidParams()['end_month'])
-                    "
-                    [formControl]="endMonth"
-                  >
-                    @for (month of monthOptions; track month.value) {
-                      <option [ngValue]="month.value">{{ month.name }}</option>
-                    }
-                  </select>
-                </div>
-              }
-              @if (end.controls.today; as today) {
-                <div class="col-md-4 col-sm-3 mb-0">
-                  <select
-                    name="today"
-                    title="today"
-                    i18n-title
-                    class="form-select"
-                    [class.is-invalid]="
-                      (today.invalid && (today.dirty || !today.untouched)) ||
-                      (invalidParams() && invalidParams()['today'])
-                    "
-                    [formControl]="today"
-                  >
-                    @for (option of todayOptions; track option.value) {
-                      <option [ngValue]="option.value">{{ option.name }}</option>
-                    }
-                  </select>
-                </div>
-              }
-            </div>
-            @for (message of invalidParams() | invalidParams: 'end_year'; track message) {
-              <p class="invalid-feedback d-block" [textContent]="message"></p>
-            }
-            @for (message of invalidParams() | invalidParams: 'end_month'; track message) {
-              <p class="invalid-feedback d-block" [textContent]="message"></p>
-            }
-            @for (message of invalidParams() | invalidParams: 'today'; track message) {
-              <p class="invalid-feedback d-block" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.produced; as produced) {
-        <div class="mb-3 row" formGroupName="produced">
-          <label class="col-md-2 col-form-label" for="produced" i18n>Produced</label>
-          <div class="col-md-10">
-            <div class="row">
-              @if (produced.controls.count; as count) {
-                <div class="col-md-2 col-sm-2 mb-0">
-                  <input
-                    type="number"
-                    id="produced"
-                    name="produced"
-                    min="0"
-                    max="100000000"
-                    class="form-control"
-                    title="number"
-                    i18n-title
-                    [class.is-invalid]="
-                      (count.invalid && (count.dirty || !count.untouched)) ||
-                      (invalidParams() && invalidParams()['produced_count'])
-                    "
-                    [formControl]="count"
-                  />
-                </div>
-              }
-              @if (produced.controls.exactly; as exactly) {
-                <div class="col-md-4 col-sm-4 mb-0">
-                  <select
-                    name="produced_exactly"
-                    class="form-select"
-                    [class.is-invalid]="
-                      (exactly.invalid && (exactly.dirty || !exactly.untouched)) ||
-                      (invalidParams() && invalidParams()['produced_exactly'])
-                    "
-                    [formControl]="exactly"
-                  >
-                    @for (option of producedOptions; track option.value) {
-                      <option [ngValue]="option.value">{{ option.name }}</option>
-                    }
-                  </select>
-                </div>
-              }
-            </div>
-            @for (message of invalidParams() | invalidParams: 'produced_count'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-            @for (message of invalidParams() | invalidParams: 'produced_exactly'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.is_concept; as isConcept) {
-        <div class="mb-3 row">
-          <label class="col-md-2 col-form-label" for="is_concept" i18n>Concept (prototype)</label>
-          <div class="col-md-10">
-            <select
-              id="is_concept"
-              name="is_concept"
-              style="width: 20%"
-              class="form-select"
-              [class.is-invalid]="
-                (isConcept.invalid && (isConcept.dirty || !isConcept.untouched)) ||
-                (invalidParams() && invalidParams()['is_concept'])
-              "
-              [formControl]="isConcept"
-            >
-              @for (option of isConceptOptions$ | async; track option.value) {
-                <option [ngValue]="option.value">{{ option.name }}</option>
-              }
-            </select>
-            @for (message of invalidParams() | invalidParams: 'is_concept'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
-            }
-          </div>
-        </div>
-      }
-      @if (form.controls.is_group; as isGroup) {
-        <div class="mb-3 row">
-          <div class="col-md-2"></div>
-          <div class="col-md-10">
-            <div class="checkbox">
-              <label>
-                <input
-                  type="checkbox"
-                  name="is_group"
-                  value="1"
-                  [class.is-invalid]="
-                    (isGroup.invalid && (isGroup.dirty || !isGroup.untouched)) ||
-                    (invalidParams() && invalidParams()['is_group'])
-                  "
-                  [formControl]="isGroup"
-                />
-                <ng-container i18n>Group</ng-container>
-              </label>
-            </div>
-          </div>
-        </div>
-      }
-      @if (form.controls.point; as point) {
-        <div class="mb-3 row">
-          <label class="col-md-2 col-form-label" for="point">Point</label>
-          <div class="col-md-10 coords">
-            <app-map-point id="point" [formControl]="point" />
-          </div>
-        </div>
-      }
-      @if (form.controls.items; as control) {
-        <div class="mb-3 row">
-          <div class="col-md-2 col-form-label text-end" i18n>Vehicles</div>
-          @if (items$ | async; as items) {
-            <div class="col-md-10">
-              @for (child of items; track child.id) {
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" [value]="child.id" (change)="onCheckboxChange($event, control)" />
-                    <span [innerHTML]="child.nameHtml"></span>
-                  </label>
-                </div>
-              }
-            </div>
+  <form method="post" class="form-horizontal" [formGroup]="form" (ngSubmit)="doSubmit(form)">
+    @if (form.controls.name; as name) {
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="name" i18n>Name</label>
+        <div class="col-md-10">
+          <input
+            type="text"
+            id="name"
+            name="name"
+            class="form-control"
+            required
+            [class.is-invalid]="
+              (name.invalid && (name.dirty || !name.untouched)) || (invalidParams() && invalidParams()['name'])
+            "
+            [formControl]="name"
+          />
+          @for (message of invalidParams() | invalidParams: 'name'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
           }
-        </div>
-      }
-      @if (form.controls.pictures; as control) {
-        <div class="mb-3 row">
-          <div class="col-md-2 col-form-label text-end" i18n>Pictures</div>
-          @if (pictures$ | async; as data) {
-            <div class="col-md-10 multicheckbox-pictures row">
-              @for (picture of data; track picture) {
-                <div class="col-md-3 mb-4">
-                  <button
-                    type="button"
-                    class="btn btn-secondary"
-                    [class.btn-success]="picture.selected"
-                    (click)="onPictureClick(picture, control)"
-                  >
-                    @if (picture.picture$ | async; as pic) {
-                      <img alt="" class="rounded w-100" [src]="pic.thumbMedium?.src" [title]="pic.nameText" />
-                    }
-                  </button>
-                </div>
-              }
-            </div>
-          }
-        </div>
-      }
-      <div class="row">
-        <div class="col-md-10 offset-md-2">
-          <button type="submit" name="submit" class="btn btn-primary" i18n [disabled]="!form.valid">Submit</button>
         </div>
       </div>
-    </form>
-  }
+    }
+    @if (form.controls.full_name; as fullName) {
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="full_name" i18n>Full name</label>
+        <div class="col-md-10">
+          <input
+            type="text"
+            id="full_name"
+            name="full_name"
+            class="form-control"
+            [class.is-invalid]="
+              (fullName.invalid && (fullName.dirty || !fullName.untouched)) ||
+              (invalidParams() && invalidParams()['full_name'])
+            "
+            [formControl]="fullName"
+          />
+          @for (message of invalidParams() | invalidParams: 'full_name'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (form.controls.catname; as catname) {
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="catname" i18n>Catname</label>
+        <div class="col-md-10">
+          <input
+            type="text"
+            id="catname"
+            name="catname"
+            class="form-control"
+            [class.is-invalid]="
+              (catname.invalid && (catname.dirty || !catname.untouched)) ||
+              (invalidParams() && invalidParams()['catname'])
+            "
+            [formControl]="catname"
+          />
+          @for (message of invalidParams() | invalidParams: 'catname'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (form.controls.body; as body) {
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="body" i18n>Body number</label>
+        <div class="col-md-10">
+          <input
+            type="text"
+            id="body"
+            name="body"
+            style="width: 30%"
+            class="form-control"
+            [class.is-invalid]="
+              (body.invalid && (body.dirty || !body.untouched)) || (invalidParams() && invalidParams()['body'])
+            "
+            [formControl]="body"
+          />
+          @for (message of invalidParams() | invalidParams: 'body'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (form.controls.spec_id; as specID) {
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="spec_id" i18n>Spec</label>
+        <div class="col-md-10">
+          <select
+            id="spec_id"
+            name="spec_id"
+            style="width: 30%"
+            class="form-select"
+            [class.is-invalid]="
+              (specID.invalid && (specID.dirty || !specID.untouched)) || (invalidParams() && invalidParams()['spec_id'])
+            "
+            [formControl]="specID"
+          >
+            @for (spec of specs$ | async; track spec.id) {
+              <option [ngValue]="spec.id">
+                {{ '…'.repeat(spec.deep || 0) + spec.short_name }}
+              </option>
+            }
+          </select>
+          @for (message of invalidParams() | invalidParams: 'spec_id'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (form.controls.vehicle_type_id; as vehicleTypeID) {
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="vehicle_type_id" i18n>Type</label>
+        <div class="col-md-10">
+          @for (typeID of vehicleTypeID.value; track typeID) {
+            <input
+              type="checkbox"
+              id="vehicle_type_id"
+              name="vehicle_type_id"
+              class="d-none"
+              [formControl]="vehicleTypeID"
+              [value]="typeID"
+            />
+            <button class="btn btn-sm btn-info" type="button" (click)="showVehicleTypesModal(vehicleTypeID)">
+              {{ vehicleTypeName$(typeID) | async }}
+            </button>
+          }
+          <button class="btn btn-sm btn-success" type="button" (click)="showVehicleTypesModal(vehicleTypeID)">
+            <span class="bi bi-plus" aria-hidden="true"></span>
+          </button>
+        </div>
+        <script type="text/ng-template" id="vehicle-type-tag-template">
+          <div>{{data.nameTranslated}} <a class="remove-button" (click)="$removeTag()">&#10006;</a></div>
+        </script>
+        <script type="text/ng-template" id="vehicle-type-list-template">
+          <div>{{'...'.repeat(data.deep)}}{{data.nameTranslated}}</div>
+        </script>
+      </div>
+    }
+    @if (form.controls.model_years; as modelYears) {
+      <div class="mb-3 row" formGroupName="model_years">
+        <label class="col-md-2 col-form-label" for="begin_model_year" i18n>Model years</label>
+        <div class="col-md-10">
+          <div class="row">
+            @if (modelYears.controls.begin_year; as beginYear) {
+              <div class="col-md-2 col-sm-4 mb-0">
+                <input
+                  type="number"
+                  id="begin_model_year"
+                  name="begin_model_year"
+                  placeholder="from"
+                  i18n-placeholder
+                  class="form-control"
+                  maxlength="4"
+                  [class.is-invalid]="
+                    (beginYear.invalid && (beginYear.dirty || !beginYear.untouched)) ||
+                    (invalidParams() && invalidParams()['begin_model_year'])
+                  "
+                  [formControl]="beginYear"
+                />
+              </div>
+            }
+            @if (modelYears.controls.begin_year_fraction; as beginYearFraction) {
+              <div class="col-md-1 col-sm-2 mb-0">
+                <select
+                  class="form-select"
+                  name="begin_model_year_fraction"
+                  [class.is-invalid]="
+                    (beginYearFraction.invalid && (beginYearFraction.dirty || !beginYearFraction.untouched)) ||
+                    (invalidParams() && invalidParams()['begin_model_year_fraction'])
+                  "
+                  [formControl]="beginYearFraction"
+                >
+                  @for (option of modelYearFractionOptions; track option.value) {
+                    <option [ngValue]="option.value">
+                      {{ option.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+            }
+            @if (modelYears.controls.end_year; as endYear) {
+              <div class="col-md-2 col-sm-4 mb-0">
+                <input
+                  type="number"
+                  name="end_model_year"
+                  placeholder="to"
+                  i18n-placeholder
+                  class="form-control"
+                  maxlength="4"
+                  [class.is-invalid]="
+                    (endYear.invalid && (endYear.dirty || !endYear.untouched)) ||
+                    (invalidParams() && invalidParams()['end_model_year'])
+                  "
+                  [formControl]="endYear"
+                />
+              </div>
+            }
+            @if (modelYears.controls.end_year_fraction; as endYearFraction) {
+              <div class="col-md-1 col-sm-2 mb-0">
+                <select
+                  class="form-select"
+                  name="end_model_year_fraction"
+                  [class.is-invalid]="
+                    (endYearFraction.invalid && (endYearFraction.dirty || !endYearFraction.untouched)) ||
+                    (invalidParams() && invalidParams()['end_model_year_fraction'])
+                  "
+                  [formControl]="endYearFraction"
+                >
+                  @for (option of modelYearFractionOptions; track option.value) {
+                    <option [ngValue]="option.value">
+                      {{ option.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+          @for (message of invalidParams() | invalidParams: 'begin_model_year'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
+          @for (message of invalidParams() | invalidParams: 'end_model_year'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (form.controls.begin; as begin) {
+      <div class="mb-3 row" formGroupName="begin">
+        <label class="col-md-2 col-form-label" for="begin_year" i18n>Begin</label>
+        <div class="col-md-10">
+          <div class="row">
+            @if (begin.controls.year; as beginYear) {
+              <div class="col-md-2 col-sm-2 mb-0">
+                <input
+                  type="number"
+                  id="begin_year"
+                  name="begin_year"
+                  placeholder="year"
+                  i18n-placeholder
+                  class="form-control"
+                  [class.is-invalid]="
+                    (beginYear.invalid && (beginYear.dirty || !beginYear.untouched)) ||
+                    (invalidParams() && invalidParams()['begin_year'])
+                  "
+                  [attr.maxlength]="4"
+                  [formControl]="beginYear"
+                />
+              </div>
+            }
+            @if (begin.controls.month; as beginMonth) {
+              <div class="col-md-4 col-sm-7 mb-0">
+                <select
+                  name="begin_month"
+                  title="month"
+                  i18n-title
+                  class="form-select"
+                  [class.is-invalid]="
+                    (beginMonth.invalid && (beginMonth.dirty || !beginMonth.untouched)) ||
+                    (invalidParams() && invalidParams()['begin_month'])
+                  "
+                  [formControl]="beginMonth"
+                >
+                  @for (month of monthOptions; track month.value) {
+                    <option [ngValue]="month.value">{{ month.name }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+          @for (message of invalidParams() | invalidParams: 'begin_year'; track message) {
+            <p class="invalid-feedback d-block">{{ message }}</p>
+          }
+          @for (message of invalidParams() | invalidParams: 'begin_month'; track message) {
+            <p class="invalid-feedback d-block">{{ message }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (form.controls.end; as end) {
+      <div class="mb-3 row" formGroupName="end">
+        <label class="col-md-2 col-form-label" for="end_year" i18n>End</label>
+        <div class="col-md-10">
+          <div class="row">
+            @if (end.controls.year; as endYear) {
+              <div class="col-md-2 col-sm-2 mb-0">
+                <input
+                  type="number"
+                  id="end_year"
+                  name="end_year"
+                  placeholder="year"
+                  i18n-placeholder
+                  class="form-control"
+                  maxlength="4"
+                  [class.is-invalid]="
+                    (endYear.invalid && (endYear.dirty || !endYear.untouched)) ||
+                    (invalidParams() && invalidParams()['end_year'])
+                  "
+                  [formControl]="endYear"
+                />
+              </div>
+            }
+            @if (end.controls.month; as endMonth) {
+              <div class="col-md-4 col-sm-7 mb-0">
+                <select
+                  name="end_month"
+                  title="month"
+                  i18n-title
+                  class="form-select"
+                  [class.is-invalid]="
+                    (endMonth.invalid && (endMonth.dirty || !endMonth.untouched)) ||
+                    (invalidParams() && invalidParams()['end_month'])
+                  "
+                  [formControl]="endMonth"
+                >
+                  @for (month of monthOptions; track month.value) {
+                    <option [ngValue]="month.value">{{ month.name }}</option>
+                  }
+                </select>
+              </div>
+            }
+            @if (end.controls.today; as today) {
+              <div class="col-md-4 col-sm-3 mb-0">
+                <select
+                  name="today"
+                  title="today"
+                  i18n-title
+                  class="form-select"
+                  [class.is-invalid]="
+                    (today.invalid && (today.dirty || !today.untouched)) ||
+                    (invalidParams() && invalidParams()['today'])
+                  "
+                  [formControl]="today"
+                >
+                  @for (option of todayOptions; track option.value) {
+                    <option [ngValue]="option.value">{{ option.name }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+          @for (message of invalidParams() | invalidParams: 'end_year'; track message) {
+            <p class="invalid-feedback d-block">{{ message }}</p>
+          }
+          @for (message of invalidParams() | invalidParams: 'end_month'; track message) {
+            <p class="invalid-feedback d-block">{{ message }}</p>
+          }
+          @for (message of invalidParams() | invalidParams: 'today'; track message) {
+            <p class="invalid-feedback d-block">{{ message }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (form.controls.produced; as produced) {
+      <div class="mb-3 row" formGroupName="produced">
+        <label class="col-md-2 col-form-label" for="produced" i18n>Produced</label>
+        <div class="col-md-10">
+          <div class="row">
+            @if (produced.controls.count; as count) {
+              <div class="col-md-2 col-sm-2 mb-0">
+                <input
+                  type="number"
+                  id="produced"
+                  name="produced"
+                  min="0"
+                  max="100000000"
+                  class="form-control"
+                  title="number"
+                  i18n-title
+                  [class.is-invalid]="
+                    (count.invalid && (count.dirty || !count.untouched)) ||
+                    (invalidParams() && invalidParams()['produced_count'])
+                  "
+                  [formControl]="count"
+                />
+              </div>
+            }
+            @if (produced.controls.exactly; as exactly) {
+              <div class="col-md-4 col-sm-4 mb-0">
+                <select
+                  name="produced_exactly"
+                  class="form-select"
+                  [class.is-invalid]="
+                    (exactly.invalid && (exactly.dirty || !exactly.untouched)) ||
+                    (invalidParams() && invalidParams()['produced_exactly'])
+                  "
+                  [formControl]="exactly"
+                >
+                  @for (option of producedOptions; track option.value) {
+                    <option [ngValue]="option.value">{{ option.name }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+          @for (message of invalidParams() | invalidParams: 'produced_count'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
+          @for (message of invalidParams() | invalidParams: 'produced_exactly'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (form.controls.is_concept; as isConcept) {
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="is_concept" i18n>Concept (prototype)</label>
+        <div class="col-md-10">
+          <select
+            id="is_concept"
+            name="is_concept"
+            style="width: 20%"
+            class="form-select"
+            [class.is-invalid]="
+              (isConcept.invalid && (isConcept.dirty || !isConcept.untouched)) ||
+              (invalidParams() && invalidParams()['is_concept'])
+            "
+            [formControl]="isConcept"
+          >
+            @for (option of isConceptOptions$ | async; track option.value) {
+              <option [ngValue]="option.value">{{ option.name }}</option>
+            }
+          </select>
+          @for (message of invalidParams() | invalidParams: 'is_concept'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (form.controls.is_group; as isGroup) {
+      <div class="mb-3 row">
+        <div class="col-md-2"></div>
+        <div class="col-md-10">
+          <div class="checkbox">
+            <label>
+              <input
+                type="checkbox"
+                name="is_group"
+                value="1"
+                [class.is-invalid]="
+                  (isGroup.invalid && (isGroup.dirty || !isGroup.untouched)) ||
+                  (invalidParams() && invalidParams()['is_group'])
+                "
+                [formControl]="isGroup"
+              />
+              <ng-container i18n>Group</ng-container>
+            </label>
+          </div>
+        </div>
+      </div>
+    }
+    @if (form.controls.point; as point) {
+      <div class="mb-3 row">
+        <label class="col-md-2 col-form-label" for="point">Point</label>
+        <div class="col-md-10 coords">
+          <app-map-point id="point" [formControl]="point" />
+        </div>
+      </div>
+    }
+    @if (form.controls.items; as control) {
+      <div class="mb-3 row">
+        <div class="col-md-2 col-form-label text-end" i18n>Vehicles</div>
+        @if (items$ | async; as items) {
+          <div class="col-md-10">
+            @for (child of items; track child.id) {
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" [value]="child.id" (change)="onCheckboxChange($event, control)" />
+                  <span [innerHTML]="child.nameHtml"></span>
+                </label>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+    @if (form.controls.pictures; as control) {
+      <div class="mb-3 row">
+        <div class="col-md-2 col-form-label text-end" i18n>Pictures</div>
+        @if (pictures$ | async; as data) {
+          <div class="col-md-10 multicheckbox-pictures row">
+            @for (picture of data; track picture) {
+              <div class="col-md-3 mb-4">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  [class.btn-success]="picture.selected"
+                  (click)="onPictureClick(picture, control)"
+                >
+                  @if (picture.picture$ | async; as pic) {
+                    <img alt="" class="rounded w-100" [src]="pic.thumbMedium?.src" [title]="pic.nameText" />
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+    <div class="row">
+      <div class="col-md-10 offset-md-2">
+        <button type="submit" name="submit" class="btn btn-primary" i18n [disabled]="!form.valid">Submit</button>
+      </div>
+    </div>
+  </form>
 }

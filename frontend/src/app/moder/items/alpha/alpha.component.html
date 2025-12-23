@@ -26,9 +26,9 @@
             class="btn btn-secondary"
             routerLink="."
             [class.active]="c === char"
-            [textContent]="c"
             [queryParams]="{char: c, page: null}"
-          ></a>
+            >{{ c }}</a
+          >
         }
       </div>
     }

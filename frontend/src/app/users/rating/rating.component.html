@@ -52,7 +52,7 @@
           <th scope="col">#</th>
           <th scope="col"></th>
           <th scope="col"></th>
-          <th scope="col" class="text-end" [textContent]="valueTitle$ | async"></th>
+          <th scope="col" class="text-end">{{ valueTitle$ | async }}</th>
           @if (rating === Rating.SPECS) {
             <th scope="col" class="text-end" i18n>Specs volume</th>
           }
@@ -61,7 +61,7 @@
       <tbody>
         @for (row of users; track row; let i = $index) {
           <tr>
-            <td [textContent]="i + 1"></td>
+            <td>{{ i + 1 }}</td>
             <td>
               @if (row.user$ | async; as user) {
                 <app-user [user]="user" />
@@ -72,11 +72,10 @@
                 @if (row.brands$ | async; as brands) {
                   <div>
                     @for (brand of brands.brands; track brand) {
-                      <a [routerLink]="brand.route" [textContent]="brand.name || 'unnamed'"></a>
-                      <span
-                        class="badge rounded-pill text-bg-secondary"
-                        [textContent]="(+brand.volume > 0 ? '+' : '') + brand.volume"
-                      ></span>
+                      <a [routerLink]="brand.route">{{ brand.name || 'unnamed' }}</a>
+                      <span class="badge rounded-pill text-bg-secondary">{{
+                        (+brand.volume > 0 ? '+' : '') + brand.volume
+                      }}</span>
                       <span>, </span>
                     }
                     …
@@ -92,10 +91,9 @@
                       @if (fan.user$ | async; as user) {
                         <app-user [user]="user" />
                       }
-                      <span
-                        class="badge rounded-pill text-bg-secondary"
-                        [textContent]="(+fan.volume > 0 ? '+' : '') + fan.volume"
-                      ></span>
+                      <span class="badge rounded-pill text-bg-secondary">{{
+                        (+fan.volume > 0 ? '+' : '') + fan.volume
+                      }}</span>
                       <span>, </span>
                     }
                     …
@@ -105,14 +103,15 @@
                 }
               }
             </td>
-            <td class="text-end" [textContent]="row.volume | number: '1.0-0'"></td>
+            <td class="text-end">{{ row.volume | number: '1.0-0' }}</td>
             @if (rating === Rating.SPECS) {
               <td
                 class="text-end"
                 [class.danger]="row.weight < 0.5"
                 [class.warning]="row.weight >= 0.5 && row.weight < 1.5"
-                [textContent]="row.weight | number: '1.2-2'"
-              ></td>
+              >
+                {{ row.weight | number: '1.2-2' }}
+              </td>
             }
           </tr>
         }

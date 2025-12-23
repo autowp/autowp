@@ -3,7 +3,7 @@
   @if (item.design) {
     <sup class="design-brand mx-2"
       ><ng-container i18n>designed by</ng-container>
-      <a [routerLink]="item.design.route" [textContent]="item.design.name"></a>
+      <a [routerLink]="item.design.route">{{ item.design.name }}</a>
     </sup>
   }
   @if (item.produced; as p) {

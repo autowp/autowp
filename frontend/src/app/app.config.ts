@@ -14,7 +14,12 @@ import {
   runInInjectionContext,
 } from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {BrowserModule, provideClientHydration, withEventReplay, withI18nSupport} from '@angular/platform-browser';
+import {
+  BrowserModule,
+  provideClientHydration,
+  withI18nSupport,
+  withIncrementalHydration,
+} from '@angular/platform-browser';
 import {provideRouter, withInMemoryScrolling} from '@angular/router';
 import {environment} from '@environment/environment';
 import {
@@ -169,7 +174,7 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideHttpClient(withInterceptors([authInterceptor$]), withFetch()),
-    provideClientHydration(withEventReplay(), withI18nSupport()),
+    provideClientHydration(withI18nSupport(), withIncrementalHydration()),
     provideAppInitializer(async () => {
       const platform = inject(PLATFORM_ID);
       const config = inject(NgbToastConfig);

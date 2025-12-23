@@ -31,9 +31,10 @@
         type="submit"
         name="theme_id"
         [disabled]="topic.themeId === theme.id"
-        [textContent]="getForumsThemeTranslation(theme.name)"
         (click)="selectTheme(topic, theme)"
-      ></button>
+      >
+        {{ getForumsThemeTranslation(theme.name) }}
+      </button>
     </div>
   }
 }

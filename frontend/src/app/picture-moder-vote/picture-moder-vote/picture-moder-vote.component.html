@@ -9,9 +9,10 @@
               <button
                 type="button"
                 class="dropdown-item"
-                [textContent]="template.message"
                 (click)="votePicture(picture, template.vote, template.message)"
-              ></button>
+              >
+                {{ template.message }}
+              </button>
             }
           }
           <div class="dropdown-divider"></div>
@@ -26,9 +27,10 @@
               <button
                 type="button"
                 class="dropdown-item"
-                [textContent]="template.message"
                 (click)="votePicture(picture, template.vote, template.message)"
-              ></button>
+              >
+                {{ template.message }}
+              </button>
             }
           }
           <div class="dropdown-divider"></div>
@@ -56,7 +58,7 @@
             @if (moder_vote.user$ | async; as user) {
               <app-user [user]="user" />
             }
-            <span [ngStyle]="{color: moder_vote.vote > 0 ? 'green' : 'red'}" [textContent]="moder_vote.reason"></span>
+            <span [style.color]="moder_vote.vote > 0 ? 'green' : 'red'">{{ moder_vote.reason }}</span>
           </li>
         }
       </ul>

@@ -33,7 +33,7 @@
             <p>
               <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
               @if (item.specificationsCount) {
-                <span class="badge rounded-pill text-bg-secondary" [textContent]="item.specificationsCount"></span>
+                <span class="badge rounded-pill text-bg-secondary">{{ item.specificationsCount }}</span>
               }
             </p>
           }
@@ -75,14 +75,14 @@
         <span class="glyphicon glyphicon-pencil"></span>
         <span i18n>Meta</span>
         @if (metaTab.count) {
-          <span class="badge rounded-pill text-bg-secondary" [textContent]="metaTab.count"></span>
+          <span class="badge rounded-pill text-bg-secondary">{{ metaTab.count }}</span>
         }
       </a>
       <a class="nav-link" routerLink="." [class.active]="activeTab === 'name'" [queryParams]="{tab: 'name'}">
         <span class="glyphicon glyphicon-align-left"></span>
         <span i18n>Name and description</span>
         @if (nameTab.count) {
-          <span class="badge rounded-pill text-bg-secondary" [textContent]="nameTab.count"></span>
+          <span class="badge rounded-pill text-bg-secondary">{{ nameTab.count }}</span>
         }
       </a>
       @if (logoTab.visible) {
@@ -90,7 +90,7 @@
           <span class="glyphicon glyphicon-align-left"></span>
           <span i18n>Logotype</span>
           @if (logoTab.count) {
-            <span class="badge rounded-pill text-bg-secondary" [textContent]="logoTab.count"></span>
+            <span class="badge rounded-pill text-bg-secondary">{{ logoTab.count }}</span>
           }
         </a>
       }
@@ -103,7 +103,7 @@
         >
           <span i18n>Catalogue</span>
           @if (catalogueTab.count) {
-            <span class="badge rounded-pill text-bg-secondary" [textContent]="catalogueTab.count"></span>
+            <span class="badge rounded-pill text-bg-secondary">{{ catalogueTab.count }}</span>
           }
         </a>
       }
@@ -111,7 +111,7 @@
         <a class="nav-link" routerLink="." [class.active]="activeTab === 'vehicles'" [queryParams]="{tab: 'vehicles'}">
           <span i18n>Vehicles</span>
           @if (vehiclesTab.count) {
-            <span class="badge rounded-pill text-bg-secondary" [textContent]="vehiclesTab.count"></span>
+            <span class="badge rounded-pill text-bg-secondary">{{ vehiclesTab.count }}</span>
           }
         </a>
       }
@@ -120,7 +120,7 @@
           <span class="bi bi-tree" aria-hidden="true"></span>
           <span i18n>Tree</span>
           @if (treeTab.count) {
-            <span class="badge rounded-pill text-bg-secondary" [textContent]="treeTab.count"></span>
+            <span class="badge rounded-pill text-bg-secondary">{{ treeTab.count }}</span>
           }
         </a>
       }
@@ -129,7 +129,7 @@
           <span class="glyphicon glyphicon-th"></span>
           <span i18n>Pictures</span>
           @if (picturesTab.count) {
-            <span class="badge rounded-pill text-bg-secondary" [textContent]="picturesTab.count"></span>
+            <span class="badge rounded-pill text-bg-secondary">{{ picturesTab.count }}</span>
           }
         </a>
       }
@@ -138,7 +138,7 @@
           <span class="glyphicon glyphicon-globe"></span>
           <span i18n>Links</span>
           @if (linksTab.count) {
-            <span class="badge rounded-pill text-bg-secondary" [textContent]="linksTab.count"></span>
+            <span class="badge rounded-pill text-bg-secondary">{{ linksTab.count }}</span>
           }
         </a>
       }

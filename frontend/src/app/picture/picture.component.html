@@ -8,7 +8,7 @@
             @if (items[0].item?.design; as design) {
               <sup class="design-brand">
                 <ng-container i18n>designed by</ng-container>
-                <a [routerLink]="design.route" [textContent]="design.name"></a>
+                <a [routerLink]="design.route">{{ design.name }}</a>
               </sup>
             }
           }
@@ -22,7 +22,7 @@
             @if (items[0].item?.design; as design) {
               <sup class="design-brand">
                 <ng-container i18n>designed by</ng-container>
-                <a [routerLink]="design.route" [textContent]="design.name"></a>
+                <a [routerLink]="design.route">{{ design.name }}</a>
               </sup>
             }
           }

@@ -29,19 +29,17 @@
         @if (user.regDate) {
           <p>
             <ng-container i18n>Registration date</ng-container>
-            <strong
-              [textContent]="user.regDate.toDate() | timeAgo"
-              [ngbTooltip]="user.regDate.toDate() | date: 'fullDate'"
-            ></strong>
+            <strong [ngbTooltip]="user.regDate.toDate() | date: 'fullDate'">{{
+              user.regDate.toDate() | timeAgo
+            }}</strong>
           </p>
         }
         @if (user.lastOnline) {
           <p>
             <ng-container i18n>Last visited</ng-container>:
-            <strong
-              [textContent]="user.lastOnline.toDate() | timeAgo"
-              [ngbTooltip]="user.lastOnline.toDate() | date: 'medium'"
-            ></strong>
+            <strong [ngbTooltip]="user.lastOnline.toDate() | date: 'medium'">{{
+              user.lastOnline.toDate() | timeAgo
+            }}</strong>
           </p>
         }
         <p i18n>Database id: {{ user.id }}</p>
@@ -53,8 +51,8 @@
         }
         <!--      <p *ngFor="let account of user.accounts">-->
         <!--        <i class="{{ account.icon }}" aria-hidden="true"></i>-->
-        <!--        <a [href]="account.link" *ngIf="account.link" [textContent]="account.name"></a>-->
-        <!--        <span *ngIf="!account.link" [textContent]="account.name"></span>-->
+        <!--        <a [href]="account.link" *ngIf="account.link">{{account.name}}</a>-->
+        <!--        <span *ngIf="!account.link">{{account.name}}</span>-->
         <!--      </p>-->
         <h2 i18n>Recent activity</h2>
         <div class="card card-body mb-4">
@@ -122,7 +120,7 @@
                 <ul>
                   @for (comment of comments; track comment.id) {
                     <li>
-                      <a [routerLink]="comment.route" [textContent]="comment.preview"></a>
+                      <a [routerLink]="comment.route">{{ comment.preview }}</a>
                     </li>
                   }
                   <li>&#xa0;…</li>

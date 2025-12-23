@@ -37,7 +37,7 @@
                   "
                 />
                 @for (message of invalidParams() | invalidParams: 'name'; track message) {
-                  <p class="invalid-feedback" [textContent]="message"></p>
+                  <p class="invalid-feedback">{{ message }}</p>
                 }
               </div>
             </div>
@@ -62,7 +62,7 @@
                   "
                 />
                 @for (message of invalidParams() | invalidParams: 'email'; track message) {
-                  <p class="invalid-feedback" [textContent]="message"></p>
+                  <p class="invalid-feedback">{{ message }}</p>
                 }
               </div>
             </div>
@@ -84,7 +84,7 @@
                   "
                 ></textarea>
                 @for (message of invalidParams() | invalidParams: 'message'; track message) {
-                  <p class="invalid-feedback" [textContent]="message"></p>
+                  <p class="invalid-feedback">{{ message }}</p>
                 }
               </div>
             </div>
@@ -96,7 +96,7 @@
                   <re-captcha [siteKey]="recaptchaKey" (resolved)="resolved($event)" />
                 }
                 @for (message of invalidParams() | invalidParams: 'captcha'; track message) {
-                  <p class="invalid-feedback" [textContent]="message"></p>
+                  <p class="invalid-feedback">{{ message }}</p>
                 }
               </div>
             </div>

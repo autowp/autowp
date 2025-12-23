@@ -79,21 +79,20 @@
                 @for (attribute of attributes; track attribute) {
                   <tr>
                     <td>
-                      <a
-                        [routerLink]="['/moder/attrs/attribute', attribute.id]"
-                        [textContent]="getAttrsTranslation(attribute.name)"
-                      ></a>
+                      <a [routerLink]="['/moder/attrs/attribute', attribute.id]">{{
+                        getAttrsTranslation(attribute.name)
+                      }}</a>
                     </td>
                     <td>
                       @if (attribute.typeId) {
-                        <span [textContent]="typeMap[attribute.typeId]"></span>
+                        <span>{{ typeMap[attribute.typeId] }}</span>
                       } @else {
                         <span>—</span>
                       }
                     </td>
                     <td>
                       @if (attribute.unitId) {
-                        <span [textContent]="getUnitNameTranslation(attribute.unitId)"></span>
+                        <span>{{ getUnitNameTranslation(attribute.unitId) }}</span>
                       } @else {
                         <span>—</span>
                       }

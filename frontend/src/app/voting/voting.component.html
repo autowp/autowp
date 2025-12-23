@@ -12,7 +12,7 @@
   </div>
   @if (voting) {
     <div class="card card-body mb-4">
-      <p style="white-space: pre-line" [textContent]="voting.text"></p>
+      <p style="white-space: pre-line">{{ voting.text }}</p>
       <hr />
       @if (voting.canVote) {
         <form (ngSubmit)="vote(voting)">
@@ -29,7 +29,7 @@
                   </label>
                 }
                 @if (variant.text) {
-                  <p class="text-info" [textContent]="variant.text"></p>
+                  <p class="text-info">{{ variant.text }}</p>
                 }
               </li>
             }
@@ -46,7 +46,7 @@
             }
             {{ variant.name }}
             @if (variant.text) {
-              <p class="text-info" [textContent]="variant.text"></p>
+              <p class="text-info">{{ variant.text }}</p>
             }
             <ngb-progressbar
               style="clear: both"

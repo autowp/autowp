@@ -27,7 +27,7 @@
               <app-user [user]="user" />
             }
             @if (event.createdAt) {
-              <div [textContent]="event.createdAt | timeAgo" [ngbTooltip]="event.createdAt | date: 'medium'"></div>
+              <div [ngbTooltip]="event.createdAt | date: 'medium'">{{ event.createdAt | timeAgo }}</div>
             }
           </td>
           <td [innerHTML]="event.description"></td>

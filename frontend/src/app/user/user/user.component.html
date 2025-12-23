@@ -4,7 +4,7 @@
     @if (user.deleted) {
       <span i18n>deleted user</span>
     } @else {
-      <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]" [textContent]="user.name"></a>
+      <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]">{{ user.name }}</a>
     }
   </span>
 }

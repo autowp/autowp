@@ -21,9 +21,9 @@
             }
             <i aria-hidden="true" [class]="account.icon"></i>
             @if (account.link) {
-              <a [href]="account.link" [textContent]="account.name"></a>
+              <a [href]="account.link">{{ account.name }}</a>
             } @else {
-              <span [textContent]="account.name"></span>
+              <span>{{ account.name }}</span>
             }
           </p>
         </div>

@@ -18,13 +18,12 @@
 
 @if (brand$ | async; as brand) {
   <a
-    class="brandicon"
+    class="brandicon brandicon-{{ cssClass(brand) }}"
     [routerLink]="['/', brand.catname]"
-    [ngClass]="'brandicon-' + cssClass(brand)"
-    [ngStyle]="{'background-image': 'url(' + icons()?.image + ')'}"
+    [style.background-image]="'url(' + icons()?.image + ')'"
   ></a>
   <h4>
-    <a [routerLink]="['/', brand.catname]" [textContent]="brand.name"></a>
+    <a [routerLink]="['/', brand.catname]">{{ brand.name }}</a>
     <small class="badge bg-secondary-subtle text-secondary-emphasis">
       {{ brand.itemsCount - brand.newItemsCount }}
       @if (brand.newItemsCount > 0) {

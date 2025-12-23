@@ -18,9 +18,9 @@
           class="nav-link"
           href="#"
           [class.active]="$index === activeParameter()"
-          [textContent]="param.name"
           (click)="selectParam(parameters, $index)"
-        ></a>
+          >{{ param.name }}</a
+        >
       }
     </div>
   }

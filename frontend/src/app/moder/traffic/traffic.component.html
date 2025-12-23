@@ -21,7 +21,7 @@
 @for (item of items$ | async; track item) {
   <div class="row">
     <div class="col-sm-2">
-      <h3 [textContent]="item.item.count"></h3>
+      <h3>{{ item.item.count }}</h3>
     </div>
     <div class="col-sm-4">
       <h3>

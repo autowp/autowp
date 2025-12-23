@@ -20,9 +20,9 @@
             <span class="bi bi-lock" aria-hidden="true"></span>
           }
           @if (topic.status !== 'deleted') {
-            <a [routerLink]="['/forums/topic', topic.id]" [textContent]="topic.name"></a>
+            <a [routerLink]="['/forums/topic', topic.id]">{{ topic.name }}</a>
           } @else {
-            <span [textContent]="topic.name"></span>
+            <span>{{ topic.name }}</span>
           }
           <span class="badge rounded-pill text-bg-secondary">
             {{ topic.oldMessages + (topic.newMessages > 0 ? '+' + topic.newMessages : '') }}

@@ -30,15 +30,15 @@
     <tbody>
       @for (user of users.items; track user.id) {
         <tr>
-          <td [textContent]="user.id"></td>
+          <td>{{ user.id }}</td>
           <td>
             @if (user.photo) {
               <img alt="" style="max-width: 300px; max-height: 300px" [src]="user.photo.src" />
             }
           </td>
-          <td [textContent]="user.login"></td>
-          <td [textContent]="user.email"></td>
-          <td [textContent]="user.name"></td>
+          <td>{{ user.login }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.name }}</td>
           <td>
             @if (user) {
               <app-user [user]="user" />

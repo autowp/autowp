@@ -1,4 +1,4 @@
-import {AsyncPipe, DatePipe, NgStyle} from '@angular/common';
+import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {FormArray, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -85,7 +85,7 @@ export class AttrFormControl<TValue> extends FormControl {
 
 @Component({
   selector: 'app-cars-specifications-editor-spec',
-  imports: [FormsModule, NgStyle, ReactiveFormsModule, UserComponent, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
+  imports: [FormsModule, ReactiveFormsModule, UserComponent, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
   templateUrl: './spec.component.html',
   styleUrl: './spec.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

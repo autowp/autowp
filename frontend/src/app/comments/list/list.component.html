@@ -6,11 +6,9 @@
   >
     <div>
       @if (message.message.createdAt) {
-        <div
-          class="float-end"
-          [textContent]="message.message.createdAt.toDate() | timeAgo"
-          [ngbTooltip]="message.message.createdAt.toDate() | date: 'medium'"
-        ></div>
+        <div class="float-end" [ngbTooltip]="message.message.createdAt.toDate() | date: 'medium'">
+          {{ message.message.createdAt.toDate() | timeAgo }}
+        </div>
       }
       @if (message.user$ | async; as user) {
         <app-user [user]="user" />

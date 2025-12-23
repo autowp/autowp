@@ -18,7 +18,7 @@
         <div class="col-3 mb-4"><ng-container i18n>Name</ng-container>:</div>
         <div class="col9 mb-4" [innerHTML]="item.nameHtml"></div>
         <div class="col-3 mb-4"><ng-container i18n>Body number</ng-container>:</div>
-        <div class="col9 mb-4" [textContent]="item.body"></div>
+        <div class="col9 mb-4">{{ item.body }}</div>
         <div class="col-3 mb-4"><ng-container i18n>Begin</ng-container>:</div>
         <div class="col9 mb-4">
           {{ item.beginYear > 0 ? item.beginYear : '????' }} {{ item.beginMonth > 0 ? item.beginMonth : '??' }}

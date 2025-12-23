@@ -6,7 +6,7 @@
         <a href="#" ngbDropdownToggle (click)="(false)">
           @for (rating of ratings; track rating) {
             @if (rating.catname === ratingCatname) {
-              <span [textContent]="getMostsRatingsTranslation(rating.name)"> </span>
+              <span>{{ getMostsRatingsTranslation(rating.name) }}</span>
             }
           }
           <i class="bi bi-caret-down" aria-hidden="true"></i>
@@ -17,9 +17,8 @@
               class="dropdown-item"
               [class.active]="rating.catname === ratingCatname"
               [routerLink]="prefix().concat([rating.catname])"
-              [textContent]="getMostsRatingsTranslation(rating.name)"
+              >{{ getMostsRatingsTranslation(rating.name) }}</a
             >
-            </a>
           }
         </div>
       </div>
@@ -31,7 +30,7 @@
           @if (typeCatname$ | async; as typeCatname) {
             @for (type of vehicleTypes; track type) {
               @if (type.catname === typeCatname) {
-                <span [textContent]="type.nameTranslated"></span>
+                <span>{{ type.nameTranslated }}</span>
               }
             }
           } @else {
@@ -45,8 +44,8 @@
               class="dropdown-item"
               [class.active]="type.catname === (typeCatname$ | async)"
               [routerLink]="prefix().concat([ratingCatname, type.catname])"
-              [textContent]="type.nameTranslated"
-            ></a>
+              >{{ type.nameTranslated }}</a
+            >
           }
         </div>
       </div>
@@ -59,7 +58,7 @@
         <a href="#" ngbDropdownToggle (click)="(false)">
           @for (year of years; track year) {
             @if (year.catname ? year.catname === yearsCatname : !yearsCatname) {
-              <span [textContent]="getMostsPeriodsTranslation(year.name)"></span>
+              <span>{{ getMostsPeriodsTranslation(year.name) }}</span>
             }
           }
           <i class="bi bi-caret-down" aria-hidden="true"></i>
@@ -72,9 +71,8 @@
                   class="dropdown-item"
                   [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
                   [routerLink]="prefix().concat([ratingCatname, typeCatname, year.catname ? year.catname : ''])"
-                  [textContent]="getMostsPeriodsTranslation(year.name)"
+                  >{{ getMostsPeriodsTranslation(year.name) }}</a
                 >
-                </a>
               }
             } @else {
               @for (year of years; track year) {
@@ -82,9 +80,8 @@
                   class="dropdown-item"
                   [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
                   [routerLink]="prefix().concat([ratingCatname, defaultTypeCatname, year.catname ? year.catname : ''])"
-                  [textContent]="getMostsPeriodsTranslation(year.name)"
+                  >{{ getMostsPeriodsTranslation(year.name) }}</a
                 >
-                </a>
               }
             }
           </div>
@@ -100,7 +97,7 @@
         </div>
         <div class="col-md-3">
           @if (first) {
-            <h3 [textContent]="getMostsRatingParamsTranslation('most/' + ratingCatname + '/param')"></h3>
+            <h3>{{ getMostsRatingParamsTranslation('most/' + ratingCatname + '/param') }}</h3>
           }
         </div>
       </div>
@@ -137,12 +134,9 @@
               <span [innerHTML]="item.valueHtml"></span>
             }
             @if (item.unitId && item.unitId !== '0') {
-              <small
-                class="unit"
-                placement="top"
-                [textContent]="getUnitAbbrTranslation(item.unitId)"
-                [ngbTooltip]="getUnitNameTranslation(item.unitId)"
-              ></small>
+              <small class="unit" placement="top" [ngbTooltip]="getUnitNameTranslation(item.unitId)">{{
+                getUnitAbbrTranslation(item.unitId)
+              }}</small>
             }
           </h3>
         </div>

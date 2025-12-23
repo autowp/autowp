@@ -26,10 +26,9 @@
       @if (data.inbox.prevDate) {
         <h3 class="text-start">
           &#x2190;
-          <a
-            [routerLink]="['/inbox', data.brandCatname, formatGrpcDate(data.inbox.prevDate)]"
-            [textContent]="parseGrpcDate(data.inbox.prevDate) | date: 'mediumDate'"
-          ></a>
+          <a [routerLink]="['/inbox', data.brandCatname, formatGrpcDate(data.inbox.prevDate)]">{{
+            parseGrpcDate(data.inbox.prevDate) | date: 'mediumDate'
+          }}</a>
           <br />
           <small
             >(<span i18n="@@n-pictures">{data.inbox.prevCount, plural,
@@ -44,7 +43,7 @@
     <div class="col-lg-4 col-md-4">
       @if (data.inbox.currentDate) {
         <h3 class="text-center">
-          <span [textContent]="parseGrpcDate(data.inbox.currentDate) | date: 'mediumDate'"></span>
+          <span>{{ parseGrpcDate(data.inbox.currentDate) | date: 'mediumDate' }}</span>
           <br />
           <small
             >(<span i18n="@@n-pictures">{data.inbox.currentCount, plural,
@@ -59,10 +58,9 @@
     <div class="col-lg-4 col-md-4">
       @if (data.inbox.nextDate) {
         <h3 class="text-end">
-          <a
-            [routerLink]="['/inbox', data.brandCatname, formatGrpcDate(data.inbox.nextDate)]"
-            [textContent]="parseGrpcDate(data.inbox.nextDate) | date: 'mediumDate'"
-          ></a>
+          <a [routerLink]="['/inbox', data.brandCatname, formatGrpcDate(data.inbox.nextDate)]">{{
+            parseGrpcDate(data.inbox.nextDate) | date: 'mediumDate'
+          }}</a>
           <br />
           <small
             >(<span i18n="@@n-pictures">{data.inbox.nextCount, plural,

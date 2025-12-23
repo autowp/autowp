@@ -67,12 +67,12 @@
       <div class="card card-body">
         <div>
           <ng-container i18n>Public URL:</ng-container>
-          <a [routerLink]="['/picture', picture.identity]" [textContent]="'/picture/' + picture.identity"></a>
+          <a [routerLink]="['/picture', picture.identity]">/picture/{{ picture.identity }}</a>
         </div>
         @if (picture.image) {
           <div style="overflow: hidden; text-overflow: ellipsis">
             <ng-container i18n>Image:</ng-container>
-            <a [href]="picture.image.src" [textContent]="picture.image.src"></a>
+            <a [href]="picture.image.src">{{ picture.image.src }}</a>
           </div>
         }
         <div>
@@ -105,16 +105,15 @@
         @if (picture.image) {
           <div>
             <ng-container i18n>File size:</ng-container>
-            <strong [textContent]="picture.image.filesize | bytes: 2"></strong>
+            <strong>{{ picture.image.filesize | bytes: 2 }}</strong>
           </div>
         }
         @if (picture.addDate) {
           <div>
             <ng-container i18n>Upload date:</ng-container>
-            <strong
-              [textContent]="picture.addDate.toDate() | timeAgo"
-              [ngbTooltip]="picture.addDate.toDate() | date: 'medium'"
-            ></strong>
+            <strong [ngbTooltip]="picture.addDate.toDate() | date: 'medium'">{{
+              picture.addDate.toDate() | timeAgo
+            }}</strong>
           </div>
         }
       </div>
@@ -579,7 +578,7 @@
             @if (ip.address) {
               <div>
                 <ng-container i18n>IP-address of uploader:</ng-container>
-                <strong [textContent]="ip.address"></strong>
+                <strong>{{ ip.address }}</strong>
                 <br />
                 @if (ip.blacklist) {
                   <p>
@@ -591,7 +590,7 @@
                       <ng-container i18n>until</ng-container> {{ date.toDate() | date }}
                     }
                     @if (ip.blacklist.reason) {
-                      <span [textContent]="ip.blacklist.reason"></span>
+                      <span>{{ ip.blacklist.reason }}</span>
                     }
                   </p>
                 }

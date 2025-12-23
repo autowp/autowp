@@ -17,12 +17,12 @@
           @for (control of form.controls; track control) {
             <tr [class.subform-header]="!!control.attr.childs.length">
               @if (control.attr.childs.length > 0) {
-                <td colspan="4" [ngStyle]="{'padding-left': control.attr.deep * 20 + 'px'}">
+                <td colspan="4" [style.padding-left]="control.attr.deep * 20 + 'px'">
                   <h4>{{ control.attr.name }}</h4>
                 </td>
               } @else {
                 <td>
-                  <div [ngStyle]="{'padding-left': control.attr.deep * 20 + 'px'}">{{ control.attr.name }}</div>
+                  <div [style.padding-left]="control.attr.deep * 20 + 'px'">{{ control.attr.name }}</div>
                 </td>
                 <td>
                   <div class="input-group input-group-sm">
@@ -123,14 +123,15 @@
                         @if (value.userValue.value?.isEmpty) {
                           <em i18n>none</em>
                         } @else {
-                          <span [textContent]="value.userValue.valueText"></span>
+                          <span>{{ value.userValue.valueText }}</span>
                         }
                         @if (value.user$ | async; as user) {
                           <app-user [user]="user" />
                         }
                         @if (value.userValue.updateDate?.toDate(); as date) {
                           <span class="date"
-                            >[<span [textContent]="date | timeAgo" [ngbTooltip]="date | date: 'medium'"></span>]</span
+                            >[<span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span
+                            >]</span
                           >
                         }
                       </div>

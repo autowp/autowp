@@ -12,7 +12,7 @@
       </h3>
     }
     @if (item.nameDefault) {
-      <h4 [textContent]="item.nameDefault"></h4>
+      <h4>{{ item.nameDefault }}</h4>
     }
     @if (havePhoto(item) && (item.previewPictures?.pictures || []).length > 4) {
       <div class="row">

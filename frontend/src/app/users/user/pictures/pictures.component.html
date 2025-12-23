@@ -22,12 +22,12 @@
         @if (icons$ | async; as icons) {
           <a
             [routerLink]="['/users', user.identity, 'pictures', brand.catname]"
-            [ngClass]="'brandicon brandicon-' + cssClass(brand)"
-            [ngStyle]="{'background-image': 'url(' + icons.image + ')'}"
+            [class]="'brandicon brandicon-' + cssClass(brand)"
+            [style.background-image]="'url(' + icons.image + ')'"
           ></a>
         }
         <h4>
-          <a [routerLink]="['/users', user.identity, 'pictures', brand.catname]" [textContent]="brand.nameOnly"></a>
+          <a [routerLink]="['/users', user.identity, 'pictures', brand.catname]">{{ brand.nameOnly }}</a>
           <small>({{ brand.descendantPicturesCount }})</small>
         </h4>
       </div>

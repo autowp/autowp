@@ -110,7 +110,7 @@
               </td>
               <td class="urls">
                 @for (route of parentsItem.parent?.publicRoutes || []; track route) {
-                  <a [routerLink]="route.route" [textContent]="route.route.join('/')"></a>
+                  <a [routerLink]="route.route">{{ route.route.join('/') }}</a>
                   <br />
                 }
               </td>
@@ -135,7 +135,7 @@
             </td>
             <td class="urls">
               <!--ng-container *ngFor="let url of item.parent.publicUrls">
-                  <a [href]="url" [textContent]="url"></a>
+                  <a [href]="url">{{url}}</a>
                   <br />
                 </ng-container-->
             </td>
@@ -179,7 +179,7 @@
               </td>
               <td class="urls">
                 @for (route of childsItem.item?.publicRoutes; track route) {
-                  <a [routerLink]="route.route" [textContent]="route.route.join('/')"></a>
+                  <a [routerLink]="route.route">{{ route.route.join('/') }}</a>
                   <br />
                 }
               </td>

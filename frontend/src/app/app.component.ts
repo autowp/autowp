@@ -1,4 +1,4 @@
-import {AsyncPipe, DOCUMENT, NgClass} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, DestroyRef, inject, Renderer2, signal} from '@angular/core';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
@@ -38,7 +38,6 @@ import {UsersOnlineComponent} from './users/online/online.component';
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    NgClass,
     RouterOutlet,
     NgbTooltip,
     ContainerComponent,

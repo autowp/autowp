@@ -1,4 +1,4 @@
-import {AsyncPipe, NgClass} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-bootstrap';
@@ -19,7 +19,7 @@ interface MenuItem {
 
 @Component({
   selector: 'app-moder-menu',
-  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, NgClass, AsyncPipe],
+  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, AsyncPipe],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

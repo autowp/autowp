@@ -1,4 +1,4 @@
-import {AsyncPipe, DOCUMENT, NgClass, NgStyle} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -38,7 +38,7 @@ function addCSS(document: Document, url: string) {
 
 @Component({
   selector: 'app-users-user-pictures',
-  imports: [RouterLink, NgClass, NgStyle, AsyncPipe],
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './pictures.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

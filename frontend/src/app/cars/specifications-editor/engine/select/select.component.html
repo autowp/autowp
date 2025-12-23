@@ -46,11 +46,9 @@
       @for (chunk of brands.items; track chunk) {
         <div class="col-md-2">
           @for (brand of chunk; track brand.id) {
-            <a
-              routerLink="/cars/select-engine"
-              [queryParams]="{item_id: itemID$ | async, brand_id: brand.id}"
-              [textContent]="brand.nameOnly"
-            ></a>
+            <a routerLink="/cars/select-engine" [queryParams]="{item_id: itemID$ | async, brand_id: brand.id}">{{
+              brand.nameOnly
+            }}</a>
             <br />
           }
         </div>

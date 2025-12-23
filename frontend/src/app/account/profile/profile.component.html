@@ -20,7 +20,7 @@
       <div class="col-6">
         <input #input type="file" accept="image/*" class="form-control" (change)="onChange(user, $event)" />
         @for (message of photoInvalidParams() | invalidParams: 'photo'; track message) {
-          <p class="invalid-feedback d-block" [textContent]="message"></p>
+          <p class="invalid-feedback d-block">{{ message }}</p>
         }
       </div>
       <div class="col-6">
@@ -58,7 +58,7 @@
                 }
               </select>
               @for (message of settingsInvalidParams() | invalidParams: 'language'; track message) {
-                <p class="invalid-feedback" [textContent]="message"></p>
+                <p class="invalid-feedback">{{ message }}</p>
               }
             </div>
           </div>
@@ -79,7 +79,7 @@
                 }
               </select>
               @for (message of settingsInvalidParams() | invalidParams: 'timezone'; track message) {
-                <p class="invalid-feedback" [textContent]="message"></p>
+                <p class="invalid-feedback">{{ message }}</p>
               }
             </div>
           </div>

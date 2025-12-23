@@ -77,7 +77,7 @@
               [(ngModel)]="language.name"
             />
             @for (message of language.invalidParams | invalidParams: 'name'; track message) {
-              <p class="invalid-feedback" [textContent]="message"></p>
+              <p class="invalid-feedback">{{ message }}</p>
             }
           </div>
         </div>

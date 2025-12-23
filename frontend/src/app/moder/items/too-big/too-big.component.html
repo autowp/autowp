@@ -28,11 +28,11 @@
     <tbody>
       @for (item of items; track item.id) {
         <tr>
-          <td [textContent]="item.id"></td>
+          <td>{{ item.id }}</td>
           <td>
             <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
           </td>
-          <td [textContent]="item.childsCount"></td>
+          <td>{{ item.childsCount }}</td>
         </tr>
       }
     </tbody>

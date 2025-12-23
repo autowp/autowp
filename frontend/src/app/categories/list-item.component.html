@@ -10,7 +10,7 @@
       />
     </h3>
     @if (item.nameDefault) {
-      <h4 [textContent]="item.nameDefault"></h4>
+      <h4>{{ item.nameDefault }}</h4>
     }
     @if (pictures$ | async; as pictures) {
       @if ((havePhoto$ | async) && pictures.length > 4) {

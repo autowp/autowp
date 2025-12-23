@@ -33,8 +33,8 @@
     <tbody>
       @for (item of items; track item.ip) {
         <tr>
-          <td [textContent]="item.ip"></td>
-          <td [textContent]="item.description"></td>
+          <td>{{ item.ip }}</td>
+          <td>{{ item.description }}</td>
           <td>
             <a i18n [href]="'http://nic.ru/whois/?query=' + item.ip">whois</a>
           </td>

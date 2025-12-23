@@ -1,4 +1,4 @@
-import {AsyncPipe, NgClass, NgStyle} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
@@ -11,7 +11,7 @@ import {switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-brands-item',
-  imports: [RouterLink, NgClass, NgStyle, NgbPopover, AsyncPipe],
+  imports: [RouterLink, NgbPopover, AsyncPipe],
   templateUrl: './item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

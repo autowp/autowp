@@ -435,9 +435,10 @@
                     <button
                       type="button"
                       class="btn btn-link dropdown-item"
-                      [textContent]="template.message"
                       (click)="votePictures(data.pictures, template.vote, template.message)"
-                    ></button>
+                    >
+                      {{ template.message }}
+                    </button>
                   }
                 </div>
               }

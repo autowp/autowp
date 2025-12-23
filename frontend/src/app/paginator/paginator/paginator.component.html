@@ -27,9 +27,9 @@
         @for (page of pagesInRange(); track page) {
           <span>
             @if (page !== data.current) {
-              <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: page}" [textContent]="padd(page)"></a>
+              <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: page}">{{ padd(page) }}</a>
             } @else {
-              <strong style="font-size: 20px; margin: 0 3px" [textContent]="padd(page)"></strong>
+              <strong style="font-size: 20px; margin: 0 3px">{{ padd(page) }}</strong>
             }
           </span>
         }

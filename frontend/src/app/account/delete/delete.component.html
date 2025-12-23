@@ -26,7 +26,7 @@
           [(ngModel)]="form.password_old"
         />
         @for (message of invalidParams() | invalidParams: 'password_old'; track message) {
-          <p class="invalid-feedback" [textContent]="message"></p>
+          <p class="invalid-feedback">{{ message }}</p>
         }
       </div>
     </div>

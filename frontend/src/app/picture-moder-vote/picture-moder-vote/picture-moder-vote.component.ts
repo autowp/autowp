@@ -1,4 +1,4 @@
-import {AsyncPipe, NgStyle} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, ComponentRef, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {Picture} from '@grpc/spec.pb';
@@ -13,7 +13,7 @@ import {PictureModerVoteModalComponent} from './modal/modal.component';
 
 @Component({
   selector: 'app-picture-moder-vote',
-  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, UserComponent, NgStyle, AsyncPipe],
+  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, UserComponent, AsyncPipe],
   templateUrl: './picture-moder-vote.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

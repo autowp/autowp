@@ -31,23 +31,18 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
           <span>
             @if (date.active) {
               <span>
-                <strong [textContent]="date.name"></strong>
+                <strong>{{ date.name }}</strong>
                 <span class="bi bi-check" aria-hidden="true"></span>
               </span>
             } @else {
               <span>
-                <a
-                  routerLink="."
-                  queryParamsHandling="merge"
-                  [queryParams]="{date: date.value}"
-                  [textContent]="date.name"
-                ></a>
+                <a routerLink="." queryParamsHandling="merge" [queryParams]="{date: date.value}">{{ date.name }}</a>
               </span>
             }
           </span>
         } @else {
           <span>
-            <span class="muted" [textContent]="date.name"></span>
+            <span class="muted">{{ date.name }}</span>
             (<ng-container i18n>busy</ng-container>)
           </span>
         }

@@ -5,7 +5,7 @@
   <p>
     <ng-container i18n>Your current e-mail address:</ng-container>
     @if (email$ | async; as email) {
-      <a [href]="email" [textContent]="email"></a>
+      <a [href]="email">{{ email }}</a>
     } @else {
       <span i18n>none</span>
     }

@@ -1,6 +1,6 @@
 @if (item(); as item) {
   <div class="map-infowindow">
-    <h5 [textContent]="item.name"></h5>
+    <h5>{{ item.name }}</h5>
     @if (item.image) {
       <p>
         <img alt="" style="max-width: 100%" [src]="item.image.src" />

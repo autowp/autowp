@@ -83,11 +83,7 @@
         @for (chunk of data.brands; track chunk) {
           <div class="col-md-2">
             @for (brandItem of chunk; track brandItem.id) {
-              <a
-                routerLink="/upload/select"
-                [queryParams]="{brand_id: brandItem.id}"
-                [textContent]="brandItem.nameOnly"
-              ></a>
+              <a routerLink="/upload/select" [queryParams]="{brand_id: brandItem.id}">{{ brandItem.nameOnly }}</a>
               <br />
             }
           </div>
