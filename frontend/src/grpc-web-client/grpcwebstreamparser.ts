@@ -23,9 +23,9 @@ export enum FrameType {
 
 enum State {
   INIT = 0, // expecting the next frame byte
-  INVALID = 3,
   LENGTH = 1, // expecting 4 bytes of length
   MESSAGE = 2, // expecting more message bytes
+  INVALID = 3,
 }
 
 interface Message {
