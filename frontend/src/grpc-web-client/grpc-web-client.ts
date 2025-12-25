@@ -21,10 +21,12 @@ import {RpcError} from './rpcerror';
 import {fromHttpStatus, StatusCode} from './statuscode';
 import {NG_GRPC_WEB_CLIENT_DEFAULT_SETTINGS} from './tokens';
 
-export const GRPC_STATUS = 'grpc-status';
-export const GRPC_STATUS_MESSAGE = 'grpc-message';
+export const CONTENT_TYPE_HEADER = 'content-type';
+export const GRPC_STATUS_HEADER = 'grpc-status';
+export const GRPC_MESSAGE_HEADER = 'grpc-message';
+export const GRPC_STATUS_DETAILS_BIN_HEADER = 'grpc-status-details-bin';
 
-const EXCLUDED_RESPONSE_HEADERS = ['content-type', GRPC_STATUS, GRPC_STATUS_MESSAGE];
+const EXCLUDED_RESPONSE_HEADERS = [CONTENT_TYPE_HEADER, GRPC_STATUS_HEADER, GRPC_MESSAGE_HEADER];
 
 export interface NgGrpcWebClientRootOptions {
   settings?: NgGrpcWebClientSettings;
@@ -160,10 +162,10 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
           const events: GrpcEvent<S>[] = [];
 
           // Check whethere there are grpc specific response headers
-          if (GRPC_STATUS in responseHeaders) {
-            grpcStatusCode = Number(responseHeaders[GRPC_STATUS]);
-            if (GRPC_STATUS_MESSAGE in responseHeaders) {
-              grpcStatusMessage = responseHeaders[GRPC_STATUS_MESSAGE];
+          if (GRPC_STATUS_HEADER in responseHeaders) {
+            grpcStatusCode = Number(responseHeaders[GRPC_STATUS_HEADER]);
+            if (GRPC_MESSAGE_HEADER in responseHeaders) {
+              grpcStatusMessage = responseHeaders[GRPC_MESSAGE_HEADER];
             }
             if (grpcStatusCode !== StatusCode.OK) {
               return of(this.handleError_(new RpcError(grpcStatusCode, grpcStatusMessage || '', initialMetadata)));
@@ -228,13 +230,13 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
                   const trailers = this.parseHttp1Headers_(trailerString);
                   let grpcStatusCode = StatusCode.OK;
                   let grpcStatusMessage = '';
-                  if (GRPC_STATUS in trailers) {
-                    grpcStatusCode = /** @type {!StatusCode} */ Number(trailers[GRPC_STATUS]);
-                    delete trailers[GRPC_STATUS];
+                  if (GRPC_STATUS_HEADER in trailers) {
+                    grpcStatusCode = /** @type {!StatusCode} */ Number(trailers[GRPC_STATUS_HEADER]);
+                    delete trailers[GRPC_STATUS_HEADER];
                   }
-                  if (GRPC_STATUS_MESSAGE in trailers) {
-                    grpcStatusMessage = trailers[GRPC_STATUS_MESSAGE];
-                    delete trailers[GRPC_STATUS_MESSAGE];
+                  if (GRPC_MESSAGE_HEADER in trailers) {
+                    grpcStatusMessage = trailers[GRPC_MESSAGE_HEADER];
+                    delete trailers[GRPC_MESSAGE_HEADER];
                   }
                   events.push(this.handleError_(new RpcError(grpcStatusCode, grpcStatusMessage, trailers)));
                 }

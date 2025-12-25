@@ -17,6 +17,7 @@ import {FormsModule} from '@angular/forms';
 import {
   BrowserModule,
   provideClientHydration,
+  withHttpTransferCacheOptions,
   withI18nSupport,
   withIncrementalHydration,
 } from '@angular/platform-browser';
@@ -60,7 +61,13 @@ import Keycloak from 'keycloak-js';
 import {provideMonacoEditor} from 'ngx-monaco-editor-v2';
 import {NgPipesModule} from 'ngx-pipes';
 
-import {provideGrpcWebClient} from '../grpc-web-client/grpc-web-client';
+import {
+  CONTENT_TYPE_HEADER,
+  GRPC_MESSAGE_HEADER,
+  GRPC_STATUS_DETAILS_BIN_HEADER,
+  GRPC_STATUS_HEADER,
+  provideGrpcWebClient,
+} from '../grpc-web-client/grpc-web-client';
 import {routes} from './app.routes';
 
 if (environment.production) {
@@ -174,7 +181,15 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideHttpClient(withInterceptors([authInterceptor$]), withFetch()),
-    provideClientHydration(withI18nSupport(), withIncrementalHydration()),
+    provideClientHydration(
+      withI18nSupport(),
+      withIncrementalHydration(),
+      withHttpTransferCacheOptions({
+        includeHeaders: [CONTENT_TYPE_HEADER, GRPC_STATUS_HEADER, GRPC_MESSAGE_HEADER, GRPC_STATUS_DETAILS_BIN_HEADER],
+        includePostRequests: true,
+        includeRequestsWithAuthHeaders: false,
+      }),
+    ),
     provideAppInitializer(async () => {
       const platform = inject(PLATFORM_ID);
       const config = inject(NgbToastConfig);

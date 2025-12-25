@@ -5,6 +5,8 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {InvalidParams} from '@utils/invalid-params.pipe';
 import {base64ToUint8Array, stringToUint8Array} from 'uint8array-extras';
 
+import {GRPC_STATUS_DETAILS_BIN_HEADER} from '../grpc-web-client/grpc-web-client';
+
 import FieldViolation = BadRequest.FieldViolation;
 
 export const extractFieldViolations = (response: GrpcStatusEvent): FieldViolation[] => {
@@ -12,7 +14,7 @@ export const extractFieldViolations = (response: GrpcStatusEvent): FieldViolatio
     return [];
   }
 
-  const statusEncoded = response.metadata.get('grpc-status-details-bin');
+  const statusEncoded = response.metadata.get(GRPC_STATUS_DETAILS_BIN_HEADER);
   if (!statusEncoded) {
     return [];
   }
