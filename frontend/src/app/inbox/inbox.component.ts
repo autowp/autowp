@@ -134,7 +134,7 @@ export class InboxComponent implements OnInit {
                   votes: true,
                 }),
                 language: this.#languageService.language,
-                limit: 24,
+                limit: 48,
                 options: new PictureListOptions({
                   addDate: currentDate,
                   pictureItem: new PictureItemListOptions({

@@ -33,7 +33,7 @@ import (
 )
 
 const (
-	newboxPicturesPerPage   = 30
+	newboxPicturesPerPage   = 60
 	newboxPicturesPerLine   = 6
 	newboxGroupTypeItem     = "item"
 	newboxGroupTypePicture  = "picture"
