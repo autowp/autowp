@@ -25,7 +25,7 @@
         <app-comments-form [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" />
       } @else {
         <remark
-          class="alert alert-block alert-info"
+          class="alert alert-block alert-info d-block"
           i18n-markdown
           markdown="To be able to post a comment, you must [create an account or sign in using social networks account](/login)"
         />
