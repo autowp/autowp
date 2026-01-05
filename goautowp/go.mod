@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.0
 	github.com/aws/aws-sdk-go-v2/config v1.32.6
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.6
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.94.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.0
 	github.com/aws/smithy-go v1.24.0
 	github.com/corona10/goimagehash v1.1.0
 	github.com/doug-martin/goqu/v9 v9.19.0
@@ -32,12 +32,12 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.4
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/jackc/pgtype v1.14.4
 	github.com/lib/pq v1.10.9
 	github.com/mozillazg/go-unidecode v0.2.0
-	github.com/nicksnyder/go-i18n/v2 v2.6.0
+	github.com/nicksnyder/go-i18n/v2 v2.6.1
 	github.com/paulmach/go.geo v0.0.0-20180829195134-22b514266d33
 	github.com/paulmach/orb v0.12.0
 	github.com/prometheus/client_golang v1.23.2
@@ -51,10 +51,10 @@ require (
 	golang.org/x/exp v0.0.0-20251219203646-944ab1f22d93
 	golang.org/x/image v0.34.0
 	golang.org/x/text v0.32.0
-	google.golang.org/genproto v0.0.0-20251213004720-97cd9d5aeac2
-	google.golang.org/genproto/googleapis/api v0.0.0-20251213004720-97cd9d5aeac2
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251213004720-97cd9d5aeac2
-	google.golang.org/grpc v1.77.0
+	google.golang.org/genproto v0.0.0-20251222181119-0a764e51fe1b
+	google.golang.org/genproto/googleapis/api v0.0.0-20251222181119-0a764e51fe1b
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251222181119-0a764e51fe1b
+	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/gographics/imagick.v3 v3.7.2
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
@@ -95,14 +95,14 @@ require (
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.29.0 // indirect
+	github.com/go-playground/validator/v10 v10.30.1 // indirect
 	github.com/go-resty/resty/v2 v2.17.1 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/go-xmlfmt/xmlfmt v1.1.3 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/goccy/go-yaml v1.19.1 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
-	github.com/golang/geo v0.0.0-20251218194845-df15212eaefe // indirect
+	github.com/golang/geo v0.0.0-20251229110840-fd652594c94c // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
