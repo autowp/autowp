@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ArticleByCatnameRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
@@ -23,6 +24,7 @@ export class ArticlesArticleComponent {
   readonly #articlesClient = inject(ArticlesClient);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
+  readonly #meta = inject(Meta);
 
   protected readonly article$ = this.#route.paramMap.pipe(
     map((params) => params.get('catname')),
@@ -43,6 +45,7 @@ export class ArticlesArticleComponent {
         pageId: 32,
         title: article.name,
       });
+      this.#meta.updateTag({property: 'og:title', content: article.name});
 
       return article;
     }),
