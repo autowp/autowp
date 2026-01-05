@@ -20,7 +20,7 @@
   <a
     class="brandicon brandicon-{{ cssClass(brand) }}"
     [routerLink]="['/', brand.catname]"
-    [style.background-image]="'url(' + icons()?.image + ')'"
+    [style.background-image]="'url(' + icons().image + ')'"
   ></a>
   <h4>
     <a [routerLink]="['/', brand.catname]">{{ brand.name }}</a>

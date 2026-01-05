@@ -40,7 +40,7 @@
   </nav>
 }
 
-@if (!pageEnv.layoutParams()?.isGalleryPage) {
+@if (!pageEnv.layoutParams().isGalleryPage) {
   @if (current$ | async; as current) {
     <div class="page-header">
       <h1 [innerHtml]="current.nameHtml"></h1>
