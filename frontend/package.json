@@ -11,6 +11,12 @@
     "serve:ssr:wheelsage": "node dist/server/server.js"
   },
   "private": true,
+  "overrides": {
+    "@angular/common": "$@angular/common",
+    "@angular/core": "$@angular/core",
+    "rxjs": "$rxjs",
+    "monaco-editor": "$monaco-editor"
+  },
   "dependencies": {
     "@angular-devkit/architect": "^0.2100.4",
     "@angular/animations": "^21.0.6",
@@ -49,7 +55,7 @@
     "monaco-editor": "^0.55",
     "ng-recaptcha-2": "^21",
     "ng2-charts": "^8.0.0",
-    "ngx-monaco-editor-v2": "github:tbo47/ngx-monaco-editor-v2",
+    "ngx-monaco-editor-v2": "^20",
     "ngx-pipes": "^3.2.0",
     "ngx-remark": "^0.2.1",
     "npm": "^10 || ^11",
