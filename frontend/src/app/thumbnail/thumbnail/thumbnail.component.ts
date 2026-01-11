@@ -1,6 +1,6 @@
 import {AsyncPipe, DecimalPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {APIUser, Picture, PictureItem, PictureStatus, SetPictureItemPerspectiveRequest} from '@grpc/spec.pb';
@@ -35,7 +35,6 @@ export class ThumbnailComponent {
   readonly #toastService = inject(ToastsService);
 
   readonly picture = input.required<ThumbnailAPIPicture>();
-  readonly picture$ = toObservable(this.picture);
 
   readonly route = input.required<string[]>();
 
@@ -50,9 +49,9 @@ export class ThumbnailComponent {
       })),
     ),
   );
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER));
 
-  protected readonly owner$: Observable<APIUser | null> = this.picture$.pipe(
+  protected readonly owner$: Observable<APIUser | null> = toObservable(this.picture).pipe(
     switchMap((picture) => this.#userService.getUser$(picture?.ownerId)),
   );
 
