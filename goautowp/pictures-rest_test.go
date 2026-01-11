@@ -86,7 +86,7 @@ func TestUploadPicture(t *testing.T) {
 
 	picturesREST.SetupRouter(router)
 
-	tests := []struct {
+	cases := []struct {
 		name    string
 		catname string
 	}{
@@ -100,8 +100,8 @@ func TestUploadPicture(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		t.Run("", func(t *testing.T) {
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
 			brandID := createItem(t, conn, cnt, &APIItem{
@@ -124,6 +124,10 @@ func TestUploadPicture(t *testing.T) {
 			body, err := io.ReadAll(resRecorder.Result().Body)
 			require.NoError(t, err)
 
+			if resRecorder.Result().StatusCode != http.StatusCreated {
+				require.Equal(t, http.StatusCreated, resRecorder.Result().StatusCode, string(body))
+			}
+
 			st := struct {
 				ID string `json:"id"`
 			}{}
@@ -132,7 +136,6 @@ func TestUploadPicture(t *testing.T) {
 			require.NoError(t, err, "failed to decode json. `%s` given", string(body))
 
 			require.NotEmpty(t, st.ID, "json not contains picture.id. `%s` given", string(body))
-			require.Equal(t, http.StatusCreated, resRecorder.Code)
 		})
 	}
 }

@@ -2670,7 +2670,7 @@ func (s *Repository) perspectivePageGroupIDs(
 func (s *Repository) generateDefaultThumbnails(ctx context.Context, imageID int) error {
 	_, err := s.imageStorage.FormattedImage(ctx, imageID, "picture-thumb-medium")
 	if err != nil {
-		return err
+		return fmt.Errorf("generateDefaultThumbnails(): %w", err)
 	}
 
 	return nil

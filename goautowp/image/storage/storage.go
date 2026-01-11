@@ -60,6 +60,7 @@ var (
 	errSelfRename              = errors.New("trying to rename to self")
 	errInvalidImageID          = errors.New("invalid image id provided")
 	errFileSizeDetectionFailed = errors.New("failed to determine file size")
+	errParenthesisNotSupported = errors.New("change image name for keys with parenthesis is not supported")
 )
 
 type Storage struct {
@@ -213,7 +214,7 @@ func (s *Storage) FormattedImage(ctx context.Context, id int, formatName string)
 
 	formattedImageID, err := s.doFormatImage(ctx, id, formatName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("doFormatImage(): %w", err)
 	}
 
 	return s.Image(ctx, formattedImageID)
@@ -505,6 +506,10 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 		return sql.ErrNoRows
 	}
 
+	if strings.Contains(img.Filepath, "(") || strings.Contains(img.Filepath, ")") {
+		return errParenthesisNotSupported
+	}
+
 	dir := s.dir(img.Dir)
 	if dir == nil {
 		return fmt.Errorf("%w: `%s`", errDirNotFound, img.Dir)
@@ -521,6 +526,9 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 		return err
 	}
 
+	sourceUrl := url.URL{Path: dir.Bucket() + "/" + img.Filepath}
+	bucket := dir.Bucket()
+
 	ctx = context.WithoutCancel(ctx)
 
 	for attemptIndex := range maxInsertAttempts {
@@ -535,18 +543,36 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 			return errSelfRename
 		}
 
+		destUrl := url.URL{Path: destFileName}
+		escapedDestUrl := destUrl.EscapedPath()
+
 		_, insertAttemptException = s.db.Update(schema.ImageTable).
 			Set(goqu.Record{schema.ImageTableFilepathColName: destFileName}).
 			Where(schema.ImageTableIDCol.Eq(img.ID)).
 			Executor().ExecContext(ctx)
 		if insertAttemptException == nil {
-			sourceUrl := url.URL{Path: dir.Bucket() + "/" + img.Filepath}
+			_, err = s3Client.CopyObject(ctx, &s3.CopyObjectInput{
+				Bucket:     &bucket,
+				CopySource: aws.String(sourceUrl.EscapedPath()),
+				Key:        aws.String(escapedDestUrl),
+				ACL:        types.ObjectCannedACLPublicRead,
+			})
+			if err != nil {
+				logrus.Errorf(
+					"CopyObject from `%s` to `%s` failed: %s",
+					sourceUrl.EscapedPath(),
+					escapedDestUrl,
+					err.Error(),
+				)
 
-			_, err = s3Client.RenameObject(ctx, &s3.RenameObjectInput{
-				Bucket:                 aws.String(dir.Bucket()),
-				RenameSource:           aws.String(sourceUrl.EscapedPath()),
-				Key:                    &destFileName,
-				DestinationIfNoneMatch: aws.String("*"),
+				return err
+			}
+
+			fpath := img.Filepath
+
+			_, err = s3Client.DeleteObject(ctx, &s3.DeleteObjectInput{
+				Bucket: &bucket,
+				Key:    &fpath,
 			})
 			if err != nil {
 				return err

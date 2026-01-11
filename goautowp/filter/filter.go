@@ -28,11 +28,13 @@ var specialCharacters = map[rune]string{
 	'„':  ",",
 	'“':  "_",
 	'”':  "_",
-	'{':  "(",
-	'}':  ")",
+	'{':  "_",
+	'}':  "_",
 	':':  "-",
 	';':  "_",
 	'-':  "-",
+	'(':  "_",
+	')':  "_",
 }
 
 func replaceSpecialCharacters(s string) string {
