@@ -85,6 +85,7 @@ export default defineConfig([
       ...perfectionist.configs['recommended-natural'].rules,
       'perfectionist/sort-classes': 'off',
       'perfectionist/sort-objects': 'off',
+      'perfectionist/sort-modules': 'off',
     },
   },
   {
