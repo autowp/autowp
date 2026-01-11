@@ -540,25 +540,13 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 			Where(schema.ImageTableIDCol.Eq(img.ID)).
 			Executor().ExecContext(ctx)
 		if insertAttemptException == nil {
-			bucket := dir.Bucket()
 			sourceUrl := url.URL{Path: dir.Bucket() + "/" + img.Filepath}
-			copySource := sourceUrl.EscapedPath()
 
-			_, err = s3Client.CopyObject(ctx, &s3.CopyObjectInput{
-				Bucket:     &bucket,
-				CopySource: &copySource,
-				Key:        &destFileName,
-				ACL:        types.ObjectCannedACLPublicRead,
-			})
-			if err != nil {
-				return err
-			}
-
-			fpath := img.Filepath
-
-			_, err = s3Client.DeleteObject(ctx, &s3.DeleteObjectInput{
-				Bucket: &bucket,
-				Key:    &fpath,
+			_, err = s3Client.RenameObject(ctx, &s3.RenameObjectInput{
+				Bucket:                 aws.String(dir.Bucket()),
+				RenameSource:           aws.String(sourceUrl.EscapedPath()),
+				Key:                    &destFileName,
+				DestinationIfNoneMatch: aws.String("*"),
 			})
 			if err != nil {
 				return err
