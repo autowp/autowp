@@ -181,7 +181,10 @@ func (s *Storage) FormattedImage(ctx context.Context, id int, formatName string)
 		schema.ImageTableFilepathCol, schema.ImageTableDirCol,
 	).
 		From(schema.ImageTable).
-		Join(schema.FormattedImageTable, goqu.On(schema.ImageTableIDCol.Eq(schema.FormattedImageTableFormattedImageIDCol))).
+		Join(
+			schema.FormattedImageTable,
+			goqu.On(schema.ImageTableIDCol.Eq(schema.FormattedImageTableFormattedImageIDCol)),
+		).
 		Where(
 			schema.FormattedImageTableImageIDCol.Eq(id),
 			schema.FormattedImageTableFormatCol.Eq(formatName),
@@ -538,7 +541,8 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 			Executor().ExecContext(ctx)
 		if insertAttemptException == nil {
 			bucket := dir.Bucket()
-			copySource := dir.Bucket() + "/" + img.Filepath
+			sourceUrl := url.URL{Path: dir.Bucket() + "/" + img.Filepath}
+			copySource := sourceUrl.EscapedPath()
 
 			_, err = s3Client.CopyObject(ctx, &s3.CopyObjectInput{
 				Bucket:     &bucket,
@@ -1036,7 +1040,10 @@ PAGINATION:
 						if itemBytes == nil {
 							itemBytes, err = s.getObjectBytes(ctx, bucket, *item.Key)
 							if err != nil {
-								fmt.Printf("getObjectBytes(%s, %s): %v\n", bucket, *item.Key, err.Error()) //nolint:forbidigo
+								fmt.Printf( //nolint:forbidigo
+									"getObjectBytes(%s, %s): %v\n",
+									bucket, *item.Key, err.Error(),
+								)
 
 								break PAGINATION
 							}
@@ -1044,7 +1051,10 @@ PAGINATION:
 
 						equal, err := s.isObjectBytesEqual(ctx, bucket, sameSizeKey, itemBytes)
 						if err != nil {
-							fmt.Printf("isObjectBytesEqual(%s, %s): %v\n", bucket, sameSizeKey, err.Error()) //nolint:forbidigo
+							fmt.Printf( //nolint:forbidigo
+								"isObjectBytesEqual(%s, %s): %v\n",
+								bucket, sameSizeKey, err.Error(),
+							)
 
 							break PAGINATION
 						}
@@ -1091,7 +1101,9 @@ PAGINATION:
 						if itemBytes == nil {
 							itemBytes, err = s.getObjectBytes(ctx, bucket, *item.Key)
 							if err != nil {
-								fmt.Printf("getObjectBytes(%s, %s): %v\n", bucket, *item.Key, err.Error()) //nolint:forbidigo
+								fmt.Printf( //nolint:forbidigo
+									"getObjectBytes(%s, %s): %v\n", bucket, *item.Key, err.Error(),
+								)
 
 								break PAGINATION
 							}
@@ -1101,7 +1113,9 @@ PAGINATION:
 							if key != *item.Key {
 								equal, err := s.isObjectBytesEqual(ctx, bucket, key, itemBytes)
 								if err != nil {
-									fmt.Printf("isObjectBytesEqual(%s, %s): %v\n", bucket, key, err.Error()) //nolint:forbidigo
+									fmt.Printf( //nolint:forbidigo
+										"isObjectBytesEqual(%s, %s): %v\n", bucket, key, err.Error(),
+									)
 
 									break PAGINATION
 								}
@@ -1371,7 +1385,9 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 		)
 
 		for i := 0; i < maxInsertAttempts && !done; i++ {
-			success, err = s.db.Select(schema.FormattedImageTableFormattedImageIDCol, schema.FormattedImageTableStatusCol).
+			success, err = s.db.Select(
+				schema.FormattedImageTableFormattedImageIDCol, schema.FormattedImageTableStatusCol,
+			).
 				From(schema.FormattedImageTable).
 				Where(schema.FormattedImageTableImageIDCol.Eq(imageID)).
 				ScanStructContext(ctx, &fiRow)

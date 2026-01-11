@@ -71,13 +71,6 @@ func TestUploadPicture(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &APIItem{
-		Name:       fmt.Sprintf("brand-%d", random.Int()),
-		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
-		Catname:    fmt.Sprintf("brand-%d", random.Int()),
-	})
-
 	picturesREST, err := cnt.PicturesREST(t.Context())
 	require.NoError(t, err)
 
@@ -87,39 +80,59 @@ func TestUploadPicture(t *testing.T) {
 	cfg := config.LoadConfig(".")
 
 	// admin
-	adminToken, err := kc.Login(
-		ctx,
-		keycloakClientID,
-		"",
-		cfg.Keycloak.Realm,
-		adminUsername,
-		adminPassword,
-	)
+	adminToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 	require.NotNil(t, adminToken)
 
 	picturesREST.SetupRouter(router)
 
-	req := CreatePictureRequest(
-		t,
-		"./test/test.jpg",
-		PicturePostForm{ItemID: brandID},
-		adminToken.AccessToken,
-	)
+	tests := []struct {
+		name    string
+		catname string
+	}{
+		{
+			name:    fmt.Sprintf("Brand %d", random.Int()),
+			catname: fmt.Sprintf("brand-%d", random.Int()),
+		},
+		{
+			name:    fmt.Sprintf("Brand %d (Foo)", random.Int()),
+			catname: fmt.Sprintf("brand-%d-foo", random.Int()),
+		},
+	}
 
-	resRecorder := httptest.NewRecorder()
-	router.ServeHTTP(resRecorder, req)
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			t.Parallel()
 
-	body, err := io.ReadAll(resRecorder.Result().Body)
-	require.NoError(t, err)
+			brandID := createItem(t, conn, cnt, &APIItem{
+				Name:       test.name,
+				IsGroup:    true,
+				ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+				Catname:    test.catname,
+			})
 
-	st := struct {
-		ID string `json:"id"`
-	}{}
+			req := CreatePictureRequest(
+				t,
+				"./test/test.jpg",
+				PicturePostForm{ItemID: brandID},
+				adminToken.AccessToken,
+			)
 
-	err = json.Unmarshal(body, &st)
-	require.NoError(t, err, "failed to decode json. `%s` given", string(body))
+			resRecorder := httptest.NewRecorder()
+			router.ServeHTTP(resRecorder, req)
 
-	require.NotEmpty(t, st.ID, "json not contains picture.id. `%s` given", string(body))
-	require.Equal(t, http.StatusCreated, resRecorder.Code)
+			body, err := io.ReadAll(resRecorder.Result().Body)
+			require.NoError(t, err)
+
+			st := struct {
+				ID string `json:"id"`
+			}{}
+
+			err = json.Unmarshal(body, &st)
+			require.NoError(t, err, "failed to decode json. `%s` given", string(body))
+
+			require.NotEmpty(t, st.ID, "json not contains picture.id. `%s` given", string(body))
+			require.Equal(t, http.StatusCreated, resRecorder.Code)
+		})
+	}
 }
