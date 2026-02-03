@@ -653,17 +653,17 @@ func langPriorityOrderExpr( //nolint: ireturn
 	}
 
 	if !ok {
-		return nil, fmt.Errorf("%w: `%s`", errLangNotFound, lang)
+		return nil, fmt.Errorf("%w: `%s`", errLangNotFound, DefaultLanguageCode)
 	}
 
-	langs := make([]interface{}, len(langPriority)+1)
-	langs[0] = col
+	args := make([]interface{}, len(langPriority)+1)
+	args[0] = col
 
 	for i, v := range langPriority {
-		langs[i+1] = v
+		args[i+1] = v
 	}
 
-	return goqu.Func("FIELD", langs...).Asc(), nil
+	return goqu.Func("FIELD", args...).Asc(), nil
 }
 
 func (s *Repository) LanguageName(ctx context.Context, itemID int64, lang string) (string, error) {
@@ -2278,7 +2278,9 @@ func (s *Repository) ItemParentSelect(
 					From(schema.ItemParentLanguageTable).
 					Where(
 						schema.ItemParentLanguageTableItemIDCol.Eq(aliasTable.Col(schema.ItemParentTableItemIDColName)),
-						schema.ItemParentLanguageTableParentIDCol.Eq(aliasTable.Col(schema.ItemParentTableParentIDColName)),
+						schema.ItemParentLanguageTableParentIDCol.Eq(
+							aliasTable.Col(schema.ItemParentTableParentIDColName),
+						),
 						goqu.Func("LENGTH", schema.ItemParentLanguageTableNameCol).Gt(0),
 					).
 					Order(orderExpr).
@@ -3276,7 +3278,9 @@ func (s *Repository) EngineVehiclesGroups(
 
 	err := s.db.Select(schema.ItemTableIDCol).
 		From(schema.ItemTable).
-		Join(schema.ItemParentCacheTable, goqu.On(schema.ItemTableEngineItemIDCol.Eq(schema.ItemParentCacheTableItemIDCol))).
+		Join(schema.ItemParentCacheTable, goqu.On(
+			schema.ItemTableEngineItemIDCol.Eq(schema.ItemParentCacheTableItemIDCol)),
+		).
 		Where(schema.ItemParentCacheTableParentIDCol.Eq(engineID)).
 		ScanValsContext(ctx, &vehicleIDs)
 	if err != nil {

@@ -3350,39 +3350,25 @@ func (s *ItemsGRPCServer) carSectionGroups(
 	brandCatname string,
 	section SectionPreset,
 ) ([]*APIBrandSection, error) {
-	var (
-		err  error
-		rows []*items.ItemParent
-	)
+	childItems := &query.ItemListOptions{
+		TypeID:                section.ItemTypeID,
+		IsNotConcept:          true,
+		VehicleTypeAncestorID: section.CarTypeID,
+	}
 
-	if section.CarTypeID > 0 {
-		rows, _, err = s.repository.ItemParents(ctx, &query.ItemParentListOptions{
-			ParentID: brandID,
-			ChildItems: &query.ItemListOptions{
-				TypeID:                section.ItemTypeID,
-				IsNotConcept:          true,
-				VehicleTypeAncestorID: section.CarTypeID,
-			},
-			Language: lang,
-		}, items.ItemParentFields{Name: true}, items.ItemParentOrderByName)
-		if err != nil {
-			return nil, fmt.Errorf("ItemParents(): %w", err)
+	if section.CarTypeID == 0 {
+		childItems.ExcludeVehicleTypeAncestorID = []int64{
+			items.VehicleTypeIDMoto, items.VehicleTypeIDTractor, items.VehicleTypeIDTruck, items.VehicleTypeIDBus,
 		}
-	} else {
-		rows, _, err = s.repository.ItemParents(ctx, &query.ItemParentListOptions{
-			ParentID: brandID,
-			ChildItems: &query.ItemListOptions{
-				TypeID:       section.ItemTypeID,
-				IsNotConcept: true,
-				ExcludeVehicleTypeAncestorID: []int64{
-					items.VehicleTypeIDMoto, items.VehicleTypeIDTractor, items.VehicleTypeIDTruck, items.VehicleTypeIDBus,
-				},
-			},
-			Language: lang,
-		}, items.ItemParentFields{Name: true}, items.ItemParentOrderByName)
-		if err != nil {
-			return nil, fmt.Errorf("ItemParents(): %w", err)
-		}
+	}
+
+	rows, _, err := s.repository.ItemParents(ctx, &query.ItemParentListOptions{
+		ParentID:   brandID,
+		ChildItems: childItems,
+		Language:   lang,
+	}, items.ItemParentFields{Name: true}, items.ItemParentOrderByName)
+	if err != nil {
+		return nil, fmt.Errorf("ItemParents(): %w", err)
 	}
 
 	groups := make([]*APIBrandSection, 0, len(rows))
