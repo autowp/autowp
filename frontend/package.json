@@ -18,7 +18,7 @@
     "monaco-editor": "$monaco-editor"
   },
   "dependencies": {
-    "@angular-devkit/architect": "^0.2100.4",
+    "@angular-devkit/architect": "^0.2101.2",
     "@angular/animations": "^21.0.6",
     "@angular/cdk": "^21",
     "@angular/common": "^21.0.6",
@@ -104,9 +104,9 @@
     "jquery": "^3.6.3",
     "prettier": "^3.2",
     "prettier-eslint": "^17.0.0-alpha.1",
-    "stylelint": "^16.2.1",
-    "stylelint-config-standard": "^39",
-    "stylelint-config-standard-scss": "^16",
+    "stylelint": "^17",
+    "stylelint-config-standard": "^40",
+    "stylelint-config-standard-scss": "^17",
     "ts-node": "^10.9.1",
     "typescript-eslint": "^8.19.1",
     "vhost": "^3.0.2"
