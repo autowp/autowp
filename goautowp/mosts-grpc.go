@@ -98,16 +98,20 @@ func (s *MostsGRPCServer) GetItems(
 }
 
 func (s *MostsGRPCServer) GetMenu(ctx context.Context, in *MostsMenuRequest) (*MostsMenu, error) {
-	yearsRanges := make([]*YearsRange, 0)
-	for _, yearRange := range s.repository.YearsMenu() {
+	yearsListItems := s.repository.YearsMenu()
+
+	yearsRanges := make([]*YearsRange, 0, len(yearsListItems))
+	for _, yearRange := range yearsListItems {
 		yearsRanges = append(yearsRanges, &YearsRange{
 			Name:    yearRange.Name,
 			Catname: yearRange.Folder,
 		})
 	}
 
-	ratings := make([]*MostsRating, 0)
-	for _, rating := range s.repository.RatingsMenu() {
+	ratingsListItems := s.repository.RatingsMenu()
+
+	ratings := make([]*MostsRating, 0, len(ratingsListItems))
+	for _, rating := range ratingsListItems {
 		ratings = append(ratings, &MostsRating{
 			Name:    rating.Name,
 			Catname: rating.Catname,

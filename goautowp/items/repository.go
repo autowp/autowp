@@ -4553,6 +4553,7 @@ func (s *Repository) extractName(
 }
 
 func (s *Repository) getAliases(ctx context.Context, itemID int64) ([]string, error) {
+	//nolint: prealloc
 	var aliases []string
 
 	err := s.db.Select(schema.BrandAliasTableNameCol).From(schema.BrandAliasTable).

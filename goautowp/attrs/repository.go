@@ -2724,7 +2724,7 @@ func (s *Repository) setFloatValue(
 func (s *Repository) setListValue(
 	ctx context.Context, attributeID, itemID int64, value []int64, isEmpty bool,
 ) (bool, error) {
-	var ( //nolint: prealloc
+	var (
 		records   []goqu.Record
 		orderings []int
 	)
@@ -3818,7 +3818,7 @@ func (s *Repository) removeEmpty(
 }
 
 func (s *Repository) flatternAttributes(attributes []*AttributeRow) []*AttributeRow {
-	result := make([]*AttributeRow, 0)
+	result := make([]*AttributeRow, 0, len(attributes))
 
 	for _, attribute := range attributes {
 		result = append(result, attribute)

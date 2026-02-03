@@ -77,10 +77,6 @@ func (s *MapGRPCServer) GetPoints(
 
 	pointsOnly := in.GetPointsOnly()
 
-	// $language = $this->language();
-
-	mapPoints := make([]*MapPoint, 0)
-
 	polygon := fmt.Sprintf("POLYGON((%F %F, %F %F, %F %F, %F %F, %F %F))",
 		lngLo,
 		latLo,
@@ -106,6 +102,8 @@ func (s *MapGRPCServer) GetPoints(
 
 		defer util.Close(rows)
 
+		mapPoints := make([]*MapPoint, 0)
+
 		for rows.Next() {
 			var point geo.Point
 
@@ -125,115 +123,138 @@ func (s *MapGRPCServer) GetPoints(
 		if err = rows.Err(); err != nil {
 			return nil, err
 		}
-	} else {
-		rows, err := sqSelect.
-			SelectAppend(
-				schema.ItemTableIDCol, schema.ItemTableNameCol, schema.ItemTableBeginYearCol, schema.ItemTableEndYearCol,
-				schema.ItemTableItemTypeIDCol, schema.ItemTableTodayCol,
-			).
-			Join(schema.ItemTable, goqu.On(schema.ItemPointTableItemIDCol.Eq(schema.ItemTableIDCol))).
-			Executor().QueryContext(ctx) //nolint:sqlclosecheck
 
-		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
+		return &MapPoints{
+			Points: mapPoints,
+		}, nil
+	}
 
-		defer util.Close(rows)
-
-		nameFormatter := items.NewItemNameFormatter(s.i18n)
-
-		for rows.Next() {
-			var (
-				point             geo.Point
-				id                int64
-				name              string
-				nullableBeginYear sql.NullInt32
-				nullableEndYear   sql.NullInt32
-				itemTypeID        schema.ItemTableItemTypeID
-				today             sql.NullBool
-			)
-
-			err = rows.Scan(&point, &id, &name, &nullableBeginYear, &nullableEndYear, &itemTypeID, &today)
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-
-			var beginYear int32
-			if nullableBeginYear.Valid {
-				beginYear = nullableBeginYear.Int32
-			}
-
-			var endYear int32
-			if nullableEndYear.Valid {
-				endYear = nullableEndYear.Int32
-			}
-
-			var todayRef *bool
-			if today.Valid {
-				todayRef = &today.Bool
-			}
-
-			nameText, err := nameFormatter.FormatText(items.ItemNameFormatterOptions{
-				Name:      name,
-				BeginYear: beginYear,
-				EndYear:   endYear,
-				Today:     todayRef,
-			}, in.GetLanguage())
-			if err != nil {
-				return nil, err
-			}
-
-			mapPoint := &MapPoint{
-				Id: fmt.Sprintf("factory%d", id),
-				Location: &latlng.LatLng{
-					Latitude:  point.Lat(),
-					Longitude: point.Lng(),
-				},
-				Name: nameText,
-			}
-
-			switch itemTypeID {
-			case schema.ItemTableItemTypeIDFactory:
-				mapPoint.Url = frontend.FactoryRoute(id)
-			case schema.ItemTableItemTypeIDMuseum:
-				mapPoint.Url = frontend.MuseumRoute(id)
-			case schema.ItemTableItemTypeIDVehicle, schema.ItemTableItemTypeIDEngine,
-				schema.ItemTableItemTypeIDCategory, schema.ItemTableItemTypeIDTwins,
-				schema.ItemTableItemTypeIDBrand, schema.ItemTableItemTypeIDPerson, schema.ItemTableItemTypeIDCopyright:
-			}
-
-			var imageID sql.NullInt64
-
-			success, err := s.db.Select(schema.PictureTableImageIDCol).
-				From(schema.PictureTable).
-				Join(schema.PictureItemTable, goqu.On(schema.PictureTableIDCol.Eq(schema.PictureItemTablePictureIDCol))).
-				Where(
-					schema.PictureTableStatusCol.Eq(schema.PictureStatusAccepted),
-					schema.PictureItemTableItemIDCol.Eq(id),
-				).
-				ScanValContext(ctx, &imageID)
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-
-			if success && imageID.Valid {
-				image, err := s.imageStorage.FormattedImage(ctx, int(imageID.Int64), "picture-thumb-medium")
-				if err != nil {
-					return nil, status.Error(codes.Internal, err.Error())
-				}
-
-				mapPoint.Image = APIImageToGRPC(image)
-			}
-
-			mapPoints = append(mapPoints, mapPoint)
-		}
-
-		if err = rows.Err(); err != nil {
-			return nil, err
-		}
+	mapPoints, err := s.pointsWithContent(ctx, sqSelect, in.GetLanguage())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &MapPoints{
 		Points: mapPoints,
 	}, nil
+}
+
+func (s *MapGRPCServer) pointsWithContent(
+	ctx context.Context,
+	sqSelect *goqu.SelectDataset,
+	lang string,
+) ([]*MapPoint, error) {
+	rows, err := sqSelect.
+		SelectAppend(
+			schema.ItemTableIDCol,
+			schema.ItemTableNameCol,
+			schema.ItemTableBeginYearCol,
+			schema.ItemTableEndYearCol,
+			schema.ItemTableItemTypeIDCol,
+			schema.ItemTableTodayCol,
+		).
+		Join(schema.ItemTable, goqu.On(schema.ItemPointTableItemIDCol.Eq(schema.ItemTableIDCol))).
+		Executor().QueryContext(ctx) //nolint:sqlclosecheck
+
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	defer util.Close(rows)
+
+	nameFormatter := items.NewItemNameFormatter(s.i18n)
+
+	mapPoints := make([]*MapPoint, 0)
+
+	for rows.Next() {
+		var (
+			point             geo.Point
+			id                int64
+			name              string
+			nullableBeginYear sql.NullInt32
+			nullableEndYear   sql.NullInt32
+			itemTypeID        schema.ItemTableItemTypeID
+			today             sql.NullBool
+		)
+
+		err = rows.Scan(&point, &id, &name, &nullableBeginYear, &nullableEndYear, &itemTypeID, &today)
+		if err != nil {
+			return nil, err
+		}
+
+		var beginYear int32
+		if nullableBeginYear.Valid {
+			beginYear = nullableBeginYear.Int32
+		}
+
+		var endYear int32
+		if nullableEndYear.Valid {
+			endYear = nullableEndYear.Int32
+		}
+
+		var todayRef *bool
+		if today.Valid {
+			todayRef = &today.Bool
+		}
+
+		nameText, err := nameFormatter.FormatText(items.ItemNameFormatterOptions{
+			Name:      name,
+			BeginYear: beginYear,
+			EndYear:   endYear,
+			Today:     todayRef,
+		}, lang)
+		if err != nil {
+			return nil, err
+		}
+
+		mapPoint := &MapPoint{
+			Id: fmt.Sprintf("factory%d", id),
+			Location: &latlng.LatLng{
+				Latitude:  point.Lat(),
+				Longitude: point.Lng(),
+			},
+			Name: nameText,
+		}
+
+		switch itemTypeID {
+		case schema.ItemTableItemTypeIDFactory:
+			mapPoint.Url = frontend.FactoryRoute(id)
+		case schema.ItemTableItemTypeIDMuseum:
+			mapPoint.Url = frontend.MuseumRoute(id)
+		case schema.ItemTableItemTypeIDVehicle, schema.ItemTableItemTypeIDEngine,
+			schema.ItemTableItemTypeIDCategory, schema.ItemTableItemTypeIDTwins,
+			schema.ItemTableItemTypeIDBrand, schema.ItemTableItemTypeIDPerson, schema.ItemTableItemTypeIDCopyright:
+		}
+
+		var imageID sql.NullInt64
+
+		success, err := s.db.Select(schema.PictureTableImageIDCol).
+			From(schema.PictureTable).
+			Join(schema.PictureItemTable, goqu.On(schema.PictureTableIDCol.Eq(schema.PictureItemTablePictureIDCol))).
+			Where(
+				schema.PictureTableStatusCol.Eq(schema.PictureStatusAccepted),
+				schema.PictureItemTableItemIDCol.Eq(id),
+			).
+			ScanValContext(ctx, &imageID)
+		if err != nil {
+			return nil, err
+		}
+
+		if success && imageID.Valid {
+			image, err := s.imageStorage.FormattedImage(ctx, int(imageID.Int64), "picture-thumb-medium")
+			if err != nil {
+				return nil, err
+			}
+
+			mapPoint.Image = APIImageToGRPC(image)
+		}
+
+		mapPoints = append(mapPoints, mapPoint)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return mapPoints, nil
 }
