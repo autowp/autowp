@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, RESPONSE_INIT} from '@angular/core';
 
 @Component({
   selector: 'app-page-not-found',
@@ -6,4 +6,13 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
   template: '<h2 i18n>Page not found</h2>',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageNotFoundComponent {}
+export class PageNotFoundComponent implements OnInit {
+  readonly #response = inject(RESPONSE_INIT);
+
+  ngOnInit(): void {
+    if (this.#response) {
+      this.#response.status = 404;
+      this.#response.statusText = 'Not Found';
+    }
+  }
+}
