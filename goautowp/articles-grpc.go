@@ -8,6 +8,8 @@ import (
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -54,12 +56,12 @@ func (s *ArticlesGRPCServer) GetList(
 
 	sqlSelect, err := paginator.GetCurrentItems(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	err = sqlSelect.ScanStructsContext(ctx, &rows)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	articles := make([]*Article, 0)
@@ -88,7 +90,7 @@ func (s *ArticlesGRPCServer) GetList(
 
 	pages, err := paginator.GetPages(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &ArticlesResponse{
@@ -134,11 +136,11 @@ func (s *ArticlesGRPCServer) GetItemByCatname(
 		Where(schema.ArticleTableEnabledCol, schema.ArticleTableCatnameCol.Eq(in.GetCatname())).
 		ScanStructContext(ctx, &article)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	if !success {
-		return nil, nil //nolint: nilnil
+		return nil, status.Error(codes.Internal, "not found")
 	}
 
 	authorID := article.AuthorID.Int64
