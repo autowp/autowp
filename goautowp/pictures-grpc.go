@@ -2297,13 +2297,20 @@ func (s *PicturesGRPCServer) notifyCopyrightsEdited(
 		return err
 	}
 
+	editorRow, err := s.userRepository.User(
+		ctx, &query.UserListOptions{IDs: revUserIDs}, users.UserFields{}, users.OrderByNone,
+	)
+	if err != nil {
+		return err
+	}
+
 	for _, userRow := range userRows {
 		pictureURL, err := s.pictureURL(picture.Identity, userRow.Language)
 		if err != nil {
 			return err
 		}
 
-		userURL, err := s.userURL(userRow.ID, userRow.Identity, userRow.Language)
+		editorURL, err := s.userURL(editorRow.ID, editorRow.Identity, userRow.Language)
 		if err != nil {
 			return err
 		}
@@ -2311,7 +2318,7 @@ func (s *PicturesGRPCServer) notifyCopyrightsEdited(
 		err = s.messagingRepository.CreateMessageFromTemplate(
 			ctx, 0, userRow.ID, "pm/user-%s-edited-picture-copyrights-%s-%s",
 			map[string]interface{}{
-				"User":       userURL,
+				"User":       editorURL,
 				"PictureURL": pictureURL,
 			},
 			userRow.Language,
