@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"regexp"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 
@@ -20,7 +19,6 @@ import (
 	"github.com/autowp/goautowp/hosts"
 	"github.com/autowp/goautowp/i18nbundle"
 	"github.com/autowp/goautowp/index"
-	"github.com/autowp/goautowp/itemofday"
 	"github.com/autowp/goautowp/items"
 	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/pictures"
@@ -44,9 +42,8 @@ import (
 const (
 	itemLinkNameMaxLength = 255
 
-	typicalPicturesInList            = 4
-	itemOfDayCacheDuration           = time.Hour * 25
-	topSpecsContriutorsCacheDuration = time.Hour
+	typicalPicturesInList             = 4
+	topSpecsContributorsCacheDuration = time.Hour
 
 	topSpecsContributorsValuesCountThreshold = 10
 	topSpecsContributorsInDays               = 3
@@ -106,10 +103,10 @@ type ItemsGRPCServer struct {
 	hostManager           *hosts.Manager
 	itemParentExtractor   *ItemParentExtractor
 	linkExtractor         *LinkExtractor
-	itemOfDayRepository   *itemofday.Repository
 	redis                 *redis.Client
 	catalogue             *Catalogue
 	fileStorageConfig     config.FileStorageConfig
+	itemOfDayCached       *ItemOfDayCached
 }
 
 func NewItemsGRPCServer(
@@ -129,10 +126,10 @@ func NewItemsGRPCServer(
 	hostManager *hosts.Manager,
 	itemParentExtractor *ItemParentExtractor,
 	linkExtractor *LinkExtractor,
-	itemOfDayRepository *itemofday.Repository,
 	redis *redis.Client,
 	catalogue *Catalogue,
 	fileStorageConfig config.FileStorageConfig,
+	itemOfDayCached *ItemOfDayCached,
 ) *ItemsGRPCServer {
 	return &ItemsGRPCServer{
 		repository:            repository,
@@ -151,10 +148,10 @@ func NewItemsGRPCServer(
 		hostManager:           hostManager,
 		itemParentExtractor:   itemParentExtractor,
 		linkExtractor:         linkExtractor,
-		itemOfDayRepository:   itemOfDayRepository,
 		redis:                 redis,
 		catalogue:             catalogue,
 		fileStorageConfig:     fileStorageConfig,
+		itemOfDayCached:       itemOfDayCached,
 	}
 }
 
@@ -1097,6 +1094,11 @@ func (s *ItemsGRPCServer) UpdateItemLanguage(
 		}
 	}
 
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, itemID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &emptypb.Empty{}, nil
 }
 
@@ -1393,6 +1395,11 @@ func (s *ItemsGRPCServer) SetItemParentLanguage(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &emptypb.Empty{}, nil
 }
 
@@ -1659,6 +1666,11 @@ func (s *ItemsGRPCServer) CreateItemParent(
 		userCtx.UserID,
 		"pm/user-%s-adds-item-%s-%s-to-item-%s-%s",
 	)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, item.ID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -2095,102 +2107,8 @@ func (s *ItemsGRPCServer) GetItemParents(
 	}, nil
 }
 
-func (s *ItemsGRPCServer) GetItemOfDay(
-	ctx context.Context,
-	in *ItemOfDayRequest,
-) (*ItemOfDay, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	lang := in.GetLanguage()
-
-	itemOfDay, err := s.itemOfDayRepository.Current(ctx)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, status.Error(codes.NotFound, err.Error())
-		}
-
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	var (
-		itemOfDayInfo ItemOfDay
-		success       bool
-	)
-
-	if itemOfDay == nil {
-		return nil, status.Error(codes.NotFound, "Item of day not found")
-	}
-
-	if itemOfDay.ItemID == 0 {
-		return nil, status.Error(codes.Internal, "Invalid item_id: can't bet zero")
-	}
-
-	key := "API_ITEM_OF_DAY_123_" + strconv.FormatInt(itemOfDay.ItemID, 10) + "_" + lang
-
-	cacheItem, err := s.redis.Get(ctx, key).Bytes()
-	if err != nil && !errors.Is(err, redis.Nil) {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if err == nil {
-		err = proto.Unmarshal(cacheItem, &itemOfDayInfo)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		success = true
-	}
-
-	if !success {
-		fields := ItemFields{
-			NameHtml:              true,
-			ItemOfDayPictures:     true,
-			AcceptedPicturesCount: true,
-			Twins:                 &ItemsRequest{},
-			Categories: &ItemsRequest{
-				Fields: &ItemFields{NameHtml: true},
-			},
-			Route: true,
-		}
-		convertedFields := convertItemFields(&fields)
-
-		item, err := s.repository.Item(ctx, &query.ItemListOptions{
-			ItemID:   itemOfDay.ItemID,
-			Language: lang,
-		}, convertedFields)
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return nil, status.Errorf(codes.Internal, "row %d not found", itemOfDay.ItemID)
-			}
-
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		extracted, err := s.extractor.Extract(ctx, item, &fields, in.GetLanguage(), userCtx)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		itemOfDayInfo = ItemOfDay{
-			Item:   extracted,
-			UserId: util.NullInt64ToScalar(itemOfDay.UserID),
-		}
-
-		cacheBytes, err := proto.Marshal(&itemOfDayInfo)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		err = s.redis.Set(ctx, key, cacheBytes, itemOfDayCacheDuration).Err()
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-	}
-
-	return &itemOfDayInfo, nil
+func (s *ItemsGRPCServer) GetItemOfDay(ctx context.Context, in *ItemOfDayRequest) (*ItemOfDay, error) {
+	return s.itemOfDayCached.GetItemOfDay(ctx, in.GetLanguage())
 }
 
 func (s *ItemsGRPCServer) GetTopSpecsContributions(
@@ -2276,7 +2194,7 @@ func (s *ItemsGRPCServer) GetTopSpecsContributions(
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 
-		err = s.redis.Set(ctx, cacheKey, cacheBytes, topSpecsContriutorsCacheDuration).Err()
+		err = s.redis.Set(ctx, cacheKey, cacheBytes, topSpecsContributorsCacheDuration).Err()
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -2899,6 +2817,11 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, item.ID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil

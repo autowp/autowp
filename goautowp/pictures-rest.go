@@ -49,6 +49,7 @@ type PicturesREST struct {
 	commentsRepository   *comments.Repository
 	duplicateFinder      *DuplicateFinder
 	telegramService      *telegram.Service
+	itemOfDayCached      *ItemOfDayCached
 }
 
 func NewPicturesREST(
@@ -63,6 +64,7 @@ func NewPicturesREST(
 	commentsRepository *comments.Repository,
 	duplicateFinder *DuplicateFinder,
 	telegramService *telegram.Service,
+	itemOfDayCached *ItemOfDayCached,
 ) *PicturesREST {
 	return &PicturesREST{
 		auth:                 auth,
@@ -76,6 +78,7 @@ func NewPicturesREST(
 		commentsRepository:   commentsRepository,
 		duplicateFinder:      duplicateFinder,
 		telegramService:      telegramService,
+		itemOfDayCached:      itemOfDayCached,
 	}
 }
 
@@ -321,6 +324,11 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 		ctx.String(http.StatusInternalServerError, err.Error())
 
 		return
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, pictureID)
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, err.Error())
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{

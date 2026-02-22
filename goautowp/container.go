@@ -75,6 +75,7 @@ type Container struct {
 	i18n                   *i18nbundle.I18n
 	itemOfDayRepository    *itemofday.Repository
 	itemsGrpcServer        *ItemsGRPCServer
+	itemOfDayCached        *ItemOfDayCached
 	ratingGrpcServer       *RatingGRPCServer
 	votingsGrpcServer      *VotingsGRPCServer
 	itemsRepository        *items.Repository
@@ -586,6 +587,11 @@ func (s *Container) PicturesREST(ctx context.Context) (*PicturesREST, error) {
 		i18nBundle,
 	)
 
+	itemOfDayCached, err := s.ItemOfDayCached(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	return NewPicturesREST(
 		auth,
 		picturesRepo,
@@ -598,6 +604,7 @@ func (s *Container) PicturesREST(ctx context.Context) (*PicturesREST, error) {
 		commentsRepo,
 		df,
 		ts,
+		itemOfDayCached,
 	), nil
 }
 
@@ -1242,6 +1249,36 @@ func (s *Container) RatingGRPCServer(ctx context.Context) (*RatingGRPCServer, er
 	return s.ratingGrpcServer, nil
 }
 
+func (s *Container) ItemOfDayCached(ctx context.Context) (*ItemOfDayCached, error) {
+	if s.itemOfDayCached == nil {
+		itemOfDayRepo, err := s.ItemOfDayRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		itemsRepo, err := s.ItemsRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		picturesRepo, err := s.PicturesRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		redisClient, err := s.Redis()
+		if err != nil {
+			return nil, err
+		}
+
+		s.itemOfDayCached = NewItemOfDayCached(
+			itemOfDayRepo, itemsRepo, picturesRepo, s.Config().ContentLanguages, redisClient, s.ItemExtractor(),
+		)
+	}
+
+	return s.itemOfDayCached, nil
+}
+
 func (s *Container) ItemsGRPCServer(ctx context.Context) (*ItemsGRPCServer, error) {
 	if s.itemsGrpcServer == nil {
 		repo, err := s.ItemsRepository(ctx)
@@ -1301,17 +1338,17 @@ func (s *Container) ItemsGRPCServer(ctx context.Context) (*ItemsGRPCServer, erro
 			return nil, err
 		}
 
-		itemOfDayRepository, err := s.ItemOfDayRepository(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		redisClient, err := s.Redis()
 		if err != nil {
 			return nil, err
 		}
 
 		catalogue, err := s.Catalogue(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		itemOfDayCached, err := s.ItemOfDayCached(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1333,10 +1370,10 @@ func (s *Container) ItemsGRPCServer(ctx context.Context) (*ItemsGRPCServer, erro
 			s.HostsManager(),
 			s.ItemParentExtractor(),
 			s.NewLinkExtractor(),
-			itemOfDayRepository,
 			redisClient,
 			catalogue,
 			s.Config().FileStorage,
+			itemOfDayCached,
 		)
 	}
 
@@ -1543,6 +1580,11 @@ func (s *Container) PicturesGRPCServer(ctx context.Context) (*PicturesGRPCServer
 			return nil, err
 		}
 
+		itemOfDayCached, err := s.ItemOfDayCached(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.picturesGrpcServer = NewPicturesGRPCServer(
 			repository,
 			auth,
@@ -1559,6 +1601,7 @@ func (s *Container) PicturesGRPCServer(ctx context.Context) (*PicturesGRPCServer
 			s.PictureItemExtractor(),
 			s.ItemExtractor(),
 			catalogue,
+			itemOfDayCached,
 		)
 	}
 

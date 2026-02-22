@@ -62,6 +62,7 @@ type PicturesGRPCServer struct {
 	pictureItemExtractor  *PictureItemExtractor
 	itemExtractor         *ItemExtractor
 	catalogue             *Catalogue
+	itemOfDayCached       *ItemOfDayCached
 }
 
 func NewPicturesGRPCServer(
@@ -80,6 +81,7 @@ func NewPicturesGRPCServer(
 	pictureItemExtractor *PictureItemExtractor,
 	itemExtractor *ItemExtractor,
 	catalogue *Catalogue,
+	itemOfDayCached *ItemOfDayCached,
 ) *PicturesGRPCServer {
 	return &PicturesGRPCServer{
 		repository:            repository,
@@ -99,6 +101,7 @@ func NewPicturesGRPCServer(
 		pictureItemExtractor:  pictureItemExtractor,
 		itemExtractor:         itemExtractor,
 		catalogue:             catalogue,
+		itemOfDayCached:       itemOfDayCached,
 	}
 }
 
@@ -413,6 +416,11 @@ func (s *PicturesGRPCServer) UpdateModerVote(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, pictureID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &emptypb.Empty{}, nil
 }
 
@@ -621,6 +629,11 @@ func (s *PicturesGRPCServer) Repair(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, in.GetId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &emptypb.Empty{}, nil
 }
 
@@ -661,6 +674,11 @@ func (s *PicturesGRPCServer) SetPictureItemArea(
 		Pictures: []int64{in.GetPictureId()},
 		Items:    []int64{in.GetItemId()},
 	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -720,6 +738,11 @@ func (s *PicturesGRPCServer) SetPictureItemPerspective(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &emptypb.Empty{}, nil
 }
 
@@ -758,6 +781,16 @@ func (s *PicturesGRPCServer) SetPictureItemItemID(
 		Pictures: []int64{in.GetPictureId()},
 		Items:    []int64{in.GetItemId(), in.GetNewItemId()},
 	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetNewItemId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -808,6 +841,11 @@ func (s *PicturesGRPCServer) DeletePictureItem(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &emptypb.Empty{}, nil
 }
 
@@ -850,6 +888,11 @@ func (s *PicturesGRPCServer) CreatePictureItem(
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil
@@ -910,6 +953,11 @@ func (s *PicturesGRPCServer) SetPictureCrop(
 		Message:  "Выделение области на картинке",
 		Pictures: []int64{in.GetPictureId()},
 	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, in.GetPictureId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -1091,6 +1139,16 @@ func (s *PicturesGRPCServer) AcceptReplacePicture(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, replacePicture.ID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, pic.ID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &emptypb.Empty{}, nil
 }
 
@@ -1179,6 +1237,11 @@ func (s *PicturesGRPCServer) UpdatePicture(
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, in.GetId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil
@@ -1367,6 +1430,11 @@ func (s *PicturesGRPCServer) SetPictureStatus(
 
 	case PictureStatus_PICTURE_STATUS_UNKNOWN:
 		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, pic.ID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil
@@ -1978,6 +2046,11 @@ func (s *PicturesGRPCServer) CorrectFileNames(
 	}
 
 	err = s.repository.CorrectFileNames(ctx, id)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, id)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
