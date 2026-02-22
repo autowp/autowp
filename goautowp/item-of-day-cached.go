@@ -34,7 +34,8 @@ type ItemOfDayCached struct {
 
 func NewItemOfDayCached(
 	repository *itemofday.Repository, itemRepository *items.Repository, picturesRepository *pictures.Repository,
-	contentLanguages []string, redis *redis.Client, extractor *ItemExtractor) *ItemOfDayCached {
+	contentLanguages []string, redis *redis.Client, extractor *ItemExtractor,
+) *ItemOfDayCached {
 	return &ItemOfDayCached{
 		repository:         repository,
 		itemRepository:     itemRepository,
