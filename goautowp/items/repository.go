@@ -3383,7 +3383,7 @@ func (s *Repository) RebuildItemOrderCache(ctx context.Context) error {
 	for page := 1; ; page++ {
 		list, pages, err := s.List(ctx, &query.ItemListOptions{
 			Limit: batchSize,
-			Page:  uint32(page), //nolint: gosec
+			Page:  uint32(page),
 		}, nil, OrderByIDAsc, true)
 		if err != nil {
 			return err
@@ -3398,7 +3398,7 @@ func (s *Repository) RebuildItemOrderCache(ctx context.Context) error {
 			}
 		}
 
-		if pages.Last == int32(page) { //nolint: gosec
+		if pages.Last == int32(page) {
 			break
 		}
 	}

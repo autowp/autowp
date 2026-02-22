@@ -1733,7 +1733,7 @@ func (s *Repository) CorrectAllFileNames(ctx context.Context) error {
 			From(schema.PictureTable).
 			Join(schema.ImageTable, goqu.On(schema.PictureTableImageIDCol.Eq(schema.ImageTableIDCol))).
 			Order(schema.PictureTableIDCol.Asc()).
-			Offset(uint(i*perPage)). //nolint: gosec
+			Offset(uint(i*perPage)).
 			Limit(perPage).ScanStructsContext(ctx, &sts)
 		if err != nil {
 			return err

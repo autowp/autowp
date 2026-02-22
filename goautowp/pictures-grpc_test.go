@@ -1824,7 +1824,7 @@ func TestCorrectFileNamesVote(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	httpResponse, err := http.DefaultClient.Do(request) //nolint: bodyclose
+	httpResponse, err := http.DefaultClient.Do(request) //nolint: bodyclose,gosec
 	require.NoError(t, err)
 
 	defer util.Close(httpResponse.Body)
@@ -1872,7 +1872,7 @@ func TestCorrectFileNamesVote(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	httpResponse, err = http.DefaultClient.Do(request) //nolint: bodyclose
+	httpResponse, err = http.DefaultClient.Do(request) //nolint: bodyclose,gosec
 	require.NoError(t, err)
 
 	defer util.Close(httpResponse.Body)
@@ -1926,7 +1926,7 @@ func TestCorrectFileNamesVote(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	httpResponse, err = http.DefaultClient.Do(request) //nolint: bodyclose
+	httpResponse, err = http.DefaultClient.Do(request) //nolint: bodyclose,gosec
 	require.NoError(t, err)
 
 	defer util.Close(httpResponse.Body)

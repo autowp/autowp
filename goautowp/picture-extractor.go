@@ -713,7 +713,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 
 					for n, p := range paginatorPictures {
 						if p.ID == row.ID {
-							pageNumber = int32(n + 1) //nolint: gosec
+							pageNumber = int32(n + 1)
 
 							break
 						}

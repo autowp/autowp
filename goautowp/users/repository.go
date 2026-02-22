@@ -70,7 +70,7 @@ type CreateUserOptions struct {
 	Email           string `json:"email"`
 	Timezone        string `json:"timezone"`
 	Language        string `json:"language"`
-	Password        string `json:"password"`
+	Password        string `json:"password"` //nolint: gosec
 	PasswordConfirm string `json:"password_confirm"`
 	Captcha         string `json:"captcha"`
 }
@@ -1138,15 +1138,15 @@ func (s *Repository) DeleteUnused(ctx context.Context) error {
 		LeftJoin(schema.CommentMessageTable, goqu.On(schema.UserTableIDCol.Eq(schema.CommentMessageTableAuthorIDCol))).
 		LeftJoin(schema.ForumsTopicsTable, goqu.On(schema.UserTableIDCol.Eq(schema.ForumsTopicsTableAuthorIDCol))).
 		LeftJoin(schema.PictureTable, goqu.On(schema.UserTableIDCol.Eq(schema.PictureTableOwnerIDCol))).
-		LeftJoin(schema.VotingVariantVoteTable, goqu.On(schema.UserTableIDCol.Eq(schema.VotingVariantVoteTableUserIDCol))).
+		LeftJoin(schema.VotingVariantVoteTable, goqu.On(
+			schema.UserTableIDCol.Eq(schema.VotingVariantVoteTableUserIDCol),
+		)).
 		LeftJoin(schema.PersonalMessagesTable.As("pmf"), goqu.On(
 			schema.UserTableIDCol.Eq(goqu.T("pmf").Col(schema.PersonalMessagesTableFromUserIDColName)),
-		),
-		).
+		)).
 		LeftJoin(schema.PersonalMessagesTable.As("pmt"), goqu.On(
 			schema.UserTableIDCol.Eq(goqu.T("pmt").Col(schema.PersonalMessagesTableToUserIDColName)),
-		),
-		).
+		)).
 		LeftJoin(schema.LogEventsTable, goqu.On(schema.UserTableIDCol.Eq(schema.LogEventsTableUserIDCol))).
 		Where(
 			schema.UserTableDeletedCol.IsFalse(),

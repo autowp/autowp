@@ -28,7 +28,7 @@ type ImageStorageConfig struct {
 		Endpoint    string `mapstructure:"endpoint"`
 		Credentials struct {
 			Key    string `mapstructure:"key"`
-			Secret string `mapstructure:"secret"`
+			Secret string `mapstructure:"secret"` //nolint: gosec
 		} `mapstructure:"credentials"`
 		UsePathStyleEndpoint bool `mapstructure:"use_path_style_endpoint"`
 	} `mapstructure:"s3"`

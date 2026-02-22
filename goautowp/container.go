@@ -497,13 +497,6 @@ func (s *Container) PublicHTTPServer(ctx context.Context) (*http.Server, error) 
 	return s.publicHTTPServer, nil
 }
 
-type TokenForm struct {
-	GrantType    string `json:"grant_type"`
-	RefreshToken string `json:"refresh_token"`
-	Username     string `json:"username"`
-	Password     string `json:"password"`
-}
-
 func (s *Container) ItemsREST(ctx context.Context) (*ItemsREST, error) {
 	itemsRepo, err := s.ItemsRepository(ctx)
 	if err != nil {

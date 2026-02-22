@@ -67,7 +67,7 @@ func downloadFile(ctx context.Context, filepath string, url string) error {
 		return err
 	}
 
-	resp, err := http.DefaultClient.Do(req) //nolint: bodyclose
+	resp, err := http.DefaultClient.Do(req) //nolint: bodyclose, gosec
 	if err != nil {
 		return err
 	}
