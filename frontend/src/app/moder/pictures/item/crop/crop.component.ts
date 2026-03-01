@@ -145,8 +145,8 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
         .setPictureCrop(
           new SetPictureCropRequest({
             cropHeight: Math.round(this.#currentCrop.h),
-            cropLeft: Math.round(this.#currentCrop.x),
-            cropTop: Math.round(this.#currentCrop.y),
+            cropLeft: this.#currentCrop.x > 0 ? Math.round(this.#currentCrop.x) : 0,
+            cropTop: this.#currentCrop.y > 0 ? Math.round(this.#currentCrop.y) : 0,
             cropWidth: Math.round(this.#currentCrop.w),
             pictureId: this.picture.id,
           }),

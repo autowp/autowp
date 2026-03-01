@@ -18,7 +18,7 @@
     "monaco-editor": "$monaco-editor"
   },
   "dependencies": {
-    "@angular-devkit/architect": "^0.2101.2",
+    "@angular-devkit/architect": "^0.2102.0",
     "@angular/animations": "^21.0.6",
     "@angular/cdk": "^21",
     "@angular/common": "^21.0.6",
@@ -55,7 +55,7 @@
     "monaco-editor": "^0.55",
     "ng-recaptcha-2": "^21",
     "ng2-charts": "^8.0.0",
-    "ngx-monaco-editor-v2": "^20",
+    "ngx-monaco-editor-v2": "^21",
     "ngx-pipes": "^3.2.0",
     "ngx-remark": "^0.2.1",
     "npm": "^10 || ^11",
