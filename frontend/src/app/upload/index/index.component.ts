@@ -78,7 +78,7 @@ const cropTitle = (image: APIImage | undefined): string => {
     RemarkModule,
   ],
   templateUrl: './index.component.html',
-  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection, sonarjs/deprecation
   changeDetection: ChangeDetectionStrategy.Default,
 })
 export class UploadIndexComponent implements OnInit {
