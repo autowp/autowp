@@ -27,7 +27,7 @@ type LanguageConfig struct {
 type KeycloakConfig struct {
 	URL          string `mapstructure:"url"           yaml:"url"`
 	ClientID     string `mapstructure:"client-id"     yaml:"client-id"`
-	ClientSecret string `mapstructure:"client-secret" yaml:"client-secret"` //nolint:gosec
+	ClientSecret string `mapstructure:"client-secret" yaml:"client-secret"`
 	Realm        string `mapstructure:"realm"         yaml:"realm"`
 }
 
@@ -36,7 +36,7 @@ type SMTPConfig struct {
 	Hostname string `mapstructure:"hostname" yaml:"hostname"`
 	Port     int    `mapstructure:"port"     yaml:"port"`
 	Username string `mapstructure:"username" yaml:"username"`
-	Password string `mapstructure:"password" yaml:"password"` //nolint:gosec
+	Password string `mapstructure:"password" yaml:"password"`
 }
 
 // FileStorageConfig FileStorageConfig.
@@ -56,7 +56,7 @@ type S3Config struct {
 // S3CredentialsConfig S3CredentialsConfig.
 type S3CredentialsConfig struct {
 	Key    string `mapstructure:"key"    yaml:"key"`
-	Secret string `mapstructure:"secret" yaml:"secret"` //nolint:gosec
+	Secret string `mapstructure:"secret" yaml:"secret"`
 }
 
 // DuplicateFinderConfig DuplicateFinderConfig.
@@ -79,7 +79,7 @@ type RestConfig struct {
 // RecaptchaConfig RecaptchaConfig.
 type RecaptchaConfig struct {
 	PublicKey  string `mapstructure:"public-key"  yaml:"public-key"`
-	PrivateKey string `mapstructure:"private-key" yaml:"private-key"` //nolint:gosec
+	PrivateKey string `mapstructure:"private-key" yaml:"private-key"`
 }
 
 // FeedbackConfig FeedbackConfig.
@@ -90,7 +90,7 @@ type FeedbackConfig struct {
 }
 
 type TelegramConfig struct {
-	AccessToken  string `mapstructure:"access-token"  yaml:"access-token"` //nolint:gosec
+	AccessToken  string `mapstructure:"access-token"  yaml:"access-token"`
 	WebHook      string `mapstructure:"webhook"       yaml:"webhook"`
 	WebhookToken string `mapstructure:"webhook-token" yaml:"webhook-token"`
 }
@@ -104,7 +104,7 @@ type AboutConfig struct {
 }
 
 type YoomoneyConfig struct {
-	Secret string `mapstructure:"secret" yaml:"secret"` //nolint:gosec
+	Secret string `mapstructure:"secret" yaml:"secret"`
 	Price  string `mapstructure:"price"  yaml:"price"`
 }
 

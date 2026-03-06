@@ -56,7 +56,7 @@ func TestS3AddImageFromFilepathChangeNameAndDelete(t *testing.T) {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, imageInfo.Src(), nil)
 		require.NoError(t, err)
 
-		resp, err := http.DefaultClient.Do(req) //nolint:bodyclose,gosec
+		resp, err := http.DefaultClient.Do(req) //nolint:bodyclose
 		require.NoError(t, err)
 
 		defer util.Close(resp.Body)
@@ -195,7 +195,7 @@ func TestAddImageAndCrop(t *testing.T) {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, imageInfo.Src(), nil)
 		require.NoError(t, err)
 
-		resp, err := http.DefaultClient.Do(req) //nolint:bodyclose,gosec
+		resp, err := http.DefaultClient.Do(req) //nolint:bodyclose
 		require.NoError(t, err)
 
 		defer util.Close(resp.Body)

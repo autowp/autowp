@@ -3829,7 +3829,7 @@ func (s *Repository) flatternAttributes(attributes []*AttributeRow) []*Attribute
 }
 
 func (s *Repository) specIDs(ctx context.Context, id int32) ([]int32, error) {
-	var ids []int32
+	var ids []int32 //nolint: prealloc
 
 	err := s.db.Select(schema.SpecTableIDCol).
 		From(schema.SpecTable).

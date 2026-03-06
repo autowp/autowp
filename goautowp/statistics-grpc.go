@@ -317,7 +317,7 @@ func (s *StatisticsGRPCServer) totalUsers(ctx context.Context) (int32, error) {
 }
 
 func (s *StatisticsGRPCServer) contributors(ctx context.Context) ([]string, error) {
-	contributors := make([]string, 0)
+	var contributors []string //nolint: prealloc
 
 	err := s.db.Select(schema.UserTableIDCol).
 		From(schema.UserTable).
@@ -335,7 +335,7 @@ func (s *StatisticsGRPCServer) contributors(ctx context.Context) ([]string, erro
 		return nil, err
 	}
 
-	picturesUsers := make([]string, 0)
+	var picturesUsers []string
 
 	err = s.db.Select(schema.UserTableIDCol).
 		From(schema.UserTable).

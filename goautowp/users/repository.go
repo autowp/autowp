@@ -70,7 +70,7 @@ type CreateUserOptions struct {
 	Email           string `json:"email"`
 	Timezone        string `json:"timezone"`
 	Language        string `json:"language"`
-	Password        string `json:"password"` //nolint: gosec
+	Password        string `json:"password"`
 	PasswordConfirm string `json:"password_confirm"`
 	Captcha         string `json:"captcha"`
 }

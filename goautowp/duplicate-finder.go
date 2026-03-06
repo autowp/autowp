@@ -138,7 +138,7 @@ func (s *DuplicateFinder) Index(ctx context.Context, id int64, url string) error
 		return err
 	}
 
-	resp, err := http.DefaultClient.Do(req) //nolint:bodyclose,gosec
+	resp, err := http.DefaultClient.Do(req) //nolint:bodyclose
 	if err != nil {
 		return err
 	}
