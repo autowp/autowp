@@ -29,7 +29,7 @@ func createRandomUser(t *testing.T, db *goqu.Database) int64 {
 
 	emailAddr := "test" + strconv.Itoa(random.Int()) + "@example.com"
 	name := "ivan"
-	res, err := db.Insert(schema.UserTable).
+	insertQuery := db.Insert(schema.UserTable).
 		Rows(goqu.Record{
 			schema.UserTableLoginColName:          nil,
 			schema.UserTableEmailColName:          emailAddr,
@@ -44,8 +44,9 @@ func createRandomUser(t *testing.T, db *goqu.Database) int64 {
 			schema.UserTableLastIPColName:         goqu.Func("INET6_ATON", "127.0.0.1"),
 			schema.UserTableLanguageColName:       "en",
 			schema.UserTableUUIDColName:           goqu.Func("UUID_TO_BIN", uuid.New().String()),
-		}).
-		Executor().ExecContext(t.Context())
+		})
+
+	res, err := insertQuery.Executor().ExecContext(t.Context())
 	require.NoError(t, err)
 
 	id, err := res.LastInsertId()

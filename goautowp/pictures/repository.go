@@ -30,8 +30,10 @@ import (
 	"github.com/autowp/goautowp/util"
 	"github.com/autowp/goautowp/validation"
 	"github.com/doug-martin/goqu/v9"
+	_ "github.com/doug-martin/goqu/v9/dialect/mysql" // enable mysql dialect
 	"github.com/doug-martin/goqu/v9/exp"
-	_ "github.com/gen2brain/avif" // AVIF support
+	_ "github.com/gen2brain/avif"      // AVIF support
+	_ "github.com/go-sql-driver/mysql" // enable mysql driver
 	"github.com/paulmach/orb"
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
