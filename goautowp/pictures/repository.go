@@ -20,7 +20,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/autowp/goautowp/comments"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/sampler"
 	"github.com/autowp/goautowp/image/storage"
@@ -112,7 +111,7 @@ type Repository struct {
 	perspectiveCache      map[int32][]int32
 	perspectiveCacheMutex sync.Mutex
 	dfConfig              config.DuplicateFinderConfig
-	commentsRepository    *comments.Repository
+	beforePictureDeleted  func(id int64) error
 }
 
 type PictureFields struct {
@@ -179,7 +178,7 @@ func NewRepository(
 	textStorageRepository *textstorage.Repository,
 	itemsRepository *items.Repository,
 	dfConfig config.DuplicateFinderConfig,
-	commentsRepository *comments.Repository,
+	beforePictureDeleted func(id int64) error,
 ) *Repository {
 	return &Repository{
 		db:                    db,
@@ -189,7 +188,7 @@ func NewRepository(
 		perspectiveCache:      make(map[int32][]int32),
 		perspectiveCacheMutex: sync.Mutex{},
 		dfConfig:              dfConfig,
-		commentsRepository:    commentsRepository,
+		beforePictureDeleted:  beforePictureDeleted,
 	}
 }
 
@@ -2018,11 +2017,7 @@ func (s *Repository) ClearQueue(ctx context.Context) error {
 			return err
 		}
 
-		err = s.commentsRepository.DeleteTopic(
-			ctx,
-			schema.CommentMessageTypeIDPictures,
-			picture.ID,
-		)
+		err = s.beforePictureDeleted(picture.ID)
 		if err != nil {
 			return err
 		}

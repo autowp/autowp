@@ -35,10 +35,12 @@ func TestTopBrandsListRuZh(t *testing.T) {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -85,10 +87,12 @@ func TestListFilters(t *testing.T) {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -139,10 +143,12 @@ func TestGetItemsNameAndCatnameShouldNotBeOmittedWhenDescendantsCountRequested(t
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -205,10 +211,11 @@ func TestGetUserPicturesBrands(t *testing.T) {
 	require.NoError(t, err)
 
 	userID := createRandomUser(ctx, t, goquDB)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -312,10 +319,11 @@ func TestPaginator(t *testing.T) {
 		})
 	}
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -347,10 +355,11 @@ func TestOrderByDescendantsCount(t *testing.T) {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -470,10 +479,11 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -627,10 +637,11 @@ func TestOrderByAddDatetime(t *testing.T) {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -722,10 +733,11 @@ func TestOrderByName(t *testing.T) {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -845,10 +857,11 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -1003,10 +1016,11 @@ func TestOrderByStarCount(t *testing.T) {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -1097,10 +1111,11 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 	ctx := t.Context()
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)
@@ -1201,10 +1216,11 @@ func CreateItem(t *testing.T, goquDB *goqu.Database, row schema.ItemRow) int64 {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
 		200,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textstorage.New(goquDB),
 		imageStorage,
 	)

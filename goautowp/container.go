@@ -26,6 +26,7 @@ import (
 	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/mosts"
 	"github.com/autowp/goautowp/pictures"
+	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/telegram"
 	"github.com/autowp/goautowp/textstorage"
 	"github.com/autowp/goautowp/traffic"
@@ -48,62 +49,63 @@ const readHeaderTimeout = time.Second * 30
 
 // Container Container.
 type Container struct {
-	articlesGRPCServer     *ArticlesGRPCServer
-	attrsRepository        *attrs.Repository
-	autowpDB               *sql.DB
-	autowpDBMutex          sync.Mutex
-	banRepository          *ban.Repository
-	catalogue              *Catalogue
-	commentsRepository     *comments.Repository
-	mostsRepository        *mosts.Repository
-	config                 config.Config
-	commentsGrpcServer     *CommentsGRPCServer
-	mostsGrpcServer        *MostsGRPCServer
-	contactsGrpcServer     *ContactsGRPCServer
-	contactsRepository     *ContactsRepository
-	duplicateFinder        *DuplicateFinder
-	donationsGrpcServer    *DonationsGRPCServer
-	emailSender            email.Sender
-	events                 *Events
-	feedback               *feedback.Repository
-	forums                 *Forums
-	goquDB                 *goqu.Database
-	goquPostgresDB         *goqu.Database
-	grpcServer             *GRPCServer
-	hostsManager           *hosts.Manager
-	imageStorage           *storage.Storage
-	i18n                   *i18nbundle.I18n
-	itemOfDayRepository    *itemofday.Repository
-	itemsGrpcServer        *ItemsGRPCServer
-	itemOfDayCached        *ItemOfDayCached
-	ratingGrpcServer       *RatingGRPCServer
-	votingsGrpcServer      *VotingsGRPCServer
-	itemsRepository        *items.Repository
-	keyCloak               *gocloak.GoCloak
-	messagingGrpcServer    *MessagingGRPCServer
-	messagingRepository    *messaging.Repository
-	publicHTTPServer       *http.Server
-	publicRouter           http.HandlerFunc
-	grpcServerWithServices *grpc.Server
-	telegramService        *telegram.Service
-	textGrpcServer         *TextGRPCServer
-	traffic                *traffic.Traffic
-	trafficGrpcServer      *TrafficGRPCServer
-	votingsRepository      *votings.Repository
-	usersRepository        *users.Repository
-	usersGrpcServer        *UsersGRPCServer
-	redis                  *redis.Client
-	auth                   *Auth
-	mapGrpcServer          *MapGRPCServer
-	picturesRepository     *pictures.Repository
-	picturesGrpcServer     *PicturesGRPCServer
-	statisticsGrpcServer   *StatisticsGRPCServer
-	forumsGrpcServer       *ForumsGRPCServer
-	attrsGRPCServer        *AttrsGRPCServer
-	textStorageRepository  *textstorage.Repository
-	yoomoneyHandler        *YoomoneyHandler
-	logRepository          *log.Repository
-	LogGrpcServer          *LogGRPCServer
+	articlesGRPCServer           *ArticlesGRPCServer
+	attrsRepository              *attrs.Repository
+	autowpDB                     *sql.DB
+	autowpDBMutex                sync.Mutex
+	banRepository                *ban.Repository
+	catalogue                    *Catalogue
+	commentsRepository           *comments.Repository
+	mostsRepository              *mosts.Repository
+	config                       config.Config
+	commentsGrpcServer           *CommentsGRPCServer
+	mostsGrpcServer              *MostsGRPCServer
+	contactsGrpcServer           *ContactsGRPCServer
+	contactsRepository           *ContactsRepository
+	duplicateFinder              *DuplicateFinder
+	donationsGrpcServer          *DonationsGRPCServer
+	emailSender                  email.Sender
+	events                       *Events
+	feedback                     *feedback.Repository
+	forums                       *Forums
+	goquDB                       *goqu.Database
+	goquPostgresDB               *goqu.Database
+	grpcServer                   *GRPCServer
+	hostsManager                 *hosts.Manager
+	imageStorage                 *storage.Storage
+	i18n                         *i18nbundle.I18n
+	itemOfDayRepository          *itemofday.Repository
+	itemsGrpcServer              *ItemsGRPCServer
+	itemOfDayCached              *ItemOfDayCached
+	itemParentLanguageRepository *items.ItemParentLanguageRepository
+	ratingGrpcServer             *RatingGRPCServer
+	votingsGrpcServer            *VotingsGRPCServer
+	itemsRepository              *items.Repository
+	keyCloak                     *gocloak.GoCloak
+	messagingGrpcServer          *MessagingGRPCServer
+	messagingRepository          *messaging.Repository
+	publicHTTPServer             *http.Server
+	publicRouter                 http.HandlerFunc
+	grpcServerWithServices       *grpc.Server
+	telegramService              *telegram.Service
+	textGrpcServer               *TextGRPCServer
+	traffic                      *traffic.Traffic
+	trafficGrpcServer            *TrafficGRPCServer
+	votingsRepository            *votings.Repository
+	usersRepository              *users.Repository
+	usersGrpcServer              *UsersGRPCServer
+	redis                        *redis.Client
+	auth                         *Auth
+	mapGrpcServer                *MapGRPCServer
+	picturesRepository           *pictures.Repository
+	picturesGrpcServer           *PicturesGRPCServer
+	statisticsGrpcServer         *StatisticsGRPCServer
+	forumsGrpcServer             *ForumsGRPCServer
+	attrsGRPCServer              *AttrsGRPCServer
+	textStorageRepository        *textstorage.Repository
+	yoomoneyHandler              *YoomoneyHandler
+	logRepository                *log.Repository
+	LogGrpcServer                *LogGRPCServer
 }
 
 // NewContainer constructor.
@@ -464,15 +466,18 @@ func (s *Container) PicturesRepository(ctx context.Context) (*pictures.Repositor
 			return nil, err
 		}
 
-		commentsRepository, err := s.CommentsRepository(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		cfg := s.Config()
 
 		s.picturesRepository = pictures.NewRepository(
-			db, is, textStorageRepository, itemsRepository, cfg.DuplicateFinder, commentsRepository,
+			db, is, textStorageRepository, itemsRepository, cfg.DuplicateFinder,
+			func(id int64) error {
+				commentsRepository, err := s.CommentsRepository(ctx)
+				if err != nil {
+					return err
+				}
+
+				return commentsRepository.DeleteTopic(ctx, schema.CommentMessageTypeIDPictures, id)
+			},
 		)
 	}
 
@@ -998,16 +1003,37 @@ func (s *Container) ItemsRepository(ctx context.Context) (*items.Repository, err
 			return nil, err
 		}
 
+		itemParentLanguageRepository, err := s.ItemParentLanguageRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.itemsRepository = items.NewRepository(
 			db,
 			cfg.MostsMinCarsCount,
-			s.Config().ContentLanguages,
+			itemParentLanguageRepository,
 			textStorageRepository,
 			imageStorage,
 		)
 	}
 
 	return s.itemsRepository, nil
+}
+
+func (s *Container) ItemParentLanguageRepository(ctx context.Context) (*items.ItemParentLanguageRepository, error) {
+	if s.itemsRepository == nil {
+		db, err := s.GoquDB(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.itemParentLanguageRepository = items.NewItemParentLanguageRepository(
+			db,
+			s.Config().ContentLanguages,
+		)
+	}
+
+	return s.itemParentLanguageRepository, nil
 }
 
 func (s *Container) ItemExtractor() *ItemExtractor {
@@ -1353,8 +1379,14 @@ func (s *Container) ItemsGRPCServer(ctx context.Context) (*ItemsGRPCServer, erro
 			return nil, err
 		}
 
+		itemParentLanguageRepository, err := s.ItemParentLanguageRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.itemsGrpcServer = NewItemsGRPCServer(
 			repo,
+			itemParentLanguageRepository,
 			db,
 			auth,
 			s.Config().ContentLanguages,

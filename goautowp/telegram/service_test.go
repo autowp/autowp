@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/autowp/goautowp/comments"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/hosts"
 	"github.com/autowp/goautowp/i18nbundle"
@@ -64,10 +63,11 @@ func TestInboxCommand(t *testing.T) {
 		imageStorage,
 	)
 	textStorageRepo := textstorage.New(goquDB)
+	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	itemRepo := items.NewRepository(
 		goquDB,
 		cfg.MostsMinCarsCount,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textStorageRepo,
 		imageStorage,
 	)
@@ -81,15 +81,13 @@ func TestInboxCommand(t *testing.T) {
 		},
 		i18n,
 	)
-	hostManager := hosts.NewManager(cfg.Languages)
-	commentsRepo := comments.NewRepository(goquDB, usersRepo, messagingRepo, hostManager)
 	picturesRepo := pictures.NewRepository(
 		goquDB,
 		imageStorage,
 		textStorageRepo,
 		itemRepo,
 		cfg.DuplicateFinder,
-		commentsRepo,
+		func(int64) error { return nil },
 	)
 
 	userID := createRandomUser(ctx, t, goquDB)

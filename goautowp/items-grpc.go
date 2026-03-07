@@ -88,6 +88,7 @@ type ItemsGRPCServer struct {
 	UnimplementedItemsServer
 
 	repository            *items.Repository
+	itemParentLanguage    *items.ItemParentLanguageRepository
 	db                    *goqu.Database
 	auth                  *Auth
 	contentLanguages      []string
@@ -111,6 +112,7 @@ type ItemsGRPCServer struct {
 
 func NewItemsGRPCServer(
 	repository *items.Repository,
+	itemParentLanguage *items.ItemParentLanguageRepository,
 	db *goqu.Database,
 	auth *Auth,
 	contentLanguages []string,
@@ -133,6 +135,7 @@ func NewItemsGRPCServer(
 ) *ItemsGRPCServer {
 	return &ItemsGRPCServer{
 		repository:            repository,
+		itemParentLanguage:    itemParentLanguage,
 		db:                    db,
 		auth:                  auth,
 		contentLanguages:      contentLanguages,
@@ -1383,7 +1386,7 @@ func (s *ItemsGRPCServer) SetItemParentLanguage(
 		return nil, wrapFieldViolations(InvalidParams)
 	}
 
-	err = s.repository.SetItemParentLanguage(
+	err = s.itemParentLanguage.SetItemParentLanguage(
 		ctx,
 		in.GetParentId(),
 		in.GetItemId(),

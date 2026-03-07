@@ -4648,3 +4648,140 @@ func TestGetVehicleTypesInaccessibleWithoutModeratePrivilege(t *testing.T) {
 	)
 	require.Error(t, err)
 }
+
+func TestItemParentLanguageAutoUpdates(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+	client := NewItemsClient(conn)
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	randomInt := random.Int()
+
+	// admin
+	kc := cnt.Keycloak()
+	adminToken, err := kc.Login(
+		ctx,
+		keycloakClientID,
+		"",
+		cfg.Keycloak.Realm,
+		adminUsername,
+		adminPassword,
+	)
+	require.NoError(t, err)
+	require.NotNil(t, adminToken)
+
+	apiCtx := metadata.AppendToOutgoingContext(
+		ctx,
+		authorizationHeader,
+		bearerPrefix+adminToken.AccessToken,
+	)
+
+	ruName := fmt.Sprintf("Лада %d Калина", randomInt)
+	brandCatname := fmt.Sprintf("lada-%d", randomInt)
+	ruBrandName := fmt.Sprintf("Лада %d", randomInt)
+
+	itemID := createItem(t, conn, cnt, &APIItem{
+		Name:       ruName,
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	})
+
+	brandID := createItem(t, conn, cnt, &APIItem{
+		Name:       ruBrandName,
+		Catname:    brandCatname,
+		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		IsGroup:    true,
+	})
+
+	_, err = client.CreateItemParent(
+		metadata.AppendToOutgoingContext(
+			ctx,
+			authorizationHeader,
+			bearerPrefix+adminToken.AccessToken,
+		),
+		&ItemParent{
+			ItemId: itemID, ParentId: brandID,
+		},
+	)
+	require.NoError(t, err)
+
+	testCases := []struct {
+		Name        string
+		Language    string
+		NewName     string
+		FullName    string
+		NewFullName string
+		BrandName   string
+	}{
+		{
+			Language:    "en",
+			BrandName:   fmt.Sprintf("Lada %d", randomInt),
+			FullName:    fmt.Sprintf("Lada %d Kalina", randomInt),
+			Name:        "Kalina",
+			NewFullName: fmt.Sprintf("Lada %d Granta", randomInt),
+			NewName:     "Granta",
+		},
+		{
+			Language:    "ru",
+			BrandName:   ruBrandName,
+			FullName:    ruName,
+			Name:        "Калина",
+			NewFullName: fmt.Sprintf("Лада %d Гранта", randomInt),
+			NewName:     "Гранта",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			t.Parallel()
+
+			_, err = client.UpdateItemLanguage(
+				apiCtx,
+				&ItemLanguage{ItemId: brandID, Language: testCase.Language, Name: testCase.BrandName},
+			)
+			require.NoError(t, err)
+
+			_, err = client.UpdateItemLanguage(
+				apiCtx,
+				&ItemLanguage{ItemId: itemID, Language: testCase.Language, Name: testCase.FullName},
+			)
+			require.NoError(t, err)
+
+			sections, err := client.GetBrandSections(ctx, &GetBrandSectionsRequest{
+				Language: testCase.Language, ItemId: brandID,
+			})
+			require.NoError(t, err)
+			require.NotEmpty(t, sections.GetSections())
+
+			for _, section := range sections.GetSections() {
+				for _, group := range section.GetGroups() {
+					require.Equal(t, testCase.Name, group.GetName())
+					require.Equal(t, []string{"/", brandCatname, "kalina"}, group.GetRouterLink())
+				}
+			}
+
+			_, err = client.UpdateItemLanguage(
+				apiCtx,
+				&ItemLanguage{
+					ItemId:   itemID,
+					Language: testCase.Language,
+					Name:     testCase.NewFullName,
+				},
+			)
+			require.NoError(t, err)
+
+			sections, err = client.GetBrandSections(ctx, &GetBrandSectionsRequest{
+				Language: testCase.Language, ItemId: brandID,
+			})
+			require.NoError(t, err)
+			require.NotEmpty(t, sections.GetSections())
+
+			for _, section := range sections.GetSections() {
+				for _, group := range section.GetGroups() {
+					require.Equal(t, testCase.NewName, group.GetName())
+					require.Equal(t, []string{"/", brandCatname, "granta"}, group.GetRouterLink())
+				}
+			}
+		})
+	}
+}

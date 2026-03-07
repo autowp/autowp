@@ -175,174 +175,6 @@ type TreeItem struct {
 	ItemType schema.ItemTableItemTypeID
 }
 
-var languagePriority = map[string][]string{
-	DefaultLanguageCode: {
-		"en",
-		"it",
-		"fr",
-		"de",
-		"es",
-		"pt",
-		"ru",
-		"be",
-		"uk",
-		"zh",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"en": {
-		"en",
-		"it",
-		"fr",
-		"de",
-		"es",
-		"pt",
-		"ru",
-		"be",
-		"uk",
-		"zh",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"fr": {
-		"fr",
-		"en",
-		"it",
-		"de",
-		"es",
-		"pt",
-		"ru",
-		"be",
-		"uk",
-		"zh",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"pt-br": {
-		"pt",
-		"en",
-		"it",
-		"fr",
-		"de",
-		"es",
-		"ru",
-		"be",
-		"uk",
-		"zh",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"ru": {
-		"ru",
-		"en",
-		"it",
-		"fr",
-		"de",
-		"es",
-		"pt",
-		"be",
-		"uk",
-		"zh",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"be": {
-		"be",
-		"ru",
-		"uk",
-		"en",
-		"it",
-		"fr",
-		"de",
-		"es",
-		"pt",
-		"zh",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"uk": {
-		"uk",
-		"ru",
-		"en",
-		"it",
-		"fr",
-		"de",
-		"es",
-		"pt",
-		"be",
-		"zh",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"zh": {
-		"zh",
-		"en",
-		"it",
-		"fr",
-		"de",
-		"es",
-		"pt",
-		"ru",
-		"be",
-		"uk",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"es": {
-		"es",
-		"en",
-		"it",
-		"fr",
-		"de",
-		"pt",
-		"ru",
-		"be",
-		"uk",
-		"zh",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"it": {
-		"it",
-		"en",
-		"fr",
-		"de",
-		"es",
-		"pt",
-		"ru",
-		"be",
-		"uk",
-		"zh",
-		"jp",
-		"he",
-		DefaultLanguageCode,
-	},
-	"he": {
-		"he",
-		"en",
-		"it",
-		"fr",
-		"de",
-		"es",
-		"pt",
-		"ru",
-		"be",
-		"uk",
-		"zh",
-		"jp",
-		DefaultLanguageCode,
-	},
-}
-
 type CataloguePathOptions struct {
 	ToBrand      bool
 	ToBrandID    int64
@@ -427,9 +259,10 @@ type Repository struct {
 	producedColumn                   *SimpleColumn
 	producedExactlyColumn            *SimpleColumn
 	attrsUserValuesUpdateDateColumn  *AttrsUserValuesUpdateDateColumn
-	contentLanguages                 []string
 	textStorageRepository            *textstorage.Repository
 	imageStorage                     *storage.Storage
+	itemParentCache                  *ItemParentCacheRepository
+	itemParentLanguage               *ItemParentLanguageRepository
 }
 
 type ItemParent struct {
@@ -486,7 +319,7 @@ type ItemParentLanguage struct {
 func NewRepository(
 	db *goqu.Database,
 	mostsMinCarsCount int,
-	contentLanguages []string,
+	itemParentLanguageRepository *ItemParentLanguageRepository,
 	textStorageRepository *textstorage.Repository,
 	imageStorage *storage.Storage,
 ) *Repository {
@@ -572,9 +405,10 @@ func NewRepository(
 		starCountColumn:                 &StarCountColumn{},
 		itemParentParentTimestampColumn: &ItemParentParentTimestampColumn{},
 		attrsUserValuesUpdateDateColumn: &AttrsUserValuesUpdateDateColumn{},
-		contentLanguages:                contentLanguages,
 		textStorageRepository:           textStorageRepository,
 		imageStorage:                    imageStorage,
+		itemParentCache:                 NewItemParentCacheRepository(db),
+		itemParentLanguage:              itemParentLanguageRepository,
 	}
 }
 
@@ -611,59 +445,6 @@ type ItemFields struct {
 	HasSpecs                   bool
 	OtherNames                 bool
 	Meta                       bool
-}
-
-func yearsPrefix(begin int32, end int32) string {
-	if begin <= 0 && end <= 0 {
-		return ""
-	}
-
-	if end == begin {
-		return strconv.Itoa(int(begin))
-	}
-
-	const oneHundred = 100
-
-	var (
-		bms = begin / oneHundred
-		ems = end / oneHundred
-	)
-
-	if bms == ems {
-		return fmt.Sprintf("%d–%02d", begin, end%oneHundred)
-	}
-
-	if begin <= 0 {
-		return fmt.Sprintf("xx–%d", end)
-	}
-
-	if end > 0 {
-		return fmt.Sprintf("%d–%d", begin, end)
-	}
-
-	return fmt.Sprintf("%d–xx", begin)
-}
-
-func langPriorityOrderExpr( //nolint: ireturn
-	col exp.IdentifierExpression, lang string,
-) (exp.OrderedExpression, error) {
-	langPriority, ok := languagePriority[lang]
-	if !ok {
-		langPriority, ok = languagePriority[DefaultLanguageCode]
-	}
-
-	if !ok {
-		return nil, fmt.Errorf("%w: `%s`", errLangNotFound, DefaultLanguageCode)
-	}
-
-	args := make([]interface{}, len(langPriority)+1)
-	args[0] = col
-
-	for i, v := range langPriority {
-		args[i+1] = v
-	}
-
-	return goqu.Func("FIELD", args...).Asc(), nil
 }
 
 func (s *Repository) LanguageName(ctx context.Context, itemID int64, lang string) (string, error) {
@@ -1316,109 +1097,6 @@ func (s *Repository) RefreshItemVehicleTypeInheritanceFromParents(
 	return nil
 }
 
-func (s *Repository) RebuildCache(ctx context.Context, itemID int64) (int64, error) {
-	parentInfos, err := s.collectParentInfo(ctx, itemID, 1)
-	if err != nil {
-		return 0, err
-	}
-
-	parentInfos[itemID] = parentInfo{
-		Diff:   0,
-		Tuning: false,
-		Sport:  false,
-		Design: false,
-	}
-
-	var (
-		updates int64
-		records = make([]goqu.Record, len(parentInfos))
-		idx     = 0
-	)
-
-	for parentID, info := range parentInfos {
-		records[idx] = goqu.Record{
-			schema.ItemParentCacheTableItemIDColName:   itemID,
-			schema.ItemParentCacheTableParentIDColName: parentID,
-			schema.ItemParentCacheTableDiffColName:     info.Diff,
-			schema.ItemParentCacheTableTuningColName:   info.Tuning,
-			schema.ItemParentCacheTableSportColName:    info.Sport,
-			schema.ItemParentCacheTableDesignColName:   info.Design,
-		}
-		idx++
-	}
-
-	ctx = context.WithoutCancel(ctx)
-
-	result, err := s.db.Insert(schema.ItemParentCacheTable).
-		Rows(records).
-		OnConflict(
-			goqu.DoUpdate(schema.ItemParentCacheTableItemIDColName+","+schema.ItemParentCacheTableParentIDColName,
-				goqu.Record{
-					schema.ItemParentCacheTableDiffColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.ItemParentCacheTableDiffColName),
-					),
-					schema.ItemParentCacheTableTuningColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.ItemParentCacheTableTuningColName),
-					),
-					schema.ItemParentCacheTableSportColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.ItemParentCacheTableSportColName),
-					),
-					schema.ItemParentCacheTableDesignColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.ItemParentCacheTableDesignColName),
-					),
-				},
-			),
-		).
-		Executor().ExecContext(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	affected, err := result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
-
-	updates += affected
-
-	keys := make([]int64, len(parentInfos))
-
-	i := 0
-
-	for k := range parentInfos {
-		keys[i] = k
-		i++
-	}
-
-	_, err = s.db.Delete(schema.ItemParentCacheTable).Where(
-		schema.ItemParentCacheTableItemIDCol.Eq(itemID),
-		schema.ItemParentCacheTableParentIDCol.NotIn(keys),
-	).Executor().ExecContext(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	childs, err := s.getChildItemsIDs(ctx, itemID)
-	if err != nil {
-		return 0, err
-	}
-
-	for _, child := range childs {
-		affected, err = s.RebuildCache(ctx, child)
-		if err != nil {
-			return 0, err
-		}
-
-		updates += affected
-	}
-
-	return updates, nil
-}
-
 func (s *Repository) ItemLanguageCount(
 	ctx context.Context,
 	options *query.ItemLanguageListOptions,
@@ -1530,7 +1208,9 @@ func (s *Repository) UpdateItemLanguage(
 		oldName = row.Name.String
 	}
 
-	if oldName != name {
+	nameChanged := oldName != name
+
+	if nameChanged {
 		set[schema.ItemLanguageTableNameColName] = name
 
 		changes = append(changes, "moder/vehicle/name")
@@ -1618,6 +1298,13 @@ func (s *Repository) UpdateItemLanguage(
 		}
 	}
 
+	if nameChanged {
+		err = s.itemParentLanguage.UpdateAutoNamesForParentsAndChilds(ctx, itemID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return changes, nil
 }
 
@@ -1679,126 +1366,6 @@ func (s *Repository) ItemsWithPicturesCount(
 	}
 
 	return int32(result), nil //nolint: gosec
-}
-
-func (s *Repository) SetItemParentLanguage(
-	ctx context.Context,
-	parentID int64,
-	itemID int64,
-	lang string,
-	newName string,
-	forceIsAuto bool,
-) error {
-	bvlRow := struct {
-		IsAuto bool   `db:"is_auto"`
-		Name   string `db:"name"`
-	}{}
-
-	success, err := s.db.From(schema.ItemParentLanguageTable).Where(
-		schema.ItemParentLanguageTableParentIDCol.Eq(parentID),
-		schema.ItemParentLanguageTableItemIDCol.Eq(itemID),
-		schema.ItemParentLanguageTableLanguageCol.Eq(lang),
-	).ScanStructContext(ctx, &bvlRow)
-	if err != nil {
-		return err
-	}
-
-	isAuto := true
-
-	if !forceIsAuto {
-		name := ""
-
-		if success {
-			isAuto = bvlRow.IsAuto
-			name = bvlRow.Name
-		}
-
-		if name != newName {
-			isAuto = false
-		}
-	}
-
-	if len(newName) == 0 {
-		parentRow := schema.ItemRow{}
-		itmRow := schema.ItemRow{}
-
-		success, err = s.db.Select(
-			schema.ItemTableIDCol,
-			schema.ItemTableNameCol,
-			schema.ItemTableBodyCol,
-			schema.ItemTableSpecIDCol,
-			schema.ItemTableBeginYearCol,
-			schema.ItemTableEndYearCol,
-			schema.ItemTableBeginModelYearCol,
-			schema.ItemTableEndModelYearCol,
-		).
-			From(schema.ItemTable).
-			Where(schema.ItemTableIDCol.Eq(parentID)).
-			ScanStructContext(ctx, &parentRow)
-		if err != nil {
-			return err
-		}
-
-		if !success {
-			return ErrItemNotFound
-		}
-
-		success, err = s.db.Select(
-			schema.ItemTableIDCol,
-			schema.ItemTableNameCol,
-			schema.ItemTableBodyCol,
-			schema.ItemTableSpecIDCol,
-			schema.ItemTableBeginYearCol,
-			schema.ItemTableEndYearCol,
-			schema.ItemTableBeginModelYearCol,
-			schema.ItemTableEndModelYearCol,
-		).
-			From(schema.ItemTable).
-			Where(schema.ItemTableIDCol.Eq(itemID)).
-			ScanStructContext(ctx, &itmRow)
-		if err != nil {
-			return err
-		}
-
-		if !success {
-			return ErrItemNotFound
-		}
-
-		newName, err = s.extractName(ctx, parentRow, itmRow, lang)
-		if err != nil {
-			return err
-		}
-
-		isAuto = true
-	}
-
-	if len(newName) > schema.ItemLanguageNameMaxLength {
-		newName = newName[:schema.ItemLanguageNameMaxLength]
-	}
-
-	_, err = s.db.Insert(schema.ItemParentLanguageTable).Rows(goqu.Record{
-		schema.ItemParentLanguageTableItemIDColName:   itemID,
-		schema.ItemParentLanguageTableParentIDColName: parentID,
-		schema.ItemParentLanguageTableLanguageColName: lang,
-		schema.ItemParentLanguageTableNameColName:     newName,
-		schema.ItemParentLanguageTableIsAutoColName:   isAuto,
-	}).OnConflict(
-		goqu.DoUpdate(schema.ItemParentLanguageTableNameColName+","+schema.ItemParentLanguageTableIsAutoColName,
-			goqu.Record{
-				schema.ItemParentLanguageTableNameColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.ItemParentLanguageTableNameColName),
-				),
-				schema.ItemParentLanguageTableIsAutoColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.ItemParentLanguageTableIsAutoColName),
-				),
-			},
-		),
-	).
-		Executor().ExecContext(ctx)
-
-	return err
 }
 
 func (s *Repository) CreateItemParent(
@@ -1892,25 +1459,12 @@ func (s *Repository) CreateItemParent(
 		return false, err
 	}
 
-	values := make(map[string]schema.ItemParentLanguageRow)
-
-	for _, lang := range s.contentLanguages {
-		name, err := s.extractName(ctx, parentRow.ItemRow, itemRow.ItemRow, lang)
-		if err != nil {
-			return false, err
-		}
-
-		values[lang] = schema.ItemParentLanguageRow{
-			Name: name,
-		}
-	}
-
-	err = s.setItemParentLanguages(ctx, parentID, itemID, values, true)
+	err = s.itemParentLanguage.AfterItemParentCreated(ctx, parentRow, itemRow)
 	if err != nil {
 		return false, err
 	}
 
-	_, err = s.RebuildCache(ctx, itemID)
+	_, err = s.itemParentCache.RebuildCache(ctx, itemID)
 
 	return err == nil, err
 }
@@ -1998,7 +1552,7 @@ func (s *Repository) UpdateItemParent(
 	}
 
 	if affected > 0 {
-		_, err = s.RebuildCache(ctx, itemID)
+		_, err = s.itemParentCache.RebuildCache(ctx, itemID)
 
 		return true, err
 	}
@@ -2036,7 +1590,7 @@ func (s *Repository) RemoveItemParent(ctx context.Context, itemID, parentID int6
 	}
 
 	if affectedItemParentRows > 0 || affectedItemParentLanguageRows > 0 {
-		_, err = s.RebuildCache(ctx, itemID)
+		_, err = s.itemParentCache.RebuildCache(ctx, itemID)
 		if err != nil {
 			return err
 		}
@@ -2162,7 +1716,7 @@ func (s *Repository) MoveItemParent(
 		return false, err
 	}
 
-	_, err = s.RebuildCache(ctx, itemRow.ID)
+	_, err = s.itemParentCache.RebuildCache(ctx, itemRow.ID)
 	if err != nil {
 		return false, err
 	}
@@ -2641,55 +2195,6 @@ func (s *Repository) Brands(ctx context.Context, lang string) ([]*BrandsListLine
 	})
 
 	return resultArray, nil
-}
-
-func (s *Repository) RefreshItemParentLanguage(
-	ctx context.Context, parentItemTypeID schema.ItemTableItemTypeID, limit uint,
-) error {
-	logrus.Infof("RefreshItemParentLanguage(%d, %d)", parentItemTypeID, limit)
-
-	var res []struct {
-		ItemID   int64 `db:"item_id"`
-		ParentID int64 `db:"parent_id"`
-	}
-
-	sqSelect := s.db.Select(
-		schema.ItemParentTableItemIDCol,
-		schema.ItemParentTableParentIDCol,
-	).
-		From(schema.ItemParentTable).
-		LeftJoin(schema.ItemParentLanguageTable, goqu.On(
-			schema.ItemParentTableItemIDCol.Eq(schema.ItemParentLanguageTableItemIDCol),
-			schema.ItemParentTableParentIDCol.Eq(schema.ItemParentLanguageTableParentIDCol),
-		)).
-		GroupBy(schema.ItemParentTableItemIDCol, schema.ItemParentTableParentIDCol).
-		Having(goqu.COUNT(schema.ItemParentLanguageTableItemIDCol).Lt(len(s.contentLanguages))).
-		Limit(limit)
-
-	if parentItemTypeID > 0 {
-		sqSelect = sqSelect.
-			Join(
-				schema.ItemTable,
-				goqu.On(schema.ItemParentTableParentIDCol.Eq(schema.ItemTableIDCol)),
-			).
-			Where(schema.ItemTableItemTypeIDCol.Eq(parentItemTypeID))
-	}
-
-	err := sqSelect.ScanStructsContext(ctx, &res)
-	if err != nil {
-		return err
-	}
-
-	ctx = context.WithoutCancel(ctx)
-
-	for _, row := range res {
-		err = s.refreshItemParentLanguage(ctx, row.ParentID, row.ItemID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (s *Repository) RefreshItemParentAllAuto(ctx context.Context) error {
@@ -3528,7 +3033,7 @@ func (s *Repository) CreateItem(
 		return 0, err
 	}
 
-	_, err = s.RebuildCache(ctx, itemID)
+	_, err = s.itemParentCache.RebuildCache(ctx, itemID)
 	if err != nil {
 		return 0, err
 	}
@@ -4314,83 +3819,6 @@ type parentInfo struct {
 	Design bool
 }
 
-func (s *Repository) collectParentInfo(
-	ctx context.Context,
-	id int64,
-	diff int64,
-) (map[int64]parentInfo, error) {
-	//nolint: sqlclosecheck
-	rows, err := s.db.Select(schema.ItemParentTableParentIDCol, schema.ItemParentTableTypeCol).
-		From(schema.ItemParentTable).
-		Where(schema.ItemParentTableItemIDCol.Eq(id)).
-		Executor().QueryContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer util.Close(rows)
-
-	result := make(map[int64]parentInfo, 0)
-
-	for rows.Next() {
-		var (
-			parentID int64
-			typeID   schema.ItemParentType
-		)
-
-		err = rows.Scan(&parentID, &typeID)
-		if err != nil {
-			return nil, err
-		}
-
-		isTuning := typeID == schema.ItemParentTypeTuning
-		isSport := typeID == schema.ItemParentTypeSport
-		isDesign := typeID == schema.ItemParentTypeDesign
-		result[parentID] = parentInfo{
-			Diff:   diff,
-			Tuning: isTuning,
-			Sport:  isSport,
-			Design: isDesign,
-		}
-
-		parentInfos, err := s.collectParentInfo(ctx, parentID, diff+1)
-		if err != nil {
-			return nil, err
-		}
-
-		for pid, info := range parentInfos {
-			val, ok := result[pid]
-
-			if !ok || info.Diff < val.Diff {
-				val = info
-				val.Tuning = result[pid].Tuning || isTuning
-				val.Sport = result[pid].Sport || isSport
-				val.Design = result[pid].Design || isDesign
-				result[pid] = val
-			}
-		}
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-func (s *Repository) getChildItemsIDs(ctx context.Context, parentID int64) ([]int64, error) {
-	vals := make([]int64, 0)
-
-	err := s.db.Select(schema.ItemParentTableItemIDCol).
-		From(schema.ItemParentTable).
-		Where(schema.ItemParentTableParentIDCol.Eq(parentID)).
-		Executor().ScanValsContext(ctx, &vals)
-	if err != nil {
-		return nil, err
-	}
-
-	return vals, nil
-}
-
 func (s *Repository) namePreferLanguage(
 	ctx context.Context,
 	parentID, itemID int64,
@@ -4430,7 +3858,7 @@ func (s *Repository) extractCatname(
 	}
 
 	if len(diffName) == 0 {
-		diffName, err = s.extractName(ctx, brandRow, vehicleRow, "en")
+		diffName, err = s.itemParentLanguage.ExtractName(ctx, brandRow, vehicleRow, "en")
 		if err != nil {
 			return "", err
 		}
@@ -4457,174 +3885,6 @@ func (s *Repository) extractCatname(
 	}
 
 	return catname, nil
-}
-
-func (s *Repository) extractName(
-	ctx context.Context, parentRow schema.ItemRow, vehicleRow schema.ItemRow, lang string,
-) (string, error) {
-	langName, err := s.getName(ctx, vehicleRow.ID, lang)
-	if err != nil {
-		return "", err
-	}
-
-	vehicleName := langName
-	if len(langName) == 0 {
-		vehicleName = vehicleRow.Name
-	}
-
-	aliases, err := s.getAliases(ctx, parentRow.ID)
-	if err != nil {
-		return "", err
-	}
-
-	name := vehicleName
-
-	for _, alias := range aliases {
-		patterns := []string{
-			"by The " + alias + " Company",
-			"by " + alias,
-			"di " + alias,
-			"par " + alias,
-			alias + "-",
-			"-" + alias,
-		}
-
-		for _, pattern := range patterns {
-			re := regexp.MustCompile(regexp.QuoteMeta(pattern))
-			name = re.ReplaceAllString(name, "")
-		}
-
-		re := regexp.MustCompile(`\b` + regexp.QuoteMeta(alias) + `\b`)
-		name = re.ReplaceAllString(name, "")
-	}
-
-	re := regexp.MustCompile("[[:space:]]+")
-	name = strings.TrimSpace(re.ReplaceAllString(name, " "))
-
-	name = strings.TrimLeft(name, "/")
-	if len(name) == 0 && len(vehicleRow.Body) > 0 && vehicleRow.Body != parentRow.Body {
-		name = vehicleRow.Body
-	}
-
-	vbmy := vehicleRow.BeginModelYear.Int32
-	vemy := vehicleRow.EndModelYear.Int32
-
-	if len(name) == 0 && vehicleRow.BeginModelYear.Valid && vbmy > 0 {
-		modelYearsDifferent := vbmy != parentRow.BeginModelYear.Int32 ||
-			vemy != parentRow.EndModelYear.Int32
-		if modelYearsDifferent {
-			name = yearsPrefix(vbmy, vemy)
-		}
-	}
-
-	vby := vehicleRow.BeginYear.Int32
-	vey := vehicleRow.EndYear.Int32
-
-	if len(name) == 0 && vehicleRow.BeginYear.Valid && vby > 0 {
-		yearsDifferent := vby != parentRow.BeginYear.Int32 || vey != parentRow.EndYear.Int32
-		if yearsDifferent {
-			name = yearsPrefix(vby, vey)
-		}
-	}
-
-	if len(name) == 0 && vehicleRow.SpecID.Valid {
-		specsDifferent := vehicleRow.SpecID.Int32 != parentRow.SpecID.Int32
-		if specsDifferent {
-			specShortName := ""
-
-			success, err := s.db.Select(schema.SpecTableShortNameCol).From(schema.SpecTable).
-				Where(schema.SpecTableIDCol.Eq(vehicleRow.SpecID.Int32)).
-				ScanValContext(ctx, &specShortName)
-			if err != nil {
-				return "", err
-			}
-
-			if success {
-				name = specShortName
-			}
-		}
-	}
-
-	if len(name) == 0 {
-		name = vehicleName
-	}
-
-	return name, nil
-}
-
-func (s *Repository) getAliases(ctx context.Context, itemID int64) ([]string, error) {
-	//nolint: prealloc
-	var aliases []string
-
-	err := s.db.Select(schema.BrandAliasTableNameCol).From(schema.BrandAliasTable).
-		Where(schema.BrandAliasTableItemIDCol.Eq(itemID)).ScanValsContext(ctx, &aliases)
-	if err != nil {
-		return nil, err
-	}
-
-	langNames, err := s.getNames(ctx, itemID)
-	if err != nil {
-		return nil, err
-	}
-
-	aliases = append(aliases, langNames...)
-
-	sort.Slice(aliases, func(i, j int) bool {
-		return len(aliases[i]) > len(aliases[j])
-	})
-
-	return aliases, nil
-}
-
-func (s *Repository) getName(ctx context.Context, itemID int64, lang string) (string, error) {
-	langPriority, ok := languagePriority[lang]
-	if !ok {
-		langPriority, ok = languagePriority[DefaultLanguageCode]
-	}
-
-	if !ok {
-		return "", fmt.Errorf("%w: `%s`", errLangNotFound, lang)
-	}
-
-	fieldParams := make([]interface{}, len(langPriority)+1)
-	fieldParams[0] = lang
-
-	for i, v := range langPriority {
-		fieldParams[i+1] = v
-	}
-
-	result := ""
-
-	success, err := s.db.Select(schema.ItemLanguageTableNameCol).
-		From(schema.ItemLanguageTable).
-		Where(
-			schema.ItemLanguageTableItemIDCol.Eq(itemID),
-			goqu.L("? > 0", goqu.Func("length", schema.ItemLanguageTableNameCol)),
-		).
-		Order(goqu.Func("FIELD", fieldParams...).Asc()).
-		Limit(1).
-		ScanValContext(ctx, &result)
-	if err != nil {
-		return "", err
-	}
-
-	if !success {
-		return "", nil
-	}
-
-	return result, nil
-}
-
-func (s *Repository) getNames(ctx context.Context, itemID int64) ([]string, error) {
-	var result []string
-
-	err := s.db.Select(schema.ItemLanguageTableNameCol).From(schema.ItemLanguageTable).
-		Where(
-			schema.ItemLanguageTableItemIDCol.Eq(itemID),
-			goqu.L("? > 0", goqu.Func("length", schema.ItemLanguageTableNameCol)),
-		).ScanValsContext(ctx, &result)
-
-	return result, err
 }
 
 type sortedColumnMapItem struct {
@@ -4706,29 +3966,6 @@ func (s *Repository) collectAncestorsIDs(ctx context.Context, id int64) ([]int64
 	}
 
 	return util.RemoveDuplicate(ids), nil
-}
-
-func (s *Repository) setItemParentLanguages(
-	ctx context.Context,
-	parentID, itemID int64,
-	values map[string]schema.ItemParentLanguageRow,
-	forceIsAuto bool,
-) error {
-	ctx = context.WithoutCancel(ctx)
-
-	for _, lang := range s.contentLanguages {
-		name := ""
-		if _, ok := values[lang]; ok {
-			name = values[lang].Name
-		}
-
-		err := s.SetItemParentLanguage(ctx, parentID, itemID, lang, name, forceIsAuto)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (s *Repository) updateItemInheritance(ctx context.Context, car schema.ItemRow) error {
@@ -4882,42 +4119,8 @@ func (s *Repository) getParentRows(
 	return rows, err
 }
 
-func (s *Repository) refreshItemParentLanguage(ctx context.Context, parentID, itemID int64) error {
-	logrus.Infof("refreshItemParentLanguage(%d, %d)", parentID, itemID)
-
-	var rows []schema.ItemParentLanguageRow
-
-	err := s.db.Select(
-		schema.ItemParentLanguageTableIsAutoCol,
-		schema.ItemParentLanguageTableNameCol,
-		schema.ItemParentLanguageTableLanguageCol,
-	).
-		From(schema.ItemParentLanguageTable).
-		Where(
-			schema.ItemParentLanguageTableItemIDCol.Eq(itemID),
-			schema.ItemParentLanguageTableParentIDCol.Eq(parentID),
-		).
-		ScanStructsContext(ctx, &rows)
-	if err != nil {
-		return err
-	}
-
-	values := make(map[string]schema.ItemParentLanguageRow)
-
-	for _, iplRow := range rows {
-		row := schema.ItemParentLanguageRow{}
-		if !iplRow.IsAuto {
-			row.Name = iplRow.Name
-		}
-
-		values[iplRow.Language] = row
-	}
-
-	return s.setItemParentLanguages(ctx, parentID, itemID, values, false)
-}
-
 func (s *Repository) refreshAuto(ctx context.Context, parentID, itemID int64) (bool, error) {
-	err := s.refreshItemParentLanguage(ctx, parentID, itemID)
+	err := s.itemParentLanguage.RefreshItemParentLanguage2(ctx, parentID, itemID)
 	if err != nil {
 		return false, err
 	}

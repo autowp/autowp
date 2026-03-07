@@ -1,7 +1,6 @@
 package pictures
 
 import (
-	"context"
 	"database/sql"
 	"io"
 	"math/rand"
@@ -10,18 +9,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Nerzal/gocloak/v13"
-	"github.com/autowp/goautowp/comments"
 	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/hosts"
-	"github.com/autowp/goautowp/i18nbundle"
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/textstorage"
-	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/google/uuid"
@@ -68,46 +61,20 @@ func repository(t *testing.T) (*goqu.Database, *Repository) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
-	pgDB, err := sql.Open("postgres", cfg.PostgresDSN)
-	require.NoError(t, err)
-
 	goquDB := goqu.New("mysql", db)
-	pgGoquDB := goqu.New("postgres", pgDB)
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
 	textStorage := textstorage.New(goquDB)
+	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	itemsRepo := items.NewRepository(
 		goquDB,
 		cfg.MostsMinCarsCount,
-		cfg.ContentLanguages,
+		itemParentLanguageRepository,
 		textStorage,
 		imageStorage,
 	)
-	keycloak := gocloak.NewClient(cfg.Keycloak.URL)
-	userRepo := users.NewRepository(
-		goquDB,
-		pgGoquDB,
-		cfg.UsersSalt,
-		cfg.Languages,
-		keycloak,
-		cfg.Keycloak,
-		cfg.MessageInterval,
-		imageStorage,
-	)
-	i, err := i18nbundle.New()
-	require.NoError(t, err)
-
-	msgRepo := messaging.NewRepository(
-		goquDB,
-		func(_ context.Context, _ int64, _ int64, _ string) error {
-			return nil
-		},
-		i,
-	)
-	hostsManager := hosts.NewManager(cfg.Languages)
-	commentsRepo := comments.NewRepository(goquDB, userRepo, msgRepo, hostsManager)
 
 	return goquDB, NewRepository(
 		goquDB,
@@ -115,7 +82,7 @@ func repository(t *testing.T) (*goqu.Database, *Repository) {
 		textStorage,
 		itemsRepo,
 		cfg.DuplicateFinder,
-		commentsRepo,
+		func(int64) error { return nil },
 	)
 }
 
