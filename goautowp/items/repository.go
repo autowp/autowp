@@ -52,8 +52,6 @@ var (
 )
 
 const (
-	DefaultLanguageCode = "xx"
-
 	NewDays                       = 7
 	ItemLanguageTextMaxLength     = 4096
 	ItemLanguageFullTextMaxLength = 65536
@@ -893,21 +891,21 @@ func (s *Repository) List( //nolint:maintidx
 		tag := language.English
 
 		switch options.Language {
-		case "ru":
+		case schema.RussianLanguageCode:
 			tag = language.Russian
-		case "zh":
+		case schema.SimplifiedChineseLanguageCode:
 			tag = language.SimplifiedChinese
-		case "fr":
+		case schema.FrenchLanguageCode:
 			tag = language.French
-		case "es":
+		case schema.SpanishLanguageCode:
 			tag = language.Spanish
-		case "uk":
+		case schema.UkrainianLanguageCode:
 			tag = language.Ukrainian
-		case "be":
+		case schema.BelarusianLanguageCode:
 			tag = language.Russian
-		case "pt-br":
+		case schema.PortugueseBrazilianLanguageCode:
 			tag = language.BrazilianPortuguese
-		case "he":
+		case schema.HebrewLanguageCode:
 			tag = language.Hebrew
 		}
 
@@ -918,7 +916,7 @@ func (s *Repository) List( //nolint:maintidx
 			jName := result[j].NameOnly
 
 			switch options.Language {
-			case "ru", "uk", "be":
+			case schema.RussianLanguageCode, schema.UkrainianLanguageCode, schema.BelarusianLanguageCode:
 				aIsCyrillic := CyrillicRegexp.MatchString(iName)
 				bIsCyrillic := CyrillicRegexp.MatchString(jName)
 
@@ -929,7 +927,7 @@ func (s *Repository) List( //nolint:maintidx
 				if bIsCyrillic && !aIsCyrillic {
 					return false
 				}
-			case "zh":
+			case schema.SimplifiedChineseLanguageCode:
 				aIsHan := HanRegexp.MatchString(iName)
 				bIsHan := HanRegexp.MatchString(jName)
 
@@ -1127,7 +1125,7 @@ func (s *Repository) ItemLanguageList(ctx context.Context, itemID int64) ([]Item
 	).
 		From(schema.ItemLanguageTable).Where(
 		schema.ItemLanguageTableItemIDCol.Eq(itemID),
-		schema.ItemLanguageTableLanguageCol.Neq(DefaultLanguageCode),
+		schema.ItemLanguageTableLanguageCol.Neq(schema.DefaultLanguageCode),
 	)
 
 	rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
@@ -3022,7 +3020,7 @@ func (s *Repository) CreateItem(
 	}
 
 	if len(row.Name) > 0 {
-		err = s.setItemLanguageName(ctx, itemID, DefaultLanguageCode, row.Name)
+		err = s.setItemLanguageName(ctx, itemID, schema.DefaultLanguageCode, row.Name)
 		if err != nil {
 			return 0, err
 		}
@@ -3200,7 +3198,7 @@ func (s *Repository) UpdateItem(
 	}
 
 	if util.Contains(mask, "name") {
-		err := s.setItemLanguageName(ctx, row.ID, DefaultLanguageCode, row.Name)
+		err := s.setItemLanguageName(ctx, row.ID, schema.DefaultLanguageCode, row.Name)
 		if err != nil {
 			return err
 		}
@@ -3852,13 +3850,13 @@ func (s *Repository) extractCatname(
 ) (string, error) {
 	var err error
 
-	diffName, err := s.namePreferLanguage(ctx, brandRow.ID, vehicleRow.ID, "en")
+	diffName, err := s.namePreferLanguage(ctx, brandRow.ID, vehicleRow.ID, schema.CatnameLanguageCode)
 	if err != nil {
 		return "", err
 	}
 
 	if len(diffName) == 0 {
-		diffName, err = s.itemParentLanguage.ExtractName(ctx, brandRow, vehicleRow, "en")
+		diffName, err = s.itemParentLanguage.ExtractName(ctx, brandRow, vehicleRow, schema.CatnameLanguageCode)
 		if err != nil {
 			return "", err
 		}

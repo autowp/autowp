@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/autowp/goautowp/i18nbundle"
+	"github.com/autowp/goautowp/schema"
 	"github.com/stretchr/testify/require"
 )
 
@@ -14,7 +15,7 @@ func TestYears(t *testing.T) {
 	require.NoError(t, err)
 
 	formatter := NewItemNameFormatter(i18nBundle)
-	lang := "en"
+	lang := schema.EnglishLanguageCode
 	falseVal := false
 	itemOptions := ItemNameFormatterOptions{
 		BeginModelYear:         0,
@@ -51,7 +52,7 @@ func TestModelYears(t *testing.T) {
 
 	var (
 		formatter = NewItemNameFormatter(bundle)
-		lang      = "en"
+		lang      = schema.EnglishLanguageCode
 		falseVal  = false
 	)
 

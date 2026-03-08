@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/items"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/textstorage"
 	"github.com/autowp/goautowp/util"
@@ -1343,7 +1342,7 @@ func TestGetPictureWithPerspectivePrefix(t *testing.T) {
 	picture, err = client.GetPicture(
 		ctx,
 		&PicturesRequest{
-			Language: "ru",
+			Language: schema.RussianLanguageCode,
 			Options:  &PictureListOptions{Id: pictureID},
 			Fields:   &PictureFields{NameText: true, NameHtml: true},
 		},
@@ -1355,7 +1354,7 @@ func TestGetPictureWithPerspectivePrefix(t *testing.T) {
 	item, err = itemsClient.Item(ctx, &ItemRequest{
 		Id:       itemID,
 		Fields:   &ItemFields{NameText: true, NameHtml: true},
-		Language: "ru",
+		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, item.GetNameText())
@@ -1790,7 +1789,7 @@ func TestCorrectFileNamesVote(t *testing.T) {
 	_, err = itemsClient.UpdateItemLanguage(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&ItemLanguage{
-			Language: items.DefaultLanguageCode,
+			Language: schema.DefaultLanguageCode,
 			Name:     newName,
 			ItemId:   vehicleID,
 		},

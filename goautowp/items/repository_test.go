@@ -45,7 +45,7 @@ func TestTopBrandsListRuZh(t *testing.T) {
 		imageStorage,
 	)
 
-	langs := []string{"ru", "zh"}
+	langs := []string{schema.RussianLanguageCode, schema.SimplifiedChineseLanguageCode}
 
 	for _, lang := range langs {
 		options := query.ItemListOptions{
@@ -98,7 +98,7 @@ func TestListFilters(t *testing.T) {
 	)
 
 	options := query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
 		ItemParentChild: &query.ItemParentListOptions{
 			ChildItems: &query.ItemListOptions{
@@ -153,7 +153,7 @@ func TestGetItemsNameAndCatnameShouldNotBeOmittedWhenDescendantsCountRequested(t
 		imageStorage,
 	)
 	options := query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
 		Limit:    10,
 	}
@@ -185,7 +185,7 @@ func createRandomUser(ctx context.Context, t *testing.T, db *goqu.Database) int6
 			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
 			schema.UserTableTimezoneColName:       "Europe/Moscow",
 			schema.UserTableLastIPColName:         goqu.Func("INET6_ATON", "127.0.0.1"),
-			schema.UserTableLanguageColName:       "en",
+			schema.UserTableLanguageColName:       schema.EnglishLanguageCode,
 			schema.UserTableUUIDColName:           goqu.Func("UUID_TO_BIN", uuid.New().String()),
 		}).
 		Executor().ExecContext(ctx)
@@ -269,7 +269,7 @@ func TestGetUserPicturesBrands(t *testing.T) {
 	require.NoError(t, err)
 
 	res2, _, err := repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
 			PictureItemsByItemID: &query.PictureItemListOptions{
 				Pictures: &query.PictureListOptions{
@@ -328,7 +328,7 @@ func TestPaginator(t *testing.T) {
 		imageStorage,
 	)
 	options := query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    2,
 		Page:     2,
 		Name:     name + "%",
@@ -411,7 +411,7 @@ func TestOrderByDescendantsCount(t *testing.T) {
 
 	// with field DescendantsCount, with pagination
 	list, pages, err := repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    1,
 		Page:     1,
 		Name:     name + "%",
@@ -427,7 +427,7 @@ func TestOrderByDescendantsCount(t *testing.T) {
 
 	// without field DescendantsCount, with pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    1,
 		Page:     1,
 		Name:     name + "%",
@@ -443,7 +443,7 @@ func TestOrderByDescendantsCount(t *testing.T) {
 
 	// with field DescendantsCount, without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Name:     name + "%",
 	}, &ItemFields{DescendantsCount: true}, OrderByDescendantsCount, true)
 	require.NoError(t, err)
@@ -455,7 +455,7 @@ func TestOrderByDescendantsCount(t *testing.T) {
 
 	// without field DescendantsCount, without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Name:     name + "%",
 	}, nil, OrderByDescendantsCount, true)
 	require.NoError(t, err)
@@ -557,7 +557,7 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 
 	// with field DescendantPicturesCount, with pagination
 	list, pages, err := repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    1,
 		Page:     1,
 		Name:     name + "%",
@@ -576,7 +576,7 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 
 	// without field DescendantPicturesCount, with pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    1,
 		Page:     1,
 		Name:     name + "%",
@@ -595,7 +595,7 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 
 	// with field DescendantPicturesCount, without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Name:     name + "%",
 		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
 			PictureItemsByItemID: &query.PictureItemListOptions{},
@@ -610,7 +610,7 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 
 	// without field DescendantPicturesCount, without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Name:     name + "%",
 		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
 			PictureItemsByItemID: &query.PictureItemListOptions{},
@@ -693,7 +693,7 @@ func TestOrderByAddDatetime(t *testing.T) {
 
 	// with pagination
 	list, pages, err := repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    1,
 		Page:     1,
 		Name:     name + "%",
@@ -709,7 +709,7 @@ func TestOrderByAddDatetime(t *testing.T) {
 
 	// without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Name:     name + "%",
 	}, nil, OrderByAddDatetime, true)
 	require.NoError(t, err)
@@ -789,7 +789,7 @@ func TestOrderByName(t *testing.T) {
 
 	// with pagination
 	list, pages, err := repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    1,
 		Page:     1,
 		Name:     "%" + name + "%",
@@ -805,7 +805,7 @@ func TestOrderByName(t *testing.T) {
 
 	// with pagination, with fields
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    1,
 		Page:     1,
 		Name:     "%" + name + "%",
@@ -821,7 +821,7 @@ func TestOrderByName(t *testing.T) {
 
 	// without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Name:     "%" + name + "%",
 	}, nil, OrderByName, true)
 	require.NoError(t, err)
@@ -833,7 +833,7 @@ func TestOrderByName(t *testing.T) {
 
 	// without pagination, with fields
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Name:     "%" + name + "%",
 	}, &ItemFields{NameOnly: true, NameHTML: true, NameText: true, NameDefault: true}, OrderByName, true)
 	require.NoError(t, err)
@@ -930,7 +930,7 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 
 	// with field DescendantsParentsCount, with pagination
 	list, pages, err := repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    1,
 		Page:     1,
 		Name:     name + "%",
@@ -952,7 +952,7 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 
 	// without field DescendantsParentsCount, with pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    1,
 		Page:     1,
 		Name:     name + "%",
@@ -972,7 +972,7 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 
 	// with field DescendantsParentsCount, without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Name:     name + "%",
 		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
 			ExcludeSelf:        true,
@@ -988,7 +988,7 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 
 	// without field DescendantsParentsCount, without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Name:     name + "%",
 		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
 			ExcludeSelf:        true,
@@ -1073,7 +1073,7 @@ func TestOrderByStarCount(t *testing.T) {
 
 	// with pagination
 	list, pages, err := repository.List(ctx, &query.ItemListOptions{
-		Language:                  "en",
+		Language:                  schema.EnglishLanguageCode,
 		Limit:                     1,
 		Page:                      1,
 		Name:                      name + "%",
@@ -1089,7 +1089,7 @@ func TestOrderByStarCount(t *testing.T) {
 
 	// without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language:                  "en",
+		Language:                  schema.EnglishLanguageCode,
 		Name:                      name + "%",
 		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{},
 	}, nil, OrderByStarCount, true)
@@ -1183,7 +1183,7 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 
 	// with pagination
 	list, pages, err := repository.List(ctx, &query.ItemListOptions{
-		Language:         "en",
+		Language:         schema.EnglishLanguageCode,
 		Limit:            1,
 		Page:             1,
 		Name:             name + "%",
@@ -1198,7 +1198,7 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 
 	// without pagination
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
-		Language:         "en",
+		Language:         schema.EnglishLanguageCode,
 		Name:             name + "%",
 		ItemParentParent: &query.ItemParentListOptions{},
 	}, nil, OrderByItemParentParentTimestamp, true)
@@ -1228,7 +1228,7 @@ func CreateItem(t *testing.T, goquDB *goqu.Database, row schema.ItemRow) int64 {
 	itemID, err := repository.CreateItem(ctx, row, 0)
 	require.NoError(t, err)
 
-	_, err = repository.UpdateItemLanguage(ctx, itemID, "en", row.Name, "", "", 0)
+	_, err = repository.UpdateItemLanguage(ctx, itemID, schema.EnglishLanguageCode, row.Name, "", "", 0)
 	require.NoError(t, err)
 
 	return itemID

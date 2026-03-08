@@ -269,7 +269,7 @@ func TestGetValues(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&AttrValuesRequest{
 			ItemId:   itemID,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -356,7 +356,7 @@ func TestGetValues(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&AttrValuesRequest{
 			ItemId:   itemID,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -367,7 +367,7 @@ func TestGetValues(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&AttrUserValuesRequest{
 			ItemId:   itemID,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 			Fields: &AttrUserValuesFields{
 				ValueText: true,
 			},
@@ -399,7 +399,7 @@ func TestGetEmptyValues(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&AttrValuesRequest{
 			ItemId:   itemID,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -481,7 +481,7 @@ func TestGetEmptyValues(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&AttrValuesRequest{
 			ItemId:   itemID,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -570,7 +570,7 @@ func TestConflicts(t *testing.T) {
 		&AttrConflictsRequest{
 			Filter:   AttrConflictsRequest_ALL,
 			Page:     0,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -584,7 +584,7 @@ func TestConflicts(t *testing.T) {
 		&AttrConflictsRequest{
 			Filter:   AttrConflictsRequest_MINUS_WEIGHT,
 			Page:     0,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -598,7 +598,7 @@ func TestConflicts(t *testing.T) {
 		&AttrConflictsRequest{
 			Filter:   AttrConflictsRequest_I_DISAGREE,
 			Page:     0,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -2426,7 +2426,7 @@ func TestLocalizedFormat(t *testing.T) {
 		),
 		&GetSpecificationsRequest{
 			ItemId:   itemID,
-			Language: "ru",
+			Language: schema.RussianLanguageCode,
 		},
 	)
 	require.NoError(t, err)

@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/autowp/goautowp/schema"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/genproto/googleapis/type/latlng"
 )
@@ -36,7 +37,7 @@ func TestGetPoints(t *testing.T) {
 		ctx,
 		&MapGetPointsRequest{
 			Bounds:   "0,0,60,60",
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -55,7 +56,7 @@ func TestGetPointsOnly(t *testing.T) {
 		ctx,
 		&MapGetPointsRequest{
 			Bounds:     "0,0,60,60",
-			Language:   "en",
+			Language:   schema.EnglishLanguageCode,
 			PointsOnly: true,
 		},
 	)

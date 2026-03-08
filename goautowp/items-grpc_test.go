@@ -30,7 +30,7 @@ func TestTopCategoriesList(t *testing.T) {
 	client := NewItemsClient(conn)
 
 	_, err := client.GetTopCategoriesList(ctx, &GetTopCategoriesListRequest{
-		Language: "ru",
+		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
 }
@@ -139,13 +139,13 @@ func TestGetTwinsBrandsList(t *testing.T) {
 	require.NoError(t, err)
 
 	res, err := client.GetTopTwinsBrandsList(ctx, &GetTopTwinsBrandsListRequest{
-		Language: "ru",
+		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
 
 	r6, err := client.GetTwinsBrandsList(ctx, &GetTwinsBrandsListRequest{
-		Language: "ru",
+		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, r6)
@@ -160,7 +160,7 @@ func TestTopBrandsList(t *testing.T) {
 	client := NewItemsClient(conn)
 
 	res, err := client.GetTopBrandsList(ctx, &GetTopBrandsListRequest{
-		Language: "ru",
+		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
@@ -174,7 +174,7 @@ func TestTopPersonsAuthorList(t *testing.T) {
 	client := NewItemsClient(conn)
 
 	r, err := client.GetTopPersonsList(ctx, &GetTopPersonsListRequest{
-		Language:        "ru",
+		Language:        schema.RussianLanguageCode,
 		PictureItemType: PictureItemType_PICTURE_ITEM_AUTHOR,
 	})
 	require.NoError(t, err)
@@ -189,7 +189,7 @@ func TestTopPersonsContentList(t *testing.T) {
 	client := NewItemsClient(conn)
 
 	r, err := client.GetTopPersonsList(ctx, &GetTopPersonsListRequest{
-		Language:        "ru",
+		Language:        schema.RussianLanguageCode,
 		PictureItemType: PictureItemType_PICTURE_ITEM_CONTENT,
 	})
 	require.NoError(t, err)
@@ -204,7 +204,7 @@ func TestTopFactoriesList(t *testing.T) {
 	client := NewItemsClient(conn)
 
 	r, err := client.GetTopFactoriesList(ctx, &GetTopFactoriesListRequest{
-		Language: "ru",
+		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, r)
@@ -538,7 +538,7 @@ func TestCatalogueMenuList(t *testing.T) {
 	client := NewItemsClient(conn)
 
 	res, err := client.List(ctx, &ItemsRequest{
-		Language: "ru",
+		Language: schema.RussianLanguageCode,
 		Fields: &ItemFields{
 			NameText:         true,
 			DescendantsCount: true,
@@ -710,7 +710,7 @@ func TestSetItemParentLanguage(t *testing.T) {
 				&ItemParentLanguage{
 					ItemId:   itemID,
 					ParentId: parentID,
-					Language: "en",
+					Language: schema.EnglishLanguageCode,
 					Name:     "",
 				},
 			)
@@ -728,7 +728,7 @@ func TestSetItemParentLanguage(t *testing.T) {
 			var itemParentLanguageRow *ItemParentLanguage
 
 			for _, row := range r3.GetItems() {
-				if row.GetLanguage() == "en" {
+				if row.GetLanguage() == schema.EnglishLanguageCode {
 					itemParentLanguageRow = row
 
 					break
@@ -758,7 +758,7 @@ func TestBrandNewItems(t *testing.T) {
 
 	_, err := client.GetBrandNewItems(ctx, &NewItemsRequest{
 		ItemId:   itemID,
-		Language: "ru",
+		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
 }
@@ -803,7 +803,7 @@ func TestNewItems(t *testing.T) {
 
 	_, err = client.GetNewItems(ctx, &NewItemsRequest{
 		ItemId:   itemID,
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.NoError(t, err)
 }
@@ -890,7 +890,7 @@ func TestInboxPicturesCount(t *testing.T) {
 		Options: &ItemListOptions{
 			Id: brandID,
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.ErrorContains(t, err, "PermissionDenied")
 
@@ -899,7 +899,7 @@ func TestInboxPicturesCount(t *testing.T) {
 		Fields: &ItemFields{
 			InboxPicturesCount: true,
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.ErrorContains(t, err, "PermissionDenied")
 
@@ -916,7 +916,7 @@ func TestInboxPicturesCount(t *testing.T) {
 			Options: &ItemListOptions{
 				Id: brandID,
 			},
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -934,7 +934,7 @@ func TestInboxPicturesCount(t *testing.T) {
 			Fields: &ItemFields{
 				InboxPicturesCount: true,
 			},
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -998,7 +998,7 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 				ParentId: parentID1,
 			},
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.NoError(t, err)
 	require.Len(t, res.GetItems(), 1)
@@ -1022,7 +1022,7 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 				ParentId: parentID1,
 			},
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.NoError(t, err)
 	require.Empty(t, res.GetItems())
@@ -1034,7 +1034,7 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 				ParentId: parentID2,
 			},
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.NoError(t, err)
 	require.Len(t, res.GetItems(), 1)
@@ -1059,7 +1059,7 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 				ParentId: parentID2,
 			},
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.NoError(t, err)
 	require.Empty(t, res.GetItems())
@@ -1126,7 +1126,7 @@ func TestDeleteItemParentNotDeletesSecondChild(t *testing.T) {
 				ParentId: parentID,
 			},
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.NoError(t, err)
 	require.Len(t, res.GetItems(), 2)
@@ -1148,7 +1148,7 @@ func TestDeleteItemParentNotDeletesSecondChild(t *testing.T) {
 				ParentId: parentID,
 			},
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.NoError(t, err)
 	require.Len(t, res.GetItems(), 1)
@@ -1229,7 +1229,7 @@ func TestUpdateItemParent(t *testing.T) {
 				ParentId: parentID,
 			},
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	})
 	require.NoError(t, err)
 	require.Len(t, res.GetItems(), 1)
@@ -1299,7 +1299,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&ItemLanguage{
 			ItemId:   itemID,
-			Language: "fr",
+			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
 		},
 	)
@@ -1318,7 +1318,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	row := rows[0]
 	require.Equal(t, itemID, row.GetItemId())
-	require.Equal(t, "fr", row.GetLanguage())
+	require.Equal(t, schema.FrenchLanguageCode, row.GetLanguage())
 	require.Equal(t, itemName, row.GetName())
 	require.Zero(t, row.GetTextId())
 	require.Zero(t, row.GetFullTextId())
@@ -1328,7 +1328,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&ItemLanguage{
 			ItemId:   itemID,
-			Language: "fr",
+			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
 			Text:     "a text",
 		},
@@ -1348,7 +1348,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	row = rows[0]
 	require.Equal(t, itemID, row.GetItemId())
-	require.Equal(t, "fr", row.GetLanguage())
+	require.Equal(t, schema.FrenchLanguageCode, row.GetLanguage())
 	require.Equal(t, itemName, row.GetName())
 	require.NotZero(t, row.GetTextId())
 	require.Equal(t, "a text", row.GetText())
@@ -1361,7 +1361,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&ItemLanguage{
 			ItemId:   itemID,
-			Language: "fr",
+			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
 			Text:     "a second text",
 		},
@@ -1381,7 +1381,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	row = rows[0]
 	require.Equal(t, itemID, row.GetItemId())
-	require.Equal(t, "fr", row.GetLanguage())
+	require.Equal(t, schema.FrenchLanguageCode, row.GetLanguage())
 	require.Equal(t, itemName, row.GetName())
 	require.Equal(t, lastTextID, row.GetTextId())
 	require.Equal(t, "a second text", row.GetText())
@@ -1392,7 +1392,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&ItemLanguage{
 			ItemId:   itemID,
-			Language: "fr",
+			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
 			Text:     "a second text",
 			FullText: "a full text",
@@ -1413,7 +1413,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	row = rows[0]
 	require.Equal(t, itemID, row.GetItemId())
-	require.Equal(t, "fr", row.GetLanguage())
+	require.Equal(t, schema.FrenchLanguageCode, row.GetLanguage())
 	require.Equal(t, itemName, row.GetName())
 	require.Equal(t, lastTextID, row.GetTextId())
 	require.Equal(t, "a second text", row.GetText())
@@ -1427,7 +1427,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&ItemLanguage{
 			ItemId:   itemID,
-			Language: "fr",
+			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
 		},
 	)
@@ -1446,7 +1446,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	row = rows[0]
 	require.Equal(t, itemID, row.GetItemId())
-	require.Equal(t, "fr", row.GetLanguage())
+	require.Equal(t, schema.FrenchLanguageCode, row.GetLanguage())
 	require.Equal(t, itemName, row.GetName())
 	require.Equal(t, lastTextID, row.GetTextId())
 	require.Empty(t, row.GetText())
@@ -1752,28 +1752,28 @@ func TestGetBrands(t *testing.T) {
 		{
 			Name:      "123",
 			Catname:   "numeric",
-			Language:  "en",
+			Language:  schema.EnglishLanguageCode,
 			Category:  APIBrandsListLine_NUMBER,
 			Character: "1",
 		},
 		{
 			Name:      "Бренд",
 			Catname:   "cyrillic",
-			Language:  "en",
+			Language:  schema.EnglishLanguageCode,
 			Category:  APIBrandsListLine_CYRILLIC,
 			Character: "Б",
 		},
 		{
 			Name:      "Latin Brand",
 			Catname:   "latin",
-			Language:  "en",
+			Language:  schema.EnglishLanguageCode,
 			Category:  APIBrandsListLine_LATIN,
 			Character: "L",
 		},
 		{
 			Name:      "所有",
 			Catname:   "han",
-			Language:  "en",
+			Language:  schema.EnglishLanguageCode,
 			Category:  APIBrandsListLine_LATIN,
 			Character: "S",
 		},
@@ -1856,7 +1856,10 @@ func TestBrandSections(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, id := range ids {
-		_, err = client.GetBrandSections(ctx, &GetBrandSectionsRequest{Language: "en", ItemId: id})
+		_, err = client.GetBrandSections(
+			ctx,
+			&GetBrandSectionsRequest{Language: schema.EnglishLanguageCode, ItemId: id},
+		)
 		require.NoError(t, err)
 	}
 }
@@ -1893,7 +1896,7 @@ func TestBrandSections2(t *testing.T) {
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&ItemLanguage{
 			ItemId:   brandID,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 			Name:     brandName,
 		},
 	)
@@ -1958,7 +1961,7 @@ func TestBrandSections2(t *testing.T) {
 				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 				&ItemLanguage{
 					ItemId:   childID,
-					Language: "en",
+					Language: schema.EnglishLanguageCode,
 					Name:     childName,
 				},
 			)
@@ -1989,7 +1992,7 @@ func TestBrandSections2(t *testing.T) {
 
 			res, err := client.GetBrandSections(
 				ctx,
-				&GetBrandSectionsRequest{Language: "en", ItemId: brandID},
+				&GetBrandSectionsRequest{Language: schema.EnglishLanguageCode, ItemId: brandID},
 			)
 			require.NoError(t, err)
 
@@ -2305,7 +2308,7 @@ func TestItemFields(t *testing.T) {
 			bearerPrefix+adminToken.AccessToken,
 		),
 		&ItemsRequest{
-			Language: "ru",
+			Language: schema.RussianLanguageCode,
 			Fields: &ItemFields{
 				AltNames:                   true,
 				AcceptedPicturesCount:      true,
@@ -2382,7 +2385,7 @@ func TestItemParentFields(t *testing.T) {
 			bearerPrefix+adminToken.AccessToken,
 		),
 		&ItemParentsRequest{
-			Language: "ru",
+			Language: schema.RussianLanguageCode,
 			Fields: &ItemParentFields{
 				Item: &ItemFields{
 					AcceptedPicturesCount:   true,
@@ -2544,7 +2547,7 @@ func TestPersonPreviewPictures(t *testing.T) {
 				},
 			},
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    10,
 		Options: &ItemListOptions{
 			Id: personID,
@@ -2648,7 +2651,7 @@ func TestCutawayAuthorsWithPreviewPictures(t *testing.T) {
 				},
 			},
 		},
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 		Limit:    12,
 		Options: &ItemListOptions{
 			Id: personID,
@@ -2714,7 +2717,7 @@ func TestItemOfDayPicture(t *testing.T) {
 			bearerPrefix+adminToken.AccessToken,
 		),
 		&ItemRequest{
-			Language: "ru",
+			Language: schema.RussianLanguageCode,
 			Fields:   &ItemFields{ItemOfDayPictures: true},
 			Id:       vehicleID,
 		},
@@ -2847,7 +2850,10 @@ func TestGetTopSpecsContributions(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	res, err := client.GetTopSpecsContributions(ctx, &TopSpecsContributionsRequest{Language: "ru"})
+	res, err := client.GetTopSpecsContributions(
+		ctx,
+		&TopSpecsContributionsRequest{Language: schema.RussianLanguageCode},
+	)
 	require.NoError(t, err)
 	require.NotEmpty(t, res.GetItems())
 }
@@ -2935,7 +2941,7 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 				EngineVehicles:      &ItemsRequest{},
 				EngineVehiclesCount: true,
 			},
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -2990,7 +2996,7 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 				EngineVehicles:      &ItemsRequest{},
 				EngineVehiclesCount: true,
 			},
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
@@ -3054,7 +3060,7 @@ func TestBrandSectionLanguageName(t *testing.T) {
 		&ItemParentLanguage{
 			ItemId:   vehicleID,
 			ParentId: brandID,
-			Language: "ru",
+			Language: schema.RussianLanguageCode,
 			Name:     "Azazaza",
 		},
 	)
@@ -3069,7 +3075,7 @@ func TestBrandSectionLanguageName(t *testing.T) {
 		&ItemParentLanguage{
 			ItemId:   vehicleID,
 			ParentId: brandID,
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 			Name:     "Custom name",
 		},
 	)
@@ -3090,7 +3096,7 @@ func TestBrandSectionLanguageName(t *testing.T) {
 
 	res, err := client.GetBrandSections(
 		ctx,
-		&GetBrandSectionsRequest{Language: "en", ItemId: brandID},
+		&GetBrandSectionsRequest{Language: schema.EnglishLanguageCode, ItemId: brandID},
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, res.GetSections()[2].GetGroups())
@@ -4425,7 +4431,7 @@ func TestGetTree(t *testing.T) {
 		EndYear:    2000,
 	})
 
-	res, err := client.GetTree(apiCtx, &GetTreeRequest{Id: itemID, Language: "en"})
+	res, err := client.GetTree(apiCtx, &GetTreeRequest{Id: itemID, Language: schema.EnglishLanguageCode})
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
 }
@@ -4465,7 +4471,7 @@ func TestCreatedBrandIsGroup(t *testing.T) {
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
 	})
 
-	res, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Language: "en"})
+	res, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Language: schema.EnglishLanguageCode})
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
 	require.True(t, res.GetIsGroup())
@@ -4712,22 +4718,25 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 		FullName    string
 		NewFullName string
 		BrandName   string
+		RouterLink  []string
 	}{
 		{
-			Language:    "en",
+			Language:    schema.EnglishLanguageCode,
 			BrandName:   fmt.Sprintf("Lada %d", randomInt),
 			FullName:    fmt.Sprintf("Lada %d Kalina", randomInt),
 			Name:        "Kalina",
 			NewFullName: fmt.Sprintf("Lada %d Granta", randomInt),
 			NewName:     "Granta",
+			RouterLink:  []string{"/", brandCatname, "granta"},
 		},
 		{
-			Language:    "ru",
+			Language:    schema.RussianLanguageCode,
 			BrandName:   ruBrandName,
 			FullName:    ruName,
 			Name:        "Калина",
 			NewFullName: fmt.Sprintf("Лада %d Гранта", randomInt),
 			NewName:     "Гранта",
+			RouterLink:  nil,
 		},
 	}
 
@@ -4779,7 +4788,10 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 			for _, section := range sections.GetSections() {
 				for _, group := range section.GetGroups() {
 					require.Equal(t, testCase.NewName, group.GetName())
-					require.Equal(t, []string{"/", brandCatname, "granta"}, group.GetRouterLink())
+
+					if testCase.RouterLink != nil {
+						require.Equal(t, testCase.RouterLink, group.GetRouterLink())
+					}
 				}
 			}
 		})

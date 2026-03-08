@@ -1639,12 +1639,12 @@ func (s *ItemsGRPCServer) CreateItemParent(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	itemNameText, err := s.formatItemNameText(item, "en")
+	itemNameText, err := s.formatItemNameText(item, EventsDefaultLanguage)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	parentNameText, err := s.formatItemNameText(parentItem, "en")
+	parentNameText, err := s.formatItemNameText(parentItem, EventsDefaultLanguage)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -1767,12 +1767,12 @@ func (s *ItemsGRPCServer) DeleteItemParent(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	itemNameText, err := s.formatItemNameText(item, "en")
+	itemNameText, err := s.formatItemNameText(item, EventsDefaultLanguage)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	parentNameText, err := s.formatItemNameText(parent, "en")
+	parentNameText, err := s.formatItemNameText(parent, EventsDefaultLanguage)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -1838,7 +1838,7 @@ func (s *ItemsGRPCServer) MoveItemParent(
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 
-		itemNameText, err := s.formatItemNameText(item, "en")
+		itemNameText, err := s.formatItemNameText(item, EventsDefaultLanguage)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -1851,7 +1851,7 @@ func (s *ItemsGRPCServer) MoveItemParent(
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 
-		oldParentNameText, err := s.formatItemNameText(oldParent, "en")
+		oldParentNameText, err := s.formatItemNameText(oldParent, EventsDefaultLanguage)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -1865,7 +1865,7 @@ func (s *ItemsGRPCServer) MoveItemParent(
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 
-		newParentNameText, err := s.formatItemNameText(newParent, "en")
+		newParentNameText, err := s.formatItemNameText(newParent, EventsDefaultLanguage)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -2496,7 +2496,7 @@ func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *APIItem) (*ItemID,
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	itemNameText, err := s.formatItemNameText(item, "en")
+	itemNameText, err := s.formatItemNameText(item, EventsDefaultLanguage)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

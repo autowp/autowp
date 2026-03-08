@@ -465,8 +465,8 @@ func (s *Repository) EnsureUserImported(
 
 	language, ok := s.languages[locale]
 	if !ok {
-		locale = "en"
-		language, ok = s.languages["en"]
+		locale = schema.EnglishLanguageCode
+		language, ok = s.languages[schema.EnglishLanguageCode]
 	}
 
 	if !ok {

@@ -358,7 +358,7 @@ func TestUpdateUser(t *testing.T) {
 			User: &APIUser{
 				Id:       me.GetId(),
 				Timezone: "Europe/Dublin",
-				Language: "ru",
+				Language: schema.RussianLanguageCode,
 			},
 			UpdateMask: &fieldmaskpb.FieldMask{
 				Paths: []string{"language", "timezone"},
@@ -373,5 +373,5 @@ func TestUpdateUser(t *testing.T) {
 	)
 	require.NoError(t, err)
 	require.Equal(t, "Europe/Dublin", res.GetTimezone())
-	require.Equal(t, "ru", res.GetLanguage())
+	require.Equal(t, schema.RussianLanguageCode, res.GetLanguage())
 }

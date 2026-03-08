@@ -342,7 +342,7 @@ func (s *PicturesREST) detectLanguage(ctx *gin.Context) (string, error) {
 		return "", err
 	}
 
-	lang := "en"
+	lang := schema.EnglishLanguageCode
 
 	if len(tags) > 0 {
 		base, _ := tags[0].Base()

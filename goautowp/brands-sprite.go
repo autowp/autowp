@@ -92,7 +92,7 @@ func createIconsSprite(
 	list, _, err := repository.List(ctx, &query.ItemListOptions{
 		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
 		HasLogo:  true,
-		Language: "en",
+		Language: schema.EnglishLanguageCode,
 	}, nil, items.OrderByName, false)
 	if err != nil {
 		return err

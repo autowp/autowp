@@ -863,7 +863,7 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 
 			// rating
 			res, err := client.GetItems(ctx, &MostsItemsRequest{
-				Language:      "en",
+				Language:      schema.EnglishLanguageCode,
 				YearsCatname:  "1930-39",
 				RatingCatname: tt.ratingCatname,
 				BrandId:       brandID,

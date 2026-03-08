@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/schema"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -127,7 +128,7 @@ func TestPicturesRating(t *testing.T) {
 	for _, item := range r.GetUsers() {
 		_, err = client.GetUserPicturesRatingBrands(ctx, &UserRatingDetailsRequest{
 			UserId:   item.GetUserId(),
-			Language: "en",
+			Language: schema.EnglishLanguageCode,
 		})
 		require.NoError(t, err)
 	}

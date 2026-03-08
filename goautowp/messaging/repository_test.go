@@ -167,7 +167,7 @@ func createRandomUser(t *testing.T, s *Repository) int64 {
 			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
 			schema.UserTableTimezoneColName:       "Europe/Moscow",
 			schema.UserTableLastIPColName:         goqu.Func("INET6_ATON", "127.0.0.1"),
-			schema.UserTableLanguageColName:       "en",
+			schema.UserTableLanguageColName:       schema.EnglishLanguageCode,
 			schema.UserTableUUIDColName:           goqu.Func("UUID_TO_BIN", uuid.New().String()),
 		}).
 		Executor().ExecContext(t.Context())

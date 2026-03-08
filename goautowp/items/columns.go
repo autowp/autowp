@@ -212,7 +212,7 @@ func (s NameDefaultColumn) SelectExpr(alias string, lang string) (AliaseableExpr
 					il1AliasTable.Col(schema.ItemLanguageTableItemIDColName).
 						Eq(goqu.T(alias).Col(schema.ItemTableIDColName)),
 					il1AliasTable.Col(schema.ItemLanguageTableLanguageColName).
-						Eq(DefaultLanguageCode),
+						Eq(schema.DefaultLanguageCode),
 				).
 				Limit(1),
 			goqu.V(""),

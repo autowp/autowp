@@ -566,7 +566,7 @@ func (s *ItemParentLanguageRepository) getName(ctx context.Context, itemID int64
 	if !ok {
 		logrus.Warnf("unexpected language code `%s`", lang)
 
-		langPriority, ok = languagePriority[DefaultLanguageCode]
+		langPriority, ok = languagePriority[schema.DefaultLanguageCode]
 	}
 
 	if !ok {

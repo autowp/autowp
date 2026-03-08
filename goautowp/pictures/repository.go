@@ -1820,7 +1820,7 @@ func (s *Repository) FileNamePattern(ctx context.Context, pictureID int64) (stri
 		nameCol          = items.NameOnlyColumn{DB: s.db}
 	)
 
-	nameColExpr, err := nameCol.SelectExpr(schema.ItemTableName, "en")
+	nameColExpr, err := nameCol.SelectExpr(schema.ItemTableName, schema.CatnameLanguageCode)
 	if err != nil {
 		return "", err
 	}

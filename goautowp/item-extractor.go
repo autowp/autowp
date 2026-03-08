@@ -129,7 +129,7 @@ func (s *ItemExtractor) ExtractRows(
 			resultRow.Name, err = itemRepository.LanguageName(
 				ctx,
 				row.ID,
-				items.DefaultLanguageCode,
+				schema.DefaultLanguageCode,
 			)
 			if err != nil {
 				return nil, err
@@ -492,7 +492,7 @@ func (s *ItemExtractor) extractPlain( //nolint: maintidx
 			ctx,
 			&query.ItemLanguageListOptions{
 				ItemID:          row.ID,
-				ExcludeLanguage: items.DefaultLanguageCode,
+				ExcludeLanguage: schema.DefaultLanguageCode,
 			},
 		)
 		if err != nil {
@@ -1477,7 +1477,7 @@ func (s *ItemExtractor) extractAltNames(
 	currentLangName := ""
 
 	for clang, langName := range langNames {
-		if clang == items.DefaultLanguageCode {
+		if clang == schema.DefaultLanguageCode {
 			continue
 		}
 
