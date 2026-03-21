@@ -2371,7 +2371,7 @@ func (s *PicturesGRPCServer) notifyCopyrightsEdited(
 	}
 
 	editorRow, err := s.userRepository.User(
-		ctx, &query.UserListOptions{IDs: revUserIDs}, users.UserFields{}, users.OrderByNone,
+		ctx, &query.UserListOptions{ID: userID}, users.UserFields{}, users.OrderByNone,
 	)
 	if err != nil {
 		return err
