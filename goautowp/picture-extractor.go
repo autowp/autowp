@@ -465,10 +465,10 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetIsLast() {
-			isLastPicture := false
+			hasOtherPicture := true
 
 			if row.Status == schema.PictureStatusAccepted {
-				isLastPicture, err = picturesRepository.Exists(ctx, &query.PictureListOptions{
+				hasOtherPicture, err = picturesRepository.Exists(ctx, &query.PictureListOptions{
 					ExcludeID: row.ID,
 					Status:    schema.PictureStatusAccepted,
 					PictureItem: &query.PictureItemListOptions{
@@ -482,7 +482,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 				}
 			}
 
-			resultRow.IsLast = isLastPicture
+			resultRow.IsLast = !hasOtherPicture
 		}
 
 		if fields.GetModerVoted() && userCtx.UserID != 0 {
