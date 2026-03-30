@@ -465,7 +465,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
   }
 
   protected toggleConcepts() {
-    this.conceptsExpanded.set(!this.conceptsExpanded);
+    this.conceptsExpanded.set(!this.conceptsExpanded());
     return false;
   }
 }
