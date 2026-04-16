@@ -35,7 +35,7 @@ create table attrs_zones
   constraint attrs_zones_fk foreign key (item_type_id) references attrs_item_types (id)
 );
 
-create index item_type_id on attrs_zones (item_type_id);
+create index attrs_zones_item_type_id on attrs_zones (item_type_id);
 
 INSERT INTO attrs_zones (id, name, item_type_id) VALUES (3, 'Автобусы', 1);
 INSERT INTO attrs_zones (id, name, item_type_id) VALUES (2, 'Грузовые автомобили', 1);
@@ -91,9 +91,9 @@ create table attrs_attributes
   constraint attrs_attributes_fk2 foreign key (unit_id) references attrs_units (id)
 );
 
-create index parent_id on attrs_attributes (parent_id);
-create index type on attrs_attributes (type_id);
-create index unit_id on attrs_attributes (unit_id);
+create index attrs_attributes_parent_id on attrs_attributes (parent_id);
+create index attrs_attributes_type on attrs_attributes (type_id);
+create index attrs_attributes_unit_id on attrs_attributes (unit_id);
 
 ALTER TABLE attrs_attributes DISABLE TRIGGER ALL;
 INSERT INTO attrs_attributes (id, name, type_id, parent_id, unit_id, description, precision, position, multiple) VALUES (1, 'specs/attrs/14/17/1', 2, 17, 1, null, null, 1, false);
