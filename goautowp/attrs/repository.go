@@ -211,7 +211,7 @@ func (s *Repository) Attributes(
 
 func (s *Repository) AttributeTypes(ctx context.Context) ([]schema.AttrsAttributeTypeRow, error) {
 	r := make([]schema.AttrsAttributeTypeRow, 0)
-	err := s.db.Select(schema.AttrsTypesTableIDCol, schema.AttrsTypesTableNameCol).
+	err := s.pgDB.Select(schema.AttrsTypesTableIDCol, schema.AttrsTypesTableNameCol).
 		From(schema.AttrsTypesTable).
 		ScanStructsContext(ctx, &r)
 
@@ -222,7 +222,7 @@ func (s *Repository) ListOptions(
 	ctx context.Context,
 	attributeID int64,
 ) ([]schema.AttrsListOptionRow, error) {
-	sqSelect := s.db.Select(schema.AttrsListOptionsTableIDCol, schema.AttrsListOptionsTableNameCol,
+	sqSelect := s.pgDB.Select(schema.AttrsListOptionsTableIDCol, schema.AttrsListOptionsTableNameCol,
 		schema.AttrsListOptionsTableAttributeIDCol, schema.AttrsListOptionsTableParentIDCol).
 		From(schema.AttrsListOptionsTable).
 		Order(schema.AttrsListOptionsTablePositionCol.Asc())
@@ -262,7 +262,7 @@ func (s *Repository) ZoneAttributes(
 	zoneID int64,
 ) ([]schema.AttrsZoneAttributeRow, error) {
 	attrs := make([]schema.AttrsZoneAttributeRow, 0)
-	err := s.db.Select(schema.AttrsZoneAttributesTableZoneIDCol, schema.AttrsZoneAttributesTableAttributeIDCol).
+	err := s.pgDB.Select(schema.AttrsZoneAttributesTableZoneIDCol, schema.AttrsZoneAttributesTableAttributeIDCol).
 		From(schema.AttrsZoneAttributesTable).
 		Where(schema.AttrsZoneAttributesTableZoneIDCol.Eq(zoneID)).
 		ScanStructsContext(ctx, &attrs)
@@ -272,7 +272,7 @@ func (s *Repository) ZoneAttributes(
 
 func (s *Repository) Zones(ctx context.Context) ([]schema.AttrsZoneRow, error) {
 	r := make([]schema.AttrsZoneRow, 0)
-	err := s.db.Select(schema.AttrsZonesTableIDCol, schema.AttrsZonesTableNameCol).
+	err := s.pgDB.Select(schema.AttrsZonesTableIDCol, schema.AttrsZonesTableNameCol).
 		From(schema.AttrsZonesTable).
 		ScanStructsContext(ctx, &r)
 
@@ -291,7 +291,7 @@ func (s *Repository) TotalValues(ctx context.Context) (int32, error) {
 }
 
 func (s *Repository) TotalZoneAttrs(ctx context.Context, zoneID int64) (int32, error) {
-	sqSelect := s.db.From(schema.AttrsAttributesTable).
+	sqSelect := s.pgDB.From(schema.AttrsAttributesTable).
 		Join(
 			schema.AttrsZoneAttributesTable,
 			goqu.On(schema.AttrsAttributesTableIDCol.Eq(schema.AttrsZoneAttributesTableAttributeIDCol)),
@@ -1187,7 +1187,7 @@ func (s *Repository) SetUserValue( //nolint: maintidx
 
 		case schema.AttrsAttributeTypeIDList, schema.AttrsAttributeTypeIDTree:
 			if len(value.ListValue) > 0 {
-				sqSelect := s.db.Select(schema.AttrsListOptionsTableIDCol).
+				sqSelect := s.pgDB.Select(schema.AttrsListOptionsTableIDCol).
 					From(schema.AttrsListOptionsTable).
 					Where(
 						schema.AttrsListOptionsTableAttributeIDCol.Eq(attribute.ID),
@@ -1848,7 +1848,7 @@ func (s *Repository) loadZoneAttributesTree(ctx context.Context, zoneID int64) e
 	if _, ok := s.zoneAttributesTree[zoneID]; !ok {
 		tree := make(map[int64][]*schema.AttrsAttributeRow)
 
-		sqSelect := s.db.Select(schema.AttrsZoneAttributesTableAttributeIDCol).
+		sqSelect := s.pgDB.Select(schema.AttrsZoneAttributesTableAttributeIDCol).
 			From(schema.AttrsZoneAttributesTable).
 			Where(schema.AttrsZoneAttributesTableZoneIDCol.Eq(zoneID)).
 			Order(schema.AttrsZoneAttributesTablePositionCol.Asc())
@@ -1896,7 +1896,7 @@ func (s *Repository) loadAttributesTree(ctx context.Context) error {
 	if s.attributesTree == nil {
 		rows := make([]schema.AttrsAttributeRow, 0)
 
-		err := s.db.Select(
+		err := s.pgDB.Select(
 			schema.AttrsAttributesTableIDCol,
 			schema.AttrsAttributesTableNameCol,
 			schema.AttrsAttributesTableDescriptionCol,
@@ -2031,7 +2031,7 @@ func (s *Repository) unitsMap(ctx context.Context) (map[int64]schema.AttrsUnitRo
 	if len(s.units) == 0 {
 		rows := make([]schema.AttrsUnitRow, 0)
 
-		err := s.db.Select(schema.AttrsUnitsTableIDCol, schema.AttrsUnitsTableNameCol, schema.AttrsUnitsTableAbbrCol).
+		err := s.pgDB.Select(schema.AttrsUnitsTableIDCol, schema.AttrsUnitsTableNameCol, schema.AttrsUnitsTableAbbrCol).
 			From(schema.AttrsUnitsTable).
 			ScanStructsContext(ctx, &rows)
 		if err != nil {
@@ -2148,7 +2148,7 @@ func (s *Repository) loadListOptions(ctx context.Context) error {
 
 	var rows []schema.AttrsListOptionRow
 
-	err := s.db.Select(
+	err := s.pgDB.Select(
 		schema.AttrsListOptionsTableAttributeIDCol,
 		schema.AttrsListOptionsTableIDCol,
 		schema.AttrsListOptionsTableParentIDCol,
@@ -2383,7 +2383,7 @@ func (s *Repository) getEngineAttributeIDs(ctx context.Context) ([]int64, error)
 		return s.engineAttributes, nil
 	}
 
-	err := s.db.Select(schema.AttrsZoneAttributesTableAttributeIDCol).
+	err := s.pgDB.Select(schema.AttrsZoneAttributesTableAttributeIDCol).
 		From(schema.AttrsZoneAttributesTable).
 		Where(schema.AttrsZoneAttributesTableZoneIDCol.Eq(engineZoneID)).
 		ScanValsContext(ctx, &s.engineAttributes)
