@@ -16,5 +16,5 @@ var (
 	ArticleTableAddDateCol         = ArticleTable.Col("add_date")
 	ArticleTablePreviewFilenameCol = ArticleTable.Col("preview_filename")
 	ArticleTableDescriptionCol     = ArticleTable.Col("description")
-	ArticleTableHTMLIDCol          = ArticleTable.Col("html_id")
+	ArticleTableHTMLCol            = ArticleTable.Col("html")
 )

@@ -129,10 +129,9 @@ func (s *ArticlesGRPCServer) GetItemByCatname(
 	success, err := s.db.Select(
 		schema.ArticleTableIDCol, schema.ArticleTableNameCol, schema.ArticleTableAuthorIDCol,
 		schema.ArticleTableCatnameCol, schema.ArticleTableAddDateCol, schema.ArticleTablePreviewFilenameCol,
-		schema.HtmlsTableHTMLCol,
+		schema.ArticleTableHTMLCol,
 	).
 		From(schema.ArticleTable).
-		LeftJoin(schema.HtmlsTable, goqu.On(schema.ArticleTableHTMLIDCol.Eq(schema.HtmlsTableIDCol))).
 		Where(schema.ArticleTableEnabledCol, schema.ArticleTableCatnameCol.Eq(in.GetCatname())).
 		ScanStructContext(ctx, &article)
 	if err != nil {
