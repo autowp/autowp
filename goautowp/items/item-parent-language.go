@@ -16,6 +16,7 @@ import (
 
 type ItemParentLanguageRepository struct {
 	db               *goqu.Database
+	pgDB             *goqu.Database
 	contentLanguages []string
 }
 
@@ -50,8 +51,12 @@ func yearsPrefix(begin int32, end int32) string {
 	return fmt.Sprintf("%d–xx", begin)
 }
 
-func NewItemParentLanguageRepository(db *goqu.Database, contentLanguages []string) *ItemParentLanguageRepository {
-	return &ItemParentLanguageRepository{db: db, contentLanguages: contentLanguages}
+func NewItemParentLanguageRepository(
+	db *goqu.Database,
+	pgDB *goqu.Database,
+	contentLanguages []string,
+) *ItemParentLanguageRepository {
+	return &ItemParentLanguageRepository{db: db, pgDB: pgDB, contentLanguages: contentLanguages}
 }
 
 func (s *ItemParentLanguageRepository) RefreshItemParentLanguage(
@@ -377,7 +382,7 @@ func (s *ItemParentLanguageRepository) ExtractName(
 		if specsDifferent {
 			specShortName := ""
 
-			success, err := s.db.Select(schema.SpecTableShortNameCol).From(schema.SpecTable).
+			success, err := s.pgDB.Select(schema.SpecTableShortNameCol).From(schema.SpecTable).
 				Where(schema.SpecTableIDCol.Eq(vehicleRow.SpecID.Int32)).
 				ScanValContext(ctx, &specShortName)
 			if err != nil {

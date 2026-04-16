@@ -91,6 +91,7 @@ type I18nUnit struct {
 // Repository Main Object.
 type Repository struct {
 	db                      *goqu.Database
+	pgDB                    *goqu.Database
 	i18n                    *i18nbundle.I18n
 	listOptions             map[int64]map[int64]string
 	listOptionsMutex        sync.Mutex
@@ -115,6 +116,7 @@ type Repository struct {
 // NewRepository constructor.
 func NewRepository(
 	db *goqu.Database,
+	pgDB *goqu.Database,
 	i18n *i18nbundle.I18n,
 	itemsRepository *items.Repository,
 	picturesRepository *pictures.Repository,
@@ -122,6 +124,7 @@ func NewRepository(
 ) *Repository {
 	return &Repository{
 		db:                      db,
+		pgDB:                    pgDB,
 		i18n:                    i18n,
 		listOptions:             make(map[int64]map[int64]string),
 		listOptionsMutex:        sync.Mutex{},
@@ -3831,7 +3834,7 @@ func (s *Repository) flatternAttributes(attributes []*AttributeRow) []*Attribute
 func (s *Repository) specIDs(ctx context.Context, id int32) ([]int32, error) {
 	var ids []int32 //nolint: prealloc
 
-	err := s.db.Select(schema.SpecTableIDCol).
+	err := s.pgDB.Select(schema.SpecTableIDCol).
 		From(schema.SpecTable).
 		Where(schema.SpecTableParentIDCol.Eq(id)).
 		ScanValsContext(ctx, &ids)

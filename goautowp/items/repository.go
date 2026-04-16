@@ -202,6 +202,7 @@ const (
 // Repository Main Object.
 type Repository struct {
 	db                               *goqu.Database
+	pgDB                             *goqu.Database
 	mostsMinCarsCount                int
 	descendantsCountColumn           *DescendantsCountColumn
 	newDescendantsCountColumn        *NewDescendantsCountColumn
@@ -316,6 +317,7 @@ type ItemParentLanguage struct {
 // NewRepository constructor.
 func NewRepository(
 	db *goqu.Database,
+	pgDB *goqu.Database,
 	mostsMinCarsCount int,
 	itemParentLanguageRepository *ItemParentLanguageRepository,
 	textStorageRepository *textstorage.Repository,
@@ -323,6 +325,7 @@ func NewRepository(
 ) *Repository {
 	return &Repository{
 		db:                               db,
+		pgDB:                             pgDB,
 		mostsMinCarsCount:                mostsMinCarsCount,
 		descendantsCountColumn:           &DescendantsCountColumn{db: db},
 		newDescendantsCountColumn:        &NewDescendantsCountColumn{db: db},
@@ -3057,7 +3060,7 @@ func (s *Repository) CreateItem(
 func (s *Repository) SpecExists(ctx context.Context, specID int32) (bool, error) {
 	var exists bool
 
-	success, err := s.db.Select(goqu.V(true)).
+	success, err := s.pgDB.Select(goqu.V(true)).
 		From(schema.SpecTable).
 		Where(schema.SpecTableIDCol.Eq(specID)).
 		ScanValContext(ctx, &exists)
@@ -3232,7 +3235,7 @@ func (s *Repository) UpdateItem(
 func (s *Repository) Spec(ctx context.Context, id int32) (*schema.SpecRow, error) {
 	var st schema.SpecRow
 
-	success, err := s.db.Select(schema.SpecTableIDCol, schema.SpecTableNameCol, schema.SpecTableShortNameCol).
+	success, err := s.pgDB.Select(schema.SpecTableIDCol, schema.SpecTableNameCol, schema.SpecTableShortNameCol).
 		From(schema.SpecTable).
 		Where(schema.SpecTableIDCol.Eq(id)).
 		ScanStructContext(ctx, &st)

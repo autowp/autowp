@@ -63,9 +63,10 @@ func TestInboxCommand(t *testing.T) {
 		imageStorage,
 	)
 	textStorageRepo := textstorage.New(goquDB)
-	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, goquPostgresDB, cfg.ContentLanguages)
 	itemRepo := items.NewRepository(
 		goquDB,
+		goquPostgresDB,
 		cfg.MostsMinCarsCount,
 		itemParentLanguageRepository,
 		textStorageRepo,

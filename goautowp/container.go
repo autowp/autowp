@@ -270,7 +270,12 @@ func (s *Container) Catalogue(ctx context.Context) (*Catalogue, error) {
 			return nil, err
 		}
 
-		s.catalogue, err = NewCatalogue(db)
+		pgDB, err := s.GoquPostgresDB(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.catalogue, err = NewCatalogue(db, pgDB)
 		if err != nil {
 			return nil, err
 		}
@@ -336,6 +341,11 @@ func (s *Container) Config() config.Config {
 
 func (s *Container) AttrsRepository(ctx context.Context) (*attrs.Repository, error) {
 	if s.attrsRepository == nil {
+		pgDB, err := s.GoquPostgresDB(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
@@ -361,7 +371,7 @@ func (s *Container) AttrsRepository(ctx context.Context) (*attrs.Repository, err
 			return nil, err
 		}
 
-		s.attrsRepository = attrs.NewRepository(db, i18n, itemsRepository, picturesRepository, is)
+		s.attrsRepository = attrs.NewRepository(db, pgDB, i18n, itemsRepository, picturesRepository, is)
 	}
 
 	return s.attrsRepository, nil
@@ -991,6 +1001,11 @@ func (s *Container) ItemsRepository(ctx context.Context) (*items.Repository, err
 			return nil, err
 		}
 
+		goquPgDB, err := s.GoquPostgresDB(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		cfg := s.Config()
 
 		textStorageRepository, err := s.TextStorageRepository(ctx)
@@ -1010,6 +1025,7 @@ func (s *Container) ItemsRepository(ctx context.Context) (*items.Repository, err
 
 		s.itemsRepository = items.NewRepository(
 			db,
+			goquPgDB,
 			cfg.MostsMinCarsCount,
 			itemParentLanguageRepository,
 			textStorageRepository,
@@ -1027,8 +1043,14 @@ func (s *Container) ItemParentLanguageRepository(ctx context.Context) (*items.It
 			return nil, err
 		}
 
+		pgDB, err := s.GoquPostgresDB(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.itemParentLanguageRepository = items.NewItemParentLanguageRepository(
 			db,
+			pgDB,
 			s.Config().ContentLanguages,
 		)
 	}

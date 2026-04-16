@@ -14,17 +14,23 @@ var errDatabaseConnectionIsNil = errors.New("database connection is nil")
 
 // Catalogue service.
 type Catalogue struct {
-	db *goqu.Database
+	db   *goqu.Database
+	pgDB *goqu.Database
 }
 
 // NewCatalogue constructor.
-func NewCatalogue(db *goqu.Database) (*Catalogue, error) {
+func NewCatalogue(db *goqu.Database, pgDB *goqu.Database) (*Catalogue, error) {
 	if db == nil {
 		return nil, errDatabaseConnectionIsNil
 	}
 
+	if pgDB == nil {
+		return nil, errDatabaseConnectionIsNil
+	}
+
 	return &Catalogue{
-		db: db,
+		db:   db,
+		pgDB: pgDB,
 	}, nil
 }
 
@@ -75,7 +81,7 @@ func (s *Catalogue) getVehicleTypesTree(
 }
 
 func (s *Catalogue) getSpecs(ctx context.Context, parentID int32) ([]*Spec, error) {
-	sqSelect := s.db.Select(schema.SpecTableIDCol, schema.SpecTableNameCol, schema.SpecTableShortNameCol).
+	sqSelect := s.pgDB.Select(schema.SpecTableIDCol, schema.SpecTableNameCol, schema.SpecTableShortNameCol).
 		From(schema.SpecTable).
 		Order(schema.SpecTableNameCol.Asc())
 

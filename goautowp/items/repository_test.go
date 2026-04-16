@@ -29,16 +29,21 @@ func TestTopBrandsListRuZh(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -81,16 +86,21 @@ func TestListFilters(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -137,16 +147,21 @@ func TestGetItemsNameAndCatnameShouldNotBeOmittedWhenDescendantsCountRequested(t
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -204,16 +219,21 @@ func TestGetUserPicturesBrands(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
 	userID := createRandomUser(ctx, t, goquDB)
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -301,7 +321,11 @@ func TestPaginator(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
@@ -311,7 +335,7 @@ func TestPaginator(t *testing.T) {
 	name := "TestPaginator" + strconv.Itoa(int(random.Uint32()%100000))
 
 	for i := range 10 {
-		CreateItem(t, goquDB, schema.ItemRow{
+		CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 			Name:            name + "_" + strconv.Itoa(i),
 			Body:            "",
@@ -319,9 +343,10 @@ func TestPaginator(t *testing.T) {
 		})
 	}
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -349,15 +374,20 @@ func TestOrderByDescendantsCount(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -366,7 +396,7 @@ func TestOrderByDescendantsCount(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	name := "TestOrderByDescendantsCount" + strconv.Itoa(int(random.Uint32()%100000))
-	itemID := CreateItem(t, goquDB, schema.ItemRow{
+	itemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 		Name:            name,
 		Body:            "",
@@ -375,7 +405,7 @@ func TestOrderByDescendantsCount(t *testing.T) {
 	})
 
 	subName := name + "sub"
-	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+	subItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 		Name:            subName,
 		Body:            "",
@@ -395,7 +425,7 @@ func TestOrderByDescendantsCount(t *testing.T) {
 
 	for i := range 10 {
 		subSubName := name + "_" + strconv.Itoa(i)
-		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+		subSubItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 			Name:            subSubName,
 			Body:            "",
@@ -473,15 +503,20 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -491,7 +526,7 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	name := "TestOrderByOrderByDescendantPicturesCount" + strconv.Itoa(int(random.Uint32()%100000))
 	userID := createRandomUser(ctx, t, goquDB)
-	itemID := CreateItem(t, goquDB, schema.ItemRow{
+	itemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 		Name:            name,
 		Body:            "",
@@ -500,7 +535,7 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 	})
 
 	subName := name + "sub"
-	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+	subItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 		Name:            subName,
 		Body:            "",
@@ -520,7 +555,7 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 
 	for i := range 10 {
 		subSubName := name + "_" + strconv.Itoa(i)
-		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+		subSubItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 			Name:            subSubName,
 			Body:            "",
@@ -631,15 +666,20 @@ func TestOrderByAddDatetime(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -648,7 +688,7 @@ func TestOrderByAddDatetime(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	name := "TestOrderByAddDatetime" + strconv.Itoa(int(random.Uint32()%100000))
-	itemID := CreateItem(t, goquDB, schema.ItemRow{
+	itemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 		Name:            name,
 		Body:            "",
@@ -657,7 +697,7 @@ func TestOrderByAddDatetime(t *testing.T) {
 	})
 
 	subName := name + "sub"
-	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+	subItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 		Name:            subName,
 		Body:            "",
@@ -677,7 +717,7 @@ func TestOrderByAddDatetime(t *testing.T) {
 
 	for i := range 10 {
 		subSubName := name + "_" + strconv.Itoa(i)
-		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+		subSubItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 			Name:            subSubName,
 			Body:            "",
@@ -727,15 +767,20 @@ func TestOrderByName(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -744,7 +789,7 @@ func TestOrderByName(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	name := "TestOrderByName" + strconv.Itoa(int(random.Uint32()%100000))
-	itemID := CreateItem(t, goquDB, schema.ItemRow{
+	itemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 		Name:            "a" + name,
 		Body:            "",
@@ -753,7 +798,7 @@ func TestOrderByName(t *testing.T) {
 	})
 
 	subName := "b" + name + "sub"
-	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+	subItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 		Name:            subName,
 		Body:            "",
@@ -773,7 +818,7 @@ func TestOrderByName(t *testing.T) {
 
 	for i := range 10 {
 		subSubName := "c" + name + "_" + strconv.Itoa(i)
-		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+		subSubItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 			Name:            subSubName,
 			Body:            "",
@@ -851,15 +896,20 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -869,7 +919,7 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	name := "TestOrderByDescendantsParentsCount" + strconv.Itoa(int(random.Uint32()%100000))
 
-	itemID := CreateItem(t, goquDB, schema.ItemRow{
+	itemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 		Name:            name,
 		Body:            "",
@@ -878,7 +928,7 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 	})
 
 	subName := name + "sub"
-	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+	subItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 		Name:            subName,
 		Body:            "",
@@ -898,7 +948,7 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 
 	for i := range 10 {
 		subSubName := name + "_" + strconv.Itoa(i)
-		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+		subSubItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 			Name:            subSubName,
 			Body:            "",
@@ -913,7 +963,7 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 
 		// add parent
 		subSubParentName := name + "_" + strconv.Itoa(i) + "_parent"
-		subSubParentItemID := CreateItem(t, goquDB, schema.ItemRow{
+		subSubParentItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDTwins,
 			Name:            subSubParentName,
 			Body:            "",
@@ -1010,15 +1060,20 @@ func TestOrderByStarCount(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	ctx := t.Context()
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -1028,7 +1083,7 @@ func TestOrderByStarCount(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	name := "TestOrderByStarCount" + strconv.Itoa(int(random.Uint32()%100000))
 
-	itemID := CreateItem(t, goquDB, schema.ItemRow{
+	itemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 		Name:            name,
 		Body:            "",
@@ -1037,7 +1092,7 @@ func TestOrderByStarCount(t *testing.T) {
 	})
 
 	subName := name + "sub"
-	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+	subItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 		Name:            subName,
 		Body:            "",
@@ -1057,7 +1112,7 @@ func TestOrderByStarCount(t *testing.T) {
 
 	for i := range 10 {
 		subSubName := name + "_" + strconv.Itoa(i)
-		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+		subSubItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 			Name:            subSubName,
 			Body:            "",
@@ -1107,13 +1162,18 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 	ctx := t.Context()
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),
@@ -1122,7 +1182,7 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	name := "TestOrderByItemParentParentTimestamp" + strconv.Itoa(int(random.Uint32()%100000))
-	itemID := CreateItem(t, goquDB, schema.ItemRow{
+	itemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 		Name:            name,
 		Body:            "",
@@ -1131,7 +1191,7 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 	})
 
 	subName := name + "sub"
-	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+	subItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 		Name:            subName,
 		Body:            "",
@@ -1151,7 +1211,7 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 
 	for i := range 10 {
 		subSubName := name + "_" + strconv.Itoa(i)
-		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+		subSubItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 			Name:            subSubName,
 			Body:            "",
@@ -1166,7 +1226,7 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 
 		// add parent
 		subSubParentName := name + "_" + strconv.Itoa(i) + "_parent"
-		subSubParentItemID := CreateItem(t, goquDB, schema.ItemRow{
+		subSubParentItemID := CreateItem(t, goquDB, goquPgDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDTwins,
 			Name:            subSubParentName,
 			Body:            "",
@@ -1208,7 +1268,7 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 	require.Nil(t, pages)
 }
 
-func CreateItem(t *testing.T, goquDB *goqu.Database, row schema.ItemRow) int64 {
+func CreateItem(t *testing.T, goquDB *goqu.Database, goquPgDB *goqu.Database, row schema.ItemRow) int64 {
 	t.Helper()
 
 	ctx := t.Context()
@@ -1216,9 +1276,10 @@ func CreateItem(t *testing.T, goquDB *goqu.Database, row schema.ItemRow) int64 {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	repository := NewRepository(
 		goquDB,
+		goquPgDB,
 		200,
 		itemParentLanguageRepository,
 		textstorage.New(goquDB),

@@ -62,15 +62,20 @@ func repository(t *testing.T) (*goqu.Database, *Repository) {
 	db, err := sql.Open("mysql", cfg.AutowpDSN)
 	require.NoError(t, err)
 
+	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
 	goquDB := goqu.New("mysql", db)
+	goquPgDB := goqu.New("postgres", postgresDB)
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
 	textStorage := textstorage.New(goquDB)
-	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
 	itemsRepo := items.NewRepository(
 		goquDB,
+		goquPgDB,
 		cfg.MostsMinCarsCount,
 		itemParentLanguageRepository,
 		textStorage,
