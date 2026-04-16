@@ -127,7 +127,7 @@ func (s *Catalogue) getPerspectiveGroups(
 	ctx context.Context,
 	pageID int32,
 ) ([]*PerspectiveGroup, error) {
-	sqSelect := s.db.Select(schema.PerspectivesGroupsTableIDCol, schema.PerspectivesGroupsTableNameCol).
+	sqSelect := s.pgDB.Select(schema.PerspectivesGroupsTableIDCol, schema.PerspectivesGroupsTableNameCol).
 		From(schema.PerspectivesGroupsTable).
 		Where(schema.PerspectivesGroupsTablePageIDCol.Eq(pageID)).
 		Order(schema.PerspectivesGroupsTablePositionCol.Asc())
@@ -176,7 +176,7 @@ func (s *Catalogue) getPerspectiveGroups(
 }
 
 func (s *Catalogue) getPerspectivePages(ctx context.Context) ([]*PerspectivePage, error) {
-	sqSelect := s.db.Select(schema.PerspectivesPagesTableIDCol, schema.PerspectivesPagesTableNameCol).
+	sqSelect := s.pgDB.Select(schema.PerspectivesPagesTableIDCol, schema.PerspectivesPagesTableNameCol).
 		From(schema.PerspectivesPagesTable).
 		Order(schema.PerspectivesPagesTableIDCol.Asc())
 
@@ -224,7 +224,7 @@ func (s *Catalogue) getPerspectivePages(ctx context.Context) ([]*PerspectivePage
 }
 
 func (s *Catalogue) getPerspectives(ctx context.Context, groupID *int32) ([]*Perspective, error) {
-	sqSelect := s.db.Select(schema.PerspectivesTableIDCol, schema.PerspectivesTableNameCol).
+	sqSelect := s.pgDB.Select(schema.PerspectivesTableIDCol, schema.PerspectivesTableNameCol).
 		From(schema.PerspectivesTable)
 
 	if groupID != nil {

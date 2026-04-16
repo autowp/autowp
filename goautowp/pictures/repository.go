@@ -107,6 +107,7 @@ type RatingFan struct {
 
 type Repository struct {
 	db                    *goqu.Database
+	pgDB                  *goqu.Database
 	imageStorage          *storage.Storage
 	textStorageRepository *textstorage.Repository
 	itemsRepository       *items.Repository
@@ -176,6 +177,7 @@ const (
 
 func NewRepository(
 	db *goqu.Database,
+	pgDB *goqu.Database,
 	imageStorage *storage.Storage,
 	textStorageRepository *textstorage.Repository,
 	itemsRepository *items.Repository,
@@ -184,6 +186,7 @@ func NewRepository(
 ) *Repository {
 	return &Repository{
 		db:                    db,
+		pgDB:                  pgDB,
 		imageStorage:          imageStorage,
 		textStorageRepository: textStorageRepository,
 		itemsRepository:       itemsRepository,
@@ -2655,7 +2658,7 @@ func (s *Repository) perspectivePageGroupIDs(
 ) ([]int32, error) {
 	var ids []int32
 
-	err := s.db.Select(schema.PerspectivesGroupsTableIDCol).
+	err := s.pgDB.Select(schema.PerspectivesGroupsTableIDCol).
 		From(schema.PerspectivesGroupsTable).
 		Where(schema.PerspectivesGroupsTablePageIDCol.Eq(pageID)).
 		Order(schema.PerspectivesGroupsTablePositionCol.Asc()).

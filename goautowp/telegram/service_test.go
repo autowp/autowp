@@ -84,6 +84,7 @@ func TestInboxCommand(t *testing.T) {
 	)
 	picturesRepo := pictures.NewRepository(
 		goquDB,
+		goquPostgresDB,
 		imageStorage,
 		textStorageRepo,
 		itemRepo,

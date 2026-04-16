@@ -461,6 +461,11 @@ func (s *Container) PicturesRepository(ctx context.Context) (*pictures.Repositor
 			return nil, err
 		}
 
+		pgDB, err := s.GoquPostgresDB(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		is, err := s.ImageStorage(ctx)
 		if err != nil {
 			return nil, err
@@ -479,7 +484,7 @@ func (s *Container) PicturesRepository(ctx context.Context) (*pictures.Repositor
 		cfg := s.Config()
 
 		s.picturesRepository = pictures.NewRepository(
-			db, is, textStorageRepository, itemsRepository, cfg.DuplicateFinder,
+			db, pgDB, is, textStorageRepository, itemsRepository, cfg.DuplicateFinder,
 			func(id int64) error {
 				commentsRepository, err := s.CommentsRepository(ctx)
 				if err != nil {

@@ -88,6 +88,7 @@ func repository(t *testing.T) (*goqu.Database, *Repository) {
 
 	return goquDB, NewRepository(
 		goquDB,
+		goquPgDB,
 		imageStorage,
 		textStorage,
 		itemsRepo,

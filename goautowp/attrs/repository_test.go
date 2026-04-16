@@ -52,6 +52,7 @@ func createRepository(t *testing.T) *Repository {
 
 	picturesRepository := pictures.NewRepository(
 		goquDB,
+		goquPgDB,
 		imageStorage,
 		textstorageRepository,
 		itemsRepository,
