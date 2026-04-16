@@ -465,8 +465,6 @@ values (1, 1, "First variant", 0, 1, "First variant text"),
 (2, 1, "Second variant", 0, 2, "Second variant text");
 /*!40000 ALTER TABLE `voting_variant` ENABLE KEYS */;
 
-insert into htmls (id, html) values (1, "Test html");
-
-insert into article ( `id`, `html_id`, `name`, `catname`, `last_editor_id`, `last_edit_date`, `add_date`, `author_id`,
+insert into article ( `id`, `html`, `name`, `catname`, `last_editor_id`, `last_edit_date`, `add_date`, `author_id`,
     `enabled`, `first_enabled_datetime`, `description`, `preview_width`, `preview_height`, `preview_filename`, `ratio`)
-values (1, 1, "Test article", "test-article", null, null, now(), null, 1, now(), "Test description", 100, 100, "test.jpg", 0);
+values (1, "Test html", "Test article", "test-article", null, null, now(), null, 1, now(), "Test description", 100, 100, "test.jpg", 0);
