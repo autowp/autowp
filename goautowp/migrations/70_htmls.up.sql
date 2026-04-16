@@ -1,4 +1,4 @@
-alter table article add column html longtext not null default '';
+alter table article add column html longtext not null;
 
 update article set html=(select html from htmls where id = article.html_id);
 
