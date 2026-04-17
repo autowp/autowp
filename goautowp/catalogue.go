@@ -38,7 +38,7 @@ func (s *Catalogue) getVehicleTypesTree(
 	ctx context.Context,
 	parentID int64,
 ) ([]*VehicleType, error) {
-	sqSelect := s.db.Select(schema.VehicleTypeTableIDCol, schema.VehicleTypeTableNameCol).
+	sqSelect := s.pgDB.Select(schema.VehicleTypeTableIDCol, schema.VehicleTypeTableNameCol).
 		From(schema.VehicleTypeTable).
 		Order(schema.VehicleTypeTablePositionCol.Asc())
 
