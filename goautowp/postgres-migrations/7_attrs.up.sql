@@ -87,7 +87,6 @@ create table attrs_attributes
   constraint attrs_attributes_unique_name unique (name, parent_id),
   constraint attrs_attributes_unique_position unique (position, parent_id),
   constraint attrs_attributes_fk foreign key (type_id) references attrs_types (id),
-  constraint attrs_attributes_fk1 foreign key (parent_id) references attrs_attributes (id),
   constraint attrs_attributes_fk2 foreign key (unit_id) references attrs_units (id)
 );
 
@@ -95,7 +94,6 @@ create index attrs_attributes_parent_id on attrs_attributes (parent_id);
 create index attrs_attributes_type on attrs_attributes (type_id);
 create index attrs_attributes_unit_id on attrs_attributes (unit_id);
 
-ALTER TABLE attrs_attributes DISABLE TRIGGER ALL;
 INSERT INTO attrs_attributes (id, name, type_id, parent_id, unit_id, description, precision, position, multiple) VALUES (1, 'specs/attrs/14/17/1', 2, 17, 1, null, null, 1, false);
 INSERT INTO attrs_attributes (id, name, type_id, parent_id, unit_id, description, precision, position, multiple) VALUES (2, 'specs/attrs/14/17/2', 2, 17, 1, null, null, 2, false);
 INSERT INTO attrs_attributes (id, name, type_id, parent_id, unit_id, description, precision, position, multiple) VALUES (3, 'specs/attrs/14/17/3', 2, 17, 1, null, null, 3, false);
@@ -315,7 +313,8 @@ INSERT INTO attrs_attributes (id, name, type_id, parent_id, unit_id, description
 INSERT INTO attrs_attributes (id, name, type_id, parent_id, unit_id, description, precision, position, multiple) VALUES (227, 'specs/attrs/transmission/gearbox/reverse-gears', 2, 42, null, '', null, 46, false);
 INSERT INTO attrs_attributes (id, name, type_id, parent_id, unit_id, description, precision, position, multiple) VALUES (228, 'specs/attrs/dynamic/max-reverse-speed', 3, 46, 8, '', 1, 48, false);
 INSERT INTO attrs_attributes (id, name, type_id, parent_id, unit_id, description, precision, position, multiple) VALUES (229, 'specs/attrs/wheels/auto-pumping-tires', 5, 84, null, '', null, 89, false);
-ALTER TABLE attrs_attributes ENABLE TRIGGER ALL;
+
+alter table attrs_attributes add constraint attrs_attributes_fk1 foreign key (parent_id) references attrs_attributes (id);
 
 
 create table attrs_zone_attributes

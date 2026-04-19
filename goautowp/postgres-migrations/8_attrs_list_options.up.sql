@@ -6,15 +6,12 @@ create table attrs_list_options
   position     int not null,
   parent_id    int null,
   constraint attrs_list_options_unique_position unique (position, attribute_id, parent_id),
-  constraint attrs_list_options_fk foreign key (attribute_id) references attrs_attributes (id),
-  constraint attrs_list_options_fk1 foreign key (parent_id) references attrs_list_options (id)
+  constraint attrs_list_options_fk foreign key (attribute_id) references attrs_attributes (id)
 );
 
 create index attrs_list_options_attribute_id on attrs_list_options (attribute_id);
-
 create index attrs_list_options_parent_id on attrs_list_options (parent_id);
 
-ALTER TABLE attrs_list_options DISABLE TRIGGER ALL;
 INSERT INTO attrs_list_options (id, attribute_id, name, position, parent_id) VALUES (1, 20, 'specs/attrs/22/19/20/options/1', 1, null);
 INSERT INTO attrs_list_options (id, attribute_id, name, position, parent_id) VALUES (2, 20, 'specs/attrs/22/19/20/options/2', 2, null);
 INSERT INTO attrs_list_options (id, attribute_id, name, position, parent_id) VALUES (3, 20, 'specs/attrs/22/19/20/options/3', 3, null);
@@ -236,4 +233,5 @@ INSERT INTO attrs_list_options (id, attribute_id, name, position, parent_id) VAL
 INSERT INTO attrs_list_options (id, attribute_id, name, position, parent_id) VALUES (220, 157, 'specs/attrs/157/options/euro-5a', 9, null);
 INSERT INTO attrs_list_options (id, attribute_id, name, position, parent_id) VALUES (221, 157, 'specs/attrs/157/options/euro-5b', 10, null);
 INSERT INTO attrs_list_options (id, attribute_id, name, position, parent_id) VALUES (222, 26, 'specs/attrs/22/24/26/options/x', 5, null);
-ALTER TABLE attrs_list_options ENABLE TRIGGER ALL;
+
+alter table attrs_list_options add constraint attrs_list_options_fk1 foreign key (parent_id) references attrs_list_options (id);

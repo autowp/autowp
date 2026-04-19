@@ -5,13 +5,11 @@ create table vehicle_type
   catname   varchar(20)      not null unique,
   name      varchar(35)      not null unique,
   position  int not null,
-  name_rp   varchar(50)      not null,
-  constraint vehicle_type_unique_position unique (position, parent_id)
+  name_rp   varchar(50)      not null
 );
 
 create index vehicle_type_parent_id on vehicle_type (parent_id);
 
-ALTER TABLE vehicle_type DISABLE TRIGGER ALL;
 INSERT INTO vehicle_type (id, parent_id, catname, name, position, name_rp) VALUES (1, 29, 'roadster', 'car-type/roadster', 1, 'car-type-rp/roadster');
 INSERT INTO vehicle_type (id, parent_id, catname, name, position, name_rp) VALUES (2, 29, 'spyder', 'car-type/spyder', 2, 'car-type-rp/spyder');
 INSERT INTO vehicle_type (id, parent_id, catname, name, position, name_rp) VALUES (3, null, 'cabriolet', 'car-type/cabriolet', 3, 'car-type-rp/cabriolet');
@@ -51,7 +49,8 @@ INSERT INTO vehicle_type (id, parent_id, catname, name, position, name_rp) VALUE
 INSERT INTO vehicle_type (id, parent_id, catname, name, position, name_rp) VALUES (44, null, 'tractor', 'car-type/tractor', 101, 'car-type-rp/tractor');
 INSERT INTO vehicle_type (id, parent_id, catname, name, position, name_rp) VALUES (45, null, 'tracked', 'car-type/tracked', 102, 'car-type-rp/tracked');
 INSERT INTO vehicle_type (id, parent_id, catname, name, position, name_rp) VALUES (46, 29, 'singleseater', 'car-type/singleseater', 3, 'car-type-rp/singleseater');
-ALTER TABLE vehicle_type ENABLE TRIGGER ALL;
+
+alter table vehicle_type add constraint vehicle_type_unique_position unique (position, parent_id);
 
 
 create table vehicle_type_parent

@@ -3,13 +3,11 @@ create table spec
   id         int primary key,
   name       varchar(50)  not null unique,
   short_name varchar(15)  not null unique,
-  parent_id  int null,
-  constraint spec_ibfk_1 foreign key (parent_id) references spec (id)
+  parent_id  int null
 );
 
 create index spec_parent_id on spec (parent_id);
 
-ALTER TABLE spec DISABLE TRIGGER ALL;
 INSERT INTO spec (id, name, short_name, parent_id) VALUES (1, 'United States & Canada', 'North America', 36);
 INSERT INTO spec (id, name, short_name, parent_id) VALUES (2, 'United Kingdom & Ireland', 'UK-spec', 35);
 INSERT INTO spec (id, name, short_name, parent_id) VALUES (3, 'Australia', 'Australia', 35);
@@ -82,4 +80,5 @@ INSERT INTO spec (id, name, short_name, parent_id) VALUES (69, 'Romania', 'Roman
 INSERT INTO spec (id, name, short_name, parent_id) VALUES (70, 'Estonia', 'Estonia', 6);
 INSERT INTO spec (id, name, short_name, parent_id) VALUES (71, 'Nigeria', 'Nigeria', 60);
 INSERT INTO spec (id, name, short_name, parent_id) VALUES (72, 'Saudi Arabia', 'Saudi Arabia', 62);
-ALTER TABLE spec ENABLE TRIGGER ALL;
+
+alter table spec add constraint spec_ibfk_1 foreign key (parent_id) references spec (id);
