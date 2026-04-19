@@ -9,7 +9,7 @@ create table spec
   constraint spec_ibfk_1 foreign key (parent_id) references spec (id)
 );
 
-create index parent_id on spec (parent_id);
+create index spec_parent_id on spec (parent_id);
 
 ALTER TABLE spec DISABLE TRIGGER ALL;
 INSERT INTO spec (id, name, short_name, parent_id) VALUES (1, 'United States & Canada', 'North America', 36);
