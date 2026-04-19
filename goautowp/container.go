@@ -291,6 +291,11 @@ func (s *Container) CommentsRepository(ctx context.Context) (*comments.Repositor
 			return nil, err
 		}
 
+		pgDB, err := s.GoquPostgresDB(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		usersRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
@@ -303,6 +308,7 @@ func (s *Container) CommentsRepository(ctx context.Context) (*comments.Repositor
 
 		s.commentsRepository = comments.NewRepository(
 			db,
+			pgDB,
 			usersRepository,
 			messagingRepository,
 			s.HostsManager(),
@@ -1502,7 +1508,7 @@ func (s *Container) CommentsGRPCServer(ctx context.Context) (*CommentsGRPCServer
 
 func (s *Container) ArticlesGRPCServer(ctx context.Context) (*ArticlesGRPCServer, error) {
 	if s.articlesGRPCServer == nil {
-		db, err := s.GoquDB(ctx)
+		db, err := s.GoquPostgresDB(ctx)
 		if err != nil {
 			return nil, err
 		}

@@ -78,6 +78,7 @@ type RatingUser struct {
 // Repository Main Object.
 type Repository struct {
 	db                *goqu.Database
+	pgDB              *goqu.Database
 	userRepository    *users.Repository
 	messageRepository *messaging.Repository
 	hostManager       *hosts.Manager
@@ -86,12 +87,14 @@ type Repository struct {
 // NewRepository constructor.
 func NewRepository(
 	db *goqu.Database,
+	pgDB *goqu.Database,
 	userRepository *users.Repository,
 	messageRepository *messaging.Repository,
 	hostManager *hosts.Manager,
 ) *Repository {
 	return &Repository{
 		db:                db,
+		pgDB:              pgDB,
 		userRepository:    userRepository,
 		messageRepository: messageRepository,
 		hostManager:       hostManager,
@@ -587,7 +590,7 @@ func (s *Repository) AssertItem(
 			Where(schema.VotingTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
 
 	case schema.CommentMessageTypeIDArticles:
-		success, err = s.db.Select(goqu.L("1")).From(schema.ArticleTable).
+		success, err = s.pgDB.Select(goqu.L("1")).From(schema.ArticleTable).
 			Where(schema.ArticleTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
 
 	case schema.CommentMessageTypeIDForums:
@@ -1442,7 +1445,7 @@ func (s *Repository) MessageRowRoute(
 	case schema.CommentMessageTypeIDArticles:
 		var catname string
 
-		success, err := s.db.Select(schema.ArticleTableCatnameCol).
+		success, err := s.pgDB.Select(schema.ArticleTableCatnameCol).
 			From(schema.ArticleTable).
 			Where(schema.ArticleTableIDCol.Eq(itemID)).
 			ScanValContext(ctx, &catname)
@@ -1530,7 +1533,9 @@ func (s *Repository) TopAuthors(ctx context.Context, limit uint) ([]RatingUser, 
 
 	const volumeAlias = "volume"
 
-	err := s.db.Select(schema.CommentMessageTableAuthorIDCol, goqu.SUM(schema.CommentMessageTableVoteCol).As(volumeAlias)).
+	err := s.db.Select(
+		schema.CommentMessageTableAuthorIDCol, goqu.SUM(schema.CommentMessageTableVoteCol).As(volumeAlias),
+	).
 		From(schema.CommentMessageTable).
 		GroupBy(schema.CommentMessageTableAuthorIDCol).
 		Order(goqu.C(volumeAlias).Desc()).
@@ -1551,7 +1556,9 @@ func (s *Repository) AuthorsFans(
 
 	err := s.db.Select(schema.CommentVoteTableUserIDCol, goqu.COUNT(goqu.Star()).As(volumeAlias)).
 		From(schema.CommentVoteTable).
-		Join(schema.CommentMessageTable, goqu.On(schema.CommentVoteTableCommentIDCol.Eq(schema.CommentMessageTableIDCol))).
+		Join(schema.CommentMessageTable, goqu.On(
+			schema.CommentVoteTableCommentIDCol.Eq(schema.CommentMessageTableIDCol),
+		)).
 		Where(schema.CommentMessageTableAuthorIDCol.Eq(userID)).
 		GroupBy(schema.CommentVoteTableUserIDCol).
 		Order(goqu.C(volumeAlias).Desc()).
@@ -1886,7 +1893,7 @@ func (s *Repository) messageRowRoute(
 	case schema.CommentMessageTypeIDArticles:
 		var catname string
 
-		success, err := s.db.Select(schema.ArticleTableCatnameCol).
+		success, err := s.pgDB.Select(schema.ArticleTableCatnameCol).
 			From(schema.ArticleTable).
 			Where(schema.ArticleTableIDCol.Eq(itemID)).
 			ScanValContext(ctx, &catname)

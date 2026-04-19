@@ -101,7 +101,7 @@ func createRepository(t *testing.T) (*Repository, *goqu.Database) {
 		i,
 	)
 
-	repo := NewRepository(goquDB, usersRepository, messagingRepository, hostsManager)
+	repo := NewRepository(goquDB, goquPostgresDB, usersRepository, messagingRepository, hostsManager)
 
 	return repo, goquDB
 }
