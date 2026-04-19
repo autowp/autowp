@@ -97,6 +97,8 @@ services:
   postgres:
     image: postgres:13-alpine
     container_name: goautowp_postgres_test
+    volumes:
+      - ./test/pg.sql:/pg.sql:ro
     environment:
       - POSTGRES_DB=traffic
       - POSTGRES_USER=traffic
