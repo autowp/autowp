@@ -1,11 +1,9 @@
 create table spec
 (
   id         int primary key,
-  name       varchar(50)  not null,
-  short_name varchar(15)  not null,
+  name       varchar(50)  not null unique,
+  short_name varchar(15)  not null unique,
   parent_id  int null,
-  constraint name unique (name),
-  constraint short_name unique (short_name),
   constraint spec_ibfk_1 foreign key (parent_id) references spec (id)
 );
 
