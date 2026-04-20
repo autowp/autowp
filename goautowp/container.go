@@ -947,7 +947,7 @@ func (s *Container) UserExtractor(ctx context.Context) (*UserExtractor, error) {
 
 func (s *Container) VotingsRepository(ctx context.Context) (*votings.Repository, error) {
 	if s.votingsRepository == nil {
-		db, err := s.GoquDB(ctx)
+		db, err := s.GoquPostgresDB(ctx)
 		if err != nil {
 			return nil, err
 		}

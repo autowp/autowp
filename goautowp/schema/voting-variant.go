@@ -9,12 +9,12 @@ const (
 
 var (
 	VotingVariantTable            = goqu.T(VotingVariantTableName)
-	VotingVariantTableIDCol       = VotingTable.Col("id")
-	VotingVariantTableVotingIDCol = VotingTable.Col("voting_id")
-	VotingVariantTablePositionCol = VotingTable.Col("position")
-	VotingVariantTableNameCol     = VotingTable.Col("name")
-	VotingVariantTableTextCol     = VotingTable.Col("text")
-	VotingVariantTableVotesCol    = VotingTable.Col(VotingVariantTableVotesColName)
+	VotingVariantTableIDCol       = VotingVariantTable.Col("id")
+	VotingVariantTableVotingIDCol = VotingVariantTable.Col("voting_id")
+	VotingVariantTablePositionCol = VotingVariantTable.Col("position")
+	VotingVariantTableNameCol     = VotingVariantTable.Col("name")
+	VotingVariantTableTextCol     = VotingVariantTable.Col("text")
+	VotingVariantTableVotesCol    = VotingVariantTable.Col(VotingVariantTableVotesColName)
 )
 
 type VotingVariantRow struct {

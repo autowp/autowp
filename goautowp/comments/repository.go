@@ -586,7 +586,7 @@ func (s *Repository) AssertItem(
 			Where(schema.ItemTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
 
 	case schema.CommentMessageTypeIDVotings:
-		success, err = s.db.Select(goqu.L("1")).From(schema.VotingTable).
+		success, err = s.pgDB.Select(goqu.L("1")).From(schema.VotingTable).
 			Where(schema.VotingTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
 
 	case schema.CommentMessageTypeIDArticles:
