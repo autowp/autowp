@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/autowp/goautowp/util"
 	"github.com/autowp/goautowp/votings"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -54,7 +55,7 @@ func (s *VotingsGRPCServer) GetVoting(ctx context.Context, in *VotingRequest) (*
 			IsMin:   variant.IsMin,
 			Name:    variant.Name,
 			Percent: variant.Percent,
-			Text:    variant.Text,
+			Text:    util.NullStringToString(variant.Text),
 			Votes:   variant.Votes,
 		})
 	}

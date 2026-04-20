@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/doug-martin/goqu/v9"
@@ -22,10 +23,10 @@ var (
 )
 
 type VotingRow struct {
-	ID           int32     `db:"id"`
-	Name         string    `db:"name"`
-	Text         string    `db:"text"`
-	Multivariant bool      `db:"multivariant"`
-	BeginDate    time.Time `db:"begin_date"`
-	EndDate      time.Time `db:"end_date"`
+	ID           int32          `db:"id"`
+	Name         string         `db:"name"`
+	Text         sql.NullString `db:"text"`
+	Multivariant bool           `db:"multivariant"`
+	BeginDate    time.Time      `db:"begin_date"`
+	EndDate      time.Time      `db:"end_date"`
 }

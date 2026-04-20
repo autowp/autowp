@@ -1,6 +1,10 @@
 package schema
 
-import "github.com/doug-martin/goqu/v9"
+import (
+	"database/sql"
+
+	"github.com/doug-martin/goqu/v9"
+)
 
 const (
 	VotingVariantTableName         = "voting_variant"
@@ -18,8 +22,8 @@ var (
 )
 
 type VotingVariantRow struct {
-	ID    int32  `db:"id"`
-	Name  string `db:"name"`
-	Text  string `db:"text"`
-	Votes int32  `db:"votes"`
+	ID    int32          `db:"id"`
+	Name  string         `db:"name"`
+	Text  sql.NullString `db:"text"`
+	Votes int32          `db:"votes"`
 }
