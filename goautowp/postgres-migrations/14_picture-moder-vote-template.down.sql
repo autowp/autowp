@@ -1,0 +1,1 @@
+drop table picture_moder_vote_template;

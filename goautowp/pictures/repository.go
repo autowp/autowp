@@ -348,7 +348,7 @@ func (s *Repository) CreateModerVoteTemplate(
 		tpl.Vote = 1
 	}
 
-	res, err := s.db.Insert(schema.PictureModerVoteTemplateTable).
+	res, err := s.pgDB.Insert(schema.PictureModerVoteTemplateTable).
 		Rows(tpl).
 		Executor().
 		ExecContext(ctx)
@@ -362,7 +362,7 @@ func (s *Repository) CreateModerVoteTemplate(
 }
 
 func (s *Repository) DeleteModerVoteTemplate(ctx context.Context, id int64, userID int64) error {
-	_, err := s.db.Delete(schema.PictureModerVoteTemplateTable).
+	_, err := s.pgDB.Delete(schema.PictureModerVoteTemplateTable).
 		Where(
 			schema.PictureModerVoteTemplateTableUserIDCol.Eq(userID),
 			schema.PictureModerVoteTemplateTableIDCol.Eq(id),
@@ -378,7 +378,7 @@ func (s *Repository) IsModerVoteTemplateExists(
 ) (bool, error) {
 	var id int64
 
-	success, err := s.db.Select(schema.PictureModerVoteTemplateTableIDCol).
+	success, err := s.pgDB.Select(schema.PictureModerVoteTemplateTableIDCol).
 		From(schema.PictureModerVoteTemplateTable).
 		Where(
 			schema.PictureModerVoteTemplateTableUserIDCol.Eq(userID),
@@ -394,7 +394,7 @@ func (s *Repository) GetModerVoteTemplates(
 ) ([]schema.PictureModerVoteTemplateRow, error) {
 	var rows []schema.PictureModerVoteTemplateRow
 
-	err := s.db.Select(
+	err := s.pgDB.Select(
 		schema.PictureModerVoteTemplateTableIDCol,
 		schema.PictureModerVoteTemplateTableReasonCol,
 		schema.PictureModerVoteTemplateTableVoteCol,
