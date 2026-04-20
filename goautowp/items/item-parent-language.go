@@ -534,7 +534,7 @@ func (s *ItemParentLanguageRepository) getAliases(ctx context.Context, itemID in
 	//nolint: prealloc
 	var aliases []string
 
-	err := s.db.Select(schema.BrandAliasTableNameCol).From(schema.BrandAliasTable).
+	err := s.pgDB.Select(schema.BrandAliasTableNameCol).From(schema.BrandAliasTable).
 		Where(schema.BrandAliasTableItemIDCol.Eq(itemID)).ScanValsContext(ctx, &aliases)
 	if err != nil {
 		return nil, err
