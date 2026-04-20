@@ -810,6 +810,11 @@ func (s *Container) GRPCServerWithServices(ctx context.Context) (*grpc.Server, e
 		return nil, err
 	}
 
+	votingSrv, err := s.VotingsGRPCServer(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	trustedPeers := []netip.Prefix{
 		netip.MustParsePrefix(s.Config().TrustedNetwork),
 	}
@@ -852,6 +857,7 @@ func (s *Container) GRPCServerWithServices(ctx context.Context) (*grpc.Server, e
 	RegisterTrafficServer(grpcServer, trafficSrv)
 	RegisterUsersServer(grpcServer, usersSrv)
 	RegisterRatingServer(grpcServer, ratingSrv)
+	RegisterVotingsServer(grpcServer, votingSrv)
 
 	reflection.Register(grpcServer)
 
