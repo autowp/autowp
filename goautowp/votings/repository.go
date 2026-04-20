@@ -114,7 +114,7 @@ func (s *Repository) Votes(ctx context.Context, id int32) ([]int64, error) {
 	err := s.db.Select(schema.VotingVariantVoteTableUserIDCol).
 		From(schema.VotingVariantVoteTable).
 		Where(schema.VotingVariantVoteTableVotingVariantIDCol.Eq(id)).
-		ScanValsContext(ctx, ids)
+		ScanValsContext(ctx, &ids)
 
 	return ids, err
 }
