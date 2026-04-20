@@ -58,6 +58,7 @@ var (
 	errImageIDIsNil          = errors.New("image_id is null")
 	ErrInvalidImage          = errors.New("invalid image")
 	errUnsupportedImageType  = errors.New("unsupported image type")
+	errNoRowsReturned        = errors.New("no rows returned")
 )
 
 var (
@@ -348,15 +349,18 @@ func (s *Repository) CreateModerVoteTemplate(
 		tpl.Vote = 1
 	}
 
-	res, err := s.pgDB.Insert(schema.PictureModerVoteTemplateTable).
+	success, err := s.pgDB.Insert(schema.PictureModerVoteTemplateTable).
 		Rows(tpl).
+		Returning(schema.PictureModerVoteTemplateTableIDCol).
 		Executor().
-		ExecContext(ctx)
+		ScanValContext(ctx, &tpl.ID)
 	if err != nil {
 		return tpl, err
 	}
 
-	tpl.ID, err = res.LastInsertId()
+	if !success {
+		return tpl, errNoRowsReturned
+	}
 
 	return tpl, err
 }
