@@ -44,7 +44,7 @@ func (s *Repository) Voting(
 	var st Voting
 
 	success, err := s.db.Select(schema.VotingTableIDCol, schema.VotingTableNameCol, schema.VotingTableTextCol,
-		schema.VotingTableMultivariantCol).
+		schema.VotingTableMultivariantCol, schema.VotingTableBeginDateCol, schema.VotingTableEndDateCol).
 		From(schema.VotingTable).
 		Where(schema.VotingTableIDCol.Eq(id)).
 		ScanStructContext(ctx, &st)
