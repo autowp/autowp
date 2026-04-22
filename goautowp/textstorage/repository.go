@@ -6,10 +6,14 @@ import (
 	"fmt"
 
 	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
 )
 
-var ErrTextNotFound = errors.New("text not found")
+var (
+	ErrTextNotFound   = errors.New("text not found")
+	errNoRowsReturned = errors.New("no rows returned")
+)
 
 // Repository Main Object.
 type Repository struct {
@@ -47,8 +51,14 @@ func (s *Repository) FirstText(ctx context.Context, ids []int32) (string, error)
 		return "", nil
 	}
 
-	args := append([]interface{}{schema.TextstorageTextTableIDColName}, ids)
 	result := ""
+
+	iIDs := make([]interface{}, len(ids))
+
+	// Loop and assign
+	for i, v := range ids {
+		iIDs[i] = v
+	}
 
 	success, err := s.db.From(schema.TextstorageTextTable).
 		Select(schema.TextstorageTextTableTextCol).
@@ -56,7 +66,11 @@ func (s *Repository) FirstText(ctx context.Context, ids []int32) (string, error)
 			schema.TextstorageTextTableIDCol.In(ids),
 			goqu.Func("length", schema.TextstorageTextTableTextCol).Gt(0),
 		).
-		Order(goqu.Func("field", args...).Asc()).
+		Order(goqu.Func(
+			"array_position",
+			goqu.L("ARRAY["+util.RepeatWithDelim("?", ",", len(iIDs))+"]::integer[]", iIDs...),
+			schema.TextstorageTextTableIDCol,
+		).Asc()).
 		Limit(1).
 		ScanValContext(ctx, &result)
 	if err != nil {
@@ -73,21 +87,21 @@ func (s *Repository) FirstText(ctx context.Context, ids []int32) (string, error)
 func (s *Repository) CreateText(ctx context.Context, text string, userID int64) (int32, error) {
 	ctx = context.WithoutCancel(ctx)
 
-	res, err := s.db.Insert(schema.TextstorageTextTable).Rows(goqu.Record{
+	var id int32
+
+	success, err := s.db.Insert(schema.TextstorageTextTable).Rows(goqu.Record{
 		schema.TextstorageTextTableRevisionColName:    0,
 		schema.TextstorageTextTableTextColName:        "",
 		schema.TextstorageTextTableLastUpdatedColName: goqu.Func("NOW"),
-	}).Executor().ExecContext(ctx)
+	}).Returning(schema.TextstorageTextTableIDCol).Executor().ScanValContext(ctx, &id)
 	if err != nil {
 		return 0, err
 	}
 
-	lastInsertID, err := res.LastInsertId()
-	if err != nil {
-		return 0, err
+	if !success {
+		return 0, errNoRowsReturned
 	}
 
-	id := int32(lastInsertID) //nolint: gosec
 	err = s.SetText(ctx, id, text, userID)
 
 	return id, err

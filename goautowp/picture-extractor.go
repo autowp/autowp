@@ -17,6 +17,7 @@ import (
 	"github.com/autowp/goautowp/textstorage"
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
+	"github.com/jackc/pgtype"
 	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -196,10 +197,10 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			}
 		}
 
-		if row.Point.Valid {
+		if row.Point.Status == pgtype.Present {
 			resultRow.Point = &latlng.LatLng{
-				Latitude:  row.Point.Point.Lat(),
-				Longitude: row.Point.Point.Lng(),
+				Latitude:  row.Point.P.Y,
+				Longitude: row.Point.P.X,
 			}
 		}
 
@@ -656,8 +657,8 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			}
 		}
 
-		if row.IP != nil && util.Contains(userCtx.Roles, users.RoleModer) {
-			resultRow.Ip = row.IP.ToIP().String()
+		if row.IP.Status == pgtype.Present && row.IP.IPNet != nil && util.Contains(userCtx.Roles, users.RoleModer) {
+			resultRow.Ip = row.IP.IPNet.IP.String()
 		}
 
 		if fields.GetSubscribed() && userCtx.UserID > 0 {

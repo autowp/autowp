@@ -117,6 +117,7 @@ func (s Wheelsize) Items(
 			radiusValCol.Gt(0),
 		)).
 		Order(orderExpr).
+		GroupByAppend(tyrewidthValCol, tyreseriesValCol, radiusValCol).
 		Limit(uint(listOptions.Limit)).
 		ScanValsContext(ctx, &itemIDs)
 	if err != nil {

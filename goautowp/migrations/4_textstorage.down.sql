@@ -1,1 +1,0 @@
-DROP TABLE textstorage_revision, textstorage_text;

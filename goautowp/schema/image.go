@@ -35,7 +35,7 @@ var (
 )
 
 type ImageRow struct {
-	ID         int    `db:"id"`
+	ID         int    `db:"id"          goqu:"pk,skipinsert"`
 	Width      int    `db:"width"`
 	Height     int    `db:"height"`
 	Filesize   int    `db:"filesize"`

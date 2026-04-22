@@ -29,7 +29,6 @@ type Traffic struct {
 	Monitoring *Monitoring
 	Whitelist  *Whitelist
 	Ban        *ban.Repository
-	autowpDB   *goqu.Database
 }
 
 // AutobanProfile AutobanProfile.
@@ -89,7 +88,6 @@ type APITrafficWhitelistPostRequestBody struct {
 // NewTraffic constructor.
 func NewTraffic(
 	pool *goqu.Database,
-	autowpDB *goqu.Database,
 	ban *ban.Repository,
 ) (*Traffic, error) {
 	monitoring, err := NewMonitoring(pool)
@@ -110,7 +108,6 @@ func NewTraffic(
 		Monitoring: monitoring,
 		Whitelist:  whitelist,
 		Ban:        ban,
-		autowpDB:   autowpDB,
 	}, nil
 }
 

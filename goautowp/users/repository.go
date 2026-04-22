@@ -20,10 +20,9 @@ import (
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql"    // enable mysql dialect
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
-	_ "github.com/go-sql-driver/mysql"                  // enable mysql driver
 	"github.com/google/uuid"
+	"github.com/jackc/pgtype"
 	_ "github.com/lib/pq" // enable postgres driver
 	"github.com/sirupsen/logrus"
 	"gopkg.in/gographics/imagick.v3/imagick"
@@ -100,7 +99,6 @@ const (
 
 // Repository Main Object.
 type Repository struct {
-	autowpDB        *goqu.Database
 	db              *goqu.Database
 	usersSalt       string
 	languages       map[string]config.LanguageConfig
@@ -117,7 +115,6 @@ type UserPreferences struct {
 
 // NewRepository constructor.
 func NewRepository(
-	autowpDB *goqu.Database,
 	db *goqu.Database,
 	usersSalt string,
 	languages map[string]config.LanguageConfig,
@@ -127,7 +124,6 @@ func NewRepository(
 	imageStorage *storage.Storage,
 ) *Repository {
 	return &Repository{
-		autowpDB:        autowpDB,
 		db:              db,
 		usersSalt:       usersSalt,
 		languages:       languages,
@@ -156,7 +152,7 @@ func (s *Repository) User(
 func (s *Repository) UserIDByIdentity(ctx context.Context, identity string) (int64, error) {
 	var userID int64
 
-	success, err := s.autowpDB.From(schema.UserTable).
+	success, err := s.db.From(schema.UserTable).
 		Where(schema.UserTableIdentityCol.Eq(identity)).
 		ScanValContext(ctx, &userID)
 	if err != nil {
@@ -241,7 +237,7 @@ func (s *Repository) Users(
 		valuePtrs = append(valuePtrs, &row.LastIP)
 		columns = append(
 			columns,
-			goqu.Func("INET6_NTOA", aliasTable.Col(schema.UserTableLastIPColName)),
+			goqu.Func("host", aliasTable.Col(schema.UserTableLastIPColName)),
 		)
 	}
 
@@ -250,7 +246,7 @@ func (s *Repository) Users(
 		columns = append(columns, aliasTable.Col(schema.UserTableLoginColName))
 	}
 
-	sqSelect := options.Select(s.autowpDB, alias).Select(columns...)
+	sqSelect := options.Select(s.db, alias).Select(columns...)
 
 	switch orderBy {
 	case OrderByNone:
@@ -315,7 +311,7 @@ func (s *Repository) Users(
 func (s *Repository) GetVotesLeft(ctx context.Context, userID int64) (int, error) {
 	var votesLeft int
 
-	success, err := s.autowpDB.Select(schema.UserTableVotesLeftCol).
+	success, err := s.db.Select(schema.UserTableVotesLeftCol).
 		From(schema.UserTable).
 		Where(schema.UserTableIDCol.Eq(userID)).
 		ScanValContext(ctx, &votesLeft)
@@ -331,7 +327,7 @@ func (s *Repository) GetVotesLeft(ctx context.Context, userID int64) (int, error
 }
 
 func (s *Repository) DecVotes(ctx context.Context, userID int64) error {
-	_, err := s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
+	_, err := s.db.Update(schema.UserTable).Set(goqu.Record{
 		schema.UserTableVotesLeftColName: goqu.L(schema.UserTableVotesLeftColName + " - 1"),
 	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
 
@@ -351,7 +347,7 @@ func (s *Repository) AfterUserCreated(ctx context.Context, userID int64) error {
 		return err
 	}
 
-	_, err = s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
+	_, err = s.db.Update(schema.UserTable).Set(goqu.Record{
 		schema.UserTableVotesLeftColName: schema.UserTableVotesPerDayCol,
 	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
 
@@ -361,7 +357,7 @@ func (s *Repository) AfterUserCreated(ctx context.Context, userID int64) error {
 func (s *Repository) UpdateUserVoteLimit(ctx context.Context, userID int64) error {
 	var age int
 
-	success, err := s.autowpDB.Select(goqu.L("TIMESTAMPDIFF(YEAR, "+schema.UserTableRegDateColName+", NOW())")).
+	success, err := s.db.Select(goqu.L("EXTRACT(YEAR FROM AGE(?))", schema.UserTableRegDateCol)).
 		From(schema.UserTable).
 		Where(schema.UserTableIDCol.Eq(userID)).
 		ScanValContext(ctx, &age)
@@ -380,7 +376,7 @@ func (s *Repository) UpdateUserVoteLimit(ctx context.Context, userID int64) erro
 		return err
 	}
 
-	picturesExists, err := s.autowpDB.From(schema.PictureTable).Where(
+	picturesExists, err := s.db.From(schema.PictureTable).Where(
 		schema.PictureTableOwnerIDCol.Eq(userID),
 		schema.PictureTableStatusCol.Eq(schema.PictureStatusAccepted),
 	).CountContext(ctx)
@@ -393,7 +389,7 @@ func (s *Repository) UpdateUserVoteLimit(ctx context.Context, userID int64) erro
 		value = 0
 	}
 
-	_, err = s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
+	_, err = s.db.Update(schema.UserTable).Set(goqu.Record{
 		schema.UserTableVotesPerDayColName: value,
 	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
 	if err != nil {
@@ -406,7 +402,7 @@ func (s *Repository) UpdateUserVoteLimit(ctx context.Context, userID int64) erro
 func (s *Repository) UserAvgVote(ctx context.Context, userID int64) (float64, error) {
 	var result float64
 
-	success, err := s.autowpDB.Select(goqu.Func("IFNULL", goqu.AVG(schema.CommentMessageTableVoteCol), 0)).
+	success, err := s.db.Select(goqu.Func("COALESCE", goqu.AVG(schema.CommentMessageTableVoteCol), 0)).
 		From(schema.CommentMessageTable).
 		Where(
 			schema.CommentMessageTableAuthorIDCol.Eq(userID),
@@ -425,12 +421,12 @@ func (s *Repository) UserAvgVote(ctx context.Context, userID int64) (float64, er
 }
 
 func (s *Repository) RefreshUserConflicts(ctx context.Context, userID int64) error {
-	_, err := s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
+	_, err := s.db.Update(schema.UserTable).Set(goqu.Record{
 		schema.UserTableSpecsWeightColName: goqu.L(
 			"1.5 * (1 + ?) / (1 + ?)",
 			goqu.Func(
-				"IFNULL",
-				s.autowpDB.Select(goqu.SUM(schema.AttrsUserValuesTableWeightCol)).
+				"COALESCE",
+				s.db.Select(goqu.SUM(schema.AttrsUserValuesTableWeightCol)).
 					From(schema.AttrsUserValuesTable).
 					Where(
 						schema.AttrsUserValuesTableUserIDCol.Eq(schema.UserTableIDCol),
@@ -439,8 +435,8 @@ func (s *Repository) RefreshUserConflicts(ctx context.Context, userID int64) err
 				0,
 			),
 			goqu.Func(
-				"IFNULL",
-				s.autowpDB.Select(goqu.Func("ABS", goqu.SUM(schema.AttrsUserValuesTableWeightCol))).
+				"COALESCE",
+				s.db.Select(goqu.Func("ABS", goqu.SUM(schema.AttrsUserValuesTableWeightCol))).
 					From(schema.AttrsUserValuesTable).
 					Where(
 						schema.AttrsUserValuesTableUserIDCol.Eq(schema.UserTableIDCol),
@@ -479,73 +475,56 @@ func (s *Repository) EnsureUserImported(
 
 	logrus.Debugf("Ensure user `%s` imported", guid)
 
-	var res sql.Result
-
 	ctx = context.WithoutCancel(ctx)
 
-	res, err := s.autowpDB.Insert(schema.UserTable).
+	st := struct {
+		UserID     int64 `db:"id"`
+		IsInserted bool  `db:"is_inserted"`
+	}{}
+
+	success, err := s.db.Insert(schema.UserTable).
 		Rows(goqu.Record{
 			schema.UserTableLoginColName:          nil,
 			schema.UserTableEmailColName:          emailAddr,
 			schema.UserTablePasswordColName:       nil,
 			schema.UserTableEmailToCheckColName:   nil,
-			schema.UserTableHideEmailColName:      1,
+			schema.UserTableHideEmailColName:      true,
 			schema.UserTableEmailCheckCodeColName: nil,
 			schema.UserTableNameColName:           name,
 			schema.UserTableRegDateColName:        goqu.Func("NOW"),
 			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
 			schema.UserTableTimezoneColName:       language.Timezone,
-			schema.UserTableLastIPColName:         goqu.Func("INET6_ATON", ip.String()),
+			schema.UserTableLastIPColName:         goqu.Func("INET", ip.String()),
 			schema.UserTableLanguageColName:       locale,
 			schema.UserTableGreenColName: util.Contains(
 				claims.ResourceAccess.Autowp.Roles,
 				RoleGreenUser,
 			),
-			schema.UserTableUUIDColName: goqu.Func("UUID_TO_BIN", guid),
+			schema.UserTableUUIDColName: guid,
 		}).
 		OnConflict(goqu.DoUpdate(schema.UserTableUUIDColName, goqu.Record{
-			schema.UserTableEmailColName: goqu.Func(
-				"values",
-				goqu.C(schema.UserTableEmailColName),
-			),
-			schema.UserTableNameColName: goqu.Func("values", goqu.C(schema.UserTableNameColName)),
-			schema.UserTableLastIPColName: goqu.Func(
-				"values",
-				goqu.C(schema.UserTableLastIPColName),
-			),
-			schema.UserTableGreenColName: goqu.Func(
-				"values",
-				goqu.C(schema.UserTableGreenColName),
-			),
+			schema.UserTableEmailColName:  schema.Excluded(schema.UserTableEmailColName),
+			schema.UserTableNameColName:   schema.Excluded(schema.UserTableNameColName),
+			schema.UserTableLastIPColName: schema.Excluded(schema.UserTableLastIPColName),
+			schema.UserTableGreenColName:  schema.Excluded(schema.UserTableGreenColName),
 		})).
-		Executor().ExecContext(ctx)
+		Returning(schema.UserTableIDColName, goqu.L("xmax = 0").As("is_inserted")).
+		Executor().ScanStructContext(ctx, &st)
 	if err != nil {
 		return 0, err
 	}
 
-	affected, err := res.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
-
-	if affected == 1 { // row just inserted
-		userID, err := res.LastInsertId()
-		if err != nil {
-			return 0, err
-		}
-
-		err = s.AfterUserCreated(ctx, userID)
+	if success && st.IsInserted { // row just inserted
+		err = s.AfterUserCreated(ctx, st.UserID)
 		if err != nil {
 			return 0, err
 		}
 	}
 
-	var userID int64
-
-	success, err := s.autowpDB.Select(schema.UserTableIDCol).
+	success, err = s.db.Select(schema.UserTableIDCol).
 		From(schema.UserTable).
-		Where(schema.UserTableUUIDCol.Eq(goqu.Func("UUID_TO_BIN", guid))).
-		ScanValContext(ctx, &userID)
+		Where(schema.UserTableUUIDCol.Eq(guid)).
+		ScanValContext(ctx, &st.UserID)
 	if err != nil {
 		return 0, err
 	}
@@ -554,7 +533,7 @@ func (s *Repository) EnsureUserImported(
 		return 0, ErrUserNotFound
 	}
 
-	return userID, nil
+	return st.UserID, nil
 }
 
 func (s *Repository) PasswordMatch(
@@ -564,7 +543,7 @@ func (s *Repository) PasswordMatch(
 ) (bool, error) {
 	var exists bool
 
-	succcess, err := s.autowpDB.Select(goqu.V(1)).
+	succcess, err := s.db.Select(goqu.V(1)).
 		From(schema.UserTable).
 		Where(
 			schema.UserTablePasswordCol.Eq(goqu.Func("MD5", goqu.Func("CONCAT", s.usersSalt, password))),
@@ -598,7 +577,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 		return false, err
 	}
 
-	if user.UUID != nil {
+	if user.UUID.Status == pgtype.Present {
 		token, err := s.keycloak.LoginClient(
 			ctx,
 			s.keycloakConfig.ClientID,
@@ -611,7 +590,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 
 		ctx = context.WithoutCancel(ctx)
 
-		userGUID, err := uuid.FromBytes(*user.UUID)
+		userGUID, err := uuid.FromBytes(user.UUID.Bytes[:])
 		if err != nil {
 			return false, err
 		}
@@ -631,7 +610,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 
 	oldImageID := user.Img
 
-	_, err = s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
+	_, err = s.db.Update(schema.UserTable).Set(goqu.Record{
 		schema.UserTableDeletedColName: true,
 		schema.UserTableUUIDColName:    nil,
 		schema.UserTableImgColName:     nil,
@@ -647,7 +626,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 		}
 	}
 
-	_, err = s.autowpDB.Delete(schema.TelegramChatTable).
+	_, err = s.db.Delete(schema.TelegramChatTable).
 		Where(schema.TelegramChatTableUserIDCol.Eq(userID)).
 		Executor().ExecContext(ctx)
 	if err != nil {
@@ -655,7 +634,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 	}
 
 	// delete linked profiles
-	_, err = s.autowpDB.Delete(schema.UserAccountTable).
+	_, err = s.db.Delete(schema.UserAccountTable).
 		Where(
 			schema.UserAccountTableUserIDCol.Eq(userID),
 			schema.UserAccountTableServiceIDCol.Eq(KeycloakExternalAccountID),
@@ -666,7 +645,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 	}
 
 	// unsubscribe from items
-	_, err = s.autowpDB.Delete(schema.UserItemSubscribeTable).
+	_, err = s.db.Delete(schema.UserItemSubscribeTable).
 		Where(schema.UserItemSubscribeTableUserIDCol.Eq(userID)).
 		Executor().ExecContext(ctx)
 	if err != nil {
@@ -677,7 +656,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 }
 
 func (s *Repository) RestoreVotes(ctx context.Context) error {
-	_, err := s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
+	_, err := s.db.Update(schema.UserTable).Set(goqu.Record{
 		schema.UserTableVotesLeftColName: schema.UserTableVotesPerDayCol,
 	}).Where(
 		schema.UserTableVotesLeftCol.Lt(schema.UserTableVotesPerDayCol),
@@ -692,11 +671,11 @@ func (s *Repository) UpdateVotesLimits(ctx context.Context) (int, error) {
 
 	ctx = context.WithoutCancel(ctx)
 
-	err := s.autowpDB.Select(schema.UserTableIDCol).
+	err := s.db.Select(schema.UserTableIDCol).
 		From(schema.UserTable).
 		Where(
 			schema.UserTableDeletedCol.IsFalse(),
-			schema.UserTableLastOnlineCol.Gt(goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL 3 MONTH"))),
+			schema.UserTableLastOnlineCol.Gt(goqu.L("NOW() - INTERVAL '3 MONTH'")),
 		).
 		ScanValsContext(ctx, &ids)
 	if err != nil {
@@ -723,7 +702,7 @@ func (s *Repository) UpdateSpecsVolumes(ctx context.Context) error {
 		Count  int64 `db:"count"`
 	}
 
-	err := s.autowpDB.Select(schema.UserTableIDCol, goqu.COUNT(schema.AttrsUserValuesTableUserIDCol).As("count")).
+	err := s.db.Select(schema.UserTableIDCol, goqu.COUNT(schema.AttrsUserValuesTableUserIDCol).As("count")).
 		From(schema.UserTable).
 		LeftJoin(schema.AttrsUserValuesTable, goqu.On(schema.UserTableIDCol.Eq(schema.AttrsUserValuesTableUserIDCol))).
 		Where(
@@ -739,9 +718,9 @@ func (s *Repository) UpdateSpecsVolumes(ctx context.Context) error {
 	ctx = context.WithoutCancel(ctx)
 
 	for _, st := range sts {
-		_, err = s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
+		_, err = s.db.Update(schema.UserTable).Set(goqu.Record{
 			schema.UserTableSpecsVolumeColName:      st.Count,
-			schema.UserTableSpecsVolumeValidColName: 1,
+			schema.UserTableSpecsVolumeValidColName: true,
 		}).Where(schema.UserTableIDCol.Eq(st.UserID)).Executor().ExecContext(ctx)
 		if err != nil {
 			return err
@@ -754,7 +733,7 @@ func (s *Repository) UpdateSpecsVolumes(ctx context.Context) error {
 func (s *Repository) ExportUsersToKeycloak(ctx context.Context) error {
 	var ids []int64
 
-	err := s.autowpDB.Select(schema.UserTableIDCol).From(schema.UserTable).Where(
+	err := s.db.Select(schema.UserTableIDCol).From(schema.UserTable).Where(
 		goqu.Or(
 			goqu.Func("LENGTH", schema.UserTableLoginCol).Gt(0),
 			goqu.Func("LENGTH", schema.UserTableEmailCol).Gt(0),
@@ -823,7 +802,7 @@ func (s *Repository) UserPreferences(
 }
 
 func (s *Repository) IncForumTopics(ctx context.Context, userID int64) error {
-	_, err := s.autowpDB.Update(schema.UserTable).
+	_, err := s.db.Update(schema.UserTable).
 		Set(s.incForumTopicsRecord()).
 		Where(schema.UserTableIDCol.Eq(userID)).
 		Executor().ExecContext(ctx)
@@ -832,7 +811,7 @@ func (s *Repository) IncForumTopics(ctx context.Context, userID int64) error {
 }
 
 func (s *Repository) IncForumMessages(ctx context.Context, userID int64) error {
-	_, err := s.autowpDB.Update(schema.UserTable).
+	_, err := s.db.Update(schema.UserTable).
 		Set(s.incForumMessagesRecord()).
 		Where(schema.UserTableIDCol.Eq(userID)).
 		Executor().ExecContext(ctx)
@@ -841,7 +820,7 @@ func (s *Repository) IncForumMessages(ctx context.Context, userID int64) error {
 }
 
 func (s *Repository) TouchLastMessage(ctx context.Context, userID int64) error {
-	_, err := s.autowpDB.Update(schema.UserTable).
+	_, err := s.db.Update(schema.UserTable).
 		Set(s.touchLastMessageRecord()).
 		Where(schema.UserTableIDCol.Eq(userID)).
 		Executor().ExecContext(ctx)
@@ -860,7 +839,7 @@ func (s *Repository) NextMessageTime(ctx context.Context, userID int64) (time.Ti
 		MessagingInterval int64        `db:"messaging_interval"`
 	}{}
 
-	success, err := s.autowpDB.Select(
+	success, err := s.db.Select(
 		schema.UserTableLastMessageTimeCol,
 		schema.UserTableRegDateCol,
 		schema.UserTableMessagingIntervalCol,
@@ -894,7 +873,7 @@ func (s *Repository) RegisterVisit(ctx context.Context, userID int64, ip net.IP)
 		LastIP     *net.IP      `db:"last_ip"`
 	}{}
 
-	success, err := s.autowpDB.Select(schema.UserTableLastOnlineCol, schema.UserTableLastIPCol).
+	success, err := s.db.Select(schema.UserTableLastOnlineCol, schema.UserTableLastIPCol).
 		From(schema.UserTable).
 		Where(schema.UserTableIDCol.Eq(userID)).
 		ScanStructContext(ctx, &st)
@@ -914,11 +893,11 @@ func (s *Repository) RegisterVisit(ctx context.Context, userID int64, ip net.IP)
 	}
 
 	if ip != nil && (st.LastIP == nil || !st.LastIP.Equal(ip)) {
-		set[schema.UserTableLastIPColName] = goqu.Func("INET6_ATON", ip.String())
+		set[schema.UserTableLastIPColName] = goqu.Func("INET", ip.String())
 	}
 
 	if len(set) > 0 {
-		_, err = s.autowpDB.Update(schema.UserTable).
+		_, err = s.db.Update(schema.UserTable).
 			Set(set).
 			Where(schema.UserTableIDCol.Eq(userID)).
 			Executor().
@@ -934,7 +913,7 @@ func (s *Repository) RegisterVisit(ctx context.Context, userID int64, ip net.IP)
 func (s *Repository) UserLanguage(ctx context.Context, userID int64) (string, error) {
 	language := ""
 
-	success, err := s.autowpDB.Select(schema.UserTableLanguageCol).
+	success, err := s.db.Select(schema.UserTableLanguageCol).
 		From(schema.UserTable).
 		Where(schema.UserTableIDCol.Eq(userID)).
 		ScanValContext(ctx, &language)
@@ -950,8 +929,8 @@ func (s *Repository) UserLanguage(ctx context.Context, userID int64) (string, er
 }
 
 func (s *Repository) RefreshPicturesCount(ctx context.Context, userID int64) error {
-	_, err := s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
-		schema.UserTablePicturesTotalColName: s.autowpDB.Select(goqu.COUNT(goqu.Star())).
+	_, err := s.db.Update(schema.UserTable).Set(goqu.Record{
+		schema.UserTablePicturesTotalColName: s.db.Select(goqu.COUNT(goqu.Star())).
 			From(schema.PictureTable).
 			Where(
 				schema.PictureTableOwnerIDCol.Eq(userID),
@@ -969,7 +948,7 @@ func (s *Repository) UserAccounts(
 ) ([]*schema.UserAccountRow, error) {
 	var rows []*schema.UserAccountRow
 
-	err := s.autowpDB.Select(goqu.Star()).
+	err := s.db.Select(goqu.Star()).
 		From(schema.UserAccountTable).
 		Where(schema.UserAccountTableUserIDCol.Eq(userID)).
 		ScanStructsContext(ctx, &rows)
@@ -984,7 +963,7 @@ func (s *Repository) HaveAccountsForOtherServices(
 ) (bool, error) {
 	var found bool
 
-	success, err := s.autowpDB.Select(goqu.V(true)).
+	success, err := s.db.Select(goqu.V(true)).
 		From(schema.UserAccountTable).
 		Where(
 			schema.UserAccountTableIDCol.Neq(id),
@@ -996,7 +975,7 @@ func (s *Repository) HaveAccountsForOtherServices(
 }
 
 func (s *Repository) RemoveUserAccount(ctx context.Context, id int64) error {
-	_, err := s.autowpDB.Delete(schema.UserAccountTable).
+	_, err := s.db.Delete(schema.UserAccountTable).
 		Where(schema.UserAccountTableIDCol.Eq(id)).
 		Executor().ExecContext(ctx)
 
@@ -1012,7 +991,7 @@ func (s *Repository) DeletePhoto(ctx context.Context, userID int64) (bool, error
 	ctx = context.WithoutCancel(ctx)
 
 	if row.Img != nil {
-		_, err = s.autowpDB.Update(schema.UserTable).
+		_, err = s.db.Update(schema.UserTable).
 			Set(goqu.Record{schema.UserTableImgColName: nil}).
 			Where(schema.UserTableIDCol.Eq(userID)).
 			Executor().ExecContext(ctx)
@@ -1043,7 +1022,7 @@ func (s *Repository) UpdateUser(ctx context.Context, row schema.UsersRow, mask [
 	}
 
 	if len(set) > 0 {
-		_, err := s.autowpDB.Update(schema.UserTable).
+		_, err := s.db.Update(schema.UserTable).
 			Set(set).
 			Where(schema.UserTableIDCol.Eq(row.ID)).
 			Executor().ExecContext(ctx)
@@ -1109,7 +1088,7 @@ func (s *Repository) SetUserPhoto(ctx context.Context, userID int64, file io.Rea
 		return err
 	}
 
-	_, err = s.autowpDB.Update(schema.UserTable).
+	_, err = s.db.Update(schema.UserTable).
 		Set(goqu.Record{
 			schema.UserTableImgColName: imageID,
 		}).
@@ -1132,7 +1111,7 @@ func (s *Repository) SetUserPhoto(ctx context.Context, userID int64, file io.Rea
 func (s *Repository) DeleteUnused(ctx context.Context) error {
 	var ids []int64
 
-	err := s.autowpDB.Select(schema.UserTableIDCol).
+	err := s.db.Select(schema.UserTableIDCol).
 		From(schema.UserTable).
 		LeftJoin(schema.AttrsUserValuesTable, goqu.On(schema.UserTableIDCol.Eq(schema.AttrsUserValuesTableUserIDCol))).
 		LeftJoin(schema.CommentMessageTable, goqu.On(schema.UserTableIDCol.Eq(schema.CommentMessageTableAuthorIDCol))).
@@ -1150,7 +1129,7 @@ func (s *Repository) DeleteUnused(ctx context.Context) error {
 		LeftJoin(schema.LogEventsTable, goqu.On(schema.UserTableIDCol.Eq(schema.LogEventsTableUserIDCol))).
 		Where(
 			schema.UserTableDeletedCol.IsFalse(),
-			schema.UserTableLastOnlineCol.Lt(goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL 2 YEAR"))),
+			schema.UserTableLastOnlineCol.Lt(goqu.L("NOW() - INTERVAL '2 YEAR'")),
 			schema.AttrsUserValuesTableUserIDCol.IsNull(),
 			schema.CommentMessageTableAuthorIDCol.IsNull(),
 			schema.ForumsTopicsTableAuthorIDCol.IsNull(),
@@ -1180,7 +1159,7 @@ func (s *Repository) DeleteUnused(ctx context.Context) error {
 }
 
 func (s *Repository) IncrementUploads(ctx context.Context, id int64) error {
-	_, err := s.autowpDB.Update(schema.UserTable).
+	_, err := s.db.Update(schema.UserTable).
 		Set(goqu.Record{
 			schema.UserTablePicturesAddedColName: goqu.L("? + 1", schema.UserTablePicturesAddedCol),
 		}).
@@ -1205,13 +1184,13 @@ func (s *Repository) ensureUserExportedToKeycloak(
 		GUID         string         `db:"guid"`
 	}{}
 
-	success, err := s.autowpDB.Select(
+	success, err := s.db.Select(
 		schema.UserTableDeletedCol,
 		schema.UserTableEmailCol,
 		schema.UserTableEmailToCheckCol,
 		schema.UserTableLoginCol,
 		schema.UserTableNameCol,
-		goqu.Func("IFNULL", goqu.Func("BIN_TO_UUID", schema.UserTableUUIDCol), "").As("guid"),
+		goqu.Func("COALESCE", schema.UserTableUUIDCol, "").As("guid"),
 	).
 		From(schema.UserTable).
 		Where(schema.UserTableIDCol.Eq(userID)).
@@ -1275,9 +1254,9 @@ func (s *Repository) ensureUserExportedToKeycloak(
 		return "", err
 	}
 
-	_, err = s.autowpDB.Update(schema.UserTable).Set(goqu.Record{
-		schema.UserTableUUIDColName: goqu.Func("UUID_TO_BIN", st.GUID),
-	}).Where(goqu.C("user_id").Eq(userID)).Executor().ExecContext(ctx)
+	_, err = s.db.Update(schema.UserTable).Set(goqu.Record{
+		schema.UserTableUUIDColName: st.GUID,
+	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
 	if err != nil {
 		return "", err
 	}

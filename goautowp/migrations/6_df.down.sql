@@ -1,1 +1,0 @@
-DROP TABLE df_hash, df_distance;

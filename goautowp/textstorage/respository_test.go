@@ -7,8 +7,6 @@ import (
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql" // enable mysql dialect
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,23 +14,21 @@ func TestGetText(t *testing.T) {
 	t.Parallel()
 
 	cfg := config.LoadConfig("../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
 
-	res, err := goquDB.Insert(schema.TextstorageTextTable).Rows(goqu.Record{
+	var id int32
+
+	success, err := goquDB.Insert(schema.TextstorageTextTable).Rows(goqu.Record{
 		schema.TextstorageTextTableTextColName:        "test",
 		schema.TextstorageTextTableLastUpdatedColName: goqu.Func("NOW"),
 		schema.TextstorageTextTableRevisionColName:    1,
-	}).Executor().ExecContext(ctx)
+	}).Returning(schema.TextstorageTextTableIDCol).Executor().ScanValContext(ctx, &id)
 	require.NoError(t, err)
-
-	lastInsertID, err := res.LastInsertId()
-	require.NoError(t, err)
-
-	id := int32(lastInsertID) //nolint:gosec
+	require.True(t, success)
 
 	repository := New(goquDB)
 

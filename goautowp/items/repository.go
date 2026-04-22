@@ -25,8 +25,9 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/mozillazg/go-unidecode"
-	geo "github.com/paulmach/go.geo"
 	"github.com/sirupsen/logrus"
+	"github.com/twpayne/go-geom"
+	"github.com/twpayne/go-geom/encoding/wkt"
 	"golang.org/x/text/collate"
 	"golang.org/x/text/language"
 )
@@ -42,8 +43,9 @@ var (
 	errInvalidItemParentCombination    = errors.New(
 		"that type of parent is not allowed for this type",
 	)
-	errGroupRequired = errors.New("only groups can have childs")
-	errSelfParent    = errors.New("self parent forbidden")
+	errGroupRequired  = errors.New("only groups can have childs")
+	errSelfParent     = errors.New("self parent forbidden")
+	errNoRowsReturned = errors.New("no rows returned")
 
 	CyrillicRegexp = regexp.MustCompile(`^\p{Cyrillic}`)
 	HanRegexp      = regexp.MustCompile(`^\p{Han}`)
@@ -202,7 +204,6 @@ const (
 // Repository Main Object.
 type Repository struct {
 	db                               *goqu.Database
-	pgDB                             *goqu.Database
 	mostsMinCarsCount                int
 	descendantsCountColumn           *DescendantsCountColumn
 	newDescendantsCountColumn        *NewDescendantsCountColumn
@@ -317,7 +318,6 @@ type ItemParentLanguage struct {
 // NewRepository constructor.
 func NewRepository(
 	db *goqu.Database,
-	pgDB *goqu.Database,
 	mostsMinCarsCount int,
 	itemParentLanguageRepository *ItemParentLanguageRepository,
 	textStorageRepository *textstorage.Repository,
@@ -325,7 +325,6 @@ func NewRepository(
 ) *Repository {
 	return &Repository{
 		db:                               db,
-		pgDB:                             pgDB,
 		mostsMinCarsCount:                mostsMinCarsCount,
 		descendantsCountColumn:           &DescendantsCountColumn{db: db},
 		newDescendantsCountColumn:        &NewDescendantsCountColumn{db: db},
@@ -654,6 +653,7 @@ func (s *Repository) List( //nolint:maintidx
 
 		wrapperColumns := s.columnsByFields(fields)
 		wrapperColumnsExpr := make([]interface{}, 0, len(wrapperColumns))
+		groupByColumnsExpr := make([]interface{}, 0, len(wrapperColumns))
 
 		for _, mapItem := range toSortedColumns(wrapperColumns) {
 			var expr AliaseableExpression
@@ -666,6 +666,12 @@ func (s *Repository) List( //nolint:maintidx
 				if err != nil {
 					return nil, nil, err
 				}
+			}
+
+			groupByExpr := mapItem.col.GroupByExpr()
+
+			if groupByExpr != nil {
+				groupByColumnsExpr = append(groupByColumnsExpr, groupByExpr)
 			}
 
 			wrapperColumnsExpr = append(wrapperColumnsExpr, expr.As(mapItem.key))
@@ -685,12 +691,16 @@ func (s *Repository) List( //nolint:maintidx
 			Join(wrappedSqSelect.Select(wrappedColumnsExpr...).As(wrappedAlias), goqu.On(
 				schema.ItemTableIDCol.Eq(wrappedIDCol),
 			)).
-			GroupBy(schema.ItemTableIDCol)
+			GroupBy(schema.ItemTableIDCol).
+			GroupByAppend(groupByColumnsExpr...)
 
-		wrapperOrderBy := s.wrapperOrderBy(schema.ItemTableName, wrappedAlias, orderBy)
+		wrapperOrderBy, groupBy := s.wrapperOrderBy(schema.ItemTableName, wrappedAlias, orderBy)
 
 		if len(wrapperOrderBy) > 0 {
 			sqSelect = sqSelect.Order(wrapperOrderBy...)
+			if len(groupBy) > 0 {
+				sqSelect = sqSelect.GroupByAppend(groupBy...)
+			}
 		}
 
 		outAlias = schema.ItemTableName
@@ -715,6 +725,11 @@ func (s *Repository) List( //nolint:maintidx
 			}
 
 			res = append(res, expr.As(mapItem.key))
+
+			groupByExpr := mapItem.col.GroupByExpr()
+			if groupByExpr != nil {
+				sqSelect = sqSelect.GroupByAppend(groupByExpr)
+			}
 		}
 
 		sqSelect = sqSelect.Select(res...)
@@ -1279,7 +1294,7 @@ func (s *Repository) UpdateItemLanguage(
 	if len(set) > 0 {
 		onConflict := goqu.Record{}
 		for col := range set {
-			onConflict[col] = goqu.Func("VALUES", goqu.C(col))
+			onConflict[col] = schema.Excluded(col)
 		}
 
 		set[schema.ItemLanguageTableItemIDColName] = itemID
@@ -1351,13 +1366,15 @@ func (s *Repository) ItemsWithPicturesCount(
 ) (int32, error) {
 	const countAlias = "c"
 
+	col := goqu.COUNT(schema.PictureTableIDCol)
+
 	sqSelect := s.db.From(
-		s.db.Select(schema.ItemTableIDCol, goqu.COUNT(schema.PictureTableIDCol).As(countAlias)).
+		s.db.Select(schema.ItemTableIDCol, col.As(countAlias)).
 			From(schema.ItemTable).
 			Join(schema.PictureItemTable, goqu.On(schema.ItemTableIDCol.Eq(schema.PictureItemTable.Col("item_id")))).
 			Join(schema.PictureTable, goqu.On(schema.PictureItemTable.Col("picture_id").Eq(schema.PictureTableIDCol))).
 			GroupBy(schema.ItemTableIDCol).
-			Having(goqu.C(countAlias).Gte(nPictures)).
+			Having(col.Gte(nPictures)).
 			As("T1"),
 	)
 
@@ -1828,7 +1845,7 @@ func (s *Repository) ItemParentSelect(
 
 		sqSelect = sqSelect.SelectAppend(
 			goqu.Func(
-				"IFNULL",
+				"COALESCE",
 				s.db.Select(schema.ItemParentLanguageTableNameCol).
 					From(schema.ItemParentLanguageTable).
 					Where(
@@ -1937,6 +1954,10 @@ func (s *Repository) UserItemSubscribed(ctx context.Context, itemID, userID int6
 }
 
 func (s *Repository) UserItemSubscribe(ctx context.Context, itemID, userID int64) error {
+	if userID == 0 {
+		return nil
+	}
+
 	_, err := s.db.Insert(schema.UserItemSubscribeTable).Rows(goqu.Record{
 		schema.UserItemSubscribeTableUserIDColName: userID,
 		schema.UserItemSubscribeTableItemIDColName: itemID,
@@ -2031,7 +2052,7 @@ func (s *Repository) VehicleTypeIDs(
 	return res, err
 }
 
-func (s *Repository) SetItemLocation(ctx context.Context, itemID int64, point *geo.Point) error {
+func (s *Repository) SetItemLocation(ctx context.Context, itemID int64, point *geom.Point) error {
 	if point == nil {
 		_, err := s.db.Delete(schema.ItemPointTable).
 			Where(schema.ItemPointTableItemIDCol.Eq(itemID)).
@@ -2040,24 +2061,26 @@ func (s *Repository) SetItemLocation(ctx context.Context, itemID int64, point *g
 		return err
 	}
 
-	_, err := s.db.Insert(schema.ItemPointTable).Rows(goqu.Record{
+	wktPoint, err := wkt.Marshal(point)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.db.Insert(schema.ItemPointTable).Rows(goqu.Record{
 		schema.ItemPointTableItemIDColName: itemID,
-		schema.ItemPointTablePointColName:  goqu.Func("Point", point.Lng(), point.Lat()),
+		schema.ItemPointTablePointColName:  goqu.Func("ST_GeogFromText", wktPoint),
 	}).OnConflict(goqu.DoUpdate(
 		schema.ItemPointTableItemIDColName,
 		goqu.Record{
-			schema.ItemPointTablePointColName: goqu.Func(
-				"VALUES",
-				goqu.C(schema.ItemPointTablePointColName),
-			),
+			schema.ItemPointTablePointColName: schema.Excluded(schema.ItemPointTablePointColName),
 		},
 	)).Executor().ExecContext(ctx)
 
 	return err
 }
 
-func (s *Repository) ItemLocation(ctx context.Context, itemID int64) (geo.Point, error) {
-	var res geo.Point
+func (s *Repository) ItemLocation(ctx context.Context, itemID int64) (geom.Point, error) {
+	var res geom.Point
 
 	success, err := s.db.Select(schema.ItemPointTablePointCol).
 		From(schema.ItemPointTable).
@@ -3012,14 +3035,19 @@ func (s *Repository) CreateItem(
 	row schema.ItemRow,
 	userID int64,
 ) (int64, error) {
-	res, err := s.db.Insert(schema.ItemTable).Rows(row).Executor().ExecContext(ctx)
+	var itemID int64
+
+	success, err := s.db.Insert(schema.ItemTable).
+		Rows(row).
+		Returning(schema.ItemTableIDCol).
+		Executor().
+		ScanValContext(ctx, &itemID)
 	if err != nil {
 		return 0, err
 	}
 
-	itemID, err := res.LastInsertId()
-	if err != nil {
-		return 0, err
+	if !success {
+		return 0, errNoRowsReturned
 	}
 
 	if len(row.Name) > 0 {
@@ -3060,7 +3088,7 @@ func (s *Repository) CreateItem(
 func (s *Repository) SpecExists(ctx context.Context, specID int32) (bool, error) {
 	var exists bool
 
-	success, err := s.pgDB.Select(goqu.V(true)).
+	success, err := s.db.Select(goqu.V(true)).
 		From(schema.SpecTable).
 		Where(schema.SpecTableIDCol.Eq(specID)).
 		ScanValContext(ctx, &exists)
@@ -3235,7 +3263,7 @@ func (s *Repository) UpdateItem(
 func (s *Repository) Spec(ctx context.Context, id int32) (*schema.SpecRow, error) {
 	var st schema.SpecRow
 
-	success, err := s.pgDB.Select(schema.SpecTableIDCol, schema.SpecTableNameCol, schema.SpecTableShortNameCol).
+	success, err := s.db.Select(schema.SpecTableIDCol, schema.SpecTableNameCol, schema.SpecTableShortNameCol).
 		From(schema.SpecTable).
 		Where(schema.SpecTableIDCol.Eq(id)).
 		ScanStructContext(ctx, &st)
@@ -3552,21 +3580,27 @@ func (s *Repository) wrapperOrderBy(
 	wrapperAlias string,
 	wrappedAlias string,
 	orderBy OrderBy,
-) []exp.OrderedExpression {
+) ([]exp.OrderedExpression, []interface{}) {
 	wrapperAliasTable := goqu.T(wrapperAlias)
 	wrappedAliasTable := goqu.T(wrappedAlias)
 
 	switch orderBy {
 	case OrderByDescendantsCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colDescendantsCount).Desc()}
+		col := wrappedAliasTable.Col(colDescendantsCount)
+
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
 	case OrderByChildsCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colChildsCount).Desc()}
+		col := wrappedAliasTable.Col(colChildsCount)
+
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
 	case OrderByDescendantPicturesCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colDescendantPicturesCount).Desc()}
+		col := wrappedAliasTable.Col(colDescendantPicturesCount)
+
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
 	case OrderByAddDatetime:
 		return []exp.OrderedExpression{
 			wrapperAliasTable.Col(schema.ItemTableAddDatetimeColName).Desc(),
-		}
+		}, []interface{}{}
 	case OrderByName:
 		return []exp.OrderedExpression{
 			wrapperAliasTable.Col(schema.ItemTableNameColName).Asc(),
@@ -3574,13 +3608,19 @@ func (s *Repository) wrapperOrderBy(
 			wrapperAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
 			wrapperAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
 			wrapperAliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-		}
+		}, []interface{}{}
 	case OrderByDescendantsParentsCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colDescendantsParentsCount).Desc()}
+		col := wrappedAliasTable.Col(colDescendantsParentsCount)
+
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
 	case OrderByStarCount:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colStarCount).Desc()}
+		col := wrappedAliasTable.Col(colStarCount)
+
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
 	case OrderByItemParentParentTimestamp:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colItemParentParentTimestamp).Desc()}
+		col := wrappedAliasTable.Col(colItemParentParentTimestamp)
+
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
 	case OrderByAge:
 		return []exp.OrderedExpression{
 			wrapperAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
@@ -3588,17 +3628,23 @@ func (s *Repository) wrapperOrderBy(
 			wrapperAliasTable.Col(schema.ItemTableNameColName).Asc(),
 			wrapperAliasTable.Col(schema.ItemTableBodyColName).Asc(),
 			wrapperAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
-		}
+		}, []interface{}{}
 	case OrderByIDDesc:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(schema.ItemTableIDColName).Desc()}
+		col := wrappedAliasTable.Col(schema.ItemTableIDColName)
+
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
 	case OrderByIDAsc:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(schema.ItemTableIDColName).Asc()}
+		col := wrappedAliasTable.Col(schema.ItemTableIDColName)
+
+		return []exp.OrderedExpression{col.Asc()}, []interface{}{col}
 	case OrderByAttrsUserValuesUpdateDate:
-		return []exp.OrderedExpression{wrappedAliasTable.Col(colAttrsUserValuesUpdateDate).Desc()}
+		col := wrappedAliasTable.Col(colAttrsUserValuesUpdateDate)
+
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
 	case OrderByNone:
 	}
 
-	return nil
+	return nil, []interface{}{}
 }
 
 func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy) []exp.OrderedExpression {
@@ -3690,10 +3736,7 @@ func (s *Repository) setItemVehicleTypeRow(
 	}).OnConflict(goqu.DoUpdate(
 		schema.ItemVehicleTypeTableItemIDColName+","+schema.ItemVehicleTypeTableVehicleTypeIDColName,
 		goqu.Record{
-			schema.ItemVehicleTypeTableInheritedColName: goqu.Func(
-				"VALUES",
-				goqu.C(schema.ItemVehicleTypeTableInheritedColName),
-			),
+			schema.ItemVehicleTypeTableInheritedColName: schema.Excluded(schema.ItemVehicleTypeTableInheritedColName),
 		},
 	)).Executor().ExecContext(ctx)
 	if err != nil {
@@ -3834,7 +3877,7 @@ func (s *Repository) namePreferLanguage(
 			schema.ItemParentLanguageTableParentIDCol.Eq(parentID),
 			goqu.Func("LENGTH", schema.ItemParentLanguageTableNameCol).Gt(0),
 		).
-		Order(goqu.L("? > 0", schema.ItemParentLanguageTableLanguageCol.Eq(lang)).Desc()).
+		Order(goqu.L("?", schema.ItemParentLanguageTableLanguageCol.Eq(lang)).Desc()).
 		ScanValContext(ctx, &res)
 	if err != nil {
 		return "", err
@@ -4207,10 +4250,7 @@ func (s *Repository) setItemLanguageName(
 	}).OnConflict(goqu.DoUpdate(
 		schema.ItemLanguageTableItemIDColName+","+schema.ItemLanguageTableLanguageColName,
 		goqu.Record{
-			schema.ItemLanguageTableNameColName: goqu.Func(
-				"VALUES",
-				goqu.C(schema.ItemLanguageTableNameColName),
-			),
+			schema.ItemLanguageTableNameColName: schema.Excluded(schema.ItemLanguageTableNameColName),
 		},
 	)).Executor().ExecContext(ctx)
 

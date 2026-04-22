@@ -22,7 +22,7 @@ var (
 )
 
 type VotingVariantRow struct {
-	ID    int32          `db:"id"`
+	ID    int32          `db:"id"    goqu:"pk,skipinsert"`
 	Name  string         `db:"name"`
 	Text  sql.NullString `db:"text"`
 	Votes int32          `db:"votes"`

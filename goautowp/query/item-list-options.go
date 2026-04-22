@@ -217,7 +217,7 @@ func (s *ItemListOptions) apply(
 
 	if s.CreatedInDays > 0 {
 		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableAddDatetimeColName).Gt(
-			goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL ? DAY", s.CreatedInDays)),
+			goqu.L("NOW() - INTERVAL ?", fmt.Sprintf("%d DAY", s.CreatedInDays)),
 		))
 	}
 
@@ -274,19 +274,19 @@ func (s *ItemListOptions) apply(
 	}
 
 	if s.HasBeginYear {
-		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableBeginYearColName))
+		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableBeginYearColName).Gt(0))
 	}
 
 	if s.HasEndYear {
-		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableEndYearColName))
+		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableEndYearColName).Gt(0))
 	}
 
 	if s.HasBeginMonth {
-		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableBeginMonthColName))
+		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableBeginMonthColName).Gt(0))
 	}
 
 	if s.HasEndMonth {
-		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableEndMonthColName))
+		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableEndMonthColName).Gt(0))
 	}
 
 	if s.HasLogo {
@@ -684,8 +684,8 @@ func (s *ItemListOptions) applySuggestionsTo(
 				aliasIDCol.Eq(ilsAliasTable.Col(schema.ItemLanguageTableItemIDColName)),
 			)).
 			Join(schema.ItemLanguageTable.As(ils2Alias), goqu.On(
-				goqu.Func("INSTR", ilsAliasTable.Col(schema.ItemLanguageTableNameColName),
-					goqu.T(ils2Alias).Col(schema.ItemLanguageTableNameColName)),
+				goqu.Func("STRPOS", ilsAliasTable.Col(schema.ItemLanguageTableNameColName),
+					goqu.T(ils2Alias).Col(schema.ItemLanguageTableNameColName)).Gt(0),
 			)).
 			Where(
 				aliasTable.Col(schema.ItemTableItemTypeIDColName).

@@ -12,9 +12,7 @@ import (
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/textstorage"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql"    // enable mysql dialect
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
-	_ "github.com/go-sql-driver/mysql"                  // enable mysql driver
 	_ "github.com/lib/pq"                               // enable postgres driver
 	"github.com/stretchr/testify/require"
 )
@@ -24,14 +22,10 @@ func createRepository(t *testing.T) *Repository {
 
 	cfg := config.LoadConfig("..")
 
-	autowpDB, err := sql.Open("mysql", cfg.AutowpDSN)
-	require.NoError(t, err)
-
 	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", autowpDB)
-	goquPgDB := goqu.New("postgres", postgresDB)
+	goquDB := goqu.New("postgres", postgresDB)
 
 	i18n, err := i18nbundle.New()
 	require.NoError(t, err)
@@ -40,10 +34,9 @@ func createRepository(t *testing.T) *Repository {
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
-	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	itemsRepository := items.NewRepository(
 		goquDB,
-		goquPgDB,
 		0,
 		itemParentLanguageRepository,
 		textstorageRepository,
@@ -52,7 +45,6 @@ func createRepository(t *testing.T) *Repository {
 
 	picturesRepository := pictures.NewRepository(
 		goquDB,
-		goquPgDB,
 		imageStorage,
 		textstorageRepository,
 		itemsRepository,
@@ -60,7 +52,7 @@ func createRepository(t *testing.T) *Repository {
 		func(int64) error { return nil },
 	)
 
-	repo := NewRepository(goquDB, goquPgDB, i18n, itemsRepository, picturesRepository, imageStorage)
+	repo := NewRepository(goquDB, i18n, itemsRepository, picturesRepository, imageStorage)
 
 	return repo
 }

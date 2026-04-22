@@ -31,7 +31,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/gen2brain/avif" // AVIF support
-	my "github.com/go-mysql/errors"
 	"github.com/sirupsen/logrus"
 	_ "golang.org/x/image/bmp"  // BMP support
 	_ "golang.org/x/image/webp" // WEBP support
@@ -61,6 +60,7 @@ var (
 	errInvalidImageID          = errors.New("invalid image id provided")
 	errFileSizeDetectionFailed = errors.New("failed to determine file size")
 	errParenthesisNotSupported = errors.New("change image name for keys with parenthesis is not supported")
+	errNoRowsReturned          = errors.New("no rows returned")
 )
 
 type Storage struct {
@@ -280,8 +280,8 @@ func (s *Storage) AddImageFromImagick(
 ) (int, error) {
 	var err error
 
-	width := int(mw.GetImageWidth())   //nolint: gosec
-	height := int(mw.GetImageHeight()) //nolint: gosec
+	width := int(mw.GetImageWidth())
+	height := int(mw.GetImageHeight())
 
 	if width <= 0 || height <= 0 {
 		return 0, fmt.Errorf("%w: (%v x %v)", errFailedToGetImageSize, width, height)
@@ -1385,8 +1385,7 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 		schema.FormattedImageTableFormattedImageIDColName: nil,
 	}).Executor().ExecContext(ctx)
 	if err != nil {
-		ok, myerr := my.Error(err) // MySQL error
-		if !ok || !errors.Is(myerr, my.ErrDupeKey) {
+		if !util.IsPgDuplicateKeyError(err) {
 			return 0, err
 		}
 
@@ -1556,15 +1555,17 @@ func (s *Storage) generateLockWrite(
 			opt := options
 			opt.Index = indexByAttempt(attemptIndex)
 
-			var (
-				destFileName string
-				res          sql.Result
-			)
+			var destFileName string
 
 			destFileName, insertAttemptException = s.createImagePath(ctx, dirName, opt)
 			if insertAttemptException == nil {
+				var (
+					id      int64
+					success bool
+				)
+
 				// store to db
-				res, insertAttemptException = s.db.Insert(schema.ImageTable).Rows(goqu.Record{
+				success, insertAttemptException = s.db.Insert(schema.ImageTable).Rows(goqu.Record{
 					schema.ImageTableWidthColName:      width,
 					schema.ImageTableHeightColName:     height,
 					schema.ImageTableDirColName:        dirName,
@@ -1575,16 +1576,17 @@ func (s *Storage) generateLockWrite(
 					schema.ImageTableCropTopColName:    0,
 					schema.ImageTableCropWidthColName:  0,
 					schema.ImageTableCropHeightColName: 0,
-					schema.ImageTableS3ColName:         1,
-				}).Executor().ExecContext(ctx)
+					schema.ImageTableS3ColName:         true,
+				}).
+					Returning(schema.ImageTableIDCol).
+					Executor().ScanValContext(ctx, &id)
 				if insertAttemptException == nil {
-					var id int64
-
-					id, insertAttemptException = res.LastInsertId()
-					if insertAttemptException == nil {
+					if success {
 						insertAttemptException = callback(destFileName)
 
 						imageID = int(id)
+					} else {
+						insertAttemptException = errNoRowsReturned
 					}
 				}
 			}

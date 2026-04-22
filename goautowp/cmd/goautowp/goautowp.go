@@ -27,6 +27,8 @@ const (
 	limitFlag                 = "limit"
 	loglevelFlag              = "loglevel"
 	ginmodeFlag               = "ginmode"
+	dirFlag                   = "dir"
+	offsetFlag                = "offset"
 )
 
 var autowpApp *goautowp.Application
@@ -208,13 +210,13 @@ func mainReturnWithCode() int { //nolint: maintidx
 						Name: "list-broken-images",
 						Flags: []cli.Flag{
 							&cli.StringFlag{
-								Name:     "dir",
+								Name:     dirFlag,
 								Value:    "",
 								Usage:    "dir",
 								Required: true,
 							},
 							&cli.StringFlag{
-								Name:     "offset",
+								Name:     offsetFlag,
 								Value:    "",
 								Usage:    "offset",
 								Required: false,
@@ -223,8 +225,8 @@ func mainReturnWithCode() int { //nolint: maintidx
 						Action: func(ctx context.Context, command *cli.Command) error {
 							return autowpApp.ImageStorageListBrokenImages(
 								ctx,
-								command.String("dir"),
-								command.String("offset"),
+								command.String(dirFlag),
+								command.String(offsetFlag),
 							)
 						},
 					},
@@ -232,7 +234,7 @@ func mainReturnWithCode() int { //nolint: maintidx
 						Name: "list-unlinked-objects",
 						Flags: []cli.Flag{
 							&cli.StringFlag{
-								Name:     "dir",
+								Name:     dirFlag,
 								Value:    "",
 								Usage:    "dir",
 								Required: true,
@@ -244,7 +246,7 @@ func mainReturnWithCode() int { //nolint: maintidx
 								Required: false,
 							},
 							&cli.StringFlag{
-								Name:     "offset",
+								Name:     offsetFlag,
 								Value:    "",
 								Usage:    "offset",
 								Required: false,
@@ -252,9 +254,9 @@ func mainReturnWithCode() int { //nolint: maintidx
 						},
 						Action: func(ctx context.Context, command *cli.Command) error {
 							return autowpApp.ImageStorageListUnlinkedObjects(ctx,
-								command.String("dir"),
+								command.String(dirFlag),
 								command.Bool("move-to-lost-and-found"),
-								command.String("offset"),
+								command.String(offsetFlag),
 							)
 						},
 					},
@@ -289,12 +291,7 @@ func mainReturnWithCode() int { //nolint: maintidx
 					},
 				},
 				Action: func(ctx context.Context, cli *cli.Command) error {
-					err := autowpApp.MigrateAutowp(ctx)
-					if err != nil {
-						return err
-					}
-
-					err = autowpApp.MigratePostgres(ctx)
+					err := autowpApp.MigratePostgres(ctx)
 					if err != nil {
 						return err
 					}
@@ -309,12 +306,6 @@ func mainReturnWithCode() int { //nolint: maintidx
 						Autoban:               cli.Bool("autoban"),
 						AttrsUpdateValuesAMQP: cli.Bool(attrsUpdateValuesAMQPFlag),
 					}, quit)
-				},
-			},
-			{
-				Name: "migrate-autowp",
-				Action: func(ctx context.Context, _ *cli.Command) error {
-					return autowpApp.MigrateAutowp(ctx)
 				},
 			},
 			{

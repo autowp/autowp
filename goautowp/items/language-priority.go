@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 )
@@ -247,12 +248,15 @@ func langPriorityOrderExpr( //nolint: ireturn
 		return nil, fmt.Errorf("%w: `%s`", errLangNotFound, schema.DefaultLanguageCode)
 	}
 
-	args := make([]interface{}, len(langPriority)+1)
-	args[0] = col
+	iLangPriority := make([]interface{}, len(langPriority))
 
 	for i, v := range langPriority {
-		args[i+1] = v
+		iLangPriority[i] = v
 	}
 
-	return goqu.Func("FIELD", args...).Asc(), nil
+	return goqu.Func(
+		"array_position",
+		goqu.L("ARRAY["+util.RepeatWithDelim("?", ",", len(iLangPriority))+"]::varchar[]", iLangPriority...),
+		col,
+	).Asc(), nil
 }

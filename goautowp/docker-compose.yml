@@ -31,7 +31,7 @@ services:
     image: quay.io/keycloak/keycloak:26.4
     container_name: goautowp_keycloak_test
     depends_on:
-      - postgres-keycloak
+      - postgres
     volumes:
       - ./test/realm.json:/opt/keycloak/data/import/realm.json
     environment:
@@ -45,7 +45,7 @@ services:
       - --hostname=localhost
       - --http-enabled=true
       - --db=postgres
-      - --db-url=jdbc:postgresql://postgres-keycloak:5432/keycloak
+      - --db-url=jdbc:postgresql://postgres:5432/keycloak
       - --db-username=keycloak
       - --db-password=password
     restart: always
@@ -73,18 +73,6 @@ services:
           memory: 16M
     privileged: true
 
-  mysql:
-    image: mysql:8
-    container_name: goautowp_mysql_test
-    volumes:
-      - ./test/dump.sql:/dump.sql:ro
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=autowp
-    ports:
-      - '0.0.0.0:3306:3306'
-    restart: always
-
   nginx:
     image: nginx:1-alpine
     container_name: goautowp_nginx_test
@@ -95,14 +83,19 @@ services:
     restart: always
 
   postgres:
-    image: postgres:13-alpine
+    image: postgis/postgis:18-3.6-alpine
     container_name: goautowp_postgres_test
     volumes:
-      - ./test/pg.sql:/pg.sql:ro
+      - ./test/postgres-initdb.d/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
+      - ./test/postgres-initdb.d/create-keycloak-database.sh:/docker-entrypoint-initdb.d/create-keycloak-database.sh:ro
+      - ./test/dump.sql:/dump.sql:ro
     environment:
       - POSTGRES_DB=traffic
       - POSTGRES_USER=traffic
       - POSTGRES_PASSWORD=password
+      - KECYLOAK_DB_NAME=keycloak
+      - KECYLOAK_DB_USER=keycloak
+      - KECYLOAK_DB_PASSWORD=password
     ports:
       - '0.0.0.0:5432:5432'
     restart: always
@@ -115,24 +108,6 @@ services:
           cpus: "0.25"
           memory: 128M
 
-  postgres-keycloak:
-    image: postgres:13-alpine
-    container_name: goautowp_postgres_keycloak_test
-    environment:
-      - POSTGRES_DB=keycloak
-      - POSTGRES_USER=keycloak
-      - POSTGRES_PASSWORD=password
-    ports:
-      - '0.0.0.0:5433:5432'
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 8G
-        reservations:
-          cpus: "0.25"
-          memory: 128M
   rabbitmq:
     image: rabbitmq:management-alpine
     container_name: goautowp_rabbitmq_test

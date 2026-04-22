@@ -285,18 +285,18 @@ func (s *Catalogue) getBrandVehicleTypes(
 		Join(schema.ItemParentCacheTable, goqu.On(schema.ItemTableIDCol.Eq(schema.ItemParentCacheTableItemIDCol))).
 		Where(
 			schema.ItemParentCacheTableParentIDCol.Eq(brandID),
-			goqu.Or(schema.ItemTableBeginYearCol, schema.ItemTableBeginModelYearCol),
+			goqu.Or(schema.ItemTableBeginYearCol.Gt(0), schema.ItemTableBeginModelYearCol.Gt(0)),
 			schema.ItemTableIsGroupCol.IsFalse(),
 		).
 		GroupBy(schema.VehicleTypeTableIDCol).
 		Order(schema.VehicleTypeTablePositionCol.Asc())
 
 	rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
-	defer util.Close(rows)
-
 	if err != nil {
 		return nil, err
 	}
+
+	defer util.Close(rows)
 
 	var result []*BrandVehicleType
 

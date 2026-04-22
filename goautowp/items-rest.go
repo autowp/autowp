@@ -76,8 +76,8 @@ func (s *ItemsREST) postLogoAction(ctx *gin.Context) {
 
 	if file.Size > items.ItemLogoMaxFileSize {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"invalid_params": gin.H{itemLogoFileField: map[string]string{
-				"fileFilesSizeTooBig": fmt.Sprintf(
+			invalidParams: gin.H{itemLogoFileField: map[string]string{
+				fileFilesSizeTooBig: fmt.Sprintf(
 					"All files in sum should have a maximum size of '%d' but '%d' were detected",
 					items.ItemLogoMaxFileSize, file.Size,
 				),
@@ -103,8 +103,8 @@ func (s *ItemsREST) postLogoAction(ctx *gin.Context) {
 
 	if !mime.Is(sampler.ContentTypeImagePNG) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"invalid_params": gin.H{itemLogoFileField: map[string]string{
-				"fileIsImageFalseType": fmt.Sprintf(
+			invalidParams: gin.H{itemLogoFileField: map[string]string{
+				fileIsImageFalseType: fmt.Sprintf(
 					"File is no image, '%s' detected",
 					mime.String(),
 				),
@@ -130,7 +130,7 @@ func (s *ItemsREST) postLogoAction(ctx *gin.Context) {
 
 	if imageConfig.Width < items.ItemLogoMinWidth || imageConfig.Height < items.ItemLogoMinHeight {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"invalid_params": gin.H{itemLogoFileField: map[string]string{
+			invalidParams: gin.H{itemLogoFileField: map[string]string{
 				"fileImageSizeTooSmall": fmt.Sprintf(
 					"Minimum expected size for image should be '%dx%d' but '%dx%d' detected",
 					items.ItemLogoMinWidth,

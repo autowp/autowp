@@ -40,6 +40,12 @@ const (
 	newboxGroupTypePictures = "pictures"
 
 	galleryItemsPerPage = 10
+
+	acceptReplaceMessageModeratorURL          = "ModeratorURL"
+	messagePictureURL                         = "PictureURL"
+	acceptReplaceMessageReplacementPictureURL = "ReplacementPictureURL"
+
+	pictureModerVoteTemplateMessageField = "message"
 )
 
 type PicturesGRPCServer struct {
@@ -172,7 +178,7 @@ func (s *PicturesGRPCServer) ValidatePictureModerVoteTemplateRow(
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "message",
+			Field:       pictureModerVoteTemplateMessageField,
 			Description: fv,
 		})
 	}
@@ -344,8 +350,12 @@ func (s *PicturesGRPCServer) UpdateModerVote(
 	}
 
 	pictureID := in.GetPictureId()
-	vote := in.GetVote() > 0
 	reason := in.GetReason()
+
+	var vote uint8
+	if in.GetVote() > 0 {
+		vote = 1
+	}
 
 	ctx = context.WithoutCancel(ctx)
 
@@ -363,14 +373,14 @@ func (s *PicturesGRPCServer) UpdateModerVote(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if vote && currentStatus == schema.PictureStatusRemoving {
+	if vote > 0 && currentStatus == schema.PictureStatusRemoving {
 		err = s.restoreFromRemoving(ctx, pictureID, userCtx.UserID)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
 
-	if (!vote) && currentStatus == schema.PictureStatusAccepted {
+	if (vote == 0) && currentStatus == schema.PictureStatusAccepted {
 		err = s.unaccept(ctx, pictureID, userCtx.UserID)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
@@ -398,7 +408,7 @@ func (s *PicturesGRPCServer) UpdateModerVote(
 	}
 
 	msgTemplate := "Подана заявка на удаление картинки %d"
-	if vote {
+	if vote > 0 {
 		msgTemplate = "Подана заявка на принятие картинки %d"
 	}
 
@@ -1119,9 +1129,9 @@ func (s *PicturesGRPCServer) AcceptReplacePicture(
 				}
 
 				return map[string]interface{}{
-					"ModeratorURL":          frontend.UserURL(uri, userCtx.UserID, user.Identity),
-					"PictureURL":            frontend.PictureURL(uri, replacePicture.Identity),
-					"ReplacementPictureURL": frontend.PictureURL(uri, pic.Identity),
+					acceptReplaceMessageModeratorURL:          frontend.UserURL(uri, userCtx.UserID, user.Identity),
+					messagePictureURL:                         frontend.PictureURL(uri, replacePicture.Identity),
+					acceptReplaceMessageReplacementPictureURL: frontend.PictureURL(uri, pic.Identity),
 				}, nil
 			})
 		if err != nil {
@@ -2261,7 +2271,7 @@ func (s *PicturesGRPCServer) unaccept(ctx context.Context, pictureID int64, user
 }
 
 func (s *PicturesGRPCServer) notifyVote(
-	ctx context.Context, pictureID int64, vote bool, reason string, userID int64,
+	ctx context.Context, pictureID int64, vote uint8, reason string, userID int64,
 ) error {
 	if pictureID == 0 {
 		return sql.ErrNoRows
@@ -2279,7 +2289,7 @@ func (s *PicturesGRPCServer) notifyVote(
 	}
 
 	tpl := "pm/new-picture-%s-vote-%s/delete"
-	if vote {
+	if vote > 0 {
 		tpl = "pm/new-picture-%s-vote-%s/accept"
 	}
 
@@ -2391,8 +2401,8 @@ func (s *PicturesGRPCServer) notifyCopyrightsEdited(
 		err = s.messagingRepository.CreateMessageFromTemplate(
 			ctx, 0, userRow.ID, "pm/user-%s-edited-picture-copyrights-%s-%s",
 			map[string]interface{}{
-				"User":       editorURL,
-				"PictureURL": pictureURL,
+				"User":            editorURL,
+				messagePictureURL: pictureURL,
 			},
 			userRow.Language,
 		)
@@ -2512,7 +2522,7 @@ func (s *PicturesGRPCServer) notifyAccepted(
 				}
 
 				return map[string]interface{}{
-					"PictureURL": pictureURL,
+					messagePictureURL: pictureURL,
 				}, nil
 			})
 		if err != nil {
@@ -2583,8 +2593,8 @@ func (s *PicturesGRPCServer) notifyRemoving(
 			}
 
 			return map[string]interface{}{
-				"PictureURL": pictureURL,
-				"Reasons":    strings.Join(reasons, "\n"),
+				messagePictureURL: pictureURL,
+				"Reasons":         strings.Join(reasons, "\n"),
 			}, nil
 		})
 }

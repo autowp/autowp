@@ -6,8 +6,8 @@ import (
 
 	"github.com/autowp/goautowp/config"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql" // enable mysql dialect
-	_ "github.com/go-sql-driver/mysql"               // enable mysql driver
+	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
+	_ "github.com/lib/pq"                               // enable postgres driver
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,17 +16,17 @@ func createRepository(t *testing.T) *Repository {
 
 	cfg := config.LoadConfig("..")
 
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 
 	s := NewRepository(goquDB)
 
 	return s
 }
 
-func TestGetUserNewMessagesCount(t *testing.T) {
+func TestPickItemOfDay(t *testing.T) {
 	t.Parallel()
 
 	s := createRepository(t)

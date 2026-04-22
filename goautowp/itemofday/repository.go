@@ -128,7 +128,7 @@ func (s *Repository) CandidateQuery() *goqu.SelectDataset {
 			),
 		).
 		GroupBy(schema.ItemTableIDCol).
-		Having(goqu.C(picturesCountAlias).Gte(s.minPictures))
+		Having(goqu.COUNT(goqu.DISTINCT(schema.PictureTableIDCol)).Gte(s.minPictures))
 
 	return sqSelect
 }
@@ -220,7 +220,7 @@ func (s *Repository) Current(ctx context.Context) (*schema.OfDayRow, error) {
 
 	success, err := s.db.Select(schema.OfDayTableItemIDCol, schema.OfDayTableUserIDCol).
 		From(schema.OfDayTable).
-		Where(schema.OfDayTableDayDateCol.Lte(goqu.Func("CURDATE"))).
+		Where(schema.OfDayTableDayDateCol.Lte(goqu.L("CURRENT_DATE"))).
 		Order(schema.OfDayTableDayDateCol.Desc()).
 		Limit(1).
 		ScanStructContext(ctx, &st)
@@ -237,11 +237,17 @@ func (s *Repository) Current(ctx context.Context) (*schema.OfDayRow, error) {
 
 func (s *Repository) candidate(ctx context.Context) (int64, error) {
 	sqSelect := s.CandidateQuery().
-		Where(goqu.L(
-			schema.ItemTableName + ".begin_year AND " + schema.ItemTableName + ".end_year OR " +
-				schema.ItemTableName + ".begin_model_year AND " + schema.ItemTableName + ".end_model_year",
+		Where(goqu.Or(
+			goqu.And(
+				schema.ItemTableBeginYearCol.Gt(0),
+				schema.ItemTableEndYearCol.Gt(0),
+			),
+			goqu.And(
+				schema.ItemTableBeginModelYearCol.Gt(0),
+				schema.ItemTableEndModelYearCol.Gt(0),
+			),
 		)).
-		Order(goqu.Func("RAND").Desc()).
+		Order(goqu.Func("RANDOM").Desc()).
 		Limit(1)
 
 	rec := CandidateRecord{}

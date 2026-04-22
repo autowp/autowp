@@ -7,13 +7,9 @@ grpc:
 sentry:
   dsn: {{ .Values.goautowp.sentry.dsn | quote }}
   environment: production
-autowp-migrations:
-  dir: ./migrations
-  dsn: "mysql://{{ .Values.mysql.username }}:{{ .Values.mysql.password }}@tcp({{ .Values.mysql.host }})/{{ .Values.mysql.database }}?charset=utf8mb4&parseTime=true&loc=UTC"
 duplicate_finder:
   rabbitmq: amqp://guest:guest@{{ include "common.names.fullname" .Subcharts.rabbitmq }}:5672/
   queue: duplicate_finder
-autowp-dsn: "{{ .Values.mysql.username }}:{{ .Values.mysql.password }}@tcp({{ .Values.mysql.host }}:3306)/{{ .Values.mysql.database }}?charset=utf8mb4&parseTime=true&loc=UTC"
 file-storage:
   bucket: files
   s3:

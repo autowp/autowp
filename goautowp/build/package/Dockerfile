@@ -58,5 +58,4 @@ USER appuser:appuser
 
 COPY goautowp /goautowp
 COPY migrations /migrations
-COPY postgres-migrations /postgres-migrations
 COPY defaults.yaml /defaults.yaml

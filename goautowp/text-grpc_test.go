@@ -47,15 +47,15 @@ func TestGetText(t *testing.T) {
 	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
-	res, err := goquDB.Insert(schema.TextstorageTextTable).Rows(goqu.Record{
+	var id int64
+
+	success, err := goquDB.Insert(schema.TextstorageTextTable).Rows(goqu.Record{
 		schema.TextstorageTextTableTextColName:        "Text 2",
 		schema.TextstorageTextTableLastUpdatedColName: goqu.Func("NOW"),
 		schema.TextstorageTextTableRevisionColName:    2,
-	}).Executor().ExecContext(ctx)
+	}).Returning(schema.TextstorageTextTableIDCol).Executor().ScanValContext(ctx, &id)
 	require.NoError(t, err)
-
-	id, err := res.LastInsertId()
-	require.NoError(t, err)
+	require.True(t, success)
 
 	_, err = goquDB.Insert(schema.TextstorageRevisionTable).Rows(goqu.Record{
 		schema.TextstorageRevisionTableTextIDColName:    id,

@@ -1,1 +1,0 @@
-UPDATE pages SET url="/twins/group/%TWINS_GROUP_ID%" WHERE id=28;

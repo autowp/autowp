@@ -8,15 +8,11 @@ sentry:
   environment: development
 metrics:
   listen: ":2112"
-autowp-migrations:
-  dir: ./migrations
-  dsn: mysql://root:password@tcp(127.0.0.1)/autowp?charset=utf8mb4&collation=utf8mb4_0900_ai_ci&parseTime=true&loc=UTC
 duplicate_finder:
   rabbitmq: amqp://guest:guest@localhost:5672/
   queue: duplicate_finder
 attrs:
   update_values_queue: attrs_update_values
-autowp-dsn: root:password@tcp(127.0.0.1:3306)/autowp?charset=utf8mb4&collation=utf8mb4_0900_ai_ci&parseTime=true&loc=UTC
 file-storage:
   bucket: files
   srcOverride:
@@ -35,7 +31,7 @@ monitoring_queue: input
 postgres-dsn: postgres://traffic:password@127.0.0.1:5432/traffic?sslmode=disable
 postgres-migrations:
   dsn: postgres://traffic:password@127.0.0.1/traffic?sslmode=disable
-  dir: ./postgres-migrations
+  dir: ./migrations
 recaptcha:
   public-key: public
   private-key: private

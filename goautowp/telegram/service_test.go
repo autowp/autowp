@@ -21,10 +21,8 @@ import (
 	"github.com/autowp/goautowp/textstorage"
 	"github.com/autowp/goautowp/users"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql"    // enable mysql dialect
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	_ "github.com/golang-migrate/migrate/v4/database/mysql"    // enable mysql migrations
 	_ "github.com/golang-migrate/migrate/v4/database/postgres" // enable postgres migrations
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -37,16 +35,12 @@ func TestInboxCommand(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 
 	cfg := config.LoadConfig("../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
 
-	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
-	require.NoError(t, err)
-
-	goquPostgresDB := goqu.New("postgres", postgresDB)
 	client := gocloak.NewClient(cfg.Keycloak.URL)
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
@@ -54,7 +48,6 @@ func TestInboxCommand(t *testing.T) {
 
 	usersRepo := users.NewRepository(
 		goquDB,
-		goquPostgresDB,
 		"",
 		cfg.Languages,
 		client,
@@ -63,10 +56,9 @@ func TestInboxCommand(t *testing.T) {
 		imageStorage,
 	)
 	textStorageRepo := textstorage.New(goquDB)
-	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, goquPostgresDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	itemRepo := items.NewRepository(
 		goquDB,
-		goquPostgresDB,
 		cfg.MostsMinCarsCount,
 		itemParentLanguageRepository,
 		textStorageRepo,
@@ -84,7 +76,6 @@ func TestInboxCommand(t *testing.T) {
 	)
 	picturesRepo := pictures.NewRepository(
 		goquDB,
-		goquPostgresDB,
 		imageStorage,
 		textStorageRepo,
 		itemRepo,
@@ -125,31 +116,32 @@ func TestInboxCommand(t *testing.T) {
 func createRandomUser(ctx context.Context, t *testing.T, db *goqu.Database) int64 {
 	t.Helper()
 
+	var id int64
+
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	emailAddr := "test" + strconv.Itoa(random.Int()) + "@example.com"
 	name := "ivan"
-	res, err := db.Insert(schema.UserTable).
+	success, err := db.Insert(schema.UserTable).
 		Rows(goqu.Record{
 			schema.UserTableLoginColName:          nil,
 			schema.UserTableEmailColName:          emailAddr,
 			schema.UserTablePasswordColName:       nil,
 			schema.UserTableEmailToCheckColName:   nil,
-			schema.UserTableHideEmailColName:      1,
+			schema.UserTableHideEmailColName:      true,
 			schema.UserTableEmailCheckCodeColName: nil,
 			schema.UserTableNameColName:           name,
 			schema.UserTableRegDateColName:        goqu.Func("NOW"),
 			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
 			schema.UserTableTimezoneColName:       "Europe/Moscow",
-			schema.UserTableLastIPColName:         goqu.Func("INET6_ATON", "127.0.0.1"),
+			schema.UserTableLastIPColName:         goqu.Func("INET", "127.0.0.1"),
 			schema.UserTableLanguageColName:       schema.EnglishLanguageCode,
-			schema.UserTableUUIDColName:           goqu.Func("UUID_TO_BIN", uuid.New().String()),
+			schema.UserTableUUIDColName:           uuid.New().String(),
 		}).
-		Executor().ExecContext(ctx)
+		Returning(schema.UserTableIDCol).
+		Executor().ScanValContext(ctx, &id)
 	require.NoError(t, err)
-
-	id, err := res.LastInsertId()
-	require.NoError(t, err)
+	require.True(t, success)
 
 	return id
 }

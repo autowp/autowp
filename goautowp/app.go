@@ -15,11 +15,8 @@ import (
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/schema"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql"    // enable mysql dialect
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
-	_ "github.com/go-sql-driver/mysql"                  // enable mysql driver
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/mysql"    // enable mysql migrations
 	_ "github.com/golang-migrate/migrate/v4/database/postgres" // enable postgres migrations
 	_ "github.com/golang-migrate/migrate/v4/source/file"       // enable file migration source
 	_ "github.com/lib/pq"                                      // enable postgres driver
@@ -48,22 +45,6 @@ func NewApplication(cfg config.Config) *Application {
 	}
 
 	return app
-}
-
-func (s *Application) MigrateAutowp(ctx context.Context) error {
-	_, err := s.container.GoquDB(ctx)
-	if err != nil {
-		return err
-	}
-
-	cfg := s.container.Config()
-
-	err = applyMigrations(cfg.AutowpMigrations)
-	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return err
-	}
-
-	return nil
 }
 
 func (s *Application) ServeGRPC(ctx context.Context, quit chan bool) error {
@@ -317,7 +298,7 @@ func applyMigrations(config config.MigrationsConfig) error {
 }
 
 func (s *Application) MigratePostgres(ctx context.Context) error {
-	_, err := s.container.GoquPostgresDB(ctx)
+	_, err := s.container.GoquDB(ctx)
 	if err != nil {
 		return err
 	}

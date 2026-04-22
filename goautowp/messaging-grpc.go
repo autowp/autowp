@@ -13,6 +13,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+const (
+	messageMessageField = "message"
+)
+
 type MessagingGRPCServer struct {
 	UnimplementedMessagingServer
 
@@ -183,7 +187,7 @@ func (s *MessagingGRPCServer) CreateMessage(
 
 	for _, fv := range problems {
 		fvs = append(fvs, &errdetails.BadRequest_FieldViolation{
-			Field:       "message",
+			Field:       messageMessageField,
 			Description: fv,
 		})
 	}

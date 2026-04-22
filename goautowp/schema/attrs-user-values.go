@@ -43,7 +43,7 @@ type AttrsUserValueRow struct {
 	AttributeID int64     `db:"attribute_id"`
 	ItemID      int64     `db:"item_id"`
 	UserID      int64     `db:"user_id"`
-	Conflict    bool      `db:"conflict"`
+	Conflict    int16     `db:"conflict"`
 	UpdateDate  time.Time `db:"update_date"`
 	AddDate     time.Time `db:"add_date"`
 }

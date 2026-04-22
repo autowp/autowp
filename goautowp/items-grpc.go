@@ -30,8 +30,8 @@ import (
 	"github.com/autowp/goautowp/validation"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	geo "github.com/paulmach/go.geo"
 	"github.com/redis/go-redis/v9"
+	"github.com/twpayne/go-geom"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -48,6 +48,20 @@ const (
 	topSpecsContributorsValuesCountThreshold = 10
 	topSpecsContributorsInDays               = 3
 	topSpecsContributorsLimit                = 4
+
+	messageItemModerURL     = "ItemModerURL"
+	messageItemName         = "ItemName"
+	messageUserURL          = "UserURL"
+	messageChangesFromField = "From"
+	messageChangesToField   = "To"
+)
+
+const (
+	itemNameField               = "name"
+	itemParentNameField         = "name"
+	itemLinkNameField           = "name"
+	itemLanguageNameField       = "name"
+	itemParentLanguageNameField = "name"
 )
 
 func (s *ItemParent) Validate() ([]*errdetails.BadRequest_FieldViolation, error) {
@@ -76,7 +90,7 @@ func (s *ItemParent) Validate() ([]*errdetails.BadRequest_FieldViolation, error)
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "name",
+			Field:       itemParentNameField,
 			Description: fv,
 		})
 	}
@@ -613,19 +627,20 @@ func (s *ItemsGRPCServer) CreateItemLink(
 		return nil, wrapFieldViolations(InvalidParams)
 	}
 
-	res, err := s.db.Insert(schema.ItemLinkTable).Rows(goqu.Record{
+	var id int64
+
+	success, err := s.db.Insert(schema.ItemLinkTable).Rows(goqu.Record{
 		schema.ItemLinkTableNameColName:   in.GetName(),
 		schema.ItemLinkTableURLColName:    in.GetUrl(),
 		schema.ItemLinkTableTypeColName:   in.GetType(),
 		schema.ItemLinkTableItemIDColName: in.GetItemId(),
-	}).Executor().ExecContext(ctx)
+	}).Returning(schema.ItemLinkTableIDCol).Executor().ScanValContext(ctx, &id)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	id, err := res.LastInsertId()
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	if !success {
+		return nil, status.Error(codes.Internal, errNoRowsReturned.Error())
 	}
 
 	return &APICreateItemLinkResponse{
@@ -695,7 +710,7 @@ func (s *APIItemLink) Validate() ([]*errdetails.BadRequest_FieldViolation, error
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "name",
+			Field:       itemLinkNameField,
 			Description: fv,
 		})
 	}
@@ -1009,7 +1024,7 @@ func (s *ItemsGRPCServer) UpdateItemLanguage(
 	}
 
 	if len(changes) > 0 {
-		err := s.repository.UserItemSubscribe(ctx, userCtx.UserID, in.GetItemId())
+		err := s.repository.UserItemSubscribe(ctx, in.GetItemId(), userCtx.UserID)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -1070,10 +1085,10 @@ func (s *ItemsGRPCServer) UpdateItemLanguage(
 			err = s.messagingRepository.CreateMessageFromTemplate(
 				ctx, 0, subscriber.ID, "pm/user-%s-edited-item-language-%s-%s",
 				map[string]interface{}{
-					"UserURL":      frontend.UserURL(uri, author.ID, author.Identity),
-					"ItemName":     itemNameText,
-					"ItemModerURL": frontend.ItemModerURL(uri, itemID),
-					"Changes":      strings.Join(changesStrs, "\n"),
+					messageUserURL:      frontend.UserURL(uri, author.ID, author.Identity),
+					messageItemName:     itemNameText,
+					messageItemModerURL: frontend.ItemModerURL(uri, itemID),
+					"Changes":           strings.Join(changesStrs, "\n"),
 				},
 				subscriber.Language,
 			)
@@ -1286,7 +1301,7 @@ func (s *ItemLanguage) Validate() ([]*errdetails.BadRequest_FieldViolation, erro
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "name",
+			Field:       itemLanguageNameField,
 			Description: fv,
 		})
 	}
@@ -1356,7 +1371,7 @@ func (s *ItemParentLanguage) Validate() ([]*errdetails.BadRequest_FieldViolation
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "name",
+			Field:       itemParentLanguageNameField,
 			Description: fv,
 		})
 	}
@@ -2474,7 +2489,12 @@ func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *APIItem) (*ItemID,
 	}
 
 	if location := in.GetLocation(); location != nil {
-		point := geo.NewPointFromLatLng(location.GetLatitude(), location.GetLongitude())
+		point, err := geom.NewPoint(geom.XY).SetCoords(geom.Coord{location.GetLatitude(), location.GetLongitude()})
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		point.SetSRID(schema.SRID)
 
 		err = s.repository.SetItemLocation(ctx, itemID, point)
 		if err != nil {
@@ -2562,7 +2582,7 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 	}
 	notifyMeta := false
 
-	if util.Contains(mask.GetPaths(), "name") {
+	if util.Contains(mask.GetPaths(), itemNameField) {
 		notifyMeta = true
 		set.Name = values.GetName()
 	}
@@ -2724,9 +2744,14 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 	}
 
 	if util.Contains(mask.GetPaths(), "location") {
-		var point *geo.Point
+		var point *geom.Point
 		if location := values.GetLocation(); location != nil {
-			point = geo.NewPointFromLatLng(location.GetLatitude(), location.GetLongitude())
+			point, err = geom.NewPoint(geom.XY).SetCoords(geom.Coord{location.GetLatitude(), location.GetLongitude()})
+			if err != nil {
+				return nil, status.Error(codes.InvalidArgument, err.Error())
+			}
+
+			point.SetSRID(schema.SRID)
 		}
 
 		err = s.repository.SetItemLocation(ctx, item.ID, point)
@@ -2810,10 +2835,10 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 				}
 
 				return map[string]interface{}{
-					"UserURL":      frontend.UserURL(uri, user.ID, user.Identity),
-					"ItemName":     itemNameText,
-					"ItemModerURL": frontend.ItemModerURL(uri, item.ID),
-					"Changes":      changesStr,
+					messageUserURL:      frontend.UserURL(uri, user.ID, user.Identity),
+					messageItemName:     itemNameText,
+					messageItemModerURL: frontend.ItemModerURL(uri, item.ID),
+					"Changes":           changesStr,
 				}, nil
 			},
 		)
@@ -3021,9 +3046,9 @@ func (s *ItemsGRPCServer) notifyItemParentSubscribers(
 			subscriber.ID,
 			messageID,
 			map[string]interface{}{
-				"UserURL":            frontend.UserURL(uri, author.ID, author.Identity),
-				"ItemName":           itemNameText,
-				"ItemModerURL":       frontend.ItemModerURL(uri, item.ID),
+				messageUserURL:       frontend.UserURL(uri, author.ID, author.Identity),
+				messageItemName:      itemNameText,
+				messageItemModerURL:  frontend.ItemModerURL(uri, item.ID),
 				"ParentItemName":     parentNameText,
 				"ParentItemModerURL": frontend.ItemModerURL(uri, parent.ID),
 			},
@@ -3354,8 +3379,8 @@ func (s *ItemsGRPCServer) boolChange(
 	return localizer.Localize(&i18n.LocalizeConfig{
 		DefaultMessage: &i18n.Message{ID: msg},
 		TemplateData: map[string]interface{}{
-			"From": from,
-			"To":   to,
+			messageChangesFromField: from,
+			messageChangesToField:   to,
 		},
 	})
 }
@@ -3382,8 +3407,8 @@ func (s *ItemsGRPCServer) nullBoolChange(
 		return localizer.Localize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{ID: msg},
 			TemplateData: map[string]interface{}{
-				"From": from,
-				"To":   to,
+				messageChangesFromField: from,
+				messageChangesToField:   to,
 			},
 		})
 	}
@@ -3408,8 +3433,8 @@ func (s *ItemsGRPCServer) nullInt16Change(
 	return localizer.Localize(&i18n.LocalizeConfig{
 		DefaultMessage: &i18n.Message{ID: msg},
 		TemplateData: map[string]interface{}{
-			"From": from,
-			"To":   to,
+			messageChangesFromField: from,
+			messageChangesToField:   to,
 		},
 	})
 }
@@ -3431,8 +3456,8 @@ func (s *ItemsGRPCServer) nullInt32Change(
 	return localizer.Localize(&i18n.LocalizeConfig{
 		DefaultMessage: &i18n.Message{ID: msg},
 		TemplateData: map[string]interface{}{
-			"From": from,
-			"To":   to,
+			messageChangesFromField: from,
+			messageChangesToField:   to,
 		},
 	})
 }
@@ -3462,8 +3487,8 @@ func (s *ItemsGRPCServer) stringChange(
 	return localizer.Localize(&i18n.LocalizeConfig{
 		DefaultMessage: &i18n.Message{ID: msg},
 		TemplateData: map[string]interface{}{
-			"From": oldValue,
-			"To":   newValue,
+			messageChangesFromField: oldValue,
+			messageChangesToField:   newValue,
 		},
 	})
 }
@@ -3699,8 +3724,8 @@ func (s *ItemsGRPCServer) buildChangesMessage( //nolint: maintidx
 		change, err = localizer.Localize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{ID: "moder/vehicle/changes/spec-%s-%s"},
 			TemplateData: map[string]interface{}{
-				"From": from,
-				"To":   to,
+				messageChangesFromField: from,
+				messageChangesToField:   to,
 			},
 		})
 		if err != nil {
@@ -3767,8 +3792,8 @@ func (s *ItemsGRPCServer) buildChangesMessage( //nolint: maintidx
 		change, err = localizer.Localize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{ID: "moder/vehicle/changes/engine-item-id-%s-%s"},
 			TemplateData: map[string]interface{}{
-				"From": from,
-				"To":   to,
+				messageChangesFromField: from,
+				messageChangesToField:   to,
 			},
 		})
 		if err != nil {

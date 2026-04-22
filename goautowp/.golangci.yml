@@ -46,7 +46,7 @@ linters:
     - godox
     - goheader
     - gomoddirectives
-    - gomodguard
+    - gomodguard_v2
     - goprintffuncname
     - gosec
     # - gosmopolitan
@@ -125,6 +125,8 @@ linters:
         - i
         - j
         - k
+    goconst:
+      ignore-tests: true
   exclusions:
     generated: lax
     presets:

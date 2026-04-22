@@ -1,1 +1,0 @@
-ALTER TABLE links RENAME item_link, CHANGE COLUMN id id bigint auto_increment;

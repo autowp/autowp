@@ -197,7 +197,7 @@ func (s *StatisticsGRPCServer) GetPulse(
 		to = time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, now.Location())
 		subPeriodMonth = 1
 		format = "2006-01"
-		dateExpr = "%Y-%m"
+		dateExpr = "YYYY-MM"
 
 	case PulseRequest_MONTH:
 		from = time.Now().AddDate(0, -1, 0)
@@ -205,7 +205,7 @@ func (s *StatisticsGRPCServer) GetPulse(
 		to = time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
 		subPeriodDay = 1
 		format = "2006-01-02"
-		dateExpr = "%Y-%m-%d"
+		dateExpr = "YYYY-MM-DD"
 
 	default:
 		from = time.Now().AddDate(0, 0, -1)
@@ -222,7 +222,7 @@ func (s *StatisticsGRPCServer) GetPulse(
 		to = time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, now.Location())
 		subPeriodTime = time.Hour
 		format = "2006-01-02 15"
-		dateExpr = "%Y-%m-%d %H"
+		dateExpr = "YYYY-MM-DD HH24"
 	}
 
 	var rows []scanRow
@@ -231,7 +231,7 @@ func (s *StatisticsGRPCServer) GetPulse(
 
 	err := s.db.Select(
 		schema.LogEventsTableUserIDCol.As("user_id"),
-		goqu.Func("DATE_FORMAT", schema.LogEventsTableAddDatetimeCol, dateExpr).As(dateAlias),
+		goqu.Func("TO_CHAR", schema.LogEventsTableAddDatetimeCol, dateExpr).As(dateAlias),
 		goqu.COUNT(goqu.Star()).As("value"),
 	).From(schema.LogEventsTable).
 		Where(
@@ -328,7 +328,7 @@ func (s *StatisticsGRPCServer) contributors(ctx context.Context) ([]string, erro
 				schema.UserTableIdentityCol.IsNull(),
 				schema.UserTableIdentityCol.Neq("autowp"),
 			),
-			schema.UserTableLastOnlineCol.Gt(goqu.L("DATE_SUB(CURDATE(), INTERVAL 6 MONTH)")),
+			schema.UserTableLastOnlineCol.Gt(goqu.L("CURRENT_DATE - INTERVAL '6 MONTH'")),
 		).
 		ScanValsContext(ctx, &contributors)
 	if err != nil {

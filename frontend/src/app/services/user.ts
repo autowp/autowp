@@ -33,12 +33,7 @@ export class UserService {
 
     if (toRequest.length > 0) {
       const promise$: Observable<null> = this.#usersClient
-        .getUsers(
-          new APIUsersRequest({
-            id: toRequest,
-            limit: '' + toRequest.length,
-          }),
-        )
+        .getUsers(new APIUsersRequest({id: toRequest, limit: toRequest.length}))
         .pipe(
           tap((response) => {
             for (const item of response.items || []) {

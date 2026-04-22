@@ -106,6 +106,8 @@ func (s Acceleration) Items(
 			axisSelect = axisSelect.GroupBy(itemIDCol)
 		}
 
+		axisSelect = axisSelect.GroupByAppend(goqu.C(valueColumnAlias))
+
 		selects = append(selects, axisSelect)
 	}
 

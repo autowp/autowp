@@ -2267,8 +2267,8 @@ message APIUserPreferencesResponse {
 
 message APIUsersRequest {
   bool is_online = 2;
-  uint64 limit = 3;
-  uint64 page = 4;
+  uint32 limit = 3;
+  uint32 page = 4;
   UserFields fields = 5;
   string search = 6;
   repeated int64 id = 7;

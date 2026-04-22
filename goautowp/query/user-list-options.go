@@ -17,8 +17,8 @@ type UserListOptions struct {
 	HasSpecs      *bool
 	IsOnline      bool
 	HasPictures   *bool
-	Limit         uint64
-	Page          uint64
+	Limit         uint32
+	Page          uint32
 	Search        string
 	ItemSubscribe *UserItemSubscribeListOptions
 }
@@ -86,7 +86,7 @@ func (s *UserListOptions) apply(alias string, sqSelect *goqu.SelectDataset) *goq
 
 	if s.IsOnline {
 		sqSelect = sqSelect.Where(aliasTable.Col(schema.UserTableLastOnlineColName).Gte(
-			goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL 5 MINUTE")),
+			goqu.L("NOW() - INTERVAL '5 MINUTE'"),
 		))
 	}
 

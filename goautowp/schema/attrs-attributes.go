@@ -62,7 +62,7 @@ var (
 )
 
 type AttrsAttributeRow struct {
-	ID          int64               `db:"id"`
+	ID          int64               `db:"id"          goqu:"pk,skipinsert"`
 	Name        string              `db:"name"`
 	ParentID    sql.NullInt64       `db:"parent_id"`
 	Description sql.NullString      `db:"description"`

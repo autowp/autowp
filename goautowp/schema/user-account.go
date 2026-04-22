@@ -14,7 +14,7 @@ var (
 )
 
 type UserAccountRow struct {
-	ID         int64  `db:"id"`
+	ID         int64  `db:"id"           goqu:"pk,skipinsert"`
 	UserID     int64  `db:"user_id"`
 	ServiceID  string `db:"service_id"`
 	ExternalID string `db:"external_id"`

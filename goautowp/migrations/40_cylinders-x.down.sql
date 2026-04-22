@@ -1,1 +1,0 @@
-DELETE FROM `attrs_list_options` WHERE id=222;

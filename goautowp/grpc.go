@@ -19,6 +19,11 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+const (
+	feedbackMessageField = "message"
+	feedbackNameField    = "name"
+)
+
 var errNoEndpointProvided = errors.New("no endpoints provided")
 
 func APIImageToGRPC(image *storage.Image) *APIImage {
@@ -201,7 +206,7 @@ func (s *Feedback) Validate(
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "name",
+			Field:       feedbackNameField,
 			Description: fv,
 		})
 	}
@@ -238,7 +243,7 @@ func (s *Feedback) Validate(
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "message",
+			Field:       feedbackMessageField,
 			Description: fv,
 		})
 	}

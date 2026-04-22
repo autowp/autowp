@@ -170,6 +170,7 @@ func (s *DayPictures) calcDate(
 	var date sql.NullTime
 
 	success, err := sqSelect.Select(goqu.T(query.PictureAlias).Col(s.column)).
+		Where(goqu.T(query.PictureAlias).Col(schema.PictureTableAcceptDatetimeColName).IsNotNull()).
 		Limit(1).
 		ScanValContext(ctx, &date)
 	if err != nil {

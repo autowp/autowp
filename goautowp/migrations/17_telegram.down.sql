@@ -1,1 +1,0 @@
-DROP TABLE telegram_brand, telegram_chat;

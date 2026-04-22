@@ -35,6 +35,9 @@ const (
 	pictureItemIDField           = "item_id"
 	pictureReplacePictureIDField = "replace_picture_id"
 	picturePerspectiveID         = "perspective_id"
+	pictureNameField             = "name"
+
+	responseStatus = "status"
 )
 
 type PicturesREST struct {
@@ -178,7 +181,7 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 	if values.File.Size > pictures.ImageMaxFileSize {
 		ctx.JSON(http.StatusBadRequest, BadRequestResponse{
 			InvalidParams: map[string]map[string]string{pictureFileField: {
-				"fileFilesSizeTooBig": fmt.Sprintf(
+				fileFilesSizeTooBig: fmt.Sprintf(
 					"All files in sum should have a maximum size of '%d' but '%d' were detected",
 					pictures.ImageMaxFileSize, values.File.Size,
 				),
@@ -221,7 +224,7 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 	if !mimeIsAllowed {
 		ctx.JSON(http.StatusBadRequest, BadRequestResponse{
 			InvalidParams: map[string]map[string]string{pictureFileField: {
-				"fileIsImageFalseType": fmt.Sprintf(
+				fileIsImageFalseType: fmt.Sprintf(
 					"File is no image, '%s' detected",
 					mime.String(),
 				),
@@ -371,7 +374,7 @@ func (s *PicturesREST) handlePicture(ctx *gin.Context, orderBy pictures.OrderBy)
 
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
-			"status": false,
+			responseStatus: false,
 		})
 
 		return
@@ -451,7 +454,7 @@ func (s *PicturesREST) handleItemOfDayPicture(ctx *gin.Context) {
 func (s *PicturesREST) populatePicture(ctx *gin.Context, row *schema.PictureRow, lang string) {
 	if row == nil {
 		ctx.JSON(http.StatusOK, gin.H{
-			"status": false,
+			responseStatus: false,
 		})
 
 		return
@@ -498,9 +501,9 @@ func (s *PicturesREST) populatePicture(ctx *gin.Context, row *schema.PictureRow,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"status": true,
-		"url":    imageInfo.Src(),
-		"name":   nameText,
-		"page":   frontend.PictureURL(uri, row.Identity),
+		responseStatus:   true,
+		"url":            imageInfo.Src(),
+		pictureNameField: nameText,
+		"page":           frontend.PictureURL(uri, row.Identity),
 	})
 }

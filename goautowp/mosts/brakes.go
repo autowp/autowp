@@ -103,6 +103,8 @@ func (s Brakes) Items(
 			axisSelect = axisSelect.GroupBy(itemIDCol)
 		}
 
+		axisSelect = axisSelect.GroupByAppend(sizeAliasCol)
+
 		selects = append(selects, axisSelect)
 	}
 

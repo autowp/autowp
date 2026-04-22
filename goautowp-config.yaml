@@ -8,12 +8,9 @@ public-rest:
       - https://en.localhost:4200
       - http://en.localhost
       - https://en.localhost
-autowp-migrations:
-  dsn: mysql://root:password@tcp(mysql)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
 duplicate_finder:
   rabbitmq: amqp://guest:guest@rabbitmq:5672/
   queue: duplicate_finder
-autowp-dsn: root:password@tcp(mysql:3306)/autowp_test?charset=utf8mb4&parseTime=true&loc=UTC
 file-storage:
   s3:
     region: "us-east-1"

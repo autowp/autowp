@@ -36,10 +36,13 @@ const (
 	CommentMessageTableDeleteDateColName         = "delete_date"
 	CommentMessageTableRepliesCountColName       = "replies_count"
 	CommentMessageTableVoteColName               = "vote"
+	CommentMessageTableDatetimeColName           = "datetime"
+	CommentMessageTableMessageColName            = "message"
+	CommentMessageTableIPColName                 = "ip"
 )
 
 type CommentMessageRow struct {
-	ID                 int64                            `db:"id"`
+	ID                 int64                            `db:"id"                  goqu:"pk,skipinsert"`
 	TypeID             CommentMessageType               `db:"type_id"`
 	ItemID             int64                            `db:"item_id"`
 	ParentID           sql.NullInt64                    `db:"parent_id"`
@@ -64,15 +67,15 @@ var (
 	CommentMessageTableAuthorIDCol = CommentMessageTable.Col(
 		CommentMessageTableAuthorIDColName,
 	)
-	CommentMessageTableDatetimeCol = CommentMessageTable.Col("datetime")
+	CommentMessageTableDatetimeCol = CommentMessageTable.Col(CommentMessageTableDatetimeColName)
 	CommentMessageTableVoteCol     = CommentMessageTable.Col(
 		CommentMessageTableVoteColName,
 	)
 	CommentMessageTableParentIDCol = CommentMessageTable.Col(
 		CommentMessageTableParentIDColName,
 	)
-	CommentMessageTableMessageCol = CommentMessageTable.Col("message")
-	CommentMessageTableIPCol      = CommentMessageTable.Col("ip")
+	CommentMessageTableMessageCol = CommentMessageTable.Col(CommentMessageTableMessageColName)
+	CommentMessageTableIPCol      = CommentMessageTable.Col(CommentMessageTableIPColName)
 	CommentMessageTableDeletedCol = CommentMessageTable.Col(
 		CommentMessageTableDeletedColName,
 	)

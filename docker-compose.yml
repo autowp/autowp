@@ -23,12 +23,23 @@ services:
       exit 0;
       "
 
+  frontend:
+    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.10.1
+    container_name: autowp_test_frontend
+    depends_on:
+      - goautowp-serve
+    network_mode: "service:goautowp-serve"
+    volumes:
+      - ./frontend/dist:/app
+    restart: always
+    user: "101:101"
+    read_only: true
+
   goautowp-scheduler-generate-index-cache:
     image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.10.1
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     depends_on:
       - keycloak
-      - mysql
       - rabbitmq
       - redis
       - traffic-postgres
@@ -41,7 +52,6 @@ services:
     container_name: autowp_test_goautowp_serve
     depends_on:
       - keycloak
-      - mysql
       - rabbitmq
       - redis
       - traffic-postgres
@@ -53,18 +63,6 @@ services:
     command: serve --df-amqp --monitoring-amqp --grpc --public --autoban --attrs-update-values-amqp --loglevel=debug
     restart: always
     user: "0"
-
-  frontend:
-    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.10.1
-    container_name: autowp_test_frontend
-    depends_on:
-      - goautowp-serve
-    network_mode: "service:goautowp-serve"
-    volumes:
-      - ./frontend/dist:/app
-    restart: always
-    user: "101:101"
-    read_only: true
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.4
@@ -102,23 +100,6 @@ services:
       - '0.0.0.0:9001:9001'
     command: server --console-address ":9001" /data
     restart: always
-
-  mysql:
-    image: mysql:8
-    container_name: autowp_test_mysql
-    volumes:
-      - ./mysql:/var/lib/mysql
-      - ./mysql.conf.d:/etc/mysql/conf.d
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: autowp_test
-      MYSQL_USER: autowp_test
-      MYSQL_PASSWORD: test
-    ports:
-      - '0.0.0.0:3306:3306'
-    restart: always
-    expose:
-      - '3306'
 
   postgres-keycloak:
     image: postgres:13-alpine

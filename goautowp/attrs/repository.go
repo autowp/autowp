@@ -91,7 +91,6 @@ type I18nUnit struct {
 // Repository Main Object.
 type Repository struct {
 	db                      *goqu.Database
-	pgDB                    *goqu.Database
 	i18n                    *i18nbundle.I18n
 	listOptions             map[int64]map[int64]string
 	listOptionsMutex        sync.Mutex
@@ -116,7 +115,6 @@ type Repository struct {
 // NewRepository constructor.
 func NewRepository(
 	db *goqu.Database,
-	pgDB *goqu.Database,
 	i18n *i18nbundle.I18n,
 	itemsRepository *items.Repository,
 	picturesRepository *pictures.Repository,
@@ -124,7 +122,6 @@ func NewRepository(
 ) *Repository {
 	return &Repository{
 		db:                      db,
-		pgDB:                    pgDB,
 		i18n:                    i18n,
 		listOptions:             make(map[int64]map[int64]string),
 		listOptionsMutex:        sync.Mutex{},
@@ -211,7 +208,7 @@ func (s *Repository) Attributes(
 
 func (s *Repository) AttributeTypes(ctx context.Context) ([]schema.AttrsAttributeTypeRow, error) {
 	r := make([]schema.AttrsAttributeTypeRow, 0)
-	err := s.pgDB.Select(schema.AttrsTypesTableIDCol, schema.AttrsTypesTableNameCol).
+	err := s.db.Select(schema.AttrsTypesTableIDCol, schema.AttrsTypesTableNameCol).
 		From(schema.AttrsTypesTable).
 		ScanStructsContext(ctx, &r)
 
@@ -222,7 +219,7 @@ func (s *Repository) ListOptions(
 	ctx context.Context,
 	attributeID int64,
 ) ([]schema.AttrsListOptionRow, error) {
-	sqSelect := s.pgDB.Select(schema.AttrsListOptionsTableIDCol, schema.AttrsListOptionsTableNameCol,
+	sqSelect := s.db.Select(schema.AttrsListOptionsTableIDCol, schema.AttrsListOptionsTableNameCol,
 		schema.AttrsListOptionsTableAttributeIDCol, schema.AttrsListOptionsTableParentIDCol).
 		From(schema.AttrsListOptionsTable).
 		Order(schema.AttrsListOptionsTablePositionCol.Asc())
@@ -262,7 +259,7 @@ func (s *Repository) ZoneAttributes(
 	zoneID int64,
 ) ([]schema.AttrsZoneAttributeRow, error) {
 	attrs := make([]schema.AttrsZoneAttributeRow, 0)
-	err := s.pgDB.Select(schema.AttrsZoneAttributesTableZoneIDCol, schema.AttrsZoneAttributesTableAttributeIDCol).
+	err := s.db.Select(schema.AttrsZoneAttributesTableZoneIDCol, schema.AttrsZoneAttributesTableAttributeIDCol).
 		From(schema.AttrsZoneAttributesTable).
 		Where(schema.AttrsZoneAttributesTableZoneIDCol.Eq(zoneID)).
 		ScanStructsContext(ctx, &attrs)
@@ -272,7 +269,7 @@ func (s *Repository) ZoneAttributes(
 
 func (s *Repository) Zones(ctx context.Context) ([]schema.AttrsZoneRow, error) {
 	r := make([]schema.AttrsZoneRow, 0)
-	err := s.pgDB.Select(schema.AttrsZonesTableIDCol, schema.AttrsZonesTableNameCol).
+	err := s.db.Select(schema.AttrsZonesTableIDCol, schema.AttrsZonesTableNameCol).
 		From(schema.AttrsZonesTable).
 		ScanStructsContext(ctx, &r)
 
@@ -291,7 +288,7 @@ func (s *Repository) TotalValues(ctx context.Context) (int32, error) {
 }
 
 func (s *Repository) TotalZoneAttrs(ctx context.Context, zoneID int64) (int32, error) {
-	sqSelect := s.pgDB.From(schema.AttrsAttributesTable).
+	sqSelect := s.db.From(schema.AttrsAttributesTable).
 		Join(
 			schema.AttrsZoneAttributesTable,
 			goqu.On(schema.AttrsAttributesTableIDCol.Eq(schema.AttrsZoneAttributesTableAttributeIDCol)),
@@ -339,7 +336,7 @@ func (s *Repository) ValuesCount(
 	ctx context.Context,
 	options query.AttrsValueListOptions,
 ) (int32, error) {
-	sqSelect := s.ValuesSelect(options, ValuesOrderByNone)
+	sqSelect := s.ValuesSelect(options, ValuesOrderByNone).ClearOrder()
 
 	result, err := sqSelect.CountContext(ctx)
 	if err != nil {
@@ -949,7 +946,7 @@ func (s *Repository) RefreshUserConflictsStat(
 
 	expr := s.db.Update(schema.UserTable).Set(goqu.Record{
 		schema.UserTableSpecsWeightColName: goqu.L(
-			"1.5 * ((1 + IFNULL((?), 0)) / (1 + IFNULL((?), 0)))",
+			"1.5 * ((1 + COALESCE((?), 0)) / (1 + COALESCE((?), 0)))",
 			pSelect,
 			nSelect,
 		),
@@ -970,7 +967,7 @@ func (s *Repository) RefreshConflictFlags(ctx context.Context) error {
 	err := s.db.Select(schema.AttrsUserValuesTableAttributeIDCol, schema.AttrsUserValuesTableItemIDCol).
 		Distinct().
 		From(schema.AttrsUserValuesTable).
-		Where(schema.AttrsUserValuesTableConflictCol.IsTrue()).
+		Where(schema.AttrsUserValuesTableConflictCol.Neq(0)).
 		ScanStructsContext(ctx, &rows)
 	if err != nil {
 		return err
@@ -1177,6 +1174,8 @@ func (s *Repository) SetUserValue( //nolint: maintidx
 		return false, nil
 	}
 
+	value.Type = attribute.TypeID.AttributeTypeID
+
 	ctx = context.WithoutCancel(ctx)
 
 	// convert empty values to valid = false
@@ -1187,7 +1186,7 @@ func (s *Repository) SetUserValue( //nolint: maintidx
 
 		case schema.AttrsAttributeTypeIDList, schema.AttrsAttributeTypeIDTree:
 			if len(value.ListValue) > 0 {
-				sqSelect := s.pgDB.Select(schema.AttrsListOptionsTableIDCol).
+				sqSelect := s.db.Select(schema.AttrsListOptionsTableIDCol).
 					From(schema.AttrsListOptionsTable).
 					Where(
 						schema.AttrsListOptionsTableAttributeIDCol.Eq(attribute.ID),
@@ -1246,7 +1245,7 @@ func (s *Repository) SetUserValue( //nolint: maintidx
 			schema.AttrsUserValuesTableUpdateDateColName:  goqu.Func("NOW"),
 		}).Executor(),
 	)
-	if err != nil && !util.IsMysqlDuplicateKeyError(err) {
+	if err != nil && !util.IsPgDuplicateKeyError(err) {
 		return false, fmt.Errorf("failed to insert attribute user value descriptor: %w", err)
 	}
 
@@ -1757,7 +1756,7 @@ func (s *Repository) ChartData(ctx context.Context, attributeID int64) ([]ChartD
 		pairs := make(map[int]Value)
 
 		sqSelect := s.db.Select(
-			goqu.Func("YEAR", schema.ItemTableBeginOrderCacheCol).As("year"),
+			goqu.L("EXTRACT(YEAR FROM ?)", schema.ItemTableBeginOrderCacheCol).As("year"),
 			goqu.Func("ROUND", goqu.Func("AVG", valueTable.ValueCol)).As("value"),
 		).
 			From(valueTable.Table).
@@ -1848,7 +1847,7 @@ func (s *Repository) loadZoneAttributesTree(ctx context.Context, zoneID int64) e
 	if _, ok := s.zoneAttributesTree[zoneID]; !ok {
 		tree := make(map[int64][]*schema.AttrsAttributeRow)
 
-		sqSelect := s.pgDB.Select(schema.AttrsZoneAttributesTableAttributeIDCol).
+		sqSelect := s.db.Select(schema.AttrsZoneAttributesTableAttributeIDCol).
 			From(schema.AttrsZoneAttributesTable).
 			Where(schema.AttrsZoneAttributesTableZoneIDCol.Eq(zoneID)).
 			Order(schema.AttrsZoneAttributesTablePositionCol.Asc())
@@ -1896,7 +1895,7 @@ func (s *Repository) loadAttributesTree(ctx context.Context) error {
 	if s.attributesTree == nil {
 		rows := make([]schema.AttrsAttributeRow, 0)
 
-		err := s.pgDB.Select(
+		err := s.db.Select(
 			schema.AttrsAttributesTableIDCol,
 			schema.AttrsAttributesTableNameCol,
 			schema.AttrsAttributesTableDescriptionCol,
@@ -2031,7 +2030,7 @@ func (s *Repository) unitsMap(ctx context.Context) (map[int64]schema.AttrsUnitRo
 	if len(s.units) == 0 {
 		rows := make([]schema.AttrsUnitRow, 0)
 
-		err := s.pgDB.Select(schema.AttrsUnitsTableIDCol, schema.AttrsUnitsTableNameCol, schema.AttrsUnitsTableAbbrCol).
+		err := s.db.Select(schema.AttrsUnitsTableIDCol, schema.AttrsUnitsTableNameCol, schema.AttrsUnitsTableAbbrCol).
 			From(schema.AttrsUnitsTable).
 			ScanStructsContext(ctx, &rows)
 		if err != nil {
@@ -2148,7 +2147,7 @@ func (s *Repository) loadListOptions(ctx context.Context) error {
 
 	var rows []schema.AttrsListOptionRow
 
-	err := s.pgDB.Select(
+	err := s.db.Select(
 		schema.AttrsListOptionsTableAttributeIDCol,
 		schema.AttrsListOptionsTableIDCol,
 		schema.AttrsListOptionsTableParentIDCol,
@@ -2383,7 +2382,7 @@ func (s *Repository) getEngineAttributeIDs(ctx context.Context) ([]int64, error)
 		return s.engineAttributes, nil
 	}
 
-	err := s.pgDB.Select(schema.AttrsZoneAttributesTableAttributeIDCol).
+	err := s.db.Select(schema.AttrsZoneAttributesTableAttributeIDCol).
 		From(schema.AttrsZoneAttributesTable).
 		Where(schema.AttrsZoneAttributesTableZoneIDCol.Eq(engineZoneID)).
 		ScanValsContext(ctx, &s.engineAttributes)
@@ -2646,9 +2645,8 @@ func (s *Repository) setStringValue(
 			goqu.DoUpdate(
 				schema.AttrsValuesStringTableAttributeIDColName+","+schema.AttrsValuesStringTableItemIDColName,
 				goqu.Record{
-					schema.AttrsValuesStringTableValueColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.AttrsValuesStringTableValueColName),
+					schema.AttrsValuesStringTableValueColName: schema.Excluded(
+						schema.AttrsValuesStringTableValueColName,
 					),
 				},
 			)).Executor(),
@@ -2677,10 +2675,7 @@ func (s *Repository) setIntValue(
 			goqu.DoUpdate(
 				schema.AttrsValuesIntTableAttributeIDColName+","+schema.AttrsValuesIntTableItemIDColName,
 				goqu.Record{
-					schema.AttrsValuesIntTableValueColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.AttrsValuesIntTableValueColName),
-					),
+					schema.AttrsValuesIntTableValueColName: schema.Excluded(schema.AttrsValuesIntTableValueColName),
 				},
 			)).Executor(),
 	)
@@ -2708,10 +2703,7 @@ func (s *Repository) setFloatValue(
 			goqu.DoUpdate(
 				schema.AttrsValuesFloatTableAttributeIDColName+","+schema.AttrsValuesFloatTableItemIDColName,
 				goqu.Record{
-					schema.AttrsValuesFloatTableValueColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.AttrsValuesFloatTableValueColName),
-					),
+					schema.AttrsValuesFloatTableValueColName: schema.Excluded(schema.AttrsValuesFloatTableValueColName),
 				},
 			)).Executor(),
 	)
@@ -2765,10 +2757,7 @@ func (s *Repository) setListValue(
 					schema.AttrsValuesListTableItemIDColName+","+
 					schema.AttrsValuesListTableOrderingColName,
 				goqu.Record{
-					schema.AttrsValuesListTableValueColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.AttrsValuesListTableValueColName),
-					),
+					schema.AttrsValuesListTableValueColName: schema.Excluded(schema.AttrsValuesListTableValueColName),
 				},
 			)).Executor(),
 	)
@@ -2827,10 +2816,7 @@ func (s *Repository) setActualValue(
 			goqu.DoUpdate(
 				schema.AttrsValuesTableAttributeIDColName+","+schema.AttrsValuesTableItemIDColName,
 				goqu.Record{
-					schema.AttrsValuesTableUpdateDateColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.AttrsValuesTableUpdateDateColName),
-					),
+					schema.AttrsValuesTableUpdateDateColName: schema.Excluded(schema.AttrsValuesTableUpdateDateColName),
 				},
 			),
 		).Executor(),
@@ -2950,7 +2936,7 @@ func (s *Repository) setScalarUserValue(
 		}).Executor(),
 	)
 	if err != nil {
-		if !util.IsMysqlDuplicateKeyError(err) {
+		if !util.IsPgDuplicateKeyError(err) {
 			return false, err
 		}
 
@@ -3038,11 +3024,11 @@ func (s *Repository) setListUserValue(
 	ctx = context.WithoutCancel(ctx)
 
 	insertExpr := s.db.Insert(schema.AttrsUserValuesListTable).Cols(
-		schema.AttrsUserValuesListTableAttributeIDCol,
-		schema.AttrsUserValuesListTableItemIDCol,
-		schema.AttrsUserValuesListTableUserIDCol,
-		schema.AttrsUserValuesListTableOrderingCol,
-		schema.AttrsUserValuesListTableValueCol,
+		schema.AttrsUserValuesListTableAttributeIDColName,
+		schema.AttrsUserValuesListTableItemIDColName,
+		schema.AttrsUserValuesListTableUserIDColName,
+		schema.AttrsUserValuesListTableOrderingColName,
+		schema.AttrsUserValuesListTableValueColName,
 	).
 		OnConflict(
 			goqu.DoUpdate(
@@ -3051,9 +3037,8 @@ func (s *Repository) setListUserValue(
 					schema.AttrsUserValuesListTableUserIDColName+","+
 					schema.AttrsUserValuesListTableOrderingColName,
 				goqu.Record{
-					schema.AttrsUserValuesListTableValueColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.AttrsUserValuesListTableValueColName),
+					schema.AttrsUserValuesListTableValueColName: schema.Excluded(
+						schema.AttrsUserValuesListTableValueColName,
 					),
 				},
 			))
@@ -3834,7 +3819,7 @@ func (s *Repository) flatternAttributes(attributes []*AttributeRow) []*Attribute
 func (s *Repository) specIDs(ctx context.Context, id int32) ([]int32, error) {
 	var ids []int32 //nolint: prealloc
 
-	err := s.pgDB.Select(schema.SpecTableIDCol).
+	err := s.db.Select(schema.SpecTableIDCol).
 		From(schema.SpecTable).
 		Where(schema.SpecTableParentIDCol.Eq(id)).
 		ScanValsContext(ctx, &ids)

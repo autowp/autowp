@@ -107,20 +107,13 @@ export class ModerCommentsComponent implements OnInit {
           );
         }
 
-        return this.#usersClient
-          .getUsers(
-            new APIUsersRequest({
-              limit: '10',
-              search: query,
-            }),
-          )
-          .pipe(
-            catchError((err: unknown) => {
-              this.#toastService.handleError(err);
-              return EMPTY;
-            }),
-            map((response) => response.items || []),
-          );
+        return this.#usersClient.getUsers(new APIUsersRequest({limit: 10, search: query})).pipe(
+          catchError((err: unknown) => {
+            this.#toastService.handleError(err);
+            return EMPTY;
+          }),
+          map((response) => response.items || []),
+        );
       }),
     );
 

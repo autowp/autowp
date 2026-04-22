@@ -129,7 +129,7 @@ func (s *Repository) DeleteMessage(ctx context.Context, userID int64, messageID 
 	ctx = context.WithoutCancel(ctx)
 
 	_, err := s.db.Update(schema.PersonalMessagesTable).
-		Set(goqu.Record{schema.PersonalMessagesTableDeletedByFromColName: 1}).
+		Set(goqu.Record{schema.PersonalMessagesTableDeletedByFromColName: true}).
 		Where(
 			schema.PersonalMessagesTableFromUserIDCol.Eq(userID),
 			schema.PersonalMessagesTableIDCol.Eq(messageID),
@@ -140,7 +140,7 @@ func (s *Repository) DeleteMessage(ctx context.Context, userID int64, messageID 
 	}
 
 	_, err = s.db.Update(schema.PersonalMessagesTable).
-		Set(goqu.Record{schema.PersonalMessagesTableDeletedByToColName: 1}).
+		Set(goqu.Record{schema.PersonalMessagesTableDeletedByToColName: true}).
 		Where(
 			schema.PersonalMessagesTableToUserIDCol.Eq(userID),
 			schema.PersonalMessagesTableIDCol.Eq(messageID),
@@ -152,7 +152,7 @@ func (s *Repository) DeleteMessage(ctx context.Context, userID int64, messageID 
 
 func (s *Repository) ClearSent(ctx context.Context, userID int64) error {
 	_, err := s.db.Update(schema.PersonalMessagesTable).
-		Set(goqu.Record{schema.PersonalMessagesTableDeletedByFromColName: 1}).
+		Set(goqu.Record{schema.PersonalMessagesTableDeletedByFromColName: true}).
 		Where(schema.PersonalMessagesTableFromUserIDCol.Eq(userID)).
 		Executor().ExecContext(ctx)
 
@@ -304,7 +304,7 @@ func (s *Repository) RecycleSystem(ctx context.Context) (int64, error) {
 	res, err := s.db.Delete(schema.PersonalMessagesTable).Where(
 		schema.PersonalMessagesTableFromUserIDCol.IsNull(),
 		schema.PersonalMessagesTableAddDatetimeCol.Lt(
-			goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL 6 MONTH")),
+			goqu.L("NOW() - INTERVAL '6 MONTH'"),
 		),
 	).Executor().ExecContext(ctx)
 	if err != nil {

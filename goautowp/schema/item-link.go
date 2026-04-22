@@ -21,7 +21,7 @@ var (
 )
 
 type LinkRow struct {
-	ID     int64  `db:"id"`
+	ID     int64  `db:"id"      goqu:"pk,skipinsert"`
 	Name   string `db:"name"`
 	URL    string `db:"url"`
 	Type   string `db:"type"`

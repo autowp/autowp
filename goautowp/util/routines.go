@@ -15,18 +15,13 @@ import (
 	"cloud.google.com/go/civil"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exec"
-	"github.com/go-sql-driver/mysql"
+	"github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/exp/constraints"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"google.golang.org/genproto/googleapis/type/date"
-)
-
-const (
-	mysqlDuplicateKeyErrorCode = 1062
-	mysqlDeadlockErrorCode     = 1213
 )
 
 func GrpcDateToDate(value *date.Date) *civil.Date {
@@ -263,18 +258,21 @@ func NullBoolToBoolPtr(value sql.NullBool) *bool {
 	return nil
 }
 
-func isMysqlErrorCode(err error, code uint16) bool {
-	var me *mysql.MySQLError
+func isPgErrorCode(err error, code string) bool {
+	var pgErr *pq.Error
+	if errors.As(err, &pgErr) {
+		return string(pgErr.Code) == code
+	}
 
-	return errors.As(err, &me) && me.Number == code
+	return false
 }
 
-func IsMysqlDuplicateKeyError(err error) bool {
-	return isMysqlErrorCode(err, mysqlDuplicateKeyErrorCode)
+func IsPgDuplicateKeyError(err error) bool {
+	return isPgErrorCode(err, "23505")
 }
 
-func IsMysqlDeadlockError(err error) bool {
-	return isMysqlErrorCode(err, mysqlDeadlockErrorCode)
+func IsPgDeadlockError(err error) bool {
+	return isPgErrorCode(err, "40P01")
 }
 
 func ScanValContextAndRetryOnDeadlock(
@@ -292,7 +290,7 @@ func ScanValContextAndRetryOnDeadlock(
 	for !isDeadlockAvoided && retriesLeft > 0 {
 		res, err = sd.ScanValContext(ctx, i)
 		if err != nil {
-			if !IsMysqlDeadlockError(err) {
+			if !IsPgDeadlockError(err) {
 				return res, err
 			}
 
@@ -319,7 +317,7 @@ func ExecAndRetryOnDeadlock(ctx context.Context, executor exec.QueryExecutor) (s
 	for !isDeadlockAvoided && retriesLeft > 0 {
 		res, err = executor.ExecContext(ctx)
 		if err != nil {
-			if !IsMysqlDeadlockError(err) {
+			if !IsPgDeadlockError(err) {
 				return res, err
 			}
 
@@ -392,4 +390,13 @@ func TitleCase(str string, tag language.Tag) string {
 	r, n := utf8.DecodeRuneInString(str)
 
 	return string(unicode.ToUpper(r)) + str[n:]
+}
+
+func RepeatWithDelim(s, sep string, count int) string {
+	slice := make([]string, count)
+	for i := range slice {
+		slice[i] = s
+	}
+
+	return strings.Join(slice, sep)
 }

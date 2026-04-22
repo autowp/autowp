@@ -69,6 +69,7 @@ func (s Power) Items(
 			valueTable.ValueCol.Gt(0),
 		).
 		Order(orderExpr).
+		GroupByAppend(valueTable.ValueCol).
 		Limit(uint(listOptions.Limit)).
 		ScanValsContext(ctx, &itemIDs)
 	if err != nil {

@@ -11,8 +11,6 @@ import (
 	"github.com/autowp/goautowp/i18nbundle"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql" // enable mysql dialect
-	_ "github.com/go-sql-driver/mysql"               // enable mysql driver
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
@@ -22,10 +20,10 @@ func createRepository(t *testing.T) *Repository {
 
 	cfg := config.LoadConfig("..")
 
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 
 	i18n, err := i18nbundle.New()
 	require.NoError(t, err)
@@ -149,32 +147,33 @@ func TestGetDialogbox(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func createRandomUser(t *testing.T, s *Repository) int64 {
+func createRandomUser(t *testing.T, repository *Repository) int64 {
 	t.Helper()
+
+	var id int64
 
 	emailAddr := "test" + strconv.Itoa(rand.Int()) + "@example.com" //nolint: gosec
 	name := "ivan"
-	res, err := s.db.Insert(schema.UserTable).
+	success, err := repository.db.Insert(schema.UserTable).
 		Rows(goqu.Record{
 			schema.UserTableLoginColName:          nil,
 			schema.UserTableEmailColName:          emailAddr,
 			schema.UserTablePasswordColName:       nil,
 			schema.UserTableEmailToCheckColName:   nil,
-			schema.UserTableHideEmailColName:      1,
+			schema.UserTableHideEmailColName:      true,
 			schema.UserTableEmailCheckCodeColName: nil,
 			schema.UserTableNameColName:           name,
 			schema.UserTableRegDateColName:        goqu.Func("NOW"),
 			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
 			schema.UserTableTimezoneColName:       "Europe/Moscow",
-			schema.UserTableLastIPColName:         goqu.Func("INET6_ATON", "127.0.0.1"),
+			schema.UserTableLastIPColName:         goqu.Func("INET", "127.0.0.1"),
 			schema.UserTableLanguageColName:       schema.EnglishLanguageCode,
-			schema.UserTableUUIDColName:           goqu.Func("UUID_TO_BIN", uuid.New().String()),
+			schema.UserTableUUIDColName:           uuid.New().String(),
 		}).
-		Executor().ExecContext(t.Context())
+		Returning(schema.UserTableIDCol).
+		Executor().ScanValContext(t.Context(), &id)
 	require.NoError(t, err)
-
-	id, err := res.LastInsertId()
-	require.NoError(t, err)
+	require.True(t, success)
 
 	return id
 }

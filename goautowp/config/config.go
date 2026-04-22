@@ -127,8 +127,6 @@ type Config struct {
 	Attrs              AttrsAttrs                `mapstructure:"attrs"                yaml:"attrs"`
 	PublicRest         RestConfig                `mapstructure:"public-rest"          yaml:"public-rest"`
 	DuplicateFinder    DuplicateFinderConfig     `mapstructure:"duplicate_finder"     yaml:"duplicate_finder"`
-	AutowpDSN          string                    `mapstructure:"autowp-dsn"           yaml:"autowp-dsn"`
-	AutowpMigrations   MigrationsConfig          `mapstructure:"autowp-migrations"    yaml:"autowp-migrations"`
 	FileStorage        FileStorageConfig         `mapstructure:"file-storage"         yaml:"file-storage"`
 	RabbitMQ           string                    `mapstructure:"rabbitmq"             yaml:"rabbitmq"`
 	MonitoringQueue    string                    `mapstructure:"monitoring_queue"     yaml:"monitoring_queue"`

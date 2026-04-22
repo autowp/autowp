@@ -42,7 +42,7 @@ var (
 )
 
 type PersonalMessageRow struct {
-	ID          int64         `db:"id"`
+	ID          int64         `db:"id"           goqu:"pk,skipinsert"`
 	FromUserID  sql.NullInt64 `db:"from_user_id"`
 	ToUserID    int64         `db:"to_user_id"`
 	Readen      bool          `db:"readen"`

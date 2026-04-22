@@ -1,1 +1,0 @@
-DROP TABLE formated_image, image;

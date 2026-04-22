@@ -52,7 +52,7 @@ func TestDuplicateFinder(t *testing.T) {
 	err = df.Index(ctx, id2, "http://localhost:80/small.jpg")
 	require.NoError(t, err)
 
-	var hash1 uint64
+	var hash1 int64
 
 	success, err := goquDB.Select(schema.DfHashTableHashCol).
 		From(schema.DfHashTable).
@@ -61,7 +61,7 @@ func TestDuplicateFinder(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, success)
 
-	var hash2 uint64
+	var hash2 int64
 
 	success, err = goquDB.Select(schema.DfHashTableHashCol).
 		From(schema.DfHashTable).

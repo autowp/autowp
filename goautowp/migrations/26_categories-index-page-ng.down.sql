@@ -1,1 +1,0 @@
-UPDATE pages SET url="/category" WHERE id=22;

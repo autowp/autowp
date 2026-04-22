@@ -1,6 +1,8 @@
 package query
 
 import (
+	"fmt"
+
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
@@ -152,7 +154,7 @@ func (s *ItemParentListOptions) apply(
 
 	if s.LinkedInDays > 0 {
 		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemParentTableTimestampColName).Gt(
-			goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL ? DAY", s.LinkedInDays)),
+			goqu.L("NOW() - INTERVAL ?", fmt.Sprintf("%d DAY", s.LinkedInDays)),
 		))
 	}
 

@@ -15,7 +15,12 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-const MaxTopicNameLength = 100
+const (
+	MaxTopicNameLength = 100
+
+	topicNameField    = "name"
+	topicMessageField = "message"
+)
 
 type ForumsGRPCServer struct {
 	UnimplementedForumsServer
@@ -164,7 +169,7 @@ func (s *CreateTopicRequest) Validate(
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "name",
+			Field:       topicNameField,
 			Description: fv,
 		})
 	}
@@ -184,7 +189,7 @@ func (s *CreateTopicRequest) Validate(
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "message",
+			Field:       topicMessageField,
 			Description: fv,
 		})
 	}
@@ -196,7 +201,7 @@ func (s *CreateTopicRequest) Validate(
 
 	if needWait {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "message",
+			Field:       topicMessageField,
 			Description: "Too often",
 		})
 	}

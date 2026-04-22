@@ -24,7 +24,11 @@ var (
 	errUnknownModeratorAttention = errors.New("unknown CommentMessageModeratorAttention value")
 )
 
-const MaxReplies = 500
+const (
+	MaxReplies = 500
+
+	commentMessageField = "message"
+)
 
 type CommentsGRPCServer struct {
 	UnimplementedCommentsServer
@@ -557,7 +561,7 @@ func (s *AddCommentRequest) Validate(
 
 	for _, fv := range problems {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "message",
+			Field:       commentMessageField,
 			Description: fv,
 		})
 	}
@@ -569,7 +573,7 @@ func (s *AddCommentRequest) Validate(
 
 	if needWait {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
-			Field:       "message",
+			Field:       commentMessageField,
 			Description: "Too often",
 		})
 	}

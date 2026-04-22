@@ -180,7 +180,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
 
           const byteSource = decodeGrpcWebTextResponse(newData);
 
-          let messages = null;
+          let messages;
           try {
             messages = this.#parser.parse(byteSource);
           } catch (error) {

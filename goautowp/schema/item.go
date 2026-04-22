@@ -91,7 +91,7 @@ var ( //nolint: dupl
 )
 
 type ItemRow struct {
-	ID                     int64               `db:"id"`
+	ID                     int64               `db:"id"                        goqu:"pk,skipinsert"`
 	Name                   string              `db:"name"`
 	Catname                sql.NullString      `db:"catname"`
 	ItemTypeID             ItemTableItemTypeID `db:"item_type_id"`

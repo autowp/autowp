@@ -1,1 +1,0 @@
-ALTER TABLE users CHANGE COLUMN password password VARCHAR(50) NOT NULL DEFAULT '';

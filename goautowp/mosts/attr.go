@@ -77,6 +77,8 @@ func (s Attr) Items(
 		sqSelect = sqSelect.GroupBy(itemIDCol)
 	}
 
+	sqSelect = sqSelect.GroupByAppend(valueTable.ValueCol)
+
 	err = sqSelect.ScanValsContext(ctx, &itemIDs)
 	if err != nil {
 		return nil, err

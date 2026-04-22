@@ -1,1 +1,0 @@
-ALTER TABLE pictures DROP CONSTRAINT pictures_change_status_user_fk;

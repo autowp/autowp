@@ -12,8 +12,6 @@ import (
 	"github.com/autowp/goautowp/image/sampler"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql" // enable mysql dialect
-	_ "github.com/go-sql-driver/mysql"               // enable mysql driver
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,10 +26,10 @@ func TestS3AddImageFromFilepathChangeNameAndDelete(t *testing.T) {
 	ctx := t.Context()
 
 	cfg := config.LoadConfig("../../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 
 	imageStorage, err := NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
@@ -100,10 +98,10 @@ func TestAddImageFromBlobAndFormat(t *testing.T) {
 	ctx := t.Context()
 
 	cfg := config.LoadConfig("../../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 
 	mw, err := NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
@@ -131,10 +129,10 @@ func TestS3AddImageWithPreferredName(t *testing.T) {
 	ctx := t.Context()
 
 	cfg := config.LoadConfig("../../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 
 	mw, err := NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
@@ -161,10 +159,10 @@ func TestAddImageAndCrop(t *testing.T) {
 	ctx := t.Context()
 
 	cfg := config.LoadConfig("../../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 
 	mw, err := NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
@@ -238,10 +236,10 @@ func TestFlopNormalizeAndMultipleRequest(t *testing.T) {
 	ctx := t.Context()
 
 	cfg := config.LoadConfig("../../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 
 	mw, err := NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
@@ -281,10 +279,10 @@ func TestRequestFormattedImageAgain(t *testing.T) {
 	ctx := t.Context()
 
 	cfg := config.LoadConfig("../../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", db)
+	goquDB := goqu.New("postgres", db)
 
 	mw, err := NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
@@ -342,8 +340,7 @@ func TestRequestFormattedImageAgain(t *testing.T) {
 
 /*func TestNormalizeProcessor(t *testing.T) {
 	cfg := config.LoadConfig("../../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
-	require.NoError(t, err)
+
 	mw, err := NewStorage(db, cfg.ImageStorage)
 	require.NoError(t, err)
 

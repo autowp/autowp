@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/netip"
-	"sync"
 	"time"
 
 	"github.com/Nerzal/gocloak/v13"
@@ -52,7 +51,6 @@ type Container struct {
 	articlesGRPCServer           *ArticlesGRPCServer
 	attrsRepository              *attrs.Repository
 	autowpDB                     *sql.DB
-	autowpDBMutex                sync.Mutex
 	banRepository                *ban.Repository
 	catalogue                    *Catalogue
 	commentsRepository           *comments.Repository
@@ -69,7 +67,6 @@ type Container struct {
 	feedback                     *feedback.Repository
 	forums                       *Forums
 	goquDB                       *goqu.Database
-	goquPostgresDB               *goqu.Database
 	grpcServer                   *GRPCServer
 	hostsManager                 *hosts.Manager
 	imageStorage                 *storage.Storage
@@ -134,77 +131,17 @@ func (s *Container) Close() error {
 		s.autowpDB = nil
 	}
 
-	/*if s.goquPostgresDB != nil {
-		s.goquPostgresDB.Close()
-		s.goquPostgresDB = nil
+	/*if s.goquDB != nil {
+		s.goquDB.Close()
+		s.goquDB = nil
 	}*/
 
 	return nil
 }
 
-func (s *Container) AutowpDB(ctx context.Context) (*sql.DB, error) {
-	s.autowpDBMutex.Lock()
-	defer s.autowpDBMutex.Unlock()
-
-	if s.autowpDB != nil {
-		return s.autowpDB, nil
-	}
-
-	const (
-		connectionTimeout = 60 * time.Second
-		reconnectDelay    = 100 * time.Millisecond
-	)
-
-	logrus.Info("Waiting for mysql")
-
-	var (
-		db    *sql.DB
-		err   error
-		start = time.Now()
-	)
-
-	for {
-		db, err = sql.Open("mysql", s.config.AutowpDSN)
-		if err != nil {
-			return nil, err
-		}
-
-		err = db.PingContext(ctx)
-		if err == nil {
-			logrus.Info("Started.")
-
-			break
-		}
-
-		if time.Since(start) > connectionTimeout {
-			return nil, err
-		}
-
-		logrus.Infof(". %s", err.Error())
-		time.Sleep(reconnectDelay)
-	}
-
-	s.autowpDB = db
-
-	return s.autowpDB, nil
-}
-
 func (s *Container) GoquDB(ctx context.Context) (*goqu.Database, error) {
-	if s.goquDB == nil {
-		db, err := s.AutowpDB(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		s.goquDB = goqu.New("mysql", db)
-	}
-
-	return s.goquDB, nil
-}
-
-func (s *Container) GoquPostgresDB(ctx context.Context) (*goqu.Database, error) {
-	if s.goquPostgresDB != nil {
-		return s.goquPostgresDB, nil
+	if s.goquDB != nil {
+		return s.goquDB, nil
 	}
 
 	start := time.Now()
@@ -242,14 +179,14 @@ func (s *Container) GoquPostgresDB(ctx context.Context) (*goqu.Database, error) 
 		time.Sleep(reconnectDelay)
 	}
 
-	s.goquPostgresDB = goqu.New("postgres", db)
+	s.goquDB = goqu.New("postgres", db)
 
-	return s.goquPostgresDB, nil
+	return s.goquDB, nil
 }
 
 func (s *Container) BanRepository(ctx context.Context) (*ban.Repository, error) {
 	if s.banRepository == nil {
-		db, err := s.GoquPostgresDB(ctx)
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -270,7 +207,7 @@ func (s *Container) Catalogue(ctx context.Context) (*Catalogue, error) {
 			return nil, err
 		}
 
-		pgDB, err := s.GoquPostgresDB(ctx)
+		pgDB, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -291,11 +228,6 @@ func (s *Container) CommentsRepository(ctx context.Context) (*comments.Repositor
 			return nil, err
 		}
 
-		pgDB, err := s.GoquPostgresDB(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		usersRepository, err := s.UsersRepository(ctx)
 		if err != nil {
 			return nil, err
@@ -308,7 +240,6 @@ func (s *Container) CommentsRepository(ctx context.Context) (*comments.Repositor
 
 		s.commentsRepository = comments.NewRepository(
 			db,
-			pgDB,
 			usersRepository,
 			messagingRepository,
 			s.HostsManager(),
@@ -347,11 +278,6 @@ func (s *Container) Config() config.Config {
 
 func (s *Container) AttrsRepository(ctx context.Context) (*attrs.Repository, error) {
 	if s.attrsRepository == nil {
-		pgDB, err := s.GoquPostgresDB(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
@@ -377,7 +303,7 @@ func (s *Container) AttrsRepository(ctx context.Context) (*attrs.Repository, err
 			return nil, err
 		}
 
-		s.attrsRepository = attrs.NewRepository(db, pgDB, i18n, itemsRepository, picturesRepository, is)
+		s.attrsRepository = attrs.NewRepository(db, i18n, itemsRepository, picturesRepository, is)
 	}
 
 	return s.attrsRepository, nil
@@ -467,11 +393,6 @@ func (s *Container) PicturesRepository(ctx context.Context) (*pictures.Repositor
 			return nil, err
 		}
 
-		pgDB, err := s.GoquPostgresDB(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		is, err := s.ImageStorage(ctx)
 		if err != nil {
 			return nil, err
@@ -490,7 +411,7 @@ func (s *Container) PicturesRepository(ctx context.Context) (*pictures.Repositor
 		cfg := s.Config()
 
 		s.picturesRepository = pictures.NewRepository(
-			db, pgDB, is, textStorageRepository, itemsRepository, cfg.DuplicateFinder,
+			db, is, textStorageRepository, itemsRepository, cfg.DuplicateFinder,
 			func(id int64) error {
 				commentsRepository, err := s.CommentsRepository(ctx)
 				if err != nil {
@@ -909,12 +830,7 @@ func (s *Container) TelegramService(ctx context.Context) (*telegram.Service, err
 
 func (s *Container) Traffic(ctx context.Context) (*traffic.Traffic, error) {
 	if s.traffic == nil {
-		db, err := s.GoquPostgresDB(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		autowpDB, err := s.GoquDB(ctx)
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -924,7 +840,7 @@ func (s *Container) Traffic(ctx context.Context) (*traffic.Traffic, error) {
 			return nil, err
 		}
 
-		traf, err := traffic.NewTraffic(db, autowpDB, banRepository)
+		traf, err := traffic.NewTraffic(db, banRepository)
 		if err != nil {
 			logrus.Error(err.Error())
 
@@ -953,7 +869,7 @@ func (s *Container) UserExtractor(ctx context.Context) (*UserExtractor, error) {
 
 func (s *Container) VotingsRepository(ctx context.Context) (*votings.Repository, error) {
 	if s.votingsRepository == nil {
-		db, err := s.GoquPostgresDB(ctx)
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -971,11 +887,6 @@ func (s *Container) UsersRepository(ctx context.Context) (*users.Repository, err
 			return nil, err
 		}
 
-		postgresDB, err := s.GoquPostgresDB(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		cfg := s.Config()
 
 		is, err := s.ImageStorage(ctx)
@@ -985,7 +896,6 @@ func (s *Container) UsersRepository(ctx context.Context) (*users.Repository, err
 
 		s.usersRepository = users.NewRepository(
 			db,
-			postgresDB,
 			cfg.UsersSalt,
 			cfg.Languages,
 			s.Keycloak(),
@@ -1018,11 +928,6 @@ func (s *Container) ItemsRepository(ctx context.Context) (*items.Repository, err
 			return nil, err
 		}
 
-		goquPgDB, err := s.GoquPostgresDB(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		cfg := s.Config()
 
 		textStorageRepository, err := s.TextStorageRepository(ctx)
@@ -1042,7 +947,6 @@ func (s *Container) ItemsRepository(ctx context.Context) (*items.Repository, err
 
 		s.itemsRepository = items.NewRepository(
 			db,
-			goquPgDB,
 			cfg.MostsMinCarsCount,
 			itemParentLanguageRepository,
 			textStorageRepository,
@@ -1060,14 +964,8 @@ func (s *Container) ItemParentLanguageRepository(ctx context.Context) (*items.It
 			return nil, err
 		}
 
-		pgDB, err := s.GoquPostgresDB(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		s.itemParentLanguageRepository = items.NewItemParentLanguageRepository(
 			db,
-			pgDB,
 			s.Config().ContentLanguages,
 		)
 	}
@@ -1514,7 +1412,7 @@ func (s *Container) CommentsGRPCServer(ctx context.Context) (*CommentsGRPCServer
 
 func (s *Container) ArticlesGRPCServer(ctx context.Context) (*ArticlesGRPCServer, error) {
 	if s.articlesGRPCServer == nil {
-		db, err := s.GoquPostgresDB(ctx)
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1709,7 +1607,7 @@ func (s *Container) DonationsGRPCServer(ctx context.Context) (*DonationsGRPCServ
 			return nil, err
 		}
 
-		db, err := s.GoquPostgresDB(ctx)
+		db, err := s.GoquDB(ctx)
 		if err != nil {
 			return nil, err
 		}

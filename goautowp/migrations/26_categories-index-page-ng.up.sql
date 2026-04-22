@@ -1,1 +1,0 @@
-UPDATE pages SET url="/ng/category" WHERE id=22;

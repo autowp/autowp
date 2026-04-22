@@ -213,7 +213,6 @@ func (s *Paginator) calculateCount(ctx context.Context) (int32, error) {
 			ClearLimit().
 			GroupBy().
 			ClearSelect().
-			Prepared(true).
 			CountContext(ctx)
 		if err != nil {
 			return 0, err
@@ -230,7 +229,6 @@ func (s *Paginator) calculateCount(ctx context.Context) (int32, error) {
 			GroupBy().
 			ClearSelect().
 			Select(goqu.COUNT(goqu.DISTINCT(columns[0]))).
-			Prepared(true).
 			ScanValContext(ctx, &res)
 		if err != nil {
 			return 0, err

@@ -17,10 +17,9 @@ import (
 	"github.com/autowp/goautowp/textstorage"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql"    // enable mysql dialect
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
+	"github.com/jackc/pgtype"
 	_ "github.com/lib/pq" // enable postgres driver
 	"github.com/stretchr/testify/require"
 	"gopkg.in/gographics/imagick.v3/imagick"
@@ -39,22 +38,22 @@ func createRandomUser(t *testing.T, db *goqu.Database) int64 {
 			schema.UserTableEmailColName:          emailAddr,
 			schema.UserTablePasswordColName:       nil,
 			schema.UserTableEmailToCheckColName:   nil,
-			schema.UserTableHideEmailColName:      1,
+			schema.UserTableHideEmailColName:      true,
 			schema.UserTableEmailCheckCodeColName: nil,
 			schema.UserTableNameColName:           name,
 			schema.UserTableRegDateColName:        goqu.Func("NOW"),
 			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
 			schema.UserTableTimezoneColName:       "Europe/Moscow",
-			schema.UserTableLastIPColName:         goqu.Func("INET6_ATON", "127.0.0.1"),
+			schema.UserTableLastIPColName:         goqu.Func("inet", "127.0.0.1"),
 			schema.UserTableLanguageColName:       schema.EnglishLanguageCode,
-			schema.UserTableUUIDColName:           goqu.Func("UUID_TO_BIN", uuid.New().String()),
+			schema.UserTableUUIDColName:           uuid.New().String(),
 		})
 
-	res, err := insertQuery.Executor().ExecContext(t.Context())
-	require.NoError(t, err)
+	var id int64
 
-	id, err := res.LastInsertId()
+	success, err := insertQuery.Returning(schema.UserTableIDCol).Executor().ScanValContext(t.Context(), &id)
 	require.NoError(t, err)
+	require.True(t, success)
 
 	return id
 }
@@ -63,23 +62,18 @@ func repository(t *testing.T) (*goqu.Database, *Repository) {
 	t.Helper()
 
 	cfg := config.LoadConfig("../")
-	db, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
-	require.NoError(t, err)
-
-	goquDB := goqu.New("mysql", db)
-	goquPgDB := goqu.New("postgres", postgresDB)
+	goquDB := goqu.New("postgres", db)
 
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
 	require.NoError(t, err)
 
 	textStorage := textstorage.New(goquDB)
-	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, goquPgDB, cfg.ContentLanguages)
+	itemParentLanguageRepository := items.NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
 	itemsRepo := items.NewRepository(
 		goquDB,
-		goquPgDB,
 		cfg.MostsMinCarsCount,
 		itemParentLanguageRepository,
 		textStorage,
@@ -88,7 +82,6 @@ func repository(t *testing.T) (*goqu.Database, *Repository) {
 
 	return goquDB, NewRepository(
 		goquDB,
-		goquPgDB,
 		imageStorage,
 		textStorage,
 		itemsRepo,
@@ -131,7 +124,7 @@ func TestImageExif(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "Corey Escobar ©2021 Courtesy of RM Sotheby's", text)
 
-	require.False(t, picture.Point.Valid)
+	require.Equal(t, pgtype.Null, picture.Point.Status)
 }
 
 func TestImageExifGPS(t *testing.T) {
@@ -161,9 +154,9 @@ func TestImageExifGPS(t *testing.T) {
 	require.EqualValues(t, 2008, picture.TakenYear.Int16)
 	require.EqualValues(t, 10, picture.TakenMonth.Byte)
 	require.EqualValues(t, 22, picture.TakenDay.Byte)
-	require.True(t, picture.Point.Valid)
-	require.InDelta(t, 43.464455, picture.Point.Point.Lat(), 0.001)
-	require.InDelta(t, 11.881478333333334, picture.Point.Point.Lng(), 0.001)
+	require.Equal(t, pgtype.Present, picture.Point.Status)
+	require.InDelta(t, 43.464455, picture.Point.P.Y, 0.001)
+	require.InDelta(t, 11.881478333333334, picture.Point.P.X, 0.001)
 }
 
 func TestImageBlackEdgeCrop(t *testing.T) {

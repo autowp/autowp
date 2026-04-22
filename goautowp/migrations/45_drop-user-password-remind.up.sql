@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS user_password_remind, user_remember, user_renames;

@@ -36,6 +36,7 @@ var (
 		"comment with moderation attention requirement can't be deleted",
 	)
 	errFailedToBuildURL = errors.New("failed to build URL")
+	errNoRowsReturned   = errors.New("no rows returned")
 )
 
 const CommentMessagePreviewLength = 60
@@ -78,7 +79,6 @@ type RatingUser struct {
 // Repository Main Object.
 type Repository struct {
 	db                *goqu.Database
-	pgDB              *goqu.Database
 	userRepository    *users.Repository
 	messageRepository *messaging.Repository
 	hostManager       *hosts.Manager
@@ -87,14 +87,12 @@ type Repository struct {
 // NewRepository constructor.
 func NewRepository(
 	db *goqu.Database,
-	pgDB *goqu.Database,
 	userRepository *users.Repository,
 	messageRepository *messaging.Repository,
 	hostManager *hosts.Manager,
 ) *Repository {
 	return &Repository{
 		db:                db,
-		pgDB:              pgDB,
 		userRepository:    userRepository,
 		messageRepository: messageRepository,
 		hostManager:       hostManager,
@@ -249,7 +247,7 @@ func (s *Repository) QueueDeleteMessage(
 
 	_, err = s.db.Update(schema.CommentMessageTable).
 		Set(goqu.Record{
-			schema.CommentMessageTableDeletedColName:    1,
+			schema.CommentMessageTableDeletedColName:    true,
 			schema.CommentMessageTableDeletedByColName:  byUserID,
 			schema.CommentMessageTableDeleteDateColName: goqu.Func("NOW"),
 		}).
@@ -262,7 +260,7 @@ func (s *Repository) QueueDeleteMessage(
 func (s *Repository) RestoreMessage(ctx context.Context, commentID int64) error {
 	_, err := s.db.Update(schema.CommentMessageTable).
 		Set(goqu.Record{
-			schema.CommentMessageTableDeletedColName:    0,
+			schema.CommentMessageTableDeletedColName:    false,
 			schema.CommentMessageTableDeleteDateColName: nil,
 		}).
 		Where(schema.CommentMessageTableIDCol.Eq(commentID)).
@@ -400,10 +398,7 @@ func (s *Repository) VoteComment(
 	}).OnConflict(goqu.DoUpdate(
 		schema.CommentVoteTableCommentIDColName+","+schema.CommentVoteTableUserIDColName,
 		goqu.Record{
-			schema.CommentVoteTableVoteColName: goqu.Func(
-				"VALUES",
-				goqu.C(schema.CommentVoteTableVoteColName),
-			),
+			schema.CommentVoteTableVoteColName: schema.Excluded(schema.CommentVoteTableVoteColName),
 		},
 	)).Executor().ExecContext(ctx)
 	if err != nil {
@@ -482,11 +477,13 @@ func (s *Repository) Add(
 
 	ctx = context.WithoutCancel(ctx)
 
-	res, err := s.db.Insert(schema.CommentMessageTable).
-		Cols(schema.CommentMessageTableDatetimeCol, schema.CommentMessageTableTypeIDCol,
-			schema.CommentMessageTableItemIDCol, schema.CommentMessageTableParentIDCol,
-			schema.CommentMessageTableAuthorIDCol, schema.CommentMessageTableMessageCol,
-			schema.CommentMessageTableIPCol, schema.CommentMessageTableModeratorAttentionCol).
+	var messageID int64
+
+	success, err := s.db.Insert(schema.CommentMessageTable).
+		Cols(schema.CommentMessageTableDatetimeColName, schema.CommentMessageTableTypeIDColName,
+			schema.CommentMessageTableItemIDColName, schema.CommentMessageTableParentIDColName,
+			schema.CommentMessageTableAuthorIDColName, schema.CommentMessageTableMessageColName,
+			schema.CommentMessageTableIPColName, schema.CommentMessageTableModeratorAttentionColName).
 		Vals(goqu.Vals{
 			goqu.Func("NOW"),
 			typeID,
@@ -497,16 +494,17 @@ func (s *Repository) Add(
 			},
 			userID,
 			message,
-			goqu.Func("INET6_ATON", addr),
+			goqu.Func("INET", addr),
 			ma,
-		}).Executor().ExecContext(ctx)
+		}).
+		Returning(schema.CommentMessageTableIDCol).
+		Executor().ScanValContext(ctx, &messageID)
 	if err != nil {
 		return 0, err
 	}
 
-	messageID, err := res.LastInsertId()
-	if err != nil {
-		return 0, err
+	if !success {
+		return 0, errNoRowsReturned
 	}
 
 	if parentID > 0 {
@@ -586,11 +584,11 @@ func (s *Repository) AssertItem(
 			Where(schema.ItemTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
 
 	case schema.CommentMessageTypeIDVotings:
-		success, err = s.pgDB.Select(goqu.L("1")).From(schema.VotingTable).
+		success, err = s.db.Select(goqu.L("1")).From(schema.VotingTable).
 			Where(schema.VotingTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
 
 	case schema.CommentMessageTypeIDArticles:
-		success, err = s.pgDB.Select(goqu.L("1")).From(schema.ArticleTable).
+		success, err = s.db.Select(goqu.L("1")).From(schema.ArticleTable).
 			Where(schema.ArticleTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
 
 	case schema.CommentMessageTypeIDForums:
@@ -834,7 +832,9 @@ func (s *Repository) CleanupDeleted(ctx context.Context) (int64, error) {
 		LeftJoin(cm2, goqu.On(cm1ID.Eq(cm2ParentID))).
 		Where(
 			cm2.Col(schema.CommentMessageTableParentIDColName).IsNull(),
-			cm2ParentID.Lt(goqu.L("DATE_SUB(NOW(), INTERVAL ? DAY)", deleteTTLDays)),
+			cm2.Col(schema.CommentMessageTableDeleteDateColName).Lt(
+				goqu.L("NOW() - INTERVAL ?", fmt.Sprintf("%d day", deleteTTLDays)),
+			),
 		).
 		Executor().QueryContext(ctx) //nolint:sqlclosecheck
 	if err != nil {
@@ -886,7 +886,7 @@ func (s *Repository) CleanupDeleted(ctx context.Context) (int64, error) {
 
 func (s *Repository) RefreshRepliesCount(ctx context.Context) (int64, error) {
 	_, err := s.db.ExecContext(ctx, `
-		create temporary table __cms
+		create temporary table __cms AS
 		select type_id, item_id, parent_id as id, count(1) as count
 		from `+schema.CommentMessageTableName+`
 		where parent_id is not null
@@ -897,10 +897,10 @@ func (s *Repository) RefreshRepliesCount(ctx context.Context) (int64, error) {
 	}
 
 	res, err := s.db.ExecContext(ctx, `
-		update `+schema.CommentMessageTableName+`
-		inner join __cms
-		using(type_id, item_id, id)
-		set `+schema.CommentMessageTableName+`.replies_count = __cms.count
+		UPDATE `+schema.CommentMessageTableName+` AS t
+        SET replies_count = __cms.count
+        FROM __cms
+		WHERE __cms.type_id=t.type_id AND __cms.item_id=t.item_id AND __cms.id=t.id
     `)
 	if err != nil {
 		return 0, err
@@ -1445,7 +1445,7 @@ func (s *Repository) MessageRowRoute(
 	case schema.CommentMessageTypeIDArticles:
 		var catname string
 
-		success, err := s.pgDB.Select(schema.ArticleTableCatnameCol).
+		success, err := s.db.Select(schema.ArticleTableCatnameCol).
 			From(schema.ArticleTable).
 			Where(schema.ArticleTableIDCol.Eq(itemID)).
 			ScanValContext(ctx, &catname)
@@ -1723,14 +1723,8 @@ func (s *Repository) updateTopicStat(
 		}).OnConflict(goqu.DoUpdate(
 			schema.CommentTopicTableItemIDColName+","+schema.CommentTopicTableTypeIDColName,
 			goqu.Record{
-				schema.CommentTopicTableLastUpdateColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.CommentTopicTableLastUpdateColName),
-				),
-				schema.CommentTopicTableMessagesColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.CommentTopicTableMessagesColName),
-				),
+				schema.CommentTopicTableLastUpdateColName: schema.Excluded(schema.CommentTopicTableLastUpdateColName),
+				schema.CommentTopicTableMessagesColName:   schema.Excluded(schema.CommentTopicTableMessagesColName),
 			},
 		)).Executor().ExecContext(ctx)
 	}
@@ -1893,7 +1887,7 @@ func (s *Repository) messageRowRoute(
 	case schema.CommentMessageTypeIDArticles:
 		var catname string
 
-		success, err := s.pgDB.Select(schema.ArticleTableCatnameCol).
+		success, err := s.db.Select(schema.ArticleTableCatnameCol).
 			From(schema.ArticleTable).
 			Where(schema.ArticleTableIDCol.Eq(itemID)).
 			ScanValContext(ctx, &catname)

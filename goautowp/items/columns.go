@@ -1,6 +1,8 @@
 package items
 
 import (
+	"fmt"
+
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
@@ -15,6 +17,7 @@ type AliaseableExpression interface {
 
 type Column interface {
 	SelectExpr(alias string, lang string) (AliaseableExpression, error)
+	GroupByExpr() interface{}
 }
 
 type DescendantsCountColumn struct {
@@ -33,6 +36,10 @@ func (s DescendantsCountColumn) SelectExpr(alias string, _ string) (AliaseableEx
 	}
 
 	return goqu.L("?", sqSelect), nil
+}
+
+func (s DescendantsCountColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type NewDescendantsCountColumn struct {
@@ -58,6 +65,10 @@ func (s NewDescendantsCountColumn) SelectExpr(
 	}
 
 	return goqu.L("?", sqSelect), nil
+}
+
+func (s NewDescendantsCountColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type DescendantTwinsGroupsCountColumn struct {
@@ -88,6 +99,10 @@ func (s DescendantTwinsGroupsCountColumn) SelectExpr(
 	return goqu.L("?", sqSelect), nil
 }
 
+func (s DescendantTwinsGroupsCountColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type DescendantPicturesCountColumn struct{}
 
 func (s DescendantPicturesCountColumn) SelectExpr(
@@ -101,6 +116,10 @@ func (s DescendantPicturesCountColumn) SelectExpr(
 	return goqu.COUNT(
 		goqu.DISTINCT(goqu.T(piTableAlias).Col(schema.PictureItemTablePictureIDColName)),
 	), nil
+}
+
+func (s DescendantPicturesCountColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type ChildsCountColumn struct {
@@ -120,6 +139,10 @@ func (s ChildsCountColumn) SelectExpr(alias string, _ string) (AliaseableExpress
 	return goqu.L("?", sqSelect), nil
 }
 
+func (s ChildsCountColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type ParentsCountColumn struct {
 	db *goqu.Database
 }
@@ -135,6 +158,10 @@ func (s ParentsCountColumn) SelectExpr(alias string, _ string) (AliaseableExpres
 	}
 
 	return goqu.L("?", sqSelect), nil
+}
+
+func (s ParentsCountColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type TextstorageRefColumn struct {
@@ -170,6 +197,10 @@ func (s TextstorageRefColumn) SelectExpr(alias string, lang string) (AliaseableE
 		nil
 }
 
+func (s TextstorageRefColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type NameDefaultColumn struct {
 	db *goqu.Database
 }
@@ -200,7 +231,7 @@ func (s NameDefaultColumn) SelectExpr(alias string, lang string) (AliaseableExpr
 	subQueryAlias := alias + "subquery"
 
 	return goqu.Func(
-			"IFNULL",
+			"COALESCE",
 			s.db.Select(il1AliasTable.Col(schema.ItemLanguageTableNameColName)).
 				From(schema.ItemLanguageTable.As(il1Alias)).
 				Join(subQuery.As(subQueryAlias), goqu.On(
@@ -220,6 +251,10 @@ func (s NameDefaultColumn) SelectExpr(alias string, lang string) (AliaseableExpr
 		nil
 }
 
+func (s NameDefaultColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type NameOnlyColumn struct {
 	DB *goqu.Database
 }
@@ -231,7 +266,7 @@ func (s NameOnlyColumn) SelectExpr(alias string, lang string) (AliaseableExpress
 	}
 
 	return goqu.Func(
-			"IFNULL",
+			"COALESCE",
 			s.DB.Select(schema.ItemLanguageTableNameCol).
 				From(schema.ItemLanguageTable).
 				Where(
@@ -243,6 +278,10 @@ func (s NameOnlyColumn) SelectExpr(alias string, lang string) (AliaseableExpress
 			goqu.T(alias).Col(schema.ItemTableNameColName),
 		),
 		nil
+}
+
+func (s NameOnlyColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type CommentsAttentionsCountColumn struct {
@@ -271,6 +310,10 @@ func (s CommentsAttentionsCountColumn) SelectExpr(
 	return goqu.L("?", sqSelect), nil
 }
 
+func (s CommentsAttentionsCountColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type StatusPicturesCountColumn struct {
 	status schema.PictureStatus
 	db     *goqu.Database
@@ -297,6 +340,10 @@ func (s StatusPicturesCountColumn) SelectExpr(
 	return goqu.L("?", sqSelect), nil
 }
 
+func (s StatusPicturesCountColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type ExactPicturesCountColumn struct {
 	db *goqu.Database
 }
@@ -314,6 +361,10 @@ func (s ExactPicturesCountColumn) SelectExpr(alias string, _ string) (Aliaseable
 	}
 
 	return goqu.L("?", sqSelect), nil
+}
+
+func (s ExactPicturesCountColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type MostsActiveColumn struct {
@@ -336,6 +387,10 @@ func (s MostsActiveColumn) SelectExpr(alias string, _ string) (AliaseableExpress
 	return goqu.L("? >= ?", sqSelect, s.mostsMinCarsCount), nil
 }
 
+func (s MostsActiveColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type DescendantsParentsCountColumn struct{}
 
 func (s DescendantsParentsCountColumn) SelectExpr(
@@ -347,6 +402,10 @@ func (s DescendantsParentsCountColumn) SelectExpr(
 	)
 
 	return goqu.COUNT(goqu.DISTINCT(goqu.T(cAlias).Col(schema.ItemParentTableParentIDColName))), nil
+}
+
+func (s DescendantsParentsCountColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type NewDescendantsParentsCountColumn struct{}
@@ -363,13 +422,17 @@ func (s NewDescendantsParentsCountColumn) SelectExpr(
 	)
 	cAliasTable := goqu.T(cAlias)
 
-	return goqu.COUNT(goqu.DISTINCT(goqu.Func("IF",
-		cAliasTable.Col(schema.ItemTableAddDatetimeColName).Gt(
-			goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL ? DAY", NewDays)),
-		),
+	return goqu.L(
+		"COUNT(DISTINCT ?) FILTER (WHERE ?)",
 		cAliasTable.Col(schema.ItemTableIDColName),
-		nil,
-	))), nil
+		cAliasTable.Col(schema.ItemTableAddDatetimeColName).Gt(
+			goqu.L("NOW() - INTERVAL ?", fmt.Sprintf("%d DAY", NewDays)),
+		),
+	), nil
+}
+
+func (s NewDescendantsParentsCountColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type ChildItemsCountColumn struct{}
@@ -381,21 +444,27 @@ func (s ChildItemsCountColumn) SelectExpr(alias string, _ string) (AliaseableExp
 	return goqu.COUNT(goqu.DISTINCT(ipcAliasTable.Col(schema.ItemParentTableItemIDColName))), nil
 }
 
+func (s ChildItemsCountColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type NewChildItemsCountColumn struct{}
 
 func (s NewChildItemsCountColumn) SelectExpr(alias string, _ string) (AliaseableExpression, error) {
 	ipcAlias := query.AppendItemParentAlias(alias, "c")
 	ipcAliasTable := goqu.T(ipcAlias)
 
-	return goqu.COUNT(goqu.DISTINCT(
-		goqu.Func("IF",
-			ipcAliasTable.Col(schema.ItemParentTableTimestampColName).Gt(
-				goqu.Func("DATE_SUB", goqu.Func("NOW"), goqu.L("INTERVAL ? DAY", NewDays)),
-			),
-			ipcAliasTable.Col(schema.ItemParentTableItemIDColName),
-			nil,
+	return goqu.L(
+		"COUNT(DISTINCT ?) FILTER (WHERE ?)",
+		ipcAliasTable.Col(schema.ItemParentTableItemIDColName),
+		ipcAliasTable.Col(schema.ItemParentTableTimestampColName).Gt(
+			goqu.L("NOW() - INTERVAL ?", fmt.Sprintf("%d DAY", NewDays)),
 		),
-	)), nil
+	), nil
+}
+
+func (s NewChildItemsCountColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type SimpleColumn struct {
@@ -406,10 +475,18 @@ func (s SimpleColumn) SelectExpr(alias string, _ string) (AliaseableExpression, 
 	return goqu.T(alias).Col(s.col), nil
 }
 
+func (s SimpleColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type SpecNameColumn struct{}
 
 func (s SpecNameColumn) SelectExpr(_ string, _ string) (AliaseableExpression, error) {
 	return schema.SpecTableNameCol, nil
+}
+
+func (s SpecNameColumn) GroupByExpr() interface{} {
+	return schema.SpecTableNameCol
 }
 
 type SpecShortNameColumn struct{}
@@ -418,10 +495,18 @@ func (s SpecShortNameColumn) SelectExpr(_ string, _ string) (AliaseableExpressio
 	return schema.SpecTableShortNameCol, nil
 }
 
+func (s SpecShortNameColumn) GroupByExpr() interface{} {
+	return schema.SpecTableShortNameCol
+}
+
 type StarCountColumn struct{}
 
 func (s StarCountColumn) SelectExpr(_ string, _ string) (AliaseableExpression, error) {
 	return goqu.COUNT(goqu.Star()), nil
+}
+
+func (s StarCountColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type ItemParentParentTimestampColumn struct{}
@@ -437,6 +522,10 @@ func (s ItemParentParentTimestampColumn) SelectExpr(
 		nil
 }
 
+func (s ItemParentParentTimestampColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type AttrsUserValuesUpdateDateColumn struct{}
 
 func (s AttrsUserValuesUpdateDateColumn) SelectExpr(
@@ -448,6 +537,10 @@ func (s AttrsUserValuesUpdateDateColumn) SelectExpr(
 				Col(schema.AttrsUserValuesTableUpdateDateColName),
 		),
 		nil
+}
+
+func (s AttrsUserValuesUpdateDateColumn) GroupByExpr() interface{} {
+	return nil
 }
 
 type HasChildSpecsColumn struct {
@@ -466,6 +559,10 @@ func (s HasChildSpecsColumn) SelectExpr(alias string, _ string) (AliaseableExpre
 	), nil
 }
 
+func (s HasChildSpecsColumn) GroupByExpr() interface{} {
+	return nil
+}
+
 type HasSpecsColumn struct {
 	db *goqu.Database
 }
@@ -477,4 +574,8 @@ func (s HasSpecsColumn) SelectExpr(alias string, _ string) (AliaseableExpression
 			Where(schema.AttrsValuesTableItemIDCol.Eq(goqu.T(alias).Col(schema.ItemTableIDColName))).
 			Limit(1),
 	), nil
+}
+
+func (s HasSpecsColumn) GroupByExpr() interface{} {
+	return nil
 }

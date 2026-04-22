@@ -179,11 +179,6 @@ feedback:
   to: autowp@gmail.com
 keycloak:
   clientSecret: secret
-mysql:
-  host: host
-  database: database
-  username: username
-  password: password
 imageCredentials:
   registry: quay.io
   username: someone

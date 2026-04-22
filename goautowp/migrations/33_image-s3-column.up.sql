@@ -1,1 +1,0 @@
-alter table image add column s3 tinyint unsigned NOT NULL DEFAULT 0;

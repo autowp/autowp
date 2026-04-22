@@ -17,6 +17,13 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
+const (
+	nameField          = "name"
+	catnameField       = "catname"
+	engineItemIDField  = "engine_item_id"
+	engineInheritField = "engine_inherit"
+)
+
 func (s *APIItem) Validate( //nolint: maintidx
 	ctx context.Context, repository *items.Repository, maskPaths []string, roles []string,
 ) ([]*errdetails.BadRequest_FieldViolation, error) {
@@ -74,34 +81,34 @@ func (s *APIItem) Validate( //nolint: maintidx
 
 	canEditEngine := util.Contains(roles, users.RoleCarsModer)
 
-	if maskPaths == nil || util.Contains(maskPaths, "engine_inherit") {
+	if maskPaths == nil || util.Contains(maskPaths, engineInheritField) {
 		if s.GetItemTypeId() != ItemType_ITEM_TYPE_VEHICLE {
 			if s.GetId() > 0 || s.GetEngineInherit() {
 				result = append(result, &errdetails.BadRequest_FieldViolation{
-					Field:       "engine_inherit",
+					Field:       engineInheritField,
 					Description: "engine_inherit can be used only for vehicle",
 				})
 			}
 		} else if (s.GetId() > 0 || s.GetId() == 0 && s.GetEngineInherit()) && !canEditEngine {
 			result = append(result, &errdetails.BadRequest_FieldViolation{
-				Field:       "engine_inherit",
+				Field:       engineInheritField,
 				Description: "permission denied",
 			})
 		}
 	}
 
-	if maskPaths == nil || util.Contains(maskPaths, "engine_item_id") {
+	if maskPaths == nil || util.Contains(maskPaths, engineItemIDField) {
 		switch {
 		case s.GetItemTypeId() != ItemType_ITEM_TYPE_VEHICLE:
 			if s.GetId() > 0 || s.GetEngineItemId() > 0 {
 				result = append(result, &errdetails.BadRequest_FieldViolation{
-					Field:       "engine_item_id",
+					Field:       engineItemIDField,
 					Description: "engine_item_id can be used only for vehicle",
 				})
 			}
 		case (s.GetId() > 0 || s.GetId() == 0 && s.GetEngineItemId() > 0) && !canEditEngine:
 			result = append(result, &errdetails.BadRequest_FieldViolation{
-				Field:       "engine_item_id",
+				Field:       engineItemIDField,
 				Description: "permission denied",
 			})
 		default:
@@ -116,7 +123,7 @@ func (s *APIItem) Validate( //nolint: maintidx
 
 				if err != nil {
 					result = append(result, &errdetails.BadRequest_FieldViolation{
-						Field:       "engine_item_id",
+						Field:       engineItemIDField,
 						Description: err.Error(),
 					})
 				}
@@ -190,7 +197,7 @@ func (s *APIItem) Validate( //nolint: maintidx
 		}
 	}
 
-	if maskPaths == nil || util.Contains(maskPaths, "name") {
+	if maskPaths == nil || util.Contains(maskPaths, nameField) {
 		nameInputFilter := validation.InputFilter{
 			Filters: []validation.FilterInterface{
 				&validation.StringTrimFilter{},
@@ -211,7 +218,7 @@ func (s *APIItem) Validate( //nolint: maintidx
 
 		for _, fv := range problems {
 			result = append(result, &errdetails.BadRequest_FieldViolation{
-				Field:       "name",
+				Field:       nameField,
 				Description: fv,
 			})
 		}
@@ -243,7 +250,7 @@ func (s *APIItem) Validate( //nolint: maintidx
 
 	if s.GetItemTypeId() == ItemType_ITEM_TYPE_VEHICLE {
 		if s.GetEngineItemId() > 0 &&
-			(maskPaths == nil || util.Contains(maskPaths, "engine_item_id")) {
+			(maskPaths == nil || util.Contains(maskPaths, engineItemIDField)) {
 			exists, err := repository.Exists(ctx, query.ItemListOptions{
 				ItemID: s.GetEngineItemId(),
 				TypeID: []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDEngine},
@@ -254,28 +261,28 @@ func (s *APIItem) Validate( //nolint: maintidx
 
 			if !exists {
 				result = append(result, &errdetails.BadRequest_FieldViolation{
-					Field:       "engine_item_id",
+					Field:       engineItemIDField,
 					Description: fmt.Sprintf("engine `%d` not found", s.GetEngineItemId()),
 				})
 			}
 		}
 	} else {
-		if s.GetEngineItemId() > 0 && (maskPaths == nil || util.Contains(maskPaths, "engine_item_id")) {
+		if s.GetEngineItemId() > 0 && (maskPaths == nil || util.Contains(maskPaths, engineItemIDField)) {
 			result = append(result, &errdetails.BadRequest_FieldViolation{
-				Field:       "engine_item_id",
+				Field:       engineItemIDField,
 				Description: "engine_item_id can be used only for vehicle",
 			})
 		}
 
-		if s.GetEngineInherit() && (maskPaths == nil || util.Contains(maskPaths, "engine_inherit")) {
+		if s.GetEngineInherit() && (maskPaths == nil || util.Contains(maskPaths, engineInheritField)) {
 			result = append(result, &errdetails.BadRequest_FieldViolation{
-				Field:       "engine_inherit",
+				Field:       engineInheritField,
 				Description: "engine_inherit can be used only for vehicle",
 			})
 		}
 	}
 
-	if maskPaths == nil || util.Contains(maskPaths, "catname") {
+	if maskPaths == nil || util.Contains(maskPaths, catnameField) {
 		if util.Contains(
 			[]ItemType{ItemType_ITEM_TYPE_CATEGORY, ItemType_ITEM_TYPE_BRAND},
 			s.GetItemTypeId(),
@@ -301,7 +308,7 @@ func (s *APIItem) Validate( //nolint: maintidx
 
 			for _, fv := range problems {
 				result = append(result, &errdetails.BadRequest_FieldViolation{
-					Field:       "catname",
+					Field:       catnameField,
 					Description: fv,
 				})
 			}
@@ -317,14 +324,14 @@ func (s *APIItem) Validate( //nolint: maintidx
 
 				if exists {
 					result = append(result, &errdetails.BadRequest_FieldViolation{
-						Field:       "catname",
+						Field:       catnameField,
 						Description: fmt.Sprintf("`%s` already exists", s.GetCatname()),
 					})
 				}
 			}
 		} else if len(s.GetCatname()) > 0 {
 			result = append(result, &errdetails.BadRequest_FieldViolation{
-				Field:       "catname",
+				Field:       catnameField,
 				Description: "catname can be used only for brand or category",
 			})
 		}

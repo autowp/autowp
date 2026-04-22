@@ -77,10 +77,8 @@ test-goautowp:
 
     - ./tools/wait.sh
 
-    - go test -run TestAutowpMigrations
     - go test -run TestPostgresMigrations
-    - docker exec -t goautowp_mysql_test sh -c "mysql -uroot --host=127.0.0.1 --port=3306 -ppassword autowp < /dump.sql"
-    - docker exec -t goautowp_postgres_test sh -c "psql --username=traffic traffic < /pg.sql"
+    - docker exec -t goautowp_postgres_test sh -c "psql --username=traffic traffic < /dump.sql"
     - gotestsum --junitfile report.xml --format testname -- -coverpkg=./... -coverprofile=cov.out -covermode count ./...
     - gocover-cobertura < cov.out > coverage.xml
     - sonar-scanner -Dsonar.token="$SONAR_TOKEN"

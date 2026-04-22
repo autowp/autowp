@@ -30,10 +30,8 @@ import (
 	"github.com/autowp/goautowp/util"
 	"github.com/autowp/goautowp/validation"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql" // enable mysql dialect
 	"github.com/doug-martin/goqu/v9/exp"
-	_ "github.com/gen2brain/avif"      // AVIF support
-	_ "github.com/go-sql-driver/mysql" // enable mysql driver
+	_ "github.com/gen2brain/avif" // AVIF support
 	"github.com/paulmach/orb"
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
@@ -108,7 +106,6 @@ type RatingFan struct {
 
 type Repository struct {
 	db                    *goqu.Database
-	pgDB                  *goqu.Database
 	imageStorage          *storage.Storage
 	textStorageRepository *textstorage.Repository
 	itemsRepository       *items.Repository
@@ -178,7 +175,6 @@ const (
 
 func NewRepository(
 	db *goqu.Database,
-	pgDB *goqu.Database,
 	imageStorage *storage.Storage,
 	textStorageRepository *textstorage.Repository,
 	itemsRepository *items.Repository,
@@ -187,7 +183,6 @@ func NewRepository(
 ) *Repository {
 	return &Repository{
 		db:                    db,
-		pgDB:                  pgDB,
 		imageStorage:          imageStorage,
 		textStorageRepository: textStorageRepository,
 		itemsRepository:       itemsRepository,
@@ -321,14 +316,8 @@ func (s *Repository) Vote(ctx context.Context, id int64, value int32, userID int
 	}).OnConflict(goqu.DoUpdate(
 		schema.PictureVoteTablePictureIDColName+","+schema.PictureVoteTableUserIDColName,
 		goqu.Record{
-			schema.PictureVoteTableValueColName: goqu.Func(
-				"VALUES",
-				goqu.C(schema.PictureVoteTableValueColName),
-			),
-			schema.PictureVoteTableTimestampColName: goqu.Func(
-				"VALUES",
-				goqu.C(schema.PictureVoteTableTimestampColName),
-			),
+			schema.PictureVoteTableValueColName:     schema.Excluded(schema.PictureVoteTableValueColName),
+			schema.PictureVoteTableTimestampColName: schema.Excluded(schema.PictureVoteTableTimestampColName),
 		},
 	)).Executor().ExecContext(ctx)
 	if err != nil {
@@ -349,7 +338,7 @@ func (s *Repository) CreateModerVoteTemplate(
 		tpl.Vote = 1
 	}
 
-	success, err := s.pgDB.Insert(schema.PictureModerVoteTemplateTable).
+	success, err := s.db.Insert(schema.PictureModerVoteTemplateTable).
 		Rows(tpl).
 		Returning(schema.PictureModerVoteTemplateTableIDCol).
 		Executor().
@@ -366,7 +355,7 @@ func (s *Repository) CreateModerVoteTemplate(
 }
 
 func (s *Repository) DeleteModerVoteTemplate(ctx context.Context, id int64, userID int64) error {
-	_, err := s.pgDB.Delete(schema.PictureModerVoteTemplateTable).
+	_, err := s.db.Delete(schema.PictureModerVoteTemplateTable).
 		Where(
 			schema.PictureModerVoteTemplateTableUserIDCol.Eq(userID),
 			schema.PictureModerVoteTemplateTableIDCol.Eq(id),
@@ -382,7 +371,7 @@ func (s *Repository) IsModerVoteTemplateExists(
 ) (bool, error) {
 	var id int64
 
-	success, err := s.pgDB.Select(schema.PictureModerVoteTemplateTableIDCol).
+	success, err := s.db.Select(schema.PictureModerVoteTemplateTableIDCol).
 		From(schema.PictureModerVoteTemplateTable).
 		Where(
 			schema.PictureModerVoteTemplateTableUserIDCol.Eq(userID),
@@ -398,7 +387,7 @@ func (s *Repository) GetModerVoteTemplates(
 ) ([]schema.PictureModerVoteTemplateRow, error) {
 	var rows []schema.PictureModerVoteTemplateRow
 
-	err := s.pgDB.Select(
+	err := s.db.Select(
 		schema.PictureModerVoteTemplateTableIDCol,
 		schema.PictureModerVoteTemplateTableReasonCol,
 		schema.PictureModerVoteTemplateTableVoteCol,
@@ -489,7 +478,7 @@ func (s *Repository) DeleteModerVote(
 }
 
 func (s *Repository) CreateModerVote(
-	ctx context.Context, pictureID int64, userID int64, vote bool, reason string,
+	ctx context.Context, pictureID int64, userID int64, vote uint8, reason string,
 ) (bool, error) {
 	res, err := s.db.Insert(schema.PictureModerVoteTable).Rows(goqu.Record{
 		schema.PictureModerVoteTablePictureIDColName: pictureID,
@@ -501,12 +490,9 @@ func (s *Repository) CreateModerVote(
 		goqu.DoUpdate(
 			schema.PictureModerVoteTablePictureIDColName+","+schema.PictureModerVoteTableUserIDColName,
 			goqu.Record{
-				schema.PictureModerVoteTableVoteColName: goqu.Func("VALUES",
-					goqu.C(schema.PictureModerVoteTableVoteColName)),
-				schema.PictureModerVoteTableReasonColName: goqu.Func("VALUES",
-					goqu.C(schema.PictureModerVoteTableReasonColName)),
-				schema.PictureModerVoteTableDayDateColName: goqu.Func("VALUES",
-					goqu.C(schema.PictureModerVoteTableDayDateColName)),
+				schema.PictureModerVoteTableVoteColName:    schema.Excluded(schema.PictureModerVoteTableVoteColName),
+				schema.PictureModerVoteTableReasonColName:  schema.Excluded(schema.PictureModerVoteTableReasonColName),
+				schema.PictureModerVoteTableDayDateColName: schema.Excluded(schema.PictureModerVoteTableDayDateColName),
 			},
 		)).Executor().ExecContext(ctx)
 	if err != nil {
@@ -525,8 +511,7 @@ func (s *Repository) ModerVoteCount(ctx context.Context, pictureID int64) (int32
 	}{}
 
 	success, err := s.db.Select(
-		goqu.SUM(goqu.Func("IF", schema.PictureModerVoteTableVoteCol, goqu.V(1), goqu.V(-1))).
-			As("sum"),
+		goqu.SUM(goqu.L("CASE WHEN ? > 0 THEN 1 ELSE -1 END", schema.PictureModerVoteTableVoteCol)).As("sum"),
 		goqu.COUNT(goqu.Star()).As("count"),
 	).
 		From(schema.PictureModerVoteTable).
@@ -611,7 +596,7 @@ func (s *Repository) PictureSelect(
 	}
 
 	if groupBy {
-		sqSelect = sqSelect.GroupBy(aliasTable.Col(schema.PictureTableIDColName))
+		sqSelect = sqSelect.GroupByAppend(aliasTable.Col(schema.PictureTableIDColName))
 	}
 
 	return sqSelect, nil
@@ -1289,7 +1274,7 @@ func (s *Repository) Accept(
 func (s *Repository) QueueRemove(ctx context.Context, pictureID int64, userID int64) (bool, error) {
 	res, err := s.db.Update(schema.PictureTable).Set(goqu.Record{
 		schema.PictureTableStatusColName:             schema.PictureStatusRemoving,
-		schema.PictureTableRemovingDateColName:       goqu.Func("CURDATE"),
+		schema.PictureTableRemovingDateColName:       goqu.Func("NOW"),
 		schema.PictureTableChangeStatusUserIDColName: userID,
 	}).
 		Where(schema.PictureTableIDCol.Eq(pictureID)).
@@ -1994,11 +1979,7 @@ func (s *Repository) ClearQueue(ctx context.Context) error {
 			goqu.Or(
 				schema.PictureTableRemovingDateCol.IsNull(),
 				schema.PictureTableRemovingDateCol.Lt(
-					goqu.Func(
-						"DATE_SUB",
-						goqu.Func("CURDATE"),
-						goqu.L("INTERVAL ? DAY", queueLifetimeDays),
-					),
+					goqu.L("CURRENT_DATE - INTERVAL ?", fmt.Sprintf("%d DAY", queueLifetimeDays)),
 				),
 			),
 		).
@@ -2143,8 +2124,10 @@ func (s *Repository) AddPictureFromReader(
 		return 0, err
 	}
 
+	var pictureID int64
+
 	// add record to db
-	res, err := s.db.Insert(schema.PictureTable).Rows(goqu.Record{
+	success, err := s.db.Insert(schema.PictureTable).Rows(goqu.Record{
 		schema.PictureTableImageIDColName:      imageID,
 		schema.PictureTableWidthColName:        imageConfig.Width,
 		schema.PictureTableHeightColName:       imageConfig.Height,
@@ -2153,20 +2136,19 @@ func (s *Repository) AddPictureFromReader(
 		schema.PictureTableFilesizeColName:     img.FileSize(),
 		schema.PictureTableStatusColName:       schema.PictureStatusInbox,
 		schema.PictureTableRemovingDateColName: nil,
-		schema.PictureTableIPColName:           goqu.Func("INET6_ATON", remoteAddr),
+		schema.PictureTableIPColName:           goqu.Func("INET", remoteAddr),
 		schema.PictureTableIdentityColName:     identity,
 		schema.PictureTableReplacePictureIDColName: sql.NullInt64{
 			Int64: replacePictureID,
 			Valid: replacePictureID > 0,
 		},
-	}).Executor().ExecContext(ctx)
+	}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &pictureID)
 	if err != nil {
 		return 0, err
 	}
 
-	pictureID, err := res.LastInsertId()
-	if err != nil {
-		return 0, err
+	if !success {
+		return 0, errNoRowsReturned
 	}
 
 	if itemID > 0 {
@@ -2247,12 +2229,8 @@ func (s *Repository) updatePictureSummary(ctx context.Context, id int64) error {
 			From(schema.PictureVoteTable).
 			Where(schema.PictureVoteTablePictureIDCol.Eq(id), schema.PictureVoteTableValueCol.Lt(0)),
 	}).OnConflict(goqu.DoUpdate(schema.PictureVoteSummaryTablePictureIDColName, goqu.Record{
-		schema.PictureVoteSummaryTablePositiveColName: goqu.Func(
-			"VALUES", goqu.C(schema.PictureVoteSummaryTablePositiveColName),
-		),
-		schema.PictureVoteSummaryTableNegativeColName: goqu.Func(
-			"VALUES", goqu.C(schema.PictureVoteSummaryTableNegativeColName),
-		),
+		schema.PictureVoteSummaryTablePositiveColName: schema.Excluded(schema.PictureVoteSummaryTablePositiveColName),
+		schema.PictureVoteSummaryTableNegativeColName: schema.Excluded(schema.PictureVoteSummaryTableNegativeColName),
 	})).Executor().ExecContext(ctx)
 
 	return err
@@ -2299,6 +2277,7 @@ func (s *Repository) orderBy( //nolint: maintidx
 		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableFilesizeColName).Asc())
 	case OrderByComments:
 		ctoAlias := alias + "cto"
+		col := goqu.T(ctoAlias).Col(schema.CommentTopicTableMessagesColName)
 		sqSelect = sqSelect.
 			LeftJoin(schema.CommentTopicTable.As(ctoAlias), goqu.On(
 				aliasTable.Col(schema.PictureTableIDColName).Eq(
@@ -2308,16 +2287,21 @@ func (s *Repository) orderBy( //nolint: maintidx
 					Col(schema.CommentTopicTableTypeIDColName).
 					Eq(schema.CommentMessageTypeIDPictures),
 			)).
-			Order(goqu.T(ctoAlias).Col(schema.CommentTopicTableMessagesColName).Desc())
+			GroupBy(col).
+			Order(col.Desc())
+		groupBy = true
 	case OrderByViews:
 		pvoAlias := alias + "pvo"
+		col := goqu.T(pvoAlias).Col(schema.PictureViewTableViewsColName)
 		sqSelect = sqSelect.
 			LeftJoin(schema.PictureViewTable.As(pvoAlias), goqu.On(
 				aliasTable.Col(schema.PictureTableIDColName).Eq(
 					goqu.T(pvoAlias).Col(schema.PictureViewTablePictureIDColName),
 				),
 			)).
-			Order(goqu.T(pvoAlias).Col(schema.PictureViewTableViewsColName).Desc())
+			GroupBy(col).
+			Order(col.Desc())
+		groupBy = true
 	case OrderByModerVotes:
 		if options.PictureModerVote == nil {
 			return nil, false, errJoinNeededToSortByPictureModerVote
@@ -2334,30 +2318,36 @@ func (s *Repository) orderBy( //nolint: maintidx
 		)
 	case OrderByLikes:
 		pvsAlias := alias + "pvs"
+		col := goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePositiveColName)
 		sqSelect = sqSelect.
 			LeftJoin(schema.PictureVoteSummaryTable.As(pvsAlias), goqu.On(
 				aliasTable.Col(schema.PictureTableIDColName).Eq(
 					goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePictureIDColName),
 				),
 			)).
+			GroupBy(col).
 			Order(
-				goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePositiveColName).Desc(),
+				col.Desc(),
 				aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
 				aliasTable.Col(schema.PictureTableIDColName).Desc(),
 			)
+		groupBy = true
 	case OrderByDislikes:
 		pvsAlias := alias + "pvs"
+		col := goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTableNegativeColName)
 		sqSelect = sqSelect.
 			LeftJoin(schema.PictureVoteSummaryTable.As(pvsAlias), goqu.On(
 				aliasTable.Col(schema.PictureTableIDColName).Eq(
 					goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTablePictureIDColName),
 				),
 			)).
+			GroupBy(col).
 			Order(
-				goqu.T(pvsAlias).Col(schema.PictureVoteSummaryTableNegativeColName).Desc(),
+				col.Desc(),
 				aliasTable.Col(schema.PictureTableAddDateColName).Desc(),
 				aliasTable.Col(schema.PictureTableIDColName).Desc(),
 			)
+		groupBy = true
 	case OrderByStatus:
 		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableStatusColName).Asc())
 	case OrderByAcceptDatetimeStrictAsc:
@@ -2407,14 +2397,16 @@ func (s *Repository) orderBy( //nolint: maintidx
 				aliasTable.Col(schema.PictureTableIDColName).
 					Eq(schema.PictureVoteSummaryTablePictureIDCol),
 			)).
+			GroupBy(schema.PictureVoteSummaryTablePositiveCol).
 			Order(
-				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
-				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
+				goqu.Func("BOOL_OR", goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
+				goqu.Func("BOOL_OR", goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
 				col.Asc(),
 				schema.PictureVoteSummaryTablePositiveCol.Desc(),
 				aliasTable.Col(schema.PictureTableWidthColName).Desc(),
 				aliasTable.Col(schema.PictureTableHeightColName).Desc(),
 			)
+		groupBy = true
 
 	case OrderByPerspectivesGroupPerspectives:
 		if options.PictureItem == nil {
@@ -2434,15 +2426,15 @@ func (s *Repository) orderBy( //nolint: maintidx
 			iAlias := options.PictureItem.ItemParentCacheAncestor.ItemsByItemIDAlias(ipcaAlias)
 			exps = append(
 				exps,
-				goqu.MAX(goqu.T(iAlias).Col(schema.ItemTableIsConceptColName)).Asc(),
+				goqu.Func("BOOL_OR", goqu.T(iAlias).Col(schema.ItemTableIsConceptColName)).Asc(),
 			)
 			exps = append(
 				exps,
-				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
+				goqu.Func("BOOL_OR", goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
 			)
 			exps = append(
 				exps,
-				goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
+				goqu.Func("BOOL_OR", goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
 			)
 		}
 
@@ -2540,16 +2532,16 @@ func (s *Repository) orderBy( //nolint: maintidx
 		)
 
 		sqSelect = sqSelect.Order(
-			goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
-			goqu.MAX(goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
-			goqu.MAX(goqu.T(iAlias).Col(schema.ItemTableIsConceptColName)).Asc(),
+			goqu.Func("BOOL_OR", goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableTuningColName)).Asc(),
+			goqu.Func("BOOL_OR", goqu.T(ipcaAlias).Col(schema.ItemParentCacheTableSportColName)).Asc(),
+			goqu.Func("BOOL_OR", goqu.T(iAlias).Col(schema.ItemTableIsConceptColName)).Asc(),
 			goqu.L("?", perspectiveIDCol.Eq(schema.PerspectiveFrontStrict)).Desc(),
 			goqu.L("?", perspectiveIDCol.Eq(schema.PerspectiveFront)).Desc(),
 			goqu.L("?", perspectiveIDCol.Eq(schema.Perspective3Div4Left)).Desc(),
 			goqu.L("?", perspectiveIDCol.Eq(schema.Perspective3Div4Right)).Desc(),
 		)
 	case OrderByRandom:
-		sqSelect = sqSelect.Order(goqu.Func("RAND").Asc())
+		sqSelect = sqSelect.Order(goqu.Func("RANDOM").Asc())
 	case OrderByNone:
 	}
 
@@ -2662,7 +2654,7 @@ func (s *Repository) perspectivePageGroupIDs(
 ) ([]int32, error) {
 	var ids []int32
 
-	err := s.pgDB.Select(schema.PerspectivesGroupsTableIDCol).
+	err := s.db.Select(schema.PerspectivesGroupsTableIDCol).
 		From(schema.PerspectivesGroupsTable).
 		Where(schema.PerspectivesGroupsTablePageIDCol.Eq(pageID)).
 		Order(schema.PerspectivesGroupsTablePositionCol.Asc()).

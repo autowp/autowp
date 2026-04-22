@@ -564,10 +564,7 @@ func (s *Service) handleInboxCommand(ctx context.Context, update *tgbotapi.Updat
 		OnConflict(goqu.DoUpdate(
 			schema.TelegramBrandTableItemIDColName+","+schema.TelegramBrandTableChatIDColName,
 			goqu.Record{
-				schema.TelegramBrandTableInboxColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.TelegramBrandTableInboxColName),
-				),
+				schema.TelegramBrandTableInboxColName: schema.Excluded(schema.TelegramBrandTableInboxColName),
 			},
 		)).
 		Executor().ExecContext(ctx)
@@ -654,10 +651,7 @@ func (s *Service) handleNewCommand(ctx context.Context, update *tgbotapi.Update)
 		OnConflict(goqu.DoUpdate(
 			schema.TelegramBrandTableItemIDColName+","+schema.TelegramBrandTableChatIDColName,
 			goqu.Record{
-				schema.TelegramBrandTableNewColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.TelegramBrandTableNewColName),
-				),
+				schema.TelegramBrandTableNewColName: schema.Excluded(schema.TelegramBrandTableNewColName),
 			},
 		)).
 		Executor().ExecContext(ctx)
@@ -841,10 +835,7 @@ func (s *Service) handleMeCommand(ctx context.Context, update *tgbotapi.Update) 
 			OnConflict(goqu.DoUpdate(
 				schema.TelegramChatTableChatIDColName,
 				goqu.Record{
-					schema.TelegramChatTableTokenColName: goqu.Func(
-						"VALUES",
-						goqu.C(schema.TelegramChatTableTokenColName),
-					),
+					schema.TelegramChatTableTokenColName: schema.Excluded(schema.TelegramChatTableTokenColName),
 				},
 			)).
 			Executor().ExecContext(ctx)

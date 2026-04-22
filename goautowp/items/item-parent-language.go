@@ -16,7 +16,6 @@ import (
 
 type ItemParentLanguageRepository struct {
 	db               *goqu.Database
-	pgDB             *goqu.Database
 	contentLanguages []string
 }
 
@@ -53,10 +52,9 @@ func yearsPrefix(begin int32, end int32) string {
 
 func NewItemParentLanguageRepository(
 	db *goqu.Database,
-	pgDB *goqu.Database,
 	contentLanguages []string,
 ) *ItemParentLanguageRepository {
-	return &ItemParentLanguageRepository{db: db, pgDB: pgDB, contentLanguages: contentLanguages}
+	return &ItemParentLanguageRepository{db: db, contentLanguages: contentLanguages}
 }
 
 func (s *ItemParentLanguageRepository) RefreshItemParentLanguage(
@@ -228,15 +226,13 @@ func (s *ItemParentLanguageRepository) SetItemParentLanguage(
 		schema.ItemParentLanguageTableNameColName:     newName,
 		schema.ItemParentLanguageTableIsAutoColName:   isAuto,
 	}).OnConflict(
-		goqu.DoUpdate(schema.ItemParentLanguageTableNameColName+","+schema.ItemParentLanguageTableIsAutoColName,
+		goqu.DoUpdate(
+			schema.ItemParentLanguageTableItemIDColName+","+schema.ItemParentLanguageTableParentIDColName+","+
+				schema.ItemParentLanguageTableLanguageColName,
 			goqu.Record{
-				schema.ItemParentLanguageTableNameColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.ItemParentLanguageTableNameColName),
-				),
-				schema.ItemParentLanguageTableIsAutoColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.ItemParentLanguageTableIsAutoColName),
+				schema.ItemParentLanguageTableNameColName: schema.Excluded(schema.ItemParentLanguageTableNameColName),
+				schema.ItemParentLanguageTableIsAutoColName: schema.Excluded(
+					schema.ItemParentLanguageTableIsAutoColName,
 				),
 			},
 		),
@@ -382,7 +378,7 @@ func (s *ItemParentLanguageRepository) ExtractName(
 		if specsDifferent {
 			specShortName := ""
 
-			success, err := s.pgDB.Select(schema.SpecTableShortNameCol).From(schema.SpecTable).
+			success, err := s.db.Select(schema.SpecTableShortNameCol).From(schema.SpecTable).
 				Where(schema.SpecTableIDCol.Eq(vehicleRow.SpecID.Int32)).
 				ScanValContext(ctx, &specShortName)
 			if err != nil {
@@ -454,12 +450,11 @@ func (s *ItemParentLanguageRepository) updateAutoName(
 		schema.ItemParentLanguageTableLanguageColName: lang,
 		schema.ItemParentLanguageTableNameColName:     newName,
 	}).OnConflict(
-		goqu.DoUpdate(schema.ItemParentLanguageTableNameColName,
+		goqu.DoUpdate(
+			schema.ItemParentLanguageTableItemIDColName+","+schema.ItemParentLanguageTableParentIDColName+","+
+				schema.ItemParentLanguageTableLanguageColName,
 			goqu.Record{
-				schema.ItemParentLanguageTableNameColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.ItemParentLanguageTableNameColName),
-				),
+				schema.ItemParentLanguageTableNameColName: schema.Excluded(schema.ItemParentLanguageTableNameColName),
 			},
 		),
 	).
@@ -534,7 +529,7 @@ func (s *ItemParentLanguageRepository) getAliases(ctx context.Context, itemID in
 	//nolint: prealloc
 	var aliases []string
 
-	err := s.pgDB.Select(schema.BrandAliasTableNameCol).From(schema.BrandAliasTable).
+	err := s.db.Select(schema.BrandAliasTableNameCol).From(schema.BrandAliasTable).
 		Where(schema.BrandAliasTableItemIDCol.Eq(itemID)).ScanValsContext(ctx, &aliases)
 	if err != nil {
 		return nil, err
@@ -567,22 +562,12 @@ func (s *ItemParentLanguageRepository) getNames(ctx context.Context, itemID int6
 }
 
 func (s *ItemParentLanguageRepository) getName(ctx context.Context, itemID int64, lang string) (string, error) {
-	langPriority, ok := languagePriority[lang]
-	if !ok {
-		logrus.Warnf("unexpected language code `%s`", lang)
-
-		langPriority, ok = languagePriority[schema.DefaultLanguageCode]
-	}
-
-	if !ok {
-		return "", fmt.Errorf("%w: `%s`", errLangNotFound, lang)
-	}
-
-	fieldParams := make([]interface{}, len(langPriority)+1)
-	fieldParams[0] = schema.ItemLanguageTableLanguageCol
-
-	for i, v := range langPriority {
-		fieldParams[i+1] = v
+	orderExpr, err := langPriorityOrderExpr(
+		schema.ItemLanguageTableLanguageCol,
+		lang,
+	)
+	if err != nil {
+		return "", err
 	}
 
 	result := ""
@@ -593,7 +578,7 @@ func (s *ItemParentLanguageRepository) getName(ctx context.Context, itemID int64
 			schema.ItemLanguageTableItemIDCol.Eq(itemID),
 			goqu.L("? > 0", goqu.Func("length", schema.ItemLanguageTableNameCol)),
 		).
-		Order(goqu.Func("FIELD", fieldParams...).Asc()).
+		Order(orderExpr).
 		Limit(1)
 
 	success, err := query.ScanValContext(ctx, &result)

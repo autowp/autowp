@@ -27,17 +27,6 @@ func TestPostgresMigrations(t *testing.T) {
 	}
 }
 
-func TestAutowpMigrations(t *testing.T) {
-	t.Parallel()
-
-	cfg := config.LoadConfig(".")
-
-	err := applyMigrations(cfg.AutowpMigrations)
-	if !errors.Is(err, migrate.ErrNoChange) {
-		require.NoError(t, err)
-	}
-}
-
 func TestServe(t *testing.T) {
 	t.Parallel()
 

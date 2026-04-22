@@ -11,7 +11,6 @@ import (
 	_ "image/png"  // PNG support
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/pictures"
@@ -155,8 +154,7 @@ func (s *DuplicateFinder) Index(ctx context.Context, id int64, url string) error
 
 	_, err = s.db.Insert(schema.DfHashTable).Rows(goqu.Record{
 		schema.DfHashTablePictureIDColName: id,
-		// can't use uint64 directly because of mysql driver issue
-		schema.DfHashTableHashColName: goqu.L(strconv.FormatUint(hash, 10)),
+		schema.DfHashTableHashColName:      hash,
 	}).Executor().ExecContext(ctx)
 	if err != nil {
 		return err
@@ -187,7 +185,7 @@ func (s *DuplicateFinder) HideSimilar(ctx context.Context, srcPictureID, dstPict
 	return err
 }
 
-func getFileHash(reader io.Reader) (uint64, error) {
+func getFileHash(reader io.Reader) (int64, error) {
 	img, _, err := image.Decode(reader)
 	if err != nil {
 		return 0, err
@@ -198,7 +196,7 @@ func getFileHash(reader io.Reader) (uint64, error) {
 		return 0, err
 	}
 
-	return hash.GetHash(), nil
+	return int64(hash.GetHash()), nil //nolint:gosec
 }
 
 func (s *DuplicateFinder) updateDistance(ctx context.Context, id int64) error {
@@ -206,7 +204,7 @@ func (s *DuplicateFinder) updateDistance(ctx context.Context, id int64) error {
 		return errInvalidID
 	}
 
-	var hash uint64
+	var hash int64
 
 	success, err := s.db.Select(schema.DfHashTableHashCol).
 		From(schema.DfHashTable).
@@ -229,8 +227,7 @@ func (s *DuplicateFinder) updateDistance(ctx context.Context, id int64) error {
 
 	err = s.db.Select(
 		schema.DfHashTablePictureIDCol,
-		goqu.Func("BIT_COUNT", goqu.L("? ^ "+strconv.FormatUint(hash, decimal), schema.DfHashTableHashCol)).
-			As(alias),
+		goqu.Func("BIT_COUNT", goqu.L("? ^ ?", schema.DfHashTableHashCol, hash)).As(alias),
 	).
 		From(schema.DfHashTable).
 		Where(schema.DfHashTablePictureIDCol.Neq(id)).
@@ -264,10 +261,7 @@ func (s *DuplicateFinder) updateDistance(ctx context.Context, id int64) error {
 		OnConflict(goqu.DoUpdate(
 			schema.DfDistanceTableSrcPictureIDColName+","+schema.DfDistanceTableDstPictureIDColName,
 			goqu.Record{
-				schema.DfDistanceTableDistanceColName: goqu.Func(
-					"VALUES",
-					goqu.C(schema.DfDistanceTableDistanceColName),
-				),
+				schema.DfDistanceTableDistanceColName: schema.Excluded(schema.DfDistanceTableDistanceColName),
 			},
 		)).
 		Executor().ExecContext(ctx)

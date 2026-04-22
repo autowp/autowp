@@ -1,1 +1,0 @@
-DROP TABLE comment_topic_subscribe, comment_vote, comment_message, comment_topic_view, comment_topic, comment_type;

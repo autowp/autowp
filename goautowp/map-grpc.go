@@ -15,7 +15,8 @@ import (
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
-	geo "github.com/paulmach/go.geo"
+	"github.com/twpayne/go-geom"
+	"github.com/twpayne/go-geom/encoding/wkt"
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -77,22 +78,23 @@ func (s *MapGRPCServer) GetPoints(
 
 	pointsOnly := in.GetPointsOnly()
 
-	polygon := fmt.Sprintf("POLYGON((%F %F, %F %F, %F %F, %F %F, %F %F))",
-		lngLo,
-		latLo,
-		lngLo,
-		latHi,
-		lngHi,
-		latHi,
-		lngHi,
-		latLo,
-		lngLo,
-		latLo,
-	)
+	polygon, err := geom.NewPolygon(geom.XY).SetCoords([][]geom.Coord{
+		{{latLo, lngLo}, {latHi, lngLo}, {latHi, lngHi}, {latLo, lngHi}, {latLo, lngLo}},
+	})
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	polygon.SetSRID(schema.SRID)
+
+	wktPolygon, err := wkt.Marshal(polygon)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
 	sqSelect := s.db.Select(schema.ItemPointTablePointCol).
 		From(schema.ItemPointTable).
-		Where(goqu.Func("ST_Contains", goqu.Func("ST_GeomFromText", polygon), schema.ItemPointTablePointCol))
+		Where(goqu.Func("ST_Intersects", goqu.Func("ST_GeogFromText", wktPolygon), schema.ItemPointTablePointCol))
 
 	if pointsOnly {
 		rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
@@ -105,7 +107,7 @@ func (s *MapGRPCServer) GetPoints(
 		mapPoints := make([]*MapPoint, 0)
 
 		for rows.Next() {
-			var point geo.Point
+			var point schema.PostgresGeographyPoint
 
 			err = rows.Scan(&point)
 			if err != nil {
@@ -114,8 +116,8 @@ func (s *MapGRPCServer) GetPoints(
 
 			mapPoints = append(mapPoints, &MapPoint{
 				Location: &latlng.LatLng{
-					Latitude:  point.Lat(),
-					Longitude: point.Lng(),
+					Latitude:  point.Point.X(),
+					Longitude: point.Point.Y(),
 				},
 			})
 		}
@@ -168,7 +170,7 @@ func (s *MapGRPCServer) pointsWithContent(
 
 	for rows.Next() {
 		var (
-			point             geo.Point
+			point             schema.PostgresGeographyPoint
 			id                int64
 			name              string
 			nullableBeginYear sql.NullInt32
@@ -210,8 +212,8 @@ func (s *MapGRPCServer) pointsWithContent(
 		mapPoint := &MapPoint{
 			Id: fmt.Sprintf("factory%d", id),
 			Location: &latlng.LatLng{
-				Latitude:  point.Lat(),
-				Longitude: point.Lng(),
+				Latitude:  point.Point.X(),
+				Longitude: point.Point.Y(),
 			},
 			Name: nameText,
 		}

@@ -263,7 +263,7 @@ export class CarsSpecificationsEditorSpecComponent {
   protected saveSpecs(item: APIItem, form: FormArray<AttrFormControls>) {
     const items = form.controls.map((control) => {
       const typeId = control.attr.typeId;
-      let valid = false;
+      let valid;
       let stringValue = undefined;
       let listValue = [];
       let boolValue = undefined;

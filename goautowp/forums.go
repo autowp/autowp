@@ -26,7 +26,7 @@ const (
 )
 
 type ForumsTheme struct {
-	ID            int64  `db:"id"`
+	ID            int64  `db:"id"             goqu:"pk,skipinsert"`
 	Name          string `db:"name"`
 	TopicsCount   int32  `db:"topics"`
 	MessagesCount int32  `db:"messages"`
@@ -35,19 +35,19 @@ type ForumsTheme struct {
 }
 
 type ForumsTopic struct {
-	ID           int64  `db:"id"`
-	Name         string `db:"name"`
-	Status       string `db:"status"`
-	Messages     int32
-	NewMessages  int32
+	ID           int64     `db:"id"           goqu:"pk,skipinsert"`
+	Name         string    `db:"name"`
+	Status       string    `db:"status"`
 	CreatedAt    time.Time `db:"add_datetime"`
 	UserID       int64     `db:"author_id"`
 	ThemeID      int64     `db:"theme_id"`
+	Messages     int32
+	NewMessages  int32
 	Subscription bool
 }
 
 type CommentMessage struct {
-	ID       int64         `db:"id"`
+	ID       int64         `db:"id"        goqu:"pk,skipinsert"`
 	Datetime time.Time     `db:"datetime"`
 	UserID   sql.NullInt64 `db:"author_id"`
 }
@@ -114,26 +114,30 @@ func (s *Forums) AddTopic(
 
 	ctx = context.WithoutCancel(ctx)
 
-	res, err := s.db.Insert(schema.ForumsTopicsTable).
-		Cols(schema.ForumsTopicsTableThemeIDCol, schema.ForumsTopicsTableNameCol, schema.ForumsTopicsTableAuthorIDCol,
-			schema.ForumsTopicsTableAuthorIPCol, schema.ForumsTopicsTableAddDatetimeCol,
-			schema.ForumsTopicsTableViewsCol, schema.ForumsTopicsTableStatusCol).
+	var topicID int64
+
+	success, err = s.db.Insert(schema.ForumsTopicsTable).
+		Cols(schema.ForumsTopicsTableThemeIDColName, schema.ForumsTopicsTableNameColName,
+			schema.ForumsTopicsTableAuthorIDColName, schema.ForumsTopicsTableAuthorIPColName,
+			schema.ForumsTopicsTableAddDatetimeColName, schema.ForumsTopicsTableViewsColName,
+			schema.ForumsTopicsTableStatusColName).
 		Vals(goqu.Vals{
 			themeID,
 			name,
 			userID,
-			goqu.Func("INET6_ATON", remoteAddr),
+			goqu.Func("INET", remoteAddr),
 			goqu.Func("NOW"),
 			0,
 			TopicStatusNormal,
-		}).Executor().ExecContext(ctx)
+		}).
+		Returning(schema.ForumsTopicsTableIDCol).
+		Executor().ScanValContext(ctx, &topicID)
 	if err != nil {
 		return 0, err
 	}
 
-	topicID, err := res.LastInsertId()
-	if err != nil {
-		return 0, err
+	if !success {
+		return 0, errNoRowsReturned
 	}
 
 	err = s.updateThemeStat(ctx, themeID)

@@ -80,7 +80,7 @@ export class UserTextComponent {
 
     const re = new RegExp(/(https?:\/\/[\w:.,/?&=~+%#'!|()-]{3,})|(www.[\w.,/?&=~+%#'!|()-]{3,})/i, 'i');
 
-    let res: null | RegExpExecArray = null;
+    let res: null | RegExpExecArray;
     let umatch: string;
     let url;
 

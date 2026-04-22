@@ -10,7 +10,6 @@ import (
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/go-sql-driver/mysql" // enable mysql driver
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,11 +17,6 @@ func createTrafficService(t *testing.T) *Traffic {
 	t.Helper()
 
 	cfg := config.LoadConfig("..")
-
-	autowpDB, err := sql.Open("mysql", cfg.AutowpDSN)
-	require.NoError(t, err)
-
-	goquDB := goqu.New("mysql", autowpDB)
 
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
@@ -32,7 +26,7 @@ func createTrafficService(t *testing.T) *Traffic {
 	banRepository, err := ban.NewRepository(goquPostgresDB)
 	require.NoError(t, err)
 
-	traf, err := NewTraffic(goquPostgresDB, goquDB, banRepository)
+	traf, err := NewTraffic(goquPostgresDB, banRepository)
 	require.NoError(t, err)
 
 	return traf

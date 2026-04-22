@@ -1,1 +1,0 @@
-DROP TABLE user_renames, user_remember, user_password_remind, user_account, personal_messages, login_state, contact, users;

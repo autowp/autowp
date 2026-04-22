@@ -2,6 +2,7 @@ package query
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -343,11 +344,7 @@ func (s *PictureListOptions) applyAcceptDate(
 	if s.AcceptedInDays > 0 {
 		sqSelect = sqSelect.Where(
 			acceptDateCol.Gt(
-				goqu.Func(
-					"DATE_SUB",
-					goqu.Func("CURDATE"),
-					goqu.L("INTERVAL ? DAY", s.AcceptedInDays),
-				),
+				goqu.L("CURRENT_DATE - INTERVAL ?", fmt.Sprintf("%d DAY", s.AcceptedInDays)),
 			),
 		)
 	}

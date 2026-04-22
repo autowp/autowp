@@ -15,6 +15,7 @@ import (
 	"github.com/autowp/goautowp/textstorage"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
+	"github.com/jackc/pgtype"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/genproto/googleapis/type/latlng"
@@ -1594,16 +1595,22 @@ func TestGetPictureIP(t *testing.T) {
 
 			identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
 
-			res, err := goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
-				Identity: identity,
-				Status:   schema.PictureStatusAccepted,
-				IP:       util.IP(ip),
-				AddDate:  time.Now(),
-			}).Executor().ExecContext(ctx)
+			var pictureID int64
+
+			var pgIP pgtype.Inet
+
+			err := pgIP.Set(ip)
 			require.NoError(t, err)
 
-			pictureID, err := res.LastInsertId()
+			success, err := goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
+				Identity: identity,
+				Status:   schema.PictureStatusAccepted,
+				IP:       pgIP,
+				AddDate:  time.Now(),
+				Point:    pgtype.Point{Status: pgtype.Null},
+			}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &pictureID)
 			require.NoError(t, err)
+			require.True(t, success)
 
 			token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 			require.NoError(t, err)
@@ -1637,11 +1644,17 @@ func TestInbox(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
 
+	var pgIP pgtype.Inet
+
+	err = pgIP.Set(net.IPv4allrouter)
+	require.NoError(t, err)
+
 	_, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
 		Identity: identity,
 		Status:   schema.PictureStatusInbox,
-		IP:       util.IP(net.IPv4allrouter),
+		IP:       pgIP,
 		AddDate:  time.Now(),
+		Point:    pgtype.Point{Status: pgtype.Null},
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 

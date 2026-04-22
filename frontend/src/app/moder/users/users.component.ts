@@ -28,8 +28,9 @@ export class ModerUsersComponent implements OnInit {
   protected readonly users$: Observable<APIUsersResponse> = this.#route.queryParamMap.pipe(
     distinctUntilChanged(),
     debounceTime(10),
-    switchMap((params) =>
-      this.#usersClient.getUsers(
+    switchMap((params) => {
+      const pageStr = params.get('page');
+      return this.#usersClient.getUsers(
         new APIUsersRequest({
           fields: new UserFields({
             email: true,
@@ -38,11 +39,11 @@ export class ModerUsersComponent implements OnInit {
             photo: true,
             regDate: true,
           }),
-          limit: '30',
-          page: params.get('page') ?? undefined,
+          limit: 30,
+          page: pageStr ? parseInt(pageStr) : undefined,
         }),
-      ),
-    ),
+      );
+    }),
     catchError((error: unknown) => {
       this.#toastService.handleError(error);
       return EMPTY;

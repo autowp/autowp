@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
+	"github.com/jackc/pgtype"
 )
 
 type PictureStatus string
@@ -64,7 +64,7 @@ var (
 )
 
 type PictureRow struct {
-	ID                 int64          `db:"id"`
+	ID                 int64          `db:"id"                    goqu:"pk,skipinsert"`
 	OwnerID            sql.NullInt64  `db:"owner_id"`
 	ChangeStatusUserID sql.NullInt64  `db:"change_status_user_id"`
 	Identity           string         `db:"identity"`
@@ -72,14 +72,14 @@ type PictureRow struct {
 	ImageID            sql.NullInt64  `db:"image_id"`
 	Width              uint16         `db:"width"`
 	Height             uint16         `db:"height"`
-	Point              NullPoint      `db:"point"`
+	Point              pgtype.Point   `db:"point"`
 	TakenYear          sql.NullInt16  `db:"taken_year"`
 	TakenMonth         sql.NullByte   `db:"taken_month"`
 	TakenDay           sql.NullByte   `db:"taken_day"`
 	CopyrightsTextID   sql.NullInt32  `db:"copyrights_text_id"`
 	AcceptDatetime     sql.NullTime   `db:"accept_datetime"`
 	ReplacePictureID   sql.NullInt64  `db:"replace_picture_id"`
-	IP                 util.IP        `db:"ip"`
+	IP                 pgtype.Inet    `db:"ip"`
 	Name               sql.NullString `db:"name"`
 	AddDate            time.Time      `db:"add_date"`
 	DPIX               sql.NullInt32  `db:"dpi_x"`

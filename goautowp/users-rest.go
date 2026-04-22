@@ -23,6 +23,12 @@ import (
 
 const userPhotoFileField = "photo"
 
+const (
+	invalidParams        = "invalid_params"
+	fileIsImageFalseType = "fileIsImageFalseType"
+	fileFilesSizeTooBig  = "fileFilesSizeTooBig"
+)
+
 type UsersREST struct {
 	auth       *Auth
 	repository *users.Repository
@@ -74,7 +80,7 @@ func (s *UsersREST) postPhotoAction(ctx *gin.Context) {
 	if file.Size > users.UserPhotoMaxFileSize {
 		ctx.JSON(http.StatusBadRequest, BadRequestResponse{
 			InvalidParams: map[string]map[string]string{userPhotoFileField: {
-				"fileFilesSizeTooBig": fmt.Sprintf(
+				fileFilesSizeTooBig: fmt.Sprintf(
 					"All files in sum should have a maximum size of '%d' but '%d' were detected",
 					users.UserPhotoMaxFileSize, file.Size,
 				),
@@ -121,7 +127,7 @@ func (s *UsersREST) postPhotoAction(ctx *gin.Context) {
 	if !mimeIsAllowed {
 		ctx.JSON(http.StatusBadRequest, BadRequestResponse{
 			InvalidParams: map[string]map[string]string{userPhotoFileField: {
-				"fileIsImageFalseType": fmt.Sprintf(
+				fileIsImageFalseType: fmt.Sprintf(
 					"File is no image, '%s' detected",
 					mime.String(),
 				),

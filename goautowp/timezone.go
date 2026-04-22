@@ -10,15 +10,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const usrShareZoneinfo = "/usr/share/zoneinfo/"
+
 var TimeZones = sync.OnceValue(func() []string {
 	zoneDirs := map[string]string{
 		"android":   "/system/usr/share/zoneinfo/",
-		"darwin":    "/usr/share/zoneinfo/",
-		"dragonfly": "/usr/share/zoneinfo/",
-		"freebsd":   "/usr/share/zoneinfo/",
-		"linux":     "/usr/share/zoneinfo/",
-		"netbsd":    "/usr/share/zoneinfo/",
-		"openbsd":   "/usr/share/zoneinfo/",
+		"darwin":    usrShareZoneinfo,
+		"dragonfly": usrShareZoneinfo,
+		"freebsd":   usrShareZoneinfo,
+		"linux":     usrShareZoneinfo,
+		"netbsd":    usrShareZoneinfo,
+		"openbsd":   usrShareZoneinfo,
 		"solaris":   "/usr/share/lib/zoneinfo/",
 	}
 

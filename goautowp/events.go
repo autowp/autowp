@@ -2,6 +2,7 @@ package goautowp
 
 import (
 	"context"
+	"errors"
 
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
@@ -9,6 +10,8 @@ import (
 )
 
 const EventsDefaultLanguage = "en"
+
+var errNoRowsReturned = errors.New("no rows returned")
 
 type Event struct {
 	UserID   int64
@@ -31,20 +34,22 @@ func NewEvents(db *goqu.Database) *Events {
 func (s *Events) Add(ctx context.Context, event Event) error {
 	ctx = context.WithoutCancel(ctx)
 
-	res, err := s.db.Insert(schema.LogEventsTable).
+	var rowID int64
+
+	success, err := s.db.Insert(schema.LogEventsTable).
 		Rows(goqu.Record{
 			schema.LogEventsTableDescriptionColName: event.Message,
 			schema.LogEventsTableUserIDColName:      event.UserID,
 			schema.LogEventsTableAddDatetimeColName: goqu.Func("NOW"),
 		}).
-		Executor().ExecContext(ctx)
+		Returning(schema.LogEventsTableIDColName).
+		Executor().ScanValContext(ctx, &rowID)
 	if err != nil {
 		return err
 	}
 
-	rowID, err := res.LastInsertId()
-	if err != nil {
-		return err
+	if !success {
+		return errNoRowsReturned
 	}
 
 	if len(event.Users) > 0 {

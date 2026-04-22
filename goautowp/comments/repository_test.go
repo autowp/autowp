@@ -17,9 +17,7 @@ import (
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/users"
 	"github.com/doug-martin/goqu/v9"
-	_ "github.com/doug-martin/goqu/v9/dialect/mysql"    // enable mysql dialect
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
-	_ "github.com/go-sql-driver/mysql"                  // enable mysql driver
 	"github.com/google/uuid"
 	_ "github.com/lib/pq" // enable postgres driver
 	"github.com/stretchr/testify/require"
@@ -32,27 +30,29 @@ func createRandomUser(ctx context.Context, t *testing.T, db *goqu.Database) int6
 
 	emailAddr := "test" + strconv.Itoa(random.Int()) + "@example.com"
 	name := "ivan"
-	res, err := db.Insert(schema.UserTable).
+
+	var id int64
+
+	success, err := db.Insert(schema.UserTable).
 		Rows(goqu.Record{
 			schema.UserTableLoginColName:          nil,
 			schema.UserTableEmailColName:          emailAddr,
 			schema.UserTablePasswordColName:       nil,
 			schema.UserTableEmailToCheckColName:   nil,
-			schema.UserTableHideEmailColName:      1,
+			schema.UserTableHideEmailColName:      true,
 			schema.UserTableEmailCheckCodeColName: nil,
 			schema.UserTableNameColName:           name,
 			schema.UserTableRegDateColName:        goqu.Func("NOW"),
 			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
 			schema.UserTableTimezoneColName:       "Europe/Moscow",
-			schema.UserTableLastIPColName:         goqu.Func("INET6_ATON", "127.0.0.1"),
+			schema.UserTableLastIPColName:         goqu.Func("INET", "127.0.0.1"),
 			schema.UserTableLanguageColName:       schema.EnglishLanguageCode,
-			schema.UserTableUUIDColName:           goqu.Func("UUID_TO_BIN", uuid.New().String()),
+			schema.UserTableUUIDColName:           uuid.New().String(),
 		}).
-		Executor().ExecContext(ctx)
+		Returning(schema.UserTableIDCol).
+		Executor().ScanValContext(ctx, &id)
 	require.NoError(t, err)
-
-	id, err := res.LastInsertId()
-	require.NoError(t, err)
+	require.True(t, success)
 
 	return id
 }
@@ -62,15 +62,10 @@ func createRepository(t *testing.T) (*Repository, *goqu.Database) {
 
 	cfg := config.LoadConfig("..")
 
-	autowpDB, err := sql.Open("mysql", cfg.AutowpDSN)
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
 
-	goquDB := goqu.New("mysql", autowpDB)
-
-	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
-	require.NoError(t, err)
-
-	goquPostgresDB := goqu.New("postgres", postgresDB)
+	goquDB := goqu.New("postgres", db)
 
 	client := gocloak.NewClient(cfg.Keycloak.URL)
 
@@ -79,7 +74,6 @@ func createRepository(t *testing.T) (*Repository, *goqu.Database) {
 
 	usersRepository := users.NewRepository(
 		goquDB,
-		goquPostgresDB,
 		cfg.UsersSalt,
 		cfg.Languages,
 		client,
@@ -101,7 +95,7 @@ func createRepository(t *testing.T) (*Repository, *goqu.Database) {
 		i,
 	)
 
-	repo := NewRepository(goquDB, goquPostgresDB, usersRepository, messagingRepository, hostsManager)
+	repo := NewRepository(goquDB, usersRepository, messagingRepository, hostsManager)
 
 	return repo, goquDB
 }

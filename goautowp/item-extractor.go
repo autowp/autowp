@@ -1563,8 +1563,8 @@ func (s *ItemExtractor) extractLocation(
 	}
 
 	return &latlng.LatLng{
-		Latitude:  location.Lat(),
-		Longitude: location.Lng(),
+		Latitude:  location.X(),
+		Longitude: location.Y(),
 	}, nil
 }
 
