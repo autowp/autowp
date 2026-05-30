@@ -16,9 +16,9 @@ spec:
     spec:
       {{- include "autowp.imagePullSecrets" . | nindent 6 }}
       volumes:
-        - configMap:
+        - secret:
             defaultMode: 420
-            name: {{ include "autowp.goautowp.fullname" . | quote }}
+            secretName: {{ include "autowp.goautowp.fullname" . | quote }}
           name: config
         - name: tmp
           emptyDir: {}
@@ -41,6 +41,10 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
           resources:
             limits:
               memory: 5Gi
@@ -84,6 +88,10 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
           readinessProbe:
             tcpSocket:
               port: grpc-port
@@ -92,6 +100,13 @@ spec:
             tcpSocket:
               port: grpc-port
             initialDelaySeconds: 3
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 101
+        runAsUser: 101
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

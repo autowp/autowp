@@ -1,0 +1,4 @@
+ksv0125:
+  trusted_registries:
+    - "registry.pereslegin.ru"
+    - docker.io

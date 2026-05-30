@@ -13,9 +13,9 @@ spec:
         spec:
           {{- include "autowp.imagePullSecrets" . | nindent 10 }}
           volumes:
-            - configMap:
+            - secret:
                 defaultMode: 420
-                name: {{ include "autowp.goautowp.fullname" . | quote }}
+                secretName: {{ include "autowp.goautowp.fullname" . | quote }}
               name: config
             - name: tmp
               emptyDir: {}
@@ -44,5 +44,16 @@ spec:
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
                 runAsUser: 101
+                runAsGroup: 101
+                allowPrivilegeEscalation: false
+                seccompProfile:
+                  type: RuntimeDefault
           restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            fsGroup: 101
+            runAsUser: 101
+            runAsGroup: 101
+            seccompProfile:
+              type: RuntimeDefault
   concurrencyPolicy: Forbid

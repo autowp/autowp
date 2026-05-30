@@ -1,3 +1,43 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "autowp.static.fullname" . | quote }}
+data:
+  nginx.conf: |-
+    user  nginx;
+    worker_processes  auto;
+
+    proxy_temp_path /tmp/proxy_temp;
+    client_body_temp_path /tmp/client_temp;
+    fastcgi_temp_path /tmp/fastcgi_temp;
+    uwsgi_temp_path /tmp/uwsgi_temp;
+    scgi_temp_path /tmp/scgi_temp;
+
+    error_log /dev/stderr warn;
+    pid       /tmp/nginx.pid;
+
+    events {
+      worker_connections  1024;
+    }
+
+    http {
+      include       /etc/nginx/mime.types;
+      default_type  application/octet-stream;
+
+      access_log /dev/stdout;
+      server_tokens off;
+
+      sendfile        on;
+      #tcp_nopush     on;
+
+      keepalive_timeout  65;
+
+      #gzip  on;
+
+      include /etc/nginx/conf.d/*.conf;
+    }
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,6 +59,9 @@ spec:
         - name: img
           persistentVolumeClaim:
             claimName: img
+        - name: config
+          configMap:
+            name: {{ include "autowp.static.image" . }}
       containers:
         - name: static
           image: {{ include "autowp.static.image" . }}
@@ -41,7 +84,11 @@ spec:
             initialDelaySeconds: 5
           volumeMounts:
             - mountPath: "/usr/share/nginx/html/img"
-              name: img
+              name: "img"
+              readOnly: true
+            - mountPath: "/etc/nginx/nginx.conf"
+              name: "config"
+              subPath: "nginx.conf"
               readOnly: true
           resources:
             limits:
@@ -50,10 +97,19 @@ spec:
             requests:
               memory: 10M
               cpu: 50m
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            readOnlyRootFilesystem: true
       securityContext:
         runAsNonRoot: true
         fsGroup: 101
         runAsUser: 101
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
