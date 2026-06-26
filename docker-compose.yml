@@ -24,7 +24,7 @@ services:
       "
 
   frontend:
-    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.10.1
+    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.20.0
     container_name: autowp_test_frontend
     depends_on:
       - goautowp-serve
@@ -36,25 +36,25 @@ services:
     read_only: true
 
   goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.10.1
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.20.0
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     depends_on:
       - keycloak
       - rabbitmq
       - redis
-      - traffic-postgres
+      - postgres
     volumes:
       - ./goautowp-config.yaml:/config.yaml:ro
     command: scheduler-generate-index-cache --loglevel=debug
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.10.1
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.20.0
     container_name: autowp_test_goautowp_serve
     depends_on:
       - keycloak
       - rabbitmq
       - redis
-      - traffic-postgres
+      - postgres
     volumes:
       - ./goautowp-config.yaml:/config.yaml:ro
     ports:
@@ -68,7 +68,7 @@ services:
     image: quay.io/keycloak/keycloak:26.4
     container_name: autowp_test_keycloak
     depends_on:
-      - postgres-keycloak
+      - postgres
     volumes:
       - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json
     environment:
@@ -82,7 +82,7 @@ services:
       - "--hostname=localhost"
       - "--http-enabled=true"
       - "--db=postgres"
-      - "--db-url=jdbc:postgresql://postgres-keycloak:5432/keycloak"
+      - "--db-url=jdbc:postgresql://postgres:5432/keycloak"
       - "--db-username=keycloak"
       - "--db-password=password"
     restart: always
@@ -99,17 +99,6 @@ services:
       - '0.0.0.0:9000:9000'
       - '0.0.0.0:9001:9001'
     command: server --console-address ":9001" /data
-    restart: always
-
-  postgres-keycloak:
-    image: postgres:13-alpine
-    container_name: autowp_test_postgres_keycloak
-    environment:
-      - POSTGRES_DB=keycloak
-      - POSTGRES_USER=keycloak
-      - POSTGRES_PASSWORD=password
-    ports:
-      - '0.0.0.0:5433:5432'
     restart: always
 
   rabbitmq:
@@ -147,13 +136,19 @@ services:
       - '0.0.0.0:443:443'
     restart: always
 
-  traffic-postgres:
-    image: postgres:13-alpine
+  postgres:
+    image: postgis/postgis:18-3.6-alpine
     container_name: autowp_test_traffic_postgres
+    volumes:
+      - ./goautowp/test/postgres-initdb.d/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
+      - ./goautowp/test/postgres-initdb.d/create-keycloak-database.sh:/docker-entrypoint-initdb.d/create-keycloak-database.sh:ro
     environment:
       - POSTGRES_DB=traffic
       - POSTGRES_USER=traffic
       - POSTGRES_PASSWORD=password
+      - KECYLOAK_DB_NAME=keycloak
+      - KECYLOAK_DB_USER=keycloak
+      - KECYLOAK_DB_PASSWORD=password
     ports:
       - '0.0.0.0:5432:5432'
     restart: always
