@@ -597,7 +597,7 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 
 	yoomoney.SetupRouter(ctx, ginEngine)
 
-	tg.SetupRouter(ginEngine)
+	tg.SetupRouter(ginEngine) //nolint: contextcheck
 
 	picturesREST, err := s.PicturesREST(ctx)
 	if err != nil {
