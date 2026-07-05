@@ -28,7 +28,6 @@ var errInvalidID = errors.New("invalid id provided")
 
 const (
 	threshold = 3
-	decimal   = 10
 )
 
 // DuplicateFinder Main Object.
@@ -225,21 +224,20 @@ func (s *DuplicateFinder) updateDistance(ctx context.Context, id int64) error {
 		Distance  int `db:"distance"`
 	}
 
-	err = s.db.Select(
-		schema.DfHashTablePictureIDCol,
-		goqu.Func("BIT_COUNT", goqu.L("? ^ ?", schema.DfHashTableHashCol, hash)).As(alias),
-	).
-		From(schema.DfHashTable).
-		Where(schema.DfHashTablePictureIDCol.Neq(id)).
-		Having(goqu.C(alias).Lte(threshold)).
-		Executor().ScanStructsContext(ctx, &sts)
+	err = s.db.Select(goqu.Star()).
+		From(s.db.Select(
+			schema.DfHashTablePictureIDCol,
+			goqu.Func("BIT_COUNT", goqu.L("(? # ?)::bytea", schema.DfHashTableHashCol, hash)).As(alias),
+		).
+			From(schema.DfHashTable).
+			Where(schema.DfHashTablePictureIDCol.Neq(id))).
+		Where(goqu.C(alias).Lte(threshold)).Executor().ScanStructsContext(ctx, &sts)
+	if err != nil {
+		return err
+	}
 
 	if len(sts) == 0 {
 		return nil
-	}
-
-	if err != nil {
-		return err
 	}
 
 	records := make([]goqu.Record, 0, len(sts)*2)
@@ -249,10 +247,12 @@ func (s *DuplicateFinder) updateDistance(ctx context.Context, id int64) error {
 			schema.DfDistanceTableSrcPictureIDColName: id,
 			schema.DfDistanceTableDstPictureIDColName: st.PictureID,
 			schema.DfDistanceTableDistanceColName:     st.Distance,
+			schema.DfDistanceTableHideColName:         false,
 		}, goqu.Record{
 			schema.DfDistanceTableSrcPictureIDColName: st.PictureID,
 			schema.DfDistanceTableDstPictureIDColName: id,
 			schema.DfDistanceTableDistanceColName:     st.Distance,
+			schema.DfDistanceTableHideColName:         false,
 		})
 	}
 
