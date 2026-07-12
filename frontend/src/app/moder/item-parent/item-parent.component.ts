@@ -143,13 +143,11 @@ export class ModerItemParentComponent {
       ]),
     ),
     map(([languages, itemParentLanguage]) => {
-      const resLanguages = languages.map(
-        (language): LanguageItem => ({
-          invalidParams: {},
-          language,
-          name: null,
-        }),
-      );
+      const resLanguages = languages.map((language): LanguageItem => ({
+        invalidParams: {},
+        language,
+        name: null,
+      }));
 
       for (const languageData of itemParentLanguage.items ? itemParentLanguage.items : []) {
         for (const i of resLanguages) {

@@ -64,15 +64,13 @@ export class CategoriesCategoryComponent {
 
   protected readonly path$: Observable<CategoryPathItem[]> = this.#categoryData$.pipe(
     map(({pathItems}) =>
-      pathItems.map(
-        (pi): CategoryPathItem => ({
-          childs: [],
-          item: pi.item,
-          loaded: pi.loaded,
-          parentId: pi.parentId,
-          routerLink: pi.routerLink,
-        }),
-      ),
+      pathItems.map((pi): CategoryPathItem => ({
+        childs: [],
+        item: pi.item,
+        loaded: pi.loaded,
+        parentId: pi.parentId,
+        routerLink: pi.routerLink,
+      })),
     ),
     shareReplay({bufferSize: 1, refCount: false}),
   );
