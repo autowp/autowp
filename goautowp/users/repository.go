@@ -237,7 +237,7 @@ func (s *Repository) Users(
 		valuePtrs = append(valuePtrs, &row.LastIP)
 		columns = append(
 			columns,
-			goqu.Func("host", aliasTable.Col(schema.UserTableLastIPColName)),
+			aliasTable.Col(schema.UserTableLastIPColName),
 		)
 	}
 

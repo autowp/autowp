@@ -87,7 +87,7 @@ type UsersRow struct {
 	Timezone      string      `db:"timezone"`
 	RegDate       *time.Time  `db:"reg_date"`
 	PicturesAdded int64       `db:"pictures_added"`
-	LastIP        string      `db:"last_ip"`
+	LastIP        pgtype.Inet `db:"last_ip"`
 	Login         *string     `db:"login"`
 	Green         bool        `db:"green"`
 	UUID          pgtype.UUID `db:"uuid"`

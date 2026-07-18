@@ -382,13 +382,18 @@ func (s *AttrsGRPCServer) GetUserValues(
 
 		extractedValue := extractAttrValue(value)
 
+		var updateDate *timestamppb.Timestamp = nil
+		if row.UpdateDate.Valid {
+			updateDate = timestamppb.New(row.UpdateDate.Time)
+		}
+
 		res[idx] = &AttrUserValue{
 			AttributeId: row.AttributeID,
 			ItemId:      row.ItemID,
 			UserId:      row.UserID,
 			Value:       &extractedValue,
 			ValueText:   valueText,
-			UpdateDate:  timestamppb.New(row.UpdateDate),
+			UpdateDate:  updateDate,
 		}
 	}
 

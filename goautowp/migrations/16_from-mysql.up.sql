@@ -102,9 +102,9 @@ create table users (
   password           varchar(50)                    null,
   e_mail             varchar(50)                    null,
   name               varchar(50)                    not null,
-  reg_date           timestamp                      null,
-  last_online        timestamp                      null,
-  icq                int      default 0   not null,
+  reg_date           timestamptz                      null,
+  last_online        timestamptz                      null,
+  icq                varchar      default ''   not null,
   url                varchar(50)      default ''    not null,
   own_car            varchar(100)     default ''    not null,
   dream_car          varchar(100)     default ''    not null,
@@ -131,7 +131,7 @@ create table users (
   specs_positives    int                            null,
   specs_negatives    int                            null,
   specs_weight       double precision           default 0     not null,
-  last_ip            inet                  not null,
+  last_ip            inet                  null,
   language           varchar(5)       default 'ru'  not null references language (code),
   uuid               uuid                     null unique,
   green              bool default false   not null
@@ -146,8 +146,8 @@ create table attrs_user_values (
   attribute_id int       not null references attrs_attributes (id),
   item_id      int       not null references item (id),
   user_id      int       not null references users (id),
-  add_date     timestamp         not null,
-  update_date  timestamp         not null,
+  add_date     timestamptz null default NOW(),
+  update_date  timestamptz null default NOW(),
   conflict     int default 0 not null,
   weight       double precision default 0 null,
   primary key (attribute_id, item_id, user_id)
@@ -192,7 +192,7 @@ create table attrs_values (
   attribute_id int                       not null references attrs_attributes (id),
   item_id      int                       not null references item (id),
   conflict     bool default false        not null,
-  update_date  timestamptz default NOW() not null,
+  update_date  timestamptz not null default NOW(),
   primary key (attribute_id, item_id)
 );
 
@@ -240,7 +240,7 @@ create table comment_message (
   deleted             bool default false not null,
   deleted_by          int                  null references users (id),
   replies_count       int      default 0 not null,
-  ip                  inet                not null,
+  ip                  inet                null,
   delete_date         timestamptz                    null
 );
 
@@ -254,7 +254,7 @@ create index comment_message_type_id on comment_message (type_id, item_id);
 create table comment_topic (
   type_id     int                       not null references comment_type (id),
   item_id     int                           not null,
-  last_update timestamptz    default NOW() not null,
+  last_update timestamptz not null default NOW(),
   messages    int default 0               not null,
   primary key (type_id, item_id)
 );
@@ -273,7 +273,7 @@ create table comment_topic_view (
   type_id   int not null references comment_type (id),
   item_id   int not null,
   user_id   int not null references users (id) on delete cascade,
-  timestamp timestamptz default NOW() not null,
+  timestamp timestamptz not null default NOW(),
   primary key (type_id, item_id, user_id)
 );
 
@@ -281,7 +281,7 @@ create table comment_vote (
   comment_id int not null references comment_message (id) on delete cascade,
   user_id    int not null references users (id) on delete cascade,
   vote       smallint not null,
-  add_date   timestamptz default NOW() not null,
+  add_date   timestamptz not null default NOW(),
   primary key (comment_id, user_id)
 );
 
@@ -325,9 +325,9 @@ create table pictures (
   identity              varchar(10)                                              not null unique,
   replace_picture_id    int                                              null references pictures (id) on delete set null,
   image_id              int                                              null references image (id),
-  ip                    inet                                            not null,
+  ip                    inet                                            null,
   copyrights_text_id    int                                                      null references textstorage_text (id),
-  point                 point                                                    null,
+  point                 geography(Point,4326) null,
   dpi_x                 int                                                      null,
   dpi_y                 int                                                      null,
   content_count         int               default 0                              not null,
@@ -431,7 +431,7 @@ create table forums_topics (
   _messages    int                          default 0               not null,
   views        int                          default 0               not null,
   status       forums_topic_status default 'normal'          not null,
-  author_ip    inet                                                  not null
+  author_ip    inet                                                  null
 );
 
 create table item_language (

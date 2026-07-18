@@ -2302,8 +2302,9 @@ func (s *Repository) topValue(ctx context.Context, data []valueItem) (Value, err
 		ratios[matchRegIdx] += weight
 
 		_, freshnessExists := freshness[matchRegIdx]
-		if !freshnessExists || freshness[matchRegIdx].Before(valueRow.Row.UpdateDate) {
-			freshness[matchRegIdx] = valueRow.Row.UpdateDate
+		if !freshnessExists ||
+			valueRow.Row.UpdateDate.Valid && freshness[matchRegIdx].Before(valueRow.Row.UpdateDate.Time) {
+			freshness[matchRegIdx] = valueRow.Row.UpdateDate.Time
 		}
 	}
 
@@ -3309,8 +3310,8 @@ func (s *Repository) refreshConflictFlag(ctx context.Context, attributeID, itemI
 			if userValue.Value.Equals(actualValue) {
 				actualValueVoters++
 
-				if minDate.After(userValue.Row.UpdateDate) {
-					minDate = userValue.Row.UpdateDate
+				if userValue.Row.UpdateDate.Valid && minDate.After(userValue.Row.UpdateDate.Time) {
+					minDate = userValue.Row.UpdateDate.Time
 				}
 			}
 		}
@@ -3330,7 +3331,7 @@ func (s *Repository) refreshConflictFlag(ctx context.Context, attributeID, itemI
 				if matchActual {
 					weight = weightFirstActual
 
-					if userValue.Row.UpdateDate.Equal(minDate) {
+					if userValue.Row.UpdateDate.Valid && userValue.Row.UpdateDate.Time.Equal(minDate) {
 						weight = weightSecondActual
 					}
 				}

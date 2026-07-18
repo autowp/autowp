@@ -30,7 +30,7 @@ func (s *AttrsUserValueListOptions) Select(db *goqu.Database, alias string) *goq
 	return s.apply(
 		alias,
 		db.From(schema.AttrsUserValuesTable.As(alias)).
-			Order(goqu.T(alias).Col(schema.AttrsUserValuesTableUpdateDateColName).Desc()),
+			Order(goqu.T(alias).Col(schema.AttrsUserValuesTableUpdateDateColName).Desc().NullsLast()),
 	)
 }
 

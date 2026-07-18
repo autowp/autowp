@@ -12,6 +12,7 @@ import (
 	"github.com/autowp/goautowp/util"
 	"github.com/autowp/goautowp/validation"
 	"github.com/doug-martin/goqu/v9/exp"
+	"github.com/jackc/pgtype"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -259,8 +260,8 @@ func extractMessage(
 	}
 
 	ip := ""
-	if canViewIP && row.IP != nil {
-		ip = row.IP.String()
+	if canViewIP && row.IP.Status == pgtype.Present {
+		ip = row.IP.IPNet.IP.String()
 	}
 
 	return &APICommentsMessage{
