@@ -19,7 +19,6 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
 	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
 	_ "github.com/lib/pq" // enable postgres driver
 	"github.com/stretchr/testify/require"
 	"gopkg.in/gographics/imagick.v3/imagick"
@@ -124,7 +123,7 @@ func TestImageExif(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "Corey Escobar ©2021 Courtesy of RM Sotheby's", text)
 
-	require.Equal(t, pgtype.Null, picture.Point.Status)
+	require.False(t, picture.Point.Valid)
 }
 
 func TestImageExifGPS(t *testing.T) {
@@ -154,9 +153,9 @@ func TestImageExifGPS(t *testing.T) {
 	require.EqualValues(t, 2008, picture.TakenYear.Int16)
 	require.EqualValues(t, 10, picture.TakenMonth.Byte)
 	require.EqualValues(t, 22, picture.TakenDay.Byte)
-	require.Equal(t, pgtype.Present, picture.Point.Status)
-	require.InDelta(t, 43.464455, picture.Point.P.Y, 0.001)
-	require.InDelta(t, 11.881478333333334, picture.Point.P.X, 0.001)
+	require.True(t, picture.Point.Valid)
+	require.InDelta(t, 43.464455, picture.Point.Point.Y(), 0.001)
+	require.InDelta(t, 11.881478333333334, picture.Point.Point.X(), 0.001)
 }
 
 func TestImageBlackEdgeCrop(t *testing.T) {

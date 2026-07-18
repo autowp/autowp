@@ -107,19 +107,21 @@ func (s *MapGRPCServer) GetPoints(
 		mapPoints := make([]*MapPoint, 0)
 
 		for rows.Next() {
-			var point schema.PostgresGeographyPoint
+			var point schema.NullPoint
 
 			err = rows.Scan(&point)
 			if err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
 
-			mapPoints = append(mapPoints, &MapPoint{
-				Location: &latlng.LatLng{
-					Latitude:  point.Point.X(),
-					Longitude: point.Point.Y(),
-				},
-			})
+			if point.Valid {
+				mapPoints = append(mapPoints, &MapPoint{
+					Location: &latlng.LatLng{
+						Latitude:  point.Point.X(),
+						Longitude: point.Point.Y(),
+					},
+				})
+			}
 		}
 
 		if err = rows.Err(); err != nil {
@@ -170,7 +172,7 @@ func (s *MapGRPCServer) pointsWithContent(
 
 	for rows.Next() {
 		var (
-			point             schema.PostgresGeographyPoint
+			point             schema.NullPoint
 			id                int64
 			name              string
 			nullableBeginYear sql.NullInt32
@@ -209,49 +211,51 @@ func (s *MapGRPCServer) pointsWithContent(
 			return nil, err
 		}
 
-		mapPoint := &MapPoint{
-			Id: fmt.Sprintf("factory%d", id),
-			Location: &latlng.LatLng{
-				Latitude:  point.Point.X(),
-				Longitude: point.Point.Y(),
-			},
-			Name: nameText,
-		}
+		if point.Valid {
+			mapPoint := &MapPoint{
+				Id: fmt.Sprintf("factory%d", id),
+				Location: &latlng.LatLng{
+					Latitude:  point.Point.X(),
+					Longitude: point.Point.Y(),
+				},
+				Name: nameText,
+			}
 
-		switch itemTypeID {
-		case schema.ItemTableItemTypeIDFactory:
-			mapPoint.Url = frontend.FactoryRoute(id)
-		case schema.ItemTableItemTypeIDMuseum:
-			mapPoint.Url = frontend.MuseumRoute(id)
-		case schema.ItemTableItemTypeIDVehicle, schema.ItemTableItemTypeIDEngine,
-			schema.ItemTableItemTypeIDCategory, schema.ItemTableItemTypeIDTwins,
-			schema.ItemTableItemTypeIDBrand, schema.ItemTableItemTypeIDPerson, schema.ItemTableItemTypeIDCopyright:
-		}
+			switch itemTypeID {
+			case schema.ItemTableItemTypeIDFactory:
+				mapPoint.Url = frontend.FactoryRoute(id)
+			case schema.ItemTableItemTypeIDMuseum:
+				mapPoint.Url = frontend.MuseumRoute(id)
+			case schema.ItemTableItemTypeIDVehicle, schema.ItemTableItemTypeIDEngine,
+				schema.ItemTableItemTypeIDCategory, schema.ItemTableItemTypeIDTwins,
+				schema.ItemTableItemTypeIDBrand, schema.ItemTableItemTypeIDPerson, schema.ItemTableItemTypeIDCopyright:
+			}
 
-		var imageID sql.NullInt64
+			var imageID sql.NullInt64
 
-		success, err := s.db.Select(schema.PictureTableImageIDCol).
-			From(schema.PictureTable).
-			Join(schema.PictureItemTable, goqu.On(schema.PictureTableIDCol.Eq(schema.PictureItemTablePictureIDCol))).
-			Where(
-				schema.PictureTableStatusCol.Eq(schema.PictureStatusAccepted),
-				schema.PictureItemTableItemIDCol.Eq(id),
-			).
-			ScanValContext(ctx, &imageID)
-		if err != nil {
-			return nil, err
-		}
-
-		if success && imageID.Valid {
-			image, err := s.imageStorage.FormattedImage(ctx, int(imageID.Int64), "picture-thumb-medium")
+			success, err := s.db.Select(schema.PictureTableImageIDCol).
+				From(schema.PictureTable).
+				Join(schema.PictureItemTable, goqu.On(schema.PictureTableIDCol.Eq(schema.PictureItemTablePictureIDCol))).
+				Where(
+					schema.PictureTableStatusCol.Eq(schema.PictureStatusAccepted),
+					schema.PictureItemTableItemIDCol.Eq(id),
+				).
+				ScanValContext(ctx, &imageID)
 			if err != nil {
 				return nil, err
 			}
 
-			mapPoint.Image = APIImageToGRPC(image)
-		}
+			if success && imageID.Valid {
+				image, err := s.imageStorage.FormattedImage(ctx, int(imageID.Int64), "picture-thumb-medium")
+				if err != nil {
+					return nil, err
+				}
 
-		mapPoints = append(mapPoints, mapPoint)
+				mapPoint.Image = APIImageToGRPC(image)
+			}
+
+			mapPoints = append(mapPoints, mapPoint)
+		}
 	}
 
 	if err = rows.Err(); err != nil {

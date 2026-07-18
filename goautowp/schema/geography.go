@@ -2,9 +2,9 @@ package schema
 
 import (
 	"database/sql/driver"
+	"encoding/binary"
 	"errors"
 
-	"github.com/paulmach/orb/encoding/ewkb"
 	"github.com/twpayne/go-geom"
 	"github.com/twpayne/go-geom/encoding/ewkbhex"
 )
@@ -27,39 +27,13 @@ type NullPoint struct {
 
 // Scan implements the [Scanner] interface.
 func (n *NullPoint) Scan(value interface{}) error {
-	if value == nil {
-		n.Point, n.Valid = geom.Point{}, false
+	n.Point, n.Valid = geom.Point{}, false
 
+	if value == nil {
 		return nil
 	}
 
-	scanner := ewkb.Scanner(n.Point)
-
-	err := scanner.Scan(value)
-	if err != nil {
-		return err
-	}
-
-	n.Valid = true
-
-	return nil
-}
-
-// Value implements the [driver.Valuer] interface.
-func (n NullPoint) Value() (driver.Value, error) {
-	if !n.Valid {
-		return nil, nil //nolint: nilnil
-	}
-
-	return n.Point, nil
-}
-
-type PostgresGeographyPoint struct {
-	Point geom.Point
-}
-
-func (p *PostgresGeographyPoint) Scan(src interface{}) error {
-	switch bytes := src.(type) {
+	switch bytes := value.(type) {
 	case []byte:
 		decoded, err := ewkbhex.Decode(string(bytes))
 		if err != nil {
@@ -75,10 +49,20 @@ func (p *PostgresGeographyPoint) Scan(src interface{}) error {
 			return errNonNilValueExpected
 		}
 
-		p.Point = *point
+		n.Point = *point
+		n.Valid = true
 	default:
 		return errBytesExpected
 	}
 
 	return nil
+}
+
+// Value implements the [driver.Valuer] interface.
+func (n NullPoint) Value() (driver.Value, error) {
+	if !n.Valid {
+		return nil, nil //nolint: nilnil
+	}
+
+	return ewkbhex.Encode(&n.Point, binary.LittleEndian)
 }

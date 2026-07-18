@@ -1607,7 +1607,7 @@ func TestGetPictureIP(t *testing.T) {
 				Status:   schema.PictureStatusAccepted,
 				IP:       pgIP,
 				AddDate:  time.Now(),
-				Point:    pgtype.Point{Status: pgtype.Null},
+				Point:    schema.NullPoint{Valid: false},
 			}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &pictureID)
 			require.NoError(t, err)
 			require.True(t, success)
@@ -1654,7 +1654,7 @@ func TestInbox(t *testing.T) {
 		Status:   schema.PictureStatusInbox,
 		IP:       pgIP,
 		AddDate:  time.Now(),
-		Point:    pgtype.Point{Status: pgtype.Null},
+		Point:    schema.NullPoint{Valid: false},
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 

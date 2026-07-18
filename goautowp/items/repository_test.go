@@ -552,7 +552,7 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 			OwnerID:  sql.NullInt64{Valid: true, Int64: userID},
 			AddDate:  time.Now(),
 			IP:       ip,
-			Point:    pgtype.Point{Status: pgtype.Null},
+			Point:    schema.NullPoint{Valid: false},
 		}).
 			Returning(schema.PictureTableIDCol).
 			Executor().ScanValContext(ctx, &pictureID)

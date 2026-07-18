@@ -1064,7 +1064,7 @@ func (s *Repository) SetPicturePoint(
 	var pointExpr goqu.Expression
 
 	if point != nil {
-		pointExpr = goqu.Func("Point", point.Lon(), point.Lat())
+		pointExpr = goqu.L("ST_Point(?, ?, ?)::geography", point.Lon(), point.Lat(), schema.SRID)
 	}
 
 	res, err := util.ExecAndRetryOnDeadlock(ctx,
@@ -2701,7 +2701,7 @@ func (s *Repository) processEXIF(
 		lat := extractedEXIF.gpsInfo.Latitude.Decimal()
 
 		if !math.IsNaN(lat) && !math.IsNaN(lng) {
-			set[schema.PictureTablePointColName] = goqu.Func("Point", lng, lat)
+			set[schema.PictureTablePointColName] = goqu.L("ST_Point(?, ?, ?)::geography", lng, lat, schema.SRID)
 		}
 	}
 

@@ -197,10 +197,10 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			}
 		}
 
-		if row.Point.Status == pgtype.Present {
+		if row.Point.Valid {
 			resultRow.Point = &latlng.LatLng{
-				Latitude:  row.Point.P.Y,
-				Longitude: row.Point.P.X,
+				Latitude:  row.Point.Point.Y(),
+				Longitude: row.Point.Point.X(),
 			}
 		}
 

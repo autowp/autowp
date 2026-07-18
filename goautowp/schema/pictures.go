@@ -72,7 +72,7 @@ type PictureRow struct {
 	ImageID            sql.NullInt64  `db:"image_id"`
 	Width              uint16         `db:"width"`
 	Height             uint16         `db:"height"`
-	Point              pgtype.Point   `db:"point"`
+	Point              NullPoint      `db:"point"`
 	TakenYear          sql.NullInt16  `db:"taken_year"`
 	TakenMonth         sql.NullByte   `db:"taken_month"`
 	TakenDay           sql.NullByte   `db:"taken_day"`
