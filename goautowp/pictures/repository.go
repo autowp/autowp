@@ -2327,7 +2327,7 @@ func (s *Repository) orderBy( //nolint: maintidx
 			)).
 			GroupBy(col).
 			Order(
-				col.Desc(),
+				col.Desc().NullsLast(),
 				aliasTable.Col(schema.PictureTableAddDateColName).Desc().NullsLast(),
 				aliasTable.Col(schema.PictureTableIDColName).Desc(),
 			)
@@ -2343,7 +2343,7 @@ func (s *Repository) orderBy( //nolint: maintidx
 			)).
 			GroupBy(col).
 			Order(
-				col.Desc(),
+				col.Desc().NullsLast(),
 				aliasTable.Col(schema.PictureTableAddDateColName).Desc().NullsLast(),
 				aliasTable.Col(schema.PictureTableIDColName).Desc(),
 			)
