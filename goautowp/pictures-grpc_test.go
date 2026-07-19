@@ -2071,3 +2071,61 @@ func TestGetPerspectivePages(t *testing.T) {
 	)
 	require.NoError(t, err)
 }
+
+func TestGetPersonPictures(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	client := NewPicturesClient(conn)
+	cfg := config.LoadConfig(".")
+
+	kc := cnt.Keycloak()
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+	require.NotNil(t, token)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	randomInt := random.Int()
+
+	itemID := createItem(t, conn, cnt, &APIItem{
+		Name:       fmt.Sprintf("person-%d", randomInt),
+		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+	})
+
+	CreatePicture(
+		t,
+		cnt,
+		"./test/test.jpg",
+		PicturePostForm{ItemID: itemID},
+		token.AccessToken,
+	)
+
+	_, err = client.GetPictures(metadata.AppendToOutgoingContext(
+		ctx,
+		authorizationHeader,
+		bearerPrefix+token.AccessToken,
+	), &PicturesRequest{
+		Fields: &PictureFields{
+			CommentsCount: true,
+			ModerVote:     true,
+			NameHtml:      true,
+			NameText:      true,
+			ThumbMedium:   true,
+			Views:         true,
+			Votes:         true,
+		},
+		Language: "en",
+		Limit:    12,
+		Options: &PictureListOptions{
+			PictureItem: &PictureItemListOptions{
+				ItemId: itemID,
+				TypeId: PictureItemType_PICTURE_ITEM_AUTHOR,
+			},
+			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+		},
+		Order:     PicturesRequest_ORDER_LIKES,
+		Page:      1,
+		Paginator: true,
+	})
+	require.NoError(t, err)
+}
