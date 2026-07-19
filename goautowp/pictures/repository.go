@@ -610,7 +610,7 @@ func (s *Repository) Exists(ctx context.Context, options *query.PictureListOptio
 
 	exists := false
 
-	success, err := s.db.Select(goqu.L("EXISTS ?", sqSelect.Select())).ScanValContext(ctx, &exists)
+	success, err := s.db.Select(goqu.L("EXISTS ?", sqSelect.Select(goqu.V(true)))).ScanValContext(ctx, &exists)
 
 	return success && exists, err
 }

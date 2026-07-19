@@ -38,7 +38,7 @@ func TestAddRemove(t *testing.T) {
 
 	ip := net.IPv4(66, 249, 73, 139)
 
-	err := repo.Add(ctx, ip, time.Hour, 1, "Test")
+	err := repo.Add(ctx, ip, time.Hour, 0, "Test")
 	require.NoError(t, err)
 
 	exists, err := repo.Exists(ctx, ip)

@@ -2,6 +2,7 @@ package ban
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"net"
 	"strings"
@@ -58,7 +59,7 @@ func (s *Repository) Add(
 	ct, err := s.db.Insert(schema.IPBanTable).Rows(goqu.Record{
 		schema.IPBanTableIPColName:       ip.String(),
 		schema.IPBanTableUntilColName:    upTo,
-		schema.IPBanTableByUserIDColName: byUserID,
+		schema.IPBanTableByUserIDColName: sql.NullInt64{Int64: byUserID, Valid: byUserID > 0},
 		schema.IPBanTableReasonColName:   reason,
 	}).OnConflict(goqu.DoUpdate(schema.IPBanTableIPColName, goqu.Record{
 		schema.IPBanTableUntilColName:    schema.Excluded(schema.IPBanTableUntilColName),
