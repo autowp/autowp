@@ -1794,12 +1794,20 @@ func (s *Repository) ItemParentSelect(
 	itemOrderAlias := "io"
 	itemOrderAliasTable := goqu.T(itemOrderAlias)
 
+	if groupBy {
+		sqSelect = sqSelect.GroupByAppend(
+			aliasTable.Col(schema.ItemParentTableItemIDColName),
+			aliasTable.Col(schema.ItemParentTableParentIDColName),
+		)
+	}
+
 	joinItem := false
 
 	switch orderBy {
 	case ItemParentOrderByNone:
 	case ItemParentOrderByAuto:
 		joinItem = true
+
 		sqSelect = sqSelect.Order(
 			aliasTable.Col(schema.ItemParentTableTypeColName).Asc(),
 			itemOrderAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
@@ -1808,6 +1816,15 @@ func (s *Repository) ItemParentSelect(
 			itemOrderAliasTable.Col(schema.ItemTableBodyColName).Asc(),
 			itemOrderAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
 		)
+		if groupBy {
+			sqSelect = sqSelect.GroupByAppend(
+				aliasTable.Col(schema.ItemTableBeginOrderCacheColName),
+				aliasTable.Col(schema.ItemTableEndOrderCacheColName),
+				aliasTable.Col(schema.ItemTableNameColName),
+				aliasTable.Col(schema.ItemTableBodyColName),
+				aliasTable.Col(schema.ItemTableSpecIDColName),
+			)
+		}
 	case ItemParentOrderByCategoriesFirst:
 		joinItem = true
 		sqSelect = sqSelect.Order(
@@ -1870,13 +1887,6 @@ func (s *Repository) ItemParentSelect(
 			aliasTable.Col(schema.ItemParentTableItemIDColName).
 				Eq(itemOrderAliasTable.Col(schema.ItemTableIDColName)),
 		))
-	}
-
-	if groupBy {
-		sqSelect = sqSelect.GroupBy(
-			aliasTable.Col(schema.ItemParentTableItemIDColName),
-			aliasTable.Col(schema.ItemParentTableParentIDColName),
-		)
 	}
 
 	return sqSelect, nil

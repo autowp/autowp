@@ -27,3 +27,4 @@ alter table user_user_preferences
 alter table vehicle_type
   add constraint vehicle_type_vehicle_type_id_fk foreign key (parent_id) references vehicle_type;
 
+alter table ip_ban add constraint ip_ban_users_id_fk foreign key (by_user_id) references users;

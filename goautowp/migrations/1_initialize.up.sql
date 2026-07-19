@@ -16,8 +16,6 @@ CREATE TABLE ip_ban (
   PRIMARY KEY (ip)
 );
 
-alter table ip_ban add constraint ip_ban_users_id_fk foreign key (by_user_id) references users;
-
 CREATE INDEX ON ip_ban (until);
 CREATE INDEX ON ip_ban (by_user_id);
 
