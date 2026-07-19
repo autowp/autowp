@@ -173,8 +173,8 @@ func (s *PictureItemListOptions) apply(
 
 	if s.HasArea {
 		sqSelect = sqSelect.Where(
-			aliasTable.Col(schema.PictureItemTableCropWidthColName),
-			aliasTable.Col(schema.PictureItemTableCropHeightColName),
+			aliasTable.Col(schema.PictureItemTableCropWidthColName).Gt(0),
+			aliasTable.Col(schema.PictureItemTableCropHeightColName).Gt(0),
 		)
 	}
 

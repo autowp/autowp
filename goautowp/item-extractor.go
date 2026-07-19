@@ -1562,9 +1562,13 @@ func (s *ItemExtractor) extractLocation(
 		return nil, err
 	}
 
+	if !location.Valid {
+		return nil, nil //nolint: nilnil
+	}
+
 	return &latlng.LatLng{
-		Latitude:  location.X(),
-		Longitude: location.Y(),
+		Latitude:  location.Point.X(),
+		Longitude: location.Point.Y(),
 	}, nil
 }
 

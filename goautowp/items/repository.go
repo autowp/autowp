@@ -2079,8 +2079,8 @@ func (s *Repository) SetItemLocation(ctx context.Context, itemID int64, point *g
 	return err
 }
 
-func (s *Repository) ItemLocation(ctx context.Context, itemID int64) (geom.Point, error) {
-	var res geom.Point
+func (s *Repository) ItemLocation(ctx context.Context, itemID int64) (schema.NullPoint, error) {
+	var res schema.NullPoint
 
 	success, err := s.db.Select(schema.ItemPointTablePointCol).
 		From(schema.ItemPointTable).

@@ -13,7 +13,10 @@ CREATE TABLE ip_ban (
   by_user_id int DEFAULT NULL,
   reason varchar(255) NOT NULL,
   ip inet NOT NULL,
-  PRIMARY KEY (ip));
+  PRIMARY KEY (ip)
+);
+
+alter table ip_ban add constraint ip_ban_users_id_fk foreign key (by_user_id) references users;
 
 CREATE INDEX ON ip_ban (until);
 CREATE INDEX ON ip_ban (by_user_id);

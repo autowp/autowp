@@ -104,6 +104,8 @@ create table perspectives_groups_perspectives
   constraint FK_perspectives_groups_perspectives_perspectives_id foreign key (perspective_id) references perspectives (id)
 );
 
+create index perspectives_groups_perspectives_group_id_index on perspectives_groups_perspectives (group_id);
+
 INSERT INTO perspectives_groups_perspectives (group_id, perspective_id, position) VALUES (1, 7, 1);
 INSERT INTO perspectives_groups_perspectives (group_id, perspective_id, position) VALUES (2, 13, 1);
 INSERT INTO perspectives_groups_perspectives (group_id, perspective_id, position) VALUES (3, 6, 1);
