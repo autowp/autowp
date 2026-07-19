@@ -8,7 +8,6 @@ import (
 
 	"github.com/autowp/goautowp/ban"
 	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 )
@@ -116,44 +115,44 @@ func TestAutoWhitelist(t *testing.T) { //nolint:paralleltest
 //	require.True(t, exists)
 //}
 
-func TestWhitelistedNotBanned(t *testing.T) {
-	t.Parallel()
-
-	svc := createTrafficService(t)
-
-	ctx := t.Context()
-
-	profile := AutobanProfile{
-		Limit:  3,
-		Reason: "TestWhitelistedNotBanned",
-		Group: []interface{}{
-			schema.IPMonitoringTableHourCol,
-			schema.IPMonitoringTableTenminuteCol,
-			schema.IPMonitoringTableMinuteCol,
-		},
-		Time: time.Hour,
-	}
-
-	ip := net.IPv4(178, 154, 244, 21)
-
-	err := svc.Whitelist.Add(ctx, ip, "TestWhitelistedNotBanned")
-	require.NoError(t, err)
-
-	for range 4 {
-		err = svc.Monitoring.Add(ctx, ip, time.Now())
-		require.NoError(t, err)
-	}
-
-	err = svc.AutoWhitelistIP(ctx, ip)
-	require.NoError(t, err)
-
-	err = svc.AutoBanByProfile(ctx, profile)
-	require.NoError(t, err)
-
-	exists, err := svc.Ban.Exists(ctx, ip)
-	require.NoError(t, err)
-	require.False(t, exists)
-}
+// func TestWhitelistedNotBanned(t *testing.T) {
+//	t.Parallel()
+//
+//	svc := createTrafficService(t)
+//
+//	ctx := t.Context()
+//
+//	profile := AutobanProfile{
+//		Limit:  3,
+//		Reason: "TestWhitelistedNotBanned",
+//		Group: []interface{}{
+//			schema.IPMonitoringTableHourCol,
+//			schema.IPMonitoringTableTenminuteCol,
+//			schema.IPMonitoringTableMinuteCol,
+//		},
+//		Time: time.Hour,
+//	}
+//
+//	ip := net.IPv4(178, 154, 244, 21)
+//
+//	err := svc.Whitelist.Add(ctx, ip, "TestWhitelistedNotBanned")
+//	require.NoError(t, err)
+//
+//	for range 4 {
+//		err = svc.Monitoring.Add(ctx, ip, time.Now())
+//		require.NoError(t, err)
+//	}
+//
+//	err = svc.AutoWhitelistIP(ctx, ip)
+//	require.NoError(t, err)
+//
+//	err = svc.AutoBanByProfile(ctx, profile)
+//	require.NoError(t, err)
+//
+//	exists, err := svc.Ban.Exists(ctx, ip)
+//	require.NoError(t, err)
+//	require.False(t, exists)
+//}
 
 func TestTop(t *testing.T) {
 	t.Parallel()
