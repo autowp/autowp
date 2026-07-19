@@ -19,7 +19,6 @@ type DayPictures struct {
 	timezone           *time.Location
 	minDate            time.Time
 	dbTimezone         *time.Location
-	dbDateTimeFormat   string
 	prevDate           civil.Date
 	nextDate           civil.Date
 	picturesRepository *pictures.Repository
@@ -37,7 +36,6 @@ func NewDayPictures(
 		timezone:           timezone,
 		listOptions:        listOptions,
 		dbTimezone:         time.UTC,
-		dbDateTimeFormat:   time.DateTime,
 		currentDate:        currentDate,
 		picturesRepository: picturesRepository,
 		column:             column,

@@ -1718,7 +1718,7 @@ func (s *Repository) updateTopicStat(
 		_, err = s.db.Insert(schema.CommentTopicTable).Rows(goqu.Record{
 			schema.CommentTopicTableItemIDColName:     itemID,
 			schema.CommentTopicTableTypeIDColName:     commentType,
-			schema.CommentTopicTableLastUpdateColName: st.LastUpdate.Time.Format(time.DateTime),
+			schema.CommentTopicTableLastUpdateColName: st.LastUpdate.Time.Format(time.RFC3339),
 			schema.CommentTopicTableMessagesColName:   st.MessagesCount,
 		}).OnConflict(goqu.DoUpdate(
 			schema.CommentTopicTableItemIDColName+","+schema.CommentTopicTableTypeIDColName,

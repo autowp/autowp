@@ -301,7 +301,7 @@ func (s *PictureListOptions) applyAddDate(
 		}
 
 		sqSelect = sqSelect.Where(
-			addDateCol.Gte(s.AddedFrom.In(s.Timezone).In(time.UTC).Format(time.DateTime)),
+			addDateCol.Gte(s.AddedFrom.In(s.Timezone).In(time.UTC).Format(time.RFC3339)),
 		)
 	}
 
@@ -317,7 +317,7 @@ func (s *PictureListOptions) applyAddDate(
 			return nil, errNoTimezone
 		}
 
-		sqSelect = sqSelect.Where(addDateCol.Lt(s.AddDateLt.In(time.UTC).Format(time.DateTime)))
+		sqSelect = sqSelect.Where(addDateCol.Lt(s.AddDateLt.In(time.UTC).Format(time.RFC3339)))
 	}
 
 	if s.AddDateGte != nil {
@@ -325,7 +325,7 @@ func (s *PictureListOptions) applyAddDate(
 			return nil, errNoTimezone
 		}
 
-		sqSelect = sqSelect.Where(addDateCol.Gte(s.AddDateGte.In(time.UTC).Format(time.DateTime)))
+		sqSelect = sqSelect.Where(addDateCol.Gte(s.AddDateGte.In(time.UTC).Format(time.RFC3339)))
 	}
 
 	return sqSelect, nil
@@ -362,7 +362,7 @@ func (s *PictureListOptions) applyAcceptDate(
 		}
 
 		sqSelect = sqSelect.Where(
-			acceptDateCol.Lt(s.AcceptDateLt.In(time.UTC).Format(time.DateTime)),
+			acceptDateCol.Lt(s.AcceptDateLt.In(time.UTC).Format(time.RFC3339)),
 		)
 	}
 
@@ -372,7 +372,7 @@ func (s *PictureListOptions) applyAcceptDate(
 		}
 
 		sqSelect = sqSelect.Where(
-			acceptDateCol.Gte(s.AcceptDateGte.In(time.UTC).Format(time.DateTime)),
+			acceptDateCol.Gte(s.AcceptDateGte.In(time.UTC).Format(time.RFC3339)),
 		)
 	}
 
@@ -454,7 +454,7 @@ func (s *PictureListOptions) setDateFilter(
 	}
 
 	return sqSelect.Where(
-		column.Gte(date.In(timezone).In(time.UTC).Format(time.DateTime)),
-		column.Lt(date.In(timezone).AddDate(0, 0, 1).In(time.UTC).Format(time.DateTime)),
+		column.Gte(date.In(timezone).In(time.UTC).Format(time.RFC3339)),
+		column.Lt(date.In(timezone).AddDate(0, 0, 1).In(time.UTC).Format(time.RFC3339)),
 	), nil
 }

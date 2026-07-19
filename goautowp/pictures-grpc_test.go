@@ -1650,12 +1650,24 @@ func TestInbox(t *testing.T) {
 	require.NoError(t, err)
 
 	now := time.Now()
+	yesterday := now.AddDate(0, 0, -1)
 
 	_, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
 		Identity: identity,
 		Status:   schema.PictureStatusInbox,
 		IP:       pgIP,
 		AddDate:  now,
+		Point:    schema.NullPoint{Valid: false},
+	}).Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	identity = "t" + strconv.Itoa(int(random.Uint32()%100000))
+
+	_, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
+		Identity: identity,
+		Status:   schema.PictureStatusInbox,
+		IP:       pgIP,
+		AddDate:  yesterday,
 		Point:    schema.NullPoint{Valid: false},
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
@@ -1676,6 +1688,25 @@ func TestInbox(t *testing.T) {
 	require.EqualValues(t, now.Day(), resp.GetCurrentDate().GetDay())
 	require.EqualValues(t, now.Month(), resp.GetCurrentDate().GetMonth())
 	require.EqualValues(t, now.Year(), resp.GetCurrentDate().GetYear())
+
+	resp, err = client.GetInbox(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
+		&InboxRequest{
+			Language: "en",
+			Date: &date.Date{
+				Year:  int32(yesterday.Year()),  //nolint:gosec
+				Month: int32(yesterday.Month()), //nolint:gosec
+				Day:   int32(yesterday.Day()),   //nolint:gosec
+			},
+		},
+	)
+	require.NoError(t, err)
+	require.EqualValues(t, yesterday.Day(), resp.GetCurrentDate().GetDay())
+	require.EqualValues(t, yesterday.Month(), resp.GetCurrentDate().GetMonth())
+	require.EqualValues(t, yesterday.Year(), resp.GetCurrentDate().GetYear())
+	require.EqualValues(t, now.Day(), resp.GetNextDate().GetDay())
+	require.EqualValues(t, now.Month(), resp.GetNextDate().GetMonth())
+	require.EqualValues(t, now.Year(), resp.GetNextDate().GetYear())
 
 	_, err = client.GetInbox(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
