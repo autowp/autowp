@@ -19,8 +19,8 @@ import {RemarkModule} from 'ngx-remark';
 import {combineLatest, EMPTY, Observable} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
+import {ToastsService} from '../../toasts/toasts.service';
 import {MostsService} from '../mosts.service';
-import {ToastsService} from "../../toasts/toasts.service";
 
 export interface MostsVehicleTypeTranslated extends MostsVehicleType.AsObject {
   nameTranslated?: string;
