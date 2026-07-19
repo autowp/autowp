@@ -1818,11 +1818,12 @@ func (s *Repository) ItemParentSelect(
 		)
 		if groupBy {
 			sqSelect = sqSelect.GroupByAppend(
-				aliasTable.Col(schema.ItemTableBeginOrderCacheColName),
-				aliasTable.Col(schema.ItemTableEndOrderCacheColName),
-				aliasTable.Col(schema.ItemTableNameColName),
-				aliasTable.Col(schema.ItemTableBodyColName),
-				aliasTable.Col(schema.ItemTableSpecIDColName),
+				aliasTable.Col(schema.ItemParentTableTypeColName),
+				itemOrderAliasTable.Col(schema.ItemTableBeginOrderCacheColName),
+				itemOrderAliasTable.Col(schema.ItemTableEndOrderCacheColName),
+				itemOrderAliasTable.Col(schema.ItemTableNameColName),
+				itemOrderAliasTable.Col(schema.ItemTableBodyColName),
+				itemOrderAliasTable.Col(schema.ItemTableSpecIDColName),
 			)
 		}
 	case ItemParentOrderByCategoriesFirst:
