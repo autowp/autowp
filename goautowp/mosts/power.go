@@ -37,6 +37,10 @@ func (s Power) Items(
 		return nil, err
 	}
 
+	if powerAttr == nil {
+		return nil, errAttributeNotFound
+	}
+
 	valueTable, err := attrs.ValueTableByType(powerAttr.TypeID.AttributeTypeID)
 	if err != nil {
 		return nil, err
@@ -57,10 +61,6 @@ func (s Power) Items(
 
 	var itemIDs []int64
 
-	if !listOptions.IsIDUnique() {
-		sqSelect = sqSelect.GroupBy(itemIDCol)
-	}
-
 	err = sqSelect.
 		Select(itemIDCol).
 		Join(valueTable.Table, goqu.On(itemIDCol.Eq(valueTable.ItemIDCol))).
@@ -69,7 +69,7 @@ func (s Power) Items(
 			valueTable.ValueCol.Gt(0),
 		).
 		Order(orderExpr).
-		GroupByAppend(valueTable.ValueCol).
+		GroupBy(itemIDCol, valueTable.ValueCol).
 		Limit(uint(listOptions.Limit)).
 		ScanValsContext(ctx, &itemIDs)
 	if err != nil {

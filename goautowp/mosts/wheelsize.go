@@ -37,6 +37,10 @@ func (s Wheelsize) Items(
 		return nil, err
 	}
 
+	if tyrewidth == nil {
+		return nil, errAttributeNotFound
+	}
+
 	tyrewidthValueTable, err := attrs.ValueTableByType(tyrewidth.TypeID.AttributeTypeID)
 	if err != nil {
 		return nil, err
@@ -47,6 +51,10 @@ func (s Wheelsize) Items(
 		return nil, err
 	}
 
+	if tyreseries == nil {
+		return nil, errAttributeNotFound
+	}
+
 	tyreseriesValueTable, err := attrs.ValueTableByType(tyreseries.TypeID.AttributeTypeID)
 	if err != nil {
 		return nil, err
@@ -55,6 +63,10 @@ func (s Wheelsize) Items(
 	radius, err := attrsRepository.Attribute(ctx, wheel.Radius)
 	if err != nil {
 		return nil, err
+	}
+
+	if radius == nil {
+		return nil, errAttributeNotFound
 	}
 
 	radiusValueTable, err := attrs.ValueTableByType(radius.TypeID.AttributeTypeID)
@@ -95,10 +107,6 @@ func (s Wheelsize) Items(
 
 	var itemIDs []int64
 
-	if !listOptions.IsIDUnique() {
-		sqSelect = sqSelect.GroupBy(itemIDCol)
-	}
-
 	err = sqSelect.
 		Select(itemIDCol).
 		Join(tyrewidthValueTable.Table.As(tyrewidthAlias), goqu.On(
@@ -117,7 +125,7 @@ func (s Wheelsize) Items(
 			radiusValCol.Gt(0),
 		)).
 		Order(orderExpr).
-		GroupByAppend(tyrewidthValCol, tyreseriesValCol, radiusValCol).
+		GroupBy(itemIDCol, tyrewidthValCol, tyreseriesValCol, radiusValCol).
 		Limit(uint(listOptions.Limit)).
 		ScanValsContext(ctx, &itemIDs)
 	if err != nil {

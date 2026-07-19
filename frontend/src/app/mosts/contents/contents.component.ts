@@ -16,10 +16,11 @@ import {
   getVehicleTypeRpTranslation,
 } from '@utils/translations';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, Observable} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {combineLatest, EMPTY, Observable} from 'rxjs';
+import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
 import {MostsService} from '../mosts.service';
+import {ToastsService} from "../../toasts/toasts.service";
 
 export interface MostsVehicleTypeTranslated extends MostsVehicleType.AsObject {
   nameTranslated?: string;
@@ -49,6 +50,7 @@ export class MostsContentsComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #mostsClient = inject(MostsClient);
   readonly #languageService = inject(LanguageService);
+  readonly #toastService = inject(ToastsService);
 
   readonly prefix = input.required<string[]>();
 
@@ -109,6 +111,10 @@ export class MostsContentsComponent {
             }),
           ),
         ),
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return EMPTY;
+        }),
       ),
     ),
     map((response) => response.items || []),

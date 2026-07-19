@@ -64,6 +64,10 @@ func (s Brakes) Items(
 			return nil, err
 		}
 
+		if diameter == nil {
+			return nil, errAttributeNotFound
+		}
+
 		diameterValueTable, err := attrs.ValueTableByType(diameter.TypeID.AttributeTypeID)
 		if err != nil {
 			return nil, err
@@ -72,6 +76,10 @@ func (s Brakes) Items(
 		thickness, err := attrsRepository.Attribute(ctx, axis.Thickness)
 		if err != nil {
 			return nil, err
+		}
+
+		if thickness == nil {
+			return nil, errAttributeNotFound
 		}
 
 		thicknessValueTable, err := attrs.ValueTableByType(thickness.TypeID.AttributeTypeID)
@@ -96,14 +104,9 @@ func (s Brakes) Items(
 				thicknessAliasTable.Col(thicknessValueTable.AttributeIDColName).Eq(axis.Thickness),
 				thicknessAliasTable.Col(thicknessValueTable.ValueColName).Gt(0),
 			)).
+			GroupBy(itemIDCol, sizeAliasCol).
 			Order(orderExp).
 			Limit(uint(listOptions.Limit))
-
-		if !listOptions.IsIDUnique() {
-			axisSelect = axisSelect.GroupBy(itemIDCol)
-		}
-
-		axisSelect = axisSelect.GroupByAppend(sizeAliasCol)
 
 		selects = append(selects, axisSelect)
 	}

@@ -94,6 +94,7 @@ func (s Acceleration) Items(
 				aliasTable.Col(attrValuesTable.AttributeIDColName).Eq(axis.Attr.ID),
 				valueCol.Gt(0),
 			).
+			GroupBy(itemIDCol, goqu.C(valueColumnAlias)).
 			Limit(uint(listOptions.Limit))
 
 		if s.OrderAsc {
@@ -101,12 +102,6 @@ func (s Acceleration) Items(
 		} else {
 			axisSelect = axisSelect.Order(valueColumnAliasCol.Desc())
 		}
-
-		if !listOptions.IsIDUnique() {
-			axisSelect = axisSelect.GroupBy(itemIDCol)
-		}
-
-		axisSelect = axisSelect.GroupByAppend(goqu.C(valueColumnAlias))
 
 		selects = append(selects, axisSelect)
 	}

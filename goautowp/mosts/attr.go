@@ -70,14 +70,9 @@ func (s Attr) Items(
 			valueTable.AttributeIDCol.Eq(attribute.ID),
 			valueTable.ValueCol.IsNotNull(),
 		).
+		GroupBy(itemIDCol, valueTable.ValueCol).
 		Order(orderExp).
 		Limit(uint(listOptions.Limit))
-
-	if !listOptions.IsIDUnique() {
-		sqSelect = sqSelect.GroupBy(itemIDCol)
-	}
-
-	sqSelect = sqSelect.GroupByAppend(valueTable.ValueCol)
 
 	err = sqSelect.ScanValsContext(ctx, &itemIDs)
 	if err != nil {
