@@ -1649,11 +1649,13 @@ func TestInbox(t *testing.T) {
 	err = pgIP.Set(net.IPv4allrouter)
 	require.NoError(t, err)
 
+	now := time.Now()
+
 	_, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
 		Identity: identity,
 		Status:   schema.PictureStatusInbox,
 		IP:       pgIP,
-		AddDate:  time.Now(),
+		AddDate:  now,
 		Point:    schema.NullPoint{Valid: false},
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
@@ -1664,13 +1666,16 @@ func TestInbox(t *testing.T) {
 
 	client := NewPicturesClient(conn)
 
-	_, err = client.GetInbox(
+	resp, err := client.GetInbox(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&InboxRequest{
 			Language: "en",
 		},
 	)
 	require.NoError(t, err)
+	require.EqualValues(t, now.Day(), resp.GetCurrentDate().GetDay())
+	require.EqualValues(t, now.Month(), resp.GetCurrentDate().GetMonth())
+	require.EqualValues(t, now.Year(), resp.GetCurrentDate().GetYear())
 
 	_, err = client.GetInbox(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),

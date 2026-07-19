@@ -167,12 +167,13 @@ func (s *DayPictures) calcDate(
 		return civil.Date{}, err
 	}
 
+	sqSelect = sqSelect.Select(goqu.T(query.PictureAlias).Col(s.column)).
+		Where(goqu.T(query.PictureAlias).Col(s.column).IsNotNull()).
+		Limit(1)
+
 	var date sql.NullTime
 
-	success, err := sqSelect.Select(goqu.T(query.PictureAlias).Col(s.column)).
-		Where(goqu.T(query.PictureAlias).Col(schema.PictureTableAcceptDatetimeColName).IsNotNull()).
-		Limit(1).
-		ScanValContext(ctx, &date)
+	success, err := sqSelect.ScanValContext(ctx, &date)
 	if err != nil {
 		return civil.Date{}, err
 	}
