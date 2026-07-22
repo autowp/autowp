@@ -220,7 +220,7 @@ export class ModerItemsItemComponent {
               }),
             }),
           }),
-          order: PicturesRequest.Order.ORDER_ADD_DATE_DESC,
+          order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
         }),
       ),
     ),

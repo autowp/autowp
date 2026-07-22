@@ -1274,7 +1274,7 @@ message PictureListOptions {
   PictureItemListOptions picture_item = 2;
   int64 owner_id = 3;
   int32 accepted_in_days = 5;
-  google.type.Date add_date = 6;
+  google.type.Date created_at = 6;
   google.type.Date accept_date = 7;
   google.type.Date added_from = 10;
   CommentTopicListOptions comment_topic = 11;
@@ -1865,8 +1865,8 @@ message PictureIDRequest {
 message PicturesRequest {
   enum Order {
     ORDER_NONE = 0;
-    ORDER_ADD_DATE_DESC = 1;
-    ORDER_ADD_DATE_ASC = 2;
+    ORDER_CREATED_AT_DESC = 1;
+    ORDER_CREATED_AT_ASC = 2;
     ORDER_RESOLUTION_DESC = 3;
     ORDER_RESOLUTION_ASC = 4;
     ORDER_FILESIZE_DESC = 5;
@@ -1922,7 +1922,7 @@ message Picture {
   APIImage image_gallery_full = 25;
   DfDistances df_distances = 26;
   int32 accepted_count = 27;
-  google.protobuf.Timestamp add_date = 28;
+  google.protobuf.Timestamp created_at = 28;
   string copyrights = 29;
   string exif = 30;
   bool is_last = 31;

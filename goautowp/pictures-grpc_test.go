@@ -1459,8 +1459,8 @@ func TestGetPicturesOrders(t *testing.T) {
 
 	testCases := []PicturesRequest_Order{
 		PicturesRequest_ORDER_NONE,
-		PicturesRequest_ORDER_ADD_DATE_DESC,
-		PicturesRequest_ORDER_ADD_DATE_ASC,
+		PicturesRequest_ORDER_CREATED_AT_DESC,
+		PicturesRequest_ORDER_CREATED_AT_ASC,
 		PicturesRequest_ORDER_RESOLUTION_DESC,
 		PicturesRequest_ORDER_RESOLUTION_ASC,
 		PicturesRequest_ORDER_FILESIZE_DESC,
@@ -1552,7 +1552,7 @@ func TestGetPicturesFilters(t *testing.T) {
 			},
 			OwnerId:               123,
 			AcceptedInDays:        3,
-			AddDate:               &date.Date{Year: 2025, Month: 1, Day: 1},
+			CreatedAt:             &date.Date{Year: 2025, Month: 1, Day: 1},
 			AcceptDate:            &date.Date{Year: 2025, Month: 1, Day: 1},
 			AddedFrom:             &date.Date{Year: 2025, Month: 1, Day: 1},
 			CommentTopic:          &CommentTopicListOptions{MessagesGtZero: true},
@@ -1603,11 +1603,11 @@ func TestGetPictureIP(t *testing.T) {
 			require.NoError(t, err)
 
 			success, err := goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
-				Identity: identity,
-				Status:   schema.PictureStatusAccepted,
-				IP:       pgIP,
-				AddDate:  time.Now(),
-				Point:    schema.NullPoint{Valid: false},
+				Identity:  identity,
+				Status:    schema.PictureStatusAccepted,
+				IP:        pgIP,
+				CreatedAt: time.Now(),
+				Point:     schema.NullPoint{Valid: false},
 			}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &pictureID)
 			require.NoError(t, err)
 			require.True(t, success)
@@ -1653,22 +1653,22 @@ func TestInbox(t *testing.T) {
 	yesterday := now.AddDate(0, 0, -1)
 
 	_, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
-		Identity: identity,
-		Status:   schema.PictureStatusInbox,
-		IP:       pgIP,
-		AddDate:  now,
-		Point:    schema.NullPoint{Valid: false},
+		Identity:  identity,
+		Status:    schema.PictureStatusInbox,
+		IP:        pgIP,
+		CreatedAt: now,
+		Point:     schema.NullPoint{Valid: false},
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
 	identity = "t" + strconv.Itoa(int(random.Uint32()%100000))
 
 	_, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
-		Identity: identity,
-		Status:   schema.PictureStatusInbox,
-		IP:       pgIP,
-		AddDate:  yesterday,
-		Point:    schema.NullPoint{Valid: false},
+		Identity:  identity,
+		Status:    schema.PictureStatusInbox,
+		IP:        pgIP,
+		CreatedAt: yesterday,
+		Point:     schema.NullPoint{Valid: false},
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 

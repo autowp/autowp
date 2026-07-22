@@ -231,11 +231,11 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
   protected readonly orderOptions: {name: string; value: PicturesRequest.Order}[] = [
     {
       name: $localize`Add date (new)`,
-      value: PicturesRequest.Order.ORDER_ADD_DATE_DESC,
+      value: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
     },
     {
       name: $localize`Add date (old)`,
-      value: PicturesRequest.Order.ORDER_ADD_DATE_ASC,
+      value: PicturesRequest.Order.ORDER_CREATED_AT_ASC,
     },
     {
       name: $localize`Resolution (large)`,

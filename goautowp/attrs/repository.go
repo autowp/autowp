@@ -1241,7 +1241,7 @@ func (s *Repository) SetUserValue( //nolint: maintidx
 			schema.AttrsUserValuesTableAttributeIDColName: attribute.ID,
 			schema.AttrsUserValuesTableItemIDColName:      itemID,
 			schema.AttrsUserValuesTableUserIDColName:      userID,
-			schema.AttrsUserValuesTableAddDateColName:     goqu.Func("NOW"),
+			schema.AttrsUserValuesTableCreatedAtColName:   goqu.Func("NOW"),
 			schema.AttrsUserValuesTableUpdateDateColName:  goqu.Func("NOW"),
 		}).Executor(),
 	)

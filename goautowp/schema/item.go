@@ -43,7 +43,7 @@ const (
 	ItemTableBodyColName                   = "body"
 	ItemTableIsGroupColName                = "is_group"
 	ItemTableProducedExactlyColName        = "produced_exactly"
-	ItemTableAddDatetimeColName            = "add_datetime"
+	ItemTableCreatedAtColName              = "created_at"
 	ItemTableBeginOrderCacheColName        = "begin_order_cache"
 	ItemTableEndOrderCacheColName          = "end_order_cache"
 	ItemTableVehicleTypeInheritColName     = "vehicle_type_inherit"
@@ -116,7 +116,7 @@ type ItemRow struct {
 	IsGroup                bool                `db:"is_group"`
 	VehicleTypeInherit     bool                `db:"vehicle_type_inherit"`
 	SpecInherit            bool                `db:"spec_inherit"`
-	AddDatetime            sql.NullTime        `db:"add_datetime"`
+	CreatedAt              sql.NullTime        `db:"created_at"`
 	FullName               sql.NullString      `db:"full_name"`
 }
 

@@ -142,7 +142,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			OwnerId:          util.NullInt64ToScalar(row.OwnerID),
 			Status:           extractPicturesStatus(row.Status),
 			Resolution:       fmt.Sprintf("%d×%d", row.Width, row.Height),
-			AddDate:          timestamppb.New(row.AddDate),
+			CreatedAt:        timestamppb.New(row.CreatedAt),
 			TakenDate: &date.Date{
 				Year:  int32(util.NullInt16ToScalar(row.TakenYear)),
 				Month: int32(util.NullByteToScalar(row.TakenMonth)),

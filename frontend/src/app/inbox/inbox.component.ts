@@ -136,7 +136,7 @@ export class InboxComponent implements OnInit {
                 language: this.#languageService.language,
                 limit: 48,
                 options: new PictureListOptions({
-                  addDate: currentDate,
+                  createdAt: currentDate,
                   pictureItem: new PictureItemListOptions({
                     itemParentCacheAncestor: brandID
                       ? new ItemParentCacheListOptions({parentId: '' + brandID})
@@ -144,7 +144,7 @@ export class InboxComponent implements OnInit {
                   }),
                   status: PictureStatus.PICTURE_STATUS_INBOX,
                 }),
-                order: PicturesRequest.Order.ORDER_ADD_DATE_DESC,
+                order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
                 page,
                 paginator: true,
               }),

@@ -1473,7 +1473,7 @@ func (s *ItemsGRPCServer) GetBrandNewItems(
 		Limit:         newItemsLimit,
 	}, &items.ItemFields{
 		NameHTML: true,
-	}, items.OrderByAddDatetime, false)
+	}, items.OrderByCreatedAt, false)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -2421,8 +2421,8 @@ func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *APIItem) (*ItemID,
 			Valid: in.GetSpecId() > 0,
 			Int32: in.GetSpecId(),
 		},
-		AddDatetime: sql.NullTime{Valid: true, Time: time.Now()},
-		Name:        in.GetName(),
+		CreatedAt: sql.NullTime{Valid: true, Time: time.Now()},
+		Name:      in.GetName(),
 		FullName: sql.NullString{
 			Valid:  in.GetFullName() != "",
 			String: in.GetFullName(),

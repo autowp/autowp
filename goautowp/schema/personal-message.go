@@ -9,7 +9,7 @@ import (
 
 const (
 	PersonalMessagesTableName                 = "personal_messages"
-	PersonalMessagesTableAddDatetimeColName   = "add_datetime"
+	PersonalMessagesTableCreatedAtColName     = "created_at"
 	PersonalMessagesTableContentsColName      = "contents"
 	PersonalMessagesTableDeletedByFromColName = "deleted_by_from"
 	PersonalMessagesTableDeletedByToColName   = "deleted_by_to"
@@ -19,10 +19,10 @@ const (
 )
 
 var (
-	PersonalMessagesTable               = goqu.T(PersonalMessagesTableName)
-	PersonalMessagesTableIDCol          = PersonalMessagesTable.Col("id")
-	PersonalMessagesTableAddDatetimeCol = PersonalMessagesTable.Col(
-		PersonalMessagesTableAddDatetimeColName,
+	PersonalMessagesTable             = goqu.T(PersonalMessagesTableName)
+	PersonalMessagesTableIDCol        = PersonalMessagesTable.Col("id")
+	PersonalMessagesTableCreatedAtCol = PersonalMessagesTable.Col(
+		PersonalMessagesTableCreatedAtColName,
 	)
 	PersonalMessagesTableDeletedByFromCol = PersonalMessagesTable.Col(
 		PersonalMessagesTableDeletedByFromColName,
@@ -42,10 +42,10 @@ var (
 )
 
 type PersonalMessageRow struct {
-	ID          int64         `db:"id"           goqu:"pk,skipinsert"`
-	FromUserID  sql.NullInt64 `db:"from_user_id"`
-	ToUserID    int64         `db:"to_user_id"`
-	Readen      bool          `db:"readen"`
-	Contents    string        `db:"contents"`
-	AddDatetime time.Time     `db:"add_datetime"`
+	ID         int64         `db:"id"           goqu:"pk,skipinsert"`
+	FromUserID sql.NullInt64 `db:"from_user_id"`
+	ToUserID   int64         `db:"to_user_id"`
+	Readen     bool          `db:"readen"`
+	Contents   string        `db:"contents"`
+	CreatedAt  time.Time     `db:"created_at"`
 }

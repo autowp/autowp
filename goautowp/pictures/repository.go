@@ -123,10 +123,10 @@ type OrderBy = int
 
 const (
 	OrderByNone OrderBy = iota
-	OrderByAddDateDesc
-	OrderByAddDateAsc
-	OrderByAddDateStrictDesc
-	OrderByAddDateStrictAsc
+	OrderByCreatedAtDesc
+	OrderByCreatedAtAsc
+	OrderByCreatedAtStrictDesc
+	OrderByCreatedAtStrictAsc
 	OrderByResolutionDesc
 	OrderByResolutionAsc
 	OrderByFilesizeDesc
@@ -579,7 +579,7 @@ func (s *Repository) PictureSelect(
 		aliasTable.Col(schema.PictureTableWidthColName),
 		aliasTable.Col(schema.PictureTableHeightColName),
 		aliasTable.Col(schema.PictureTableNameColName),
-		aliasTable.Col(schema.PictureTableAddDateColName),
+		aliasTable.Col(schema.PictureTableCreatedAtColName),
 		aliasTable.Col(schema.PictureTableTakenDayColName),
 		aliasTable.Col(schema.PictureTableTakenMonthColName),
 		aliasTable.Col(schema.PictureTableTakenYearColName),
@@ -2132,7 +2132,7 @@ func (s *Repository) AddPictureFromReader(
 		schema.PictureTableWidthColName:        imageConfig.Width,
 		schema.PictureTableHeightColName:       imageConfig.Height,
 		schema.PictureTableOwnerIDColName:      userID,
-		schema.PictureTableAddDateColName:      goqu.Func("NOW"),
+		schema.PictureTableCreatedAtColName:    goqu.Func("NOW"),
 		schema.PictureTableFilesizeColName:     img.FileSize(),
 		schema.PictureTableStatusColName:       schema.PictureStatusInbox,
 		schema.PictureTableRemovingDateColName: nil,
@@ -2245,25 +2245,25 @@ func (s *Repository) orderBy( //nolint: maintidx
 	)
 
 	switch order {
-	case OrderByAddDateStrictDesc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAddDateColName).Desc().NullsLast())
-	case OrderByAddDateStrictAsc:
-		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableAddDateColName).Asc().NullsLast())
-	case OrderByAddDateDesc:
+	case OrderByCreatedAtStrictDesc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableCreatedAtColName).Desc().NullsLast())
+	case OrderByCreatedAtStrictAsc:
+		sqSelect = sqSelect.Order(aliasTable.Col(schema.PictureTableCreatedAtColName).Asc().NullsLast())
+	case OrderByCreatedAtDesc:
 		sqSelect = sqSelect.Order(
-			aliasTable.Col(schema.PictureTableAddDateColName).Desc().NullsLast(),
+			aliasTable.Col(schema.PictureTableCreatedAtColName).Desc().NullsLast(),
 			aliasTable.Col(schema.PictureTableIDColName).Desc(),
 		)
-	case OrderByAddDateAsc:
+	case OrderByCreatedAtAsc:
 		sqSelect = sqSelect.Order(
-			aliasTable.Col(schema.PictureTableAddDateColName).Asc().NullsLast(),
+			aliasTable.Col(schema.PictureTableCreatedAtColName).Asc().NullsLast(),
 			aliasTable.Col(schema.PictureTableIDColName).Asc(),
 		)
 	case OrderByResolutionDesc:
 		sqSelect = sqSelect.Order(
 			aliasTable.Col(schema.PictureTableWidthColName).Desc(),
 			aliasTable.Col(schema.PictureTableHeightColName).Desc(),
-			aliasTable.Col(schema.PictureTableAddDateColName).Desc().NullsLast(),
+			aliasTable.Col(schema.PictureTableCreatedAtColName).Desc().NullsLast(),
 			aliasTable.Col(schema.PictureTableIDColName).Desc(),
 		)
 	case OrderByResolutionAsc:
@@ -2328,7 +2328,7 @@ func (s *Repository) orderBy( //nolint: maintidx
 			GroupBy(col).
 			Order(
 				col.Desc().NullsLast(),
-				aliasTable.Col(schema.PictureTableAddDateColName).Desc().NullsLast(),
+				aliasTable.Col(schema.PictureTableCreatedAtColName).Desc().NullsLast(),
 				aliasTable.Col(schema.PictureTableIDColName).Desc(),
 			)
 		groupBy = true
@@ -2344,7 +2344,7 @@ func (s *Repository) orderBy( //nolint: maintidx
 			GroupBy(col).
 			Order(
 				col.Desc().NullsLast(),
-				aliasTable.Col(schema.PictureTableAddDateColName).Desc().NullsLast(),
+				aliasTable.Col(schema.PictureTableCreatedAtColName).Desc().NullsLast(),
 				aliasTable.Col(schema.PictureTableIDColName).Desc(),
 			)
 		groupBy = true
@@ -2357,13 +2357,13 @@ func (s *Repository) orderBy( //nolint: maintidx
 	case OrderByAcceptDatetimeAsc:
 		sqSelect = sqSelect.Order(
 			aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Asc().NullsLast(),
-			aliasTable.Col(schema.PictureTableAddDateColName).Asc().NullsLast(),
+			aliasTable.Col(schema.PictureTableCreatedAtColName).Asc().NullsLast(),
 			aliasTable.Col(schema.PictureTableIDColName).Asc(),
 		)
 	case OrderByAcceptDatetimeDesc:
 		sqSelect = sqSelect.Order(
 			aliasTable.Col(schema.PictureTableAcceptDatetimeColName).Desc().NullsLast(),
-			aliasTable.Col(schema.PictureTableAddDateColName).Desc().NullsLast(),
+			aliasTable.Col(schema.PictureTableCreatedAtColName).Desc().NullsLast(),
 			aliasTable.Col(schema.PictureTableIDColName).Desc(),
 		)
 	case OrderByDfDistanceSimilarity:
@@ -2478,7 +2478,7 @@ func (s *Repository) orderBy( //nolint: maintidx
 				goqu.MIN(schema.PerspectivesTablePositionCol).Asc(),
 				aliasTable.Col(schema.PictureTableWidthColName).Desc(),
 				aliasTable.Col(schema.PictureTableHeightColName).Desc(),
-				aliasTable.Col(schema.PictureTableAddDateColName).Desc().NullsLast(),
+				aliasTable.Col(schema.PictureTableCreatedAtColName).Desc().NullsLast(),
 				aliasTable.Col(schema.PictureTableIDColName).Desc(),
 			)
 	case OrderByTopPerspectives, OrderByBottomPerspectives, OrderByFrontPerspectives:

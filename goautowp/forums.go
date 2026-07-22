@@ -35,10 +35,10 @@ type ForumsTheme struct {
 }
 
 type ForumsTopic struct {
-	ID           int64     `db:"id"           goqu:"pk,skipinsert"`
+	ID           int64     `db:"id"         goqu:"pk,skipinsert"`
 	Name         string    `db:"name"`
 	Status       string    `db:"status"`
-	CreatedAt    time.Time `db:"add_datetime"`
+	CreatedAt    time.Time `db:"created_at"`
 	UserID       int64     `db:"author_id"`
 	ThemeID      int64     `db:"theme_id"`
 	Messages     int32
@@ -119,7 +119,7 @@ func (s *Forums) AddTopic(
 	success, err = s.db.Insert(schema.ForumsTopicsTable).
 		Cols(schema.ForumsTopicsTableThemeIDColName, schema.ForumsTopicsTableNameColName,
 			schema.ForumsTopicsTableAuthorIDColName, schema.ForumsTopicsTableAuthorIPColName,
-			schema.ForumsTopicsTableAddDatetimeColName, schema.ForumsTopicsTableViewsColName,
+			schema.ForumsTopicsTableCreatedAtColName, schema.ForumsTopicsTableViewsColName,
 			schema.ForumsTopicsTableStatusColName).
 		Vals(goqu.Vals{
 			themeID,
@@ -547,7 +547,7 @@ func (s *Forums) topicsSelect(isModerator bool) *goqu.SelectDataset {
 		schema.ForumsTopicsTableIDCol,
 		schema.ForumsTopicsTableNameCol,
 		schema.ForumsTopicsTableStatusCol,
-		schema.ForumsTopicsTableAddDatetimeCol,
+		schema.ForumsTopicsTableCreatedAtCol,
 		schema.ForumsTopicsTableAuthorIDCol,
 		schema.ForumsTopicsTableThemeIDCol,
 	).
