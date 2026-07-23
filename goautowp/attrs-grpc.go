@@ -393,7 +393,7 @@ func (s *AttrsGRPCServer) GetUserValues(
 			UserId:      row.UserID,
 			Value:       &extractedValue,
 			ValueText:   valueText,
-			UpdateDate:  updateDate,
+			UpdatedAt:   updateDate,
 		}
 	}
 

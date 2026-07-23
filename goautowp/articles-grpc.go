@@ -82,7 +82,7 @@ func (s *ArticlesGRPCServer) GetList(
 			Name:        article.Name,
 			AuthorId:    authorID,
 			Catname:     article.Catname,
-			Date:        timestamppb.New(article.CreatedAt),
+			CreatedAt:   timestamppb.New(article.CreatedAt),
 			PreviewUrl:  previewURL,
 			Description: article.Description,
 		})
@@ -162,7 +162,7 @@ func (s *ArticlesGRPCServer) GetItemByCatname(
 		Name:       article.Name,
 		AuthorId:   authorID,
 		Catname:    article.Catname,
-		Date:       timestamppb.New(article.CreatedAt),
+		CreatedAt:  timestamppb.New(article.CreatedAt),
 		PreviewUrl: previewURL,
 		Html:       html,
 	}, nil

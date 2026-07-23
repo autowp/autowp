@@ -128,7 +128,7 @@
                         @if (value.user$ | async; as user) {
                           <app-user [user]="user" />
                         }
-                        @if (value.userValue.updateDate?.toDate(); as date) {
+                        @if (value.userValue.updatedAt?.toDate(); as date) {
                           <span class="date"
                             >[<span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span
                             >]</span
