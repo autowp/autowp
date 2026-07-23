@@ -171,6 +171,7 @@ service Items {
   rpc UpdateItem(UpdateItemRequest) returns (google.protobuf.Empty) {}
   rpc Item(ItemRequest) returns (APIItem) {}
   rpc List(ItemsRequest) returns (APIItemList) {}
+  rpc GetItemsFirstChars(ItemsFirstCharsRequest) returns (AlphaResponse) {}
   rpc GetTree(GetTreeRequest) returns (APITreeItem) {}
   rpc GetContentLanguages(google.protobuf.Empty) returns (APIContentLanguages) {}
   rpc GetItemLink(ItemLinksRequest) returns (APIItemLink) {}
@@ -1579,6 +1580,12 @@ message ItemListOptions {
   string text = 33;
   bool no_vehicle_type = 34;
   ItemVehicleTypeListOptions item_vehicle_type = 35;
+  string name_first_char = 38;
+}
+
+message ItemsFirstCharsRequest {
+  ItemListOptions options = 1;
+  string language = 2;
 }
 
 message ItemVehicleTypeListOptions {

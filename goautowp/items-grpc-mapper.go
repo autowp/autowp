@@ -247,6 +247,7 @@ func convertItemListOptions(in *ItemListOptions) (*query.ItemListOptions, error)
 		Text:                  in.GetText(),
 		NoVehicleType:         in.GetNoVehicleType(),
 		ItemVehicleType:       convertItemVehicleTypeListOptions(in.GetItemVehicleType()),
+		NameFirstChar:         in.GetNameFirstChar(),
 	}
 
 	result.ItemParentCacheAncestor, err = convertItemParentCacheListOptions(in.GetAncestor())

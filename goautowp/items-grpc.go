@@ -530,6 +530,43 @@ func (s *ItemsGRPCServer) List(ctx context.Context, in *ItemsRequest) (*APIItemL
 	}, nil
 }
 
+func (s *ItemsGRPCServer) GetItemsFirstChars(
+	ctx context.Context,
+	in *ItemsFirstCharsRequest,
+) (*AlphaResponse, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	isModer := util.Contains(userCtx.Roles, users.RoleModer)
+
+	inOptions := in.GetOptions()
+
+	if (inOptions.GetExcludeSelfAndChilds() > 0 || inOptions.GetAutocomplete() != "" ||
+		inOptions.GetSuggestionsTo() != 0) && !isModer {
+		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+	}
+
+	options, err := convertItemListOptions(inOptions)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if options == nil {
+		options = &query.ItemListOptions{}
+	}
+
+	options.Language = in.GetLanguage()
+
+	chars, err := s.repository.ItemsFirstChars(ctx, options)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return categorizeFirstChars(chars), nil
+}
+
 func (s *ItemsGRPCServer) GetContentLanguages(
 	_ context.Context,
 	_ *emptypb.Empty,
@@ -2356,6 +2393,19 @@ func (s *ItemsGRPCServer) GetAlpha(ctx context.Context, _ *emptypb.Empty) (*Alph
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	return categorizeFirstChars(chars), nil
+}
+
+var (
+	firstCharsNumbersRegexp  = regexp.MustCompile(`^[~>/§("0-9-]$`)
+	firstCharsLatinRegexp    = regexp.MustCompile(`^[A-Za-z]$`)
+	firstCharsCyrillicRegexp = regexp.MustCompile(`^\p{Cyrillic}$`)
+	firstCharsHanRegexp      = regexp.MustCompile(`^\p{Han}$`)
+)
+
+// categorizeFirstChars buckets a set of first characters into the same
+// numbers/latin/cyrillic/han/other groups used by the alphabetical filter UI.
+func categorizeFirstChars(chars []string) *AlphaResponse {
 	res := AlphaResponse{
 		Numbers:  make([]string, 0),
 		Latin:    make([]string, 0),
@@ -2364,27 +2414,22 @@ func (s *ItemsGRPCServer) GetAlpha(ctx context.Context, _ *emptypb.Empty) (*Alph
 		Other:    make([]string, 0),
 	}
 
-	reNumbers := regexp.MustCompile(`^[~>/§("0-9-]$`)
-	reLatinChars := regexp.MustCompile(`^[A-Za-z]$`)
-	reCyrillic := regexp.MustCompile(`^\p{Cyrillic}$`)
-	reHan := regexp.MustCompile(`^\p{Han}$`)
-
 	for _, char := range chars {
 		switch {
-		case reHan.MatchString(char):
+		case firstCharsHanRegexp.MatchString(char):
 			res.Han = append(res.Han, char)
-		case reCyrillic.MatchString(char):
+		case firstCharsCyrillicRegexp.MatchString(char):
 			res.Cyrillic = append(res.Cyrillic, char)
-		case reNumbers.MatchString(char):
+		case firstCharsNumbersRegexp.MatchString(char):
 			res.Numbers = append(res.Numbers, char)
-		case reLatinChars.MatchString(char):
+		case firstCharsLatinRegexp.MatchString(char):
 			res.Latin = append(res.Latin, char)
 		default:
 			res.Other = append(res.Other, char)
 		}
 	}
 
-	return &res, nil
+	return &res
 }
 
 func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *APIItem) (*ItemID, error) {

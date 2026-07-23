@@ -1837,6 +1837,68 @@ func TestGetBrands(t *testing.T) {
 	}
 }
 
+func TestGetItemsFirstChars(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+
+	goquDB, err := cnt.GoquDB(t.Context())
+	require.NoError(t, err)
+
+	client := NewItemsClient(conn)
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+
+	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
+
+	personName := fmt.Sprintf("Zeta-%d", random.Int())
+
+	personID := createItem(t, conn, cnt, &APIItem{
+		Name:       personName,
+		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+	})
+
+	// name is only set for English; requests below use Russian, which does not have a
+	// direct item_language row and must fall back to English via NameOnly's priority chain.
+	_, err = client.UpdateItemLanguage(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
+		&ItemLanguage{
+			ItemId:   personID,
+			Language: schema.EnglishLanguageCode,
+			Name:     personName,
+		},
+	)
+	require.NoError(t, err)
+
+	charsRes, err := client.GetItemsFirstChars(ctx, &ItemsFirstCharsRequest{
+		Options:  &ItemListOptions{Id: personID},
+		Language: schema.RussianLanguageCode,
+	})
+	require.NoError(t, err)
+	require.Contains(t, charsRes.GetLatin(), "Z")
+
+	listRes, err := client.List(ctx, &ItemsRequest{
+		Language: schema.RussianLanguageCode,
+		Options: &ItemListOptions{
+			Id:            personID,
+			NameFirstChar: "Z",
+		},
+	})
+	require.NoError(t, err)
+	require.Len(t, listRes.GetItems(), 1)
+	require.Equal(t, personID, listRes.GetItems()[0].GetId())
+
+	emptyRes, err := client.List(ctx, &ItemsRequest{
+		Language: schema.RussianLanguageCode,
+		Options: &ItemListOptions{
+			Id:            personID,
+			NameFirstChar: "A",
+		},
+	})
+	require.NoError(t, err)
+	require.Empty(t, emptyRes.GetItems())
+}
+
 func TestBrandSections(t *testing.T) {
 	t.Parallel()
 

@@ -107,6 +107,8 @@ ng lint                                  # eslint, includes Angular template rul
 npx stylelint "src/**/*.scss"
 ```
 
+Note: clear `frontend/dist` directory before run `ng lint` to prevent OOM during linting
+
 There is no unit test suite configured for the frontend (no `*.spec.ts` files, no `test` builder
 in `angular.json`) — don't assume Karma/Jest is set up.
 
@@ -135,3 +137,7 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   override data, not part of the chart itself.
 - CI (`.gitlab-ci.yml`) is the authoritative source for exact lint/build/test invocations if this
   file and reality diverge — check it first when in doubt.
+
+## Commits
+
+We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)

@@ -6,6 +6,7 @@ import {
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
+  ItemsFirstCharsRequest,
   ItemsRequest,
   ItemType,
   PictureItemListOptions,
@@ -48,6 +49,12 @@ export class PersonsComponent implements OnInit {
     debounceTime(10),
   );
 
+  protected readonly char$ = this.#route.queryParamMap.pipe(
+    map((params) => params.get('char')),
+    distinctUntilChanged(),
+    debounceTime(10),
+  );
+
   protected readonly authors$ = this.#route.data.pipe(
     map((params) => !!params['authors']),
     distinctUntilChanged(),
@@ -55,8 +62,37 @@ export class PersonsComponent implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly data$ = combineLatest([this.#page$, this.authors$]).pipe(
-    switchMap(([page, authors]) => {
+  protected readonly charGroups$ = this.authors$.pipe(
+    switchMap((authors) => {
+      const typeId = authors ? PictureItemType.PICTURE_ITEM_AUTHOR : PictureItemType.PICTURE_ITEM_CONTENT;
+
+      return this.#itemsClient
+        .getItemsFirstChars(
+          new ItemsFirstCharsRequest({
+            language: this.#languageService.language,
+            options: new ItemListOptions({
+              descendant: new ItemParentCacheListOptions({
+                pictureItemsByItemId: new PictureItemListOptions({
+                  pictures: new PictureListOptions({status: PictureStatus.PICTURE_STATUS_ACCEPTED}),
+                  typeId,
+                }),
+              }),
+              typeId: ItemType.ITEM_TYPE_PERSON,
+            }),
+          }),
+        )
+        .pipe(
+          catchError((error: unknown) => {
+            this.#toastService.handleError(error);
+            return EMPTY;
+          }),
+        );
+    }),
+    shareReplay({bufferSize: 1, refCount: false}),
+  );
+
+  protected readonly data$ = combineLatest([this.#page$, this.authors$, this.char$]).pipe(
+    switchMap(([page, authors, char]) => {
       let typeId = PictureItemType.PICTURE_ITEM_CONTENT;
       if (authors) {
         typeId = PictureItemType.PICTURE_ITEM_AUTHOR;
@@ -87,6 +123,7 @@ export class PersonsComponent implements OnInit {
                   typeId,
                 }),
               }),
+              nameFirstChar: char ?? undefined,
               typeId: ItemType.ITEM_TYPE_PERSON,
             }),
             order: ItemsRequest.Order.NAME,
