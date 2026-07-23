@@ -19,6 +19,25 @@
   </li>
 </ul>
 
+@if (charGroups$ | async; as groups) {
+  @let char = char$ | async;
+  @for (group of [groups.latin, groups.cyrillic, groups.han, groups.numbers, groups.other]; track group) {
+    @if (group.length) {
+      <div class="btn-group mb-2">
+        @for (c of group; track c) {
+          <a
+            class="btn btn-secondary"
+            routerLink="."
+            [class.active]="c === char"
+            [queryParams]="{char: c, page: null}"
+            >{{ c }}</a
+          >
+        }
+      </div>
+    }
+  }
+}
+
 @if (data$ | async; as data) {
   @for (item of data.items; track item.id) {
     <app-catalogue-list-item [item]="item" />

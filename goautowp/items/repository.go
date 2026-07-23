@@ -2232,6 +2232,36 @@ func (s *Repository) Brands(ctx context.Context, lang string) ([]*BrandsListLine
 	return resultArray, nil
 }
 
+// ItemsFirstChars returns the sorted, deduplicated set of first characters (uppercased) of
+// the NameOnly (locale-priority resolved name, with fallback) of every item matching options.
+func (s *Repository) ItemsFirstChars(ctx context.Context, options *query.ItemListOptions) ([]string, error) {
+	rows, _, err := s.List(ctx, options, &ItemFields{NameOnly: true}, OrderByNone, false)
+	if err != nil {
+		return nil, err
+	}
+
+	charsSet := make(map[string]struct{})
+
+	for _, row := range rows {
+		name := row.NameOnly
+		if len(name) == 0 {
+			continue
+		}
+
+		char := strings.ToUpper(string([]rune(name)[0:1]))
+		charsSet[char] = struct{}{}
+	}
+
+	chars := make([]string, 0, len(charsSet))
+	for char := range charsSet {
+		chars = append(chars, char)
+	}
+
+	slices.Sort(chars)
+
+	return chars, nil
+}
+
 func (s *Repository) RefreshItemParentAllAuto(ctx context.Context) error {
 	logrus.Infof("RefreshItemParentAllAuto()")
 

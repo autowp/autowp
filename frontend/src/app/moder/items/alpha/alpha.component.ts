@@ -40,7 +40,7 @@ export class ModerItemsAlphaComponent implements OnInit {
               fields: new ItemFields({nameHtml: true}),
               language: this.#languageService.language,
               limit: 40,
-              options: new ItemListOptions({name: char + '%'}),
+              options: new ItemListOptions({nameFirstChar: char}),
               page,
             }),
           )

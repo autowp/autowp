@@ -76,6 +76,7 @@ type ItemListOptions struct {
 	AttrsUserValues              *AttrsUserValueListOptions
 	AttrsUserValuesCountGte      int
 	YearsRange                   YearsRange
+	NameFirstChar                string
 }
 
 func ItemParentNoParentAlias(alias string) string {
@@ -244,6 +245,7 @@ func (s *ItemListOptions) apply(
 	}
 
 	sqSelect = s.applyName(alias, sqSelect)
+	sqSelect = s.applyNameFirstChar(alias, sqSelect)
 
 	if s.Dateless {
 		sqSelect = sqSelect.Where(
@@ -638,6 +640,40 @@ func (s *ItemListOptions) applyName(
 	}
 
 	return sqSelect
+}
+
+func (s *ItemListOptions) applyNameFirstChar(
+	alias string, sqSelect *goqu.SelectDataset,
+) *goqu.SelectDataset {
+	if len(s.NameFirstChar) == 0 {
+		return sqSelect
+	}
+
+	subSelect := sqSelect.ClearSelect().
+		ClearLimit().
+		ClearOffset().
+		ClearOrder().
+		ClearWhere().
+		GroupBy().
+		FromSelf()
+
+	ilfcAlias := "ilfc"
+	ilfcAliasTable := goqu.T(ilfcAlias)
+
+	// WHERE EXISTS(SELECT item_id FROM item_language WHERE item.id = item_id AND name ILIKE ?)
+	return sqSelect.Where(
+		goqu.L(
+			"EXISTS ?",
+			subSelect.
+				From(schema.ItemLanguageTable.As(ilfcAlias)).
+				Where(
+					goqu.T(alias).Col(schema.ItemTableIDColName).Eq(
+						ilfcAliasTable.Col(schema.ItemLanguageTableItemIDColName),
+					),
+					ilfcAliasTable.Col(schema.ItemLanguageTableNameColName).ILike(s.NameFirstChar+"%"),
+				),
+		),
+	)
 }
 
 func (s *ItemListOptions) applyExcludeSelfAndChilds(
