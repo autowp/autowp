@@ -231,12 +231,12 @@ func (s *StatisticsGRPCServer) GetPulse(
 
 	err := s.db.Select(
 		schema.LogEventsTableUserIDCol.As("user_id"),
-		goqu.Func("TO_CHAR", schema.LogEventsTableAddDatetimeCol, dateExpr).As(dateAlias),
+		goqu.Func("TO_CHAR", schema.LogEventsTableCreatedAtCol, dateExpr).As(dateAlias),
 		goqu.COUNT(goqu.Star()).As("value"),
 	).From(schema.LogEventsTable).
 		Where(
-			schema.LogEventsTableAddDatetimeCol.Gte(from),
-			schema.LogEventsTableAddDatetimeCol.Lt(to),
+			schema.LogEventsTableCreatedAtCol.Gte(from),
+			schema.LogEventsTableCreatedAtCol.Lt(to),
 		).
 		GroupBy(schema.LogEventsTableUserIDCol, goqu.C(dateAlias)).ScanStructsContext(ctx, &rows)
 	if err != nil {

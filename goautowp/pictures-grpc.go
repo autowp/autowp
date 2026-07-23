@@ -1582,6 +1582,8 @@ func (s *PicturesGRPCServer) GetPicture(
 		options = &query.PictureListOptions{}
 	}
 
+	restrictPictureListOptionsToModer(options, isModer)
+
 	options.Limit = in.GetLimit()
 	options.Page = in.GetPage()
 
@@ -1647,10 +1649,12 @@ func (s *PicturesGRPCServer) GetPictures(
 		options = &query.PictureListOptions{}
 	}
 
+	restrictPictureListOptionsToModer(options, isModer)
+
 	options.Limit = in.GetLimit()
 	options.Page = in.GetPage()
 
-	if options.AddDate != nil || options.AcceptDate != nil || options.AddedFrom != nil {
+	if options.CreatedAt != nil || options.AcceptDate != nil || options.AddedFrom != nil {
 		options.Timezone, err = s.resolveTimezone(ctx, userCtx.UserID, in.GetLanguage())
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
@@ -1717,10 +1721,12 @@ func (s *PicturesGRPCServer) GetPicturesPaginator(
 		options = &query.PictureListOptions{}
 	}
 
+	restrictPictureListOptionsToModer(options, isModer)
+
 	options.Limit = in.GetLimit()
 	options.Page = in.GetPage()
 
-	if options.AddDate != nil || options.AcceptDate != nil || options.AddedFrom != nil {
+	if options.CreatedAt != nil || options.AcceptDate != nil || options.AddedFrom != nil {
 		options.Timezone, err = s.resolveTimezone(ctx, userCtx.UserID, in.GetLanguage())
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
@@ -1784,7 +1790,7 @@ func (s *PicturesGRPCServer) GetInbox(ctx context.Context, in *InboxRequest) (*I
 	}
 
 	service, err := NewDayPictures(
-		s.repository, schema.PictureTableAddDateColName, timezone, &listOptions, *inCurrentDate,
+		s.repository, schema.PictureTableCreatedAtColName, timezone, &listOptions, *inCurrentDate,
 	)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -2098,6 +2104,8 @@ func (s *PicturesGRPCServer) GetGallery(
 	if repoOptions == nil {
 		repoOptions = &query.PictureListOptions{}
 	}
+
+	restrictPictureListOptionsToModer(repoOptions, isModer)
 
 	repoOptions.Limit = galleryItemsPerPage
 	repoOptions.Page = request.GetPage()
@@ -2713,7 +2721,7 @@ func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, use
 		inOptions.GetPictureItem().GetItemParentCacheAncestor().GetParentId() == 0 &&
 		inOptions.GetPictureItem().GetPerspectiveId() == 0 &&
 		inOptions.GetOwnerId() == 0 && inOptions.GetAcceptedInDays() < acceptedInDaysMax &&
-		inOptions.GetAddDate() == nil && inOptions.GetId() == 0 && inOptions.GetIdentity() == ""
+		inOptions.GetCreatedAt() == nil && inOptions.GetId() == 0 && inOptions.GetIdentity() == ""
 	if restricted {
 		return status.Error(
 			codes.PermissionDenied,
@@ -2738,6 +2746,17 @@ func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, use
 	}
 
 	return nil
+}
+
+// restrictPictureListOptionsToModer silently drops filters that are only allowed for moderators,
+// instead of rejecting the request, so that non-moder callers just get the unfiltered result.
+func restrictPictureListOptionsToModer(options *query.PictureListOptions, isModer bool) {
+	if isModer {
+		return
+	}
+
+	options.HasCopyrights = false
+	options.HasNoCopyrights = false
 }
 
 func (s *PicturesGRPCServer) inboxBrands(ctx context.Context, lang string) ([]*InboxBrand, error) {

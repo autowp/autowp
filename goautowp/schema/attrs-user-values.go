@@ -9,7 +9,7 @@ import (
 const (
 	AttrsUserValuesTableName               = "attrs_user_values"
 	AttrsUserValuesTableUserIDColName      = "user_id"
-	AttrsUserValuesTableAddDateColName     = "add_date"
+	AttrsUserValuesTableCreatedAtColName   = "created_at"
 	AttrsUserValuesTableUpdateDateColName  = "update_date"
 	AttrsUserValuesTableItemIDColName      = "item_id"
 	AttrsUserValuesTableAttributeIDColName = "attribute_id"
@@ -41,5 +41,5 @@ type AttrsUserValueRow struct {
 	UserID      int64        `db:"user_id"`
 	Conflict    int16        `db:"conflict"`
 	UpdateDate  sql.NullTime `db:"update_date"`
-	AddDate     sql.NullTime `db:"add_date"`
+	CreatedAt   sql.NullTime `db:"created_at"`
 }

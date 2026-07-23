@@ -1006,6 +1006,88 @@ func TestSetPictureCopyrights(t *testing.T) {
 	require.Equal(t, "Third", text)
 }
 
+func TestGetPicturesHasCopyrightsFilter(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+	kc := cnt.Keycloak()
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+	require.NotNil(t, token)
+
+	testerToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, testUsername, testPassword)
+	require.NoError(t, err)
+	require.NotNil(t, testerToken)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	itemID := createItem(t, conn, cnt, &APIItem{
+		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	})
+
+	withCopyrightsID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
+		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+	withoutCopyrightsID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
+		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+
+	client := NewPicturesClient(conn)
+
+	moderCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken)
+
+	_, err = client.SetPictureCopyrights(
+		moderCtx,
+		&SetPictureCopyrightsRequest{Id: withCopyrightsID, Copyrights: "Some copyrights"},
+	)
+	require.NoError(t, err)
+
+	testCases := []struct {
+		name            string
+		pictureID       int64
+		hasCopyrights   bool
+		hasNoCopyrights bool
+		expectFound     bool
+	}{
+		{"has-copyrights matches picture with copyrights", withCopyrightsID, true, false, true},
+		{"has-copyrights excludes picture without copyrights", withoutCopyrightsID, true, false, false},
+		{"no-copyrights excludes picture with copyrights", withCopyrightsID, false, true, false},
+		{"no-copyrights matches picture without copyrights", withoutCopyrightsID, false, true, true},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			res, err := client.GetPictures(moderCtx, &PicturesRequest{
+				Options: &PictureListOptions{
+					Id:              tc.pictureID,
+					HasCopyrights:   tc.hasCopyrights,
+					HasNoCopyrights: tc.hasNoCopyrights,
+				},
+			})
+			require.NoError(t, err)
+
+			if tc.expectFound {
+				require.Len(t, res.GetItems(), 1)
+			} else {
+				require.Empty(t, res.GetItems())
+			}
+		})
+	}
+
+	t.Run("ignored for non-moder users", func(t *testing.T) {
+		t.Parallel()
+
+		testerCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+testerToken.AccessToken)
+
+		res, err := client.GetPictures(testerCtx, &PicturesRequest{
+			Options: &PictureListOptions{Id: withoutCopyrightsID, HasCopyrights: true},
+		})
+		require.NoError(t, err)
+		require.Len(t, res.GetItems(), 1)
+	})
+}
+
 func TestSetPictureStatus(t *testing.T) {
 	t.Parallel()
 
@@ -1459,8 +1541,8 @@ func TestGetPicturesOrders(t *testing.T) {
 
 	testCases := []PicturesRequest_Order{
 		PicturesRequest_ORDER_NONE,
-		PicturesRequest_ORDER_ADD_DATE_DESC,
-		PicturesRequest_ORDER_ADD_DATE_ASC,
+		PicturesRequest_ORDER_CREATED_AT_DESC,
+		PicturesRequest_ORDER_CREATED_AT_ASC,
 		PicturesRequest_ORDER_RESOLUTION_DESC,
 		PicturesRequest_ORDER_RESOLUTION_ASC,
 		PicturesRequest_ORDER_FILESIZE_DESC,
@@ -1552,7 +1634,7 @@ func TestGetPicturesFilters(t *testing.T) {
 			},
 			OwnerId:               123,
 			AcceptedInDays:        3,
-			AddDate:               &date.Date{Year: 2025, Month: 1, Day: 1},
+			CreatedAt:             &date.Date{Year: 2025, Month: 1, Day: 1},
 			AcceptDate:            &date.Date{Year: 2025, Month: 1, Day: 1},
 			AddedFrom:             &date.Date{Year: 2025, Month: 1, Day: 1},
 			CommentTopic:          &CommentTopicListOptions{MessagesGtZero: true},
@@ -1564,6 +1646,8 @@ func TestGetPicturesFilters(t *testing.T) {
 			HasNoReplacePicture:   true,
 			HasNoPictureModerVote: true,
 			HasSpecialName:        true,
+			HasCopyrights:         true,
+			HasNoCopyrights:       true,
 		},
 	}
 
@@ -1603,11 +1687,11 @@ func TestGetPictureIP(t *testing.T) {
 			require.NoError(t, err)
 
 			success, err := goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
-				Identity: identity,
-				Status:   schema.PictureStatusAccepted,
-				IP:       pgIP,
-				AddDate:  time.Now(),
-				Point:    schema.NullPoint{Valid: false},
+				Identity:  identity,
+				Status:    schema.PictureStatusAccepted,
+				IP:        pgIP,
+				CreatedAt: time.Now(),
+				Point:     schema.NullPoint{Valid: false},
 			}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &pictureID)
 			require.NoError(t, err)
 			require.True(t, success)
@@ -1653,22 +1737,22 @@ func TestInbox(t *testing.T) {
 	yesterday := now.AddDate(0, 0, -1)
 
 	_, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
-		Identity: identity,
-		Status:   schema.PictureStatusInbox,
-		IP:       pgIP,
-		AddDate:  now,
-		Point:    schema.NullPoint{Valid: false},
+		Identity:  identity,
+		Status:    schema.PictureStatusInbox,
+		IP:        pgIP,
+		CreatedAt: now,
+		Point:     schema.NullPoint{Valid: false},
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
 	identity = "t" + strconv.Itoa(int(random.Uint32()%100000))
 
 	_, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
-		Identity: identity,
-		Status:   schema.PictureStatusInbox,
-		IP:       pgIP,
-		AddDate:  yesterday,
-		Point:    schema.NullPoint{Valid: false},
+		Identity:  identity,
+		Status:    schema.PictureStatusInbox,
+		IP:        pgIP,
+		CreatedAt: yesterday,
+		Point:     schema.NullPoint{Valid: false},
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 

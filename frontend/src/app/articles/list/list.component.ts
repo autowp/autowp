@@ -16,7 +16,7 @@ import {UserComponent} from '../../user/user/user.component';
 
 interface Article {
   author$: Observable<APIUser>;
-  date: Date;
+  createdAt: Date;
   description: string;
   id: string;
   name: string;
@@ -46,7 +46,7 @@ export class ListComponent implements OnInit {
     map((params) => parseInt(params.get('page') ?? '', 10) || 1),
     distinctUntilChanged(),
     debounceTime(30),
-    switchMap((page) => this.#articlesClient.getList(new ArticlesRequest({limit: '10', page: '' + page}))),
+    switchMap((page) => this.#articlesClient.getList(new ArticlesRequest({limit: 10, page}))),
     catchError((response: unknown) => {
       console.error(response);
       this.#toastService.handleError(response);
@@ -55,7 +55,7 @@ export class ListComponent implements OnInit {
     map((response) => ({
       articles: (response.items || []).map((article) => ({
         author$: article.authorId !== '0' ? this.#userService.getUser$(article.authorId) : of(null),
-        date: article.date?.toDate(),
+        createdAt: article.createdAt?.toDate(),
         description: article.description,
         id: article.id,
         name: article.name,

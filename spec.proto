@@ -672,7 +672,7 @@ message AttrUserValue {
   int64 user_id = 3;
   AttrValueValue value = 4;
   string value_text = 5;
-  google.protobuf.Timestamp update_date = 6;
+  google.protobuf.Timestamp updated_at = 6;
 }
 
 message AttrUserValuesResponse {
@@ -847,7 +847,7 @@ message APIUser {
   APIImage img = 17;
   string gravatar_large = 18;
   APIImage photo = 19;
-  google.protobuf.Timestamp reg_date = 21;
+  google.protobuf.Timestamp registered_at = 21;
   int32 pictures_added = 23;
   int32 pictures_accepted_count = 24;
   string last_ip = 25;
@@ -1274,7 +1274,7 @@ message PictureListOptions {
   PictureItemListOptions picture_item = 2;
   int64 owner_id = 3;
   int32 accepted_in_days = 5;
-  google.type.Date add_date = 6;
+  google.type.Date created_at = 6;
   google.type.Date accept_date = 7;
   google.type.Date added_from = 10;
   CommentTopicListOptions comment_topic = 11;
@@ -1288,6 +1288,8 @@ message PictureListOptions {
   bool has_no_picture_moder_vote = 19;
   DfDistanceListOptions df_distance = 20;
   bool has_special_name = 21;
+  bool has_copyrights = 22;
+  bool has_no_copyrights = 23;
 }
 
 message DfDistanceListOptions {
@@ -1865,8 +1867,8 @@ message PictureIDRequest {
 message PicturesRequest {
   enum Order {
     ORDER_NONE = 0;
-    ORDER_ADD_DATE_DESC = 1;
-    ORDER_ADD_DATE_ASC = 2;
+    ORDER_CREATED_AT_DESC = 1;
+    ORDER_CREATED_AT_ASC = 2;
     ORDER_RESOLUTION_DESC = 3;
     ORDER_RESOLUTION_ASC = 4;
     ORDER_FILESIZE_DESC = 5;
@@ -1922,7 +1924,7 @@ message Picture {
   APIImage image_gallery_full = 25;
   DfDistances df_distances = 26;
   int32 accepted_count = 27;
-  google.protobuf.Timestamp add_date = 28;
+  google.protobuf.Timestamp created_at = 28;
   string copyrights = 29;
   string exif = 30;
   bool is_last = 31;
@@ -2184,7 +2186,7 @@ message Message {
   bool is_new = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
   bool can_delete = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
   bool can_reply = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
-  google.protobuf.Timestamp date = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp created_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
   bool all_messages_link = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
   int32 dialog_count = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
   int64 author_id = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
@@ -2223,7 +2225,7 @@ message Pages {
 message DonationsTransaction {
   int32 sum = 1 [(google.api.field_behavior) = REQUIRED];
   string currency = 2 [(google.api.field_behavior) = REQUIRED];
-  google.protobuf.Timestamp date = 3;
+  google.protobuf.Timestamp created_at = 3;
   string contributor = 4 [(google.api.field_behavior) = REQUIRED];
   string purpose = 5 [(google.api.field_behavior) = REQUIRED];
   int64 user_id = 6 [(google.api.field_behavior) = REQUIRED];
@@ -2334,8 +2336,8 @@ message GetUserRatingFansResponse {
 }
 
 message ArticlesRequest {
-  uint64 limit = 1;
-  uint64 page = 2;
+  int32 limit = 1;
+  int32 page = 2;
 }
 
 message ArticlesResponse {
@@ -2348,7 +2350,7 @@ message Article {
   string name = 2;
   int64 author_id = 3;
   string catname = 4;
-  google.protobuf.Timestamp date = 5;
+  google.protobuf.Timestamp created_at = 5;
   string html = 6;
   string preview_url = 7;
   string description = 8;

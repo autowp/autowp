@@ -52,8 +52,8 @@
             }
           </td>
           <td>
-            @if (user.regDate) {
-              <span [ngbTooltip]="user.regDate.toDate() | date: 'fullDate'">{{ user.regDate.toDate() | timeAgo }}</span>
+            @if (user.registeredAt; as date) {
+              <span [ngbTooltip]="date.toDate() | date: 'fullDate'">{{ date.toDate() | timeAgo }}</span>
             }
           </td>
         </tr>

@@ -144,7 +144,7 @@ const (
 	OrderByNone OrderBy = iota
 	OrderByDescendantsCount
 	OrderByDescendantPicturesCount
-	OrderByAddDatetime
+	OrderByCreatedAt
 	OrderByName
 	OrderByDescendantsParentsCount
 	OrderByStarCount
@@ -248,7 +248,7 @@ type Repository struct {
 	endModelYearFractionColumn       *SimpleColumn
 	todayColumn                      *SimpleColumn
 	bodyColumn                       *SimpleColumn
-	addDatetimeColumn                *SimpleColumn
+	createdAtColumn                  *SimpleColumn
 	beginOrderCacheColumn            *SimpleColumn
 	endOrderCacheColumn              *SimpleColumn
 	nameColumn                       *SimpleColumn
@@ -394,7 +394,7 @@ func NewRepository(
 		},
 		todayColumn:                     &SimpleColumn{col: schema.ItemTableTodayColName},
 		bodyColumn:                      &SimpleColumn{col: schema.ItemTableBodyColName},
-		addDatetimeColumn:               &SimpleColumn{col: schema.ItemTableAddDatetimeColName},
+		createdAtColumn:                 &SimpleColumn{col: schema.ItemTableCreatedAtColName},
 		beginOrderCacheColumn:           &SimpleColumn{col: schema.ItemTableBeginOrderCacheColName},
 		endOrderCacheColumn:             &SimpleColumn{col: schema.ItemTableEndOrderCacheColName},
 		nameColumn:                      &SimpleColumn{col: schema.ItemTableNameColName},
@@ -3535,8 +3535,8 @@ func (s *Repository) orderBy(
 		columns = []columnOrder{{col: s.childsCountColumn, asc: false}}
 	case OrderByDescendantPicturesCount:
 		columns = []columnOrder{{col: s.descendantPicturesCountColumn, asc: false}}
-	case OrderByAddDatetime:
-		columns = []columnOrder{{col: s.addDatetimeColumn, asc: false}}
+	case OrderByCreatedAt:
+		columns = []columnOrder{{col: s.createdAtColumn, asc: false}}
 	case OrderByName:
 		columns = []columnOrder{
 			{col: s.nameColumn, asc: true},
@@ -3608,9 +3608,9 @@ func (s *Repository) wrapperOrderBy(
 		col := wrappedAliasTable.Col(colDescendantPicturesCount)
 
 		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
-	case OrderByAddDatetime:
+	case OrderByCreatedAt:
 		return []exp.OrderedExpression{
-			wrapperAliasTable.Col(schema.ItemTableAddDatetimeColName).Desc(),
+			wrapperAliasTable.Col(schema.ItemTableCreatedAtColName).Desc(),
 		}, []interface{}{}
 	case OrderByName:
 		return []exp.OrderedExpression{
@@ -3670,9 +3670,9 @@ func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy) []exp.Ordered
 		orderByExp = []exp.OrderedExpression{goqu.C(colChildsCount).Desc()}
 	case OrderByDescendantPicturesCount:
 		orderByExp = []exp.OrderedExpression{goqu.C(colDescendantPicturesCount).Desc()}
-	case OrderByAddDatetime:
+	case OrderByCreatedAt:
 		orderByExp = []exp.OrderedExpression{
-			aliasTable.Col(schema.ItemTableAddDatetimeColName).Desc(),
+			aliasTable.Col(schema.ItemTableCreatedAtColName).Desc(),
 		}
 	case OrderByName:
 		orderByExp = []exp.OrderedExpression{
@@ -3728,7 +3728,7 @@ func (s *Repository) wrappedSelectColumns(orderBy OrderBy) map[string]Column {
 		columns[colItemParentParentTimestamp] = s.itemParentParentTimestampColumn
 	case OrderByAttrsUserValuesUpdateDate:
 		columns[colAttrsUserValuesUpdateDate] = s.attrsUserValuesUpdateDateColumn
-	case OrderByName, OrderByAddDatetime, OrderByAge, OrderByIDDesc, OrderByIDAsc, OrderByNone:
+	case OrderByName, OrderByCreatedAt, OrderByAge, OrderByIDDesc, OrderByIDAsc, OrderByNone:
 	}
 
 	return columns

@@ -214,11 +214,11 @@ func (s *Repository) CreateMessage(
 
 	_, err := s.db.Insert(schema.PersonalMessagesTable).Rows(
 		goqu.Record{
-			schema.PersonalMessagesTableFromUserIDColName:  nullableFromUserID,
-			schema.PersonalMessagesTableToUserIDColName:    toUserID,
-			schema.PersonalMessagesTableContentsColName:    text,
-			schema.PersonalMessagesTableAddDatetimeColName: goqu.Func("NOW"),
-			schema.PersonalMessagesTableReadenColName:      false,
+			schema.PersonalMessagesTableFromUserIDColName: nullableFromUserID,
+			schema.PersonalMessagesTableToUserIDColName:   toUserID,
+			schema.PersonalMessagesTableContentsColName:   text,
+			schema.PersonalMessagesTableCreatedAtColName:  goqu.Func("NOW"),
+			schema.PersonalMessagesTableReadenColName:     false,
 		},
 	).Executor().ExecContext(ctx)
 	if err != nil {
@@ -303,7 +303,7 @@ func (s *Repository) Recycle(ctx context.Context) (int64, error) {
 func (s *Repository) RecycleSystem(ctx context.Context) (int64, error) {
 	res, err := s.db.Delete(schema.PersonalMessagesTable).Where(
 		schema.PersonalMessagesTableFromUserIDCol.IsNull(),
-		schema.PersonalMessagesTableAddDatetimeCol.Lt(
+		schema.PersonalMessagesTableCreatedAtCol.Lt(
 			goqu.L("NOW() - INTERVAL '6 MONTH'"),
 		),
 	).Executor().ExecContext(ctx)
@@ -386,7 +386,7 @@ func (s *Repository) getReceivedSelect(userID int64) *goqu.SelectDataset {
 			schema.PersonalMessagesTableToUserIDCol.Eq(userID),
 			schema.PersonalMessagesTableDeletedByToCol.IsFalse(),
 		).
-		Order(schema.PersonalMessagesTableAddDatetimeCol.Desc())
+		Order(schema.PersonalMessagesTableCreatedAtCol.Desc())
 }
 
 func (s *Repository) getSystemSelect(userID int64) *goqu.SelectDataset {
@@ -403,7 +403,7 @@ func (s *Repository) getSentSelect(userID int64) *goqu.SelectDataset {
 			schema.PersonalMessagesTableFromUserIDCol.Eq(userID),
 			schema.PersonalMessagesTableDeletedByFromCol.IsNotTrue(),
 		).
-		Order(schema.PersonalMessagesTableAddDatetimeCol.Desc())
+		Order(schema.PersonalMessagesTableCreatedAtCol.Desc())
 }
 
 func (s *Repository) getDialogSelect(userID int64, withUserID int64) *goqu.SelectDataset {
@@ -422,7 +422,7 @@ func (s *Repository) getDialogSelect(userID int64, withUserID int64) *goqu.Selec
 				),
 			),
 		).
-		Order(schema.PersonalMessagesTableAddDatetimeCol.Desc())
+		Order(schema.PersonalMessagesTableCreatedAtCol.Desc())
 }
 
 func (s *Repository) prepareList(
@@ -478,7 +478,7 @@ func (s *Repository) prepareList(
 			Text:             msg.Contents,
 			IsNew:            isNew,
 			CanDelete:        canDelete,
-			Date:             msg.AddDatetime,
+			Date:             msg.CreatedAt,
 			CanReply:         canReply,
 			DialogCount:      dialogCount,
 			AllMessagesLink:  options.AllMessagesLink,

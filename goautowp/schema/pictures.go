@@ -37,7 +37,7 @@ const (
 	PictureTableCopyrightsTextIDColName   = "copyrights_text_id"
 	PictureTableAcceptDatetimeColName     = "accept_datetime"
 	PictureTableRemovingDateColName       = "removing_date"
-	PictureTableAddDateColName            = "add_date"
+	PictureTableCreatedAtColName          = "created_at"
 	PictureTableFilesizeColName           = "filesize"
 	PictureTableDPIXColName               = "dpi_x"
 	PictureTableDPIYColName               = "dpi_y"
@@ -81,7 +81,7 @@ type PictureRow struct {
 	ReplacePictureID   sql.NullInt64  `db:"replace_picture_id"`
 	IP                 pgtype.Inet    `db:"ip"`
 	Name               sql.NullString `db:"name"`
-	AddDate            time.Time      `db:"add_date"`
+	CreatedAt          time.Time      `db:"created_at"`
 	DPIX               sql.NullInt32  `db:"dpi_x"`
 	DPIY               sql.NullInt32  `db:"dpi_y"`
 }

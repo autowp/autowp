@@ -89,7 +89,7 @@ func (s *DonationsGRPCServer) GetTransactions(
 		res = append(res, &DonationsTransaction{
 			Sum:         row.Sum,
 			Currency:    row.Currency,
-			Date:        timestamppb.New(row.Date),
+			CreatedAt:   timestamppb.New(row.Date),
 			Contributor: row.Contributor,
 			Purpose:     row.Purpose,
 			UserId:      userID,

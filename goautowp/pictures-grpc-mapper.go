@@ -147,6 +147,8 @@ func convertPictureListOptions(in *PictureListOptions) (*query.PictureListOption
 		CommentTopic:          convertCommentTopicListOptions(in.GetCommentTopic()),
 		PictureModerVote:      convertPictureModerVoteListOptions(in.GetPictureModerVote()),
 		HasSpecialName:        in.GetHasSpecialName(),
+		HasCopyrights:         in.GetHasCopyrights(),
+		HasNoCopyrights:       in.GetHasNoCopyrights(),
 	}
 
 	var err error
@@ -166,12 +168,12 @@ func convertPictureListOptions(in *PictureListOptions) (*query.PictureListOption
 		result.Statuses = statuses
 	}
 
-	addDate := in.GetAddDate()
-	if addDate != nil {
-		result.AddDate = &civil.Date{
-			Year:  int(addDate.GetYear()),
-			Month: time.Month(addDate.GetMonth()),
-			Day:   int(addDate.GetDay()),
+	createdAt := in.GetCreatedAt()
+	if createdAt != nil {
+		result.CreatedAt = &civil.Date{
+			Year:  int(createdAt.GetYear()),
+			Month: time.Month(createdAt.GetMonth()),
+			Day:   int(createdAt.GetDay()),
 		}
 	}
 
@@ -262,10 +264,10 @@ func convertPicturesOrder(order PicturesRequest_Order) pictures.OrderBy {
 	switch order {
 	case PicturesRequest_ORDER_NONE:
 		return pictures.OrderByNone
-	case PicturesRequest_ORDER_ADD_DATE_DESC:
-		return pictures.OrderByAddDateDesc
-	case PicturesRequest_ORDER_ADD_DATE_ASC:
-		return pictures.OrderByAddDateAsc
+	case PicturesRequest_ORDER_CREATED_AT_DESC:
+		return pictures.OrderByCreatedAtDesc
+	case PicturesRequest_ORDER_CREATED_AT_ASC:
+		return pictures.OrderByCreatedAtAsc
 	case PicturesRequest_ORDER_RESOLUTION_DESC:
 		return pictures.OrderByResolutionDesc
 	case PicturesRequest_ORDER_RESOLUTION_ASC:

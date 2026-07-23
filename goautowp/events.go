@@ -40,7 +40,7 @@ func (s *Events) Add(ctx context.Context, event Event) error {
 		Rows(goqu.Record{
 			schema.LogEventsTableDescriptionColName: event.Message,
 			schema.LogEventsTableUserIDColName:      event.UserID,
-			schema.LogEventsTableAddDatetimeColName: goqu.Func("NOW"),
+			schema.LogEventsTableCreatedAtColName:   goqu.Func("NOW"),
 		}).
 		Returning(schema.LogEventsTableIDColName).
 		Executor().ScanValContext(ctx, &rowID)

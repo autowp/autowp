@@ -13,7 +13,7 @@ var (
 	ArticleTableCatnameCol         = ArticleTable.Col("catname")
 	ArticleTableAuthorIDCol        = ArticleTable.Col("author_id")
 	ArticleTableEnabledCol         = ArticleTable.Col("enabled")
-	ArticleTableAddDateCol         = ArticleTable.Col("add_date")
+	ArticleTableCreatedAtCol       = ArticleTable.Col("created_at")
 	ArticleTablePreviewFilenameCol = ArticleTable.Col("preview_filename")
 	ArticleTableDescriptionCol     = ArticleTable.Col("description")
 	ArticleTableHTMLCol            = ArticleTable.Col("html")

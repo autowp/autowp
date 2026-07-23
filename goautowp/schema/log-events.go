@@ -7,7 +7,7 @@ const (
 	LogEventsTableIDColName          = "id"
 	LogEventsTableDescriptionColName = "description"
 	LogEventsTableUserIDColName      = "user_id"
-	LogEventsTableAddDatetimeColName = "add_datetime"
+	LogEventsTableCreatedAtColName   = "created_at"
 )
 
 var (
@@ -15,5 +15,5 @@ var (
 	LogEventsTableIDCol          = LogEventsTable.Col(LogEventsTableIDColName)
 	LogEventsTableDescriptionCol = LogEventsTable.Col(LogEventsTableDescriptionColName)
 	LogEventsTableUserIDCol      = LogEventsTable.Col(LogEventsTableUserIDColName)
-	LogEventsTableAddDatetimeCol = LogEventsTable.Col(LogEventsTableAddDatetimeColName)
+	LogEventsTableCreatedAtCol   = LogEventsTable.Col(LogEventsTableCreatedAtColName)
 )

@@ -216,7 +216,7 @@ func (s *ItemListOptions) apply(
 	sqSelect = s.applyParentTypesOf(alias, sqSelect)
 
 	if s.CreatedInDays > 0 {
-		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableAddDatetimeColName).Gt(
+		sqSelect = sqSelect.Where(aliasTable.Col(schema.ItemTableCreatedAtColName).Gt(
 			goqu.L("NOW() - INTERVAL ?", fmt.Sprintf("%d DAY", s.CreatedInDays)),
 		))
 	}

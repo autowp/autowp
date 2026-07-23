@@ -547,12 +547,12 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 		require.NoError(t, err)
 
 		success, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
-			Identity: identity,
-			Status:   schema.PictureStatusAccepted,
-			OwnerID:  sql.NullInt64{Valid: true, Int64: userID},
-			AddDate:  time.Now(),
-			IP:       ip,
-			Point:    schema.NullPoint{Valid: false},
+			Identity:  identity,
+			Status:    schema.PictureStatusAccepted,
+			OwnerID:   sql.NullInt64{Valid: true, Int64: userID},
+			CreatedAt: time.Now(),
+			IP:        ip,
+			Point:     schema.NullPoint{Valid: false},
 		}).
 			Returning(schema.PictureTableIDCol).
 			Executor().ScanValContext(ctx, &pictureID)
@@ -635,7 +635,7 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
 }
 
-func TestOrderByAddDatetime(t *testing.T) {
+func TestOrderByCreatedAt(t *testing.T) {
 	t.Parallel()
 
 	cfg := config.LoadConfig("../")
@@ -658,7 +658,7 @@ func TestOrderByAddDatetime(t *testing.T) {
 	)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	name := "TestOrderByAddDatetime" + strconv.Itoa(int(random.Uint32()%100000))
+	name := "TestOrderByCreatedAt" + strconv.Itoa(int(random.Uint32()%100000))
 	itemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 		Name:            name,
@@ -708,7 +708,7 @@ func TestOrderByAddDatetime(t *testing.T) {
 		Limit:    1,
 		Page:     1,
 		Name:     name + "%",
-	}, nil, OrderByAddDatetime, true)
+	}, nil, OrderByCreatedAt, true)
 	require.NoError(t, err)
 	require.NotEmpty(t, list)
 	require.Len(t, list, 1)
@@ -722,7 +722,7 @@ func TestOrderByAddDatetime(t *testing.T) {
 	list, pages, err = repository.List(ctx, &query.ItemListOptions{
 		Language: schema.EnglishLanguageCode,
 		Name:     name + "%",
-	}, nil, OrderByAddDatetime, true)
+	}, nil, OrderByCreatedAt, true)
 	require.NoError(t, err)
 	require.NotEmpty(t, list)
 	require.Len(t, list, 12)

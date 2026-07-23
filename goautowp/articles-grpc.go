@@ -36,7 +36,7 @@ func (s *ArticlesGRPCServer) GetList(
 		Name            string         `db:"name"`
 		AuthorID        sql.NullInt64  `db:"author_id"`
 		Catname         string         `db:"catname"`
-		AddDate         time.Time      `db:"add_date"`
+		CreatedAt       time.Time      `db:"created_at"`
 		PreviewFilename sql.NullString `db:"preview_filename"`
 		Description     string         `db:"description"`
 	}
@@ -45,12 +45,12 @@ func (s *ArticlesGRPCServer) GetList(
 
 	paginator := util.Paginator{
 		SQLSelect: s.db.Select(schema.ArticleTableIDCol, schema.ArticleTableNameCol, schema.ArticleTableAuthorIDCol,
-			schema.ArticleTableCatnameCol, schema.ArticleTableAddDateCol, schema.ArticleTablePreviewFilenameCol,
+			schema.ArticleTableCatnameCol, schema.ArticleTableCreatedAtCol, schema.ArticleTablePreviewFilenameCol,
 			schema.ArticleTableDescriptionCol).
 			From(schema.ArticleTable).
 			Where(schema.ArticleTableEnabledCol).
-			Order(schema.ArticleTableAddDateCol.Desc()),
-		CurrentPageNumber: int32(in.GetPage()), //nolint: gosec
+			Order(schema.ArticleTableCreatedAtCol.Desc()),
+		CurrentPageNumber: in.GetPage(),
 		ItemCountPerPage:  util.DefaultItemCountPerPage,
 	}
 
@@ -82,7 +82,7 @@ func (s *ArticlesGRPCServer) GetList(
 			Name:        article.Name,
 			AuthorId:    authorID,
 			Catname:     article.Catname,
-			Date:        timestamppb.New(article.AddDate),
+			CreatedAt:   timestamppb.New(article.CreatedAt),
 			PreviewUrl:  previewURL,
 			Description: article.Description,
 		})
@@ -119,7 +119,7 @@ func (s *ArticlesGRPCServer) GetItemByCatname(
 		Name            string         `db:"name"`
 		AuthorID        sql.NullInt64  `db:"author_id"`
 		Catname         string         `db:"catname"`
-		AddDate         time.Time      `db:"add_date"`
+		CreatedAt       time.Time      `db:"created_at"`
 		PreviewFilename sql.NullString `db:"preview_filename"`
 		HTML            sql.NullString `db:"html"`
 	}
@@ -128,7 +128,7 @@ func (s *ArticlesGRPCServer) GetItemByCatname(
 
 	success, err := s.db.Select(
 		schema.ArticleTableIDCol, schema.ArticleTableNameCol, schema.ArticleTableAuthorIDCol,
-		schema.ArticleTableCatnameCol, schema.ArticleTableAddDateCol, schema.ArticleTablePreviewFilenameCol,
+		schema.ArticleTableCatnameCol, schema.ArticleTableCreatedAtCol, schema.ArticleTablePreviewFilenameCol,
 		schema.ArticleTableHTMLCol,
 	).
 		From(schema.ArticleTable).
@@ -162,7 +162,7 @@ func (s *ArticlesGRPCServer) GetItemByCatname(
 		Name:       article.Name,
 		AuthorId:   authorID,
 		Catname:    article.Catname,
-		Date:       timestamppb.New(article.AddDate),
+		CreatedAt:  timestamppb.New(article.CreatedAt),
 		PreviewUrl: previewURL,
 		Html:       html,
 	}, nil

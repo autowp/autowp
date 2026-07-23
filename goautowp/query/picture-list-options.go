@@ -34,12 +34,13 @@ type PictureListOptions struct {
 	ExcludeID             int64
 	ExcludeIDs            []int64
 	HasCopyrights         bool
+	HasNoCopyrights       bool
 	Limit                 uint32
 	Page                  uint32
 	AcceptedInDays        int32
-	AddDate               *civil.Date
-	AddDateLt             *time.Time
-	AddDateGte            *time.Time
+	CreatedAt             *civil.Date
+	CreatedAtLt           *time.Time
+	CreatedAtGte          *time.Time
 	AcceptDate            *civil.Date
 	AcceptDateLt          *time.Time
 	AcceptDateGte         *time.Time
@@ -67,9 +68,9 @@ func (s *PictureListOptions) Clone() *PictureListOptions {
 	clone := *s
 
 	clone.PictureItem = s.PictureItem.Clone()
-	clone.AddDate = s.AddDate
-	clone.AddDateLt = s.AddDateLt
-	clone.AddDateGte = s.AddDateGte
+	clone.CreatedAt = s.CreatedAt
+	clone.CreatedAtLt = s.CreatedAtLt
+	clone.CreatedAtGte = s.CreatedAtGte
 	clone.AcceptDate = s.AcceptDate
 	clone.AcceptDateLt = s.AcceptDateLt
 	clone.AcceptDateGte = s.AcceptDateGte
@@ -201,13 +202,9 @@ func (s *PictureListOptions) apply(
 		}
 	}
 
-	if s.HasCopyrights {
-		sqSelect = sqSelect.Where(
-			aliasTable.Col(schema.PictureTableCopyrightsTextIDColName).IsNotNull(),
-		)
-	}
+	sqSelect = s.applyHasCopyrights(alias, sqSelect)
 
-	sqSelect, err = s.applyAddDate(alias, sqSelect)
+	sqSelect, err = s.applyCreatedAt(alias, sqSelect)
 	if err != nil {
 		return nil, err
 	}
@@ -285,14 +282,14 @@ func (s *PictureListOptions) apply(
 	return sqSelect, nil
 }
 
-func (s *PictureListOptions) applyAddDate(
+func (s *PictureListOptions) applyCreatedAt(
 	alias string,
 	sqSelect *goqu.SelectDataset,
 ) (*goqu.SelectDataset, error) {
 	var (
-		err        error
-		aliasTable = goqu.T(alias)
-		addDateCol = aliasTable.Col(schema.PictureTableAddDateColName)
+		err          error
+		aliasTable   = goqu.T(alias)
+		createdAtCol = aliasTable.Col(schema.PictureTableCreatedAtColName)
 	)
 
 	if s.AddedFrom != nil {
@@ -301,31 +298,31 @@ func (s *PictureListOptions) applyAddDate(
 		}
 
 		sqSelect = sqSelect.Where(
-			addDateCol.Gte(s.AddedFrom.In(s.Timezone).In(time.UTC).Format(time.RFC3339)),
+			createdAtCol.Gte(s.AddedFrom.In(s.Timezone).In(time.UTC).Format(time.RFC3339)),
 		)
 	}
 
-	if s.AddDate != nil {
-		sqSelect, err = s.setDateFilter(sqSelect, addDateCol, *s.AddDate, s.Timezone)
+	if s.CreatedAt != nil {
+		sqSelect, err = s.setDateFilter(sqSelect, createdAtCol, *s.CreatedAt, s.Timezone)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if s.AddDateLt != nil {
+	if s.CreatedAtLt != nil {
 		if s.Timezone == nil {
 			return nil, errNoTimezone
 		}
 
-		sqSelect = sqSelect.Where(addDateCol.Lt(s.AddDateLt.In(time.UTC).Format(time.RFC3339)))
+		sqSelect = sqSelect.Where(createdAtCol.Lt(s.CreatedAtLt.In(time.UTC).Format(time.RFC3339)))
 	}
 
-	if s.AddDateGte != nil {
+	if s.CreatedAtGte != nil {
 		if s.Timezone == nil {
 			return nil, errNoTimezone
 		}
 
-		sqSelect = sqSelect.Where(addDateCol.Gte(s.AddDateGte.In(time.UTC).Format(time.RFC3339)))
+		sqSelect = sqSelect.Where(createdAtCol.Gte(s.CreatedAtGte.In(time.UTC).Format(time.RFC3339)))
 	}
 
 	return sqSelect, nil
@@ -439,6 +436,40 @@ func (s *PictureListOptions) applyHasNoComments(
 		goqu.Or(
 			ctAliasTable.Col(schema.CommentTopicTableItemIDColName).IsNull(),
 			ctAliasTable.Col(schema.CommentTopicTableMessagesColName).Eq(0),
+		),
+	)
+}
+
+func (s *PictureListOptions) applyHasCopyrights(
+	alias string,
+	sqSelect *goqu.SelectDataset,
+) *goqu.SelectDataset {
+	if !s.HasCopyrights && !s.HasNoCopyrights {
+		return sqSelect
+	}
+
+	aliasTable := goqu.T(alias)
+	crAlias := alias + "_cr"
+	crAliasTable := goqu.T(crAlias)
+
+	onCondition := goqu.On(
+		aliasTable.Col(schema.PictureTableCopyrightsTextIDColName).
+			Eq(crAliasTable.Col(schema.TextstorageTextTableIDColName)),
+	)
+
+	if s.HasCopyrights {
+		// A picture can only match if a copyrights row actually exists, so an inner join lets
+		// the planner filter rows before the text comparison instead of joining everything.
+		return sqSelect.Join(schema.TextstorageTextTable.As(crAlias), onCondition).Where(
+			crAliasTable.Col(schema.TextstorageTextTableTextColName).IsNotNull(),
+			crAliasTable.Col(schema.TextstorageTextTableTextColName).Neq(""),
+		)
+	}
+
+	return sqSelect.LeftJoin(schema.TextstorageTextTable.As(crAlias), onCondition).Where(
+		goqu.Or(
+			crAliasTable.Col(schema.TextstorageTextTableTextColName).IsNull(),
+			crAliasTable.Col(schema.TextstorageTextTableTextColName).Eq(""),
 		),
 	)
 }

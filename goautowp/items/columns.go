@@ -425,7 +425,7 @@ func (s NewDescendantsParentsCountColumn) SelectExpr(
 	return goqu.L(
 		"COUNT(DISTINCT ?) FILTER (WHERE ?)",
 		cAliasTable.Col(schema.ItemTableIDColName),
-		cAliasTable.Col(schema.ItemTableAddDatetimeColName).Gt(
+		cAliasTable.Col(schema.ItemTableCreatedAtColName).Gt(
 			goqu.L("NOW() - INTERVAL ?", fmt.Sprintf("%d DAY", NewDays)),
 		),
 	), nil

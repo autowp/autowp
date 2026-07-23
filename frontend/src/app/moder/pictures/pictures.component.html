@@ -18,7 +18,7 @@
     class="nav-link"
     routerLink="/moder/pictures"
     i18n
-    [queryParams]="{order: PicturesRequest.Order.ORDER_ADD_DATE_DESC, status: 'inbox'}"
+    [queryParams]="{order: PicturesRequest.Order.ORDER_CREATED_AT_DESC, status: 'inbox'}"
     >Inbox</a
   >
   <a
@@ -26,7 +26,7 @@
     routerLink="/moder/pictures"
     i18n
     [queryParams]="{
-      order: PicturesRequest.Order.ORDER_ADD_DATE_DESC,
+      order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
       status: 'accepted',
       perspective_id: 'null',
       type_id: 1,
@@ -44,7 +44,7 @@
     class="nav-link"
     routerLink="/moder/pictures"
     i18n
-    [queryParams]="{order: PicturesRequest.Order.ORDER_ADD_DATE_DESC, requests: 3, status: 'custom1'}"
+    [queryParams]="{order: PicturesRequest.Order.ORDER_CREATED_AT_DESC, requests: 3, status: 'custom1'}"
     >Votes</a
   >
   <a
@@ -65,7 +65,7 @@
     class="nav-link"
     routerLink="/moder/pictures"
     i18n
-    [queryParams]="{order: PicturesRequest.Order.ORDER_ADD_DATE_DESC, status: 'inbox', replace: 'true'}"
+    [queryParams]="{order: PicturesRequest.Order.ORDER_CREATED_AT_DESC, status: 'inbox', replace: 'true'}"
     >Replaces</a
   >
 </div>
@@ -275,6 +275,34 @@
               queryParamsHandling="merge"
               [class.active]="option.value === replace()"
               [queryParams]="{replace: option.value}"
+              >{{ option.name }}</a
+            >
+          }
+        </div>
+      </div>
+      <div class="btn-group mb-3" ngbDropdown>
+        <button
+          class="btn btn-block"
+          ngbDropdownToggle
+          type="button"
+          [class.btn-primary]="copyrights() !== null"
+          [class.btn-outline-secondary]="copyrights() === null"
+        >
+          <ng-container i18n>Has copyrights</ng-container>:
+          @for (option of copyrightsOptions; track option) {
+            @if (option.value === copyrights()) {
+              {{ option.name }}
+            }
+          }
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+          @for (option of copyrightsOptions; track option) {
+            <a
+              class="dropdown-item"
+              routerLink="."
+              queryParamsHandling="merge"
+              [class.active]="option.value === copyrights()"
+              [queryParams]="{copyrights: option.value}"
               >{{ option.name }}</a
             >
           }

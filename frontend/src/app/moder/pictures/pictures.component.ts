@@ -204,6 +204,22 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
   ];
   protected readonly replace = signal<boolean | null>(null);
 
+  protected readonly copyrightsOptions = [
+    {
+      name: $localize`not matters`,
+      value: null,
+    },
+    {
+      name: $localize`has copyrights`,
+      value: true,
+    },
+    {
+      name: $localize`no copyrights`,
+      value: false,
+    },
+  ];
+  protected readonly copyrights = signal<boolean | null>(null);
+
   protected readonly requestsOptions = [
     {
       name: $localize`not matters`,
@@ -231,11 +247,11 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
   protected readonly orderOptions: {name: string; value: PicturesRequest.Order}[] = [
     {
       name: $localize`Add date (new)`,
-      value: PicturesRequest.Order.ORDER_ADD_DATE_DESC,
+      value: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
     },
     {
       name: $localize`Add date (old)`,
-      value: PicturesRequest.Order.ORDER_ADD_DATE_ASC,
+      value: PicturesRequest.Order.ORDER_CREATED_AT_ASC,
     },
     {
       name: $localize`Resolution (large)`,
@@ -420,6 +436,17 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
           this.replace.set(null);
           break;
       }
+      switch (params.get('copyrights')) {
+        case 'false':
+          this.copyrights.set(false);
+          break;
+        case 'true':
+          this.copyrights.set(true);
+          break;
+        default:
+          this.copyrights.set(null);
+          break;
+      }
       this.requests.set(params.get('requests') ? parseInt(params.get('requests') ?? '', 10) : null);
       this.specialName.set(!!params.get('special_name'));
       this.lost.set(!!params.get('lost'));
@@ -469,7 +496,9 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
                 dstPicture: statuses ? new PictureListOptions({statuses}) : undefined,
               })
             : undefined,
+          hasCopyrights: this.copyrights() === true,
           hasNoComments: this.comments() === false,
+          hasNoCopyrights: this.copyrights() === false,
           hasNoPictureItem: this.lost(),
           hasNoPictureModerVote: this.requests() === 0,
           hasNoReplacePicture: this.replace() === false,

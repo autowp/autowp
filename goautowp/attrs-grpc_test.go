@@ -1635,7 +1635,7 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 	require.False(t, secondaryValue.GetValue().GetIsEmpty())
 	require.Equal(t, int32(78), secondaryValue.GetValue().GetIntValue())
 
-	require.NotEqual(t, value.GetUpdateDate().AsTime(), secondaryValue.GetUpdateDate().AsTime())
+	require.NotEqual(t, value.GetUpdatedAt().AsTime(), secondaryValue.GetUpdatedAt().AsTime())
 
 	// set secondary value again
 	time.Sleep(time.Second)
@@ -1681,7 +1681,7 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 	require.False(t, thirdValue.GetValue().GetIsEmpty())
 	require.Equal(t, int32(78), thirdValue.GetValue().GetIntValue())
 
-	require.Equal(t, secondaryValue.GetUpdateDate().AsTime(), thirdValue.GetUpdateDate().AsTime())
+	require.Equal(t, secondaryValue.GetUpdatedAt().AsTime(), thirdValue.GetUpdatedAt().AsTime())
 }
 
 func TestNonMultipleValuesFiltered(t *testing.T) {

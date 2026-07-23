@@ -1,4 +1,4 @@
-insert into article (id, html, name, catname, last_editor_id, last_edit_date, add_date, author_id,
+insert into article (id, html, name, catname, last_editor_id, last_edit_date, created_at, author_id,
     enabled, first_enabled_datetime, description, preview_width, preview_height, preview_filename, ratio)
 values (1, 'Test html', 'Test article', 'test-article', null, null, now(), null, true, now(), 'Test description', 100, 100, 'test.jpg', 0);
 
@@ -10,7 +10,7 @@ values (1, 1, 'First variant', 0, 1, 'First variant text'),
        (2, 1, 'Second variant', 0, 2, 'Second variant text');
 
 
-INSERT INTO item (id, name, begin_year, end_year, body, spec_id, spec_inherit, produced, produced_exactly, is_concept, today, add_datetime, begin_month, end_month, begin_order_cache, end_order_cache, begin_model_year, end_model_year, is_group, vehicle_type_inherit, is_concept_inherit, engine_item_id, engine_inherit, item_type_id, catname, full_name, position, logo_id)
+INSERT INTO item (id, name, begin_year, end_year, body, spec_id, spec_inherit, produced, produced_exactly, is_concept, today, created_at, begin_month, end_month, begin_order_cache, end_order_cache, begin_model_year, end_model_year, is_group, vehicle_type_inherit, is_concept_inherit, engine_item_id, engine_inherit, item_type_id, catname, full_name, position, logo_id)
 VALUES
   (1,         'test car',1999,NULL,'',NULL,true,  100,true,false,true,'2016-11-25 18:31:47', 2,NULL,NULL,NULL,2000,NULL,false,false,false,   1,true,1,NULL,NULL,0,NULL),
   (2, 'test concept car',1999,2005,'',NULL,true,  233,false,true,false,'2016-11-25 18:31:47', 6,   4,NULL,NULL,1999,2005,false,false,false,NULL,true,1,NULL,NULL,0,NULL),

@@ -14,7 +14,7 @@ const eventsPerPage = 40
 type Event struct {
 	ID          int64     `db:"id"`
 	UserID      int64     `db:"user_id"`
-	CreatedAt   time.Time `db:"add_datetime"`
+	CreatedAt   time.Time `db:"created_at"`
 	Description string    `db:"description"`
 	Items       []int64   `db:"-"`
 	Pictures    []int64   `db:"-"`
@@ -43,9 +43,9 @@ func (s *Repository) Events(
 	options ListOptions,
 ) ([]Event, *util.Pages, error) {
 	sqSelect := s.db.Select(schema.LogEventsTableIDCol, schema.LogEventsTableUserIDCol,
-		schema.LogEventsTableAddDatetimeCol, schema.LogEventsTableDescriptionCol).
+		schema.LogEventsTableCreatedAtCol, schema.LogEventsTableDescriptionCol).
 		From(schema.LogEventsTable).
-		Order(schema.LogEventsTableAddDatetimeCol.Desc(), schema.LogEventsTableIDCol.Desc())
+		Order(schema.LogEventsTableCreatedAtCol.Desc(), schema.LogEventsTableIDCol.Desc())
 
 	if options.ArticleID != 0 {
 		sqSelect = sqSelect.

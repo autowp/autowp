@@ -25,8 +25,8 @@ export class DonateLogComponent implements OnInit {
   protected readonly items$ = this.#donations.getTransactions(new Empty()).pipe(
     map((response) =>
       (response.items || []).map((item) => ({
+        createdAt: item.createdAt?.toDate(),
         currency: item.currency,
-        date: item.date?.toDate(),
         purpose: item.purpose,
         sum: item.sum / 100,
         user$: this.#userService.getUser$(item.userId),

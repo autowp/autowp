@@ -230,7 +230,7 @@ func (s *PerspectivePictureFetcher) pictureSelect(
 	//	"status",
 	//	"owner_id",
 	//	"filesize",
-	//	"add_date",
+	//	"created_at",
 	//	"dpi_x",
 	//	"dpi_y",
 	//	"point",

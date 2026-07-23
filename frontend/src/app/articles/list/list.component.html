@@ -31,8 +31,8 @@
             @if (article.author$ | async; as author) {
               <app-user [user]="author" />
             }
-            @if (article.date) {
-              <span class="date" [ngbTooltip]="article.date | date: 'medium'">{{ article.date | timeAgo }}</span>
+            @if (article.createdAt; as date) {
+              <span class="date" [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span>
             }
           </p>
         </li>

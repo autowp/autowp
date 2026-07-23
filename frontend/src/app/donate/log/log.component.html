@@ -27,8 +27,8 @@
       @for (item of items; track item) {
         <tr>
           <td>
-            @if (item.date) {
-              <span [ngbTooltip]="item.date | date: 'medium'">{{ item.date | timeAgo }}</span>
+            @if (item.createdAt; as date) {
+              <span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span>
             }
           </td>
           <td>

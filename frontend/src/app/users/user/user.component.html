@@ -26,12 +26,10 @@
           <ng-container i18n>Known as:</ng-container>
           <strong>«{{ user.name }}»</strong>
         </p>
-        @if (user.regDate) {
+        @if (user.registeredAt; as date) {
           <p>
             <ng-container i18n>Registration date</ng-container>
-            <strong [ngbTooltip]="user.regDate.toDate() | date: 'fullDate'">{{
-              user.regDate.toDate() | timeAgo
-            }}</strong>
+            <strong [ngbTooltip]="date.toDate() | date: 'fullDate'">{{ date.toDate() | timeAgo }}</strong>
           </p>
         }
         @if (user.lastOnline) {

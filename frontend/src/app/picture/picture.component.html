@@ -233,7 +233,7 @@
           <li>
             <ng-container i18n>Added by:</ng-container>
             <app-user [user]="owner" />,
-            @if (picture.addDate?.toDate(); as date) {
+            @if (picture.createdAt?.toDate(); as date) {
               <span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span>
             }
           </li>

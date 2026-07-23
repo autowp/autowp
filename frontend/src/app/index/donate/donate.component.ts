@@ -36,8 +36,8 @@ export class IndexDonateComponent {
         .filter((d) => d.sum > 0)
         .map((d) => ({
           contributor: d.contributor,
+          createdAt: d.createdAt,
           currency: d.currency,
-          date: d.date,
           normalizedSum: (rates[d.currency] * d.sum) / 100,
           purpose: d.purpose,
           sum: d.sum / 100,
@@ -50,16 +50,16 @@ export class IndexDonateComponent {
 
       return {
         charges: charges.map((o) => ({
+          createdAt: o.createdAt,
           currency: o.currency,
-          date: o.date,
           percent: (-100 * o.sum * rates[o.currency]) / 100 / total,
           purpose: o.purpose,
           sum: o.sum / 100,
         })),
         donations: donations.map((o) => ({
           contributor: o.contributor,
+          createdAt: o.createdAt,
           currency: o.currency,
-          date: o.date,
           percent: (100 * o.sum * rates[o.currency]) / total,
           sum: o.sum,
         })),
