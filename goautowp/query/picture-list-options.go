@@ -34,6 +34,7 @@ type PictureListOptions struct {
 	ExcludeID             int64
 	ExcludeIDs            []int64
 	HasCopyrights         bool
+	HasNoCopyrights       bool
 	Limit                 uint32
 	Page                  uint32
 	AcceptedInDays        int32
@@ -201,11 +202,7 @@ func (s *PictureListOptions) apply(
 		}
 	}
 
-	if s.HasCopyrights {
-		sqSelect = sqSelect.Where(
-			aliasTable.Col(schema.PictureTableCopyrightsTextIDColName).IsNotNull(),
-		)
-	}
+	sqSelect = s.applyHasCopyrights(alias, sqSelect)
 
 	sqSelect, err = s.applyCreatedAt(alias, sqSelect)
 	if err != nil {
@@ -439,6 +436,40 @@ func (s *PictureListOptions) applyHasNoComments(
 		goqu.Or(
 			ctAliasTable.Col(schema.CommentTopicTableItemIDColName).IsNull(),
 			ctAliasTable.Col(schema.CommentTopicTableMessagesColName).Eq(0),
+		),
+	)
+}
+
+func (s *PictureListOptions) applyHasCopyrights(
+	alias string,
+	sqSelect *goqu.SelectDataset,
+) *goqu.SelectDataset {
+	if !s.HasCopyrights && !s.HasNoCopyrights {
+		return sqSelect
+	}
+
+	aliasTable := goqu.T(alias)
+	crAlias := alias + "_cr"
+	crAliasTable := goqu.T(crAlias)
+
+	onCondition := goqu.On(
+		aliasTable.Col(schema.PictureTableCopyrightsTextIDColName).
+			Eq(crAliasTable.Col(schema.TextstorageTextTableIDColName)),
+	)
+
+	if s.HasCopyrights {
+		// A picture can only match if a copyrights row actually exists, so an inner join lets
+		// the planner filter rows before the text comparison instead of joining everything.
+		return sqSelect.Join(schema.TextstorageTextTable.As(crAlias), onCondition).Where(
+			crAliasTable.Col(schema.TextstorageTextTableTextColName).IsNotNull(),
+			crAliasTable.Col(schema.TextstorageTextTableTextColName).Neq(""),
+		)
+	}
+
+	return sqSelect.LeftJoin(schema.TextstorageTextTable.As(crAlias), onCondition).Where(
+		goqu.Or(
+			crAliasTable.Col(schema.TextstorageTextTableTextColName).IsNull(),
+			crAliasTable.Col(schema.TextstorageTextTableTextColName).Eq(""),
 		),
 	)
 }

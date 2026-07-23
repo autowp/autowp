@@ -147,6 +147,8 @@ func convertPictureListOptions(in *PictureListOptions) (*query.PictureListOption
 		CommentTopic:          convertCommentTopicListOptions(in.GetCommentTopic()),
 		PictureModerVote:      convertPictureModerVoteListOptions(in.GetPictureModerVote()),
 		HasSpecialName:        in.GetHasSpecialName(),
+		HasCopyrights:         in.GetHasCopyrights(),
+		HasNoCopyrights:       in.GetHasNoCopyrights(),
 	}
 
 	var err error

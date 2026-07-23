@@ -1582,6 +1582,8 @@ func (s *PicturesGRPCServer) GetPicture(
 		options = &query.PictureListOptions{}
 	}
 
+	restrictPictureListOptionsToModer(options, isModer)
+
 	options.Limit = in.GetLimit()
 	options.Page = in.GetPage()
 
@@ -1646,6 +1648,8 @@ func (s *PicturesGRPCServer) GetPictures(
 	if options == nil {
 		options = &query.PictureListOptions{}
 	}
+
+	restrictPictureListOptionsToModer(options, isModer)
 
 	options.Limit = in.GetLimit()
 	options.Page = in.GetPage()
@@ -1716,6 +1720,8 @@ func (s *PicturesGRPCServer) GetPicturesPaginator(
 	if options == nil {
 		options = &query.PictureListOptions{}
 	}
+
+	restrictPictureListOptionsToModer(options, isModer)
 
 	options.Limit = in.GetLimit()
 	options.Page = in.GetPage()
@@ -2098,6 +2104,8 @@ func (s *PicturesGRPCServer) GetGallery(
 	if repoOptions == nil {
 		repoOptions = &query.PictureListOptions{}
 	}
+
+	restrictPictureListOptionsToModer(repoOptions, isModer)
 
 	repoOptions.Limit = galleryItemsPerPage
 	repoOptions.Page = request.GetPage()
@@ -2738,6 +2746,17 @@ func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, use
 	}
 
 	return nil
+}
+
+// restrictPictureListOptionsToModer silently drops filters that are only allowed for moderators,
+// instead of rejecting the request, so that non-moder callers just get the unfiltered result.
+func restrictPictureListOptionsToModer(options *query.PictureListOptions, isModer bool) {
+	if isModer {
+		return
+	}
+
+	options.HasCopyrights = false
+	options.HasNoCopyrights = false
 }
 
 func (s *PicturesGRPCServer) inboxBrands(ctx context.Context, lang string) ([]*InboxBrand, error) {

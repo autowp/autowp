@@ -285,6 +285,34 @@
           class="btn btn-block"
           ngbDropdownToggle
           type="button"
+          [class.btn-primary]="copyrights() !== null"
+          [class.btn-outline-secondary]="copyrights() === null"
+        >
+          <ng-container i18n>Has copyrights</ng-container>:
+          @for (option of copyrightsOptions; track option) {
+            @if (option.value === copyrights()) {
+              {{ option.name }}
+            }
+          }
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+          @for (option of copyrightsOptions; track option) {
+            <a
+              class="dropdown-item"
+              routerLink="."
+              queryParamsHandling="merge"
+              [class.active]="option.value === copyrights()"
+              [queryParams]="{copyrights: option.value}"
+              >{{ option.name }}</a
+            >
+          }
+        </div>
+      </div>
+      <div class="btn-group mb-3" ngbDropdown>
+        <button
+          class="btn btn-block"
+          ngbDropdownToggle
+          type="button"
           [class.btn-primary]="requests() !== null"
           [class.btn-outline-secondary]="requests() === null"
         >
