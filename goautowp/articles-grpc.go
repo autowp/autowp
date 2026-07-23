@@ -50,7 +50,7 @@ func (s *ArticlesGRPCServer) GetList(
 			From(schema.ArticleTable).
 			Where(schema.ArticleTableEnabledCol).
 			Order(schema.ArticleTableCreatedAtCol.Desc()),
-		CurrentPageNumber: int32(in.GetPage()), //nolint: gosec
+		CurrentPageNumber: in.GetPage(),
 		ItemCountPerPage:  util.DefaultItemCountPerPage,
 	}
 

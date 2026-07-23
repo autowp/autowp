@@ -46,7 +46,7 @@ export class ListComponent implements OnInit {
     map((params) => parseInt(params.get('page') ?? '', 10) || 1),
     distinctUntilChanged(),
     debounceTime(30),
-    switchMap((page) => this.#articlesClient.getList(new ArticlesRequest({limit: '10', page: '' + page}))),
+    switchMap((page) => this.#articlesClient.getList(new ArticlesRequest({limit: 10, page}))),
     catchError((response: unknown) => {
       console.error(response);
       this.#toastService.handleError(response);
