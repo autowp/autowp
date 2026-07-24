@@ -1120,11 +1120,11 @@ func (s *Repository) DeleteUnused(ctx context.Context) error {
 		LeftJoin(schema.VotingVariantVoteTable, goqu.On(
 			schema.UserTableIDCol.Eq(schema.VotingVariantVoteTableUserIDCol),
 		)).
-		LeftJoin(schema.PersonalMessagesTable.As("pmf"), goqu.On(
-			schema.UserTableIDCol.Eq(goqu.T("pmf").Col(schema.PersonalMessagesTableFromUserIDColName)),
+		LeftJoin(schema.PersonalMessageTable.As("pmf"), goqu.On(
+			schema.UserTableIDCol.Eq(goqu.T("pmf").Col(schema.PersonalMessageTableFromUserIDColName)),
 		)).
-		LeftJoin(schema.PersonalMessagesTable.As("pmt"), goqu.On(
-			schema.UserTableIDCol.Eq(goqu.T("pmt").Col(schema.PersonalMessagesTableToUserIDColName)),
+		LeftJoin(schema.PersonalMessageTable.As("pmt"), goqu.On(
+			schema.UserTableIDCol.Eq(goqu.T("pmt").Col(schema.PersonalMessageTableToUserIDColName)),
 		)).
 		LeftJoin(schema.LogEventTable, goqu.On(schema.UserTableIDCol.Eq(schema.LogEventTableUserIDCol))).
 		Where(
@@ -1135,8 +1135,8 @@ func (s *Repository) DeleteUnused(ctx context.Context) error {
 			schema.ForumsTopicsTableAuthorIDCol.IsNull(),
 			schema.PictureTableOwnerIDCol.IsNull(),
 			schema.VotingVariantVoteTableUserIDCol.IsNull(),
-			goqu.T("pmf").Col(schema.PersonalMessagesTableFromUserIDColName).IsNull(),
-			goqu.T("pmt").Col(schema.PersonalMessagesTableToUserIDColName).IsNull(),
+			goqu.T("pmf").Col(schema.PersonalMessageTableFromUserIDColName).IsNull(),
+			goqu.T("pmt").Col(schema.PersonalMessageTableToUserIDColName).IsNull(),
 			schema.LogEventTableUserIDCol.IsNull(),
 		).
 		Order(schema.UserTableIDCol.Asc()).

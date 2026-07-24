@@ -8,36 +8,36 @@ import (
 )
 
 const (
-	PersonalMessagesTableName                 = "personal_messages"
-	PersonalMessagesTableCreatedAtColName     = "created_at"
-	PersonalMessagesTableContentsColName      = "contents"
-	PersonalMessagesTableDeletedByFromColName = "deleted_by_from"
-	PersonalMessagesTableDeletedByToColName   = "deleted_by_to"
-	PersonalMessagesTableFromUserIDColName    = "from_user_id"
-	PersonalMessagesTableToUserIDColName      = "to_user_id"
-	PersonalMessagesTableReadenColName        = "readen"
+	PersonalMessageTableName                 = "personal_message"
+	PersonalMessageTableCreatedAtColName     = "created_at"
+	PersonalMessageTableContentsColName      = "contents"
+	PersonalMessageTableDeletedByFromColName = "deleted_by_from"
+	PersonalMessageTableDeletedByToColName   = "deleted_by_to"
+	PersonalMessageTableFromUserIDColName    = "from_user_id"
+	PersonalMessageTableToUserIDColName      = "to_user_id"
+	PersonalMessageTableReadenColName        = "readen"
 )
 
 var (
-	PersonalMessagesTable             = goqu.T(PersonalMessagesTableName)
-	PersonalMessagesTableIDCol        = PersonalMessagesTable.Col("id")
-	PersonalMessagesTableCreatedAtCol = PersonalMessagesTable.Col(
-		PersonalMessagesTableCreatedAtColName,
+	PersonalMessageTable             = goqu.T(PersonalMessageTableName)
+	PersonalMessageTableIDCol        = PersonalMessageTable.Col("id")
+	PersonalMessageTableCreatedAtCol = PersonalMessageTable.Col(
+		PersonalMessageTableCreatedAtColName,
 	)
-	PersonalMessagesTableDeletedByFromCol = PersonalMessagesTable.Col(
-		PersonalMessagesTableDeletedByFromColName,
+	PersonalMessageTableDeletedByFromCol = PersonalMessageTable.Col(
+		PersonalMessageTableDeletedByFromColName,
 	)
-	PersonalMessagesTableDeletedByToCol = PersonalMessagesTable.Col(
-		PersonalMessagesTableDeletedByToColName,
+	PersonalMessageTableDeletedByToCol = PersonalMessageTable.Col(
+		PersonalMessageTableDeletedByToColName,
 	)
-	PersonalMessagesTableFromUserIDCol = PersonalMessagesTable.Col(
-		PersonalMessagesTableFromUserIDColName,
+	PersonalMessageTableFromUserIDCol = PersonalMessageTable.Col(
+		PersonalMessageTableFromUserIDColName,
 	)
-	PersonalMessagesTableToUserIDCol = PersonalMessagesTable.Col(
-		PersonalMessagesTableToUserIDColName,
+	PersonalMessageTableToUserIDCol = PersonalMessageTable.Col(
+		PersonalMessageTableToUserIDColName,
 	)
-	PersonalMessagesTableReadenCol = PersonalMessagesTable.Col(
-		PersonalMessagesTableReadenColName,
+	PersonalMessageTableReadenCol = PersonalMessageTable.Col(
+		PersonalMessageTableReadenColName,
 	)
 )
 

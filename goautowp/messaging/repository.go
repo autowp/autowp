@@ -65,7 +65,7 @@ func NewRepository(
 func (s *Repository) GetUserNewMessagesCount(ctx context.Context, userID int64) (int32, error) {
 	paginator := util.Paginator{
 		SQLSelect: s.getReceivedSelect(userID).
-			Where(schema.PersonalMessagesTableReadenCol.IsNotTrue()),
+			Where(schema.PersonalMessageTableReadenCol.IsNotTrue()),
 	}
 
 	return paginator.GetTotalItemCount(ctx)
@@ -82,7 +82,7 @@ func (s *Repository) GetInboxCount(ctx context.Context, userID int64) (int32, er
 func (s *Repository) GetInboxNewCount(ctx context.Context, userID int64) (int32, error) {
 	paginator := util.Paginator{
 		SQLSelect: s.getInboxSelect(userID).
-			Where(schema.PersonalMessagesTableReadenCol.IsNotTrue()),
+			Where(schema.PersonalMessageTableReadenCol.IsNotTrue()),
 	}
 
 	return paginator.GetTotalItemCount(ctx)
@@ -107,7 +107,7 @@ func (s *Repository) GetSystemCount(ctx context.Context, userID int64) (int32, e
 func (s *Repository) GetSystemNewCount(ctx context.Context, userID int64) (int32, error) {
 	paginator := util.Paginator{
 		SQLSelect: s.getSystemSelect(userID).
-			Where(schema.PersonalMessagesTableReadenCol.IsNotTrue()),
+			Where(schema.PersonalMessageTableReadenCol.IsNotTrue()),
 	}
 
 	return paginator.GetTotalItemCount(ctx)
@@ -128,22 +128,22 @@ func (s *Repository) GetDialogCount(
 func (s *Repository) DeleteMessage(ctx context.Context, userID int64, messageID int64) error {
 	ctx = context.WithoutCancel(ctx)
 
-	_, err := s.db.Update(schema.PersonalMessagesTable).
-		Set(goqu.Record{schema.PersonalMessagesTableDeletedByFromColName: true}).
+	_, err := s.db.Update(schema.PersonalMessageTable).
+		Set(goqu.Record{schema.PersonalMessageTableDeletedByFromColName: true}).
 		Where(
-			schema.PersonalMessagesTableFromUserIDCol.Eq(userID),
-			schema.PersonalMessagesTableIDCol.Eq(messageID),
+			schema.PersonalMessageTableFromUserIDCol.Eq(userID),
+			schema.PersonalMessageTableIDCol.Eq(messageID),
 		).
 		Executor().ExecContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	_, err = s.db.Update(schema.PersonalMessagesTable).
-		Set(goqu.Record{schema.PersonalMessagesTableDeletedByToColName: true}).
+	_, err = s.db.Update(schema.PersonalMessageTable).
+		Set(goqu.Record{schema.PersonalMessageTableDeletedByToColName: true}).
 		Where(
-			schema.PersonalMessagesTableToUserIDCol.Eq(userID),
-			schema.PersonalMessagesTableIDCol.Eq(messageID),
+			schema.PersonalMessageTableToUserIDCol.Eq(userID),
+			schema.PersonalMessageTableIDCol.Eq(messageID),
 		).
 		Executor().ExecContext(ctx)
 
@@ -151,19 +151,19 @@ func (s *Repository) DeleteMessage(ctx context.Context, userID int64, messageID 
 }
 
 func (s *Repository) ClearSent(ctx context.Context, userID int64) error {
-	_, err := s.db.Update(schema.PersonalMessagesTable).
-		Set(goqu.Record{schema.PersonalMessagesTableDeletedByFromColName: true}).
-		Where(schema.PersonalMessagesTableFromUserIDCol.Eq(userID)).
+	_, err := s.db.Update(schema.PersonalMessageTable).
+		Set(goqu.Record{schema.PersonalMessageTableDeletedByFromColName: true}).
+		Where(schema.PersonalMessageTableFromUserIDCol.Eq(userID)).
 		Executor().ExecContext(ctx)
 
 	return err
 }
 
 func (s *Repository) ClearSystem(ctx context.Context, userID int64) error {
-	_, err := s.db.Delete(schema.PersonalMessagesTable).
+	_, err := s.db.Delete(schema.PersonalMessageTable).
 		Where(
-			schema.PersonalMessagesTableToUserIDCol.Eq(userID),
-			schema.PersonalMessagesTableFromUserIDCol.IsNull(),
+			schema.PersonalMessageTableToUserIDCol.Eq(userID),
+			schema.PersonalMessageTableFromUserIDCol.IsNull(),
 		).
 		Executor().ExecContext(ctx)
 
@@ -212,13 +212,13 @@ func (s *Repository) CreateMessage(
 
 	ctx = context.WithoutCancel(ctx)
 
-	_, err := s.db.Insert(schema.PersonalMessagesTable).Rows(
+	_, err := s.db.Insert(schema.PersonalMessageTable).Rows(
 		goqu.Record{
-			schema.PersonalMessagesTableFromUserIDColName: nullableFromUserID,
-			schema.PersonalMessagesTableToUserIDColName:   toUserID,
-			schema.PersonalMessagesTableContentsColName:   text,
-			schema.PersonalMessagesTableCreatedAtColName:  goqu.Func("NOW"),
-			schema.PersonalMessagesTableReadenColName:     false,
+			schema.PersonalMessageTableFromUserIDColName: nullableFromUserID,
+			schema.PersonalMessageTableToUserIDColName:   toUserID,
+			schema.PersonalMessageTableContentsColName:   text,
+			schema.PersonalMessageTableCreatedAtColName:  goqu.Func("NOW"),
+			schema.PersonalMessageTableReadenColName:     false,
 		},
 	).Executor().ExecContext(ctx)
 	if err != nil {
@@ -286,11 +286,11 @@ func (s *Repository) GetDialogbox(
 }
 
 func (s *Repository) Recycle(ctx context.Context) (int64, error) {
-	res, err := s.db.Delete(schema.PersonalMessagesTable).Where(
-		schema.PersonalMessagesTableDeletedByToCol.IsTrue(),
+	res, err := s.db.Delete(schema.PersonalMessageTable).Where(
+		schema.PersonalMessageTableDeletedByToCol.IsTrue(),
 		goqu.Or(
-			schema.PersonalMessagesTableDeletedByFromCol.IsTrue(),
-			schema.PersonalMessagesTableFromUserIDCol.IsNull(),
+			schema.PersonalMessageTableDeletedByFromCol.IsTrue(),
+			schema.PersonalMessageTableFromUserIDCol.IsNull(),
 		),
 	).Executor().ExecContext(ctx)
 	if err != nil {
@@ -301,9 +301,9 @@ func (s *Repository) Recycle(ctx context.Context) (int64, error) {
 }
 
 func (s *Repository) RecycleSystem(ctx context.Context) (int64, error) {
-	res, err := s.db.Delete(schema.PersonalMessagesTable).Where(
-		schema.PersonalMessagesTableFromUserIDCol.IsNull(),
-		schema.PersonalMessagesTableCreatedAtCol.Lt(
+	res, err := s.db.Delete(schema.PersonalMessageTable).Where(
+		schema.PersonalMessageTableFromUserIDCol.IsNull(),
+		schema.PersonalMessageTableCreatedAtCol.Lt(
 			goqu.L("NOW() - INTERVAL '6 MONTH'"),
 		),
 	).Executor().ExecContext(ctx)
@@ -317,9 +317,9 @@ func (s *Repository) RecycleSystem(ctx context.Context) (int64, error) {
 func (s *Repository) markReaden(ctx context.Context, ids []int64) error {
 	var err error
 	if len(ids) > 0 {
-		_, err = s.db.Update(schema.PersonalMessagesTable).
-			Set(goqu.Record{schema.PersonalMessagesTableReadenColName: true}).
-			Where(schema.PersonalMessagesTableIDCol.In(ids)).
+		_, err = s.db.Update(schema.PersonalMessageTable).
+			Set(goqu.Record{schema.PersonalMessageTableReadenColName: true}).
+			Where(schema.PersonalMessageTableIDCol.In(ids)).
 			Executor().ExecContext(ctx)
 	}
 
@@ -381,48 +381,48 @@ func (s *Repository) getBox(
 }
 
 func (s *Repository) getReceivedSelect(userID int64) *goqu.SelectDataset {
-	return s.db.From(schema.PersonalMessagesTable).
+	return s.db.From(schema.PersonalMessageTable).
 		Where(
-			schema.PersonalMessagesTableToUserIDCol.Eq(userID),
-			schema.PersonalMessagesTableDeletedByToCol.IsFalse(),
+			schema.PersonalMessageTableToUserIDCol.Eq(userID),
+			schema.PersonalMessageTableDeletedByToCol.IsFalse(),
 		).
-		Order(schema.PersonalMessagesTableCreatedAtCol.Desc())
+		Order(schema.PersonalMessageTableCreatedAtCol.Desc())
 }
 
 func (s *Repository) getSystemSelect(userID int64) *goqu.SelectDataset {
-	return s.getReceivedSelect(userID).Where(schema.PersonalMessagesTableFromUserIDCol.IsNull())
+	return s.getReceivedSelect(userID).Where(schema.PersonalMessageTableFromUserIDCol.IsNull())
 }
 
 func (s *Repository) getInboxSelect(userID int64) *goqu.SelectDataset {
-	return s.getReceivedSelect(userID).Where(schema.PersonalMessagesTableFromUserIDCol.IsNotNull())
+	return s.getReceivedSelect(userID).Where(schema.PersonalMessageTableFromUserIDCol.IsNotNull())
 }
 
 func (s *Repository) getSentSelect(userID int64) *goqu.SelectDataset {
-	return s.db.From(schema.PersonalMessagesTable).
+	return s.db.From(schema.PersonalMessageTable).
 		Where(
-			schema.PersonalMessagesTableFromUserIDCol.Eq(userID),
-			schema.PersonalMessagesTableDeletedByFromCol.IsNotTrue(),
+			schema.PersonalMessageTableFromUserIDCol.Eq(userID),
+			schema.PersonalMessageTableDeletedByFromCol.IsNotTrue(),
 		).
-		Order(schema.PersonalMessagesTableCreatedAtCol.Desc())
+		Order(schema.PersonalMessageTableCreatedAtCol.Desc())
 }
 
 func (s *Repository) getDialogSelect(userID int64, withUserID int64) *goqu.SelectDataset {
-	return s.db.From(schema.PersonalMessagesTable).
+	return s.db.From(schema.PersonalMessageTable).
 		Where(
 			goqu.Or(
 				goqu.And(
-					schema.PersonalMessagesTableFromUserIDCol.Eq(userID),
-					schema.PersonalMessagesTableToUserIDCol.Eq(withUserID),
-					schema.PersonalMessagesTableDeletedByFromCol.IsNotTrue(),
+					schema.PersonalMessageTableFromUserIDCol.Eq(userID),
+					schema.PersonalMessageTableToUserIDCol.Eq(withUserID),
+					schema.PersonalMessageTableDeletedByFromCol.IsNotTrue(),
 				),
 				goqu.And(
-					schema.PersonalMessagesTableFromUserIDCol.Eq(withUserID),
-					schema.PersonalMessagesTableToUserIDCol.Eq(userID),
-					schema.PersonalMessagesTableDeletedByToCol.IsNotTrue(),
+					schema.PersonalMessageTableFromUserIDCol.Eq(withUserID),
+					schema.PersonalMessageTableToUserIDCol.Eq(userID),
+					schema.PersonalMessageTableDeletedByToCol.IsNotTrue(),
 				),
 			),
 		).
-		Order(schema.PersonalMessagesTableCreatedAtCol.Desc())
+		Order(schema.PersonalMessageTableCreatedAtCol.Desc())
 }
 
 func (s *Repository) prepareList(
