@@ -183,12 +183,12 @@ func (s *Storage) FormattedImage(ctx context.Context, id int, formatName string)
 	).
 		From(schema.ImageTable).
 		Join(
-			schema.FormattedImageTable,
-			goqu.On(schema.ImageTableIDCol.Eq(schema.FormattedImageTableFormattedImageIDCol)),
+			schema.ImageFormattedTable,
+			goqu.On(schema.ImageTableIDCol.Eq(schema.ImageFormattedTableImageFormattedIDCol)),
 		).
 		Where(
-			schema.FormattedImageTableImageIDCol.Eq(id),
-			schema.FormattedImageTableFormatCol.Eq(formatName),
+			schema.ImageFormattedTableImageIDCol.Eq(id),
+			schema.ImageFormattedTableFormatCol.Eq(formatName),
 		).ScanStructContext(ctx, &row)
 	if err != nil {
 		return nil, err
@@ -385,8 +385,8 @@ func (s *Storage) RemoveImage(ctx context.Context, imageID int) error {
 	}
 
 	// to save remove formatted image
-	_, err = s.db.Delete(schema.FormattedImageTable).
-		Where(schema.FormattedImageTableFormattedImageIDCol.Eq(row.ID)).
+	_, err = s.db.Delete(schema.ImageFormattedTable).
+		Where(schema.ImageFormattedTableImageFormattedIDCol.Eq(row.ID)).
 		Executor().ExecContext(ctx)
 	if err != nil {
 		return err
@@ -426,23 +426,23 @@ func (s *Storage) RemoveImage(ctx context.Context, imageID int) error {
 }
 
 func (s *Storage) Flush(ctx context.Context, options FlushOptions) error {
-	sqSelect := s.db.Select(schema.FormattedImageTableImageIDCol, schema.FormattedImageTableFormatCol,
-		schema.FormattedImageTableFormattedImageIDCol).
-		From(schema.FormattedImageTable)
+	sqSelect := s.db.Select(schema.ImageFormattedTableImageIDCol, schema.ImageFormattedTableFormatCol,
+		schema.ImageFormattedTableImageFormattedIDCol).
+		From(schema.ImageFormattedTable)
 
 	if len(options.Format) > 0 {
-		sqSelect = sqSelect.Where(schema.FormattedImageTableFormatCol.Eq(options.Format))
+		sqSelect = sqSelect.Where(schema.ImageFormattedTableFormatCol.Eq(options.Format))
 	}
 
 	if options.Image > 0 {
-		sqSelect = sqSelect.Where(schema.FormattedImageTableImageIDCol.Eq(options.Image))
+		sqSelect = sqSelect.Where(schema.ImageFormattedTableImageIDCol.Eq(options.Image))
 	}
 
 	if len(options.Ext) > 0 {
 		sqSelect = sqSelect.
 			Join(
 				schema.ImageTable,
-				goqu.On(schema.FormattedImageTableFormattedImageIDCol.Eq(schema.ImageTableIDCol)),
+				goqu.On(schema.ImageFormattedTableImageFormattedIDCol.Eq(schema.ImageTableIDCol)),
 			).
 			Where(schema.ImageTableFilepathCol.ILike("%." + options.Ext))
 	}
@@ -451,7 +451,7 @@ func (s *Storage) Flush(ctx context.Context, options FlushOptions) error {
 		sqSelect = sqSelect.Limit(options.Limit)
 	}
 
-	var rows []schema.FormattedImageRow
+	var rows []schema.ImageFormattedRow
 
 	err := sqSelect.ScanStructsContext(ctx, &rows)
 	if err != nil {
@@ -463,17 +463,17 @@ func (s *Storage) Flush(ctx context.Context, options FlushOptions) error {
 	for _, row := range rows {
 		logrus.Infof("flushing image `%d/%s`", row.ImageID, row.Format)
 
-		if row.FormattedImageID.Valid && row.FormattedImageID.Int32 > 0 {
-			err = s.RemoveImage(ctx, int(row.FormattedImageID.Int32))
+		if row.ImageFormattedID.Valid && row.ImageFormattedID.Int32 > 0 {
+			err = s.RemoveImage(ctx, int(row.ImageFormattedID.Int32))
 			if err != nil {
 				return err
 			}
 		}
 
-		_, err = s.db.Delete(schema.FormattedImageTable).
+		_, err = s.db.Delete(schema.ImageFormattedTable).
 			Where(
-				schema.FormattedImageTableImageIDCol.Eq(row.ImageID),
-				schema.FormattedImageTableFormatCol.Eq(row.Format),
+				schema.ImageFormattedTableImageIDCol.Eq(row.ImageID),
+				schema.ImageFormattedTableFormatCol.Eq(row.Format),
 			).
 			Executor().ExecContext(ctx)
 		if err != nil {
@@ -841,16 +841,16 @@ func (s *Storage) FormattedImages(
 		schema.ImageTableFilesizeCol,
 		schema.ImageTableFilepathCol,
 		schema.ImageTableDirCol,
-		schema.FormattedImageTableImageIDCol,
+		schema.ImageFormattedTableImageIDCol,
 	).
 		From(schema.ImageTable).
 		Join(
-			schema.FormattedImageTable,
-			goqu.On(schema.ImageTableIDCol.Eq(schema.FormattedImageTableFormattedImageIDCol)),
+			schema.ImageFormattedTable,
+			goqu.On(schema.ImageTableIDCol.Eq(schema.ImageFormattedTableImageFormattedIDCol)),
 		).
 		Where(
-			schema.FormattedImageTableImageIDCol.In(imageIDs),
-			schema.FormattedImageTableFormatCol.Eq(formatName),
+			schema.ImageFormattedTableImageIDCol.In(imageIDs),
+			schema.ImageFormattedTableFormatCol.Eq(formatName),
 		)
 
 	rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
@@ -1378,11 +1378,11 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 
 	ctx = context.WithoutCancel(ctx)
 
-	_, err = s.db.Insert(schema.FormattedImageTable).Rows(goqu.Record{
-		schema.FormattedImageTableFormatColName:           formatName,
-		schema.FormattedImageTableImageIDColName:          imageID,
-		schema.FormattedImageTableStatusColName:           StatusProcessing,
-		schema.FormattedImageTableFormattedImageIDColName: nil,
+	_, err = s.db.Insert(schema.ImageFormattedTable).Rows(goqu.Record{
+		schema.ImageFormattedTableFormatColName:           formatName,
+		schema.ImageFormattedTableImageIDColName:          imageID,
+		schema.ImageFormattedTableStatusColName:           StatusProcessing,
+		schema.ImageFormattedTableImageFormattedIDColName: nil,
 	}).Executor().ExecContext(ctx)
 	if err != nil {
 		if !util.IsPgDuplicateKeyError(err) {
@@ -1394,15 +1394,15 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 
 		var (
 			done  = false
-			fiRow schema.FormattedImageRow
+			fiRow schema.ImageFormattedRow
 		)
 
 		for i := 0; i < maxInsertAttempts && !done; i++ {
 			success, err = s.db.Select(
-				schema.FormattedImageTableFormattedImageIDCol, schema.FormattedImageTableStatusCol,
+				schema.ImageFormattedTableImageFormattedIDCol, schema.ImageFormattedTableStatusCol,
 			).
-				From(schema.FormattedImageTable).
-				Where(schema.FormattedImageTableImageIDCol.Eq(imageID)).
+				From(schema.ImageFormattedTable).
+				Where(schema.ImageFormattedTableImageIDCol.Eq(imageID)).
 				ScanStructContext(ctx, &fiRow)
 			if err != nil {
 				return 0, err
@@ -1420,12 +1420,12 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 
 		if !done {
 			// mark as failed
-			_, err = s.db.Update(schema.FormattedImageTable).
-				Set(goqu.Record{schema.FormattedImageTableStatusColName: StatusFailed}).
+			_, err = s.db.Update(schema.ImageFormattedTable).
+				Set(goqu.Record{schema.ImageFormattedTableStatusColName: StatusFailed}).
 				Where(
-					schema.FormattedImageTableFormatCol.Eq(formatName),
-					schema.FormattedImageTableImageIDCol.Eq(imageID),
-					schema.FormattedImageTableStatusCol.Eq(StatusProcessing),
+					schema.ImageFormattedTableFormatCol.Eq(formatName),
+					schema.ImageFormattedTableImageIDCol.Eq(imageID),
+					schema.ImageFormattedTableStatusCol.Eq(StatusProcessing),
 				).
 				Executor().ExecContext(ctx)
 			if err != nil {
@@ -1433,7 +1433,7 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 			}
 		}
 
-		if !fiRow.FormattedImageID.Valid {
+		if !fiRow.ImageFormattedID.Valid {
 			return 0, fmt.Errorf(
 				"doFormatImage(%d, %s): %w",
 				imageID,
@@ -1442,7 +1442,7 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 			)
 		}
 
-		return int(fiRow.FormattedImageID.Int32), nil
+		return int(fiRow.ImageFormattedID.Int32), nil
 	}
 
 	var formattedImageID int
@@ -1502,14 +1502,14 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 		return 0, err
 	}
 
-	_, err = s.db.Update(schema.FormattedImageTable).
+	_, err = s.db.Update(schema.ImageFormattedTable).
 		Set(goqu.Record{
-			schema.FormattedImageTableFormattedImageIDColName: formattedImageID,
-			schema.FormattedImageTableStatusColName:           StatusDefault,
+			schema.ImageFormattedTableImageFormattedIDColName: formattedImageID,
+			schema.ImageFormattedTableStatusColName:           StatusDefault,
 		}).
 		Where(
-			schema.FormattedImageTableFormatCol.Eq(formatName),
-			schema.FormattedImageTableImageIDCol.Eq(imageID),
+			schema.ImageFormattedTableFormatCol.Eq(formatName),
+			schema.ImageFormattedTableImageIDCol.Eq(imageID),
 		).
 		Executor().ExecContext(ctx)
 	if err != nil {
@@ -1517,13 +1517,13 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 	}
 
 	// } catch (Exception $e) {
-	_, err = s.db.Update(schema.FormattedImageTable).
+	_, err = s.db.Update(schema.ImageFormattedTable).
 		Set(goqu.Record{
-			schema.FormattedImageTableStatusColName: StatusFailed,
+			schema.ImageFormattedTableStatusColName: StatusFailed,
 		}).
 		Where(
-			schema.FormattedImageTableFormatCol.Eq(formatName),
-			schema.FormattedImageTableImageIDCol.Eq(imageID),
+			schema.ImageFormattedTableFormatCol.Eq(formatName),
+			schema.ImageFormattedTableImageIDCol.Eq(imageID),
 		).
 		Executor().ExecContext(ctx)
 	if err != nil {
