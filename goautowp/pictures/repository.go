@@ -1570,10 +1570,10 @@ func (s *Repository) PerspectivesPairs(ctx context.Context, ids []int32) (map[in
 
 	var rows []schema.PerspectiveRow
 
-	err := s.db.Select(schema.PerspectivesTableIDCol, schema.PerspectivesTableNameCol).
-		From(schema.PerspectivesTable).
-		Where(schema.PerspectivesTableIDCol.In(ids)).
-		Order(schema.PerspectivesTablePositionCol.Asc()).
+	err := s.db.Select(schema.PerspectiveTableIDCol, schema.PerspectiveTableNameCol).
+		From(schema.PerspectiveTable).
+		Where(schema.PerspectiveTableIDCol.In(ids)).
+		Order(schema.PerspectiveTablePositionCol.Asc()).
 		ScanStructsContext(ctx, &rows)
 	if err != nil {
 		return nil, err
@@ -2385,7 +2385,7 @@ func (s *Repository) orderBy( //nolint: maintidx
 			piAlias                 = options.PictureItemAlias(alias, 0)
 			ipcaAlias               = options.PictureItem.ItemParentCacheAncestorAlias(piAlias)
 			pgpAlias                = query.AppendPerspectiveGroupPerspectiveAlias(piAlias)
-			col       exp.Orderable = goqu.T(pgpAlias).Col(schema.PerspectivesGroupsPerspectivesTablePositionColName)
+			col       exp.Orderable = goqu.T(pgpAlias).Col(schema.PerspectiveGroupPerspectiveTablePositionColName)
 		)
 
 		if !options.IsIDUnique() {
@@ -2441,7 +2441,7 @@ func (s *Repository) orderBy( //nolint: maintidx
 		if options.PictureItem.PerspectiveGroupPerspective != nil {
 			var (
 				pgpAlias               = query.AppendPerspectiveGroupPerspectiveAlias(piAlias)
-				col      exp.Orderable = goqu.T(pgpAlias).Col(schema.PerspectivesGroupsPerspectivesTablePositionColName)
+				col      exp.Orderable = goqu.T(pgpAlias).Col(schema.PerspectiveGroupPerspectiveTablePositionColName)
 			)
 
 			if !options.IsIDUnique() {
@@ -2469,13 +2469,13 @@ func (s *Repository) orderBy( //nolint: maintidx
 
 		groupBy = true
 		sqSelect = sqSelect.
-			LeftJoin(schema.PerspectivesTable, goqu.On(
+			LeftJoin(schema.PerspectiveTable, goqu.On(
 				goqu.T(piAlias).
 					Col(schema.PictureItemTablePerspectiveIDColName).
-					Eq(schema.PerspectivesTableIDCol),
+					Eq(schema.PerspectiveTableIDCol),
 			)).
 			Order(
-				goqu.MIN(schema.PerspectivesTablePositionCol).Asc(),
+				goqu.MIN(schema.PerspectiveTablePositionCol).Asc(),
 				aliasTable.Col(schema.PictureTableWidthColName).Desc(),
 				aliasTable.Col(schema.PictureTableHeightColName).Desc(),
 				aliasTable.Col(schema.PictureTableCreatedAtColName).Desc().NullsLast(),
@@ -2654,10 +2654,10 @@ func (s *Repository) perspectivePageGroupIDs(
 ) ([]int32, error) {
 	var ids []int32
 
-	err := s.db.Select(schema.PerspectivesGroupsTableIDCol).
-		From(schema.PerspectivesGroupsTable).
-		Where(schema.PerspectivesGroupsTablePageIDCol.Eq(pageID)).
-		Order(schema.PerspectivesGroupsTablePositionCol.Asc()).
+	err := s.db.Select(schema.PerspectiveGroupTableIDCol).
+		From(schema.PerspectiveGroupTable).
+		Where(schema.PerspectiveGroupTablePageIDCol.Eq(pageID)).
+		Order(schema.PerspectiveGroupTablePositionCol.Asc()).
 		ScanValsContext(ctx, &ids)
 
 	return ids, err

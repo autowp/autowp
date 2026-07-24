@@ -3,7 +3,7 @@ package schema
 import "github.com/doug-martin/goqu/v9"
 
 const (
-	PerspectivesTableName = "perspectives"
+	PerspectiveTableName = "perspective"
 
 	PerspectiveFront          = 1
 	PerspectiveBack           = 2
@@ -29,10 +29,10 @@ const (
 )
 
 var (
-	PerspectivesTable            = goqu.T(PerspectivesTableName)
-	PerspectivesTableIDCol       = PerspectivesTable.Col("id")
-	PerspectivesTablePositionCol = PerspectivesTable.Col("position")
-	PerspectivesTableNameCol     = PerspectivesTable.Col("name")
+	PerspectiveTable            = goqu.T(PerspectiveTableName)
+	PerspectiveTableIDCol       = PerspectiveTable.Col("id")
+	PerspectiveTablePositionCol = PerspectiveTable.Col("position")
+	PerspectiveTableNameCol     = PerspectiveTable.Col("name")
 )
 
 type PerspectiveRow struct {

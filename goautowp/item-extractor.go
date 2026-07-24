@@ -733,7 +733,7 @@ func (s *ItemExtractor) orientedPictureList(
 
 	perspectivesGroupIDs, err := pictureRepository.PerspectivePageGroupIDs(
 		ctx,
-		schema.PerspectivesPageFivePics,
+		schema.PerspectivePageFivePics,
 	)
 	if err != nil {
 		return nil, err

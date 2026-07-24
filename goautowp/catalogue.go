@@ -127,10 +127,10 @@ func (s *Catalogue) getPerspectiveGroups(
 	ctx context.Context,
 	pageID int32,
 ) ([]*PerspectiveGroup, error) {
-	sqSelect := s.pgDB.Select(schema.PerspectivesGroupsTableIDCol, schema.PerspectivesGroupsTableNameCol).
-		From(schema.PerspectivesGroupsTable).
-		Where(schema.PerspectivesGroupsTablePageIDCol.Eq(pageID)).
-		Order(schema.PerspectivesGroupsTablePositionCol.Asc())
+	sqSelect := s.pgDB.Select(schema.PerspectiveGroupTableIDCol, schema.PerspectiveGroupTableNameCol).
+		From(schema.PerspectiveGroupTable).
+		Where(schema.PerspectiveGroupTablePageIDCol.Eq(pageID)).
+		Order(schema.PerspectiveGroupTablePositionCol.Asc())
 
 	rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
 	if err != nil {
@@ -176,9 +176,9 @@ func (s *Catalogue) getPerspectiveGroups(
 }
 
 func (s *Catalogue) getPerspectivePages(ctx context.Context) ([]*PerspectivePage, error) {
-	sqSelect := s.pgDB.Select(schema.PerspectivesPagesTableIDCol, schema.PerspectivesPagesTableNameCol).
-		From(schema.PerspectivesPagesTable).
-		Order(schema.PerspectivesPagesTableIDCol.Asc())
+	sqSelect := s.pgDB.Select(schema.PerspectivePageTableIDCol, schema.PerspectivePageTableNameCol).
+		From(schema.PerspectivePageTable).
+		Order(schema.PerspectivePageTableIDCol.Asc())
 
 	rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
 	if err != nil {
@@ -224,23 +224,23 @@ func (s *Catalogue) getPerspectivePages(ctx context.Context) ([]*PerspectivePage
 }
 
 func (s *Catalogue) getPerspectives(ctx context.Context, groupID *int32) ([]*Perspective, error) {
-	sqSelect := s.pgDB.Select(schema.PerspectivesTableIDCol, schema.PerspectivesTableNameCol).
-		From(schema.PerspectivesTable)
+	sqSelect := s.pgDB.Select(schema.PerspectiveTableIDCol, schema.PerspectiveTableNameCol).
+		From(schema.PerspectiveTable)
 
 	if groupID != nil {
 		sqSelect = sqSelect.
 			Join(
-				schema.PerspectivesGroupsPerspectivesTable,
+				schema.PerspectiveGroupPerspectiveTable,
 				goqu.On(
-					schema.PerspectivesTableIDCol.Eq(
-						schema.PerspectivesGroupsPerspectivesTablePerspectiveIDCol,
+					schema.PerspectiveTableIDCol.Eq(
+						schema.PerspectiveGroupPerspectiveTablePerspectiveIDCol,
 					),
 				),
 			).
-			Where(schema.PerspectivesGroupsPerspectivesTableGroupIDCol.Eq(*groupID)).
-			Order(schema.PerspectivesGroupsPerspectivesTablePositionCol.Asc())
+			Where(schema.PerspectiveGroupPerspectiveTableGroupIDCol.Eq(*groupID)).
+			Order(schema.PerspectiveGroupPerspectiveTablePositionCol.Asc())
 	} else {
-		sqSelect = sqSelect.Order(schema.PerspectivesTablePositionCol.Asc())
+		sqSelect = sqSelect.Order(schema.PerspectiveTablePositionCol.Asc())
 	}
 
 	rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck

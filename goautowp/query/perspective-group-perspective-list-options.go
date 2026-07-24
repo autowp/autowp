@@ -36,11 +36,11 @@ func (s *PerspectiveGroupPerspectiveListOptions) JoinToPerspectiveIDAndApply(
 	return s.apply(
 		alias,
 		sqSelect.Join(
-			schema.PerspectivesGroupsPerspectivesTable.As(alias),
+			schema.PerspectiveGroupPerspectiveTable.As(alias),
 			goqu.On(
 				srcCol.Eq(
 					goqu.T(alias).
-						Col(schema.PerspectivesGroupsPerspectivesTablePerspectiveIDColName),
+						Col(schema.PerspectiveGroupPerspectiveTablePerspectiveIDColName),
 				),
 			),
 		),
@@ -54,7 +54,7 @@ func (s *PerspectiveGroupPerspectiveListOptions) apply(
 	if s.GroupID != 0 {
 		sqSelect = sqSelect.Where(
 			goqu.T(alias).
-				Col(schema.PerspectivesGroupsPerspectivesTableGroupIDColName).
+				Col(schema.PerspectiveGroupPerspectiveTableGroupIDColName).
 				Eq(s.GroupID),
 		)
 	}
