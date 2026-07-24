@@ -17,7 +17,7 @@ const (
 	PictureStatusRemoved  PictureStatus = "removed"
 	PictureStatusInbox    PictureStatus = "inbox"
 
-	PictureTableName                      = "pictures"
+	PictureTableName                      = "picture"
 	PictureTableIDColName                 = "id"
 	PictureTableImageIDColName            = "image_id"
 	PictureTableIdentityColName           = "identity"
