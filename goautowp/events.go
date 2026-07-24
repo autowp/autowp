@@ -36,13 +36,13 @@ func (s *Events) Add(ctx context.Context, event Event) error {
 
 	var rowID int64
 
-	success, err := s.db.Insert(schema.LogEventsTable).
+	success, err := s.db.Insert(schema.LogEventTable).
 		Rows(goqu.Record{
-			schema.LogEventsTableDescriptionColName: event.Message,
-			schema.LogEventsTableUserIDColName:      event.UserID,
-			schema.LogEventsTableCreatedAtColName:   goqu.Func("NOW"),
+			schema.LogEventTableDescriptionColName: event.Message,
+			schema.LogEventTableUserIDColName:      event.UserID,
+			schema.LogEventTableCreatedAtColName:   goqu.Func("NOW"),
 		}).
-		Returning(schema.LogEventsTableIDColName).
+		Returning(schema.LogEventTableIDColName).
 		Executor().ScanValContext(ctx, &rowID)
 	if err != nil {
 		return err
@@ -58,12 +58,12 @@ func (s *Events) Add(ctx context.Context, event Event) error {
 		rows := make([]interface{}, len(event.Users))
 		for idx, id := range event.Users {
 			rows[idx] = goqu.Record{
-				schema.LogEventsUserTableLogEventIDColName: rowID,
-				schema.LogEventsUserTableUserIDColName:     id,
+				schema.LogEventUserTableLogEventIDColName: rowID,
+				schema.LogEventUserTableUserIDColName:     id,
 			}
 		}
 
-		_, err = s.db.Insert(schema.LogEventsUserTable).Rows(rows...).Executor().ExecContext(ctx)
+		_, err = s.db.Insert(schema.LogEventUserTable).Rows(rows...).Executor().ExecContext(ctx)
 		if err != nil {
 			return err
 		}
@@ -75,12 +75,12 @@ func (s *Events) Add(ctx context.Context, event Event) error {
 		rows := make([]interface{}, len(event.Pictures))
 		for idx, id := range event.Pictures {
 			rows[idx] = goqu.Record{
-				schema.LogEventsPicturesTableLogEventIDColName: rowID,
-				schema.LogEventsPicturesTablePictureIDColName:  id,
+				schema.LogEventPictureTableLogEventIDColName: rowID,
+				schema.LogEventPictureTablePictureIDColName:  id,
 			}
 		}
 
-		_, err = s.db.Insert(schema.LogEventsPicturesTable).
+		_, err = s.db.Insert(schema.LogEventPictureTable).
 			Rows(rows...).
 			Executor().
 			ExecContext(ctx)
@@ -95,12 +95,12 @@ func (s *Events) Add(ctx context.Context, event Event) error {
 		rows := make([]interface{}, len(event.Items))
 		for idx, id := range event.Items {
 			rows[idx] = goqu.Record{
-				schema.LogEventsItemTableLogEventIDColName: rowID,
-				schema.LogEventsItemTableItemIDColName:     id,
+				schema.LogEventItemTableLogEventIDColName: rowID,
+				schema.LogEventItemTableItemIDColName:     id,
 			}
 		}
 
-		_, err = s.db.Insert(schema.LogEventsItemTable).Rows(rows...).Executor().ExecContext(ctx)
+		_, err = s.db.Insert(schema.LogEventItemTable).Rows(rows...).Executor().ExecContext(ctx)
 		if err != nil {
 			return err
 		}

@@ -42,34 +42,34 @@ func (s *Repository) Events(
 	ctx context.Context,
 	options ListOptions,
 ) ([]Event, *util.Pages, error) {
-	sqSelect := s.db.Select(schema.LogEventsTableIDCol, schema.LogEventsTableUserIDCol,
-		schema.LogEventsTableCreatedAtCol, schema.LogEventsTableDescriptionCol).
-		From(schema.LogEventsTable).
-		Order(schema.LogEventsTableCreatedAtCol.Desc(), schema.LogEventsTableIDCol.Desc())
+	sqSelect := s.db.Select(schema.LogEventTableIDCol, schema.LogEventTableUserIDCol,
+		schema.LogEventTableCreatedAtCol, schema.LogEventTableDescriptionCol).
+		From(schema.LogEventTable).
+		Order(schema.LogEventTableCreatedAtCol.Desc(), schema.LogEventTableIDCol.Desc())
 
 	if options.ArticleID != 0 {
 		sqSelect = sqSelect.
-			Join(schema.LogEventsArticlesTable,
-				goqu.On(schema.LogEventsTableIDCol.Eq(schema.LogEventsArticlesTableLogEventIDCol))).
-			Where(schema.LogEventsArticlesTableArticleIDCol.Eq(options.ArticleID))
+			Join(schema.LogEventArticleTable,
+				goqu.On(schema.LogEventTableIDCol.Eq(schema.LogEventArticleTableLogEventIDCol))).
+			Where(schema.LogEventArticleTableArticleIDCol.Eq(options.ArticleID))
 	}
 
 	if options.ItemID != 0 {
 		sqSelect = sqSelect.
-			Join(schema.LogEventsItemTable,
-				goqu.On(schema.LogEventsTableIDCol.Eq(schema.LogEventsItemTableLogEventIDCol))).
-			Where(schema.LogEventsItemTableItemIDCol.Eq(options.ItemID))
+			Join(schema.LogEventItemTable,
+				goqu.On(schema.LogEventTableIDCol.Eq(schema.LogEventItemTableLogEventIDCol))).
+			Where(schema.LogEventItemTableItemIDCol.Eq(options.ItemID))
 	}
 
 	if options.PictureID != 0 {
 		sqSelect = sqSelect.
-			Join(schema.LogEventsPicturesTable,
-				goqu.On(schema.LogEventsTableIDCol.Eq(schema.LogEventsPicturesTableLogEventIDCol))).
-			Where(schema.LogEventsPicturesTablePictureIDCol.Eq(options.PictureID))
+			Join(schema.LogEventPictureTable,
+				goqu.On(schema.LogEventTableIDCol.Eq(schema.LogEventPictureTableLogEventIDCol))).
+			Where(schema.LogEventPictureTablePictureIDCol.Eq(options.PictureID))
 	}
 
 	if options.UserID != 0 {
-		sqSelect = sqSelect.Where(schema.LogEventsTableUserIDCol.Eq(options.UserID))
+		sqSelect = sqSelect.Where(schema.LogEventTableUserIDCol.Eq(options.UserID))
 	}
 
 	paginator := util.Paginator{
@@ -96,17 +96,17 @@ func (s *Repository) Events(
 	}
 
 	for idx, row := range rows {
-		err = s.db.Select(schema.LogEventsItemTableItemIDCol).
-			From(schema.LogEventsItemTable).
-			Where(schema.LogEventsItemTableLogEventIDCol.Eq(row.ID)).
+		err = s.db.Select(schema.LogEventItemTableItemIDCol).
+			From(schema.LogEventItemTable).
+			Where(schema.LogEventItemTableLogEventIDCol.Eq(row.ID)).
 			ScanValsContext(ctx, &rows[idx].Items)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		err = s.db.Select(schema.LogEventsPicturesTablePictureIDCol).
-			From(schema.LogEventsPicturesTable).
-			Where(schema.LogEventsPicturesTableLogEventIDCol.Eq(row.ID)).
+		err = s.db.Select(schema.LogEventPictureTablePictureIDCol).
+			From(schema.LogEventPictureTable).
+			Where(schema.LogEventPictureTableLogEventIDCol.Eq(row.ID)).
 			ScanValsContext(ctx, &rows[idx].Pictures)
 		if err != nil {
 			return nil, nil, err

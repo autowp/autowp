@@ -230,15 +230,15 @@ func (s *StatisticsGRPCServer) GetPulse(
 	const dateAlias = "date"
 
 	err := s.db.Select(
-		schema.LogEventsTableUserIDCol.As("user_id"),
-		goqu.Func("TO_CHAR", schema.LogEventsTableCreatedAtCol, dateExpr).As(dateAlias),
+		schema.LogEventTableUserIDCol.As("user_id"),
+		goqu.Func("TO_CHAR", schema.LogEventTableCreatedAtCol, dateExpr).As(dateAlias),
 		goqu.COUNT(goqu.Star()).As("value"),
-	).From(schema.LogEventsTable).
+	).From(schema.LogEventTable).
 		Where(
-			schema.LogEventsTableCreatedAtCol.Gte(from),
-			schema.LogEventsTableCreatedAtCol.Lt(to),
+			schema.LogEventTableCreatedAtCol.Gte(from),
+			schema.LogEventTableCreatedAtCol.Lt(to),
 		).
-		GroupBy(schema.LogEventsTableUserIDCol, goqu.C(dateAlias)).ScanStructsContext(ctx, &rows)
+		GroupBy(schema.LogEventTableUserIDCol, goqu.C(dateAlias)).ScanStructsContext(ctx, &rows)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

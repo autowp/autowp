@@ -1126,7 +1126,7 @@ func (s *Repository) DeleteUnused(ctx context.Context) error {
 		LeftJoin(schema.PersonalMessagesTable.As("pmt"), goqu.On(
 			schema.UserTableIDCol.Eq(goqu.T("pmt").Col(schema.PersonalMessagesTableToUserIDColName)),
 		)).
-		LeftJoin(schema.LogEventsTable, goqu.On(schema.UserTableIDCol.Eq(schema.LogEventsTableUserIDCol))).
+		LeftJoin(schema.LogEventTable, goqu.On(schema.UserTableIDCol.Eq(schema.LogEventTableUserIDCol))).
 		Where(
 			schema.UserTableDeletedCol.IsFalse(),
 			schema.UserTableLastOnlineCol.Lt(goqu.L("NOW() - INTERVAL '2 YEAR'")),
@@ -1137,7 +1137,7 @@ func (s *Repository) DeleteUnused(ctx context.Context) error {
 			schema.VotingVariantVoteTableUserIDCol.IsNull(),
 			goqu.T("pmf").Col(schema.PersonalMessagesTableFromUserIDColName).IsNull(),
 			goqu.T("pmt").Col(schema.PersonalMessagesTableToUserIDColName).IsNull(),
-			schema.LogEventsTableUserIDCol.IsNull(),
+			schema.LogEventTableUserIDCol.IsNull(),
 		).
 		Order(schema.UserTableIDCol.Asc()).
 		Limit(deleteUnusedBatchSize).

@@ -66,9 +66,9 @@ func TestStatisticsPulse(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	_, err = db.Insert(schema.LogEventsTable).
-		Cols(schema.LogEventsTableDescriptionColName, schema.LogEventsTableUserIDColName,
-			schema.LogEventsTableCreatedAtColName).
+	_, err = db.Insert(schema.LogEventTable).
+		Cols(schema.LogEventTableDescriptionColName, schema.LogEventTableUserIDColName,
+			schema.LogEventTableCreatedAtColName).
 		Vals(
 			goqu.Vals{"Description", user.GetId(), goqu.Func("NOW")},
 		).Executor().ExecContext(ctx)
