@@ -3,10 +3,10 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APICommentsMessage,
   APIDeleteUserRequest,
   APIUser,
   APIUserPreferencesRequest,
+  CommentMessage,
   CommentMessageFields,
   CreateContactRequest,
   CreateTrafficBlacklistItemRequest,
@@ -138,7 +138,7 @@ export class UsersUserComponent {
     map((response) => response.items || []),
   );
 
-  protected readonly comments$: Observable<APICommentsMessage[]> = this.user$.pipe(
+  protected readonly comments$: Observable<CommentMessage[]> = this.user$.pipe(
     switchMap((user) => {
       if (user.deleted) {
         return of([]);

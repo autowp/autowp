@@ -413,33 +413,34 @@ func (s *ForumsGRPCServer) GetLastTopic(
 func (s *ForumsGRPCServer) GetLastMessage(
 	ctx context.Context,
 	in *GetTopicRequest,
-) (*APICommentMessage, error) {
+) (*CommentMessage, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	isModerator := util.Contains(userCtx.Roles, users.RoleForumsModer)
+	canViewIP := util.Contains(userCtx.Roles, users.RoleModer)
 
-	msg, err := s.forums.LastMessage(ctx, in.GetId(), isModerator)
+	row, err := s.forums.LastMessage(ctx, in.GetId(), isModerator, canViewIP)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if msg == nil {
+	if row == nil {
 		return nil, status.Error(codes.NotFound, "Message not found")
 	}
 
-	var userID int64
-	if msg.UserID.Valid {
-		userID = msg.UserID.Int64
-	}
-
-	return &APICommentMessage{
-		Id:        msg.ID,
-		CreatedAt: timestamppb.New(msg.Datetime),
-		UserId:    userID,
-	}, nil
+	return extractMessage(
+		ctx,
+		row,
+		s.commentsRepository,
+		nil,
+		userCtx.UserID,
+		userCtx.Roles,
+		canViewIP,
+		&CommentMessageFields{}, //nolint:exhaustruct
+	)
 }
 
 func (s *ForumsGRPCServer) ListTopics(

@@ -3,9 +3,9 @@ import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {
-  APICommentsMessage,
-  APICommentsMessages,
+  CommentMessage,
   CommentMessageFields,
+  CommentMessages,
   CommentsType,
   CommentsViewRequest,
   GetMessagePageRequest,
@@ -51,7 +51,7 @@ export class CommentsComponent {
 
   protected readonly authenticated$ = this.auth.authenticated$;
 
-  protected readonly data$: Observable<{messages: APICommentsMessage[]; paginator?: Pages}> = combineLatest([
+  protected readonly data$: Observable<{messages: CommentMessage[]; paginator?: Pages}> = combineLatest([
     this.authenticated$,
     this.itemID$.pipe(debounceTime(10), distinctUntilChanged()),
     this.typeID$.pipe(debounceTime(10), distinctUntilChanged()),
@@ -126,7 +126,7 @@ export class CommentsComponent {
     typeID: CommentsType,
     limit: null | number | undefined,
     page: null | number | undefined,
-  ): Observable<APICommentsMessages> {
+  ): Observable<CommentMessages> {
     return this.#commentsGrpc.getMessages(
       new GetMessagesRequest({
         fields: new CommentMessageFields({

@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, ComponentRef, inject, input, output}
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
-  APICommentsMessage,
+  CommentMessage,
   CommentMessageFields,
   CommentsSetDeletedRequest,
   CommentsType,
@@ -25,7 +25,7 @@ import {UserComponent} from '../../user/user/user.component';
 import {CommentsFormComponent} from '../form/form.component';
 import {CommentsVotesComponent} from '../votes/votes.component';
 
-export interface APICommentInList extends APICommentsMessage {
+export interface CommentInList extends CommentMessage {
   resolve?: boolean;
   showReply?: boolean;
 }
@@ -58,7 +58,7 @@ export class CommentsListComponent {
   readonly typeID = input.required<CommentsType>();
   protected readonly typeID$ = toObservable(this.typeID);
 
-  readonly messages = input.required<APICommentInList[]>();
+  readonly messages = input.required<CommentInList[]>();
   protected readonly messages$ = toObservable(this.messages).pipe(
     map((messages) =>
       messages.map((message) => ({
@@ -81,7 +81,7 @@ export class CommentsListComponent {
 
   protected readonly ModeratorAttention = ModeratorAttention;
 
-  protected vote(message: APICommentsMessage, value: number) {
+  protected vote(message: CommentMessage, value: number) {
     this.#commentsGrpc
       .voteComment(
         new CommentsVoteCommentRequest({
@@ -110,7 +110,7 @@ export class CommentsListComponent {
     return false;
   }
 
-  protected setIsDeleted(message: APICommentsMessage, value: boolean) {
+  protected setIsDeleted(message: CommentMessage, value: boolean) {
     this.#commentsGrpc
       .setDeleted(
         new CommentsSetDeletedRequest({
@@ -124,12 +124,12 @@ export class CommentsListComponent {
       });
   }
 
-  protected reply(message: APICommentInList, resolve: boolean) {
+  protected reply(message: CommentInList, resolve: boolean) {
     message.showReply = true;
     message.resolve = resolve;
   }
 
-  protected showVotes(message: APICommentsMessage) {
+  protected showVotes(message: CommentMessage) {
     const modalRef = this.#modalService.open(CommentsVotesComponent, {
       centered: true,
       size: 'lg',
@@ -143,7 +143,7 @@ export class CommentsListComponent {
     this.sent.emit(id);
   }
 
-  protected onCancel(message: APICommentInList) {
+  protected onCancel(message: CommentInList) {
     message.showReply = false;
   }
 }

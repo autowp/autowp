@@ -128,7 +128,7 @@ func extractMessage(
 	ctx context.Context, row *schema.CommentMessageRow, repository *comments.Repository,
 	picturesRepository *pictures.Repository, userID int64, roles []string, canViewIP bool,
 	fields *CommentMessageFields,
-) (*APICommentsMessage, error) {
+) (*CommentMessage, error) {
 	canRemove := util.Contains(roles, users.RoleCommentsModer)
 	isModer := util.Contains(roles, users.RoleModer)
 
@@ -166,7 +166,7 @@ func extractMessage(
 		vote          int32
 		userVote      int32
 		route         []string
-		replies       []*APICommentsMessage
+		replies       []*CommentMessage
 		pictureStatus PictureStatus
 	)
 
@@ -226,7 +226,7 @@ func extractMessage(
 				return nil, err
 			}
 
-			replies = make([]*APICommentsMessage, 0)
+			replies = make([]*CommentMessage, 0)
 
 			for _, row := range rows {
 				msg, err := extractMessage(
@@ -264,7 +264,7 @@ func extractMessage(
 		ip = row.IP.IPNet.IP.String()
 	}
 
-	return &APICommentsMessage{
+	return &CommentMessage{
 		Id:                 row.ID,
 		TypeId:             typeID,
 		ItemId:             row.ItemID,
@@ -672,7 +672,7 @@ func (s *CommentsGRPCServer) Add(
 
 func (s *CommentsGRPCServer) GetMessagePage(
 	ctx context.Context, in *GetMessagePageRequest,
-) (*APICommentsMessagePage, error) {
+) (*CommentMessagePage, error) {
 	itemID, typeID, page, err := s.repository.MessagePage(ctx, in.GetMessageId(), in.GetPerPage())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -683,7 +683,7 @@ func (s *CommentsGRPCServer) GetMessagePage(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &APICommentsMessagePage{ //nolint:exhaustruct
+	return &CommentMessagePage{ //nolint:exhaustruct
 		TypeId: convertedTypeID,
 		ItemId: itemID,
 		Page:   page,
@@ -693,7 +693,7 @@ func (s *CommentsGRPCServer) GetMessagePage(
 func (s *CommentsGRPCServer) GetMessage(
 	ctx context.Context,
 	in *GetMessageRequest,
-) (*APICommentsMessage, error) {
+) (*CommentMessage, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -736,7 +736,7 @@ func (s *CommentsGRPCServer) GetMessage(
 func (s *CommentsGRPCServer) GetMessages(
 	ctx context.Context,
 	in *GetMessagesRequest,
-) (*APICommentsMessages, error) {
+) (*CommentMessages, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -817,7 +817,7 @@ func (s *CommentsGRPCServer) GetMessages(
 
 	paginator := s.repository.Paginator(options)
 
-	msgs := make([]*APICommentsMessage, 0)
+	msgs := make([]*CommentMessage, 0)
 
 	if in.GetLimit() > 0 {
 		sqSelect, err := paginator.GetCurrentItems(ctx)
@@ -869,7 +869,7 @@ func (s *CommentsGRPCServer) GetMessages(
 		return nil, err
 	}
 
-	return &APICommentsMessages{
+	return &CommentMessages{
 		Items: msgs,
 		Paginator: &Pages{
 			PageCount:        pages.PageCount,

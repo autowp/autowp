@@ -2,8 +2,8 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APICommentMessage,
   APIUser,
+  CommentMessage,
   GetThemeRequest,
   GetTopicRequest,
   ListThemesRequest,
@@ -28,7 +28,7 @@ import {UserComponent} from '../user/user/user.component';
 import {ForumsTopicListComponent} from './topic-list/topic-list.component';
 
 interface ThemeItem extends Theme.AsObject {
-  lastMessage$: Observable<APICommentMessage | null>;
+  lastMessage$: Observable<CommentMessage | null>;
   lastMessageAuthor$: Observable<APIUser | null>;
   lastTopic$: Observable<null | Topic>;
   themes$: Observable<ListThemesResponse>;
@@ -119,7 +119,7 @@ export class ForumsComponent {
               if (!msg) {
                 return of(null);
               }
-              return this.#userService.getUser$(msg.userId);
+              return this.#userService.getUser$(msg.authorId);
             }),
           );
           return {

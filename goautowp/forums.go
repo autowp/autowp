@@ -46,12 +46,6 @@ type ForumsTopic struct {
 	Subscription bool
 }
 
-type CommentMessage struct {
-	ID       int64         `db:"id"        goqu:"pk,skipinsert"`
-	Datetime time.Time     `db:"datetime"`
-	UserID   sql.NullInt64 `db:"author_id"`
-}
-
 // Forums Main Object.
 type Forums struct {
 	db                 *goqu.Database
@@ -366,10 +360,20 @@ func (s *Forums) LastMessage(
 	ctx context.Context,
 	topicID int64,
 	isModerator bool,
-) (*CommentMessage, error) {
-	sqSelect := s.db.Select(
-		schema.CommentMessageTableIDCol, schema.CommentMessageTableDatetimeCol, schema.CommentMessageTableAuthorIDCol,
-	).
+	canViewIP bool,
+) (*schema.CommentMessageRow, error) {
+	columns := []interface{}{
+		schema.CommentMessageTableIDCol, schema.CommentMessageTableTypeIDCol,
+		schema.CommentMessageTableItemIDCol, schema.CommentMessageTableParentIDCol,
+		schema.CommentMessageTableDatetimeCol, schema.CommentMessageTableDeletedCol,
+		schema.CommentMessageTableModeratorAttentionCol, schema.CommentMessageTableAuthorIDCol,
+	}
+
+	if canViewIP {
+		columns = append(columns, schema.CommentMessageTableIPCol)
+	}
+
+	sqSelect := s.db.Select(columns...).
 		From(schema.CommentMessageTable).
 		Join(
 			schema.ForumsTopicsTable,
@@ -396,9 +400,9 @@ func (s *Forums) LastMessage(
 			Where(schema.ForumsThemesTableIsModeratorCol.IsFalse())
 	}
 
-	cm := CommentMessage{}
+	row := schema.CommentMessageRow{}
 
-	success, err := sqSelect.ScanStructContext(ctx, &cm)
+	success, err := sqSelect.ScanStructContext(ctx, &row)
 	if err != nil {
 		return nil, err
 	}
@@ -407,7 +411,7 @@ func (s *Forums) LastMessage(
 		return nil, nil //nolint:nilnil
 	}
 
-	return &cm, nil
+	return &row, nil
 }
 
 func (s *Forums) Topics(

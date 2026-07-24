@@ -63,7 +63,7 @@ func TestGetLastTopicAndLastMessage(t *testing.T) {
 	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
-	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
+	userID, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 
 	topicID, err := client.CreateTopic(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
@@ -93,6 +93,10 @@ func TestGetLastTopicAndLastMessage(t *testing.T) {
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, message)
+	require.Equal(t, topic.GetId(), message.GetItemId())
+	require.Equal(t, CommentsType_FORUMS_TYPE_ID, message.GetTypeId())
+	require.Equal(t, userID, message.GetAuthorId())
+	require.NotNil(t, message.GetCreatedAt())
 
 	topics, err := client.ListTopics(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),

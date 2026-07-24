@@ -3,8 +3,8 @@ import {ChangeDetectionStrategy, Component, inject, input, output} from '@angula
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
-  APICommentMessage,
   APIUser,
+  CommentMessage,
   CommentsType,
   CommentsUnSubscribeRequest,
   GetTopicRequest,
@@ -27,7 +27,7 @@ interface TopicItem {
   author$: Observable<APIUser | null>;
   createdAt: Date | undefined;
   id: string;
-  lastMessage$: Observable<APICommentMessage | null>;
+  lastMessage$: Observable<CommentMessage | null>;
   lastMessageAuthor$: Observable<APIUser | null>;
   name: string;
   newMessages: number;
@@ -74,7 +74,7 @@ export class ForumsTopicListComponent {
             if (!msg) {
               return of(null);
             }
-            return this.#userService.getUser$(msg.userId);
+            return this.#userService.getUser$(msg.authorId);
           }),
         );
         return {

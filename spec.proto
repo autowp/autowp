@@ -51,7 +51,7 @@ service Forums {
   rpc ListThemes(ListThemesRequest) returns (ListThemesResponse) {}
   rpc GetTopic(GetTopicRequest) returns (Topic) {}
   rpc GetLastTopic(GetThemeRequest) returns (Topic) {}
-  rpc GetLastMessage(GetTopicRequest) returns (APICommentMessage) {}
+  rpc GetLastMessage(GetTopicRequest) returns (CommentMessage) {}
   rpc ListTopics(ListTopicsRequest) returns (ListTopicsResponse) {}
 }
 
@@ -236,9 +236,9 @@ service Comments {
   rpc MoveComment(CommentsMoveCommentRequest) returns (google.protobuf.Empty) {}
   rpc VoteComment(CommentsVoteCommentRequest) returns (CommentsVoteCommentResponse) {}
   rpc Add(AddCommentRequest) returns (AddCommentResponse) {}
-  rpc GetMessagePage(GetMessagePageRequest) returns (APICommentsMessagePage) {}
-  rpc GetMessage(GetMessageRequest) returns (APICommentsMessage) {}
-  rpc GetMessages(GetMessagesRequest) returns (APICommentsMessages) {}
+  rpc GetMessagePage(GetMessagePageRequest) returns (CommentMessagePage) {}
+  rpc GetMessage(GetMessageRequest) returns (CommentMessage) {}
+  rpc GetMessages(GetMessagesRequest) returns (CommentMessages) {}
 }
 
 service Log {
@@ -1010,12 +1010,6 @@ message Topic {
 message ListTopicsResponse {
   repeated Topic items = 1;
   Pages paginator = 2;
-}
-
-message APICommentMessage {
-  int64 id = 1;
-  google.protobuf.Timestamp created_at = 2;
-  int64 user_id = 3;
 }
 
 message CreateTopicRequest {
@@ -2656,14 +2650,14 @@ message GetMessagesRequest {
   int32 page = 12;
 }
 
-message APICommentsMessagePage {
+message CommentMessagePage {
   CommentsType type_id = 1;
   int64 item_id = 2;
   int32 page = 3;
 }
 
-message APICommentsMessages {
-  repeated APICommentsMessage items = 1;
+message CommentMessages {
+  repeated CommentMessage items = 1;
   Pages paginator = 2;
 }
 
@@ -2673,7 +2667,7 @@ enum ModeratorAttention {
   COMPLETE = 2;
 }
 
-message APICommentsMessage {
+message CommentMessage {
   int64 id = 1;
   CommentsType type_id = 2;
   int64 item_id = 3;
@@ -2689,7 +2683,7 @@ message APICommentsMessage {
   string preview = 13;
   repeated string route = 14;
   int32 userVote = 15;
-  repeated APICommentsMessage replies = 16;
+  repeated CommentMessage replies = 16;
   PictureStatus picture_status = 17;
 }
 

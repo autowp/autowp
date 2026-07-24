@@ -3,12 +3,12 @@ import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angul
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APICommentsMessage,
   APIGetUserRequest,
   APIItem,
   APIUser,
   APIUser as APIUser2,
   APIUsersRequest,
+  CommentMessage,
   CommentMessageFields,
   GetMessagesRequest,
   ItemFields,
@@ -145,7 +145,7 @@ export class ModerCommentsComponent implements OnInit {
   );
 
   protected readonly data$: Observable<{
-    comments: {comment: APICommentsMessage; user$: Observable<APIUser2 | null>}[];
+    comments: {comment: CommentMessage; user$: Observable<APIUser2 | null>}[];
     paginator?: Pages;
   }> = combineLatest([this.userID$, this.#moderatorAttention$, this.#picturesOfItemID$, this.#page$]).pipe(
     switchMap(([userID, moderatorAttention, picturesOfItemID, page]) => {
