@@ -10,114 +10,114 @@
   <h1 id="header" i18n>Statistics</h1>
 </div>
 
-@if (rating$ | async; as rating) {
-  <ul class="nav nav-pills" style="margin-bottom: 10px">
-    <li class="nav-item">
-      <a class="nav-link" i18n [class.active]="rating === Rating.SPECS" [routerLink]="['/users/rating', Rating.SPECS]"
-        >Specifications</a
-      >
-    </li>
-    <li class="nav-item">
-      <a
-        class="nav-link"
-        i18n
-        [class.active]="rating === Rating.PICTURES"
-        [routerLink]="['/users/rating', Rating.PICTURES]"
-        >Pictures</a
-      >
-    </li>
-    <li class="nav-item">
-      <a
-        class="nav-link"
-        i18n
-        [class.active]="rating === Rating.COMMENT_LIKES"
-        [routerLink]="['/users/rating', Rating.COMMENT_LIKES]"
-        >Likes</a
-      >
-    </li>
-    <li class="nav-item">
-      <a
-        class="nav-link"
-        i18n
-        [class.active]="rating === Rating.PICTURE_LIKES"
-        [routerLink]="['/users/rating', Rating.PICTURE_LIKES]"
-        >Picture likes</a
-      >
-    </li>
-  </ul>
-  @if (users$ | async; as users) {
-    <table class="table" aria-describedby="header">
-      <thead>
+<ul class="nav nav-pills" style="margin-bottom: 10px">
+  <li class="nav-item">
+    <a class="nav-link" i18n [class.active]="rating() === Rating.SPECS" [routerLink]="['/users/rating', Rating.SPECS]"
+      >Specifications</a
+    >
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      i18n
+      [class.active]="rating() === Rating.PICTURES"
+      [routerLink]="['/users/rating', Rating.PICTURES]"
+      >Pictures</a
+    >
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      i18n
+      [class.active]="rating() === Rating.COMMENT_LIKES"
+      [routerLink]="['/users/rating', Rating.COMMENT_LIKES]"
+      >Likes</a
+    >
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      i18n
+      [class.active]="rating() === Rating.PICTURE_LIKES"
+      [routerLink]="['/users/rating', Rating.PICTURE_LIKES]"
+      >Picture likes</a
+    >
+  </li>
+</ul>
+@if (usersResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (usersResource.isLoading()) {
+  <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+} @else if (usersResource.value(); as users) {
+  <table class="table" aria-describedby="header">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col" class="text-end">{{ valueTitle() }}</th>
+        @if (rating() === Rating.SPECS) {
+          <th scope="col" class="text-end" i18n>Specs volume</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of users; track row; let i = $index) {
         <tr>
-          <th scope="col">#</th>
-          <th scope="col"></th>
-          <th scope="col"></th>
-          <th scope="col" class="text-end">{{ valueTitle$ | async }}</th>
-          @if (rating === Rating.SPECS) {
-            <th scope="col" class="text-end" i18n>Specs volume</th>
+          <td>{{ i + 1 }}</td>
+          <td>
+            @if (row.user$ | async; as user) {
+              <app-user [user]="user" />
+            }
+          </td>
+          <td>
+            @if (row.brands$ && i < 10) {
+              @if (row.brands$ | async; as brands) {
+                <div>
+                  @for (brand of brands.brands; track brand) {
+                    <a [routerLink]="brand.route">{{ brand.name || 'unnamed' }}</a>
+                    <span class="badge rounded-pill text-bg-secondary">{{
+                      (+brand.volume > 0 ? '+' : '') + brand.volume
+                    }}</span>
+                    <span>, </span>
+                  }
+                  …
+                </div>
+              } @else {
+                <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+              }
+            }
+            @if (row.fans$ && i < 10) {
+              @if (row.fans$ | async; as fans) {
+                <div>
+                  @for (fan of fans; track fan) {
+                    @if (fan.user$ | async; as user) {
+                      <app-user [user]="user" />
+                    }
+                    <span class="badge rounded-pill text-bg-secondary">{{
+                      (+fan.volume > 0 ? '+' : '') + fan.volume
+                    }}</span>
+                    <span>, </span>
+                  }
+                  …
+                </div>
+              } @else {
+                <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+              }
+            }
+          </td>
+          <td class="text-end">{{ row.volume | number: '1.0-0' }}</td>
+          @if (rating() === Rating.SPECS) {
+            <td
+              class="text-end"
+              [class.danger]="row.weight < 0.5"
+              [class.warning]="row.weight >= 0.5 && row.weight < 1.5"
+            >
+              {{ row.weight | number: '1.2-2' }}
+            </td>
           }
         </tr>
-      </thead>
-      <tbody>
-        @for (row of users; track row; let i = $index) {
-          <tr>
-            <td>{{ i + 1 }}</td>
-            <td>
-              @if (row.user$ | async; as user) {
-                <app-user [user]="user" />
-              }
-            </td>
-            <td>
-              @if (row.brands$ && i < 10) {
-                @if (row.brands$ | async; as brands) {
-                  <div>
-                    @for (brand of brands.brands; track brand) {
-                      <a [routerLink]="brand.route">{{ brand.name || 'unnamed' }}</a>
-                      <span class="badge rounded-pill text-bg-secondary">{{
-                        (+brand.volume > 0 ? '+' : '') + brand.volume
-                      }}</span>
-                      <span>, </span>
-                    }
-                    …
-                  </div>
-                } @else {
-                  <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
-                }
-              }
-              @if (row.fans$ && i < 10) {
-                @if (row.fans$ | async; as fans) {
-                  <div>
-                    @for (fan of fans; track fan) {
-                      @if (fan.user$ | async; as user) {
-                        <app-user [user]="user" />
-                      }
-                      <span class="badge rounded-pill text-bg-secondary">{{
-                        (+fan.volume > 0 ? '+' : '') + fan.volume
-                      }}</span>
-                      <span>, </span>
-                    }
-                    …
-                  </div>
-                } @else {
-                  <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
-                }
-              }
-            </td>
-            <td class="text-end">{{ row.volume | number: '1.0-0' }}</td>
-            @if (rating === Rating.SPECS) {
-              <td
-                class="text-end"
-                [class.danger]="row.weight < 0.5"
-                [class.warning]="row.weight >= 0.5 && row.weight < 1.5"
-              >
-                {{ row.weight | number: '1.2-2' }}
-              </td>
-            }
-          </tr>
-        }
-      </tbody>
-    </table>
-  } @else {
-    <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
-  }
+      }
+    </tbody>
+  </table>
 }

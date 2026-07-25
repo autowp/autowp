@@ -1,4 +1,8 @@
-@if (data$ | async; as data) {
+@if (dataResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (dataResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (dataResource.value(); as data) {
   <table class="table table-stripped">
     <caption i18n>
       Attribute values
@@ -49,7 +53,7 @@
     </tbody>
   </table>
 
-  @if (itemID$ | async; as itemID) {
+  @if (itemID(); as itemID) {
     <form (submit)="moveValues(itemID)">
       <input
         type="text"

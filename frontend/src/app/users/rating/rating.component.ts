@@ -1,16 +1,22 @@
 import {AsyncPipe, DecimalPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIUser, APIUsersRatingResponse, UserRatingBrandsResponse, UserRatingDetailsRequest} from '@grpc/spec.pb';
+import {
+  APIUser,
+  APIUsersRatingResponse,
+  APIUsersRatingUser,
+  UserRatingBrandsResponse,
+  UserRatingDetailsRequest,
+} from '@grpc/spec.pb';
 import {RatingClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
-import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 enum Rating {
@@ -29,44 +35,39 @@ enum Rating {
 export class UsersRatingComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #ratingClient = inject(RatingClient);
   readonly #userService = inject(UserService);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly rating$: Observable<Rating> = this.#route.paramMap.pipe(
-    map((params) => params.get('rating')),
-    debounceTime(30),
-    distinctUntilChanged(),
-    map((rating) => {
-      switch (rating) {
-        case Rating.COMMENT_LIKES:
-        case Rating.PICTURE_LIKES:
-        case Rating.PICTURES:
-        case Rating.SPECS:
-          return rating;
-        default:
-          return Rating.SPECS;
-      }
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
+  protected readonly rating = toSignal(
+    this.#route.paramMap.pipe(
+      map((params) => {
+        switch (params.get('rating')) {
+          case Rating.COMMENT_LIKES:
+          case Rating.PICTURE_LIKES:
+          case Rating.PICTURES:
+          case Rating.SPECS:
+            return params.get('rating') as Rating;
+          default:
+            return Rating.SPECS;
+        }
+      }),
+    ),
+    {requireSync: true},
   );
 
-  protected readonly valueTitle$: Observable<string> = this.rating$.pipe(
-    map((rating) => {
-      switch (rating) {
-        case Rating.COMMENT_LIKES:
-          return $localize`Likes`;
-        case Rating.PICTURE_LIKES:
-          return $localize`Picture likes`;
-        case Rating.PICTURES:
-          return $localize`Pictures`;
-        case Rating.SPECS:
-          return $localize`Specs volume`;
-      }
-      return rating;
-    }),
-  );
+  protected readonly valueTitle = computed(() => {
+    switch (this.rating()) {
+      case Rating.COMMENT_LIKES:
+        return $localize`Likes`;
+      case Rating.PICTURE_LIKES:
+        return $localize`Picture likes`;
+      case Rating.PICTURES:
+        return $localize`Pictures`;
+      case Rating.SPECS:
+        return $localize`Specs volume`;
+    }
+  });
 
   private getRatingFans$(rating: Rating, userId: string) {
     if (rating == Rating.PICTURE_LIKES) {
@@ -106,16 +107,9 @@ export class UsersRatingComponent implements OnInit {
     return null;
   }
 
-  protected readonly users$: Observable<
-    {
-      brands$: null | Observable<UserRatingBrandsResponse>;
-      fans$: null | Observable<{user$: Observable<APIUser | null>; volume: string}[]>;
-      user$: Observable<APIUser | null>;
-      volume: string;
-      weight: number;
-    }[]
-  > = this.rating$.pipe(
-    switchMap((rating) => {
+  protected readonly usersResource = rxResource({
+    stream: () => {
+      const rating = this.rating();
       let o$: Observable<APIUsersRatingResponse>;
       switch (rating) {
         case Rating.COMMENT_LIKES:
@@ -130,26 +124,31 @@ export class UsersRatingComponent implements OnInit {
         case Rating.SPECS:
           o$ = this.#ratingClient.getUserSpecsRating(new Empty());
           break;
-        default:
-          return EMPTY;
       }
       return o$.pipe(
-        catchError((err: unknown) => {
-          this.#toastService.handleError(err);
-          return EMPTY;
-        }),
-        map((response) =>
-          (response.users ? response.users : []).map((user) => ({
-            brands$: this.getRatingBrands$(rating, user.userId),
-            fans$: this.getRatingFans$(rating, user.userId),
-            user$: this.#userService.getUser$(user.userId),
-            volume: user.volume,
-            weight: user.weight,
-          })),
-        ),
+        map((response) => (response.users ? response.users : []).map((user) => this.#mapUser(rating, user))),
       );
-    }),
-  );
+    },
+  });
+
+  #mapUser(
+    rating: Rating,
+    user: APIUsersRatingUser,
+  ): {
+    brands$: null | Observable<UserRatingBrandsResponse>;
+    fans$: null | Observable<{user$: Observable<APIUser | null>; volume: string}[]>;
+    user$: Observable<APIUser | null>;
+    volume: string;
+    weight: number;
+  } {
+    return {
+      brands$: this.getRatingBrands$(rating, user.userId),
+      fans$: this.getRatingFans$(rating, user.userId),
+      user$: this.#userService.getUser$(user.userId),
+      volume: user.volume,
+      weight: user.weight,
+    };
+  }
 
   protected readonly Rating = Rating;
 

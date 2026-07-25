@@ -1,9 +1,9 @@
 import {AsyncPipe, DecimalPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
-import {toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
-import {APIUser, Picture, PictureItem, PictureStatus, SetPictureItemPerspectiveRequest} from '@grpc/spec.pb';
+import {Picture, PictureItem, PictureStatus, SetPictureItemPerspectiveRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';
@@ -11,8 +11,8 @@ import {getPerspectiveTranslation} from '@utils/translations';
 import {APIPerspectiveService} from 'app/api/perspective/perspective.service';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {UserComponent} from 'app/user/user/user.component';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {EMPTY} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 interface ThumbnailAPIPicture extends Picture {
   selected?: boolean;
@@ -50,9 +50,9 @@ export class ThumbnailComponent {
   );
   protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER));
 
-  protected readonly owner$: Observable<APIUser | null> = toObservable(this.picture).pipe(
-    switchMap((picture) => this.#userService.getUser$(picture?.ownerId)),
-  );
+  protected readonly ownerResource = rxResource({
+    stream: () => this.#userService.getUser$(this.picture().ownerId),
+  });
 
   protected savePerspective(pictureItem: PictureItem) {
     this.#picturesClient

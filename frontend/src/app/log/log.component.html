@@ -10,7 +10,11 @@
   <h1 i18n id="header">Log of events</h1>
 </div>
 
-@if (response$ | async; as response) {
+@if (responseResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (responseResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (responseResource.value(); as response) {
   <table class="table table-condensed table-striped" aria-describedby="header">
     <thead>
       <tr>
@@ -56,6 +60,4 @@
   @if (response.paginator) {
     <app-paginator [data]="response.paginator" />
   }
-} @else {
-  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }

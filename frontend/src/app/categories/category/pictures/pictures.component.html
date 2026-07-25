@@ -2,7 +2,13 @@
   <h2 i18n>Pictures</h2>
 </div>
 
-@if (data$ | async; as data) {
+@if (categoryResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (picturesResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (categoryResource.isLoading() || picturesResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (picturesResource.value(); as data) {
   @for (chunk of data.pictures; track chunk) {
     <div class="row">
       @for (i of chunk; track i) {

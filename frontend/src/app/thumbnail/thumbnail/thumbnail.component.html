@@ -91,7 +91,7 @@
             }
           </span>
         }
-        @if (owner$ | async; as owner) {
+        @if (ownerResource.value(); as owner) {
           <br />
           <app-user [user]="owner" />
         }

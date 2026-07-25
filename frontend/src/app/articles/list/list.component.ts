@@ -1,22 +1,22 @@
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIUser, ArticlesRequest} from '@grpc/spec.pb';
+import {APIUser, Article, ArticlesRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
-import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
-interface Article {
-  author$: Observable<APIUser>;
-  createdAt: Date;
+interface ArticleListItem {
+  author$: Observable<APIUser | null>;
+  createdAt: Date | undefined;
   description: string;
   id: string;
   name: string;
@@ -34,7 +34,6 @@ interface Article {
 export class ListComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #articlesClient = inject(ArticlesClient);
   readonly #userService = inject(UserService);
 
@@ -42,27 +41,30 @@ export class ListComponent implements OnInit {
     this.#pageEnv.set({pageId: 31});
   }
 
-  protected readonly articles$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10) || 1),
-    distinctUntilChanged(),
-    debounceTime(30),
-    switchMap((page) => this.#articlesClient.getList(new ArticlesRequest({limit: 10, page}))),
-    catchError((response: unknown) => {
-      console.error(response);
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    map((response) => ({
-      articles: (response.items || []).map((article) => ({
-        author$: article.authorId !== '0' ? this.#userService.getUser$(article.authorId) : of(null),
-        createdAt: article.createdAt?.toDate(),
-        description: article.description,
-        id: article.id,
-        name: article.name,
-        previewUrl: article.previewUrl,
-        routerLink: ['/articles', article.catname],
-      })) as Article[],
-      paginator: response.paginator,
-    })),
+  readonly #page = toSignal(
+    this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10) || 1)),
+    {requireSync: true},
   );
+
+  protected readonly articlesResource = rxResource({
+    stream: () =>
+      this.#articlesClient.getList(new ArticlesRequest({limit: 10, page: this.#page()})).pipe(
+        map((response) => ({
+          articles: (response.items || []).map((article) => this.#mapArticle(article)),
+          paginator: response.paginator,
+        })),
+      ),
+  });
+
+  #mapArticle(article: Article): ArticleListItem {
+    return {
+      author$: article.authorId !== '0' ? this.#userService.getUser$(article.authorId) : of(null),
+      createdAt: article.createdAt?.toDate(),
+      description: article.description,
+      id: article.id,
+      name: article.name,
+      previewUrl: article.previewUrl,
+      routerLink: ['/articles', article.catname],
+    };
+  }
 }

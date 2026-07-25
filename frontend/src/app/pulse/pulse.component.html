@@ -17,27 +17,33 @@
     }
   </div>
 
-  @if (gridData$ | async; as gridData) {
-    <canvas
-      baseChart
-      width="400"
-      height="150"
-      type="bar"
-      [datasets]="gridData.data"
-      [labels]="(labels$ | async) || undefined"
-      [options]="chartOptions"
-      [legend]="false"
-    ></canvas>
-  }
-  @if (legend$ | async; as legend) {
-    <p>
-      @for (item of legend; track item) {
-        <span>
-          @if (item.user$ | async; as user) {
-            <app-user [user]="user" />
-          }
-        </span>
-      }
-    </p>
+  @if (dataResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  } @else if (dataResource.isLoading()) {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  } @else {
+    @if (gridData$ | async; as gridData) {
+      <canvas
+        baseChart
+        width="400"
+        height="150"
+        type="bar"
+        [datasets]="gridData.data"
+        [labels]="labels() || undefined"
+        [options]="chartOptions"
+        [legend]="false"
+      ></canvas>
+    }
+    @if (legend$ | async; as legend) {
+      <p>
+        @for (item of legend; track item) {
+          <span>
+            @if (item.user$ | async; as user) {
+              <app-user [user]="user" />
+            }
+          </span>
+        }
+      </p>
+    }
   }
 </div>

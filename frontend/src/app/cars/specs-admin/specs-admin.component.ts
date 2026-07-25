@@ -1,5 +1,6 @@
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {
@@ -17,8 +18,8 @@ import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {getUnitAbbrTranslation} from '@utils/translations';
-import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -46,49 +47,42 @@ export class CarsSpecsAdminComponent implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #attrsService = inject(APIAttrsService);
 
-  readonly #reload$ = new BehaviorSubject<void>(void 0);
-
   protected readonly move: {
     item_id: string;
   } = {
     item_id: '',
   };
 
-  protected readonly itemID$ = this.#route.queryParamMap.pipe(
-    map((params) => params.get('item_id') ?? ''),
-    distinctUntilChanged(),
-    debounceTime(10),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  protected readonly itemID = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('item_id') ?? '')), {
+    requireSync: true,
+  });
 
-  protected readonly data$: Observable<{
-    items: AttrUserValueListItem[];
-  }> = combineLatest([this.itemID$, this.#reload$]).pipe(
-    switchMap(([itemID]) =>
-      this.#attrsClient.getUserValues(
-        new AttrUserValuesRequest({
-          fields: new AttrUserValuesFields({valueText: true}),
-          itemId: itemID,
-          language: this.#languageService.language,
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-    map((response) => ({
-      items: (response.items || []).map((userValue) => {
-        const attr$ = this.#attrsService.getAttribute$(userValue.attributeId);
-        return {
-          path$: this.#attrsService.getPath$(userValue.attributeId),
-          unitAbbr$: attr$.pipe(map((attr) => (attr?.unitId ? getUnitAbbrTranslation(attr.unitId) : null))),
-          user$: this.#userService.getUser$(userValue.userId),
-          userValue,
-        };
-      }),
-    })),
-  );
+  protected readonly dataResource = rxResource({
+    stream: () =>
+      this.#attrsClient
+        .getUserValues(
+          new AttrUserValuesRequest({
+            fields: new AttrUserValuesFields({valueText: true}),
+            itemId: this.itemID(),
+            language: this.#languageService.language,
+          }),
+        )
+        .pipe(
+          map((response) => ({
+            items: (response.items || []).map((userValue) => this.#mapUserValue(userValue)),
+          })),
+        ),
+  });
+
+  #mapUserValue(userValue: AttrUserValue): AttrUserValueListItem {
+    const attr$ = this.#attrsService.getAttribute$(userValue.attributeId);
+    return {
+      path$: this.#attrsService.getPath$(userValue.attributeId),
+      unitAbbr$: attr$.pipe(map((attr) => (attr?.unitId ? getUnitAbbrTranslation(attr.unitId) : null))),
+      user$: this.#userService.getUser$(userValue.userId),
+      userValue,
+    };
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 103});
@@ -106,7 +100,7 @@ export class CarsSpecsAdminComponent implements OnInit {
       .subscribe({
         error: (response: unknown) => this.#toastService.handleError(response),
         next: () => {
-          this.#reload$.next();
+          this.dataResource.reload();
         },
       });
   }
@@ -126,7 +120,7 @@ export class CarsSpecsAdminComponent implements OnInit {
       .subscribe({
         error: (response: unknown) => this.#toastService.handleError(response),
         next: () => {
-          this.#reload$.next();
+          this.dataResource.reload();
         },
       });
   }
