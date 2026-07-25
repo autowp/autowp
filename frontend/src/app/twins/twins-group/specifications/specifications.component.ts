@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
-import {APIItem, GetSpecificationsRequest, ItemFields, ItemRequest} from '@grpc/spec.pb';
+import {GetSpecificationsRequest, Item, ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -51,7 +51,7 @@ export class TwinsGroupSpecificationsComponent {
     map((response) => this.#sanitizer.bypassSecurityTrustHtml(response.html)),
   );
 
-  protected readonly group$: Observable<APIItem> = this.id$.pipe(
+  protected readonly group$: Observable<Item> = this.id$.pipe(
     switchMap((id) =>
       this.#itemsClient.item(
         new ItemRequest({

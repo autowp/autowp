@@ -10,7 +10,7 @@ import {
   output,
 } from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {APIImage, Picture} from '@grpc/spec.pb';
+import {Image, Picture} from '@grpc/spec.pb';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {BehaviorSubject, combineLatest, Subscription} from 'rxjs';
 
@@ -153,7 +153,7 @@ export class UploadCropComponent implements OnDestroy, OnInit {
 
   protected onSave(picture: Picture) {
     if (!picture.image) {
-      picture.image = new APIImage();
+      picture.image = new Image();
     }
     picture.image.cropLeft = this.currentCrop.x;
     picture.image.cropTop = this.currentCrop.y;

@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParent,
@@ -114,7 +114,7 @@ export class CarsEngineSelectComponent {
     map((response) => response.items || []),
   );
 
-  protected readonly brands$: Observable<{items: APIItem[][]; paginator?: Pages}> = this.#search$.pipe(
+  protected readonly brands$: Observable<{items: Item[][]; paginator?: Pages}> = this.#search$.pipe(
     map((str) => str.trim()),
     distinctUntilChanged(),
     debounceTime(50),
@@ -142,7 +142,7 @@ export class CarsEngineSelectComponent {
       return EMPTY;
     }),
     map((response) => ({
-      items: chunk<APIItem>(response.items ? response.items : [], 6),
+      items: chunk<Item>(response.items ? response.items : [], 6),
       paginator: response.paginator,
     })),
   );
@@ -155,7 +155,7 @@ export class CarsEngineSelectComponent {
     this.#itemsClient
       .updateItem(
         new UpdateItemRequest({
-          item: new APIItem({
+          item: new Item({
             engineInherit: false,
             engineItemId: engineId,
             id: itemID,

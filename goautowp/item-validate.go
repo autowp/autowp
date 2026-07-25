@@ -24,7 +24,7 @@ const (
 	engineInheritField = "engine_inherit"
 )
 
-func (s *APIItem) Validate( //nolint: maintidx
+func (s *Item) Validate( //nolint: maintidx
 	ctx context.Context, repository *items.Repository, maskPaths []string, roles []string,
 ) ([]*errdetails.BadRequest_FieldViolation, error) {
 	if maskPaths == nil || util.Contains(maskPaths, "is_group") {

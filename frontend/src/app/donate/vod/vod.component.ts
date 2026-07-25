@@ -1,7 +1,7 @@
 import {AsyncPipe, DOCUMENT, formatDate} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, LOCALE_ID, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIItem, APIUser, ItemFields, ItemRequest} from '@grpc/spec.pb';
+import {Item, ItemFields, ItemRequest, User} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
@@ -58,7 +58,7 @@ export class DonateVodComponent implements OnInit {
 
   protected readonly itemSelected$ = this.#itemID$.pipe(map((itemID) => !!itemID));
 
-  protected readonly item$: Observable<APIItem | null> = this.#itemID$.pipe(
+  protected readonly item$: Observable<Item | null> = this.#itemID$.pipe(
     switchMap((itemID) => {
       if (!itemID) {
         return of(null);
@@ -78,11 +78,9 @@ export class DonateVodComponent implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly itemOfDayItem$: Observable<APIItem> = this.item$.pipe(
-    switchMap((item) => (item ? of(item) : EMPTY)),
-  );
+  protected readonly itemOfDayItem$: Observable<Item> = this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY)));
 
-  protected readonly itemOfDayUser$: Observable<APIUser | null> = this.anonymous$.pipe(
+  protected readonly itemOfDayUser$: Observable<null | User> = this.anonymous$.pipe(
     switchMap((anonymous) => (anonymous ? of(null) : this.#user$)),
   );
 

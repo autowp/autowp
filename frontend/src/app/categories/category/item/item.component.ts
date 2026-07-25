@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemParent,
   ItemParentFields,
@@ -201,7 +201,7 @@ export class CategoriesCategoryItemComponent {
     }),
   );
 
-  protected readonly item$: Observable<APIItem | null> = combineLatest([this.#categoryData$, this.itemParents$]).pipe(
+  protected readonly item$: Observable<Item | null> = combineLatest([this.#categoryData$, this.itemParents$]).pipe(
     switchMap(([{current}, itemParents]) => {
       if (!current) {
         return EMPTY;
@@ -243,7 +243,7 @@ export class CategoriesCategoryItemComponent {
     }),
   );
 
-  protected readonly current$: Observable<APIItem | undefined> = this.#categoryData$.pipe(
+  protected readonly current$: Observable<Item | undefined> = this.#categoryData$.pipe(
     map(({current}) => current),
     shareReplay({bufferSize: 1, refCount: false}),
   );

@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
 import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
-import {APIItem, APIItemLink, APIItemLinkRequest, ItemLinkListOptions, ItemLinksRequest} from '@grpc/spec.pb';
+import {Item, ItemLink, ItemLinkListOptions, ItemLinkRequest, ItemLinksRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {forkJoin, Observable, of} from 'rxjs';
@@ -21,7 +21,7 @@ export class ModerItemsItemLinksComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #toastService = inject(ToastsService);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
   protected readonly loadingNumber = signal(false);
@@ -41,14 +41,14 @@ export class ModerItemsItemLinksComponent {
       ),
   });
 
-  protected saveLinks(itemId: string, links: APIItemLink[]) {
+  protected saveLinks(itemId: string, links: ItemLink[]) {
     const promises: Observable<null>[] = [];
 
     if (this.newLink.url) {
       promises.push(
         this.#itemsClient
           .createItemLink(
-            new APIItemLink({
+            new ItemLink({
               itemId: itemId,
               name: this.newLink.name,
               type: this.newLink.type,
@@ -77,7 +77,7 @@ export class ModerItemsItemLinksComponent {
         promises.push(
           this.#itemsClient
             .updateItemLink(
-              new APIItemLink({
+              new ItemLink({
                 id: link.id,
                 itemId: itemId,
                 name: link.name,
@@ -94,7 +94,7 @@ export class ModerItemsItemLinksComponent {
             ),
         );
       } else {
-        promises.push(this.#itemsClient.deleteItemLink(new APIItemLinkRequest({id: link.id})).pipe(map(() => null)));
+        promises.push(this.#itemsClient.deleteItemLink(new ItemLinkRequest({id: link.id})).pipe(map(() => null)));
       }
     }
 

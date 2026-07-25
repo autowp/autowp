@@ -813,7 +813,7 @@ func (s *Application) AttrsUpdateValuesAMQP(ctx context.Context, quit chan bool)
 	return nil
 }
 
-func (s *Application) ImageStorageGetImage(ctx context.Context, imageID int) (*APIImage, error) {
+func (s *Application) ImageStorageGetImage(ctx context.Context, imageID int) (*Image, error) {
 	is, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return nil, err
@@ -831,7 +831,7 @@ func (s *Application) ImageStorageGetFormattedImage(
 	ctx context.Context,
 	imageID int,
 	format string,
-) (*APIImage, error) {
+) (*Image, error) {
 	is, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return nil, err

@@ -3,8 +3,8 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {
-  APIItem,
   CommentsType,
+  Item,
   ItemFields,
   ItemLinkListOptions,
   ItemLinksRequest,
@@ -100,7 +100,7 @@ export class MuseumComponent {
     }),
   );
 
-  protected readonly item$: Observable<APIItem> = this.#itemID$.pipe(
+  protected readonly item$: Observable<Item> = this.#itemID$.pipe(
     switchMap((id) =>
       this.#itemsClient.item(
         new ItemRequest({

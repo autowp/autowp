@@ -37,7 +37,7 @@ func TestView(t *testing.T) {
 	require.NotNil(t, token)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -68,7 +68,7 @@ func TestVote(t *testing.T) {
 	client := NewPicturesClient(conn)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -137,7 +137,7 @@ func TestModerVote(t *testing.T) {
 	require.NotNil(t, token)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -259,7 +259,7 @@ func TestFlopNormalizeAndRepair(t *testing.T) {
 	require.NotNil(t, token)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -308,7 +308,7 @@ func TestDeleteSimilar(t *testing.T) {
 	client := NewPicturesClient(conn)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -338,7 +338,7 @@ func TestPictureItemAreaAndPerspective(t *testing.T) {
 	require.NotNil(t, token)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -413,13 +413,13 @@ func TestPictureItemSetPictureItemItemID(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	itemID1 := createItem(t, conn, cnt, &APIItem{
+	itemID1 := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-1-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	itemID2 := createItem(t, conn, cnt, &APIItem{
+	itemID2 := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-2-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -473,7 +473,7 @@ func TestPictureCrop(t *testing.T) {
 	require.NotNil(t, token)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -532,7 +532,7 @@ func TestPictureCropByOneAxis(t *testing.T) {
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -602,7 +602,7 @@ func TestInvalidPictureCrop(t *testing.T) {
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -690,7 +690,7 @@ func TestClearReplacePicture(t *testing.T) {
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -738,7 +738,7 @@ func TestSetPicturePoint(t *testing.T) {
 	require.NotNil(t, token)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -848,7 +848,7 @@ func TestUpdatePicture(t *testing.T) {
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -937,7 +937,7 @@ func TestSetPictureCopyrights(t *testing.T) {
 	textStorageRepository := textstorage.New(goquDB)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1021,7 +1021,7 @@ func TestGetPicturesHasCopyrightsFilter(t *testing.T) {
 	require.NotNil(t, testerToken)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1102,7 +1102,7 @@ func TestSetPictureStatus(t *testing.T) {
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1224,7 +1224,7 @@ func TestReplacePicture(t *testing.T) {
 	require.NoError(t, err)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1254,7 +1254,7 @@ func TestReplacePicture(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -1380,7 +1380,7 @@ func TestGetPictureWithPerspectivePrefix(t *testing.T) {
 
 	itemName := fmt.Sprintf("vehicle-%d", random.Int())
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:            itemName,
 		IsGroup:         false,
 		ItemTypeId:      ItemType_ITEM_TYPE_VEHICLE,
@@ -1465,7 +1465,7 @@ func TestGetPicturePath(t *testing.T) {
 
 	// create brand
 	brandName := fmt.Sprintf("Opel-%d", randomInt)
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       brandName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -1474,14 +1474,14 @@ func TestGetPicturePath(t *testing.T) {
 	})
 
 	itemName := fmt.Sprintf("vehicle-%d", randomInt)
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       itemName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	childName := fmt.Sprintf("child-%d", randomInt)
-	childID := createItem(t, conn, cnt, &APIItem{
+	childID := createItem(t, conn, cnt, &Item{
 		Name:       childName,
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -1834,7 +1834,7 @@ func TestNewbox(t *testing.T) {
 	require.NotNil(t, token)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1909,7 +1909,7 @@ func TestCorrectFileNamesVote(t *testing.T) {
 	randomInt := random.Int()
 
 	vehicleName := fmt.Sprintf("Toyota %d Corolla", randomInt)
-	vehicleID := createItem(t, conn, cnt, &APIItem{
+	vehicleID := createItem(t, conn, cnt, &Item{
 		Name:       vehicleName,
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -1965,7 +1965,7 @@ func TestCorrectFileNamesVote(t *testing.T) {
 
 	// add brand
 	brandName := fmt.Sprintf("Toyota %d", randomInt)
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       brandName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -2013,7 +2013,7 @@ func TestCorrectFileNamesVote(t *testing.T) {
 
 	// add second brand
 	brand2Name := fmt.Sprintf("Peugeot %d", randomInt)
-	brand2ID := createItem(t, conn, cnt, &APIItem{
+	brand2ID := createItem(t, conn, cnt, &Item{
 		Name:       brand2Name,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -2078,7 +2078,7 @@ func TestGetGallery(t *testing.T) {
 	require.NotNil(t, token)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -2207,7 +2207,7 @@ func TestGetPersonPictures(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("person-%d", randomInt),
 		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
 	})

@@ -3,11 +3,11 @@ import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@ang
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIUser,
-  APIUsersRatingResponse,
-  APIUsersRatingUser,
+  User,
   UserRatingBrandsResponse,
   UserRatingDetailsRequest,
+  UsersRatingResponse,
+  UsersRatingUser,
 } from '@grpc/spec.pb';
 import {RatingClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
@@ -110,7 +110,7 @@ export class UsersRatingComponent implements OnInit {
   protected readonly usersResource = rxResource({
     stream: () => {
       const rating = this.rating();
-      let o$: Observable<APIUsersRatingResponse>;
+      let o$: Observable<UsersRatingResponse>;
       switch (rating) {
         case Rating.COMMENT_LIKES:
           o$ = this.#ratingClient.getUserCommentsRating(new Empty());
@@ -133,11 +133,11 @@ export class UsersRatingComponent implements OnInit {
 
   #mapUser(
     rating: Rating,
-    user: APIUsersRatingUser,
+    user: UsersRatingUser,
   ): {
     brands$: null | Observable<UserRatingBrandsResponse>;
-    fans$: null | Observable<{user$: Observable<APIUser | null>; volume: string}[]>;
-    user$: Observable<APIUser | null>;
+    fans$: null | Observable<{user$: Observable<null | User>; volume: string}[]>;
+    user$: Observable<null | User>;
     volume: string;
     weight: number;
   } {

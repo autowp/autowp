@@ -64,7 +64,7 @@ func (s *IPExtractor) Extract(
 			}
 
 			if banItem != nil {
-				result.Blacklist = &APIBanItem{
+				result.Blacklist = &BanItem{
 					Until:    timestamppb.New(banItem.Until),
 					ByUserId: banItem.ByUserID,
 					ByUser:   nil,
@@ -97,7 +97,7 @@ func (s *IPExtractor) Extract(
 	if ok {
 		canBan := len(roles) > 0 && util.Contains(roles, users.RoleUsersModer)
 
-		result.Rights = &APIIPRights{
+		result.Rights = &IPRights{
 			AddToBlacklist:      canBan,
 			RemoveFromBlacklist: canBan,
 		}

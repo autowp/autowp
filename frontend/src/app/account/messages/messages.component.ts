@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIUser, Message, MessagingGetMessagesRequest, Pages} from '@grpc/spec.pb';
+import {Message, MessagingGetMessagesRequest, Pages, User} from '@grpc/spec.pb';
 import {MessagingClient} from '@grpc/spec.pbsc';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
@@ -53,7 +53,7 @@ export class AccountMessagesComponent {
   );
 
   protected readonly messages$: Observable<{
-    items: {author$: Observable<APIUser | null>; message: Message}[];
+    items: {author$: Observable<null | User>; message: Message}[];
     paginator: Pages | undefined;
   }> = combineLatest([this.folder$, this.page$, this.userId$, this.#change$, this.#messageService.changed$]).pipe(
     debounceTime(50),

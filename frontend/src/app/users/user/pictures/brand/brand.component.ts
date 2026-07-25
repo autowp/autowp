@@ -2,8 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
-  APIUser,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -14,6 +13,7 @@ import {
   PictureListOptions,
   PicturesRequest,
   PictureStatus,
+  User,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
@@ -42,7 +42,7 @@ export class UsersUserPicturesBrandComponent {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly user$: Observable<APIUser> = this.#route.paramMap.pipe(
+  protected readonly user$: Observable<User> = this.#route.paramMap.pipe(
     map((params) => params.get('identity')),
     switchMap((identity) => (identity ? of(identity) : EMPTY)),
     distinctUntilChanged(),
@@ -60,7 +60,7 @@ export class UsersUserPicturesBrandComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  readonly #brand$: Observable<APIItem> = this.#route.paramMap.pipe(
+  readonly #brand$: Observable<Item> = this.#route.paramMap.pipe(
     map((params) => params.get('brand') ?? ''),
     distinctUntilChanged(),
     debounceTime(10),

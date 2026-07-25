@@ -3,8 +3,6 @@ import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core'
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
-  APIUser,
   CreatePictureItemRequest,
   CreateTrafficBlacklistItemRequest,
   DeletePictureItemRequest,
@@ -14,6 +12,7 @@ import {
   DfDistanceFields,
   DfDistanceRequest,
   IP,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheFields,
@@ -38,6 +37,7 @@ import {
   SetPictureItemPerspectiveRequest,
   SetPictureStatusRequest,
   UpdatePictureRequest,
+  User,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, TrafficClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -61,7 +61,7 @@ import {ModerPicturesPerspectivePickerComponent} from '../perspective-picker/per
 
 interface LastItemInfo {
   hasItem: boolean;
-  item: APIItem | null;
+  item: Item | null;
 }
 
 @Component({
@@ -185,11 +185,11 @@ export class ModerPicturesItemComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly changeStatusUser$: Observable<APIUser | null> = this.picture$.pipe(
+  protected readonly changeStatusUser$: Observable<null | User> = this.picture$.pipe(
     switchMap((picture) => this.#userService.getUser$(picture.changeStatusUserId)),
   );
 
-  protected readonly owner$: Observable<APIUser | null> = this.picture$.pipe(
+  protected readonly owner$: Observable<null | User> = this.picture$.pipe(
     switchMap((picture) => this.#userService.getUser$(picture.ownerId)),
   );
 
@@ -325,7 +325,7 @@ export class ModerPicturesItemComponent {
     return found;
   }
 
-  protected addItem(id: string, item: APIItem, type: number) {
+  protected addItem(id: string, item: Item, type: number) {
     this.pictureItemLoading.set(true);
     this.#picturesClient
       .createPictureItem(

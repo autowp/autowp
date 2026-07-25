@@ -66,7 +66,7 @@ func TestSetItemLogo(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -104,7 +104,7 @@ func TestSetItemLogoInvalidFile(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -131,7 +131,7 @@ func TestSetItemLogoInvalidFile2(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -158,7 +158,7 @@ func TestSetItemLogoInvalidFile3(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,

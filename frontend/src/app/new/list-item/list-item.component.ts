@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {APIItem, Picture} from '@grpc/spec.pb';
+import {Item, Picture} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {RemarkModule} from 'ngx-remark';
@@ -18,7 +18,7 @@ export class NewListItemComponent {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   readonly pictures = input.required<Picture[]>();
   readonly totalPictures = input.required<number>();
   readonly date = input.required<string>();

@@ -1,6 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
-import {APIAccountsAccount, DeleteUserAccountRequest} from '@grpc/spec.pb';
+import {AccountsAccount, DeleteUserAccountRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
@@ -22,7 +22,7 @@ export class AccountAccountsComponent implements OnInit {
   readonly #usersClient = inject(UsersClient);
 
   readonly #reload$ = new BehaviorSubject<void>(void 0);
-  protected readonly accounts$: Observable<APIAccountsAccount[]> = combineLatest([
+  protected readonly accounts$: Observable<AccountsAccount[]> = combineLatest([
     this.#usersClient.getAccounts(new Empty()),
     this.#reload$,
   ]).pipe(
@@ -39,7 +39,7 @@ export class AccountAccountsComponent implements OnInit {
     this.#pageEnv.set({pageId: 123});
   }
 
-  protected remove(account: APIAccountsAccount) {
+  protected remove(account: AccountsAccount) {
     this.#usersClient.deleteUserAccount(new DeleteUserAccountRequest({id: account.id})).subscribe({
       error: (response: unknown) => {
         this.disconnectFailed.set(true);

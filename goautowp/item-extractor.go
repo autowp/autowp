@@ -46,7 +46,7 @@ func NewItemExtractor(
 
 func (s *ItemExtractor) ExtractRows(
 	ctx context.Context, rows []*items.Item, fields *ItemFields, lang string, userCtx UserContext,
-) ([]*APIItem, error) {
+) ([]*Item, error) {
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
 
 	if fields == nil {
@@ -61,7 +61,7 @@ func (s *ItemExtractor) ExtractRows(
 
 	var (
 		err    error
-		result = make([]*APIItem, 0, len(rows))
+		result = make([]*Item, 0, len(rows))
 	)
 
 	pictureItemRequest := fields.GetPictureItems()
@@ -90,7 +90,7 @@ func (s *ItemExtractor) ExtractRows(
 	}
 
 	for _, row := range rows {
-		resultRow := &APIItem{
+		resultRow := &Item{
 			Id:                         row.ID,
 			Catname:                    util.NullStringToString(row.Catname),
 			EngineItemId:               util.NullInt64ToScalar(row.EngineItemID),
@@ -177,7 +177,7 @@ func (s *ItemExtractor) ExtractRows(
 
 func (s *ItemExtractor) Extract(
 	ctx context.Context, row *items.Item, fields *ItemFields, lang string, userCtx UserContext,
-) (*APIItem, error) {
+) (*Item, error) {
 	result, err := s.ExtractRows(ctx, []*items.Item{row}, fields, lang, userCtx)
 	if err != nil {
 		return nil, err
@@ -347,7 +347,7 @@ func (s *ItemExtractor) extractPlain( //nolint: maintidx
 	ctx context.Context,
 	fields *ItemFields,
 	row *items.Item,
-	resultRow *APIItem,
+	resultRow *Item,
 	lang string,
 	userCtx UserContext,
 ) error {
@@ -695,7 +695,7 @@ func (s *ItemExtractor) extractItemOfDayPictures(
 
 			imageInfo, ok := imagesInfo[format][imageID]
 
-			var thumb *APIImage
+			var thumb *Image
 			if ok {
 				thumb = APIImageToGRPC(&imageInfo)
 			}
@@ -978,7 +978,7 @@ func (s *ItemExtractor) extractChildsCount(
 
 func (s *ItemExtractor) extractEngineVehicles(
 	ctx context.Context, fields *ItemFields, row *items.Item, lang string, userCtx UserContext,
-) ([]*APIItem, error) {
+) ([]*Item, error) {
 	evs := fields.GetEngineVehicles()
 	if evs == nil {
 		return nil, nil
@@ -1185,15 +1185,15 @@ func (s *ItemExtractor) extractCommentsCount(
 
 func (s *ItemExtractor) extractLogos(
 	ctx context.Context, fields *ItemFields, row *items.Item,
-) (*APIImage, *APIImage, *APIImage, error) {
+) (*Image, *Image, *Image, error) {
 	if !row.LogoID.Valid {
 		return nil, nil, nil, nil
 	}
 
 	var (
-		logo      *APIImage
-		logo120   *APIImage
-		brandicon *APIImage
+		logo      *Image
+		logo120   *Image
+		brandicon *Image
 	)
 
 	imageStorage, err := s.container.ImageStorage(ctx)
@@ -1237,7 +1237,7 @@ func (s *ItemExtractor) extractConnectedItems(
 	opts *query.ItemListOptions,
 	lang string,
 	userCtx UserContext,
-) ([]*APIItem, error) {
+) ([]*Item, error) {
 	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
@@ -1265,7 +1265,7 @@ func (s *ItemExtractor) extractConnectedItems(
 
 func (s *ItemExtractor) extractTwins(
 	ctx context.Context, fields *ItemFields, row *items.Item, lang string, userCtx UserContext,
-) ([]*APIItem, error) {
+) ([]*Item, error) {
 	twinsRequest := fields.GetTwins()
 	if twinsRequest == nil {
 		return nil, nil
@@ -1281,7 +1281,7 @@ func (s *ItemExtractor) extractTwins(
 
 func (s *ItemExtractor) extractCategories(
 	ctx context.Context, fields *ItemFields, row *items.Item, lang string, userCtx UserContext,
-) ([]*APIItem, error) {
+) ([]*Item, error) {
 	categoriesRequest := fields.GetCategories()
 	if categoriesRequest == nil {
 		return nil, nil

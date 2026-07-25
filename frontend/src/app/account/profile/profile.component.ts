@@ -3,7 +3,7 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, viewChild} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {environment} from '@environment/environment';
-import {APIMeRequest, APIUser, DeleteUserPhotoRequest, UpdateUserRequest, UserFields} from '@grpc/spec.pb';
+import {DeleteUserPhotoRequest, MeRequest, UpdateUserRequest, User, UserFields} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
@@ -75,7 +75,7 @@ export class AccountProfileComponent implements OnInit {
     }),
     switchMap(() =>
       this.#usersClient.me(
-        new APIMeRequest({
+        new MeRequest({
           fields: new UserFields({
             img: true,
             language: true,
@@ -122,7 +122,7 @@ export class AccountProfileComponent implements OnInit {
       .updateUser(
         new UpdateUserRequest({
           updateMask: new FieldMask({paths: ['language', 'timezone']}),
-          user: new APIUser({
+          user: new User({
             id,
             language: form.controls.language.value || undefined,
             timezone: form.controls.timezone.value || undefined,
@@ -153,7 +153,7 @@ export class AccountProfileComponent implements OnInit {
     });
   }
 
-  protected onChange(user: APIUser, event: Event) {
+  protected onChange(user: User, event: Event) {
     const files = [].slice.call((event.target as HTMLInputElement).files);
     if (files.length <= 0) {
       return;
@@ -186,7 +186,7 @@ export class AccountProfileComponent implements OnInit {
             input.nativeElement.value = '';
           }
         }),
-        switchMap(() => this.#usersClient.me(new APIMeRequest({fields: new UserFields({img: true})}))),
+        switchMap(() => this.#usersClient.me(new MeRequest({fields: new UserFields({img: true})}))),
         catchError((response: unknown) => {
           this.#toastService.handleError(response);
           return EMPTY;

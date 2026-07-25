@@ -2,8 +2,8 @@ import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core'
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIImage,
-  APIItem,
+  Image,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemsRequest,
@@ -94,7 +94,7 @@ export class CutawayAuthorsComponent implements OnInit {
     this.#pageEnv.set({pageId: 201});
   }
 
-  private prepareItems(items: APIItem[]): CatalogueListItem[] {
+  private prepareItems(items: Item[]): CatalogueListItem[] {
     return items.map((item) => {
       const itemRouterLink = ['/persons'];
       itemRouterLink.push(item.id);
@@ -102,7 +102,7 @@ export class CutawayAuthorsComponent implements OnInit {
       const largeFormat = !!item.previewPictures?.largeFormat;
 
       const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map((picture, idx) => {
-        let thumb: APIImage | undefined = undefined;
+        let thumb: Image | undefined = undefined;
         if (picture.picture) {
           thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
         }

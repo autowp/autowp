@@ -4,12 +4,12 @@ import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {
-  APIUser,
   AttrUserValue,
   AttrUserValuesFields,
   AttrUserValuesRequest,
   DeleteAttrUserValuesRequest,
   MoveAttrUserValuesRequest,
+  User,
 } from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -28,7 +28,7 @@ import {UserComponent} from '../../user/user/user.component';
 interface AttrUserValueListItem {
   path$: Observable<string[]>;
   unitAbbr$: Observable<null | string | undefined>;
-  user$: Observable<APIUser | null>;
+  user$: Observable<null | User>;
   userValue: AttrUserValue;
 }
 

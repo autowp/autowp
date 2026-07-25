@@ -58,12 +58,12 @@ func (s *ItemParentCacheExtractor) ExtractRows(
 
 func (s *ItemParentCacheExtractor) preloadItems(
 	ctx context.Context, request *ItemsRequest, ids []int64, lang string, userCtx UserContext,
-) (map[int64]*APIItem, error) {
+) (map[int64]*Item, error) {
 	if request == nil {
 		return nil, nil //nolint: nilnil
 	}
 
-	result := make(map[int64]*APIItem, len(ids))
+	result := make(map[int64]*Item, len(ids))
 
 	if len(ids) == 0 {
 		return result, nil

@@ -2,7 +2,7 @@ import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APIBrandsListCharacter, BrandIcons, GetBrandsRequest} from '@grpc/spec.pb';
+import {BrandIcons, BrandsListCharacter, GetBrandsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
@@ -58,7 +58,7 @@ export class BrandsComponent implements OnInit {
     this.#pageEnv.set({pageId: 61});
   }
 
-  protected scrollTo(info: APIBrandsListCharacter) {
+  protected scrollTo(info: BrandsListCharacter) {
     const element = this.#document.getElementById('char' + info.id);
     if (element) {
       element.scrollIntoView({behavior: 'smooth'});

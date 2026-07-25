@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -35,7 +35,7 @@ export class CategoriesIndexComponent implements OnInit {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly items$: Observable<{item: APIItem; picture$: Observable<Picture>}[][]> = this.#itemsClient
+  protected readonly items$: Observable<{item: Item; picture$: Observable<Picture>}[][]> = this.#itemsClient
     .list(
       new ItemsRequest({
         fields: new ItemFields({

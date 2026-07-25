@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, inject, input, output} from '@angula
 import {rxResource, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -73,7 +73,7 @@ export class ModerItemsItemSelectParentTwinsComponent {
         )
         .pipe(
           map((response) => ({
-            brands: chunk<APIItem>(response.items ? response.items : [], 6),
+            brands: chunk<Item>(response.items ? response.items : [], 6),
             paginator: response.paginator,
           })),
         );

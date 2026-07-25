@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -53,7 +53,7 @@ export class CatalogueRecentComponent {
     debounceTime(10),
   );
 
-  protected readonly brand$: Observable<APIItem | null> = this.#route.paramMap.pipe(
+  protected readonly brand$: Observable<Item | null> = this.#route.paramMap.pipe(
     map((params) => params.get('brand')),
     distinctUntilChanged(),
     debounceTime(10),

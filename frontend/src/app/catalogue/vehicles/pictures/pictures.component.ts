@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemParent,
   ItemParentCacheListOptions,
   Pages,
@@ -57,7 +57,7 @@ export class CatalogueVehiclesPicturesComponent {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  readonly #catalogue$: Observable<{brand: APIItem; path: ItemParent[]; type: string}> = this.#catalogueService
+  readonly #catalogue$: Observable<{brand: Item; path: ItemParent[]; type: string}> = this.#catalogueService
     .resolveCatalogue$(this.#route)
     .pipe(
       switchMap((data) => {
@@ -84,7 +84,7 @@ export class CatalogueVehiclesPicturesComponent {
     debounceTime(10),
   );
 
-  protected readonly brand$: Observable<APIItem> = this.#catalogue$.pipe(map(({brand}) => brand));
+  protected readonly brand$: Observable<Item> = this.#catalogue$.pipe(map(({brand}) => brand));
 
   protected readonly breadcrumbs$: Observable<Breadcrumbs[]> = this.#catalogue$.pipe(
     map(({brand, path}) => CatalogueService.pathToBreadcrumbs(brand, path)),
@@ -98,10 +98,10 @@ export class CatalogueVehiclesPicturesComponent {
     map(([routerLink, exact]) => [...routerLink, ...(exact ? ['exact'] : []), 'pictures']),
   );
 
-  protected readonly item$: Observable<APIItem> = this.#catalogue$.pipe(
+  protected readonly item$: Observable<Item> = this.#catalogue$.pipe(
     map(({path}) => path[path.length - 1].item),
     filter((item) => !!item),
-    tap((item: APIItem) => {
+    tap((item: Item) => {
       this.#pageEnv.set({
         pageId: 34,
         title: $localize`All pictures of ${item.nameText}`,

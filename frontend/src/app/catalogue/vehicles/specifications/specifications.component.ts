@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {APIItem, GetSpecificationsRequest, ItemFields} from '@grpc/spec.pb';
+import {GetSpecificationsRequest, Item, ItemFields} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -47,7 +47,7 @@ export class CatalogueVehiclesSpecificationsComponent {
       shareReplay({bufferSize: 1, refCount: false}),
     );
 
-  protected readonly brand$: Observable<APIItem> = this.#catalogue$.pipe(
+  protected readonly brand$: Observable<Item> = this.#catalogue$.pipe(
     map(({brand}) => brand),
     tap((brand) => {
       this.#pageEnv.set({

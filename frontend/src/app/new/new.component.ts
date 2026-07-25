@@ -1,7 +1,7 @@
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {APIItem, NewboxRequest, Pages, Picture} from '@grpc/spec.pb';
+import {Item, NewboxRequest, Pages, Picture} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -17,7 +17,7 @@ import {NewListItemComponent} from './list-item/list-item.component';
 
 interface APINewGroupRepacked {
   chunks?: Picture[][];
-  item?: APIItem;
+  item?: Item;
   pictures?: Picture[];
   totalPictures?: number;
   type: string;

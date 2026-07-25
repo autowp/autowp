@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, inject, input, output} from '@angula
 import {toObservable} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -64,7 +64,7 @@ export class ModerItemsItemSelectParentCatalogueComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly catalogueBrands$: Observable<null | {brands: APIItem[][]; paginator?: Pages}> = this.brandID$.pipe(
+  protected readonly catalogueBrands$: Observable<null | {brands: Item[][]; paginator?: Pages}> = this.brandID$.pipe(
     switchMap((brandID) =>
       brandID
         ? of(null)
@@ -96,7 +96,7 @@ export class ModerItemsItemSelectParentCatalogueComponent {
               return EMPTY;
             }),
             map((response) => ({
-              brands: chunk<APIItem>(response.items ? response.items : [], 6),
+              brands: chunk<Item>(response.items ? response.items : [], 6),
               paginator: response.paginator,
             })),
           ),

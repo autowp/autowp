@@ -65,7 +65,7 @@ func TestPictureLikesRating(t *testing.T) {
 	require.NotNil(t, adminToken)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})

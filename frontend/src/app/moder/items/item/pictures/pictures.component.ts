@@ -3,8 +3,8 @@ import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
-  APIItem,
   DfDistanceRequest,
+  Item,
   ItemListOptions,
   ItemType,
   Picture,
@@ -32,7 +32,7 @@ export class ModerItemsItemPicturesComponent {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
   protected readonly canUseTurboGroupCreator$ = this.item$.pipe(

@@ -1,5 +1,5 @@
 import {inject, Service} from '@angular/core';
-import {APIGetItemVehicleTypesRequest, APIItemVehicleType, APIItemVehicleTypeRequest, ItemType} from '@grpc/spec.pb';
+import {GetItemVehicleTypesRequest, ItemType, ItemVehicleType, ItemVehicleTypeRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {forkJoin, Observable, of} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
@@ -41,7 +41,7 @@ export class ItemService {
   public setItemVehicleTypes$(itemId: string, ids: string[]): Observable<void> {
     return this.#itemsClient
       .getItemVehicleTypes(
-        new APIGetItemVehicleTypesRequest({
+        new GetItemVehicleTypesRequest({
           itemId: itemId,
         }),
       )
@@ -56,7 +56,7 @@ export class ItemService {
               promises.push(
                 this.#itemsClient
                   .deleteItemVehicleType(
-                    new APIItemVehicleTypeRequest({
+                    new ItemVehicleTypeRequest({
                       itemId: itemId,
                       vehicleTypeId: itemVehicleType.vehicleTypeId,
                     }),
@@ -71,7 +71,7 @@ export class ItemService {
               promises.push(
                 this.#itemsClient
                   .createItemVehicleType(
-                    new APIItemVehicleType({
+                    new ItemVehicleType({
                       itemId: itemId,
                       vehicleTypeId,
                     }),

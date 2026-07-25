@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
 import {rxResource, toObservable} from '@angular/core/rxjs-interop';
-import {APIGetItemVehicleTypesRequest, APIItem, ItemType, UpdateItemRequest} from '@grpc/spec.pb';
+import {GetItemVehicleTypesRequest, Item, ItemType, UpdateItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
@@ -32,7 +32,7 @@ export class ModerItemsItemMetaComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #toastService = inject(ToastsService);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
   protected readonly loadingNumber = signal(false);
@@ -47,7 +47,7 @@ export class ModerItemsItemMetaComponent {
       if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE || item.itemTypeId === ItemType.ITEM_TYPE_TWINS) {
         return this.#itemsClient
           .getItemVehicleTypes(
-            new APIGetItemVehicleTypesRequest({
+            new GetItemVehicleTypesRequest({
               itemId: item.id,
             }),
           )
@@ -58,7 +58,7 @@ export class ModerItemsItemMetaComponent {
     },
   });
 
-  protected saveMeta(item: APIItem, event: ItemMetaFormResult) {
+  protected saveMeta(item: Item, event: ItemMetaFormResult) {
     this.loadingNumber.set(true);
 
     const newItem = itemMetaFormResultsToAPIItem(event);

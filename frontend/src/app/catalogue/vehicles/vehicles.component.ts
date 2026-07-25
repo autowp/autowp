@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParent,
@@ -71,7 +71,7 @@ export class CatalogueVehiclesComponent {
   protected readonly canAddItem$ = this.#auth.hasRole$(Role.CARS_MODER);
   protected readonly canAcceptPicture$ = this.#auth.hasRole$(Role.PICTURES_MODER);
 
-  readonly #catalogue$: Observable<{brand: APIItem; path: ItemParent[]; type: string}> = this.#catalogueService
+  readonly #catalogue$: Observable<{brand: Item; path: ItemParent[]; type: string}> = this.#catalogueService
     .resolveCatalogue$(this.#route)
     .pipe(
       switchMap((data) => {
@@ -86,7 +86,7 @@ export class CatalogueVehiclesComponent {
       shareReplay({bufferSize: 1, refCount: false}),
     );
 
-  protected readonly brand$: Observable<APIItem> = this.#catalogue$.pipe(map(({brand}) => brand));
+  protected readonly brand$: Observable<Item> = this.#catalogue$.pipe(map(({brand}) => brand));
 
   readonly #routerLink$: Observable<string[]> = this.#catalogue$.pipe(
     map(({brand, path}) => {
@@ -109,7 +109,7 @@ export class CatalogueVehiclesComponent {
     map(({brand, path}) => CatalogueService.pathToBreadcrumbs(brand, path)),
   );
 
-  protected readonly item$: Observable<APIItem> = combineLatest([this.#catalogue$, this.isModer$]).pipe(
+  protected readonly item$: Observable<Item> = combineLatest([this.#catalogue$, this.isModer$]).pipe(
     switchMap(([{path}, isModer]) => {
       const last = path[path.length - 1];
 
@@ -154,7 +154,7 @@ export class CatalogueVehiclesComponent {
         }),
       );
     }),
-    switchMap((item: APIItem | null) => {
+    switchMap((item: Item | null) => {
       if (!item) {
         this.#router.navigate(['/error-404'], {
           skipLocationChange: true,
@@ -360,7 +360,7 @@ export class CatalogueVehiclesComponent {
     }),
   );
 
-  private static convertItem(item: APIItem, routerLink: string[]): CatalogueListItem {
+  private static convertItem(item: Item, routerLink: string[]): CatalogueListItem {
     const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map((picture, idx) => {
       const largeFormat = !!item.previewPictures?.largeFormat;
       let thumb = null;

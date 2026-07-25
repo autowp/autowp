@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {APIItem, ItemFields, ItemListOptions, ItemsRequest, Picture} from '@grpc/spec.pb';
+import {Item, ItemFields, ItemListOptions, ItemsRequest, Picture} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -40,7 +40,7 @@ export class CatalogueMixedGalleryComponent {
     }),
   );
 
-  protected readonly brand$: Observable<APIItem> = this.#route.paramMap.pipe(
+  protected readonly brand$: Observable<Item> = this.#route.paramMap.pipe(
     map((params) => params.get('brand')),
     distinctUntilChanged(),
     debounceTime(10),

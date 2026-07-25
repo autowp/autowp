@@ -3,9 +3,6 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIDeleteUserRequest,
-  APIUser,
-  APIUserPreferencesRequest,
   CommentMessage,
   CommentMessageFields,
   CreateContactRequest,
@@ -13,13 +10,16 @@ import {
   DeleteContactRequest,
   DeleteTrafficBlacklistItemRequest,
   DeleteUserPhotoRequest,
+  DeleteUserRequest,
   GetMessagesRequest,
   IP,
   Picture,
   PictureFields,
   PictureListOptions,
   PicturesRequest,
+  User,
   UserFields,
+  UserPreferencesRequest,
 } from '@grpc/spec.pb';
 import {CommentsClient, ContactsClient, PicturesClient, TrafficClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -78,7 +78,7 @@ export class UsersUserComponent {
   protected readonly canBan$ = this.#auth.hasRole$(Role.USERS_MODER);
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  protected readonly user$: Observable<APIUser> = this.#route.paramMap.pipe(
+  protected readonly user$: Observable<User> = this.#route.paramMap.pipe(
     map((params) => '' + params.get('identity')),
     distinctUntilChanged(),
     debounceTime(30),
@@ -216,7 +216,7 @@ export class UsersUserComponent {
       }
 
       return this.#usersGrpc
-        .getUserPreferences(new APIUserPreferencesRequest({userId: user.id}))
+        .getUserPreferences(new UserPreferencesRequest({userId: user.id}))
         .pipe(map(({disableCommentsNotifications}) => disableCommentsNotifications));
     }),
     catchError((response: unknown) => {
@@ -226,12 +226,12 @@ export class UsersUserComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected openMessageForm(user: APIUser) {
+  protected openMessageForm(user: User) {
     this.#messageDialogService.showDialog('' + user.id);
     return false;
   }
 
-  protected setInContacts(user: APIUser, value: boolean) {
+  protected setInContacts(user: User, value: boolean) {
     if (value) {
       this.#contactsClient
         .createContact(new CreateContactRequest({contact: {contactUserId: user.id}}))
@@ -246,22 +246,20 @@ export class UsersUserComponent {
     });
   }
 
-  protected setCommentNotificationsDisabled(user: APIUser, value: boolean) {
+  protected setCommentNotificationsDisabled(user: User, value: boolean) {
     if (value) {
-      this.#usersGrpc
-        .disableUserCommentsNotifications(new APIUserPreferencesRequest({userId: user.id}))
-        .subscribe(() => {
-          this.#userUserPreferencesChanged$.next();
-        });
+      this.#usersGrpc.disableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe(() => {
+        this.#userUserPreferencesChanged$.next();
+      });
       return;
     }
 
-    this.#usersGrpc.enableUserCommentsNotifications(new APIUserPreferencesRequest({userId: user.id})).subscribe(() => {
+    this.#usersGrpc.enableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe(() => {
       this.#userUserPreferencesChanged$.next();
     });
   }
 
-  protected deletePhoto(user: APIUser) {
+  protected deletePhoto(user: User) {
     if (!this.#document.defaultView?.confirm('Are you sure?')) {
       return;
     }
@@ -274,13 +272,13 @@ export class UsersUserComponent {
     });
   }
 
-  protected deleteUser(user: APIUser) {
+  protected deleteUser(user: User) {
     if (!this.#document.defaultView?.confirm('Are you sure?')) {
       return;
     }
     this.#usersGrpc
       .deleteUser(
-        new APIDeleteUserRequest({
+        new DeleteUserRequest({
           userId: user.id,
         }),
       )

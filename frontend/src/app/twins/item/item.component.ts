@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {APIItem, ItemType} from '@grpc/spec.pb';
+import {Item, ItemType} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {RemarkModule} from 'ngx-remark';
@@ -17,11 +17,11 @@ export class TwinsItemComponent {
   readonly #auth = inject(AuthService);
 
   readonly groupId = input.required<string>();
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  protected havePhoto(item: APIItem) {
+  protected havePhoto(item: Item) {
     if (item.previewPictures) {
       for (const picture of item.previewPictures.pictures || []) {
         if (picture) {
@@ -32,7 +32,7 @@ export class TwinsItemComponent {
     return false;
   }
 
-  protected canHavePhoto(item: APIItem) {
+  protected canHavePhoto(item: Item) {
     return (
       [
         ItemType.ITEM_TYPE_VEHICLE,

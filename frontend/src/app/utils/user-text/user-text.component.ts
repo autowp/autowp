@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APIUser, Picture, PictureFields, PictureListOptions, PicturesRequest} from '@grpc/spec.pb';
+import {Picture, PictureFields, PictureListOptions, PicturesRequest, User} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
@@ -17,7 +17,7 @@ interface CommentTextElement {
   text?: string;
   type: 'a' | 'picture' | 'text' | 'user';
   url?: string;
-  user?: APIUser;
+  user?: User;
 }
 
 interface CommentTextLine {

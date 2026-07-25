@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIGetItemParentLanguagesRequest,
+  GetItemParentLanguagesRequest,
   ItemFields,
   ItemParent,
   ItemParentLanguage,
@@ -135,7 +135,7 @@ export class ModerItemParentComponent {
       combineLatest([
         this.#contentLanguage.languages$,
         this.#itemsClient.getItemParentLanguages(
-          new APIGetItemParentLanguagesRequest({
+          new GetItemParentLanguagesRequest({
             itemId: '' + itemID,
             parentId: '' + parentID,
           }),

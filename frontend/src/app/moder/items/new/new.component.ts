@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {APIGetItemVehicleTypesRequest, APIItem, ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb';
+import {GetItemVehicleTypesRequest, Item, ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {ItemService} from '@services/item';
@@ -56,10 +56,10 @@ export class ModerItemsNewComponent {
     map((itemTypeID) => getItemTypeTranslation(itemTypeID, 'new-item')),
   );
 
-  protected readonly item$: Observable<APIItem> = this.#itemTypeID$.pipe(
+  protected readonly item$: Observable<Item> = this.#itemTypeID$.pipe(
     map(
       (itemTypeID) =>
-        new APIItem({
+        new Item({
           isConceptInherit: true,
           itemTypeId: itemTypeID,
         }),
@@ -72,7 +72,7 @@ export class ModerItemsNewComponent {
     distinctUntilChanged(),
   );
 
-  protected readonly parent$: Observable<APIItem | null> = this.#parentID$.pipe(
+  protected readonly parent$: Observable<Item | null> = this.#parentID$.pipe(
     switchMap((parentID) => {
       if (!parentID) {
         return of(null);
@@ -94,7 +94,7 @@ export class ModerItemsNewComponent {
       if (item && [ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)) {
         return this.#itemsClient
           .getItemVehicleTypes(
-            new APIGetItemVehicleTypesRequest({
+            new GetItemVehicleTypesRequest({
               itemId: item.id,
             }),
           )
@@ -157,7 +157,7 @@ export class ModerItemsNewComponent {
   }
 
   protected readonly formParams$: Observable<{
-    item: APIItem;
+    item: Item;
     parentIsConcept: ParentIsConcept;
     vehicleTypeIDs: string[];
   }> = combineLatest([this.item$, this.parent$, this.#vehicleTypeIDs$]).pipe(

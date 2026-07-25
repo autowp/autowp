@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {APIUser, CommentMessageFields, GetMessagesRequest} from '@grpc/spec.pb';
+import {CommentMessageFields, GetMessagesRequest, User} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
@@ -48,7 +48,7 @@ export class UsersUserCommentsComponent {
       shareReplay({bufferSize: 1, refCount: false}),
     );
 
-  protected readonly user$: Observable<APIUser> = this.#route.paramMap.pipe(
+  protected readonly user$: Observable<User> = this.#route.paramMap.pipe(
     map((params) => params.get('identity')),
     distinctUntilChanged(),
     debounceTime(10),

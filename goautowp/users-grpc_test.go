@@ -65,7 +65,7 @@ func TestCreateUpdateDeleteUser(t *testing.T) {
 
 	me, err := client.Me(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 	require.NotNil(t, me)
@@ -91,7 +91,7 @@ func TestCreateUpdateDeleteUser(t *testing.T) {
 		Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
-	user, err := client.GetUser(ctx, &APIGetUserRequest{UserId: me.GetId()})
+	user, err := client.GetUser(ctx, &GetUserRequest{UserId: me.GetId()})
 	require.NoError(t, err)
 	require.NotEmpty(t, user)
 	// require.NotEmpty(t, user.Gravatar)
@@ -115,7 +115,7 @@ func TestCreateUpdateDeleteUser(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIDeleteUserRequest{UserId: me.GetId(), Password: password},
+		&DeleteUserRequest{UserId: me.GetId(), Password: password},
 	)
 	require.NoError(t, err)
 }
@@ -161,7 +161,7 @@ func TestSetDisabledUserCommentsNotifications(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -172,7 +172,7 @@ func TestSetDisabledUserCommentsNotifications(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIUserPreferencesRequest{UserId: tester.GetId()},
+		&UserPreferencesRequest{UserId: tester.GetId()},
 	)
 	require.NoError(t, err)
 
@@ -182,7 +182,7 @@ func TestSetDisabledUserCommentsNotifications(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIUserPreferencesRequest{UserId: tester.GetId()},
+		&UserPreferencesRequest{UserId: tester.GetId()},
 	)
 	require.NoError(t, err)
 	require.True(t, res1.GetDisableCommentsNotifications())
@@ -194,7 +194,7 @@ func TestSetDisabledUserCommentsNotifications(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIUserPreferencesRequest{UserId: tester.GetId()},
+		&UserPreferencesRequest{UserId: tester.GetId()},
 	)
 	require.NoError(t, err)
 
@@ -204,7 +204,7 @@ func TestSetDisabledUserCommentsNotifications(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIUserPreferencesRequest{UserId: tester.GetId()},
+		&UserPreferencesRequest{UserId: tester.GetId()},
 	)
 	require.NoError(t, err)
 	require.False(t, res2.GetDisableCommentsNotifications())
@@ -239,11 +239,11 @@ func TestGetOnlineUsers(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 
-	res, err := client.GetUsers(ctx, &APIUsersRequest{IsOnline: true, Fields: &UserFields{
+	res, err := client.GetUsers(ctx, &UsersRequest{IsOnline: true, Fields: &UserFields{
 		Email:                 true,
 		Timezone:              true,
 		Language:              true,
@@ -270,7 +270,7 @@ func TestGetUsersPagination(t *testing.T) {
 
 	client := NewUsersClient(conn)
 
-	_, err := client.GetUsers(ctx, &APIUsersRequest{Page: 1, Limit: 10})
+	_, err := client.GetUsers(ctx, &UsersRequest{Page: 1, Limit: 10})
 	require.NoError(t, err)
 }
 
@@ -303,16 +303,16 @@ func TestGetUsersSearch(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 
-	res, err := client.GetUsers(ctx, &APIUsersRequest{Search: strings.ToLower(me.GetName())})
+	res, err := client.GetUsers(ctx, &UsersRequest{Search: strings.ToLower(me.GetName())})
 	require.NoError(t, err)
 	require.NotEmpty(t, res.GetItems())
 	require.NotEmpty(t, res.GetItems()[0])
 
-	res, err = client.GetUsers(ctx, &APIUsersRequest{Search: strings.ToUpper(me.GetName())})
+	res, err = client.GetUsers(ctx, &UsersRequest{Search: strings.ToUpper(me.GetName())})
 	require.NoError(t, err)
 	require.NotEmpty(t, res.GetItems())
 	require.NotEmpty(t, res.GetItems()[0])
@@ -348,14 +348,14 @@ func TestUpdateUser(t *testing.T) {
 
 	me, err := client.Me(
 		ctx,
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 
 	_, err = client.UpdateUser(
 		ctx,
 		&UpdateUserRequest{
-			User: &APIUser{
+			User: &User{
 				Id:       me.GetId(),
 				Timezone: "Europe/Dublin",
 				Language: schema.RussianLanguageCode,
@@ -369,7 +369,7 @@ func TestUpdateUser(t *testing.T) {
 
 	res, err := client.GetUser(
 		ctx,
-		&APIGetUserRequest{UserId: me.GetId(), Fields: &UserFields{Timezone: true, Language: true}},
+		&GetUserRequest{UserId: me.GetId(), Fields: &UserFields{Timezone: true, Language: true}},
 	)
 	require.NoError(t, err)
 	require.Equal(t, "Europe/Dublin", res.GetTimezone())

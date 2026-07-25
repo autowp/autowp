@@ -1,7 +1,7 @@
 import {DOCUMENT} from '@angular/common';
 import {inject, Service} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {APIMeRequest, APIUser} from '@grpc/spec.pb';
+import {MeRequest, User} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {KEYCLOAK_EVENT_SIGNAL, KeycloakEventType} from 'keycloak-angular';
 import Keycloak from 'keycloak-js';
@@ -48,7 +48,7 @@ export class AuthService {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  public readonly user$: Observable<APIUser | null> = this.#token$.pipe(
+  public readonly user$: Observable<null | User> = this.#token$.pipe(
     distinctUntilChanged((a, b) => {
       if (!a) {
         return !b;
@@ -66,7 +66,7 @@ export class AuthService {
         return of(null);
       }
 
-      return this.#usersClient.me(new APIMeRequest({})).pipe(
+      return this.#usersClient.me(new MeRequest({})).pipe(
         catchError(() => {
           return of(null);
         }),

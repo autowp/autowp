@@ -2,9 +2,9 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIItem,
   BrandVehicleType,
   GetBrandVehicleTypesRequest,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -46,7 +46,7 @@ export class CatalogueCarsComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly brand$: Observable<APIItem> = this.#route.paramMap.pipe(
+  protected readonly brand$: Observable<Item> = this.#route.paramMap.pipe(
     map((params) => params.get('brand')),
     distinctUntilChanged(),
     switchMap((catname) => {

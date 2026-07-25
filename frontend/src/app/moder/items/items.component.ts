@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit} f
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -127,7 +127,7 @@ export class ModerItemsComponent implements OnInit {
 
   protected ancestorID: null | number = null;
   protected ancestorQuery = '';
-  protected ancestorsDataSource: (text$: Observable<string>) => Observable<APIItem[]> = (text$: Observable<string>) =>
+  protected ancestorsDataSource: (text$: Observable<string>) => Observable<Item[]> = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
       switchMap((query) => {
@@ -343,7 +343,7 @@ export class ModerItemsComponent implements OnInit {
     });
   }
 
-  protected ancestorFormatter(x: APIItem) {
+  protected ancestorFormatter(x: Item) {
     return x.nameText;
   }
 

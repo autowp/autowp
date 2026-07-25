@@ -3,8 +3,8 @@ import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angul
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
   CreatePictureItemRequest,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParent,
@@ -364,7 +364,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
     ),
   );
 
-  protected readonly brands$: Observable<{items: APIItem[][]; paginator?: Pages}> = combineLatest([
+  protected readonly brands$: Observable<{items: Item[][]; paginator?: Pages}> = combineLatest([
     this.#page$,
     this.searchBrandControl.valueChanges.pipe(startWith(''), distinctUntilChanged(), debounceTime(30)),
   ]).pipe(
@@ -383,7 +383,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
       ),
     ),
     map((response) => ({
-      items: chunk<APIItem>(response.items ? response.items : [], 6),
+      items: chunk<Item>(response.items ? response.items : [], 6),
       paginator: response.paginator,
     })),
   );

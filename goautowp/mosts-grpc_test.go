@@ -785,14 +785,14 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 
 			randomInt := random.Int()
 
-			brandID := createItem(t, conn, cnt, &APIItem{ //nolint: contextcheck
+			brandID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:       fmt.Sprintf("brand-%d", randomInt),
 				IsGroup:    true,
 				ItemTypeId: ItemType_ITEM_TYPE_BRAND,
 				Catname:    fmt.Sprintf("brand-%d", randomInt),
 			})
 
-			vehicle1ID := createItem(t, conn, cnt, &APIItem{ //nolint: contextcheck
+			vehicle1ID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:       fmt.Sprintf("vehicle1-%d", randomInt),
 				IsGroup:    true,
 				ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -801,7 +801,7 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 			})
 
 			// second vehicle
-			vehicle2ID := createItem(t, conn, cnt, &APIItem{ //nolint: contextcheck
+			vehicle2ID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:       fmt.Sprintf("vehicle2-%d", randomInt),
 				IsGroup:    true,
 				ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,

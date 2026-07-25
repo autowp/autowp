@@ -1,6 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {APIUser, APIUsersRequest} from '@grpc/spec.pb';
+import {User, UsersRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {BehaviorSubject, Observable} from 'rxjs';
@@ -19,8 +19,8 @@ export class UsersOnlineComponent {
   readonly #usersClient = inject(UsersClient);
 
   readonly #reload$ = new BehaviorSubject<void>(void 0);
-  protected readonly users$: Observable<APIUser[]> = this.#reload$.pipe(
-    switchMap(() => this.#usersClient.getUsers(new APIUsersRequest({isOnline: true}))),
+  protected readonly users$: Observable<User[]> = this.#reload$.pipe(
+    switchMap(() => this.#usersClient.getUsers(new UsersRequest({isOnline: true}))),
     map((response) => (response.items ? response.items : [])),
   );
 

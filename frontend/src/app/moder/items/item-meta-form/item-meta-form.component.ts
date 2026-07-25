@@ -20,7 +20,7 @@ import {
 } from '@angular/forms';
 import {LatLng} from '@grpc/google/type/latlng.pb';
 import {
-  APIItem,
+  Item,
   ItemType,
   Picture,
   PictureFields,
@@ -139,8 +139,8 @@ interface PicturesListItem {
   selected: boolean;
 }
 
-export function itemMetaFormResultsToAPIItem(result: ItemMetaFormResult): APIItem {
-  return new APIItem({
+export function itemMetaFormResultsToAPIItem(result: ItemMetaFormResult): Item {
+  return new Item({
     beginModelYear: result.model_years?.begin_year || undefined,
     beginModelYearFraction: result.model_years?.begin_year_fraction,
     beginMonth: result.begin?.month || undefined,
@@ -213,12 +213,12 @@ export class ItemMetaFormComponent {
   readonly parentIsConcept = input<null | ParentIsConcept>(null);
   protected readonly parentIsConcept$ = toObservable(this.parentIsConcept);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
   readonly vehicleTypeIDs = input.required<string[]>();
 
-  readonly items = input<APIItem[]>([]);
+  readonly items = input<Item[]>([]);
   protected readonly items$ = toObservable(this.items).pipe(map((items) => (items && items.length ? items : null)));
 
   readonly pictures = input<PictureItem[]>([]);

@@ -2,10 +2,10 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
-  APIItemLink,
   GetBrandSectionsRequest,
+  Item,
   ItemFields,
+  ItemLink,
   ItemLinkListOptions,
   ItemLinksRequest,
   ItemListOptions,
@@ -66,7 +66,7 @@ export class CatalogueIndexComponent {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER).pipe(shareReplay({bufferSize: 1, refCount: false}));
 
-  protected readonly brand$: Observable<APIItem> = combineLatest([
+  protected readonly brand$: Observable<Item> = combineLatest([
     this.isModer$,
     this.#route.paramMap.pipe(
       map((params) => params.get('brand')),
@@ -171,9 +171,9 @@ export class CatalogueIndexComponent {
       this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId: brand.id})})),
     ),
     map((response) => {
-      const official: APIItemLink[] = [];
-      const club: APIItemLink[] = [];
-      const other: APIItemLink[] = [];
+      const official: ItemLink[] = [];
+      const club: ItemLink[] = [];
+      const other: ItemLink[] = [];
       (response.items ? response.items : []).forEach((item) => {
         switch (item.type) {
           case 'club':
@@ -191,7 +191,7 @@ export class CatalogueIndexComponent {
     }),
   );
 
-  protected readonly factories$: Observable<{item: APIItem; picture$: Observable<Picture>}[]> = this.brand$.pipe(
+  protected readonly factories$: Observable<{item: Item; picture$: Observable<Picture>}[]> = this.brand$.pipe(
     switchMap((brand) =>
       this.#itemsClient.list(
         new ItemsRequest({

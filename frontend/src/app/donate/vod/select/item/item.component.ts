@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angula
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParent,
@@ -36,7 +36,7 @@ export class DonateVodSelectItemComponent {
   protected readonly itemParent$ = toObservable(this.itemParent);
   protected readonly expanded = signal(false);
 
-  protected readonly item$: Observable<APIItem> = this.itemParent$.pipe(
+  protected readonly item$: Observable<Item> = this.itemParent$.pipe(
     switchMap((itemParent) =>
       itemParent
         ? this.#itemsClient.item(

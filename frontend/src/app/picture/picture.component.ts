@@ -13,13 +13,12 @@ import {
 import {toObservable} from '@angular/core/rxjs-interop';
 import {Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
-  APIItemLink,
-  APIUser,
   CommentsSubscribeRequest,
   CommentsType,
   CommentsUnSubscribeRequest,
+  Item,
   ItemFields,
+  ItemLink,
   ItemLinkListOptions,
   ItemLinksRequest,
   ItemListOptions,
@@ -38,6 +37,7 @@ import {
   PicturesVoteRequest,
   SetPictureItemPerspectiveRequest,
   SetPictureStatusRequest,
+  User,
 } from '@grpc/spec.pb';
 import {CommentsClient, ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -121,7 +121,7 @@ export class PictureComponent {
     );
   });
 
-  protected readonly owner$: Observable<APIUser | null> = this.picture$.pipe(
+  protected readonly owner$: Observable<null | User> = this.picture$.pipe(
     switchMap((picture) => this.#userService.getUser$(picture?.ownerId)),
   );
 
@@ -327,7 +327,7 @@ export class PictureComponent {
     map((response) => response.items || []),
   );
 
-  protected readonly brands$: Observable<APIItem[]> = this.picture$.pipe(
+  protected readonly brands$: Observable<Item[]> = this.picture$.pipe(
     filter((picture) => !!picture),
     switchMap((picture) =>
       this.#itemsClient.list(
@@ -383,7 +383,7 @@ export class PictureComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly links$: Observable<APIItemLink[]> = this.picture$.pipe(
+  protected readonly links$: Observable<ItemLink[]> = this.picture$.pipe(
     filter((picture) => !!picture),
     switchMap((picture) =>
       this.#itemsClient.getItemLinks(

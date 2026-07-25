@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {APIItem, ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb';
+import {Item, ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -51,7 +51,7 @@ export class ModerItemsItemSelectParentComponent implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly item$: Observable<APIItem> = this.itemID$.pipe(
+  protected readonly item$: Observable<Item> = this.itemID$.pipe(
     switchMap((itemID) =>
       this.#itemsClient.item(
         new ItemRequest({

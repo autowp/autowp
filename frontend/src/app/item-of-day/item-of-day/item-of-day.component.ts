@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APIItem, APIUser, ItemOfDayPicture, ItemType} from '@grpc/spec.pb';
+import {Item, ItemOfDayPicture, ItemType, User} from '@grpc/spec.pb';
 import {Observable} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 
@@ -16,8 +16,8 @@ import {UserComponent} from '../../user/user/user.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemOfDayComponent {
-  readonly item$ = input.required<Observable<APIItem>>();
-  protected readonly _item$: Observable<APIItem> = toObservable(this.item$).pipe(switchMap((item$) => item$));
+  readonly item$ = input.required<Observable<Item>>();
+  protected readonly _item$: Observable<Item> = toObservable(this.item$).pipe(switchMap((item$) => item$));
 
   protected readonly itemOfDayPictures$?: Observable<null | {
     first: ItemOfDayPicture[];
@@ -34,7 +34,7 @@ export class ItemOfDayComponent {
     }),
   );
 
-  public readonly user$ = input.required<Observable<APIUser | null>>();
+  public readonly user$ = input.required<Observable<null | User>>();
 
   protected readonly ItemType = ItemType;
 }

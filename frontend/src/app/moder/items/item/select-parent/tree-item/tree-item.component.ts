@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, forwardRef, inject, input, output, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {
-  APIItem,
+  Item,
   ItemListOptions,
   ItemParent,
   ItemParentListOptions,
@@ -29,7 +29,7 @@ export class ModerItemsItemSelectParentTreeItemComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
   readonly order = input.required<ItemParentsRequest.Order>();
@@ -68,7 +68,7 @@ export class ModerItemsItemSelectParentTreeItemComponent {
     map((response) => response.items || []),
   );
 
-  protected isDisabled(item: APIItem): boolean {
+  protected isDisabled(item: Item): boolean {
     return item.id === this.disableItemID();
   }
 

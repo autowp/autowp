@@ -3,20 +3,20 @@ import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angul
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIGetUserRequest,
-  APIItem,
-  APIUser,
-  APIUser as APIUser2,
-  APIUsersRequest,
+  User as APIUser2,
   CommentMessage,
   CommentMessageFields,
   GetMessagesRequest,
+  GetUserRequest,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemsRequest,
   ModeratorAttention,
   Pages,
   PictureStatus,
+  User,
+  UsersRequest,
 } from '@grpc/spec.pb';
 import {CommentsClient, ItemsClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
@@ -53,14 +53,12 @@ export class ModerCommentsComponent implements OnInit {
 
   protected readonly itemID = signal<null | string>(null);
   protected readonly itemQuery = new FormControl<string>('', {nonNullable: true});
-  protected readonly itemsDataSource: (text$: Observable<string>) => Observable<APIItem[]> = (
-    text$: Observable<string>,
-  ) =>
+  protected readonly itemsDataSource: (text$: Observable<string>) => Observable<Item[]> = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
       switchMap((query) => {
         if (query === '') {
-          return of([] as APIItem[]);
+          return of([] as Item[]);
         }
 
         const params = new ItemsRequest({
@@ -87,9 +85,7 @@ export class ModerCommentsComponent implements OnInit {
     );
 
   protected readonly userQuery = new FormControl<string>('', {nonNullable: true});
-  protected readonly usersDataSource: (text$: Observable<string>) => Observable<APIUser[]> = (
-    text$: Observable<string>,
-  ) =>
+  protected readonly usersDataSource: (text$: Observable<string>) => Observable<User[]> = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
       switchMap((query) => {
@@ -98,7 +94,7 @@ export class ModerCommentsComponent implements OnInit {
         }
 
         if (query.startsWith('#')) {
-          return this.#usersClient.getUser(new APIGetUserRequest({userId: query.substring(1) || ''})).pipe(
+          return this.#usersClient.getUser(new GetUserRequest({userId: query.substring(1) || ''})).pipe(
             catchError((err: unknown) => {
               this.#toastService.handleError(err);
               return EMPTY;
@@ -107,7 +103,7 @@ export class ModerCommentsComponent implements OnInit {
           );
         }
 
-        return this.#usersClient.getUsers(new APIUsersRequest({limit: 10, search: query})).pipe(
+        return this.#usersClient.getUsers(new UsersRequest({limit: 10, search: query})).pipe(
           catchError((err: unknown) => {
             this.#toastService.handleError(err);
             return EMPTY;
@@ -202,7 +198,7 @@ export class ModerCommentsComponent implements OnInit {
     });
   }
 
-  protected itemFormatter(x: APIItem) {
+  protected itemFormatter(x: Item) {
     return x.nameText;
   }
 
@@ -225,7 +221,7 @@ export class ModerCommentsComponent implements OnInit {
     });
   }
 
-  protected userFormatter(x: APIUser) {
+  protected userFormatter(x: User) {
     return x.name;
   }
 

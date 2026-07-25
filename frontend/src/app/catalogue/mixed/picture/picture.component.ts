@@ -3,8 +3,8 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
   CommentsType,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemsRequest,
@@ -46,7 +46,7 @@ export class CatalogueMixedPictureComponent {
 
   protected readonly CommentsType = CommentsType;
 
-  protected readonly brand$: Observable<APIItem> = this.#route.paramMap.pipe(
+  protected readonly brand$: Observable<Item> = this.#route.paramMap.pipe(
     map((params) => params.get('brand')),
     distinctUntilChanged(),
     debounceTime(10),

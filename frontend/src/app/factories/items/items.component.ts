@@ -2,8 +2,8 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIImage,
-  APIItem,
+  Image,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemRequest,
@@ -54,7 +54,7 @@ export class FactoryItemsComponent {
     debounceTime(10),
   );
 
-  protected readonly factory$: Observable<APIItem> = this.#route.paramMap.pipe(
+  protected readonly factory$: Observable<Item> = this.#route.paramMap.pipe(
     map((params) => params.get('id') ?? ''),
     distinctUntilChanged(),
     debounceTime(10),
@@ -143,7 +143,7 @@ export class FactoryItemsComponent {
         const largeFormat = !!item.previewPictures?.largeFormat;
 
         const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map((picture, idx) => {
-          let thumb: APIImage | undefined = undefined;
+          let thumb: Image | undefined = undefined;
           if (picture.picture) {
             thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
           }

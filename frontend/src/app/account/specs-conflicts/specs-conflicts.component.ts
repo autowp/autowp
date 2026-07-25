@@ -2,15 +2,15 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIItem,
-  APIUser,
   AttrAttribute,
   AttrConflict,
   AttrConflictsRequest,
   AttrConflictValue,
+  Item,
   ItemFields,
   ItemRequest,
   Pages,
+  User,
 } from '@grpc/spec.pb';
 import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
@@ -28,13 +28,13 @@ import {UserComponent} from '../../user/user/user.component';
 interface APIAttrConflictInList {
   attribute$: Observable<AttrAttribute | undefined>;
   conflict: AttrConflict;
-  item$: Observable<APIItem | null>;
+  item$: Observable<Item | null>;
   unitName$: Observable<null | string>;
   values: APIAttrConflictValueInList[];
 }
 
 interface APIAttrConflictValueInList {
-  user$: Observable<APIUser | null>;
+  user$: Observable<null | User>;
   value: AttrConflictValue;
 }
 
@@ -82,11 +82,11 @@ export class AccountSpecsConflictsComponent implements OnInit {
     map((filter) => mapFilter(filter)),
   );
 
-  protected readonly user$: Observable<APIUser | null> = this.auth.user$;
+  protected readonly user$: Observable<null | User> = this.auth.user$;
 
-  readonly #itemsCache = new Map<string, Observable<APIItem>>();
+  readonly #itemsCache = new Map<string, Observable<Item>>();
 
-  private getItem$(id: string): Observable<APIItem | null> {
+  private getItem$(id: string): Observable<Item | null> {
     let o$ = this.#itemsCache.get(id);
     if (!o$) {
       o$ = this.#itemsClient

@@ -73,7 +73,7 @@ func TestYoomoneyWebhookHappyPath(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:            fmt.Sprintf("item-of-day-%d", random.Int()),
 		IsGroup:         true,
 		ItemTypeId:      ItemType_ITEM_TYPE_BRAND,

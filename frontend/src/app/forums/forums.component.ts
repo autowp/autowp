@@ -2,7 +2,6 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIUser,
   CommentMessage,
   GetThemeRequest,
   GetTopicRequest,
@@ -12,6 +11,7 @@ import {
   Pages,
   Theme,
   Topic,
+  User,
 } from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
@@ -28,7 +28,7 @@ import {ForumsTopicListComponent} from './topic-list/topic-list.component';
 
 interface ThemeItem extends Theme.AsObject {
   lastMessage$: Observable<CommentMessage | null>;
-  lastMessageAuthor$: Observable<APIUser | null>;
+  lastMessageAuthor$: Observable<null | User>;
   lastTopic$: Observable<null | Topic>;
   themes$: Observable<ListThemesResponse>;
 }

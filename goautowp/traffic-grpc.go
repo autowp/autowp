@@ -74,11 +74,11 @@ func (s *TrafficGRPCServer) GetTrafficTop(
 
 		var (
 			user       *schema.UsersRow
-			topItemBan *APIBanItem
+			topItemBan *BanItem
 		)
 
 		if banItem != nil {
-			var extractedUser *APIUser
+			var extractedUser *User
 
 			if banItem.ByUserID > 0 {
 				user, err = s.usersRepository.User(ctx, &query.UserListOptions{
@@ -102,7 +102,7 @@ func (s *TrafficGRPCServer) GetTrafficTop(
 				}
 			}
 
-			topItemBan = &APIBanItem{
+			topItemBan = &BanItem{
 				Until:    timestamppb.New(banItem.Until),
 				ByUserId: banItem.ByUserID,
 				ByUser:   extractedUser,

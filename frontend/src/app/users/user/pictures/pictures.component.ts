@@ -2,7 +2,7 @@ import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -81,7 +81,7 @@ export class UsersUserPicturesComponent implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly brands$: Observable<APIItem[]> = this.user$.pipe(
+  protected readonly brands$: Observable<Item[]> = this.user$.pipe(
     switchMap((user) =>
       this.#itemsClient.list(
         new ItemsRequest({
@@ -117,7 +117,7 @@ export class UsersUserPicturesComponent implements OnInit {
     this.#pageEnv.set({pageId: 63});
   }
 
-  protected cssClass(item: APIItem) {
+  protected cssClass(item: Item) {
     return item.catname.replace(/\./g, '_');
   }
 }

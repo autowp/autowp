@@ -42,13 +42,13 @@ func (s *UserExtractor) Extract(
 	fields *UserFields,
 	currentUserID int64,
 	currentUserRoles []string,
-) (*APIUser, error) {
+) (*User, error) {
 	identity := ""
 	if row.Identity != nil {
 		identity = *row.Identity
 	}
 
-	user := APIUser{
+	user := User{
 		Id:       row.ID,
 		Deleted:  row.Deleted,
 		Route:    frontend.UserRoute(row.ID, row.Identity),

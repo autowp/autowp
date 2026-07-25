@@ -3,9 +3,9 @@ import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angul
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
-  APIItemList,
+  Item,
   ItemFields,
+  ItemList,
   ItemListOptions,
   ItemParent,
   ItemParentFields,
@@ -52,10 +52,10 @@ export class UploadSelectComponent implements OnInit {
       | {
           concepts: ItemParent[];
           engines: ItemParent[];
-          item: APIItem;
+          item: Item;
           vehicles: ItemParent[];
         };
-    brands: APIItem[][] | undefined;
+    brands: Item[][] | undefined;
     paginator: Pages | undefined;
   }> = combineLatest([
     this.search.valueChanges.pipe(
@@ -95,7 +95,7 @@ export class UploadSelectComponent implements OnInit {
     this.#pageEnv.set({pageId: 30});
   }
 
-  private brandsObservable$(page: number, search: string): Observable<APIItemList> {
+  private brandsObservable$(page: number, search: string): Observable<ItemList> {
     return this.#itemsClient
       .list(
         new ItemsRequest({
@@ -123,7 +123,7 @@ export class UploadSelectComponent implements OnInit {
   private brandObservable$(brandId: string): Observable<{
     concepts: ItemParent[];
     engines: ItemParent[];
-    item: APIItem;
+    item: Item;
     vehicles: ItemParent[];
   }> {
     return this.#itemsClient.item(new ItemRequest({id: brandId, language: this.#languageService.language})).pipe(
@@ -138,7 +138,7 @@ export class UploadSelectComponent implements OnInit {
     );
   }
 
-  private brandItemsObservable(item: APIItem) {
+  private brandItemsObservable(item: Item) {
     return forkJoin([
       of(item),
       this.#itemsClient

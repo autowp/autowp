@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIItem, APIItemList, ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
+import {Item, ItemFields, ItemList, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
@@ -45,9 +45,9 @@ export class ModerItemsAlphaComponent implements OnInit {
             }),
           )
         : of({
-            items: [] as APIItem[],
+            items: [] as Item[],
             paginator: undefined,
-          } as APIItemList),
+          } as ItemList),
     ),
   );
 

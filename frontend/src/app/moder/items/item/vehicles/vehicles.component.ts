@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APIItem, ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
+import {Item, ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {EMPTY, Observable} from 'rxjs';
@@ -20,7 +20,7 @@ export class ModerItemsItemVehiclesComponent {
 
   readonly itemId = input.required<string>();
 
-  protected readonly engineVehicles$: Observable<APIItem[]> = toObservable(this.itemId).pipe(
+  protected readonly engineVehicles$: Observable<Item[]> = toObservable(this.itemId).pipe(
     switchMap((itemId) =>
       itemId
         ? this.#itemsClient.list(

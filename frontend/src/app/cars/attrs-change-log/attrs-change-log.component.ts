@@ -3,14 +3,14 @@ import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core'
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
-  APIUser,
-  APIUsersRequest,
   AttrUserValue,
   AttrUserValuesFields,
   AttrUserValuesRequest,
+  Item,
   ItemFields,
   ItemRequest,
+  User,
+  UsersRequest,
 } from '@grpc/spec.pb';
 import {AttrsClient, ItemsClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip, NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
@@ -28,10 +28,10 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 interface AttrUserValueListItem {
-  item$: Observable<APIItem | null>;
+  item$: Observable<Item | null>;
   path$: Observable<string[]>;
   unitAbbr$: Observable<null | string | undefined>;
-  user$: Observable<APIUser | null>;
+  user$: Observable<null | User>;
   userValue: AttrUserValue;
 }
 
@@ -65,7 +65,7 @@ export class CarsAttrsChangeLogComponent implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
   readonly #attrsService = inject(APIAttrsService);
 
-  readonly #itemsCache = new Map<string, Observable<APIItem>>();
+  readonly #itemsCache = new Map<string, Observable<Item>>();
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
@@ -118,7 +118,7 @@ export class CarsAttrsChangeLogComponent implements OnInit {
     }),
   );
 
-  protected readonly usersDataSource: (text$: Observable<string>) => Observable<(APIUser | null)[]> = (
+  protected readonly usersDataSource: (text$: Observable<string>) => Observable<(null | User)[]> = (
     text$: Observable<string>,
   ) =>
     text$.pipe(
@@ -138,7 +138,7 @@ export class CarsAttrsChangeLogComponent implements OnInit {
           );
         }
 
-        return this.#usersClient.getUsers(new APIUsersRequest({limit: 10, search: query})).pipe(
+        return this.#usersClient.getUsers(new UsersRequest({limit: 10, search: query})).pipe(
           catchError((err: unknown) => {
             this.#toastService.handleError(err);
             return EMPTY;
@@ -148,7 +148,7 @@ export class CarsAttrsChangeLogComponent implements OnInit {
       }),
     );
 
-  private getItem$(id: string): Observable<APIItem | null> {
+  private getItem$(id: string): Observable<Item | null> {
     let o$ = this.#itemsCache.get(id);
     if (!o$) {
       o$ = this.#itemsClient
@@ -165,8 +165,8 @@ export class CarsAttrsChangeLogComponent implements OnInit {
     this.#pageEnv.set({pageId: 103});
   }
 
-  protected userFormatter(x: APIUser | string) {
-    return x instanceof APIUser ? x.name : x;
+  protected userFormatter(x: string | User) {
+    return x instanceof User ? x.name : x;
   }
 
   protected userOnSelect(e: NgbTypeaheadSelectItemEvent): void {

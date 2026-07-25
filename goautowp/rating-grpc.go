@@ -50,7 +50,7 @@ func NewRatingGRPCServer(
 
 func (s *RatingGRPCServer) GetUserPicturesRating(
 	ctx context.Context, _ *emptypb.Empty,
-) (*APIUsersRatingResponse, error) {
+) (*UsersRatingResponse, error) {
 	falseRef := false
 	trueRef := true
 
@@ -63,15 +63,15 @@ func (s *RatingGRPCServer) GetUserPicturesRating(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIUsersRatingUser, len(rows))
+	result := make([]*UsersRatingUser, len(rows))
 	for idx, row := range rows {
-		result[idx] = &APIUsersRatingUser{
+		result[idx] = &UsersRatingUser{
 			UserId: row.ID,
 			Volume: row.PicturesTotal,
 		}
 	}
 
-	return &APIUsersRatingResponse{
+	return &UsersRatingResponse{
 		Users: result,
 	}, nil
 }
@@ -99,9 +99,9 @@ func (s *RatingGRPCServer) GetUserPicturesRatingBrands(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIUsersRatingUserBrand, len(brands))
+	result := make([]*UsersRatingUserBrand, len(brands))
 	for idx, brand := range brands {
-		result[idx] = &APIUsersRatingUserBrand{
+		result[idx] = &UsersRatingUserBrand{
 			Name:   brand.NameOnly,
 			Route:  frontend.BrandRoute(util.NullStringToString(brand.Catname)),
 			Volume: int64(brand.DescendantPicturesCount),
@@ -115,21 +115,21 @@ func (s *RatingGRPCServer) GetUserPicturesRatingBrands(
 
 func (s *RatingGRPCServer) GetUserCommentsRating(
 	ctx context.Context, _ *emptypb.Empty,
-) (*APIUsersRatingResponse, error) {
+) (*UsersRatingResponse, error) {
 	ratingUsers, err := s.commentsRepository.TopAuthors(ctx, usersRatingLimit)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIUsersRatingUser, len(ratingUsers))
+	result := make([]*UsersRatingUser, len(ratingUsers))
 	for idx, ratingUser := range ratingUsers {
-		result[idx] = &APIUsersRatingUser{
+		result[idx] = &UsersRatingUser{
 			UserId: ratingUser.AuthorID,
 			Volume: ratingUser.Volume,
 		}
 	}
 
-	return &APIUsersRatingResponse{
+	return &UsersRatingResponse{
 		Users: result,
 	}, nil
 }
@@ -142,9 +142,9 @@ func (s *RatingGRPCServer) GetUserCommentsRatingFans(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIUsersRatingUserFan, len(fans))
+	result := make([]*UsersRatingUserFan, len(fans))
 	for idx, fan := range fans {
-		result[idx] = &APIUsersRatingUserFan{
+		result[idx] = &UsersRatingUserFan{
 			UserId: fan.UserID,
 			Volume: fan.Volume,
 		}
@@ -157,21 +157,21 @@ func (s *RatingGRPCServer) GetUserCommentsRatingFans(
 
 func (s *RatingGRPCServer) GetUserPictureLikesRating(
 	ctx context.Context, _ *emptypb.Empty,
-) (*APIUsersRatingResponse, error) {
+) (*UsersRatingResponse, error) {
 	ratingUsers, err := s.picturesRepository.TopLikes(ctx, usersRatingLimit)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIUsersRatingUser, len(ratingUsers))
+	result := make([]*UsersRatingUser, len(ratingUsers))
 	for idx, ratingUser := range ratingUsers {
-		result[idx] = &APIUsersRatingUser{
+		result[idx] = &UsersRatingUser{
 			UserId: ratingUser.OwnerID,
 			Volume: ratingUser.Volume,
 		}
 	}
 
-	return &APIUsersRatingResponse{
+	return &UsersRatingResponse{
 		Users: result,
 	}, nil
 }
@@ -184,9 +184,9 @@ func (s *RatingGRPCServer) GetUserPictureLikesRatingFans(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIUsersRatingUserFan, len(fans))
+	result := make([]*UsersRatingUserFan, len(fans))
 	for idx, fan := range fans {
-		result[idx] = &APIUsersRatingUserFan{
+		result[idx] = &UsersRatingUserFan{
 			UserId: fan.UserID,
 			Volume: fan.Volume,
 		}
@@ -199,7 +199,7 @@ func (s *RatingGRPCServer) GetUserPictureLikesRatingFans(
 
 func (s *RatingGRPCServer) GetUserSpecsRating(
 	ctx context.Context, _ *emptypb.Empty,
-) (*APIUsersRatingResponse, error) {
+) (*UsersRatingResponse, error) {
 	falseRef := false
 	trueRef := true
 
@@ -212,16 +212,16 @@ func (s *RatingGRPCServer) GetUserSpecsRating(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIUsersRatingUser, len(ratingUsers))
+	result := make([]*UsersRatingUser, len(ratingUsers))
 	for idx, u := range ratingUsers {
-		result[idx] = &APIUsersRatingUser{
+		result[idx] = &UsersRatingUser{
 			UserId: u.ID,
 			Volume: u.SpecsVolume,
 			Weight: u.SpecsWeight,
 		}
 	}
 
-	return &APIUsersRatingResponse{
+	return &UsersRatingResponse{
 		Users: result,
 	}, nil
 }
@@ -234,9 +234,9 @@ func (s *RatingGRPCServer) GetUserSpecsRatingBrands(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIUsersRatingUserBrand, len(brands))
+	result := make([]*UsersRatingUserBrand, len(brands))
 	for idx, brand := range brands {
-		result[idx] = &APIUsersRatingUserBrand{
+		result[idx] = &UsersRatingUserBrand{
 			Name:   brand.Name,
 			Route:  frontend.BrandRoute(brand.Catname),
 			Volume: brand.Volume,

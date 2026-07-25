@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemRequest,
   ItemType,
@@ -43,7 +43,7 @@ export class FactoryComponent {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  protected readonly item$: Observable<APIItem> = this.#route.paramMap.pipe(
+  protected readonly item$: Observable<Item> = this.#route.paramMap.pipe(
     map((params) => params.get('id') ?? ''),
     distinctUntilChanged(),
     debounceTime(10),

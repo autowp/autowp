@@ -2,7 +2,7 @@ import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIUsersRequest, UserFields} from '@grpc/spec.pb';
+import {UserFields, UsersRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
@@ -29,7 +29,7 @@ export class ModerUsersComponent implements OnInit {
     stream: () => {
       const pageStr = this.#page();
       return this.#usersClient.getUsers(
-        new APIUsersRequest({
+        new UsersRequest({
           fields: new UserFields({
             email: true,
             lastOnline: true,

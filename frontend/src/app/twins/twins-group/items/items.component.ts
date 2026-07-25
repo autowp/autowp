@@ -2,8 +2,8 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
-  APIItem,
   CommentsType,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentListOptions,
@@ -44,7 +44,7 @@ export class TwinsGroupItemsComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly group$: Observable<APIItem | null> = this.groupId$.pipe(
+  protected readonly group$: Observable<Item | null> = this.groupId$.pipe(
     switchMap((group) => {
       if (!group) {
         return of(null);

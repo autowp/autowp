@@ -42,33 +42,33 @@ func TestGetTwinsBrandsList(t *testing.T) {
 	ctx := t.Context()
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brand1 := createItem(t, conn, cnt, &APIItem{
+	brand1 := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand1-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand1-%d", random.Int()),
 	})
 
-	brand2 := createItem(t, conn, cnt, &APIItem{
+	brand2 := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand2-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand2-%d", random.Int()),
 	})
 
-	vehicle1 := createItem(t, conn, cnt, &APIItem{
+	vehicle1 := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle1-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	vehicle2 := createItem(t, conn, cnt, &APIItem{
+	vehicle2 := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle2-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	twins := createItem(t, conn, cnt, &APIItem{
+	twins := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("twins-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_TWINS,
@@ -252,7 +252,7 @@ func TestItemLinks(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIItemLink{
+		&ItemLink{
 			Name:   "Link 1 ",
 			Url:    " https://example.org",
 			Type:   " club",
@@ -282,7 +282,7 @@ func TestItemLinks(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIItemLink{
+		&ItemLink{
 			Id:     r1.GetId(),
 			Name:   "Link 2",
 			Url:    "https://example2.org",
@@ -344,7 +344,7 @@ func TestItemVehicleTypes(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIItemVehicleType{
+		&ItemVehicleType{
 			ItemId:        1,
 			VehicleTypeId: 1,
 		},
@@ -357,7 +357,7 @@ func TestItemVehicleTypes(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIItemVehicleTypeRequest{
+		&ItemVehicleTypeRequest{
 			ItemId:        1,
 			VehicleTypeId: 1,
 		},
@@ -372,7 +372,7 @@ func TestItemVehicleTypes(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIItemVehicleType{
+		&ItemVehicleType{
 			ItemId:        1,
 			VehicleTypeId: 2,
 		},
@@ -385,7 +385,7 @@ func TestItemVehicleTypes(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIGetItemVehicleTypesRequest{
+		&GetItemVehicleTypesRequest{
 			ItemId: 1,
 		},
 	)
@@ -398,7 +398,7 @@ func TestItemVehicleTypes(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIItemVehicleTypeRequest{
+		&ItemVehicleTypeRequest{
 			ItemId:        1,
 			VehicleTypeId: 1,
 		},
@@ -411,7 +411,7 @@ func TestItemVehicleTypes(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIItemVehicleTypeRequest{
+		&ItemVehicleTypeRequest{
 			ItemId:        1,
 			VehicleTypeId: 2,
 		},
@@ -426,7 +426,7 @@ func TestItemVehicleTypes(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIItemVehicleTypeRequest{
+		&ItemVehicleTypeRequest{
 			ItemId:        1,
 			VehicleTypeId: 1,
 		},
@@ -439,7 +439,7 @@ func TestItemVehicleTypes(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIGetItemVehicleTypesRequest{
+		&GetItemVehicleTypesRequest{
 			ItemId: 1,
 		},
 	)
@@ -476,7 +476,7 @@ func TestItemParentLanguages(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIGetItemParentLanguagesRequest{
+		&GetItemParentLanguagesRequest{
 			ItemId:   1,
 			ParentId: 1,
 		},
@@ -513,7 +513,7 @@ func TestItemLanguages(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIGetItemLanguagesRequest{
+		&GetItemLanguagesRequest{
 			ItemId: 1,
 		},
 	)
@@ -526,7 +526,7 @@ func TestCatalogueMenuList(t *testing.T) {
 	ctx := t.Context()
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	createItem(t, conn, cnt, &APIItem{
+	createItem(t, conn, cnt, &Item{
 		Name:            fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:         false,
 		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
@@ -676,7 +676,7 @@ func TestSetItemParentLanguage(t *testing.T) {
 			childName := fmt.Sprintf(testCase.ChildName, randomInt)
 			parentName := fmt.Sprintf(testCase.ParentName, randomInt)
 
-			itemID := createItem(t, conn, cnt, &APIItem{ //nolint: contextcheck
+			itemID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:           childName,
 				ItemTypeId:     ItemType_ITEM_TYPE_VEHICLE,
 				BeginYear:      testCase.ChildBeginYear,
@@ -686,7 +686,7 @@ func TestSetItemParentLanguage(t *testing.T) {
 				SpecId:         testCase.ChildSpecID,
 			})
 
-			parentID := createItem(t, conn, cnt, &APIItem{ //nolint: contextcheck
+			parentID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:           parentName,
 				IsGroup:        true,
 				ItemTypeId:     ItemType_ITEM_TYPE_VEHICLE,
@@ -718,7 +718,7 @@ func TestSetItemParentLanguage(t *testing.T) {
 
 			r3, err := client.GetItemParentLanguages(
 				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-				&APIGetItemParentLanguagesRequest{
+				&GetItemParentLanguagesRequest{
 					ItemId:   itemID,
 					ParentId: parentID,
 				},
@@ -747,7 +747,7 @@ func TestBrandNewItems(t *testing.T) {
 	ctx := t.Context()
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -775,14 +775,14 @@ func TestNewItems(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_CATEGORY,
 		Catname:    fmt.Sprintf("category-%d", random.Int()),
 	})
 
-	childID := createItem(t, conn, cnt, &APIItem{
+	childID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -818,7 +818,7 @@ func TestInboxPicturesCount(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	// create brand
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:            fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:         true,
 		ItemTypeId:      ItemType_ITEM_TYPE_BRAND,
@@ -828,7 +828,7 @@ func TestInboxPicturesCount(t *testing.T) {
 	})
 
 	// create vehicle
-	childID := createItem(t, conn, cnt, &APIItem{
+	childID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -953,7 +953,7 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	parentID1 := createItem(t, conn, cnt, &APIItem{
+	parentID1 := createItem(t, conn, cnt, &Item{
 		Name:            fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:         true,
 		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
@@ -962,7 +962,7 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 		ProducedExactly: false,
 	})
 
-	parentID2 := createItem(t, conn, cnt, &APIItem{
+	parentID2 := createItem(t, conn, cnt, &Item{
 		Name:            fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:         true,
 		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
@@ -971,7 +971,7 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 		ProducedExactly: false,
 	})
 
-	childID := createItem(t, conn, cnt, &APIItem{
+	childID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -1077,20 +1077,20 @@ func TestDeleteItemParentNotDeletesSecondChild(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	parentID := createItem(t, conn, cnt, &APIItem{
+	parentID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_CATEGORY,
 		Catname:    fmt.Sprintf("category-%d", random.Int()),
 	})
 
-	childID1 := createItem(t, conn, cnt, &APIItem{
+	childID1 := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	childID2 := createItem(t, conn, cnt, &APIItem{
+	childID2 := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -1176,7 +1176,7 @@ func TestUpdateItemParent(t *testing.T) {
 	randomInt := random.Int()
 
 	parentName := fmt.Sprintf("Peugeot-%d", randomInt)
-	parentID := createItem(t, conn, cnt, &APIItem{
+	parentID := createItem(t, conn, cnt, &Item{
 		Name:            parentName,
 		IsGroup:         true,
 		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
@@ -1186,7 +1186,7 @@ func TestUpdateItemParent(t *testing.T) {
 	})
 
 	childName := fmt.Sprintf("Peugeot-%d 407", randomInt)
-	childID := createItem(t, conn, cnt, &APIItem{
+	childID := createItem(t, conn, cnt, &Item{
 		Name:       childName,
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -1286,7 +1286,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 	randomInt := random.Int()
 
 	itemName := fmt.Sprintf("Peugeot-%d", randomInt)
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:            itemName,
 		IsGroup:         true,
 		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
@@ -1307,7 +1307,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	res, err := client.GetItemLanguages(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&APIGetItemLanguagesRequest{
+		&GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1337,7 +1337,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	res, err = client.GetItemLanguages(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&APIGetItemLanguagesRequest{
+		&GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1370,7 +1370,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	res, err = client.GetItemLanguages(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&APIGetItemLanguagesRequest{
+		&GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1402,7 +1402,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	res, err = client.GetItemLanguages(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&APIGetItemLanguagesRequest{
+		&GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1435,7 +1435,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	res, err = client.GetItemLanguages(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&APIGetItemLanguagesRequest{
+		&GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1473,7 +1473,7 @@ func TestSetUserItemSubscription(t *testing.T) {
 	randomInt := random.Int()
 
 	itemName := fmt.Sprintf("Peugeot-%d", randomInt)
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:            itemName,
 		IsGroup:         true,
 		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
@@ -1529,14 +1529,14 @@ func TestSetItemEngine(t *testing.T) {
 	randomInt := random.Int()
 
 	itemName := fmt.Sprintf("Peugeot-%d", randomInt)
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       itemName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &APIItem{
+	engineID := createItem(t, conn, cnt, &Item{
 		Name:       engineName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
@@ -1545,7 +1545,7 @@ func TestSetItemEngine(t *testing.T) {
 	_, err = client.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -1564,7 +1564,7 @@ func TestSetItemEngine(t *testing.T) {
 	_, err = client.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: true,
@@ -1583,7 +1583,7 @@ func TestSetItemEngine(t *testing.T) {
 	_, err = client.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -1602,7 +1602,7 @@ func TestSetItemEngine(t *testing.T) {
 	_, err = client.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            itemID,
 				EngineItemId:  0,
 				EngineInherit: false,
@@ -1638,21 +1638,21 @@ func TestSetItemEngineInheritance(t *testing.T) {
 	randomInt := random.Int()
 
 	itemName := fmt.Sprintf("Peugeot-%d", randomInt)
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       itemName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &APIItem{
+	engineID := createItem(t, conn, cnt, &Item{
 		Name:       engineName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
 	})
 
 	// test inheritance
-	parentItemID := createItem(t, conn, cnt, &APIItem{
+	parentItemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("Peugeot-%d-Parent", randomInt),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -1670,7 +1670,7 @@ func TestSetItemEngineInheritance(t *testing.T) {
 	_, err = client.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            parentItemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -1689,7 +1689,7 @@ func TestSetItemEngineInheritance(t *testing.T) {
 	_, err = client.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            itemID,
 				EngineInherit: true,
 			},
@@ -1708,7 +1708,7 @@ func TestSetItemEngineInheritance(t *testing.T) {
 	_, err = client.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            parentItemID,
 				EngineItemId:  0,
 				EngineInherit: false,
@@ -1746,35 +1746,35 @@ func TestGetBrands(t *testing.T) {
 		Name      string
 		Catname   string
 		Language  string
-		Category  APIBrandsListLine_Category
+		Category  BrandsListLine_Category
 		Character string
 	}{
 		{
 			Name:      "123",
 			Catname:   "numeric",
 			Language:  schema.EnglishLanguageCode,
-			Category:  APIBrandsListLine_NUMBER,
+			Category:  BrandsListLine_NUMBER,
 			Character: "1",
 		},
 		{
 			Name:      "Бренд",
 			Catname:   "cyrillic",
 			Language:  schema.EnglishLanguageCode,
-			Category:  APIBrandsListLine_CYRILLIC,
+			Category:  BrandsListLine_CYRILLIC,
 			Character: "Б",
 		},
 		{
 			Name:      "Latin Brand",
 			Catname:   "latin",
 			Language:  schema.EnglishLanguageCode,
-			Category:  APIBrandsListLine_LATIN,
+			Category:  BrandsListLine_LATIN,
 			Character: "L",
 		},
 		{
 			Name:      "所有",
 			Catname:   "han",
 			Language:  schema.EnglishLanguageCode,
-			Category:  APIBrandsListLine_LATIN,
+			Category:  BrandsListLine_LATIN,
 			Character: "S",
 		},
 	}
@@ -1784,7 +1784,7 @@ func TestGetBrands(t *testing.T) {
 			t.Parallel()
 
 			brandName := fmt.Sprintf("%s-%d", testCase.Name, randomInt)
-			brandID := createItem(t, conn, cnt, &APIItem{ //nolint: contextcheck
+			brandID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:       brandName,
 				IsGroup:    true,
 				ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -1811,7 +1811,7 @@ func TestGetBrands(t *testing.T) {
 			res, err := client.GetBrands(ctx, &GetBrandsRequest{Language: testCase.Language})
 			require.NoError(t, err)
 
-			lineIndex := slices.IndexFunc(res.GetLines(), func(line *APIBrandsListLine) bool {
+			lineIndex := slices.IndexFunc(res.GetLines(), func(line *BrandsListLine) bool {
 				return testCase.Category == line.GetCategory()
 			})
 			require.GreaterOrEqual(t, lineIndex, 0)
@@ -1820,7 +1820,7 @@ func TestGetBrands(t *testing.T) {
 
 			characterIndex := slices.IndexFunc(
 				line.GetCharacters(),
-				func(character *APIBrandsListCharacter) bool {
+				func(character *BrandsListCharacter) bool {
 					return testCase.Character == character.GetCharacter()
 				},
 			)
@@ -1829,7 +1829,7 @@ func TestGetBrands(t *testing.T) {
 			character := line.GetCharacters()[characterIndex]
 
 			require.True(t,
-				slices.ContainsFunc(character.GetItems(), func(item *APIBrandsListItem) bool {
+				slices.ContainsFunc(character.GetItems(), func(item *BrandsListItem) bool {
 					return item.GetId() == brandID
 				}),
 			)
@@ -1853,7 +1853,7 @@ func TestGetItemsFirstChars(t *testing.T) {
 
 	personName := fmt.Sprintf("Zeta-%d", random.Int())
 
-	personID := createItem(t, conn, cnt, &APIItem{
+	personID := createItem(t, conn, cnt, &Item{
 		Name:       personName,
 		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
 	})
@@ -1946,7 +1946,7 @@ func TestBrandSections2(t *testing.T) {
 
 	// create brand
 	brandName := fmt.Sprintf("Opel-%d", randomInt)
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       brandName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -2012,7 +2012,7 @@ func TestBrandSections2(t *testing.T) {
 
 			// create child vehicle
 			childName := fmt.Sprintf("Opel-%d %s", randomInt, testCase.Name)
-			childID := createItem(t, conn, cnt, &APIItem{ //nolint: contextcheck
+			childID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:       childName,
 				IsGroup:    true,
 				ItemTypeId: testCase.ItemTypeID,
@@ -2036,7 +2036,7 @@ func TestBrandSections2(t *testing.T) {
 						authorizationHeader,
 						bearerPrefix+adminToken,
 					),
-					&APIItemVehicleType{
+					&ItemVehicleType{
 						ItemId:        childID,
 						VehicleTypeId: vehicleTypeID,
 					},
@@ -2059,7 +2059,7 @@ func TestBrandSections2(t *testing.T) {
 			require.NoError(t, err)
 
 			for _, sectionName := range testCase.SectionNames {
-				idx := slices.IndexFunc(res.GetSections(), func(section *APIBrandSection) bool {
+				idx := slices.IndexFunc(res.GetSections(), func(section *BrandSection) bool {
 					return section.GetName() == sectionName
 				})
 				require.GreaterOrEqual(
@@ -2074,7 +2074,7 @@ func TestBrandSections2(t *testing.T) {
 
 				require.True(
 					t,
-					slices.ContainsFunc(section.GetGroups(), func(a *APIBrandSection) bool {
+					slices.ContainsFunc(section.GetGroups(), func(a *BrandSection) bool {
 						return a.GetName() == testCase.Name
 					}),
 					"item `%s` not found in section `%s`",
@@ -2105,14 +2105,14 @@ func TestTwinsGroupBrands(t *testing.T) {
 	randomInt := random.Int()
 
 	groupName := fmt.Sprintf("Twins-Group-%d", randomInt)
-	groupID := createItem(t, conn, cnt, &APIItem{
+	groupID := createItem(t, conn, cnt, &Item{
 		Name:       groupName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_TWINS,
 	})
 
 	brandName := fmt.Sprintf("Brand-%d", randomInt)
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       brandName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -2120,7 +2120,7 @@ func TestTwinsGroupBrands(t *testing.T) {
 	})
 
 	vehicleName := fmt.Sprintf("Vehicle-%d", randomInt)
-	vehicleID := createItem(t, conn, cnt, &APIItem{
+	vehicleID := createItem(t, conn, cnt, &Item{
 		Name:       vehicleName,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -2277,7 +2277,7 @@ func TestGetItemParents(t *testing.T) {
 	randomInt := random.Int()
 
 	parentName := fmt.Sprintf("Parent-%d", randomInt)
-	parentID := createItem(t, conn, cnt, &APIItem{
+	parentID := createItem(t, conn, cnt, &Item{
 		Name:       parentName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_CATEGORY,
@@ -2285,13 +2285,13 @@ func TestGetItemParents(t *testing.T) {
 	})
 
 	child1Name := fmt.Sprintf("Child1-%d", randomInt)
-	child1ID := createItem(t, conn, cnt, &APIItem{
+	child1ID := createItem(t, conn, cnt, &Item{
 		Name:       child1Name,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	child2Name := fmt.Sprintf("Child2-%d", randomInt)
-	child2ID := createItem(t, conn, cnt, &APIItem{
+	child2ID := createItem(t, conn, cnt, &Item{
 		Name:       child2Name,
 		ItemTypeId: ItemType_ITEM_TYPE_CATEGORY,
 		Catname:    fmt.Sprintf("child2-%d", randomInt),
@@ -2495,14 +2495,14 @@ func TestTwinsGroupPictures(t *testing.T) {
 	randomInt := random.Int()
 
 	groupName := fmt.Sprintf("Twins-Group-%d", randomInt)
-	groupID := createItem(t, conn, cnt, &APIItem{
+	groupID := createItem(t, conn, cnt, &Item{
 		Name:       groupName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_TWINS,
 	})
 
 	vehicleName := fmt.Sprintf("Vehicle-%d", randomInt)
-	vehicleID := createItem(t, conn, cnt, &APIItem{
+	vehicleID := createItem(t, conn, cnt, &Item{
 		Name:       vehicleName,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -2574,7 +2574,7 @@ func TestPersonPreviewPictures(t *testing.T) {
 	randomInt := random.Int()
 
 	personName := fmt.Sprintf("Person-%d", randomInt)
-	personID := createItem(t, conn, cnt, &APIItem{
+	personID := createItem(t, conn, cnt, &Item{
 		Name:       personName,
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
@@ -2655,14 +2655,14 @@ func TestCutawayAuthorsWithPreviewPictures(t *testing.T) {
 	randomInt := random.Int()
 
 	personName := fmt.Sprintf("Person-%d", randomInt)
-	personID := createItem(t, conn, cnt, &APIItem{
+	personID := createItem(t, conn, cnt, &Item{
 		Name:       personName,
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
 	})
 
 	vehicleName := fmt.Sprintf("Vehicle-%d", randomInt)
-	vehicleID := createItem(t, conn, cnt, &APIItem{
+	vehicleID := createItem(t, conn, cnt, &Item{
 		Name:       vehicleName,
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -2763,7 +2763,7 @@ func TestItemOfDayPicture(t *testing.T) {
 	randomInt := random.Int()
 
 	vehicleName := fmt.Sprintf("Vehicle-%d", randomInt)
-	vehicleID := createItem(t, conn, cnt, &APIItem{
+	vehicleID := createItem(t, conn, cnt, &Item{
 		Name:       vehicleName,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -2803,7 +2803,7 @@ func TestGetTopSpecsContributions(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test",
 		Body:       "E31",
@@ -2931,14 +2931,14 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "5 Series",
 		Body:       "",
 		IsGroup:    true,
 	})
 
-	childID := createItem(t, conn, cnt, &APIItem{
+	childID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "5 Series",
 		Body:       "E31",
@@ -2957,7 +2957,7 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	randomInt := random.Int()
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &APIItem{
+	engineID := createItem(t, conn, cnt, &Item{
 		Name:       engineName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
@@ -2966,7 +2966,7 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	_, err = client.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -2985,7 +2985,7 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	_, err = client.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            childID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -3011,7 +3011,7 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	require.EqualValues(t, 2, res.GetEngineVehiclesCount())
 
 	for i := range 10 {
-		childChildID := createItem(t, conn, cnt, &APIItem{
+		childChildID := createItem(t, conn, cnt, &Item{
 			ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 			Name:       "5 Series",
 			Body:       fmt.Sprintf("E31-%d", i),
@@ -3037,7 +3037,7 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 				bearerPrefix+token.AccessToken,
 			),
 			&UpdateItemRequest{
-				Item: &APIItem{
+				Item: &Item{
 					Id:            childChildID,
 					EngineItemId:  engineID,
 					EngineInherit: false,
@@ -3089,14 +3089,14 @@ func TestBrandSectionLanguageName(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", randomInt),
 	})
 
-	vehicleID := createItem(t, conn, cnt, &APIItem{
+	vehicleID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -3149,7 +3149,7 @@ func TestBrandSectionLanguageName(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&APIItemVehicleType{
+		&ItemVehicleType{
 			ItemId:        vehicleID,
 			VehicleTypeId: 19,
 		},
@@ -3227,7 +3227,7 @@ func TestUpdateItemName(t *testing.T) {
 	name := fmt.Sprintf("vehicle-%d", randomInt)
 	newName := fmt.Sprintf("vehicle-%d-2", randomInt)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       name,
 		Body:       "Body",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
@@ -3239,7 +3239,7 @@ func TestUpdateItemName(t *testing.T) {
 	require.Equal(t, "Body", item.GetBody())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:   itemID,
 			Name: newName,
 			Body: "IgnoreMe",
@@ -3286,7 +3286,7 @@ func TestUpdateItemBody(t *testing.T) {
 	body := "Body"
 	newBody := "New Body"
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       name,
 		Body:       body,
 		BeginYear:  2000,
@@ -3299,7 +3299,7 @@ func TestUpdateItemBody(t *testing.T) {
 	require.Equal(t, body, item.GetBody())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:        itemID,
 			Body:      newBody,
 			BeginYear: 2001,
@@ -3349,7 +3349,7 @@ func TestUpdateItemBeginYear(t *testing.T) { //nolint: dupl
 		newBeginYear = 2001
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       name,
 		BeginYear:  beginYear,
 		EndYear:    2000,
@@ -3362,7 +3362,7 @@ func TestUpdateItemBeginYear(t *testing.T) { //nolint: dupl
 	require.EqualValues(t, beginYear, item.GetBeginYear())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:        itemID,
 			BeginYear: newBeginYear,
 			EndYear:   2001,
@@ -3412,7 +3412,7 @@ func TestUpdateItemEndYear(t *testing.T) { //nolint: dupl
 		newEndYear = 2001
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:           name,
 		EndYear:        endYear,
 		BeginModelYear: 2000,
@@ -3425,7 +3425,7 @@ func TestUpdateItemEndYear(t *testing.T) { //nolint: dupl
 	require.EqualValues(t, endYear, item.GetEndYear())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:             itemID,
 			EndYear:        newEndYear,
 			BeginModelYear: 2001,
@@ -3475,7 +3475,7 @@ func TestUpdateItemBeginModelYear(t *testing.T) { //nolint: dupl
 		newBeginModelYear = 2001
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:           name,
 		BeginModelYear: beginModelYear,
 		EndModelYear:   2000,
@@ -3488,7 +3488,7 @@ func TestUpdateItemBeginModelYear(t *testing.T) { //nolint: dupl
 	require.EqualValues(t, beginModelYear, item.GetBeginModelYear())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:             itemID,
 			BeginModelYear: newBeginModelYear,
 			EndModelYear:   2001,
@@ -3538,7 +3538,7 @@ func TestUpdateItemEndModelYear(t *testing.T) { //nolint: dupl
 		newEndModelYear = 2001
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:         name,
 		EndModelYear: endModelYear,
 		BeginMonth:   1,
@@ -3551,7 +3551,7 @@ func TestUpdateItemEndModelYear(t *testing.T) { //nolint: dupl
 	require.EqualValues(t, endModelYear, item.GetEndModelYear())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:           itemID,
 			EndModelYear: newEndModelYear,
 			BeginMonth:   3,
@@ -3601,7 +3601,7 @@ func TestUpdateItemBeginMonth(t *testing.T) {
 		newBeginMonth = time.May
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       name,
 		BeginMonth: int32(beginMonth),
 		EndMonth:   int32(time.February),
@@ -3614,7 +3614,7 @@ func TestUpdateItemBeginMonth(t *testing.T) {
 	require.EqualValues(t, beginMonth, item.GetBeginMonth())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:         itemID,
 			BeginMonth: int32(newBeginMonth),
 			EndMonth:   int32(time.December),
@@ -3664,7 +3664,7 @@ func TestUpdateItemEndMonth(t *testing.T) {
 		newEndMonth = time.May
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:                   name,
 		EndMonth:               int32(endMonth),
 		BeginModelYearFraction: "¼",
@@ -3677,7 +3677,7 @@ func TestUpdateItemEndMonth(t *testing.T) {
 	require.EqualValues(t, endMonth, item.GetEndMonth())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:                     itemID,
 			EndMonth:               int32(newEndMonth),
 			BeginModelYearFraction: "½",
@@ -3727,7 +3727,7 @@ func TestUpdateItemBeginModelYearFraction(t *testing.T) { //nolint: dupl
 		newBeginModelYearFraction = "½"
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:                   name,
 		BeginModelYearFraction: beginModelYearFraction,
 		EndModelYearFraction:   "¼",
@@ -3740,7 +3740,7 @@ func TestUpdateItemBeginModelYearFraction(t *testing.T) { //nolint: dupl
 	require.Equal(t, beginModelYearFraction, item.GetBeginModelYearFraction())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:                     itemID,
 			BeginModelYearFraction: newBeginModelYearFraction,
 			EndModelYearFraction:   "½",
@@ -3790,7 +3790,7 @@ func TestUpdateItemEndModelYearFraction(t *testing.T) {
 		newEndModelYearFraction = "½"
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:                 name,
 		EndModelYearFraction: endModelYearFraction,
 		SpecId:               schema.SpecIDWorldwide,
@@ -3803,7 +3803,7 @@ func TestUpdateItemEndModelYearFraction(t *testing.T) {
 	require.Equal(t, endModelYearFraction, item.GetEndModelYearFraction())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:                   itemID,
 			EndModelYearFraction: newEndModelYearFraction,
 			SpecId:               schema.SpecIDNorthAmerica,
@@ -3853,7 +3853,7 @@ func TestUpdateItemSpecID(t *testing.T) {
 		newSpecID = schema.SpecIDNorthAmerica
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       name,
 		SpecId:     specID,
 		IsConcept:  true,
@@ -3866,7 +3866,7 @@ func TestUpdateItemSpecID(t *testing.T) {
 	require.EqualValues(t, specID, item.GetSpecId())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:        itemID,
 			SpecId:    newSpecID,
 			IsConcept: false,
@@ -3916,7 +3916,7 @@ func TestUpdateItemIsConcept(t *testing.T) { //nolint: dupl
 		newIsConcept = false
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:        name,
 		IsConcept:   isConcept,
 		SpecInherit: true,
@@ -3929,7 +3929,7 @@ func TestUpdateItemIsConcept(t *testing.T) { //nolint: dupl
 	require.Equal(t, isConcept, item.GetIsConcept())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:          itemID,
 			IsConcept:   newIsConcept,
 			SpecInherit: false,
@@ -3979,7 +3979,7 @@ func TestUpdateItemSpecInherit(t *testing.T) { //nolint: dupl
 		newSpecInherit = false
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:             name,
 		SpecInherit:      specInherit,
 		IsConceptInherit: true,
@@ -3992,7 +3992,7 @@ func TestUpdateItemSpecInherit(t *testing.T) { //nolint: dupl
 	require.Equal(t, specInherit, item.GetSpecInherit())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:               itemID,
 			SpecInherit:      newSpecInherit,
 			IsConceptInherit: false,
@@ -4042,7 +4042,7 @@ func TestUpdateItemIsConceptInherit(t *testing.T) { //nolint: dupl
 		newIsConceptInherit = false
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:             name,
 		IsConceptInherit: isConceptInherit,
 		IsGroup:          true,
@@ -4055,7 +4055,7 @@ func TestUpdateItemIsConceptInherit(t *testing.T) { //nolint: dupl
 	require.Equal(t, isConceptInherit, item.GetIsConceptInherit())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:               itemID,
 			IsConceptInherit: newIsConceptInherit,
 			IsGroup:          false,
@@ -4105,7 +4105,7 @@ func TestUpdateItemIsGroup(t *testing.T) {
 		newIsGroup = false
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       name,
 		IsGroup:    isGroup,
 		Produced:   &wrapperspb.Int32Value{Value: 10},
@@ -4118,7 +4118,7 @@ func TestUpdateItemIsGroup(t *testing.T) {
 	require.Equal(t, isGroup, item.GetIsGroup())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:       itemID,
 			IsGroup:  newIsGroup,
 			Produced: &wrapperspb.Int32Value{Value: 30},
@@ -4168,7 +4168,7 @@ func TestUpdateItemProduced(t *testing.T) {
 		newProduced = 30
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:            name,
 		Produced:        &wrapperspb.Int32Value{Value: produced},
 		ProducedExactly: true,
@@ -4181,7 +4181,7 @@ func TestUpdateItemProduced(t *testing.T) {
 	require.EqualValues(t, produced, item.GetProduced().GetValue())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:              itemID,
 			Produced:        &wrapperspb.Int32Value{Value: newProduced},
 			ProducedExactly: false,
@@ -4231,7 +4231,7 @@ func TestUpdateItemProducedExactly(t *testing.T) {
 		newProducedExactly = false
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:            name,
 		ProducedExactly: producedExactly,
 		Today:           &wrapperspb.BoolValue{Value: true},
@@ -4244,7 +4244,7 @@ func TestUpdateItemProducedExactly(t *testing.T) {
 	require.Equal(t, producedExactly, item.GetProducedExactly())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:              itemID,
 			ProducedExactly: newProducedExactly,
 			Today:           &wrapperspb.BoolValue{Value: false},
@@ -4295,7 +4295,7 @@ func TestUpdateItemToday(t *testing.T) {
 		newToday = false
 	)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       name,
 		Today:      &wrapperspb.BoolValue{Value: today},
 		Catname:    catname,
@@ -4308,7 +4308,7 @@ func TestUpdateItemToday(t *testing.T) {
 	require.Equal(t, today, item.GetToday().GetValue())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:      itemID,
 			Today:   &wrapperspb.BoolValue{Value: newToday},
 			Catname: fmt.Sprintf("vehicle-%d-new", randomInt),
@@ -4355,7 +4355,7 @@ func TestUpdateItemCatname(t *testing.T) {
 	catname := fmt.Sprintf("vehicle-%d", randomInt)
 	newCatname := fmt.Sprintf("vehicle-%d-new", randomInt)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       name,
 		Catname:    catname,
 		FullName:   "FullName",
@@ -4368,7 +4368,7 @@ func TestUpdateItemCatname(t *testing.T) {
 	require.Equal(t, catname, item.GetCatname())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:       itemID,
 			Catname:  newCatname,
 			FullName: "FullName New",
@@ -4413,7 +4413,7 @@ func TestUpdateItemFullname(t *testing.T) {
 
 	name := fmt.Sprintf("vehicle-%d", randomInt)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		FullName:   "FullName",
 		Catname:    fmt.Sprintf("vehicle-%d", randomInt),
 		Name:       name,
@@ -4426,7 +4426,7 @@ func TestUpdateItemFullname(t *testing.T) {
 	require.Equal(t, "FullName", item.GetFullName())
 
 	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &APIItem{
+		Item: &Item{
 			Id:       itemID,
 			FullName: "FullName New",
 			Name:     "New name",
@@ -4447,7 +4447,7 @@ func TestUpdateBeginOrderCache(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	createItem(t, conn, cnt, &APIItem{
+	createItem(t, conn, cnt, &Item{
 		Name:                   fmt.Sprintf("engine-%d", randomInt),
 		ItemTypeId:             ItemType_ITEM_TYPE_ENGINE,
 		BeginModelYear:         1999,
@@ -4486,7 +4486,7 @@ func TestGetTree(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("person-%d", randomInt),
 		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
 		BeginYear:  1999,
@@ -4527,7 +4527,7 @@ func TestCreatedBrandIsGroup(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand-%d", randomInt),
 		Catname:    fmt.Sprintf("brand-%d", randomInt),
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -4749,12 +4749,12 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 	brandCatname := fmt.Sprintf("lada-%d", randomInt)
 	ruBrandName := fmt.Sprintf("Лада %d", randomInt)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       ruName,
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       ruBrandName,
 		Catname:    brandCatname,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,

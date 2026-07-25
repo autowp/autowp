@@ -2,9 +2,9 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
-  APIItem,
-  APIItemLink,
+  Item,
   ItemFields,
+  ItemLink,
   ItemLinkListOptions,
   ItemLinksRequest,
   ItemRequest,
@@ -59,7 +59,7 @@ export class PersonsPersonInfoComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly item$: Observable<APIItem> = this.#itemID$.pipe(
+  protected readonly item$: Observable<Item> = this.#itemID$.pipe(
     switchMap((id) =>
       this.#itemsClient.item(
         new ItemRequest({
@@ -98,7 +98,7 @@ export class PersonsPersonInfoComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly links$: Observable<APIItemLink[]> = this.#itemID$.pipe(
+  protected readonly links$: Observable<ItemLink[]> = this.#itemID$.pipe(
     switchMap((itemID) =>
       this.#itemsClient.getItemLinks(
         new ItemLinksRequest({

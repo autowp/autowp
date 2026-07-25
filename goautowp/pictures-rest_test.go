@@ -20,7 +20,7 @@ func TestUploadPictureTooSmall(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &APIItem{
+	brandID := createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
@@ -104,7 +104,7 @@ func TestUploadPicture(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			brandID := createItem(t, conn, cnt, &APIItem{
+			brandID := createItem(t, conn, cnt, &Item{
 				Name:       test.name,
 				IsGroup:    true,
 				ItemTypeId: ItemType_ITEM_TYPE_BRAND,

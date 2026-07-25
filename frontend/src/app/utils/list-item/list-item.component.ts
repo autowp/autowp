@@ -3,7 +3,7 @@ import type {APIItemChildsCounts} from '@services/item';
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {APIImage, APIItem, APIUser, Design, ItemType, Picture} from '@grpc/spec.pb';
+import {Design, Image, Item, ItemType, Picture, User} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {RemarkModule} from 'ngx-remark';
 import {Observable} from 'rxjs';
@@ -14,16 +14,16 @@ import {ItemHeaderComponent} from '../item-header/item-header.component';
 export interface CatalogueListItem {
   acceptedPicturesCount: number | undefined;
   canEditSpecs: boolean | undefined;
-  categories?: APIItem[];
+  categories?: Item[];
   childsCounts: APIItemChildsCounts | null;
-  contributors?: Observable<APIUser | null>[];
+  contributors?: Observable<null | User>[];
   description: null | string;
   design: Design | undefined;
   details: {
     count: number;
     routerLink: string[];
   };
-  engineVehicles?: APIItem[];
+  engineVehicles?: Item[];
   hasText: boolean;
   id: string;
   itemTypeId: number;
@@ -37,13 +37,13 @@ export interface CatalogueListItem {
   produced: number | undefined;
   producedExactly: boolean | null;
   specsRouterLink: null | string[];
-  twinsGroups?: APIItem[];
+  twinsGroups?: Item[];
 }
 
 export interface CatalogueListItemPicture {
   picture: null | Picture;
   routerLink?: string[];
-  thumb?: APIImage | null;
+  thumb?: Image | null;
 }
 
 @Component({

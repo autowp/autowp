@@ -3,13 +3,11 @@ import {ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal} f
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIGetUserRequest,
-  APIItem,
-  APIUser,
-  APIUsersRequest,
   CommentTopicListOptions,
   DfDistanceListOptions,
   DfDistanceRequest,
+  GetUserRequest,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -28,6 +26,8 @@ import {
   PicturesRequest,
   PictureStatus,
   SetPictureStatusRequest,
+  User,
+  UsersRequest,
   VehicleType,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, UsersClient} from '@grpc/spec.pbsc';
@@ -303,7 +303,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
 
   protected readonly ownerID = signal('');
   protected readonly ownerQuery = new FormControl<string>('', {nonNullable: true});
-  protected readonly ownersDataSource: (text$: Observable<string>) => Observable<APIUser[]> = (
+  protected readonly ownersDataSource: (text$: Observable<string>) => Observable<User[]> = (
     text$: Observable<string>,
   ) =>
     text$.pipe(
@@ -314,7 +314,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
         }
 
         if (query.startsWith('#')) {
-          return this.#usersClient.getUser(new APIGetUserRequest({userId: query.substring(1) || ''})).pipe(
+          return this.#usersClient.getUser(new GetUserRequest({userId: query.substring(1) || ''})).pipe(
             catchError((err: unknown) => {
               this.#toastService.handleError(err);
               return EMPTY;
@@ -323,7 +323,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
           );
         }
 
-        return this.#usersClient.getUsers(new APIUsersRequest({limit: 10, search: query})).pipe(
+        return this.#usersClient.getUsers(new UsersRequest({limit: 10, search: query})).pipe(
           catchError((err: unknown) => {
             this.#toastService.handleError(err);
             return EMPTY;
@@ -335,9 +335,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
 
   protected readonly itemID = signal('');
   protected readonly itemQuery = new FormControl<string>('', {nonNullable: true});
-  protected readonly itemsDataSource: (text$: Observable<string>) => Observable<APIItem[]> = (
-    text$: Observable<string>,
-  ) =>
+  protected readonly itemsDataSource: (text$: Observable<string>) => Observable<Item[]> = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
       switchMap((query) => {
@@ -608,11 +606,11 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
     this.hasSelectedItem.set(this.#selected.length > 0);
   }
 
-  protected itemFormatter(x: APIItem) {
+  protected itemFormatter(x: Item) {
     return x.nameText;
   }
 
-  protected ownerFormatter(x: APIUser) {
+  protected ownerFormatter(x: User) {
     return x.name;
   }
 

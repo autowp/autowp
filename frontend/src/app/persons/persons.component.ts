@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -147,7 +147,7 @@ export class PersonsComponent implements OnInit {
     this.#pageEnv.set({pageId: 214});
   }
 
-  private prepareItems(items: APIItem[], authors: boolean): CatalogueListItem[] {
+  private prepareItems(items: Item[], authors: boolean): CatalogueListItem[] {
     return items.map((item): CatalogueListItem => {
       const itemRouterLink = ['/persons'];
       itemRouterLink.push(item.id);

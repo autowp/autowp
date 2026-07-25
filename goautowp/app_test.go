@@ -131,7 +131,7 @@ func TestSpecsRefreshUserConflicts(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -223,7 +223,7 @@ func TestBuildBrandsSprite(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	for i := range 1 {
-		itemID := createItem(t, conn, cnt, &APIItem{
+		itemID := createItem(t, conn, cnt, &Item{
 			Name:       fmt.Sprintf("brand-%d-%d", random.Int(), i),
 			ItemTypeId: ItemType_ITEM_TYPE_BRAND,
 			Catname:    fmt.Sprintf("brand-%d-%d", random.Int(), i),

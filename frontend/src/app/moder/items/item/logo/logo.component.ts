@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse, HttpEventType} from '@angular/common/http';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
-import {APIItem} from '@grpc/spec.pb';
+import {Item} from '@grpc/spec.pb';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
@@ -20,7 +20,7 @@ export class ModerItemsItemLogoComponent {
   readonly #http = inject(HttpClient);
   readonly #cdr = inject(ChangeDetectorRef);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
 
   readonly itemUpdated = output<void>();
 

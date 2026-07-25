@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APITopBrandsListItem, NewItemsRequest} from '@grpc/spec.pb';
+import {NewItemsRequest, TopBrandsListItem} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
@@ -20,7 +20,7 @@ export class IndexBrandsBrandComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly brand = input.required<APITopBrandsListItem>();
+  readonly brand = input.required<TopBrandsListItem>();
   protected readonly brand$ = toObservable(this.brand);
 
   protected readonly response$ = this.brand$.pipe(

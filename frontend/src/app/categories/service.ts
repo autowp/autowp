@@ -1,21 +1,21 @@
 import {inject, Service} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {APIItem, ItemType, PathItem, PathRequest} from '@grpc/spec.pb';
+import {Item, ItemType, PathItem, PathRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {Observable} from 'rxjs';
 import {distinctUntilChanged, map, switchMap} from 'rxjs/operators';
 
 export interface CategoryPipeResult {
-  category: APIItem | undefined;
-  current: APIItem | undefined;
+  category: Item | undefined;
+  current: Item | undefined;
   path: PathItem[];
   pathCatnames: string[];
   pathItems: SvcPathItem[];
 }
 
 interface SvcPathItem {
-  item: APIItem;
+  item: Item;
   loaded: boolean;
   parentId: string;
   routerLink: string[];
@@ -56,7 +56,7 @@ export class CategoriesService {
         ),
       ),
       map((response) => {
-        let category: APIItem | undefined = undefined;
+        let category: Item | undefined = undefined;
         const path = response.path || [];
         for (const item of path) {
           if (item.item?.itemTypeId !== ItemType.ITEM_TYPE_CATEGORY) {

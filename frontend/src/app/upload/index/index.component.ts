@@ -14,8 +14,8 @@ import {
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIImage,
-  APIItem,
+  Image,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemRequest,
@@ -57,7 +57,7 @@ interface UploadProgress {
   success: boolean;
 }
 
-const cropTitle = (image: APIImage | undefined): string => {
+const cropTitle = (image: Image | undefined): string => {
   if (!(image?.cropWidth && image?.cropHeight)) {
     return '';
   }
@@ -143,7 +143,7 @@ export class UploadIndexComponent implements OnInit {
     debounceTime(10),
   );
 
-  readonly #item$: Observable<APIItem | null> = this.itemID$.pipe(
+  readonly #item$: Observable<Item | null> = this.itemID$.pipe(
     switchMap((id) => {
       if (!id) {
         return of(null);

@@ -1,9 +1,9 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIItem,
-  APIItemList,
+  Item,
   ItemFields,
+  ItemList,
   ItemListOptions,
   ItemParent,
   ItemParentCacheListOptions,
@@ -39,20 +39,20 @@ export class DonateVodSelectComponent implements OnDestroy, OnInit {
   readonly #cdr = inject(ChangeDetectorRef);
 
   #querySub?: Subscription;
-  protected brands: APIItem[][] = [];
+  protected brands: Item[][] = [];
   protected paginator: null | Pages = null;
-  protected brand: APIItem | null = null;
+  protected brand: Item | null = null;
   protected vehicles: ItemParent[] = [];
   protected concepts: ItemParent[] = [];
   protected conceptsExpanded = false;
 
   readonly #select$: Observable<null | {
     brand: null | {
-      brand: APIItem;
+      brand: Item;
       concepts: ItemParents;
       vehicles: ItemParents;
     };
-    items: APIItemList | null;
+    items: ItemList | null;
   }> = this.#route.queryParamMap.pipe(
     map((params) => ({
       anonymous: !!params.get('anonymous'),

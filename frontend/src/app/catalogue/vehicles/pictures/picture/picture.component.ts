@@ -3,8 +3,8 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
   CommentsType,
+  Item,
   ItemParentCacheListOptions,
   Picture,
   PictureFields,
@@ -89,7 +89,7 @@ export class CatalogueVehiclesPicturesPictureComponent {
 
   protected readonly CommentsType = CommentsType;
 
-  protected readonly brand$: Observable<APIItem> = this.#catalogue$.pipe(map(({brand}) => brand));
+  protected readonly brand$: Observable<Item> = this.#catalogue$.pipe(map(({brand}) => brand));
 
   protected readonly breadcrumbs$ = this.#catalogue$.pipe(
     map(({brand, path}) => CatalogueService.pathToBreadcrumbs(brand, path)),

@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APIImage, APIItem, ItemType, Picture} from '@grpc/spec.pb';
+import {Image, Item, ItemType, Picture} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {RemarkModule} from 'ngx-remark';
@@ -12,7 +12,7 @@ import {map, switchMap} from 'rxjs/operators';
 interface PictureThumbRoute {
   picture: null | Picture;
   route: null | string[];
-  thumb: APIImage | undefined;
+  thumb: Image | undefined;
 }
 
 @Component({
@@ -24,7 +24,7 @@ interface PictureThumbRoute {
 export class CategoriesListItemComponent {
   readonly #auth = inject(AuthService);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
   readonly parentRouterLink = input.required<string[]>();
@@ -69,7 +69,7 @@ export class CategoriesListItemComponent {
     }),
   );
 
-  protected isHavePhoto(item: APIItem) {
+  protected isHavePhoto(item: Item) {
     if (item.previewPictures) {
       for (const picture of item.previewPictures?.pictures || []) {
         if (picture?.picture) {

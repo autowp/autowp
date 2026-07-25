@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APITopCategoriesListItem, NewItemsRequest} from '@grpc/spec.pb';
+import {NewItemsRequest, TopCategoriesListItem} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
@@ -20,7 +20,7 @@ export class IndexCategoriesCategoryComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly category = input.required<APITopCategoriesListItem>();
+  readonly category = input.required<TopCategoriesListItem>();
   protected readonly category$ = toObservable(this.category);
 
   protected readonly response$ = this.category$.pipe(

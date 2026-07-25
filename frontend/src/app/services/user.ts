@@ -1,5 +1,5 @@
 import {inject, Service} from '@angular/core';
-import {APIGetUserRequest, APIUser, APIUsersRequest, UserFields} from '@grpc/spec.pb';
+import {GetUserRequest, User, UserFields, UsersRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {forkJoin, Observable, of} from 'rxjs';
 import {map, shareReplay, tap} from 'rxjs/operators';
@@ -8,10 +8,10 @@ import {map, shareReplay, tap} from 'rxjs/operators';
 export class UserService {
   readonly #usersClient = inject(UsersClient);
 
-  #cache: Map<string, APIUser> = new Map<string, APIUser>();
+  #cache: Map<string, User> = new Map<string, User>();
   #promises = new Map<string, Observable<null>>();
 
-  #cache2 = new Map<string, Observable<APIUser | null>>();
+  #cache2 = new Map<string, Observable<null | User>>();
 
   private queryUsers$(ids: string[]): Observable<null> {
     const toRequest: string[] = [];
@@ -31,7 +31,7 @@ export class UserService {
 
     if (toRequest.length > 0) {
       const promise$: Observable<null> = this.#usersClient
-        .getUsers(new APIUsersRequest({id: toRequest, limit: toRequest.length}))
+        .getUsers(new UsersRequest({id: toRequest, limit: toRequest.length}))
         .pipe(
           tap((response) => {
             for (const item of response.items || []) {
@@ -55,10 +55,10 @@ export class UserService {
     return forkJoin(waitFor).pipe(map(() => null));
   }
 
-  public getUserMap$(ids: string[]): Observable<Map<string, APIUser>> {
+  public getUserMap$(ids: string[]): Observable<Map<string, User>> {
     return this.queryUsers$(ids).pipe(
       map(() => {
-        const result = new Map<string, APIUser>();
+        const result = new Map<string, User>();
         for (const id of ids) {
           const user = this.#cache.get(id);
           if (user === undefined) {
@@ -71,7 +71,7 @@ export class UserService {
     );
   }
 
-  public getUser$(id: string | undefined): Observable<APIUser | null> {
+  public getUser$(id: string | undefined): Observable<null | User> {
     if (!id || id === '0') {
       return of(null);
     }
@@ -81,7 +81,7 @@ export class UserService {
       return cached$;
     }
 
-    const o$ = this.#usersClient.getUser(new APIGetUserRequest({userId: id})).pipe(
+    const o$ = this.#usersClient.getUser(new GetUserRequest({userId: id})).pipe(
       map((user) => (user ? user : null)),
       shareReplay({bufferSize: 1, refCount: false}),
     );
@@ -90,13 +90,13 @@ export class UserService {
     return o$;
   }
 
-  public getByIdentity$(identity: string, fields: undefined | UserFields): Observable<APIUser | null> {
+  public getByIdentity$(identity: string, fields: undefined | UserFields): Observable<null | User> {
     const result = RegExp(/^user(\d+)$/).exec(identity);
 
     if (result) {
-      return this.#usersClient.getUser(new APIGetUserRequest({fields, userId: result[1]}));
+      return this.#usersClient.getUser(new GetUserRequest({fields, userId: result[1]}));
     }
 
-    return this.#usersClient.getUser(new APIGetUserRequest({fields, identity}));
+    return this.#usersClient.getUser(new GetUserRequest({fields, identity}));
   }
 }

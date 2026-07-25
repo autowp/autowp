@@ -26,12 +26,12 @@ const (
 
 var errNoEndpointProvided = errors.New("no endpoints provided")
 
-func APIImageToGRPC(image *storage.Image) *APIImage {
+func APIImageToGRPC(image *storage.Image) *Image {
 	if image == nil {
 		return nil
 	}
 
-	return &APIImage{ //nolint:exhaustruct
+	return &Image{ //nolint:exhaustruct
 		Id:         int32(image.ID()), //nolint: gosec
 		Src:        image.Src(),
 		Width:      int32(image.Width()),    //nolint: gosec

@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {DomSanitizer} from '@angular/platform-browser';
-import {APIItem, GetSpecificationsRequest} from '@grpc/spec.pb';
+import {GetSpecificationsRequest, Item} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {EMPTY} from 'rxjs';
@@ -19,7 +19,7 @@ export class CarsSpecificationsEditorResultComponent {
   readonly #sanitizer = inject(DomSanitizer);
   readonly #languageService = inject(LanguageService);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
 
   protected readonly html$ = toObservable(this.item).pipe(
     switchMap((item) =>

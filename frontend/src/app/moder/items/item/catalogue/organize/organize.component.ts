@@ -2,8 +2,8 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIGetItemVehicleTypesRequest,
-  APIItem,
+  GetItemVehicleTypesRequest,
+  Item,
   ItemFields,
   ItemParent,
   ItemParentFields,
@@ -63,7 +63,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly childs$: Observable<APIItem[]> = combineLatest([
+  protected readonly childs$: Observable<Item[]> = combineLatest([
     this.#itemID$.pipe(
       switchMap((id) =>
         this.#itemsClient.getItemParents(
@@ -88,7 +88,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
     map(([data, itemTypeID]) =>
       (data.items || [])
         .map((i) => i.item)
-        .filter((i): i is APIItem => !!i)
+        .filter((i): i is Item => !!i)
         .filter(
           (item) =>
             item && item?.itemTypeId && allowedItemTypeCombinations[itemTypeID as ItemType].includes(item?.itemTypeId),
@@ -96,7 +96,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
     ),
   );
 
-  protected readonly item$: Observable<APIItem> = this.#itemID$.pipe(
+  protected readonly item$: Observable<Item> = this.#itemID$.pipe(
     switchMap((id) =>
       this.#itemsClient.item(
         new ItemRequest({
@@ -125,9 +125,9 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
     }),
   );
 
-  protected readonly newItem$: Observable<APIItem> = combineLatest([this.#itemTypeID$, this.item$]).pipe(
+  protected readonly newItem$: Observable<Item> = combineLatest([this.#itemTypeID$, this.item$]).pipe(
     map(([itemTypeID, item]) => {
-      const newItem = {...item.toObject()} as APIItem;
+      const newItem = {...item.toObject()} as Item;
       newItem.itemTypeId = itemTypeID;
       return newItem;
     }),
@@ -138,7 +138,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
       [ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)
         ? this.#itemsClient
             .getItemVehicleTypes(
-              new APIGetItemVehicleTypesRequest({
+              new GetItemVehicleTypesRequest({
                 itemId: item.id,
               }),
             )
@@ -154,7 +154,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
     });
   }
 
-  protected submit(item: APIItem, itemTypeID: number, event: ItemMetaFormResult) {
+  protected submit(item: Item, itemTypeID: number, event: ItemMetaFormResult) {
     this.loading.set(true);
 
     const newItem = itemMetaFormResultsToAPIItem(event);

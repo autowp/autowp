@@ -82,7 +82,7 @@ func getUserWithCleanHistory(
 
 	user, err := NewUsersClient(conn).Me(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -100,7 +100,7 @@ func getUserWithCleanHistory(
 	return user.GetId(), token.AccessToken
 }
 
-func createItem(t *testing.T, conn *grpc.ClientConn, cnt *Container, row *APIItem) int64 {
+func createItem(t *testing.T, conn *grpc.ClientConn, cnt *Container, row *Item) int64 {
 	t.Helper()
 
 	ctx := t.Context()

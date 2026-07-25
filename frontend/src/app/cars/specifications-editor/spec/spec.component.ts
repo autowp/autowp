@@ -3,8 +3,6 @@ import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {FormArray, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {
-  APIItem,
-  APIUser,
   AttrAttributeType,
   AttrListOption,
   AttrSetUserValuesRequest,
@@ -14,6 +12,8 @@ import {
   AttrValue,
   AttrValuesRequest,
   AttrValueValue,
+  Item,
+  User,
 } from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -44,7 +44,7 @@ export interface APIAttrAttributeInSpecEditor extends AttrAttributeTreeItem {
 }
 
 interface AttrUserValueWithUser {
-  user$: Observable<APIUser | null>;
+  user$: Observable<null | User>;
   userValue: AttrUserValue;
 }
 
@@ -98,7 +98,7 @@ export class CarsSpecificationsEditorSpecComponent {
   readonly #attrsClient = inject(AttrsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   readonly item$ = toObservable(this.item);
 
   readonly #change$ = new BehaviorSubject<void>(void 0);
@@ -260,7 +260,7 @@ export class CarsSpecificationsEditorSpecComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected saveSpecs(item: APIItem, form: FormArray<AttrFormControls>) {
+  protected saveSpecs(item: Item, form: FormArray<AttrFormControls>) {
     const items = form.controls.map((control) => {
       const typeId = control.attr.typeId;
       let valid;

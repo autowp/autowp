@@ -128,64 +128,64 @@ service Contacts {
 }
 
 service Users {
-  rpc DeleteUser(APIDeleteUserRequest) returns (google.protobuf.Empty) {}
-  rpc GetUser(APIGetUserRequest) returns (APIUser) {
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {}
+  rpc GetUser(GetUserRequest) returns (User) {
     option (google.api.http) = {
       get: "/v3/users/{user_id}"
     };
   }
-  rpc Me(APIMeRequest) returns (APIUser) {}
+  rpc Me(MeRequest) returns (User) {}
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty) {}
-  rpc GetUserPreferences(APIUserPreferencesRequest) returns (APIUserPreferencesResponse) {}
-  rpc DisableUserCommentsNotifications(APIUserPreferencesRequest) returns (google.protobuf.Empty) {}
-  rpc EnableUserCommentsNotifications(APIUserPreferencesRequest) returns (google.protobuf.Empty) {}
-  rpc GetUsers(APIUsersRequest) returns (APIUsersResponse) {}
-  rpc GetAccounts(google.protobuf.Empty) returns (APIAccountsResponse) {}
+  rpc GetUserPreferences(UserPreferencesRequest) returns (UserPreferencesResponse) {}
+  rpc DisableUserCommentsNotifications(UserPreferencesRequest) returns (google.protobuf.Empty) {}
+  rpc EnableUserCommentsNotifications(UserPreferencesRequest) returns (google.protobuf.Empty) {}
+  rpc GetUsers(UsersRequest) returns (UsersResponse) {}
+  rpc GetAccounts(google.protobuf.Empty) returns (AccountsResponse) {}
   rpc DeleteUserAccount(DeleteUserAccountRequest) returns (google.protobuf.Empty) {}
   rpc DeleteUserPhoto(DeleteUserPhotoRequest) returns (google.protobuf.Empty) {}
 }
 
 service Rating {
-  rpc GetUserPicturesRating(google.protobuf.Empty) returns (APIUsersRatingResponse) {}
+  rpc GetUserPicturesRating(google.protobuf.Empty) returns (UsersRatingResponse) {}
   rpc GetUserPicturesRatingBrands(UserRatingDetailsRequest) returns (UserRatingBrandsResponse) {}
-  rpc GetUserCommentsRating(google.protobuf.Empty) returns (APIUsersRatingResponse) {}
+  rpc GetUserCommentsRating(google.protobuf.Empty) returns (UsersRatingResponse) {}
   rpc GetUserCommentsRatingFans(UserRatingDetailsRequest) returns (GetUserRatingFansResponse) {}
-  rpc GetUserPictureLikesRating(google.protobuf.Empty) returns (APIUsersRatingResponse) {}
+  rpc GetUserPictureLikesRating(google.protobuf.Empty) returns (UsersRatingResponse) {}
   rpc GetUserPictureLikesRatingFans(UserRatingDetailsRequest) returns (GetUserRatingFansResponse) {}
-  rpc GetUserSpecsRating(google.protobuf.Empty) returns (APIUsersRatingResponse) {}
+  rpc GetUserSpecsRating(google.protobuf.Empty) returns (UsersRatingResponse) {}
   rpc GetUserSpecsRatingBrands(UserRatingDetailsRequest) returns (UserRatingBrandsResponse) {}
 }
 
 service Items {
   rpc GetItemOfDay(ItemOfDayRequest) returns (ItemOfDay) {}
-  rpc GetBrands(GetBrandsRequest) returns (APIBrandsList) {}
-  rpc GetBrandSections(GetBrandSectionsRequest) returns (APIBrandSections) {}
-  rpc GetTopBrandsList(GetTopBrandsListRequest) returns (APITopBrandsList) {}
-  rpc GetTopPersonsList(GetTopPersonsListRequest) returns (APITopPersonsList) {}
-  rpc GetTopFactoriesList(GetTopFactoriesListRequest) returns (APITopFactoriesList) {}
-  rpc GetTopCategoriesList(GetTopCategoriesListRequest) returns (APITopCategoriesList) {}
-  rpc GetTwinsBrandsList(GetTwinsBrandsListRequest) returns (APITwinsBrandsList) {}
-  rpc GetTopTwinsBrandsList(GetTopTwinsBrandsListRequest) returns (APITopTwinsBrandsList) {}
+  rpc GetBrands(GetBrandsRequest) returns (BrandsList) {}
+  rpc GetBrandSections(GetBrandSectionsRequest) returns (BrandSections) {}
+  rpc GetTopBrandsList(GetTopBrandsListRequest) returns (TopBrandsList) {}
+  rpc GetTopPersonsList(GetTopPersonsListRequest) returns (TopPersonsList) {}
+  rpc GetTopFactoriesList(GetTopFactoriesListRequest) returns (TopFactoriesList) {}
+  rpc GetTopCategoriesList(GetTopCategoriesListRequest) returns (TopCategoriesList) {}
+  rpc GetTwinsBrandsList(GetTwinsBrandsListRequest) returns (TwinsBrandsList) {}
+  rpc GetTopTwinsBrandsList(GetTopTwinsBrandsListRequest) returns (TopTwinsBrandsList) {}
   rpc GetTopSpecsContributions(TopSpecsContributionsRequest) returns (TopSpecsContributions) {}
-  rpc CreateItem(APIItem) returns (ItemID) {}
+  rpc CreateItem(.goautowp.Item) returns (ItemID) {}
   rpc UpdateItem(UpdateItemRequest) returns (google.protobuf.Empty) {}
-  rpc Item(ItemRequest) returns (APIItem) {}
-  rpc List(ItemsRequest) returns (APIItemList) {}
+  rpc Item(ItemRequest) returns (.goautowp.Item) {}
+  rpc List(ItemsRequest) returns (ItemList) {}
   rpc GetItemsFirstChars(ItemsFirstCharsRequest) returns (AlphaResponse) {}
-  rpc GetTree(GetTreeRequest) returns (APITreeItem) {}
-  rpc GetContentLanguages(google.protobuf.Empty) returns (APIContentLanguages) {}
-  rpc GetItemLink(ItemLinksRequest) returns (APIItemLink) {}
+  rpc GetTree(GetTreeRequest) returns (TreeItem) {}
+  rpc GetContentLanguages(google.protobuf.Empty) returns (ContentLanguages) {}
+  rpc GetItemLink(ItemLinksRequest) returns (ItemLink) {}
   rpc GetItemLinks(ItemLinksRequest) returns (ItemLinks) {}
-  rpc DeleteItemLink(APIItemLinkRequest) returns (google.protobuf.Empty) {}
-  rpc CreateItemLink(APIItemLink) returns (APICreateItemLinkResponse) {}
-  rpc UpdateItemLink(APIItemLink) returns (google.protobuf.Empty) {}
-  rpc GetItemVehicleTypes(APIGetItemVehicleTypesRequest) returns (APIGetItemVehicleTypesResponse) {}
-  rpc GetItemVehicleType(APIItemVehicleTypeRequest) returns (APIItemVehicleType) {}
-  rpc CreateItemVehicleType(APIItemVehicleType) returns (google.protobuf.Empty) {}
-  rpc DeleteItemVehicleType(APIItemVehicleTypeRequest) returns (google.protobuf.Empty) {}
-  rpc GetItemLanguages(APIGetItemLanguagesRequest) returns (ItemLanguages) {}
+  rpc DeleteItemLink(ItemLinkRequest) returns (google.protobuf.Empty) {}
+  rpc CreateItemLink(ItemLink) returns (CreateItemLinkResponse) {}
+  rpc UpdateItemLink(ItemLink) returns (google.protobuf.Empty) {}
+  rpc GetItemVehicleTypes(GetItemVehicleTypesRequest) returns (GetItemVehicleTypesResponse) {}
+  rpc GetItemVehicleType(ItemVehicleTypeRequest) returns (ItemVehicleType) {}
+  rpc CreateItemVehicleType(ItemVehicleType) returns (google.protobuf.Empty) {}
+  rpc DeleteItemVehicleType(ItemVehicleTypeRequest) returns (google.protobuf.Empty) {}
+  rpc GetItemLanguages(GetItemLanguagesRequest) returns (ItemLanguages) {}
   rpc UpdateItemLanguage(ItemLanguage) returns (google.protobuf.Empty) {}
-  rpc GetItemParentLanguages(APIGetItemParentLanguagesRequest) returns (ItemParentLanguages) {}
+  rpc GetItemParentLanguages(GetItemParentLanguagesRequest) returns (ItemParentLanguages) {}
   rpc SetItemParentLanguage(ItemParentLanguage) returns (google.protobuf.Empty) {}
   rpc GetStats(google.protobuf.Empty) returns (StatsResponse) {}
   rpc GetBrandNewItems(NewItemsRequest) returns (NewItemsResponse) {}
@@ -816,7 +816,7 @@ message GetContactRequest {
   int64 user_id = 1;
 }
 
-message APIImage {
+message Image {
   int32 id = 1;
   string src = 2;
   int32 width = 3;
@@ -828,7 +828,7 @@ message APIImage {
   int32 crop_height = 9;
 }
 
-message APIUser {
+message User {
   int64 id = 1;
   string name = 2;
   bool deleted = 3;
@@ -836,7 +836,7 @@ message APIUser {
   bool green = 5;
   repeated string route = 6;
   string identity = 7;
-  APIImage avatar = 8;
+  Image avatar = 8;
   string gravatar = 9;
   google.protobuf.Timestamp last_online = 10;
   double specs_weight = 11;
@@ -845,9 +845,9 @@ message APIUser {
   string language = 14;
   int64 votes_per_day = 15;
   int64 votes_left = 16;
-  APIImage img = 17;
+  Image img = 17;
   string gravatar_large = 18;
-  APIImage photo = 19;
+  Image photo = 19;
   google.protobuf.Timestamp registered_at = 21;
   int32 pictures_added = 23;
   int32 pictures_accepted_count = 24;
@@ -857,7 +857,7 @@ message APIUser {
 
 message Contact {
   int64 contact_user_id = 1 [(google.api.field_behavior) = REQUIRED];
-  APIUser user = 2 [(google.api.field_behavior) = OPTIONAL];
+  User user = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message ContactItems {
@@ -879,20 +879,20 @@ message CommentVote {
     NEGATIVE = 1;
   }
   VoteValue value = 1;
-  APIUser user = 2;
+  User user = 2;
 }
 
-message APIBanItem {
+message BanItem {
   google.protobuf.Timestamp until = 1;
   int64 by_user_id = 2;
-  APIUser by_user = 3;
+  User by_user = 3;
   string reason = 4;
 }
 
 message TrafficTopItem {
   string ip = 1;
   int32 count = 2;
-  APIBanItem ban = 3;
+  BanItem ban = 3;
   bool in_whitelist = 4;
   string whois_url = 5;
 }
@@ -906,7 +906,7 @@ message GetIPRequest {
   repeated string fields = 2;
 }
 
-message APIIPRights {
+message IPRights {
   bool add_to_blacklist = 1;
   bool remove_from_blacklist = 2;
 }
@@ -914,8 +914,8 @@ message APIIPRights {
 message IP {
   string address = 1;
   string hostname = 2;
-  APIBanItem blacklist = 3;
-  APIIPRights rights = 4;
+  BanItem blacklist = 3;
+  IPRights rights = 4;
 }
 
 message CreateFeedbackRequest {
@@ -1043,22 +1043,22 @@ message MessageSummary {
   int32 system_new_count = 5;
 }
 
-message APIDeleteUserRequest {
+message DeleteUserRequest {
   int64 user_id = 1;
   string password = 2;
 }
 
 message UpdateUserRequest {
-  APIUser user = 1;
+  User user = 1;
 
   google.protobuf.FieldMask update_mask = 2;
 }
 
-message APIMeRequest {
+message MeRequest {
   UserFields fields = 1;
 }
 
-message APIGetUserRequest {
+message GetUserRequest {
   int64 user_id = 1 [(google.api.field_behavior) = OPTIONAL];
   string identity = 3 [(google.api.field_behavior) = OPTIONAL];
   UserFields fields = 2 [(google.api.field_behavior) = OPTIONAL];
@@ -1081,15 +1081,15 @@ message UserFields {
   bool login = 18 [(google.api.field_behavior) = OPTIONAL];
 }
 
-message APIBrandSection {
+message BrandSection {
   string name = 1;
   repeated string routerLink = 3;
   int32 count = 4;
-  repeated APIBrandSection groups = 5;
+  repeated BrandSection groups = 5;
 }
 
-message APIBrandSections {
-  repeated APIBrandSection sections = 1;
+message BrandSections {
+  repeated BrandSection sections = 1;
 }
 
 message GetBrandSectionsRequest {
@@ -1105,7 +1105,7 @@ message GetBrandsRequest {
   string language = 1;
 }
 
-message APIBrandsListItem {
+message BrandsListItem {
   int64 id = 1;
   string catname = 2;
   string name = 3;
@@ -1114,13 +1114,13 @@ message APIBrandsListItem {
   int32 accepted_pictures_count = 6;
 }
 
-message APIBrandsListCharacter {
+message BrandsListCharacter {
   string character = 1;
   string id = 2;
-  repeated APIBrandsListItem items = 3;
+  repeated BrandsListItem items = 3;
 }
 
-message APIBrandsListLine {
+message BrandsListLine {
   enum Category {
     DEFAULT = 0;
     NUMBER = 1;
@@ -1128,19 +1128,19 @@ message APIBrandsListLine {
     LATIN = 3;
   }
   Category category = 1;
-  repeated APIBrandsListCharacter characters = 2;
+  repeated BrandsListCharacter characters = 2;
 }
 
-message APIBrandsList {
-  repeated APIBrandsListLine lines = 1;
+message BrandsList {
+  repeated BrandsListLine lines = 1;
 }
 
-message APITopBrandsList {
-  repeated APITopBrandsListItem brands = 1;
+message TopBrandsList {
+  repeated TopBrandsListItem brands = 1;
   int32 total = 2;
 }
 
-message APITopBrandsListItem {
+message TopBrandsListItem {
   int64 id = 1;
   string catname = 2;
   string name = 3;
@@ -1201,7 +1201,7 @@ message TopSpecsContributionsRequest {
 }
 
 message TopSpecsContributions {
-  repeated APIItem items = 1;
+  repeated Item items = 1;
 }
 
 message GetTopCategoriesListRequest {
@@ -1212,16 +1212,16 @@ message GetTopFactoriesListRequest {
   string language = 1;
 }
 
-message APITopPersonsList {
-  repeated APITopPersonsListItem items = 1;
+message TopPersonsList {
+  repeated TopPersonsListItem items = 1;
 }
 
-message APITopPersonsListItem {
+message TopPersonsListItem {
   int64 id = 1;
   string name = 3;
 }
 
-message APITwinsBrandsListItem {
+message TwinsBrandsListItem {
   int64 id = 1;
   string name = 2;
   string catname = 3;
@@ -1229,20 +1229,20 @@ message APITwinsBrandsListItem {
   int32 new_count = 5;
 }
 
-message APITwinsBrandsList {
-  repeated APITwinsBrandsListItem items = 1;
+message TwinsBrandsList {
+  repeated TwinsBrandsListItem items = 1;
 }
 
-message APITopTwinsBrandsList {
-  repeated APITwinsBrandsListItem items = 1;
+message TopTwinsBrandsList {
+  repeated TwinsBrandsListItem items = 1;
   int32 count = 2;
 }
 
-message APITopCategoriesList {
-  repeated APITopCategoriesListItem items = 1;
+message TopCategoriesList {
+  repeated TopCategoriesListItem items = 1;
 }
 
-message APITopCategoriesListItem {
+message TopCategoriesListItem {
   int64 id = 1;
   string name = 2;
   string catname = 3;
@@ -1250,11 +1250,11 @@ message APITopCategoriesListItem {
   int32 new_count = 5;
 }
 
-message APITopFactoriesList {
-  repeated APITopFactoriesListItem items = 1;
+message TopFactoriesList {
+  repeated TopFactoriesListItem items = 1;
 }
 
-message APITopFactoriesListItem {
+message TopFactoriesListItem {
   int64 id = 1;
   string name = 2;
   int32 count = 3;
@@ -1450,7 +1450,7 @@ message ItemID {
 }
 
 message UpdateItemRequest {
-  APIItem item = 1;
+  Item item = 1;
 
   google.protobuf.FieldMask update_mask = 2;
 }
@@ -1539,7 +1539,7 @@ message ItemParentCaches {
 message ItemParentCache {
   int64 item_id = 1;
   int64 parent_id = 2;
-  APIItem parent_item = 3;
+  Item parent_item = 3;
 }
 
 message ItemListOptions {
@@ -1591,14 +1591,14 @@ message GetTreeRequest {
   string language = 2;
 }
 
-message APITreeItem {
+message TreeItem {
   int64 id = 1;
   string name_html = 2;
-  repeated APITreeItem childs = 3;
+  repeated TreeItem childs = 3;
   ItemParentType type = 4;
 }
 
-message APIItem {
+message Item {
   int64 id = 1;
   string catname = 2;
   string name_only = 3;
@@ -1622,12 +1622,12 @@ message APIItem {
   int32 parents_count = 68;
   int32 descendant_twins_groups_count = 16;
   string full_name = 18;
-  APIImage logo = 67;
-  APIImage logo120 = 19;
+  Image logo = 67;
+  Image logo120 = 19;
   bool mosts_active = 20;
   int32 comments_attentions_count = 21;
   bool is_compiles_item_of_day = 22;
-  APIImage brandicon = 23;
+  Image brandicon = 23;
   int64 attr_zone_id = 24;
   bool engine_inherit = 25;
   google.type.LatLng location = 26;
@@ -1646,13 +1646,13 @@ message APIItem {
   repeated string route = 41;
   ItemLinks links = 42;
   bool has_text = 43;
-  repeated APIItem categories = 44;
-  repeated APIItem twins = 45;
+  repeated Item categories = 44;
+  repeated Item twins = 45;
   bool can_edit_specs = 46;
   ItemParents item_parent_childs = 47;
   int32 comments_count = 48;
   PreviewPictures preview_pictures = 49;
-  repeated APIItem engine_vehicles = 50;
+  repeated Item engine_vehicles = 50;
   repeated RelatedGroupPicture related_group_pictures = 51;
   repeated ItemOfDayPicture item_of_day_pictures = 52;
   int32 begin_year = 53;
@@ -1681,7 +1681,7 @@ message SpecsContributor {
 
 message ItemOfDayPicture {
   string name = 1;
-  APIImage thumb = 2;
+  Image thumb = 2;
   repeated string route = 3;
 }
 
@@ -1690,7 +1690,7 @@ message ItemOfDayRequest {
 }
 
 message ItemOfDay {
-  APIItem item = 1;
+  Item item = 1;
   int64 user_id = 2;
 }
 
@@ -1727,8 +1727,8 @@ message Design {
   repeated string route = 2;
 }
 
-message APIItemList {
-  repeated APIItem items = 1;
+message ItemList {
+  repeated Item items = 1;
   Pages paginator = 2;
 }
 
@@ -1816,7 +1816,7 @@ message MapPoint {
   string id = 2;
   string name = 3;
   repeated string url = 4;
-  APIImage image = 5;
+  Image image = 5;
 }
 
 message PicturesViewRequest {
@@ -1901,11 +1901,11 @@ message Picture {
   string identity = 8;
   uint32 width = 2;
   uint32 height = 3;
-  APIImage image = 4;
+  Image image = 4;
   google.type.LatLng point = 5;
   int32 copyrights_text_id = 6;
-  APIImage thumb_medium = 7;
-  APIImage thumb_large = 46;
+  Image thumb_medium = 7;
+  Image thumb_large = 46;
   string name_text = 9;
   string name_html = 10;
   int64 owner_id = 11;
@@ -1921,8 +1921,8 @@ message Picture {
   int32 moder_vote_count = 21;
   repeated PathTreePictureItem path = 23;
   PictureItems picture_items = 24;
-  APIImage image_gallery = 47;
-  APIImage image_gallery_full = 25;
+  Image image_gallery = 47;
+  Image image_gallery_full = 25;
   DfDistances df_distances = 26;
   int32 accepted_count = 27;
   google.protobuf.Timestamp created_at = 28;
@@ -1940,7 +1940,7 @@ message Picture {
   string ip = 40;
   int32 dpi_x = 41;
   int32 dpi_y = 42;
-  APIImage preview_large = 43;
+  Image preview_large = 43;
   bool subscribed = 44;
   PicturesPages paginator = 45;
 }
@@ -2020,7 +2020,7 @@ message PictureItem {
   uint32 crop_width = 6;
   uint32 crop_height = 7;
   int32 perspective_id = 8;
-  APIItem item = 9;
+  Item item = 9;
   ItemParentCaches item_parent_cache_ancestors = 10;
   Picture picture = 11;
 }
@@ -2098,7 +2098,7 @@ message NewboxRequest {
 }
 
 message NewboxGroup {
-  APIItem item = 1;
+  Item item = 1;
   repeated Picture pictures = 2;
   int32 total_pictures = 3;
   string type = 4;
@@ -2260,15 +2260,15 @@ message AboutDataResponse {
   int32 total_comments = 11;
 }
 
-message APIUserPreferencesRequest {
+message UserPreferencesRequest {
   int64 user_id = 1;
 }
 
-message APIUserPreferencesResponse {
+message UserPreferencesResponse {
   bool disable_comments_notifications = 1;
 }
 
-message APIUsersRequest {
+message UsersRequest {
   bool is_online = 2;
   uint32 limit = 3;
   uint32 page = 4;
@@ -2277,16 +2277,16 @@ message APIUsersRequest {
   repeated int64 id = 7;
 }
 
-message APIUsersResponse {
-  repeated APIUser items = 1;
+message UsersResponse {
+  repeated User items = 1;
   Pages paginator = 2;
 }
 
-message APIAccountsResponse {
-  repeated APIAccountsAccount items = 1;
+message AccountsResponse {
+  repeated AccountsAccount items = 1;
 }
 
-message APIAccountsAccount {
+message AccountsAccount {
   bool can_remove = 1;
   string icon = 2;
   int64 id = 3;
@@ -2302,25 +2302,25 @@ message DeleteUserPhotoRequest {
   int64 id = 1;
 }
 
-message APIUsersRatingUserBrand {
+message UsersRatingUserBrand {
   string name = 1;
   repeated string route = 2;
   int64 volume = 3;
 }
 
-message APIUsersRatingUserFan {
+message UsersRatingUserFan {
   int64 user_id = 1;
   int64 volume = 2;
 }
 
-message APIUsersRatingUser {
+message UsersRatingUser {
   int64 user_id = 1;
   int64 volume = 2;
   double weight = 3;
 }
 
-message APIUsersRatingResponse {
-  repeated APIUsersRatingUser users = 1;
+message UsersRatingResponse {
+  repeated UsersRatingUser users = 1;
 }
 
 message UserRatingDetailsRequest {
@@ -2329,11 +2329,11 @@ message UserRatingDetailsRequest {
 }
 
 message UserRatingBrandsResponse {
-  repeated APIUsersRatingUserBrand brands = 1;
+  repeated UsersRatingUserBrand brands = 1;
 }
 
 message GetUserRatingFansResponse {
-  repeated APIUsersRatingUserFan fans = 1;
+  repeated UsersRatingUserFan fans = 1;
 }
 
 message ArticlesRequest {
@@ -2361,11 +2361,11 @@ message ArticleByCatnameRequest {
   string catname = 1;
 }
 
-message APIContentLanguages {
+message ContentLanguages {
   repeated string languages = 1;
 }
 
-message APIItemLinkRequest {
+message ItemLinkRequest {
   int64 id = 1;
 }
 
@@ -2381,10 +2381,10 @@ message ItemLinksRequest {
 }
 
 message ItemLinks {
-  repeated APIItemLink items = 1;
+  repeated ItemLink items = 1;
 }
 
-message APIItemLink {
+message ItemLink {
   int64 id = 1;
   string name = 2;
   string url = 3;
@@ -2392,30 +2392,30 @@ message APIItemLink {
   int64 item_id = 5;
 }
 
-message APICreateItemLinkResponse {
+message CreateItemLinkResponse {
   int64 id = 1;
 }
 
-message APIGetItemVehicleTypesRequest {
+message GetItemVehicleTypesRequest {
   int64 item_id = 1;
   int64 vehicle_type_id = 2;
 }
 
-message APIItemVehicleType {
+message ItemVehicleType {
   int64 item_id = 1;
   int64 vehicle_type_id = 2;
 }
 
-message APIGetItemVehicleTypesResponse {
-  repeated APIItemVehicleType items = 1;
+message GetItemVehicleTypesResponse {
+  repeated ItemVehicleType items = 1;
 }
 
-message APIItemVehicleTypeRequest {
+message ItemVehicleTypeRequest {
   int64 item_id = 1;
   int64 vehicle_type_id = 2;
 }
 
-message APIGetItemLanguagesRequest {
+message GetItemLanguagesRequest {
   int64 item_id = 1;
 }
 
@@ -2433,7 +2433,7 @@ message ItemLanguage {
   string full_text = 7;
 }
 
-message APIGetItemParentLanguagesRequest {
+message GetItemParentLanguagesRequest {
   int64 item_id = 1;
   int64 parent_id = 2;
 }
@@ -2465,8 +2465,8 @@ message NewItemsRequest {
 }
 
 message NewItemsResponse {
-  APIItem brand = 1;
-  repeated APIItem items = 2;
+  Item brand = 1;
+  repeated Item items = 2;
 }
 
 message ItemParentFields {
@@ -2502,10 +2502,10 @@ message ItemParent {
   int64 parent_id = 2;
   ItemParentType type = 3;
   string catname = 4;
-  APIItem item = 5;
-  APIItem parent = 8;
-  APIItem duplicate_parent = 6;
-  APIItem duplicate_child = 7;
+  Item item = 5;
+  Item parent = 8;
+  Item duplicate_parent = 6;
+  Item duplicate_child = 7;
   PicturesList child_descendant_pictures = 9;
 }
 
@@ -2549,7 +2549,7 @@ message AlphaResponse {
 
 message PathItem {
   string catname = 1;
-  APIItem item = 2;
+  Item item = 2;
   int64 parent_id = 3;
 }
 
@@ -2588,7 +2588,7 @@ message MostsItemsRequest {
 }
 
 message MostsItem {
-  APIItem item = 1;
+  Item item = 1;
   string value_html = 2;
   int64 unit_id = 3;
 }

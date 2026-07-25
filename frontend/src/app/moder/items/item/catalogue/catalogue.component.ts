@@ -4,8 +4,8 @@ import {toObservable} from '@angular/core/rxjs-interop';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {
-  APIItem,
   DeleteItemParentRequest,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParent,
@@ -49,7 +49,7 @@ export class ModerItemsItemCatalogueComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
   protected readonly ItemType: typeof ItemType = ItemType;
@@ -79,9 +79,7 @@ export class ModerItemsItemCatalogueComponent {
     map((item) => ![ItemType.ITEM_TYPE_FACTORY, ItemType.ITEM_TYPE_TWINS].includes(item.itemTypeId)),
   );
 
-  protected readonly itemsDataSource: (text$: Observable<string>) => Observable<APIItem[]> = (
-    text$: Observable<string>,
-  ) =>
+  protected readonly itemsDataSource: (text$: Observable<string>) => Observable<Item[]> = (text$: Observable<string>) =>
     this.item$.pipe(
       switchMap((item) => (item ? of(item) : EMPTY)),
       switchMap((item) =>
@@ -158,7 +156,7 @@ export class ModerItemsItemCatalogueComponent {
     map((response) => response.items || []),
   );
 
-  protected readonly suggestions$: Observable<APIItem[]> = combineLatest([
+  protected readonly suggestions$: Observable<Item[]> = combineLatest([
     this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
     this.reloadSuggestions$,
   ]).pipe(
@@ -177,17 +175,17 @@ export class ModerItemsItemCatalogueComponent {
     map((response) => response.items || []),
   );
 
-  protected itemFormatter(x: APIItem) {
+  protected itemFormatter(x: Item) {
     return x.nameText;
   }
 
-  protected itemOnSelect(item: APIItem, e: NgbTypeaheadSelectItemEvent): void {
+  protected itemOnSelect(item: Item, e: NgbTypeaheadSelectItemEvent): void {
     e.preventDefault();
     this.addParent(item, '' + e.item.id);
     this.itemQuery.setValue('');
   }
 
-  protected addParent(item: APIItem, parentId: string) {
+  protected addParent(item: Item, parentId: string) {
     this.#itemsClient
       .createItemParent(
         new ItemParent({
@@ -218,11 +216,11 @@ export class ModerItemsItemCatalogueComponent {
       });
   }
 
-  protected deleteChild(item: APIItem, itemId: string) {
+  protected deleteChild(item: Item, itemId: string) {
     this.deleteItemParent(itemId, '' + item.id);
   }
 
-  protected deleteParent(item: APIItem, parentId: string) {
+  protected deleteParent(item: Item, parentId: string) {
     this.deleteItemParent('' + item.id, parentId);
   }
 

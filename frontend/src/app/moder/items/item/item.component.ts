@@ -2,9 +2,8 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
-  APITreeItem,
   GetTreeRequest,
+  Item,
   ItemFields,
   ItemParentCacheListOptions,
   ItemRequest,
@@ -14,6 +13,7 @@ import {
   PictureListOptions,
   PicturesRequest,
   SetUserItemSubscriptionRequest,
+  TreeItem,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
@@ -118,7 +118,7 @@ export class ModerItemsItemComponent {
     debounceTime(30),
   );
 
-  protected readonly item$: Observable<APIItem> = combineLatest([this.#itemID, this.reloadItem$]).pipe(
+  protected readonly item$: Observable<Item> = combineLatest([this.#itemID, this.reloadItem$]).pipe(
     switchMap(([id]) =>
       this.#itemsClient.item(
         new ItemRequest({
@@ -200,7 +200,7 @@ export class ModerItemsItemComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly tree$: Observable<APITreeItem> = this.item$.pipe(
+  protected readonly tree$: Observable<TreeItem> = this.item$.pipe(
     switchMap((item) =>
       this.#itemsClient.getTree(new GetTreeRequest({id: item.id, language: this.#languageService.language})),
     ),
@@ -232,7 +232,7 @@ export class ModerItemsItemComponent {
     }),
   );
 
-  protected toggleSubscription(item: APIItem) {
+  protected toggleSubscription(item: Item) {
     const newValue = !item.subscription;
     this.#itemsClient
       .setUserItemSubscription(

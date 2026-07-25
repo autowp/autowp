@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APITopFactoriesListItem, NewItemsRequest} from '@grpc/spec.pb';
+import {NewItemsRequest, TopFactoriesListItem} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
@@ -20,7 +20,7 @@ export class IndexFactoriesFactoryComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly factory = input.required<APITopFactoriesListItem>();
+  readonly factory = input.required<TopFactoriesListItem>();
   protected readonly factory$ = toObservable(this.factory);
 
   protected readonly response$ = this.factory$.pipe(

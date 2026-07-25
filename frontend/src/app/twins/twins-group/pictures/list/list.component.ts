@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemParentCacheListOptions,
   ItemRequest,
@@ -44,7 +44,7 @@ export class TwinsGroupPicturesListComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly group$: Observable<APIItem> = this.id$.pipe(
+  protected readonly group$: Observable<Item> = this.id$.pipe(
     switchMap((group) => {
       if (!group) {
         this.#router.navigate(['/error-404'], {

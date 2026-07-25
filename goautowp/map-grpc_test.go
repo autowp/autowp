@@ -16,7 +16,7 @@ func createItemWithPoint(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	createItem(t, conn, cnt, &APIItem{
+	createItem(t, conn, cnt, &Item{
 		Name:       fmt.Sprintf("factory-%d", random.Int()),
 		IsGroup:    false,
 		ItemTypeId: ItemType_ITEM_TYPE_FACTORY,

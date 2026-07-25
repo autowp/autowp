@@ -3,8 +3,8 @@ import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angul
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIGetItemVehicleTypesRequest,
-  APIItem,
+  GetItemVehicleTypesRequest,
+  Item,
   ItemFields,
   ItemParent,
   ItemRequest,
@@ -71,7 +71,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
         .pipe(map((response) => response.items || [])),
   });
 
-  protected readonly item$: Observable<APIItem> = this.#itemID$.pipe(
+  protected readonly item$: Observable<Item> = this.#itemID$.pipe(
     switchMap((id) =>
       this.#itemsClient.item(
         new ItemRequest({
@@ -104,7 +104,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
       [ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)
         ? this.#itemsClient
             .getItemVehicleTypes(
-              new APIGetItemVehicleTypesRequest({
+              new GetItemVehicleTypesRequest({
                 itemId: item.id,
               }),
             )
@@ -115,7 +115,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
 
   protected readonly newItem$ = this.item$.pipe(
     map((item) => {
-      const newItem = {...item.toObject()} as APIItem;
+      const newItem = {...item.toObject()} as Item;
       newItem.isGroup = false;
       return newItem;
     }),
@@ -128,7 +128,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
     });
   }
 
-  protected submit(item: APIItem, event: ItemMetaFormResult, pictures: PictureItem[]) {
+  protected submit(item: Item, event: ItemMetaFormResult, pictures: PictureItem[]) {
     this.loading.set(true);
 
     const newItem = itemMetaFormResultsToAPIItem(event);
@@ -140,7 +140,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
         ? of(null)
         : this.#itemsClient.updateItem(
             new UpdateItemRequest({
-              item: new APIItem({id: item.id, isGroup: true}),
+              item: new Item({id: item.id, isGroup: true}),
               updateMask: new FieldMask({paths: ['is_group']}),
             }),
           ),

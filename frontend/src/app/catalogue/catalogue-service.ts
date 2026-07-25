@@ -1,8 +1,8 @@
 import {inject, Service} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
-  APIItem,
   ChildsCount,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParent,
@@ -40,7 +40,7 @@ export class CatalogueService {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  public static pathToBreadcrumbs(brand: APIItem, path: ItemParent[]): Breadcrumbs[] {
+  public static pathToBreadcrumbs(brand: Item, path: ItemParent[]): Breadcrumbs[] {
     const result: Breadcrumbs[] = [];
     const routerLink = ['/', brand.catname];
     for (const item of path) {
@@ -64,7 +64,7 @@ export class CatalogueService {
   public resolveCatalogue$(
     route: ActivatedRoute,
     itemFields?: ItemFields,
-  ): Observable<null | {brand: APIItem; path: ItemParent[]; type: string}> {
+  ): Observable<null | {brand: Item; path: ItemParent[]; type: string}> {
     const pathPipeRecursive: ParentObservableFunc = () =>
       switchMap((parent: null | Parent) => {
         if (!parent?.id || parent.path.length <= 0) {
@@ -166,7 +166,7 @@ export class CatalogueService {
     );
   }
 
-  private getBrand$(route: ActivatedRoute): Observable<APIItem | null> {
+  private getBrand$(route: ActivatedRoute): Observable<Item | null> {
     return route.paramMap.pipe(
       map((params) => params.get('brand')),
       distinctUntilChanged(),

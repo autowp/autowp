@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APIItem, ItemFields, ItemRequest, UpdateItemRequest} from '@grpc/spec.pb';
+import {Item, ItemFields, ItemRequest, UpdateItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
@@ -24,7 +24,7 @@ export class CarsSpecificationsEditorEngineComponent {
   readonly #toastService = inject(ToastsService);
   readonly #languageService = inject(LanguageService);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
   readonly changed = output<void>();
@@ -32,7 +32,7 @@ export class CarsSpecificationsEditorEngineComponent {
     .hasRole$(Role.CARS_MODER)
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
 
-  protected readonly engine$: Observable<APIItem | null> = this.item$.pipe(
+  protected readonly engine$: Observable<Item | null> = this.item$.pipe(
     switchMap((item) => {
       if (!item?.engineItemId || item?.engineItemId === '0') {
         return of(null);
@@ -49,11 +49,11 @@ export class CarsSpecificationsEditorEngineComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  private setEngineID(item: APIItem, value: string, inherited: boolean) {
+  private setEngineID(item: Item, value: string, inherited: boolean) {
     this.#itemsClient
       .updateItem(
         new UpdateItemRequest({
-          item: new APIItem({
+          item: new Item({
             engineInherit: inherited,
             engineItemId: value,
             id: item.id,
@@ -67,11 +67,11 @@ export class CarsSpecificationsEditorEngineComponent {
       });
   }
 
-  protected inheritEngine(item: APIItem) {
+  protected inheritEngine(item: Item) {
     this.setEngineID(item, '0', true);
   }
 
-  protected cancelInheritance(item: APIItem) {
+  protected cancelInheritance(item: Item) {
     this.setEngineID(item, '0', false);
   }
 }

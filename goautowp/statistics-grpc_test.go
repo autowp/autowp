@@ -62,7 +62,7 @@ func TestStatisticsPulse(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 

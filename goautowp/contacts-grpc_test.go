@@ -49,7 +49,7 @@ func TestCreateDeleteContact(t *testing.T) {
 			authorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 

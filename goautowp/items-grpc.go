@@ -175,7 +175,7 @@ func NewItemsGRPCServer(
 func (s *ItemsGRPCServer) GetBrands(
 	ctx context.Context,
 	in *GetBrandsRequest,
-) (*APIBrandsList, error) {
+) (*BrandsList, error) {
 	if s == nil {
 		return nil, status.Error(codes.Internal, "self not initialized")
 	}
@@ -187,15 +187,15 @@ func (s *ItemsGRPCServer) GetBrands(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIBrandsListLine, 0, len(resultArray))
+	result := make([]*BrandsListLine, 0, len(resultArray))
 
 	for _, line := range resultArray {
-		characters := make([]*APIBrandsListCharacter, 0, len(line.Characters))
+		characters := make([]*BrandsListCharacter, 0, len(line.Characters))
 
 		for _, character := range line.Characters {
-			rows := make([]*APIBrandsListItem, 0, len(character.Items))
+			rows := make([]*BrandsListItem, 0, len(character.Items))
 			for _, item := range character.Items {
-				rows = append(rows, &APIBrandsListItem{
+				rows = append(rows, &BrandsListItem{
 					Id:                    item.ID,
 					Catname:               item.Catname,
 					Name:                  item.Name,
@@ -205,39 +205,39 @@ func (s *ItemsGRPCServer) GetBrands(
 				})
 			}
 
-			characters = append(characters, &APIBrandsListCharacter{
+			characters = append(characters, &BrandsListCharacter{
 				Id:        character.ID,
 				Character: character.Character,
 				Items:     rows,
 			})
 		}
 
-		var category APIBrandsListLine_Category
+		var category BrandsListLine_Category
 
 		switch line.Category {
 		case items.BrandsListCategoryDefault:
-			category = APIBrandsListLine_DEFAULT
+			category = BrandsListLine_DEFAULT
 		case items.BrandsListCategoryNumber:
-			category = APIBrandsListLine_NUMBER
+			category = BrandsListLine_NUMBER
 		case items.BrandsListCategoryCyrillic:
-			category = APIBrandsListLine_CYRILLIC
+			category = BrandsListLine_CYRILLIC
 		case items.BrandsListCategoryLatin:
-			category = APIBrandsListLine_LATIN
+			category = BrandsListLine_LATIN
 		}
 
-		result = append(result, &APIBrandsListLine{
+		result = append(result, &BrandsListLine{
 			Category:   category,
 			Characters: characters,
 		})
 	}
 
-	return &APIBrandsList{Lines: result}, nil
+	return &BrandsList{Lines: result}, nil
 }
 
 func (s *ItemsGRPCServer) GetTopBrandsList(
 	ctx context.Context,
 	in *GetTopBrandsListRequest,
-) (*APITopBrandsList, error) {
+) (*TopBrandsList, error) {
 	if s == nil {
 		return nil, status.Error(codes.Internal, "self not initialized")
 	}
@@ -247,9 +247,9 @@ func (s *ItemsGRPCServer) GetTopBrandsList(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	brands := make([]*APITopBrandsListItem, len(cache.Items))
+	brands := make([]*TopBrandsListItem, len(cache.Items))
 	for idx, brand := range cache.Items {
-		brands[idx] = &APITopBrandsListItem{
+		brands[idx] = &TopBrandsListItem{
 			Id:            brand.ID,
 			Catname:       util.NullStringToString(brand.Catname),
 			Name:          brand.NameOnly,
@@ -258,7 +258,7 @@ func (s *ItemsGRPCServer) GetTopBrandsList(
 		}
 	}
 
-	return &APITopBrandsList{
+	return &TopBrandsList{
 		Brands: brands,
 		Total:  int32(cache.Total), //nolint: gosec
 	}, nil
@@ -267,7 +267,7 @@ func (s *ItemsGRPCServer) GetTopBrandsList(
 func (s *ItemsGRPCServer) GetTopPersonsList(
 	ctx context.Context,
 	in *GetTopPersonsListRequest,
-) (*APITopPersonsList, error) {
+) (*TopPersonsList, error) {
 	var pictureItemType schema.PictureItemType
 
 	switch in.GetPictureItemType() { //nolint:exhaustive
@@ -284,15 +284,15 @@ func (s *ItemsGRPCServer) GetTopPersonsList(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	is := make([]*APITopPersonsListItem, len(res))
+	is := make([]*TopPersonsListItem, len(res))
 	for idx, b := range res {
-		is[idx] = &APITopPersonsListItem{
+		is[idx] = &TopPersonsListItem{
 			Id:   b.ID,
 			Name: b.NameOnly,
 		}
 	}
 
-	return &APITopPersonsList{
+	return &TopPersonsList{
 		Items: is,
 	}, nil
 }
@@ -300,15 +300,15 @@ func (s *ItemsGRPCServer) GetTopPersonsList(
 func (s *ItemsGRPCServer) GetTopFactoriesList(
 	ctx context.Context,
 	in *GetTopFactoriesListRequest,
-) (*APITopFactoriesList, error) {
+) (*TopFactoriesList, error) {
 	res, err := s.index.FactoriesCache(ctx, in.GetLanguage())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	is := make([]*APITopFactoriesListItem, len(res))
+	is := make([]*TopFactoriesListItem, len(res))
 	for idx, b := range res {
-		is[idx] = &APITopFactoriesListItem{
+		is[idx] = &TopFactoriesListItem{
 			Id:       b.ID,
 			Name:     b.NameOnly,
 			Count:    b.ChildItemsCount,
@@ -316,7 +316,7 @@ func (s *ItemsGRPCServer) GetTopFactoriesList(
 		}
 	}
 
-	return &APITopFactoriesList{
+	return &TopFactoriesList{
 		Items: is,
 	}, nil
 }
@@ -324,15 +324,15 @@ func (s *ItemsGRPCServer) GetTopFactoriesList(
 func (s *ItemsGRPCServer) GetTopCategoriesList(
 	ctx context.Context,
 	in *GetTopCategoriesListRequest,
-) (*APITopCategoriesList, error) {
+) (*TopCategoriesList, error) {
 	res, err := s.index.CategoriesCache(ctx, in.GetLanguage())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	is := make([]*APITopCategoriesListItem, len(res))
+	is := make([]*TopCategoriesListItem, len(res))
 	for idx, itm := range res {
-		is[idx] = &APITopCategoriesListItem{
+		is[idx] = &TopCategoriesListItem{
 			Id:       itm.ID,
 			Name:     itm.NameOnly,
 			Catname:  util.NullStringToString(itm.Catname),
@@ -341,7 +341,7 @@ func (s *ItemsGRPCServer) GetTopCategoriesList(
 		}
 	}
 
-	return &APITopCategoriesList{
+	return &TopCategoriesList{
 		Items: is,
 	}, nil
 }
@@ -349,15 +349,15 @@ func (s *ItemsGRPCServer) GetTopCategoriesList(
 func (s *ItemsGRPCServer) GetTopTwinsBrandsList(
 	ctx context.Context,
 	in *GetTopTwinsBrandsListRequest,
-) (*APITopTwinsBrandsList, error) {
+) (*TopTwinsBrandsList, error) {
 	twinsData, err := s.index.TwinsCache(ctx, in.GetLanguage())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	is := make([]*APITwinsBrandsListItem, len(twinsData.Res))
+	is := make([]*TwinsBrandsListItem, len(twinsData.Res))
 	for idx, twin := range twinsData.Res {
-		is[idx] = &APITwinsBrandsListItem{
+		is[idx] = &TwinsBrandsListItem{
 			Id:       twin.ID,
 			Catname:  util.NullStringToString(twin.Catname),
 			Name:     twin.NameOnly,
@@ -366,7 +366,7 @@ func (s *ItemsGRPCServer) GetTopTwinsBrandsList(
 		}
 	}
 
-	return &APITopTwinsBrandsList{
+	return &TopTwinsBrandsList{
 		Items: is,
 		Count: int32(twinsData.Count), //nolint: gosec
 	}, nil
@@ -375,7 +375,7 @@ func (s *ItemsGRPCServer) GetTopTwinsBrandsList(
 func (s *ItemsGRPCServer) GetTwinsBrandsList(
 	ctx context.Context,
 	in *GetTwinsBrandsListRequest,
-) (*APITwinsBrandsList, error) {
+) (*TwinsBrandsList, error) {
 	twinsData, _, err := s.repository.List(ctx, &query.ItemListOptions{
 		Language: in.GetLanguage(),
 		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
@@ -396,9 +396,9 @@ func (s *ItemsGRPCServer) GetTwinsBrandsList(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	is := make([]*APITwinsBrandsListItem, len(twinsData))
+	is := make([]*TwinsBrandsListItem, len(twinsData))
 	for idx, brand := range twinsData {
-		is[idx] = &APITwinsBrandsListItem{
+		is[idx] = &TwinsBrandsListItem{
 			Id:       brand.ID,
 			Catname:  util.NullStringToString(brand.Catname),
 			Name:     brand.NameOnly,
@@ -407,12 +407,12 @@ func (s *ItemsGRPCServer) GetTwinsBrandsList(
 		}
 	}
 
-	return &APITwinsBrandsList{
+	return &TwinsBrandsList{
 		Items: is,
 	}, nil
 }
 
-func (s *ItemsGRPCServer) Item(ctx context.Context, in *ItemRequest) (*APIItem, error) {
+func (s *ItemsGRPCServer) Item(ctx context.Context, in *ItemRequest) (*Item, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -443,7 +443,7 @@ func (s *ItemsGRPCServer) Item(ctx context.Context, in *ItemRequest) (*APIItem, 
 	return s.extractor.Extract(ctx, res, in.GetFields(), in.GetLanguage(), userCtx)
 }
 
-func (s *ItemsGRPCServer) List(ctx context.Context, in *ItemsRequest) (*APIItemList, error) {
+func (s *ItemsGRPCServer) List(ctx context.Context, in *ItemsRequest) (*ItemList, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -500,7 +500,7 @@ func (s *ItemsGRPCServer) List(ctx context.Context, in *ItemsRequest) (*APIItemL
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	is := make([]*APIItem, len(res))
+	is := make([]*Item, len(res))
 	for idx, i := range res {
 		is[idx], err = s.extractor.Extract(ctx, i, in.GetFields(), in.GetLanguage(), userCtx)
 		if err != nil {
@@ -524,7 +524,7 @@ func (s *ItemsGRPCServer) List(ctx context.Context, in *ItemsRequest) (*APIItemL
 		}
 	}
 
-	return &APIItemList{
+	return &ItemList{
 		Items:     is,
 		Paginator: paginator,
 	}, nil
@@ -570,8 +570,8 @@ func (s *ItemsGRPCServer) GetItemsFirstChars(
 func (s *ItemsGRPCServer) GetContentLanguages(
 	_ context.Context,
 	_ *emptypb.Empty,
-) (*APIContentLanguages, error) {
-	return &APIContentLanguages{
+) (*ContentLanguages, error) {
+	return &ContentLanguages{
 		Languages: s.contentLanguages,
 	}, nil
 }
@@ -579,7 +579,7 @@ func (s *ItemsGRPCServer) GetContentLanguages(
 func (s *ItemsGRPCServer) GetItemLink(
 	ctx context.Context,
 	in *ItemLinksRequest,
-) (*APIItemLink, error) {
+) (*ItemLink, error) {
 	options, err := convertLinkListOptions(in.GetOptions())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -621,7 +621,7 @@ func (s *ItemsGRPCServer) GetItemLinks(
 
 func (s *ItemsGRPCServer) DeleteItemLink(
 	ctx context.Context,
-	in *APIItemLinkRequest,
+	in *ItemLinkRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -644,8 +644,8 @@ func (s *ItemsGRPCServer) DeleteItemLink(
 
 func (s *ItemsGRPCServer) CreateItemLink(
 	ctx context.Context,
-	in *APIItemLink,
-) (*APICreateItemLinkResponse, error) {
+	in *ItemLink,
+) (*CreateItemLinkResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -680,14 +680,14 @@ func (s *ItemsGRPCServer) CreateItemLink(
 		return nil, status.Error(codes.Internal, errNoRowsReturned.Error())
 	}
 
-	return &APICreateItemLinkResponse{
+	return &CreateItemLinkResponse{
 		Id: id,
 	}, nil
 }
 
 func (s *ItemsGRPCServer) UpdateItemLink(
 	ctx context.Context,
-	in *APIItemLink,
+	in *ItemLink,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -723,7 +723,7 @@ func (s *ItemsGRPCServer) UpdateItemLink(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *APIItemLink) Validate() ([]*errdetails.BadRequest_FieldViolation, error) {
+func (s *ItemLink) Validate() ([]*errdetails.BadRequest_FieldViolation, error) {
 	var (
 		result   = make([]*errdetails.BadRequest_FieldViolation, 0)
 		problems []string
@@ -801,8 +801,8 @@ func (s *APIItemLink) Validate() ([]*errdetails.BadRequest_FieldViolation, error
 
 func (s *ItemsGRPCServer) GetItemVehicleTypes(
 	ctx context.Context,
-	in *APIGetItemVehicleTypesRequest,
-) (*APIGetItemVehicleTypesResponse, error) {
+	in *GetItemVehicleTypesRequest,
+) (*GetItemVehicleTypesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -837,10 +837,10 @@ func (s *ItemsGRPCServer) GetItemVehicleTypes(
 
 	defer util.Close(rows)
 
-	res := make([]*APIItemVehicleType, 0)
+	res := make([]*ItemVehicleType, 0)
 
 	for rows.Next() {
-		var ivt APIItemVehicleType
+		var ivt ItemVehicleType
 
 		err = rows.Scan(&ivt.ItemId, &ivt.VehicleTypeId)
 		if err != nil {
@@ -854,15 +854,15 @@ func (s *ItemsGRPCServer) GetItemVehicleTypes(
 		return nil, err
 	}
 
-	return &APIGetItemVehicleTypesResponse{
+	return &GetItemVehicleTypesResponse{
 		Items: res,
 	}, nil
 }
 
 func (s *ItemsGRPCServer) GetItemVehicleType(
 	ctx context.Context,
-	in *APIItemVehicleTypeRequest,
-) (*APIItemVehicleType, error) {
+	in *ItemVehicleTypeRequest,
+) (*ItemVehicleType, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -884,7 +884,7 @@ func (s *ItemsGRPCServer) GetItemVehicleType(
 			schema.ItemVehicleTypeTableVehicleTypeIDCol.Eq(in.GetVehicleTypeId()),
 		)
 
-	var ivt APIItemVehicleType
+	var ivt ItemVehicleType
 
 	rows, err := sqlSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
 	if err != nil {
@@ -909,7 +909,7 @@ func (s *ItemsGRPCServer) GetItemVehicleType(
 
 func (s *ItemsGRPCServer) CreateItemVehicleType(
 	ctx context.Context,
-	in *APIItemVehicleType,
+	in *ItemVehicleType,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -944,7 +944,7 @@ func (s *ItemsGRPCServer) CreateItemVehicleType(
 
 func (s *ItemsGRPCServer) DeleteItemVehicleType(
 	ctx context.Context,
-	in *APIItemVehicleTypeRequest,
+	in *ItemVehicleTypeRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -964,7 +964,7 @@ func (s *ItemsGRPCServer) DeleteItemVehicleType(
 }
 
 func (s *ItemsGRPCServer) GetItemLanguages(
-	ctx context.Context, in *APIGetItemLanguagesRequest,
+	ctx context.Context, in *GetItemLanguagesRequest,
 ) (*ItemLanguages, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -1158,7 +1158,7 @@ func (s *ItemsGRPCServer) UpdateItemLanguage(
 }
 
 func (s *ItemsGRPCServer) GetItemParentLanguages(
-	ctx context.Context, in *APIGetItemParentLanguagesRequest,
+	ctx context.Context, in *GetItemParentLanguagesRequest,
 ) (*ItemParentLanguages, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -1515,7 +1515,7 @@ func (s *ItemsGRPCServer) GetBrandNewItems(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	extractedItems := make([]*APIItem, 0, len(carList))
+	extractedItems := make([]*Item, 0, len(carList))
 
 	for _, car := range carList {
 		extractedItem, err := s.extractor.Extract(
@@ -1598,7 +1598,7 @@ func (s *ItemsGRPCServer) GetNewItems(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	extractedItems := make([]*APIItem, 0, len(carList))
+	extractedItems := make([]*Item, 0, len(carList))
 
 	for _, car := range carList {
 		extractedItem, err := s.extractor.Extract(
@@ -2004,7 +2004,7 @@ func (s *ItemsGRPCServer) SetUserItemSubscription(
 
 func (s *ItemsGRPCServer) GetBrandSections(
 	ctx context.Context, in *GetBrandSectionsRequest,
-) (*APIBrandSections, error) {
+) (*BrandSections, error) {
 	item, err := s.repository.Item(ctx, &query.ItemListOptions{
 		ItemID:   in.GetItemId(),
 		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
@@ -2019,7 +2019,7 @@ func (s *ItemsGRPCServer) GetBrandSections(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &APIBrandSections{
+	return &BrandSections{
 		Sections: sections,
 	}, nil
 }
@@ -2432,7 +2432,7 @@ func categorizeFirstChars(chars []string) *AlphaResponse {
 	return &res
 }
 
-func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *APIItem) (*ItemID, error) {
+func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *Item) (*ItemID, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -2900,7 +2900,7 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 	return &emptypb.Empty{}, nil
 }
 
-func (s *ItemsGRPCServer) GetTree(ctx context.Context, in *GetTreeRequest) (*APITreeItem, error) {
+func (s *ItemsGRPCServer) GetTree(ctx context.Context, in *GetTreeRequest) (*TreeItem, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -3153,7 +3153,7 @@ func (s *ItemsGRPCServer) notifyItemSubscribers(
 
 func (s *ItemsGRPCServer) brandSections(
 	ctx context.Context, lang string, brandID int64, brandCatname string,
-) ([]*APIBrandSection, error) {
+) ([]*BrandSection, error) {
 	// create groups array
 	sections, err := s.carSections(ctx, lang, brandID, brandCatname)
 	if err != nil {
@@ -3167,7 +3167,7 @@ func (s *ItemsGRPCServer) brandSections(
 
 	return append(
 		sections,
-		&APIBrandSection{
+		&BrandSection{
 			Name:       "Other",
 			RouterLink: nil,
 			Groups:     otherGroups,
@@ -3177,8 +3177,8 @@ func (s *ItemsGRPCServer) brandSections(
 
 func (s *ItemsGRPCServer) otherGroups(
 	ctx context.Context, brandID int64, brandCatname string, lang string,
-) ([]*APIBrandSection, error) {
-	var groups []*APIBrandSection
+) ([]*BrandSection, error) {
+	var groups []*BrandSection
 
 	// concepts
 	hasConcepts, err := s.repository.Exists(ctx, query.ItemListOptions{
@@ -3203,7 +3203,7 @@ func (s *ItemsGRPCServer) otherGroups(
 			return nil, err
 		}
 
-		groups = append(groups, &APIBrandSection{
+		groups = append(groups, &BrandSection{
 			RouterLink: frontend.BrandConceptsRoute(brandCatname),
 			Name:       translated,
 		})
@@ -3255,7 +3255,7 @@ func (s *ItemsGRPCServer) otherGroups(
 				return nil, err
 			}
 
-			groups = append(groups, &APIBrandSection{
+			groups = append(groups, &BrandSection{
 				RouterLink: frontend.BrandGroupRoute(brandCatname, groupType.Catname),
 				Name:       translated,
 				Count:      int32(picturesCount), //nolint: gosec
@@ -3268,7 +3268,7 @@ func (s *ItemsGRPCServer) otherGroups(
 
 func (s *ItemsGRPCServer) carSections(
 	ctx context.Context, lang string, brandID int64, brandCatname string,
-) ([]*APIBrandSection, error) {
+) ([]*BrandSection, error) {
 	sectionsPresets := []SectionPreset{
 		{
 			ItemTypeID: []schema.ItemTableItemTypeID{
@@ -3315,7 +3315,7 @@ func (s *ItemsGRPCServer) carSections(
 		},
 	}
 
-	sections := make([]*APIBrandSection, 0, len(sectionsPresets))
+	sections := make([]*BrandSection, 0, len(sectionsPresets))
 
 	for _, sectionsPreset := range sectionsPresets {
 		sectionGroups, err := s.carSectionGroups(
@@ -3329,7 +3329,7 @@ func (s *ItemsGRPCServer) carSections(
 			return nil, fmt.Errorf("carSectionGroups(): %w", err)
 		}
 
-		sections = append(sections, &APIBrandSection{
+		sections = append(sections, &BrandSection{
 			Name:       sectionsPreset.Name,
 			RouterLink: sectionsPreset.RouterLink,
 			Groups:     sectionGroups,
@@ -3345,7 +3345,7 @@ func (s *ItemsGRPCServer) carSectionGroups(
 	brandID int64,
 	brandCatname string,
 	section SectionPreset,
-) ([]*APIBrandSection, error) {
+) ([]*BrandSection, error) {
 	childItems := &query.ItemListOptions{
 		TypeID:                section.ItemTypeID,
 		IsNotConcept:          true,
@@ -3367,10 +3367,10 @@ func (s *ItemsGRPCServer) carSectionGroups(
 		return nil, fmt.Errorf("ItemParents(): %w", err)
 	}
 
-	groups := make([]*APIBrandSection, 0, len(rows))
+	groups := make([]*BrandSection, 0, len(rows))
 
 	for _, row := range rows {
-		groups = append(groups, &APIBrandSection{
+		groups = append(groups, &BrandSection{
 			RouterLink: frontend.BrandItemRoute(brandCatname, row.Catname),
 			Name:       row.Name,
 		})
@@ -3855,16 +3855,16 @@ func (s *ItemsGRPCServer) buildChangesMessage( //nolint: maintidx
 
 func (s *ItemsGRPCServer) carTreeWalk(
 	ctx context.Context, car *items.Item, lang string, parentType schema.ItemParentType,
-) (*APITreeItem, error) {
+) (*TreeItem, error) {
 	nameHTML, err := s.formatItemNameHTML(car, lang)
 	if err != nil {
 		return nil, err
 	}
 
-	data := APITreeItem{
+	data := TreeItem{
 		Id:       car.ID,
 		NameHtml: nameHTML,
-		Childs:   []*APITreeItem{},
+		Childs:   []*TreeItem{},
 		Type:     extractItemParentType(parentType),
 	}
 

@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, effect, inject, OnInit} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {APIItem, ItemType, Picture} from '@grpc/spec.pb';
+import {Item, ItemType, Picture} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 import {GalleryComponent} from 'app/gallery/gallery.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
@@ -53,11 +53,7 @@ export class CategoryGalleryComponent implements OnInit {
     });
   }
 
-  protected currentRouterLinkPrefix(
-    category: APIItem | null,
-    currentItem: APIItem,
-    pathCatnames: string[],
-  ): null | string[] {
+  protected currentRouterLinkPrefix(category: Item | null, currentItem: Item, pathCatnames: string[]): null | string[] {
     if (!category) {
       return null;
     }

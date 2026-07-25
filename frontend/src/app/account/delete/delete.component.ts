@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
-import {APIDeleteUserRequest} from '@grpc/spec.pb';
+import {DeleteUserRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
@@ -42,7 +42,7 @@ export class AccountDeleteComponent implements OnInit {
         switchMap((user) =>
           user
             ? this.#usersGrpc.deleteUser(
-                new APIDeleteUserRequest({
+                new DeleteUserRequest({
                   password: this.form.password_old,
                   userId: user.id,
                 }),

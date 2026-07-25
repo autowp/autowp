@@ -3,13 +3,13 @@ import {ChangeDetectionStrategy, Component, inject, input, output} from '@angula
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
-  APIUser,
   CommentMessage,
   CommentsType,
   CommentsUnSubscribeRequest,
   GetTopicRequest,
   SetTopicStatusRequest,
   Topic,
+  User,
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
@@ -22,11 +22,11 @@ import {Observable, of, throwError} from 'rxjs';
 import {catchError, map, shareReplay, switchMap} from 'rxjs/operators';
 
 interface TopicItem {
-  author$: Observable<APIUser | null>;
+  author$: Observable<null | User>;
   createdAt: Date | undefined;
   id: string;
   lastMessage$: Observable<CommentMessage | null>;
-  lastMessageAuthor$: Observable<APIUser | null>;
+  lastMessageAuthor$: Observable<null | User>;
   name: string;
   newMessages: number;
   oldMessages: number;

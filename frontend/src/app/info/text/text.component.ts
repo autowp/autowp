@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {APIUser, GetTextRequest} from '@grpc/spec.pb';
+import {GetTextRequest, User} from '@grpc/spec.pb';
 import {TextClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
@@ -16,7 +16,7 @@ interface InfoText {
   current: null | {
     revision: string;
     text: string;
-    user$: Observable<APIUser | null>;
+    user$: Observable<null | User>;
   };
   currentModel: DiffEditorModel;
   next: null | {
@@ -25,7 +25,7 @@ interface InfoText {
   prev: null | {
     revision: string;
     text: string;
-    user$: Observable<APIUser | null>;
+    user$: Observable<null | User>;
   };
   prevModel: DiffEditorModel;
 }

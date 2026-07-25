@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {environment} from '@environment/environment';
-import {APIMeRequest, UserFields} from '@grpc/spec.pb';
+import {MeRequest, UserFields} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {EMPTY, Observable} from 'rxjs';
@@ -21,7 +21,7 @@ export class AccountEmailComponent implements OnInit {
   readonly #usersClient = inject(UsersClient);
 
   protected readonly email$: Observable<null | string> = this.#usersClient
-    .me(new APIMeRequest({fields: new UserFields({email: true})}))
+    .me(new MeRequest({fields: new UserFields({email: true})}))
     .pipe(
       catchError((error: unknown) => {
         this.#toastService.handleError(error);

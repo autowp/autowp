@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Params, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
-import {APIItem, ItemFields, ItemListOptions, ItemParentListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
+import {Item, ItemFields, ItemListOptions, ItemParentListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
@@ -15,7 +15,7 @@ import {CategoriesService} from '../service';
 
 export interface CategoryPathItem {
   childs: {active: boolean; nameHtml: string; routerLink: string[]}[];
-  item: APIItem;
+  item: Item;
   loaded: boolean;
   parentId: string;
   routerLink: string[];
@@ -48,7 +48,7 @@ export class CategoriesCategoryComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly current$: Observable<APIItem | undefined> = this.#categoryData$.pipe(
+  protected readonly current$: Observable<Item | undefined> = this.#categoryData$.pipe(
     map(({current}) => current),
     shareReplay({bufferSize: 1, refCount: false}),
   );

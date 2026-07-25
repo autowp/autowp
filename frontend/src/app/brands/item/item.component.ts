@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {APIBrandsListItem, BrandIcons, NewItemsRequest} from '@grpc/spec.pb';
+import {BrandIcons, BrandsListItem, NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
@@ -19,7 +19,7 @@ export class BrandsItemComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly brand = input.required<APIBrandsListItem>();
+  readonly brand = input.required<BrandsListItem>();
   protected readonly brand$ = toObservable(this.brand);
 
   readonly icons = input.required<BrandIcons>();
@@ -37,7 +37,7 @@ export class BrandsItemComponent {
     ),
   );
 
-  protected cssClass(item: APIBrandsListItem): string {
+  protected cssClass(item: BrandsListItem): string {
     return item.catname.replace(/\./g, '_');
   }
 }

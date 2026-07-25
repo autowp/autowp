@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemsRequest,
@@ -41,7 +41,7 @@ export class CatalogueMixedComponent {
   readonly #languageService = inject(LanguageService);
   readonly #toastService = inject(ToastsService);
 
-  protected readonly brand$: Observable<APIItem> = this.#route.paramMap.pipe(
+  protected readonly brand$: Observable<Item> = this.#route.paramMap.pipe(
     map((params) => params.get('brand')),
     distinctUntilChanged(),
     debounceTime(10),

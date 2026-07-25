@@ -66,19 +66,19 @@ func NewUsersGRPCServer(
 	}
 }
 
-func (s *UsersGRPCServer) Me(ctx context.Context, in *APIMeRequest) (*APIUser, error) {
+func (s *UsersGRPCServer) Me(ctx context.Context, in *MeRequest) (*User, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return s.GetUser(ctx, &APIGetUserRequest{
+	return s.GetUser(ctx, &GetUserRequest{
 		UserId: userCtx.UserID,
 		Fields: in.GetFields(),
 	})
 }
 
-func (s *UsersGRPCServer) GetUser(ctx context.Context, in *APIGetUserRequest) (*APIUser, error) {
+func (s *UsersGRPCServer) GetUser(ctx context.Context, in *GetUserRequest) (*User, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -112,7 +112,7 @@ func (s *UsersGRPCServer) GetUser(ctx context.Context, in *APIGetUserRequest) (*
 
 func (s *UsersGRPCServer) DeleteUser(
 	ctx context.Context,
-	in *APIDeleteUserRequest,
+	in *DeleteUserRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -169,7 +169,7 @@ func (s *UsersGRPCServer) DeleteUser(
 
 func (s *UsersGRPCServer) DisableUserCommentsNotifications(
 	ctx context.Context,
-	in *APIUserPreferencesRequest,
+	in *UserPreferencesRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -199,7 +199,7 @@ func (s *UsersGRPCServer) DisableUserCommentsNotifications(
 
 func (s *UsersGRPCServer) EnableUserCommentsNotifications(
 	ctx context.Context,
-	in *APIUserPreferencesRequest,
+	in *UserPreferencesRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -229,8 +229,8 @@ func (s *UsersGRPCServer) EnableUserCommentsNotifications(
 
 func (s *UsersGRPCServer) GetUserPreferences(
 	ctx context.Context,
-	in *APIUserPreferencesRequest,
-) (*APIUserPreferencesResponse, error) {
+	in *UserPreferencesRequest,
+) (*UserPreferencesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -249,15 +249,15 @@ func (s *UsersGRPCServer) GetUserPreferences(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &APIUserPreferencesResponse{
+	return &UserPreferencesResponse{
 		DisableCommentsNotifications: prefs.DisableCommentsNotifications,
 	}, nil
 }
 
 func (s *UsersGRPCServer) GetUsers(
 	ctx context.Context,
-	in *APIUsersRequest,
-) (*APIUsersResponse, error) {
+	in *UsersRequest,
+) (*UsersResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -274,7 +274,7 @@ func (s *UsersGRPCServer) GetUsers(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*APIUser, 0)
+	result := make([]*User, 0)
 
 	for idx := range rows {
 		apiUser, err := s.userExtractor.Extract(
@@ -307,7 +307,7 @@ func (s *UsersGRPCServer) GetUsers(
 		}
 	}
 
-	return &APIUsersResponse{
+	return &UsersResponse{
 		Items:     result,
 		Paginator: paginator,
 	}, nil
@@ -316,7 +316,7 @@ func (s *UsersGRPCServer) GetUsers(
 func (s *UsersGRPCServer) GetAccounts(
 	ctx context.Context,
 	_ *emptypb.Empty,
-) (*APIAccountsResponse, error) {
+) (*AccountsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -331,7 +331,7 @@ func (s *UsersGRPCServer) GetAccounts(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	accounts := make([]*APIAccountsAccount, 0, len(rows))
+	accounts := make([]*AccountsAccount, 0, len(rows))
 
 	for _, row := range rows {
 		if row.ServiceID != "keycloak" {
@@ -340,7 +340,7 @@ func (s *UsersGRPCServer) GetAccounts(
 				return nil, status.Error(codes.Internal, err.Error())
 			}
 
-			accounts = append(accounts, &APIAccountsAccount{
+			accounts = append(accounts, &AccountsAccount{
 				Icon: "fa fa-" + strings.ReplaceAll(
 					row.ServiceID,
 					"googleplus",
@@ -354,7 +354,7 @@ func (s *UsersGRPCServer) GetAccounts(
 		}
 	}
 
-	return &APIAccountsResponse{
+	return &AccountsResponse{
 		Items: accounts,
 	}, nil
 }

@@ -260,7 +260,7 @@ func TestGetValues(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "TestGetValues",
 	})
@@ -390,7 +390,7 @@ func TestGetEmptyValues(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "TestGetEmptyValues",
 	})
@@ -631,13 +631,13 @@ func TestValuesInherits(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestValuesInherits Parent",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		IsGroup:    true,
 	})
 
-	childItemID := createItem(t, conn, cnt, &APIItem{
+	childItemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestValuesInherits Child",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -736,12 +736,12 @@ func TestEngineValuesApplied(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	engineItemID := createItem(t, conn, cnt, &APIItem{
+	engineItemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestEngineValuesApplied Engine",
 		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
 	})
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:         "TestEngineValuesApplied Engine",
 		ItemTypeId:   ItemType_ITEM_TYPE_VEHICLE,
 		EngineItemId: engineItemID,
@@ -816,7 +816,7 @@ func TestSetUserValuesList(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestSetUserValuesList",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -928,7 +928,7 @@ func TestSetValuesRaceConditions(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestSetValuesRaceConditions",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1151,26 +1151,26 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 	usersClient := NewUsersClient(conn)
 	me, err := usersClient.Me(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&APIMeRequest{},
+		&MeRequest{},
 	)
 	require.NoError(t, err)
 	require.NotNil(t, me)
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestValuesInheritsThroughItem item",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		IsGroup:    true,
 	})
 
-	childItemID := createItem(t, conn, cnt, &APIItem{
+	childItemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestValuesInheritsThroughItem child",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		IsGroup:    true,
 	})
 
-	inheritorItemID := createItem(t, conn, cnt, &APIItem{
+	inheritorItemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestValuesInheritsThroughItem interior",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1314,13 +1314,13 @@ func TestInheritedValueOverridden(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestInheritedValueOverridden",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		IsGroup:    true,
 	})
 
-	childItemID := createItem(t, conn, cnt, &APIItem{
+	childItemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestInheritedValueOverridden child",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1447,12 +1447,12 @@ func TestMoveValues(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	srcItemID := createItem(t, conn, cnt, &APIItem{
+	srcItemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestMoveValues",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	destItemID := createItem(t, conn, cnt, &APIItem{
+	destItemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestMoveValues dest",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1544,7 +1544,7 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestValueDateMustChangesWhenValueChanged",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1697,7 +1697,7 @@ func TestNonMultipleValuesFiltered(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestNonMultipleValuesFiltered",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1758,7 +1758,7 @@ func TestEmptyListValueConsiderAsNonValid(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestEmptyListValueConsiderAsNonValid",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1811,7 +1811,7 @@ func TestEmptyStringValueConsiderAsNonValid(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestEmptyStringValueConsiderAsNonValid",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})
@@ -1864,7 +1864,7 @@ func TestSpecifications(t *testing.T) {
 	client := NewAttrsClient(conn)
 	itemsClient := NewItemsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test",
 		Body:       "E31",
@@ -1874,7 +1874,7 @@ func TestSpecifications(t *testing.T) {
 	randomInt := random.Int()
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &APIItem{
+	engineID := createItem(t, conn, cnt, &Item{
 		Name:       engineName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
@@ -1883,7 +1883,7 @@ func TestSpecifications(t *testing.T) {
 	_, err = itemsClient.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -2105,14 +2105,14 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	client := NewAttrsClient(conn)
 	itemsClient := NewItemsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test",
 		Body:       "E31",
 		IsGroup:    true,
 	})
 
-	child1ID := createItem(t, conn, cnt, &APIItem{
+	child1ID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test Child 1",
 		Body:       "E31",
@@ -2127,7 +2127,7 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	)
 	require.NoError(t, err)
 
-	child2ID := createItem(t, conn, cnt, &APIItem{
+	child2ID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test Child 1",
 		Body:       "E31",
@@ -2146,7 +2146,7 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	require.NoError(t, err)
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &APIItem{
+	engineID := createItem(t, conn, cnt, &Item{
 		Name:       engineName,
 		IsGroup:    true,
 		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
@@ -2155,7 +2155,7 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	_, err = itemsClient.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&UpdateItemRequest{
-			Item: &APIItem{
+			Item: &Item{
 				Id:            child1ID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -2379,7 +2379,7 @@ func TestLocalizedFormat(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test",
 		Body:       "E31",
@@ -2446,7 +2446,7 @@ func TestSetUserValuesIsEmpty(t *testing.T) {
 
 	client := NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &APIItem{
+	itemID := createItem(t, conn, cnt, &Item{
 		Name:       "TestSetUserValuesIsEmpty",
 		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 	})

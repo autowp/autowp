@@ -2,7 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  APIItem,
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParent,
@@ -31,7 +31,7 @@ import {TwinsSidebarComponent} from './sidebar.component';
 interface ChunkedGroup {
   childs: ItemParent[][];
   hasMoreImages: boolean;
-  item: APIItem;
+  item: Item;
 }
 
 @Component({
@@ -62,7 +62,7 @@ export class TwinsComponent implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly brand$: Observable<APIItem | null> = this.currentBrandCatname$.pipe(
+  protected readonly brand$: Observable<Item | null> = this.currentBrandCatname$.pipe(
     switchMap((brand) => {
       if (!brand) {
         return of(null);
@@ -155,7 +155,7 @@ export class TwinsComponent implements OnInit {
     })),
   );
 
-  private static hasMoreImages(group: APIItem): boolean {
+  private static hasMoreImages(group: Item): boolean {
     let count = 0;
     for (const itemParent of group.itemParentChilds?.items || []) {
       if (itemParent.childDescendantPictures?.items?.length) {

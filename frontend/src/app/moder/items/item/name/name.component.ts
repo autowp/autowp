@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angula
 import {toObservable} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
-import {APIGetItemLanguagesRequest, APIItem, ItemLanguage} from '@grpc/spec.pb';
+import {GetItemLanguagesRequest, Item, ItemLanguage} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavLinkBase, NgbNavOutlet} from '@ng-bootstrap/ng-bootstrap';
 import {ContentLanguageService} from '@services/content-language';
@@ -34,7 +34,7 @@ export class ModerItemsItemNameComponent {
   readonly #contentLanguage = inject(ContentLanguageService);
   readonly #itemsClient = inject(ItemsClient);
 
-  readonly item = input.required<APIItem>();
+  readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
   protected readonly loadingNumber = signal(false);
@@ -66,7 +66,7 @@ export class ModerItemsItemNameComponent {
       item
         ? combineLatest([
             of(item.id),
-            this.#itemsClient.getItemLanguages(new APIGetItemLanguagesRequest({itemId: item.id})),
+            this.#itemsClient.getItemLanguages(new GetItemLanguagesRequest({itemId: item.id})),
             this.languages$,
           ])
         : EMPTY,

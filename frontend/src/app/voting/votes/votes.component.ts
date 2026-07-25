@@ -1,7 +1,7 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {APIUser, VotingRequest} from '@grpc/spec.pb';
+import {User, VotingRequest} from '@grpc/spec.pb';
 import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UserService} from '@services/user';
@@ -26,7 +26,7 @@ export class VotingVotesComponent {
   readonly votingID = input.required<number>();
   readonly variantID = input.required<number>();
 
-  protected readonly votes$: Observable<Observable<APIUser | null>[]> = combineLatest([
+  protected readonly votes$: Observable<Observable<null | User>[]> = combineLatest([
     toObservable(this.votingID),
     toObservable(this.variantID),
   ]).pipe(
