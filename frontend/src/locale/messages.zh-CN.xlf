@@ -1145,97 +1145,6 @@
         </context-group>
         <target state="translated">正在加载…</target>
       </trans-unit>
-      <trans-unit id="644309535037934189" datatype="html">
-        <source>### People
-
-Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
-
-Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имеющихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
-
-Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:
-
-%users%
-
-#### &quot;Цветовая дифференциация штанов&quot;
-
-Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из &quot;зеленых&quot;, вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что &quot;зеленые&quot; - это самые отзывчивые и заинтересованные в жизни проекта люди.
-
-Некоторая часть &quot;зеленых&quot; наделена модераторскими функциями.
-
-### Feedback
-
-Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в &quot;[обратную связь](/feedback)&quot; администрации сайта.
-
-Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, все они имеют единственный ответ: мы не размещаем рекламу.
-
-### Numbers
-
-Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:
-
-* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных
-* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений
-
-### Development
-
-Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
-
-French site translation: %fr-translator%
-
-Chinese site translation: %zh-translator%
-
-Belarusian site translation: %be-translator%
-
-Brazilian portuguese site translation: %pt-br-translator%
-
-Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других &quot;умных словах&quot;.
-
-Исходный код сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
-
-%github%
-
-[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
-[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
-[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
-
-### Поддержать проект
-
-You can support our project by [finances](/donate) or [moral](/feedback).
-Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/about/about.component.ts</context>
-          <context context-type="linenumber">27,81</context>
-        </context-group>
-        <target state="translated">### 我们的团队
-来到这里投入时间和知识的人们是本网站存在的根基。
-我们当中既有人添加图片，也有人帮助修改错误。有的人钟爱某一品牌，也有人喜爱所有车型。不仅有人一步步充实网站，更有人贡献出自己稀有的图片收藏。
-在这个庞大的群体中，每个人都与众不同，这里是一些主要成员：
-%users%
-#### "不同颜色的用户名"
-首先，我们当中一些人被一种特殊的颜色标记着———绿色，这是一个特殊的标签，当你看到绿色用户名时，可以向他们任何一位咨询关于网站的问题，因为绿色代表着本站最重要、最热情的一群人。
-绿色用户名往往意味着管理员身份。
-### 意见反馈
-如果您有任何意见、建议或其他的想法，可以到[论坛](/forums/)联系他们, 选择通过站内信或写“[意见反馈](/feedback)”为网站管理提建议。
-如果您有关于广告、交换链接或推广产品的问题，很抱歉：我们不设置广告。
-### 资源
-对于庞大的图片数量我们不能免俗地产生一种自豪感，并且想把这些数字公布出来，下面只是其中一部分:
-* 线上收录了超过%total-pictures%张图片、%total-vehicles%款车型，数据总量超过%total-size%。
-* 逾%total-users%名用户发表了超过%total-comments%条评论。
-### 开发
-网站的发展和技术支持主要来自%developer%([首要贡献者](https://github.com/autowp/autowp/graphs/contributors))
-法语页面建设者: %fr-translator%
-中文页面建设者: %zh-translator%
-Belarusian site translation: %be-translator%
-Brazilian portuguese site translation: %pt-br-translator%
-技术支持：[Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/)，还有许多优秀的计算机语言。
-网站源代码向所有人开放，每个人都有机会影响网站的性质和质量。
-%github%
-[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
-[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
-[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
-### 支持我们
-您可以通过[捐助](/donate) 或[反馈意见](/feedback)支持我们网站
-欲添加更多语言请参与 [翻译网站](https://github.com/autowp/autowp-frontend/tree/master/src/locale) 。</target>
-      </trans-unit>
       <trans-unit id="3594232496989819559" datatype="html">
         <source>Access Control</source>
         <context-group purpose="location">
@@ -1532,18 +1441,6 @@ Brazilian portuguese site translation: %pt-br-translator%
         </context-group>
         <target state="final">取消</target>
       </trans-unit>
-      <trans-unit id="7598325924502577387" datatype="html">
-        <source>Не удалось удалить учетную запись.
-
-Такое бывает, если привязанная учётная запись является единственным способом авторизации, т.е. не задан e-mail или другие учётный записи.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/accounts/accounts.component.html</context>
-          <context context-type="linenumber">39,45</context>
-        </context-group>
-        <target state="translated">无法删除该帐户。
-
-这种情况可能由捆绑账户是唯一的身份验证方法引起，即：没有指定的电子邮件或其他帐户。</target>
-      </trans-unit>
       <trans-unit id="8648013142848402213" datatype="html">
         <source>Account removed</source>
         <context-group purpose="location">
@@ -1555,22 +1452,6 @@ Brazilian portuguese site translation: %pt-br-translator%
           <context context-type="linenumber">2,8</context>
         </context-group>
         <target state="translated">取消账户</target>
-      </trans-unit>
-      <trans-unit id="8329708942701236062" datatype="html">
-        <source>Мы сожалем, что вам пришлось оказаться на этой странице, и вы планируете покинуть наш сайт навсегда, но не можем вам в этом отказать.
-
-Нажав на красную кнопку, все данные, касающиеся вас, будут обезличены или удалены.
-
-Этот процесс необратим, поэтому хорошенько подумайте и не принимайте поспешных решений.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/delete/delete.component.html</context>
-          <context context-type="linenumber">7,15</context>
-        </context-group>
-        <target state="translated">我们为您来到这一页面感到惋惜，请您确认打算永远离开我们的网站。
-
-按下红色按钮，所有与你相关的数据将被匿名或删除。
-
-这个过程是不可逆的，请仔细思考，不要草率决定。</target>
       </trans-unit>
       <trans-unit id="user/password" datatype="html">
         <source>Password</source>
@@ -3069,36 +2950,6 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
           <context context-type="linenumber">142,145</context>
         </context-group>
         <target state="translated">管理</target>
-      </trans-unit>
-      <trans-unit id="4469739204884506708" datatype="html">
-        <source>Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.
-
-
-О структуре самих характеристик.
-
-Все характеристики организованы в виде дерева элементов &quot;параметр - значение&quot;. Значения могут быть числовыми и текстовыми.
-
-Важной особенностью является тот факт, что каждая характеристика может быть задана одновременно несколькими пользователями. В этом случае актуальным (используемым) значением является то, которое система сочтет приоритетным по ряду признаков.
-
-Если вы столкнулись с ситуацией, когда вам не удаётся перекрыть введенное кем-то ранее значение, то вы можете просто написать об этом автору. Впрочем в процессе реализации система автоматического уведомления автором о том, что с его значением кто-то не согласен.
-
-
-Все значения, которые здесь вводятся - отображаются на сайте, в характеристиках, используются в построении разделы &quot;самые-самые&quot;, а также отображаются в некоторых других местах сайта.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/cars/specifications-editor/specifications-editor.component.html</context>
-          <context context-type="linenumber">112,127</context>
-        </context-group>
-        <target state="translated">由于所有数据将公开，请您认真进行所有操作。
-
-本身的结构特征。
-
-所有技术参数都组织成“选项——数据”的结构，数据可以是数字或文本。
-
-每项技术参数可以被多个用户同时限定，在这种情况下，当前（旧）数据在系统中优先显示。
-
-如果对之前输入的数据存在异议，您可以联系作者，系统会自动通知作者数据产生了争议。
-
-所有被输入的数据都会显示在网站上，如“汽车之最”中的技术参数和网站其它一些地方。</target>
       </trans-unit>
       <trans-unit id="7268251020272700756" datatype="html">
         <source>
@@ -8687,69 +8538,69 @@ Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*</target>
       <trans-unit id="rules" datatype="html">
         <source>
 1. ## Common
-  1. При размещении любых материалов или их фрагментов обязательно указывать источник
-  2. Запрещено одновременное использование нескольких аккаунтов одним пользователем.
-  3. На всём сайте в любой форме запрещён мат, нецензурные выражения и т.д.
-  4. Запрещено оскорбление посетителей сайта
-  5. Запрещено поднятие вопросов: политики, религии, сексуальных предпочтений и прочего, если это напрямую не связано с предметом обсуждения или не оговорено особым образом
-  6. Запрещено обсуждение действий модераторов где либо, кроме как в специально обозначенных местах или личной переписке с ними
-  7. Запрещена публикация личной переписки или любой иной информации, дискредитирующей других участников сайта
-  8. Запрещено использование в качестве аватаров или фотографий нецензурных изображений
-2. ## Комментарии
-  1. Запрещено обсуждение чего либо, кроме предмета комментирования
-  2. Запрещено написание бессмысленных сообщений, содержащих только &quot;смайлик&quot; или другой способ уведомления о настроении
-  3. Неккоректные сообщения будут удаляться без уведомления
-3. ## Форум
-  1. Запрещено использование написания заглавными буквами, воспринимаемого как крик
-  2. Запрещен &quot;оффтопик&quot; в любом виде
-  3. Запрещено создание одинаковых тем в нескольких ветках
-  4. Запрещено поднятие вопроса о &quot;лучшем автомобиле&quot;, без уточнения сферы использования
-4. ## Правила ведения каталога
-  ### Именование автомобилей
-  1. Названия автомобилям присваиваются в соответствии с их оригинальным названием, доступным на кузове или в официальных изданиях компании
-  2. Название автомобиля пишется с заглавной буквы, но допускается написание только строчными или только заглавными буквами, если это соответсвует официальному наименованию автомобиля
-  3. Желательно указание кода кузова/серии/модели
-  4. Допутимо использование кириллицы, латиницы, отдельных символов греческого алфавита
-  5. Допустимо использование цифр
-  6. Допустимо использование специальных символов, если таковые применялись производителем
-  7. Для разделения автомобилей по типу кузова, допустимо добавлять его к названию
-  8. Допустимо добавления к названию информации, идентифицирующей рынок сбыта, для разделения автомобилей по этому признаку. Например, UK-spec, North America, ZA-spec
-  9. Адаптированные к языковой версии сайта названия автомобилей следуют тем же правилам, но не имеют ограничения на используемый алфавит
+  1. When posting any materials or fragments of them, be sure to indicate the source
+  2. Simultaneous use of several accounts by one user is prohibited.
+  3. Profanity, obscene expressions, etc. are prohibited anywhere on the site, in any form.
+  4. Insulting site visitors is prohibited
+  5. Raising questions of politics, religion, sexual preferences and the like is prohibited, unless directly related to the subject of discussion or specifically agreed otherwise
+  6. Discussing moderators&apos; actions anywhere other than in specially designated places or personal correspondence with them is prohibited
+  7. Publishing private correspondence or any other information discrediting other site members is prohibited
+  8. Using obscene images as avatars or photos is prohibited
+2. ## Comments
+  1. Discussing anything other than the subject being commented on is prohibited
+  2. Writing meaningless messages containing only a &quot;smiley&quot; or another way of signaling mood is prohibited
+  3. Incorrect messages will be deleted without notice
+3. ## Forum
+  1. Writing in all caps, perceived as shouting, is prohibited
+  2. &quot;Off-topic&quot; posting of any kind is prohibited
+  3. Creating identical topics across multiple threads is prohibited
+  4. Raising the question of the &quot;best car&quot; without specifying the intended use is prohibited
+4. ## Catalogue rules
+  ### Naming cars
+  1. Car names are assigned according to their original name, as shown on the body or in the manufacturer&apos;s official publications
+  2. The car name is written with a capital letter, but writing entirely in lowercase or entirely in uppercase is allowed if that matches the car&apos;s official name
+  3. It is desirable to specify the body/series/model code
+  4. Use of Cyrillic, Latin, and individual Greek alphabet characters is allowed
+  5. Use of digits is allowed
+  6. Use of special characters is allowed if they were used by the manufacturer
+  7. To distinguish cars by body type, it is allowed to add it to the name
+  8. It is allowed to add information identifying the sales market to the name, to distinguish cars by this attribute. For example, UK-spec, North America, ZA-spec
+  9. Car names adapted to the site&apos;s language version follow the same rules, but have no restriction on the alphabet used
 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/rules/rules.component.ts</context>
           <context context-type="linenumber">6,36</context>
         </context-group>
-        <target state="needs-translation">
-1. ## Common
-  1. При размещении любых материалов или их фрагментов обязательно указывать источник
-  2. Запрещено одновременное использование нескольких аккаунтов одним пользователем.
-  3. На всём сайте в любой форме запрещён мат, нецензурные выражения и т.д.
-  4. Запрещено оскорбление посетителей сайта
-  5. Запрещено поднятие вопросов: политики, религии, сексуальных предпочтений и прочего, если это напрямую не связано с предметом обсуждения или не оговорено особым образом
-  6. Запрещено обсуждение действий модераторов где либо, кроме как в специально обозначенных местах или личной переписке с ними
-  7. Запрещена публикация личной переписки или любой иной информации, дискредитирующей других участников сайта
-  8. Запрещено использование в качестве аватаров или фотографий нецензурных изображений
-2. ## Комментарии
-  1. Запрещено обсуждение чего либо, кроме предмета комментирования
-  2. Запрещено написание бессмысленных сообщений, содержащих только "смайлик" или другой способ уведомления о настроении
-  3. Неккоректные сообщения будут удаляться без уведомления
-3. ## Форум
-  1. Запрещено использование написания заглавными буквами, воспринимаемого как крик
-  2. Запрещен "оффтопик" в любом виде
-  3. Запрещено создание одинаковых тем в нескольких ветках
-  4. Запрещено поднятие вопроса о "лучшем автомобиле", без уточнения сферы использования
-4. ## Правила ведения каталога
-  ### Именование автомобилей
-  1. Названия автомобилям присваиваются в соответствии с их оригинальным названием, доступным на кузове или в официальных изданиях компании
-  2. Название автомобиля пишется с заглавной буквы, но допускается написание только строчными или только заглавными буквами, если это соответсвует официальному наименованию автомобиля
-  3. Желательно указание кода кузова/серии/модели
-  4. Допутимо использование кириллицы, латиницы, отдельных символов греческого алфавита
-  5. Допустимо использование цифр
-  6. Допустимо использование специальных символов, если таковые применялись производителем
-  7. Для разделения автомобилей по типу кузова, допустимо добавлять его к названию
-  8. Допустимо добавления к названию информации, идентифицирующей рынок сбыта, для разделения автомобилей по этому признаку. Например, UK-spec, North America, ZA-spec
-  9. Адаптированные к языковой версии сайта названия автомобилей следуют тем же правилам, но не имеют ограничения на используемый алфавит
+        <target state="translated">
+1. ## 通用
+  1. 发布任何资料或其片段时，必须注明出处
+  2. 禁止同一用户同时使用多个账号。
+  3. 网站内任何形式的脏话、不雅用语等均被禁止。
+  4. 禁止侮辱网站访客
+  5. 禁止讨论政治、宗教、性取向等话题，除非与讨论主题直接相关或另有特别约定
+  6. 除在专门指定的地方或与版主的私人通信外，禁止在其他任何地方讨论版主的行为
+  7. 禁止发布私人通信或任何其他诋毁网站其他成员的信息
+  8. 禁止将不雅图片用作头像或照片
+2. ## 评论
+  1. 禁止讨论与所评论主题无关的内容
+  2. 禁止发布仅包含"表情符号"或其他情绪表达方式的无意义消息
+  3. 不当消息将被删除，恕不另行通知
+3. ## 论坛
+  1. 禁止使用被视为喊叫的全大写字母书写
+  2. 禁止任何形式的"跑题"
+  3. 禁止在多个板块创建相同的主题
+  4. 禁止在未说明使用范围的情况下讨论"最佳汽车"问题
+4. ## 目录规则
+  ### 汽车命名
+  1. 汽车名称根据其原始名称分配，该名称显示在车身上或制造商的官方出版物中
+  2. 汽车名称首字母大写，但如果符合汽车官方名称，也允许全部小写或全部大写
+  3. 建议注明车身/系列/型号代码
+  4. 允许使用西里尔字母、拉丁字母和部分希腊字母
+  5. 允许使用数字
+  6. 如果制造商使用过特殊字符，则允许使用
+  7. 为按车身类型区分汽车，允许将其添加到名称中
+  8. 允许在名称中添加标识销售市场的信息，以此区分汽车。例如，UK-spec、North America、ZA-spec
+  9. 适应网站语言版本的汽车名称遵循相同规则，但对所用字母表没有限制
 </target>
       </trans-unit>
       <trans-unit id="3618113761309540743" datatype="html">
@@ -9059,45 +8910,6 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="linenumber">111,114</context>
         </context-group>
         <target state="translated">剪切</target>
-      </trans-unit>
-      <trans-unit id="4221899693058951778" datatype="html">
-        <source>Если у вас есть изображения, которых вы не нашли на этом сайте и они соответствуют тематике сайта, то вы можете добавить их в наш каталог, воспользовавшись формой, расположенной ниже.
-
-Было бы здорово, если бы вы указали, что за автомобиль изображён на картинке, чтобы облегчить её добавление и избежать ошибки.
-
-Требования, предъявляемые к добавляемым картинкам:
-
-* [JPEG](http://ru.wikipedia.org/wiki/JPEG) or [PNG](http://ru.wikipedia.org/wiki/PNG) format. Resolution from  640×360 up to 10000×10000.
-* Изображение должно по возможности быть максимально доступного качества, не содержать различных артефактов изменения размера или компрессии (размытия, нечёткости, расплытия цветов, ребристости прямых линий и т.д.). Исключение составляют редкие фото(производителя), сканы из проспектов. Решение об оставлении такого фото на сайте принимает модераторский состав.
-* Отсутствие надписей и логотипов посторонних сайтов, нанесенных не авторами/владельцами материала.
-* Автомобиль должен иметь первоначальный вид как при выходе с завода. Не должны присутствовать признаки &lt;em&gt;самодельного тюнинга&lt;/em&gt;, желательно отстутвие изменений, связанных со старением автомобиля.
-* Основной и единственной темой изображения должен являться автомобиль, двигатель, логотип автокомпании, автомобильный завод или музей. Наличие в кадре посторонних предметов или людей - нежелательно.
-* Любительские фотографии вашего автомобиля, автомобиля ваших друзей или любого другого, встретившегося вам на улице, а также фотографии с выставок - не будут приняты на сайт 100%. Если только вы не профессионал.
-* Для первых фотографий автомобиля возможны пониженные требования.
-
-**Убедительная просьба**, перед добавлением изображений, убедиться в их отсутствии в каталоге.
-
-Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
-          <context context-type="linenumber">123,142</context>
-        </context-group>
-        <target state="translated">如果您有没有在这个网站找到对应主题的图片，可以通过下面的目录添加它们。
-遵循下列指示可以让添加照片更轻松，希望您仔细阅读。
-
-添加照片相关要求：
-
-* [JPEG](http://ru.wikipedia.org/wiki/JPEG)或[PNG](http://ru.wikipedia.org/wiki/PNG)格式。分辨率范围: 从640×360至10000×10000。
-* 图像质量应尽可能高，且没有被调整过尺寸或压缩（模糊、模糊化、颜色失真、罗纹线等）。珍贵的扫描图片(生产商拍摄)例外。图片在网站的存留由一部分管理员决定。
-* 图像不能有非该图像的作者/所有者添加的水印。
-* 图像车辆必须保持原厂状态，不能存在&lt;em&gt;个人改装&lt;/em&gt;，因年代久远产生的老化则可以接受。
-* 图像主要和唯一的主题必须是汽车，汽车公司的商标或发动机，不允许有人物存在。
-* 图像必须是专业图片，您自己或朋友的爱车照片、街拍以及车展上拍摄的照片不能保证100％被接受。
-* 对于一款车型的首张照片，要求可能会提高。
-
-**我们恳请您**, 在添加图片之前请确保它不存在于现有目录中。
-
-请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。</target>
       </trans-unit>
       <trans-unit id="8872921071143397020" datatype="html">
         <source>Only registered users can upload pictures</source>
@@ -12282,62 +12094,6 @@ Please note that image submissions are moderated. This means that all images wil
         </context-group>
         <target state="translated">推出年份</target>
       </trans-unit>
-      <trans-unit id="7870412339235723093" datatype="html">
-        <source>с</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">473</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">476</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">479</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">492</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">501</context>
-        </context-group>
-        <target state="translated">从</target>
-      </trans-unit>
-      <trans-unit id="8595674783515096117" datatype="html">
-        <source>по</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">474</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">477</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">483</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">496</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">502</context>
-        </context-group>
-        <target state="translated">至</target>
-      </trans-unit>
-      <trans-unit id="9116375826628355438" datatype="html">
-        <source>модельные</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">475</context>
-        </context-group>
-        <target state="translated">型号</target>
-      </trans-unit>
       <trans-unit id="7197870580140559288" datatype="html">
         <source>Sales</source>
         <context-group purpose="location">
@@ -12345,102 +12101,6 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="linenumber">478</context>
         </context-group>
         <target state="translated">销售</target>
-      </trans-unit>
-      <trans-unit id="710182655671461404" datatype="html">
-        <source>год</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">480</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">484</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">488</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">493</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">497</context>
-        </context-group>
-        <target state="translated">年</target>
-      </trans-unit>
-      <trans-unit id="2829306838046948476" datatype="html">
-        <source>месяц</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">481</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">485</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">489</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">494</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">498</context>
-        </context-group>
-        <target state="translated">月</target>
-      </trans-unit>
-      <trans-unit id="2950330628749255549" datatype="html">
-        <source>число</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">482</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">486</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">490</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">495</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">499</context>
-        </context-group>
-        <target state="translated">日</target>
-      </trans-unit>
-      <trans-unit id="7597617921377138440" datatype="html">
-        <source>дебют на автосалоне</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">487</context>
-        </context-group>
-        <target state="translated">在车展亮相</target>
-      </trans-unit>
-      <trans-unit id="2324883934615074363" datatype="html">
-        <source>производство</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">491</context>
-        </context-group>
-        <target state="translated">生产</target>
-      </trans-unit>
-      <trans-unit id="5656530858518222152" datatype="html">
-        <source>участие в соревнованиях</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">500</context>
-        </context-group>
-        <target state="translated">参加赛事</target>
       </trans-unit>
       <trans-unit id="6069983946261448262" datatype="html">
         <source>emission standard</source>
@@ -13644,14 +13304,6 @@ Transmission is not considered</source>
         </context-group>
         <target state="translated">圆柱头中的迷彩帽子</target>
       </trans-unit>
-      <trans-unit id="9160175706963283689" datatype="html">
-        <source>Десмодромный ГРМ</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/utils/translations.ts</context>
-          <context context-type="linenumber">691</context>
-        </context-group>
-        <target state="needs-translation">Десмодромный ГРМ</target>
-      </trans-unit>
       <trans-unit id="6472759528598170139" datatype="html">
         <source>Timing without camshaft</source>
         <context-group purpose="location">
@@ -14585,6 +14237,310 @@ Transmission is not considered</source>
       Voting during <x id="INTERPOLATION" equiv-text="{{ voting.beginDate.toDate() | date: 'mediumDate' }}"/> to
       <x id="INTERPOLATION_1" equiv-text="{{ voting.endDate.toDate() | date: 'mediumDate' }}"/>
     </target>
+      </trans-unit>
+      <trans-unit id="2091821594770358343" datatype="html">
+        <source>Has copyrights</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.component.html</context>
+          <context context-type="linenumber">291,292</context>
+        </context-group>
+        <target state="translated">版权</target>
+      </trans-unit>
+      <trans-unit id="8128576666066432453" datatype="html">
+        <source>has copyrights</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.component.ts</context>
+          <context context-type="linenumber">213</context>
+        </context-group>
+        <target state="translated">有版权</target>
+      </trans-unit>
+      <trans-unit id="7594621742635835201" datatype="html">
+        <source>no copyrights</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.component.ts</context>
+          <context context-type="linenumber">217</context>
+        </context-group>
+        <target state="translated">无版权</target>
+      </trans-unit>
+      <trans-unit id="1403940753895046406" datatype="html">
+        <source>Please treat every action you take with full responsibility, as it will become visible to the public.
+
+
+About the structure of the specifications themselves.
+
+All specifications are organized as a tree of &quot;parameter - value&quot; elements. Values can be numeric or text.
+
+An important feature is that each specification can be set simultaneously by several users. In that case, the current (used) value is the one the system considers the priority, based on a number of criteria.
+
+If you run into a situation where you cannot override a value entered earlier by someone else, you can simply write to the author about it. That said, a system for automatically notifying the author that someone disagrees with their value is in the process of being implemented.
+
+
+All values entered here are displayed on the site, in the specifications, are used to build the &quot;record-breakers&quot; section, and are also shown in some other places on the site.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/cars/specifications-editor/specifications-editor.component.html</context>
+          <context context-type="linenumber">112,127</context>
+        </context-group>
+        <target state="translated">请对您执行的每一项操作都负起全部责任，因为它们将会公开可见。
+
+
+关于规格本身的结构。
+
+所有规格都按照"参数-值"元素树的形式组织。值可以是数字或文本。
+
+一个重要的特点是，每个规格都可以由多个用户同时设置。在这种情况下，当前（使用中）的值是系统根据一系列标准认为具有优先权的那个值。
+
+如果您遇到无法覆盖他人先前输入的值的情况，您可以直接写信给作者说明此事。不过，一个在有人对其值持不同意见时自动通知作者的系统正在开发中。
+
+
+此处输入的所有值都会显示在网站上、在规格中，用于构建"之最"版块，也会显示在网站的其他一些地方。</target>
+      </trans-unit>
+      <trans-unit id="1489734794717715377" datatype="html">
+        <source>Achtung! High Voltage! Don&apos;t go here!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
+          <context context-type="linenumber">341,342</context>
+        </context-group>
+        <target state="translated">Achtung! 高压危险！不要往这里走！</target>
+      </trans-unit>
+      <trans-unit id="2328433361214556670" datatype="html">
+        <source>auto show debut</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">487</context>
+        </context-group>
+        <target state="translated">车展首发</target>
+      </trans-unit>
+      <trans-unit id="2885348639891517434" datatype="html">
+        <source>desmodromic valve timing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">691</context>
+        </context-group>
+        <target state="translated">锥形气门正时机构</target>
+      </trans-unit>
+      <trans-unit id="3448655817768118255" datatype="html">
+        <source>production</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">491</context>
+        </context-group>
+        <target state="translated">生产</target>
+      </trans-unit>
+      <trans-unit id="4880994214629128764" datatype="html">
+        <source>Use this field only in EXCEPTIONAL cases. Better yet, never use it at all.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
+          <context context-type="linenumber">342,345</context>
+        </context-group>
+        <target state="translated">此字段仅限在特殊情况下使用。最好永远不要使用它。</target>
+      </trans-unit>
+      <trans-unit id="5062152674491459883" datatype="html">
+        <source>competition participation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">500</context>
+        </context-group>
+        <target state="translated">参加比赛</target>
+      </trans-unit>
+      <trans-unit id="5633021448686863176" datatype="html">
+        <source>### People
+
+Our project owes its existence to the people who come here and contribute their time and knowledge.
+
+Some add materials, others help find errors in what&apos;s already there. Some specialize in a particular make, others keep up with everything. Some quietly fill the site step by step without seeking attention, while others gather applause with rare but striking photos.
+
+There are many of us, and we&apos;re all different, and that&apos;s wonderful. Here are just a few of us:
+
+%users%
+
+#### &quot;Color coding of pants&quot;
+
+It&apos;s become our custom to mark some of our people with a special color - green. It&apos;s not just for show - it&apos;s a special badge. Know that if you see one of the &quot;greens&quot;, you can always grab them and ask about anything related to our project, because the &quot;greens&quot; are the most responsive people, most invested in the life of the project.
+
+Some of the &quot;greens&quot; also hold moderator privileges.
+
+### Feedback
+
+If you have any remarks, suggestions or other thoughts, you can voice them on the [forum](/forums/), ask personally through the messaging system, or write to the site administration via &quot;[feedback](/feedback)&quot;.
+
+If you have questions about advertising, link exchange or promoting your product in other ways, they all have the same answer: we do not place advertising.
+
+### Numbers
+
+As it happens, we like to indulge our vanity with big numbers, and to show them off to everyone. Some of them, for your attention:
+
+* the site has more than %total-pictures% images, %total-vehicles% cars, amounting to roughly %total-size% of data
+* about %total-users% users are registered, who have left more than %total-comments% comments
+
+### Development
+
+The project is developed and maintained mainly by %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+
+French site translation: %fr-translator%
+
+Chinese site translation: %zh-translator%
+
+Belarusian site translation: %be-translator%
+
+Brazilian portuguese site translation: %pt-br-translator%
+
+The site runs on [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), as well as many other &quot;clever words&quot;.
+
+The site&apos;s source code is open, so that anyone willing has the opportunity to influence the nature and quality of the project.
+
+%github%
+
+[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
+[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
+[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
+
+### Support the project
+
+You can support our project by [finances](/donate) or [moral](/feedback).
+Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/about/about.component.ts</context>
+          <context context-type="linenumber">27,81</context>
+        </context-group>
+        <target state="translated">### 人物
+
+我们的项目之所以存在，要归功于那些来到这里、投入自己的时间和知识的人们。
+
+有些人添加资料，有些人帮忙找出已有资料中的错误。有些人专注于某个特定品牌，有些人则跟进所有内容。有些人默默无闻地一步步充实着网站，而另一些人则用稀有却惊艳的照片赢得赞誉。
+
+我们人数众多，各不相同，这正是美好之处。以下仅是我们中的一部分：
+
+%users%
+
+#### "裤子的颜色区分"
+
+我们习惯用特殊的颜色——绿色——来标记我们的一些成员。这不仅仅是为了好看——这是一个特殊的标记。请知悉，如果您看到某位"绿色成员"，您随时可以找到他们，询问有关我们项目的任何问题，因为"绿色成员"是对项目生活最热心、最投入的人。
+
+部分"绿色成员"还拥有版主权限。
+
+### 反馈
+
+如果您有任何意见、建议或其他想法，可以在[论坛](/forums/)上发表，通过消息系统亲自询问，或通过"[反馈](/feedback)"写信给网站管理层。
+
+如果您对广告投放、链接交换或以其他方式推广您的产品有疑问，答案只有一个：我们不投放广告。
+
+### 数字
+
+我们喜欢用大数字来满足自己的虚荣心，并向所有人展示这些数字。请看其中一些：
+
+* 网站上有超过 %total-pictures% 张图片，%total-vehicles% 辆汽车，数据量约为 %total-size%
+* 已注册约 %total-users% 名用户，发表了超过 %total-comments% 条评论
+
+### 开发
+
+该项目主要由 %developer% 开发和维护（[贡献者](https://github.com/autowp/autowp/graphs/contributors)）
+
+网站法语翻译：%fr-translator%
+
+网站中文翻译：%zh-translator%
+
+网站白俄罗斯语翻译：%be-translator%
+
+网站巴西葡萄牙语翻译：%pt-br-translator%
+
+本网站基于 [Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/) 以及许多其他"高深名词"构建。
+
+网站的源代码是开放的，以便任何有意愿的人都有机会影响项目的性质和质量。
+
+%github%
+
+[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
+[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
+[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
+
+### 支持本项目
+
+您可以通过[资金](/donate)或[精神](/feedback)方式支持我们的项目。
+参与将[网站翻译](https://github.com/autowp/autowp-frontend/tree/master/src/locale)成其他语言。</target>
+      </trans-unit>
+      <trans-unit id="6061298927401023633" datatype="html">
+        <source>If you have images that you haven&apos;t found on this site and they match the site&apos;s subject matter, you can add them to our catalogue using the form below.
+
+It would be great if you specified what car is shown in the picture, to make it easier to add and to avoid mistakes.
+
+Requirements for added images:
+
+* [JPEG](http://ru.wikipedia.org/wiki/JPEG) or [PNG](http://ru.wikipedia.org/wiki/PNG) format. Resolution from  640×360 up to 10000×10000.
+* The image should, if possible, be of the highest quality available, and should not contain resizing or compression artifacts (blurring, fuzziness, color bleeding, jagged straight lines, etc.). Exceptions are made for rare photos (from the manufacturer) and scans from brochures. The decision to keep such a photo on the site is made by the moderator team.
+* No captions or logos of unrelated sites added by someone other than the author/owner of the material.
+* The car should look as it did when it left the factory. There should be no signs of &lt;em&gt;home-made tuning&lt;/em&gt;, and it is preferable that there be no changes related to the car&apos;s aging.
+* The main and only subject of the image should be a car, an engine, a car company&apos;s logo, a car factory, or a museum. The presence of unrelated objects or people in the frame is undesirable.
+* Amateur photos of your car, your friends&apos; cars, or any other car you happened to see on the street, as well as photos from exhibitions, will almost certainly not be accepted on the site — unless you are a professional.
+* Lower requirements may apply to the first photos of a car.
+
+**We kindly ask** that before adding images, you make sure they are not already in the catalogue.
+
+Please note that adding pictures is moderated. That is, all pictures will be reviewed by the site&apos;s leading members before being added to the catalogue.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
+          <context context-type="linenumber">123,142</context>
+        </context-group>
+        <target state="translated">如果您有在本站未找到的图片，且符合本站主题，您可以使用下方表单将其添加到我们的目录中。
+
+如果您能说明图片中是什么车型，那就太好了，这样可以更方便地添加图片并避免出错。
+
+添加图片的要求：
+
+* [JPEG](http://ru.wikipedia.org/wiki/JPEG) 或 [PNG](http://ru.wikipedia.org/wiki/PNG) 格式。分辨率从 640×360 到 10000×10000。
+* 图片应尽可能保证最高的可用质量，不应含有各种缩放或压缩产生的伪影（模糊、不清晰、色彩渗出、直线锯齿等）。稀有照片（厂商提供）和宣传册扫描件除外。是否将此类照片保留在网站上由版主团队决定。
+* 不得含有非作者/所有者添加的其他网站的文字或标志。
+* 汽车应保持出厂时的原始外观。不应有&lt;em&gt;自行改装&lt;/em&gt;的痕迹，最好没有与汽车老化相关的变化。
+* 图片的主要且唯一主题应为汽车、发动机、汽车公司徽标、汽车工厂或博物馆。画面中出现无关物品或人物是不受欢迎的。
+* 您自己车辆、朋友车辆或街上偶遇的任何其他车辆的业余照片，以及展会照片，几乎肯定不会被网站接受——除非您是专业人士。
+* 汽车的首批照片可能适用较低的要求。
+
+**恳请**在添加图片之前，确认目录中尚无该图片。
+
+请注意，图片添加是经过审核的。也就是说，所有图片在加入目录之前都会经过网站资深成员的审核。</target>
+      </trans-unit>
+      <trans-unit id="6709402656112567179" datatype="html">
+        <source>Failed to delete the account.
+
+This can happen if the linked account is your only way to sign in, i.e. no e-mail or other accounts are set.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/accounts/accounts.component.html</context>
+          <context context-type="linenumber">39,45</context>
+        </context-group>
+        <target state="translated">账号删除失败。
+
+如果关联账号是您唯一的登录方式，即未设置电子邮箱或其他账号，就会发生这种情况。</target>
+      </trans-unit>
+      <trans-unit id="7077499683201547335" datatype="html">
+        <source>model</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">475</context>
+        </context-group>
+        <target state="translated">车型</target>
+      </trans-unit>
+      <trans-unit id="8038216499934620399" datatype="html">
+        <source>We&apos;re sorry that you ended up on this page, planning to leave our site for good, but we cannot refuse you that.
+
+By clicking the red button, all data concerning you will be anonymized or deleted.
+
+This process is irreversible, so think it over carefully and don&apos;t make a hasty decision.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/delete/delete.component.html</context>
+          <context context-type="linenumber">7,15</context>
+        </context-group>
+        <target state="translated">很遗憾您来到了这个页面，打算永远离开我们的网站，但我们无法拒绝您的这个请求。
+
+点击红色按钮后，与您相关的所有数据将被匿名化或删除。
+
+此过程不可逆转，因此请仔细考虑，不要草率做决定。</target>
+      </trans-unit>
+      <trans-unit id="8109444760941768648" datatype="html">
+        <source>more…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/map/popup/popup.component.html</context>
+          <context context-type="linenumber">10,14</context>
+        </context-group>
+        <target state="translated">详情…</target>
       </trans-unit>
     </body>
   </file>

@@ -5,34 +5,34 @@ import {RemarkModule} from 'ngx-remark';
 
 const rulesMarkdown = $localize`:@@rules:
 1. ## Common
-  1. При размещении любых материалов или их фрагментов обязательно указывать источник
-  2. Запрещено одновременное использование нескольких аккаунтов одним пользователем.
-  3. На всём сайте в любой форме запрещён мат, нецензурные выражения и т.д.
-  4. Запрещено оскорбление посетителей сайта
-  5. Запрещено поднятие вопросов: политики, религии, сексуальных предпочтений и прочего, если это напрямую не связано с предметом обсуждения или не оговорено особым образом
-  6. Запрещено обсуждение действий модераторов где либо, кроме как в специально обозначенных местах или личной переписке с ними
-  7. Запрещена публикация личной переписки или любой иной информации, дискредитирующей других участников сайта
-  8. Запрещено использование в качестве аватаров или фотографий нецензурных изображений
-2. ## Комментарии
-  1. Запрещено обсуждение чего либо, кроме предмета комментирования
-  2. Запрещено написание бессмысленных сообщений, содержащих только "смайлик" или другой способ уведомления о настроении
-  3. Неккоректные сообщения будут удаляться без уведомления
-3. ## Форум
-  1. Запрещено использование написания заглавными буквами, воспринимаемого как крик
-  2. Запрещен "оффтопик" в любом виде
-  3. Запрещено создание одинаковых тем в нескольких ветках
-  4. Запрещено поднятие вопроса о "лучшем автомобиле", без уточнения сферы использования
-4. ## Правила ведения каталога
-  ### Именование автомобилей
-  1. Названия автомобилям присваиваются в соответствии с их оригинальным названием, доступным на кузове или в официальных изданиях компании
-  2. Название автомобиля пишется с заглавной буквы, но допускается написание только строчными или только заглавными буквами, если это соответсвует официальному наименованию автомобиля
-  3. Желательно указание кода кузова/серии/модели
-  4. Допутимо использование кириллицы, латиницы, отдельных символов греческого алфавита
-  5. Допустимо использование цифр
-  6. Допустимо использование специальных символов, если таковые применялись производителем
-  7. Для разделения автомобилей по типу кузова, допустимо добавлять его к названию
-  8. Допустимо добавления к названию информации, идентифицирующей рынок сбыта, для разделения автомобилей по этому признаку. Например, UK-spec, North America, ZA-spec
-  9. Адаптированные к языковой версии сайта названия автомобилей следуют тем же правилам, но не имеют ограничения на используемый алфавит
+  1. When posting any materials or fragments of them, be sure to indicate the source
+  2. Simultaneous use of several accounts by one user is prohibited.
+  3. Profanity, obscene expressions, etc. are prohibited anywhere on the site, in any form.
+  4. Insulting site visitors is prohibited
+  5. Raising questions of politics, religion, sexual preferences and the like is prohibited, unless directly related to the subject of discussion or specifically agreed otherwise
+  6. Discussing moderators' actions anywhere other than in specially designated places or personal correspondence with them is prohibited
+  7. Publishing private correspondence or any other information discrediting other site members is prohibited
+  8. Using obscene images as avatars or photos is prohibited
+2. ## Comments
+  1. Discussing anything other than the subject being commented on is prohibited
+  2. Writing meaningless messages containing only a "smiley" or another way of signaling mood is prohibited
+  3. Incorrect messages will be deleted without notice
+3. ## Forum
+  1. Writing in all caps, perceived as shouting, is prohibited
+  2. "Off-topic" posting of any kind is prohibited
+  3. Creating identical topics across multiple threads is prohibited
+  4. Raising the question of the "best car" without specifying the intended use is prohibited
+4. ## Catalogue rules
+  ### Naming cars
+  1. Car names are assigned according to their original name, as shown on the body or in the manufacturer's official publications
+  2. The car name is written with a capital letter, but writing entirely in lowercase or entirely in uppercase is allowed if that matches the car's official name
+  3. It is desirable to specify the body/series/model code
+  4. Use of Cyrillic, Latin, and individual Greek alphabet characters is allowed
+  5. Use of digits is allowed
+  6. Use of special characters is allowed if they were used by the manufacturer
+  7. To distinguish cars by body type, it is allowed to add it to the name
+  8. It is allowed to add information identifying the sales market to the name, to distinguish cars by this attribute. For example, UK-spec, North America, ZA-spec
+  9. Car names adapted to the site's language version follow the same rules, but have no restriction on the alphabet used
 `;
 
 @Component({

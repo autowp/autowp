@@ -26,36 +26,36 @@ function replacePairs(str: string, pairs: Record<string, string>): string {
 
 const aboutText = $localize`### People
 
-Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
+Our project owes its existence to the people who come here and contribute their time and knowledge.
 
-Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имеющихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
+Some add materials, others help find errors in what's already there. Some specialize in a particular make, others keep up with everything. Some quietly fill the site step by step without seeking attention, while others gather applause with rare but striking photos.
 
-Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:
+There are many of us, and we're all different, and that's wonderful. Here are just a few of us:
 
 %users%
 
-#### "Цветовая дифференциация штанов"
+#### "Color coding of pants"
 
-Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из "зеленых", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что "зеленые" - это самые отзывчивые и заинтересованные в жизни проекта люди.
+It's become our custom to mark some of our people with a special color - green. It's not just for show - it's a special badge. Know that if you see one of the "greens", you can always grab them and ask about anything related to our project, because the "greens" are the most responsive people, most invested in the life of the project.
 
-Некоторая часть "зеленых" наделена модераторскими функциями.
+Some of the "greens" also hold moderator privileges.
 
 ### Feedback
 
-Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/feedback)" администрации сайта.
+If you have any remarks, suggestions or other thoughts, you can voice them on the [forum](/forums/), ask personally through the messaging system, or write to the site administration via "[feedback](/feedback)".
 
-Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, все они имеют единственный ответ: мы не размещаем рекламу.
+If you have questions about advertising, link exchange or promoting your product in other ways, they all have the same answer: we do not place advertising.
 
 ### Numbers
 
-Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:
+As it happens, we like to indulge our vanity with big numbers, and to show them off to everyone. Some of them, for your attention:
 
-* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных
-* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений
+* the site has more than %total-pictures% images, %total-vehicles% cars, amounting to roughly %total-size% of data
+* about %total-users% users are registered, who have left more than %total-comments% comments
 
 ### Development
 
-Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+The project is developed and maintained mainly by %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
 
 French site translation: %fr-translator%
 
@@ -65,9 +65,9 @@ Belarusian site translation: %be-translator%
 
 Brazilian portuguese site translation: %pt-br-translator%
 
-Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
+The site runs on [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), as well as many other "clever words".
 
-Исходный код сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
+The site's source code is open, so that anyone willing has the opportunity to influence the nature and quality of the project.
 
 %github%
 
@@ -75,7 +75,7 @@ Brazilian portuguese site translation: %pt-br-translator%
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
 [![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
 
-### Поддержать проект
+### Support the project
 
 You can support our project by [finances](/donate) or [moral](/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.`;
