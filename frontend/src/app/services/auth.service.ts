@@ -1,5 +1,5 @@
 import {DOCUMENT} from '@angular/common';
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {APIMeRequest, APIUser} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
@@ -19,9 +19,7 @@ export enum Role {
   USERS_MODER = 'users-moder',
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class AuthService {
   readonly #keycloak = inject(Keycloak);
   readonly #usersClient = inject(UsersClient);

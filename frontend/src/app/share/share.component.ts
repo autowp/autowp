@@ -10,9 +10,10 @@ import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShareComponent {
+  readonly #document = inject(DOCUMENT);
+
   readonly url = input.required<string>();
   readonly text = input.required<string>();
-  readonly #document = inject(DOCUMENT);
 
   buildURL(url: string, params: Record<string, string>): string {
     let p = new HttpParams();

@@ -1,11 +1,9 @@
-import {ComponentRef, inject, Injectable} from '@angular/core';
+import {ComponentRef, inject, Service} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ModalMessageComponent} from './modal-message/modal-message.component';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class MessageDialogService {
   readonly #modalService = inject(NgbModal);
 

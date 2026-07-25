@@ -1,12 +1,10 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {ReCaptchaConfig} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {Observable} from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ReCaptchaService {
   readonly #autowp = inject(AutowpClient);
 

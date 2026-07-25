@@ -1,5 +1,5 @@
 import {DecimalPipe, isPlatformBrowser} from '@angular/common';
-import {provideHttpClient, withFetch, withInterceptors} from '@angular/common/http';
+import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {
   ApplicationConfig,
   enableProdMode,
@@ -19,7 +19,6 @@ import {
   provideClientHydration,
   withHttpTransferCacheOptions,
   withI18nSupport,
-  withIncrementalHydration,
 } from '@angular/platform-browser';
 import {provideRouter, withInMemoryScrolling} from '@angular/router';
 import {environment} from '@environment/environment';
@@ -50,6 +49,13 @@ import {UserService} from '@services/user';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {Angulartics2Module} from 'angulartics2';
 import {
+  CONTENT_TYPE_HEADER,
+  GRPC_MESSAGE_HEADER,
+  GRPC_STATUS_DETAILS_BIN_HEADER,
+  GRPC_STATUS_HEADER,
+  provideGrpcWebClient,
+} from 'grpc-web-client/grpc-web-client';
+import {
   AutoRefreshTokenService,
   createKeycloakSignal,
   KEYCLOAK_EVENT_SIGNAL,
@@ -61,13 +67,6 @@ import Keycloak from 'keycloak-js';
 import {provideMonacoEditor} from 'ngx-monaco-editor-v2';
 import {NgPipesModule} from 'ngx-pipes';
 
-import {
-  CONTENT_TYPE_HEADER,
-  GRPC_MESSAGE_HEADER,
-  GRPC_STATUS_DETAILS_BIN_HEADER,
-  GRPC_STATUS_HEADER,
-  provideGrpcWebClient,
-} from '../grpc-web-client/grpc-web-client';
 import {routes} from './app.routes';
 
 if (environment.production) {
@@ -180,10 +179,9 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: 'enabled',
       }),
     ),
-    provideHttpClient(withInterceptors([authInterceptor$]), withFetch()),
+    provideHttpClient(withInterceptors([authInterceptor$])),
     provideClientHydration(
       withI18nSupport(),
-      withIncrementalHydration(),
       withHttpTransferCacheOptions({
         includeHeaders: [CONTENT_TYPE_HEADER, GRPC_STATUS_HEADER, GRPC_MESSAGE_HEADER, GRPC_STATUS_DETAILS_BIN_HEADER],
         includePostRequests: true,

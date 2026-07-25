@@ -10,10 +10,9 @@ import {UserService} from '@services/user';
 import {getPerspectiveTranslation} from '@utils/translations';
 import {APIPerspectiveService} from 'app/api/perspective/perspective.service';
 import {ToastsService} from 'app/toasts/toasts.service';
+import {UserComponent} from 'app/user/user/user.component';
 import {EMPTY, Observable} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
-
-import {UserComponent} from '../../user/user/user.component';
 
 interface ThumbnailAPIPicture extends Picture {
   selected?: boolean;
@@ -24,8 +23,8 @@ interface ThumbnailAPIPicture extends Picture {
   imports: [RouterLink, UserComponent, FormsModule, AsyncPipe, DecimalPipe],
   templateUrl: './thumbnail.component.html',
   styleUrl: './thumbnail.component.scss',
-  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection, sonarjs/deprecation
-  changeDetection: ChangeDetectionStrategy.Default,
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ThumbnailComponent {
   readonly #perspectiveService = inject(APIPerspectiveService);

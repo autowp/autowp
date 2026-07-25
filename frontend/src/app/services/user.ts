@@ -1,12 +1,10 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {APIGetUserRequest, APIUser, APIUsersRequest, UserFields} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {forkJoin, Observable, of} from 'rxjs';
 import {map, shareReplay, tap} from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class UserService {
   readonly #usersClient = inject(UsersClient);
 

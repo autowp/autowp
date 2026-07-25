@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service} from '@angular/core';
 import {Observable, Observer} from 'rxjs';
 import {map} from 'rxjs/operators';
 
@@ -9,9 +9,7 @@ export interface Page {
   id: number;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class PageService {
   readonly #pages = new Map<number, Page>();
   readonly #parents = new Map<number, null | number>();

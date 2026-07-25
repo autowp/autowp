@@ -1,9 +1,7 @@
 import {DOCUMENT} from '@angular/common';
-import {ErrorHandler, inject, Injectable} from '@angular/core';
+import {ErrorHandler, inject, Service} from '@angular/core';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class GlobalErrorHandler implements ErrorHandler {
   readonly #document = inject(DOCUMENT);
 

@@ -1,12 +1,10 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {GetIPRequest, IP} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class IpService {
   readonly #autowp = inject(AutowpClient);
 

@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {DeleteModerVoteTemplateRequest, ModerVoteTemplate} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
@@ -11,9 +11,7 @@ export interface APIPictureModerVoteTemplatePostData {
   vote: number;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class APIPictureModerVoteTemplateService {
   readonly #auth = inject(AuthService);
   readonly #pictures = inject(PicturesClient);

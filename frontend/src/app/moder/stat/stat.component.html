@@ -40,6 +40,9 @@
             @case ('moder/statistics/from-and-to-years-and-months') {
               <ng-container i18n>Years and months of begin and end production</ng-container>
             }
+            @default {
+              Unknown stat
+            }
           }
         </h3>
         <p>{{ item.value }} / {{ item.total }}</p>

@@ -1,5 +1,5 @@
 import {HttpEvent, HttpHandlerFn, HttpRequest} from '@angular/common/http';
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {environment} from '@environment/environment';
 import {GrpcDataEvent, GrpcEvent, GrpcMessage, GrpcRequest} from '@ngx-grpc/common';
 import {GrpcHandler, GrpcInterceptor} from '@ngx-grpc/core';
@@ -23,9 +23,7 @@ export function authInterceptor$(req: HttpRequest<unknown>, next: HttpHandlerFn)
   return next(authReq);
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class GrpcLogInterceptor implements GrpcInterceptor {
   readonly #dataStyle = 'color: #5c7ced;';
   readonly #errorStyle = 'color: red;';
@@ -59,9 +57,7 @@ export class GrpcLogInterceptor implements GrpcInterceptor {
   }
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class GrpcAuthInterceptor implements GrpcInterceptor {
   readonly #keycloak = inject(Keycloak);
 

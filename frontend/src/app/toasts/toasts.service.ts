@@ -1,5 +1,5 @@
 import {HttpErrorResponse, HttpResponseBase} from '@angular/common/http';
-import {Injectable, signal} from '@angular/core';
+import {Service, signal} from '@angular/core';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 
 export interface Toast {
@@ -8,7 +8,7 @@ export interface Toast {
   type: string;
 }
 
-@Injectable({providedIn: 'root'})
+@Service()
 export class ToastsService {
   public readonly toasts = signal<Toast[]>([]);
 

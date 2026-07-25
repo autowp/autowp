@@ -1,15 +1,12 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {GetContactRequest} from '@grpc/spec.pb';
 import {ContactsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
+import {StatusCode} from 'grpc-web-client/statuscode';
 import {Observable, of, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
-import {StatusCode} from '../../grpc-web-client/statuscode';
-
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class AppContactsService {
   readonly #contactsClient = inject(ContactsClient);
 

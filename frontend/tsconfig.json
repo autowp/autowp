@@ -25,12 +25,12 @@
       "@angular/localize"
     ],
     "useDefineForClassFields": false,
-    "baseUrl": "src",
     "paths": {
-      "@grpc/*": ["grpc/*"],
-      "@environment/*": ["environments/*"],
-      "@services/*": ["app/services/*"],
-      "@utils/*": ["app/utils/*"]
+      "*": ["./src/*"],
+      "@grpc/*": ["./src/grpc/*"],
+      "@environment/*": ["./src/environments/*"],
+      "@services/*": ["./src/app/services/*"],
+      "@utils/*": ["./src/app/utils/*"]
     },
     "strictNullChecks": true,
     "strict": true

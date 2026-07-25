@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {APIGetItemVehicleTypesRequest, APIItemVehicleType, APIItemVehicleTypeRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {forkJoin, Observable, of} from 'rxjs';
@@ -34,9 +34,7 @@ export const allowedItemTypeCombinations: Record<ItemType, ItemType[]> = {
   [ItemType.ITEM_TYPE_VEHICLE]: [ItemType.ITEM_TYPE_VEHICLE],
 };
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ItemService {
   readonly #itemsClient = inject(ItemsClient);
 

@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {PictureListOptions, PicturesRequest, PictureStatus, PicturesUserSummary} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
@@ -10,9 +10,7 @@ import {AuthService, Role} from './auth.service';
 export const perspectiveIDLogotype = 22,
   perspectiveIDMixed = 25;
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class PictureService {
   readonly #auth = inject(AuthService);
   readonly #picturesClient = inject(PicturesClient);

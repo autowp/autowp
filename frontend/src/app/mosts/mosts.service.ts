@@ -1,12 +1,10 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {MostsMenu, MostsMenuRequest} from '@grpc/spec.pb';
 import {MostsClient} from '@grpc/spec.pbsc';
 import {Observable} from 'rxjs';
 import {shareReplay} from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class MostsService {
   readonly #mostsClient = inject(MostsClient);
 

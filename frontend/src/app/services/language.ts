@@ -1,4 +1,4 @@
-import {inject, Injectable, LOCALE_ID} from '@angular/core';
+import {inject, LOCALE_ID, Service} from '@angular/core';
 import {environment} from '@environment/environment';
 
 export interface Language {
@@ -9,9 +9,7 @@ export interface Language {
   name: string;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class LanguageService {
   readonly #localeId = inject(LOCALE_ID);
 

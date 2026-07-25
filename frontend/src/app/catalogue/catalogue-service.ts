@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
   APIItem,
@@ -35,9 +35,7 @@ interface Parent {
 
 type ParentObservableFunc = () => OperatorFunction<null | Parent, null | Parent>;
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class CatalogueService {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);

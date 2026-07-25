@@ -35,13 +35,13 @@ import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
+import {ToastsService} from 'app/toasts/toasts.service';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
 import {combineLatest, concat, EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap, take, tap} from 'rxjs/operators';
 
-import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
-import {ToastsService} from '../../toasts/toasts.service';
 import {UploadCropComponent} from '../crop/crop.component';
 
 interface APIPictureUpload {
@@ -78,8 +78,8 @@ const cropTitle = (image: APIImage | undefined): string => {
     RemarkModule,
   ],
   templateUrl: './index.component.html',
-  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection, sonarjs/deprecation
-  changeDetection: ChangeDetectionStrategy.Default,
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class UploadIndexComponent implements OnInit {
   readonly #http = inject(HttpClient);

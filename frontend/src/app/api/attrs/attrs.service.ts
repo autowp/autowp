@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {
   AttrAttribute,
   AttrAttributeType,
@@ -26,9 +26,7 @@ function toTree(items: AttrAttribute[], parentID: string): AttrAttributeTreeItem
     });
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class APIAttrsService {
   readonly #attrsClient = inject(AttrsClient);
 

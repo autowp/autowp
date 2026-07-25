@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {APIItem, ItemType, PathItem, PathRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -21,9 +21,7 @@ interface SvcPathItem {
   routerLink: string[];
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class CategoriesService {
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);

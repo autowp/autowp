@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {
   CreateMessageRequest,
   Message,
@@ -14,9 +14,7 @@ import {catchError, debounceTime, map, shareReplay, switchMap, tap} from 'rxjs/o
 import {ToastsService} from '../toasts/toasts.service';
 import {AuthService} from './auth.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class MessageService {
   readonly #auth = inject(AuthService);
   readonly #toasts = inject(ToastsService);

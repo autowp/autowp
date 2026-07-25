@@ -1,5 +1,5 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
-import {inject, Injectable, Provider} from '@angular/core';
+import {inject, Provider, Service} from '@angular/core';
 import {
   GrpcClient,
   GrpcClientFactory,
@@ -44,7 +44,7 @@ export interface NgGrpcWebClientSettings {
 /**
  * GrpcClientFactory implementation based on grpc-web
  */
-@Injectable({providedIn: 'root'})
+@Service()
 export class NgGrpcWebClientFactory implements GrpcClientFactory<NgGrpcWebClientSettings> {
   readonly #httpClient = inject(HttpClient);
   readonly #defaultSettings: NgGrpcWebClientSettings | null = inject(NG_GRPC_WEB_CLIENT_DEFAULT_SETTINGS, {
