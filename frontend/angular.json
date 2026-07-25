@@ -180,11 +180,11 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "browserTarget": "wheelsage:build"
+            "buildTarget": "wheelsage:build"
           },
           "configurations": {
             "serve": {
-              "browserTarget": "wheelsage:build:serve"
+              "buildTarget": "wheelsage:build:serve"
             }
           }
         },
