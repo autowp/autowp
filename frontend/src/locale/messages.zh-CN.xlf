@@ -2,6 +2,398 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file source-language="en" datatype="plaintext" original="ng2.template" target-language="zh-CN">
     <body>
+      <trans-unit id="1130914636248035703" datatype="html">
+        <source>Achievements</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/achievements/achievements-routing.module.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/achievements/achievements.component.html</context>
+          <context context-type="linenumber">2,6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/users/user/user.component.html</context>
+          <context context-type="linenumber">87,89</context>
+        </context-group>
+      <target state="translated">成就</target>
+      </trans-unit>
+      <trans-unit id="1499439542480114306" datatype="html">
+        <source>God of Inspectors</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">918</context>
+        </context-group>
+      <target state="translated">督察之神</target>
+      </trans-unit>
+      <trans-unit id="1518907612369226539" datatype="html">
+        <source>Practicing Inspector</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">915</context>
+        </context-group>
+      <target state="translated">熟练督察员</target>
+      </trans-unit>
+      <trans-unit id="1556499883361080008" datatype="html">
+        <source>Awarded for posting 10,000 comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">957</context>
+        </context-group>
+      <target state="translated">因发表10,000条评论而授予</target>
+      </trans-unit>
+      <trans-unit id="1585024002033774507" datatype="html">
+        <source>Awarded for being registered for 10 years or more</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">960</context>
+        </context-group>
+      <target state="translated">因注册满10年或以上而授予</target>
+      </trans-unit>
+      <trans-unit id="1661465679355113823" datatype="html">
+        <source>Awarded for personally contributing 1,000 attribute/spec values</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">951</context>
+        </context-group>
+      <target state="translated">因亲自贡献1,000项属性/规格数值而授予</target>
+      </trans-unit>
+      <trans-unit id="1772513896925348878" datatype="html">
+        <source>Rookie Spec Master</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">924</context>
+        </context-group>
+      <target state="translated">新手规格达人</target>
+      </trans-unit>
+      <trans-unit id="183309477666524996" datatype="html">
+        <source>Regular Inspector</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">916</context>
+        </context-group>
+      <target state="translated">普通督察员</target>
+      </trans-unit>
+      <trans-unit id="2163686626805005345" datatype="html">
+        <source>Regular Commentator</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">931</context>
+        </context-group>
+      <target state="translated">普通评论员</target>
+      </trans-unit>
+      <trans-unit id="2341881759132041539" datatype="html">
+        <source>Veteran</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">934</context>
+        </context-group>
+      <target state="translated">元老</target>
+      </trans-unit>
+      <trans-unit id="2360502417110047167" datatype="html">
+        <source>God of Picture Busters</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">923</context>
+        </context-group>
+      <target state="translated">清道夫之神</target>
+      </trans-unit>
+      <trans-unit id="3170346016048888121" datatype="html">
+        <source>Awarded for personally contributing 10,000 attribute/spec values</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">952</context>
+        </context-group>
+      <target state="translated">因亲自贡献10,000项属性/规格数值而授予</target>
+      </trans-unit>
+      <trans-unit id="3206720407452424596" datatype="html">
+        <source>Expert Commentator</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">932</context>
+        </context-group>
+      <target state="translated">专家评论员</target>
+      </trans-unit>
+      <trans-unit id="3581168178692932114" datatype="html">
+        <source>Practicing Picture Buster</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">920</context>
+        </context-group>
+      <target state="translated">熟练清道夫</target>
+      </trans-unit>
+      <trans-unit id="3776869191500540221" datatype="html">
+        <source>Awarded to moderators for putting 100 pictures into the delete queue</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">945</context>
+        </context-group>
+      <target state="translated">因将100张图片放入删除队列而授予版主</target>
+      </trans-unit>
+      <trans-unit id="3952592260646456906" datatype="html">
+        <source>Expert Picture Buster</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">922</context>
+        </context-group>
+      <target state="translated">专家清道夫</target>
+      </trans-unit>
+      <trans-unit id="4163306512522649403" datatype="html">
+        <source>Top pictures contributor</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">913</context>
+        </context-group>
+      <target state="translated">顶级图片贡献者</target>
+      </trans-unit>
+      <trans-unit id="4326913083108315850" datatype="html">
+        <source>Commentator God</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">933</context>
+        </context-group>
+      <target state="translated">评论之神</target>
+      </trans-unit>
+      <trans-unit id="4371233982301358584" datatype="html">
+        <source>Awarded for personally contributing 1,000,000 attribute/spec values</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">954</context>
+        </context-group>
+      <target state="translated">因亲自贡献1,000,000项属性/规格数值而授予</target>
+      </trans-unit>
+      <trans-unit id="5010690785362785450" datatype="html">
+        <source>Regular Picture Buster</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">921</context>
+        </context-group>
+      <target state="translated">普通清道夫</target>
+      </trans-unit>
+      <trans-unit id="5171377529966909115" datatype="html">
+        <source>Awarded to moderators for putting 10,000 pictures into the delete queue</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">947</context>
+        </context-group>
+      <target state="translated">因将10,000张图片放入删除队列而授予版主</target>
+      </trans-unit>
+      <trans-unit id="518551618737351003" datatype="html">
+        <source>Awarded for posting 100 comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">955</context>
+        </context-group>
+      <target state="translated">因发表100条评论而授予</target>
+      </trans-unit>
+      <trans-unit id="5305944703560254448" datatype="html">
+        <source>Awarded when one of your uploaded pictures is accepted for the first time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">938</context>
+        </context-group>
+      <target state="translated">当您上传的一张图片首次被采纳时授予</target>
+      </trans-unit>
+      <trans-unit id="5763789178649933568" datatype="html">
+        <source>Awarded for personally contributing 100,000 attribute/spec values</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">953</context>
+        </context-group>
+      <target state="translated">因亲自贡献100,000项属性/规格数值而授予</target>
+      </trans-unit>
+      <trans-unit id="6017156389635024795" datatype="html">
+        <source>Awarded to moderators for personally accepting 1,000,000 pictures</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">944</context>
+        </context-group>
+      <target state="translated">因亲自采纳1,000,000张图片而授予版主</target>
+      </trans-unit>
+      <trans-unit id="6050853625023328841" datatype="html">
+        <source>Spec Master God</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">928</context>
+        </context-group>
+      <target state="translated">规格之神</target>
+      </trans-unit>
+      <trans-unit id="6244029692503663095" datatype="html">
+        <source>Regular Spec Master</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">926</context>
+        </context-group>
+      <target state="translated">普通规格达人</target>
+      </trans-unit>
+      <trans-unit id="6450589435598331519" datatype="html">
+        <source>Awarded for posting 1,000,000 comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">959</context>
+        </context-group>
+      <target state="translated">因发表1,000,000条评论而授予</target>
+      </trans-unit>
+      <trans-unit id="652730283724209789" datatype="html">
+        <source>Rookie Picture Buster</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">919</context>
+        </context-group>
+      <target state="translated">新手清道夫</target>
+      </trans-unit>
+      <trans-unit id="6592934557974738241" datatype="html">
+        <source>Awarded to moderators for putting 1,000,000 pictures into the delete queue</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">949</context>
+        </context-group>
+      <target state="translated">因将1,000,000张图片放入删除队列而授予版主</target>
+      </trans-unit>
+      <trans-unit id="6663807986522850763" datatype="html">
+        <source>Awarded to moderators for personally accepting 1,000 pictures</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">941</context>
+        </context-group>
+      <target state="translated">因亲自采纳1,000张图片而授予版主</target>
+      </trans-unit>
+      <trans-unit id="671576453354308515" datatype="html">
+        <source>Practicing Spec Master</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">925</context>
+        </context-group>
+      <target state="translated">熟练规格达人</target>
+      </trans-unit>
+      <trans-unit id="6948315637603333705" datatype="html">
+        <source>Awarded to moderators for personally accepting 10,000 pictures</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">942</context>
+        </context-group>
+      <target state="translated">因亲自采纳10,000张图片而授予版主</target>
+      </trans-unit>
+      <trans-unit id="6972059931186076544" datatype="html">
+        <source>Awarded to moderators for putting 100,000 pictures into the delete queue</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">948</context>
+        </context-group>
+      <target state="translated">因将100,000张图片放入删除队列而授予版主</target>
+      </trans-unit>
+      <trans-unit id="7141873608744133479" datatype="html">
+        <source>Awarded to moderators for putting 1,000 pictures into the delete queue</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">946</context>
+        </context-group>
+      <target state="translated">因将1,000张图片放入删除队列而授予版主</target>
+      </trans-unit>
+      <trans-unit id="7358459218836867408" datatype="html">
+        <source>Awarded for posting 1,000 comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">956</context>
+        </context-group>
+      <target state="translated">因发表1,000条评论而授予</target>
+      </trans-unit>
+      <trans-unit id="758310798793086554" datatype="html">
+        <source>Rookie Inspector</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">914</context>
+        </context-group>
+      <target state="translated">新手督察员</target>
+      </trans-unit>
+      <trans-unit id="7621501576237634197" datatype="html">
+        <source>Awarded to moderators for personally accepting 100,000 pictures</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">943</context>
+        </context-group>
+      <target state="translated">因亲自采纳100,000张图片而授予版主</target>
+      </trans-unit>
+      <trans-unit id="7717696427876557205" datatype="html">
+        <source>Awarded for being among the top 10 contributors by accepted pictures</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">939</context>
+        </context-group>
+      <target state="translated">因跻身被采纳图片数量前10名的贡献者而授予</target>
+      </trans-unit>
+      <trans-unit id="7828758025855799361" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ counts[code] || &apos;0&apos; }}"/> users earned this</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/achievements/achievements.component.html</context>
+          <context context-type="linenumber">14,15</context>
+        </context-group>
+      <target state="translated"><x id="INTERPOLATION" equiv-text="{{ counts[code] || &apos;0&apos; }}"/> 位用户获得了此成就</target>
+      </trans-unit>
+      <trans-unit id="7865806515690431492" datatype="html">
+        <source>Practicing Commentator</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">930</context>
+        </context-group>
+      <target state="translated">熟练评论员</target>
+      </trans-unit>
+      <trans-unit id="7955750960926554174" datatype="html">
+        <source>Awarded for posting 100,000 comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">958</context>
+        </context-group>
+      <target state="translated">因发表100,000条评论而授予</target>
+      </trans-unit>
+      <trans-unit id="800175729188908281" datatype="html">
+        <source>Awarded to moderators for personally accepting 100 pictures</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">940</context>
+        </context-group>
+      <target state="translated">因亲自采纳100张图片而授予版主</target>
+      </trans-unit>
+      <trans-unit id="8026747999826213050" datatype="html">
+        <source>Awarded for personally contributing 100 attribute/spec values</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">950</context>
+        </context-group>
+      <target state="translated">因亲自贡献100项属性/规格数值而授予</target>
+      </trans-unit>
+      <trans-unit id="8211431080791516372" datatype="html">
+        <source>Pictures contributor</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">912</context>
+        </context-group>
+      <target state="translated">图片贡献者</target>
+      </trans-unit>
+      <trans-unit id="8636572983820122670" datatype="html">
+        <source>Expert Spec Master</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">927</context>
+        </context-group>
+      <target state="translated">专家规格达人</target>
+      </trans-unit>
+      <trans-unit id="9078053977409767483" datatype="html">
+        <source>Expert Inspector</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">917</context>
+        </context-group>
+      <target state="translated">专家督察员</target>
+      </trans-unit>
+      <trans-unit id="9114120013635447175" datatype="html">
+        <source>Rookie Commentator</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">929</context>
+        </context-group>
+      <target state="translated">新手评论员</target>
+      </trans-unit>
       <trans-unit id="ngb.alert.close" datatype="html">
         <source>Close</source>
         <context-group purpose="location">

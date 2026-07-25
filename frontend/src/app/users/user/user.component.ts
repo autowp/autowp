@@ -12,16 +12,26 @@ import {
   DeleteUserPhotoRequest,
   DeleteUserRequest,
   GetMessagesRequest,
+  GetUserAchievementsRequest,
   IP,
   Picture,
   PictureFields,
   PictureListOptions,
   PicturesRequest,
   User,
+  UserAchievementItem,
+  UserAchievementProgress,
   UserFields,
   UserPreferencesRequest,
 } from '@grpc/spec.pb';
-import {CommentsClient, ContactsClient, PicturesClient, TrafficClient, UsersClient} from '@grpc/spec.pbsc';
+import {
+  AchievementsClient,
+  CommentsClient,
+  ContactsClient,
+  PicturesClient,
+  TrafficClient,
+  UsersClient,
+} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {AppContactsService} from '@services/contacts';
@@ -30,6 +40,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import {getAchievementTranslation} from '@utils/translations';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
 
@@ -61,6 +72,7 @@ export class UsersUserComponent {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
   readonly #document = inject(DOCUMENT);
+  readonly #achievementsClient = inject(AchievementsClient);
 
   protected readonly banPeriods = [
     {name: $localize`hour`, value: 1},
@@ -158,6 +170,20 @@ export class UsersUserComponent {
         )
         .pipe(map((response) => (response.items ? response.items : [])));
     }),
+  );
+
+  protected readonly achievements$: Observable<{
+    items: UserAchievementItem[];
+    progress: UserAchievementProgress[];
+  }> = this.user$.pipe(
+    switchMap((user) =>
+      this.#achievementsClient.getUserAchievements(new GetUserAchievementsRequest({userId: user.id})),
+    ),
+    catchError((err: unknown) => {
+      this.#toastService.handleError(err);
+      return EMPTY;
+    }),
+    map((response) => ({items: response.items || [], progress: response.progress || []})),
   );
 
   readonly #ipChange$ = new BehaviorSubject<void>(void 0);
@@ -316,5 +342,9 @@ export class UsersUserComponent {
           this.#ipChange$.next();
         },
       });
+  }
+
+  protected getAchievementTranslation(code: string): string {
+    return getAchievementTranslation(code);
   }
 }

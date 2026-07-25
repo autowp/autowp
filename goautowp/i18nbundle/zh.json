@@ -1,6 +1,7 @@
 {
   "pm/user-%s-post-new-message-%s": "{{.Name}} posted new message\n{{.Message}}",
   "pm/user-%s-replies-to-you-%s" : "{{.Name}}回复了您\n{{.Message}}",
+  "pm/achievement-granted": "恭喜！您获得了一个新成就。\n{{.ProfileURL}}",
   "carlist/model-years": "年款",
   "carlist/years": "生产年份",
   "present-time-abbr": "至今",

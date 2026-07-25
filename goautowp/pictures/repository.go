@@ -114,6 +114,9 @@ type Repository struct {
 	dfConfig              config.DuplicateFinderConfig
 	beforePictureDeleted  func(id int64) error
 	afterPictureAccepted  func(ctx context.Context) error
+
+	afterPictureAcceptedAchievements func(ctx context.Context, ownerID sql.NullInt64, moderatorID int64) error
+	afterPictureQueuedForRemoval     func(ctx context.Context, moderatorID int64) error
 }
 
 type PictureFields struct {
@@ -182,6 +185,8 @@ func NewRepository(
 	dfConfig config.DuplicateFinderConfig,
 	beforePictureDeleted func(id int64) error,
 	afterPictureAccepted func(ctx context.Context) error,
+	afterPictureAcceptedAchievements func(ctx context.Context, ownerID sql.NullInt64, moderatorID int64) error,
+	afterPictureQueuedForRemoval func(ctx context.Context, moderatorID int64) error,
 ) *Repository {
 	return &Repository{
 		db:                    db,
@@ -193,6 +198,9 @@ func NewRepository(
 		dfConfig:              dfConfig,
 		beforePictureDeleted:  beforePictureDeleted,
 		afterPictureAccepted:  afterPictureAccepted,
+
+		afterPictureAcceptedAchievements: afterPictureAcceptedAchievements,
+		afterPictureQueuedForRemoval:     afterPictureQueuedForRemoval,
 	}
 }
 
@@ -1283,6 +1291,10 @@ func (s *Repository) Accept(
 		if err := s.afterPictureAccepted(ctx); err != nil {
 			return isFirstTimeAccepted, success, err
 		}
+
+		if err := s.afterPictureAcceptedAchievements(ctx, picture.OwnerID, userID); err != nil {
+			return isFirstTimeAccepted, success, err
+		}
 	}
 
 	return isFirstTimeAccepted, success, nil
@@ -1301,8 +1313,18 @@ func (s *Repository) QueueRemove(ctx context.Context, pictureID int64, userID in
 	}
 
 	affected, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
 
-	return affected > 0, err
+	success := affected > 0
+	if success {
+		if err := s.afterPictureQueuedForRemoval(ctx, userID); err != nil {
+			return false, err
+		}
+	}
+
+	return success, nil
 }
 
 func (s *Repository) PictureItemSelect(

@@ -1,6 +1,7 @@
 {
   "pm/user-%s-post-new-message-%s": "{{.Name}} posted new message\n{{.Message}}",
   "pm/user-%s-replies-to-you-%s": "{{.Name}} replies to you\n{{.Message}}",
+  "pm/achievement-granted": "מזל טוב! זכית בהישג חדש.\n{{.ProfileURL}}",
   "pm/user-%s-removed-item-%s-%s-from-item-%s-%s": "User {{ .UserURL }} removed {{ .ItemName }} ( {{ .ItemModerURL }} ) from {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
   "carlist/model-years": "model years",
   "carlist/years": "years of production",

@@ -538,7 +538,7 @@ func TestPictureCropByOneAxis(t *testing.T) {
 	})
 
 	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	client := NewPicturesClient(conn)
 
@@ -608,7 +608,7 @@ func TestInvalidPictureCrop(t *testing.T) {
 	})
 
 	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	client := NewPicturesClient(conn)
 
@@ -744,7 +744,7 @@ func TestSetPicturePoint(t *testing.T) {
 	})
 
 	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	client := NewPicturesClient(conn)
 
@@ -943,9 +943,9 @@ func TestSetPictureCopyrights(t *testing.T) {
 	})
 
 	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 	pictureID2 := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	client := NewPicturesClient(conn)
 
@@ -1027,9 +1027,9 @@ func TestGetPicturesHasCopyrightsFilter(t *testing.T) {
 	})
 
 	withCopyrightsID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 	withoutCopyrightsID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	client := NewPicturesClient(conn)
 
@@ -1396,7 +1396,7 @@ func TestGetPictureWithPerspectivePrefix(t *testing.T) {
 	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{
 		ItemID:        itemID,
 		PerspectiveID: schema.PerspectiveIDUnderTheHood,
-	}, PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+	}, PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	picture, err := client.GetPicture(
 		ctx,
@@ -1916,7 +1916,7 @@ func TestCorrectFileNamesVote(t *testing.T) {
 	})
 
 	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: vehicleID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	newName := fmt.Sprintf("Toyota %d Corolla New", randomInt)
 	_, err = itemsClient.UpdateItemLanguage(

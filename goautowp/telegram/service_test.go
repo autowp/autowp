@@ -85,6 +85,8 @@ func TestInboxCommand(t *testing.T) {
 		cfg.DuplicateFinder,
 		func(int64) error { return nil },
 		func(context.Context) error { return nil },
+		func(context.Context, sql.NullInt64, int64) error { return nil },
+		func(context.Context, int64) error { return nil },
 	)
 
 	userID := createRandomUser(ctx, t, goquDB)

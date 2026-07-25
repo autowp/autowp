@@ -5,3 +5,8 @@
       max-width: 100%;
   }
 }
+
+.achievement-in-progress img {
+  opacity: 0.35;
+  filter: grayscale(100%);
+}

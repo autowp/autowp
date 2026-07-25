@@ -439,6 +439,19 @@ service Votings {
   }
 }
 
+service Achievements {
+  rpc GetUserAchievements(GetUserAchievementsRequest) returns (UserAchievementsList) {
+    option (google.api.http) = {
+      get: "/v3/achievements/user/{user_id}"
+    };
+  }
+  rpc GetAchievementStats(google.protobuf.Empty) returns (AchievementStatsList) {
+    option (google.api.http) = {
+      get: "/v3/achievements/stats"
+    };
+  }
+}
+
 message ChartDataRequest {
   int64 id = 1;
 }
@@ -768,6 +781,38 @@ message PerspectivePage {
 
 message PerspectivePagesItems {
   repeated PerspectivePage items = 1;
+}
+
+message GetUserAchievementsRequest {
+  int64 user_id = 1;
+}
+
+message UserAchievementItem {
+  string code = 1;
+  google.protobuf.Timestamp created_at = 2;
+}
+
+// Reports progress toward the next tier not yet earned in one of the four tiered series
+// (Inspector, Picture Buster, Spec Master, Commentator). code is that next tier's
+// achievement code.
+message UserAchievementProgress {
+  string code = 1;
+  int64 current = 2;
+  int64 threshold = 3;
+}
+
+message UserAchievementsList {
+  repeated UserAchievementItem items = 1;
+  repeated UserAchievementProgress progress = 2;
+}
+
+message AchievementStat {
+  string code = 1;
+  int64 users_count = 2;
+}
+
+message AchievementStatsList {
+  repeated AchievementStat items = 1;
 }
 
 message ReCaptchaConfig {

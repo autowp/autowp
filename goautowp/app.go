@@ -505,6 +505,29 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 	//
 	// logrus.Infof("Clean topics: %d", affected)
 
+	achievementsRep, err := s.container.AchievementsRepository(ctx)
+	if err != nil {
+		return err
+	}
+
+	achievementsGranted, err := achievementsRep.RecomputeTopPicturesContributors(ctx)
+	if err != nil {
+		logrus.Error(err.Error())
+
+		return err
+	}
+
+	logrus.Infof("Top pictures contributor achievement newly granted to %d users", achievementsGranted)
+
+	veteransGranted, err := achievementsRep.RecomputeVeteranBadges(ctx)
+	if err != nil {
+		logrus.Error(err.Error())
+
+		return err
+	}
+
+	logrus.Infof("Veteran achievement newly granted to %d users", veteransGranted)
+
 	return nil
 }
 

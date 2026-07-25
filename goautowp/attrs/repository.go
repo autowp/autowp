@@ -110,6 +110,7 @@ type Repository struct {
 	i18nUnits               map[string]map[int64]I18nUnit
 	i18nUnitsMutex          sync.Mutex
 	nameFormatter           *items.ItemNameFormatter
+	afterUserValueSet       func(ctx context.Context, userID int64) error
 }
 
 // NewRepository constructor.
@@ -119,6 +120,7 @@ func NewRepository(
 	itemsRepository *items.Repository,
 	picturesRepository *pictures.Repository,
 	imageStorage *storage.Storage,
+	afterUserValueSet func(ctx context.Context, userID int64) error,
 ) *Repository {
 	return &Repository{
 		db:                      db,
@@ -141,6 +143,7 @@ func NewRepository(
 		zoneAttributes:          make(map[int64][]*schema.AttrsAttributeRow),
 		zoneAttributesTree:      make(map[int64]map[int64][]*schema.AttrsAttributeRow),
 		nameFormatter:           items.NewItemNameFormatter(i18n),
+		afterUserValueSet:       afterUserValueSet,
 	}
 }
 
@@ -1363,6 +1366,16 @@ func (s *Repository) SetUserValue( //nolint: maintidx
 			itemID,
 			err,
 		)
+	}
+
+	// Achievement counter tracks the acting user's own contributions, so it's gated on
+	// valueChanged specifically (this user's value row was newly set/changed) — not the
+	// combined return value, which also reflects unrelated aggregate recomputation via
+	// somethingChanged.
+	if valueChanged {
+		if err := s.afterUserValueSet(ctx, userID); err != nil {
+			return false, err
+		}
 	}
 
 	return somethingChanged || valueChanged, nil

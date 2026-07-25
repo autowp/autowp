@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Nerzal/gocloak/v13"
+	"github.com/autowp/goautowp/achievements"
 	"github.com/autowp/goautowp/attrs"
 	"github.com/autowp/goautowp/ban"
 	"github.com/autowp/goautowp/comments"
@@ -48,6 +49,8 @@ const readHeaderTimeout = time.Second * 30
 
 // Container Container.
 type Container struct {
+	achievementsRepository       *achievements.Repository
+	achievementsGrpcServer       *AchievementsGRPCServer
 	articlesGRPCServer           *ArticlesGRPCServer
 	attrsRepository              *attrs.Repository
 	autowpDB                     *sql.DB
@@ -247,6 +250,14 @@ func (s *Container) CommentsRepository(ctx context.Context) (*comments.Repositor
 			usersRepository,
 			messagingRepository,
 			s.HostsManager(),
+			func(ctx context.Context, authorID int64) error {
+				achievementsRepository, err := s.AchievementsRepository(ctx)
+				if err != nil {
+					return err
+				}
+
+				return achievementsRepository.GrantCommentPosted(ctx, authorID)
+			},
 		)
 	}
 
@@ -307,7 +318,17 @@ func (s *Container) AttrsRepository(ctx context.Context) (*attrs.Repository, err
 			return nil, err
 		}
 
-		s.attrsRepository = attrs.NewRepository(db, i18n, itemsRepository, picturesRepository, is)
+		s.attrsRepository = attrs.NewRepository(
+			db, i18n, itemsRepository, picturesRepository, is,
+			func(ctx context.Context, userID int64) error {
+				achievementsRepository, err := s.AchievementsRepository(ctx)
+				if err != nil {
+					return err
+				}
+
+				return achievementsRepository.GrantSpecValueSet(ctx, userID)
+			},
+		)
 	}
 
 	return s.attrsRepository, nil
@@ -436,6 +457,22 @@ func (s *Container) PicturesRepository(ctx context.Context) (*pictures.Repositor
 				}
 
 				return nil
+			},
+			func(ctx context.Context, ownerID sql.NullInt64, moderatorID int64) error {
+				achievementsRepository, err := s.AchievementsRepository(ctx)
+				if err != nil {
+					return err
+				}
+
+				return achievementsRepository.GrantPictureAccepted(ctx, ownerID, moderatorID)
+			},
+			func(ctx context.Context, moderatorID int64) error {
+				achievementsRepository, err := s.AchievementsRepository(ctx)
+				if err != nil {
+					return err
+				}
+
+				return achievementsRepository.GrantPictureQueuedForRemoval(ctx, moderatorID)
 			},
 		)
 	}
@@ -779,6 +816,11 @@ func (s *Container) GRPCServerWithServices(ctx context.Context) (*grpc.Server, e
 		return nil, err
 	}
 
+	achievementsSrv, err := s.AchievementsGRPCServer(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	trustedPeers := []netip.Prefix{
 		netip.MustParsePrefix(s.Config().TrustedNetwork),
 	}
@@ -822,6 +864,7 @@ func (s *Container) GRPCServerWithServices(ctx context.Context) (*grpc.Server, e
 	RegisterUsersServer(grpcServer, usersSrv)
 	RegisterRatingServer(grpcServer, ratingSrv)
 	RegisterVotingsServer(grpcServer, votingSrv)
+	RegisterAchievementsServer(grpcServer, achievementsSrv)
 
 	reflection.Register(grpcServer)
 
@@ -1784,6 +1827,44 @@ func (s *Container) MessagingRepository(ctx context.Context) (*messaging.Reposit
 	}
 
 	return s.messagingRepository, nil
+}
+
+func (s *Container) AchievementsRepository(ctx context.Context) (*achievements.Repository, error) {
+	if s.achievementsRepository == nil {
+		db, err := s.GoquDB(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		usersRepository, err := s.UsersRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		messagingRepository, err := s.MessagingRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.achievementsRepository = achievements.NewRepository(
+			db, usersRepository, messagingRepository, s.HostsManager(),
+		)
+	}
+
+	return s.achievementsRepository, nil
+}
+
+func (s *Container) AchievementsGRPCServer(ctx context.Context) (*AchievementsGRPCServer, error) {
+	if s.achievementsGrpcServer == nil {
+		repository, err := s.AchievementsRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.achievementsGrpcServer = NewAchievementsGRPCServer(repository)
+	}
+
+	return s.achievementsGrpcServer, nil
 }
 
 // MessagingHub is the in-process registry of live /ws/messages connections for this pod.

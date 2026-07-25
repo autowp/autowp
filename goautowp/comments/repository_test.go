@@ -57,7 +57,9 @@ func createRandomUser(ctx context.Context, t *testing.T, db *goqu.Database) int6
 	return id
 }
 
-func createRepository(t *testing.T) (*Repository, *goqu.Database) {
+func createRepositoryWithCallback(
+	t *testing.T, afterCommentAdded func(ctx context.Context, authorID int64) error,
+) (*Repository, *goqu.Database) {
 	t.Helper()
 
 	cfg := config.LoadConfig("..")
@@ -98,9 +100,15 @@ func createRepository(t *testing.T) (*Repository, *goqu.Database) {
 		i,
 	)
 
-	repo := NewRepository(goquDB, usersRepository, messagingRepository, hostsManager)
+	repo := NewRepository(goquDB, usersRepository, messagingRepository, hostsManager, afterCommentAdded)
 
 	return repo, goquDB
+}
+
+func createRepository(t *testing.T) (*Repository, *goqu.Database) {
+	t.Helper()
+
+	return createRepositoryWithCallback(t, func(context.Context, int64) error { return nil })
 }
 
 func TestCleanupDeleted(t *testing.T) {
@@ -139,6 +147,33 @@ func TestAdd(t *testing.T) {
 
 	_, err := repo.Add(ctx, commentType, itemID, 0, userID, "Test message", "127.0.0.1", false)
 	require.NoError(t, err)
+}
+
+func TestAddCallsAfterCommentAdded(t *testing.T) {
+	t.Parallel()
+
+	var calledWith []int64
+
+	repo, db := createRepositoryWithCallback(t, func(_ context.Context, authorID int64) error {
+		calledWith = append(calledWith, authorID)
+
+		return nil
+	})
+	ctx := t.Context()
+	userID := createRandomUser(ctx, t, db)
+
+	var (
+		commentType       = schema.CommentMessageTypeIDPictures
+		itemID      int64 = 1
+	)
+
+	_, err := repo.Add(ctx, commentType, itemID, 0, userID, "Test message", "127.0.0.1", false)
+	require.NoError(t, err)
+	require.Equal(t, []int64{userID}, calledWith)
+
+	_, err = repo.Add(ctx, commentType, itemID, 0, userID, "Second message", "127.0.0.1", false)
+	require.NoError(t, err)
+	require.Equal(t, []int64{userID, userID}, calledWith)
 }
 
 func TestCleanBrokenMessages(t *testing.T) {

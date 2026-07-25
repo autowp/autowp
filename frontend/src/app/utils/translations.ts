@@ -907,3 +907,65 @@ export function getVehicleTypeRpTranslation(id: string): string {
 export function getVehicleTypeTranslation(id: string): string {
   return vehicleTypes[id] ?? id;
 }
+
+const achievementNames: Record<string, string> = {
+  'pictures-contributor': $localize`Pictures contributor`,
+  'top-pictures-contributor': $localize`Top pictures contributor`,
+  'inspector-rookie': $localize`Rookie Inspector`,
+  'inspector-practicing': $localize`Practicing Inspector`,
+  'inspector-regular': $localize`Regular Inspector`,
+  'inspector-expert': $localize`Expert Inspector`,
+  'inspector-god': $localize`God of Inspectors`,
+  'picture-buster-rookie': $localize`Rookie Picture Buster`,
+  'picture-buster-practicing': $localize`Practicing Picture Buster`,
+  'picture-buster-regular': $localize`Regular Picture Buster`,
+  'picture-buster-expert': $localize`Expert Picture Buster`,
+  'picture-buster-god': $localize`God of Picture Busters`,
+  'spec-master-rookie': $localize`Rookie Spec Master`,
+  'spec-master-practicing': $localize`Practicing Spec Master`,
+  'spec-master-regular': $localize`Regular Spec Master`,
+  'spec-master-expert': $localize`Expert Spec Master`,
+  'spec-master-god': $localize`Spec Master God`,
+  'commentator-rookie': $localize`Rookie Commentator`,
+  'commentator-practicing': $localize`Practicing Commentator`,
+  'commentator-regular': $localize`Regular Commentator`,
+  'commentator-expert': $localize`Expert Commentator`,
+  'commentator-god': $localize`Commentator God`,
+  veteran: $localize`Veteran`,
+};
+
+const achievementDescriptions: Record<string, string> = {
+  'pictures-contributor': $localize`Awarded when one of your uploaded pictures is accepted for the first time`,
+  'top-pictures-contributor': $localize`Awarded for being among the top 10 contributors by accepted pictures`,
+  'inspector-rookie': $localize`Awarded to moderators for personally accepting 100 pictures`,
+  'inspector-practicing': $localize`Awarded to moderators for personally accepting 1,000 pictures`,
+  'inspector-regular': $localize`Awarded to moderators for personally accepting 10,000 pictures`,
+  'inspector-expert': $localize`Awarded to moderators for personally accepting 100,000 pictures`,
+  'inspector-god': $localize`Awarded to moderators for personally accepting 1,000,000 pictures`,
+  'picture-buster-rookie': $localize`Awarded to moderators for putting 100 pictures into the delete queue`,
+  'picture-buster-practicing': $localize`Awarded to moderators for putting 1,000 pictures into the delete queue`,
+  'picture-buster-regular': $localize`Awarded to moderators for putting 10,000 pictures into the delete queue`,
+  'picture-buster-expert': $localize`Awarded to moderators for putting 100,000 pictures into the delete queue`,
+  'picture-buster-god': $localize`Awarded to moderators for putting 1,000,000 pictures into the delete queue`,
+  'spec-master-rookie': $localize`Awarded for personally contributing 100 attribute/spec values`,
+  'spec-master-practicing': $localize`Awarded for personally contributing 1,000 attribute/spec values`,
+  'spec-master-regular': $localize`Awarded for personally contributing 10,000 attribute/spec values`,
+  'spec-master-expert': $localize`Awarded for personally contributing 100,000 attribute/spec values`,
+  'spec-master-god': $localize`Awarded for personally contributing 1,000,000 attribute/spec values`,
+  'commentator-rookie': $localize`Awarded for posting 100 comments`,
+  'commentator-practicing': $localize`Awarded for posting 1,000 comments`,
+  'commentator-regular': $localize`Awarded for posting 10,000 comments`,
+  'commentator-expert': $localize`Awarded for posting 100,000 comments`,
+  'commentator-god': $localize`Awarded for posting 1,000,000 comments`,
+  veteran: $localize`Awarded for being registered for 10 years or more`,
+};
+
+export const ACHIEVEMENT_CODES = Object.keys(achievementNames);
+
+export function getAchievementTranslation(code: string): string {
+  return achievementNames[code] ?? code;
+}
+
+export function getAchievementDescriptionTranslation(code: string): string {
+  return achievementDescriptions[code] ?? '';
+}

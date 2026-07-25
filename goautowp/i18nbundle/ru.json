@@ -1,6 +1,7 @@
 {
   "pm/user-%s-post-new-message-%s": "{{.Name}} написал сообщение\n{{.Message}}",
   "pm/user-%s-replies-to-you-%s": "{{.Name}} ответил на ваше сообщение\n{{.Message}}",
+  "pm/achievement-granted": "Поздравляем! Вы получили новое достижение.\n{{.ProfileURL}}",
   "carlist/model-years": "модельный год",
   "carlist/years": "года выпуска",
   "present-time-abbr": "н.в.",

@@ -82,6 +82,7 @@ type Repository struct {
 	userRepository    *users.Repository
 	messageRepository *messaging.Repository
 	hostManager       *hosts.Manager
+	afterCommentAdded func(ctx context.Context, authorID int64) error
 }
 
 // NewRepository constructor.
@@ -90,12 +91,14 @@ func NewRepository(
 	userRepository *users.Repository,
 	messageRepository *messaging.Repository,
 	hostManager *hosts.Manager,
+	afterCommentAdded func(ctx context.Context, authorID int64) error,
 ) *Repository {
 	return &Repository{
 		db:                db,
 		userRepository:    userRepository,
 		messageRepository: messageRepository,
 		hostManager:       hostManager,
+		afterCommentAdded: afterCommentAdded,
 	}
 }
 
@@ -521,6 +524,10 @@ func (s *Repository) Add(
 
 	err = s.UpdateTopicView(ctx, typeID, itemID, userID)
 	if err != nil {
+		return 0, err
+	}
+
+	if err := s.afterCommentAdded(ctx, userID); err != nil {
 		return 0, err
 	}
 
