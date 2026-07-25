@@ -114,7 +114,7 @@ in `angular.json`) — don't assume Karma/Jest is set up.
 
 ### Frontend architecture
 
-- Angular 21 standalone app with SSR: `main.ts` (browser bootstrap), `main.server.ts` +
+- Angular 22 standalone app with SSR: `main.ts` (browser bootstrap), `main.server.ts` +
   `server.ts` (Express SSR entry), `app.config.ts` / `app.config.server.ts` split
   client/server providers, `app.routes.ts` / `app.routes.server.ts` split client/server routing.
 - **`src/grpc/`** — generated grpc-web client from `spec.proto` (via `@ngx-grpc`); treat as
@@ -139,6 +139,8 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   (`goautowp.image` / `frontend.image`).
 - CI (`.gitlab-ci.yml`) is the authoritative source for exact lint/build/test invocations if this
   file and reality diverge — check it first when in doubt.
+- nginx with `router.conf` is used to replace ingress-controller with local development. `router.conf` routes
+  and `chart/templates/routes.yaml` must match
 
 ## Commits
 

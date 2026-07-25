@@ -8,11 +8,12 @@ import {PicturesWebSocketService} from '@services/pictures-ws.service';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, map, startWith, switchMap} from 'rxjs/operators';
+import {catchError, map, startWith, switchMap, throttleTime} from 'rxjs/operators';
 
-// Reload cadence for live "new picture accepted" notifications: batches bursts of
-// near-simultaneous accepts into a single refetch instead of reloading on each one.
-const RELOAD_DEBOUNCE_MS = 15000;
+// Reload cadence for live "new picture accepted" notifications: the first accept in a
+// burst reloads right away (leading edge), and if more accepts arrive within the window
+// a single trailing reload catches them up, capping reloads to once per 15s.
+const RELOAD_THROTTLE_MS = 15000;
 
 @Component({
   selector: 'app-index-pictures',
@@ -27,10 +28,9 @@ export class IndexPicturesComponent {
   readonly #picturesWs = inject(PicturesWebSocketService);
 
   protected readonly items$: Observable<Picture[]> = this.#picturesWs.pictureAccepted$.pipe(
-    debounceTime(RELOAD_DEBOUNCE_MS),
-    // Bypasses the debounce above: the initial load must render immediately, only
-    // subsequent live-reload triggers should be debounced.
+    // The initial load must render immediately too, so it shares the same leading edge.
     startWith(void 0),
+    throttleTime(RELOAD_THROTTLE_MS, undefined, {leading: true, trailing: true}),
     switchMap(() =>
       this.#picturesClient
         .getPictures(

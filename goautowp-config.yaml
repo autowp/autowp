@@ -8,6 +8,10 @@ public-rest:
       - https://en.localhost:4200
       - http://en.localhost
       - https://en.localhost
+      - http://ru.localhost
+      - https://ru.localhost
+      - http://uk.localhost
+      - https://uk.localhost
 duplicate_finder:
   rabbitmq: amqp://guest:guest@rabbitmq:5672/
   queue: duplicate_finder
