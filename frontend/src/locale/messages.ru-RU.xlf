@@ -1563,9 +1563,7 @@ Good luck.</source>
           <context context-type="sourcefile">src/app/account/messages/messages.component.html</context>
           <context context-type="linenumber">11,15</context>
         </context-group>
-        <target state="needs-translation">
-            Delete all sent messages
-          </target>
+        <target state="translated">Удалить все отправленные сообщения</target>
       </trans-unit>
       <trans-unit id="1252352831693623725" datatype="html">
         <source>
@@ -1575,9 +1573,7 @@ Good luck.</source>
           <context context-type="sourcefile">src/app/account/messages/messages.component.html</context>
           <context context-type="linenumber">17,24</context>
         </context-group>
-        <target state="needs-translation">
-            Delete all system notifications
-          </target>
+        <target state="translated">Удалить все системные уведомления</target>
       </trans-unit>
       <trans-unit id="8283283518834338374" datatype="html" approved="yes">
         <source>System notification</source>
@@ -1657,7 +1653,7 @@ Good luck.</source>
           <context context-type="sourcefile">src/app/account/profile/profile.component.html</context>
           <context context-type="linenumber">13,16</context>
         </context-group>
-        <target state="needs-translation">You can upload photo or use [Gravatar](https://gravatar.com/)</target>
+        <target state="translated">Вы можете загрузить фото или использовать [Gravatar](https://gravatar.com/)</target>
       </trans-unit>
       <trans-unit id="6261406176927621365" datatype="html" approved="yes">
         <source>Delete photo</source>
@@ -2783,7 +2779,7 @@ All images are posted for educational purposes.
           <context context-type="sourcefile">src/app/cars/specifications-editor/spec/spec.component.html</context>
           <context context-type="linenumber">33,35</context>
         </context-group>
-        <target state="needs-translation">not applicable</target>
+        <target state="translated">не применимо</target>
       </trans-unit>
       <trans-unit id="3768927257183755959" datatype="html">
         <source>Save</source>
@@ -2957,9 +2953,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
           <context context-type="sourcefile">src/app/cars/specifications-editor/specifications-editor.component.html</context>
           <context context-type="linenumber">146,153</context>
         </context-group>
-        <target state="needs-translation">
-              Refresh inheritance
-            </target>
+        <target state="translated">Обновить наследование</target>
       </trans-unit>
       <trans-unit id="7147380428352250004" datatype="html">
         <source>
@@ -3861,7 +3855,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
           <context context-type="sourcefile">src/app/index/index.component.html</context>
           <context context-type="linenumber">81,83</context>
         </context-group>
-        <target state="translated">Cutaway</target>
+        <target state="translated">Разрез</target>
       </trans-unit>
       <trans-unit id="5505637243815082364" datatype="html">
         <source>Authors</source>
@@ -4751,7 +4745,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/index/categories/categories.component.html</context>
           <context context-type="linenumber">16,18</context>
         </context-group>
-        <target state="needs-translation">Do you know which cars helped to maintain law and order on the streets of world cities at different times? What cars did the Pope drive? Not? Then you are exactly in this section.</target>
+        <target state="translated">Знаете ли вы, какие автомобили помогали поддерживать закон и порядок на улицах городов мира в разное время? На каких автомобилях ездил Папа Римский? Нет? Тогда вам как раз в этот раздел.</target>
       </trans-unit>
       <trans-unit id="650155251177555929" datatype="html">
         <source>Help the project</source>
@@ -5090,9 +5084,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/message-dialog/modal-message/modal-message.component.html</context>
           <context context-type="linenumber">38,41</context>
         </context-group>
-        <target state="needs-translation">
-    cancel
-  </target>
+        <target state="translated">отмена</target>
       </trans-unit>
       <trans-unit id="4129844194772988318" datatype="html">
         <source>Moderator page</source>
@@ -5716,7 +5708,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/moder/index/index.component.html</context>
           <context context-type="linenumber">119,122</context>
         </context-group>
-        <target state="translated">Hotlinks</target>
+        <target state="translated">Хотлинки</target>
       </trans-unit>
       <trans-unit id="5687678964036430258" datatype="html">
         <source>Picture vote templates</source>
@@ -6462,7 +6454,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
           <context context-type="linenumber">18,20</context>
         </context-group>
-        <target state="needs-translation">Buses without type</target>
+        <target state="translated">Автобусы без типа</target>
       </trans-unit>
       <trans-unit id="3814783289016932782" datatype="html">
         <source>Truck without type</source>
@@ -6470,7 +6462,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
           <context context-type="linenumber">21,26</context>
         </context-group>
-        <target state="needs-translation">Truck without type</target>
+        <target state="translated">Грузовик без типа</target>
       </trans-unit>
       <trans-unit id="7257417999674711915" datatype="html">
         <source>% - any characters</source>
@@ -6478,7 +6470,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
           <context context-type="linenumber">31,35</context>
         </context-group>
-        <target state="needs-translation">% - any characters</target>
+        <target state="translated">% - любые символы</target>
       </trans-unit>
       <trans-unit id="1719962734407063089" datatype="html">
         <source>Name (exclude)</source>
@@ -6494,7 +6486,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
           <context context-type="linenumber">44,47</context>
         </context-group>
-        <target state="needs-translation">_ - any single character</target>
+        <target state="translated">_ - любой одиночный символ</target>
       </trans-unit>
       <trans-unit id="8725893485868036092" datatype="html">
         <source>Item type</source>
@@ -7192,9 +7184,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
           <context context-type="linenumber">448,452</context>
         </context-group>
-        <target state="needs-translation">
-                  Unaccept
-                </target>
+        <target state="translated">Отклонить</target>
       </trans-unit>
       <trans-unit id="6181266094051602977" datatype="html">
         <source>In delete queue</source>
@@ -7340,9 +7330,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
           <context context-type="linenumber">599,602</context>
         </context-group>
-        <target state="needs-translation">
-                    unban
-                  </target>
+        <target state="translated">разбанить</target>
       </trans-unit>
       <trans-unit id="508734394943632528" datatype="html">
         <source>For period</source>
@@ -8075,9 +8063,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/moder/traffic/traffic.component.html</context>
           <context context-type="linenumber">53,56</context>
         </context-group>
-        <target state="needs-translation">
-            unban
-          </target>
+        <target state="translated">разбанить</target>
       </trans-unit>
       <trans-unit id="6847012349231440909" datatype="html">
         <source>Whitelist</source>
@@ -8352,7 +8338,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/picture/picture.component.html</context>
           <context context-type="linenumber">172,173</context>
         </context-group>
-        <target state="needs-translation">Author:</target>
+        <target state="translated">Автор:</target>
       </trans-unit>
       <trans-unit id="9171050839862843613" datatype="html">
         <source>Picture suggested to replace</source>
@@ -8478,9 +8464,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/picture/picture.component.html</context>
           <context context-type="linenumber">432,436</context>
         </context-group>
-        <target state="needs-translation">
-                      Unaccept
-                    </target>
+        <target state="translated">Отклонить</target>
       </trans-unit>
       <trans-unit id="9193599304199301271" datatype="html">
         <source>
@@ -8490,9 +8474,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/picture/picture.component.html</context>
           <context context-type="linenumber">440,445</context>
         </context-group>
-        <target state="needs-translation">
-                      Restore
-                    </target>
+        <target state="translated">Восстановить</target>
       </trans-unit>
       <trans-unit id="445751465783209809" datatype="html">
         <source>Edit picture №<x id="INTERPOLATION" equiv-text="{{ picture.id }}"/></source>
@@ -8766,7 +8748,7 @@ Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [th
           <context context-type="sourcefile">src/app/thumbnail/thumbnail/thumbnail.component.html</context>
           <context context-type="linenumber">53,54</context>
         </context-group>
-        <target state="needs-translation">Thumbnail is cropped (<x id="INTERPOLATION" equiv-text="{{ picture.cropResolution }}"/>)</target>
+        <target state="translated">Миниатюра обрезана (<x id="INTERPOLATION" equiv-text="{{ picture.cropResolution }}"/>)</target>
       </trans-unit>
       <trans-unit id="2612900014543194253" datatype="html">
         <source>Top View</source>
@@ -9212,9 +9194,7 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="sourcefile">src/app/users/user/user.component.html</context>
           <context context-type="linenumber">225,229</context>
         </context-group>
-        <target state="needs-translation">
-                          unban
-                        </target>
+        <target state="translated">разбанить</target>
       </trans-unit>
       <trans-unit id="n-produced" datatype="html">
         <source>{VAR_PLURAL, plural, one {Produced in <x id="INTERPOLATION"/> copy} other {Produced in <x id="INTERPOLATION"/> copies}}</source>
@@ -9934,7 +9914,7 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">181</context>
         </context-group>
-        <target state="translated">cutaway</target>
+        <target state="translated">разрез</target>
       </trans-unit>
       <trans-unit id="8613741909398167343" datatype="html">
         <source>dashboard</source>
@@ -10358,7 +10338,7 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">235</context>
         </context-group>
-        <target state="needs-translation">Singleseater</target>
+        <target state="translated">Одноместный</target>
       </trans-unit>
       <trans-unit id="1374964839097456608" datatype="html">
         <source>Spyder</source>
@@ -10708,7 +10688,7 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">278</context>
         </context-group>
-        <target state="needs-translation">Singleseaters</target>
+        <target state="translated">Одноместные</target>
       </trans-unit>
       <trans-unit id="car-type-rp/spyder" datatype="html">
         <source>Spyders</source>
@@ -11745,7 +11725,7 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">424</context>
         </context-group>
-        <target state="translated">combined</target>
+        <target state="translated">смешанный</target>
       </trans-unit>
       <trans-unit id="6163129208574599183" datatype="html">
         <source>EPA (to 2008)</source>
@@ -11777,7 +11757,7 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">422</context>
         </context-group>
-        <target state="translated">urban</target>
+        <target state="translated">городской</target>
       </trans-unit>
       <trans-unit id="6052166397363986919" datatype="html">
         <source>extra urban</source>
@@ -11785,7 +11765,7 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">423</context>
         </context-group>
-        <target state="translated">extra urban</target>
+        <target state="translated">загородный</target>
       </trans-unit>
       <trans-unit id="1586743387138128680" datatype="html" approved="yes">
         <source>&quot;start-stop&quot; system</source>
@@ -12235,7 +12215,7 @@ Transmission is not considered</source>
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">523</context>
         </context-group>
-        <target state="translated">36.8% urban + 63.2% extra urban</target>
+        <target state="translated">36.8% городской + 63.2% загородный</target>
       </trans-unit>
       <trans-unit id="8259234826290053325" datatype="html">
         <source>axis. 2×radius</source>
@@ -14155,7 +14135,7 @@ Transmission is not considered</source>
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">825</context>
         </context-group>
-        <target state="needs-translation">2020-24th</target>
+        <target state="translated">2020-24ых</target>
       </trans-unit>
       <trans-unit id="7645822191910133173" datatype="html">
         <source>all time</source>
