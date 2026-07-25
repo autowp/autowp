@@ -7,7 +7,7 @@ import {StatisticsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {ChartConfiguration} from 'chart.js';
-import {BaseChartDirective} from 'ng2-charts';
+import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {combineLatest, EMPTY, of} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 
@@ -23,6 +23,7 @@ interface Period {
   selector: 'app-pulse',
   imports: [RouterLink, BaseChartDirective, UserComponent, AsyncPipe],
   templateUrl: './pulse.component.html',
+  providers: [provideCharts(withDefaultRegisterables())],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PulseComponent implements OnInit {
