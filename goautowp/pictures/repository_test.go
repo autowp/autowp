@@ -1,6 +1,7 @@
 package pictures
 
 import (
+	"context"
 	"database/sql"
 	"io"
 	"math/rand"
@@ -86,6 +87,7 @@ func repository(t *testing.T) (*goqu.Database, *Repository) {
 		itemsRepo,
 		cfg.DuplicateFinder,
 		func(int64) error { return nil },
+		func(context.Context) error { return nil },
 	)
 }
 

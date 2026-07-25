@@ -31,6 +31,7 @@ const (
 type Repository struct {
 	db                    *goqu.Database
 	createMessageCallback CreateMessageCallback
+	listChangedCallback   ListChangedCallback
 	i18n                  *i18nbundle.I18n
 }
 
@@ -50,14 +51,21 @@ type Message struct {
 
 type CreateMessageCallback func(ctx context.Context, fromUserID int64, toUserID int64, text string) error
 
+// ListChangedCallback is invoked after a message create/delete/clear commits, naming the
+// users whose message list just changed (for a live-reload notification, not for
+// delivering message content).
+type ListChangedCallback func(ctx context.Context, userIDs []int64) error
+
 func NewRepository(
 	db *goqu.Database,
 	createMessageCallback CreateMessageCallback,
+	listChangedCallback ListChangedCallback,
 	i18n *i18nbundle.I18n,
 ) *Repository {
 	return &Repository{
 		db:                    db,
 		createMessageCallback: createMessageCallback,
+		listChangedCallback:   listChangedCallback,
 		i18n:                  i18n,
 	}
 }
@@ -146,8 +154,13 @@ func (s *Repository) DeleteMessage(ctx context.Context, userID int64, messageID 
 			schema.PersonalMessageTableIDCol.Eq(messageID),
 		).
 		Executor().ExecContext(ctx)
+	if err != nil {
+		return err
+	}
 
-	return err
+	// Deleting only ever flips the acting user's own visibility flags, so only their
+	// other sessions/tabs/devices need to know to refetch.
+	return s.listChangedCallback(ctx, []int64{userID})
 }
 
 func (s *Repository) ClearSent(ctx context.Context, userID int64) error {
@@ -155,8 +168,11 @@ func (s *Repository) ClearSent(ctx context.Context, userID int64) error {
 		Set(goqu.Record{schema.PersonalMessageTableDeletedByFromColName: true}).
 		Where(schema.PersonalMessageTableFromUserIDCol.Eq(userID)).
 		Executor().ExecContext(ctx)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return s.listChangedCallback(ctx, []int64{userID})
 }
 
 func (s *Repository) ClearSystem(ctx context.Context, userID int64) error {
@@ -166,8 +182,11 @@ func (s *Repository) ClearSystem(ctx context.Context, userID int64) error {
 			schema.PersonalMessageTableFromUserIDCol.IsNull(),
 		).
 		Executor().ExecContext(ctx)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return s.listChangedCallback(ctx, []int64{userID})
 }
 
 func (s *Repository) CreateMessageFromTemplate(
@@ -225,7 +244,19 @@ func (s *Repository) CreateMessage(
 		return err
 	}
 
-	return s.createMessageCallback(ctx, fromUserID, toUserID, text)
+	err = s.createMessageCallback(ctx, fromUserID, toUserID, text)
+	if err != nil {
+		return err
+	}
+
+	// Both participants' views changed: the recipient's inbox and the sender's sent
+	// folder. System messages (fromUserID == 0) have no connected sender to notify.
+	userIDs := []int64{toUserID}
+	if fromUserID != 0 {
+		userIDs = append(userIDs, fromUserID)
+	}
+
+	return s.listChangedCallback(ctx, userIDs)
 }
 
 func (s *Repository) GetInbox(

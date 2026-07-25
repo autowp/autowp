@@ -8,13 +8,12 @@ import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {PastTimeIndicatorComponent} from '@utils/past-time-indicator/past-time-indicator.component';
 import {UserTextComponent} from '@utils/user-text/user-text.component';
+import {MessageDialogService} from 'app/message-dialog/message-dialog.service';
+import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
+import {ToastsService} from 'app/toasts/toasts.service';
+import {UserComponent} from 'app/user/user/user.component';
 import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
-
-import {MessageDialogService} from '../../message-dialog/message-dialog.service';
-import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
-import {ToastsService} from '../../toasts/toasts.service';
-import {UserComponent} from '../../user/user/user.component';
 
 @Component({
   selector: 'app-account-messages',
@@ -56,7 +55,8 @@ export class AccountMessagesComponent {
   protected readonly messages$: Observable<{
     items: {author$: Observable<APIUser | null>; message: Message}[];
     paginator: Pages | undefined;
-  }> = combineLatest([this.folder$, this.page$, this.userId$, this.#change$]).pipe(
+  }> = combineLatest([this.folder$, this.page$, this.userId$, this.#change$, this.#messageService.changed$]).pipe(
+    debounceTime(50),
     switchMap(([folder, page, userId]) => {
       let pageId = 0;
 

@@ -1,6 +1,7 @@
 package attrs
 
 import (
+	"context"
 	"database/sql"
 	"testing"
 
@@ -50,6 +51,7 @@ func createRepository(t *testing.T) *Repository {
 		itemsRepository,
 		cfg.DuplicateFinder,
 		func(int64) error { return nil },
+		func(context.Context) error { return nil },
 	)
 
 	repo := NewRepository(goquDB, i18n, itemsRepository, picturesRepository, imageStorage)

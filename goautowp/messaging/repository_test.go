@@ -28,11 +28,13 @@ func createRepository(t *testing.T) *Repository {
 	i18n, err := i18nbundle.New()
 	require.NoError(t, err)
 
-	s := NewRepository(goquDB, func(_ context.Context, _ int64, _ int64, _ string) error {
+	repo := NewRepository(goquDB, func(_ context.Context, _ int64, _ int64, _ string) error {
+		return nil
+	}, func(_ context.Context, _ []int64) error {
 		return nil
 	}, i18n)
 
-	return s
+	return repo
 }
 
 func TestGetUserNewMessagesCount(t *testing.T) {

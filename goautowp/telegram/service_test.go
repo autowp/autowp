@@ -72,6 +72,9 @@ func TestInboxCommand(t *testing.T) {
 		func(_ context.Context, _ int64, _ int64, _ string) error {
 			return nil
 		},
+		func(_ context.Context, _ []int64) error {
+			return nil
+		},
 		i18n,
 	)
 	picturesRepo := pictures.NewRepository(
@@ -81,6 +84,7 @@ func TestInboxCommand(t *testing.T) {
 		itemRepo,
 		cfg.DuplicateFinder,
 		func(int64) error { return nil },
+		func(context.Context) error { return nil },
 	)
 
 	userID := createRandomUser(ctx, t, goquDB)

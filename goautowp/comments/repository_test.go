@@ -92,6 +92,9 @@ func createRepository(t *testing.T) (*Repository, *goqu.Database) {
 		func(_ context.Context, _ int64, _ int64, _ string) error {
 			return nil
 		},
+		func(_ context.Context, _ []int64) error {
+			return nil
+		},
 		i,
 	)
 

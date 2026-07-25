@@ -113,6 +113,7 @@ type Repository struct {
 	perspectiveCacheMutex sync.Mutex
 	dfConfig              config.DuplicateFinderConfig
 	beforePictureDeleted  func(id int64) error
+	afterPictureAccepted  func(ctx context.Context) error
 }
 
 type PictureFields struct {
@@ -180,6 +181,7 @@ func NewRepository(
 	itemsRepository *items.Repository,
 	dfConfig config.DuplicateFinderConfig,
 	beforePictureDeleted func(id int64) error,
+	afterPictureAccepted func(ctx context.Context) error,
 ) *Repository {
 	return &Repository{
 		db:                    db,
@@ -190,6 +192,7 @@ func NewRepository(
 		perspectiveCacheMutex: sync.Mutex{},
 		dfConfig:              dfConfig,
 		beforePictureDeleted:  beforePictureDeleted,
+		afterPictureAccepted:  afterPictureAccepted,
 	}
 }
 
@@ -1267,8 +1270,22 @@ func (s *Repository) Accept(
 	}
 
 	affected, err := res.RowsAffected()
+	if err != nil {
+		return isFirstTimeAccepted, false, err
+	}
 
-	return isFirstTimeAccepted, affected > 0, err
+	success := affected > 0
+
+	// Only notify the "new pictures" live-reload channel the first time a picture
+	// becomes accepted (i.e. when accept_datetime is newly set) — that's the only case
+	// where the index page's accept-datetime-ordered list actually changes.
+	if success && isFirstTimeAccepted {
+		if err := s.afterPictureAccepted(ctx); err != nil {
+			return isFirstTimeAccepted, success, err
+		}
+	}
+
+	return isFirstTimeAccepted, success, nil
 }
 
 func (s *Repository) QueueRemove(ctx context.Context, pictureID int64, userID int64) (bool, error) {

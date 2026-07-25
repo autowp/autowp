@@ -81,6 +81,8 @@ type Container struct {
 	keyCloak                     *gocloak.GoCloak
 	messagingGrpcServer          *MessagingGRPCServer
 	messagingRepository          *messaging.Repository
+	messagingHub                 *messaging.Hub
+	messagingWS                  *MessagingWS
 	publicHTTPServer             *http.Server
 	publicRouter                 http.HandlerFunc
 	grpcServerWithServices       *grpc.Server
@@ -96,6 +98,8 @@ type Container struct {
 	mapGrpcServer                *MapGRPCServer
 	picturesRepository           *pictures.Repository
 	picturesGrpcServer           *PicturesGRPCServer
+	picturesHub                  *pictures.Hub
+	picturesWS                   *PicturesWS
 	statisticsGrpcServer         *StatisticsGRPCServer
 	forumsGrpcServer             *ForumsGRPCServer
 	attrsGRPCServer              *AttrsGRPCServer
@@ -410,6 +414,11 @@ func (s *Container) PicturesRepository(ctx context.Context) (*pictures.Repositor
 
 		cfg := s.Config()
 
+		redisClient, err := s.Redis()
+		if err != nil {
+			return nil, err
+		}
+
 		s.picturesRepository = pictures.NewRepository(
 			db, is, textStorageRepository, itemsRepository, cfg.DuplicateFinder,
 			func(id int64) error {
@@ -420,10 +429,35 @@ func (s *Container) PicturesRepository(ctx context.Context) (*pictures.Repositor
 
 				return commentsRepository.DeleteTopic(ctx, schema.CommentMessageTypeIDPictures, id)
 			},
+			func(ctx context.Context) error {
+				// Best-effort: a missed live-reload ping isn't worth failing the accept.
+				if err := pictures.PublishAccepted(ctx, redisClient); err != nil {
+					logrus.Error(err.Error())
+				}
+
+				return nil
+			},
 		)
 	}
 
 	return s.picturesRepository, nil
+}
+
+// PicturesHub is the in-process registry of live /ws/pictures connections for this pod.
+func (s *Container) PicturesHub() *pictures.Hub {
+	if s.picturesHub == nil {
+		s.picturesHub = pictures.NewHub()
+	}
+
+	return s.picturesHub
+}
+
+func (s *Container) PicturesWS() *PicturesWS {
+	if s.picturesWS == nil {
+		s.picturesWS = NewPicturesWS(s.PicturesHub(), s.config.PublicRest.Cors.Origin)
+	}
+
+	return s.picturesWS
 }
 
 func (s *Container) PublicHTTPServer(ctx context.Context) (*http.Server, error) {
@@ -619,6 +653,15 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 	}
 
 	usersREST.SetupRouter(ginEngine) //nolint: contextcheck
+
+	messagingWS, err := s.MessagingWS(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("MessagingWS(): %w", err)
+	}
+
+	messagingWS.SetupRouter(ginEngine) //nolint: contextcheck
+
+	s.PicturesWS().SetupRouter(ginEngine)
 
 	s.publicRouter = func(resp http.ResponseWriter, req *http.Request) {
 		if wrappedGrpc.IsAcceptableGrpcCorsRequest(req) || wrappedGrpc.IsGrpcWebRequest(req) {
@@ -1707,6 +1750,11 @@ func (s *Container) MessagingRepository(ctx context.Context) (*messaging.Reposit
 			return nil, err
 		}
 
+		redisClient, err := s.Redis()
+		if err != nil {
+			return nil, err
+		}
+
 		s.messagingRepository = messaging.NewRepository(
 			db,
 			func(ctx context.Context, fromUserID int64, toUserID int64, text string) error {
@@ -1717,11 +1765,42 @@ func (s *Container) MessagingRepository(ctx context.Context) (*messaging.Reposit
 
 				return tg.NotifyMessage(ctx, fromUserID, toUserID, text)
 			},
+			func(ctx context.Context, userIDs []int64) error {
+				// Best-effort: a missed live-reload ping isn't worth failing the
+				// underlying message operation over.
+				if err := messaging.PublishEvent(ctx, redisClient, userIDs); err != nil {
+					logrus.Error(err.Error())
+				}
+
+				return nil
+			},
 			i18n,
 		)
 	}
 
 	return s.messagingRepository, nil
+}
+
+// MessagingHub is the in-process registry of live /ws/messages connections for this pod.
+func (s *Container) MessagingHub() *messaging.Hub {
+	if s.messagingHub == nil {
+		s.messagingHub = messaging.NewHub()
+	}
+
+	return s.messagingHub
+}
+
+func (s *Container) MessagingWS(ctx context.Context) (*MessagingWS, error) {
+	if s.messagingWS == nil {
+		auth, err := s.Auth(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.messagingWS = NewMessagingWS(s.MessagingHub(), auth, s.config.PublicRest.Cors.Origin)
+	}
+
+	return s.messagingWS, nil
 }
 
 func (s *Container) Keycloak() *gocloak.GoCloak {

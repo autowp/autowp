@@ -23,6 +23,7 @@ var (
 const (
 	authorizationHeader = "authorization"
 	bearerSchema        = "Bearer"
+	defaultRemoteAddr   = "127.0.0.1"
 )
 
 type Auth struct {
@@ -63,7 +64,7 @@ func (s *Auth) ValidateREST(ctx *gin.Context) (UserContext, error) {
 
 	remoteAddr := ctx.ClientIP()
 	if remoteAddr == "" {
-		remoteAddr = "127.0.0.1"
+		remoteAddr = defaultRemoteAddr
 	}
 
 	ip := net.ParseIP(remoteAddr)
@@ -93,7 +94,7 @@ func (s *Auth) ValidateGRPC(ctx context.Context) (UserContext, error) {
 	}
 
 	if remoteAddr == "" {
-		remoteAddr = "127.0.0.1"
+		remoteAddr = defaultRemoteAddr
 	}
 
 	ip := net.ParseIP(remoteAddr)

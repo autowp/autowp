@@ -198,6 +198,13 @@ spec:
               name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
+        - path: "/ws/"
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
         - path: "/yoomoney/informing"
           pathType: Prefix
           backend:

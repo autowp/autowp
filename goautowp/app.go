@@ -14,6 +14,8 @@ import (
 	"github.com/autowp/goautowp/attrsamqp"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/storage"
+	"github.com/autowp/goautowp/messaging"
+	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/schema"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
 	"github.com/golang-migrate/migrate/v4"
@@ -132,6 +134,28 @@ func (s *Application) Serve(ctx context.Context, options ServeOptions, quit chan
 
 			wg.Done()
 		}()
+
+		wg.Add(1)
+
+		go func() {
+			err := s.ListenMessagingWSEvents(ctx, quit)
+			if err != nil {
+				logrus.Errorln(err.Error())
+			}
+
+			wg.Done()
+		}()
+
+		wg.Add(1)
+
+		go func() {
+			err := s.ListenPicturesWSEvents(ctx, quit)
+			if err != nil {
+				logrus.Errorln(err.Error())
+			}
+
+			wg.Done()
+		}()
 	}
 
 	if options.Autoban {
@@ -231,6 +255,56 @@ func (s *Application) ServePublic(ctx context.Context, quit chan bool) error {
 	}
 
 	logrus.Infoln("public HTTP listener stopped")
+
+	return nil
+}
+
+// ListenMessagingWSEvents fans out Redis-published "messages changed" events to this
+// pod's local /ws/messages connections. Only meaningful while ServePublic is also
+// running, since that's what owns the hub and accepts the connections.
+func (s *Application) ListenMessagingWSEvents(ctx context.Context, quit chan bool) error {
+	redisClient, err := s.container.Redis()
+	if err != nil {
+		return err
+	}
+
+	hub := s.container.MessagingHub()
+
+	logrus.Info("Messaging WS listener started")
+
+	err = messaging.Subscribe(ctx, redisClient, hub, quit)
+	if err != nil {
+		logrus.Error(err.Error())
+
+		return err
+	}
+
+	logrus.Info("Messaging WS listener stopped")
+
+	return nil
+}
+
+// ListenPicturesWSEvents fans out Redis-published "picture accepted" events to this
+// pod's local /ws/pictures connections. Only meaningful while ServePublic is also
+// running, since that's what owns the hub and accepts the connections.
+func (s *Application) ListenPicturesWSEvents(ctx context.Context, quit chan bool) error {
+	redisClient, err := s.container.Redis()
+	if err != nil {
+		return err
+	}
+
+	hub := s.container.PicturesHub()
+
+	logrus.Info("Pictures WS listener started")
+
+	err = pictures.Subscribe(ctx, redisClient, hub, quit)
+	if err != nil {
+		logrus.Error(err.Error())
+
+		return err
+	}
+
+	logrus.Info("Pictures WS listener stopped")
 
 	return nil
 }

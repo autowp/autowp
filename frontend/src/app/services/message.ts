@@ -13,21 +13,28 @@ import {catchError, debounceTime, map, shareReplay, switchMap, tap} from 'rxjs/o
 
 import {ToastsService} from '../toasts/toasts.service';
 import {AuthService} from './auth.service';
+import {MessagingWebSocketService} from './messaging-ws.service';
 
 @Service()
 export class MessageService {
   readonly #auth = inject(AuthService);
   readonly #toasts = inject(ToastsService);
   readonly #messagingClient = inject(MessagingClient);
+  readonly #ws = inject(MessagingWebSocketService);
 
   readonly #deleted$ = new BehaviorSubject<void>(void 0);
   readonly #sent$ = new BehaviorSubject<void>(void 0);
   readonly #seen$ = new BehaviorSubject<void>(void 0);
 
+  // Passthrough for consumers (e.g. the messages list screen) that want to react to any
+  // server-side change (send/delete/clear, from this session or another tab/device).
+  public readonly changed$: Observable<void> = this.#ws.messagesChanged$;
+
   readonly #new$: Observable<null | number> = combineLatest([
     this.#auth.authenticated$,
     this.#deleted$,
     this.#seen$,
+    this.#ws.messagesChanged$,
   ]).pipe(
     debounceTime(10),
     switchMap(([authenticated]) => {
@@ -49,6 +56,7 @@ export class MessageService {
     this.#sent$,
     this.#seen$,
     this.#auth.authenticated$,
+    this.#ws.messagesChanged$,
   ]).pipe(
     map(([, , , authenticated]) => authenticated),
     debounceTime(10),
