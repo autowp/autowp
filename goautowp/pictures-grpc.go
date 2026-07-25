@@ -1598,7 +1598,22 @@ func (s *PicturesGRPCServer) GetPicture(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	if !canViewPictureStatus(row, isModer, userCtx.UserID) {
+		return nil, status.Error(codes.NotFound, sql.ErrNoRows.Error())
+	}
+
 	return s.pictureExtractor.Extract(ctx, row, in.GetFields(), in.GetLanguage(), userCtx)
+}
+
+// canViewPictureStatus reports whether a caller may see a picture that isn't yet public
+// (i.e. not accepted), regardless of which query filters were used to reach it: only
+// moderators and the picture's own owner may see inbox/removing/removed pictures.
+func canViewPictureStatus(row *schema.PictureRow, isModer bool, userID int64) bool {
+	if isModer || row.Status == schema.PictureStatusAccepted {
+		return true
+	}
+
+	return userID != 0 && row.OwnerID.Valid && row.OwnerID.Int64 == userID
 }
 
 func (s *PicturesGRPCServer) LoadLocation(timezone string) (*time.Location, error) {
@@ -1667,6 +1682,16 @@ func (s *PicturesGRPCServer) GetPictures(
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+
+	visibleRows := rows[:0]
+
+	for _, row := range rows {
+		if canViewPictureStatus(row, isModer, userCtx.UserID) {
+			visibleRows = append(visibleRows, row)
+		}
+	}
+
+	rows = visibleRows
 
 	res, err := s.pictureExtractor.ExtractRows(ctx, rows, in.GetFields(), in.GetLanguage(), userCtx)
 	if err != nil {
@@ -2712,8 +2737,9 @@ func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, use
 	inOptions := in.GetOptions()
 	fields := in.GetFields()
 
-	if inOptions.GetStatus() == PictureStatus_PICTURE_STATUS_INBOX && userID == 0 {
-		return status.Error(codes.PermissionDenied, "inbox not allowed anonymously")
+	if inOptions.GetStatus() == PictureStatus_PICTURE_STATUS_INBOX && !isModer &&
+		(userID == 0 || inOptions.GetOwnerId() != userID) {
+		return status.Error(codes.PermissionDenied, "inbox is only available to moderators or its owner")
 	}
 
 	restricted := !isModer && inOptions.GetPictureItem().GetItemId() == 0 &&

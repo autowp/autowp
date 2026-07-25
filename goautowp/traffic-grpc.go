@@ -55,6 +55,10 @@ func (s *TrafficGRPCServer) GetTrafficTop(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
+		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+	}
+
 	items, err := s.traffic.Monitoring.ListOfTop(ctx, trafficTopLimit)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())

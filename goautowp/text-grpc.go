@@ -5,6 +5,8 @@ import (
 	"database/sql"
 
 	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/users"
+	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -13,14 +15,17 @@ import (
 type TextGRPCServer struct {
 	UnimplementedTextServer
 
-	db *goqu.Database
+	auth *Auth
+	db   *goqu.Database
 }
 
 func NewTextGRPCServer(
+	auth *Auth,
 	db *goqu.Database,
 ) *TextGRPCServer {
 	return &TextGRPCServer{
-		db: db,
+		auth: auth,
+		db:   db,
 	}
 }
 
@@ -28,6 +33,13 @@ func (s *TextGRPCServer) GetText(
 	ctx context.Context,
 	in *GetTextRequest,
 ) (*GetTextResponse, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	isModer := util.Contains(userCtx.Roles, users.RoleModer)
+
 	var (
 		lastRevision    int64
 		currentRevision = in.GetRevision()
@@ -49,6 +61,10 @@ func (s *TextGRPCServer) GetText(
 
 	if currentRevision == 0 {
 		currentRevision = lastRevision
+	}
+
+	if currentRevision != lastRevision && !isModer {
+		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
 	}
 
 	stCurrent := struct {

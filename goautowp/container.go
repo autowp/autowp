@@ -1121,7 +1121,12 @@ func (s *Container) TextGRPCServer(ctx context.Context) (*TextGRPCServer, error)
 			return nil, err
 		}
 
-		s.textGrpcServer = NewTextGRPCServer(db)
+		auth, err := s.Auth(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.textGrpcServer = NewTextGRPCServer(auth, db)
 	}
 
 	return s.textGrpcServer, nil
