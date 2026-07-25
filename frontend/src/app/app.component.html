@@ -47,7 +47,7 @@
               <ng-container i18n>Categories</ng-container>
               <b class="caret" aria-hidden="true"></b>
             </button>
-            @if (categories$ | async; as categories) {
+            @if (categoriesResource.value(); as categories) {
               <div ngbDropdownMenu>
                 @for (category of categories.items; track category.id) {
                   <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/category', category.catname]">

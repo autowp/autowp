@@ -1,5 +1,5 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
@@ -14,16 +14,14 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY} from 'rxjs';
-import {catchError, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 import {ItemComponent} from '../../item/item/item.component';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
-import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
   selector: 'app-cars-deteless',
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, ItemComponent],
+  imports: [RouterLink, PaginatorComponent, ItemComponent],
   templateUrl: './dateless.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -32,12 +30,13 @@ export class CarsDatelessComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
-  readonly #toastService = inject(ToastsService);
 
-  protected readonly data$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-    switchMap((page) =>
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
+
+  protected readonly dataResource = rxResource({
+    stream: () =>
       this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({
@@ -69,15 +68,10 @@ export class CarsDatelessComponent implements OnInit {
             dateless: true,
           }),
           order: ItemsRequest.Order.AGE,
-          page,
+          page: this.#page(),
         }),
       ),
-    ),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-  );
+  });
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 1});

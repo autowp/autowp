@@ -18,18 +18,22 @@
       </button>
       @if (open) {
         <ul class="list-unstyled">
-          @if (childs$ | async; as childs) {
-            @for (child of childs; track child) {
-              <li class="ms-4">
-                <app-upload-select-tree-item [item]="child" />
-              </li>
-            }
-          } @else {
+          @if (childsResource.error(); as error) {
+            <li class="ms-4">
+              <span class="alert alert-danger" role="alert">{{ error.message }}</span>
+            </li>
+          } @else if (childsResource.isLoading()) {
             <li class="ms-4">
               <span>
                 <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
               </span>
             </li>
+          } @else if (childsResource.value(); as response) {
+            @for (child of response.items || []; track child) {
+              <li class="ms-4">
+                <app-upload-select-tree-item [item]="child" />
+              </li>
+            }
           }
           <li class="ms-4">
             <a

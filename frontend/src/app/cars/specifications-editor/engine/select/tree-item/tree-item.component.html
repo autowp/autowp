@@ -16,13 +16,14 @@
       <a href="#" class="toggle" [innerHTML]="item.item?.nameHtml" (click)="toggle()"></a>
       @if (open()) {
         <ul class="list-unstyled">
-          @if (loading()) {
+          @if (childsResource.error(); as error) {
+            <li class="text-danger" style="margin-left: 16px">{{ error.message }}</li>
+          } @else if (childsResource.isLoading()) {
             <li style="margin-left: 16px">
               <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
             </li>
-          }
-          @if (childs$ | async; as childs) {
-            @for (child of childs; track child.itemId) {
+          } @else if (childsResource.value(); as data) {
+            @for (child of data.items || []; track child.itemId) {
               <li style="margin-left: 16px">
                 <app-cars-select-engine-tree-item [item]="child" (selected)="selectEngine($event)" />
               </li>

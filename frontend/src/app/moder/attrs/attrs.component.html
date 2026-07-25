@@ -17,18 +17,28 @@
   <div class="col-md-6">
     <h2 i18n>Zones</h2>
     <div class="card card-body">
-      <ul>
-        @for (zone of zones$ | async; track zone.id) {
-          <li>
-            <a [routerLink]="['/moder/attrs/zone', zone.id]">{{ zone.name }}</a>
-          </li>
-        }
-      </ul>
+      @if (zonesResource.error(); as error) {
+        <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+      } @else if (zonesResource.isLoading()) {
+        <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+      } @else if (zonesResource.value(); as zones) {
+        <ul>
+          @for (zone of zones; track zone.id) {
+            <li>
+              <a [routerLink]="['/moder/attrs/zone', zone.id]">{{ zone.name }}</a>
+            </li>
+          }
+        </ul>
+      }
     </div>
   </div>
   <div class="col-md-6">
     <h2 i18n>Attributes</h2>
-    @if (attributes$ | async; as attributes) {
+    @if (attributesResource.error(); as error) {
+      <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+    } @else if (attributesResource.isLoading()) {
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    } @else if (attributesResource.value(); as attributes) {
       <div class="card card-body">
         <app-moder-attrs-attribute-list [attributes]="attributes" />
       </div>

@@ -92,8 +92,12 @@
           @if (form.controls.captcha) {
             <div class="mb-3 row">
               <div class="col-md-10 offset-md-2">
-                @if (recaptchaKey$ | async; as recaptchaKey) {
-                  <re-captcha [siteKey]="recaptchaKey" (resolved)="resolved($event)" />
+                @if (recaptchaKeyResource.error(); as error) {
+                  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+                } @else if (recaptchaKeyResource.isLoading()) {
+                  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+                } @else if (recaptchaKeyResource.value(); as response) {
+                  <re-captcha [siteKey]="response.publicKey" (resolved)="resolved($event)" />
                 }
                 @for (message of invalidParams() | invalidParams: 'captcha'; track message) {
                   <p class="invalid-feedback">{{ message }}</p>

@@ -1,6 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {APIGetItemVehicleTypesRequest, APIItem, ItemType, UpdateItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
@@ -10,7 +10,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {ItemService} from '@services/item';
 import {InvalidParams} from '@utils/invalid-params.pipe';
 import {EMPTY, forkJoin, Observable, of} from 'rxjs';
-import {catchError, map, switchMap, tap} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../../grpc';
 import {ToastsService} from '../../../../toasts/toasts.service';
@@ -40,9 +40,11 @@ export class ModerItemsItemMetaComponent {
   protected readonly canEditMeta$ = this.#auth.hasRole$(Role.CARS_MODER);
   protected readonly invalidParams = signal<InvalidParams>({});
 
-  protected readonly vehicleTypeIDs$: Observable<string[]> = this.item$.pipe(
-    switchMap((item) => {
-      if (item && (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE || item.itemTypeId === ItemType.ITEM_TYPE_TWINS)) {
+  protected readonly vehicleTypeIDsResource = rxResource({
+    stream: (): Observable<string[]> => {
+      const item = this.item();
+
+      if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE || item.itemTypeId === ItemType.ITEM_TYPE_TWINS) {
         return this.#itemsClient
           .getItemVehicleTypes(
             new APIGetItemVehicleTypesRequest({
@@ -53,8 +55,8 @@ export class ModerItemsItemMetaComponent {
       }
 
       return of([]);
-    }),
-  );
+    },
+  });
 
   protected saveMeta(item: APIItem, event: ItemMetaFormResult) {
     this.loadingNumber.set(true);

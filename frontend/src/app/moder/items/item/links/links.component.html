@@ -1,4 +1,9 @@
-@if (links$ | async; as links) {
+@if (linksResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (linksResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (linksResource.value(); as response) {
+  @let links = response.items || [];
   @if (item$ | async; as item) {
     @if (canEditMeta$ | async) {
       <form method="post" (submit)="saveLinks(item.id, links)">
@@ -86,6 +91,4 @@
       </tbody>
     </table>
   }
-} @else {
-  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }

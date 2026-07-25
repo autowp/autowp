@@ -6,7 +6,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/new" i18n>New pictures</a>
     </li>
-    @if (date$ | async; as date) {
+    @if (date(); as date) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/new', date]">{{ date | date: 'mediumDate' }}</a>
       </li>
@@ -14,13 +14,21 @@
   </ol>
 </nav>
 
-@if (item$ | async; as item) {
+@if (itemResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (itemResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (itemResource.value(); as item) {
   <div class="page-header">
     <h1 [innerHTML]="item.nameHtml"></h1>
   </div>
 }
 
-@if (pictures$ | async; as data) {
+@if (picturesResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (picturesResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (picturesResource.value(); as data) {
   <div class="row">
     @for (picture of data.items || []; track picture) {
       <div class="col-6 col-md-4 col-lg-3 col-xl-2">

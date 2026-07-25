@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   APIGetItemVehicleTypesRequest,
@@ -57,17 +58,18 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly pictures$: Observable<PictureItem[]> = this.#itemID$.pipe(
-    switchMap((itemID) =>
-      this.#picturesClient.getPictureItems(
-        new PictureItemsRequest({
-          options: new PictureItemListOptions({itemId: '' + itemID}),
-        }),
-      ),
-    ),
-    map((response) => response.items || []),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {requireSync: true});
+
+  protected readonly picturesResource = rxResource({
+    stream: () =>
+      this.#picturesClient
+        .getPictureItems(
+          new PictureItemsRequest({
+            options: new PictureItemListOptions({itemId: '' + this.#itemID()}),
+          }),
+        )
+        .pipe(map((response) => response.items || [])),
+  });
 
   protected readonly item$: Observable<APIItem> = this.#itemID$.pipe(
     switchMap((id) =>

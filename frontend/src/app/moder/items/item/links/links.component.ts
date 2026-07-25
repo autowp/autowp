@@ -1,12 +1,12 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {APIItem, APIItemLink, APIItemLinkRequest, ItemLinkListOptions, ItemLinksRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
-import {BehaviorSubject, EMPTY, forkJoin, Observable, of} from 'rxjs';
-import {catchError, map, switchMap, tap} from 'rxjs/operators';
+import {forkJoin, Observable, of} from 'rxjs';
+import {catchError, map, tap} from 'rxjs/operators';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 
@@ -23,7 +23,6 @@ export class ModerItemsItemLinksComponent {
 
   readonly item = input.required<APIItem>();
   protected readonly item$ = toObservable(this.item);
-  readonly #reload$ = new BehaviorSubject<void>(void 0);
 
   protected readonly loadingNumber = signal(false);
 
@@ -35,15 +34,12 @@ export class ModerItemsItemLinksComponent {
     url: '',
   };
 
-  protected readonly links$: Observable<APIItemLink[]> = this.#reload$.pipe(
-    switchMap(() => this.item$),
-    switchMap((item) =>
-      item
-        ? this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId: item.id})}))
-        : EMPTY,
-    ),
-    map((response) => (response.items ? response.items : [])),
-  );
+  protected readonly linksResource = rxResource({
+    stream: () =>
+      this.#itemsClient.getItemLinks(
+        new ItemLinksRequest({options: new ItemLinkListOptions({itemId: this.item().id})}),
+      ),
+  });
 
   protected saveLinks(itemId: string, links: APIItemLink[]) {
     const promises: Observable<null>[] = [];
@@ -105,7 +101,7 @@ export class ModerItemsItemLinksComponent {
     this.loadingNumber.set(true);
     forkJoin(promises).subscribe({
       complete: () => this.loadingNumber.set(false),
-      next: () => this.#reload$.next(),
+      next: () => this.linksResource.reload(),
     });
   }
 }

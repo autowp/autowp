@@ -1,35 +1,33 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {APIUsersRequest, APIUsersResponse, UserFields} from '@grpc/spec.pb';
+import {APIUsersRequest, UserFields} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
-import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
   selector: 'app-moder-users',
-  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, AsyncPipe, DatePipe, TimeAgoPipe],
+  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, DatePipe, TimeAgoPipe],
   templateUrl: './users.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerUsersComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
-  readonly #toastService = inject(ToastsService);
   readonly #usersClient = inject(UsersClient);
 
-  protected readonly users$: Observable<APIUsersResponse> = this.#route.queryParamMap.pipe(
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((params) => {
-      const pageStr = params.get('page');
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('page'))), {requireSync: true});
+
+  protected readonly usersResource = rxResource({
+    stream: () => {
+      const pageStr = this.#page();
       return this.#usersClient.getUsers(
         new APIUsersRequest({
           fields: new UserFields({
@@ -43,12 +41,8 @@ export class ModerUsersComponent implements OnInit {
           page: pageStr ? parseInt(pageStr) : undefined,
         }),
       );
-    }),
-    catchError((error: unknown) => {
-      this.#toastService.handleError(error);
-      return EMPTY;
-    }),
-  );
+    },
+  });
 
   ngOnInit(): void {
     this.#pageEnv.set({

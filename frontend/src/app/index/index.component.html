@@ -43,7 +43,11 @@
     <h4>
       <ng-container i18n>Persons on photo</ng-container> <small><a routerLink="/persons" i18n>all</a></small>
     </h4>
-    @if (contentPersons$ | async; as persons) {
+    @if (contentPersonsResource.error(); as error) {
+      <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+    } @else if (contentPersonsResource.isLoading()) {
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    } @else if (contentPersonsResource.value(); as persons) {
       <p>
         @for (person of persons.items; track person.id) {
           <a [routerLink]="['/persons', person.id]">{{ person.name }}</a
@@ -51,8 +55,6 @@
         }
         …
       </p>
-    } @else {
-      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
     }
   </div>
 
@@ -60,7 +62,11 @@
     <h4>
       <ng-container i18n>Authors</ng-container> <small><a routerLink="/persons/authors" i18n>all</a></small>
     </h4>
-    @if (authorPersons$ | async; as persons) {
+    @if (authorPersonsResource.error(); as error) {
+      <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+    } @else if (authorPersonsResource.isLoading()) {
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    } @else if (authorPersonsResource.value(); as persons) {
       <p>
         @for (person of persons.items; track person.id) {
           <a [routerLink]="['/persons', person.id]">{{ person.name }}</a
@@ -68,8 +74,6 @@
         }
         …
       </p>
-    } @else {
-      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
     }
   </div>
 </div>

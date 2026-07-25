@@ -1,4 +1,8 @@
-@if (categories$ | async; as response) {
+@if (categoriesResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (categoriesResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (categoriesResource.value(); as response) {
   <div class="card card-body">
     <ul>
       @for (item of response.items; track item.id) {

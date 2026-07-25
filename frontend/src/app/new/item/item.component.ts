@@ -1,5 +1,6 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
@@ -15,75 +16,64 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {parseStringToGrpcDate} from '@services/utils';
-import {combineLatest, EMPTY} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
-import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
   selector: 'app-new-item',
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, DatePipe, ThumbnailComponent],
+  imports: [RouterLink, PaginatorComponent, DatePipe, ThumbnailComponent],
   templateUrl: './item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewItemComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #itemID$ = this.#route.paramMap.pipe(
-    map((params) => params.get('item_id') ?? ''),
-    distinctUntilChanged(),
-    debounceTime(10),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('item_id') ?? '')), {
+    requireSync: true,
+  });
 
-  protected readonly date$ = this.#route.paramMap.pipe(
-    map((params) => params.get('date')),
-    distinctUntilChanged(),
-    debounceTime(10),
-  );
+  protected readonly date = toSignal(this.#route.paramMap.pipe(map((params) => params.get('date'))), {
+    requireSync: true,
+  });
 
-  readonly #page$ = this.#route.queryParamMap.pipe(
-    map((query) => parseInt(query.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-    debounceTime(30),
-  );
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((query) => parseInt(query.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
 
-  protected readonly item$ = this.#itemID$.pipe(
-    switchMap((itemID) =>
-      this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({
-            nameHtml: true,
-            nameText: true,
+  protected readonly itemResource = rxResource({
+    stream: () =>
+      this.#itemsClient
+        .item(
+          new ItemRequest({
+            fields: new ItemFields({
+              nameHtml: true,
+              nameText: true,
+            }),
+            id: this.#itemID(),
+            language: this.#languageService.language,
           }),
-          id: itemID,
-          language: this.#languageService.language,
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-    tap((item) => {
-      this.#pageEnv.set({
-        pageId: 210,
-        title: item.nameText,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+        )
+        .pipe(
+          tap((item) => {
+            this.#pageEnv.set({
+              pageId: 210,
+              title: item.nameText,
+            });
+          }),
+        ),
+  });
 
-  protected readonly pictures$ = combineLatest([this.#itemID$, this.date$, this.#page$]).pipe(
-    switchMap(([itemID, date, page]) =>
-      this.#picturesClient.getPictures(
+  protected readonly picturesResource = rxResource({
+    stream: () => {
+      const date = this.date();
+
+      return this.#picturesClient.getPictures(
         new PicturesRequest({
           fields: new PictureFields({
             commentsCount: true,
@@ -99,19 +89,15 @@ export class NewItemComponent {
           options: new PictureListOptions({
             acceptDate: date ? parseStringToGrpcDate(date) : undefined,
             pictureItem: new PictureItemListOptions({
-              itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: itemID}),
+              itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: this.#itemID()}),
             }),
             status: PictureStatus.PICTURE_STATUS_ACCEPTED,
           }),
           order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
-          page,
+          page: this.#page(),
           paginator: true,
         }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-  );
+      );
+    },
+  });
 }

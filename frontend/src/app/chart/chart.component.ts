@@ -1,5 +1,5 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {AttrAttributeType, ChartDataRequest, ChartParameter} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
@@ -9,14 +9,13 @@ import {getAttrsTranslation} from '@utils/translations';
 import {ChartOptions} from 'chart.js';
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {ObjectTyped} from 'object-typed';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 import {ToastsService} from '../toasts/toasts.service';
 
 @Component({
   selector: 'app-chart',
-  imports: [RouterLink, BaseChartDirective, AsyncPipe],
+  imports: [RouterLink, BaseChartDirective],
   templateUrl: './chart.component.html',
   providers: [provideCharts(withDefaultRegisterables())],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,18 +25,17 @@ export class ChartComponent implements OnInit {
   readonly #toastService = inject(ToastsService);
   readonly #attrsClient = inject(AttrsClient);
 
-  protected readonly parameters$: Observable<ChartParameter[]> = this.#attrsClient.getChartParameters(new Empty()).pipe(
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    map((response) =>
-      (response.parameters || []).map((parameter) => {
-        parameter.name = getAttrsTranslation(parameter.name);
-        return parameter;
-      }),
-    ),
-  );
+  protected readonly parametersResource = rxResource({
+    stream: () =>
+      this.#attrsClient.getChartParameters(new Empty()).pipe(
+        map((response) =>
+          (response.parameters || []).map((parameter) => {
+            parameter.name = getAttrsTranslation(parameter.name);
+            return parameter;
+          }),
+        ),
+      ),
+  });
   protected readonly activeParameter = signal(0);
   protected readonly chartOptions: ChartOptions<'line'> = {
     responsive: true,

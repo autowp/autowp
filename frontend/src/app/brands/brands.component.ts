@@ -1,15 +1,15 @@
 import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {APIBrandsListCharacter, BrandIcons, GetBrandsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, shareReplay, tap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {shareReplay, tap} from 'rxjs/operators';
 
-import {ToastsService} from '../toasts/toasts.service';
 import {BrandsItemComponent} from './item/item.component';
 
 function addCSS(document: Document, url: string) {
@@ -34,23 +34,18 @@ function addCSS(document: Document, url: string) {
 })
 export class BrandsComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
   readonly #document = inject(DOCUMENT);
 
-  protected readonly items$ = this.#itemsClient
-    .getBrands(
-      new GetBrandsRequest({
-        language: this.#languageService.language,
-      }),
-    )
-    .pipe(
-      catchError((response: unknown) => {
-        this.#toastService.handleError(response);
-        return EMPTY;
-      }),
-    );
+  protected readonly itemsResource = rxResource({
+    stream: () =>
+      this.#itemsClient.getBrands(
+        new GetBrandsRequest({
+          language: this.#languageService.language,
+        }),
+      ),
+  });
 
   protected readonly icons$: Observable<BrandIcons> = this.#itemsClient.getBrandIcons(new Empty()).pipe(
     tap((icons) => {

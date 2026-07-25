@@ -13,7 +13,11 @@
   <h1 i18n id="header">Users</h1>
 </div>
 
-@if (users$ | async; as users) {
+@if (usersResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (usersResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (usersResource.value(); as users) {
   <table class="table table-bordered table-striped" aria-describedby="header">
     <thead>
       <tr>
@@ -63,6 +67,4 @@
   @if (users.paginator) {
     <app-paginator [data]="users.paginator" />
   }
-} @else {
-  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }

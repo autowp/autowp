@@ -1,5 +1,5 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 import {CreateFeedbackRequest} from '@grpc/spec.pb';
@@ -10,8 +10,6 @@ import {ReCaptchaService} from '@services/recaptcha';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RecaptchaModule} from 'ng-recaptcha-2';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../grpc';
 import {ToastsService} from '../toasts/toasts.service';
@@ -20,7 +18,7 @@ const CAPTCHA = 'captcha';
 
 @Component({
   selector: 'app-feedback',
-  imports: [RouterLink, FormsModule, ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe, AsyncPipe, RemarkModule],
+  imports: [RouterLink, FormsModule, ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe, RemarkModule],
   templateUrl: './feedback.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,13 +29,9 @@ export class FeedbackComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
 
-  protected readonly recaptchaKey$: Observable<string> = this.#reCaptchaService.get$().pipe(
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    map((response) => response.publicKey),
-  );
+  protected readonly recaptchaKeyResource = rxResource({
+    stream: () => this.#reCaptchaService.get$(),
+  });
   protected readonly invalidParams = signal<InvalidParams>({});
 
   protected readonly form = new FormGroup({

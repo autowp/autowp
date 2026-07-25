@@ -1,5 +1,5 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {GetTopPersonsListRequest, ItemOfDay, ItemOfDayRequest, PictureItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -32,7 +32,6 @@ import {IndexTwinsComponent} from './twins/twins.component';
     RouterLink,
     IndexFactoriesComponent,
     IndexSpecsCarsComponent,
-    AsyncPipe,
     RemarkModule,
   ],
   templateUrl: './index.component.html',
@@ -81,18 +80,24 @@ export class IndexComponent implements OnInit {
     switchMap((itemOfDay) => this.#userService.getUser$(itemOfDay.userId)),
   );
 
-  protected readonly contentPersons$ = this.#itemsClient.getTopPersonsList(
-    new GetTopPersonsListRequest({
-      language: this.#languageService.language,
-      pictureItemType: PictureItemType.PICTURE_ITEM_CONTENT,
-    }),
-  );
-  protected readonly authorPersons$ = this.#itemsClient.getTopPersonsList(
-    new GetTopPersonsListRequest({
-      language: this.#languageService.language,
-      pictureItemType: PictureItemType.PICTURE_ITEM_AUTHOR,
-    }),
-  );
+  protected readonly contentPersonsResource = rxResource({
+    stream: () =>
+      this.#itemsClient.getTopPersonsList(
+        new GetTopPersonsListRequest({
+          language: this.#languageService.language,
+          pictureItemType: PictureItemType.PICTURE_ITEM_CONTENT,
+        }),
+      ),
+  });
+  protected readonly authorPersonsResource = rxResource({
+    stream: () =>
+      this.#itemsClient.getTopPersonsList(
+        new GetTopPersonsListRequest({
+          language: this.#languageService.language,
+          pictureItemType: PictureItemType.PICTURE_ITEM_AUTHOR,
+        }),
+      ),
+  });
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 1});

@@ -4,7 +4,7 @@
       <ngb-progressbar type="success" class="mb-2" [striped]="true" [animated]="true" [value]="100" />
     }
     @if (canEditMeta$ | async) {
-      @if (vehicleTypeIDs$ | async; as vehicleTypeIDs) {
+      @if (vehicleTypeIDsResource.value(); as vehicleTypeIDs) {
         <app-item-meta-form
           [item]="item"
           [invalidParams]="invalidParams()"

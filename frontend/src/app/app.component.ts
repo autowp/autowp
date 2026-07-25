@@ -1,6 +1,6 @@
 import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, DestroyRef, inject, Renderer2, signal} from '@angular/core';
-import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {rxResource, takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {environment} from '@environment/environment';
 import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
@@ -20,12 +20,11 @@ import {PageEnvService} from '@services/page-env.service';
 import {Angulartics2GoogleAnalytics} from 'angulartics2';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, map, shareReplay} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map, shareReplay} from 'rxjs/operators';
 
 import {MenuComponent} from './moder/menu/menu/menu.component';
 import {ContainerComponent} from './toasts/container/container.component';
-import {ToastsService} from './toasts/toasts.service';
 import {UsersOnlineComponent} from './users/online/online.component';
 
 @Component({
@@ -58,7 +57,6 @@ export class AppComponent {
   readonly #renderer = inject(Renderer2);
   readonly #keycloak = inject(Keycloak);
   readonly #itemsClient = inject(ItemsClient);
-  readonly #toastService = inject(ToastsService);
   readonly #document = inject(DOCUMENT);
   readonly #destroyRef = inject(DestroyRef);
 
@@ -68,27 +66,23 @@ export class AppComponent {
     .getNew$()
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
   protected readonly searchHostname: string;
-  protected readonly categories$ = this.#itemsClient
-    .list(
-      new ItemsRequest({
-        fields: new ItemFields({
-          descendantsCount: true,
-          nameText: true,
+  protected readonly categoriesResource = rxResource({
+    stream: () =>
+      this.#itemsClient.list(
+        new ItemsRequest({
+          fields: new ItemFields({
+            descendantsCount: true,
+            nameText: true,
+          }),
+          language: this.#languageService.language,
+          limit: 20,
+          options: new ItemListOptions({
+            noParent: true,
+            typeId: ItemType.ITEM_TYPE_CATEGORY,
+          }),
         }),
-        language: this.#languageService.language,
-        limit: 20,
-        options: new ItemListOptions({
-          noParent: true,
-          typeId: ItemType.ITEM_TYPE_CATEGORY,
-        }),
-      }),
-    )
-    .pipe(
-      catchError((err: unknown) => {
-        this.#toastService.handleError(err);
-        return EMPTY;
-      }),
-    );
+      ),
+  });
 
   protected readonly language: string = this.#languageService.language;
   protected readonly urlPath$ = this.router.events.pipe(

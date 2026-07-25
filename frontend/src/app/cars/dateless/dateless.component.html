@@ -11,7 +11,11 @@
 </div>
 
 <div class="row">
-  @if (data$ | async; as data) {
+  @if (dataResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  } @else if (dataResource.isLoading()) {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  } @else if (dataResource.value(); as data) {
     <div class="col-md-8 offset-md-2">
       @for (item of data.items; track item.id) {
         <app-item [item]="item" />
@@ -21,7 +25,5 @@
         <app-paginator [data]="data.paginator" />
       }
     </div>
-  } @else {
-    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 </div>
