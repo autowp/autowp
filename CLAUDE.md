@@ -127,14 +127,16 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   `src/app/services/*`, `@utils/*` → `src/app/utils/*`, `@environment/*` → `src/environments/*`.
 - Uses ng-bootstrap (Bootstrap 5) for UI, Keycloak (`keycloak-angular`/`keycloak-js`) for auth,
   Leaflet for maps, Monaco editor and `marked`/`remark` for markdown editing, Chart.js for charts.
+- i18n implemented using angular/i18n. Command `ng extract-i18n --output-path src/locale` extracts
+  tokens for internationalization into `messages.xlf` file. Each time frontend code was changed check for
+  new internationalization tokens and translate them into other `messages.*.xlf files`
 
 ## Cross-cutting notes
 
 - Auth for both gRPC and REST is backed by Keycloak (`goautowp/auth.go`, `KeycloakConfig`); local
   dev/test Keycloak is provisioned via `goautowp/docker-compose.yml` with `test/realm.json`.
 - The `chart/` directory holds the Helm chart used to deploy both services together
-  (`goautowp.image` / `frontend.image`); `chart/values-prod.yaml` here is local/untracked-style
-  override data, not part of the chart itself.
+  (`goautowp.image` / `frontend.image`).
 - CI (`.gitlab-ci.yml`) is the authoritative source for exact lint/build/test invocations if this
   file and reality diverge — check it first when in doubt.
 
