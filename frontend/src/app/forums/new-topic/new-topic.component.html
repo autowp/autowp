@@ -6,7 +6,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/forums" i18n>Forums</a>
     </li>
-    @if (theme$ | async; as theme) {
+    @if (themeResource.value(); as theme) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/forums', theme.id]">{{ getForumsThemeTranslation(theme.name) }}</a>
       </li>
@@ -19,7 +19,11 @@
 </div>
 
 @if (authenticated$ | async) {
-  @if (theme$ | async; as theme) {
+  @if (themeResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  } @else if (themeResource.isLoading()) {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  } @else if (themeResource.value(); as theme) {
     <form method="post" class="form-horizontal" (submit)="submit(theme)">
       <div class="mb-3 row">
         <label class="col-md-2 col-form-label" for="name" i18n>Subject</label>

@@ -13,12 +13,12 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY} from 'rxjs';
+import {chunkBy} from 'app/chunk';
+import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
+import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
+import {of} from 'rxjs';
 import {map} from 'rxjs/operators';
 
-import {chunkBy} from '../../../chunk';
-import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
-import {ThumbnailComponent} from '../../../thumbnail/thumbnail/thumbnail.component';
 import {CategoriesService} from '../../service';
 
 interface PictureRoute {
@@ -51,7 +51,7 @@ export class CategoriesCategoryPicturesComponent {
     stream: () => {
       const categoryData = this.categoryResource.value();
       if (!categoryData?.category || !categoryData.current) {
-        return EMPTY;
+        return of(undefined);
       }
       const {category, current, pathCatnames} = categoryData;
 

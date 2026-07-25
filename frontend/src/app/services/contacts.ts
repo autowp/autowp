@@ -1,10 +1,10 @@
 import {inject, Service} from '@angular/core';
 import {GetContactRequest} from '@grpc/spec.pb';
 import {ContactsClient} from '@grpc/spec.pbsc';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
-import {StatusCode} from 'grpc-web-client/statuscode';
 import {Observable, of, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
+
+import {isNotFoundError} from '../grpc';
 
 @Service()
 export class AppContactsService {
@@ -14,7 +14,7 @@ export class AppContactsService {
     return this.#contactsClient.getContact(new GetContactRequest({userId})).pipe(
       map((response) => !!response.contactUserId),
       catchError((err: unknown) => {
-        if (err instanceof GrpcStatusEvent && err.statusCode === StatusCode.NOT_FOUND) {
+        if (isNotFoundError(err)) {
           return of(false);
         }
 

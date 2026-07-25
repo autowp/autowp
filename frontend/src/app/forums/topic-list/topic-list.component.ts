@@ -12,16 +12,14 @@ import {
   Topic,
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';
 import {PastTimeIndicatorComponent} from '@utils/past-time-indicator/past-time-indicator.component';
+import {isNotFoundError} from 'app/grpc';
+import {ToastsService} from 'app/toasts/toasts.service';
+import {UserComponent} from 'app/user/user/user.component';
 import {Observable, of, throwError} from 'rxjs';
 import {catchError, map, shareReplay, switchMap} from 'rxjs/operators';
-
-import {StatusCode} from '../../../grpc-web-client/statuscode';
-import {ToastsService} from '../../toasts/toasts.service';
-import {UserComponent} from '../../user/user/user.component';
 
 interface TopicItem {
   author$: Observable<APIUser | null>;
@@ -62,7 +60,7 @@ export class ForumsTopicListComponent {
       topics.map((topic) => {
         const lastMessage$ = this.#grpc.getLastMessage(new GetTopicRequest({id: topic.id})).pipe(
           catchError((error: unknown) => {
-            if (error instanceof GrpcStatusEvent && error.statusCode === StatusCode.NOT_FOUND) {
+            if (isNotFoundError(error)) {
               return of(null);
             }
             return throwError(() => error);

@@ -1,17 +1,18 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, OnInit} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
 import {APIItem, ItemType, Picture} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, Observable, of} from 'rxjs';
-import {distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {GalleryComponent} from 'app/gallery/gallery.component';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
-import {GalleryComponent} from '../../../gallery/gallery.component';
-import {CategoriesService, CategoryPipeResult} from '../../service';
+import {CategoriesService} from '../../service';
 
 @Component({
   selector: 'app-category-gallery',
-  imports: [GalleryComponent, AsyncPipe],
+  imports: [GalleryComponent],
   templateUrl: './gallery.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -21,33 +22,28 @@ export class CategoryGalleryComponent implements OnInit {
   readonly #router = inject(Router);
   readonly #categoriesService = inject(CategoriesService);
 
-  protected readonly identity$ = this.#route.paramMap.pipe(
-    map((route) => route.get('identity')),
-    distinctUntilChanged(),
-    switchMap((identity) => {
-      if (!identity) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(identity);
-    }),
-  );
+  protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
+    requireSync: true,
+  });
 
-  protected readonly data$: Observable<CategoryPipeResult> = this.#categoriesService
-    .categoryPipe$(this.#route.parent!)
-    .pipe(
-      switchMap((data) => {
-        if (!data.current) {
-          this.#router.navigate(['/error-404'], {
-            skipLocationChange: true,
-          });
-          return EMPTY;
-        }
-        return of(data);
-      }),
-    );
+  protected readonly dataResource = rxResource({
+    stream: () => {
+      if (!this.identity()) {
+        return notFoundError();
+      }
+      return this.#categoriesService
+        .categoryPipe$(this.#route.parent!)
+        .pipe(switchMap((data) => (data.current ? of(data) : notFoundError())));
+    },
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.dataResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({

@@ -41,23 +41,22 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, TrafficClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import {isNotFoundError} from 'app/grpc';
+import {MarkdownEditComponent} from 'app/markdown-edit/markdown-edit/markdown-edit.component';
+import {PictureModerVoteComponent} from 'app/picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
+import {ToastsService} from 'app/toasts/toasts.service';
+import {UserComponent} from 'app/user/user/user.component';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 import {sprintf} from 'sprintf-js';
 
-import {StatusCode} from '../../../../grpc-web-client/statuscode';
-import {MarkdownEditComponent} from '../../../markdown-edit/markdown-edit/markdown-edit.component';
-import {PictureModerVoteComponent} from '../../../picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
-import {ToastsService} from '../../../toasts/toasts.service';
-import {UserComponent} from '../../../user/user/user.component';
 import {ModerPicturesPerspectivePickerComponent} from '../perspective-picker/perspective-picker.component';
 
 interface LastItemInfo {
@@ -224,7 +223,7 @@ export class ModerPicturesItemComponent {
         )
         .pipe(
           catchError((error: unknown) => {
-            if (error instanceof GrpcStatusEvent && error.statusCode == StatusCode.NOT_FOUND) {
+            if (isNotFoundError(error)) {
               return of(null);
             }
             console.error(error);

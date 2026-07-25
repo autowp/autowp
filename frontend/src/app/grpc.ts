@@ -1,13 +1,34 @@
 import {BadRequest} from '@grpc/google/rpc/error-details.pb';
 import {Status} from '@grpc/google/rpc/status.pb';
 import {ErrorDetails} from '@grpc/spec.pb';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
+import {GrpcMetadata, GrpcStatusEvent} from '@ngx-grpc/common';
 import {InvalidParams} from '@utils/invalid-params.pipe';
+import {GRPC_STATUS_DETAILS_BIN_HEADER} from 'grpc-web-client/grpc-web-client';
+import {StatusCode} from 'grpc-web-client/statuscode';
+import {Observable, throwError} from 'rxjs';
 import {base64ToUint8Array, stringToUint8Array} from 'uint8array-extras';
 
-import {GRPC_STATUS_DETAILS_BIN_HEADER} from '../grpc-web-client/grpc-web-client';
-
 import FieldViolation = BadRequest.FieldViolation;
+
+/**
+ * For use inside an rxResource `stream()` when a route param or other precondition is missing -
+ * makes that case indistinguishable from a genuine backend NOT_FOUND response.
+ */
+export const notFoundError = (): Observable<never> =>
+  throwError(() => new GrpcStatusEvent(StatusCode.NOT_FOUND, 'Not found', new GrpcMetadata()));
+
+/**
+ * Detects a NOT_FOUND gRPC status, whether it's the raw event caught by a plain `catchError`
+ * or wrapped in an `Error.cause` by rxResource's `encapsulateResourceError`.
+ */
+export const isNotFoundError = (error: unknown): boolean => {
+  if (error instanceof GrpcStatusEvent) {
+    return error.statusCode === StatusCode.NOT_FOUND;
+  }
+  return (
+    error instanceof Error && error.cause instanceof GrpcStatusEvent && error.cause.statusCode === StatusCode.NOT_FOUND
+  );
+};
 
 export const extractFieldViolations = (response: GrpcStatusEvent): FieldViolation[] => {
   if (!(response instanceof GrpcStatusEvent)) {

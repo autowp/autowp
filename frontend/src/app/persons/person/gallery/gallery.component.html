@@ -1,7 +1,7 @@
-@if (itemID$ | async; as itemID) {
-  @if (identity$ | async; as identity) {
+@if (itemID(); as itemID) {
+  @if (identity(); as identity) {
     <app-gallery
-      [filter]="{exactItemID: itemID, exactItemLinkType: 1}"
+      [filter]="{exactItemID: itemID, exactItemLinkType: PictureItemType.PICTURE_ITEM_CONTENT}"
       [current]="identity"
       [galleryPrefix]="['/persons', itemID, 'gallery']"
       [picturePrefix]="['/persons', itemID]"

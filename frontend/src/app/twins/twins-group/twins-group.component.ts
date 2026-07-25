@@ -1,26 +1,19 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
-import {
-  APIItem,
-  ItemFields,
-  ItemListOptions,
-  ItemParentListOptions,
-  ItemRequest,
-  ItemsRequest,
-  ItemType,
-} from '@grpc/spec.pb';
+import {ItemFields, ItemListOptions, ItemParentListOptions, ItemRequest, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, Observable, of} from 'rxjs';
-import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 import {TwinsSidebarComponent} from '../sidebar.component';
 
 @Component({
   selector: 'app-twins-group',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, TwinsSidebarComponent, AsyncPipe],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, TwinsSidebarComponent],
   templateUrl: './twins-group.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,58 +24,68 @@ export class TwinsGroupComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly group$: Observable<APIItem> = this.#route.paramMap.pipe(
-    map((params) => params.get('group') ?? ''),
-    distinctUntilChanged(),
-    switchMap((group) =>
-      group
-        ? this.#itemsClient.item(
-            new ItemRequest({
-              fields: new ItemFields({
-                acceptedPicturesCount: true,
-                hasChildSpecs: true,
-                nameHtml: true,
-                nameText: true,
-              }),
-              id: group,
-              language: this.#languageService.language,
-            }),
-          )
-        : EMPTY,
-    ),
-    switchMap((group) => {
-      if (!group) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(group);
-    }),
-    tap((group) => {
-      this.pageEnv.set({
-        pageId: 25,
-        title: group.nameText,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  readonly #groupID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('group') ?? '')), {
+    requireSync: true,
+  });
 
-  protected readonly selectedBrands$: Observable<string[]> = this.group$.pipe(
-    switchMap((group) =>
-      this.#itemsClient.list(
-        new ItemsRequest({
-          options: new ItemListOptions({
-            child: new ItemParentListOptions({
-              itemParentParentByChild: new ItemParentListOptions({
-                parentId: group.id,
-              }),
-            }),
-            typeId: ItemType.ITEM_TYPE_BRAND,
+  protected readonly groupResource = rxResource({
+    stream: () => {
+      const groupID = this.#groupID();
+      if (!groupID) {
+        return notFoundError();
+      }
+      return this.#itemsClient.item(
+        new ItemRequest({
+          fields: new ItemFields({
+            acceptedPicturesCount: true,
+            hasChildSpecs: true,
+            nameHtml: true,
+            nameText: true,
           }),
+          id: groupID,
+          language: this.#languageService.language,
         }),
-      ),
-    ),
-    map((response) => (response.items || []).map((item) => item.catname)),
-  );
+      );
+    },
+  });
+
+  protected readonly selectedBrandsResource = rxResource({
+    stream: () => {
+      const group = this.groupResource.value();
+      if (!group) {
+        return of([]);
+      }
+      return this.#itemsClient
+        .list(
+          new ItemsRequest({
+            options: new ItemListOptions({
+              child: new ItemParentListOptions({
+                itemParentParentByChild: new ItemParentListOptions({
+                  parentId: group.id,
+                }),
+              }),
+              typeId: ItemType.ITEM_TYPE_BRAND,
+            }),
+          }),
+        )
+        .pipe(map((response) => (response.items || []).map((item) => item.catname)));
+    },
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.groupResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const group = this.groupResource.value();
+      if (group) {
+        this.pageEnv.set({
+          pageId: 25,
+          title: group.nameText,
+        });
+      }
+    });
+  }
 }

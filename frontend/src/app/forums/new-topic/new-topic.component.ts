@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, OnInit, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {CreateTopicRequest, GetThemeRequest, Theme, Topic} from '@grpc/spec.pb';
@@ -9,12 +10,11 @@ import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getForumsThemeTranslation} from '@utils/translations';
+import {extractFieldViolations, fieldViolations2InvalidParams, isNotFoundError, notFoundError} from 'app/grpc';
+import {ToastsService} from 'app/toasts/toasts.service';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
-
-import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
-import {ToastsService} from '../../toasts/toasts.service';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-forums-new-topic',
@@ -38,19 +38,30 @@ export class ForumsNewTopicComponent implements OnInit {
     subscription: false,
   };
   protected readonly invalidParams = signal<InvalidParams>({});
-  protected readonly theme$ = this.#route.paramMap.pipe(
-    map((params) => params.get('theme_id')),
-    distinctUntilChanged(),
-    switchMap((themeID) => (themeID ? this.#grpc.getTheme(new GetThemeRequest({id: themeID})) : EMPTY)),
-    catchError(() => {
-      this.#router.navigate(['/error-404'], {
-        skipLocationChange: true,
-      });
-      return EMPTY;
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+
+  readonly #themeID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('theme_id'))), {
+    requireSync: true,
+  });
+
+  protected readonly themeResource = rxResource({
+    stream: () => {
+      const themeID = this.#themeID();
+      if (!themeID) {
+        return notFoundError();
+      }
+      return this.#grpc.getTheme(new GetThemeRequest({id: themeID}));
+    },
+  });
+
   protected readonly authenticated$: Observable<boolean> = this.auth.authenticated$;
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.themeResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 45});

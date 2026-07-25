@@ -14,7 +14,6 @@ import {
   Topic,
 } from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {PastTimeIndicatorComponent} from '@utils/past-time-indicator/past-time-indicator.component';
@@ -22,7 +21,7 @@ import {getForumsThemeDescriptionTranslation, getForumsThemeTranslation} from '@
 import {BehaviorSubject, combineLatest, Observable, of, throwError} from 'rxjs';
 import {catchError, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
-import {StatusCode} from '../../grpc-web-client/statuscode';
+import {isNotFoundError} from '../grpc';
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {UserComponent} from '../user/user/user.component';
 import {ForumsTopicListComponent} from './topic-list/topic-list.component';
@@ -91,7 +90,7 @@ export class ForumsComponent {
         themes: (data.themes ? data.themes : []).map((theme) => {
           const lastTopic$ = this.#grpc.getLastTopic(new GetThemeRequest({id: theme.id})).pipe(
             catchError((error: unknown) => {
-              if (error instanceof GrpcStatusEvent && error.statusCode === StatusCode.NOT_FOUND) {
+              if (isNotFoundError(error)) {
                 return of(null);
               }
               return throwError(() => error);
@@ -107,7 +106,7 @@ export class ForumsComponent {
               return this.#grpc.getLastMessage(new GetTopicRequest({id: topic.id}));
             }),
             catchError((error: unknown) => {
-              if (error instanceof GrpcStatusEvent && error.statusCode === StatusCode.NOT_FOUND) {
+              if (isNotFoundError(error)) {
                 return of(null);
               }
               return throwError(() => error);

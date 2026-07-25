@@ -1,15 +1,15 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink, RouterOutlet} from '@angular/router';
-import {APIItem, ItemFields, ItemRequest, ItemType} from '@grpc/spec.pb';
+import {ItemFields, ItemRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
-
-import {ToastsService} from '../../toasts/toasts.service';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-persons-person',
@@ -22,53 +22,45 @@ export class PersonsPersonComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #auth = inject(AuthService);
   protected readonly pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  readonly #itemID$: Observable<string> = this.#route.paramMap.pipe(
-    map((params) => params.get('id') ?? ''),
-    distinctUntilChanged(),
-  );
+  readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
+    requireSync: true,
+  });
 
-  protected readonly item$: Observable<APIItem> = this.#itemID$.pipe(
-    switchMap((id) =>
-      this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({
-            nameHtml: true,
-            nameText: true,
+  protected readonly itemResource = rxResource({
+    stream: () =>
+      this.#itemsClient
+        .item(
+          new ItemRequest({
+            fields: new ItemFields({
+              nameHtml: true,
+              nameText: true,
+            }),
+            id: this.#itemID(),
+            language: this.#languageService.language,
           }),
-          id,
-          language: this.#languageService.language,
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      this.#router.navigate(['/error-404'], {
-        skipLocationChange: true,
-      });
-      return EMPTY;
-    }),
-    switchMap((item) => {
-      if (item.itemTypeId !== ItemType.ITEM_TYPE_PERSON) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
+        )
+        .pipe(switchMap((item) => (item.itemTypeId === ItemType.ITEM_TYPE_PERSON ? of(item) : notFoundError()))),
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.itemResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
       }
 
-      return of(item);
-    }),
-    tap((item) => {
-      this.pageEnv.set({
-        pageId: 213,
-        title: item.nameText,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+      const item = this.itemResource.value();
+      if (item) {
+        this.pageEnv.set({
+          pageId: 213,
+          title: item.nameText,
+        });
+      }
+    });
+  }
 }

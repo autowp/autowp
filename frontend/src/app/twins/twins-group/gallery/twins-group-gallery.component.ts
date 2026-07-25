@@ -1,18 +1,17 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {APIItem, ItemFields, ItemRequest, Picture} from '@grpc/spec.pb';
+import {ItemFields, ItemRequest, Picture} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, Observable, of} from 'rxjs';
-import {distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
-
-import {GalleryComponent} from '../../../gallery/gallery.component';
+import {GalleryComponent} from 'app/gallery/gallery.component';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-twins-group-gallery',
-  imports: [GalleryComponent, AsyncPipe],
+  imports: [GalleryComponent],
   templateUrl: './twins-group-gallery.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,12 +22,15 @@ export class TwinsGroupGalleryComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly group$: Observable<APIItem | null> = this.#route.parent!.parent!.paramMap.pipe(
-    map((route) => route.get('group')),
-    distinctUntilChanged(),
-    switchMap((groupID) => {
+  readonly #groupID = toSignal(this.#route.parent!.parent!.paramMap.pipe(map((route) => route.get('group'))), {
+    requireSync: true,
+  });
+
+  protected readonly groupResource = rxResource({
+    stream: () => {
+      const groupID = this.#groupID();
       if (!groupID) {
-        return of(null);
+        return notFoundError();
       }
       return this.#itemsClient.item(
         new ItemRequest({
@@ -40,29 +42,30 @@ export class TwinsGroupGalleryComponent {
           language: this.#languageService.language,
         }),
       );
-    }),
-    switchMap((group) => {
-      if (!group) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(group);
-    }),
-    tap((group) => {
-      this.#pageEnv.set({
-        layout: {isGalleryPage: true},
-        pageId: 28,
-        title: group ? group.nameText : '',
-      });
-    }),
-  );
+    },
+  });
 
-  protected readonly identity$ = this.#route.paramMap.pipe(
-    map((route) => route.get('identity')),
-    distinctUntilChanged(),
-  );
+  protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
+    requireSync: true,
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.groupResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const group = this.groupResource.value();
+      if (group) {
+        this.#pageEnv.set({
+          layout: {isGalleryPage: true},
+          pageId: 28,
+          title: group.nameText,
+        });
+      }
+    });
+  }
 
   protected pictureSelected(item: null | Picture) {
     if (item) {

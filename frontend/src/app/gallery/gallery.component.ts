@@ -19,12 +19,11 @@ import {
   PictureStatus,
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {LanguageService} from '@services/language';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, tap} from 'rxjs/operators';
 
-import {StatusCode} from '../../grpc-web-client/statuscode';
+import {isNotFoundError} from '../grpc';
 import {ToastsService} from '../toasts/toasts.service';
 import {CarouselItemComponent} from './carousel-item.component';
 
@@ -50,7 +49,7 @@ const galleryFields = new PictureFields({
 
 export interface APIGalleryFilter {
   exactItemID?: string;
-  exactItemLinkType?: number;
+  exactItemLinkType?: PictureItemType;
   itemID?: string;
   perspectiveExclude?: number[];
   perspectiveID?: number;
@@ -206,7 +205,7 @@ export class GalleryComponent {
           )
           .pipe(
             catchError((response: unknown) => {
-              if (response instanceof GrpcStatusEvent && response.statusCode === StatusCode.NOT_FOUND) {
+              if (isNotFoundError(response)) {
                 this.#router.navigate(['/error-404'], {
                   skipLocationChange: true,
                 });
@@ -266,7 +265,7 @@ export class GalleryComponent {
 
     return this.#picturesClient.getGallery(new GalleryRequest({request})).pipe(
       catchError((response: unknown) => {
-        if (response instanceof GrpcStatusEvent && response.statusCode === StatusCode.NOT_FOUND) {
+        if (isNotFoundError(response)) {
           this.#router.navigate(['/error-404'], {
             skipLocationChange: true,
           });

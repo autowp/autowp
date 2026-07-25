@@ -16,16 +16,15 @@ import {
   SetUserItemSubscriptionRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {getItemTypeTranslation} from '@utils/translations';
+import {isNotFoundError} from 'app/grpc';
+import {ToastsService} from 'app/toasts/toasts.service';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
-import {StatusCode} from '../../../../grpc-web-client/statuscode';
-import {ToastsService} from '../../../toasts/toasts.service';
 import {ModerItemsItemCatalogueComponent} from './catalogue/catalogue.component';
 import {ModerItemsItemLinksComponent} from './links/links.component';
 import {ModerItemsItemLogoComponent} from './logo/logo.component';
@@ -225,7 +224,7 @@ export class ModerItemsItemComponent {
       ),
     ),
     catchError((error: unknown) => {
-      if (error instanceof GrpcStatusEvent && error.statusCode == StatusCode.NOT_FOUND) {
+      if (isNotFoundError(error)) {
         return of(undefined);
       }
       console.error(error);

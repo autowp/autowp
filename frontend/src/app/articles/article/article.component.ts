@@ -1,20 +1,16 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ArticleByCatnameRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
-
-import {StatusCode} from '../../../grpc-web-client/statuscode';
-import {ToastsService} from '../../toasts/toasts.service';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-articles-article',
-  imports: [RouterLink, AsyncPipe],
+  imports: [RouterLink],
   templateUrl: './article.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,41 +19,37 @@ export class ArticlesArticleComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #articlesClient = inject(ArticlesClient);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #meta = inject(Meta);
 
-  protected readonly article$ = this.#route.paramMap.pipe(
-    map((params) => params.get('catname')),
-    distinctUntilChanged(),
-    debounceTime(30),
-    switchMap((catname) => {
-      if (!catname) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(catname);
-    }),
-    switchMap((catname) => this.#articlesClient.getItemByCatname(new ArticleByCatnameRequest({catname}))),
-    map((article) => {
-      this.#pageEnv.set({
-        pageId: 32,
-        title: article.name,
-      });
-      this.#meta.updateTag({property: 'og:title', content: article.name});
+  readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('catname'))), {
+    requireSync: true,
+  });
 
-      return article;
-    }),
-    catchError((response: unknown) => {
-      if (response instanceof GrpcStatusEvent && response.statusCode === StatusCode.NOT_FOUND) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-      } else {
-        this.#toastService.handleError(response);
+  protected readonly articleResource = rxResource({
+    stream: () => {
+      const catname = this.#catname();
+      if (!catname) {
+        return notFoundError();
       }
-      return EMPTY;
-    }),
-  );
+      return this.#articlesClient.getItemByCatname(new ArticleByCatnameRequest({catname}));
+    },
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.articleResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const article = this.articleResource.value();
+      if (article) {
+        this.#pageEnv.set({
+          pageId: 32,
+          title: article.name,
+        });
+        this.#meta.updateTag({property: 'og:title', content: article.name});
+      }
+    });
+  }
 }

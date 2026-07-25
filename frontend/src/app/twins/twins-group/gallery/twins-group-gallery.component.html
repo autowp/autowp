@@ -1,5 +1,9 @@
-@if (group$ | async; as group) {
-  @if (identity$ | async; as identity) {
+@if (groupResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (groupResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (groupResource.value(); as group) {
+  @if (identity(); as identity) {
     <app-gallery
       [filter]="{itemID: group.id}"
       [current]="identity"

@@ -20,18 +20,22 @@
   <a class="nav-link" routerLink="/moder/traffic" i18n>Traffic</a>
   <a class="nav-link active" routerLink="/moder/traffic/whitelist" i18n>Whitelist</a>
 </div>
-<table class="table table-striped table-condensed" aria-describedby="header">
-  <thead>
-    <tr>
-      <th i18n>IP</th>
-      <th i18n>Description</th>
-      <th i18n>Whois</th>
-      <th i18n>Action</th>
-    </tr>
-  </thead>
-  @if (items$ | async; as items) {
+@if (itemsResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (itemsResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (itemsResource.value(); as data) {
+  <table class="table table-striped table-condensed" aria-describedby="header">
+    <thead>
+      <tr>
+        <th i18n>IP</th>
+        <th i18n>Description</th>
+        <th i18n>Whois</th>
+        <th i18n>Action</th>
+      </tr>
+    </thead>
     <tbody>
-      @for (item of items; track item.ip) {
+      @for (item of data.items || []; track item.ip) {
         <tr>
           <td>{{ item.ip }}</td>
           <td>{{ item.description }}</td>
@@ -52,5 +56,5 @@
         </tr>
       }
     </tbody>
-  }
-</table>
+  </table>
+}

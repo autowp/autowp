@@ -17,15 +17,14 @@ import {
   PicturesRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
-import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {CommentsComponent} from 'app/comments/comments/comments.component';
+import {isNotFoundError} from 'app/grpc';
+import {PictureComponent} from 'app/picture/picture.component';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
-import {StatusCode} from '../../../../grpc-web-client/statuscode';
-import {CommentsComponent} from '../../../comments/comments/comments.component';
-import {PictureComponent} from '../../../picture/picture.component';
 import {BrandPerspectivePageData} from '../../catalogue.module';
 
 @Component({
@@ -152,7 +151,7 @@ export class CatalogueMixedPictureComponent {
         )
         .pipe(
           catchError((error: unknown) => {
-            if (error instanceof GrpcStatusEvent && error.statusCode == StatusCode.NOT_FOUND) {
+            if (isNotFoundError(error)) {
               // NOT_FOUND
               return of(null);
             }
