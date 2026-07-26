@@ -27,61 +27,62 @@ const (
 type Metric string
 
 const (
-	MetricInspector     Metric = "inspector"
-	MetricPictureBuster Metric = "picture-buster"
-	MetricSpecMaster    Metric = "spec-master"
-	MetricCommentator   Metric = "commentator"
+	MetricPictureInspector Metric = "picture-inspector"
+	MetricPictureBuster    Metric = "picture-buster"
+	MetricSpecMaster       Metric = "spec-master"
+	MetricCommentator      Metric = "commentator"
 )
 
-// tier is the shared shape for every 5-rung series (Inspector, Picture Buster, Spec
-// Master, Commentator). code is the achievement code for this specific rung — used both
-// to look up the frontend icon/name and, in Progress, to report which code a user is
-// working toward next.
+// tier is the shared shape for every 5-rung series (Picture Inspector, Picture Buster,
+// Spec Master, Commentator), using the same Bronze/Silver/Gold/Platinum/Diamond ladder
+// as most ranked-game tier systems. code is the achievement code for this specific rung —
+// used both to look up the frontend icon/name and, in Progress, to report which code a
+// user is working toward next.
 type tier struct {
 	threshold     int64
 	achievementID int32
 	code          string
 }
 
-var inspectorTiers = []tier{
-	{100, schema.AchievementIDInspectorRookie, "inspector-rookie"},
-	{1000, schema.AchievementIDInspectorPracticing, "inspector-practicing"},
-	{10000, schema.AchievementIDInspectorRegular, "inspector-regular"},
-	{100000, schema.AchievementIDInspectorExpert, "inspector-expert"},
-	{1000000, schema.AchievementIDInspectorGod, "inspector-god"},
+var pictureInspectorTiers = []tier{
+	{100, schema.AchievementIDPictureInspectorBronze, "picture-inspector-bronze"},
+	{1000, schema.AchievementIDPictureInspectorSilver, "picture-inspector-silver"},
+	{10000, schema.AchievementIDPictureInspectorGold, "picture-inspector-gold"},
+	{100000, schema.AchievementIDPictureInspectorPlatinum, "picture-inspector-platinum"},
+	{1000000, schema.AchievementIDPictureInspectorDiamond, "picture-inspector-diamond"},
 }
 
 var pictureBusterTiers = []tier{
-	{100, schema.AchievementIDPictureBusterRookie, "picture-buster-rookie"},
-	{1000, schema.AchievementIDPictureBusterPracticing, "picture-buster-practicing"},
-	{10000, schema.AchievementIDPictureBusterRegular, "picture-buster-regular"},
-	{100000, schema.AchievementIDPictureBusterExpert, "picture-buster-expert"},
-	{1000000, schema.AchievementIDPictureBusterGod, "picture-buster-god"},
+	{100, schema.AchievementIDPictureBusterBronze, "picture-buster-bronze"},
+	{1000, schema.AchievementIDPictureBusterSilver, "picture-buster-silver"},
+	{10000, schema.AchievementIDPictureBusterGold, "picture-buster-gold"},
+	{100000, schema.AchievementIDPictureBusterPlatinum, "picture-buster-platinum"},
+	{1000000, schema.AchievementIDPictureBusterDiamond, "picture-buster-diamond"},
 }
 
 var specMasterTiers = []tier{
-	{100, schema.AchievementIDSpecMasterRookie, "spec-master-rookie"},
-	{1000, schema.AchievementIDSpecMasterPracticing, "spec-master-practicing"},
-	{10000, schema.AchievementIDSpecMasterRegular, "spec-master-regular"},
-	{100000, schema.AchievementIDSpecMasterExpert, "spec-master-expert"},
-	{1000000, schema.AchievementIDSpecMasterGod, "spec-master-god"},
+	{100, schema.AchievementIDSpecMasterBronze, "spec-master-bronze"},
+	{1000, schema.AchievementIDSpecMasterSilver, "spec-master-silver"},
+	{10000, schema.AchievementIDSpecMasterGold, "spec-master-gold"},
+	{100000, schema.AchievementIDSpecMasterPlatinum, "spec-master-platinum"},
+	{1000000, schema.AchievementIDSpecMasterDiamond, "spec-master-diamond"},
 }
 
 var commentatorTiers = []tier{
-	{100, schema.AchievementIDCommentatorRookie, "commentator-rookie"},
-	{1000, schema.AchievementIDCommentatorPracticing, "commentator-practicing"},
-	{10000, schema.AchievementIDCommentatorRegular, "commentator-regular"},
-	{100000, schema.AchievementIDCommentatorExpert, "commentator-expert"},
-	{1000000, schema.AchievementIDCommentatorGod, "commentator-god"},
+	{100, schema.AchievementIDCommentatorBronze, "commentator-bronze"},
+	{1000, schema.AchievementIDCommentatorSilver, "commentator-silver"},
+	{10000, schema.AchievementIDCommentatorGold, "commentator-gold"},
+	{100000, schema.AchievementIDCommentatorPlatinum, "commentator-platinum"},
+	{1000000, schema.AchievementIDCommentatorDiamond, "commentator-diamond"},
 }
 
 // tieredSeries maps each metric to its 5-rung ladder, so Progress can iterate all four
 // generically instead of hand-rolling four near-identical blocks.
 var tieredSeries = map[Metric][]tier{
-	MetricInspector:     inspectorTiers,
-	MetricPictureBuster: pictureBusterTiers,
-	MetricSpecMaster:    specMasterTiers,
-	MetricCommentator:   commentatorTiers,
+	MetricPictureInspector: pictureInspectorTiers,
+	MetricPictureBuster:    pictureBusterTiers,
+	MetricSpecMaster:       specMasterTiers,
+	MetricCommentator:      commentatorTiers,
 }
 
 type Repository struct {
@@ -158,7 +159,7 @@ func (s *Repository) GrantPictureAccepted(ctx context.Context, ownerID sql.NullI
 		}
 	}
 
-	return s.incrementAndGrant(ctx, moderatorID, MetricInspector, inspectorTiers)
+	return s.incrementAndGrant(ctx, moderatorID, MetricPictureInspector, pictureInspectorTiers)
 }
 
 // GrantPictureQueuedForRemoval is called from pictures.Repository on every successful
@@ -257,9 +258,9 @@ type SeriesProgress struct {
 // userID is to it — one query against the persisted user_achievement_progress counters,
 // not four live COUNTs against source tables. A series is omitted entirely if the user
 // has no counter row at all (never done that action) — this is what keeps a random
-// visitor's profile from showing "0/100 Rookie Inspector"; a non-moderator has no
-// `inspector` row, so Inspector/Picture Buster progress only ever appears for users
-// who've actually moderated. Also omitted if every tier in the series is already earned
+// visitor's profile from showing "0/100 Bronze Picture Inspector"; a non-moderator has
+// no `picture-inspector` row, so Picture Inspector/Picture Buster progress only ever
+// appears for users who've actually moderated. Also omitted if every tier in the series is already earned
 // (maxed out). "Top pictures contributor" and "Veteran" are intentionally not part of
 // this (rank-relative / date-based, no clean incremental "current/threshold" to show).
 func (s *Repository) Progress(

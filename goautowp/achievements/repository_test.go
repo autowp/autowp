@@ -159,7 +159,7 @@ func TestGrantCommentPostedTierCrossing(t *testing.T) {
 
 	count, err := db.From(schema.UserAchievementTable).Where(
 		schema.UserAchievementTableUserIDCol.Eq(userID),
-		schema.UserAchievementTableAchievementIDCol.Eq(schema.AchievementIDCommentatorRookie),
+		schema.UserAchievementTableAchievementIDCol.Eq(schema.AchievementIDCommentatorBronze),
 	).CountContext(ctx)
 	require.NoError(t, err)
 	require.Equal(t, int64(0), count, "must not be granted before reaching the threshold")
@@ -168,7 +168,7 @@ func TestGrantCommentPostedTierCrossing(t *testing.T) {
 
 	count, err = db.From(schema.UserAchievementTable).Where(
 		schema.UserAchievementTableUserIDCol.Eq(userID),
-		schema.UserAchievementTableAchievementIDCol.Eq(schema.AchievementIDCommentatorRookie),
+		schema.UserAchievementTableAchievementIDCol.Eq(schema.AchievementIDCommentatorBronze),
 	).CountContext(ctx)
 	require.NoError(t, err)
 	require.Equal(t, int64(1), count, "must be granted exactly upon reaching the threshold")
@@ -241,24 +241,24 @@ func TestProgressOmitsUnstartedAndMaxedSeries(t *testing.T) {
 	progress, err = repo.Progress(ctx, userID, map[string]bool{})
 	require.NoError(t, err)
 	require.Len(t, progress, 1)
-	require.Equal(t, "commentator-rookie", progress[0].Code)
+	require.Equal(t, "commentator-bronze", progress[0].Code)
 	require.Equal(t, int64(42), progress[0].Current)
 	require.Equal(t, int64(100), progress[0].Threshold)
 
-	// Once the rookie tier is (simulated as) earned, progress should point at the
+	// Once the bronze tier is (simulated as) earned, progress should point at the
 	// next tier instead.
-	progress, err = repo.Progress(ctx, userID, map[string]bool{"commentator-rookie": true})
+	progress, err = repo.Progress(ctx, userID, map[string]bool{"commentator-bronze": true})
 	require.NoError(t, err)
 	require.Len(t, progress, 1)
-	require.Equal(t, "commentator-practicing", progress[0].Code)
+	require.Equal(t, "commentator-silver", progress[0].Code)
 
 	// If every tier in the series is already earned, no progress entry remains.
 	progress, err = repo.Progress(ctx, userID, map[string]bool{
-		"commentator-rookie":     true,
-		"commentator-practicing": true,
-		"commentator-regular":    true,
-		"commentator-expert":     true,
-		"commentator-god":        true,
+		"commentator-bronze":   true,
+		"commentator-silver":   true,
+		"commentator-gold":     true,
+		"commentator-platinum": true,
+		"commentator-diamond":  true,
 	})
 	require.NoError(t, err)
 	require.Empty(t, progress)
@@ -284,7 +284,7 @@ func TestUserAchievements(t *testing.T) {
 	require.Len(t, result.Earned, 1)
 	require.Equal(t, "pictures-contributor", result.Earned[0].Code)
 	require.Len(t, result.Progress, 1)
-	require.Equal(t, "commentator-rookie", result.Progress[0].Code)
+	require.Equal(t, "commentator-bronze", result.Progress[0].Code)
 	require.Equal(t, int64(5), result.Progress[0].Current)
 }
 
@@ -316,7 +316,7 @@ func TestAchievementCounts(t *testing.T) {
 	require.GreaterOrEqual(t, counts["pictures-contributor"], int64(2))
 	// An achievement nobody (in this run) has earned still appears, with count 0 or
 	// more — the LEFT JOIN must not omit rows entirely.
-	_, ok := counts["inspector-god"]
+	_, ok := counts["picture-inspector-diamond"]
 	require.True(t, ok)
 }
 

@@ -1,4 +1,4 @@
--- Inspector: count of accept events performed by each moderator (log_event.user_id).
+-- Picture Inspector: count of accept events performed by each moderator (log_event.user_id).
 -- COUNT(DISTINCT log_event.id), not COUNT(*): defensive against a log_event ever being
 -- joined to more than one picture.
 -- Note: a WITH clause scopes to a single statement, so the CTE is repeated for each of
@@ -25,7 +25,7 @@ WITH moderator_accept_counts AS (
   GROUP BY log_event.user_id
 )
 INSERT INTO user_achievement_progress (user_id, metric, count, updated_at)
-SELECT moderator_id, 'inspector', accepted_count, now()
+SELECT moderator_id, 'picture-inspector', accepted_count, now()
 FROM moderator_accept_counts
 ON CONFLICT (user_id, metric) DO UPDATE SET count = EXCLUDED.count, updated_at = now();
 

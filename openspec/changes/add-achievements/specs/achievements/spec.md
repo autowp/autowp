@@ -6,9 +6,10 @@ unique, stable `code`. The dictionary SHALL NOT store user-facing display name o
 description text — those are resolved client-side from `code`.
 
 The initial dictionary SHALL contain 23 achievements: `pictures-contributor`,
-`top-pictures-contributor`, four 5-tier ladders (`inspector-*`, `picture-buster-*`,
-`spec-master-*`, `commentator-*`, each Rookie/Practicing/Regular/Expert/God at
-100/1,000/10,000/100,000/1,000,000), and `veteran`.
+`top-pictures-contributor`, four 5-tier ladders (`picture-inspector-*`,
+`picture-buster-*`, `spec-master-*`, `commentator-*`, each
+Bronze/Silver/Gold/Platinum/Diamond at 100/1,000/10,000/100,000/1,000,000), and
+`veteran`.
 
 #### Scenario: Looking up an achievement by code
 - **WHEN** any part of the system needs an achievement's identity
@@ -39,14 +40,14 @@ The system SHALL NOT grant or retain an achievement for a deleted user account.
 - **THEN** no achievement record is created and no notification is sent
 
 ### Requirement: Tiered Achievement Progress Tracking
-For each of the four 5-tier achievement series (Inspector, Picture Buster, Spec Master,
-Commentator), the system SHALL maintain a persistent, monotonically increasing per-user
-counter reflecting lifetime activity toward that series, independent of later changes to
-the underlying source data.
+For each of the four 5-tier achievement series (Picture Inspector, Picture Buster, Spec
+Master, Commentator), the system SHALL maintain a persistent, monotonically increasing
+per-user counter reflecting lifetime activity toward that series, independent of later
+changes to the underlying source data.
 
 Each qualifying action SHALL increment the relevant user's counter by exactly one:
 - A picture newly transitioning to accepted status increments the accepting moderator's
-  Inspector counter (only on that picture's first-ever acceptance).
+  Picture Inspector counter (only on that picture's first-ever acceptance).
 - A picture being queued for removal increments the moderator's Picture Buster counter.
 - A user setting a new or changed attribute/spec value increments that user's Spec
   Master counter (a no-op resubmission of an unchanged value SHALL NOT increment it).
@@ -58,12 +59,12 @@ every lower tier not yet granted.
 
 #### Scenario: Crossing a tier threshold
 - **WHEN** a qualifying action brings a user's series counter to exactly a tier's
-  threshold (e.g. 100 for Rookie)
+  threshold (e.g. 100 for Bronze)
 - **THEN** that tier is granted and a congratulation notification is sent
 
 #### Scenario: Re-accepting an already-accepted picture
 - **WHEN** a picture that was already accepted once is accepted again
-- **THEN** the accepting moderator's Inspector counter is not incremented
+- **THEN** the accepting moderator's Picture Inspector counter is not incremented
 
 #### Scenario: Resubmitting an unchanged spec value
 - **WHEN** a user submits the same value for an attribute/item pair they already hold a
@@ -108,7 +109,7 @@ on that user's profile.
 
 #### Scenario: Non-moderator's profile
 - **WHEN** viewing the profile of a user who has never moderated a picture
-- **THEN** no Inspector or Picture Buster progress is shown for that user
+- **THEN** no Picture Inspector or Picture Buster progress is shown for that user
 
 ### Requirement: Achievements Catalog Page
 The system SHALL provide a public page listing every achievement in the dictionary, each

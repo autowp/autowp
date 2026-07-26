@@ -12,29 +12,29 @@ const (
 	AchievementTableCodeColName  = "code"
 	AchievementTableLabelColName = "label"
 
-	AchievementIDPicturesContributor     = 1
-	AchievementIDTopPicturesContributor  = 2
-	AchievementIDInspectorRookie         = 3
-	AchievementIDInspectorPracticing     = 4
-	AchievementIDInspectorRegular        = 5
-	AchievementIDInspectorExpert         = 6
-	AchievementIDInspectorGod            = 7
-	AchievementIDPictureBusterRookie     = 8
-	AchievementIDPictureBusterPracticing = 9
-	AchievementIDPictureBusterRegular    = 10
-	AchievementIDPictureBusterExpert     = 11
-	AchievementIDPictureBusterGod        = 12
-	AchievementIDSpecMasterRookie        = 13
-	AchievementIDSpecMasterPracticing    = 14
-	AchievementIDSpecMasterRegular       = 15
-	AchievementIDSpecMasterExpert        = 16
-	AchievementIDSpecMasterGod           = 17
-	AchievementIDCommentatorRookie       = 18
-	AchievementIDCommentatorPracticing   = 19
-	AchievementIDCommentatorRegular      = 20
-	AchievementIDCommentatorExpert       = 21
-	AchievementIDCommentatorGod          = 22
-	AchievementIDVeteran                 = 23
+	AchievementIDPicturesContributor      = 1
+	AchievementIDTopPicturesContributor   = 2
+	AchievementIDPictureInspectorBronze   = 3
+	AchievementIDPictureInspectorSilver   = 4
+	AchievementIDPictureInspectorGold     = 5
+	AchievementIDPictureInspectorPlatinum = 6
+	AchievementIDPictureInspectorDiamond  = 7
+	AchievementIDPictureBusterBronze      = 8
+	AchievementIDPictureBusterSilver      = 9
+	AchievementIDPictureBusterGold        = 10
+	AchievementIDPictureBusterPlatinum    = 11
+	AchievementIDPictureBusterDiamond     = 12
+	AchievementIDSpecMasterBronze         = 13
+	AchievementIDSpecMasterSilver         = 14
+	AchievementIDSpecMasterGold           = 15
+	AchievementIDSpecMasterPlatinum       = 16
+	AchievementIDSpecMasterDiamond        = 17
+	AchievementIDCommentatorBronze        = 18
+	AchievementIDCommentatorSilver        = 19
+	AchievementIDCommentatorGold          = 20
+	AchievementIDCommentatorPlatinum      = 21
+	AchievementIDCommentatorDiamond       = 22
+	AchievementIDVeteran                  = 23
 )
 
 var (

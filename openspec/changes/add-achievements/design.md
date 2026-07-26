@@ -1,9 +1,10 @@
 ## Context
 
 23 achievements across 5 categories: one-shot (Pictures Contributor), relative/periodic
-(Top Pictures Contributor, Veteran), and four 5-tier ladders (Inspector, Picture Buster,
-Spec Master, Commentator), each Rookie(100) → Practicing(1,000) → Regular(10,000) →
-Expert(100,000) → God(1,000,000). Full implementation plan lives at
+(Top Pictures Contributor, Veteran), and four 5-tier ladders (Picture Inspector, Picture
+Buster, Spec Master, Commentator), each Bronze(100) → Silver(1,000) → Gold(10,000) →
+Platinum(100,000) → Diamond(1,000,000) — the same ladder used by most ranked-game tier
+systems. Full implementation plan lives at
 `/home/dvp/.claude/plans/lazy-mixing-curry.md` for file-level detail; this document
 captures only the decisions that need justification.
 
@@ -90,7 +91,7 @@ explicitly an approximation.
 - **Exact** (ground truth already in the DB): Spec Master (`attrs_user_values` row
   count), Commentator (`comment_message` row count), Veteran (`users.reg_date`), Top
   Pictures Contributor (`users.pictures_total`).
-- **Approximated**: Inspector and Picture Buster, via `log_event`/`log_event_picture`
+- **Approximated**: Picture Inspector and Picture Buster, via `log_event`/`log_event_picture`
   text-matching against the exact `fmt.Sprintf` strings the application already logs for
   these actions (no better historical signal exists — moderator attribution for
   individual accept/queue actions isn't tracked anywhere else).
@@ -100,7 +101,7 @@ explicitly an approximation.
 
 ## Risks / Trade-offs
 
-- **Approximated backfill counts** for Inspector/Picture Buster could be off if
+- **Approximated backfill counts** for Picture Inspector/Picture Buster could be off if
   `log_event.description` text ever changes without updating the migration's `LIKE`
   patterns — both patterns are documented at their source (`pictures-grpc.go`) and are
   currently the only occurrence of that exact phrase in the codebase.

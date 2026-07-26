@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="g-picture-inspector-diamond" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E3F8FF"/>
+      <stop offset="1" stop-color="#29B6F6"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31.5" fill="none" stroke="#E3F8FF" stroke-width="1.5" opacity="0.7"/>
+  <circle cx="32" cy="32" r="30" fill="url(#g-picture-inspector-diamond)" stroke="#01579B" stroke-width="2"/>
+  <ellipse cx="32" cy="14" rx="20" ry="8" fill="#fff" opacity="0.18"/>
+  <circle cx="28" cy="28" r="9" fill="none" stroke="#fff" stroke-width="4"/>
+  <line x1="35" y1="35" x2="45" y2="45" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M0,-6.5 L1.7,-1.7 L6.5,0 L1.7,1.7 L0,6.5 L-1.7,1.7 L-6.5,0 L-1.7,-1.7 Z" fill="#fff" transform="translate(48,17)"/>
+  <path d="M0,-4.5 L1.2,-1.2 L4.5,0 L1.2,1.2 L0,4.5 L-1.2,1.2 L-4.5,0 L-1.2,-1.2 Z" fill="#fff" transform="translate(15,47)"/>
+</svg>

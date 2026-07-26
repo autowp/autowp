@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="g-spec-master-gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE28A"/>
+      <stop offset="1" stop-color="#D8A437"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#g-spec-master-gold)" stroke="#B07C1F" stroke-width="2"/>
+  <ellipse cx="32" cy="14" rx="20" ry="8" fill="#fff" opacity="0.18"/>
+  <rect x="20" y="20" width="24" height="28" rx="3" fill="#fff"/>
+  <rect x="27" y="17" width="10" height="5" rx="2" fill="#D8A437"/>
+  <path d="M25,34 L30,39 L40,27" stroke="#D8A437" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

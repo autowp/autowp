@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="g-picture-buster-diamond" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E3F8FF"/>
+      <stop offset="1" stop-color="#29B6F6"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31.5" fill="none" stroke="#E3F8FF" stroke-width="1.5" opacity="0.7"/>
+  <circle cx="32" cy="32" r="30" fill="url(#g-picture-buster-diamond)" stroke="#01579B" stroke-width="2"/>
+  <ellipse cx="32" cy="14" rx="20" ry="8" fill="#fff" opacity="0.18"/>
+  <rect x="20" y="22" width="24" height="4" rx="1" fill="#fff"/>
+  <rect x="28" y="18" width="8" height="4" rx="1" fill="#fff"/>
+  <path d="M22,26 L42,26 L40,46 L24,46 Z" fill="#fff"/>
+  <line x1="28" y1="30" x2="28" y2="42" stroke="#29B6F6" stroke-width="2" stroke-linecap="round"/>
+  <line x1="32" y1="30" x2="32" y2="42" stroke="#29B6F6" stroke-width="2" stroke-linecap="round"/>
+  <line x1="36" y1="30" x2="36" y2="42" stroke="#29B6F6" stroke-width="2" stroke-linecap="round"/>
+  <path d="M0,-6.5 L1.7,-1.7 L6.5,0 L1.7,1.7 L0,6.5 L-1.7,1.7 L-6.5,0 L-1.7,-1.7 Z" fill="#fff" transform="translate(48,17)"/>
+  <path d="M0,-4.5 L1.2,-1.2 L4.5,0 L1.2,1.2 L0,4.5 L-1.2,1.2 L-4.5,0 L-1.2,-1.2 Z" fill="#fff" transform="translate(15,47)"/>
+</svg>
