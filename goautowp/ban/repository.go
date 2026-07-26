@@ -10,7 +10,6 @@ import (
 
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/jackc/pgtype"
 	"github.com/sirupsen/logrus"
 )
 
@@ -115,12 +114,7 @@ func (s *Repository) Exists(ctx context.Context, ip net.IP) (bool, error) {
 func (s *Repository) Get(ctx context.Context, ip net.IP) (*Item, error) {
 	var item Item
 
-	st := struct {
-		PgInet   pgtype.Inet `db:"ip"`
-		Until    time.Time   `db:"until"`
-		Reason   string      `db:"reason"`
-		ByUserID int64       `db:"by_user_id"`
-	}{}
+	st := schema.IPBanRow{}
 
 	success, err := s.db.Select(schema.IPBanTableIPCol, schema.IPBanTableUntilCol, schema.IPBanTableReasonCol,
 		schema.IPBanTableByUserIDCol).
@@ -139,7 +133,10 @@ func (s *Repository) Get(ctx context.Context, ip net.IP) (*Item, error) {
 
 	item.Until = st.Until
 	item.Reason = st.Reason
-	item.ByUserID = st.ByUserID
+
+	if st.ByUserID.Valid {
+		item.ByUserID = st.ByUserID.Int64
+	}
 
 	if st.PgInet.IPNet != nil {
 		item.IP = st.PgInet.IPNet.IP
