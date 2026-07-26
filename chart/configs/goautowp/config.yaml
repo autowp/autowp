@@ -2,6 +2,11 @@ gin-mode: "release"
 log-level: "warn"
 public-rest:
   listen: ":8080"
+  cors:
+    origin:
+      {{- range .Values.hostnames }}
+      - {{ (printf "https://%s" .) | quote }}
+      {{- end }}
 grpc:
   listen: ":8082"
 sentry:
