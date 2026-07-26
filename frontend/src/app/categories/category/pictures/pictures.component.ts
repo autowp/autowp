@@ -48,8 +48,8 @@ export class CategoriesCategoryPicturesComponent {
   });
 
   protected readonly picturesResource = rxResource({
-    stream: () => {
-      const categoryData = this.categoryResource.value();
+    params: () => ({categoryData: this.categoryResource.value(), page: this.#page()}),
+    stream: ({params: {categoryData, page}}) => {
       if (!categoryData?.category || !categoryData.current) {
         return of(undefined);
       }
@@ -76,7 +76,7 @@ export class CategoriesCategoryPicturesComponent {
               status: PictureStatus.PICTURE_STATUS_ACCEPTED,
             }),
             order: PicturesRequest.Order.ORDER_PERSPECTIVES,
-            page: this.#page(),
+            page,
             paginator: true,
           }),
         )

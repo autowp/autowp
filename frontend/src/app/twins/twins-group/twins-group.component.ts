@@ -50,8 +50,8 @@ export class TwinsGroupComponent {
   });
 
   protected readonly selectedBrandsResource = rxResource({
-    stream: () => {
-      const group = this.groupResource.value();
+    params: () => this.groupResource.value(),
+    stream: ({params: group}) => {
       if (!group) {
         return of([]);
       }
