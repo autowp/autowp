@@ -18,21 +18,21 @@
         </context-group>
       <target state="translated">Conquistas</target>
       </trans-unit>
-      <trans-unit id="1499439542480114306" datatype="html">
-        <source>God of Inspectors</source>
+      <trans-unit id="1439398056584283193" datatype="html">
+        <source>Diamond Picture Inspector</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">918</context>
         </context-group>
-      <target state="translated">Deus dos inspetores</target>
+      <target state="translated">Inspetor Diamante</target>
       </trans-unit>
-      <trans-unit id="1518907612369226539" datatype="html">
-        <source>Practicing Inspector</source>
+      <trans-unit id="5555013348406247540" datatype="html">
+        <source>Silver Picture Inspector</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">915</context>
         </context-group>
-      <target state="translated">Inspetor praticante</target>
+      <target state="translated">Inspetor Prata</target>
       </trans-unit>
       <trans-unit id="1556499883361080008" datatype="html">
         <source>Awarded for posting 10,000 comments</source>
@@ -58,29 +58,29 @@
         </context-group>
       <target state="translated">Concedido por contribuir pessoalmente com 1.000 valores de especificações</target>
       </trans-unit>
-      <trans-unit id="1772513896925348878" datatype="html">
-        <source>Rookie Spec Master</source>
+      <trans-unit id="8478594008652482376" datatype="html">
+        <source>Bronze Spec Master</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">924</context>
         </context-group>
-      <target state="translated">Mestre de especificações iniciante</target>
+      <target state="translated">Mestre de especificações Bronze</target>
       </trans-unit>
-      <trans-unit id="183309477666524996" datatype="html">
-        <source>Regular Inspector</source>
+      <trans-unit id="5844493695921973940" datatype="html">
+        <source>Gold Picture Inspector</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">916</context>
         </context-group>
-      <target state="translated">Inspetor regular</target>
+      <target state="translated">Inspetor Ouro</target>
       </trans-unit>
-      <trans-unit id="2163686626805005345" datatype="html">
-        <source>Regular Commentator</source>
+      <trans-unit id="4936413196423238780" datatype="html">
+        <source>Gold Commentator</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">931</context>
         </context-group>
-      <target state="translated">Comentarista regular</target>
+      <target state="translated">Comentarista Ouro</target>
       </trans-unit>
       <trans-unit id="2341881759132041539" datatype="html">
         <source>Veteran</source>
@@ -90,13 +90,13 @@
         </context-group>
       <target state="translated">Veterano</target>
       </trans-unit>
-      <trans-unit id="2360502417110047167" datatype="html">
-        <source>God of Picture Busters</source>
+      <trans-unit id="4394798539091548968" datatype="html">
+        <source>Diamond Picture Buster</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">923</context>
         </context-group>
-      <target state="translated">Deus dos removedores</target>
+      <target state="translated">Removedor Diamante</target>
       </trans-unit>
       <trans-unit id="3170346016048888121" datatype="html">
         <source>Awarded for personally contributing 10,000 attribute/spec values</source>
@@ -106,21 +106,21 @@
         </context-group>
       <target state="translated">Concedido por contribuir pessoalmente com 10.000 valores de especificações</target>
       </trans-unit>
-      <trans-unit id="3206720407452424596" datatype="html">
-        <source>Expert Commentator</source>
+      <trans-unit id="3409377147180964367" datatype="html">
+        <source>Platinum Commentator</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">932</context>
         </context-group>
-      <target state="translated">Comentarista especialista</target>
+      <target state="translated">Comentarista Platina</target>
       </trans-unit>
-      <trans-unit id="3581168178692932114" datatype="html">
-        <source>Practicing Picture Buster</source>
+      <trans-unit id="1108259117092148631" datatype="html">
+        <source>Silver Picture Buster</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">920</context>
         </context-group>
-      <target state="translated">Removedor praticante</target>
+      <target state="translated">Removedor Prata</target>
       </trans-unit>
       <trans-unit id="3776869191500540221" datatype="html">
         <source>Awarded to moderators for putting 100 pictures into the delete queue</source>
@@ -130,13 +130,13 @@
         </context-group>
       <target state="translated">Concedido a moderadores por colocar 100 fotos na fila de remoção</target>
       </trans-unit>
-      <trans-unit id="3952592260646456906" datatype="html">
-        <source>Expert Picture Buster</source>
+      <trans-unit id="4393315602173233297" datatype="html">
+        <source>Platinum Picture Buster</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">922</context>
         </context-group>
-      <target state="translated">Removedor especialista</target>
+      <target state="translated">Removedor Platina</target>
       </trans-unit>
       <trans-unit id="4163306512522649403" datatype="html">
         <source>Top pictures contributor</source>
@@ -146,13 +146,13 @@
         </context-group>
       <target state="translated">Maior contribuidor de fotos</target>
       </trans-unit>
-      <trans-unit id="4326913083108315850" datatype="html">
-        <source>Commentator God</source>
+      <trans-unit id="2100626252716965862" datatype="html">
+        <source>Diamond Commentator</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">933</context>
         </context-group>
-      <target state="translated">Deus dos comentaristas</target>
+      <target state="translated">Comentarista Diamante</target>
       </trans-unit>
       <trans-unit id="4371233982301358584" datatype="html">
         <source>Awarded for personally contributing 1,000,000 attribute/spec values</source>
@@ -162,13 +162,13 @@
         </context-group>
       <target state="translated">Concedido por contribuir pessoalmente com 1.000.000 valores de especificações</target>
       </trans-unit>
-      <trans-unit id="5010690785362785450" datatype="html">
-        <source>Regular Picture Buster</source>
+      <trans-unit id="8453888812665016638" datatype="html">
+        <source>Gold Picture Buster</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">921</context>
         </context-group>
-      <target state="translated">Removedor regular</target>
+      <target state="translated">Removedor Ouro</target>
       </trans-unit>
       <trans-unit id="5171377529966909115" datatype="html">
         <source>Awarded to moderators for putting 10,000 pictures into the delete queue</source>
@@ -210,21 +210,21 @@
         </context-group>
       <target state="translated">Concedido a moderadores por aceitar pessoalmente 1.000.000 fotos</target>
       </trans-unit>
-      <trans-unit id="6050853625023328841" datatype="html">
-        <source>Spec Master God</source>
+      <trans-unit id="863468936104093016" datatype="html">
+        <source>Diamond Spec Master</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">928</context>
         </context-group>
-      <target state="translated">Deus das especificações</target>
+      <target state="translated">Mestre de especificações Diamante</target>
       </trans-unit>
-      <trans-unit id="6244029692503663095" datatype="html">
-        <source>Regular Spec Master</source>
+      <trans-unit id="9180228284907656248" datatype="html">
+        <source>Gold Spec Master</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">926</context>
         </context-group>
-      <target state="translated">Mestre de especificações regular</target>
+      <target state="translated">Mestre de especificações Ouro</target>
       </trans-unit>
       <trans-unit id="6450589435598331519" datatype="html">
         <source>Awarded for posting 1,000,000 comments</source>
@@ -234,13 +234,13 @@
         </context-group>
       <target state="translated">Concedido por postar 1.000.000 comentários</target>
       </trans-unit>
-      <trans-unit id="652730283724209789" datatype="html">
-        <source>Rookie Picture Buster</source>
+      <trans-unit id="8370424430408388201" datatype="html">
+        <source>Bronze Picture Buster</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">919</context>
         </context-group>
-      <target state="translated">Removedor iniciante</target>
+      <target state="translated">Removedor Bronze</target>
       </trans-unit>
       <trans-unit id="6592934557974738241" datatype="html">
         <source>Awarded to moderators for putting 1,000,000 pictures into the delete queue</source>
@@ -258,13 +258,13 @@
         </context-group>
       <target state="translated">Concedido a moderadores por aceitar pessoalmente 1.000 fotos</target>
       </trans-unit>
-      <trans-unit id="671576453354308515" datatype="html">
-        <source>Practicing Spec Master</source>
+      <trans-unit id="3716529155804310612" datatype="html">
+        <source>Silver Spec Master</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">925</context>
         </context-group>
-      <target state="translated">Mestre de especificações praticante</target>
+      <target state="translated">Mestre de especificações Prata</target>
       </trans-unit>
       <trans-unit id="6948315637603333705" datatype="html">
         <source>Awarded to moderators for personally accepting 10,000 pictures</source>
@@ -298,13 +298,13 @@
         </context-group>
       <target state="translated">Concedido por postar 1.000 comentários</target>
       </trans-unit>
-      <trans-unit id="758310798793086554" datatype="html">
-        <source>Rookie Inspector</source>
+      <trans-unit id="6055566662338006778" datatype="html">
+        <source>Bronze Picture Inspector</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">914</context>
         </context-group>
-      <target state="translated">Inspetor iniciante</target>
+      <target state="translated">Inspetor Bronze</target>
       </trans-unit>
       <trans-unit id="7621501576237634197" datatype="html">
         <source>Awarded to moderators for personally accepting 100,000 pictures</source>
@@ -330,13 +330,13 @@
         </context-group>
       <target state="translated"><x id="INTERPOLATION" equiv-text="{{ counts[code] || &apos;0&apos; }}"/> usuários conquistaram isso</target>
       </trans-unit>
-      <trans-unit id="7865806515690431492" datatype="html">
-        <source>Practicing Commentator</source>
+      <trans-unit id="8118625541268449189" datatype="html">
+        <source>Silver Commentator</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">930</context>
         </context-group>
-      <target state="translated">Comentarista praticante</target>
+      <target state="translated">Comentarista Prata</target>
       </trans-unit>
       <trans-unit id="7955750960926554174" datatype="html">
         <source>Awarded for posting 100,000 comments</source>
@@ -370,29 +370,29 @@
         </context-group>
       <target state="translated">Contribuidor de fotos</target>
       </trans-unit>
-      <trans-unit id="8636572983820122670" datatype="html">
-        <source>Expert Spec Master</source>
+      <trans-unit id="2860981382872380789" datatype="html">
+        <source>Platinum Spec Master</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">927</context>
         </context-group>
-      <target state="translated">Mestre de especificações especialista</target>
+      <target state="translated">Mestre de especificações Platina</target>
       </trans-unit>
-      <trans-unit id="9078053977409767483" datatype="html">
-        <source>Expert Inspector</source>
+      <trans-unit id="6383414346788350543" datatype="html">
+        <source>Platinum Picture Inspector</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">917</context>
         </context-group>
-      <target state="translated">Inspetor especialista</target>
+      <target state="translated">Inspetor Platina</target>
       </trans-unit>
-      <trans-unit id="9114120013635447175" datatype="html">
-        <source>Rookie Commentator</source>
+      <trans-unit id="4389500912560211644" datatype="html">
+        <source>Bronze Commentator</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">929</context>
         </context-group>
-      <target state="translated">Comentarista iniciante</target>
+      <target state="translated">Comentarista Bronze</target>
       </trans-unit>
       <trans-unit id="ngb.alert.close" datatype="html">
         <source>Close</source>
@@ -9501,6 +9501,54 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="linenumber">82,86</context>
         </context-group>
         <target state="translated">Log do usuário</target>
+      </trans-unit>
+      <trans-unit id="6018163423115831013" datatype="html">
+        <source>All achievements</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/users/user/user.component.html</context>
+          <context context-type="linenumber">139,144</context>
+        </context-group>
+      <target state="translated">Todas as conquistas</target>
+      </trans-unit>
+      <trans-unit id="820667618189284119" datatype="html">
+        <source>Picture Inspector</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/achievements/achievements.component.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      <target state="translated">Inspetor</target>
+      </trans-unit>
+      <trans-unit id="8788782033873884939" datatype="html">
+        <source>Picture Buster</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/achievements/achievements.component.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      <target state="translated">Removedor</target>
+      </trans-unit>
+      <trans-unit id="29555328289978305" datatype="html">
+        <source>Spec Master</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/achievements/achievements.component.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      <target state="translated">Mestre de especificações</target>
+      </trans-unit>
+      <trans-unit id="2726864171452013466" datatype="html">
+        <source>Commentator</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/achievements/achievements.component.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      <target state="translated">Comentarista</target>
+      </trans-unit>
+      <trans-unit id="3821293762552091652" datatype="html">
+        <source>Not yet earned</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/users/user/user.component.html</context>
+          <context context-type="linenumber">115,117</context>
+        </context-group>
+      <target state="translated">Ainda não conquistado</target>
       </trans-unit>
       <trans-unit id="1682335247494061522" datatype="html">
         <source>Recent uploads</source>

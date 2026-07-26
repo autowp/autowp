@@ -5,6 +5,33 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {ACHIEVEMENT_CODES, getAchievementDescriptionTranslation, getAchievementTranslation} from '@utils/translations';
 import {catchError, map, Observable, of} from 'rxjs';
 
+interface AchievementGroup {
+  codes: string[];
+  title: null | string;
+}
+
+const SERIES: {prefix: string; title: string}[] = [
+  {prefix: 'picture-inspector-', title: $localize`Picture Inspector`},
+  {prefix: 'picture-buster-', title: $localize`Picture Buster`},
+  {prefix: 'spec-master-', title: $localize`Spec Master`},
+  {prefix: 'commentator-', title: $localize`Commentator`},
+];
+
+function buildGroups(codes: string[]): AchievementGroup[] {
+  const used = new Set<string>();
+
+  const groups = SERIES.map((series) => {
+    const seriesCodes = codes.filter((code) => code.startsWith(series.prefix));
+    seriesCodes.forEach((code) => used.add(code));
+
+    return {title: series.title, codes: seriesCodes};
+  });
+
+  const rest = codes.filter((code) => !used.has(code));
+
+  return [{title: null, codes: rest}, ...groups];
+}
+
 @Component({
   selector: 'app-achievements',
   imports: [AsyncPipe],
@@ -14,7 +41,7 @@ import {catchError, map, Observable, of} from 'rxjs';
 export class AchievementsComponent {
   readonly #achievementsClient = inject(AchievementsClient);
 
-  protected readonly codes = ACHIEVEMENT_CODES;
+  protected readonly groups: AchievementGroup[] = buildGroups(ACHIEVEMENT_CODES);
 
   protected readonly counts$: Observable<Record<string, string>> = this.#achievementsClient
     .getAchievementStats(new Empty())

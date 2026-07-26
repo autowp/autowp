@@ -40,7 +40,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {getAchievementTranslation} from '@utils/translations';
+import {getAchievementDescriptionTranslation, getAchievementTranslation} from '@utils/translations';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
 
@@ -346,5 +346,9 @@ export class UsersUserComponent {
 
   protected getAchievementTranslation(code: string): string {
     return getAchievementTranslation(code);
+  }
+
+  protected getAchievementDescriptionTranslation(code: string): string {
+    return getAchievementDescriptionTranslation(code);
   }
 }

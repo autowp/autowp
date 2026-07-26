@@ -1,21 +1,28 @@
 <div class="page-header">
   <h1 i18n>Achievements</h1>
 </div>
-<div class="row">
-  @if (counts$ | async; as counts) {
-    @for (code of codes; track code) {
-      <div class="col-md-6" [id]="code">
-        <div class="card card-body mb-4 d-flex flex-row align-items-center gap-3">
-          <img width="64" height="64" alt="" [src]="'/assets/achievements/' + code + '.svg'" />
-          <div>
-            <h3>{{ getAchievementTranslation(code) }}</h3>
-            <p class="mb-0">{{ getAchievementDescriptionTranslation(code) }}</p>
-            <p class="text-muted mb-0">
-              <ng-container i18n>{{ counts[code] || '0' }} users earned this</ng-container>
-            </p>
+@if (counts$ | async; as counts) {
+  @for (group of groups; track group.title) {
+    @if (group.codes.length) {
+      @if (group.title) {
+        <h2>{{ group.title }}</h2>
+      }
+      <div class="row">
+        @for (code of group.codes; track code) {
+          <div class="col-md-6" [id]="code">
+            <div class="card card-body mb-4 d-flex flex-row align-items-center gap-3">
+              <img width="64" height="64" alt="" [src]="'/assets/achievements/' + code + '.svg'" />
+              <div>
+                <h3>{{ getAchievementTranslation(code) }}</h3>
+                <p class="mb-0">{{ getAchievementDescriptionTranslation(code) }}</p>
+                <p class="text-muted mb-0">
+                  <ng-container i18n>{{ counts[code] || '0' }} users earned this</ng-container>
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        }
       </div>
     }
   }
-</div>
+}

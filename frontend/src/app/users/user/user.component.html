@@ -85,40 +85,59 @@
           @if (achievementsResponse.items.length || achievementsResponse.progress.length) {
             <div id="achievements">
               <h2 i18n>Achievements</h2>
-              <div class="card card-body mb-4">
-                <ul class="list-inline mb-0">
+              @if (achievementsResponse.items.length) {
+                <div class="row">
                   @for (achievement of achievementsResponse.items; track achievement.code) {
-                    <li class="list-inline-item">
-                      <a routerLink="/achievements" [fragment]="achievement.code">
+                    <div class="col-md-6">
+                      <a
+                        routerLink="/achievements"
+                        class="card card-body mb-3 d-flex flex-row align-items-center gap-3 text-body text-decoration-none"
+                        [fragment]="achievement.code"
+                      >
                         <img
                           width="48"
                           height="48"
                           alt=""
                           [src]="'/assets/achievements/' + achievement.code + '.svg'"
-                          [ngbTooltip]="getAchievementTranslation(achievement.code)"
                         />
+                        <div>
+                          <div class="fw-semibold">{{ getAchievementTranslation(achievement.code) }}</div>
+                          <div class="text-muted small mb-0">
+                            {{ getAchievementDescriptionTranslation(achievement.code) }}
+                          </div>
+                        </div>
                       </a>
-                    </li>
+                    </div>
                   }
-                  @for (progress of achievementsResponse.progress; track progress.code) {
-                    <li class="list-inline-item achievement-in-progress">
-                      <a
-                        routerLink="/achievements"
-                        [fragment]="progress.code"
-                        [ngbTooltip]="
-                          getAchievementTranslation(progress.code) +
-                          ': ' +
-                          progress.current +
-                          ' / ' +
-                          progress.threshold
-                        "
-                      >
-                        <img width="48" height="48" alt="" [src]="'/assets/achievements/' + progress.code + '.svg'" />
-                      </a>
-                    </li>
-                  }
-                </ul>
-              </div>
+                </div>
+              }
+              @if (achievementsResponse.progress.length) {
+                <h3 class="h6" i18n>Not yet earned</h3>
+                <div class="card card-body mb-4">
+                  <ul class="list-inline mb-0">
+                    @for (progress of achievementsResponse.progress; track progress.code) {
+                      <li class="list-inline-item achievement-in-progress">
+                        <a
+                          routerLink="/achievements"
+                          [fragment]="progress.code"
+                          [ngbTooltip]="
+                            getAchievementTranslation(progress.code) +
+                            ': ' +
+                            progress.current +
+                            ' / ' +
+                            progress.threshold
+                          "
+                        >
+                          <img width="48" height="48" alt="" [src]="'/assets/achievements/' + progress.code + '.svg'" />
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+              <p>
+                <a routerLink="/achievements" i18n>All achievements</a>
+              </p>
             </div>
           }
         }
