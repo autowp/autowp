@@ -24,7 +24,7 @@ services:
       "
 
   frontend:
-    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.25.0
+    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.30.0
     container_name: autowp_test_frontend
     depends_on:
       - goautowp-serve
@@ -36,7 +36,7 @@ services:
     read_only: true
 
   goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.25.0
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.30.0
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     depends_on:
       - keycloak
@@ -48,7 +48,7 @@ services:
     command: scheduler-generate-index-cache --loglevel=debug
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.25.0
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.30.0
     container_name: autowp_test_goautowp_serve
     depends_on:
       - keycloak
