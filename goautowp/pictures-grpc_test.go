@@ -479,7 +479,7 @@ func TestPictureCrop(t *testing.T) {
 	})
 
 	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	client := NewPicturesClient(conn)
 
@@ -1504,7 +1504,7 @@ func TestGetPicturePath(t *testing.T) {
 	require.NoError(t, err)
 
 	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: childID},
-		PictureStatus_PICTURE_STATUS_INBOX, token.AccessToken)
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	picture, err := client.GetPicture(
 		ctx,
@@ -1733,7 +1733,25 @@ func TestInbox(t *testing.T) {
 	err = pgIP.Set(net.IPv4allrouter)
 	require.NoError(t, err)
 
-	now := time.Now()
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+	require.NotNil(t, token)
+
+	authCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken)
+
+	// GetInbox computes "current date" in the requesting user's profile timezone
+	// (PicturesGRPCServer.resolveTimezone), not the test process's local timezone —
+	// those can differ (the seeded admin user is Europe/London, the test runner may be
+	// anything), which made this test flaky around timezone/day boundaries. Resolve
+	// `now`/`yesterday` in that same timezone so the comparisons below are apples-to-apples.
+	usersClient := NewUsersClient(conn)
+	me, err := usersClient.Me(authCtx, &MeRequest{Fields: &UserFields{Timezone: true}})
+	require.NoError(t, err)
+
+	loc, err := time.LoadLocation(me.GetTimezone())
+	require.NoError(t, err)
+
+	now := time.Now().In(loc)
 	yesterday := now.AddDate(0, 0, -1)
 
 	_, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
@@ -1756,14 +1774,10 @@ func TestInbox(t *testing.T) {
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
-	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
-	require.NoError(t, err)
-	require.NotNil(t, token)
-
 	client := NewPicturesClient(conn)
 
 	resp, err := client.GetInbox(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
+		authCtx,
 		&InboxRequest{
 			Language: "en",
 		},
@@ -1774,7 +1788,7 @@ func TestInbox(t *testing.T) {
 	require.EqualValues(t, now.Year(), resp.GetCurrentDate().GetYear())
 
 	resp, err = client.GetInbox(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
+		authCtx,
 		&InboxRequest{
 			Language: "en",
 			Date: &date.Date{
@@ -1793,7 +1807,7 @@ func TestInbox(t *testing.T) {
 	require.EqualValues(t, now.Year(), resp.GetNextDate().GetYear())
 
 	_, err = client.GetInbox(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
+		authCtx,
 		&InboxRequest{
 			BrandId:  1,
 			Language: "en",
