@@ -666,6 +666,13 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 		ginEngine.Use(cors.New(corsConfig))
 	}
 
+	banRepository, err := s.BanRepository(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("BanRepository(): %w", err)
+	}
+
+	ginEngine.Use(BanGinMiddleware(banRepository)) //nolint: contextcheck
+
 	yoomoney.SetupRouter(ctx, ginEngine)
 
 	tg.SetupRouter(ginEngine) //nolint: contextcheck
@@ -835,14 +842,21 @@ func (s *Container) GRPCServerWithServices(ctx context.Context) (*grpc.Server, e
 		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
 	}
 
+	banRepository, err := s.BanRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.UnaryServerInterceptorOpts(opts...),
+			BanUnaryServerInterceptor(banRepository),
 		),
 		grpc.ChainStreamInterceptor(
 			logging.StreamServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.StreamServerInterceptorOpts(opts...),
+			BanStreamServerInterceptor(banRepository), //nolint: contextcheck
 		),
 	)
 	RegisterArticlesServer(grpcServer, articlesSrv)
