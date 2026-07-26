@@ -89,7 +89,7 @@ ON CONFLICT (user_id, metric) DO UPDATE SET count = EXCLUDED.count, updated_at =
 WITH comment_counts AS (
   SELECT author_id, COUNT(*) AS comment_count
   FROM comment_message
-  WHERE deleted = false
+  WHERE deleted = false and author_id is not null
   GROUP BY author_id
 )
 INSERT INTO user_achievement (user_id, achievement_id, created_at)
@@ -102,7 +102,7 @@ ON CONFLICT DO NOTHING;
 WITH comment_counts AS (
   SELECT author_id, COUNT(*) AS comment_count
   FROM comment_message
-  WHERE deleted = false
+  WHERE deleted = false and author_id is not null
   GROUP BY author_id
 )
 INSERT INTO user_achievement_progress (user_id, metric, count, updated_at)
