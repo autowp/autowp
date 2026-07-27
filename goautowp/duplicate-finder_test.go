@@ -52,27 +52,9 @@ func TestDuplicateFinder(t *testing.T) {
 	err = df.Index(ctx, id2, "http://localhost:80/small.jpg")
 	require.NoError(t, err)
 
-	var hash1 int64
-
-	success, err := goquDB.Select(schema.DfHashTableHashCol).
-		From(schema.DfHashTable).
-		Where(schema.DfHashTablePictureIDCol.Eq(id1)).
-		ScanValContext(ctx, &hash1)
-	require.NoError(t, err)
-	require.True(t, success)
-
-	var hash2 int64
-
-	success, err = goquDB.Select(schema.DfHashTableHashCol).
-		From(schema.DfHashTable).
-		Where(schema.DfHashTablePictureIDCol.Eq(id2)).
-		ScanValContext(ctx, &hash2)
-	require.NoError(t, err)
-	require.True(t, success)
-
 	var distance int
 
-	success, err = goquDB.Select(schema.DfDistanceTableDistanceCol).
+	success, err := goquDB.Select(schema.DfDistanceTableDistanceCol).
 		From(schema.DfDistanceTable).
 		Where(
 			schema.DfDistanceTableSrcPictureIDCol.Eq(id1),
@@ -81,5 +63,9 @@ func TestDuplicateFinder(t *testing.T) {
 		ScanValContext(ctx, &distance)
 	require.NoError(t, err)
 	require.True(t, success)
-	require.LessOrEqual(t, distance, 2)
+	// large.jpg and small.jpg are the same source photo at different
+	// resolutions; PDQ's Jarosz-filter downsampling makes it very resistant
+	// to resizing, so real-world distance for this pair is ~2 out of 256
+	// bits. Leave headroom above that to avoid flakiness from re-encoding.
+	require.LessOrEqual(t, distance, 10)
 }

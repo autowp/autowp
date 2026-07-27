@@ -10,13 +10,16 @@ import (
 	_ "image/jpeg" // JPEG support
 	_ "image/png"  // PNG support
 	"io"
+	"math/bits"
 	"net/http"
+	"time"
 
+	"github.com/ajdnik/imghash/v2"
+	"github.com/ajdnik/imghash/v2/hashtype"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
-	"github.com/corona10/goimagehash"
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/gen2brain/avif" // AVIF support
 	"github.com/sirupsen/logrus"
@@ -24,11 +27,20 @@ import (
 	_ "golang.org/x/image/webp" // WEBP support
 )
 
-var errInvalidID = errors.New("invalid id provided")
-
-const (
-	threshold = 3
+var (
+	errInvalidID          = errors.New("invalid id provided")
+	errUnexpectedHashType = errors.New("PDQ hasher returned an unexpected hash type")
 )
+
+// threshold is the maximum Hamming distance (out of 256 bits) for two PDQ
+// hashes to be considered a likely duplicate. 31 is Meta's published
+// recommendation for the PDQ algorithm.
+const threshold = 31
+
+// indexDelay is paced between processed AMQP messages so a large backlog
+// (e.g. a full-catalogue reindex) doesn't hammer Postgres with back-to-back
+// updateDistance scans over the whole df_hash table.
+const indexDelay = 100 * time.Millisecond
 
 // DuplicateFinder Main Object.
 type DuplicateFinder struct {
@@ -118,6 +130,8 @@ func (s *DuplicateFinder) ListenAMQP(ctx context.Context, quitChan chan bool) er
 			if err != nil {
 				logrus.Errorf("error indexing image `%d`/`%s`: %v", message.PictureID, message.URL, err)
 			}
+
+			time.Sleep(indexDelay)
 		}
 	}
 
@@ -153,7 +167,7 @@ func (s *DuplicateFinder) Index(ctx context.Context, id int64, url string) error
 
 	_, err = s.db.Insert(schema.DfHashTable).Rows(goqu.Record{
 		schema.DfHashTablePictureIDColName: id,
-		schema.DfHashTableHashColName:      hash,
+		schema.DfHashTableHashColName:      bitString(hash),
 	}).Executor().ExecContext(ctx)
 	if err != nil {
 		return err
@@ -184,18 +198,65 @@ func (s *DuplicateFinder) HideSimilar(ctx context.Context, srcPictureID, dstPict
 	return err
 }
 
-func getFileHash(reader io.Reader) (int64, error) {
+// getFileHash computes a 256-bit PDQ perceptual hash of the image.
+// PDQ (Meta's "Perceptual DCT Quality" hash) is far more resistant to
+// rescaling, recompression, and minor edits than a plain 64-bit pHash,
+// which makes it a better fit for catalogue duplicate detection.
+func getFileHash(reader io.Reader) ([]byte, error) {
 	img, _, err := image.Decode(reader)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	hash, err := goimagehash.PerceptionHash(img)
+	hasher, err := imghash.NewPDQ()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return int64(hash.GetHash()), nil //nolint:gosec
+	hash, err := hasher.Calculate(img)
+	if err != nil {
+		return nil, err
+	}
+
+	bin, ok := hash.(hashtype.Binary)
+	if !ok {
+		return nil, errUnexpectedHashType
+	}
+
+	return []byte(bin), nil
+}
+
+// hammingDistance returns the number of differing bits between two
+// equal-length PDQ hashes. Mirrors, in Go, the distance the SQL in
+// updateDistance computes via bit_count(a.hash # b.hash) — kept as a pure
+// function so hash quality can be unit tested without a database.
+func hammingDistance(a, b []byte) int {
+	distance := 0
+	for i := range a {
+		distance += bits.OnesCount8(a[i] ^ b[i])
+	}
+
+	return distance
+}
+
+// bitString renders a 32-byte PDQ hash as Postgres bit-string text (256
+// '0'/'1' characters) for storage in the df_hash.hash bit(256) column.
+// Postgres has no cast from bytea to bit/bit varying, so the hash can't be
+// passed through as a []byte parameter.
+func bitString(hash []byte) string {
+	out := make([]byte, 0, len(hash)*8) //nolint:mnd
+	for _, b := range hash {
+		for i := 7; i >= 0; i-- {
+			bit := byte('0')
+			if b&(1<<uint(i)) != 0 {
+				bit = '1'
+			}
+
+			out = append(out, bit)
+		}
+	}
+
+	return string(out)
 }
 
 func (s *DuplicateFinder) updateDistance(ctx context.Context, id int64) error {
@@ -203,35 +264,52 @@ func (s *DuplicateFinder) updateDistance(ctx context.Context, id int64) error {
 		return errInvalidID
 	}
 
-	var hash int64
+	var exists bool
 
-	success, err := s.db.Select(schema.DfHashTableHashCol).
+	found, err := s.db.Select(goqu.V(1)).
 		From(schema.DfHashTable).
 		Where(schema.DfHashTablePictureIDCol.Eq(id)).
-		ScanValContext(ctx, &hash)
+		ScanValContext(ctx, &exists)
 	if err != nil {
 		return err
 	}
 
-	if !success {
+	if !found {
 		return sql.ErrNoRows
 	}
 
-	const alias = "distance"
+	const (
+		ownAlias      = "own"
+		otherAlias    = "other"
+		distanceAlias = "distance"
+	)
+
+	own := goqu.T(ownAlias)
+	other := goqu.T(otherAlias)
 
 	var sts []struct {
-		PictureID int `db:"picture_id"`
-		Distance  int `db:"distance"`
+		PictureID int64 `db:"picture_id"`
+		Distance  int   `db:"distance"`
 	}
 
 	err = s.db.Select(goqu.Star()).
 		From(s.db.Select(
-			schema.DfHashTablePictureIDCol,
-			goqu.Func("BIT_COUNT", goqu.L("(? # ?)::bytea", schema.DfHashTableHashCol, hash)).As(alias),
+			other.Col(schema.DfHashTablePictureIDColName),
+			goqu.Func("BIT_COUNT", goqu.L(
+				"? # ?",
+				own.Col(schema.DfHashTableHashColName),
+				other.Col(schema.DfHashTableHashColName),
+			)).As(distanceAlias),
 		).
-			From(schema.DfHashTable).
-			Where(schema.DfHashTablePictureIDCol.Neq(id))).
-		Where(goqu.C(alias).Lte(threshold)).Executor().ScanStructsContext(ctx, &sts)
+			From(
+				schema.DfHashTable.As(ownAlias),
+				schema.DfHashTable.As(otherAlias),
+			).
+			Where(
+				own.Col(schema.DfHashTablePictureIDColName).Eq(id),
+				other.Col(schema.DfHashTablePictureIDColName).Neq(id),
+			)).
+		Where(goqu.C(distanceAlias).Lte(threshold)).Executor().ScanStructsContext(ctx, &sts)
 	if err != nil {
 		return err
 	}
