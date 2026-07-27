@@ -35,8 +35,10 @@ var (
 	errCommentWithModerAttentionCantBeDeleted = errors.New(
 		"comment with moderation attention requirement can't be deleted",
 	)
-	errFailedToBuildURL = errors.New("failed to build URL")
-	errNoRowsReturned   = errors.New("no rows returned")
+	errFailedToBuildURL  = errors.New("failed to build URL")
+	errNoRowsReturned    = errors.New("no rows returned")
+	errPictureRemoved    = errors.New("picture is removed")
+	errForumsTopicClosed = errors.New("forum topic is closed")
 )
 
 const CommentMessagePreviewLength = 60
@@ -583,8 +585,23 @@ func (s *Repository) AssertItem(
 
 	switch typeID {
 	case schema.CommentMessageTypeIDPictures:
-		success, err = s.db.Select(goqu.L("1")).From(schema.PictureTable).
-			Where(schema.PictureTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
+		var pictureStatus schema.PictureStatus
+
+		success, err = s.db.Select(schema.PictureTableStatusCol).From(schema.PictureTable).
+			Where(schema.PictureTableIDCol.Eq(itemID)).ScanValContext(ctx, &pictureStatus)
+		if err != nil {
+			return err
+		}
+
+		if !success {
+			return sql.ErrNoRows
+		}
+
+		if pictureStatus == schema.PictureStatusRemoved {
+			return errPictureRemoved
+		}
+
+		return nil
 
 	case schema.CommentMessageTypeIDItems:
 		success, err = s.db.Select(goqu.L("1")).From(schema.ItemTable).
@@ -599,8 +616,23 @@ func (s *Repository) AssertItem(
 			Where(schema.ArticleTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
 
 	case schema.CommentMessageTypeIDForums:
-		success, err = s.db.Select(goqu.L("1")).From(schema.ForumsTopicsTable).
-			Where(schema.ForumsTopicsTableIDCol.Eq(itemID)).ScanValContext(ctx, &val)
+		var topicStatus schema.ForumsTopicStatus
+
+		success, err = s.db.Select(schema.ForumsTopicsTableStatusCol).From(schema.ForumsTopicsTable).
+			Where(schema.ForumsTopicsTableIDCol.Eq(itemID)).ScanValContext(ctx, &topicStatus)
+		if err != nil {
+			return err
+		}
+
+		if !success {
+			return sql.ErrNoRows
+		}
+
+		if topicStatus == schema.ForumsTopicStatusClosed {
+			return errForumsTopicClosed
+		}
+
+		return nil
 
 	default:
 		return errInvalidType

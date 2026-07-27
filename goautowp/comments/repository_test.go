@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"math/rand"
+	"net"
 	"strconv"
 	"testing"
 	"time"
@@ -19,6 +20,7 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
 	"github.com/google/uuid"
+	"github.com/jackc/pgtype"
 	_ "github.com/lib/pq" // enable postgres driver
 	"github.com/stretchr/testify/require"
 )
@@ -51,6 +53,36 @@ func createRandomUser(ctx context.Context, t *testing.T, db *goqu.Database) int6
 		}).
 		Returning(schema.UserTableIDCol).
 		Executor().ScanValContext(ctx, &id)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	return id
+}
+
+// createTestPicture inserts a dedicated picture row so tests posting
+// "pictures"-type comments against it aren't racing CleanBrokenMessages
+// (which deletes any pictures-type comment whose item_id has no matching
+// picture row) against other t.Parallel() tests sharing a hardcoded item_id.
+func createTestPicture(t *testing.T, db *goqu.Database) int64 {
+	t.Helper()
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
+
+	var pgIP pgtype.Inet
+
+	err := pgIP.Set(net.IPv4(127, 0, 0, 1))
+	require.NoError(t, err)
+
+	var id int64
+
+	success, err := db.Insert(schema.PictureTable).Rows(schema.PictureRow{
+		Identity:  identity,
+		Status:    schema.PictureStatusAccepted,
+		IP:        pgIP,
+		CreatedAt: time.Now(),
+		Point:     schema.NullPoint{Valid: false},
+	}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(t.Context(), &id)
 	require.NoError(t, err)
 	require.True(t, success)
 
@@ -206,6 +238,60 @@ func markUserDeleted(ctx context.Context, t *testing.T, db *goqu.Database, userI
 	require.NoError(t, err)
 }
 
+func TestAssertItemRejectsRemovedPicture(t *testing.T) {
+	t.Parallel()
+
+	repo, db := createRepository(t)
+	ctx := t.Context()
+
+	pictureID := createTestPicture(t, db)
+
+	err := repo.AssertItem(ctx, schema.CommentMessageTypeIDPictures, pictureID)
+	require.NoError(t, err)
+
+	_, err = db.Update(schema.PictureTable).
+		Set(goqu.Record{schema.PictureTableStatusColName: schema.PictureStatusRemoved}).
+		Where(schema.PictureTableIDCol.Eq(pictureID)).
+		Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	err = repo.AssertItem(ctx, schema.CommentMessageTypeIDPictures, pictureID)
+	require.ErrorIs(t, err, errPictureRemoved)
+}
+
+func TestAssertItemRejectsClosedForumsTopic(t *testing.T) {
+	t.Parallel()
+
+	repo, db := createRepository(t)
+	ctx := t.Context()
+
+	author := createRandomUser(ctx, t, db)
+
+	var topicID int64
+
+	success, err := db.Insert(schema.ForumsTopicsTable).
+		Rows(goqu.Record{
+			schema.ForumsTopicsTableNameColName:     "Test topic",
+			schema.ForumsTopicsTableAuthorIDColName: author,
+		}).
+		Returning(schema.ForumsTopicsTableIDCol).
+		Executor().ScanValContext(ctx, &topicID)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	err = repo.AssertItem(ctx, schema.CommentMessageTypeIDForums, topicID)
+	require.NoError(t, err)
+
+	_, err = db.Update(schema.ForumsTopicsTable).
+		Set(goqu.Record{schema.ForumsTopicsTableStatusColName: schema.ForumsTopicStatusClosed}).
+		Where(schema.ForumsTopicsTableIDCol.Eq(topicID)).
+		Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	err = repo.AssertItem(ctx, schema.CommentMessageTypeIDForums, topicID)
+	require.ErrorIs(t, err, errForumsTopicClosed)
+}
+
 func TestTopAuthorsAndAuthorsFansExcludeDeletedUsers(t *testing.T) {
 	t.Parallel()
 
@@ -215,10 +301,8 @@ func TestTopAuthorsAndAuthorsFansExcludeDeletedUsers(t *testing.T) {
 	author := createRandomUser(ctx, t, db)
 	voter := createRandomUser(ctx, t, db)
 
-	var (
-		commentType       = schema.CommentMessageTypeIDPictures
-		itemID      int64 = 1
-	)
+	commentType := schema.CommentMessageTypeIDPictures
+	itemID := createTestPicture(t, db)
 
 	commentID, err := repo.Add(ctx, commentType, itemID, 0, author, "Test message", "127.0.0.1", false)
 	require.NoError(t, err)

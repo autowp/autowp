@@ -2,6 +2,15 @@ package schema
 
 import "github.com/doug-martin/goqu/v9"
 
+type ForumsTopicStatus string
+
+const (
+	ForumsTopicStatusUnknown ForumsTopicStatus = ""
+	ForumsTopicStatusNormal  ForumsTopicStatus = "normal"
+	ForumsTopicStatusClosed  ForumsTopicStatus = "closed"
+	ForumsTopicStatusDeleted ForumsTopicStatus = "deleted"
+)
+
 const (
 	ForumsTopicsTableName             = "forums_topics"
 	ForumsTopicsTableIDColName        = "id"

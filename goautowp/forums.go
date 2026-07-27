@@ -19,11 +19,10 @@ var (
 	)
 )
 
-const (
-	TopicStatusNormal  = "normal"
-	TopicStatusClosed  = "closed"
-	TopicStatusDeleted = "deleted"
-)
+var visibleTopicStatuses = []string{
+	string(schema.ForumsTopicStatusNormal),
+	string(schema.ForumsTopicStatusClosed),
+}
 
 type ForumsTheme struct {
 	ID            int64  `db:"id"             goqu:"pk,skipinsert"`
@@ -122,7 +121,7 @@ func (s *Forums) AddTopic(
 			goqu.Func("INET", remoteAddr),
 			goqu.Func("NOW"),
 			0,
-			TopicStatusNormal,
+			schema.ForumsTopicStatusNormal,
 		}).
 		Returning(schema.ForumsTopicsTableIDCol).
 		Executor().ScanValContext(ctx, &topicID)
@@ -143,11 +142,11 @@ func (s *Forums) AddTopic(
 }
 
 func (s *Forums) Close(ctx context.Context, id int64) error {
-	return s.setStatus(ctx, id, TopicStatusClosed)
+	return s.setStatus(ctx, id, string(schema.ForumsTopicStatusClosed))
 }
 
 func (s *Forums) Open(ctx context.Context, id int64) error {
-	return s.setStatus(ctx, id, TopicStatusNormal)
+	return s.setStatus(ctx, id, string(schema.ForumsTopicStatusNormal))
 }
 
 func (s *Forums) Delete(ctx context.Context, id int64) error {
@@ -185,7 +184,7 @@ func (s *Forums) Delete(ctx context.Context, id int64) error {
 
 	ctx = context.WithoutCancel(ctx)
 
-	err = s.setStatus(ctx, id, TopicStatusDeleted)
+	err = s.setStatus(ctx, id, string(schema.ForumsTopicStatusDeleted))
 	if err != nil {
 		return err
 	}
@@ -384,7 +383,7 @@ func (s *Forums) LastMessage(
 			goqu.On(schema.ForumsTopicsTableThemeIDCol.Eq(schema.ForumsThemeParentTableForumThemeIDCol)),
 		).
 		Where(
-			schema.ForumsTopicsTableStatusCol.In([]string{TopicStatusNormal, TopicStatusClosed}),
+			schema.ForumsTopicsTableStatusCol.In(visibleTopicStatuses),
 			schema.ForumsTopicsTableIDCol.Eq(topicID),
 			schema.CommentMessageTableTypeIDCol.Eq(schema.CommentMessageTypeIDForums),
 		).
@@ -478,7 +477,7 @@ func (s *Forums) updateThemeStat(ctx context.Context, themeID int64) error {
 		).
 		Where(
 			schema.ForumsThemeParentTableParentIDCol.Eq(schema.ForumsThemesTableIDCol),
-			schema.ForumsTopicsTableStatusCol.In([]string{TopicStatusNormal, TopicStatusClosed}),
+			schema.ForumsTopicsTableStatusCol.In(visibleTopicStatuses),
 		)
 
 	messagesSelect := topicsSelect.
@@ -560,7 +559,7 @@ func (s *Forums) topicsSelect(isModerator bool) *goqu.SelectDataset {
 			schema.ForumsTopicsTableIDCol.Eq(schema.CommentTopicTableItemIDCol),
 			schema.CommentTopicTableTypeIDCol.Eq(schema.CommentMessageTypeIDForums),
 		)).
-		Where(schema.ForumsTopicsTableStatusCol.In([]string{TopicStatusNormal, TopicStatusClosed}))
+		Where(schema.ForumsTopicsTableStatusCol.In(visibleTopicStatuses))
 
 	if !isModerator {
 		sqSelect = sqSelect.
