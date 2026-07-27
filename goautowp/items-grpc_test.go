@@ -431,7 +431,7 @@ func TestItemVehicleTypes(t *testing.T) {
 			VehicleTypeId: 1,
 		},
 	)
-	require.Error(t, err)
+	require.ErrorContains(t, err, "NotFound")
 
 	r8, err := client.GetItemVehicleTypes(
 		metadata.AppendToOutgoingContext(

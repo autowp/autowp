@@ -884,27 +884,21 @@ func (s *ItemsGRPCServer) GetItemVehicleType(
 			schema.ItemVehicleTypeTableVehicleTypeIDCol.Eq(in.GetVehicleTypeId()),
 		)
 
-	var ivt ItemVehicleType
+	var row schema.ItemVehicleTypeRow
 
-	rows, err := sqlSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
+	found, err := sqlSelect.ScanStructContext(ctx, &row)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	defer util.Close(rows)
-
-	rows.Next()
-
-	err = rows.Scan(&ivt.ItemId, &ivt.VehicleTypeId)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	if !found {
+		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return &ivt, nil
+	return &ItemVehicleType{ //nolint:exhaustruct
+		ItemId:        row.ItemID,
+		VehicleTypeId: row.VehicleTypeID,
+	}, nil
 }
 
 func (s *ItemsGRPCServer) CreateItemVehicleType(

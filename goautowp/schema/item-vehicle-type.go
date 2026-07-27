@@ -21,3 +21,8 @@ var (
 		ItemVehicleTypeTableInheritedColName,
 	)
 )
+
+type ItemVehicleTypeRow struct {
+	ItemID        int64 `db:"item_id"`
+	VehicleTypeID int64 `db:"vehicle_type_id"`
+}
