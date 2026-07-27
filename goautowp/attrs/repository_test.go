@@ -58,7 +58,9 @@ func createRandomUser(t *testing.T, db *goqu.Database) int64 {
 }
 
 func createRepositoryWithCallback(
-	t *testing.T, afterUserValueSet func(ctx context.Context, userID int64) error,
+	t *testing.T,
+	afterUserValueSet func(ctx context.Context, userID int64) error,
+	afterUserValueChanged func(ctx context.Context, userID int64) error,
 ) (*Repository, *goqu.Database) {
 	t.Helper()
 
@@ -97,7 +99,9 @@ func createRepositoryWithCallback(
 		func(context.Context, int64) error { return nil },
 	)
 
-	repo := NewRepository(goquDB, i18n, itemsRepository, picturesRepository, imageStorage, afterUserValueSet)
+	repo := NewRepository(
+		goquDB, i18n, itemsRepository, picturesRepository, imageStorage, afterUserValueSet, afterUserValueChanged,
+	)
 
 	return repo, goquDB
 }
@@ -105,7 +109,11 @@ func createRepositoryWithCallback(
 func createRepository(t *testing.T) *Repository {
 	t.Helper()
 
-	repo, _ := createRepositoryWithCallback(t, func(context.Context, int64) error { return nil })
+	repo, _ := createRepositoryWithCallback(
+		t,
+		func(context.Context, int64) error { return nil },
+		func(context.Context, int64) error { return nil },
+	)
 
 	return repo
 }
@@ -130,11 +138,15 @@ func TestSetUserValueCallsCallbackOnlyOnChange(t *testing.T) {
 
 	var calledWith []int64
 
-	repo, db := createRepositoryWithCallback(t, func(_ context.Context, userID int64) error {
-		calledWith = append(calledWith, userID)
+	repo, db := createRepositoryWithCallback(
+		t,
+		func(_ context.Context, userID int64) error {
+			calledWith = append(calledWith, userID)
 
-		return nil
-	})
+			return nil
+		},
+		func(context.Context, int64) error { return nil },
+	)
 
 	ctx := t.Context()
 	userID := createRandomUser(t, db)
@@ -156,6 +168,48 @@ func TestSetUserValueCallsCallbackOnlyOnChange(t *testing.T) {
 	_, err = repo.SetUserValue(ctx, userID, attributeID, itemID, Value{Valid: true, IntValue: 43})
 	require.NoError(t, err)
 	require.Equal(t, []int64{userID, userID}, calledWith)
+}
+
+func TestUserValueChangeInvalidatesSpecsVolume(t *testing.T) {
+	t.Parallel()
+
+	var calledWith []int64
+
+	repo, db := createRepositoryWithCallback(
+		t,
+		func(context.Context, int64) error { return nil },
+		func(_ context.Context, userID int64) error {
+			calledWith = append(calledWith, userID)
+
+			return nil
+		},
+	)
+
+	ctx := t.Context()
+	userID := createRandomUser(t, db)
+
+	// attribute id 4 is a seeded integer-type attribute, item id 1 a seeded item
+	// (see dump.sql fixture data loaded for the test DB).
+	const attributeID, itemID int64 = 4, 1
+
+	_, err := repo.SetUserValue(ctx, userID, attributeID, itemID, Value{Valid: true, IntValue: 42})
+	require.NoError(t, err)
+	require.Equal(t, []int64{userID}, calledWith)
+
+	// Resubmitting the exact same value must not fire the callback again.
+	_, err = repo.SetUserValue(ctx, userID, attributeID, itemID, Value{Valid: true, IntValue: 42})
+	require.NoError(t, err)
+	require.Equal(t, []int64{userID}, calledWith)
+
+	// A genuinely different value fires it again.
+	_, err = repo.SetUserValue(ctx, userID, attributeID, itemID, Value{Valid: true, IntValue: 43})
+	require.NoError(t, err)
+	require.Equal(t, []int64{userID, userID}, calledWith)
+
+	// Deleting the value fires it too.
+	err = repo.DeleteUserValue(ctx, attributeID, itemID, userID)
+	require.NoError(t, err)
+	require.Equal(t, []int64{userID, userID, userID}, calledWith)
 }
 
 func TestAttributeTypes(t *testing.T) {

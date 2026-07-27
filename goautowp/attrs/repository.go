@@ -111,6 +111,7 @@ type Repository struct {
 	i18nUnitsMutex          sync.Mutex
 	nameFormatter           *items.ItemNameFormatter
 	afterUserValueSet       func(ctx context.Context, userID int64) error
+	afterUserValueChanged   func(ctx context.Context, userID int64) error
 }
 
 // NewRepository constructor.
@@ -121,6 +122,7 @@ func NewRepository(
 	picturesRepository *pictures.Repository,
 	imageStorage *storage.Storage,
 	afterUserValueSet func(ctx context.Context, userID int64) error,
+	afterUserValueChanged func(ctx context.Context, userID int64) error,
 ) *Repository {
 	return &Repository{
 		db:                      db,
@@ -144,6 +146,7 @@ func NewRepository(
 		zoneAttributesTree:      make(map[int64]map[int64][]*schema.AttrsAttributeRow),
 		nameFormatter:           items.NewItemNameFormatter(i18n),
 		afterUserValueSet:       afterUserValueSet,
+		afterUserValueChanged:   afterUserValueChanged,
 	}
 }
 
@@ -880,6 +883,10 @@ func (s *Repository) DeleteUserValue(ctx context.Context, attributeID, itemID, u
 		)
 	}
 
+	if err := s.afterUserValueChanged(ctx, userID); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -1374,6 +1381,10 @@ func (s *Repository) SetUserValue( //nolint: maintidx
 	// somethingChanged.
 	if valueChanged {
 		if err := s.afterUserValueSet(ctx, userID); err != nil {
+			return false, err
+		}
+
+		if err := s.afterUserValueChanged(ctx, userID); err != nil {
 			return false, err
 		}
 	}

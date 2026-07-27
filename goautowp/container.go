@@ -328,6 +328,14 @@ func (s *Container) AttrsRepository(ctx context.Context) (*attrs.Repository, err
 
 				return achievementsRepository.GrantSpecValueSet(ctx, userID)
 			},
+			func(ctx context.Context, userID int64) error {
+				usersRepository, err := s.UsersRepository(ctx)
+				if err != nil {
+					return err
+				}
+
+				return usersRepository.InvalidateSpecsVolume(ctx, userID)
+			},
 		)
 	}
 

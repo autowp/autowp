@@ -421,6 +421,25 @@ func (s *Application) SchedulerHourly(ctx context.Context) error {
 	return nil
 }
 
+// SpecsVolumeBackfill invalidates every non-deleted user's specs_volume and
+// immediately recomputes it. One-off admin command for the bug where
+// specs_volume froze after its first computation (attrs_user_values changes
+// never invalidated it) — new writes are fixed going forward via
+// users.Repository.InvalidateSpecsVolume, but already-affected users need
+// this to catch up once.
+func (s *Application) SpecsVolumeBackfill(ctx context.Context) error {
+	usersRep, err := s.container.UsersRepository(ctx)
+	if err != nil {
+		return err
+	}
+
+	if err := usersRep.InvalidateAllSpecsVolumes(ctx); err != nil {
+		return err
+	}
+
+	return usersRep.UpdateSpecsVolumes(ctx)
+}
+
 func (s *Application) SchedulerDaily(ctx context.Context) error {
 	usersRep, err := s.container.UsersRepository(ctx)
 	if err != nil {

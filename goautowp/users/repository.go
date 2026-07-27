@@ -696,6 +696,30 @@ func (s *Repository) UpdateVotesLimits(ctx context.Context) (int, error) {
 	return affected, nil
 }
 
+// InvalidateSpecsVolume marks a user's specs_volume as stale so the next
+// UpdateSpecsVolumes run (scheduler-daily) recomputes it. Call whenever a
+// user's attrs_user_values rows change (set or delete).
+func (s *Repository) InvalidateSpecsVolume(ctx context.Context, userID int64) error {
+	_, err := s.db.Update(schema.UserTable).Set(goqu.Record{
+		schema.UserTableSpecsVolumeValidColName: false,
+	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
+
+	return err
+}
+
+// InvalidateAllSpecsVolumes marks every non-deleted user's specs_volume as
+// stale. One-off backfill for users whose specs_volume was frozen by a bug
+// where attrs_user_values changes never invalidated it (see
+// InvalidateSpecsVolume); the next UpdateSpecsVolumes call recomputes
+// everyone marked here.
+func (s *Repository) InvalidateAllSpecsVolumes(ctx context.Context) error {
+	_, err := s.db.Update(schema.UserTable).Set(goqu.Record{
+		schema.UserTableSpecsVolumeValidColName: false,
+	}).Where(schema.UserTableDeletedCol.IsFalse()).Executor().ExecContext(ctx)
+
+	return err
+}
+
 func (s *Repository) UpdateSpecsVolumes(ctx context.Context) error {
 	var sts []struct {
 		UserID int64 `db:"id"`

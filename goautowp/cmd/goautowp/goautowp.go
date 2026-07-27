@@ -391,6 +391,13 @@ func mainReturnWithCode() int { //nolint: maintidx
 				},
 			},
 			{
+				Name:  "specs-volume-backfill",
+				Usage: "Recompute users.specs_volume for every user; one-off fix for values frozen by a bug",
+				Action: func(ctx context.Context, _ *cli.Command) error {
+					return autowpApp.SpecsVolumeBackfill(ctx)
+				},
+			},
+			{
 				Name: "refresh-item-parent-language",
 				Flags: []cli.Flag{
 					&cli.UintFlag{
