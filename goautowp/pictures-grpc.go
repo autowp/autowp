@@ -2737,9 +2737,8 @@ func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, use
 	inOptions := in.GetOptions()
 	fields := in.GetFields()
 
-	if inOptions.GetStatus() == PictureStatus_PICTURE_STATUS_INBOX && !isModer &&
-		(userID == 0 || inOptions.GetOwnerId() != userID) {
-		return status.Error(codes.PermissionDenied, "inbox is only available to moderators or its owner")
+	if inOptions.GetStatus() == PictureStatus_PICTURE_STATUS_INBOX && !isModer && userID == 0 {
+		return status.Error(codes.PermissionDenied, "inbox is only available to registered users")
 	}
 
 	restricted := !isModer && inOptions.GetPictureItem().GetItemId() == 0 &&
