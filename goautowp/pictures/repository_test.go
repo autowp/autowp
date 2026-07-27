@@ -139,6 +139,70 @@ func createTestPicture(t *testing.T, db *goqu.Database, ownerID sql.NullInt64) i
 	return id
 }
 
+func containsOwnerID(rows []RatingUser, ownerID int64) bool {
+	for _, row := range rows {
+		if row.OwnerID == ownerID {
+			return true
+		}
+	}
+
+	return false
+}
+
+func containsFanUserID(rows []RatingFan, userID int64) bool {
+	for _, row := range rows {
+		if row.UserID == userID {
+			return true
+		}
+	}
+
+	return false
+}
+
+func markUserDeleted(ctx context.Context, t *testing.T, db *goqu.Database, userID int64) {
+	t.Helper()
+
+	_, err := db.Update(schema.UserTable).
+		Set(goqu.Record{schema.UserTableDeletedColName: true}).
+		Where(schema.UserTableIDCol.Eq(userID)).
+		Executor().ExecContext(ctx)
+	require.NoError(t, err)
+}
+
+func TestTopLikesAndTopOwnerFansExcludeDeletedUsers(t *testing.T) {
+	t.Parallel()
+
+	db, repo := repository(t)
+	ctx := t.Context()
+
+	owner := createRandomUser(t, db)
+	voter := createRandomUser(t, db)
+	pictureID := createTestPicture(t, db, sql.NullInt64{Int64: owner, Valid: true})
+
+	err := repo.Vote(ctx, pictureID, 1, voter)
+	require.NoError(t, err)
+
+	topLikes, err := repo.TopLikes(ctx, 1000)
+	require.NoError(t, err)
+	require.True(t, containsOwnerID(topLikes, owner))
+
+	fans, err := repo.TopOwnerFans(ctx, owner, 1000)
+	require.NoError(t, err)
+	require.True(t, containsFanUserID(fans, voter))
+
+	markUserDeleted(ctx, t, db, owner)
+
+	topLikes, err = repo.TopLikes(ctx, 1000)
+	require.NoError(t, err)
+	require.False(t, containsOwnerID(topLikes, owner))
+
+	markUserDeleted(ctx, t, db, voter)
+
+	fans, err = repo.TopOwnerFans(ctx, owner, 1000)
+	require.NoError(t, err)
+	require.False(t, containsFanUserID(fans, voter))
+}
+
 func TestAcceptCallsAchievementsCallback(t *testing.T) {
 	t.Parallel()
 

@@ -1544,6 +1544,8 @@ func (s *Repository) TopAuthors(ctx context.Context, limit uint) ([]RatingUser, 
 		schema.CommentMessageTableAuthorIDCol, goqu.SUM(schema.CommentMessageTableVoteCol).As(volumeAlias),
 	).
 		From(schema.CommentMessageTable).
+		Join(schema.UserTable, goqu.On(schema.CommentMessageTableAuthorIDCol.Eq(schema.UserTableIDCol))).
+		Where(schema.UserTableDeletedCol.IsFalse()).
 		GroupBy(schema.CommentMessageTableAuthorIDCol).
 		Order(goqu.C(volumeAlias).Desc()).
 		Limit(limit).
@@ -1566,7 +1568,11 @@ func (s *Repository) AuthorsFans(
 		Join(schema.CommentMessageTable, goqu.On(
 			schema.CommentVoteTableCommentIDCol.Eq(schema.CommentMessageTableIDCol),
 		)).
-		Where(schema.CommentMessageTableAuthorIDCol.Eq(userID)).
+		Join(schema.UserTable, goqu.On(schema.CommentVoteTableUserIDCol.Eq(schema.UserTableIDCol))).
+		Where(
+			schema.CommentMessageTableAuthorIDCol.Eq(userID),
+			schema.UserTableDeletedCol.IsFalse(),
+		).
 		GroupBy(schema.CommentVoteTableUserIDCol).
 		Order(goqu.C(volumeAlias).Desc()).
 		Limit(limit).

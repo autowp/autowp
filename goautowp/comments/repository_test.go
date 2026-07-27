@@ -176,6 +176,77 @@ func TestAddCallsAfterCommentAdded(t *testing.T) {
 	require.Equal(t, []int64{userID, userID}, calledWith)
 }
 
+func containsAuthorID(rows []RatingUser, authorID int64) bool {
+	for _, row := range rows {
+		if row.AuthorID == authorID {
+			return true
+		}
+	}
+
+	return false
+}
+
+func containsFanUserID(rows []RatingFan, userID int64) bool {
+	for _, row := range rows {
+		if row.UserID == userID {
+			return true
+		}
+	}
+
+	return false
+}
+
+func markUserDeleted(ctx context.Context, t *testing.T, db *goqu.Database, userID int64) {
+	t.Helper()
+
+	_, err := db.Update(schema.UserTable).
+		Set(goqu.Record{schema.UserTableDeletedColName: true}).
+		Where(schema.UserTableIDCol.Eq(userID)).
+		Executor().ExecContext(ctx)
+	require.NoError(t, err)
+}
+
+func TestTopAuthorsAndAuthorsFansExcludeDeletedUsers(t *testing.T) {
+	t.Parallel()
+
+	repo, db := createRepository(t)
+	ctx := t.Context()
+
+	author := createRandomUser(ctx, t, db)
+	voter := createRandomUser(ctx, t, db)
+
+	var (
+		commentType       = schema.CommentMessageTypeIDPictures
+		itemID      int64 = 1
+	)
+
+	commentID, err := repo.Add(ctx, commentType, itemID, 0, author, "Test message", "127.0.0.1", false)
+	require.NoError(t, err)
+
+	_, err = repo.VoteComment(ctx, voter, commentID, 1)
+	require.NoError(t, err)
+
+	topAuthors, err := repo.TopAuthors(ctx, 1000)
+	require.NoError(t, err)
+	require.True(t, containsAuthorID(topAuthors, author))
+
+	fans, err := repo.AuthorsFans(ctx, author, 1000)
+	require.NoError(t, err)
+	require.True(t, containsFanUserID(fans, voter))
+
+	markUserDeleted(ctx, t, db, author)
+
+	topAuthors, err = repo.TopAuthors(ctx, 1000)
+	require.NoError(t, err)
+	require.False(t, containsAuthorID(topAuthors, author))
+
+	markUserDeleted(ctx, t, db, voter)
+
+	fans, err = repo.AuthorsFans(ctx, author, 1000)
+	require.NoError(t, err)
+	require.False(t, containsFanUserID(fans, voter))
+}
+
 func TestCleanBrokenMessages(t *testing.T) {
 	t.Parallel()
 

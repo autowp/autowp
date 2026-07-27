@@ -439,7 +439,11 @@ func (s *Repository) TopLikes(ctx context.Context, limit uint) ([]RatingUser, er
 	err := s.db.Select(schema.PictureTableOwnerIDCol, goqu.SUM(schema.PictureVoteTableValueCol).As(volumeAlias)).
 		From(schema.PictureTable).
 		Join(schema.PictureVoteTable, goqu.On(schema.PictureTableIDCol.Eq(schema.PictureVoteTablePictureIDCol))).
-		Where(schema.PictureTableOwnerIDCol.Neq(schema.PictureVoteTableUserIDCol)).
+		Join(schema.UserTable, goqu.On(schema.PictureTableOwnerIDCol.Eq(schema.UserTableIDCol))).
+		Where(
+			schema.PictureTableOwnerIDCol.Neq(schema.PictureVoteTableUserIDCol),
+			schema.UserTableDeletedCol.IsFalse(),
+		).
 		GroupBy(schema.PictureTableOwnerIDCol).
 		Order(goqu.C(volumeAlias).Desc()).
 		Limit(limit).
@@ -460,7 +464,11 @@ func (s *Repository) TopOwnerFans(
 	err := s.db.Select(schema.PictureVoteTableUserIDCol, goqu.COUNT(goqu.Star()).As(volumeAlias)).
 		From(schema.PictureTable).
 		Join(schema.PictureVoteTable, goqu.On(schema.PictureTableIDCol.Eq(schema.PictureVoteTablePictureIDCol))).
-		Where(schema.PictureTableOwnerIDCol.Eq(userID)).
+		Join(schema.UserTable, goqu.On(schema.PictureVoteTableUserIDCol.Eq(schema.UserTableIDCol))).
+		Where(
+			schema.PictureTableOwnerIDCol.Eq(userID),
+			schema.UserTableDeletedCol.IsFalse(),
+		).
 		GroupBy(schema.PictureVoteTableUserIDCol).
 		Order(goqu.C(volumeAlias).Desc()).
 		Limit(limit).
