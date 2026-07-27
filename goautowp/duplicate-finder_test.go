@@ -1,8 +1,11 @@
 package goautowp
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -68,4 +71,34 @@ func TestDuplicateFinder(t *testing.T) {
 	// to resizing, so real-world distance for this pair is ~2 out of 256
 	// bits. Leave headroom above that to avoid flakiness from re-encoding.
 	require.LessOrEqual(t, distance, 10)
+}
+
+// TestIndexRespectsContextDeadline is a regression test for the
+// duplicate-finder AMQP consumer's HTTP fetch having no bound: a hung
+// remote image host would otherwise stall the single-threaded consumer
+// loop indefinitely. Uses a short parent-context deadline rather than
+// waiting out the real fetchImageTimeout constant — context.WithTimeout
+// always resolves to the earlier of the parent's deadline and its own
+// duration, so this exercises the same code path fast.
+func TestIndexRespectsContextDeadline(t *testing.T) {
+	t.Parallel()
+
+	srv := httptest.NewServer(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
+		time.Sleep(200 * time.Millisecond)
+	}))
+	defer srv.Close()
+
+	goquDB, err := cnt.GoquDB(t.Context())
+	require.NoError(t, err)
+
+	cfg := config.LoadConfig(".")
+
+	df, err := NewDuplicateFinder(goquDB, cfg.DuplicateFinder)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Millisecond)
+	defer cancel()
+
+	err = df.Index(ctx, 1, srv.URL)
+	require.ErrorIs(t, err, context.DeadlineExceeded)
 }

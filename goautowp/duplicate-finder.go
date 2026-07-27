@@ -29,7 +29,7 @@ import (
 
 var (
 	errInvalidID          = errors.New("invalid id provided")
-	errUnexpectedHashType = errors.New("PDQ hasher returned an unexpected hash type")
+	errUnexpectedHashType = errors.New("PDQ hasher: unexpected hash type")
 )
 
 // threshold is the maximum Hamming distance (out of 256 bits) for two PDQ
@@ -41,6 +41,12 @@ const threshold = 31
 // (e.g. a full-catalogue reindex) doesn't hammer Postgres with back-to-back
 // updateDistance scans over the whole df_hash table.
 const indexDelay = 100 * time.Millisecond
+
+// fetchImageTimeout bounds how long Index waits on the source image fetch
+// (connection, headers, and body read/decode). ListenAMQP's consumer loop
+// is single-threaded, so a hung remote host would otherwise stall the whole
+// duplicate-finder queue indefinitely.
+const fetchImageTimeout = 30 * time.Second
 
 // DuplicateFinder Main Object.
 type DuplicateFinder struct {
@@ -145,7 +151,10 @@ func (s *DuplicateFinder) ListenAMQP(ctx context.Context, quitChan chan bool) er
 func (s *DuplicateFinder) Index(ctx context.Context, id int64, url string) error {
 	logrus.Infof("Indexing picture %v", id)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	fetchCtx, cancel := context.WithTimeout(ctx, fetchImageTimeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(fetchCtx, http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
