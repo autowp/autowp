@@ -7,6 +7,12 @@
       "skillPath": "skills/dev-skills/angular-developer/SKILL.md",
       "computedHash": "258cc410839924d8c2b31afe9dd7349a1c03b9215ddba7942a87ce976c894adb"
     },
+    "angular-ssr": {
+      "source": "analogjs/angular-skills",
+      "sourceType": "github",
+      "skillPath": "skills/angular-ssr/SKILL.md",
+      "computedHash": "e4627d43ca867d14f3936e3246d0da54966baa63e87a541ae6ad4ee9286fa28c"
+    },
     "golang-code-style": {
       "source": "samber/cc-skills-golang",
       "sourceType": "github",
@@ -36,6 +42,12 @@
       "sourceType": "github",
       "skillPath": "skills/golang-project-layout/SKILL.md",
       "computedHash": "4410bbe9953100fd277f6a1deb1c66d7d73c5e30217af322edf2125394940286"
+    },
+    "helm-chart-scaffolding": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/kubernetes-operations/skills/helm-chart-scaffolding/SKILL.md",
+      "computedHash": "d37f4bee4daa0c969ce9912054b46b04164d57ecd0e1d958e6dfb2e5aec16503"
     }
   }
 }
