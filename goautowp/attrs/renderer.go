@@ -234,8 +234,13 @@ func (s Wheel) Render(
 	radius, radiusOk := values[s.Radius]
 	rimWidth, rimWidthOk := values[s.Rimwidth]
 
+	hasRimWidth := rimWidthOk && len(rimWidth) > 0
+	hasRadius := radiusOk && len(radius) > 0
+	hasTyreWidth := tyreWidthOk && len(tyreWidth) > 0
+	hasTyreSeries := tyreSeriesOk && len(tyreSeries) > 0
+
 	diskName := ""
-	if rimWidthOk && len(rimWidth) > 0 || radiusOk && len(radius) > 0 {
+	if hasRimWidth || hasRadius {
 		diskName = fmt.Sprintf(
 			"%sJ × %s",
 			util.StringDefault(rimWidth, "?"),
@@ -244,8 +249,7 @@ func (s Wheel) Render(
 	}
 
 	tyreName := ""
-	if tyreWidthOk && len(tyreWidth) > 0 || tyreSeriesOk && len(tyreSeries) > 0 ||
-		radiusOk && len(radius) > 0 {
+	if hasTyreWidth || hasTyreSeries || hasRadius {
 		tyreName = fmt.Sprintf(
 			"%s/%s R%s",
 			util.StringDefault(tyreWidth, "???"),

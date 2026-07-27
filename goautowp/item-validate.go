@@ -89,15 +89,20 @@ func (s *Item) Validate( //nolint: maintidx
 					Description: "engine_inherit can be used only for vehicle",
 				})
 			}
-		} else if (s.GetId() > 0 || s.GetId() == 0 && s.GetEngineInherit()) && !canEditEngine {
-			result = append(result, &errdetails.BadRequest_FieldViolation{
-				Field:       engineInheritField,
-				Description: "permission denied",
-			})
+		} else {
+			changesRestrictedEngineInherit := s.GetId() > 0 || (s.GetId() == 0 && s.GetEngineInherit())
+			if changesRestrictedEngineInherit && !canEditEngine {
+				result = append(result, &errdetails.BadRequest_FieldViolation{
+					Field:       engineInheritField,
+					Description: "permission denied",
+				})
+			}
 		}
 	}
 
 	if maskPaths == nil || util.Contains(maskPaths, engineItemIDField) {
+		changesRestrictedEngineItemID := s.GetId() > 0 || (s.GetId() == 0 && s.GetEngineItemId() > 0)
+
 		switch {
 		case s.GetItemTypeId() != ItemType_ITEM_TYPE_VEHICLE:
 			if s.GetId() > 0 || s.GetEngineItemId() > 0 {
@@ -106,7 +111,7 @@ func (s *Item) Validate( //nolint: maintidx
 					Description: "engine_item_id can be used only for vehicle",
 				})
 			}
-		case (s.GetId() > 0 || s.GetId() == 0 && s.GetEngineItemId() > 0) && !canEditEngine:
+		case changesRestrictedEngineItemID && !canEditEngine:
 			result = append(result, &errdetails.BadRequest_FieldViolation{
 				Field:       engineItemIDField,
 				Description: "permission denied",
@@ -131,21 +136,25 @@ func (s *Item) Validate( //nolint: maintidx
 		}
 	}
 
-	if (maskPaths == nil || util.Contains(maskPaths, "today")) &&
-		s.GetEndYear() > 0 && s.GetEndYear() < int32(time.Now().Year()) { //nolint: gosec
+	touchesToday := maskPaths == nil || util.Contains(maskPaths, "today")
+	endYearInPast := s.GetEndYear() > 0 && s.GetEndYear() < int32(time.Now().Year()) //nolint: gosec
+
+	if touchesToday && endYearInPast {
 		s.Today = &wrapperspb.BoolValue{Value: false}
 	}
 
-	if (maskPaths == nil || util.Contains(maskPaths, "spec_id")) && s.GetSpecId() > 0 &&
-		s.GetSpecInherit() {
+	touchesSpecID := maskPaths == nil || util.Contains(maskPaths, "spec_id")
+	if touchesSpecID && s.GetSpecId() > 0 && s.GetSpecInherit() {
 		s.SpecId = 0
 	}
 
-	if (maskPaths == nil || util.Contains(maskPaths, "location")) &&
-		!util.Contains(
-			[]ItemType{ItemType_ITEM_TYPE_FACTORY, ItemType_ITEM_TYPE_MUSEUM},
-			s.GetItemTypeId(),
-		) {
+	touchesLocation := maskPaths == nil || util.Contains(maskPaths, "location")
+	isLocationlessType := !util.Contains(
+		[]ItemType{ItemType_ITEM_TYPE_FACTORY, ItemType_ITEM_TYPE_MUSEUM},
+		s.GetItemTypeId(),
+	)
+
+	if touchesLocation && isLocationlessType {
 		if s.GetLocation() != nil {
 			result = append(result, &errdetails.BadRequest_FieldViolation{
 				Field:       "location",
@@ -154,7 +163,8 @@ func (s *Item) Validate( //nolint: maintidx
 		}
 	}
 
-	if (maskPaths == nil || util.Contains(maskPaths, "full_name")) &&
+	touchesFullName := maskPaths == nil || util.Contains(maskPaths, "full_name")
+	if touchesFullName &&
 		s.GetItemTypeId() != ItemType_ITEM_TYPE_BRAND && len(s.GetFullName()) > 0 {
 		result = append(result, &errdetails.BadRequest_FieldViolation{
 			Field:       "full_name",

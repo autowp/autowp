@@ -412,6 +412,19 @@ func (s *ItemsGRPCServer) GetTwinsBrandsList(
 	}, nil
 }
 
+// requestsModeratorOnlyFields reports whether fields asks for any field
+// that's only meant to be visible to moderators.
+func requestsModeratorOnlyFields(fields *items.ItemFields) bool {
+	return fields != nil && (fields.InboxPicturesCount || fields.CommentsAttentionsCount || fields.Meta)
+}
+
+// requestsModeratorOnlyListFilter reports whether inOptions asks for a list
+// filter that's only meant to be usable by moderators.
+func requestsModeratorOnlyListFilter(inOptions *ItemListOptions) bool {
+	return inOptions.GetExcludeSelfAndChilds() > 0 || inOptions.GetAutocomplete() != "" ||
+		inOptions.GetSuggestionsTo() != 0
+}
+
 func (s *ItemsGRPCServer) Item(ctx context.Context, in *ItemRequest) (*Item, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -422,9 +435,7 @@ func (s *ItemsGRPCServer) Item(ctx context.Context, in *ItemRequest) (*Item, err
 
 	fields := convertItemFields(in.GetFields())
 
-	if fields != nil &&
-		(fields.InboxPicturesCount || fields.CommentsAttentionsCount || fields.Meta) &&
-		!isModer {
+	if requestsModeratorOnlyFields(fields) && !isModer {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
@@ -452,16 +463,13 @@ func (s *ItemsGRPCServer) List(ctx context.Context, in *ItemsRequest) (*ItemList
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
 
 	fields := convertItemFields(in.GetFields())
-	if fields != nil &&
-		(fields.InboxPicturesCount || fields.CommentsAttentionsCount || fields.Meta) &&
-		!isModer {
+	if requestsModeratorOnlyFields(fields) && !isModer {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	inOptions := in.GetOptions()
 
-	if (inOptions.GetExcludeSelfAndChilds() > 0 || inOptions.GetAutocomplete() != "" ||
-		inOptions.GetSuggestionsTo() != 0) && !isModer {
+	if requestsModeratorOnlyListFilter(inOptions) && !isModer {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
@@ -543,8 +551,7 @@ func (s *ItemsGRPCServer) GetItemsFirstChars(
 
 	inOptions := in.GetOptions()
 
-	if (inOptions.GetExcludeSelfAndChilds() > 0 || inOptions.GetAutocomplete() != "" ||
-		inOptions.GetSuggestionsTo() != 0) && !isModer {
+	if requestsModeratorOnlyListFilter(inOptions) && !isModer {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 

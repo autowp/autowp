@@ -1251,9 +1251,11 @@ func (s *Repository) ensureUserExportedToKeycloak(
 		emailVerified = false
 	}
 
+	hasLogin := st.Login.Valid && len(st.Login.String) > 0
+	hasKeyCloakEmail := keyCloakEmail != nil && len(*keyCloakEmail) > 0
+
 	username := st.Login.String
-	if (!st.Login.Valid || len(st.Login.String) == 0) && keyCloakEmail != nil &&
-		len(*keyCloakEmail) > 0 {
+	if !hasLogin && hasKeyCloakEmail {
 		username = *keyCloakEmail
 	}
 
