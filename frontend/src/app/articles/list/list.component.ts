@@ -47,8 +47,9 @@ export class ListComponent implements OnInit {
   );
 
   protected readonly articlesResource = rxResource({
-    stream: () =>
-      this.#articlesClient.getList(new ArticlesRequest({limit: 10, page: this.#page()})).pipe(
+    params: () => this.#page(),
+    stream: ({params: page}) =>
+      this.#articlesClient.getList(new ArticlesRequest({limit: 10, page})).pipe(
         map((response) => ({
           articles: (response.items || []).map((article) => this.#mapArticle(article)),
           paginator: response.paginator,

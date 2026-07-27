@@ -44,8 +44,8 @@ export class ForumsNewTopicComponent implements OnInit {
   });
 
   protected readonly themeResource = rxResource({
-    stream: () => {
-      const themeID = this.#themeID();
+    params: () => this.#themeID(),
+    stream: ({params: themeID}) => {
       if (!themeID) {
         return notFoundError();
       }

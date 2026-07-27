@@ -51,7 +51,8 @@ export class ThumbnailComponent {
   protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER));
 
   protected readonly ownerResource = rxResource({
-    stream: () => this.#userService.getUser$(this.picture().ownerId),
+    params: () => this.picture().ownerId,
+    stream: ({params: ownerId}) => this.#userService.getUser$(ownerId),
   });
 
   protected savePerspective(pictureItem: PictureItem) {

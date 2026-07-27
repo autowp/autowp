@@ -57,15 +57,22 @@ export class LogComponent implements OnInit {
   });
 
   protected readonly responseResource = rxResource({
-    stream: () =>
+    params: () => ({
+      articleId: this.#articleId(),
+      itemId: this.#itemId(),
+      page: this.#page(),
+      pictureId: this.#pictureId(),
+      userId: this.#userId(),
+    }),
+    stream: ({params: {articleId, itemId, page, pictureId, userId}}) =>
       this.#logClient
         .getEvents(
           new LogEventsRequest({
-            articleId: this.#articleId() ?? undefined,
-            itemId: this.#itemId() ?? undefined,
-            page: +(this.#page() ?? 0),
-            pictureId: this.#pictureId() ?? undefined,
-            userId: this.#userId() ?? undefined,
+            articleId: articleId ?? undefined,
+            itemId: itemId ?? undefined,
+            page: +(page ?? 0),
+            pictureId: pictureId ?? undefined,
+            userId: userId ?? undefined,
           }),
         )
         .pipe(

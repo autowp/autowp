@@ -36,7 +36,8 @@ export class ModerItemsItemSelectParentBrandsComponent {
   });
 
   protected readonly brandsResource = rxResource({
-    stream: () =>
+    params: () => ({page: this.#page(), search: this.#search()}),
+    stream: ({params: {page, search}}) =>
       this.#itemsClient
         .list(
           new ItemsRequest({
@@ -44,10 +45,10 @@ export class ModerItemsItemSelectParentBrandsComponent {
             language: this.#languageService.language,
             limit: 500,
             options: new ItemListOptions({
-              name: this.#search() ? '%' + this.#search() + '%' : undefined,
+              name: search ? '%' + search + '%' : undefined,
               typeId: ItemType.ITEM_TYPE_BRAND,
             }),
-            page: this.#page(),
+            page,
           }),
         )
         .pipe(

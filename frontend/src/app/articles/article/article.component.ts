@@ -26,8 +26,8 @@ export class ArticlesArticleComponent {
   });
 
   protected readonly articleResource = rxResource({
-    stream: () => {
-      const catname = this.#catname();
+    params: () => this.#catname(),
+    stream: ({params: catname}) => {
       if (!catname) {
         return notFoundError();
       }

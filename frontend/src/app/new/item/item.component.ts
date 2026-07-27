@@ -47,14 +47,15 @@ export class NewItemComponent {
   });
 
   protected readonly itemResource = rxResource({
-    stream: () =>
+    params: () => this.#itemID(),
+    stream: ({params: itemID}) =>
       this.#itemsClient.item(
         new ItemRequest({
           fields: new ItemFields({
             nameHtml: true,
             nameText: true,
           }),
-          id: this.#itemID(),
+          id: itemID,
           language: this.#languageService.language,
         }),
       ),
@@ -73,10 +74,9 @@ export class NewItemComponent {
   }
 
   protected readonly picturesResource = rxResource({
-    stream: () => {
-      const date = this.date();
-
-      return this.#picturesClient.getPictures(
+    params: () => ({date: this.date(), itemID: this.#itemID(), page: this.#page()}),
+    stream: ({params: {date, itemID, page}}) =>
+      this.#picturesClient.getPictures(
         new PicturesRequest({
           fields: new PictureFields({
             commentsCount: true,
@@ -92,15 +92,14 @@ export class NewItemComponent {
           options: new PictureListOptions({
             acceptDate: date ? parseStringToGrpcDate(date) : undefined,
             pictureItem: new PictureItemListOptions({
-              itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: this.#itemID()}),
+              itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: itemID}),
             }),
             status: PictureStatus.PICTURE_STATUS_ACCEPTED,
           }),
           order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
-          page: this.#page(),
+          page,
           paginator: true,
         }),
-      );
-    },
+      ),
   });
 }

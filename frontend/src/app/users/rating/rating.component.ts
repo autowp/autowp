@@ -108,8 +108,8 @@ export class UsersRatingComponent implements OnInit {
   }
 
   protected readonly usersResource = rxResource({
-    stream: () => {
-      const rating = this.rating();
+    params: () => this.rating(),
+    stream: ({params: rating}) => {
       let o$: Observable<UsersRatingResponse>;
       switch (rating) {
         case Rating.COMMENT_LIKES:

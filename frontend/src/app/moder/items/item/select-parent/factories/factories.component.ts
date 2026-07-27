@@ -35,7 +35,8 @@ export class ModerItemsItemSelectParentFactoriesComponent {
   );
 
   protected readonly factoriesResource = rxResource({
-    stream: () =>
+    params: () => this.#page(),
+    stream: ({params: page}) =>
       this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({nameHtml: true}),
@@ -44,7 +45,7 @@ export class ModerItemsItemSelectParentFactoriesComponent {
           options: new ItemListOptions({
             typeId: ItemType.ITEM_TYPE_FACTORY,
           }),
-          page: this.#page(),
+          page,
         }),
       ),
   });

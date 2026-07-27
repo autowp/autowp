@@ -29,10 +29,9 @@ export class CarsSelectEngineTreeItemComponent {
 
   protected readonly open = signal(false);
   protected readonly childsResource = rxResource({
-    stream: () => {
-      const item = this.item();
-
-      return this.#itemsClient.getItemParents(
+    params: () => this.item(),
+    stream: ({params: item}) =>
+      this.#itemsClient.getItemParents(
         new ItemParentsRequest({
           fields: new ItemParentFields({
             item: new ItemFields({
@@ -50,8 +49,7 @@ export class CarsSelectEngineTreeItemComponent {
           }),
           order: ItemParentsRequest.Order.AUTO,
         }),
-      );
-    },
+      ),
   });
 
   protected selectEngine(engineId: string) {

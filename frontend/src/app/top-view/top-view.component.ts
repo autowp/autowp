@@ -27,7 +27,8 @@ export class TopViewComponent implements OnInit {
   });
 
   protected readonly dataResource = rxResource({
-    stream: () =>
+    params: () => this.#page(),
+    stream: ({params: page}) =>
       this.#picturesClient.getPictures(
         new PicturesRequest({
           fields: new PictureFields({
@@ -48,7 +49,7 @@ export class TopViewComponent implements OnInit {
             status: PictureStatus.PICTURE_STATUS_ACCEPTED,
           }),
           order: PicturesRequest.Order.ORDER_ACCEPT_DATETIME_DESC,
-          page: this.#page(),
+          page,
           paginator: true,
         }),
       ),

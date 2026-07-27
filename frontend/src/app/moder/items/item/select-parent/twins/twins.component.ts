@@ -47,8 +47,9 @@ export class ModerItemsItemSelectParentTwinsComponent {
   );
 
   protected readonly twinsBrandsResource = rxResource({
-    stream: () => {
-      if (this.brandID()) {
+    params: () => ({brandID: this.brandID(), page: this.page()}),
+    stream: ({params: {brandID, page}}) => {
+      if (brandID) {
         return of(null);
       }
       return this.#itemsClient
@@ -68,7 +69,7 @@ export class ModerItemsItemSelectParentTwinsComponent {
               typeId: ItemType.ITEM_TYPE_BRAND,
             }),
             order: ItemsRequest.Order.NAME,
-            page: this.page(),
+            page,
           }),
         )
         .pipe(
@@ -81,8 +82,8 @@ export class ModerItemsItemSelectParentTwinsComponent {
   });
 
   protected readonly twinsResource = rxResource({
-    stream: () => {
-      const brandID = this.brandID();
+    params: () => ({brandID: this.brandID(), page: this.page()}),
+    stream: ({params: {brandID, page}}) => {
       if (!brandID) {
         return of(null);
       }
@@ -100,7 +101,7 @@ export class ModerItemsItemSelectParentTwinsComponent {
             typeId: ItemType.ITEM_TYPE_TWINS,
           }),
           order: ItemsRequest.Order.NAME,
-          page: this.page(),
+          page,
         }),
       );
     },

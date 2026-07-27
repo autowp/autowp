@@ -27,8 +27,9 @@ export class CategoryGalleryComponent implements OnInit {
   });
 
   protected readonly dataResource = rxResource({
-    stream: () => {
-      if (!this.identity()) {
+    params: () => this.identity(),
+    stream: ({params: identity}) => {
+      if (!identity) {
         return notFoundError();
       }
       return this.#categoriesService

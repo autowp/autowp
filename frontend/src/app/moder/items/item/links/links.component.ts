@@ -35,10 +35,9 @@ export class ModerItemsItemLinksComponent {
   };
 
   protected readonly linksResource = rxResource({
-    stream: () =>
-      this.#itemsClient.getItemLinks(
-        new ItemLinksRequest({options: new ItemLinkListOptions({itemId: this.item().id})}),
-      ),
+    params: () => this.item().id,
+    stream: ({params: itemId}) =>
+      this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId})})),
   });
 
   protected saveLinks(itemId: string, links: ItemLink[]) {

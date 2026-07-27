@@ -58,12 +58,13 @@ export class CarsSpecsAdminComponent implements OnInit {
   });
 
   protected readonly dataResource = rxResource({
-    stream: () =>
+    params: () => this.itemID(),
+    stream: ({params: itemId}) =>
       this.#attrsClient
         .getUserValues(
           new AttrUserValuesRequest({
             fields: new AttrUserValuesFields({valueText: true}),
-            itemId: this.itemID(),
+            itemId,
             language: this.#languageService.language,
           }),
         )

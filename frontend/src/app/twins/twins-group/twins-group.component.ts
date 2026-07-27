@@ -29,8 +29,8 @@ export class TwinsGroupComponent {
   });
 
   protected readonly groupResource = rxResource({
-    stream: () => {
-      const groupID = this.#groupID();
+    params: () => this.#groupID(),
+    stream: ({params: groupID}) => {
       if (!groupID) {
         return notFoundError();
       }

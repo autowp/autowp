@@ -61,11 +61,12 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {requireSync: true});
 
   protected readonly picturesResource = rxResource({
-    stream: () =>
+    params: () => this.#itemID(),
+    stream: ({params: itemID}) =>
       this.#picturesClient
         .getPictureItems(
           new PictureItemsRequest({
-            options: new PictureItemListOptions({itemId: '' + this.#itemID()}),
+            options: new PictureItemListOptions({itemId: '' + itemID}),
           }),
         )
         .pipe(map((response) => response.items || [])),

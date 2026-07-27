@@ -35,7 +35,8 @@ export class ModerItemsItemSelectParentCategoriesComponent {
   );
 
   protected readonly categoriesResource = rxResource({
-    stream: () =>
+    params: () => this.#page(),
+    stream: ({params: page}) =>
       this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({childsCount: true, nameHtml: true}),
@@ -45,7 +46,7 @@ export class ModerItemsItemSelectParentCategoriesComponent {
             noParent: true,
             typeId: ItemType.ITEM_TYPE_CATEGORY,
           }),
-          page: this.#page(),
+          page,
         }),
       ),
   });

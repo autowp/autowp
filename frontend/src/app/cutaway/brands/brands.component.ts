@@ -45,7 +45,8 @@ export class CutawayBrandsComponent implements OnInit {
   });
 
   protected readonly queryResource = rxResource({
-    stream: () =>
+    params: () => this.#page(),
+    stream: ({params: page}) =>
       this.#itemsClient
         .list(
           new ItemsRequest({
@@ -82,7 +83,7 @@ export class CutawayBrandsComponent implements OnInit {
               typeId: ItemType.ITEM_TYPE_BRAND,
             }),
             order: ItemsRequest.Order.AGE,
-            page: this.#page(),
+            page,
           }),
         )
         .pipe(

@@ -36,7 +36,8 @@ export class CarsDatelessComponent implements OnInit {
   });
 
   protected readonly dataResource = rxResource({
-    stream: () =>
+    params: () => this.#page(),
+    stream: ({params: page}) =>
       this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({
@@ -68,7 +69,7 @@ export class CarsDatelessComponent implements OnInit {
             dateless: true,
           }),
           order: ItemsRequest.Order.AGE,
-          page: this.#page(),
+          page,
         }),
       ),
   });

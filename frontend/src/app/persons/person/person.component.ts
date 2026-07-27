@@ -32,7 +32,8 @@ export class PersonsPersonComponent {
   });
 
   protected readonly itemResource = rxResource({
-    stream: () =>
+    params: () => this.#itemID(),
+    stream: ({params: itemID}) =>
       this.#itemsClient
         .item(
           new ItemRequest({
@@ -40,7 +41,7 @@ export class PersonsPersonComponent {
               nameHtml: true,
               nameText: true,
             }),
-            id: this.#itemID(),
+            id: itemID,
             language: this.#languageService.language,
           }),
         )

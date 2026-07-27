@@ -29,7 +29,8 @@ export class UploadSelectTreeItemComponent {
   protected open = false;
 
   protected readonly childsResource = rxResource({
-    stream: () =>
+    params: () => this.item().itemId,
+    stream: ({params: parentId}) =>
       this.#itemsClient.getItemParents(
         new ItemParentsRequest({
           fields: new ItemParentFields({
@@ -41,7 +42,7 @@ export class UploadSelectTreeItemComponent {
           language: this.#languageService.language,
           limit: 500,
           options: new ItemParentListOptions({
-            parentId: this.item().itemId,
+            parentId,
           }),
           order: ItemParentsRequest.Order.AUTO,
         }),

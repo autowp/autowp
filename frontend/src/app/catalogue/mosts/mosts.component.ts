@@ -39,8 +39,8 @@ export class CatalogueMostsComponent {
   });
 
   protected readonly brandResource = rxResource({
-    stream: () => {
-      const catname = this.#brandCatname();
+    params: () => this.#brandCatname(),
+    stream: ({params: catname}) => {
       if (!catname) {
         return notFoundError();
       }

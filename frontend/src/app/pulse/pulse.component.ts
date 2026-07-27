@@ -52,7 +52,8 @@ export class PulseComponent implements OnInit {
   };
 
   protected readonly dataResource = rxResource({
-    stream: () => this.#statisticsClient.getPulse(new PulseRequest({period: this.#period()})),
+    params: () => this.#period(),
+    stream: ({params: period}) => this.#statisticsClient.getPulse(new PulseRequest({period})),
   });
 
   protected readonly legend$ = toObservable(computed(() => this.dataResource.value())).pipe(

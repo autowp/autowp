@@ -41,9 +41,8 @@ export class ModerItemsItemMetaComponent {
   protected readonly invalidParams = signal<InvalidParams>({});
 
   protected readonly vehicleTypeIDsResource = rxResource({
-    stream: (): Observable<string[]> => {
-      const item = this.item();
-
+    params: () => this.item(),
+    stream: ({params: item}): Observable<string[]> => {
       if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE || item.itemTypeId === ItemType.ITEM_TYPE_TWINS) {
         return this.#itemsClient
           .getItemVehicleTypes(

@@ -26,9 +26,9 @@ export class ModerUsersComponent implements OnInit {
   readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('page'))), {requireSync: true});
 
   protected readonly usersResource = rxResource({
-    stream: () => {
-      const pageStr = this.#page();
-      return this.#usersClient.getUsers(
+    params: () => this.#page(),
+    stream: ({params: pageStr}) =>
+      this.#usersClient.getUsers(
         new UsersRequest({
           fields: new UserFields({
             email: true,
@@ -40,8 +40,7 @@ export class ModerUsersComponent implements OnInit {
           limit: 30,
           page: pageStr ? parseInt(pageStr) : undefined,
         }),
-      );
-    },
+      ),
   });
 
   ngOnInit(): void {
