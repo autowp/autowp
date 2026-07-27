@@ -120,7 +120,7 @@ func (s *UsersGRPCServer) DeleteUser(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
@@ -177,11 +177,11 @@ func (s *UsersGRPCServer) DisableUserCommentsNotifications(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if in.GetUserId() == userCtx.UserID {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	err = s.userRepository.SetDisableUserCommentsNotifications(
@@ -207,11 +207,11 @@ func (s *UsersGRPCServer) EnableUserCommentsNotifications(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if in.GetUserId() == userCtx.UserID {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	err = s.userRepository.SetDisableUserCommentsNotifications(
@@ -237,11 +237,11 @@ func (s *UsersGRPCServer) GetUserPreferences(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if in.GetUserId() == userCtx.UserID {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	prefs, err := s.userRepository.UserPreferences(ctx, userCtx.UserID, in.GetUserId())
@@ -323,7 +323,7 @@ func (s *UsersGRPCServer) GetAccounts(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	rows, err := s.userRepository.UserAccounts(ctx, userCtx.UserID)
@@ -369,7 +369,7 @@ func (s *UsersGRPCServer) DeleteUserAccount(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	canRemove, err := s.canRemoveAccount(ctx, userCtx.UserID, in.GetId())
@@ -378,7 +378,7 @@ func (s *UsersGRPCServer) DeleteUserAccount(
 	}
 
 	if !canRemove {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	err = s.userRepository.RemoveUserAccount(ctx, in.GetId())
@@ -399,7 +399,7 @@ func (s *UsersGRPCServer) DeleteUserPhoto(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleUsersModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetId() == 0 {
@@ -441,7 +441,7 @@ func (s *UsersGRPCServer) UpdateUser(
 	}
 
 	if userCtx.UserID != values.GetId() {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	maskPaths := in.GetUpdateMask().GetPaths()

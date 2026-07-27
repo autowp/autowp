@@ -56,7 +56,7 @@ func (s *TrafficGRPCServer) GetTrafficTop(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	items, err := s.traffic.Monitoring.ListOfTop(ctx, trafficTopLimit)
@@ -139,12 +139,12 @@ func (s *TrafficGRPCServer) DeleteTrafficBlacklistItem(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleUsersModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	ip := net.ParseIP(in.GetIp())
 	if ip == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	err = s.traffic.Ban.Remove(ctx, ip)
@@ -165,12 +165,12 @@ func (s *TrafficGRPCServer) DeleteTrafficWhitelistItem(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	ip := net.ParseIP(in.GetIp())
 	if ip == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	err = s.traffic.Whitelist.Remove(ctx, ip)
@@ -191,14 +191,14 @@ func (s *TrafficGRPCServer) CreateTrafficBlacklistItem(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleUsersModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	item := in.GetItem()
 
 	ip := net.ParseIP(item.GetIp())
 	if ip == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	duration := time.Hour * time.Duration(item.GetPeriod())
@@ -221,14 +221,14 @@ func (s *TrafficGRPCServer) CreateTrafficWhitelistItem(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	item := in.GetItem()
 
 	ip := net.ParseIP(item.GetIp())
 	if ip == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	ctx = context.WithoutCancel(ctx)
@@ -256,7 +256,7 @@ func (s *TrafficGRPCServer) GetTrafficWhitelistItems(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	list, err := s.traffic.Whitelist.List(ctx)

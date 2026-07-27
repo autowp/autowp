@@ -32,7 +32,7 @@ func (s *LogGRPCServer) GetEvents(ctx context.Context, in *LogEventsRequest) (*L
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	res, pages, err := s.repository.Events(ctx, log.ListOptions{

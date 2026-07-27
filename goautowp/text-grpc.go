@@ -56,7 +56,7 @@ func (s *TextGRPCServer) GetText(
 	}
 
 	if !success {
-		return nil, status.Error(codes.NotFound, "NotFound")
+		return nil, status.Error(codes.NotFound, "not found")
 	}
 
 	if currentRevision == 0 {
@@ -64,7 +64,7 @@ func (s *TextGRPCServer) GetText(
 	}
 
 	if currentRevision != lastRevision && !isModer {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	stCurrent := struct {

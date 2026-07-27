@@ -19,6 +19,8 @@ type ItemParentLanguageRepository struct {
 	contentLanguages []string
 }
 
+var extraSpacesRegexp = regexp.MustCompile("[[:space:]]+")
+
 func yearsPrefix(begin int32, end int32) string {
 	if begin <= 0 && end <= 0 {
 		return ""
@@ -344,8 +346,7 @@ func (s *ItemParentLanguageRepository) ExtractName(
 		}
 	}
 
-	re := regexp.MustCompile("[[:space:]]+")
-	name = strings.TrimSpace(re.ReplaceAllString(name, " "))
+	name = strings.TrimSpace(extraSpacesRegexp.ReplaceAllString(name, " "))
 
 	name = strings.TrimLeft(name, "/")
 	if len(name) == 0 && len(vehicleRow.Body) > 0 && vehicleRow.Body != parentRow.Body {

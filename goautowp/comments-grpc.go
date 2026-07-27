@@ -316,7 +316,7 @@ func (s *CommentsGRPCServer) GetCommentVotes(
 	}
 
 	if votes == nil {
-		return nil, status.Errorf(codes.NotFound, "NotFound")
+		return nil, status.Errorf(codes.NotFound, "not found")
 	}
 
 	result := make([]*CommentVote, 0)
@@ -438,11 +438,11 @@ func (s *CommentsGRPCServer) SetDeleted(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCommentsModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetDeleted() {
@@ -468,11 +468,11 @@ func (s *CommentsGRPCServer) MoveComment(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleForumsModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	commentType, err := s.repository.GetCommentType(ctx, in.GetCommentId())
@@ -481,7 +481,7 @@ func (s *CommentsGRPCServer) MoveComment(
 	}
 
 	if commentType != schema.CommentMessageTypeIDForums {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	commentsType, err := convertCommentsType(in.GetTypeId())
@@ -507,7 +507,7 @@ func (s *CommentsGRPCServer) VoteComment(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	votesLeft, err := s.usersRepository.GetVotesLeft(ctx, userCtx.UserID)
@@ -592,7 +592,7 @@ func (s *CommentsGRPCServer) Add(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	InvalidParams, err := in.Validate(ctx, s.repository, userCtx.UserID)
@@ -718,7 +718,7 @@ func (s *CommentsGRPCServer) GetMessage(
 	}
 
 	if row == nil {
-		return nil, status.Errorf(codes.NotFound, "NotFound")
+		return nil, status.Errorf(codes.NotFound, "not found")
 	}
 
 	return extractMessage(
@@ -806,7 +806,7 @@ func (s *CommentsGRPCServer) GetMessages(
 			options.PicturesOfItemID = in.GetPicturesOfItemId()
 		}
 	} else if in.GetItemId() == 0 && in.GetUserId() == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetLimit() <= 0 {

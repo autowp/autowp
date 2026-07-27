@@ -31,6 +31,8 @@ var (
 	errLabelNotMatchedByRegexp          = errors.New("label not matched by regular expression")
 )
 
+var vodLabelRegexp = regexp.MustCompile(`^vod/(\d{4}-\d{2}-\d{2})/(\d+)/(\d+)$`)
+
 type YoomoneyHandler struct {
 	price              decimal2.Decimal
 	notificationSecret string
@@ -122,9 +124,7 @@ func (s *YoomoneyHandler) Handle(ctx context.Context, fields YoomoneyWebhook) er
 		return errPriceIsGreaterThanWithdrawAmount
 	}
 
-	re := regexp.MustCompile(`^vod/(\d{4}-\d{2}-\d{2})/(\d+)/(\d+)$`)
-
-	matches := re.FindStringSubmatch(fields.Label)
+	matches := vodLabelRegexp.FindStringSubmatch(fields.Label)
 	if len(matches) < 2 {
 		return errLabelNotMatchedByRegexp
 	}

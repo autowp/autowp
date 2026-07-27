@@ -27,7 +27,7 @@ func (s *AchievementsGRPCServer) GetUserAchievements(
 ) (*UserAchievementsList, error) {
 	userID := in.GetUserId()
 	if userID == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	result, err := s.repository.UserAchievements(ctx, userID)

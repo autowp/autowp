@@ -37,6 +37,11 @@ var specialCharacters = map[rune]string{
 	')':  "_",
 }
 
+var (
+	disallowedFilenameCharsRegexp = regexp.MustCompile("[^A-Za-z0-9.(){}_-]")
+	repeatedUnderscoreRegexp      = regexp.MustCompile("[_]{2,}")
+)
+
 func replaceSpecialCharacters(s string) string {
 	var sb strings.Builder
 
@@ -59,13 +64,11 @@ func SanitizeFilename(filename string) string {
 
 	filename = replaceSpecialCharacters(filename)
 
-	re := regexp.MustCompile("[^A-Za-z0-9.(){}_-]")
-	filename = re.ReplaceAllString(filename, "_")
+	filename = disallowedFilenameCharsRegexp.ReplaceAllString(filename, "_")
 
 	filename = strings.Trim(filename, "_-")
 
-	re2 := regexp.MustCompile("[_]{2,}")
-	filename = re2.ReplaceAllString(filename, "_")
+	filename = repeatedUnderscoreRegexp.ReplaceAllString(filename, "_")
 
 	switch filename {
 	case ".", "..", "":

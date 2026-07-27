@@ -102,7 +102,7 @@ func (s *AttrsGRPCServer) GetAttribute(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	row, err := s.repository.Attribute(ctx, in.GetId())
@@ -111,7 +111,7 @@ func (s *AttrsGRPCServer) GetAttribute(
 	}
 
 	if row == nil {
-		return nil, status.Error(codes.NotFound, "NotFound")
+		return nil, status.Error(codes.NotFound, "not found")
 	}
 
 	return convertAttribute(row), nil
@@ -126,7 +126,7 @@ func (s *AttrsGRPCServer) ListAttributes(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	rows, err := s.repository.Attributes(
@@ -178,7 +178,7 @@ func (s *AttrsGRPCServer) GetListOptions(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	rows, err := s.repository.ListOptions(ctx, in.GetAttributeId())
@@ -412,7 +412,7 @@ func (s *AttrsGRPCServer) GetConflicts(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	const conflictsPerPage = 30

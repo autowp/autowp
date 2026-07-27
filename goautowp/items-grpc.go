@@ -425,7 +425,7 @@ func (s *ItemsGRPCServer) Item(ctx context.Context, in *ItemRequest) (*Item, err
 	if fields != nil &&
 		(fields.InboxPicturesCount || fields.CommentsAttentionsCount || fields.Meta) &&
 		!isModer {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	res, err := s.repository.Item(ctx, &query.ItemListOptions{
@@ -455,14 +455,14 @@ func (s *ItemsGRPCServer) List(ctx context.Context, in *ItemsRequest) (*ItemList
 	if fields != nil &&
 		(fields.InboxPicturesCount || fields.CommentsAttentionsCount || fields.Meta) &&
 		!isModer {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	inOptions := in.GetOptions()
 
 	if (inOptions.GetExcludeSelfAndChilds() > 0 || inOptions.GetAutocomplete() != "" ||
 		inOptions.GetSuggestionsTo() != 0) && !isModer {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	options, err := convertItemListOptions(inOptions)
@@ -545,7 +545,7 @@ func (s *ItemsGRPCServer) GetItemsFirstChars(
 
 	if (inOptions.GetExcludeSelfAndChilds() > 0 || inOptions.GetAutocomplete() != "" ||
 		inOptions.GetSuggestionsTo() != 0) && !isModer {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	options, err := convertItemListOptions(inOptions)
@@ -629,7 +629,7 @@ func (s *ItemsGRPCServer) DeleteItemLink(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	_, err = s.db.Delete(schema.ItemLinkTable).
@@ -652,7 +652,7 @@ func (s *ItemsGRPCServer) CreateItemLink(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	InvalidParams, err := in.Validate()
@@ -695,7 +695,7 @@ func (s *ItemsGRPCServer) UpdateItemLink(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	InvalidParams, err := in.Validate()
@@ -809,11 +809,11 @@ func (s *ItemsGRPCServer) GetItemVehicleTypes(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetItemId() == 0 && in.GetVehicleTypeId() == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	sqlSelect := s.db.Select(schema.ItemVehicleTypeTableItemIDCol, schema.ItemVehicleTypeTableVehicleTypeIDCol).
@@ -869,11 +869,11 @@ func (s *ItemsGRPCServer) GetItemVehicleType(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetItemId() == 0 && in.GetVehicleTypeId() == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	sqlSelect := s.db.Select(schema.ItemVehicleTypeTableItemIDCol, schema.ItemVehicleTypeTableVehicleTypeIDCol).
@@ -917,7 +917,7 @@ func (s *ItemsGRPCServer) CreateItemVehicleType(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	count, err := s.repository.Count(ctx, query.ItemListOptions{
@@ -952,7 +952,7 @@ func (s *ItemsGRPCServer) DeleteItemVehicleType(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	err = s.repository.RemoveItemVehicleType(ctx, in.GetItemId(), in.GetVehicleTypeId())
@@ -972,7 +972,7 @@ func (s *ItemsGRPCServer) GetItemLanguages(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	rows, err := s.repository.ItemLanguageList(ctx, in.GetItemId())
@@ -1025,7 +1025,7 @@ func (s *ItemsGRPCServer) UpdateItemLanguage(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	InvalidParams, err := in.Validate()
@@ -1166,7 +1166,7 @@ func (s *ItemsGRPCServer) GetItemParentLanguages(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	rows, err := s.repository.ParentLanguageList(ctx, in.GetItemId(), in.GetParentId())
@@ -1196,7 +1196,7 @@ func (s *ItemsGRPCServer) GetStats(ctx context.Context, _ *emptypb.Empty) (*Stat
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	totalBrands, err := s.repository.Count(ctx, query.ItemListOptions{
@@ -1426,7 +1426,7 @@ func (s *ItemsGRPCServer) SetItemParentLanguage(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	InvalidParams, err := in.Validate()
@@ -1631,7 +1631,7 @@ func (s *ItemsGRPCServer) CreateItemParent(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	InvalidParams, err := in.Validate()
@@ -1743,7 +1743,7 @@ func (s *ItemsGRPCServer) UpdateItemParent(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	InvalidParams, err := in.Validate()
@@ -1780,7 +1780,7 @@ func (s *ItemsGRPCServer) DeleteItemParent(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	item, err := s.repository.Item(
@@ -1866,7 +1866,7 @@ func (s *ItemsGRPCServer) MoveItemParent(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	ctx = context.WithoutCancel(ctx)
@@ -1959,7 +1959,7 @@ func (s *ItemsGRPCServer) RefreshInheritance(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	ctx = context.WithoutCancel(ctx)
@@ -1986,7 +1986,7 @@ func (s *ItemsGRPCServer) SetUserItemSubscription(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetSubscribed() {
@@ -2042,7 +2042,7 @@ func (s *ItemsGRPCServer) GetItemParent(
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
 	if !isModer {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	inOptions := in.GetOptions()
@@ -2097,7 +2097,7 @@ func (s *ItemsGRPCServer) GetItemParents(
 	inOptions := in.GetOptions()
 
 	if inOptions.GetItemId() == 0 && inOptions.GetParentId() == 0 && !isModer {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	options, err := convertItemParentListOptions(inOptions)
@@ -2385,7 +2385,7 @@ func (s *ItemsGRPCServer) GetAlpha(ctx context.Context, _ *emptypb.Empty) (*Alph
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
 	if !isModer {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	chars, err := s.repository.FirstCharacters(ctx)
@@ -2439,7 +2439,7 @@ func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *Item) (*ItemID, er
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	in.Id = 0
@@ -2587,7 +2587,7 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetItem().GetId() == 0 {
@@ -2907,7 +2907,7 @@ func (s *ItemsGRPCServer) GetTree(ctx context.Context, in *GetTreeRequest) (*Tre
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetId() == 0 {
@@ -2941,7 +2941,7 @@ func (s *ItemsGRPCServer) GetVehicleTypes(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	rows, err := s.catalogue.getVehicleTypesTree(ctx, 0)

@@ -43,13 +43,13 @@ func (s *ContactsGRPCServer) CreateContact(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	contact := in.GetContact()
 
 	if contact.GetContactUserId() == userCtx.UserID {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	deleted := false
@@ -65,7 +65,7 @@ func (s *ContactsGRPCServer) CreateContact(
 	}
 
 	if user == nil {
-		return nil, status.Error(codes.NotFound, "NotFound")
+		return nil, status.Error(codes.NotFound, "not found")
 	}
 
 	err = s.contactsRepository.create(ctx, userCtx.UserID, contact.GetContactUserId())
@@ -86,7 +86,7 @@ func (s *ContactsGRPCServer) DeleteContact(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	err = s.contactsRepository.delete(ctx, userCtx.UserID, in.GetUserId())
@@ -107,11 +107,11 @@ func (s *ContactsGRPCServer) GetContact(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetUserId() == userCtx.UserID {
-		return nil, status.Error(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Error(codes.InvalidArgument, "invalid argument")
 	}
 
 	exists, err := s.contactsRepository.isExists(ctx, userCtx.UserID, in.GetUserId())
@@ -120,7 +120,7 @@ func (s *ContactsGRPCServer) GetContact(
 	}
 
 	if !exists {
-		return nil, status.Error(codes.NotFound, "NotFound")
+		return nil, status.Error(codes.NotFound, "not found")
 	}
 
 	return &Contact{
@@ -138,7 +138,7 @@ func (s *ContactsGRPCServer) GetContacts(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Error(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	userRows, _, err := s.userRepository.Users(ctx, &query.UserListOptions{

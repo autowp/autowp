@@ -55,7 +55,7 @@ func (s *ForumsGRPCServer) GetUserSummary(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	subscriptionsCount, err := s.forums.GetUserSummary(ctx, userCtx.UserID)
@@ -78,7 +78,7 @@ func (s *ForumsGRPCServer) CreateTopic(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	InvalidParams, err := in.Validate(ctx, s.commentsRepository, userCtx.UserID)
@@ -219,12 +219,12 @@ func (s *ForumsGRPCServer) CloseTopic(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	forumAdmin := util.Contains(userCtx.Roles, users.RoleForumsModer)
 	if !forumAdmin {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	err = s.forums.Close(ctx, in.GetId())
@@ -245,12 +245,12 @@ func (s *ForumsGRPCServer) OpenTopic(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	forumAdmin := util.Contains(userCtx.Roles, users.RoleForumsModer)
 	if !forumAdmin {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	err = s.forums.Open(ctx, in.GetId())
@@ -271,12 +271,12 @@ func (s *ForumsGRPCServer) DeleteTopic(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	forumAdmin := util.Contains(userCtx.Roles, users.RoleForumsModer)
 	if !forumAdmin {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	err = s.forums.Delete(ctx, in.GetId())
@@ -297,12 +297,12 @@ func (s *ForumsGRPCServer) UpdateTopic(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	forumAdmin := util.Contains(userCtx.Roles, users.RoleForumsModer)
 	if !forumAdmin {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	err = s.forums.MoveTopic(ctx, in.GetTopic().GetId(), in.GetTopic().GetThemeId())

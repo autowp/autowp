@@ -27,7 +27,11 @@ var TimeZones = sync.OnceValue(func() []string {
 	var result []string
 
 	// Reads the Directory corresponding to the OS
-	dirFile, _ := os.ReadDir(zoneDirs[runtime.GOOS])
+	dirFile, err := os.ReadDir(zoneDirs[runtime.GOOS])
+	if err != nil {
+		logrus.Error(err)
+	}
+
 	for _, i := range dirFile {
 		// Checks if starts with Capital Letter
 		if i.Name() == (strings.ToUpper(i.Name()[:1]) + i.Name()[1:]) {

@@ -87,7 +87,7 @@ func (s *GRPCServer) GetIP(ctx context.Context, in *GetIPRequest) (*IP, error) {
 
 	ip := net.ParseIP(in.GetIp())
 	if ip == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	m := make(map[string]bool)

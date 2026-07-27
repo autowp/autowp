@@ -17,6 +17,10 @@ const (
 	ItemAlias                     = "i"
 )
 
+var autocompleteRegexp = regexp.MustCompile(
+	`^(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?$`,
+)
+
 func AppendItemAlias(alias string, suffix string) string {
 	return alias + "_" + ItemAlias + suffix
 }
@@ -795,10 +799,7 @@ func (s *ItemListOptions) applyAutocompleteFilter(
 
 	var err error
 
-	regex := regexp.MustCompile(
-		`^(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?$`,
-	)
-	match := regex.FindStringSubmatch(query)
+	match := autocompleteRegexp.FindStringSubmatch(query)
 
 	if match != nil {
 		query = strings.TrimSpace(match[5])

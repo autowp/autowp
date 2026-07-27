@@ -133,7 +133,7 @@ func (s *PicturesGRPCServer) Vote(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	err = s.repository.Vote(ctx, in.GetPictureId(), in.GetValue(), userCtx.UserID)
@@ -196,11 +196,11 @@ func (s *PicturesGRPCServer) CreateModerVoteTemplate(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	tpl := schema.PictureModerVoteTemplateRow{
@@ -236,11 +236,11 @@ func (s *PicturesGRPCServer) DeleteModerVoteTemplate(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	err = s.repository.DeleteModerVoteTemplate(ctx, in.GetId(), userCtx.UserID)
@@ -261,11 +261,11 @@ func (s *PicturesGRPCServer) GetModerVoteTemplates(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	rows, err := s.repository.GetModerVoteTemplates(ctx, userCtx.UserID)
@@ -293,11 +293,11 @@ func (s *PicturesGRPCServer) DeleteModerVote(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	pictureID := in.GetPictureId()
@@ -333,11 +333,11 @@ func (s *PicturesGRPCServer) UpdateModerVote(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	InvalidParams, err := in.Validate()
@@ -493,7 +493,7 @@ func (s *PicturesGRPCServer) GetUserSummary(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	acceptedCount, err := s.repository.Count(ctx, &query.PictureListOptions{
@@ -588,15 +588,15 @@ func (s *PicturesGRPCServer) DeleteSimilar(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	if in.GetId() == 0 || in.GetSimilarPictureId() == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	ctx = context.WithoutCancel(ctx)
@@ -627,11 +627,11 @@ func (s *PicturesGRPCServer) Repair(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	err = s.repository.Repair(ctx, in.GetId())
@@ -656,11 +656,11 @@ func (s *PicturesGRPCServer) SetPictureItemArea(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	pictureItemType := convertPictureItemType(in.GetType())
@@ -705,13 +705,13 @@ func (s *PicturesGRPCServer) SetPictureItemPerspective(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
 		pictureID := in.GetPictureId()
 		if pictureID == 0 {
-			return nil, status.Error(codes.NotFound, "NotFound")
+			return nil, status.Error(codes.NotFound, "not found")
 		}
 
 		pic, err := s.repository.Picture(
@@ -723,7 +723,7 @@ func (s *PicturesGRPCServer) SetPictureItemPerspective(
 
 		if !pic.OwnerID.Valid || pic.OwnerID.Int64 != userCtx.UserID ||
 			pic.Status != schema.PictureStatusInbox {
-			return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 		}
 	}
 
@@ -765,11 +765,11 @@ func (s *PicturesGRPCServer) SetPictureItemItemID(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	pictureItemType := convertPictureItemType(in.GetType())
@@ -817,11 +817,11 @@ func (s *PicturesGRPCServer) DeletePictureItem(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	pictureItemType := convertPictureItemType(in.GetType())
@@ -838,7 +838,7 @@ func (s *PicturesGRPCServer) DeletePictureItem(
 	}
 
 	if !success {
-		return nil, status.Errorf(codes.NotFound, "NotFound")
+		return nil, status.Errorf(codes.NotFound, "not found")
 	}
 
 	err = s.events.Add(ctx, Event{
@@ -868,11 +868,11 @@ func (s *PicturesGRPCServer) CreatePictureItem(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	pictureItemType := convertPictureItemType(in.GetType())
@@ -918,13 +918,13 @@ func (s *PicturesGRPCServer) SetPictureCrop(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
 		pictureID := in.GetPictureId()
 		if pictureID == 0 {
-			return nil, status.Error(codes.NotFound, "NotFound")
+			return nil, status.Error(codes.NotFound, "not found")
 		}
 
 		pic, err := s.repository.Picture(
@@ -932,7 +932,7 @@ func (s *PicturesGRPCServer) SetPictureCrop(
 		)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				return nil, status.Errorf(codes.NotFound, "NotFound")
+				return nil, status.Errorf(codes.NotFound, "not found")
 			}
 
 			return nil, status.Error(codes.Internal, err.Error())
@@ -940,7 +940,7 @@ func (s *PicturesGRPCServer) SetPictureCrop(
 
 		if !pic.OwnerID.Valid || pic.OwnerID.Int64 != userCtx.UserID ||
 			pic.Status != schema.PictureStatusInbox {
-			return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 		}
 	}
 
@@ -985,11 +985,11 @@ func (s *PicturesGRPCServer) ClearReplacePicture(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	ctx = context.WithoutCancel(ctx)
@@ -1023,16 +1023,16 @@ func (s *PicturesGRPCServer) AcceptReplacePicture(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	pictureID := in.GetId()
 	if pictureID == 0 {
-		return nil, status.Errorf(codes.NotFound, "NotFound")
+		return nil, status.Errorf(codes.NotFound, "not found")
 	}
 
 	pic, err := s.repository.Picture(
@@ -1043,7 +1043,7 @@ func (s *PicturesGRPCServer) AcceptReplacePicture(
 	}
 
 	if !pic.ReplacePictureID.Valid {
-		return nil, status.Errorf(codes.NotFound, "NotFound")
+		return nil, status.Errorf(codes.NotFound, "not found")
 	}
 
 	replacePicture, err := s.repository.Picture(
@@ -1054,7 +1054,7 @@ func (s *PicturesGRPCServer) AcceptReplacePicture(
 	}
 
 	if !s.canReplace(pic, replacePicture, userCtx.Roles) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	ctx = context.WithoutCancel(ctx)
@@ -1172,11 +1172,11 @@ func (s *PicturesGRPCServer) SetPicturePoint(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	var (
@@ -1219,11 +1219,11 @@ func (s *PicturesGRPCServer) UpdatePicture(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	inDate := in.GetTakenDate()
@@ -1266,11 +1266,11 @@ func (s *PicturesGRPCServer) SetPictureCopyrights(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	pictureID := in.GetId()
@@ -1284,7 +1284,7 @@ func (s *PicturesGRPCServer) SetPictureCopyrights(
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, status.Errorf(codes.NotFound, "NotFound")
+			return nil, status.Errorf(codes.NotFound, "not found")
 		}
 
 		return nil, status.Error(codes.Internal, err.Error())
@@ -1318,16 +1318,16 @@ func (s *PicturesGRPCServer) SetPictureStatus(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	pictureID := in.GetId()
 	if pictureID == 0 {
-		return nil, status.Errorf(codes.NotFound, "NotFound")
+		return nil, status.Errorf(codes.NotFound, "not found")
 	}
 
 	pic, err := s.repository.Picture(
@@ -1347,7 +1347,7 @@ func (s *PicturesGRPCServer) SetPictureStatus(
 		}
 
 		if !canAccept {
-			return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 		}
 
 		isFirstTimeAccepted, success, err := s.repository.Accept(ctx, pic.ID, userCtx.UserID)
@@ -1385,7 +1385,7 @@ func (s *PicturesGRPCServer) SetPictureStatus(
 		case schema.PictureStatusRemoving:
 			canRestore := util.Contains(userCtx.Roles, users.RoleAdmin)
 			if !canRestore {
-				return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+				return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 			}
 
 			err = s.restoreFromRemoving(ctx, pic.ID, userCtx.UserID)
@@ -1395,7 +1395,7 @@ func (s *PicturesGRPCServer) SetPictureStatus(
 		case schema.PictureStatusAccepted:
 			canUnaccept := util.Contains(userCtx.Roles, users.RolePicturesModer)
 			if !canUnaccept {
-				return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+				return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 			}
 
 			err = s.unaccept(ctx, pic.ID, userCtx.UserID)
@@ -1411,7 +1411,7 @@ func (s *PicturesGRPCServer) SetPictureStatus(
 		}
 
 		if !canDelete {
-			return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 		}
 
 		success, err := s.repository.QueueRemove(ctx, pic.ID, userCtx.UserID)
@@ -1436,10 +1436,10 @@ func (s *PicturesGRPCServer) SetPictureStatus(
 		}
 
 	case PictureStatus_PICTURE_STATUS_REMOVED:
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 
 	case PictureStatus_PICTURE_STATUS_UNKNOWN:
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, pic.ID)
@@ -1482,12 +1482,12 @@ func (s *PicturesGRPCServer) GetPictureItem(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
 	if !isModer {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	options, err := convertPictureItemListOptions(in.GetOptions())
@@ -1526,7 +1526,7 @@ func (s *PicturesGRPCServer) GetPictureItems(
 	inOptions := in.GetOptions()
 
 	if inOptions.GetPictureId() == 0 && inOptions.GetItemId() == 0 {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	options, err := convertPictureItemListOptions(inOptions)
@@ -1789,7 +1789,7 @@ func (s *PicturesGRPCServer) GetInbox(ctx context.Context, in *InboxRequest) (*I
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	listOptions := query.PictureListOptions{
@@ -1979,7 +1979,7 @@ func (s *PicturesGRPCServer) GetCanonicalRoute(
 ) (*CanonicalRoute, error) {
 	identity := in.GetIdentity()
 	if identity == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	picture, err := s.repository.Picture(ctx, &query.PictureListOptions{
@@ -2078,12 +2078,12 @@ func (s *PicturesGRPCServer) CorrectFileNames(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	id := in.GetId()
 	if id == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
 	err = s.repository.CorrectFileNames(ctx, id)
@@ -2152,7 +2152,7 @@ func (s *PicturesGRPCServer) GetGallery(
 		row, err := s.repository.Picture(ctx, &filterCopy, nil, pictures.OrderByNone)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				return nil, status.Errorf(codes.NotFound, "NotFound")
+				return nil, status.Errorf(codes.NotFound, "not found")
 			}
 
 			return nil, status.Error(codes.Internal, err.Error())
@@ -2346,7 +2346,7 @@ func (s *PicturesGRPCServer) enforcePictureImageOperation(
 	pictureID int64,
 ) (int64, error) {
 	if pictureID == 0 {
-		return 0, status.Error(codes.NotFound, "NotFound")
+		return 0, status.Error(codes.NotFound, "not found")
 	}
 
 	userCtx, err := s.auth.ValidateGRPC(ctx)
@@ -2355,11 +2355,11 @@ func (s *PicturesGRPCServer) enforcePictureImageOperation(
 	}
 
 	if userCtx.UserID == 0 {
-		return 0, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return 0, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return 0, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return 0, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	pic, err := s.repository.Picture(
@@ -2370,13 +2370,13 @@ func (s *PicturesGRPCServer) enforcePictureImageOperation(
 	}
 
 	if pic == nil {
-		return 0, status.Errorf(codes.NotFound, "NotFound")
+		return 0, status.Errorf(codes.NotFound, "not found")
 	}
 
 	canNormalize := pic.Status == schema.PictureStatusInbox &&
 		util.Contains(userCtx.Roles, users.RolePicturesModer)
 	if !canNormalize {
-		return 0, status.Errorf(codes.PermissionDenied, "PermissionDenied")
+		return 0, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
 	return userCtx.UserID, nil
@@ -2761,13 +2761,13 @@ func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, use
 		inOptions.GetReplacePicture() != nil || inOptions.GetHasNoPictureItem() || inOptions.GetHasNoPoint() ||
 		inOptions.GetAddedFrom() != nil || inOptions.GetPictureItem().GetExcludeAncestorOrSelfId() != 0)
 	if restricted {
-		return status.Error(codes.PermissionDenied, "PermissionDenied")
+		return status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	restricted = !isModer && (fields.GetAcceptedCount() || fields.GetExif() || fields.GetIsLast() ||
 		fields.GetSpecialName() || fields.GetSiblings() != nil)
 	if restricted {
-		return status.Error(codes.PermissionDenied, "PermissionDenied")
+		return status.Error(codes.PermissionDenied, "permission denied")
 	}
 
 	return nil

@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+var whitespaceRunRegexp = regexp.MustCompile("[[:space:]]+")
+
 // StringSingleSpaces filter.
 type StringSingleSpaces struct{}
 
@@ -16,11 +18,10 @@ func (s *StringSingleSpaces) FilterString(value string) string {
 
 	value = strings.ReplaceAll(value, "\r", "")
 	lines := strings.Split(value, "\n")
-	re := regexp.MustCompile("[[:space:]]+")
 	out := make([]string, len(lines))
 
 	for idx, line := range lines {
-		out[idx] = re.ReplaceAllString(line, " ")
+		out[idx] = whitespaceRunRegexp.ReplaceAllString(line, " ")
 	}
 
 	return strings.Join(out, "\n")

@@ -28,6 +28,8 @@ type NamingStrategy interface {
 
 const ItemPerDir = 1000
 
+var pathSeparatorRegexp = regexp.MustCompile(`[/\\]+`)
+
 type NamingStrategySerial struct {
 	deep int
 }
@@ -35,8 +37,7 @@ type NamingStrategySerial struct {
 type NamingStrategyPattern struct{}
 
 func normalizePattern(pattern string) string {
-	a := regexp.MustCompile(`[/\\]+`)
-	patternComponents := a.Split(pattern, -1)
+	patternComponents := pathSeparatorRegexp.Split(pattern, -1)
 
 	result := make([]string, 0)
 

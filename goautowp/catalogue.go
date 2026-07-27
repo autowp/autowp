@@ -49,11 +49,10 @@ func (s *Catalogue) getVehicleTypesTree(
 	}
 
 	rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
-	defer util.Close(rows)
-
 	if err != nil {
 		return nil, err
 	}
+	defer util.Close(rows)
 
 	result := make([]*VehicleType, 0)
 
@@ -153,14 +152,14 @@ func (s *Catalogue) getPerspectiveGroups(
 		wg.Add(1)
 
 		go func() {
+			defer wg.Done()
+
 			perspectives, err := s.getPerspectives(ctx, &group.Id)
 			if err != nil {
 				return
 			}
 
 			group.Perspectives = perspectives
-
-			wg.Done()
 		}()
 
 		perspectiveGroups = append(perspectiveGroups, &group)
@@ -201,14 +200,14 @@ func (s *Catalogue) getPerspectivePages(ctx context.Context) ([]*PerspectivePage
 		wg.Add(1)
 
 		go func() {
+			defer wg.Done()
+
 			groups, err := s.getPerspectiveGroups(ctx, page.GetId())
 			if err != nil {
 				return
 			}
 
 			page.Groups = groups
-
-			wg.Done()
 		}()
 
 		perspectivePages = append(perspectivePages, &page)

@@ -50,6 +50,8 @@ var (
 	errUpdateMessageChatMissing = errors.New("update.message.chat is nil")
 )
 
+var spacesRegExp = regexp.MustCompile(`[[:space:]]+`)
+
 type Service struct {
 	config              config.TelegramConfig
 	db                  *goqu.Database
@@ -753,8 +755,6 @@ func (s *Service) handleMeCommand(ctx context.Context, update *tgbotapi.Update) 
 	if update.Message.Chat == nil {
 		return errUpdateMessageChatMissing
 	}
-
-	spacesRegExp := regexp.MustCompile(`[[:space:]]+`)
 
 	args := spacesRegExp.Split(strings.TrimSpace(update.Message.CommandArguments()), -1)
 	if args[0] == "" {

@@ -41,7 +41,7 @@ func (s *MessagingGRPCServer) GetMessagesNewCount(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	count, err := s.repository.GetUserNewMessagesCount(ctx, userCtx.UserID)
@@ -64,7 +64,7 @@ func (s *MessagingGRPCServer) GetMessagesSummary(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	inbox, err := s.repository.GetInboxCount(ctx, userCtx.UserID)
@@ -111,7 +111,7 @@ func (s *MessagingGRPCServer) DeleteMessage(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	err = s.repository.DeleteMessage(ctx, userCtx.UserID, in.GetMessageId())
@@ -132,7 +132,7 @@ func (s *MessagingGRPCServer) ClearFolder(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	switch in.GetFolder() {
@@ -148,7 +148,7 @@ func (s *MessagingGRPCServer) ClearFolder(
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 	default:
-		return nil, status.Error(codes.InvalidArgument, "InvalidArgument")
+		return nil, status.Error(codes.InvalidArgument, "invalid argument")
 	}
 
 	return &emptypb.Empty{}, nil
@@ -164,7 +164,7 @@ func (s *MessagingGRPCServer) CreateMessage(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	var (
@@ -214,7 +214,7 @@ func (s *MessagingGRPCServer) GetMessages(
 	}
 
 	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	var (
