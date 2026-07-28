@@ -274,8 +274,6 @@ func (s *Application) ListenMessagingWSEvents(ctx context.Context, quit chan boo
 
 	err = messaging.Subscribe(ctx, redisClient, hub, quit)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -299,8 +297,6 @@ func (s *Application) ListenPicturesWSEvents(ctx context.Context, quit chan bool
 
 	err = pictures.Subscribe(ctx, redisClient, hub, quit)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -319,8 +315,6 @@ func (s *Application) ListenDuplicateFinderAMQP(ctx context.Context, quit chan b
 
 	err = df.ListenAMQP(ctx, quit)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -395,8 +389,6 @@ func (s *Application) SchedulerHourly(ctx context.Context) error {
 
 	deleted, err := traffic.Monitoring.GC(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -404,8 +396,6 @@ func (s *Application) SchedulerHourly(ctx context.Context) error {
 
 	deleted, err = traffic.Ban.GC(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -413,8 +403,6 @@ func (s *Application) SchedulerHourly(ctx context.Context) error {
 
 	err = traffic.AutoWhitelist(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -448,8 +436,6 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 
 	err = usersRep.UpdateSpecsVolumes(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -460,8 +446,6 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 
 	affected, err := commentsRep.CleanupDeleted(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -469,8 +453,6 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 
 	err = usersRep.DeleteUnused(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -481,8 +463,6 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 
 	deleted, err := messRepo.Recycle(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -490,8 +470,6 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 
 	deleted, err = messRepo.RecycleSystem(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -531,8 +509,6 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 
 	achievementsGranted, err := achievementsRep.RecomputeTopPicturesContributors(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -540,8 +516,6 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 
 	veteransGranted, err := achievementsRep.RecomputeVeteranBadges(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -558,15 +532,11 @@ func (s *Application) SchedulerMidnight(ctx context.Context) error {
 
 	err = ur.RestoreVotes(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
 	affected, err := ur.UpdateVotesLimits(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -579,8 +549,6 @@ func (s *Application) SchedulerMidnight(ctx context.Context) error {
 
 	success, err := idr.Pick(ctx)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -821,8 +789,6 @@ func (s *Application) ListenMonitoringAMQP(ctx context.Context, quit chan bool) 
 
 	err = traffic.Monitoring.Listen(ctx, cfg.RabbitMQ, cfg.MonitoringQueue, quit)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 
@@ -845,8 +811,6 @@ func (s *Application) AttrsUpdateValuesAMQP(ctx context.Context, quit chan bool)
 
 	err = listener.ListenUpdateValues(ctx, cfg.RabbitMQ, cfg.Attrs.AttrsUpdateValuesQueue, quit)
 	if err != nil {
-		logrus.Error(err.Error())
-
 		return err
 	}
 

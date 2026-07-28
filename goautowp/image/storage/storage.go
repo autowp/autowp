@@ -1050,32 +1050,34 @@ PAGINATION:
 					err = s.isKeyExists(ctx, dir, sameSizeKey)
 					if err != nil {
 						lostSameSizeKeys[sameSizeKey] = err.Error()
-					} else {
-						if itemBytes == nil {
-							itemBytes, err = s.getObjectBytes(ctx, bucket, *item.Key)
-							if err != nil {
-								fmt.Printf( //nolint:forbidigo
-									"getObjectBytes(%s, %s): %v\n",
-									bucket, *item.Key, err.Error(),
-								)
 
-								break PAGINATION
-							}
-						}
+						continue
+					}
 
-						equal, err := s.isObjectBytesEqual(ctx, bucket, sameSizeKey, itemBytes)
+					if itemBytes == nil {
+						itemBytes, err = s.getObjectBytes(ctx, bucket, *item.Key)
 						if err != nil {
 							fmt.Printf( //nolint:forbidigo
-								"isObjectBytesEqual(%s, %s): %v\n",
-								bucket, sameSizeKey, err.Error(),
+								"getObjectBytes(%s, %s): %v\n",
+								bucket, *item.Key, err.Error(),
 							)
 
 							break PAGINATION
 						}
+					}
 
-						if equal {
-							nonLostSameKeys = append(nonLostSameKeys, sameSizeKey)
-						}
+					equal, err := s.isObjectBytesEqual(ctx, bucket, sameSizeKey, itemBytes)
+					if err != nil {
+						fmt.Printf( //nolint:forbidigo
+							"isObjectBytesEqual(%s, %s): %v\n",
+							bucket, sameSizeKey, err.Error(),
+						)
+
+						break PAGINATION
+					}
+
+					if equal {
+						nonLostSameKeys = append(nonLostSameKeys, sameSizeKey)
 					}
 				}
 

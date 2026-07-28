@@ -71,8 +71,6 @@ func NewDuplicateFinder(
 func (s *DuplicateFinder) ListenAMQP(ctx context.Context, quitChan chan bool) error {
 	rabbitMQ, err := util.ConnectRabbitMQ(s.config.RabbitMQ)
 	if err != nil {
-		logrus.Error(err)
-
 		return err
 	}
 

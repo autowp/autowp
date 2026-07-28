@@ -96,7 +96,7 @@ func (s *Catalogue) getSpecs(ctx context.Context, parentID int32) ([]*Spec, erro
 	}
 	defer util.Close(rows)
 
-	var specs []*Spec
+	specs := make([]*Spec, 0)
 
 	for rows.Next() {
 		var spec Spec
@@ -139,7 +139,7 @@ func (s *Catalogue) getPerspectiveGroups(
 
 	var wg sync.WaitGroup
 
-	var perspectiveGroups []*PerspectiveGroup
+	perspectiveGroups := make([]*PerspectiveGroup, 0)
 
 	for rows.Next() {
 		var group PerspectiveGroup
@@ -187,7 +187,7 @@ func (s *Catalogue) getPerspectivePages(ctx context.Context) ([]*PerspectivePage
 
 	var wg sync.WaitGroup
 
-	var perspectivePages []*PerspectivePage
+	perspectivePages := make([]*PerspectivePage, 0)
 
 	for rows.Next() {
 		var page PerspectivePage
@@ -248,7 +248,7 @@ func (s *Catalogue) getPerspectives(ctx context.Context, groupID *int32) ([]*Per
 	}
 	defer util.Close(rows)
 
-	var perspectives []*Perspective
+	perspectives := make([]*Perspective, 0)
 
 	for rows.Next() {
 		var perspective Perspective
@@ -297,7 +297,7 @@ func (s *Catalogue) getBrandVehicleTypes(
 
 	defer util.Close(rows)
 
-	var result []*BrandVehicleType
+	result := make([]*BrandVehicleType, 0)
 
 	for rows.Next() {
 		var bvType BrandVehicleType

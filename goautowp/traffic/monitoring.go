@@ -48,8 +48,6 @@ func (s *Monitoring) Listen(
 ) error {
 	conn, err := util.ConnectRabbitMQ(url)
 	if err != nil {
-		logrus.Error(err)
-
 		return err
 	}
 

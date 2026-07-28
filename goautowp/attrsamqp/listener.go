@@ -33,8 +33,6 @@ func (s *AttrsAMQP) ListenUpdateValues(
 ) error {
 	conn, err := util.ConnectRabbitMQ(url)
 	if err != nil {
-		logrus.Error(err)
-
 		return err
 	}
 

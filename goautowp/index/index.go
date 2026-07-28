@@ -27,7 +27,7 @@ const (
 	factoriesCacheKey   = "GO_FACTORIES_3_%s"
 )
 
-type Index struct {
+type Cache struct {
 	redis      *redis.Client
 	repository *items.Repository
 }
@@ -42,14 +42,14 @@ type TwinsCache struct {
 	Res   []*items.Item
 }
 
-func NewIndex(redis *redis.Client, repository *items.Repository) *Index {
-	return &Index{
+func NewCache(redis *redis.Client, repository *items.Repository) *Cache {
+	return &Cache{
 		redis:      redis,
 		repository: repository,
 	}
 }
 
-func (s *Index) GenerateBrandsCache(ctx context.Context, lang string) error {
+func (s *Cache) GenerateBrandsCache(ctx context.Context, lang string) error {
 	logrus.Infof("generate brands cache for `%s`", lang)
 
 	resultArray, err := s.repository.Brands(ctx, lang)
@@ -65,7 +65,7 @@ func (s *Index) GenerateBrandsCache(ctx context.Context, lang string) error {
 	return s.redis.Set(ctx, fmt.Sprintf(brandsCacheKey, lang), string(cacheBytes), 0).Err()
 }
 
-func (s *Index) BrandsCache(ctx context.Context, lang string) ([]*items.BrandsListLine, error) {
+func (s *Cache) BrandsCache(ctx context.Context, lang string) ([]*items.BrandsListLine, error) {
 	var cache []*items.BrandsListLine
 
 	item, err := s.redis.Get(ctx, fmt.Sprintf(brandsCacheKey, lang)).Result()
@@ -78,7 +78,7 @@ func (s *Index) BrandsCache(ctx context.Context, lang string) ([]*items.BrandsLi
 	return cache, err
 }
 
-func (s *Index) GenerateTopBrandsCache(ctx context.Context, lang string) error {
+func (s *Cache) GenerateTopBrandsCache(ctx context.Context, lang string) error {
 	logrus.Infof("generate index brands cache for `%s`", lang)
 
 	var cache TopBrandsCache
@@ -115,7 +115,7 @@ func (s *Index) GenerateTopBrandsCache(ctx context.Context, lang string) error {
 	return s.redis.Set(ctx, fmt.Sprintf(topBrandsCacheKey, lang), string(cacheBytes), 0).Err()
 }
 
-func (s *Index) TopBrandsCache(ctx context.Context, lang string) (TopBrandsCache, error) {
+func (s *Cache) TopBrandsCache(ctx context.Context, lang string) (TopBrandsCache, error) {
 	var cache TopBrandsCache
 
 	item, err := s.redis.Get(ctx, fmt.Sprintf(topBrandsCacheKey, lang)).Result()
@@ -128,7 +128,7 @@ func (s *Index) TopBrandsCache(ctx context.Context, lang string) (TopBrandsCache
 	return cache, err
 }
 
-func (s *Index) GenerateTwinsCache(ctx context.Context, lang string) error {
+func (s *Cache) GenerateTwinsCache(ctx context.Context, lang string) error {
 	logrus.Infof("generate index twins cache for `%s`", lang)
 
 	var (
@@ -178,7 +178,7 @@ func (s *Index) GenerateTwinsCache(ctx context.Context, lang string) error {
 	return s.redis.Set(ctx, fmt.Sprintf(twinsCacheKey, lang), string(cacheBytes), 0).Err()
 }
 
-func (s *Index) TwinsCache(ctx context.Context, lang string) (TwinsCache, error) {
+func (s *Cache) TwinsCache(ctx context.Context, lang string) (TwinsCache, error) {
 	twinsData := TwinsCache{}
 
 	item, err := s.redis.Get(ctx, fmt.Sprintf(twinsCacheKey, lang)).Result()
@@ -191,7 +191,7 @@ func (s *Index) TwinsCache(ctx context.Context, lang string) (TwinsCache, error)
 	return twinsData, err
 }
 
-func (s *Index) GenerateCategoriesCache(ctx context.Context, lang string) error {
+func (s *Cache) GenerateCategoriesCache(ctx context.Context, lang string) error {
 	logrus.Infof("generate index categories cache for `%s`", lang)
 
 	var (
@@ -221,7 +221,7 @@ func (s *Index) GenerateCategoriesCache(ctx context.Context, lang string) error 
 	return s.redis.Set(ctx, fmt.Sprintf(categoriesCacheKey, lang), string(b), 0).Err()
 }
 
-func (s *Index) CategoriesCache(ctx context.Context, lang string) ([]items.Item, error) {
+func (s *Cache) CategoriesCache(ctx context.Context, lang string) ([]items.Item, error) {
 	var res []items.Item
 
 	item, err := s.redis.Get(ctx, fmt.Sprintf(categoriesCacheKey, lang)).Result()
@@ -234,7 +234,7 @@ func (s *Index) CategoriesCache(ctx context.Context, lang string) ([]items.Item,
 	return res, err
 }
 
-func (s *Index) GeneratePersonsCache(
+func (s *Cache) GeneratePersonsCache(
 	ctx context.Context, pictureItemType schema.PictureItemType, lang string,
 ) error {
 	logrus.Infof("generate index persons cache for `%s`", lang)
@@ -268,7 +268,7 @@ func (s *Index) GeneratePersonsCache(
 	return s.redis.Set(ctx, fmt.Sprintf(personsCacheKey, pictureItemType, lang), string(b), 0).Err()
 }
 
-func (s *Index) PersonsCache(
+func (s *Cache) PersonsCache(
 	ctx context.Context, pictureItemType schema.PictureItemType, lang string,
 ) ([]items.Item, error) {
 	var res []items.Item
@@ -283,7 +283,7 @@ func (s *Index) PersonsCache(
 	return res, err
 }
 
-func (s *Index) GenerateFactoriesCache(ctx context.Context, lang string) error {
+func (s *Cache) GenerateFactoriesCache(ctx context.Context, lang string) error {
 	logrus.Infof("generate index factories cache for `%s`", lang)
 
 	var (
@@ -320,7 +320,7 @@ func (s *Index) GenerateFactoriesCache(ctx context.Context, lang string) error {
 	return s.redis.Set(ctx, fmt.Sprintf(factoriesCacheKey, lang), string(b), 0).Err()
 }
 
-func (s *Index) FactoriesCache(ctx context.Context, lang string) ([]items.Item, error) {
+func (s *Cache) FactoriesCache(ctx context.Context, lang string) ([]items.Item, error) {
 	var res []items.Item
 
 	item, err := s.redis.Get(ctx, fmt.Sprintf(factoriesCacheKey, lang)).Result()

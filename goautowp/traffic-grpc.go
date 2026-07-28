@@ -27,14 +27,14 @@ type TrafficGRPCServer struct {
 	auth            *Auth
 	usersRepository *users.Repository
 	userExtractor   *UserExtractor
-	traffic         *traffic.Traffic
+	traffic         *traffic.Repository
 }
 
 func NewTrafficGRPCServer(
 	auth *Auth,
 	usersRepository *users.Repository,
 	userExtractor *UserExtractor,
-	traffic *traffic.Traffic,
+	traffic *traffic.Repository,
 ) *TrafficGRPCServer {
 	return &TrafficGRPCServer{
 		auth:            auth,

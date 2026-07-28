@@ -674,104 +674,119 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			}
 		}
 
-		paginatorRequest := fields.GetPaginator()
-		if paginatorRequest != nil {
-			filter, err := convertPictureListOptions(paginatorRequest.GetOptions())
-			if err != nil {
-				return nil, err
-			}
-
-			if filter != nil {
-				filter.Status = row.Status
-				filter.Limit = 1
-				orderBy := convertPicturesOrder(paginatorRequest.GetOrder())
-
-				paginator, err := picturesRepository.PicturesPaginator(filter, nil, orderBy)
-				if err != nil {
-					return nil, err
-				}
-
-				total, err := paginator.GetTotalItemCount(ctx)
-				if err != nil {
-					return nil, err
-				}
-
-				if total < maxPaginatorLength {
-					filter.Limit = uint32(total) //nolint: gosec
-
-					paginatorPictures, _, err := picturesRepository.Pictures(
-						ctx,
-						filter,
-						nil,
-						orderBy,
-						false,
-					)
-					if err != nil {
-						return nil, err
-					}
-
-					var pageNumber int32
-
-					for n, p := range paginatorPictures {
-						if p.ID == row.ID {
-							pageNumber = int32(n + 1)
-
-							break
-						}
-					}
-
-					paginator.PageRange = 15
-					paginator.CurrentPageNumber = pageNumber
-
-					pages, err := paginator.GetPages(ctx)
-					if err != nil {
-						return nil, err
-					}
-
-					picturesPages := PicturesPages{
-						PageCount:      pages.PageCount,
-						TotalItemCount: pages.TotalItemCount,
-					}
-
-					if pages.Previous > 0 {
-						picturesPages.Previous = paginatorPictures[pages.Previous-1].Identity
-					}
-
-					if pages.Next > 0 {
-						picturesPages.Next = paginatorPictures[pages.Next-1].Identity
-					}
-
-					if pages.First > 0 {
-						picturesPages.First = paginatorPictures[pages.First-1].Identity
-					}
-
-					if pages.Last > 0 {
-						picturesPages.Last = paginatorPictures[pages.Last-1].Identity
-					}
-
-					if pages.Current > 0 {
-						picturesPages.Current = paginatorPictures[pages.Current-1].Identity
-					}
-
-					pagesInRange := make([]*PicturesPagesPage, 0)
-					for _, i := range pages.PagesInRange {
-						pagesInRange = append(pagesInRange, &PicturesPagesPage{
-							Page:     i,
-							Identity: paginatorPictures[i-1].Identity,
-						})
-					}
-
-					picturesPages.PagesInRange = pagesInRange
-
-					resultRow.Paginator = &picturesPages
-				}
-			}
+		resultRow.Paginator, err = s.buildPicturesPaginator(ctx, row, fields.GetPaginator(), picturesRepository)
+		if err != nil {
+			return nil, err
 		}
 
 		result = append(result, resultRow)
 	}
 
 	return result, nil
+}
+
+// buildPicturesPaginator computes the sibling-pictures paginator for row
+// within paginatorRequest's filter, or returns nil if no paginator was
+// requested, the filter is empty, or the result set is too large to
+// paginate cheaply (see maxPaginatorLength).
+func (s *PictureExtractor) buildPicturesPaginator(
+	ctx context.Context,
+	row *schema.PictureRow,
+	paginatorRequest *PicturesRequest,
+	picturesRepository *pictures.Repository,
+) (*PicturesPages, error) {
+	if paginatorRequest == nil {
+		return nil, nil //nolint:nilnil
+	}
+
+	filter, err := convertPictureListOptions(paginatorRequest.GetOptions())
+	if err != nil {
+		return nil, err
+	}
+
+	if filter == nil {
+		return nil, nil //nolint:nilnil
+	}
+
+	filter.Status = row.Status
+	filter.Limit = 1
+	orderBy := convertPicturesOrder(paginatorRequest.GetOrder())
+
+	paginator, err := picturesRepository.PicturesPaginator(filter, nil, orderBy)
+	if err != nil {
+		return nil, err
+	}
+
+	total, err := paginator.GetTotalItemCount(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if total >= maxPaginatorLength {
+		return nil, nil //nolint:nilnil
+	}
+
+	filter.Limit = uint32(total) //nolint: gosec
+
+	paginatorPictures, _, err := picturesRepository.Pictures(ctx, filter, nil, orderBy, false)
+	if err != nil {
+		return nil, err
+	}
+
+	var pageNumber int32
+
+	for n, p := range paginatorPictures {
+		if p.ID == row.ID {
+			pageNumber = int32(n + 1)
+
+			break
+		}
+	}
+
+	paginator.PageRange = 15
+	paginator.CurrentPageNumber = pageNumber
+
+	pages, err := paginator.GetPages(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	picturesPages := PicturesPages{
+		PageCount:      pages.PageCount,
+		TotalItemCount: pages.TotalItemCount,
+	}
+
+	if pages.Previous > 0 {
+		picturesPages.Previous = paginatorPictures[pages.Previous-1].Identity
+	}
+
+	if pages.Next > 0 {
+		picturesPages.Next = paginatorPictures[pages.Next-1].Identity
+	}
+
+	if pages.First > 0 {
+		picturesPages.First = paginatorPictures[pages.First-1].Identity
+	}
+
+	if pages.Last > 0 {
+		picturesPages.Last = paginatorPictures[pages.Last-1].Identity
+	}
+
+	if pages.Current > 0 {
+		picturesPages.Current = paginatorPictures[pages.Current-1].Identity
+	}
+
+	pagesInRange := make([]*PicturesPagesPage, 0)
+	for _, i := range pages.PagesInRange {
+		pagesInRange = append(pagesInRange, &PicturesPagesPage{
+			Page:     i,
+			Identity: paginatorPictures[i-1].Identity,
+		})
+	}
+
+	picturesPages.PagesInRange = pagesInRange
+
+	return &picturesPages, nil
 }
 
 func (s *PictureExtractor) preloadTopicsStat(

@@ -1653,8 +1653,6 @@ func (s *Repository) DfIndex(ctx context.Context) error {
 
 	rabbitMQ, err := util.ConnectRabbitMQ(s.dfConfig.RabbitMQ)
 	if err != nil {
-		logrus.Error(err)
-
 		return err
 	}
 
@@ -2662,8 +2660,6 @@ func (s *Repository) updateContentCount(ctx context.Context, pictureID int64) er
 func (s *Repository) queueIndexImage(ctx context.Context, id int64, url string) error {
 	rabbitMQ, err := util.ConnectRabbitMQ(s.dfConfig.RabbitMQ)
 	if err != nil {
-		logrus.Error(err)
-
 		return err
 	}
 

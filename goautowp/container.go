@@ -91,7 +91,7 @@ type Container struct {
 	grpcServerWithServices       *grpc.Server
 	telegramService              *telegram.Service
 	textGrpcServer               *TextGRPCServer
-	traffic                      *traffic.Traffic
+	traffic                      *traffic.Repository
 	trafficGrpcServer            *TrafficGRPCServer
 	votingsRepository            *votings.Repository
 	usersRepository              *users.Repository
@@ -936,7 +936,7 @@ func (s *Container) TelegramService(ctx context.Context) (*telegram.Service, err
 	return s.telegramService, nil
 }
 
-func (s *Container) Traffic(ctx context.Context) (*traffic.Traffic, error) {
+func (s *Container) Traffic(ctx context.Context) (*traffic.Repository, error) {
 	if s.traffic == nil {
 		db, err := s.GoquDB(ctx)
 		if err != nil {
@@ -948,7 +948,7 @@ func (s *Container) Traffic(ctx context.Context) (*traffic.Traffic, error) {
 			return nil, err
 		}
 
-		traf, err := traffic.NewTraffic(db, banRepository)
+		traf, err := traffic.NewRepository(db, banRepository)
 		if err != nil {
 			logrus.Error(err.Error())
 
@@ -1983,7 +1983,7 @@ func (s *Container) Redis() (*redis.Client, error) {
 	return s.redis, nil
 }
 
-func (s *Container) Index(ctx context.Context) (*index.Index, error) {
+func (s *Container) Index(ctx context.Context) (*index.Cache, error) {
 	redisClient, err := s.Redis()
 	if err != nil {
 		return nil, err
@@ -1994,7 +1994,7 @@ func (s *Container) Index(ctx context.Context) (*index.Index, error) {
 		return nil, err
 	}
 
-	return index.NewIndex(redisClient, repository), nil
+	return index.NewCache(redisClient, repository), nil
 }
 
 func (s *Container) TextStorageRepository(ctx context.Context) (*textstorage.Repository, error) {

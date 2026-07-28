@@ -111,7 +111,7 @@ type ItemsGRPCServer struct {
 	i18n                  *i18nbundle.I18n
 	attrsRepository       *attrs.Repository
 	picturesRepository    *pictures.Repository
-	index                 *index.Index
+	index                 *index.Cache
 	events                *Events
 	usersRepository       *users.Repository
 	messagingRepository   *messaging.Repository
@@ -135,7 +135,7 @@ func NewItemsGRPCServer(
 	i18n *i18nbundle.I18n,
 	attrsRepository *attrs.Repository,
 	picturesRepository *pictures.Repository,
-	index *index.Index,
+	index *index.Cache,
 	events *Events,
 	usersRepository *users.Repository,
 	messagingRepository *messaging.Repository,

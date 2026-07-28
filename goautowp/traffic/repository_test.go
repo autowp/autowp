@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createTrafficService(t *testing.T) *Traffic {
+func createTrafficService(t *testing.T) *Repository {
 	t.Helper()
 
 	cfg := config.LoadConfig("..")
@@ -25,7 +25,7 @@ func createTrafficService(t *testing.T) *Traffic {
 	banRepository, err := ban.NewRepository(goquPostgresDB)
 	require.NoError(t, err)
 
-	traf, err := NewTraffic(goquPostgresDB, banRepository)
+	traf, err := NewRepository(goquPostgresDB, banRepository)
 	require.NoError(t, err)
 
 	return traf
