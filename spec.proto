@@ -277,13 +277,9 @@ service Pictures {
   rpc SetPictureItemItemID(SetPictureItemItemIDRequest) returns (google.protobuf.Empty) {}
   rpc DeletePictureItem(DeletePictureItemRequest) returns (google.protobuf.Empty) {}
   rpc CreatePictureItem(CreatePictureItemRequest) returns (google.protobuf.Empty) {}
-  rpc SetPictureCrop(SetPictureCropRequest) returns (google.protobuf.Empty) {}
   rpc ClearReplacePicture(PictureIDRequest) returns (google.protobuf.Empty) {}
   rpc AcceptReplacePicture(PictureIDRequest) returns (google.protobuf.Empty) {}
-  rpc SetPicturePoint(SetPicturePointRequest) returns (google.protobuf.Empty) {}
   rpc UpdatePicture(UpdatePictureRequest) returns (google.protobuf.Empty) {}
-  rpc SetPictureCopyrights(SetPictureCopyrightsRequest) returns (google.protobuf.Empty) {}
-  rpc SetPictureStatus(SetPictureStatusRequest) returns (google.protobuf.Empty) {}
   rpc GetInbox(InboxRequest) returns (Inbox) {}
   rpc GetNewbox(NewboxRequest) returns (Newbox) {}
   rpc GetCanonicalRoute(CanonicalRouteRequest) returns (CanonicalRoute) {}
@@ -1988,6 +1984,14 @@ message Picture {
   Image preview_large = 43;
   bool subscribed = 44;
   PicturesPages paginator = 45;
+  PictureCrop crop = 48;
+}
+
+message PictureCrop {
+  uint32 left = 1;
+  uint32 top = 2;
+  uint32 width = 3;
+  uint32 height = 4;
 }
 
 message PicturesPages {
@@ -2107,34 +2111,9 @@ message CreatePictureItemRequest {
   int32 perspective_id = 4;
 }
 
-message SetPictureCropRequest {
-  int64 picture_id = 1;
-  uint32 crop_left = 4;
-  uint32 crop_top = 5;
-  uint32 crop_width = 6;
-  uint32 crop_height = 7;
-}
-
-message SetPicturePointRequest {
-  int64 picture_id = 1;
-  google.type.LatLng point = 2;
-}
-
 message UpdatePictureRequest {
-  int64 id = 1;
-  google.type.Date taken_date = 2;
-  string name = 3;
-  google.protobuf.FieldMask update_mask = 4;
-}
-
-message SetPictureCopyrightsRequest {
-  int64 id = 1;
-  string copyrights = 2;
-}
-
-message SetPictureStatusRequest {
-  int64 id = 1;
-  PictureStatus status = 2;
+  Picture picture = 1;
+  google.protobuf.FieldMask update_mask = 2;
 }
 
 message NewboxRequest {

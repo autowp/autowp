@@ -36,11 +36,12 @@ import {
   PicturesViewRequest,
   PicturesVoteRequest,
   SetPictureItemPerspectiveRequest,
-  SetPictureStatusRequest,
+  UpdatePictureRequest,
   User,
 } from '@grpc/spec.pb';
 import {CommentsClient, ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
@@ -229,7 +230,12 @@ export class PictureComponent {
   private setPictureStatus(picture: Picture, status: PictureStatus) {
     this.statusLoading.set(true);
     this.#picturesClient
-      .setPictureStatus(new SetPictureStatusRequest({id: picture.id, status}))
+      .updatePicture(
+        new UpdatePictureRequest({
+          picture: new Picture({id: picture.id, status}),
+          updateMask: new FieldMask({paths: ['status']}),
+        }),
+      )
       .pipe(
         catchError((err: unknown) => {
           this.#toastService.handleError(err);

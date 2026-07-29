@@ -32,10 +32,8 @@ import {
   PictureModerVoteRequest,
   PicturesRequest,
   PictureStatus,
-  SetPictureCopyrightsRequest,
   SetPictureItemItemIDRequest,
   SetPictureItemPerspectiveRequest,
-  SetPictureStatusRequest,
   UpdatePictureRequest,
   User,
 } from '@grpc/spec.pb';
@@ -384,10 +382,12 @@ export class ModerPicturesItemComponent {
     this.#picturesClient
       .updatePicture(
         new UpdatePictureRequest({
-          id: picture.id,
-          name: picture.specialName,
-          takenDate: picture.takenDate,
-          updateMask: new FieldMask({paths: ['name', 'taken_date']}),
+          picture: new Picture({
+            id: picture.id,
+            specialName: picture.specialName,
+            takenDate: picture.takenDate,
+          }),
+          updateMask: new FieldMask({paths: ['special_name', 'taken_date']}),
         }),
       )
       .pipe(
@@ -408,10 +408,10 @@ export class ModerPicturesItemComponent {
     this.copyrightsLoading.set(true);
 
     this.#picturesClient
-      .setPictureCopyrights(
-        new SetPictureCopyrightsRequest({
-          copyrights: picture.copyrights,
-          id: picture.id,
+      .updatePicture(
+        new UpdatePictureRequest({
+          picture: new Picture({copyrights: picture.copyrights, id: picture.id}),
+          updateMask: new FieldMask({paths: ['copyrights']}),
         }),
       )
       .pipe(
@@ -431,7 +431,9 @@ export class ModerPicturesItemComponent {
   private setPictureStatus(id: string, status: PictureStatus) {
     this.statusLoading.set(true);
     this.#picturesClient
-      .setPictureStatus(new SetPictureStatusRequest({id, status}))
+      .updatePicture(
+        new UpdatePictureRequest({picture: new Picture({id, status}), updateMask: new FieldMask({paths: ['status']})}),
+      )
       .pipe(
         catchError((err: unknown) => {
           this.#toastService.handleError(err);

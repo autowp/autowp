@@ -1112,7 +1112,7 @@ func (s *Repository) UpdatePicture(
 ) (bool, error) {
 	set := goqu.Record{}
 
-	if util.Contains(mask, "name") {
+	if util.Contains(mask, "special_name") {
 		set[schema.PictureTableNameColName] = sql.NullString{
 			String: name,
 			Valid:  len(name) > 0,

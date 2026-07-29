@@ -27,6 +27,7 @@ import (
 	"github.com/autowp/goautowp/validation"
 	"github.com/paulmach/orb"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -908,73 +909,6 @@ func (s *PicturesGRPCServer) CreatePictureItem(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *PicturesGRPCServer) SetPictureCrop(
-	ctx context.Context,
-	in *SetPictureCropRequest,
-) (*emptypb.Empty, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
-		pictureID := in.GetPictureId()
-		if pictureID == 0 {
-			return nil, status.Error(codes.NotFound, "not found")
-		}
-
-		pic, err := s.repository.Picture(
-			ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
-		)
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return nil, status.Errorf(codes.NotFound, "not found")
-			}
-
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		if !pic.OwnerID.Valid || pic.OwnerID.Int64 != userCtx.UserID ||
-			pic.Status != schema.PictureStatusInbox {
-			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-		}
-	}
-
-	ctx = context.WithoutCancel(ctx)
-
-	err = s.repository.SetPictureCrop(
-		ctx, in.GetPictureId(), sampler.Crop{
-			Left:   int(in.GetCropLeft()),
-			Top:    int(in.GetCropTop()),
-			Width:  int(in.GetCropWidth()),
-			Height: int(in.GetCropHeight()),
-		},
-	)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	err = s.events.Add(ctx, Event{
-		UserID:   userCtx.UserID,
-		Message:  "Выделение области на картинке",
-		Pictures: []int64{in.GetPictureId()},
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, in.GetPictureId())
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &emptypb.Empty{}, nil
-}
-
 func (s *PicturesGRPCServer) ClearReplacePicture(
 	ctx context.Context,
 	in *PictureIDRequest,
@@ -1162,52 +1096,8 @@ func (s *PicturesGRPCServer) AcceptReplacePicture(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *PicturesGRPCServer) SetPicturePoint(
-	ctx context.Context,
-	in *SetPicturePointRequest,
-) (*emptypb.Empty, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-	}
-
-	var (
-		point    = in.GetPoint()
-		orbPoint *orb.Point
-	)
-
-	if point.GetLatitude() != 0 || point.GetLongitude() != 0 {
-		orbPoint = &orb.Point{point.GetLongitude(), point.GetLatitude()}
-	}
-
-	ctx = context.WithoutCancel(ctx)
-
-	success, err := s.repository.SetPicturePoint(ctx, in.GetPictureId(), orbPoint)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if success {
-		err = s.events.Add(ctx, Event{
-			UserID:   userCtx.UserID,
-			Message:  "Изменена точка для изображения",
-			Pictures: []int64{in.GetPictureId()},
-		})
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-	}
-
-	return &emptypb.Empty{}, nil
-}
+// moderOnlyUpdatePictureFields are UpdatePictureRequest mask paths that require RoleModer regardless of ownership.
+var moderOnlyUpdatePictureFields = []string{"special_name", "taken_date", "status", "copyrights", "point"}
 
 func (s *PicturesGRPCServer) UpdatePicture(
 	ctx context.Context,
@@ -1222,17 +1112,30 @@ func (s *PicturesGRPCServer) UpdatePicture(
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
+	values := in.GetPicture()
+
+	pictureID := values.GetId()
+	if pictureID == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "id is zero")
 	}
 
-	inDate := in.GetTakenDate()
 	maskPaths := in.GetUpdateMask().GetPaths()
+
+	isModer := util.Contains(userCtx.Roles, users.RoleModer)
+	if !isModer {
+		for _, field := range moderOnlyUpdatePictureFields {
+			if util.Contains(maskPaths, field) {
+				return nil, status.Errorf(codes.PermissionDenied, "permission denied")
+			}
+		}
+	}
+
+	inDate := values.GetTakenDate()
 
 	ctx = context.WithoutCancel(ctx)
 
 	success, err := s.repository.UpdatePicture(
-		ctx, in.GetId(), in.GetName(),
+		ctx, pictureID, values.GetSpecialName(),
 		int16(inDate.GetYear()), int8(inDate.GetMonth()), int8(inDate.GetDay()), //nolint: gosec
 		maskPaths,
 	)
@@ -1244,207 +1147,42 @@ func (s *PicturesGRPCServer) UpdatePicture(
 		err = s.events.Add(ctx, Event{
 			UserID:   userCtx.UserID,
 			Message:  "Редактирование изображения (дата, особое название)",
-			Pictures: []int64{in.GetId()},
+			Pictures: []int64{pictureID},
 		})
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
 
-	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, in.GetId())
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &emptypb.Empty{}, nil
-}
-
-func (s *PicturesGRPCServer) SetPictureCopyrights(
-	ctx context.Context, in *SetPictureCopyrightsRequest,
-) (*emptypb.Empty, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-	}
-
-	pictureID := in.GetId()
-	ctx = context.WithoutCancel(ctx)
-
-	success, textID, err := s.repository.SetPictureCopyrights(
-		ctx,
-		pictureID,
-		in.GetCopyrights(),
-		userCtx.UserID,
-	)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, status.Errorf(codes.NotFound, "not found")
-		}
-
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if success {
-		err = s.events.Add(ctx, Event{
-			UserID:   userCtx.UserID,
-			Message:  "Редактирование текста копирайтов изображения",
-			Pictures: []int64{in.GetId()},
-		})
+	if util.Contains(maskPaths, "status") {
+		err = s.setPictureStatus(ctx, pictureID, values.GetStatus(), userCtx)
 		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+			return nil, err
 		}
+	}
 
-		err = s.notifyCopyrightsEdited(ctx, pictureID, textID, userCtx.UserID)
+	if util.Contains(maskPaths, "copyrights") {
+		err = s.setPictureCopyrights(ctx, pictureID, values.GetCopyrights(), userCtx)
 		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+			return nil, err
 		}
 	}
 
-	return &emptypb.Empty{}, nil
-}
-
-func (s *PicturesGRPCServer) SetPictureStatus(
-	ctx context.Context, in *SetPictureStatusRequest,
-) (*emptypb.Empty, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-	}
-
-	pictureID := in.GetId()
-	if pictureID == 0 {
-		return nil, status.Errorf(codes.NotFound, "not found")
-	}
-
-	pic, err := s.repository.Picture(
-		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
-	)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	ctx = context.WithoutCancel(ctx)
-
-	switch in.GetStatus() {
-	case PictureStatus_PICTURE_STATUS_ACCEPTED:
-		canAccept, err := s.canAccept(ctx, pic, userCtx.Roles)
+	if util.Contains(maskPaths, "point") {
+		err = s.setPicturePoint(ctx, pictureID, values.GetPoint(), userCtx)
 		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+			return nil, err
 		}
-
-		if !canAccept {
-			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-		}
-
-		isFirstTimeAccepted, success, err := s.repository.Accept(ctx, pic.ID, userCtx.UserID)
-		if err != nil {
-			return nil, status.Error(codes.Internal, "Accept error: "+err.Error())
-		}
-
-		if success {
-			err = s.events.Add(ctx, Event{
-				UserID:   userCtx.UserID,
-				Message:  fmt.Sprintf("Картинка `%d` принята", pic.ID),
-				Pictures: []int64{pic.ID},
-			})
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-
-			if pic.OwnerID.Valid {
-				err = s.userRepository.RefreshPicturesCount(ctx, pic.OwnerID.Int64)
-				if err != nil {
-					return nil, status.Error(
-						codes.Internal,
-						"RefreshPicturesCount error: "+err.Error(),
-					)
-				}
-			}
-
-			err = s.notifyAccepted(ctx, pic, userCtx.UserID, isFirstTimeAccepted)
-			if err != nil {
-				return nil, status.Error(codes.Internal, "notifyAccepted error: "+err.Error())
-			}
-		}
-	case PictureStatus_PICTURE_STATUS_INBOX:
-		switch pic.Status {
-		case schema.PictureStatusRemoving:
-			canRestore := util.Contains(userCtx.Roles, users.RoleAdmin)
-			if !canRestore {
-				return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-			}
-
-			err = s.restoreFromRemoving(ctx, pic.ID, userCtx.UserID)
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-		case schema.PictureStatusAccepted:
-			canUnaccept := util.Contains(userCtx.Roles, users.RolePicturesModer)
-			if !canUnaccept {
-				return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-			}
-
-			err = s.unaccept(ctx, pic.ID, userCtx.UserID)
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-		case schema.PictureStatusUnknown, schema.PictureStatusRemoved, schema.PictureStatusInbox:
-		}
-	case PictureStatus_PICTURE_STATUS_REMOVING:
-		canDelete, err := s.pictureCanDelete(ctx, pic, userCtx.Roles, userCtx.UserID)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		if !canDelete {
-			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-		}
-
-		success, err := s.repository.QueueRemove(ctx, pic.ID, userCtx.UserID)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		if success {
-			err = s.notifyRemoving(ctx, pic, userCtx.UserID)
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-
-			err = s.events.Add(ctx, Event{
-				UserID:   userCtx.UserID,
-				Message:  fmt.Sprintf("Картинка `%d` поставлена в очередь на удаление", pic.ID),
-				Pictures: []int64{pic.ID},
-			})
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-		}
-
-	case PictureStatus_PICTURE_STATUS_REMOVED:
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-
-	case PictureStatus_PICTURE_STATUS_UNKNOWN:
-		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
-	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, pic.ID)
+	if util.Contains(maskPaths, "crop") {
+		err = s.setPictureCrop(ctx, pictureID, values.GetCrop(), userCtx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, pictureID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -2223,6 +1961,226 @@ func (s *PicturesGRPCServer) GetPerspectivePages(
 	return &PerspectivePagesItems{ //nolint:exhaustruct
 		Items: res,
 	}, nil
+}
+
+func (s *PicturesGRPCServer) setPictureStatus(
+	ctx context.Context, pictureID int64, targetStatus PictureStatus, userCtx UserContext,
+) error {
+	pic, err := s.repository.Picture(
+		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
+	)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	switch targetStatus {
+	case PictureStatus_PICTURE_STATUS_ACCEPTED:
+		canAccept, err := s.canAccept(ctx, pic, userCtx.Roles)
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		if !canAccept {
+			return status.Errorf(codes.PermissionDenied, "permission denied")
+		}
+
+		isFirstTimeAccepted, success, err := s.repository.Accept(ctx, pic.ID, userCtx.UserID)
+		if err != nil {
+			return status.Error(codes.Internal, "Accept error: "+err.Error())
+		}
+
+		if success {
+			err = s.events.Add(ctx, Event{
+				UserID:   userCtx.UserID,
+				Message:  fmt.Sprintf("Картинка `%d` принята", pic.ID),
+				Pictures: []int64{pic.ID},
+			})
+			if err != nil {
+				return status.Error(codes.Internal, err.Error())
+			}
+
+			if pic.OwnerID.Valid {
+				err = s.userRepository.RefreshPicturesCount(ctx, pic.OwnerID.Int64)
+				if err != nil {
+					return status.Error(
+						codes.Internal,
+						"RefreshPicturesCount error: "+err.Error(),
+					)
+				}
+			}
+
+			err = s.notifyAccepted(ctx, pic, userCtx.UserID, isFirstTimeAccepted)
+			if err != nil {
+				return status.Error(codes.Internal, "notifyAccepted error: "+err.Error())
+			}
+		}
+	case PictureStatus_PICTURE_STATUS_INBOX:
+		switch pic.Status {
+		case schema.PictureStatusRemoving:
+			canRestore := util.Contains(userCtx.Roles, users.RoleAdmin)
+			if !canRestore {
+				return status.Errorf(codes.PermissionDenied, "permission denied")
+			}
+
+			err = s.restoreFromRemoving(ctx, pic.ID, userCtx.UserID)
+			if err != nil {
+				return status.Error(codes.Internal, err.Error())
+			}
+		case schema.PictureStatusAccepted:
+			canUnaccept := util.Contains(userCtx.Roles, users.RolePicturesModer)
+			if !canUnaccept {
+				return status.Errorf(codes.PermissionDenied, "permission denied")
+			}
+
+			err = s.unaccept(ctx, pic.ID, userCtx.UserID)
+			if err != nil {
+				return status.Error(codes.Internal, err.Error())
+			}
+		case schema.PictureStatusUnknown, schema.PictureStatusRemoved, schema.PictureStatusInbox:
+		}
+	case PictureStatus_PICTURE_STATUS_REMOVING:
+		canDelete, err := s.pictureCanDelete(ctx, pic, userCtx.Roles, userCtx.UserID)
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		if !canDelete {
+			return status.Errorf(codes.PermissionDenied, "permission denied")
+		}
+
+		success, err := s.repository.QueueRemove(ctx, pic.ID, userCtx.UserID)
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		if success {
+			err = s.notifyRemoving(ctx, pic, userCtx.UserID)
+			if err != nil {
+				return status.Error(codes.Internal, err.Error())
+			}
+
+			err = s.events.Add(ctx, Event{
+				UserID:   userCtx.UserID,
+				Message:  fmt.Sprintf("Картинка `%d` поставлена в очередь на удаление", pic.ID),
+				Pictures: []int64{pic.ID},
+			})
+			if err != nil {
+				return status.Error(codes.Internal, err.Error())
+			}
+		}
+
+	case PictureStatus_PICTURE_STATUS_REMOVED:
+		return status.Errorf(codes.PermissionDenied, "permission denied")
+
+	case PictureStatus_PICTURE_STATUS_UNKNOWN:
+		return status.Errorf(codes.InvalidArgument, "invalid argument")
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) setPictureCopyrights(
+	ctx context.Context, pictureID int64, copyrights string, userCtx UserContext,
+) error {
+	success, textID, err := s.repository.SetPictureCopyrights(ctx, pictureID, copyrights, userCtx.UserID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return status.Errorf(codes.NotFound, "not found")
+		}
+
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	if success {
+		err = s.events.Add(ctx, Event{
+			UserID:   userCtx.UserID,
+			Message:  "Редактирование текста копирайтов изображения",
+			Pictures: []int64{pictureID},
+		})
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		err = s.notifyCopyrightsEdited(ctx, pictureID, textID, userCtx.UserID)
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) setPicturePoint(
+	ctx context.Context, pictureID int64, point *latlng.LatLng, userCtx UserContext,
+) error {
+	var orbPoint *orb.Point
+
+	if point.GetLatitude() != 0 || point.GetLongitude() != 0 {
+		orbPoint = &orb.Point{point.GetLongitude(), point.GetLatitude()}
+	}
+
+	success, err := s.repository.SetPicturePoint(ctx, pictureID, orbPoint)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	if success {
+		err = s.events.Add(ctx, Event{
+			UserID:   userCtx.UserID,
+			Message:  "Изменена точка для изображения",
+			Pictures: []int64{pictureID},
+		})
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) setPictureCrop(
+	ctx context.Context, pictureID int64, crop *PictureCrop, userCtx UserContext,
+) error {
+	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
+		pic, err := s.repository.Picture(
+			ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
+		)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return status.Errorf(codes.NotFound, "not found")
+			}
+
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		if !pic.OwnerID.Valid || pic.OwnerID.Int64 != userCtx.UserID ||
+			pic.Status != schema.PictureStatusInbox {
+			return status.Errorf(codes.PermissionDenied, "permission denied")
+		}
+	}
+
+	err := s.repository.SetPictureCrop(
+		ctx, pictureID, sampler.Crop{
+			Left:   int(crop.GetLeft()),
+			Top:    int(crop.GetTop()),
+			Width:  int(crop.GetWidth()),
+			Height: int(crop.GetHeight()),
+		},
+	)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.events.Add(ctx, Event{
+		UserID:   userCtx.UserID,
+		Message:  "Выделение области на картинке",
+		Pictures: []int64{pictureID},
+	})
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	return nil
 }
 
 func (s *PicturesGRPCServer) restoreFromRemoving(

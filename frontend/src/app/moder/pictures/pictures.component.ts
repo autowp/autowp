@@ -25,7 +25,7 @@ import {
   PictureModerVoteListOptions,
   PicturesRequest,
   PictureStatus,
-  SetPictureStatusRequest,
+  UpdatePictureRequest,
   User,
   UsersRequest,
   VehicleType,
@@ -38,7 +38,7 @@ import {
   NgbTypeahead,
   NgbTypeaheadSelectItemEvent,
 } from '@ng-bootstrap/ng-bootstrap';
-import {Empty} from '@ngx-grpc/well-known-types';
+import {Empty, FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
@@ -696,8 +696,11 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
         if (picture.id === id) {
           promises.push(
             this.#picturesClient
-              .setPictureStatus(
-                new SetPictureStatusRequest({id: picture.id, status: PictureStatus.PICTURE_STATUS_ACCEPTED}),
+              .updatePicture(
+                new UpdatePictureRequest({
+                  picture: new Picture({id: picture.id, status: PictureStatus.PICTURE_STATUS_ACCEPTED}),
+                  updateMask: new FieldMask({paths: ['status']}),
+                }),
               )
               .pipe(
                 catchError((err: unknown) => {

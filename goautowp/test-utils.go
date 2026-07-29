@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 const (
@@ -50,11 +51,11 @@ func addPicture(
 
 	picturesClient := NewPicturesClient(conn)
 
-	_, err := picturesClient.SetPictureStatus(
+	_, err := picturesClient.UpdatePicture(
 		metadata.AppendToOutgoingContext(t.Context(), authorizationHeader, bearerPrefix+token),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: status,
+		&UpdatePictureRequest{
+			Picture:    &Picture{Id: pictureID, Status: status},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)

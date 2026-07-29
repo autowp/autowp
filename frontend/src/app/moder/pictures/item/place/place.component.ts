@@ -4,8 +4,9 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {LatLng as grpcLatLng} from '@grpc/google/type/latlng.pb';
-import {Picture, PictureListOptions, PicturesRequest, SetPicturePointRequest} from '@grpc/spec.pb';
+import {Picture, PictureListOptions, PicturesRequest, UpdatePictureRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {icon, LatLng, latLng, LeafletMouseEvent, Map, Marker, marker, TileLayer, tileLayer} from 'leaflet';
 import {EMPTY, Observable} from 'rxjs';
@@ -159,13 +160,16 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
 
   protected doSubmit(form: FormGroup<PointForm>, picture: Picture) {
     this.#picturesClient
-      .setPicturePoint(
-        new SetPicturePointRequest({
-          pictureId: picture.id,
-          point: new grpcLatLng({
-            latitude: form.controls.lat.value ? parseFloat(form.controls.lat.value) : 0,
-            longitude: form.controls.lng.value ? parseFloat(form.controls.lng.value) : 0,
+      .updatePicture(
+        new UpdatePictureRequest({
+          picture: new Picture({
+            id: picture.id,
+            point: new grpcLatLng({
+              latitude: form.controls.lat.value ? parseFloat(form.controls.lat.value) : 0,
+              longitude: form.controls.lng.value ? parseFloat(form.controls.lng.value) : 0,
+            }),
           }),
+          updateMask: new FieldMask({paths: ['point']}),
         }),
       )
       .pipe(

@@ -868,15 +868,18 @@ func TestInboxPicturesCount(t *testing.T) {
 		}, adminToken.AccessToken)
 
 		if i >= 5 {
-			_, err = picturesClient.SetPictureStatus(
+			_, err = picturesClient.UpdatePicture(
 				metadata.AppendToOutgoingContext(
 					ctx,
 					authorizationHeader,
 					bearerPrefix+adminToken.AccessToken,
 				),
-				&SetPictureStatusRequest{
-					Id:     pictureID,
-					Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+				&UpdatePictureRequest{
+					Picture: &Picture{
+						Id:     pictureID,
+						Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+					},
+					UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 				},
 			)
 			require.NoError(t, err)
@@ -2519,11 +2522,14 @@ func TestTwinsGroupPictures(t *testing.T) {
 		ItemID: vehicleID,
 	}, adminToken)
 
-	_, err = picturesClient.SetPictureStatus(
+	_, err = picturesClient.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
@@ -2584,11 +2590,14 @@ func TestPersonPreviewPictures(t *testing.T) {
 		ItemID: personID,
 	}, adminToken)
 
-	_, err = picturesClient.SetPictureStatus(
+	_, err = picturesClient.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
@@ -2673,11 +2682,14 @@ func TestCutawayAuthorsWithPreviewPictures(t *testing.T) {
 		PerspectiveID: schema.PerspectiveCutaway,
 	}, adminToken)
 
-	_, err = picturesClient.SetPictureStatus(
+	_, err = picturesClient.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)

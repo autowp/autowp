@@ -484,26 +484,36 @@ func TestPictureCrop(t *testing.T) {
 
 	client := NewPicturesClient(conn)
 
-	_, err = client.SetPictureCrop(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCropRequest{
-			PictureId:  pictureID,
-			CropLeft:   0,
-			CropTop:    0,
-			CropWidth:  0,
-			CropHeight: 10,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Crop: &PictureCrop{
+					Left:   0,
+					Top:    0,
+					Width:  0,
+					Height: 10,
+				},
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"crop"}},
 		},
 	)
 	require.NoError(t, err)
 
-	_, err = client.SetPictureCrop(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCropRequest{
-			PictureId:  pictureID,
-			CropLeft:   0,
-			CropTop:    0,
-			CropWidth:  10,
-			CropHeight: 10,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Crop: &PictureCrop{
+					Left:   0,
+					Top:    0,
+					Width:  10,
+					Height: 10,
+				},
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"crop"}},
 		},
 	)
 	require.NoError(t, err)
@@ -543,14 +553,19 @@ func TestPictureCropByOneAxis(t *testing.T) {
 
 	client := NewPicturesClient(conn)
 
-	_, err = client.SetPictureCrop(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCropRequest{
-			PictureId:  pictureID,
-			CropLeft:   0,
-			CropTop:    0,
-			CropWidth:  200,
-			CropHeight: 130,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Crop: &PictureCrop{
+					Left:   0,
+					Top:    0,
+					Width:  200,
+					Height: 130,
+				},
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"crop"}},
 		},
 	)
 	require.NoError(t, err)
@@ -568,14 +583,19 @@ func TestPictureCropByOneAxis(t *testing.T) {
 	require.Equal(t, 200, crop.Width)
 	require.Equal(t, 130, crop.Height)
 
-	_, err = client.SetPictureCrop(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCropRequest{
-			PictureId:  pictureID,
-			CropLeft:   0,
-			CropTop:    0,
-			CropWidth:  180,
-			CropHeight: 143,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Crop: &PictureCrop{
+					Left:   0,
+					Top:    0,
+					Width:  180,
+					Height: 143,
+				},
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"crop"}},
 		},
 	)
 	require.NoError(t, err)
@@ -613,14 +633,19 @@ func TestInvalidPictureCrop(t *testing.T) {
 
 	client := NewPicturesClient(conn)
 
-	_, err = client.SetPictureCrop(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCropRequest{
-			PictureId:  pictureID,
-			CropLeft:   0,
-			CropTop:    0,
-			CropWidth:  1002,
-			CropHeight: 140,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Crop: &PictureCrop{
+					Left:   0,
+					Top:    0,
+					Width:  1002,
+					Height: 140,
+				},
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"crop"}},
 		},
 	)
 	require.NoError(t, err)
@@ -638,14 +663,19 @@ func TestInvalidPictureCrop(t *testing.T) {
 	require.Equal(t, 1000, crop.Width)
 	require.Equal(t, 140, crop.Height)
 
-	_, err = client.SetPictureCrop(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCropRequest{
-			PictureId:  pictureID,
-			CropLeft:   0,
-			CropTop:    0,
-			CropWidth:  190,
-			CropHeight: 565,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Crop: &PictureCrop{
+					Left:   0,
+					Top:    0,
+					Width:  190,
+					Height: 565,
+				},
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"crop"}},
 		},
 	)
 	require.NoError(t, err)
@@ -657,14 +687,19 @@ func TestInvalidPictureCrop(t *testing.T) {
 	require.Equal(t, 190, crop.Width)
 	require.Equal(t, 563, crop.Height)
 
-	_, err = client.SetPictureCrop(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCropRequest{
-			PictureId:  pictureID,
-			CropLeft:   30,
-			CropTop:    0,
-			CropWidth:  990,
-			CropHeight: 143,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Crop: &PictureCrop{
+					Left:   30,
+					Top:    0,
+					Width:  990,
+					Height: 143,
+				},
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"crop"}},
 		},
 	)
 	require.NoError(t, err)
@@ -727,7 +762,7 @@ func TestClearReplacePicture(t *testing.T) {
 	require.False(t, value.Valid)
 }
 
-func TestSetPicturePoint(t *testing.T) {
+func TestUpdatePicturePoint(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
@@ -749,14 +784,17 @@ func TestSetPicturePoint(t *testing.T) {
 
 	client := NewPicturesClient(conn)
 
-	_, err = client.SetPicturePoint(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPicturePointRequest{
-			PictureId: pictureID,
-			Point: &latlng.LatLng{
-				Latitude:  0,
-				Longitude: 0,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Point: &latlng.LatLng{
+					Latitude:  0,
+					Longitude: 0,
+				},
 			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"point"}},
 		},
 	)
 	require.NoError(t, err)
@@ -768,14 +806,17 @@ func TestSetPicturePoint(t *testing.T) {
 	require.NoError(t, err)
 	require.Nil(t, pic.GetPoint())
 
-	_, err = client.SetPicturePoint(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPicturePointRequest{
-			PictureId: pictureID,
-			Point: &latlng.LatLng{
-				Latitude:  10,
-				Longitude: 0,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Point: &latlng.LatLng{
+					Latitude:  10,
+					Longitude: 0,
+				},
 			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"point"}},
 		},
 	)
 	require.NoError(t, err)
@@ -786,14 +827,17 @@ func TestSetPicturePoint(t *testing.T) {
 	require.InDelta(t, float64(10), pic.GetPoint().GetLatitude(), 0.001)
 	require.InDelta(t, float64(0), pic.GetPoint().GetLongitude(), 0.001)
 
-	_, err = client.SetPicturePoint(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPicturePointRequest{
-			PictureId: pictureID,
-			Point: &latlng.LatLng{
-				Latitude:  0,
-				Longitude: 10,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Point: &latlng.LatLng{
+					Latitude:  0,
+					Longitude: 10,
+				},
 			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"point"}},
 		},
 	)
 	require.NoError(t, err)
@@ -804,14 +848,17 @@ func TestSetPicturePoint(t *testing.T) {
 	require.InDelta(t, float64(0), pic.GetPoint().GetLatitude(), 0.001)
 	require.InDelta(t, float64(10), pic.GetPoint().GetLongitude(), 0.001)
 
-	_, err = client.SetPicturePoint(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPicturePointRequest{
-			PictureId: pictureID,
-			Point: &latlng.LatLng{
-				Latitude:  -10,
-				Longitude: 10,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+				Point: &latlng.LatLng{
+					Latitude:  -10,
+					Longitude: 10,
+				},
 			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"point"}},
 		},
 	)
 	require.NoError(t, err)
@@ -822,10 +869,13 @@ func TestSetPicturePoint(t *testing.T) {
 	require.InDelta(t, float64(-10), pic.GetPoint().GetLatitude(), 0.001)
 	require.InDelta(t, float64(10), pic.GetPoint().GetLongitude(), 0.001)
 
-	_, err = client.SetPicturePoint(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPicturePointRequest{
-			PictureId: pictureID,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id: pictureID,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"point"}},
 		},
 	)
 	require.NoError(t, err)
@@ -862,15 +912,17 @@ func TestUpdatePicture(t *testing.T) {
 	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&UpdatePictureRequest{
-			Id:   pictureID,
-			Name: "Foo",
-			TakenDate: &date.Date{
-				Year:  2020,
-				Month: 2,
-				Day:   1,
+			Picture: &Picture{
+				Id:          pictureID,
+				SpecialName: "Foo",
+				TakenDate: &date.Date{
+					Year:  2020,
+					Month: 2,
+					Day:   1,
+				},
 			},
 			UpdateMask: &fieldmaskpb.FieldMask{
-				Paths: []string{"name", "taken_date"},
+				Paths: []string{"special_name", "taken_date"},
 			},
 		},
 	)
@@ -898,14 +950,16 @@ func TestUpdatePicture(t *testing.T) {
 	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&UpdatePictureRequest{
-			Id:   pictureID,
-			Name: "Foo",
-			TakenDate: &date.Date{
-				Year:  2020,
-				Month: 2,
+			Picture: &Picture{
+				Id:          pictureID,
+				SpecialName: "Foo",
+				TakenDate: &date.Date{
+					Year:  2020,
+					Month: 2,
+				},
 			},
 			UpdateMask: &fieldmaskpb.FieldMask{
-				Paths: []string{"name", "taken_date"},
+				Paths: []string{"special_name", "taken_date"},
 			},
 		},
 	)
@@ -931,10 +985,12 @@ func TestUpdatePicture(t *testing.T) {
 	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
 		&UpdatePictureRequest{
-			Id:   pictureID,
-			Name: "Bar",
+			Picture: &Picture{
+				Id:          pictureID,
+				SpecialName: "Bar",
+			},
 			UpdateMask: &fieldmaskpb.FieldMask{
-				Paths: []string{"name"},
+				Paths: []string{"special_name"},
 			},
 		},
 	)
@@ -957,7 +1013,7 @@ func TestUpdatePicture(t *testing.T) {
 	require.True(t, pic.TakenMonth.Valid)
 }
 
-func TestSetPictureCopyrights(t *testing.T) {
+func TestUpdatePictureCopyrights(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
@@ -985,11 +1041,14 @@ func TestSetPictureCopyrights(t *testing.T) {
 
 	client := NewPicturesClient(conn)
 
-	_, err = client.SetPictureCopyrights(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCopyrightsRequest{
-			Id:         pictureID,
-			Copyrights: "First",
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:         pictureID,
+				Copyrights: "First",
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"copyrights"}},
 		},
 	)
 	require.NoError(t, err)
@@ -1006,20 +1065,26 @@ func TestSetPictureCopyrights(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "First", text)
 
-	_, err = client.SetPictureCopyrights(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCopyrightsRequest{
-			Id:         pictureID,
-			Copyrights: "Second",
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:         pictureID,
+				Copyrights: "Second",
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"copyrights"}},
 		},
 	)
 	require.NoError(t, err)
 
-	_, err = client.SetPictureCopyrights(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureCopyrightsRequest{
-			Id:         pictureID2,
-			Copyrights: "Third",
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:         pictureID2,
+				Copyrights: "Third",
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"copyrights"}},
 		},
 	)
 	require.NoError(t, err)
@@ -1071,9 +1136,12 @@ func TestGetPicturesHasCopyrightsFilter(t *testing.T) {
 
 	moderCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken)
 
-	_, err = client.SetPictureCopyrights(
+	_, err = client.UpdatePicture(
 		moderCtx,
-		&SetPictureCopyrightsRequest{Id: withCopyrightsID, Copyrights: "Some copyrights"},
+		&UpdatePictureRequest{
+			Picture:    &Picture{Id: withCopyrightsID, Copyrights: "Some copyrights"},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"copyrights"}},
+		},
 	)
 	require.NoError(t, err)
 
@@ -1124,7 +1192,7 @@ func TestGetPicturesHasCopyrightsFilter(t *testing.T) {
 	})
 }
 
-func TestSetPictureStatus(t *testing.T) {
+func TestUpdatePictureStatus(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
@@ -1151,11 +1219,14 @@ func TestSetPictureStatus(t *testing.T) {
 	var picStatus schema.PictureStatus
 
 	// accept
-	_, err = client.SetPictureStatus(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
@@ -1168,11 +1239,14 @@ func TestSetPictureStatus(t *testing.T) {
 	require.Equal(t, schema.PictureStatusAccepted, picStatus)
 
 	// unaccept
-	_, err = client.SetPictureStatus(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_INBOX,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_INBOX,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
@@ -1185,11 +1259,14 @@ func TestSetPictureStatus(t *testing.T) {
 	require.Equal(t, schema.PictureStatusInbox, picStatus)
 
 	// remove without vote
-	_, err = client.SetPictureStatus(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_REMOVING,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_REMOVING,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.ErrorContains(t, err, "PermissionDenied")
@@ -1202,11 +1279,14 @@ func TestSetPictureStatus(t *testing.T) {
 	require.NoError(t, err)
 
 	// remove with vote
-	_, err = client.SetPictureStatus(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_REMOVING,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_REMOVING,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
@@ -1219,11 +1299,14 @@ func TestSetPictureStatus(t *testing.T) {
 	require.Equal(t, schema.PictureStatusRemoving, picStatus)
 
 	// restore
-	_, err = client.SetPictureStatus(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_INBOX,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_INBOX,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
@@ -1236,11 +1319,14 @@ func TestSetPictureStatus(t *testing.T) {
 	require.Equal(t, schema.PictureStatusInbox, picStatus)
 
 	// accept
-	_, err = client.SetPictureStatus(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.Error(t, err)
@@ -1299,11 +1385,14 @@ func TestReplacePicture(t *testing.T) {
 	var picStatus schema.PictureStatus
 
 	// accept
-	_, err = client.SetPictureStatus(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
@@ -1897,11 +1986,14 @@ func TestNewbox(t *testing.T) {
 		token.AccessToken,
 	)
 
-	_, err = client.SetPictureStatus(
+	_, err = client.UpdatePicture(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)

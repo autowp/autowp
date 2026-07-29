@@ -1,8 +1,16 @@
 import {DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Picture, PictureFields, PictureListOptions, PicturesRequest, SetPictureCropRequest} from '@grpc/spec.pb';
+import {
+  Picture,
+  PictureCrop,
+  PictureFields,
+  PictureListOptions,
+  PicturesRequest,
+  UpdatePictureRequest,
+} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {BehaviorSubject, EMPTY, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
@@ -142,13 +150,18 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
   protected saveCrop() {
     if (this.picture) {
       this.#picturesClient
-        .setPictureCrop(
-          new SetPictureCropRequest({
-            cropHeight: Math.round(this.#currentCrop.h),
-            cropLeft: this.#currentCrop.x > 0 ? Math.round(this.#currentCrop.x) : 0,
-            cropTop: this.#currentCrop.y > 0 ? Math.round(this.#currentCrop.y) : 0,
-            cropWidth: Math.round(this.#currentCrop.w),
-            pictureId: this.picture.id,
+        .updatePicture(
+          new UpdatePictureRequest({
+            picture: new Picture({
+              crop: new PictureCrop({
+                height: Math.round(this.#currentCrop.h),
+                left: this.#currentCrop.x > 0 ? Math.round(this.#currentCrop.x) : 0,
+                top: this.#currentCrop.y > 0 ? Math.round(this.#currentCrop.y) : 0,
+                width: Math.round(this.#currentCrop.w),
+              }),
+              id: this.picture.id,
+            }),
+            updateMask: new FieldMask({paths: ['crop']}),
           }),
         )
         .pipe(

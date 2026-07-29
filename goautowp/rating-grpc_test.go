@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 func TestLikesRating(t *testing.T) {
@@ -78,15 +79,18 @@ func TestPictureLikesRating(t *testing.T) {
 		testerToken.AccessToken,
 	)
 
-	_, err = picturesClient.SetPictureStatus(
+	_, err = picturesClient.UpdatePicture(
 		metadata.AppendToOutgoingContext(
 			ctx,
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&SetPictureStatusRequest{
-			Id:     pictureID,
-			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:     pictureID,
+				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)

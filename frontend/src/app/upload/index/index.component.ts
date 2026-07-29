@@ -21,16 +21,18 @@ import {
   ItemRequest,
   ItemType,
   Picture,
+  PictureCrop,
   PictureFields,
   PictureItemListOptions,
   PictureItemsRequest,
   PictureItemType,
   PictureListOptions,
   PicturesRequest,
-  SetPictureCropRequest,
+  UpdatePictureRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -352,13 +354,18 @@ export class UploadIndexComponent implements OnInit {
 
     componentRef.instance.changed.subscribe(() => {
       this.#picturesClient
-        .setPictureCrop(
-          new SetPictureCropRequest({
-            cropHeight: picture.picture.image?.cropHeight ? Math.round(picture.picture.image.cropHeight) : undefined,
-            cropLeft: picture.picture.image?.cropLeft ? Math.round(picture.picture.image.cropLeft) : undefined,
-            cropTop: picture.picture.image?.cropTop ? Math.round(picture.picture.image.cropTop) : undefined,
-            cropWidth: picture.picture.image?.cropWidth ? Math.round(picture.picture.image.cropWidth) : undefined,
-            pictureId: picture.picture.id,
+        .updatePicture(
+          new UpdatePictureRequest({
+            picture: new Picture({
+              crop: new PictureCrop({
+                height: picture.picture.image?.cropHeight ? Math.round(picture.picture.image.cropHeight) : undefined,
+                left: picture.picture.image?.cropLeft ? Math.round(picture.picture.image.cropLeft) : undefined,
+                top: picture.picture.image?.cropTop ? Math.round(picture.picture.image.cropTop) : undefined,
+                width: picture.picture.image?.cropWidth ? Math.round(picture.picture.image.cropWidth) : undefined,
+              }),
+              id: picture.picture.id,
+            }),
+            updateMask: new FieldMask({paths: ['crop']}),
           }),
         )
         .pipe(
