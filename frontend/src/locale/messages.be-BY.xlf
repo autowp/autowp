@@ -14956,6 +14956,42 @@ This process is irreversible, so think it over carefully and don&apos;t make a h
         </context-group>
         <target state="translated">падрабязней…</target>
       </trans-unit>
+      <trans-unit id="7665878414520006988" datatype="html">
+        <source>Not a duplicate</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/similar/similar.component.html</context>
+          <context context-type="linenumber">41,44</context>
+        </context-group>
+        <target state="translated">Не дублікат</target>
+      </trans-unit>
+      <trans-unit id="1120467645641403997" datatype="html">
+        <source>Similar pictures</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/menu/menu/menu.component.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/pictures-routing.module.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/similar/similar.component.html</context>
+          <context context-type="linenumber">2,6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/similar/similar.component.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <target state="translated">Падобныя малюнкі</target>
+      </trans-unit>
+      <trans-unit id="1779552786277618671" datatype="html">
+        <source>Distance</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/similar/similar.component.html</context>
+          <context context-type="linenumber">33,35</context>
+        </context-group>
+        <target state="translated">Адлегласць</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

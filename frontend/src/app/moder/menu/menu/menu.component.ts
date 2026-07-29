@@ -47,6 +47,12 @@ export class MenuComponent {
           routerLink: ['/moder/pictures'],
         },
         {
+          count$: this.#pictureService.similarPicturesCount$,
+          icon: 'bi bi-file-earmark-image',
+          label: $localize`Similar pictures`,
+          routerLink: ['/moder/pictures/similar'],
+        },
+        {
           count$: this.#commentService.attentionCommentsCount$,
           icon: 'bi bi-chat-fill',
           label: $localize`Comments`,

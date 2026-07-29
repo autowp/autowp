@@ -1,0 +1,54 @@
+<div class="container-fluid">
+  <h1 i18n>Similar pictures</h1>
+
+  @if (data$ | async; as data) {
+    @if (data.paginator) {
+      <app-paginator [data]="data.paginator" />
+    }
+
+    @for (picture of data.pictures; track picture.id) {
+      <div class="row align-items-start mb-4 pb-4 border-bottom">
+        <div class="col-md-3">
+          <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" />
+          @if (picture.replaceable; as replaceable) {
+            <p class="alert alert-info small" role="alert">
+              <ng-container i18n>Photo suggested to replace</ng-container>
+              <a [routerLink]="['/picture', replaceable.identity]">/picture/{{ replaceable.identity }}</a>
+            </p>
+          }
+        </div>
+        <div class="col-md-9">
+          <div class="row">
+            @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
+              <div class="col-md-4 mb-3">
+                @if (dfDistance.dstPicture; as dstPicture) {
+                  <app-thumbnail [picture]="dstPicture" [route]="['/picture', dstPicture.identity]" />
+                  @if (dstPicture.replaceable; as replaceable) {
+                    <p class="alert alert-info small" role="alert">
+                      <ng-container i18n>Photo suggested to replace</ng-container>
+                      <a [routerLink]="['/picture', replaceable.identity]">/picture/{{ replaceable.identity }}</a>
+                    </p>
+                  }
+                }
+                <p class="text-muted small"><ng-container i18n>Distance</ng-container>: {{ dfDistance.distance }}</p>
+                <button
+                  type="button"
+                  class="btn btn-warning btn-sm"
+                  [disabled]="hideLoadingKey() === picture.id + '-' + dfDistance.dstPictureId"
+                  (click)="hideSimilar(picture, dfDistance)"
+                >
+                  <i class="bi bi-x-circle" aria-hidden="true"></i>
+                  <ng-container i18n>Not a duplicate</ng-container>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (data.paginator) {
+      <app-paginator [data]="data.paginator" />
+    }
+  }
+</div>

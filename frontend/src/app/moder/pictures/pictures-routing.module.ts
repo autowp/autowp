@@ -4,6 +4,12 @@ import {moderGuard} from '../../moder.guard';
 
 export const routes: Routes = [
   {
+    canActivate: [moderGuard],
+    loadComponent: () => import('./similar/similar.component').then((m) => m.ModerPicturesSimilarComponent),
+    path: 'similar',
+    title: $localize`Similar pictures`,
+  },
+  {
     children: [
       {
         canActivate: [moderGuard],
