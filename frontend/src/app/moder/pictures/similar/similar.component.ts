@@ -1,5 +1,5 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   DeleteSimilarRequest,
@@ -14,8 +14,8 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {BehaviorSubject, EMPTY} from 'rxjs';
-import {catchError, map, shareReplay, switchMap} from 'rxjs/operators';
+import {EMPTY} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../../thumbnail/thumbnail/thumbnail.component';
@@ -30,7 +30,7 @@ const similarPictureFields = () =>
 
 @Component({
   selector: 'app-moder-pictures-similar',
-  imports: [AsyncPipe, PaginatorComponent, RouterLink, ThumbnailComponent],
+  imports: [PaginatorComponent, RouterLink, ThumbnailComponent],
   templateUrl: './similar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -40,45 +40,42 @@ export class ModerPicturesSimilarComponent implements OnInit {
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
 
-  readonly #change$ = new BehaviorSubject<void>(void 0);
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
 
   protected readonly hideLoadingKey = signal<null | string>(null);
 
-  protected readonly data$ = this.#route.queryParamMap.pipe(
-    switchMap((params) => {
-      const qParams = new PicturesRequest({
-        fields: new PictureFields({
-          ...similarPictureFields(),
-          dfDistance: new DfDistanceRequest({
-            fields: new DfDistanceFields({
-              dstPicture: new PicturesRequest({fields: similarPictureFields()}),
+  protected readonly picturesResource = rxResource({
+    params: () => this.#page(),
+    stream: ({params: page}) =>
+      this.#picturesClient
+        .getPictures(
+          new PicturesRequest({
+            fields: Object.assign(similarPictureFields(), {
+              dfDistance: new DfDistanceRequest({
+                fields: new DfDistanceFields({
+                  dstPicture: new PicturesRequest({fields: similarPictureFields()}),
+                }),
+                limit: 5,
+              }),
             }),
-            limit: 5,
+            limit: 12,
+            options: new PictureListOptions({
+              dfDistance: new DfDistanceListOptions({}),
+            }),
+            order: PicturesRequest.Order.ORDER_DF_DISTANCE_SIMILARITY,
+            page,
+            paginator: true,
           }),
-        }),
-        limit: 12,
-        options: new PictureListOptions({
-          dfDistance: new DfDistanceListOptions({}),
-        }),
-        order: PicturesRequest.Order.ORDER_DF_DISTANCE_SIMILARITY,
-        page: parseInt(params.get('page') ?? '', 10),
-        paginator: true,
-      });
-
-      return this.#change$.pipe(
-        switchMap(() => this.#picturesClient.getPictures(qParams)),
-        catchError((response: unknown) => {
-          this.#toastService.handleError(response);
-          return EMPTY;
-        }),
-      );
-    }),
-    map((response) => ({
-      paginator: response.paginator,
-      pictures: response.items || [],
-    })),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+        )
+        .pipe(
+          map((response) => ({
+            paginator: response.paginator,
+            pictures: response.items || [],
+          })),
+        ),
+  });
 
   ngOnInit(): void {
     this.#pageEnv.set({
@@ -104,7 +101,7 @@ export class ModerPicturesSimilarComponent implements OnInit {
       .subscribe({
         next: () => {
           this.hideLoadingKey.set(null);
-          this.#change$.next();
+          this.picturesResource.reload();
         },
       });
   }
