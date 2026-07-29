@@ -1227,12 +1227,14 @@ func (s *PicturesGRPCServer) UpdatePicture(
 	}
 
 	inDate := in.GetTakenDate()
+	maskPaths := in.GetUpdateMask().GetPaths()
 
 	ctx = context.WithoutCancel(ctx)
 
 	success, err := s.repository.UpdatePicture(
 		ctx, in.GetId(), in.GetName(),
 		int16(inDate.GetYear()), int8(inDate.GetMonth()), int8(inDate.GetDay()), //nolint: gosec
+		maskPaths,
 	)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())

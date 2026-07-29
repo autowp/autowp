@@ -2124,6 +2124,7 @@ message UpdatePictureRequest {
   int64 id = 1;
   google.type.Date taken_date = 2;
   string name = 3;
+  google.protobuf.FieldMask update_mask = 4;
 }
 
 message SetPictureCopyrightsRequest {

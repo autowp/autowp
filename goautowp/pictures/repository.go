@@ -1108,26 +1108,38 @@ func (s *Repository) UpdatePicture(
 	takenYear int16,
 	takenMonth int8,
 	takenDay int8,
+	mask []string,
 ) (bool, error) {
+	set := goqu.Record{}
+
+	if util.Contains(mask, "name") {
+		set[schema.PictureTableNameColName] = sql.NullString{
+			String: name,
+			Valid:  len(name) > 0,
+		}
+	}
+
+	if util.Contains(mask, "taken_date") {
+		set[schema.PictureTableTakenYearColName] = sql.NullInt16{
+			Int16: takenYear,
+			Valid: takenYear > 0,
+		}
+		set[schema.PictureTableTakenMonthColName] = sql.NullInt16{
+			Int16: int16(takenMonth),
+			Valid: takenMonth > 0,
+		}
+		set[schema.PictureTableTakenDayColName] = sql.NullInt16{
+			Int16: int16(takenDay),
+			Valid: takenDay > 0,
+		}
+	}
+
+	if len(set) == 0 {
+		return false, nil
+	}
+
 	res, err := s.db.Update(schema.PictureTable).
-		Set(goqu.Record{
-			schema.PictureTableNameColName: sql.NullString{
-				String: name,
-				Valid:  len(name) > 0,
-			},
-			schema.PictureTableTakenYearColName: sql.NullInt16{
-				Int16: takenYear,
-				Valid: takenYear > 0,
-			},
-			schema.PictureTableTakenMonthColName: sql.NullInt16{
-				Int16: int16(takenMonth),
-				Valid: takenMonth > 0,
-			},
-			schema.PictureTableTakenDayColName: sql.NullInt16{
-				Int16: int16(takenDay),
-				Valid: takenDay > 0,
-			},
-		}).
+		Set(set).
 		Where(schema.PictureTableIDCol.Eq(pictureID)).
 		Executor().ExecContext(ctx)
 	if err != nil {

@@ -21,6 +21,7 @@ import (
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -868,6 +869,9 @@ func TestUpdatePicture(t *testing.T) {
 				Month: 2,
 				Day:   1,
 			},
+			UpdateMask: &fieldmaskpb.FieldMask{
+				Paths: []string{"name", "taken_date"},
+			},
 		},
 	)
 	require.NoError(t, err)
@@ -900,6 +904,9 @@ func TestUpdatePicture(t *testing.T) {
 				Year:  2020,
 				Month: 2,
 			},
+			UpdateMask: &fieldmaskpb.FieldMask{
+				Paths: []string{"name", "taken_date"},
+			},
 		},
 	)
 	require.NoError(t, err)
@@ -919,6 +926,35 @@ func TestUpdatePicture(t *testing.T) {
 	require.Equal(t, byte(2), pic.TakenMonth.Byte)
 	require.True(t, pic.TakenMonth.Valid)
 	require.False(t, pic.TakenDay.Valid)
+
+	// Updating only the name must not touch taken_date when it is absent from the mask.
+	_, err = client.UpdatePicture(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
+		&UpdatePictureRequest{
+			Id:   pictureID,
+			Name: "Bar",
+			UpdateMask: &fieldmaskpb.FieldMask{
+				Paths: []string{"name"},
+			},
+		},
+	)
+	require.NoError(t, err)
+
+	success, err = goquDB.Select(
+		schema.PictureTableNameColName,
+		schema.PictureTableTakenYearColName,
+		schema.PictureTableTakenMonthColName,
+	).
+		From(schema.PictureTable).
+		Where(schema.PictureTableIDCol.Eq(pictureID)).ScanStructContext(ctx, &pic)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	require.Equal(t, "Bar", pic.Name.String)
+	require.Equal(t, int16(2020), pic.TakenYear.Int16)
+	require.True(t, pic.TakenYear.Valid)
+	require.Equal(t, byte(2), pic.TakenMonth.Byte)
+	require.True(t, pic.TakenMonth.Valid)
 }
 
 func TestSetPictureCopyrights(t *testing.T) {

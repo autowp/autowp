@@ -41,6 +41,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, TrafficClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -386,6 +387,7 @@ export class ModerPicturesItemComponent {
           id: picture.id,
           name: picture.specialName,
           takenDate: picture.takenDate,
+          updateMask: new FieldMask({paths: ['name', 'taken_date']}),
         }),
       )
       .pipe(
