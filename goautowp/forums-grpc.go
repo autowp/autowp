@@ -209,84 +209,6 @@ func (s *CreateTopicRequest) Validate(
 	return result, nil
 }
 
-func (s *ForumsGRPCServer) CloseTopic(
-	ctx context.Context,
-	in *SetTopicStatusRequest,
-) (*emptypb.Empty, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	forumAdmin := util.Contains(userCtx.Roles, users.RoleForumsModer)
-	if !forumAdmin {
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-	}
-
-	err = s.forums.Close(ctx, in.GetId())
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &emptypb.Empty{}, nil
-}
-
-func (s *ForumsGRPCServer) OpenTopic(
-	ctx context.Context,
-	in *SetTopicStatusRequest,
-) (*emptypb.Empty, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	forumAdmin := util.Contains(userCtx.Roles, users.RoleForumsModer)
-	if !forumAdmin {
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-	}
-
-	err = s.forums.Open(ctx, in.GetId())
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &emptypb.Empty{}, nil
-}
-
-func (s *ForumsGRPCServer) DeleteTopic(
-	ctx context.Context,
-	in *SetTopicStatusRequest,
-) (*emptypb.Empty, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	forumAdmin := util.Contains(userCtx.Roles, users.RoleForumsModer)
-	if !forumAdmin {
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-	}
-
-	err = s.forums.Delete(ctx, in.GetId())
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &emptypb.Empty{}, nil
-}
-
 func (s *ForumsGRPCServer) UpdateTopic(
 	ctx context.Context,
 	in *UpdateTopicRequest,
@@ -305,9 +227,31 @@ func (s *ForumsGRPCServer) UpdateTopic(
 		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
-	err = s.forums.MoveTopic(ctx, in.GetTopic().GetId(), in.GetTopic().GetThemeId())
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	values := in.GetTopic()
+	maskPaths := in.GetUpdateMask().GetPaths()
+
+	if util.Contains(maskPaths, "theme_id") {
+		err = s.forums.MoveTopic(ctx, values.GetId(), values.GetThemeId())
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	if util.Contains(maskPaths, "status") {
+		switch values.GetStatus() {
+		case string(schema.ForumsTopicStatusClosed):
+			err = s.forums.Close(ctx, values.GetId())
+		case string(schema.ForumsTopicStatusNormal):
+			err = s.forums.Open(ctx, values.GetId())
+		case string(schema.ForumsTopicStatusDeleted):
+			err = s.forums.Delete(ctx, values.GetId())
+		default:
+			return nil, status.Errorf(codes.InvalidArgument, "invalid status")
+		}
+
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
 	}
 
 	return &emptypb.Empty{}, nil

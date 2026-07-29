@@ -7,11 +7,12 @@ import {
   CommentsType,
   CommentsUnSubscribeRequest,
   GetTopicRequest,
-  SetTopicStatusRequest,
   Topic,
+  UpdateTopicRequest,
   User,
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';
 import {PastTimeIndicatorComponent} from '@utils/past-time-indicator/past-time-indicator.component';
@@ -108,29 +109,50 @@ export class ForumsTopicListComponent {
   }
 
   protected openTopic(topic: TopicItem) {
-    this.#grpc.openTopic(new SetTopicStatusRequest({id: topic.id})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
-      next: () => {
-        topic.status = 'normal';
-      },
-    });
+    this.#grpc
+      .updateTopic(
+        new UpdateTopicRequest({
+          topic: new Topic({id: topic.id, status: 'normal'}),
+          updateMask: new FieldMask({paths: ['status']}),
+        }),
+      )
+      .subscribe({
+        error: (response: unknown) => this.#toastService.handleError(response),
+        next: () => {
+          topic.status = 'normal';
+        },
+      });
   }
 
   protected closeTopic(topic: TopicItem) {
-    this.#grpc.closeTopic(new SetTopicStatusRequest({id: topic.id})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
-      next: () => {
-        topic.status = 'closed';
-      },
-    });
+    this.#grpc
+      .updateTopic(
+        new UpdateTopicRequest({
+          topic: new Topic({id: topic.id, status: 'closed'}),
+          updateMask: new FieldMask({paths: ['status']}),
+        }),
+      )
+      .subscribe({
+        error: (response: unknown) => this.#toastService.handleError(response),
+        next: () => {
+          topic.status = 'closed';
+        },
+      });
   }
 
   protected deleteTopic(topic: TopicItem) {
-    this.#grpc.deleteTopic(new SetTopicStatusRequest({id: topic.id})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
-      next: () => {
-        this.reload.emit(void 0);
-      },
-    });
+    this.#grpc
+      .updateTopic(
+        new UpdateTopicRequest({
+          topic: new Topic({id: topic.id, status: 'deleted'}),
+          updateMask: new FieldMask({paths: ['status']}),
+        }),
+      )
+      .subscribe({
+        error: (response: unknown) => this.#toastService.handleError(response),
+        next: () => {
+          this.reload.emit(void 0);
+        },
+      });
   }
 }

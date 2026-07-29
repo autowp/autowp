@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 func TestGetThemes(t *testing.T) {
@@ -126,7 +127,7 @@ func TestGetUserSummary(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestCloseTopic(t *testing.T) {
+func TestUpdateTopicStatus(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
@@ -167,38 +168,41 @@ func TestCloseTopic(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, topic)
 
-	_, err = client.CloseTopic(
+	_, err = client.UpdateTopic(
 		metadata.AppendToOutgoingContext(
 			ctx,
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&SetTopicStatusRequest{
-			Id: topic.GetId(),
+		&UpdateTopicRequest{
+			Topic:      &Topic{Id: topic.GetId(), Status: "closed"},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
 
-	_, err = client.OpenTopic(
+	_, err = client.UpdateTopic(
 		metadata.AppendToOutgoingContext(
 			ctx,
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&SetTopicStatusRequest{
-			Id: topic.GetId(),
+		&UpdateTopicRequest{
+			Topic:      &Topic{Id: topic.GetId(), Status: "normal"},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
 
-	_, err = client.DeleteTopic(
+	_, err = client.UpdateTopic(
 		metadata.AppendToOutgoingContext(
 			ctx,
 			authorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&SetTopicStatusRequest{
-			Id: topic.GetId(),
+		&UpdateTopicRequest{
+			Topic:      &Topic{Id: topic.GetId(), Status: "deleted"},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)

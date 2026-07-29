@@ -43,9 +43,6 @@ service Autowp {
 service Forums {
   rpc GetUserSummary(google.protobuf.Empty) returns (ForumsUserSummary) {}
   rpc CreateTopic(CreateTopicRequest) returns (CreateTopicResponse) {}
-  rpc CloseTopic(SetTopicStatusRequest) returns (google.protobuf.Empty) {}
-  rpc OpenTopic(SetTopicStatusRequest) returns (google.protobuf.Empty) {}
-  rpc DeleteTopic(SetTopicStatusRequest) returns (google.protobuf.Empty) {}
   rpc UpdateTopic(UpdateTopicRequest) returns (google.protobuf.Empty) {}
   rpc GetTheme(GetThemeRequest) returns (Theme) {}
   rpc ListThemes(ListThemesRequest) returns (ListThemesResponse) {}
@@ -1060,10 +1057,6 @@ message CreateTopicRequest {
 }
 
 message CreateTopicResponse {
-  int64 id = 1;
-}
-
-message SetTopicStatusRequest {
   int64 id = 1;
 }
 
