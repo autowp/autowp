@@ -85,7 +85,7 @@ export class LogComponent implements OnInit {
 
   #mapEvent(event: LogEvent) {
     return {
-      createdAt: event.createdAt?.toDate(),
+      createdAt: event.createTime?.toDate(),
       description: event.description,
       items: event.items.map((item) =>
         this.#itemsClient.item(

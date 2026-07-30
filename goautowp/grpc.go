@@ -85,7 +85,7 @@ func (s *GRPCServer) GetIP(ctx context.Context, in *GetIPRequest) (*IP, error) {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	ip := net.ParseIP(in.GetIp())
+	ip := net.ParseIP(in.GetIpAddress())
 	if ip == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}

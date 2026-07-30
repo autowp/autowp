@@ -253,7 +253,7 @@ func (s *MessagingGRPCServer) GetMessages(
 			IsNew:           msg.IsNew,
 			CanDelete:       msg.CanDelete,
 			CanReply:        msg.CanReply,
-			CreatedAt:       timestamppb.New(msg.Date),
+			CreateTime:      timestamppb.New(msg.Date),
 			AllMessagesLink: msg.AllMessagesLink,
 			DialogCount:     msg.DialogCount,
 			ToUserId:        msg.ToUserID,

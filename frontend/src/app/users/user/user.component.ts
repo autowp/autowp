@@ -317,7 +317,7 @@ export class UsersUserComponent {
   }
 
   protected removeFromBlacklist(ip: string) {
-    this.#trafficClient.deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ip})).subscribe({
+    this.#trafficClient.deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip})).subscribe({
       error: (response: unknown) => this.#toastService.handleError(response),
       next: () => {
         this.#ipChange$.next();
@@ -330,7 +330,7 @@ export class UsersUserComponent {
       .createTrafficBlacklistItem(
         new CreateTrafficBlacklistItemRequest({
           item: {
-            ip,
+            ipAddress: ip,
             period: this.banPeriod,
             reason: this.banReason ?? '',
           },

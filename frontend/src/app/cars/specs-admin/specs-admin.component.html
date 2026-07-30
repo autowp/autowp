@@ -20,7 +20,7 @@
       @for (row of data.items; track row) {
         <tr>
           <td>
-            @if (row.userValue.updatedAt?.toDate(); as date) {
+            @if (row.userValue.updateTime?.toDate(); as date) {
               <span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span>
             }
           </td>

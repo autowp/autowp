@@ -275,7 +275,7 @@ func convertTopic(topic *ForumsTopic) *Topic {
 		Status:       topic.Status,
 		OldMessages:  topic.Messages - topic.NewMessages,
 		NewMessages:  topic.NewMessages,
-		CreatedAt:    timestamppb.New(topic.CreatedAt),
+		CreateTime:   timestamppb.New(topic.CreatedAt),
 		UserId:       topic.UserID,
 		ThemeId:      topic.ThemeID,
 		Subscription: topic.Subscription,

@@ -32,7 +32,7 @@ export class ModerTrafficWhitelistComponent implements OnInit {
 
   protected deleteItem(item: TrafficWhitelistItem) {
     this.#trafficClient
-      .deleteTrafficWhitelistItem(new DeleteTrafficWhitelistItemRequest({ip: item.ip}))
+      .deleteTrafficWhitelistItem(new DeleteTrafficWhitelistItemRequest({ipAddress: item.ipAddress}))
       .subscribe(() => {
         this.itemsResource.reload();
       });

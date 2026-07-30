@@ -40,9 +40,9 @@
         <td>
           @if (topic.lastMessage$ | async; as lastMessage) {
             <div>
-              @if (lastMessage.createdAt) {
+              @if (lastMessage.createTime) {
                 <small>
-                  <app-past-time-indicator [date]="lastMessage.createdAt.toDate()" />
+                  <app-past-time-indicator [date]="lastMessage.createTime.toDate()" />
                 </small>
                 <br />
               }

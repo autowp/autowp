@@ -38,7 +38,7 @@ export class ModerTrafficComponent implements OnInit {
     switchMap(() => this.#trafficClient.getTrafficTop(new Empty())),
     map((response) =>
       (response.items ? response.items : []).map((item) => ({
-        hostname$: this.#ipService.getHostByAddr$(item.ip),
+        hostname$: this.#ipService.getHostByAddr$(item.ipAddress),
         item,
       })),
     ),
@@ -53,7 +53,7 @@ export class ModerTrafficComponent implements OnInit {
 
   protected addToWhitelist(ip: string) {
     this.#trafficClient
-      .createTrafficWhitelistItem(new CreateTrafficWhitelistItemRequest({item: {ip, description: ''}}))
+      .createTrafficWhitelistItem(new CreateTrafficWhitelistItemRequest({item: {ipAddress: ip, description: ''}}))
       .subscribe(() => this.#change$.next());
   }
 
@@ -62,7 +62,7 @@ export class ModerTrafficComponent implements OnInit {
       .createTrafficBlacklistItem(
         new CreateTrafficBlacklistItemRequest({
           item: {
-            ip: ip,
+            ipAddress: ip,
             period: 240,
             reason: '',
           },
@@ -73,7 +73,7 @@ export class ModerTrafficComponent implements OnInit {
 
   protected removeFromBlacklist(ip: string) {
     this.#trafficClient
-      .deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ip}))
+      .deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip}))
       .subscribe(() => this.#change$.next());
   }
 }

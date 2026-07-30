@@ -72,7 +72,7 @@ func (s *UserExtractor) Extract(
 		user.PicturesAdded = int32(row.PicturesAdded) //nolint:gosec
 
 		if fields.GetRegDate() && row.RegDate != nil {
-			user.RegisteredAt = timestamppb.New(*row.RegDate)
+			user.CreateTime = timestamppb.New(*row.RegDate)
 		}
 
 		if row.LastOnline != nil {

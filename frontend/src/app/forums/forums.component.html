@@ -73,8 +73,8 @@
             </p>
             @if (theme.lastMessage$ | async; as lastMessage) {
               <p>
-                @if (lastMessage.createdAt) {
-                  <app-past-time-indicator [date]="lastMessage.createdAt.toDate()" />
+                @if (lastMessage.createTime) {
+                  <app-past-time-indicator [date]="lastMessage.createTime.toDate()" />
                 }
                 @if (theme.lastMessageAuthor$ | async; as lastMessageAuthor) {
                   <app-user [user]="lastMessageAuthor" />

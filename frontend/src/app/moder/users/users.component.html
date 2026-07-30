@@ -56,7 +56,7 @@
             }
           </td>
           <td>
-            @if (user.registeredAt; as date) {
+            @if (user.createTime; as date) {
               <span [ngbTooltip]="date.toDate() | date: 'fullDate'">{{ date.toDate() | timeAgo }}</span>
             }
           </td>

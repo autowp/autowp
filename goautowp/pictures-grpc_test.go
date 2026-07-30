@@ -1771,7 +1771,7 @@ func TestGetPicturesFilters(t *testing.T) {
 			},
 			OwnerId:               123,
 			AcceptedInDays:        3,
-			CreatedAt:             &date.Date{Year: 2025, Month: 1, Day: 1},
+			CreateDate:            &date.Date{Year: 2025, Month: 1, Day: 1},
 			AcceptDate:            &date.Date{Year: 2025, Month: 1, Day: 1},
 			AddedFrom:             &date.Date{Year: 2025, Month: 1, Day: 1},
 			CommentTopic:          &CommentTopicListOptions{MessagesGtZero: true},
@@ -1846,7 +1846,7 @@ func TestGetPictureIP(t *testing.T) {
 				},
 			)
 			require.NoError(t, err)
-			require.Equal(t, ip.String(), picture.GetIp())
+			require.Equal(t, ip.String(), picture.GetIpAddress())
 		})
 	}
 }

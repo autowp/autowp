@@ -5,9 +5,9 @@
     [class.deleted]="message.message.deleted"
   >
     <div>
-      @if (message.message.createdAt) {
-        <div class="float-end" [ngbTooltip]="message.message.createdAt.toDate() | date: 'medium'">
-          {{ message.message.createdAt.toDate() | timeAgo }}
+      @if (message.message.createTime) {
+        <div class="float-end" [ngbTooltip]="message.message.createTime.toDate() | date: 'medium'">
+          {{ message.message.createTime.toDate() | timeAgo }}
         </div>
       }
       @if (message.user$ | async; as user) {
@@ -113,12 +113,12 @@
             <span class="d-none d-md-inline" i18n>Move</span>
           </a>
         }
-        @if (message.message.ip) {
+        @if (message.message.ipAddress) {
           <i
             class="float-end bi bi-eye"
             aria-hidden="true"
             style="margin-right: 20px"
-            [ngbTooltip]="message.message.ip"
+            [ngbTooltip]="message.message.ipAddress"
           ></i>
         }
         @if (message.message.moderatorAttention === ModeratorAttention.REQUIRED) {

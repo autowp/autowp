@@ -26,7 +26,7 @@
           <ng-container i18n>Known as:</ng-container>
           <strong>«{{ user.name }}»</strong>
         </p>
-        @if (user.registeredAt; as date) {
+        @if (user.createTime; as date) {
           <p>
             <ng-container i18n>Registration date</ng-container>
             <strong [ngbTooltip]="date.toDate() | date: 'fullDate'">{{ date.toDate() | timeAgo }}</strong>

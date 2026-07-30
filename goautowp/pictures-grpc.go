@@ -2719,7 +2719,7 @@ func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, use
 		inOptions.GetPictureItem().GetItemParentCacheAncestor().GetParentId() == 0 &&
 		inOptions.GetPictureItem().GetPerspectiveId() == 0 &&
 		inOptions.GetOwnerId() == 0 && inOptions.GetAcceptedInDays() < acceptedInDaysMax &&
-		inOptions.GetCreatedAt() == nil && inOptions.GetId() == 0 && inOptions.GetIdentity() == ""
+		inOptions.GetCreateDate() == nil && inOptions.GetId() == 0 && inOptions.GetIdentity() == ""
 	if restricted {
 		return status.Error(
 			codes.PermissionDenied,

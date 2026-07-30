@@ -136,7 +136,7 @@ export class InboxComponent implements OnInit {
                 language: this.#languageService.language,
                 limit: 48,
                 options: new PictureListOptions({
-                  createdAt: currentDate,
+                  createDate: currentDate,
                   pictureItem: new PictureItemListOptions({
                     itemParentCacheAncestor: brandID
                       ? new ItemParentCacheListOptions({parentId: '' + brandID})

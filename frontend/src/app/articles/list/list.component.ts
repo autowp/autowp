@@ -60,7 +60,7 @@ export class ListComponent implements OnInit {
   #mapArticle(article: Article): ArticleListItem {
     return {
       author$: article.authorId !== '0' ? this.#userService.getUser$(article.authorId) : of(null),
-      createdAt: article.createdAt?.toDate(),
+      createdAt: article.createTime?.toDate(),
       description: article.description,
       id: article.id,
       name: article.name,

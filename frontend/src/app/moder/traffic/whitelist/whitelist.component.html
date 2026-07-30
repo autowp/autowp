@@ -35,12 +35,12 @@
       </tr>
     </thead>
     <tbody>
-      @for (item of data.items || []; track item.ip) {
+      @for (item of data.items || []; track item.ipAddress) {
         <tr>
-          <td>{{ item.ip }}</td>
+          <td>{{ item.ipAddress }}</td>
           <td>{{ item.description }}</td>
           <td>
-            <a i18n [href]="'http://nic.ru/whois/?query=' + item.ip">whois</a>
+            <a i18n [href]="'http://nic.ru/whois/?query=' + item.ipAddress">whois</a>
           </td>
           <td>
             <button

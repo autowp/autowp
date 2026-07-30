@@ -25,7 +25,7 @@
     </div>
     <div class="col-sm-4">
       <h3>
-        {{ item.item.ip }}
+        {{ item.item.ipAddress }}
         <a [href]="item.item.whoisUrl">whois</a>
       </h3>
       <p>{{ item.hostname$ | async }}</p>
@@ -49,14 +49,16 @@
       }
       <div>
         @if (item.item.ban) {
-          <button type="button" class="btn btn-secondary" i18n (click)="removeFromBlacklist(item.item.ip)">
+          <button type="button" class="btn btn-secondary" i18n (click)="removeFromBlacklist(item.item.ipAddress)">
             unban
           </button>
         } @else {
-          <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(item.item.ip)">Ban</button>
+          <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(item.item.ipAddress)">Ban</button>
         }
         @if (!item.item.inWhitelist) {
-          <button type="button" class="btn btn-success" i18n (click)="addToWhitelist(item.item.ip)">Whitelist</button>
+          <button type="button" class="btn btn-success" i18n (click)="addToWhitelist(item.item.ipAddress)">
+            Whitelist
+          </button>
         }
       </div>
     </div>

@@ -116,7 +116,7 @@ func (s *TrafficGRPCServer) GetTrafficTop(
 		}
 
 		result[idx] = &TrafficTopItem{
-			Ip:          item.IP.String(),
+			IpAddress:   item.IP.String(),
 			Count:       int32(item.Count), //nolint: gosec
 			Ban:         topItemBan,
 			InWhitelist: inWhitelist,
@@ -142,7 +142,7 @@ func (s *TrafficGRPCServer) DeleteTrafficBlacklistItem(
 		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
-	ip := net.ParseIP(in.GetIp())
+	ip := net.ParseIP(in.GetIpAddress())
 	if ip == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
@@ -168,7 +168,7 @@ func (s *TrafficGRPCServer) DeleteTrafficWhitelistItem(
 		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
-	ip := net.ParseIP(in.GetIp())
+	ip := net.ParseIP(in.GetIpAddress())
 	if ip == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
@@ -196,7 +196,7 @@ func (s *TrafficGRPCServer) CreateTrafficBlacklistItem(
 
 	item := in.GetItem()
 
-	ip := net.ParseIP(item.GetIp())
+	ip := net.ParseIP(item.GetIpAddress())
 	if ip == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
@@ -226,7 +226,7 @@ func (s *TrafficGRPCServer) CreateTrafficWhitelistItem(
 
 	item := in.GetItem()
 
-	ip := net.ParseIP(item.GetIp())
+	ip := net.ParseIP(item.GetIpAddress())
 	if ip == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
@@ -267,7 +267,7 @@ func (s *TrafficGRPCServer) GetTrafficWhitelistItems(
 	result := make([]*TrafficWhitelistItem, len(list))
 	for idx, i := range list {
 		result[idx] = &TrafficWhitelistItem{
-			Ip:          i.IP.String(),
+			IpAddress:   i.IP.String(),
 			Description: i.Description,
 		}
 	}

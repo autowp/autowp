@@ -38,8 +38,8 @@ func (s *AchievementsGRPCServer) GetUserAchievements(
 	items := make([]*UserAchievementItem, 0, len(result.Earned))
 	for _, row := range result.Earned {
 		items = append(items, &UserAchievementItem{
-			Code:      row.Code,
-			CreatedAt: timestamppb.New(row.CreatedAt),
+			Code:       row.Code,
+			CreateTime: timestamppb.New(row.CreatedAt),
 		})
 	}
 

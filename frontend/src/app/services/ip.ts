@@ -8,7 +8,7 @@ import {map} from 'rxjs/operators';
 export class IpService {
   readonly #autowp = inject(AutowpClient);
 
-  #hostnames = new Map<string, Observable<string>>();
+  readonly #hostnames = new Map<string, Observable<string>>();
 
   public getHostByAddr$(ip: string): Observable<string> {
     const hostname$ = this.#hostnames.get(ip);
@@ -24,6 +24,6 @@ export class IpService {
   }
 
   public getIp$(ip: string, fields: string[]): Observable<IP> {
-    return this.#autowp.getIP(new GetIPRequest({ip, fields}));
+    return this.#autowp.getIP(new GetIPRequest({ipAddress: ip, fields}));
   }
 }

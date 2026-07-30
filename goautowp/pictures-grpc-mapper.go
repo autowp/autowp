@@ -168,12 +168,12 @@ func convertPictureListOptions(in *PictureListOptions) (*query.PictureListOption
 		result.Statuses = statuses
 	}
 
-	createdAt := in.GetCreatedAt()
-	if createdAt != nil {
+	createDate := in.GetCreateDate()
+	if createDate != nil {
 		result.CreatedAt = &civil.Date{
-			Year:  int(createdAt.GetYear()),
-			Month: time.Month(createdAt.GetMonth()),
-			Day:   int(createdAt.GetDay()),
+			Year:  int(createDate.GetYear()),
+			Month: time.Month(createDate.GetMonth()),
+			Day:   int(createDate.GetDay()),
 		}
 	}
 

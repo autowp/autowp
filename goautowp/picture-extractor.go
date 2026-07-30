@@ -142,7 +142,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			OwnerId:          util.NullInt64ToScalar(row.OwnerID),
 			Status:           extractPicturesStatus(row.Status),
 			Resolution:       fmt.Sprintf("%d×%d", row.Width, row.Height),
-			CreatedAt:        timestamppb.New(row.CreatedAt),
+			CreateTime:       timestamppb.New(row.CreatedAt),
 			TakenDate: &date.Date{
 				Year:  int32(util.NullInt16ToScalar(row.TakenYear)),
 				Month: int32(util.NullByteToScalar(row.TakenMonth)),
@@ -658,7 +658,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if row.IP.Status == pgtype.Present && row.IP.IPNet != nil && util.Contains(userCtx.Roles, users.RoleModer) {
-			resultRow.Ip = row.IP.IPNet.IP.String()
+			resultRow.IpAddress = row.IP.IPNet.IP.String()
 		}
 
 		if fields.GetSubscribed() && userCtx.UserID > 0 {

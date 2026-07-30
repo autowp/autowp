@@ -194,10 +194,10 @@ export class ModerPicturesItemComponent {
 
   protected readonly ip$: Observable<IP | null> = this.picture$.pipe(
     switchMap((picture) => {
-      if (!picture.ip) {
+      if (!picture.ipAddress) {
         return of(null);
       }
-      return this.#ipService.getIp$(picture.ip, ['blacklist', 'rights']).pipe(catchError(() => of(null)));
+      return this.#ipService.getIp$(picture.ipAddress, ['blacklist', 'rights']).pipe(catchError(() => of(null)));
     }),
   );
 
@@ -631,7 +631,7 @@ export class ModerPicturesItemComponent {
 
   protected removeFromBlacklist(ip: string) {
     this.#trafficClient
-      .deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ip}))
+      .deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip}))
       .subscribe(() => this.#change$.next());
   }
 
@@ -640,7 +640,7 @@ export class ModerPicturesItemComponent {
       .createTrafficBlacklistItem(
         new CreateTrafficBlacklistItemRequest({
           item: {
-            ip: ip,
+            ipAddress: ip,
             period: this.banPeriod,
             reason: this.banReason || '',
           },

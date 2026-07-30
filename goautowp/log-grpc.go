@@ -49,7 +49,7 @@ func (s *LogGRPCServer) GetEvents(ctx context.Context, in *LogEventsRequest) (*L
 	is := make([]*LogEvent, 0, len(res))
 	for _, item := range res {
 		is = append(is, &LogEvent{
-			CreatedAt:   timestamppb.New(item.CreatedAt),
+			CreateTime:  timestamppb.New(item.CreatedAt),
 			Description: item.Description,
 			UserId:      item.UserID,
 			Items:       item.Items,

@@ -78,7 +78,7 @@ export class ForumsTopicListComponent {
         );
         return {
           author$: this.#userService.getUser$(topic.userId),
-          createdAt: topic.createdAt?.toDate(),
+          createdAt: topic.createTime?.toDate(),
           id: topic.id,
           lastMessage$,
           lastMessageAuthor$,

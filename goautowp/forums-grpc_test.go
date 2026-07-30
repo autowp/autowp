@@ -97,7 +97,7 @@ func TestGetLastTopicAndLastMessage(t *testing.T) {
 	require.Equal(t, topic.GetId(), message.GetItemId())
 	require.Equal(t, CommentsType_FORUMS_TYPE_ID, message.GetTypeId())
 	require.Equal(t, userID, message.GetAuthorId())
-	require.NotNil(t, message.GetCreatedAt())
+	require.NotNil(t, message.GetCreateTime())
 
 	topics, err := client.ListTopics(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),

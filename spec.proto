@@ -12,6 +12,7 @@ import "google/rpc/status.proto";
 import "google/rpc/error_details.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+import "google/api/field_info.proto";
 // #import "google/api/client.proto";
 
 option go_package = "github.com/autowp/goautowp";
@@ -678,7 +679,7 @@ message AttrUserValue {
   int64 user_id = 3;
   AttrValueValue value = 4;
   string value_text = 5;
-  google.protobuf.Timestamp updated_at = 6;
+  google.protobuf.Timestamp update_time = 6;
 }
 
 message AttrUserValuesResponse {
@@ -781,7 +782,7 @@ message GetUserAchievementsRequest {
 
 message UserAchievementItem {
   string code = 1;
-  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp create_time = 2;
 }
 
 // Reports progress toward the next tier not yet earned in one of the four tiered series
@@ -885,7 +886,7 @@ message User {
   Image img = 17;
   string gravatar_large = 18;
   Image photo = 19;
-  google.protobuf.Timestamp registered_at = 21;
+  google.protobuf.Timestamp create_time = 21;
   int32 pictures_added = 23;
   int32 pictures_accepted_count = 24;
   string last_ip = 25;
@@ -927,7 +928,7 @@ message BanItem {
 }
 
 message TrafficTopItem {
-  string ip = 1;
+  string ip_address = 1 [(google.api.field_info).format = IPV4_OR_IPV6];
   int32 count = 2;
   BanItem ban = 3;
   bool in_whitelist = 4;
@@ -939,7 +940,7 @@ message TrafficTopResponse {
 }
 
 message GetIPRequest {
-  string ip = 1;
+  string ip_address = 1 [(google.api.field_info).format = IPV4_OR_IPV6];
   repeated string fields = 2;
 }
 
@@ -967,11 +968,11 @@ message Feedback {
 }
 
 message DeleteTrafficWhitelistItemRequest {
-  string ip = 1;
+  string ip_address = 1 [(google.api.field_info).format = IPV4_OR_IPV6];
 }
 
 message DeleteTrafficBlacklistItemRequest {
-  string ip = 1;
+  string ip_address = 1 [(google.api.field_info).format = IPV4_OR_IPV6];
 }
 
 message CreateTrafficBlacklistItemRequest {
@@ -983,12 +984,12 @@ message CreateTrafficWhitelistItemRequest {
 }
 
 message TrafficWhitelistItem {
-  string ip = 1;
+  string ip_address = 1 [(google.api.field_info).format = IPV4_OR_IPV6];
   string description = 2;
 }
 
 message TrafficBlacklistItem {
-  string ip = 1;
+  string ip_address = 1 [(google.api.field_info).format = IPV4_OR_IPV6];
   int32 period = 2;
   string reason = 3;
 }
@@ -1038,7 +1039,7 @@ message Topic {
   string status = 3;
   int32 old_messages = 4;
   int32 new_messages = 5;
-  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp create_time = 6;
   int64 user_id = 7;
   int64 theme_id = 8;
   bool subscription = 9;
@@ -1302,7 +1303,7 @@ message PictureListOptions {
   PictureItemListOptions picture_item = 2;
   int64 owner_id = 3;
   int32 accepted_in_days = 5;
-  google.type.Date created_at = 6;
+  google.type.Date create_date = 6;
   google.type.Date accept_date = 7;
   google.type.Date added_from = 10;
   CommentTopicListOptions comment_topic = 11;
@@ -1827,7 +1828,7 @@ message LogEvents {
 }
 
 message LogEvent {
-  google.protobuf.Timestamp created_at = 1;
+  google.protobuf.Timestamp create_time = 1;
   string description = 2;
   int64 user_id = 3;
   repeated int64 pictures = 4;
@@ -1958,7 +1959,7 @@ message Picture {
   Image image_gallery_full = 25;
   DfDistances df_distances = 26;
   int32 accepted_count = 27;
-  google.protobuf.Timestamp created_at = 28;
+  google.protobuf.Timestamp create_time = 28;
   string copyrights = 29;
   string exif = 30;
   bool is_last = 31;
@@ -1970,7 +1971,7 @@ message Picture {
   string special_name = 37;
   google.type.Date taken_date = 38;
   int64 change_status_user_id = 39;
-  string ip = 40;
+  string ip_address = 40 [(google.api.field_info).format = IPV4_OR_IPV6];
   int32 dpi_x = 41;
   int32 dpi_y = 42;
   Image preview_large = 43;
@@ -2192,7 +2193,7 @@ message Message {
   bool is_new = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
   bool can_delete = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
   bool can_reply = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
-  google.protobuf.Timestamp created_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp create_time = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
   bool all_messages_link = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
   int32 dialog_count = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
   int64 author_id = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
@@ -2231,7 +2232,7 @@ message Pages {
 message DonationsTransaction {
   int32 sum = 1 [(google.api.field_behavior) = REQUIRED];
   string currency = 2 [(google.api.field_behavior) = REQUIRED];
-  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp create_time = 3;
   string contributor = 4 [(google.api.field_behavior) = REQUIRED];
   string purpose = 5 [(google.api.field_behavior) = REQUIRED];
   int64 user_id = 6 [(google.api.field_behavior) = REQUIRED];
@@ -2356,7 +2357,7 @@ message Article {
   string name = 2;
   int64 author_id = 3;
   string catname = 4;
-  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp create_time = 5;
   string html = 6;
   string preview_url = 7;
   string description = 8;
@@ -2677,12 +2678,12 @@ message CommentMessage {
   CommentsType type_id = 2;
   int64 item_id = 3;
   int64 parent_id = 4;
-  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp create_time = 5;
   bool deleted = 6;
   ModeratorAttention moderator_attention = 7;
   bool is_new = 8;
   int64 author_id = 9;
-  string ip = 10;
+  string ip_address = 10 [(google.api.field_info).format = IPV4_OR_IPV6];
   string text = 11;
   int32 vote = 12;
   string preview = 13;
