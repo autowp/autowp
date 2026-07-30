@@ -104,7 +104,7 @@ export class CarsSpecificationsEditorSpecComponent {
   readonly #change$ = new BehaviorSubject<void>(void 0);
 
   // fields: 'options,childs.options',
-  protected readonly attributes$: Observable<APIAttrAttributeInSpecEditor[]> = this.item$.pipe(
+  readonly #attributes$: Observable<APIAttrAttributeInSpecEditor[]> = this.item$.pipe(
     distinctUntilChanged(),
     switchMap((item) =>
       item?.attrZoneId
@@ -121,10 +121,10 @@ export class CarsSpecificationsEditorSpecComponent {
 
   protected readonly AttrAttributeTypeId = AttrAttributeType.Id;
 
-  protected readonly currentUserValues$: Observable<Record<string, AttrUserValue>> = combineLatest([
+  readonly #currentUserValues$: Observable<Record<string, AttrUserValue>> = combineLatest([
     this.item$,
     this.#auth.user$,
-    this.attributes$,
+    this.#attributes$,
     this.#change$,
   ]).pipe(
     switchMap(([item, user, attributes]) =>
@@ -160,8 +160,8 @@ export class CarsSpecificationsEditorSpecComponent {
   );
 
   protected readonly form$: Observable<FormArray<AttrFormControls>> = combineLatest([
-    this.attributes$,
-    this.currentUserValues$,
+    this.#attributes$,
+    this.#currentUserValues$,
   ]).pipe(
     map(([attributes, currentUserValues]) => {
       const controls: AttrFormControls[] = attributes.map((attr) => {

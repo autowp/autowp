@@ -52,20 +52,20 @@ export class PersonsPersonAuthorPictureComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly personID$ = this.#route.parent!.parent!.paramMap.pipe(
+  readonly #personID$ = this.#route.parent!.parent!.paramMap.pipe(
     map((params) => params.get('id') ?? ''),
     distinctUntilChanged(),
   );
 
-  protected readonly picturesRouterLink$ = this.personID$.pipe(map((personID) => ['/persons', personID, 'author']));
+  protected readonly picturesRouterLink$ = this.#personID$.pipe(map((personID) => ['/persons', personID, 'author']));
 
-  protected readonly galleryRouterLink$: Observable<string[]> = combineLatest([this.personID$, this.#identity$]).pipe(
+  protected readonly galleryRouterLink$: Observable<string[]> = combineLatest([this.#personID$, this.#identity$]).pipe(
     map(([personID, identity]) => ['/persons', personID, 'author', 'gallery', identity]),
   );
 
   protected readonly picture$: Observable<Picture> = combineLatest([
     this.#identity$,
-    this.personID$,
+    this.#personID$,
     this.#changed$,
   ]).pipe(
     switchMap(([identity, itemID]) =>

@@ -27,7 +27,7 @@ export class MarkdownEditComponent implements AfterViewInit {
 
   readonly control = computed(() => new FormControl<string>(this.text(), {nonNullable: true}));
 
-  readonly autosize = viewChild(CdkTextareaAutosize);
+  private readonly autosize = viewChild(CdkTextareaAutosize);
 
   ngAfterViewInit(): void {
     this.autosize()!.resizeToFitContent(true);

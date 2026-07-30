@@ -44,7 +44,7 @@ export class CommentsComponent {
   protected readonly typeID$ = toObservable(this.typeID);
 
   readonly limit = input<null | number>();
-  protected readonly limit$ = toObservable(this.limit);
+  readonly #limit$ = toObservable(this.limit);
 
   readonly page = input<number>();
   protected readonly page$ = toObservable(this.page);
@@ -55,7 +55,7 @@ export class CommentsComponent {
     this.authenticated$,
     this.itemID$.pipe(debounceTime(10), distinctUntilChanged()),
     this.typeID$.pipe(debounceTime(10), distinctUntilChanged()),
-    this.limit$.pipe(debounceTime(10), distinctUntilChanged()),
+    this.#limit$.pipe(debounceTime(10), distinctUntilChanged()),
     this.page$.pipe(debounceTime(10), distinctUntilChanged()),
     this.#reload$,
   ]).pipe(
@@ -86,7 +86,7 @@ export class CommentsComponent {
   protected readonly CommentsType = CommentsType;
 
   protected onSent(id: string) {
-    this.limit$
+    this.#limit$
       .pipe(
         take(1),
         switchMap((limit) => {

@@ -55,9 +55,9 @@ export class MostsContentsComponent {
   readonly prefix = input.required<string[]>();
 
   readonly ratingCatname = input.required<null | string>();
-  protected readonly ratingCatname$ = toObservable(this.ratingCatname);
+  readonly #ratingCatname$ = toObservable(this.ratingCatname);
 
-  protected readonly ratingCatnameNormalized$ = this.ratingCatname$.pipe(
+  protected readonly ratingCatnameNormalized$ = this.#ratingCatname$.pipe(
     switchMap((ratingCatname) =>
       this.#menu$.pipe(map((menu) => (ratingCatname ? ratingCatname : (menu.ratings || [])[0].catname))),
     ),

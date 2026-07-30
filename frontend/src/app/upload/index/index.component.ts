@@ -106,7 +106,7 @@ export class UploadIndexComponent implements OnInit {
 
   public readonly input = viewChild<ElementRef>('input');
 
-  protected readonly perspectiveID$ = this.#route.queryParamMap.pipe(
+  readonly #perspectiveID$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('perspective_id') ?? '', 10)),
     distinctUntilChanged(),
     debounceTime(10),
@@ -225,7 +225,7 @@ export class UploadIndexComponent implements OnInit {
     return combineLatest([
       this.itemID$.pipe(take(1)),
       this.replace$.pipe(take(1)),
-      this.perspectiveID$.pipe(take(1)),
+      this.#perspectiveID$.pipe(take(1)),
     ]).pipe(
       map(([itemID, replace, perspectiveID]) => {
         const formData: FormData = new FormData();

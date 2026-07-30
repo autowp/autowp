@@ -42,7 +42,7 @@ export class ModerItemsItemSelectParentCatalogueComponent {
   protected readonly itemID$ = toObservable(this.itemID);
 
   readonly itemTypeID = input.required<ItemType>();
-  protected readonly itemTypeID$ = toObservable(this.itemTypeID);
+  readonly #itemTypeID$ = toObservable(this.itemTypeID);
 
   protected readonly page$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '', 10)),
@@ -51,7 +51,7 @@ export class ModerItemsItemSelectParentCatalogueComponent {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly search$ = this.#route.queryParamMap.pipe(
+  readonly #search$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('search')),
     distinctUntilChanged(),
     debounceTime(10),
@@ -68,7 +68,7 @@ export class ModerItemsItemSelectParentCatalogueComponent {
     switchMap((brandID) =>
       brandID
         ? of(null)
-        : combineLatest([this.itemTypeID$, this.search$, this.page$]).pipe(
+        : combineLatest([this.#itemTypeID$, this.#search$, this.page$]).pipe(
             switchMap(([itemTypeID, search, page]) =>
               this.#itemsClient.list(
                 new ItemsRequest({
@@ -103,7 +103,7 @@ export class ModerItemsItemSelectParentCatalogueComponent {
     ),
   );
 
-  protected readonly catalogueItems$ = combineLatest([this.itemTypeID$, this.brandID$, this.page$]).pipe(
+  protected readonly catalogueItems$ = combineLatest([this.#itemTypeID$, this.brandID$, this.page$]).pipe(
     switchMap(([itemTypeID, brandID, page]) =>
       brandID
         ? this.#itemsClient.getItemParents(

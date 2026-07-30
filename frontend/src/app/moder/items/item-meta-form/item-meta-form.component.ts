@@ -208,10 +208,10 @@ export class ItemMetaFormComponent {
   readonly submitted = output<ItemMetaFormResult>();
 
   readonly disableIsGroup = input<boolean>(false);
-  protected readonly disableIsGroup$ = toObservable(this.disableIsGroup);
+  readonly #disableIsGroup$ = toObservable(this.disableIsGroup);
 
   readonly parentIsConcept = input<null | ParentIsConcept>(null);
-  protected readonly parentIsConcept$ = toObservable(this.parentIsConcept);
+  readonly #parentIsConcept$ = toObservable(this.parentIsConcept);
 
   readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
@@ -310,7 +310,7 @@ export class ItemMetaFormComponent {
     },
   ];
 
-  protected readonly isConceptOptions$ = this.parentIsConcept$.pipe(
+  protected readonly isConceptOptions$ = this.#parentIsConcept$.pipe(
     map((parentIsConcept) => [
       {
         name: $localize`no`,
@@ -349,7 +349,7 @@ export class ItemMetaFormComponent {
   protected readonly form$: Observable<FormGroup<Form>> = combineLatest([
     this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
     toObservable(this.vehicleTypeIDs),
-    this.disableIsGroup$,
+    this.#disableIsGroup$,
     this.items$,
     this.pictures$,
   ]).pipe(

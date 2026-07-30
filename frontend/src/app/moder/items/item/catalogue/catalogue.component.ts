@@ -54,9 +54,9 @@ export class ModerItemsItemCatalogueComponent {
 
   protected readonly ItemType: typeof ItemType = ItemType;
 
-  protected readonly reloadChilds$ = new BehaviorSubject<void>(void 0);
-  protected readonly reloadParents$ = new BehaviorSubject<void>(void 0);
-  protected readonly reloadSuggestions$ = new BehaviorSubject<void>(void 0);
+  readonly #reloadChilds$ = new BehaviorSubject<void>(void 0);
+  readonly #reloadParents$ = new BehaviorSubject<void>(void 0);
+  readonly #reloadSuggestions$ = new BehaviorSubject<void>(void 0);
 
   protected readonly itemQuery = new FormControl<string>('', {nonNullable: true});
 
@@ -114,7 +114,7 @@ export class ModerItemsItemCatalogueComponent {
 
   protected readonly childs$: Observable<ItemParent[]> = combineLatest([
     this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
-    this.reloadChilds$,
+    this.#reloadChilds$,
   ]).pipe(
     switchMap(([item]) =>
       this.#itemsClient.getItemParents(
@@ -136,7 +136,7 @@ export class ModerItemsItemCatalogueComponent {
 
   protected readonly parents$: Observable<ItemParent[]> = combineLatest([
     this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
-    this.reloadParents$,
+    this.#reloadParents$,
   ]).pipe(
     switchMap(([item]) =>
       this.#itemsClient.getItemParents(
@@ -158,7 +158,7 @@ export class ModerItemsItemCatalogueComponent {
 
   protected readonly suggestions$: Observable<Item[]> = combineLatest([
     this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
-    this.reloadSuggestions$,
+    this.#reloadSuggestions$,
   ]).pipe(
     switchMap(([item]) =>
       this.#itemsClient.list(
@@ -194,8 +194,8 @@ export class ModerItemsItemCatalogueComponent {
         }),
       )
       .subscribe(() => {
-        this.reloadParents$.next();
-        this.reloadSuggestions$.next();
+        this.#reloadParents$.next();
+        this.#reloadSuggestions$.next();
       });
 
     return false;
@@ -210,9 +210,9 @@ export class ModerItemsItemCatalogueComponent {
         }),
       )
       .subscribe(() => {
-        this.reloadChilds$.next();
-        this.reloadParents$.next();
-        this.reloadSuggestions$.next();
+        this.#reloadChilds$.next();
+        this.#reloadParents$.next();
+        this.#reloadSuggestions$.next();
       });
   }
 

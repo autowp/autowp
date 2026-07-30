@@ -46,7 +46,7 @@ export class AccountMessagesComponent {
     debounceTime(30),
   );
 
-  protected readonly userId$: Observable<string | undefined> = this.#route.queryParamMap.pipe(
+  readonly #userId$: Observable<string | undefined> = this.#route.queryParamMap.pipe(
     map((params) => params.get('user_id') ?? undefined),
     distinctUntilChanged(),
     debounceTime(30),
@@ -55,7 +55,7 @@ export class AccountMessagesComponent {
   protected readonly messages$: Observable<{
     items: {author$: Observable<null | User>; message: Message}[];
     paginator: Pages | undefined;
-  }> = combineLatest([this.folder$, this.page$, this.userId$, this.#change$, this.#messageService.changed$]).pipe(
+  }> = combineLatest([this.folder$, this.page$, this.#userId$, this.#change$, this.#messageService.changed$]).pipe(
     debounceTime(50),
     switchMap(([folder, page, userId]) => {
       let pageId = 0;

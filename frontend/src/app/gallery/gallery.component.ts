@@ -178,7 +178,7 @@ export class GalleryComponent {
   readonly picturePrefix = input.required<string[]>();
   readonly pictureSelected = output<null | Picture>();
 
-  protected readonly currentFilter$ = toObservable(this.filter).pipe(
+  readonly #currentFilter$ = toObservable(this.filter).pipe(
     distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
     debounceTime(50),
     shareReplay({bufferSize: 1, refCount: false}),
@@ -191,7 +191,7 @@ export class GalleryComponent {
   );
 
   protected readonly gallery$: Observable<Gallery> = combineLatest([
-    this.currentFilter$.pipe(switchMap((filter) => (filter ? of(new Gallery(filter, [] as Picture[])) : EMPTY))),
+    this.#currentFilter$.pipe(switchMap((filter) => (filter ? of(new Gallery(filter, [] as Picture[])) : EMPTY))),
     this.identity$.pipe(switchMap((identity) => (identity ? of(identity) : EMPTY))),
   ]).pipe(
     switchMap(([gallery, identity]) => {

@@ -48,6 +48,5 @@ export class UploadSelectTreeItemComponent {
         }),
       ),
   });
-  protected readonly ItemParent = ItemParent;
   protected readonly ItemParentType = ItemParentType;
 }
