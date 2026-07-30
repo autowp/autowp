@@ -1,6 +1,27 @@
 <div class="container-fluid">
   <h1 i18n>Similar pictures</h1>
 
+  <ng-template #brandTemplate let-model="result">
+    <span [innerHTML]="model.nameHtml"></span>
+  </ng-template>
+  <div class="input-group mb-3" style="max-width: 20rem">
+    <input
+      name="brand"
+      placeholder="Brand"
+      i18n-placeholder
+      class="form-control"
+      [ngbTypeahead]="brandsDataSource"
+      [formControl]="brandQuery"
+      [inputFormatter]="brandFormatter"
+      [resultTemplate]="brandTemplate"
+      [class.border-primary]="brandID()"
+      (selectItem)="brandOnSelect($event)"
+    />
+    <button class="btn btn-outline-secondary" type="button" [disabled]="!brandID()" (click)="clearBrand()">
+      <span class="bi bi-x" aria-hidden="true"></span>
+    </button>
+  </div>
+
   @if (picturesResource.error(); as error) {
     <p class="alert alert-danger" role="alert">{{ error.message }}</p>
   } @else if (picturesResource.isLoading()) {
@@ -13,7 +34,7 @@
     @for (picture of data.pictures; track picture.id) {
       <div class="row align-items-start mb-4 pb-4 border-bottom">
         <div class="col-md-3">
-          <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" />
+          <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" [showSimilar]="false" />
           @if (picture.replaceable; as replaceable) {
             <p class="alert alert-info small" role="alert">
               <ng-container i18n>Photo suggested to replace</ng-container>

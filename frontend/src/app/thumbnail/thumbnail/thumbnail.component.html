@@ -137,13 +137,15 @@
           }
         </div>
       }
-      @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
-        <p class="alert alert-warning" role="alert">
-          <span class="bi bi-file-earmark-image me-1" aria-hidden="true"></span>
-          <a i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
-            >Similar picture: {{ dfDistance.distance }}</a
-          >
-        </p>
+      @if (showSimilar()) {
+        @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
+          <p class="alert alert-warning" role="alert">
+            <span class="bi bi-file-earmark-image me-1" aria-hidden="true"></span>
+            <a i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
+              >Similar picture: {{ dfDistance.distance }}</a
+            >
+          </p>
+        }
       }
     </div>
   </div>

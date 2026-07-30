@@ -41,6 +41,8 @@ export class ThumbnailComponent {
   readonly selectable = input(false);
   readonly selected = output<boolean>();
 
+  readonly showSimilar = input(true);
+
   protected readonly perspectiveOptions$ = this.#perspectiveService.getPerspectives$().pipe(
     map((options) =>
       options.map((option) => ({
