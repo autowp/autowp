@@ -51,7 +51,7 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
     x: 0,
     y: 0,
   };
-  #minSize = [400, 300];
+  readonly #minSize = [400, 300];
   protected picture?: Picture;
   protected readonly img$ = new BehaviorSubject<HTMLImageElement | null>(null);
 

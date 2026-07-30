@@ -70,8 +70,8 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
   readonly #withCredentials: boolean;
 
   constructor(
-    private settings: NgGrpcWebClientSettings,
-    private httpClient: HttpClient,
+    private readonly settings: NgGrpcWebClientSettings,
+    private readonly httpClient: HttpClient,
   ) {
     this.#withCredentials = settings.withCredentials ?? false;
   }

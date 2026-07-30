@@ -8,10 +8,10 @@ import {map, shareReplay, tap} from 'rxjs/operators';
 export class UserService {
   readonly #usersClient = inject(UsersClient);
 
-  #cache: Map<string, User> = new Map<string, User>();
-  #promises = new Map<string, Observable<null>>();
+  readonly #cache: Map<string, User> = new Map<string, User>();
+  readonly #promises = new Map<string, Observable<null>>();
 
-  #cache2 = new Map<string, Observable<null | User>>();
+  readonly #cache2 = new Map<string, Observable<null | User>>();
 
   private queryUsers$(ids: string[]): Observable<null> {
     const toRequest: string[] = [];

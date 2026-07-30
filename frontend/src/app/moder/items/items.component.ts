@@ -127,7 +127,9 @@ export class ModerItemsComponent implements OnInit {
 
   protected ancestorID: null | number = null;
   protected ancestorQuery = '';
-  protected ancestorsDataSource: (text$: Observable<string>) => Observable<Item[]> = (text$: Observable<string>) =>
+  protected readonly ancestorsDataSource: (text$: Observable<string>) => Observable<Item[]> = (
+    text$: Observable<string>,
+  ) =>
     text$.pipe(
       debounceTime(200),
       switchMap((query) => {

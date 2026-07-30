@@ -28,7 +28,7 @@ export interface CategoryPathItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesCategoryComponent {
-  protected pageEnv = inject(PageEnvService);
+  protected readonly pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
   readonly #auth = inject(AuthService);
   readonly #categoriesService = inject(CategoriesService);

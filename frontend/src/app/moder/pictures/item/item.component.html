@@ -609,8 +609,8 @@
                       <label i18n for="reason">Reason</label>
                       <input maxlength="50" class="form-control" name="reason" id="reason" [(ngModel)]="banReason" />
                     </div>
-                    <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(picture.ipAddress)">
-                      Ban
+                    <button type="button" class="btn btn-danger" (click)="addToBlacklist(picture.ipAddress)">
+                      <ng-container i18n>Ban</ng-container>
                     </button>
                   </form>
                 }

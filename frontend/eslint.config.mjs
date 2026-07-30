@@ -38,6 +38,7 @@ export default defineConfig([
     rules: {
       'no-duplicate-imports': 'error',
       'no-restricted-globals': ['error', {globals: ['window', 'document', 'event']}],
+      '@typescript-eslint/prefer-readonly': 'error',
       '@angular-eslint/runtime-localize': 'off',
       '@angular-eslint/component-selector': [
         'error',

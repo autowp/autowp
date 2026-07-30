@@ -56,7 +56,7 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
     x: 0,
     y: 0,
   };
-  #minSize = [50, 50];
+  readonly #minSize = [50, 50];
   protected picture: null | Picture = null;
   protected readonly img$ = new BehaviorSubject<HTMLImageElement | null>(null);
 

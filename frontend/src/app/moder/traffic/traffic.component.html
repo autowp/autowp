@@ -49,15 +49,17 @@
       }
       <div>
         @if (item.item.ban) {
-          <button type="button" class="btn btn-secondary" i18n (click)="removeFromBlacklist(item.item.ipAddress)">
-            unban
+          <button type="button" class="btn btn-secondary" (click)="removeFromBlacklist(item.item.ipAddress)">
+            <ng-container i18n>unban</ng-container>
           </button>
         } @else {
-          <button type="button" class="btn btn-danger" i18n (click)="addToBlacklist(item.item.ipAddress)">Ban</button>
+          <button type="button" class="btn btn-danger" (click)="addToBlacklist(item.item.ipAddress)">
+            <ng-container i18n>Ban</ng-container>
+          </button>
         }
         @if (!item.item.inWhitelist) {
-          <button type="button" class="btn btn-success" i18n (click)="addToWhitelist(item.item.ipAddress)">
-            Whitelist
+          <button type="button" class="btn btn-success" (click)="addToWhitelist(item.item.ipAddress)">
+            <ng-container i18n>Whitelist</ng-container>
           </button>
         }
       </div>
