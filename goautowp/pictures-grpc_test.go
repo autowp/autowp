@@ -350,52 +350,64 @@ func TestPictureItemAreaAndPerspective(t *testing.T) {
 
 	client := NewPicturesClient(conn)
 
-	_, err = client.SetPictureItemArea(
+	_, err = client.UpdatePictureItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureItemAreaRequest{
-			PictureId:  pictureID,
-			ItemId:     itemID,
-			Type:       PictureItemType_PICTURE_ITEM_CONTENT,
-			CropLeft:   0,
-			CropTop:    0,
-			CropWidth:  10,
-			CropHeight: 10,
+		&UpdatePictureItemRequest{
+			PictureItem: &PictureItem{
+				PictureId:  pictureID,
+				ItemId:     itemID,
+				Type:       PictureItemType_PICTURE_ITEM_CONTENT,
+				CropLeft:   0,
+				CropTop:    0,
+				CropWidth:  10,
+				CropHeight: 10,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"crop"}},
 		},
 	)
 	require.NoError(t, err)
 
-	_, err = client.SetPictureItemArea(
+	_, err = client.UpdatePictureItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureItemAreaRequest{
-			PictureId:  pictureID,
-			ItemId:     itemID,
-			Type:       PictureItemType_PICTURE_ITEM_CONTENT,
-			CropLeft:   0,
-			CropTop:    0,
-			CropWidth:  0,
-			CropHeight: 10,
+		&UpdatePictureItemRequest{
+			PictureItem: &PictureItem{
+				PictureId:  pictureID,
+				ItemId:     itemID,
+				Type:       PictureItemType_PICTURE_ITEM_CONTENT,
+				CropLeft:   0,
+				CropTop:    0,
+				CropWidth:  0,
+				CropHeight: 10,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"crop"}},
 		},
 	)
 	require.NoError(t, err)
 
-	_, err = client.SetPictureItemPerspective(
+	_, err = client.UpdatePictureItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureItemPerspectiveRequest{
-			PictureId:     pictureID,
-			ItemId:        itemID,
-			Type:          PictureItemType_PICTURE_ITEM_CONTENT,
-			PerspectiveId: 1,
+		&UpdatePictureItemRequest{
+			PictureItem: &PictureItem{
+				PictureId:     pictureID,
+				ItemId:        itemID,
+				Type:          PictureItemType_PICTURE_ITEM_CONTENT,
+				PerspectiveId: 1,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"perspective_id"}},
 		},
 	)
 	require.NoError(t, err)
 
-	_, err = client.SetPictureItemPerspective(
+	_, err = client.UpdatePictureItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&SetPictureItemPerspectiveRequest{
-			PictureId:     pictureID,
-			ItemId:        itemID,
-			Type:          PictureItemType_PICTURE_ITEM_CONTENT,
-			PerspectiveId: 0,
+		&UpdatePictureItemRequest{
+			PictureItem: &PictureItem{
+				PictureId:     pictureID,
+				ItemId:        itemID,
+				Type:          PictureItemType_PICTURE_ITEM_CONTENT,
+				PerspectiveId: 0,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"perspective_id"}},
 		},
 	)
 	require.NoError(t, err)

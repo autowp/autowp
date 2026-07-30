@@ -35,7 +35,7 @@ import {
   PictureStatus,
   PicturesViewRequest,
   PicturesVoteRequest,
-  SetPictureItemPerspectiveRequest,
+  UpdatePictureItemRequest,
   UpdatePictureRequest,
   User,
 } from '@grpc/spec.pb';
@@ -152,12 +152,15 @@ export class PictureComponent {
 
   protected savePerspective(perspectiveID: null | number, item: PictureItem) {
     this.#picturesClient
-      .setPictureItemPerspective(
-        new SetPictureItemPerspectiveRequest({
-          itemId: item.itemId,
-          perspectiveId: perspectiveID ?? undefined,
-          pictureId: item.pictureId,
-          type: item.type,
+      .updatePictureItem(
+        new UpdatePictureItemRequest({
+          pictureItem: new PictureItem({
+            itemId: item.itemId,
+            perspectiveId: perspectiveID ?? undefined,
+            pictureId: item.pictureId,
+            type: item.type,
+          }),
+          updateMask: new FieldMask({paths: ['perspective_id']}),
         }),
       )
       .pipe(

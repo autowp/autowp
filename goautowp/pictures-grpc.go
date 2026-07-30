@@ -648,8 +648,8 @@ func (s *PicturesGRPCServer) Repair(
 	return &emptypb.Empty{}, nil
 }
 
-func (s *PicturesGRPCServer) SetPictureItemArea(
-	ctx context.Context, in *SetPictureItemAreaRequest,
+func (s *PicturesGRPCServer) UpdatePictureItem(
+	ctx context.Context, in *UpdatePictureItemRequest,
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -660,98 +660,23 @@ func (s *PicturesGRPCServer) SetPictureItemArea(
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-	}
+	values := in.GetPictureItem()
+	maskPaths := in.GetUpdateMask().GetPaths()
 
-	pictureItemType := convertPictureItemType(in.GetType())
 	ctx = context.WithoutCancel(ctx)
 
-	err = s.repository.SetPictureItemArea(
-		ctx, in.GetPictureId(), in.GetItemId(), pictureItemType, pictures.PictureItemArea{
-			Left:   uint16(in.GetCropLeft()),   //nolint: gosec
-			Top:    uint16(in.GetCropTop()),    //nolint: gosec
-			Width:  uint16(in.GetCropWidth()),  //nolint: gosec
-			Height: uint16(in.GetCropHeight()), //nolint: gosec
-		},
-	)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	err = s.events.Add(ctx, Event{
-		UserID:   userCtx.UserID,
-		Message:  "Выделение области на картинке",
-		Pictures: []int64{in.GetPictureId()},
-		Items:    []int64{in.GetItemId()},
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId())
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &emptypb.Empty{}, nil
-}
-
-func (s *PicturesGRPCServer) SetPictureItemPerspective(
-	ctx context.Context, in *SetPictureItemPerspectiveRequest,
-) (*emptypb.Empty, error) {
-	userCtx, err := s.auth.ValidateGRPC(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	if userCtx.UserID == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	if !util.Contains(userCtx.Roles, users.RoleModer) {
-		pictureID := in.GetPictureId()
-		if pictureID == 0 {
-			return nil, status.Error(codes.NotFound, "not found")
-		}
-
-		pic, err := s.repository.Picture(
-			ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
-		)
+	if util.Contains(maskPaths, "crop") {
+		err = s.setPictureItemArea(ctx, values, userCtx)
 		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		if !pic.OwnerID.Valid || pic.OwnerID.Int64 != userCtx.UserID ||
-			pic.Status != schema.PictureStatusInbox {
-			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
+			return nil, err
 		}
 	}
 
-	pictureItemType := convertPictureItemType(in.GetType())
-
-	ctx = context.WithoutCancel(ctx)
-
-	err = s.repository.SetPictureItemPerspective(
-		ctx, in.GetPictureId(), in.GetItemId(), pictureItemType, in.GetPerspectiveId(),
-	)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	err = s.events.Add(ctx, Event{
-		UserID:   userCtx.UserID,
-		Message:  "Установка ракурса картинки",
-		Pictures: []int64{in.GetPictureId()},
-		Items:    []int64{in.GetItemId()},
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId())
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	if util.Contains(maskPaths, "perspective_id") {
+		err = s.setPictureItemPerspective(ctx, values, userCtx)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &emptypb.Empty{}, nil
@@ -2176,6 +2101,94 @@ func (s *PicturesGRPCServer) setPictureCrop(
 		Message:  "Выделение области на картинке",
 		Pictures: []int64{pictureID},
 	})
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) setPictureItemArea(
+	ctx context.Context, values *PictureItem, userCtx UserContext,
+) error {
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
+		return status.Errorf(codes.PermissionDenied, "permission denied")
+	}
+
+	pictureItemType := convertPictureItemType(values.GetType())
+
+	err := s.repository.SetPictureItemArea(
+		ctx, values.GetPictureId(), values.GetItemId(), pictureItemType, pictures.PictureItemArea{
+			Left:   uint16(values.GetCropLeft()),   //nolint: gosec
+			Top:    uint16(values.GetCropTop()),    //nolint: gosec
+			Width:  uint16(values.GetCropWidth()),  //nolint: gosec
+			Height: uint16(values.GetCropHeight()), //nolint: gosec
+		},
+	)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.events.Add(ctx, Event{
+		UserID:   userCtx.UserID,
+		Message:  "Выделение области на картинке",
+		Pictures: []int64{values.GetPictureId()},
+		Items:    []int64{values.GetItemId()},
+	})
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, values.GetItemId())
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) setPictureItemPerspective(
+	ctx context.Context, values *PictureItem, userCtx UserContext,
+) error {
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
+		pictureID := values.GetPictureId()
+		if pictureID == 0 {
+			return status.Error(codes.NotFound, "not found")
+		}
+
+		pic, err := s.repository.Picture(
+			ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
+		)
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		if !pic.OwnerID.Valid || pic.OwnerID.Int64 != userCtx.UserID ||
+			pic.Status != schema.PictureStatusInbox {
+			return status.Errorf(codes.PermissionDenied, "permission denied")
+		}
+	}
+
+	pictureItemType := convertPictureItemType(values.GetType())
+
+	err := s.repository.SetPictureItemPerspective(
+		ctx, values.GetPictureId(), values.GetItemId(), pictureItemType, values.GetPerspectiveId(),
+	)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.events.Add(ctx, Event{
+		UserID:   userCtx.UserID,
+		Message:  "Установка ракурса картинки",
+		Pictures: []int64{values.GetPictureId()},
+		Items:    []int64{values.GetItemId()},
+	})
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, values.GetItemId())
 	if err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}

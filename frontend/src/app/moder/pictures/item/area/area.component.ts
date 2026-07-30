@@ -4,13 +4,15 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   Picture,
   PictureFields,
+  PictureItem,
   PictureItemListOptions,
   PictureItemsRequest,
   PictureListOptions,
   PicturesRequest,
-  SetPictureItemAreaRequest,
+  UpdatePictureItemRequest,
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {BehaviorSubject, EMPTY, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
@@ -203,15 +205,18 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
   protected saveCrop() {
     if (this.picture) {
       this.#picturesClient
-        .setPictureItemArea(
-          new SetPictureItemAreaRequest({
-            cropHeight: Math.round(this.#currentCrop.h),
-            cropLeft: this.#currentCrop.x > 0 ? Math.round(this.#currentCrop.x) : 0,
-            cropTop: this.#currentCrop.y > 0 ? Math.round(this.#currentCrop.y) : 0,
-            cropWidth: Math.round(this.#currentCrop.w),
-            itemId: this.#itemID,
-            pictureId: this.#id,
-            type: this.#type,
+        .updatePictureItem(
+          new UpdatePictureItemRequest({
+            pictureItem: new PictureItem({
+              cropHeight: Math.round(this.#currentCrop.h),
+              cropLeft: this.#currentCrop.x > 0 ? Math.round(this.#currentCrop.x) : 0,
+              cropTop: this.#currentCrop.y > 0 ? Math.round(this.#currentCrop.y) : 0,
+              cropWidth: Math.round(this.#currentCrop.w),
+              itemId: this.#itemID,
+              pictureId: this.#id,
+              type: this.#type,
+            }),
+            updateMask: new FieldMask({paths: ['crop']}),
           }),
         )
         .pipe(

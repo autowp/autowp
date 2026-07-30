@@ -269,8 +269,7 @@ service Pictures {
   rpc GetPicturesPaginator(PicturesRequest) returns (Pages) {}
   rpc GetPictureItem(PictureItemsRequest) returns (PictureItem) {}
   rpc GetPictureItems(PictureItemsRequest) returns (PictureItems) {}
-  rpc SetPictureItemArea(SetPictureItemAreaRequest) returns (google.protobuf.Empty) {}
-  rpc SetPictureItemPerspective(SetPictureItemPerspectiveRequest) returns (google.protobuf.Empty) {}
+  rpc UpdatePictureItem(UpdatePictureItemRequest) returns (google.protobuf.Empty) {}
   rpc SetPictureItemItemID(SetPictureItemItemIDRequest) returns (google.protobuf.Empty) {}
   rpc DeletePictureItem(DeletePictureItemRequest) returns (google.protobuf.Empty) {}
   rpc CreatePictureItem(CreatePictureItemRequest) returns (google.protobuf.Empty) {}
@@ -2067,21 +2066,9 @@ message PictureItem {
   Picture picture = 11;
 }
 
-message SetPictureItemAreaRequest {
-  int64 picture_id = 1;
-  int64 item_id = 2;
-  PictureItemType type = 3;
-  uint32 crop_left = 4;
-  uint32 crop_top = 5;
-  uint32 crop_width = 6;
-  uint32 crop_height = 7;
-}
-
-message SetPictureItemPerspectiveRequest {
-  int64 picture_id = 1;
-  int64 item_id = 2;
-  PictureItemType type = 3;
-  int32 perspective_id = 4;
+message UpdatePictureItemRequest {
+  PictureItem picture_item = 1;
+  google.protobuf.FieldMask update_mask = 2;
 }
 
 message SetPictureItemItemIDRequest {

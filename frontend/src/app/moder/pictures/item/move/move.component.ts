@@ -15,11 +15,13 @@ import {
   ItemsRequest,
   ItemType,
   Pages,
+  PictureItem,
   PictureItemType,
   SetPictureItemItemIDRequest,
-  SetPictureItemPerspectiveRequest,
+  UpdatePictureItemRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
@@ -417,12 +419,15 @@ export class ModerPicturesItemMoveComponent implements OnInit {
               return of(null);
             }
 
-            return this.#picturesClient.setPictureItemPerspective(
-              new SetPictureItemPerspectiveRequest({
-                itemId: dstItemID,
-                perspectiveId: dstPerspectiveID || undefined,
-                pictureId: '' + id,
-                type: srcType,
+            return this.#picturesClient.updatePictureItem(
+              new UpdatePictureItemRequest({
+                pictureItem: new PictureItem({
+                  itemId: dstItemID,
+                  perspectiveId: dstPerspectiveID || undefined,
+                  pictureId: '' + id,
+                  type: srcType,
+                }),
+                updateMask: new FieldMask({paths: ['perspective_id']}),
               }),
             );
           }),

@@ -3,8 +3,9 @@ import {ChangeDetectionStrategy, Component, inject, input, output} from '@angula
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
-import {Picture, PictureItem, PictureStatus, SetPictureItemPerspectiveRequest} from '@grpc/spec.pb';
+import {Picture, PictureItem, PictureStatus, UpdatePictureItemRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';
 import {getPerspectiveTranslation} from '@utils/translations';
@@ -57,12 +58,15 @@ export class ThumbnailComponent {
 
   protected savePerspective(pictureItem: PictureItem) {
     this.#picturesClient
-      .setPictureItemPerspective(
-        new SetPictureItemPerspectiveRequest({
-          itemId: pictureItem.itemId,
-          perspectiveId: pictureItem.perspectiveId,
-          pictureId: pictureItem.pictureId,
-          type: pictureItem.type,
+      .updatePictureItem(
+        new UpdatePictureItemRequest({
+          pictureItem: new PictureItem({
+            itemId: pictureItem.itemId,
+            perspectiveId: pictureItem.perspectiveId,
+            pictureId: pictureItem.pictureId,
+            type: pictureItem.type,
+          }),
+          updateMask: new FieldMask({paths: ['perspective_id']}),
         }),
       )
       .pipe(
