@@ -25,7 +25,7 @@ export class MarkdownEditComponent implements AfterViewInit {
   readonly text = input.required<string>();
   readonly textChange = output<string>();
 
-  readonly control = computed(() => new FormControl<string>(this.text(), {nonNullable: true}));
+  protected readonly control = computed(() => new FormControl<string>(this.text(), {nonNullable: true}));
 
   private readonly autosize = viewChild(CdkTextareaAutosize);
 
