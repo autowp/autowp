@@ -1271,11 +1271,16 @@ func (s *PicturesGRPCServer) GetPicture(
 }
 
 // canViewPictureStatus reports whether a caller may see a picture that isn't yet public
-// (i.e. not accepted), regardless of which query filters were used to reach it: only
-// moderators and the picture's own owner may see inbox/removing/removed pictures.
+// (i.e. not accepted), regardless of which query filters were used to reach it: any
+// registered user may see inbox pictures (they're a public moderation queue), but only
+// moderators and the picture's own owner may see removing/removed pictures.
 func canViewPictureStatus(row *schema.PictureRow, isModer bool, userID int64) bool {
 	if isModer || row.Status == schema.PictureStatusAccepted {
 		return true
+	}
+
+	if row.Status == schema.PictureStatusInbox {
+		return userID != 0
 	}
 
 	return userID != 0 && row.OwnerID.Valid && row.OwnerID.Int64 == userID
