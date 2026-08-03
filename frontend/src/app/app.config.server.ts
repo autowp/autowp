@@ -1,4 +1,5 @@
-import {ApplicationConfig, mergeApplicationConfig} from '@angular/core';
+import {HTTP_TRANSFER_CACHE_ORIGIN_MAP} from '@angular/common/http';
+import {ApplicationConfig, inject, mergeApplicationConfig, REQUEST} from '@angular/core';
 import {provideServerRendering, withRoutes} from '@angular/ssr';
 import {environment} from '@environment/environment';
 
@@ -12,6 +13,16 @@ const serverConfig: ApplicationConfig = {
     provideGrpcWebClient({
       settings: {host: environment.ssrGrpcHost},
     }),
+    {
+      // Lets the HttpTransferCache recognize SSR requests to environment.ssrGrpcHost (an
+      // intra-pod address) and browser requests to the public site origin as the same request,
+      // so hydration reuses the SSR-fetched gRPC responses instead of re-fetching them.
+      provide: HTTP_TRANSFER_CACHE_ORIGIN_MAP,
+      useFactory: () => {
+        const host = inject(REQUEST)?.headers.get('host');
+        return host ? {[environment.ssrGrpcHost]: `https://${host}`} : {};
+      },
+    },
   ],
 };
 

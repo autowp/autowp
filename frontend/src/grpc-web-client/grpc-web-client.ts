@@ -118,7 +118,12 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
 
     const serialized = req.serializeBinary();
     const payload = this.encodeRequest_(serialized);
-    const url = this.settings.host + path;
+    // Resolve to an absolute same-origin URL rather than a bare relative path: the SSR
+    // HttpTransferCache keys responses by the literal request URL, and HTTP_TRANSFER_CACHE_ORIGIN_MAP
+    // (set in app.config.server.ts) rewrites the SSR origin to match this one on the client.
+    // eslint-disable-next-line no-restricted-globals
+    const host = this.settings.host || (typeof window !== 'undefined' ? window.location.origin : '');
+    const url = host + path;
 
     return this.httpClient
       .request('POST', url, {
