@@ -58,6 +58,8 @@ export class CarsSpecsAdminComponent implements OnInit {
   });
 
   protected readonly dataResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'cars-specs-admin',
     params: () => this.itemID(),
     stream: ({params: itemId}) =>
       this.#attrsClient

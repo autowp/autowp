@@ -39,6 +39,8 @@ export class CatalogueMostsComponent {
   });
 
   protected readonly brandResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'catalogue-mosts-brand',
     params: () => this.#brandCatname(),
     stream: ({params: catname}) => {
       if (!catname) {

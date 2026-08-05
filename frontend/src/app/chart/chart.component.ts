@@ -26,6 +26,8 @@ export class ChartComponent implements OnInit {
   readonly #attrsClient = inject(AttrsClient);
 
   protected readonly parametersResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'chart-parameters',
     stream: () =>
       this.#attrsClient.getChartParameters(new Empty()).pipe(
         map((response) =>

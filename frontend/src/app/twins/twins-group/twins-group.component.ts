@@ -29,6 +29,8 @@ export class TwinsGroupComponent {
   });
 
   protected readonly groupResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'twins-group',
     params: () => this.#groupID(),
     stream: ({params: groupID}) => {
       if (!groupID) {
@@ -50,6 +52,8 @@ export class TwinsGroupComponent {
   });
 
   protected readonly selectedBrandsResource = rxResource({
+    // Distinct id from groupResource above; singleton per page.
+    id: 'twins-group-selected-brands',
     params: () => this.groupResource.value(),
     stream: ({params: group}) => {
       if (!group) {

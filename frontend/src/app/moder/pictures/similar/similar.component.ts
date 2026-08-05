@@ -108,6 +108,8 @@ export class ModerPicturesSimilarComponent implements OnInit {
     );
 
   protected readonly picturesResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-pictures-similar',
     params: () => ({brandID: this.brandID(), page: this.#page()}),
     stream: ({params: {brandID, page}}) =>
       this.#picturesClient

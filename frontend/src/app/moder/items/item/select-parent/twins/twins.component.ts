@@ -47,6 +47,9 @@ export class ModerItemsItemSelectParentTwinsComponent {
   );
 
   protected readonly twinsBrandsResource = rxResource({
+    // Only one select-parent tab is rendered at a time; seeds status as resolved from
+    // TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-select-parent-twins-brands',
     params: () => ({brandID: this.brandID(), page: this.page()}),
     stream: ({params: {brandID, page}}) => {
       if (brandID) {
@@ -82,6 +85,9 @@ export class ModerItemsItemSelectParentTwinsComponent {
   });
 
   protected readonly twinsResource = rxResource({
+    // Only one select-parent tab is rendered at a time; seeds status as resolved from
+    // TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-select-parent-twins',
     params: () => ({brandID: this.brandID(), page: this.page()}),
     stream: ({params: {brandID, page}}) => {
       if (!brandID) {

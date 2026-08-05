@@ -32,6 +32,8 @@ export class PersonsPersonComponent {
   });
 
   protected readonly itemResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'persons-person',
     params: () => this.#itemID(),
     stream: ({params: itemID}) =>
       this.#itemsClient

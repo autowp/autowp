@@ -35,6 +35,8 @@ export class ModerItemsItemLinksComponent {
   };
 
   protected readonly linksResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration; singleton per moder item page.
+    id: 'moder-items-item-links',
     params: () => this.item().id,
     stream: ({params: itemId}) =>
       this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId})})),

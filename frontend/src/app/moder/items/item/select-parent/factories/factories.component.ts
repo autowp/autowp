@@ -35,6 +35,9 @@ export class ModerItemsItemSelectParentFactoriesComponent {
   );
 
   protected readonly factoriesResource = rxResource({
+    // Only one select-parent tab is rendered at a time; seeds status as resolved from
+    // TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-select-parent-factories',
     params: () => this.#page(),
     stream: ({params: page}) =>
       this.#itemsClient.list(

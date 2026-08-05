@@ -19,6 +19,8 @@ export class ModerTrafficWhitelistComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
 
   protected readonly itemsResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-traffic-whitelist',
     stream: () => this.#trafficClient.getTrafficWhitelistItems(new Empty()),
   });
 

@@ -36,6 +36,9 @@ export class ModerItemsItemSelectParentBrandsComponent {
   });
 
   protected readonly brandsResource = rxResource({
+    // Only one select-parent tab is rendered at a time; seeds status as resolved from
+    // TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-select-parent-brands',
     params: () => ({page: this.#page(), search: this.#search()}),
     stream: ({params: {page, search}}) =>
       this.#itemsClient

@@ -27,6 +27,8 @@ export class TopViewComponent implements OnInit {
   });
 
   protected readonly dataResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'top-view-page',
     params: () => this.#page(),
     stream: ({params: page}) =>
       this.#picturesClient.getPictures(

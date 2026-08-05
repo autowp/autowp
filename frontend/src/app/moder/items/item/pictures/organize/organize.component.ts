@@ -61,6 +61,8 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {requireSync: true});
 
   protected readonly picturesResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-items-item-pictures-organize',
     params: () => this.#itemID(),
     stream: ({params: itemID}) =>
       this.#picturesClient

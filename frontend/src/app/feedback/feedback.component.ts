@@ -30,6 +30,8 @@ export class FeedbackComponent implements OnInit {
   readonly #toastService = inject(ToastsService);
 
   protected readonly recaptchaKeyResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'feedback-recaptcha-key',
     stream: () => this.#reCaptchaService.get$(),
   });
   protected readonly invalidParams = signal<InvalidParams>({});

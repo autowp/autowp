@@ -17,10 +17,14 @@ export class ModerAttrsComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
 
   protected readonly attributesResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-attrs-attributes',
     stream: () => this.#attrsService.getAttributes$(null, null),
   });
 
   protected readonly zonesResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-attrs-zones',
     stream: () => this.#attrsService.zones$,
   });
 

@@ -57,6 +57,8 @@ export class LogComponent implements OnInit {
   });
 
   protected readonly responseResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'log-events',
     params: () => ({
       articleId: this.#articleId(),
       itemId: this.#itemId(),

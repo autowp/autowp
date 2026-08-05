@@ -18,6 +18,8 @@ export class InfoSpecComponent implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
 
   protected readonly specsResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'info-spec-page',
     stream: () => this.#itemsClient.getSpecs(new Empty()),
   });
 

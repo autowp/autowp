@@ -44,6 +44,8 @@ export class CutawayAuthorsComponent implements OnInit {
   });
 
   protected readonly queryResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'cutaway-authors',
     params: () => this.#page(),
     stream: ({params: page}) =>
       this.#itemsClient

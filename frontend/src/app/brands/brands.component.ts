@@ -39,6 +39,8 @@ export class BrandsComponent implements OnInit {
   readonly #document = inject(DOCUMENT);
 
   protected readonly itemsResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'brands-page',
     stream: () =>
       this.#itemsClient.getBrands(
         new GetBrandsRequest({

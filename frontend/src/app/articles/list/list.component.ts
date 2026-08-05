@@ -47,6 +47,10 @@ export class ListComponent implements OnInit {
   );
 
   protected readonly articlesResource = rxResource({
+    // Lets the resource seed its status as already-resolved from TransferState on hydration
+    // instead of restarting at 'loading' and flashing the spinner before the (already
+    // transfer-cached) HTTP response resolves a tick later.
+    id: 'articles-list',
     params: () => this.#page(),
     stream: ({params: page}) =>
       this.#articlesClient.getList(new ArticlesRequest({limit: 10, page})).pipe(

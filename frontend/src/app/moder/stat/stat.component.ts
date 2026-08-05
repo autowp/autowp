@@ -17,6 +17,8 @@ export class ModerStatComponent implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
 
   protected readonly statsResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-stat-page',
     stream: () => this.#itemsClient.getStats(new Empty()),
   });
 

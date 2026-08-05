@@ -35,6 +35,9 @@ export class ModerItemsItemSelectParentCategoriesComponent {
   );
 
   protected readonly categoriesResource = rxResource({
+    // Only one select-parent tab is rendered at a time; seeds status as resolved from
+    // TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-select-parent-categories',
     params: () => this.#page(),
     stream: ({params: page}) =>
       this.#itemsClient.list(

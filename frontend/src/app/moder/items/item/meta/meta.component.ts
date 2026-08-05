@@ -41,6 +41,9 @@ export class ModerItemsItemMetaComponent {
   protected readonly invalidParams = signal<InvalidParams>({});
 
   protected readonly vehicleTypeIDsResource = rxResource({
+    // Singleton per item-edit page (one item shown at a time); seeds status as resolved from
+    // TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-items-item-meta-vehicle-types',
     params: () => this.item(),
     stream: ({params: item}): Observable<string[]> => {
       if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE || item.itemTypeId === ItemType.ITEM_TYPE_TWINS) {

@@ -47,6 +47,8 @@ export class NewItemComponent {
   });
 
   protected readonly itemResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'new-item-detail',
     params: () => this.#itemID(),
     stream: ({params: itemID}) =>
       this.#itemsClient.item(
@@ -74,6 +76,8 @@ export class NewItemComponent {
   }
 
   protected readonly picturesResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'new-item-detail-pictures',
     params: () => ({date: this.date(), itemID: this.#itemID(), page: this.#page()}),
     stream: ({params: {date, itemID, page}}) =>
       this.#picturesClient.getPictures(

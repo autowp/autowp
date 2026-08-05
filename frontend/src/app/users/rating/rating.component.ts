@@ -108,6 +108,8 @@ export class UsersRatingComponent implements OnInit {
   }
 
   protected readonly usersResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'users-rating',
     params: () => this.rating(),
     stream: ({params: rating}) => {
       let o$: Observable<UsersRatingResponse>;

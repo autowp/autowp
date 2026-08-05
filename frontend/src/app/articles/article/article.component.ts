@@ -26,6 +26,8 @@ export class ArticlesArticleComponent {
   });
 
   protected readonly articleResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'articles-article',
     params: () => this.#catname(),
     stream: ({params: catname}) => {
       if (!catname) {

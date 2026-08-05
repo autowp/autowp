@@ -81,6 +81,8 @@ export class IndexComponent implements OnInit {
   );
 
   protected readonly contentPersonsResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'index-content-persons',
     stream: () =>
       this.#itemsClient.getTopPersonsList(
         new GetTopPersonsListRequest({
@@ -90,6 +92,8 @@ export class IndexComponent implements OnInit {
       ),
   });
   protected readonly authorPersonsResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'index-author-persons',
     stream: () =>
       this.#itemsClient.getTopPersonsList(
         new GetTopPersonsListRequest({

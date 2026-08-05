@@ -45,6 +45,8 @@ export class CutawayBrandsComponent implements OnInit {
   });
 
   protected readonly queryResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'cutaway-brands',
     params: () => this.#page(),
     stream: ({params: page}) =>
       this.#itemsClient

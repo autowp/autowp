@@ -52,6 +52,8 @@ export class PulseComponent implements OnInit {
   };
 
   protected readonly dataResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'pulse-page',
     params: () => this.#period(),
     stream: ({params: period}) => this.#statisticsClient.getPulse(new PulseRequest({period})),
   });

@@ -17,6 +17,8 @@ export class ModerPerspectivesComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
 
   protected readonly pagesResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-perspectives',
     stream: () => this.#picturesClient.getPerspectivePages(new Empty()),
   });
 

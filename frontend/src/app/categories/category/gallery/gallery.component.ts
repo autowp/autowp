@@ -27,6 +27,8 @@ export class CategoryGalleryComponent implements OnInit {
   });
 
   protected readonly dataResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'categories-category-gallery',
     params: () => this.identity(),
     stream: ({params: identity}) => {
       if (!identity) {

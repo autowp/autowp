@@ -27,6 +27,8 @@ export class CutawayComponent implements OnInit {
   });
 
   protected readonly queryResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'cutaway-page',
     params: () => this.#page(),
     stream: ({params: page}) =>
       this.#picturesClient.getPictures(

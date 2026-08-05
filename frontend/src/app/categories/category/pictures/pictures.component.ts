@@ -44,10 +44,14 @@ export class CategoriesCategoryPicturesComponent {
   });
 
   protected readonly categoryResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'categories-category-pictures-category',
     stream: () => this.#categoriesService.categoryPipe$(this.#route.parent!.parent!),
   });
 
   protected readonly picturesResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'categories-category-pictures',
     params: () => ({categoryData: this.categoryResource.value(), page: this.#page()}),
     stream: ({params: {categoryData, page}}) => {
       if (!categoryData?.category || !categoryData.current) {

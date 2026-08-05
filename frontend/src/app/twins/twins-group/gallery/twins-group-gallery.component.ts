@@ -27,6 +27,8 @@ export class TwinsGroupGalleryComponent {
   });
 
   protected readonly groupResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'twins-group-gallery',
     params: () => this.#groupID(),
     stream: ({params: groupID}) => {
       if (!groupID) {

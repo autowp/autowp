@@ -26,6 +26,8 @@ export class ModerUsersComponent implements OnInit {
   readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('page'))), {requireSync: true});
 
   protected readonly usersResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'moder-users-page',
     params: () => this.#page(),
     stream: ({params: pageStr}) =>
       this.#usersClient.getUsers(

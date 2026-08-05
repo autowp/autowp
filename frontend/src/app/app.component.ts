@@ -67,6 +67,8 @@ export class AppComponent {
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
   protected readonly searchHostname: string;
   protected readonly categoriesResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'app-root-categories',
     stream: () =>
       this.#itemsClient.list(
         new ItemsRequest({
