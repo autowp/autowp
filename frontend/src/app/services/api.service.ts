@@ -7,12 +7,46 @@ import Keycloak from 'keycloak-js';
 import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
 
+// gRPC method paths whose response never depends on the caller's identity (verified against the
+// backend handler — none of them read auth/user context or gate on role). Sending an Authorization
+// header on these defeats the SSR HttpTransferCache (Angular refuses to serve/populate the cache
+// for requests carrying auth headers), forcing a duplicate fetch on hydration for every logged-in
+// user even though the data is identical either way. Do not add a path here unless the backend
+// handler is confirmed to never branch on caller identity — most services mix public and
+// personalized/role-gated methods (e.g. items, pictures, comments, forums, users), so allowlist
+// individual methods rather than a whole service prefix unless every method in it is public.
+const PUBLIC_GRPC_PATH_PREFIXES = [
+  '/goautowp.Articles/',
+  '/goautowp.Statistics/GetAboutData',
+  '/goautowp.Statistics/GetPulse',
+  '/goautowp.Map/GetPoints',
+  '/goautowp.Donations/GetVODData',
+  '/goautowp.Donations/GetTransactions',
+  '/goautowp.Attrs/GetSpecifications',
+  '/goautowp.Attrs/GetChildSpecifications',
+  '/goautowp.Attrs/GetChartParameters',
+  '/goautowp.Attrs/GetChartData',
+  '/goautowp.Attrs/GetAttributeTypes',
+  '/goautowp.Attrs/GetUnits',
+  '/goautowp.Attrs/GetZoneAttributes',
+  '/goautowp.Attrs/GetZones',
+  '/goautowp.Achievements/GetUserAchievements',
+  '/goautowp.Achievements/GetAchievementStats',
+  '/goautowp.Pictures/GetPerspectives',
+  '/goautowp.Pictures/GetPerspectivePages',
+  '/goautowp.Pictures/GetCanonicalRoute',
+];
+
+function isPublicGrpcPath(path: string): boolean {
+  return PUBLIC_GRPC_PATH_PREFIXES.some((prefix) => path.includes(prefix));
+}
+
 export function authInterceptor$(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
   const keycloak = inject(Keycloak);
 
   const token = keycloak.token;
 
-  if (!token) {
+  if (!token || isPublicGrpcPath(req.url)) {
     return next(req);
   }
 
@@ -67,7 +101,7 @@ export class GrpcAuthInterceptor implements GrpcInterceptor {
   ): Observable<GrpcEvent<S>> {
     const token = this.#keycloak.token;
 
-    if (!token) {
+    if (!token || isPublicGrpcPath(request.path)) {
       return next.handle(request);
     }
 
