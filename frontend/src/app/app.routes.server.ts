@@ -33,8 +33,12 @@ export const serverRoutes: ServerRoute[] = [
     path: 'top-view/**',
     renderMode: RenderMode.Server,
   },
+  // No `/**` here deliberately: only the bare brand page (e.g. /toyota) is server-rendered, not
+  // anything nested under it (e.g. /toyota/corolla, /toyota/cars, /toyota/mixed/...). A path
+  // with more segments than this fails to match this node (it has no children) and falls through
+  // to the final Client catch-all below instead.
   {
-    path: ':brand/**',
+    path: ':brand',
     renderMode: RenderMode.Server,
   },
   // Every other top-level route pinned to Client explicitly. `:brand` above is a generic
