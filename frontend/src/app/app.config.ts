@@ -30,7 +30,7 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import {GRPC_INTERCEPTORS, GrpcCoreModule} from '@ngx-grpc/core';
-import {authInterceptor$, GrpcAuthInterceptor, GrpcLogInterceptor} from '@services/api.service';
+import {authInterceptor$, GrpcLogInterceptor} from '@services/api.service';
 import {AuthService} from '@services/auth.service';
 import {AppContactsService} from '@services/contacts';
 import {ContentLanguageService} from '@services/content-language';
@@ -137,7 +137,6 @@ export const appConfig: ApplicationConfig = {
       settings: {host: environment.grpcHost},
     }),
     {multi: true, provide: GRPC_INTERCEPTORS, useClass: GrpcLogInterceptor},
-    {multi: true, provide: GRPC_INTERCEPTORS, useClass: GrpcAuthInterceptor},
     provideKeycloakSSR({
       config: environment.keycloak,
       features: [

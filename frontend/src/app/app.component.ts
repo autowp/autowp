@@ -13,6 +13,7 @@ import {
   NgbModal,
   NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
+import {skipAuthMetadata} from '@services/api.service';
 import {AuthService} from '@services/auth.service';
 import {Language, LanguageService} from '@services/language';
 import {MessageService} from '@services/message';
@@ -83,6 +84,10 @@ export class AppComponent {
             typeId: ItemType.ITEM_TYPE_CATEGORY,
           }),
         }),
+        // Items/List can be personalized (e.g. canEditSpecs, moderator-only counts), but this
+        // call only requests descendantsCount/nameText, which are never gated by caller identity
+        // (goautowp/item-extractor.go). Skip auth so it stays cache-eligible for logged-in users.
+        skipAuthMetadata(),
       ),
   });
 

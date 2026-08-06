@@ -1,7 +1,7 @@
 import {HttpEvent, HttpHandlerFn, HttpRequest} from '@angular/common/http';
 import {inject, Service} from '@angular/core';
 import {environment} from '@environment/environment';
-import {GrpcDataEvent, GrpcEvent, GrpcMessage, GrpcRequest} from '@ngx-grpc/common';
+import {GrpcDataEvent, GrpcEvent, GrpcMessage, GrpcMetadata, GrpcRequest} from '@ngx-grpc/common';
 import {GrpcHandler, GrpcInterceptor} from '@ngx-grpc/core';
 import Keycloak from 'keycloak-js';
 import {Observable} from 'rxjs';
@@ -41,10 +41,27 @@ function isPublicGrpcPath(path: string): boolean {
   return PUBLIC_GRPC_PATH_PREFIXES.some((prefix) => path.includes(prefix));
 }
 
+// Per-call opt-out for methods that CAN be personalized but where the caller wants the
+// cache-eligible anonymous response anyway (e.g. rendering a public preview of an endpoint that
+// would otherwise vary by caller identity). Pass to a generated gRPC client method's
+// requestMetadata parameter, e.g. `picturesClient.getPicture(request, skipAuthMetadata())`.
+// Unlike PUBLIC_GRPC_PATH_PREFIXES above (an always-safe default for methods that never vary by
+// identity), this is opt-in per call site: the caller is asserting that, at this particular call
+// site, an anonymous-equivalent response is acceptable even for a logged-in user.
+const SKIP_AUTH_HEADER = 'x-skip-auth';
+
+export function skipAuthMetadata(): GrpcMetadata {
+  return new GrpcMetadata({[SKIP_AUTH_HEADER]: '1'});
+}
+
 export function authInterceptor$(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
   const keycloak = inject(Keycloak);
 
   const token = keycloak.token;
+
+  if (req.headers.has(SKIP_AUTH_HEADER)) {
+    return next(req.clone({headers: req.headers.delete(SKIP_AUTH_HEADER)}));
+  }
 
   if (!token || isPublicGrpcPath(req.url)) {
     return next(req);
@@ -88,25 +105,5 @@ export class GrpcLogInterceptor implements GrpcInterceptor {
         console.groupEnd();
       }),
     );
-  }
-}
-
-@Service()
-export class GrpcAuthInterceptor implements GrpcInterceptor {
-  readonly #keycloak = inject(Keycloak);
-
-  intercept<Q extends GrpcMessage, S extends GrpcMessage>(
-    request: GrpcRequest<Q, S>,
-    next: GrpcHandler,
-  ): Observable<GrpcEvent<S>> {
-    const token = this.#keycloak.token;
-
-    if (!token || isPublicGrpcPath(request.path)) {
-      return next.handle(request);
-    }
-
-    request.requestMetadata.set('Authorization', 'Bearer ' + token);
-
-    return next.handle(request);
   }
 }
