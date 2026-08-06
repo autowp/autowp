@@ -6,7 +6,6 @@ import {RouterLink} from '@angular/router';
 import {Design, Image, Item, ItemType, Picture, User} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {RemarkModule} from 'ngx-remark';
-import {Observable} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 import {ItemHeaderComponent} from '../item-header/item-header.component';
@@ -16,7 +15,7 @@ export interface CatalogueListItem {
   canEditSpecs: boolean | undefined;
   categories?: Item[];
   childsCounts: APIItemChildsCounts | null;
-  contributors?: Observable<null | User>[];
+  contributors?: (null | User)[];
   description: null | string;
   design: Design | undefined;
   details: {

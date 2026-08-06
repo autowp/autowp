@@ -1,4 +1,4 @@
-import {AsyncPipe, DecimalPipe} from '@angular/common';
+import {DecimalPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -8,14 +8,15 @@ import {
   UserRatingDetailsRequest,
   UsersRatingResponse,
   UsersRatingUser,
+  UsersRatingUserFan,
 } from '@grpc/spec.pb';
 import {RatingClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {forkJoin, Observable, of} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 import {UserComponent} from '../../user/user/user.component';
 
@@ -26,9 +27,18 @@ enum Rating {
   SPECS = 'specs',
 }
 
+// Only the top N rows expand into per-user brands/fans detail in the template.
+const EXPANDED_ROWS_COUNT = 10;
+
+interface RatingRow {
+  userId: string;
+  volume: string;
+  weight: number;
+}
+
 @Component({
   selector: 'app-users-rating',
-  imports: [RouterLink, UserComponent, AsyncPipe, DecimalPipe],
+  imports: [RouterLink, UserComponent, DecimalPipe],
   templateUrl: './rating.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -69,44 +79,6 @@ export class UsersRatingComponent implements OnInit {
     }
   });
 
-  private getRatingFans$(rating: Rating, userId: string) {
-    if (rating == Rating.PICTURE_LIKES) {
-      return this.#ratingClient.getUserPictureLikesRatingFans(new UserRatingDetailsRequest({userId})).pipe(
-        map((response) =>
-          (response.fans ? response.fans : []).map((fan) => ({
-            user$: this.#userService.getUser$(fan.userId),
-            volume: fan.volume,
-          })),
-        ),
-      );
-    }
-    if (rating == Rating.COMMENT_LIKES) {
-      return this.#ratingClient.getUserCommentsRatingFans(new UserRatingDetailsRequest({userId})).pipe(
-        map((response) =>
-          (response.fans ? response.fans : []).map((fan) => ({
-            user$: this.#userService.getUser$(fan.userId),
-            volume: fan.volume,
-          })),
-        ),
-      );
-    }
-    return null;
-  }
-
-  private getRatingBrands$(rating: Rating, userId: string) {
-    if (rating == Rating.PICTURES) {
-      return this.#ratingClient.getUserPicturesRatingBrands(
-        new UserRatingDetailsRequest({language: this.#languageService.language, userId}),
-      );
-    }
-    if (rating == Rating.SPECS) {
-      return this.#ratingClient.getUserSpecsRatingBrands(
-        new UserRatingDetailsRequest({language: this.#languageService.language, userId}),
-      );
-    }
-    return null;
-  }
-
   protected readonly usersResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: 'users-rating',
@@ -127,32 +99,120 @@ export class UsersRatingComponent implements OnInit {
           o$ = this.#ratingClient.getUserSpecsRating(new Empty());
           break;
       }
-      return o$.pipe(
-        map((response) => (response.users ? response.users : []).map((user) => this.#mapUser(rating, user))),
-      );
+      return o$.pipe(map((response) => (response.users ? response.users : []).map((user) => this.#mapUser(user))));
     },
   });
 
-  #mapUser(
-    rating: Rating,
-    user: UsersRatingUser,
-  ): {
-    brands$: null | Observable<UserRatingBrandsResponse>;
-    fans$: null | Observable<{user$: Observable<null | User>; volume: string}[]>;
-    user$: Observable<null | User>;
-    volume: string;
-    weight: number;
-  } {
+  #mapUser(user: UsersRatingUser): RatingRow {
     return {
-      brands$: this.getRatingBrands$(rating, user.userId),
-      fans$: this.getRatingFans$(rating, user.userId),
-      user$: this.#userService.getUser$(user.userId),
+      userId: user.userId,
       volume: user.volume,
       weight: user.weight,
     };
   }
 
+  // Per-item lookups here used to be raw Observables created inside #mapUser and consumed via
+  // `| async` in the template. That races Angular's SSR whenStable() check (the outer resource's
+  // pending task completes before the template's deferred change-detection pass ever subscribes
+  // to the nested Observables), so the data can silently be missing from SSR output. Chaining
+  // resources off usersResource keeps every lookup inside Angular's pending-task tracking.
+  protected readonly usersByIdResource = rxResource({
+    id: 'users-rating-users',
+    params: () => this.usersResource.value()?.map((row) => row.userId) ?? [],
+    // A plain object rather than a Map: TransferState round-trips resource values through
+    // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+    // enumerable properties, no toJSON), losing all entries.
+    stream: ({params: userIds}): Observable<Record<string, User>> => {
+      if (userIds.length === 0) {
+        return of({});
+      }
+      return this.#userService.getUserMap$(userIds).pipe(
+        map((userMap) => Object.fromEntries(userMap)),
+        // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
+        // user rather than erroring the whole resource over one stale reference.
+        catchError(() => of({})),
+      );
+    },
+  });
+
+  readonly #topUserIds = computed(
+    () =>
+      this.usersResource
+        .value()
+        ?.slice(0, EXPANDED_ROWS_COUNT)
+        .map((row) => row.userId) ?? [],
+  );
+
+  protected readonly brandsResource = rxResource({
+    id: 'users-rating-brands',
+    params: () => ({rating: this.rating(), userIds: this.#topUserIds()}),
+    stream: ({params: {rating, userIds}}): Observable<Record<string, UserRatingBrandsResponse>> => {
+      if (userIds.length === 0 || (rating !== Rating.PICTURES && rating !== Rating.SPECS)) {
+        return of({});
+      }
+      const requests = userIds.map((userId) => {
+        const request = new UserRatingDetailsRequest({language: this.#languageService.language, userId});
+        const response$ =
+          rating === Rating.PICTURES
+            ? this.#ratingClient.getUserPicturesRatingBrands(request)
+            : this.#ratingClient.getUserSpecsRatingBrands(request);
+
+        return response$.pipe(map((response) => [userId, response] as const));
+      });
+
+      return forkJoin(requests).pipe(
+        map((entries) => Object.fromEntries(entries)),
+        catchError(() => of({})),
+      );
+    },
+  });
+
+  protected readonly fansResource = rxResource({
+    id: 'users-rating-fans',
+    params: () => ({rating: this.rating(), userIds: this.#topUserIds()}),
+    stream: ({params: {rating, userIds}}): Observable<Record<string, UsersRatingUserFan[]>> => {
+      if (userIds.length === 0 || (rating !== Rating.PICTURE_LIKES && rating !== Rating.COMMENT_LIKES)) {
+        return of({});
+      }
+      const requests = userIds.map((userId) => {
+        const request = new UserRatingDetailsRequest({userId});
+        const response$ =
+          rating === Rating.PICTURE_LIKES
+            ? this.#ratingClient.getUserPictureLikesRatingFans(request)
+            : this.#ratingClient.getUserCommentsRatingFans(request);
+
+        return response$.pipe(map((response) => [userId, response.fans || []] as const));
+      });
+
+      return forkJoin(requests).pipe(
+        map((entries) => Object.fromEntries(entries)),
+        catchError(() => of({})),
+      );
+    },
+  });
+
+  protected readonly fansUsersResource = rxResource({
+    id: 'users-rating-fans-users',
+    params: () => {
+      const fans = this.fansResource.value();
+      if (!fans) {
+        return [];
+      }
+      return [...new Set(Object.values(fans).flatMap((list) => list.map((fan) => fan.userId)))];
+    },
+    stream: ({params: userIds}): Observable<Record<string, User>> => {
+      if (userIds.length === 0) {
+        return of({});
+      }
+      return this.#userService.getUserMap$(userIds).pipe(
+        map((userMap) => Object.fromEntries(userMap)),
+        catchError(() => of({})),
+      );
+    },
+  });
+
   protected readonly Rating = Rating;
+  protected readonly EXPANDED_ROWS_COUNT = EXPANDED_ROWS_COUNT;
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 173});

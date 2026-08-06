@@ -194,8 +194,8 @@
         } @else {
           <ng-container i18n>contributor</ng-container>
         }
-        @for (contributor$ of item.contributors; track contributor$) {
-          @if (contributor$ | async; as user) {
+        @for (contributor of item.contributors; track contributor) {
+          @if (contributor; as user) {
             <app-user [user]="user" />
           }
         }

@@ -66,13 +66,15 @@
         <tr>
           <td>{{ i + 1 }}</td>
           <td>
-            @if (row.user$ | async; as user) {
+            @if (usersByIdResource.value()?.[row.userId]; as user) {
               <app-user [user]="user" />
             }
           </td>
           <td>
-            @if (row.brands$ && i < 10) {
-              @if (row.brands$ | async; as brands) {
+            @if (i < EXPANDED_ROWS_COUNT && (rating() === Rating.PICTURES || rating() === Rating.SPECS)) {
+              @if (brandsResource.isLoading()) {
+                <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+              } @else if (brandsResource.value()?.[row.userId]; as brands) {
                 <div>
                   @for (brand of brands.brands; track brand) {
                     <a [routerLink]="brand.route">{{ brand.name || 'unnamed' }}</a>
@@ -83,15 +85,15 @@
                   }
                   …
                 </div>
-              } @else {
-                <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
               }
             }
-            @if (row.fans$ && i < 10) {
-              @if (row.fans$ | async; as fans) {
+            @if (i < EXPANDED_ROWS_COUNT && (rating() === Rating.PICTURE_LIKES || rating() === Rating.COMMENT_LIKES)) {
+              @if (fansResource.isLoading()) {
+                <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
+              } @else if (fansResource.value()?.[row.userId]; as fans) {
                 <div>
                   @for (fan of fans; track fan) {
-                    @if (fan.user$ | async; as user) {
+                    @if (fansUsersResource.value()?.[fan.userId]; as user) {
                       <app-user [user]="user" />
                     }
                     <span class="badge rounded-pill text-bg-secondary">{{
@@ -101,8 +103,6 @@
                   }
                   …
                 </div>
-              } @else {
-                <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
               }
             }
           </td>
