@@ -1,4 +1,4 @@
-@if (brand$ | async; as brand) {
+@if (brandResource.value(); as brand) {
   <header class="mb-4">
     <div class="p-5 mb-4 rounded-3 brand-hero-unit clearfix">
       <!-- [translate-attr-alt]="''"  sprintf($this->translate('catalogue/brand/logo-of-%s'), $this->brand['name']) 'format' => 'logo', -->
@@ -66,7 +66,7 @@
           </a>
         </li>
       }
-      @if (isModer$ | async) {
+      @if (isModer()) {
         <li class="nav-item">
           <a class="nav-link" [routerLink]="['/moder/items/item', brand.id]">
             <i class="bi bi-gear-fill" aria-hidden="true"></i>
@@ -100,8 +100,8 @@
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }
 
-@if (sections$ | async) {
-  @for (section of sections$ | async; track section) {
+@if (sectionsResource.value(); as sections) {
+  @for (section of sections; track section) {
     @if (section.halfChunks.length) {
       <div class="card mb-4">
         <div class="card-body">
@@ -139,14 +139,14 @@
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }
 
-@if (factories$ | async; as factories) {
+@if (factoriesResource.value(); as factories) {
   @if (factories.length) {
     <section>
       <h2 i18n>Factories</h2>
       <div class="row">
         @for (factory of factories; track factory.item.id) {
           <div class="col-6 col-lg-3">
-            @if (factory.picture$ | async; as picture) {
+            @if (factory.picture; as picture) {
               @if (picture.thumbMedium) {
                 <a class="d-block rounded mb-4" [routerLink]="['/factories', factory.item.id]">
                   <img
@@ -168,7 +168,7 @@
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }
 
-@if (pictures$ | async; as pictures) {
+@if (picturesResource.value(); as pictures) {
   @if (pictures.length) {
     <section>
       <h2 i18n>Popular images</h2>
@@ -187,7 +187,7 @@
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }
 
-@if (links$ | async; as links) {
+@if (linksResource.value(); as links) {
   @if (links.official.length + links.club.length + links.other.length > 0) {
     <section>
       <h2 i18n>Links</h2>

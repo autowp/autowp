@@ -1,14 +1,13 @@
-import {AsyncPipe, DOCUMENT} from '@angular/common';
+import {DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {BrandIcons, BrandsListCharacter, GetBrandsRequest} from '@grpc/spec.pb';
+import {BrandsListCharacter, GetBrandsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {Observable} from 'rxjs';
-import {shareReplay, tap} from 'rxjs/operators';
+import {tap} from 'rxjs/operators';
 
 import {BrandsItemComponent} from './item/item.component';
 
@@ -28,7 +27,7 @@ function addCSS(document: Document, url: string) {
 
 @Component({
   selector: 'app-brands',
-  imports: [RouterLink, BrandsItemComponent, AsyncPipe],
+  imports: [RouterLink, BrandsItemComponent],
   templateUrl: './brands.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -49,12 +48,20 @@ export class BrandsComponent implements OnInit {
       ),
   });
 
-  protected readonly icons$: Observable<BrandIcons> = this.#itemsClient.getBrandIcons(new Empty()).pipe(
-    tap((icons) => {
-      addCSS(this.#document, icons.css);
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  // Was a raw Observable, only subscribed once the template's nested @for loops (three levels
+  // deep, gated behind itemsResource) reached the `| async`. That races Angular's SSR
+  // whenStable() check the same way the Articles list author lookup did — resource() registers
+  // its pending task through Angular's reactive graph (an effect, scheduled at construction)
+  // rather than lazy template subscription, so it doesn't race.
+  protected readonly iconsResource = rxResource({
+    id: 'brands-icons',
+    stream: () =>
+      this.#itemsClient.getBrandIcons(new Empty()).pipe(
+        tap((icons) => {
+          addCSS(this.#document, icons.css);
+        }),
+      ),
+  });
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 61});

@@ -1,5 +1,5 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   GetBrandSectionsRequest,
@@ -26,19 +26,13 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {getCatalogueSectionsTranslation} from '@utils/translations';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {forkJoin, Observable, of} from 'rxjs';
+import {catchError, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
 
 import {chunk, chunkBy} from '../../chunk';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../../toasts/toasts.service';
 import {CatalogueService} from '../catalogue-service';
-
-interface APIBrandSectionGroup {
-  count: number;
-  name: string;
-  routerLink: string[];
-}
 
 interface PictureRoute {
   picture: Picture;
@@ -47,7 +41,7 @@ interface PictureRoute {
 
 @Component({
   selector: 'app-catalogue-index',
-  imports: [RouterLink, AsyncPipe, ThumbnailComponent, RemarkModule],
+  imports: [RouterLink, ThumbnailComponent, RemarkModule],
   templateUrl: './index.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -64,22 +58,33 @@ export class CatalogueIndexComponent {
 
   protected readonly ItemType = ItemType;
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER).pipe(shareReplay({bufferSize: 1, refCount: false}));
+  protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER), {initialValue: false});
 
-  protected readonly brand$: Observable<Item> = combineLatest([
-    this.isModer$,
+  readonly #catname = toSignal(
     this.#route.paramMap.pipe(
       map((params) => params.get('brand')),
       distinctUntilChanged(),
-      debounceTime(10),
     ),
-  ]).pipe(
-    switchMap(([isModer, catname]) => {
+    {requireSync: true},
+  );
+
+  // Chained resources (below) register their pending task through Angular's reactive graph
+  // (an effect scheduled at construction) rather than lazy template `| async` subscription, so
+  // they don't race Angular's SSR whenStable() check the way a raw Observable stored on an object
+  // and subscribed later by the template would (see the Articles list author-lookup fix for the
+  // full explanation). `id` also seeds each resource as already-resolved from TransferState on
+  // hydration — notably useful here since isModer depends on client-side Keycloak
+  // initialization, which can take a real amount of time; without `id` the whole page would
+  // blank-and-reload on every hydration waiting for it, even though SSR already has the data.
+  protected readonly brandResource = rxResource({
+    id: 'catalogue-brand',
+    params: () => ({catname: this.#catname(), isModer: this.isModer()}),
+    stream: ({params: {catname, isModer}}): Observable<Item | undefined> => {
       if (!catname) {
         this.#router.navigate(['/error-404'], {
           skipLocationChange: true,
         });
-        return EMPTY;
+        return of(undefined);
       }
 
       const fields = new ItemFields({
@@ -96,159 +101,191 @@ export class CatalogueIndexComponent {
         fields.commentsAttentionsCount = true;
       }
 
-      return this.#itemsClient.list(
-        new ItemsRequest({
-          fields,
-          language: this.#languageService.language,
-          limit: 1,
-          options: new ItemListOptions({
-            catname,
-          }),
-        }),
-      );
-    }),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    switchMap((response) => {
-      if (!response.items || response.items.length <= 0) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-
-      return of(response.items[0]);
-    }),
-    tap((brand) => {
-      this.#pageEnv.set({
-        pageId: 10,
-        title: brand.nameText,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
-
-  protected readonly pictures$ = this.brand$.pipe(
-    switchMap((brand) =>
-      this.#picturesClient.getPictures(
-        new PicturesRequest({
-          fields: new PictureFields({
-            commentsCount: true,
-            moderVote: true,
-            nameHtml: true,
-            nameText: true,
-            path: new PicturePathRequest({parentId: brand.id}),
-            thumbMedium: true,
-            views: true,
-            votes: true,
-          }),
-          language: this.#languageService.language,
-          limit: 12,
-          options: new PictureListOptions({
-            pictureItem: new PictureItemListOptions({
-              itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: brand.id}),
-            }),
-            status: PictureStatus.PICTURE_STATUS_ACCEPTED,
-          }),
-          order: PicturesRequest.Order.ORDER_LIKES,
-        }),
-      ),
-    ),
-    map((response) => {
-      const pictures: PictureRoute[] = (response.items || []).map((pic) => ({
-        picture: pic,
-        route: this.#catalogue.picturePathToRoute(pic),
-      }));
-
-      return chunkBy(pictures, 4);
-    }),
-  );
-
-  protected readonly links$ = this.brand$.pipe(
-    switchMap((brand) =>
-      this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId: brand.id})})),
-    ),
-    map((response) => {
-      const official: ItemLink[] = [];
-      const club: ItemLink[] = [];
-      const other: ItemLink[] = [];
-      (response.items ? response.items : []).forEach((item) => {
-        switch (item.type) {
-          case 'club':
-            club.push(item);
-            break;
-          case 'official':
-            official.push(item);
-            break;
-          default:
-            other.push(item);
-            break;
-        }
-      });
-      return {club, official, other};
-    }),
-  );
-
-  protected readonly factories$: Observable<{item: Item; picture$: Observable<Picture>}[]> = this.brand$.pipe(
-    switchMap((brand) =>
-      this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({nameHtml: true}),
-          language: this.#languageService.language,
-          limit: 4,
-          options: new ItemListOptions({
-            descendant: new ItemParentCacheListOptions({
-              itemParentCacheAncestorByItemId: new ItemParentCacheListOptions({
-                itemsByParentId: new ItemListOptions({id: brand.id}),
-              }),
-            }),
-            pictureItems: new PictureItemListOptions({
-              pictures: new PictureListOptions({
-                status: PictureStatus.PICTURE_STATUS_ACCEPTED,
-              }),
-            }),
-            typeId: ItemType.ITEM_TYPE_FACTORY,
-          }),
-        }),
-      ),
-    ),
-    map((response) =>
-      (response.items || []).map((item) => ({
-        item,
-        picture$: this.#picturesClient.getPicture(
-          new PicturesRequest({
-            fields: new PictureFields({thumbMedium: true}),
+      return this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields,
             language: this.#languageService.language,
+            limit: 1,
+            options: new ItemListOptions({
+              catname,
+            }),
+          }),
+        )
+        .pipe(
+          catchError((response: unknown) => {
+            this.#toastService.handleError(response);
+            return of(undefined);
+          }),
+          switchMap((response) => {
+            if (!response || !response.items || response.items.length <= 0) {
+              this.#router.navigate(['/error-404'], {
+                skipLocationChange: true,
+              });
+              return of(undefined);
+            }
+
+            return of(response.items[0]);
+          }),
+          tap((brand) => {
+            if (brand) {
+              this.#pageEnv.set({
+                pageId: 10,
+                title: brand.nameText,
+              });
+            }
+          }),
+        );
+    },
+  });
+
+  protected readonly picturesResource = rxResource({
+    id: 'catalogue-brand-pictures',
+    params: () => this.brandResource.value(),
+    stream: ({params: brand}) =>
+      this.#picturesClient
+        .getPictures(
+          new PicturesRequest({
+            fields: new PictureFields({
+              commentsCount: true,
+              moderVote: true,
+              nameHtml: true,
+              nameText: true,
+              path: new PicturePathRequest({parentId: brand.id}),
+              thumbMedium: true,
+              views: true,
+              votes: true,
+            }),
+            language: this.#languageService.language,
+            limit: 12,
             options: new PictureListOptions({
-              pictureItem: new PictureItemListOptions({itemId: item.id}),
+              pictureItem: new PictureItemListOptions({
+                itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: brand.id}),
+              }),
               status: PictureStatus.PICTURE_STATUS_ACCEPTED,
             }),
             order: PicturesRequest.Order.ORDER_LIKES,
           }),
-        ),
-      })),
-    ),
-  );
+        )
+        .pipe(
+          map((response) => {
+            const pictures: PictureRoute[] = (response.items || []).map((pic) => ({
+              picture: pic,
+              route: this.#catalogue.picturePathToRoute(pic),
+            }));
 
-  protected readonly sections$: Observable<
-    {halfChunks: APIBrandSectionGroup[][][]; name: string; routerLink: string[]}[]
-  > = this.brand$.pipe(
-    switchMap((brand) =>
-      this.#itemsClient.getBrandSections(
-        new GetBrandSectionsRequest({
-          itemId: brand.id,
-          language: this.#languageService.language,
+            return chunkBy(pictures, 4);
+          }),
+        ),
+  });
+
+  protected readonly linksResource = rxResource({
+    id: 'catalogue-brand-links',
+    params: () => this.brandResource.value(),
+    stream: ({params: brand}) =>
+      this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId: brand.id})})).pipe(
+        map((response) => {
+          const official: ItemLink[] = [];
+          const club: ItemLink[] = [];
+          const other: ItemLink[] = [];
+          (response.items ? response.items : []).forEach((item) => {
+            switch (item.type) {
+              case 'club':
+                club.push(item);
+                break;
+              case 'official':
+                official.push(item);
+                break;
+              default:
+                other.push(item);
+                break;
+            }
+          });
+          return {club, official, other};
         }),
       ),
-    ),
-    map((response) =>
-      (response.sections || []).map((section) => ({
-        halfChunks: chunk(section.groups || [], 2).map((halfChunk) => chunk(halfChunk, 2)),
-        name: getCatalogueSectionsTranslation(section.name),
-        routerLink: section.routerLink,
-      })),
-    ),
-  );
+  });
+
+  // Fetches each factory's picture with forkJoin inside the same stream, rather than storing a
+  // per-item Observable for the template to subscribe lazily via `| async` (the previous shape
+  // here, which raced SSR's whenStable() check the same way the Articles list author lookup did).
+  protected readonly factoriesResource = rxResource({
+    id: 'catalogue-brand-factories',
+    params: () => this.brandResource.value(),
+    stream: ({params: brand}) =>
+      this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({nameHtml: true}),
+            language: this.#languageService.language,
+            limit: 4,
+            options: new ItemListOptions({
+              descendant: new ItemParentCacheListOptions({
+                itemParentCacheAncestorByItemId: new ItemParentCacheListOptions({
+                  itemsByParentId: new ItemListOptions({id: brand.id}),
+                }),
+              }),
+              pictureItems: new PictureItemListOptions({
+                pictures: new PictureListOptions({
+                  status: PictureStatus.PICTURE_STATUS_ACCEPTED,
+                }),
+              }),
+              typeId: ItemType.ITEM_TYPE_FACTORY,
+            }),
+          }),
+        )
+        .pipe(
+          switchMap((response) => {
+            const items = response.items || [];
+            if (items.length === 0) {
+              return of([]);
+            }
+
+            return forkJoin(
+              items.map((item) =>
+                this.#picturesClient
+                  .getPicture(
+                    new PicturesRequest({
+                      fields: new PictureFields({thumbMedium: true}),
+                      language: this.#languageService.language,
+                      options: new PictureListOptions({
+                        pictureItem: new PictureItemListOptions({itemId: item.id}),
+                        status: PictureStatus.PICTURE_STATUS_ACCEPTED,
+                      }),
+                      order: PicturesRequest.Order.ORDER_LIKES,
+                    }),
+                  )
+                  .pipe(
+                    map((picture) => ({item, picture})),
+                    // A factory without an accepted picture yet shouldn't take down every other
+                    // factory's picture in the same batch.
+                    catchError(() => of({item, picture: null})),
+                  ),
+              ),
+            );
+          }),
+        ),
+  });
+
+  protected readonly sectionsResource = rxResource({
+    id: 'catalogue-brand-sections',
+    params: () => this.brandResource.value(),
+    stream: ({params: brand}) =>
+      this.#itemsClient
+        .getBrandSections(
+          new GetBrandSectionsRequest({
+            itemId: brand.id,
+            language: this.#languageService.language,
+          }),
+        )
+        .pipe(
+          map((response) =>
+            (response.sections || []).map((section) => ({
+              halfChunks: chunk(section.groups || [], 2).map((halfChunk) => chunk(halfChunk, 2)),
+              name: getCatalogueSectionsTranslation(section.name),
+              routerLink: section.routerLink,
+            })),
+          ),
+        ),
+  });
 }
