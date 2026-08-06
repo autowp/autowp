@@ -1,21 +1,21 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {Article, ArticlesRequest, User} from '@grpc/spec.pb';
+import {Article, ArticlesRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {Observable, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {of} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {UserComponent} from '../../user/user/user.component';
 
 interface ArticleListItem {
-  author$: Observable<null | User>;
+  authorId: string;
   createdAt: Date | undefined;
   description: string;
   id: string;
@@ -26,7 +26,7 @@ interface ArticleListItem {
 
 @Component({
   selector: 'app-articles-list',
-  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, AsyncPipe, DatePipe, TimeAgoPipe],
+  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, DatePipe, TimeAgoPipe],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,9 +61,31 @@ export class ListComponent implements OnInit {
       ),
   });
 
+  // A raw Observable + `| async` subscribed lazily from the template only starts once the
+  // template first evaluates it, which can race Angular's SSR whenStable() check: the article
+  // list's own resource reports its pending task done as soon as its HTTP response arrives, but
+  // the change-detection pass that would evaluate `@for` and subscribe to each author's Observable
+  // is scheduled separately and can land after SSR has already decided to serialize — so `<app-user>`
+  // can end up missing from the SSR output. Chaining a second resource off articlesResource keeps
+  // author lookups inside Angular's pending-task tracking the whole way through.
+  protected readonly authorsResource = rxResource({
+    id: 'articles-list-authors',
+    params: () => this.articlesResource.value()?.articles.map((article) => article.authorId) ?? [],
+    stream: ({params: authorIds}) => {
+      const ids = authorIds.filter((id) => id !== '0');
+      if (ids.length === 0) {
+        return of(new Map());
+      }
+      // getUserMap$ throws if the backend can't find a requested author (e.g. a deleted account).
+      // Degrade to showing no author for the page rather than erroring the whole resource over one
+      // stale reference.
+      return this.#userService.getUserMap$(ids).pipe(catchError(() => of(new Map())));
+    },
+  });
+
   #mapArticle(article: Article): ArticleListItem {
     return {
-      author$: article.authorId !== '0' ? this.#userService.getUser$(article.authorId) : of(null),
+      authorId: article.authorId,
       createdAt: article.createTime?.toDate(),
       description: article.description,
       id: article.id,
