@@ -2,13 +2,13 @@ import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {Article, ArticlesRequest} from '@grpc/spec.pb';
+import {Article, ArticlesRequest, User} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {of} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -71,15 +71,21 @@ export class ListComponent implements OnInit {
   protected readonly authorsResource = rxResource({
     id: 'articles-list-authors',
     params: () => this.articlesResource.value()?.articles.map((article) => article.authorId) ?? [],
-    stream: ({params: authorIds}) => {
+    // A plain object rather than a Map: TransferState round-trips resource values through
+    // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+    // enumerable properties), losing all entries and coming back as a plain object anyway.
+    stream: ({params: authorIds}): Observable<Record<string, User>> => {
       const ids = authorIds.filter((id) => id !== '0');
       if (ids.length === 0) {
-        return of(new Map());
+        return of({});
       }
       // getUserMap$ throws if the backend can't find a requested author (e.g. a deleted account).
       // Degrade to showing no author for the page rather than erroring the whole resource over one
       // stale reference.
-      return this.#userService.getUserMap$(ids).pipe(catchError(() => of(new Map())));
+      return this.#userService.getUserMap$(ids).pipe(
+        map((userMap) => Object.fromEntries(userMap)),
+        catchError(() => of({})),
+      );
     },
   });
 

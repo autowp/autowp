@@ -32,7 +32,7 @@
             <a i18n [routerLink]="article.routerLink">details</a>
           </p>
           <p>
-            @if (authorsResource.value()?.get(article.authorId); as author) {
+            @if (authorsResource.value()?.[article.authorId]; as author) {
               <app-user [user]="author" />
             }
             @if (article.createdAt; as date) {
