@@ -1,6 +1,5 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {
   CommentMessage,
@@ -15,8 +14,8 @@ import {
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap, take, tap} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {catchError, map, tap} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -25,7 +24,7 @@ import {CommentsListComponent} from '../list/list.component';
 
 @Component({
   selector: 'app-comments',
-  imports: [CommentsListComponent, PaginatorComponent, CommentsFormComponent, AsyncPipe, RemarkModule],
+  imports: [CommentsListComponent, PaginatorComponent, CommentsFormComponent, RemarkModule],
   templateUrl: './comments.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -35,90 +34,88 @@ export class CommentsComponent {
   readonly #toastService = inject(ToastsService);
   readonly #commentsGrpc = inject(CommentsClient);
 
-  readonly #reload$ = new BehaviorSubject<void>(void 0);
-
   readonly itemID = input.required<string>();
-  protected readonly itemID$ = toObservable(this.itemID);
-
   readonly typeID = input.required<CommentsType>();
-  protected readonly typeID$ = toObservable(this.typeID);
-
   readonly limit = input<null | number>();
-  readonly #limit$ = toObservable(this.limit);
-
   readonly page = input<number>();
-  protected readonly page$ = toObservable(this.page);
 
-  protected readonly authenticated$ = this.auth.authenticated$;
+  protected readonly authenticated = toSignal(this.auth.authenticated$, {initialValue: false});
 
-  protected readonly data$: Observable<{messages: CommentMessage[]; paginator?: Pages}> = combineLatest([
-    this.authenticated$,
-    this.itemID$.pipe(debounceTime(10), distinctUntilChanged()),
-    this.typeID$.pipe(debounceTime(10), distinctUntilChanged()),
-    this.#limit$.pipe(debounceTime(10), distinctUntilChanged()),
-    this.page$.pipe(debounceTime(10), distinctUntilChanged()),
-    this.#reload$,
-  ]).pipe(
-    switchMap(([authenticated, itemID, typeID, limit, page]) =>
-      typeID && itemID
-        ? this.load$(itemID, typeID, limit, page).pipe(
-            tap(() => {
-              if (authenticated) {
-                this.#commentsGrpc
-                  .view(
-                    new CommentsViewRequest({
-                      itemId: itemID,
-                      typeId: typeID ? typeID : undefined,
-                    }),
-                  )
-                  .subscribe();
-              }
-            }),
-            map((response) => ({
-              messages: response.items ? response.items : [],
-              paginator: response.paginator,
-            })),
-          )
-        : EMPTY,
-    ),
-  );
+  // Chained off the input/auth signals directly rather than raw Observables with debounceTime(10)
+  // on four separate sources feeding a combineLatest (the previous shape here). Angular's actual
+  // SSR whenStable() (used by platform-server's renderApplication) tracks only
+  // PendingTasksInternal, not zone macrotasks, so a setTimeout-based delay before this chain's
+  // first HTTP call isn't tracked as pending by anything — every comment section on the site could
+  // go missing from SSR output if some other resource happened to resolve during that window.
+  // resource() registers its pending task through Angular's reactive graph instead, so there's no
+  // such window.
+  protected readonly dataResource = rxResource({
+    id: 'comments',
+    params: () => ({
+      authenticated: this.authenticated(),
+      itemID: this.itemID(),
+      limit: this.limit(),
+      page: this.page(),
+      typeID: this.typeID(),
+    }),
+    stream: ({
+      params: {authenticated, itemID, limit, page, typeID},
+    }): Observable<undefined | {messages: CommentMessage[]; paginator?: Pages}> => {
+      if (!typeID || !itemID) {
+        return of(undefined);
+      }
+
+      return this.load$(itemID, typeID, limit, page).pipe(
+        tap(() => {
+          if (authenticated) {
+            this.#commentsGrpc
+              .view(
+                new CommentsViewRequest({
+                  itemId: itemID,
+                  typeId: typeID,
+                }),
+              )
+              .subscribe();
+          }
+        }),
+        map((response) => ({
+          messages: response.items ? response.items : [],
+          paginator: response.paginator,
+        })),
+      );
+    },
+  });
 
   protected readonly CommentsType = CommentsType;
 
   protected onSent(id: string) {
-    this.#limit$
-      .pipe(
-        take(1),
-        switchMap((limit) => {
-          if (!limit) {
-            this.#reload$.next();
-            return EMPTY;
-          }
+    const limit = this.limit();
+    if (!limit) {
+      this.dataResource.reload();
+      return;
+    }
 
-          return this.#commentsGrpc.getMessagePage(new GetMessagePageRequest({messageId: id, perPage: limit})).pipe(
-            catchError((error: unknown) => {
-              this.#toastService.handleError(error);
-              return EMPTY;
-            }),
-            switchMap((response) =>
-              this.page$.pipe(
-                take(1),
-                tap((page) => {
-                  if (page !== response.page) {
-                    this.#router.navigate([], {
-                      queryParams: {page: response.page},
-                      queryParamsHandling: 'merge',
-                    });
-                  } else {
-                    this.#reload$.next();
-                  }
-                }),
-              ),
-            ),
-          );
+    this.#commentsGrpc
+      .getMessagePage(new GetMessagePageRequest({messageId: id, perPage: limit}))
+      .pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return of(undefined);
         }),
       )
-      .subscribe();
+      .subscribe((response) => {
+        if (!response) {
+          return;
+        }
+        if (this.page() !== response.page) {
+          this.#router.navigate([], {
+            queryParams: {page: response.page},
+            queryParamsHandling: 'merge',
+          });
+        } else {
+          this.dataResource.reload();
+        }
+      });
   }
 
   protected load$(

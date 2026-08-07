@@ -1,4 +1,4 @@
-import {AsyncPipe, DatePipe, DecimalPipe, DOCUMENT} from '@angular/common';
+import {DatePipe, DecimalPipe, DOCUMENT} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -10,7 +10,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Router, RouterLink} from '@angular/router';
 import {
   CommentsSubscribeRequest,
@@ -48,8 +48,8 @@ import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, filter, map, shareReplay, switchMap} from 'rxjs/operators';
+import {EMPTY, Observable, of} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 import {ModerPicturesPerspectivePickerComponent} from '../moder/pictures/perspective-picker/perspective-picker.component';
 import {PictureModerVoteComponent} from '../picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
@@ -70,7 +70,6 @@ import {PicturePaginatorComponent} from './paginator.component';
     NgbDropdownMenu,
     NgbProgressbar,
     ModerPicturesPerspectivePickerComponent,
-    AsyncPipe,
     DecimalPipe,
     DatePipe,
     NgMathPipesModule,
@@ -102,7 +101,6 @@ export class PictureComponent {
   readonly changed = output<boolean>();
 
   readonly picture = input.required<Picture>();
-  readonly picture$ = toObservable(this.picture);
 
   protected readonly osmURL = computed(() => {
     const point = this.picture().point;
@@ -122,27 +120,51 @@ export class PictureComponent {
     );
   });
 
-  protected readonly owner$: Observable<null | User> = this.picture$.pipe(
-    switchMap((picture) => this.#userService.getUser$(picture?.ownerId)),
-  );
+  // Every resource below is chained off the `picture` input signal directly (not a raw Observable
+  // stored on an object and subscribed lazily by the template via `| async`, the previous shape
+  // here) — that pattern races Angular's SSR whenStable() check the same way the Articles list
+  // author lookup did. resource() registers its pending task through Angular's reactive graph (an
+  // effect scheduled at construction) instead, so it doesn't race.
+  protected readonly ownerResource = rxResource({
+    id: 'picture-owner',
+    params: () => this.picture().ownerId,
+    stream: ({params: ownerId}) => this.#userService.getUser$(ownerId),
+  });
 
-  protected readonly moderVotes$ = this.picture$.pipe(
-    map((picture) =>
-      (picture?.pictureModerVotes?.items || []).map((vote) => ({
-        reason: vote.reason,
-        user$: this.#userService.getUser$(vote.userId),
-        vote: vote.vote,
-      })),
-    ),
-  );
+  protected readonly moderVoteUsersResource = rxResource({
+    id: 'picture-moder-vote-users',
+    params: () => [...new Set((this.picture().pictureModerVotes?.items || []).map((vote) => vote.userId))],
+    // A plain object rather than a Map: TransferState round-trips resource values through
+    // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+    // enumerable properties, no toJSON), losing all entries.
+    stream: ({params: userIds}): Observable<Record<string, User>> => {
+      if (userIds.length === 0) {
+        return of({});
+      }
+      return this.#userService.getUserMap$(userIds).pipe(
+        map((userMap) => Object.fromEntries(userMap)),
+        // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
+        // user rather than erroring the whole resource over one stale reference.
+        catchError(() => of({})),
+      );
+    },
+  });
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
-  protected readonly canEditSpecs$ = this.#auth.authenticated$;
+  protected readonly moderVotes = computed(() => {
+    const usersById = this.moderVoteUsersResource.value() ?? {};
+
+    return (this.picture().pictureModerVotes?.items || []).map((vote) => ({
+      reason: vote.reason,
+      user: usersById[vote.userId] ?? null,
+      vote: vote.vote,
+    }));
+  });
+
+  protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER), {initialValue: false});
+  protected readonly authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
   protected readonly showShareDialog = signal(false);
   protected readonly location = this.#document.defaultView?.location;
   protected readonly statusLoading = signal(false);
-
-  protected readonly authenticated$ = this.#auth.authenticated$;
 
   constructor() {
     effect(() => {
@@ -271,96 +293,101 @@ export class PictureComponent {
     this.setPictureStatus(picture, PictureStatus.PICTURE_STATUS_INBOX);
   }
 
-  protected readonly factories$ = this.picture$.pipe(
-    filter((picture) => !!picture),
-    switchMap((picture) =>
-      this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({nameHtml: true}),
-          language: this.#languageService.language,
-          limit: 10,
-          options: new ItemListOptions({
-            descendant: new ItemParentCacheListOptions({
-              pictureItemsByItemId: new PictureItemListOptions({pictureId: picture.id}),
-            }),
-            typeId: ItemType.ITEM_TYPE_FACTORY,
-          }),
-        }),
-      ),
-    ),
-    map((response) => response.items || []),
-  );
-
-  protected readonly categories$ = this.picture$.pipe(
-    filter((picture) => !!picture),
-    switchMap((picture) =>
-      this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({nameHtml: true}),
-          language: this.#languageService.language,
-          limit: 10,
-          options: new ItemListOptions({
-            child: new ItemParentListOptions({
-              item: new ItemListOptions({
-                typeIds: [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_ENGINE],
+  protected readonly factoriesResource = rxResource({
+    id: 'picture-factories',
+    params: () => this.picture().id,
+    stream: ({params: pictureId}) =>
+      this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({nameHtml: true}),
+            language: this.#languageService.language,
+            limit: 10,
+            options: new ItemListOptions({
+              descendant: new ItemParentCacheListOptions({
+                pictureItemsByItemId: new PictureItemListOptions({pictureId}),
               }),
-              itemParentCacheItemByChild: new ItemParentCacheListOptions({
-                pictureItemsByItemId: new PictureItemListOptions({pictureId: picture.id}),
+              typeId: ItemType.ITEM_TYPE_FACTORY,
+            }),
+          }),
+        )
+        .pipe(map((response) => response.items || [])),
+  });
+
+  protected readonly categoriesResource = rxResource({
+    id: 'picture-categories',
+    params: () => this.picture().id,
+    stream: ({params: pictureId}) =>
+      this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({nameHtml: true}),
+            language: this.#languageService.language,
+            limit: 10,
+            options: new ItemListOptions({
+              child: new ItemParentListOptions({
+                item: new ItemListOptions({
+                  typeIds: [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_ENGINE],
+                }),
+                itemParentCacheItemByChild: new ItemParentCacheListOptions({
+                  pictureItemsByItemId: new PictureItemListOptions({pictureId}),
+                }),
               }),
+              typeId: ItemType.ITEM_TYPE_CATEGORY,
             }),
-            typeId: ItemType.ITEM_TYPE_CATEGORY,
           }),
-        }),
-      ),
-    ),
-    map((response) => response.items || []),
-  );
+        )
+        .pipe(map((response) => response.items || [])),
+  });
 
-  protected readonly twins$ = this.picture$.pipe(
-    filter((picture) => !!picture),
-    switchMap((picture) =>
-      this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({nameHtml: true}),
-          language: this.#languageService.language,
-          limit: 10,
-          options: new ItemListOptions({
-            descendant: new ItemParentCacheListOptions({
-              pictureItemsByItemId: new PictureItemListOptions({pictureId: picture.id}),
+  protected readonly twinsResource = rxResource({
+    id: 'picture-twins',
+    params: () => this.picture().id,
+    stream: ({params: pictureId}) =>
+      this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({nameHtml: true}),
+            language: this.#languageService.language,
+            limit: 10,
+            options: new ItemListOptions({
+              descendant: new ItemParentCacheListOptions({
+                pictureItemsByItemId: new PictureItemListOptions({pictureId}),
+              }),
+              typeId: ItemType.ITEM_TYPE_TWINS,
             }),
-            typeId: ItemType.ITEM_TYPE_TWINS,
           }),
-        }),
-      ),
-    ),
-    map((response) => response.items || []),
-  );
+        )
+        .pipe(map((response) => response.items || [])),
+  });
 
-  protected readonly brands$: Observable<Item[]> = this.picture$.pipe(
-    filter((picture) => !!picture),
-    switchMap((picture) =>
-      this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({nameHtml: true}),
-          language: this.#languageService.language,
-          limit: 10,
-          options: new ItemListOptions({
-            descendant: new ItemParentCacheListOptions({
-              pictureItemsByItemId: new PictureItemListOptions({pictureId: picture.id}),
+  protected readonly brandsResource = rxResource({
+    id: 'picture-brands',
+    params: () => this.picture().id,
+    stream: ({params: pictureId}): Observable<Item[]> =>
+      this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({nameHtml: true}),
+            language: this.#languageService.language,
+            limit: 10,
+            options: new ItemListOptions({
+              descendant: new ItemParentCacheListOptions({
+                pictureItemsByItemId: new PictureItemListOptions({pictureId}),
+              }),
+              typeId: ItemType.ITEM_TYPE_BRAND,
             }),
-            typeId: ItemType.ITEM_TYPE_BRAND,
           }),
-        }),
-      ),
-    ),
-    map((response) => response.items || []),
-  );
+        )
+        .pipe(map((response) => response.items || [])),
+  });
 
-  protected readonly pictureItems$: Observable<PictureItem[]> = this.picture$
-    .pipe(
-      filter((picture) => !!picture),
-      switchMap((picture) =>
-        this.#picturesClient.getPictureItems(
+  protected readonly pictureItemsResource = rxResource({
+    id: 'picture-items',
+    params: () => this.picture().id,
+    stream: ({params: pictureId}): Observable<PictureItem[]> =>
+      this.#picturesClient
+        .getPictureItems(
           new PictureItemsRequest({
             fields: new PictureItemFields({
               item: new ItemsRequest({
@@ -377,64 +404,57 @@ export class PictureComponent {
               }),
             }),
             language: this.#languageService.language,
-            options: new PictureItemListOptions({pictureId: picture.id}),
+            options: new PictureItemListOptions({pictureId}),
           }),
-        ),
-      ),
-    )
-    .pipe(
-      map((response) => response.items || []),
-      shareReplay({bufferSize: 1, refCount: false}),
-    );
+        )
+        .pipe(map((response) => response.items || [])),
+  });
 
-  protected readonly contentItems$ = this.pictureItems$.pipe(
-    map((items) => items.filter((item) => item.type === PictureItemType.PICTURE_ITEM_CONTENT)),
-    shareReplay({bufferSize: 1, refCount: false}),
+  protected readonly contentItems = computed(() =>
+    (this.pictureItemsResource.value() ?? []).filter((item) => item.type === PictureItemType.PICTURE_ITEM_CONTENT),
   );
 
-  protected readonly links$: Observable<ItemLink[]> = this.picture$.pipe(
-    filter((picture) => !!picture),
-    switchMap((picture) =>
-      this.#itemsClient.getItemLinks(
-        new ItemLinksRequest({
-          options: new ItemLinkListOptions({
-            itemParentCacheDescendant: new ItemParentCacheListOptions({
-              pictureItemsByItemId: new PictureItemListOptions({pictureId: picture.id}),
+  protected readonly linksResource = rxResource({
+    id: 'picture-links',
+    params: () => this.picture().id,
+    stream: ({params: pictureId}): Observable<ItemLink[]> =>
+      this.#itemsClient
+        .getItemLinks(
+          new ItemLinksRequest({
+            options: new ItemLinkListOptions({
+              itemParentCacheDescendant: new ItemParentCacheListOptions({
+                pictureItemsByItemId: new PictureItemListOptions({pictureId}),
+              }),
+              type: 'official',
             }),
-            type: 'official',
           }),
-        }),
-      ),
-    ),
-    map((response) => response.items || []),
-  );
+        )
+        .pipe(map((response) => response.items || [])),
+  });
 
-  protected readonly takenDate$: Observable<null | {date: Date; format: string}> = this.picture$.pipe(
-    filter((picture) => !!picture),
-    map((picture) => {
-      const date = picture.takenDate;
-      if (!date) {
-        return null;
-      }
-
-      if (date.year) {
-        const resDate = new Date();
-        resDate.setFullYear(date.year, 0, 1);
-        let format = 'yyyy';
-        if (date.month) {
-          resDate.setFullYear(date.year, date.month - 1, 1);
-          format = 'MM.yyyy';
-          if (date.day) {
-            resDate.setFullYear(date.year, date.month - 1, date.day);
-            format = 'dd.MM.yyyy';
-          }
-        }
-        return {date: resDate, format};
-      }
-
+  protected readonly takenDate = computed<null | {date: Date; format: string}>(() => {
+    const date = this.picture().takenDate;
+    if (!date) {
       return null;
-    }),
-  );
+    }
+
+    if (date.year) {
+      const resDate = new Date();
+      resDate.setFullYear(date.year, 0, 1);
+      let format = 'yyyy';
+      if (date.month) {
+        resDate.setFullYear(date.year, date.month - 1, 1);
+        format = 'MM.yyyy';
+        if (date.day) {
+          resDate.setFullYear(date.year, date.month - 1, date.day);
+          format = 'dd.MM.yyyy';
+        }
+      }
+      return {date: resDate, format};
+    }
+
+    return null;
+  });
 
   protected readonly PictureItemType = PictureItemType;
   protected readonly PictureStatus = PictureStatus;

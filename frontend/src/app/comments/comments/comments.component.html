@@ -1,8 +1,8 @@
 <div class="comments">
-  @if (typeID$ | async; as typeID) {
-    @if (itemID$ | async; as itemID) {
-      @if (data$ | async; as data) {
-        @if (data.messages && (typeID$ | async) !== CommentsType.FORUMS_TYPE_ID) {
+  @if (typeID(); as typeID) {
+    @if (itemID(); as itemID) {
+      @if (dataResource.value(); as data) {
+        @if (data.messages && typeID !== CommentsType.FORUMS_TYPE_ID) {
           <h2 i18n>Comments</h2>
         }
         @if (data.messages) {
@@ -21,7 +21,7 @@
         <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
       }
 
-      @if (authenticated$ | async) {
+      @if (authenticated()) {
         <app-comments-form [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" />
       } @else {
         <remark

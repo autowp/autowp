@@ -1,10 +1,10 @@
-@if (picture$ | async; as picture) {
+@if (picture(); as picture) {
   <div class="btn-group mb-3">
     @if (!picture.moderVoted) {
       <div ngbDropdown>
         <button class="btn btn-success" type="button" ngbDropdownToggle i18n>Want accept</button>
         <div ngbDropdownMenu>
-          @for (template of moderVoteTemplateOptions$ | async; track template.id) {
+          @for (template of moderVoteTemplatesResource.value(); track template.id) {
             @if (template.vote > 0) {
               <button
                 type="button"
@@ -22,7 +22,7 @@
       <div ngbDropdown>
         <button class="btn btn-danger" type="button" ngbDropdownToggle i18n>Want delete</button>
         <div ngbDropdownMenu>
-          @for (template of moderVoteTemplateOptions$ | async; track template.id) {
+          @for (template of moderVoteTemplatesResource.value(); track template.id) {
             @if (template.vote < 0) {
               <button
                 type="button"
@@ -43,7 +43,7 @@
   </div>
 }
 
-@if (votes$ | async; as votes) {
+@if (votes(); as votes) {
   @if (votes.length) {
     <div>
       <ng-container i18n>Already voted:</ng-container>
@@ -55,7 +55,7 @@
             } @else {
               <i class="bi bi-hand-thumbs-down-fill text-danger" aria-hidden="true"></i>
             }
-            @if (moder_vote.user$ | async; as user) {
+            @if (moder_vote.user; as user) {
               <app-user [user]="user" />
             }
             <span [style.color]="moder_vote.vote > 0 ? 'green' : 'red'">{{ moder_vote.reason }}</span>

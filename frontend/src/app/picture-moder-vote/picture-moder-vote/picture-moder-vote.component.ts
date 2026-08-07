@@ -1,11 +1,11 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, ComponentRef, inject, input, output} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
-import {Picture} from '@grpc/spec.pb';
+import {ChangeDetectionStrategy, Component, ComponentRef, computed, inject, input, output} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {Picture, User} from '@grpc/spec.pb';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {UserService} from '@services/user';
-import {map, shareReplay} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -13,7 +13,7 @@ import {PictureModerVoteModalComponent} from './modal/modal.component';
 
 @Component({
   selector: 'app-picture-moder-vote',
-  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, UserComponent, AsyncPipe],
+  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, UserComponent],
   templateUrl: './picture-moder-vote.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -24,23 +24,47 @@ export class PictureModerVoteComponent {
   readonly #userService = inject(UserService);
 
   readonly picture = input.required<Picture>();
-  protected readonly picture$ = toObservable(this.picture);
 
   readonly changed = output<void>();
 
-  protected readonly votes$ = this.picture$.pipe(
-    map((picture) =>
-      (picture?.pictureModerVotes?.items || []).map((vote) => ({
-        reason: vote.reason,
-        user$: this.#userService.getUser$(vote.userId),
-        vote: vote.vote,
-      })),
-    ),
-  );
+  // Chained off the picture input signal directly rather than a raw Observable stored on an
+  // object and subscribed lazily by the template via `| async` (the previous shape here): that
+  // pattern races Angular's SSR whenStable() check the same way the Articles list author lookup
+  // did. resource() registers its pending task through Angular's reactive graph instead.
+  protected readonly voteUsersResource = rxResource({
+    id: 'picture-moder-vote-list-users',
+    params: () => [...new Set((this.picture().pictureModerVotes?.items || []).map((vote) => vote.userId))],
+    // A plain object rather than a Map: TransferState round-trips resource values through
+    // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+    // enumerable properties, no toJSON), losing all entries.
+    stream: ({params: userIds}): Observable<Record<string, User>> => {
+      if (userIds.length === 0) {
+        return of({});
+      }
+      return this.#userService.getUserMap$(userIds).pipe(
+        map((userMap) => Object.fromEntries(userMap)),
+        // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
+        // user rather than erroring the whole resource over one stale reference.
+        catchError(() => of({})),
+      );
+    },
+  });
 
-  protected readonly moderVoteTemplateOptions$ = this.#moderVoteTemplateService
-    .getTemplates$()
-    .pipe(shareReplay({bufferSize: 1, refCount: false}));
+  protected readonly votes = computed(() => {
+    const usersById = this.voteUsersResource.value() ?? {};
+
+    return (this.picture().pictureModerVotes?.items || []).map((vote) => ({
+      reason: vote.reason,
+      user: usersById[vote.userId] ?? null,
+      vote: vote.vote,
+    }));
+  });
+
+  protected readonly moderVoteTemplatesResource = rxResource({
+    id: 'picture-moder-vote-templates',
+    stream: () => this.#moderVoteTemplateService.getTemplates$(),
+  });
+
   protected reason = '';
   protected save = false;
 

@@ -1,6 +1,6 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, ComponentRef, inject, input, output} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {DatePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, ComponentRef, computed, inject, input, output} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
   CommentMessage,
@@ -10,6 +10,7 @@ import {
   CommentsVoteCommentRequest,
   GetMessageRequest,
   ModeratorAttention,
+  User,
 } from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -17,7 +18,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {UserTextComponent} from '@utils/user-text/user-text.component';
-import {EMPTY} from 'rxjs';
+import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {ToastsService} from '../../toasts/toasts.service';
@@ -32,16 +33,7 @@ export interface CommentInList extends CommentMessage {
 
 @Component({
   selector: 'app-comments-list',
-  imports: [
-    NgbTooltip,
-    UserComponent,
-    RouterLink,
-    UserTextComponent,
-    CommentsFormComponent,
-    AsyncPipe,
-    DatePipe,
-    TimeAgoPipe,
-  ],
+  imports: [NgbTooltip, UserComponent, RouterLink, UserTextComponent, CommentsFormComponent, DatePipe, TimeAgoPipe],
   templateUrl: './list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -53,31 +45,52 @@ export class CommentsListComponent {
   readonly #userService = inject(UserService);
 
   readonly itemID = input.required<string>();
-  protected readonly itemID$ = toObservable(this.itemID);
-
   readonly typeID = input.required<CommentsType>();
-  protected readonly typeID$ = toObservable(this.typeID);
-
   readonly messages = input.required<CommentInList[]>();
-  protected readonly messages$ = toObservable(this.messages).pipe(
-    map((messages) =>
-      messages.map((message) => ({
-        canVote$: this.auth.user$.pipe(map((user) => !!(user && user.id !== message.authorId))),
-        message,
-        user$: this.#userService.getUser$(message.authorId),
-      })),
-    ),
-  );
-
   readonly deep = input.required<number>();
-  protected readonly deep$ = toObservable(this.deep);
 
   readonly sent = output<string>();
 
-  protected readonly canRemoveComments$ = this.auth.hasRole$(Role.COMMENTS_MODER);
-  protected readonly canMoveMessage$ = this.auth.hasRole$(Role.FORUMS_MODER);
-  protected readonly isModer$ = this.auth.hasRole$(Role.MODER);
-  protected readonly authenticated$ = this.auth.authenticated$;
+  protected readonly currentUser = toSignal(this.auth.user$, {initialValue: null});
+
+  // Chained off the messages input signal directly rather than a raw Observable stored on an
+  // object and subscribed lazily by the template via `| async` (the previous shape here): that
+  // pattern races Angular's SSR whenStable() check the same way the Articles list author lookup
+  // did. resource() registers its pending task through Angular's reactive graph instead.
+  protected readonly usersResource = rxResource({
+    id: 'comments-list-users',
+    params: () => [...new Set(this.messages().map((message) => message.authorId))],
+    // A plain object rather than a Map: TransferState round-trips resource values through
+    // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+    // enumerable properties, no toJSON), losing all entries.
+    stream: ({params: userIds}): Observable<Record<string, User>> => {
+      if (userIds.length === 0) {
+        return of({});
+      }
+      return this.#userService.getUserMap$(userIds).pipe(
+        map((userMap) => Object.fromEntries(userMap)),
+        // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
+        // user rather than erroring the whole resource over one stale reference.
+        catchError(() => of({})),
+      );
+    },
+  });
+
+  protected readonly rows = computed(() => {
+    const usersById = this.usersResource.value() ?? {};
+    const currentUser = this.currentUser();
+
+    return this.messages().map((message) => ({
+      canVote: !!(currentUser && currentUser.id !== message.authorId),
+      message,
+      user: usersById[message.authorId] ?? null,
+    }));
+  });
+
+  protected readonly canRemoveComments = toSignal(this.auth.hasRole$(Role.COMMENTS_MODER), {initialValue: false});
+  protected readonly canMoveMessage = toSignal(this.auth.hasRole$(Role.FORUMS_MODER), {initialValue: false});
+  protected readonly isModer = toSignal(this.auth.hasRole$(Role.MODER), {initialValue: false});
+  protected readonly authenticated = toSignal(this.auth.authenticated$, {initialValue: false});
 
   protected readonly ModeratorAttention = ModeratorAttention;
 

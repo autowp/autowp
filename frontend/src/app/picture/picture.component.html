@@ -1,9 +1,9 @@
-@if (picture$ | async; as picture) {
+@if (picture(); as picture) {
   <div class="page-header">
     @if (h2()) {
       <h2>
         <span [innerHTML]="picture.nameHtml"></span>
-        @if (pictureItems$ | async; as items) {
+        @if (pictureItemsResource.value(); as items) {
           @if (items.length === 1 && items[0].item?.design) {
             @if (items[0].item?.design; as design) {
               <sup class="design-brand">
@@ -17,7 +17,7 @@
     } @else {
       <h1>
         <span [innerHTML]="picture.nameHtml"></span>
-        @if (pictureItems$ | async; as items) {
+        @if (pictureItemsResource.value(); as items) {
           @if (items.length === 1 && items[0].item?.design) {
             @if (items[0].item?.design; as design) {
               <sup class="design-brand">
@@ -44,7 +44,7 @@
           >
             <img alt="" class="rounded border border-light w-100" loading="lazy" [src]="picture.previewLarge.src" />
           </span>
-          @if (pictureItems$ | async; as pictureItems) {
+          @if (pictureItemsResource.value(); as pictureItems) {
             @if (pictureItems.length === 1) {
               @if (pictureItems[0].item; as item) {
                 @if (item.altNames && item.altNames.length > 0) {
@@ -71,7 +71,7 @@
         <div class="col-6">
           @if (picture.votes; as votes) {
             <div class="picture-vote">
-              @if (authenticated$ | async) {
+              @if (authenticated()) {
                 <button type="button" class="btn btn-link position-relative p-0 me-2" (click)="vote(picture, 1)">
                   <i
                     class="bi fs-1 vote-up"
@@ -97,7 +97,7 @@
                   }
                 </button>
               }
-              @if (authenticated$ | async) {
+              @if (authenticated()) {
                 <button type="button" class="btn btn-link position-relative p-0" (click)="vote(picture, -1)">
                   <i
                     class="bi fs-1 vote-down"
@@ -127,7 +127,7 @@
           }
         </div>
         <div class="col-6 text-end">
-          @if (authenticated$ | async) {
+          @if (authenticated()) {
             @if (!picture.subscribed) {
               <button
                 type="button"
@@ -165,7 +165,7 @@
       @if (showShareDialog() && location) {
         <app-share [url]="location.href" [text]="picture.nameText" />
       }
-      @if (pictureItems$ | async; as items) {
+      @if (pictureItemsResource.value(); as items) {
         @for (item of items; track item.itemId) {
           @if (item.type === PictureItemType.PICTURE_ITEM_AUTHOR) {
             <p>
@@ -180,7 +180,7 @@
           <remark [markdown]="picture.copyrights" />
         </div>
       }
-      @if (pictureItems$ | async; as pictureItems) {
+      @if (pictureItemsResource.value(); as pictureItems) {
         @for (pictureItem of pictureItems; track pictureItem.itemId) {
           @if (pictureItem.item; as item) {
             @if (pictureItem.type === PictureItemType.PICTURE_ITEM_COPYRIGHTS && item.description) {
@@ -189,7 +189,7 @@
           }
         }
       }
-      @for (pictureItem of contentItems$ | async; track pictureItem.itemId) {
+      @for (pictureItem of contentItems(); track pictureItem.itemId) {
         @if (pictureItem.item; as item) {
           @if (item.description) {
             <remark style="margin-bottom: 10px" [markdown]="item.description" />
@@ -229,7 +229,7 @@
             <ng-container i18n>Filesize</ng-container>: <strong>{{ picture.image.filesize | bytes: 2 }}</strong>
           </li>
         }
-        @if (owner$ | async; as owner) {
+        @if (ownerResource.value(); as owner) {
           <li>
             <ng-container i18n>Added by:</ng-container>
             <app-user [user]="owner" />,
@@ -238,7 +238,7 @@
             }
           </li>
         }
-        @if (takenDate$ | async; as takenDate) {
+        @if (takenDate(); as takenDate) {
           <li><ng-container i18n>Date taken:</ng-container> {{ takenDate.date | date: takenDate.format }}</li>
         }
         @if (osmURL(); as osmURL) {
@@ -267,26 +267,26 @@
   Discuss anything and just talk about cars and not only can you on [the forum](/forums/)."
       />
       <ul class="unstyled">
-        @for (link of links$ | async; track link) {
+        @for (link of linksResource.value(); track link) {
           <li>
             <a target="_blank" [href]="link.url"><i class="bi bi-globe" aria-hidden="true"></i> {{ link.name }}</a>
           </li>
         }
-        @for (category of categories$ | async; track category.id) {
+        @for (category of categoriesResource.value(); track category.id) {
           <li>
             <a [routerLink]="['/category', category.catname]">
               <i class="bi bi-tag-fill" aria-hidden="true"></i> <span [innerHTML]="category.nameHtml"></span>
             </a>
           </li>
         }
-        @for (group of twins$ | async; track group.id) {
+        @for (group of twinsResource.value(); track group.id) {
           <li>
             <a [routerLink]="['/twins/group', group.id]">
               <i class="bi bi-circle-half" aria-hidden="true"></i> <span [innerHTML]="group.nameHtml"></span>
             </a>
           </li>
         }
-        @for (factory of factories$ | async; track factory.id) {
+        @for (factory of factoriesResource.value(); track factory.id) {
           <li>
             <a [routerLink]="['/factories', factory.id]">
               <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>
@@ -294,8 +294,8 @@
             </a>
           </li>
         }
-        @if (canEditSpecs$ | async; as canEditSpecs) {
-          @if (pictureItems$ | async; as pictureItems) {
+        @if (authenticated(); as canEditSpecs) {
+          @if (pictureItemsResource.value(); as pictureItems) {
             @for (pictureItem of pictureItems; track pictureItem.itemId) {
               @if (pictureItem.item; as item) {
                 @if (
@@ -330,8 +330,8 @@
             }
           }
         }
-        @if (authenticated$ | async) {
-          @if (contentItems$ | async; as items) {
+        @if (authenticated()) {
+          @if (contentItems(); as items) {
             @if (items.length > 1) {
               <li ngbDropdown>
                 <button type="button" ngbDropdownToggle class="btn btn-link" style="padding: 0">
@@ -361,8 +361,8 @@
             }
           }
         }
-        @if (authenticated$ | async) {
-          @if (pictureItems$ | async; as pictureItems) {
+        @if (authenticated()) {
+          @if (pictureItemsResource.value(); as pictureItems) {
             @if (pictureItems.length > 0) {
               <li>
                 <a routerLink="/upload" [queryParams]="{replace: picture.id}">
@@ -379,7 +379,7 @@
       }
     </div>
   </div>
-  @if (moderVotes$ | async; as votes) {
+  @if (moderVotes(); as votes) {
     @if (votes.length > 0) {
       <div>
         <p i18n>Moderators about this picture:</p>
@@ -389,7 +389,7 @@
               @if (moderVote.vote) {
                 <span>
                   <i style="color: green" class="bi bi-hand-thumbs-up-fill" aria-hidden="true"></i>
-                  @if (moderVote.user$ | async; as user) {
+                  @if (moderVote.user; as user) {
                     <app-user [user]="user" />
                   }
                   <span style="color: green">{{ moderVote.reason }}</span>
@@ -397,7 +397,7 @@
               } @else {
                 <span>
                   <i style="color: red" class="bi bi-hand-thumbs-down-fill" aria-hidden="true"></i>
-                  @if (moderVote.user$ | async; as user) {
+                  @if (moderVote.user; as user) {
                     <app-user [user]="user" />
                   }
                   <span style="color: red">{{ moderVote.reason }}</span>
@@ -409,7 +409,7 @@
       </div>
     }
   }
-  @if ((isModer$ | async) && picture) {
+  @defer (when isModer()) {
     <div>
       <h3><a routerLink="/moder" i18n>Moderator page</a></h3>
       <div class="card card-body mb-4">
@@ -448,7 +448,7 @@
               }
             </div>
           }
-          @if (contentItems$ | async; as items) {
+          @if (contentItems(); as items) {
             @if (items.length > 0) {
               <div class="col-md-4">
                 <div class="d-block" i18n>Perspective</div>
@@ -469,7 +469,7 @@
               <i class="bi bi-gear-fill" aria-hidden="true"></i>
               <a i18n [routerLink]="['/moder/pictures', picture.id]">Edit picture №{{ picture.id }}</a>
             </p>
-            @if (pictureItems$ | async; as items) {
+            @if (pictureItemsResource.value(); as items) {
               @for (item of items; track item.itemId) {
                 <p>
                   <i class="bi bi-gear-fill" aria-hidden="true"></i>
@@ -478,7 +478,7 @@
                   </a>
                 </p>
               }
-              @for (brand of brands$ | async; track brand.id) {
+              @for (brand of brandsResource.value(); track brand.id) {
                 <p>
                   <i class="bi bi-gear-fill" aria-hidden="true"></i>
                   <a [routerLink]="['/moder/items/item', brand.id]">
