@@ -1,12 +1,10 @@
-import {HttpErrorResponse} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
-import {ActivatedRoute, NavigationExtras, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CanonicalRouteRequest,
   CommentsType,
-  Picture,
   PictureFields,
   PictureListOptions,
   PictureModerVoteRequest,
@@ -15,8 +13,9 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {from, Observable, of, throwError} from 'rxjs';
-import {catchError, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of, switchMap} from 'rxjs';
+import {distinctUntilChanged, map} from 'rxjs/operators';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
 import {PictureComponent} from './picture.component';
@@ -43,16 +42,6 @@ export class PicturePageComponent {
     {requireSync: true},
   );
 
-  // Router.navigate() is async (it goes through the same PendingTasks-tracked navigation
-  // pipeline SSR's whenStable() waits on), so a fire-and-forget call here would let this
-  // resource's stream complete with `undefined` and settle the resource before the redirect
-  // actually lands - the same untracked-timing-window class of bug as the debounceTime(10)
-  // removal above, just with the async gap coming from the Router instead of a timer. Folding
-  // the navigation Promise into the stream keeps the resource (and SSR) pending until the
-  // redirect has actually happened.
-  readonly #navigateAway = (commands: string[], extras: NavigationExtras): Observable<undefined> =>
-    from(this.#router.navigate(commands, extras)).pipe(map(() => undefined));
-
   // Chained off a signal rather than a raw Observable pipe with debounceTime(10): Angular's actual
   // SSR whenStable() (used by platform-server's renderApplication) tracks only
   // PendingTasksInternal, not zone macrotasks, so a setTimeout-based delay before this chain's
@@ -60,75 +49,97 @@ export class PicturePageComponent {
   // happened to resolve during that window, SSR could serialize before this chain, and everything
   // depending on it (the whole page), had even started. distinctUntilChanged already prevents
   // redundant refetches for the same identity.
+  protected readonly canonicalResource = rxResource({
+    id: 'picture-page-canonical',
+    params: () => this.#identity(),
+    stream: ({params: identity}) => {
+      if (!identity) {
+        return notFoundError();
+      }
+      return this.#picturesClient.getCanonicalRoute(new CanonicalRouteRequest({identity}));
+    },
+  });
+
+  // Only fetches once the canonical route has resolved to *this* page (an empty route) - while
+  // canonicalResource is still loading, or resolved to a redirect elsewhere, this stays idle so
+  // the picture is never fetched (and never briefly flashed) under the wrong URL.
   protected readonly pictureResource = rxResource({
     id: 'picture-page',
-    params: () => this.#identity(),
-    stream: ({params: identity}): Observable<Picture | undefined> => {
-      if (!identity) {
-        return this.#navigateAway(['/error-404'], {skipLocationChange: true});
+    params: () => ({canonical: this.canonicalResource.value(), identity: this.#identity()}),
+    stream: ({params: {identity, canonical}}) => {
+      if (!identity || !canonical || (canonical.route && canonical.route.length > 0)) {
+        return of(undefined);
       }
 
-      return this.#picturesClient.getCanonicalRoute(new CanonicalRouteRequest({identity})).pipe(
-        catchError((response: unknown) => {
-          if (response instanceof HttpErrorResponse && response.status === 404) {
-            return this.#navigateAway(['/error-404'], {skipLocationChange: true});
-          }
-          return throwError(() => response);
-        }),
-        switchMap((canonical) => {
-          if (!canonical) {
-            return of(undefined);
-          }
-          if (canonical.route && canonical.route.length > 0) {
-            return this.#navigateAway(canonical.route, {replaceUrl: true});
-          }
-
-          return this.#picturesClient.getPicture(
-            new PicturesRequest({
-              fields: new PictureFields({
-                copyrights: true,
-                image: true,
-                moderVoted: true,
-                nameHtml: true,
-                nameText: true,
-                pictureModerVotes: new PictureModerVoteRequest(),
-                previewLarge: true,
-                replaceable: new PicturesRequest({
-                  fields: new PictureFields({nameHtml: true}),
-                }),
-                rights: true,
-                subscribed: true,
-                votes: true,
+      return this.#picturesClient
+        .getPicture(
+          new PicturesRequest({
+            fields: new PictureFields({
+              copyrights: true,
+              image: true,
+              moderVoted: true,
+              nameHtml: true,
+              nameText: true,
+              pictureModerVotes: new PictureModerVoteRequest(),
+              previewLarge: true,
+              replaceable: new PicturesRequest({
+                fields: new PictureFields({nameHtml: true}),
               }),
-              language: this.#languageService.language,
-              options: new PictureListOptions({identity}),
+              rights: true,
+              subscribed: true,
+              votes: true,
             }),
-          );
-        }),
-        switchMap((picture) => {
-          if (!picture) {
-            return this.#navigateAway(['/error-404'], {skipLocationChange: true});
-          }
-          return of(picture);
-        }),
-        tap((picture) => {
-          if (!picture) {
-            return;
-          }
-          this.#meta.updateTag({property: 'og:title', content: picture.nameText});
-          if (picture.previewLarge) {
-            this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
-          }
-          this.#pageEnv.set({
-            pageId: 187,
-            title: picture.nameText,
-          });
-        }),
-      );
+            language: this.#languageService.language,
+            options: new PictureListOptions({identity}),
+          }),
+        )
+        .pipe(switchMap((picture) => (picture ? of(picture) : notFoundError())));
     },
   });
 
   protected readonly CommentsType = CommentsType;
+
+  constructor() {
+    // Router.navigate() is fire-and-forget here (not folded into either resource's stream): it
+    // runs outside both resources' own pending-task lifecycles, so there's no window where a
+    // resource can settle and let SSR's whenStable() serialize before the redirect it triggered
+    // has actually registered.
+    effect(() => {
+      if (isNotFoundError(this.canonicalResource.error()) || isNotFoundError(this.pictureResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
+      // template instead) doesn't blow up this effect.
+      if (!this.canonicalResource.hasValue()) {
+        return;
+      }
+
+      const canonical = this.canonicalResource.value();
+      if (canonical.route && canonical.route.length > 0) {
+        void this.#router.navigate(canonical.route, {replaceUrl: true});
+        return;
+      }
+
+      if (!this.pictureResource.hasValue()) {
+        return;
+      }
+
+      const picture = this.pictureResource.value();
+      if (picture) {
+        this.#meta.updateTag({property: 'og:title', content: picture.nameText});
+        if (picture.previewLarge) {
+          this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
+        }
+        this.#pageEnv.set({
+          pageId: 187,
+          title: picture.nameText,
+        });
+      }
+    });
+  }
 
   protected reloadPicture() {
     this.pictureResource.reload();
