@@ -15,7 +15,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {of, switchMap} from 'rxjs';
-import {distinctUntilChanged, map} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
 import {PictureComponent} from './picture.component';
@@ -34,13 +34,9 @@ export class PicturePageComponent {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #identity = toSignal(
-    this.#route.paramMap.pipe(
-      map((route) => route.get('identity')),
-      distinctUntilChanged(),
-    ),
-    {requireSync: true},
-  );
+  readonly #identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
+    requireSync: true,
+  });
 
   // Chained off a signal rather than a raw Observable pipe with debounceTime(10): Angular's actual
   // SSR whenStable() (used by platform-server's renderApplication) tracks only

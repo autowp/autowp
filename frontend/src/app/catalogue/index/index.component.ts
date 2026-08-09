@@ -27,7 +27,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {getCatalogueSectionsTranslation} from '@utils/translations';
 import {RemarkModule} from 'ngx-remark';
 import {forkJoin, Observable, of} from 'rxjs';
-import {catchError, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
+import {catchError, map, switchMap, tap} from 'rxjs/operators';
 
 import {chunk, chunkBy} from '../../chunk';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
@@ -60,13 +60,9 @@ export class CatalogueIndexComponent {
 
   protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER), {initialValue: false});
 
-  readonly #catname = toSignal(
-    this.#route.paramMap.pipe(
-      map((params) => params.get('brand')),
-      distinctUntilChanged(),
-    ),
-    {requireSync: true},
-  );
+  readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
+    requireSync: true,
+  });
 
   // Chained resources (below) register their pending task through Angular's reactive graph
   // (an effect scheduled at construction) rather than lazy template `| async` subscription, so
