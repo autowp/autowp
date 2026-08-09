@@ -2,7 +2,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, NavigationExtras, Router, RouterLink} from '@angular/router';
 import {
   CanonicalRouteRequest,
   CommentsType,
@@ -15,7 +15,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {Observable, of, throwError} from 'rxjs';
+import {from, Observable, of, throwError} from 'rxjs';
 import {catchError, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
@@ -43,6 +43,16 @@ export class PicturePageComponent {
     {requireSync: true},
   );
 
+  // Router.navigate() is async (it goes through the same PendingTasks-tracked navigation
+  // pipeline SSR's whenStable() waits on), so a fire-and-forget call here would let this
+  // resource's stream complete with `undefined` and settle the resource before the redirect
+  // actually lands - the same untracked-timing-window class of bug as the debounceTime(10)
+  // removal above, just with the async gap coming from the Router instead of a timer. Folding
+  // the navigation Promise into the stream keeps the resource (and SSR) pending until the
+  // redirect has actually happened.
+  readonly #navigateAway = (commands: string[], extras: NavigationExtras): Observable<undefined> =>
+    from(this.#router.navigate(commands, extras)).pipe(map(() => undefined));
+
   // Chained off a signal rather than a raw Observable pipe with debounceTime(10): Angular's actual
   // SSR whenStable() (used by platform-server's renderApplication) tracks only
   // PendingTasksInternal, not zone macrotasks, so a setTimeout-based delay before this chain's
@@ -55,19 +65,13 @@ export class PicturePageComponent {
     params: () => this.#identity(),
     stream: ({params: identity}): Observable<Picture | undefined> => {
       if (!identity) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return of(undefined);
+        return this.#navigateAway(['/error-404'], {skipLocationChange: true});
       }
 
       return this.#picturesClient.getCanonicalRoute(new CanonicalRouteRequest({identity})).pipe(
         catchError((response: unknown) => {
           if (response instanceof HttpErrorResponse && response.status === 404) {
-            this.#router.navigate(['/error-404'], {
-              skipLocationChange: true,
-            });
-            return of(undefined);
+            return this.#navigateAway(['/error-404'], {skipLocationChange: true});
           }
           return throwError(() => response);
         }),
@@ -76,10 +80,7 @@ export class PicturePageComponent {
             return of(undefined);
           }
           if (canonical.route && canonical.route.length > 0) {
-            this.#router.navigate(canonical.route, {
-              replaceUrl: true,
-            });
-            return of(undefined);
+            return this.#navigateAway(canonical.route, {replaceUrl: true});
           }
 
           return this.#picturesClient.getPicture(
@@ -106,10 +107,7 @@ export class PicturePageComponent {
         }),
         switchMap((picture) => {
           if (!picture) {
-            this.#router.navigate(['/error-404'], {
-              skipLocationChange: true,
-            });
-            return of(undefined);
+            return this.#navigateAway(['/error-404'], {skipLocationChange: true});
           }
           return of(picture);
         }),
