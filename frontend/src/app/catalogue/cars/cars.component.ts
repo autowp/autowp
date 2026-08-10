@@ -1,6 +1,6 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   BrandVehicleType,
   GetBrandVehicleTypesRequest,
@@ -28,30 +28,54 @@ import {
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
 import {getVehicleTypeTranslation} from '@utils/translations';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {Observable, of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {convertChildsCounts} from '../catalogue-service';
 
 @Component({
   selector: 'app-catalogue-cars',
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
+  imports: [RouterLink, PaginatorComponent, CatalogueListItemComponent],
   templateUrl: './cars.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueCarsComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly brand$: Observable<Item> = this.#route.paramMap.pipe(
-    map((params) => params.get('brand')),
-    distinctUntilChanged(),
-    switchMap((catname) => {
+  readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
+    requireSync: true,
+  });
+
+  protected readonly vehicleTypeCatname = toSignal(
+    this.#route.paramMap.pipe(map((params) => params.get('vehicle_type'))),
+    {requireSync: true},
+  );
+
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
+
+  // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
+  // than an imperative Router.navigate() inside the stream (which races SSR's whenStable() the
+  // same way the picture-page canonicalResource did) - see the constructor effect() below, which
+  // is the single place that navigates off this resource's error() signal.
+  //
+  // `id` is suffixed with the brand catname read once at construction time - a static id would
+  // let a second instance of this component, created by navigating away and to a different
+  // brand's cars page before Angular's whenStable() ever resolves, match TransferState's
+  // still-present entry from the first brand and seed itself with the wrong data.
+  protected readonly brandResource = rxResource({
+    id: `catalogue-cars-brand-${this.#catname() ?? ''}`,
+    params: () => this.#catname(),
+    stream: ({params: catname}): Observable<Item> => {
       if (!catname) {
-        return EMPTY;
+        return notFoundError();
       }
       return this.#itemsClient
         .list(
@@ -67,87 +91,94 @@ export class CatalogueCarsComponent {
             }),
           }),
         )
-        .pipe(map((response) => (response.items?.length ? response.items[0] : null)));
-    }),
-    switchMap((brand) => (brand ? of(brand) : EMPTY)),
-    shareReplay({bufferSize: 1, refCount: false}),
+        .pipe(
+          switchMap((response) => {
+            if (!response.items || response.items.length <= 0) {
+              return notFoundError();
+            }
+            return of(response.items[0]);
+          }),
+        );
+    },
+  });
+
+  protected readonly vehicleTypesResource = rxResource({
+    id: `catalogue-cars-vehicle-types-${this.#catname() ?? ''}`,
+    params: () => this.brandResource.value(),
+    stream: ({params: brand}): Observable<BrandVehicleType[]> =>
+      this.#itemsClient
+        .getBrandVehicleTypes(new GetBrandVehicleTypesRequest({brandId: +brand.id}))
+        .pipe(map((response) => response.items || [])),
+  });
+
+  protected readonly currentVehicleType = computed(() =>
+    this.vehicleTypesResource.value()?.find((type) => type.catname === this.vehicleTypeCatname()),
   );
 
-  readonly #vehicleTypes$: Observable<BrandVehicleType[]> = this.brand$.pipe(
-    switchMap((brand) => this.#itemsClient.getBrandVehicleTypes(new GetBrandVehicleTypesRequest({brandId: +brand.id}))),
-    map((vehicleTypes) => (vehicleTypes.items ? vehicleTypes.items : [])),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  protected readonly title = computed<string | undefined>(() => {
+    const brand = this.brandResource.hasValue() ? this.brandResource.value() : undefined;
+    if (!brand) {
+      return undefined;
+    }
 
-  protected readonly currentVehicleType$: Observable<BrandVehicleType | undefined> = combineLatest([
-    this.brand$,
-    this.#vehicleTypes$,
-    this.#route.paramMap.pipe(
-      map((params) => params.get('vehicle_type')),
-      distinctUntilChanged(),
-      debounceTime(10),
-    ),
-  ]).pipe(
-    map(([brand, vehicleTypes, vehicleTypeCatname]) => {
-      const currentVehicleType = vehicleTypes.find((type) => type.catname === vehicleTypeCatname);
+    const currentVehicleType = this.currentVehicleType();
+    const itemName =
+      brand.nameOnly + (currentVehicleType ? ' ' + getVehicleTypeTranslation(currentVehicleType.name) : '');
 
-      if (brand) {
-        let itemName = brand.nameOnly;
-        let pageId = 14;
-        if (currentVehicleType) {
-          itemName += ' ' + getVehicleTypeTranslation(currentVehicleType.name);
-          pageId = 138;
-        }
-        this.#pageEnv.set({
-          pageId,
-          title: $localize`${itemName} in chronological order`,
-        });
+    return $localize`${itemName} in chronological order`;
+  });
+
+  protected readonly vehicleTypeOptions = computed(() => {
+    const brand = this.brandResource.hasValue() ? this.brandResource.value() : undefined;
+    if (!brand) {
+      return [];
+    }
+
+    const current = this.currentVehicleType();
+
+    return (this.vehicleTypesResource.value() ?? []).map((type) => ({
+      active: !!(current && type.id === current.id),
+      id: type.id,
+      itemsCount: type.itemsCount,
+      name: getVehicleTypeTranslation(type.name),
+      route: ['/', brand.catname, 'cars', type.catname],
+    }));
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
       }
 
-      return currentVehicleType;
+      const title = this.title();
+      if (title === undefined) {
+        return;
+      }
+
+      this.#pageEnv.set({
+        pageId: this.currentVehicleType() ? 138 : 14,
+        title,
+      });
+    });
+  }
+
+  protected readonly resultResource = rxResource({
+    id: `catalogue-cars-result-${this.#catname() ?? ''}`,
+    params: () => ({
+      brand: this.brandResource.value(),
+      currentVehicleType: this.currentVehicleType(),
+      page: this.#page(),
     }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+    stream: ({
+      params: {brand, currentVehicleType, page},
+    }): Observable<undefined | {items: CatalogueListItem[]; paginator: Pages | undefined}> => {
+      if (!brand) {
+        return of(undefined);
+      }
 
-  protected readonly title$ = combineLatest([this.brand$, this.currentVehicleType$]).pipe(
-    map(([brand, currentVehicleType]) => {
-      const itemName =
-        brand.nameOnly + (currentVehicleType ? ' ' + getVehicleTypeTranslation(currentVehicleType.name) : '');
-      return $localize`${itemName} in chronological order`;
-    }),
-  );
-
-  protected readonly vehicleTypeOptions$: Observable<
-    {
-      active: boolean;
-      id: number;
-      itemsCount: string;
-      name: string;
-      route: string[];
-    }[]
-  > = combineLatest([this.#vehicleTypes$, this.currentVehicleType$, this.brand$]).pipe(
-    map(([types, current, brand]) =>
-      types.map((t) => ({
-        active: !!(current && t.id === current.id),
-        id: t.id,
-        itemsCount: t.itemsCount,
-        name: getVehicleTypeTranslation(t.name),
-        route: ['/', brand.catname, 'cars', t.catname],
-      })),
-    ),
-  );
-
-  protected readonly result$: Observable<{items: CatalogueListItem[]; paginator: Pages | undefined}> = combineLatest([
-    this.brand$,
-    this.currentVehicleType$,
-    this.#route.queryParamMap.pipe(
-      map((params) => parseInt(params.get('page') ?? '', 10)),
-      distinctUntilChanged(),
-      debounceTime(10),
-    ),
-  ]).pipe(
-    switchMap(([brand, currentVehicleType, page]) =>
-      this.#itemsClient
+      return this.#itemsClient
         .list(
           new ItemsRequest({
             fields: new ItemFields({
@@ -247,7 +278,7 @@ export class CatalogueCarsComponent {
               paginator: response.paginator,
             };
           }),
-        ),
-    ),
-  );
+        );
+    },
+  });
 }

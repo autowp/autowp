@@ -38,8 +38,8 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server,
   },
   // No `/**` here deliberately: only the bare brand page (e.g. /toyota) is server-rendered, not
-  // most other things nested under it (e.g. /toyota/corolla, /toyota/cars, /toyota/moder-only...).
-  // A path with more segments than this fails to match this node (it has no children) and falls
+  // most other things nested under it (e.g. /toyota/corolla, /toyota/moder-only-routes...). A
+  // path with more segments than this fails to match this node (it has no children) and falls
   // through to the final Client catch-all below instead - except the entries below, which have
   // their own more specific paths and are matched first. :brand/{mixed,other,logotypes}/** all
   // share the same CatalogueMixed*Component classes.
@@ -61,6 +61,10 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: ':brand/recent',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: ':brand/cars/**',
     renderMode: RenderMode.Server,
   },
   // Every other top-level route pinned to Client explicitly. `:brand` above is a generic
