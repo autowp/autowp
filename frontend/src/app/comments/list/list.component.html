@@ -5,9 +5,9 @@
     [class.deleted]="row.message.deleted"
   >
     <div>
-      @if (row.message.createTime) {
-        <div class="float-end" [ngbTooltip]="row.message.createTime.toDate() | date: 'medium'">
-          {{ row.message.createTime.toDate() | timeAgo }}
+      @if (row.createdDate; as createdDate) {
+        <div class="float-end" [ngbTooltip]="createdDate | date: 'medium'">
+          {{ createdDate | timeAgo }}
         </div>
       }
       @if (row.user; as user) {

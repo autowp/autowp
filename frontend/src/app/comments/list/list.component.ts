@@ -28,6 +28,7 @@ import {NgbModal, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import {timestampToDate} from '@utils/timestamp';
 import {UserTextComponent} from '@utils/user-text/user-text.component';
 import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
@@ -105,6 +106,11 @@ export class CommentsListComponent implements OnInit {
 
     return this.messages().map((message) => ({
       canVote: !!(currentUser && currentUser.id !== message.authorId),
+      // Computed here (from seconds/nanos) rather than via message.createTime.toDate() in the
+      // template: after this component is recreated from a TransferState-seeded resource on
+      // hydration, `message` is a plain JSON-shaped object, not a real CommentMessage class
+      // instance, so createTime has no .toDate() method even though it still has seconds/nanos.
+      createdDate: timestampToDate(message.createTime),
       message,
       user: usersById[message.authorId] ?? null,
     }));

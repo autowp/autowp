@@ -49,6 +49,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import {timestampToDate} from '@utils/timestamp';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable, of} from 'rxjs';
@@ -105,6 +106,12 @@ export class PictureComponent implements OnInit {
   readonly changed = output<boolean>();
 
   readonly picture = input.required<Picture>();
+
+  // Uses timestampToDate() rather than picture().createTime?.toDate() directly in the template:
+  // after this component is recreated from a TransferState-seeded resource on hydration (see the
+  // ngOnInit() note below), `picture()` is a plain JSON-shaped object, not a real Picture class
+  // instance, so createTime has no .toDate() method even though it still has seconds/nanos.
+  protected readonly createdDate = computed(() => timestampToDate(this.picture().createTime));
 
   protected readonly osmURL = computed(() => {
     const point = this.picture().point;
