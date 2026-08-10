@@ -1,19 +1,20 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Item, ItemFields, ItemListOptions, ItemsRequest, Picture} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, Observable, of} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {Observable, of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {GalleryComponent} from '../../../gallery/gallery.component';
 import {BrandPerspectivePageData} from '../../catalogue.module';
 
 @Component({
   selector: 'app-catalogue-mixed-gallery',
-  imports: [GalleryComponent, AsyncPipe],
+  imports: [GalleryComponent],
   templateUrl: './gallery.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -24,63 +25,70 @@ export class CatalogueMixedGalleryComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly identity$: Observable<string> = this.#route.paramMap.pipe(
-    map((route) => route.get('identity') || ''),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((identity) => {
-      if (!identity) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
+  readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
+    requireSync: true,
+  });
 
-      return of(identity);
-    }),
-  );
+  protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
+    requireSync: true,
+  });
 
-  protected readonly brand$: Observable<Item> = this.#route.paramMap.pipe(
-    map((params) => params.get('brand')),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((catname) => {
-      if (!catname) {
-        return EMPTY;
+  // Static per-route config (mixed/other/logotypes each declare their own `data`), not a resolver
+  // that changes without a fresh component instance, so requireSync is safe here.
+  protected readonly data = toSignal(this.#route.data as Observable<BrandPerspectivePageData>, {requireSync: true});
+
+  // Missing catname/identity, or a not-found brand, are all surfaced as a NOT_FOUND resource
+  // error rather than an imperative Router.navigate() inside the stream — see the constructor
+  // effect() below, which is the single place that navigates off this resource's error() signal.
+  //
+  // `id` is suffixed with data().catname (mixed/other/logotypes all share this component) and the
+  // brand catname read once at construction time — see the identical note on
+  // CatalogueMixedComponent.brandResource in ../mixed.component.ts.
+  protected readonly brandResource = rxResource({
+    id: `catalogue-mixed-gallery-brand-${this.data().catname}-${this.#catname() ?? ''}`,
+    params: () => ({catname: this.#catname(), identity: this.identity()}),
+    stream: ({params: {catname, identity}}): Observable<Item> => {
+      if (!catname || !identity) {
+        return notFoundError();
       }
-      return this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({
-            nameHtml: true,
-            nameText: true,
+      return this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({
+              nameHtml: true,
+              nameText: true,
+            }),
+            language: this.#languageService.language,
+            limit: 1,
+            options: new ItemListOptions({
+              catname,
+            }),
           }),
-          language: this.#languageService.language,
-          limit: 1,
-          options: new ItemListOptions({
-            catname,
+        )
+        .pipe(
+          switchMap((response) => {
+            if (!response.items || response.items.length <= 0) {
+              return notFoundError();
+            }
+            return of(response.items[0]);
           }),
-        }),
-      );
-    }),
-    map((response) => (response.items?.length ? response.items[0] : null)),
-    switchMap((brand) => {
-      if (!brand) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
+        );
+    },
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
       }
-      return of(brand);
-    }),
-  );
+    });
+  }
 
-  protected readonly data$ = this.#route.data as Observable<BrandPerspectivePageData>;
-
-  protected pictureSelected(data: BrandPerspectivePageData, item: null | Picture) {
+  protected pictureSelected(item: null | Picture) {
     if (item) {
       this.#pageEnv.set({
         layout: {isGalleryPage: true},
-        pageId: data.picture_page.id,
+        pageId: this.data().picture_page.id,
         title: item.nameText,
       });
     }

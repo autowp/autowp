@@ -1,5 +1,5 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -20,16 +20,16 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {CommentsComponent} from 'app/comments/comments/comments.component';
-import {isNotFoundError} from 'app/grpc';
+import {isNotFoundError, notFoundError} from 'app/grpc';
 import {PictureComponent} from 'app/picture/picture.component';
-import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {BrandPerspectivePageData} from '../../catalogue.module';
 
 @Component({
   selector: 'app-catalogue-mixed-picture',
-  imports: [RouterLink, CommentsComponent, AsyncPipe, PictureComponent],
+  imports: [RouterLink, CommentsComponent, PictureComponent],
   templateUrl: './picture.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -42,73 +42,74 @@ export class CatalogueMixedPictureComponent {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly changed$ = new BehaviorSubject<void>(void 0);
-
   protected readonly CommentsType = CommentsType;
 
-  protected readonly brand$: Observable<Item> = this.#route.paramMap.pipe(
-    map((params) => params.get('brand')),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((catname) => {
-      if (!catname) {
-        return EMPTY;
+  readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
+    requireSync: true,
+  });
+
+  protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
+    requireSync: true,
+  });
+
+  // Static per-route config (mixed/other/logotypes each declare their own `data`), not a resolver
+  // that changes without a fresh component instance, so requireSync is safe here.
+  protected readonly data = toSignal(this.#route.data as Observable<BrandPerspectivePageData>, {requireSync: true});
+
+  // Missing catname/identity, or a not-found brand, are all surfaced as a NOT_FOUND resource
+  // error rather than an imperative Router.navigate() inside the stream — see the constructor
+  // effect() below, which is the single place that navigates off this resource's error() signal.
+  //
+  // `id` is suffixed with data().catname (mixed/other/logotypes all share this component) and the
+  // brand catname read once at construction time — see the identical note on
+  // CatalogueMixedComponent.brandResource in ../mixed.component.ts.
+  protected readonly brandResource = rxResource({
+    id: `catalogue-mixed-picture-brand-${this.data().catname}-${this.#catname() ?? ''}`,
+    params: () => ({catname: this.#catname(), identity: this.identity()}),
+    stream: ({params: {catname, identity}}): Observable<Item> => {
+      if (!catname || !identity) {
+        return notFoundError();
       }
-
-      return this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({
-            nameHtml: true,
-            nameText: true,
+      return this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({
+              nameHtml: true,
+              nameText: true,
+            }),
+            language: this.#languageService.language,
+            limit: 1,
+            options: new ItemListOptions({
+              catname,
+            }),
           }),
-          language: this.#languageService.language,
-          limit: 1,
-          options: new ItemListOptions({
-            catname,
+        )
+        .pipe(
+          switchMap((response) => {
+            if (!response.items || response.items.length <= 0) {
+              return notFoundError();
+            }
+            return of(response.items[0]);
           }),
-        }),
-      );
-    }),
-    map((response) => (response.items?.length ? response.items[0] : null)),
-    switchMap((brand) => {
-      if (!brand) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(brand);
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+        );
+    },
+  });
 
-  protected readonly data$ = (this.#route.data as Observable<BrandPerspectivePageData>).pipe(
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
-
-  protected readonly identity$ = this.#route.paramMap.pipe(
-    map((route) => route.get('identity')),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((identity) => {
+  // Only fetches once brandResource has resolved - while it's still loading or in an error state,
+  // this stays idle so the picture is never fetched (and never briefly flashed) under the wrong
+  // brand.
+  protected readonly pictureResource = rxResource({
+    id: `catalogue-mixed-picture-${this.data().catname}-${this.#catname() ?? ''}-${this.identity() ?? ''}`,
+    params: () => this.brandResource.value(),
+    stream: ({params: brand}): Observable<Picture> => {
+      const identity = this.identity();
       if (!identity) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
+        return notFoundError();
       }
-      return of(identity);
-    }),
-  );
 
-  protected readonly picture$: Observable<Picture> = combineLatest([
-    this.brand$,
-    this.data$,
-    this.identity$,
-    this.changed$,
-  ]).pipe(
-    switchMap(([brand, data, identity]) =>
-      this.#picturesClient
+      const data = this.data();
+
+      return this.#picturesClient
         .getPicture(
           new PicturesRequest({
             fields: new PictureFields({
@@ -149,39 +150,41 @@ export class CatalogueMixedPictureComponent {
             }),
           }),
         )
-        .pipe(
-          catchError((error: unknown) => {
-            if (isNotFoundError(error)) {
-              // NOT_FOUND
-              return of(null);
-            }
-            console.error(error);
-            return throwError(() => error);
-          }),
-          switchMap((picture) => {
-            if (!picture) {
-              this.#router.navigate(['/error-404'], {
-                skipLocationChange: true,
-              });
-              return EMPTY;
-            }
-            return of(picture);
-          }),
-          tap((picture) => {
-            this.#meta.updateTag({property: 'og:title', content: picture.nameText});
-            if (picture.previewLarge) {
-              this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
-            }
-            this.#pageEnv.set({
-              pageId: data.picture_page.id,
-              title: picture.nameText,
-            });
-          }),
-        ),
-    ),
-  );
+        .pipe(switchMap((picture) => (picture ? of(picture) : notFoundError())));
+    },
+  });
+
+  constructor() {
+    // Router.navigate() is fire-and-forget here (not folded into either resource's stream): it
+    // runs outside both resources' own pending-task lifecycles, so there's no window where a
+    // resource can settle and let SSR's whenStable() serialize before the redirect it triggered
+    // has actually registered.
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error()) || isNotFoundError(this.pictureResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
+      // template instead) doesn't blow up this effect.
+      if (!this.pictureResource.hasValue()) {
+        return;
+      }
+
+      const picture = this.pictureResource.value();
+      this.#meta.updateTag({property: 'og:title', content: picture.nameText});
+      if (picture.previewLarge) {
+        this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
+      }
+      this.#pageEnv.set({
+        pageId: this.data().picture_page.id,
+        title: picture.nameText,
+      });
+    });
+  }
 
   protected reloadPicture() {
-    this.changed$.next();
+    this.pictureResource.reload();
   }
 }
