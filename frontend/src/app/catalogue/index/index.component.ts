@@ -1,5 +1,6 @@
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   GetBrandSectionsRequest,
@@ -25,13 +26,13 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {getCatalogueSectionsTranslation} from '@utils/translations';
+import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {forkJoin, Observable, of} from 'rxjs';
-import {catchError, map, switchMap, tap} from 'rxjs/operators';
+import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {chunk, chunkBy} from '../../chunk';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
-import {ToastsService} from '../../toasts/toasts.service';
 import {CatalogueService} from '../catalogue-service';
 
 interface PictureRoute {
@@ -47,13 +48,13 @@ interface PictureRoute {
 })
 export class CatalogueIndexComponent {
   readonly #pageEnv = inject(PageEnvService);
+  readonly #meta = inject(Meta);
   readonly #route = inject(ActivatedRoute);
   readonly #auth = inject(AuthService);
   readonly #router = inject(Router);
   readonly #catalogue = inject(CatalogueService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
-  readonly #toastService = inject(ToastsService);
   readonly #picturesClient = inject(PicturesClient);
 
   protected readonly ItemType = ItemType;
@@ -72,15 +73,17 @@ export class CatalogueIndexComponent {
   // hydration — notably useful here since isModer depends on client-side Keycloak
   // initialization, which can take a real amount of time; without `id` the whole page would
   // blank-and-reload on every hydration waiting for it, even though SSR already has the data.
+  //
+  // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
+  // than an imperative Router.navigate() inside the stream (which raced SSR's whenStable() the
+  // same way the picture-page canonicalResource did) — see the constructor effect() below, which
+  // is the single place that navigates or toasts off this resource's error()/value() signals.
   protected readonly brandResource = rxResource({
     id: 'catalogue-brand',
     params: () => ({catname: this.#catname(), isModer: this.isModer()}),
-    stream: ({params: {catname, isModer}}): Observable<Item | undefined> => {
+    stream: ({params: {catname, isModer}}): Observable<Item> => {
       if (!catname) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return of(undefined);
+        return notFoundError();
       }
 
       const fields = new ItemFields({
@@ -109,31 +112,48 @@ export class CatalogueIndexComponent {
           }),
         )
         .pipe(
-          catchError((response: unknown) => {
-            this.#toastService.handleError(response);
-            return of(undefined);
-          }),
           switchMap((response) => {
-            if (!response || !response.items || response.items.length <= 0) {
-              this.#router.navigate(['/error-404'], {
-                skipLocationChange: true,
-              });
-              return of(undefined);
+            if (!response.items || response.items.length <= 0) {
+              return notFoundError();
             }
 
             return of(response.items[0]);
           }),
-          tap((brand) => {
-            if (brand) {
-              this.#pageEnv.set({
-                pageId: 10,
-                title: brand.nameText,
-              });
-            }
-          }),
         );
     },
   });
+
+  constructor() {
+    // Router.navigate() is fire-and-forget here (not folded into the resource stream): it runs
+    // outside brandResource's own pending-task lifecycle, so there's no window where the resource
+    // can settle and let SSR's whenStable() serialize before the redirect it triggered has
+    // actually registered - matching the pattern in ArticlesArticleComponent/PicturePageComponent.
+    // Non-NOT_FOUND errors aren't toasted here - the template already renders
+    // `brandResource.error().message` inline, so a toast would just duplicate it.
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that.
+      if (!this.brandResource.hasValue()) {
+        return;
+      }
+
+      const brand = this.brandResource.value();
+      this.#meta.updateTag({property: 'og:title', content: brand.nameText});
+      if (brand.logo120) {
+        this.#meta.updateTag({property: 'og:image', content: brand.logo120.src});
+      }
+
+      this.#pageEnv.set({
+        pageId: 10,
+        title: brand.nameText,
+      });
+    });
+  }
 
   protected readonly picturesResource = rxResource({
     id: 'catalogue-brand-pictures',
