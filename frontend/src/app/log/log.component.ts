@@ -1,15 +1,18 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
+  Item,
   ItemFields,
   ItemRequest,
   LogEvent,
   LogEventsRequest,
+  Picture,
   PictureFields,
   PictureListOptions,
   PicturesRequest,
+  User,
 } from '@grpc/spec.pb';
 import {ItemsClient, LogClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -17,23 +20,29 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {EMPTY} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {forkJoin, Observable, of} from 'rxjs';
+import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
-import {ToastsService} from '../toasts/toasts.service';
 import {UserComponent} from '../user/user/user.component';
+
+interface LogEventView {
+  createdAt: Date | undefined;
+  description: string;
+  items: Item[];
+  pictures: Picture[];
+  user: null | User;
+}
 
 @Component({
   selector: 'app-log',
-  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, AsyncPipe, DatePipe, TimeAgoPipe],
+  imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, DatePipe, TimeAgoPipe],
   templateUrl: './log.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LogComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #logClient = inject(LogClient);
   readonly #userService = inject(UserService);
   readonly #itemsClient = inject(ItemsClient);
@@ -78,44 +87,66 @@ export class LogComponent implements OnInit {
           }),
         )
         .pipe(
-          map((response) => ({
-            items: (response.items || []).map((event) => this.#mapEvent(event)),
-            paginator: response.paginator,
-          })),
+          // Each event's referenced items/pictures/user are resolved here, inside the resource's
+          // own stream, rather than left as raw Observables for the template to subscribe lazily
+          // via `| async` - the latter can race SSR's whenStable() check the same way the Articles
+          // list author-lookup did (see the comment on CatalogueIndexComponent.brandResource).
+          switchMap((response) => {
+            const events = response.items || [];
+            const items$: Observable<LogEventView[]> =
+              events.length > 0 ? forkJoin(events.map((event) => this.#mapEvent(event))) : of([]);
+
+            return items$.pipe(map((items) => ({items, paginator: response.paginator})));
+          }),
         ),
   });
 
-  #mapEvent(event: LogEvent) {
-    return {
-      createdAt: event.createTime?.toDate(),
-      description: event.description,
-      items: event.items.map((item) =>
-        this.#itemsClient.item(
-          new ItemRequest({
-            fields: new ItemFields({nameHtml: true}),
-            id: item,
-            language: this.#languageService.language,
-          }),
-        ),
-      ),
-      pictures: event.pictures.map((item) =>
-        this.#picturesClient
-          .getPicture(
-            new PicturesRequest({
-              fields: new PictureFields({nameHtml: true}),
-              language: this.#languageService.language,
-              options: new PictureListOptions({id: item}),
-            }),
-          )
-          .pipe(
-            catchError((response: unknown) => {
-              this.#toastService.handleError(response);
-              return EMPTY;
-            }),
-          ),
-      ),
-      user$: this.#userService.getUser$(event.userId),
-    };
+  #mapEvent(event: LogEvent): Observable<LogEventView> {
+    const items$: Observable<Item[]> =
+      event.items.length > 0
+        ? forkJoin(
+            event.items.map((item) =>
+              this.#itemsClient
+                .item(
+                  new ItemRequest({
+                    fields: new ItemFields({nameHtml: true}),
+                    id: item,
+                    language: this.#languageService.language,
+                  }),
+                )
+                // A deleted/inaccessible item shouldn't take down the whole event row - drop it
+                // from the list rather than toasting a background lookup failure.
+                .pipe(catchError(() => of(null))),
+            ),
+          ).pipe(map((items) => items.filter((item): item is Item => item !== null)))
+        : of([]);
+
+    const pictures$: Observable<Picture[]> =
+      event.pictures.length > 0
+        ? forkJoin(
+            event.pictures.map((item) =>
+              this.#picturesClient
+                .getPicture(
+                  new PicturesRequest({
+                    fields: new PictureFields({nameHtml: true}),
+                    language: this.#languageService.language,
+                    options: new PictureListOptions({id: item}),
+                  }),
+                )
+                .pipe(catchError(() => of(null))),
+            ),
+          ).pipe(map((pictures) => pictures.filter((picture): picture is Picture => picture !== null)))
+        : of([]);
+
+    return forkJoin([items$, pictures$, this.#userService.getUser$(event.userId)]).pipe(
+      map(([items, pictures, user]) => ({
+        createdAt: event.createTime?.toDate(),
+        description: event.description,
+        items,
+        pictures,
+        user,
+      })),
+    );
   }
 
   ngOnInit(): void {

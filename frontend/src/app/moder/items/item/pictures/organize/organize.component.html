@@ -9,7 +9,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/moder/items" i18n>Items</a>
     </li>
-    @if (item$ | async; as item) {
+    @if (itemResource.value(); as item) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
       </li>
@@ -23,23 +23,21 @@
 
 <remark i18n-markdown markdown="Turbo group creator from pictures" />
 
-@if (picturesResource.error(); as error) {
+@if (itemResource.error() ?? picturesResource.error(); as error) {
   <p class="alert alert-danger" role="alert">{{ error.message }}</p>
-} @else if (picturesResource.isLoading()) {
+} @else if (itemResource.isLoading() || picturesResource.isLoading()) {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
-} @else if (picturesResource.value(); as pictures) {
-  @if (item$ | async; as item) {
-    @if (newItem$ | async; as newItem) {
-      @if (!loading()) {
-        <app-item-meta-form
-          class="mb-4"
-          [item]="newItem"
-          [vehicleTypeIDs]="(vehicleTypeIDs$ | async) || []"
-          [invalidParams]="invalidParams()"
-          [pictures]="pictures"
-          (submitted)="submit(item, $event, pictures)"
-        />
-      }
+} @else if (itemResource.value(); as item) {
+  @if (picturesResource.value(); as pictures) {
+    @if (!loading()) {
+      <app-item-meta-form
+        class="mb-4"
+        [item]="newItem()"
+        [vehicleTypeIDs]="vehicleTypeIDsResource.value() || []"
+        [invalidParams]="invalidParams()"
+        [pictures]="pictures"
+        (submitted)="submit(item, $event, pictures)"
+      />
     }
   }
 }

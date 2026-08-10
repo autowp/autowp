@@ -27,7 +27,7 @@
       @for (event of response.items; track event) {
         <tr>
           <td>
-            @if (event.user$ | async; as user) {
+            @if (event.user; as user) {
               <app-user [user]="user" />
             }
             @if (event.createdAt) {
@@ -36,20 +36,16 @@
           </td>
           <td [innerHTML]="event.description"></td>
           <td>
-            @for (item$ of event.items; track item$) {
+            @for (item of event.items; track item.id) {
               <div>
                 Item:
-                @if (item$ | async; as item) {
-                  <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
-                }
+                <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
               </div>
             }
-            @for (picture$ of event.pictures; track picture$) {
+            @for (picture of event.pictures; track picture.id) {
               <div>
                 Picture:
-                @if (picture$ | async; as picture) {
-                  <a [routerLink]="['/moder/pictures', picture.id]" [innerHTML]="picture.nameHtml"></a>
-                }
+                <a [routerLink]="['/moder/pictures', picture.id]" [innerHTML]="picture.nameHtml"></a>
               </div>
             }
           </td>

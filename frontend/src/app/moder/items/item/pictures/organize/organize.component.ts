@@ -1,5 +1,4 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -21,9 +20,10 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {ItemService} from '@services/item';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams} from '@utils/invalid-params.pipe';
+import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {EMPTY, forkJoin, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../../../grpc';
 import {ToastsService} from '../../../../../toasts/toasts.service';
@@ -35,7 +35,7 @@ import {
 
 @Component({
   selector: 'app-moder-items-item-pictures-organize',
-  imports: [RouterLink, AsyncPipe, ItemMetaFormComponent, RemarkModule],
+  imports: [RouterLink, ItemMetaFormComponent, RemarkModule],
   templateUrl: './organize.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -50,13 +50,6 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
 
   protected readonly loading = signal(false);
   protected readonly invalidParams = signal<InvalidParams>({});
-
-  readonly #itemID$ = this.#route.paramMap.pipe(
-    map((params) => params.get('id') ?? ''),
-    distinctUntilChanged(),
-    debounceTime(30),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
 
   readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {requireSync: true});
 
@@ -74,9 +67,18 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
         .pipe(map((response) => response.items || [])),
   });
 
-  protected readonly item$: Observable<Item> = this.#itemID$.pipe(
-    switchMap((id) =>
-      this.#itemsClient.item(
+  // Fetches and NOT_FOUND-checking both happen here; navigating away on NOT_FOUND happens in the
+  // constructor effect() below, matching the pattern in CatalogueIndexComponent.brandResource -
+  // resources fetch, effects navigate.
+  protected readonly itemResource = rxResource({
+    id: 'moder-items-item-pictures-organize-item',
+    params: () => this.#itemID(),
+    stream: ({params: itemID}) => {
+      if (!itemID) {
+        return notFoundError();
+      }
+
+      return this.#itemsClient.item(
         new ItemRequest({
           fields: new ItemFields({
             childsCount: true,
@@ -87,23 +89,16 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
             nameHtml: true,
             nameText: true,
           }),
-          id,
+          id: itemID,
         }),
-      ),
-    ),
-    switchMap((item) => {
-      if (!item) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(item);
-    }),
-  );
+      );
+    },
+  });
 
-  protected readonly vehicleTypeIDs$ = this.item$.pipe(
-    switchMap((item) =>
+  protected readonly vehicleTypeIDsResource = rxResource({
+    id: 'moder-items-item-pictures-organize-vehicle-types',
+    params: () => this.itemResource.value(),
+    stream: ({params: item}) =>
       [ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)
         ? this.#itemsClient
             .getItemVehicleTypes(
@@ -113,16 +108,22 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
             )
             .pipe(map((response) => (response.items ? response.items : []).map((row) => row.vehicleTypeId)))
         : of([] as string[]),
-    ),
-  );
+  });
 
-  protected readonly newItem$ = this.item$.pipe(
-    map((item) => {
-      const newItem = {...item.toObject()} as Item;
-      newItem.isGroup = false;
-      return newItem;
-    }),
-  );
+  protected readonly newItem = computed(() => {
+    const item = this.itemResource.value();
+    const newItem = {...item.toObject()} as Item;
+    newItem.isGroup = false;
+    return newItem;
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.itemResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({
