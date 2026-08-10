@@ -1297,6 +1297,7 @@ message TopFactoriesListItem {
 
 message PictureListOptions {
   int64 id = 4;
+  repeated int64 ids = 24;
   string identity = 8;
   PictureStatus status = 1;
   repeated PictureStatus statuses = 9;

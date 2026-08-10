@@ -134,6 +134,7 @@ func convertPictureListOptions(in *PictureListOptions) (*query.PictureListOption
 
 	result := query.PictureListOptions{
 		ID:                    in.GetId(),
+		IDs:                   in.GetIds(),
 		Status:                convertPictureStatus(in.GetStatus()),
 		AcceptedInDays:        in.GetAcceptedInDays(),
 		OwnerID:               in.GetOwnerId(),

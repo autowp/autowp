@@ -29,15 +29,17 @@
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 } @else if (itemResource.value(); as item) {
   @if (picturesResource.value(); as pictures) {
-    @if (!loading()) {
-      <app-item-meta-form
-        class="mb-4"
-        [item]="newItem()"
-        [vehicleTypeIDs]="vehicleTypeIDsResource.value() || []"
-        [invalidParams]="invalidParams()"
-        [pictures]="pictures"
-        (submitted)="submit(item, $event, pictures)"
-      />
+    @if (newItem(); as newItem) {
+      @if (!loading()) {
+        <app-item-meta-form
+          class="mb-4"
+          [item]="newItem"
+          [vehicleTypeIDs]="vehicleTypeIDsResource.value() || []"
+          [invalidParams]="invalidParams()"
+          [pictures]="pictures"
+          (submitted)="submit(item, $event, pictures)"
+        />
+      }
     }
   }
 }

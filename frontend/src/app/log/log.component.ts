@@ -93,15 +93,48 @@ export class LogComponent implements OnInit {
           // list author-lookup did (see the comment on CatalogueIndexComponent.brandResource).
           switchMap((response) => {
             const events = response.items || [];
-            const items$: Observable<LogEventView[]> =
-              events.length > 0 ? forkJoin(events.map((event) => this.#mapEvent(event))) : of([]);
+            if (events.length === 0) {
+              return of({items: [], paginator: response.paginator});
+            }
 
-            return items$.pipe(map((items) => ({items, paginator: response.paginator})));
+            // One batched request for every picture referenced across all events (via
+            // PictureListOptions.ids), rather than one getPicture() call per reference.
+            const pictureIds = [...new Set(events.flatMap((event) => event.pictures))];
+
+            return this.#fetchPictures$(pictureIds).pipe(
+              switchMap((pictures) =>
+                forkJoin(events.map((event) => this.#mapEvent(event, pictures))).pipe(
+                  map((items) => ({items, paginator: response.paginator})),
+                ),
+              ),
+            );
           }),
         ),
   });
 
-  #mapEvent(event: LogEvent): Observable<LogEventView> {
+  #fetchPictures$(ids: string[]): Observable<Map<string, Picture>> {
+    if (ids.length === 0) {
+      return of(new Map());
+    }
+
+    return this.#picturesClient
+      .getPictures(
+        new PicturesRequest({
+          fields: new PictureFields({nameHtml: true}),
+          language: this.#languageService.language,
+          limit: ids.length,
+          options: new PictureListOptions({ids}),
+        }),
+      )
+      .pipe(
+        map((response) => new Map((response.items || []).map((picture) => [picture.id, picture]))),
+        // A failure here shouldn't take down the whole event list - degrade to showing no
+        // pictures rather than toasting a background lookup failure.
+        catchError(() => of(new Map<string, Picture>())),
+      );
+  }
+
+  #mapEvent(event: LogEvent, pictures: Map<string, Picture>): Observable<LogEventView> {
     const items$: Observable<Item[]> =
       event.items.length > 0
         ? forkJoin(
@@ -121,29 +154,14 @@ export class LogComponent implements OnInit {
           ).pipe(map((items) => items.filter((item): item is Item => item !== null)))
         : of([]);
 
-    const pictures$: Observable<Picture[]> =
-      event.pictures.length > 0
-        ? forkJoin(
-            event.pictures.map((item) =>
-              this.#picturesClient
-                .getPicture(
-                  new PicturesRequest({
-                    fields: new PictureFields({nameHtml: true}),
-                    language: this.#languageService.language,
-                    options: new PictureListOptions({id: item}),
-                  }),
-                )
-                .pipe(catchError(() => of(null))),
-            ),
-          ).pipe(map((pictures) => pictures.filter((picture): picture is Picture => picture !== null)))
-        : of([]);
-
-    return forkJoin([items$, pictures$, this.#userService.getUser$(event.userId)]).pipe(
-      map(([items, pictures, user]) => ({
+    return forkJoin([items$, this.#userService.getUser$(event.userId)]).pipe(
+      map(([items, user]) => ({
         createdAt: event.createTime?.toDate(),
         description: event.description,
         items,
-        pictures,
+        pictures: event.pictures
+          .map((id) => pictures.get(id))
+          .filter((picture): picture is Picture => picture !== undefined),
         user,
       })),
     );

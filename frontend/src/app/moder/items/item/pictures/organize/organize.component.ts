@@ -110,9 +110,12 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
         : of([] as string[]),
   });
 
-  protected readonly newItem = computed(() => {
-    const item = this.itemResource.value();
-    const newItem = {...item.toObject()} as Item;
+  protected readonly newItem = computed<Item | undefined>(() => {
+    if (!this.itemResource.hasValue()) {
+      return undefined;
+    }
+
+    const newItem = {...this.itemResource.value().toObject()} as Item;
     newItem.isGroup = false;
     return newItem;
   });
