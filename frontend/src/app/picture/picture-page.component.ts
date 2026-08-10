@@ -46,7 +46,11 @@ export class PicturePageComponent {
   // depending on it (the whole page), had even started. distinctUntilChanged already prevents
   // redundant refetches for the same identity.
   protected readonly canonicalResource = rxResource({
-    id: 'picture-page-canonical',
+    // Suffixed with the identity read once at construction time - a static id would let a
+    // second instance of this component, created by navigating away and to a different
+    // picture's page before Angular's whenStable() ever resolves, match TransferState's
+    // still-present entry from the first picture and seed itself with the wrong data.
+    id: `picture-page-canonical-${this.#identity() ?? ''}`,
     params: () => this.#identity(),
     stream: ({params: identity}) => {
       if (!identity) {
@@ -60,7 +64,7 @@ export class PicturePageComponent {
   // canonicalResource is still loading, or resolved to a redirect elsewhere, this stays idle so
   // the picture is never fetched (and never briefly flashed) under the wrong URL.
   protected readonly pictureResource = rxResource({
-    id: 'picture-page',
+    id: `picture-page-${this.#identity() ?? ''}`,
     params: () => ({canonical: this.canonicalResource.value(), identity: this.#identity()}),
     stream: ({params: {identity, canonical}}) => {
       if (!identity || !canonical || (canonical.route && canonical.route.length > 0)) {

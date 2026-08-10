@@ -48,8 +48,12 @@ export class ModerItemsItemSelectParentTwinsComponent {
 
   protected readonly twinsBrandsResource = rxResource({
     // Only one select-parent tab is rendered at a time; seeds status as resolved from
-    // TransferState on hydration, avoiding a loading-state blink.
-    id: 'moder-select-parent-twins-brands',
+    // TransferState on hydration, avoiding a loading-state blink. Suffixed with `page` read once
+    // at construction time - a static id would let a second instance of this component, created
+    // by navigating away and back with a different `?page=` before Angular's whenStable() ever
+    // resolves, match TransferState's still-present entry from the first page and seed itself
+    // with the wrong data.
+    id: `moder-select-parent-twins-brands-${this.page()}`,
     params: () => ({brandID: this.brandID(), page: this.page()}),
     stream: ({params: {brandID, page}}) => {
       if (brandID) {
@@ -86,8 +90,9 @@ export class ModerItemsItemSelectParentTwinsComponent {
 
   protected readonly twinsResource = rxResource({
     // Only one select-parent tab is rendered at a time; seeds status as resolved from
-    // TransferState on hydration, avoiding a loading-state blink.
-    id: 'moder-select-parent-twins',
+    // TransferState on hydration, avoiding a loading-state blink. Suffixed with brandID/page read
+    // once at construction time - see the identical note on twinsBrandsResource above.
+    id: `moder-select-parent-twins-${this.brandID() ?? ''}-${this.page()}`,
     params: () => ({brandID: this.brandID(), page: this.page()}),
     stream: ({params: {brandID, page}}) => {
       if (!brandID) {

@@ -1,5 +1,5 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, Injector, input, OnInit, ResourceRef, signal} from '@angular/core';
 import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {GetItemVehicleTypesRequest, Item, ItemType, UpdateItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -26,11 +26,12 @@ import {
   templateUrl: './meta.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ModerItemsItemMetaComponent {
+export class ModerItemsItemMetaComponent implements OnInit {
   readonly #auth = inject(AuthService);
   readonly #itemService = inject(ItemService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #toastService = inject(ToastsService);
+  readonly #injector = inject(Injector);
 
   readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
@@ -40,25 +41,37 @@ export class ModerItemsItemMetaComponent {
   protected readonly canEditMeta$ = this.#auth.hasRole$(Role.CARS_MODER);
   protected readonly invalidParams = signal<InvalidParams>({});
 
-  protected readonly vehicleTypeIDsResource = rxResource({
-    // Singleton per item-edit page (one item shown at a time); seeds status as resolved from
-    // TransferState on hydration, avoiding a loading-state blink.
-    id: 'moder-items-item-meta-vehicle-types',
-    params: () => this.item(),
-    stream: ({params: item}): Observable<string[]> => {
-      if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE || item.itemTypeId === ItemType.ITEM_TYPE_TWINS) {
-        return this.#itemsClient
-          .getItemVehicleTypes(
-            new GetItemVehicleTypesRequest({
-              itemId: item.id,
-            }),
-          )
-          .pipe(map((response) => (response.items ? response.items : []).map((row) => row.vehicleTypeId)));
-      }
+  // Constructed in ngOnInit() (with an explicit injector) rather than as a field initializer:
+  // `item` is a *required* input, unreadable until Angular has bound it, which happens after
+  // construction but before ngOnInit.
+  protected vehicleTypeIDsResource!: ResourceRef<string[] | undefined>;
 
-      return of([]);
-    },
-  });
+  ngOnInit(): void {
+    this.vehicleTypeIDsResource = rxResource({
+      // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+      // Suffixed with item().id read once at construction time - not actually a singleton across
+      // different items: a static id would let a second instance of this component, created by
+      // navigating away and to a different item's page before Angular's whenStable() ever
+      // resolves, match TransferState's still-present entry from the first item and seed itself
+      // with the wrong data.
+      id: `moder-items-item-meta-vehicle-types-${this.item().id}`,
+      injector: this.#injector,
+      params: () => this.item(),
+      stream: ({params: item}): Observable<string[]> => {
+        if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE || item.itemTypeId === ItemType.ITEM_TYPE_TWINS) {
+          return this.#itemsClient
+            .getItemVehicleTypes(
+              new GetItemVehicleTypesRequest({
+                itemId: item.id,
+              }),
+            )
+            .pipe(map((response) => (response.items ? response.items : []).map((row) => row.vehicleTypeId)));
+        }
+
+        return of([]);
+      },
+    });
+  }
 
   protected saveMeta(item: Item, event: ItemMetaFormResult) {
     this.loadingNumber.set(true);

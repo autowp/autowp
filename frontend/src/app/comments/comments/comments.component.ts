@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, Injector, input, OnInit, ResourceRef} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {
@@ -28,11 +28,12 @@ import {CommentsListComponent} from '../list/list.component';
   templateUrl: './comments.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommentsComponent {
+export class CommentsComponent implements OnInit {
   readonly #router = inject(Router);
   protected readonly auth = inject(AuthService);
   readonly #toastService = inject(ToastsService);
   readonly #commentsGrpc = inject(CommentsClient);
+  readonly #injector = inject(Injector);
 
   readonly itemID = input.required<string>();
   readonly typeID = input.required<CommentsType>();
@@ -49,44 +50,59 @@ export class CommentsComponent {
   // go missing from SSR output if some other resource happened to resolve during that window.
   // resource() registers its pending task through Angular's reactive graph instead, so there's no
   // such window.
-  protected readonly dataResource = rxResource({
-    id: 'comments',
-    params: () => ({
-      authenticated: this.authenticated(),
-      itemID: this.itemID(),
-      limit: this.limit(),
-      page: this.page(),
-      typeID: this.typeID(),
-    }),
-    stream: ({
-      params: {authenticated, itemID, limit, page, typeID},
-    }): Observable<undefined | {messages: CommentMessage[]; paginator?: Pages}> => {
-      if (!typeID || !itemID) {
-        return of(undefined);
-      }
-
-      return this.load$(itemID, typeID, limit, page).pipe(
-        tap(() => {
-          if (authenticated) {
-            this.#commentsGrpc
-              .view(
-                new CommentsViewRequest({
-                  itemId: itemID,
-                  typeId: typeID,
-                }),
-              )
-              .subscribe();
-          }
-        }),
-        map((response) => ({
-          messages: response.items ? response.items : [],
-          paginator: response.paginator,
-        })),
-      );
-    },
-  });
+  //
+  // Constructed in ngOnInit() (with an explicit injector) rather than as a field initializer:
+  // itemID/typeID are *required* inputs, unreadable until Angular has bound them, which happens
+  // after construction but before ngOnInit.
+  protected dataResource!: ResourceRef<undefined | {messages: CommentMessage[]; paginator?: Pages}>;
 
   protected readonly CommentsType = CommentsType;
+
+  ngOnInit(): void {
+    this.dataResource = rxResource({
+      // Suffixed with typeID/itemID read once at construction time - this component is recreated
+      // for a different item whenever its host re-renders the conditional block it sits behind
+      // (e.g. a picture page's comments section, for a different picture); a static id would let
+      // the new instance match a still-present TransferState entry from the previous item (while
+      // Angular's whenStable() hasn't resolved yet) and seed itself with the wrong item's
+      // comments.
+      id: `comments-${this.typeID()}-${this.itemID()}`,
+      injector: this.#injector,
+      params: () => ({
+        authenticated: this.authenticated(),
+        itemID: this.itemID(),
+        limit: this.limit(),
+        page: this.page(),
+        typeID: this.typeID(),
+      }),
+      stream: ({
+        params: {authenticated, itemID, limit, page, typeID},
+      }): Observable<undefined | {messages: CommentMessage[]; paginator?: Pages}> => {
+        if (!typeID || !itemID) {
+          return of(undefined);
+        }
+
+        return this.load$(itemID, typeID, limit, page).pipe(
+          tap(() => {
+            if (authenticated) {
+              this.#commentsGrpc
+                .view(
+                  new CommentsViewRequest({
+                    itemId: itemID,
+                    typeId: typeID,
+                  }),
+                )
+                .subscribe();
+            }
+          }),
+          map((response) => ({
+            messages: response.items ? response.items : [],
+            paginator: response.paginator,
+          })),
+        );
+      },
+    });
+  }
 
   protected onSent(id: string) {
     const limit = this.limit();

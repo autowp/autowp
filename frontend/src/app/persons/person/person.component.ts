@@ -33,7 +33,11 @@ export class PersonsPersonComponent {
 
   protected readonly itemResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'persons-person',
+    // Suffixed with the person id read once at construction time - a static id would let a
+    // second instance of this component, created by navigating away and to a different person's
+    // page before Angular's whenStable() ever resolves, match TransferState's still-present
+    // entry from the first person and seed itself with the wrong data.
+    id: `persons-person-${this.#itemID()}`,
     params: () => this.#itemID(),
     stream: ({params: itemID}) =>
       this.#itemsClient

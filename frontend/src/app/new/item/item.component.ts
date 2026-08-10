@@ -48,7 +48,11 @@ export class NewItemComponent {
 
   protected readonly itemResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'new-item-detail',
+    // Suffixed with the item id read once at construction time - a static id would let a second
+    // instance of this component, created by navigating away and to a different item's page
+    // before Angular's whenStable() ever resolves, match TransferState's still-present entry
+    // from the first item and seed itself with the wrong data.
+    id: `new-item-detail-${this.#itemID()}`,
     params: () => this.#itemID(),
     stream: ({params: itemID}) =>
       this.#itemsClient.item(
@@ -77,7 +81,7 @@ export class NewItemComponent {
 
   protected readonly picturesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'new-item-detail-pictures',
+    id: `new-item-detail-pictures-${this.#itemID()}`,
     params: () => ({date: this.date(), itemID: this.#itemID(), page: this.#page()}),
     stream: ({params: {date, itemID, page}}) =>
       this.#picturesClient.getPictures(

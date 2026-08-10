@@ -1,5 +1,16 @@
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, ComponentRef, computed, inject, input, output} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ComponentRef,
+  computed,
+  inject,
+  Injector,
+  input,
+  OnInit,
+  output,
+  ResourceRef,
+} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
@@ -37,12 +48,13 @@ export interface CommentInList extends CommentMessage {
   templateUrl: './list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommentsListComponent {
+export class CommentsListComponent implements OnInit {
   protected readonly auth = inject(AuthService);
   readonly #modalService = inject(NgbModal);
   readonly #toastService = inject(ToastsService);
   readonly #commentsGrpc = inject(CommentsClient);
   readonly #userService = inject(UserService);
+  readonly #injector = inject(Injector);
 
   readonly itemID = input.required<string>();
   readonly typeID = input.required<CommentsType>();
@@ -57,24 +69,35 @@ export class CommentsListComponent {
   // object and subscribed lazily by the template via `| async` (the previous shape here): that
   // pattern races Angular's SSR whenStable() check the same way the Articles list author lookup
   // did. resource() registers its pending task through Angular's reactive graph instead.
-  protected readonly usersResource = rxResource({
-    id: 'comments-list-users',
-    params: () => [...new Set(this.messages().map((message) => message.authorId))],
-    // A plain object rather than a Map: TransferState round-trips resource values through
-    // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
-    // enumerable properties, no toJSON), losing all entries.
-    stream: ({params: userIds}): Observable<Record<string, User>> => {
-      if (userIds.length === 0) {
-        return of({});
-      }
-      return this.#userService.getUserMap$(userIds).pipe(
-        map((userMap) => Object.fromEntries(userMap)),
-        // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
-        // user rather than erroring the whole resource over one stale reference.
-        catchError(() => of({})),
-      );
-    },
-  });
+  //
+  // Constructed in ngOnInit() (with an explicit injector) rather than as a field initializer:
+  // itemID/typeID are *required* inputs, unreadable until Angular has bound them, which happens
+  // after construction but before ngOnInit.
+  protected usersResource!: ResourceRef<Record<string, User> | undefined>;
+
+  ngOnInit(): void {
+    this.usersResource = rxResource({
+      // Suffixed with typeID/itemID read once at construction time - see the identical note on
+      // CommentsComponent.dataResource in ../comments/comments.component.ts.
+      id: `comments-list-users-${this.typeID()}-${this.itemID()}`,
+      injector: this.#injector,
+      params: () => [...new Set(this.messages().map((message) => message.authorId))],
+      // A plain object rather than a Map: TransferState round-trips resource values through
+      // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+      // enumerable properties, no toJSON), losing all entries.
+      stream: ({params: userIds}): Observable<Record<string, User>> => {
+        if (userIds.length === 0) {
+          return of({});
+        }
+        return this.#userService.getUserMap$(userIds).pipe(
+          map((userMap) => Object.fromEntries(userMap)),
+          // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
+          // user rather than erroring the whole resource over one stale reference.
+          catchError(() => of({})),
+        );
+      },
+    });
+  }
 
   protected readonly rows = computed(() => {
     const usersById = this.usersResource.value() ?? {};

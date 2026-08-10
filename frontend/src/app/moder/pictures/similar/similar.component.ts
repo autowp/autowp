@@ -109,7 +109,11 @@ export class ModerPicturesSimilarComponent implements OnInit {
 
   protected readonly picturesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'moder-pictures-similar',
+    // Suffixed with the brand id read once at construction time - a static id would let a second
+    // instance of this component, created by navigating away and back with a different
+    // `?brand_id=` before Angular's whenStable() ever resolves, match TransferState's
+    // still-present entry from the first brand and seed itself with the wrong data.
+    id: `moder-pictures-similar-${this.brandID()}`,
     params: () => ({brandID: this.brandID(), page: this.#page()}),
     stream: ({params: {brandID, page}}) =>
       this.#picturesClient

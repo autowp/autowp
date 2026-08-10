@@ -40,7 +40,11 @@ export class CatalogueMostsComponent {
 
   protected readonly brandResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'catalogue-mosts-brand',
+    // Suffixed with the brand catname read once at construction time - a static id would let a
+    // second instance of this component, created by navigating SSR /bmw/mosts -> away ->
+    // /toyota/mosts before Angular's whenStable() ever resolves, match TransferState's
+    // still-present bmw entry and seed itself with bmw's brand instead of fetching toyota's.
+    id: `catalogue-mosts-brand-${this.#brandCatname() ?? ''}`,
     params: () => this.#brandCatname(),
     stream: ({params: catname}) => {
       if (!catname) {

@@ -74,12 +74,20 @@ export class CatalogueIndexComponent {
   // initialization, which can take a real amount of time; without `id` the whole page would
   // blank-and-reload on every hydration waiting for it, even though SSR already has the data.
   //
+  // Every `id` below is suffixed with the catname read once at construction time (component
+  // construction happens per brand, since a route-param-only change reuses the instance and
+  // never re-reads `id`). A static id would let a *second* CatalogueIndexComponent instance -
+  // created by navigating SSR /bmw -> away -> /toyota, all before Angular's whenStable() ever
+  // resolves (isActive stays true the whole time isModer's Keycloak init is pending) - match the
+  // TransferState entry BMW's SSR pass already wrote under the same static key, and seed itself
+  // with BMW's data instead of fetching Toyota's.
+  //
   // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
   // than an imperative Router.navigate() inside the stream (which raced SSR's whenStable() the
   // same way the picture-page canonicalResource did) — see the constructor effect() below, which
   // is the single place that navigates or toasts off this resource's error()/value() signals.
   protected readonly brandResource = rxResource({
-    id: 'catalogue-brand',
+    id: `catalogue-brand-${this.#catname() ?? ''}`,
     params: () => ({catname: this.#catname(), isModer: this.isModer()}),
     stream: ({params: {catname, isModer}}): Observable<Item> => {
       if (!catname) {
@@ -156,7 +164,7 @@ export class CatalogueIndexComponent {
   }
 
   protected readonly picturesResource = rxResource({
-    id: 'catalogue-brand-pictures',
+    id: `catalogue-brand-pictures-${this.#catname() ?? ''}`,
     params: () => this.brandResource.value(),
     stream: ({params: brand}) =>
       this.#picturesClient
@@ -196,7 +204,7 @@ export class CatalogueIndexComponent {
   });
 
   protected readonly linksResource = rxResource({
-    id: 'catalogue-brand-links',
+    id: `catalogue-brand-links-${this.#catname() ?? ''}`,
     params: () => this.brandResource.value(),
     stream: ({params: brand}) =>
       this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId: brand.id})})).pipe(
@@ -226,7 +234,7 @@ export class CatalogueIndexComponent {
   // per-item Observable for the template to subscribe lazily via `| async` (the previous shape
   // here, which raced SSR's whenStable() check the same way the Articles list author lookup did).
   protected readonly factoriesResource = rxResource({
-    id: 'catalogue-brand-factories',
+    id: `catalogue-brand-factories-${this.#catname() ?? ''}`,
     params: () => this.brandResource.value(),
     stream: ({params: brand}) =>
       this.#itemsClient
@@ -284,7 +292,7 @@ export class CatalogueIndexComponent {
   });
 
   protected readonly sectionsResource = rxResource({
-    id: 'catalogue-brand-sections',
+    id: `catalogue-brand-sections-${this.#catname() ?? ''}`,
     params: () => this.brandResource.value(),
     stream: ({params: brand}) =>
       this.#itemsClient

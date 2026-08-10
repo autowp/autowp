@@ -27,7 +27,11 @@ export class ArticlesArticleComponent {
 
   protected readonly articleResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'articles-article',
+    // Suffixed with the catname read once at construction time: a static id would let a second
+    // instance of this component - created by navigating SSR /articles/foo -> away -> /articles/bar
+    // before Angular's whenStable() ever resolves - match TransferState's still-present 'foo'
+    // entry and seed itself with foo's article instead of fetching bar's.
+    id: `articles-article-${this.#catname() ?? ''}`,
     params: () => this.#catname(),
     stream: ({params: catname}) => {
       if (!catname) {

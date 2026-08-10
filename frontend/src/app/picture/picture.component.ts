@@ -6,8 +6,11 @@ import {
   computed,
   effect,
   inject,
+  Injector,
   input,
+  OnInit,
   output,
+  ResourceRef,
   signal,
 } from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
@@ -83,7 +86,7 @@ import {PicturePaginatorComponent} from './paginator.component';
   styleUrl: './picture.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PictureComponent {
+export class PictureComponent implements OnInit {
   readonly #auth = inject(AuthService);
   readonly #router = inject(Router);
   readonly #commentsGrpc = inject(CommentsClient);
@@ -94,6 +97,7 @@ export class PictureComponent {
   readonly #languageService = inject(LanguageService);
   readonly #cdr = inject(ChangeDetectorRef);
   readonly #document = inject(DOCUMENT);
+  readonly #injector = inject(Injector);
 
   readonly prefix = input.required<string[]>();
   readonly galleryRoute = input.required<string[]>();
@@ -125,30 +129,20 @@ export class PictureComponent {
   // here) — that pattern races Angular's SSR whenStable() check the same way the Articles list
   // author lookup did. resource() registers its pending task through Angular's reactive graph (an
   // effect scheduled at construction) instead, so it doesn't race.
-  protected readonly ownerResource = rxResource({
-    id: 'picture-owner',
-    params: () => this.picture().ownerId,
-    stream: ({params: ownerId}) => this.#userService.getUser$(ownerId),
-  });
-
-  protected readonly moderVoteUsersResource = rxResource({
-    id: 'picture-moder-vote-users',
-    params: () => [...new Set((this.picture().pictureModerVotes?.items || []).map((vote) => vote.userId))],
-    // A plain object rather than a Map: TransferState round-trips resource values through
-    // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
-    // enumerable properties, no toJSON), losing all entries.
-    stream: ({params: userIds}): Observable<Record<string, User>> => {
-      if (userIds.length === 0) {
-        return of({});
-      }
-      return this.#userService.getUserMap$(userIds).pipe(
-        map((userMap) => Object.fromEntries(userMap)),
-        // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
-        // user rather than erroring the whole resource over one stale reference.
-        catchError(() => of({})),
-      );
-    },
-  });
+  //
+  // All of them are constructed in ngOnInit() (with an explicit injector, since ngOnInit isn't an
+  // injection context), not as field initializers: `picture` is a *required* input, and Angular's
+  // compiler forbids reading a required input's value before the class is fully constructed - it
+  // isn't bound yet at field-initializer/constructor time. ngOnInit runs after Angular has bound
+  // inputs, so `picture()` is safe to read there for the one-time `id` string.
+  //
+  // Every `id` is suffixed with `picture().id`. This component is recreated whenever its host
+  // re-renders the `@else if (pictureResource.value(); as picture)` block it sits behind (e.g.
+  // PicturePageComponent) for a *different* picture - a static id would let that new instance
+  // match a still-present TransferState entry from the previous picture (while Angular's
+  // whenStable() hasn't resolved yet) and seed itself with the wrong picture's data.
+  protected ownerResource!: ResourceRef<null | undefined | User>;
+  protected moderVoteUsersResource!: ResourceRef<Record<string, User> | undefined>;
 
   protected readonly moderVotes = computed(() => {
     const usersById = this.moderVoteUsersResource.value() ?? {};
@@ -169,6 +163,178 @@ export class PictureComponent {
   constructor() {
     effect(() => {
       this.#picturesClient.view(new PicturesViewRequest({pictureId: this.picture().id})).subscribe();
+    });
+  }
+
+  ngOnInit(): void {
+    const pictureId = this.picture().id;
+
+    this.ownerResource = rxResource({
+      id: `picture-owner-${pictureId}`,
+      injector: this.#injector,
+      params: () => this.picture().ownerId,
+      stream: ({params: ownerId}) => this.#userService.getUser$(ownerId),
+    });
+
+    this.moderVoteUsersResource = rxResource({
+      id: `picture-moder-vote-users-${pictureId}`,
+      injector: this.#injector,
+      params: () => [...new Set((this.picture().pictureModerVotes?.items || []).map((vote) => vote.userId))],
+      // A plain object rather than a Map: TransferState round-trips resource values through
+      // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+      // enumerable properties, no toJSON), losing all entries.
+      stream: ({params: userIds}): Observable<Record<string, User>> => {
+        if (userIds.length === 0) {
+          return of({});
+        }
+        return this.#userService.getUserMap$(userIds).pipe(
+          map((userMap) => Object.fromEntries(userMap)),
+          // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
+          // user rather than erroring the whole resource over one stale reference.
+          catchError(() => of({})),
+        );
+      },
+    });
+
+    this.factoriesResource = rxResource({
+      id: `picture-factories-${pictureId}`,
+      injector: this.#injector,
+      params: () => this.picture().id,
+      stream: ({params: pictureId}) =>
+        this.#itemsClient
+          .list(
+            new ItemsRequest({
+              fields: new ItemFields({nameHtml: true}),
+              language: this.#languageService.language,
+              limit: 10,
+              options: new ItemListOptions({
+                descendant: new ItemParentCacheListOptions({
+                  pictureItemsByItemId: new PictureItemListOptions({pictureId}),
+                }),
+                typeId: ItemType.ITEM_TYPE_FACTORY,
+              }),
+            }),
+          )
+          .pipe(map((response) => response.items || [])),
+    });
+
+    this.categoriesResource = rxResource({
+      id: `picture-categories-${pictureId}`,
+      injector: this.#injector,
+      params: () => this.picture().id,
+      stream: ({params: pictureId}) =>
+        this.#itemsClient
+          .list(
+            new ItemsRequest({
+              fields: new ItemFields({nameHtml: true}),
+              language: this.#languageService.language,
+              limit: 10,
+              options: new ItemListOptions({
+                child: new ItemParentListOptions({
+                  item: new ItemListOptions({
+                    typeIds: [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_ENGINE],
+                  }),
+                  itemParentCacheItemByChild: new ItemParentCacheListOptions({
+                    pictureItemsByItemId: new PictureItemListOptions({pictureId}),
+                  }),
+                }),
+                typeId: ItemType.ITEM_TYPE_CATEGORY,
+              }),
+            }),
+          )
+          .pipe(map((response) => response.items || [])),
+    });
+
+    this.twinsResource = rxResource({
+      id: `picture-twins-${pictureId}`,
+      injector: this.#injector,
+      params: () => this.picture().id,
+      stream: ({params: pictureId}) =>
+        this.#itemsClient
+          .list(
+            new ItemsRequest({
+              fields: new ItemFields({nameHtml: true}),
+              language: this.#languageService.language,
+              limit: 10,
+              options: new ItemListOptions({
+                descendant: new ItemParentCacheListOptions({
+                  pictureItemsByItemId: new PictureItemListOptions({pictureId}),
+                }),
+                typeId: ItemType.ITEM_TYPE_TWINS,
+              }),
+            }),
+          )
+          .pipe(map((response) => response.items || [])),
+    });
+
+    this.brandsResource = rxResource({
+      id: `picture-brands-${pictureId}`,
+      injector: this.#injector,
+      params: () => this.picture().id,
+      stream: ({params: pictureId}): Observable<Item[]> =>
+        this.#itemsClient
+          .list(
+            new ItemsRequest({
+              fields: new ItemFields({nameHtml: true}),
+              language: this.#languageService.language,
+              limit: 10,
+              options: new ItemListOptions({
+                descendant: new ItemParentCacheListOptions({
+                  pictureItemsByItemId: new PictureItemListOptions({pictureId}),
+                }),
+                typeId: ItemType.ITEM_TYPE_BRAND,
+              }),
+            }),
+          )
+          .pipe(map((response) => response.items || [])),
+    });
+
+    this.pictureItemsResource = rxResource({
+      id: `picture-items-${pictureId}`,
+      injector: this.#injector,
+      params: () => this.picture().id,
+      stream: ({params: pictureId}): Observable<PictureItem[]> =>
+        this.#picturesClient
+          .getPictureItems(
+            new PictureItemsRequest({
+              fields: new PictureItemFields({
+                item: new ItemsRequest({
+                  fields: new ItemFields({
+                    altNames: true,
+                    description: true,
+                    design: true,
+                    hasSpecs: true,
+                    hasText: true,
+                    nameHtml: true,
+                    route: true,
+                    specsRoute: true,
+                  }),
+                }),
+              }),
+              language: this.#languageService.language,
+              options: new PictureItemListOptions({pictureId}),
+            }),
+          )
+          .pipe(map((response) => response.items || [])),
+    });
+
+    this.linksResource = rxResource({
+      id: `picture-links-${pictureId}`,
+      injector: this.#injector,
+      params: () => this.picture().id,
+      stream: ({params: pictureId}): Observable<ItemLink[]> =>
+        this.#itemsClient
+          .getItemLinks(
+            new ItemLinksRequest({
+              options: new ItemLinkListOptions({
+                itemParentCacheDescendant: new ItemParentCacheListOptions({
+                  pictureItemsByItemId: new PictureItemListOptions({pictureId}),
+                }),
+                type: 'official',
+              }),
+            }),
+          )
+          .pipe(map((response) => response.items || [])),
     });
   }
 
@@ -293,144 +459,17 @@ export class PictureComponent {
     this.setPictureStatus(picture, PictureStatus.PICTURE_STATUS_INBOX);
   }
 
-  protected readonly factoriesResource = rxResource({
-    id: 'picture-factories',
-    params: () => this.picture().id,
-    stream: ({params: pictureId}) =>
-      this.#itemsClient
-        .list(
-          new ItemsRequest({
-            fields: new ItemFields({nameHtml: true}),
-            language: this.#languageService.language,
-            limit: 10,
-            options: new ItemListOptions({
-              descendant: new ItemParentCacheListOptions({
-                pictureItemsByItemId: new PictureItemListOptions({pictureId}),
-              }),
-              typeId: ItemType.ITEM_TYPE_FACTORY,
-            }),
-          }),
-        )
-        .pipe(map((response) => response.items || [])),
-  });
-
-  protected readonly categoriesResource = rxResource({
-    id: 'picture-categories',
-    params: () => this.picture().id,
-    stream: ({params: pictureId}) =>
-      this.#itemsClient
-        .list(
-          new ItemsRequest({
-            fields: new ItemFields({nameHtml: true}),
-            language: this.#languageService.language,
-            limit: 10,
-            options: new ItemListOptions({
-              child: new ItemParentListOptions({
-                item: new ItemListOptions({
-                  typeIds: [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_ENGINE],
-                }),
-                itemParentCacheItemByChild: new ItemParentCacheListOptions({
-                  pictureItemsByItemId: new PictureItemListOptions({pictureId}),
-                }),
-              }),
-              typeId: ItemType.ITEM_TYPE_CATEGORY,
-            }),
-          }),
-        )
-        .pipe(map((response) => response.items || [])),
-  });
-
-  protected readonly twinsResource = rxResource({
-    id: 'picture-twins',
-    params: () => this.picture().id,
-    stream: ({params: pictureId}) =>
-      this.#itemsClient
-        .list(
-          new ItemsRequest({
-            fields: new ItemFields({nameHtml: true}),
-            language: this.#languageService.language,
-            limit: 10,
-            options: new ItemListOptions({
-              descendant: new ItemParentCacheListOptions({
-                pictureItemsByItemId: new PictureItemListOptions({pictureId}),
-              }),
-              typeId: ItemType.ITEM_TYPE_TWINS,
-            }),
-          }),
-        )
-        .pipe(map((response) => response.items || [])),
-  });
-
-  protected readonly brandsResource = rxResource({
-    id: 'picture-brands',
-    params: () => this.picture().id,
-    stream: ({params: pictureId}): Observable<Item[]> =>
-      this.#itemsClient
-        .list(
-          new ItemsRequest({
-            fields: new ItemFields({nameHtml: true}),
-            language: this.#languageService.language,
-            limit: 10,
-            options: new ItemListOptions({
-              descendant: new ItemParentCacheListOptions({
-                pictureItemsByItemId: new PictureItemListOptions({pictureId}),
-              }),
-              typeId: ItemType.ITEM_TYPE_BRAND,
-            }),
-          }),
-        )
-        .pipe(map((response) => response.items || [])),
-  });
-
-  protected readonly pictureItemsResource = rxResource({
-    id: 'picture-items',
-    params: () => this.picture().id,
-    stream: ({params: pictureId}): Observable<PictureItem[]> =>
-      this.#picturesClient
-        .getPictureItems(
-          new PictureItemsRequest({
-            fields: new PictureItemFields({
-              item: new ItemsRequest({
-                fields: new ItemFields({
-                  altNames: true,
-                  description: true,
-                  design: true,
-                  hasSpecs: true,
-                  hasText: true,
-                  nameHtml: true,
-                  route: true,
-                  specsRoute: true,
-                }),
-              }),
-            }),
-            language: this.#languageService.language,
-            options: new PictureItemListOptions({pictureId}),
-          }),
-        )
-        .pipe(map((response) => response.items || [])),
-  });
+  protected factoriesResource!: ResourceRef<Item[] | undefined>;
+  protected categoriesResource!: ResourceRef<Item[] | undefined>;
+  protected twinsResource!: ResourceRef<Item[] | undefined>;
+  protected brandsResource!: ResourceRef<Item[] | undefined>;
+  protected pictureItemsResource!: ResourceRef<PictureItem[] | undefined>;
 
   protected readonly contentItems = computed(() =>
     (this.pictureItemsResource.value() ?? []).filter((item) => item.type === PictureItemType.PICTURE_ITEM_CONTENT),
   );
 
-  protected readonly linksResource = rxResource({
-    id: 'picture-links',
-    params: () => this.picture().id,
-    stream: ({params: pictureId}): Observable<ItemLink[]> =>
-      this.#itemsClient
-        .getItemLinks(
-          new ItemLinksRequest({
-            options: new ItemLinkListOptions({
-              itemParentCacheDescendant: new ItemParentCacheListOptions({
-                pictureItemsByItemId: new PictureItemListOptions({pictureId}),
-              }),
-              type: 'official',
-            }),
-          }),
-        )
-        .pipe(map((response) => response.items || [])),
-  });
+  protected linksResource!: ResourceRef<ItemLink[] | undefined>;
 
   protected readonly takenDate = computed<null | {date: Date; format: string}>(() => {
     const date = this.picture().takenDate;

@@ -43,15 +43,29 @@ export class CategoriesCategoryPicturesComponent {
     requireSync: true,
   });
 
+  // Read once at construction time purely to scope the resources' TransferState ids below -
+  // categoryResource itself re-derives these reactively from the route inside categoryPipe$.
+  readonly #category = toSignal(this.#route.parent!.parent!.paramMap.pipe(map((params) => params.get('category'))), {
+    requireSync: true,
+  });
+  readonly #path = toSignal(this.#route.parent!.parent!.paramMap.pipe(map((params) => params.get('path'))), {
+    requireSync: true,
+  });
+
   protected readonly categoryResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'categories-category-pictures-category',
+    // Suffixed with the ancestor category identity read once at construction time - a static id
+    // would let a second instance of this component, created by navigating away and to a
+    // different category's pictures URL before Angular's whenStable() ever resolves, match
+    // TransferState's still-present entry from the first category and seed itself with the wrong
+    // data.
+    id: `categories-category-pictures-category-${this.#category() ?? ''}-${this.#path() ?? ''}`,
     stream: () => this.#categoriesService.categoryPipe$(this.#route.parent!.parent!),
   });
 
   protected readonly picturesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'categories-category-pictures',
+    id: `categories-category-pictures-${this.#category() ?? ''}-${this.#path() ?? ''}`,
     params: () => ({categoryData: this.categoryResource.value(), page: this.#page()}),
     stream: ({params: {categoryData, page}}) => {
       if (!categoryData?.category || !categoryData.current) {

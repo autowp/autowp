@@ -55,7 +55,12 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
 
   protected readonly picturesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'moder-items-item-pictures-organize',
+    // Suffixed with the item id read once at construction time - a static id would let a second
+    // instance of this component, created by navigating away and to a different item's organize
+    // page before Angular's whenStable() ever resolves, match TransferState's still-present
+    // entry from the first item and seed itself with the wrong data. Every resource below gets
+    // the same treatment.
+    id: `moder-items-item-pictures-organize-${this.#itemID()}`,
     params: () => this.#itemID(),
     stream: ({params: itemID}) =>
       this.#picturesClient
@@ -71,7 +76,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   // constructor effect() below, matching the pattern in CatalogueIndexComponent.brandResource -
   // resources fetch, effects navigate.
   protected readonly itemResource = rxResource({
-    id: 'moder-items-item-pictures-organize-item',
+    id: `moder-items-item-pictures-organize-item-${this.#itemID()}`,
     params: () => this.#itemID(),
     stream: ({params: itemID}) => {
       if (!itemID) {
@@ -96,7 +101,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   });
 
   protected readonly vehicleTypeIDsResource = rxResource({
-    id: 'moder-items-item-pictures-organize-vehicle-types',
+    id: `moder-items-item-pictures-organize-vehicle-types-${this.#itemID()}`,
     params: () => this.itemResource.value(),
     stream: ({params: item}) =>
       [ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)

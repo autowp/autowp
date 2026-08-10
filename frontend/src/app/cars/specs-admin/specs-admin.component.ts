@@ -59,7 +59,11 @@ export class CarsSpecsAdminComponent implements OnInit {
 
   protected readonly dataResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'cars-specs-admin',
+    // Suffixed with the item id read once at construction time - a static id would let a second
+    // instance of this component, created by navigating away and back with a different
+    // `?item_id=` before Angular's whenStable() ever resolves, match TransferState's
+    // still-present entry from the first item and seed itself with the wrong data.
+    id: `cars-specs-admin-${this.itemID()}`,
     params: () => this.itemID(),
     stream: ({params: itemId}) =>
       this.#attrsClient

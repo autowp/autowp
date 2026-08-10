@@ -1,4 +1,15 @@
-import {ChangeDetectionStrategy, Component, ComponentRef, computed, inject, input, output} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ComponentRef,
+  computed,
+  inject,
+  Injector,
+  input,
+  OnInit,
+  output,
+  ResourceRef,
+} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Picture, User} from '@grpc/spec.pb';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -17,11 +28,12 @@ import {PictureModerVoteModalComponent} from './modal/modal.component';
   templateUrl: './picture-moder-vote.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PictureModerVoteComponent {
+export class PictureModerVoteComponent implements OnInit {
   readonly #moderVoteService = inject(PictureModerVoteService);
   readonly #moderVoteTemplateService = inject(APIPictureModerVoteTemplateService);
   readonly #modalService = inject(NgbModal);
   readonly #userService = inject(UserService);
+  readonly #injector = inject(Injector);
 
   readonly picture = input.required<Picture>();
 
@@ -31,24 +43,12 @@ export class PictureModerVoteComponent {
   // object and subscribed lazily by the template via `| async` (the previous shape here): that
   // pattern races Angular's SSR whenStable() check the same way the Articles list author lookup
   // did. resource() registers its pending task through Angular's reactive graph instead.
-  protected readonly voteUsersResource = rxResource({
-    id: 'picture-moder-vote-list-users',
-    params: () => [...new Set((this.picture().pictureModerVotes?.items || []).map((vote) => vote.userId))],
-    // A plain object rather than a Map: TransferState round-trips resource values through
-    // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
-    // enumerable properties, no toJSON), losing all entries.
-    stream: ({params: userIds}): Observable<Record<string, User>> => {
-      if (userIds.length === 0) {
-        return of({});
-      }
-      return this.#userService.getUserMap$(userIds).pipe(
-        map((userMap) => Object.fromEntries(userMap)),
-        // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
-        // user rather than erroring the whole resource over one stale reference.
-        catchError(() => of({})),
-      );
-    },
-  });
+  //
+  // Constructed in ngOnInit() (with an explicit injector) rather than as a field initializer:
+  // `picture` is a *required* input, unreadable until Angular has bound it, which happens after
+  // construction but before ngOnInit - see the identical note on PictureComponent's resources in
+  // ../../picture/picture.component.ts.
+  protected voteUsersResource!: ResourceRef<Record<string, User> | undefined>;
 
   protected readonly votes = computed(() => {
     const usersById = this.voteUsersResource.value() ?? {};
@@ -67,6 +67,28 @@ export class PictureModerVoteComponent {
 
   protected reason = '';
   protected save = false;
+
+  ngOnInit(): void {
+    this.voteUsersResource = rxResource({
+      id: `picture-moder-vote-list-users-${this.picture().id}`,
+      injector: this.#injector,
+      params: () => [...new Set((this.picture().pictureModerVotes?.items || []).map((vote) => vote.userId))],
+      // A plain object rather than a Map: TransferState round-trips resource values through
+      // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+      // enumerable properties, no toJSON), losing all entries.
+      stream: ({params: userIds}): Observable<Record<string, User>> => {
+        if (userIds.length === 0) {
+          return of({});
+        }
+        return this.#userService.getUserMap$(userIds).pipe(
+          map((userMap) => Object.fromEntries(userMap)),
+          // getUserMap$ throws if the backend can't find a requested user. Degrade to showing no
+          // user rather than erroring the whole resource over one stale reference.
+          catchError(() => of({})),
+        );
+      },
+    });
+  }
 
   protected votePicture(picture: Picture, vote: number, reason: string): void {
     this.#moderVoteService.vote$(picture.id, vote, reason).subscribe(() => {

@@ -28,7 +28,11 @@ export class CategoryGalleryComponent implements OnInit {
 
   protected readonly dataResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'categories-category-gallery',
+    // Suffixed with the picture identity read once at construction time - a static id would let a
+    // second instance of this component, created by navigating away and to a different picture's
+    // gallery URL before Angular's whenStable() ever resolves, match TransferState's still-present
+    // entry from the first picture and seed itself with the wrong data.
+    id: `categories-category-gallery-${this.identity() ?? ''}`,
     params: () => this.identity(),
     stream: ({params: identity}) => {
       if (!identity) {

@@ -1,8 +1,8 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, Injector, input, OnInit, ResourceRef, signal} from '@angular/core';
 import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
-import {Item, ItemLink, ItemLinkListOptions, ItemLinkRequest, ItemLinksRequest} from '@grpc/spec.pb';
+import {Item, ItemLink, ItemLinkListOptions, ItemLinkRequest, ItemLinks, ItemLinksRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {forkJoin, Observable, of} from 'rxjs';
@@ -16,10 +16,11 @@ import {ToastsService} from '../../../../toasts/toasts.service';
   templateUrl: './links.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ModerItemsItemLinksComponent {
+export class ModerItemsItemLinksComponent implements OnInit {
   readonly #auth = inject(AuthService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #toastService = inject(ToastsService);
+  readonly #injector = inject(Injector);
 
   readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
@@ -34,13 +35,25 @@ export class ModerItemsItemLinksComponent {
     url: '',
   };
 
-  protected readonly linksResource = rxResource({
-    // Seeds status as resolved from TransferState on hydration; singleton per moder item page.
-    id: 'moder-items-item-links',
-    params: () => this.item().id,
-    stream: ({params: itemId}) =>
-      this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId})})),
-  });
+  // Constructed in ngOnInit() (with an explicit injector) rather than as a field initializer:
+  // `item` is a *required* input, unreadable until Angular has bound it, which happens after
+  // construction but before ngOnInit.
+  protected linksResource!: ResourceRef<ItemLinks | undefined>;
+
+  ngOnInit(): void {
+    this.linksResource = rxResource({
+      // Seeds status as resolved from TransferState on hydration. Suffixed with item().id read
+      // once at construction time - not actually a singleton across different items: a static id
+      // would let a second instance of this component, created by navigating away and to a
+      // different item's page before Angular's whenStable() ever resolves, match TransferState's
+      // still-present entry from the first item and seed itself with the wrong data.
+      id: `moder-items-item-links-${this.item().id}`,
+      injector: this.#injector,
+      params: () => this.item().id,
+      stream: ({params: itemId}) =>
+        this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId})})),
+    });
+  }
 
   protected saveLinks(itemId: string, links: ItemLink[]) {
     const promises: Observable<null>[] = [];

@@ -67,7 +67,12 @@ export class LogComponent implements OnInit {
 
   protected readonly responseResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'log-events',
+    // Suffixed with every filter read once at construction time - a static id would let a second
+    // instance of this component, created by navigating away and to this page again with
+    // different `?article_id=`/`?item_id=`/etc. filters before Angular's whenStable() ever
+    // resolves, match TransferState's still-present entry from the first filter set and seed
+    // itself with the wrong data.
+    id: `log-events-${this.#articleId() ?? ''}-${this.#itemId() ?? ''}-${this.#page() ?? ''}-${this.#pictureId() ?? ''}-${this.#userId() ?? ''}`,
     params: () => ({
       articleId: this.#articleId(),
       itemId: this.#itemId(),

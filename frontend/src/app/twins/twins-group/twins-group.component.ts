@@ -30,7 +30,11 @@ export class TwinsGroupComponent {
 
   protected readonly groupResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'twins-group',
+    // Suffixed with the group id read once at construction time - a static id would let a
+    // second instance of this component, created by navigating away and to a different twins
+    // group's page before Angular's whenStable() ever resolves, match TransferState's
+    // still-present entry from the first group and seed itself with the wrong data.
+    id: `twins-group-${this.#groupID()}`,
     params: () => this.#groupID(),
     stream: ({params: groupID}) => {
       if (!groupID) {
@@ -52,8 +56,9 @@ export class TwinsGroupComponent {
   });
 
   protected readonly selectedBrandsResource = rxResource({
-    // Distinct id from groupResource above; singleton per page.
-    id: 'twins-group-selected-brands',
+    // Distinct id from groupResource above, also suffixed with the group id (see that resource's
+    // comment) - this is not actually a singleton per page across different twins groups.
+    id: `twins-group-selected-brands-${this.#groupID()}`,
     params: () => this.groupResource.value(),
     stream: ({params: group}) => {
       if (!group) {

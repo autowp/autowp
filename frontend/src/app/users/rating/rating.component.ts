@@ -81,7 +81,12 @@ export class UsersRatingComponent implements OnInit {
 
   protected readonly usersResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'users-rating',
+    // Suffixed with the rating route param read once at construction time - a static id would
+    // let a second instance of this component, created by navigating away and to a different
+    // rating page before Angular's whenStable() ever resolves, match TransferState's
+    // still-present entry from the first rating and seed itself with the wrong data. Every other
+    // resource below is downstream of `rating`/`usersResource` and gets the same treatment.
+    id: `users-rating-${this.rating()}`,
     params: () => this.rating(),
     stream: ({params: rating}) => {
       let o$: Observable<UsersRatingResponse>;
@@ -117,7 +122,7 @@ export class UsersRatingComponent implements OnInit {
   // to the nested Observables), so the data can silently be missing from SSR output. Chaining
   // resources off usersResource keeps every lookup inside Angular's pending-task tracking.
   protected readonly usersByIdResource = rxResource({
-    id: 'users-rating-users',
+    id: `users-rating-users-${this.rating()}`,
     params: () => this.usersResource.value()?.map((row) => row.userId) ?? [],
     // A plain object rather than a Map: TransferState round-trips resource values through
     // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
@@ -144,7 +149,7 @@ export class UsersRatingComponent implements OnInit {
   );
 
   protected readonly brandsResource = rxResource({
-    id: 'users-rating-brands',
+    id: `users-rating-brands-${this.rating()}`,
     params: () => ({rating: this.rating(), userIds: this.#topUserIds()}),
     stream: ({params: {rating, userIds}}): Observable<Record<string, UserRatingBrandsResponse>> => {
       if (userIds.length === 0 || (rating !== Rating.PICTURES && rating !== Rating.SPECS)) {
@@ -168,7 +173,7 @@ export class UsersRatingComponent implements OnInit {
   });
 
   protected readonly fansResource = rxResource({
-    id: 'users-rating-fans',
+    id: `users-rating-fans-${this.rating()}`,
     params: () => ({rating: this.rating(), userIds: this.#topUserIds()}),
     stream: ({params: {rating, userIds}}): Observable<Record<string, UsersRatingUserFan[]>> => {
       if (userIds.length === 0 || (rating !== Rating.PICTURE_LIKES && rating !== Rating.COMMENT_LIKES)) {
@@ -192,7 +197,7 @@ export class UsersRatingComponent implements OnInit {
   });
 
   protected readonly fansUsersResource = rxResource({
-    id: 'users-rating-fans-users',
+    id: `users-rating-fans-users-${this.rating()}`,
     params: () => {
       const fans = this.fansResource.value();
       if (!fans) {
