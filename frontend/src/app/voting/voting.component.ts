@@ -8,6 +8,7 @@ import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
+import {timestampToDate} from '@utils/timestamp';
 import {BehaviorSubject, EMPTY} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
 
@@ -91,6 +92,19 @@ export class VotingComponent {
       });
 
     return false;
+  }
+
+  // Use timestampToDate() rather than voting.beginDate/endDate.toDate() directly in the template:
+  // getVoting()'s response is served from TransferState on hydration (see
+  // HTTP_TRANSFER_CACHE_ORIGIN_MAP in app.config.server.ts), so it's a plain JSON-shaped object at
+  // that point, not a real Voting class instance - the Timestamp fields have no .toDate() method
+  // even though seconds/nanos are still present.
+  protected beginDate(voting: Voting): Date | undefined {
+    return timestampToDate(voting.beginDate);
+  }
+
+  protected endDate(voting: Voting): Date | undefined {
+    return timestampToDate(voting.endDate);
   }
 
   protected isVariantSelected(voting: Voting): boolean {
