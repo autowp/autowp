@@ -1,7 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {
   Item,
   ItemFields,
@@ -17,17 +16,17 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {icon, latLng, Marker, marker, tileLayer} from 'leaflet';
 import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 
 import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../toasts/toasts.service';
+import {FactoryMapComponent} from './map/factory-map.component';
 
 @Component({
   selector: 'app-factories',
-  imports: [RouterLink, LeafletModule, AsyncPipe, ThumbnailComponent, RemarkModule],
+  imports: [RouterLink, AsyncPipe, ThumbnailComponent, RemarkModule, FactoryMapComponent],
   templateUrl: './factories.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -116,37 +115,6 @@ export class FactoryComponent {
     catchError((err: unknown) => {
       this.#toastService.handleError(err);
       return EMPTY;
-    }),
-  );
-
-  protected readonly map$ = this.item$.pipe(
-    map((factory) => {
-      if (!factory.location?.longitude || !factory.location.latitude) {
-        return null;
-      }
-
-      const center = latLng([factory.location.latitude, factory.location.longitude]);
-      const markers: Marker[] = [
-        marker(center, {
-          icon: icon({
-            iconAnchor: [13, 41],
-            iconSize: [25, 41],
-            iconUrl: 'assets/marker-icon.png',
-            shadowUrl: 'assets/marker-shadow.png',
-          }),
-        }),
-      ];
-      const options = {
-        center,
-        layers: [
-          tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-          }),
-        ],
-        zoom: 17,
-      };
-
-      return {markers, options};
     }),
   );
 }

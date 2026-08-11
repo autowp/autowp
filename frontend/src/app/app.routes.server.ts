@@ -18,6 +18,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server,
   },
   {
+    path: 'achievements',
+    renderMode: RenderMode.Server,
+  },
+  {
     path: 'feedback/**',
     renderMode: RenderMode.Server,
   },
@@ -35,6 +39,22 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: 'picture/**',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'mascots/**',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'rules/**',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'voting/**',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'factories/**',
     renderMode: RenderMode.Server,
   },
   // No `/**` here deliberately: only the bare brand page (e.g. /toyota) is server-rendered, not
@@ -73,22 +93,20 @@ export const serverRoutes: ServerRoute[] = [
   // falling back to it — so without these entries, :brand would silently swallow every route
   // below too (moder/account/upload have no SSR value, Keycloak never runs server-side; new/inbox
   // render user-specific, timezone-dependent content SSR can't produce correctly; map/museums/
-  // factories/chart/pulse/info depend on browser-only libraries — Leaflet, Chart.js, Monaco —
-  // with no platform guards yet).
+  // chart/pulse/info depend on browser-only libraries — Leaflet, Chart.js, Monaco — with no
+  // platform guards yet; factories/** is server-rendered because its Leaflet usage is isolated in
+  // FactoryMapComponent, used only inside an @defer block, so it never loads server-side).
   {path: 'about/**', renderMode: RenderMode.Client},
-  {path: 'achievements/**', renderMode: RenderMode.Client},
   {path: 'account/**', renderMode: RenderMode.Client},
   {path: 'cars/**', renderMode: RenderMode.Client},
   {path: 'category/**', renderMode: RenderMode.Client},
   {path: 'chart/**', renderMode: RenderMode.Client},
   {path: 'donate/**', renderMode: RenderMode.Client},
-  {path: 'factories/**', renderMode: RenderMode.Client},
   {path: 'forums/**', renderMode: RenderMode.Client},
   {path: 'inbox/**', renderMode: RenderMode.Client},
   {path: 'info/**', renderMode: RenderMode.Client},
   {path: 'log/**', renderMode: RenderMode.Client},
   {path: 'map/**', renderMode: RenderMode.Client},
-  {path: 'mascots/**', renderMode: RenderMode.Client},
   {path: 'moder/**', renderMode: RenderMode.Client},
   {path: 'mosts/**', renderMode: RenderMode.Client},
   {path: 'museums/**', renderMode: RenderMode.Client},
@@ -96,11 +114,9 @@ export const serverRoutes: ServerRoute[] = [
   {path: 'persons/**', renderMode: RenderMode.Client},
   {path: 'gallery/**', renderMode: RenderMode.Client},
   {path: 'pulse/**', renderMode: RenderMode.Client},
-  {path: 'rules/**', renderMode: RenderMode.Client},
   {path: 'twins/**', renderMode: RenderMode.Client},
   {path: 'upload/**', renderMode: RenderMode.Client},
   {path: 'users/**', renderMode: RenderMode.Client},
-  {path: 'voting/**', renderMode: RenderMode.Client},
   {path: 'login/**', renderMode: RenderMode.Client},
   {path: 'error-404/**', renderMode: RenderMode.Client},
   {

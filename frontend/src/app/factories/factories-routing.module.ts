@@ -13,4 +13,5 @@ export const routes: Routes = [
     path: ':id',
     title: $localize`Products`,
   },
+  {path: '', pathMatch: 'full', redirectTo: '/error-404'},
 ];

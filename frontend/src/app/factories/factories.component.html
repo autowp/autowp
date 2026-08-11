@@ -24,14 +24,12 @@
     }
   </div>
 
-  @if (map$ | async; as map) {
-    <div
-      style="height: 300px"
-      class="mb-4 w-100"
-      leaflet
-      [leafletOptions]="map.options"
-      [leafletLayers]="map.markers"
-    ></div>
+  @if (factory.location?.latitude && factory.location?.longitude) {
+    @defer {
+      <app-factory-map [latitude]="factory.location.latitude" [longitude]="factory.location.longitude" />
+    } @placeholder {
+      <div style="height: 300px" class="mb-4 w-100"></div>
+    }
   }
 
   @if (factory.fullText) {
