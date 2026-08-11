@@ -2535,7 +2535,7 @@ func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *Item) (*ItemID, er
 	}
 
 	if location := in.GetLocation(); location != nil {
-		point, err := geom.NewPoint(geom.XY).SetCoords(geom.Coord{location.GetLatitude(), location.GetLongitude()})
+		point, err := geom.NewPoint(geom.XY).SetCoords(geom.Coord{location.GetLongitude(), location.GetLatitude()})
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
@@ -2792,7 +2792,7 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 	if util.Contains(mask.GetPaths(), "location") {
 		var point *geom.Point
 		if location := values.GetLocation(); location != nil {
-			point, err = geom.NewPoint(geom.XY).SetCoords(geom.Coord{location.GetLatitude(), location.GetLongitude()})
+			point, err = geom.NewPoint(geom.XY).SetCoords(geom.Coord{location.GetLongitude(), location.GetLatitude()})
 			if err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}

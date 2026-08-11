@@ -79,7 +79,7 @@ func (s *MapGRPCServer) GetPoints(
 	pointsOnly := in.GetPointsOnly()
 
 	polygon, err := geom.NewPolygon(geom.XY).SetCoords([][]geom.Coord{
-		{{latLo, lngLo}, {latHi, lngLo}, {latHi, lngHi}, {latLo, lngHi}, {latLo, lngLo}},
+		{{lngLo, latLo}, {lngLo, latHi}, {lngHi, latHi}, {lngHi, latLo}, {lngLo, latLo}},
 	})
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -117,8 +117,8 @@ func (s *MapGRPCServer) GetPoints(
 			if point.Valid {
 				mapPoints = append(mapPoints, &MapPoint{
 					Location: &latlng.LatLng{
-						Latitude:  point.Point.X(),
-						Longitude: point.Point.Y(),
+						Latitude:  point.Point.Y(),
+						Longitude: point.Point.X(),
 					},
 				})
 			}
@@ -215,8 +215,8 @@ func (s *MapGRPCServer) pointsWithContent(
 			mapPoint := &MapPoint{
 				Id: fmt.Sprintf("factory%d", id),
 				Location: &latlng.LatLng{
-					Latitude:  point.Point.X(),
-					Longitude: point.Point.Y(),
+					Latitude:  point.Point.Y(),
+					Longitude: point.Point.X(),
 				},
 				Name: nameText,
 			}

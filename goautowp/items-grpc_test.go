@@ -13,6 +13,7 @@ import (
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -3264,6 +3265,74 @@ func TestUpdateItemName(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, newName, item.GetName())
 	require.Equal(t, "Body", item.GetBody())
+}
+
+// Regression test for a latitude/longitude axis swap: goautowp.ru/wheelsage.org once stored
+// item_point with X=latitude, Y=longitude (backwards from the PostGIS/WKT standard), while
+// pictures.point used the correct X=longitude, Y=latitude convention throughout. Every pair below
+// uses distinct, non-zero latitude and longitude values so a swap flips which assertion fails,
+// instead of silently passing on symmetric or zero coordinates.
+func TestUpdateItemLocationAxisOrder(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+	client := NewItemsClient(conn)
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	randomInt := random.Int()
+
+	kc := cnt.Keycloak()
+	adminToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+	require.NotNil(t, adminToken)
+
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken.AccessToken)
+
+	itemID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("factory-%d", randomInt),
+		ItemTypeId: ItemType_ITEM_TYPE_FACTORY,
+	})
+
+	testCases := []struct {
+		latitude  float64
+		longitude float64
+	}{
+		{latitude: 10, longitude: 0},
+		{latitude: 0, longitude: 10},
+		{latitude: -10, longitude: 20},
+		// Moscow: a swap would put the point in the ocean south of Ghana, in either direction.
+		{latitude: 55.7520, longitude: 37.6175},
+	}
+
+	for _, testCase := range testCases {
+		_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
+			Item: &Item{
+				Id: itemID,
+				Location: &latlng.LatLng{
+					Latitude:  testCase.latitude,
+					Longitude: testCase.longitude,
+				},
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"location"}},
+		})
+		require.NoError(t, err)
+
+		item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Location: true}})
+		require.NoError(t, err)
+		require.NotNil(t, item.GetLocation())
+		require.InDelta(t, testCase.latitude, item.GetLocation().GetLatitude(), 0.0001)
+		require.InDelta(t, testCase.longitude, item.GetLocation().GetLongitude(), 0.0001)
+	}
+
+	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
+		Item:       &Item{Id: itemID},
+		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"location"}},
+	})
+	require.NoError(t, err)
+
+	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Location: true}})
+	require.NoError(t, err)
+	require.Nil(t, item.GetLocation())
 }
 
 func TestUpdateItemBody(t *testing.T) {
