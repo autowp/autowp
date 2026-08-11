@@ -4,8 +4,17 @@ import {environment} from '@environment/environment';
 import {GrpcDataEvent, GrpcEvent, GrpcMessage, GrpcMetadata, GrpcRequest} from '@ngx-grpc/common';
 import {GrpcHandler, GrpcInterceptor} from '@ngx-grpc/core';
 import Keycloak from 'keycloak-js';
-import {Observable} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {from, Observable} from 'rxjs';
+import {catchError, switchMap, tap} from 'rxjs/operators';
+
+// Passed to Keycloak#updateToken() on every authenticated request, rather than trusting the
+// cached token's freshness: keycloak-js's own background refresh is driven by a TokenExpired
+// event scheduled via setTimeout against the token's expiry, which browsers throttle or pause
+// entirely in inactive tabs. Without this, the first request after returning to a long-backgrounded
+// tab races ahead of that catch-up refresh and goes out with an already-expired token, surfacing
+// as a "token is expired" error from the backend. updateToken() is a no-op (no network call) when
+// the cached token is already valid for longer than this, so this costs nothing on the common path.
+const MIN_TOKEN_VALIDITY_SECONDS = 20;
 
 // gRPC method paths whose response never depends on the caller's identity (verified against the
 // backend handler — none of them read auth/user context or gate on role). Sending an Authorization
@@ -57,21 +66,27 @@ export function skipAuthMetadata(): GrpcMetadata {
 export function authInterceptor$(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
   const keycloak = inject(Keycloak);
 
-  const token = keycloak.token;
-
   if (req.headers.has(SKIP_AUTH_HEADER)) {
     return next(req.clone({headers: req.headers.delete(SKIP_AUTH_HEADER)}));
   }
 
-  if (!token || isPublicGrpcPath(req.url)) {
+  if (!keycloak.token || isPublicGrpcPath(req.url)) {
     return next(req);
   }
 
-  const authReq = req.clone({
-    headers: req.headers.set('Authorization', 'Bearer ' + token),
-  });
-
-  return next(authReq);
+  return from(keycloak.updateToken(MIN_TOKEN_VALIDITY_SECONDS)).pipe(
+    // Refresh failure (e.g. the refresh token itself expired) isn't this interceptor's job to
+    // resolve - fall through and send whatever token is still cached, same as before this fix,
+    // and let the backend's response drive re-auth.
+    catchError(() => [false]),
+    switchMap(() =>
+      next(
+        req.clone({
+          headers: req.headers.set('Authorization', 'Bearer ' + keycloak.token),
+        }),
+      ),
+    ),
+  );
 }
 
 @Service()
