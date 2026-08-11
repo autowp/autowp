@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -15,12 +16,45 @@ import (
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/twpayne/go-geom"
-	"github.com/twpayne/go-geom/encoding/wkt"
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+const (
+	minLongitude = -180.0
+	maxLongitude = 180.0
+	worldWidth   = 360.0
+)
+
+// normalizedLongitudeRanges splits a longitude range that may extend beyond +-180deg - Leaflet
+// allows continuous horizontal panning across repeated "world copies", so bounds like (300, 700)
+// are just as valid as (-60, 60) for the same visible strip - into one or two ranges within the
+// canonical [-180, 180] space that stored points actually use. A range spanning the full world or
+// more collapses to a single canonical [-180, 180] range; otherwise at most one antimeridian split
+// is needed, since a single map viewport's width is always less than 360deg.
+func normalizedLongitudeRanges(lngLo, lngHi float64) [][2]float64 {
+	if lngHi-lngLo >= worldWidth {
+		return [][2]float64{{minLongitude, maxLongitude}}
+	}
+
+	normLo := math.Mod(lngLo+maxLongitude, worldWidth)
+	if normLo < 0 {
+		normLo += worldWidth
+	}
+
+	normLo -= maxLongitude
+	normHi := normLo + (lngHi - lngLo)
+
+	if normHi <= maxLongitude {
+		return [][2]float64{{normLo, normHi}}
+	}
+
+	return [][2]float64{
+		{normLo, maxLongitude},
+		{minLongitude, normHi - worldWidth},
+	}
+}
 
 type MapGRPCServer struct {
 	UnimplementedMapServer
@@ -78,23 +112,32 @@ func (s *MapGRPCServer) GetPoints(
 
 	pointsOnly := in.GetPointsOnly()
 
-	polygon, err := geom.NewPolygon(geom.XY).SetCoords([][]geom.Coord{
-		{{lngLo, latLo}, {lngLo, latHi}, {lngHi, latHi}, {lngHi, latLo}, {lngLo, latLo}},
-	})
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
+	// Stored points always use canonical [-180, 180] longitude, but the incoming bounds may not -
+	// besides spanning close to or more than 360deg at low zoom, Leaflet also allows continuous
+	// horizontal panning past +-180deg into repeated "world copies" (e.g. bounds of (300, 700)
+	// instead of (-60, 60) for the same visible strip) - so normalize into one or two canonical
+	// ranges first.
+	//
+	// Compared via ST_Intersects against the point cast to geometry, not against the geography
+	// column directly: geography compares along the shortest great-circle arc, so an edge wider
+	// than 180deg of longitude - which a normalized range can still be, e.g. [-170, 180] - gets
+	// silently interpreted as wrapping the short way around the globe, matching only a narrow
+	// sliver near the antimeridian instead of the intended wide view. The item_point_point_geom
+	// GIST index (see migrations/29_item_point_geometry_index.up.sql) covers this cast, so this
+	// stays index-accelerated rather than falling back to a sequential scan.
+	rangeExprs := make([]goqu.Expression, 0, 2)
 
-	polygon.SetSRID(schema.SRID)
-
-	wktPolygon, err := wkt.Marshal(polygon)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	for _, lngRange := range normalizedLongitudeRanges(lngLo, lngHi) {
+		rangeExprs = append(rangeExprs, goqu.Func(
+			"ST_Intersects",
+			goqu.L("?::geometry", schema.ItemPointTablePointCol),
+			goqu.Func("ST_MakeEnvelope", lngRange[0], latLo, lngRange[1], latHi, schema.SRID),
+		))
 	}
 
 	sqSelect := s.db.Select(schema.ItemPointTablePointCol).
 		From(schema.ItemPointTable).
-		Where(goqu.Func("ST_Intersects", goqu.Func("ST_GeogFromText", wktPolygon), schema.ItemPointTablePointCol))
+		Where(goqu.Or(rangeExprs...))
 
 	if pointsOnly {
 		rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
