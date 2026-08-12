@@ -1,4 +1,6 @@
-@if (group$ | async; as group) {
+@if (groupResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (groupResource.value(); as group) {
   <div class="page-header">
     <h2 i18n>Specifications of {{ group.nameText }}</h2>
   </div>
@@ -6,7 +8,7 @@
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }
 
-@if (html$ | async; as html) {
+@if (html(); as html) {
   <div [innerHtml]="html"></div>
 } @else {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>

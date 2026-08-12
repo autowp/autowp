@@ -1,6 +1,7 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CommentsSubscribeRequest,
   CommentsType,
@@ -13,8 +14,8 @@ import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
-import {Observable} from 'rxjs';
-import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {isNotFoundError} from 'app/grpc';
+import {map} from 'rxjs/operators';
 
 import {CommentsComponent} from '../../comments/comments/comments.component';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -28,6 +29,7 @@ import {MESSAGES_PER_PAGE} from '../forums.module';
 })
 export class ForumsTopicComponent {
   readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
   protected readonly auth = inject(AuthService);
   readonly #toastService = inject(ToastsService);
@@ -36,29 +38,48 @@ export class ForumsTopicComponent {
 
   protected readonly limit = MESSAGES_PER_PAGE;
   protected readonly authenticated$ = this.auth.authenticated$;
-  protected readonly page$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    distinctUntilChanged(),
+  protected readonly page = toSignal(
+    this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))),
+    {requireSync: true},
   );
 
   protected readonly CommentsType = CommentsType;
 
-  protected readonly topic$: Observable<Topic> = this.#route.paramMap.pipe(
-    map((params) => params.get('topic_id') ?? undefined),
-    distinctUntilChanged(),
-    switchMap((topicID) => this.#grpc.getTopic(new GetTopicRequest({id: topicID}))),
-    tap((topic) => {
-      this.#pageEnv.set({
-        pageId: 44,
-        title: topic.name,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  readonly #topicID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('topic_id') ?? '')), {
+    requireSync: true,
+  });
 
-  protected readonly theme$ = this.topic$.pipe(
-    switchMap((topic) => this.#grpc.getTheme(new GetThemeRequest({id: topic.themeId}))),
-  );
+  protected readonly topicResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    // Suffixed with the topic id read once at construction time - see the identical note on
+    // PersonsPersonComponent.itemResource in app/persons/person/person.component.ts.
+    id: `forums-topic-${this.#topicID()}`,
+    params: () => this.#topicID(),
+    stream: ({params: topicID}) => this.#grpc.getTopic(new GetTopicRequest({id: topicID})),
+  });
+
+  protected readonly themeResource = rxResource({
+    id: `forums-topic-theme-${this.#topicID()}`,
+    params: () => this.topicResource.value()?.themeId,
+    stream: ({params: themeId}) => this.#grpc.getTheme(new GetThemeRequest({id: themeId})),
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.topicResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const topic = this.topicResource.value();
+      if (topic) {
+        this.#pageEnv.set({
+          pageId: 44,
+          title: topic.name,
+        });
+      }
+    });
+  }
 
   protected subscribe(topic: Topic) {
     this.#comments

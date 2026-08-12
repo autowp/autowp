@@ -1,11 +1,11 @@
-@if (groupId$ | async; as groupId) {
-  @if (childs$ | async; as childs) {
+@if (groupId(); as groupId) {
+  @if (childsResource.value(); as childs) {
     @for (item of childs.items; track item.id) {
       <app-twins-item [groupId]="groupId" [item]="item" />
     }
   }
 
-  @if (group$ | async; as group) {
+  @if (groupResource.value(); as group) {
     @if (group.description) {
       <div>
         <h3 i18n>Description</h3>

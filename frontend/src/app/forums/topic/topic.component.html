@@ -6,7 +6,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/forums" i18n>Forums</a>
     </li>
-    @if (theme$ | async; as theme) {
+    @if (themeResource.value(); as theme) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/forums', theme.id]">{{ getForumsThemeTranslation(theme.name) }}</a>
       </li>
@@ -14,17 +14,14 @@
   </ol>
 </nav>
 
-@if (topic$ | async; as topic) {
+@if (topicResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (topicResource.value(); as topic) {
   <div class="page-header">
     <h1>{{ topic.name }}</h1>
   </div>
   <section class="forum-topic-page comments">
-    <app-comments
-      [itemID]="topic.id"
-      [typeID]="CommentsType.FORUMS_TYPE_ID"
-      [limit]="limit"
-      [page]="(page$ | async) || 0"
-    />
+    <app-comments [itemID]="topic.id" [typeID]="CommentsType.FORUMS_TYPE_ID" [limit]="limit" [page]="page() || 0" />
     @if (authenticated$ | async) {
       <div class="text-end mb-3">
         @if (!topic.subscription) {

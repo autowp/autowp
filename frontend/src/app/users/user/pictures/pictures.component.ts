@@ -1,6 +1,7 @@
-import {AsyncPipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {DOCUMENT} from '@angular/common';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, OnInit} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   Item,
   ItemFields,
@@ -17,10 +18,9 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
-
-import {ToastsService} from '../../../toasts/toasts.service';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 function addCSS(document: Document, url: string) {
   const cssId = 'brands-css';
@@ -38,80 +38,95 @@ function addCSS(document: Document, url: string) {
 
 @Component({
   selector: 'app-users-user-pictures',
-  imports: [RouterLink, AsyncPipe],
+  imports: [RouterLink],
   templateUrl: './pictures.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersUserPicturesComponent implements OnInit {
   readonly #userService = inject(UserService);
   readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
   readonly #document = inject(DOCUMENT);
 
-  protected readonly icons$ = this.#itemsClient.getBrandIcons(new Empty()).pipe(
-    tap((icons) => {
-      addCSS(this.#document, icons.css);
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  protected readonly iconsResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'users-user-pictures-brand-icons',
+    stream: () => this.#itemsClient.getBrandIcons(new Empty()),
+  });
 
-  readonly #userId$: Observable<string> = this.#route.paramMap.pipe(
-    map((params) => params.get('identity') ?? ''),
-    distinctUntilChanged(),
-    debounceTime(10),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  readonly #identity = toSignal(this.#route.paramMap.pipe(map((params) => params.get('identity') ?? '')), {
+    requireSync: true,
+  });
 
-  protected readonly user$ = this.#userId$.pipe(
-    switchMap((identity) => this.#userService.getByIdentity$(identity, undefined)),
-    switchMap((user) => {
-      if (!user) {
-        return EMPTY;
-      }
-      return of(user);
-    }),
-    map((user) => ({
+  protected readonly userResource = rxResource({
+    id: `users-user-pictures-user-${this.#identity()}`,
+    params: () => this.#identity(),
+    stream: ({params: identity}) =>
+      this.#userService
+        .getByIdentity$(identity, undefined)
+        .pipe(switchMap((user) => (user ? of(user) : notFoundError()))),
+  });
+
+  protected readonly user = computed(() => {
+    const user = this.userResource.value();
+    if (!user) {
+      return null;
+    }
+
+    return {
       id: user.id,
       identity: user.identity ? user.identity : 'user' + user.id,
       name: user.name,
-    })),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+    };
+  });
 
-  protected readonly brands$: Observable<Item[]> = this.user$.pipe(
-    switchMap((user) =>
-      this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({
-            descendantPicturesCount: true,
-            nameOnly: true,
-          }),
-          language: this.#languageService.language,
-          limit: 3000,
-          options: new ItemListOptions({
-            descendant: new ItemParentCacheListOptions({
-              pictureItemsByItemId: new PictureItemListOptions({
-                pictures: new PictureListOptions({
-                  ownerId: '' + user.id,
-                  status: PictureStatus.PICTURE_STATUS_ACCEPTED,
+  protected readonly brandsResource = rxResource({
+    id: `users-user-pictures-brands-${this.#identity()}`,
+    params: () => this.userResource.value()?.id,
+    stream: ({params: userId}) =>
+      this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({
+              descendantPicturesCount: true,
+              nameOnly: true,
+            }),
+            language: this.#languageService.language,
+            limit: 3000,
+            options: new ItemListOptions({
+              descendant: new ItemParentCacheListOptions({
+                pictureItemsByItemId: new PictureItemListOptions({
+                  pictures: new PictureListOptions({
+                    ownerId: '' + userId,
+                    status: PictureStatus.PICTURE_STATUS_ACCEPTED,
+                  }),
                 }),
               }),
+              typeId: ItemType.ITEM_TYPE_BRAND,
             }),
-            typeId: ItemType.ITEM_TYPE_BRAND,
+            order: ItemsRequest.Order.NAME_NAT,
           }),
-          order: ItemsRequest.Order.NAME_NAT,
-        }),
-      ),
-    ),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    map((brands) => (brands.items ? brands.items : [])),
-  );
+        )
+        .pipe(map((brands) => (brands.items ? brands.items : []))),
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.userResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+      }
+    });
+
+    effect(() => {
+      const icons = this.iconsResource.value();
+      if (icons) {
+        addCSS(this.#document, icons.css);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 63});

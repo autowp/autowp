@@ -1,5 +1,6 @@
-import {AsyncPipe, DecimalPipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {DecimalPipe, DOCUMENT} from '@angular/common';
+import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {Router, RouterLink} from '@angular/router';
 import {User} from '@grpc/spec.pb';
 import {StatisticsClient} from '@grpc/spec.pbsc';
@@ -9,7 +10,7 @@ import {UserService} from '@services/user';
 import escapeStringRegexp from 'escape-string-regexp';
 import {marked} from 'marked';
 import {BytesPipe} from 'ngx-pipes';
-import {map, switchMap} from 'rxjs/operators';
+import {of} from 'rxjs';
 
 import * as versionJson from '../../version.json';
 
@@ -82,7 +83,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
 
 @Component({
   selector: 'app-about',
-  imports: [RouterLink, AsyncPipe],
+  imports: [RouterLink],
   templateUrl: './about.component.html',
   providers: [BytesPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -98,52 +99,67 @@ export class AboutComponent implements OnInit {
 
   protected readonly version = versionJson;
 
-  protected readonly html$ = this.#statisticsClient
-    .getAboutData(new Empty())
-    .pipe(
-      switchMap((about) => {
-        const ids: string[] = about.contributors;
-        ids.push(about.developer);
-        ids.push(about.frTranslator);
-        ids.push(about.zhTranslator);
-        ids.push(about.beTranslator);
-        ids.push(about.ptBrTranslator);
+  protected readonly aboutResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'about-data',
+    stream: () => this.#statisticsClient.getAboutData(new Empty()),
+  });
 
-        return this.#userService.getUserMap$(ids).pipe(
-          map((users) => ({
-            about,
-            aboutText,
-            users,
-          })),
-        );
-      }),
-    )
-    .pipe(
-      map((data) => {
-        const contributorsHtml: string[] = [];
-        for (const id of data.about.contributors) {
-          contributorsHtml.push(this.userHtml(data.users.get(id)));
-        }
+  protected readonly usersResource = rxResource({
+    id: 'about-users',
+    params: () => this.aboutResource.value(),
+    stream: ({params: about}) => {
+      if (!about) {
+        return of(new Map<string, User>());
+      }
 
-        const html = marked.parse(data.aboutText, {async: false});
-        return replacePairs(html, {
-          '%be-translator%': this.userHtml(data.users.get(data.about.beTranslator)),
-          '%developer%': this.userHtml(data.users.get(data.about.developer)),
-          '%fr-translator%': this.userHtml(data.users.get(data.about.frTranslator)),
-          '%github%':
-            '<i class="bi bi-github" aria-hidden="true"></i> ' +
-            '<a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>',
-          '%pt-br-translator%': this.userHtml(data.users.get(data.about.ptBrTranslator)),
-          '%total-comments%': data.about.totalComments.toString(),
-          '%total-pictures%': this.#decimalPipe.transform(data.about.totalPictures) ?? '',
-          '%total-size%': this.#bytesPipe.transform(data.about.picturesSize * 1024 * 1024, 1).toString(),
-          '%total-users%': data.about.totalUsers.toString(),
-          '%total-vehicles%': data.about.totalItems.toString(),
-          '%users%': contributorsHtml.join(' '),
-          '%zh-translator%': this.userHtml(data.users.get(data.about.zhTranslator)),
-        });
-      }),
-    );
+      // Fetched into a fresh array rather than pushing onto about.contributors directly - that
+      // would mutate the resource's own value and leak the developer/translators into the
+      // contributors list below, which already shows them separately.
+      const ids = [
+        ...about.contributors,
+        about.developer,
+        about.frTranslator,
+        about.zhTranslator,
+        about.beTranslator,
+        about.ptBrTranslator,
+      ];
+
+      return this.#userService.getUserMap$(ids);
+    },
+  });
+
+  protected readonly html = computed(() => {
+    const about = this.aboutResource.value();
+    const users = this.usersResource.value();
+    if (!about || !users) {
+      return null;
+    }
+
+    const contributorsHtml: string[] = [];
+    for (const id of about.contributors) {
+      contributorsHtml.push(this.userHtml(users.get(id)));
+    }
+
+    const html = marked.parse(aboutText, {async: false});
+
+    return replacePairs(html, {
+      '%be-translator%': this.userHtml(users.get(about.beTranslator)),
+      '%developer%': this.userHtml(users.get(about.developer)),
+      '%fr-translator%': this.userHtml(users.get(about.frTranslator)),
+      '%github%':
+        '<i class="bi bi-github" aria-hidden="true"></i> ' +
+        '<a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>',
+      '%pt-br-translator%': this.userHtml(users.get(about.ptBrTranslator)),
+      '%total-comments%': about.totalComments.toString(),
+      '%total-pictures%': this.#decimalPipe.transform(about.totalPictures) ?? '',
+      '%total-size%': this.#bytesPipe.transform(about.picturesSize * 1024 * 1024, 1).toString(),
+      '%total-users%': about.totalUsers.toString(),
+      '%total-vehicles%': about.totalItems.toString(),
+      '%users%': contributorsHtml.join(' '),
+      '%zh-translator%': this.userHtml(users.get(about.zhTranslator)),
+    });
+  });
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 136});

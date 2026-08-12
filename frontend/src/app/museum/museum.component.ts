@@ -1,9 +1,9 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CommentsType,
-  Item,
   ItemFields,
   ItemLinkListOptions,
   ItemLinksRequest,
@@ -19,18 +19,18 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
 import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
-import {ToastsService} from '../toasts/toasts.service';
 import {MuseumMapComponent} from './map/museum-map.component';
 
 @Component({
   selector: 'app-museum',
-  imports: [RouterLink, CommentsComponent, AsyncPipe, ThumbnailComponent, RemarkModule, MuseumMapComponent],
+  imports: [RouterLink, CommentsComponent, ThumbnailComponent, RemarkModule, MuseumMapComponent, AsyncPipe],
   templateUrl: './museum.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -40,35 +40,47 @@ export class MuseumComponent {
   readonly #router = inject(Router);
   readonly #itemsClient = inject(ItemsClient);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
   protected readonly museumModer$ = this.#auth.hasRole$(Role.CARS_MODER);
 
-  readonly #itemID$ = this.#route.paramMap.pipe(
-    map((params) => params.get('id') ?? ''),
-    distinctUntilChanged(),
-    debounceTime(10),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
+    requireSync: true,
+  });
 
-  protected readonly links$ = this.#itemID$.pipe(
-    switchMap((itemID) =>
-      this.#itemsClient.getItemLinks(
-        new ItemLinksRequest({
-          options: new ItemLinkListOptions({itemId: itemID}),
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return of(null);
-    }),
-  );
+  protected readonly itemResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: `museum-item-${this.#itemID()}`,
+    params: () => this.#itemID(),
+    stream: ({params: id}) =>
+      this.#itemsClient
+        .item(
+          new ItemRequest({
+            fields: new ItemFields({
+              description: true,
+              location: true,
+              nameHtml: true,
+              nameText: true,
+            }),
+            id,
+            language: this.#languageService.language,
+          }),
+        )
+        .pipe(switchMap((item) => (item.itemTypeId === ItemType.ITEM_TYPE_MUSEUM ? of(item) : notFoundError()))),
+  });
 
-  protected readonly pictures$ = this.#itemID$.pipe(
-    switchMap((itemID) =>
+  protected readonly linksResource = rxResource({
+    id: `museum-links-${this.#itemID()}`,
+    params: () => this.itemResource.value()?.id,
+    stream: ({params: itemId}) =>
+      this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId})})),
+  });
+
+  protected readonly picturesResource = rxResource({
+    id: `museum-pictures-${this.#itemID()}`,
+    params: () => this.itemResource.value()?.id,
+    stream: ({params: itemId}) =>
       this.#picturesClient.getPictures(
         new PicturesRequest({
           fields: new PictureFields({
@@ -83,61 +95,31 @@ export class MuseumComponent {
           language: this.#languageService.language,
           limit: 20,
           options: new PictureListOptions({
-            pictureItem: new PictureItemListOptions({
-              itemId: itemID,
-            }),
+            pictureItem: new PictureItemListOptions({itemId}),
             status: PictureStatus.PICTURE_STATUS_ACCEPTED,
           }),
           order: PicturesRequest.Order.ORDER_LIKES,
           paginator: false,
         }),
       ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-  );
-
-  protected readonly item$: Observable<Item> = this.#itemID$.pipe(
-    switchMap((id) =>
-      this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({
-            description: true,
-            location: true,
-            nameHtml: true,
-            nameText: true,
-          }),
-          id,
-          language: this.#languageService.language,
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      this.#router.navigate(['/error-404'], {
-        skipLocationChange: true,
-      });
-      return EMPTY;
-    }),
-    switchMap((item) => {
-      if (!item || item.itemTypeId !== ItemType.ITEM_TYPE_MUSEUM) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(item);
-    }),
-    tap((item) => {
-      this.#pageEnv.set({
-        pageId: 159,
-        title: item.nameText,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  });
 
   protected readonly CommentsType = CommentsType;
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.itemResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const item = this.itemResource.value();
+      if (item) {
+        this.#pageEnv.set({
+          pageId: 159,
+          title: item.nameText,
+        });
+      }
+    });
+  }
 }

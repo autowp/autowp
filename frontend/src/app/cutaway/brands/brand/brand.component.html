@@ -9,7 +9,9 @@
   </ol>
 </nav>
 
-@if (brand$ | async; as brand) {
+@if (brandResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (brandResource.value(); as brand) {
   <div class="page-header">
     <h1 [innerHTML]="brand.nameHtml"></h1>
   </div>
@@ -29,7 +31,9 @@
   </li>
 </ul>
 
-@if (query$ | async; as response) {
+@if (picturesResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (picturesResource.value(); as response) {
   <div class="row">
     @for (picture of response.items || []; track picture) {
       <div class="col-6 col-md-4 col-lg-3">

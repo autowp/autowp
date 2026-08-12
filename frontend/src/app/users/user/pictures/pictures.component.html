@@ -3,7 +3,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/" i18n>Index page</a>
     </li>
-    @if (user$ | async; as user) {
+    @if (user(); as user) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/users', user.identity]">{{ user.name }}</a>
       </li>
@@ -15,11 +15,13 @@
   <h1 i18n>User's pictures</h1>
 </div>
 
-@if (user$ | async; as user) {
+@if (userResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (user(); as user) {
   <div class="brand-icons row">
-    @for (brand of brands$ | async; track brand.id) {
+    @for (brand of brandsResource.value(); track brand.id) {
       <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        @if (icons$ | async; as icons) {
+        @if (iconsResource.value(); as icons) {
           <a
             [routerLink]="['/users', user.identity, 'pictures', brand.catname]"
             [class]="'brandicon brandicon-' + cssClass(brand)"

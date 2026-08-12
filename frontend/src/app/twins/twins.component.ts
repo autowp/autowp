@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   Item,
@@ -11,7 +12,6 @@ import {
   ItemParentsRequest,
   ItemsRequest,
   ItemType,
-  Pages,
   PictureFields,
   PictureListOptions,
   PicturesRequest,
@@ -21,8 +21,8 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {combineLatest, Observable, of} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {of} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 import {chunkBy} from '../chunk';
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
@@ -40,7 +40,7 @@ interface ChunkedGroup {
   templateUrl: './twins.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TwinsComponent implements OnInit {
+export class TwinsComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #auth = inject(AuthService);
@@ -49,21 +49,22 @@ export class TwinsComponent implements OnInit {
 
   protected readonly canEdit$ = this.#auth.hasRole$(Role.CARS_MODER);
 
-  protected readonly page$ = this.#route.queryParamMap.pipe(
-    map((query) => parseInt(query.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-    debounceTime(10),
+  protected readonly page = toSignal(
+    this.#route.queryParamMap.pipe(map((query) => parseInt(query.get('page') ?? '', 10))),
+    {requireSync: true},
   );
 
-  protected readonly currentBrandCatname$ = this.#route.paramMap.pipe(
-    map((params) => params.get('brand')),
-    distinctUntilChanged(),
-    debounceTime(10),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  protected readonly currentBrandCatname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
+    requireSync: true,
+  });
 
-  protected readonly brand$: Observable<Item | null> = this.currentBrandCatname$.pipe(
-    switchMap((brand) => {
+  protected readonly brandResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    // Stays a soft null when there's no brand catname or it doesn't resolve to one - /twins with
+    // no brand is a valid "all brands" view, not an error, so this never redirects to /error-404.
+    id: `twins-brand-${this.currentBrandCatname() ?? ''}`,
+    params: () => this.currentBrandCatname(),
+    stream: ({params: brand}) => {
       if (!brand) {
         return of(null);
       }
@@ -82,26 +83,18 @@ export class TwinsComponent implements OnInit {
             }),
           }),
         )
-        .pipe(map((response) => (response?.items && response.items.length > 0 ? response.items[0] : null)));
-    }),
-    tap((brand) => {
-      if (brand) {
-        this.#pageEnv.set({
-          pageId: 153,
-          title: brand.nameOnly,
-        });
-      } else {
-        this.#pageEnv.set({pageId: 25});
-      }
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+        .pipe(map((response) => (response.items && response.items.length > 0 ? response.items[0] : null)));
+    },
+  });
 
-  protected readonly data$: Observable<{
-    groups: ChunkedGroup[];
-    paginator: Pages | undefined;
-  }> = combineLatest([this.page$, this.brand$]).pipe(
-    switchMap(([page, brand]) =>
+  protected readonly dataResource = rxResource({
+    id: `twins-data-${this.currentBrandCatname() ?? ''}`,
+    params: () => {
+      const brand = this.brandResource.value();
+
+      return brand === undefined ? undefined : {brand, page: this.page()};
+    },
+    stream: ({params: {brand, page}}) =>
       this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({
@@ -144,16 +137,23 @@ export class TwinsComponent implements OnInit {
           page,
         }),
       ),
-    ),
-    map((response) => ({
-      groups: (response.items || []).map((group) => ({
+  });
+
+  protected readonly data = computed(() => {
+    const response = this.dataResource.value();
+    if (!response) {
+      return null;
+    }
+
+    return {
+      groups: (response.items || []).map((group): ChunkedGroup => ({
         childs: chunkBy(group.itemParentChilds?.items || [], 3),
         hasMoreImages: TwinsComponent.hasMoreImages(group),
         item: group,
       })),
       paginator: response.paginator,
-    })),
-  );
+    };
+  });
 
   private static hasMoreImages(group: Item): boolean {
     let count = 0;
@@ -165,7 +165,21 @@ export class TwinsComponent implements OnInit {
     return (group.acceptedPicturesCount ?? 0) > count;
   }
 
-  ngOnInit(): void {
-    this.#pageEnv.set({pageId: 25});
+  constructor() {
+    effect(() => {
+      const brand = this.brandResource.value();
+      if (brand === undefined) {
+        return;
+      }
+
+      if (brand) {
+        this.#pageEnv.set({
+          pageId: 153,
+          title: brand.nameOnly,
+        });
+      } else {
+        this.#pageEnv.set({pageId: 25});
+      }
+    });
   }
 }
