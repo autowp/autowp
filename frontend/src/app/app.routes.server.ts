@@ -57,6 +57,10 @@ export const serverRoutes: ServerRoute[] = [
     path: 'factories/**',
     renderMode: RenderMode.Server,
   },
+  {
+    path: 'persons/**',
+    renderMode: RenderMode.Server,
+  },
   // No `/**` here deliberately: only the bare brand page (e.g. /toyota) is server-rendered, not
   // most other things nested under it (e.g. /toyota/corolla, /toyota/moder-only-routes...). A
   // path with more segments than this fails to match this node (it has no children) and falls
@@ -111,7 +115,6 @@ export const serverRoutes: ServerRoute[] = [
   {path: 'mosts/**', renderMode: RenderMode.Client},
   {path: 'museums/**', renderMode: RenderMode.Client},
   {path: 'new/**', renderMode: RenderMode.Client},
-  {path: 'persons/**', renderMode: RenderMode.Client},
   {path: 'gallery/**', renderMode: RenderMode.Client},
   {path: 'pulse/**', renderMode: RenderMode.Client},
   {path: 'twins/**', renderMode: RenderMode.Client},
