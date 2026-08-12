@@ -4,22 +4,6 @@
     max-width: 300px;
 }
 
-.map-picture-marker {
-    border-radius: 4px;
-    box-shadow: 0 0 4px rgb(0 0 0 / 50%);
-    background: #fff;
-    object-fit: contain;
-}
-
-.map-cluster {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgb(13 110 253 / 85%);
-    color: #fff;
-    font-weight: bold;
-    border: 2px solid #fff;
-    box-shadow: 0 0 4px rgb(0 0 0 / 50%);
-    cursor: pointer;
+.map-container:fullscreen {
+    height: 100% !important;
 }

@@ -6,7 +6,9 @@ import {
   ComponentRef,
   inject,
   NgZone,
+  OnDestroy,
   OnInit,
+  signal,
   ViewContainerRef,
 } from '@angular/core';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
@@ -38,6 +40,13 @@ const MAX_PICTURE_MARKER_SIZE = 100;
 // How many zoom levels a cluster click steps in, when zooming into that cluster's area.
 const CLUSTER_ZOOM_STEP = 2;
 
+// Half-width, in degrees, of the bounding box used to re-resolve a cluster that was clicked at
+// max zoom (see resolveStuckCluster). Small enough that even the finest achievable grid cell
+// (this span / pictureGridSize on the backend) separates most nearby-but-distinct pictures,
+// without being so small that a normal, deliberately grouped set of nearby photos (e.g. a small
+// venue) gets needlessly split apart.
+const CLUSTER_RESOLVE_DELTA = 0.0005;
+
 function createMarker(lat: number, lng: number): Marker {
   return marker([lat, lng], {
     icon: icon({
@@ -47,36 +56,6 @@ function createMarker(lat: number, lng: number): Marker {
       shadowUrl: 'assets/marker-shadow.png',
     }),
   });
-}
-
-function createPictureMarker(picture: MapSinglePicture, onClick: () => void): Marker {
-  const lat = picture.location?.latitude ?? 0;
-  const lng = picture.location?.longitude ?? 0;
-
-  const thumb = picture.thumb;
-
-  let m: Marker;
-
-  if (thumb?.src && thumb.width > 0 && thumb.height > 0) {
-    const scale = MAX_PICTURE_MARKER_SIZE / Math.max(thumb.width, thumb.height);
-    const width = thumb.width * scale;
-    const height = thumb.height * scale;
-
-    m = marker([lat, lng], {
-      icon: icon({
-        className: 'map-picture-marker',
-        iconAnchor: [width / 2, height / 2],
-        iconSize: [width, height],
-        iconUrl: thumb.src,
-      }),
-    });
-  } else {
-    m = createMarker(lat, lng);
-  }
-
-  m.on('click', onClick);
-
-  return m;
 }
 
 function clusterSize(count: number): number {
@@ -117,7 +96,7 @@ function createClusterMarker(cluster: MapPictureCluster, onClick: () => void): M
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnDestroy, OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
@@ -130,7 +109,19 @@ export class MapComponent implements OnInit {
 
   #compRef?: ComponentRef<MapPopupComponent>;
   #map?: Map;
+  readonly #onFullscreenChange = () => {
+    this.#zone.run(() => {
+      // eslint-disable-next-line sonarjs/different-types-comparison -- both sides are DOM Elements
+      this.isFullscreen.set(this.#document.fullscreenElement === this.#map?.getContainer());
+      // The map container's size changes with the fullscreen transition, but Leaflet has no way
+      // to know that on its own - without this, tiles stay laid out for the old (small) size
+      // until the next pan/zoom.
+      this.#map?.invalidateSize();
+    });
+  };
+
   protected markers: Marker[] = [];
+  protected readonly isFullscreen = signal(false);
 
   protected readonly mode = toSignal(
     this.#route.queryParamMap.pipe(
@@ -199,9 +190,29 @@ export class MapComponent implements OnInit {
       });
     });
 
+    this.#document.addEventListener('fullscreenchange', this.#onFullscreenChange);
+
     this.#zone.run(() => {
       this.#bounds$.next(lmap.getBounds());
     });
+  }
+
+  ngOnDestroy(): void {
+    this.#document.removeEventListener('fullscreenchange', this.#onFullscreenChange);
+  }
+
+  protected toggleFullscreen(): void {
+    const container = this.#map?.getContainer();
+
+    if (!container) {
+      return;
+    }
+
+    if (this.#document.fullscreenElement) {
+      void this.#document.exitFullscreen();
+    } else {
+      void container.requestFullscreen();
+    }
   }
 
   private clearMarkers(): void {
@@ -249,27 +260,31 @@ export class MapComponent implements OnInit {
 
     for (const point of points) {
       if (point.picture) {
-        const picture = point.picture;
-
-        this.markers.push(
-          createPictureMarker(picture, () => {
-            this.#zone.run(() => {
-              void this.#router.navigate(['/picture', picture.identity]);
-            });
-          }),
-        );
+        this.markers.push(this.createPictureMarker(point.picture));
       } else if (point.cluster) {
         const cluster = point.cluster;
 
         this.markers.push(
           createClusterMarker(cluster, () => {
             this.#zone.run(() => {
-              if (this.#map && cluster.location) {
-                this.#map.setView(
-                  [cluster.location.latitude, cluster.location.longitude],
-                  Math.min(this.#map.getZoom() + CLUSTER_ZOOM_STEP, this.#map.getMaxZoom()),
-                );
+              if (!this.#map || !cluster.location) {
+                return;
               }
+
+              // Already as zoomed in as the tile layer allows: setView below would be a no-op
+              // and leave the cluster's pictures permanently unreachable, since the viewport
+              // (and so the backend's grid cell size, which is derived from it) can't shrink any
+              // further. Fall back to explicitly resolving the cluster instead of zooming.
+              if (this.#map.getZoom() >= this.#map.getMaxZoom()) {
+                this.resolveStuckCluster(cluster);
+
+                return;
+              }
+
+              this.#map.setView(
+                [cluster.location.latitude, cluster.location.longitude],
+                Math.min(this.#map.getZoom() + CLUSTER_ZOOM_STEP, this.#map.getMaxZoom()),
+              );
             });
           }),
         );
@@ -277,5 +292,122 @@ export class MapComponent implements OnInit {
     }
 
     this.#cdr.markForCheck();
+  }
+
+  // Re-queries a small, fixed-size box around a cluster that can no longer be split apart by
+  // zooming (see the maxZoom check above), and shows the result in a popup so its pictures are
+  // still reachable. Pictures whose coordinates are close enough to remain grouped even at this
+  // resolution (or, in the limit, truly identical) still show as a smaller cluster count within
+  // the popup - there's no zoom level that could ever separate those further.
+  private resolveStuckCluster(cluster: MapPictureCluster): void {
+    if (!cluster.location) {
+      return;
+    }
+
+    const bounds = [
+      cluster.location.longitude - CLUSTER_RESOLVE_DELTA,
+      cluster.location.latitude - CLUSTER_RESOLVE_DELTA,
+      cluster.location.longitude + CLUSTER_RESOLVE_DELTA,
+      cluster.location.latitude + CLUSTER_RESOLVE_DELTA,
+    ].join(',');
+
+    this.#mapClient.getPicturePoints(new MapGetPicturePointsRequest({bounds})).subscribe({
+      error: (response: unknown) => this.#toastService.handleError(response),
+      next: (response) => {
+        this.#zone.run(() => {
+          this.showClusterResolutionPopup(cluster, response.points ?? []);
+        });
+      },
+    });
+  }
+
+  private showClusterResolutionPopup(cluster: MapPictureCluster, points: MapPicturePoint[]): void {
+    if (!this.#map || !cluster.location) {
+      return;
+    }
+
+    const container = this.#document.createElement('div');
+    container.className = 'map-cluster-popup';
+
+    for (const point of points) {
+      if (point.picture) {
+        const picture = point.picture;
+
+        const link = this.#document.createElement('a');
+        link.className = 'map-cluster-popup-item';
+        this.bindRouterLink(link, ['/picture', picture.identity]);
+
+        if (picture.thumb?.src) {
+          const img = this.#document.createElement('img');
+          img.src = picture.thumb.src;
+          img.alt = '';
+          link.appendChild(img);
+        }
+
+        container.appendChild(link);
+      } else if (point.cluster) {
+        const span = this.#document.createElement('span');
+        span.className = 'map-cluster-popup-more';
+        span.textContent = `+${point.cluster.count}`;
+        container.appendChild(span);
+      }
+    }
+
+    new Popup()
+      .setLatLng([cluster.location.latitude, cluster.location.longitude])
+      .setContent(container)
+      .openOn(this.#map);
+  }
+
+  // Real <a href> elements (built via the DOM API, not string interpolation, to avoid any HTML-
+  // escaping concerns) rather than a synthetic click target, so picture markers/popup links work
+  // natively with keyboard focus + Enter, right-click "open in new tab", and middle-click - none
+  // of which a click-only handler on a plain non-anchor element would support. A plain (no
+  // modifier keys) left-click is still intercepted to route through Angular's Router instead of a
+  // full page navigation; anything else (ctrl/cmd/shift-click, middle-click) is left to the
+  // browser's native handling of the href.
+  private bindRouterLink(anchor: HTMLAnchorElement, commands: readonly unknown[]): void {
+    anchor.href = this.#router.createUrlTree(commands).toString();
+    anchor.addEventListener('click', (event: MouseEvent) => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+        return;
+      }
+
+      event.preventDefault();
+      this.#zone.run(() => {
+        void this.#router.navigate(commands);
+      });
+    });
+  }
+
+  private createPictureMarker(picture: MapSinglePicture): Marker {
+    const lat = picture.location?.latitude ?? 0;
+    const lng = picture.location?.longitude ?? 0;
+    const thumb = picture.thumb;
+
+    const link = this.#document.createElement('a');
+    link.className = 'map-picture-marker';
+    this.bindRouterLink(link, ['/picture', picture.identity]);
+
+    const img = this.#document.createElement('img');
+    img.alt = '';
+    link.appendChild(img);
+
+    let iconSize: [number, number] = [25, 41];
+    let iconAnchor: [number, number] = [13, 41];
+
+    if (thumb?.src && thumb.width > 0 && thumb.height > 0) {
+      const scale = MAX_PICTURE_MARKER_SIZE / Math.max(thumb.width, thumb.height);
+
+      iconSize = [thumb.width * scale, thumb.height * scale];
+      iconAnchor = [iconSize[0] / 2, iconSize[1] / 2];
+      img.src = thumb.src;
+    } else {
+      img.src = 'assets/marker-icon.png';
+    }
+
+    return marker([lat, lng], {
+      icon: divIcon({className: 'map-picture-marker-icon', html: link, iconAnchor, iconSize}),
+    });
   }
 }
