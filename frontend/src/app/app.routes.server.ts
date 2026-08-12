@@ -86,6 +86,14 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server,
   },
   {
+    path: 'users/**',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'error-404',
+    renderMode: RenderMode.Server,
+  },
+  {
     path: 'cars/dateless',
     renderMode: RenderMode.Server,
   },
@@ -172,9 +180,7 @@ export const serverRoutes: ServerRoute[] = [
   {path: 'gallery/**', renderMode: RenderMode.Client},
   {path: 'pulse/**', renderMode: RenderMode.Client},
   {path: 'upload/**', renderMode: RenderMode.Client},
-  {path: 'users/**', renderMode: RenderMode.Client},
   {path: 'login/**', renderMode: RenderMode.Client},
-  {path: 'error-404/**', renderMode: RenderMode.Client},
   {
     path: '**',
     renderMode: RenderMode.Client,
