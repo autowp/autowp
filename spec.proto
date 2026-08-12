@@ -2516,6 +2516,7 @@ message ItemParentsRequest {
     NONE = 0;
     AUTO = 1;
     CATEGORIES_FIRST = 2;
+    NAME = 3;
   }
 
   ItemParentListOptions options = 1;

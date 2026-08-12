@@ -2121,6 +2121,8 @@ func (s *ItemsGRPCServer) GetItemParents(
 		order = items.ItemParentOrderByCategoriesFirst
 	case ItemParentsRequest_AUTO:
 		order = items.ItemParentOrderByAuto
+	case ItemParentsRequest_NAME:
+		order = items.ItemParentOrderByName
 	}
 
 	fields := convertItemParentFields(in.GetFields())

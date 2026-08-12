@@ -2347,6 +2347,83 @@ func TestGetItemParents(t *testing.T) {
 	require.Equal(t, child2ID, res.GetItems()[0].GetItemId())
 }
 
+// Regression test for a moderator-picker UX bug: ModerPicturesItemMoveComponent's vehicle/engine
+// pickers used Order_AUTO (see items/repository.go's ItemParentOrderByAuto), which sorts primarily
+// by production year - fine for a public model list, but confusing for a picker where a moderator
+// is searching for a specific model by name. Order_NAME wires up the same
+// items.ItemParentOrderByName the public GetBrandSections path already uses (sorted by
+// item_parent_language name with item.name fallback), which is a plain alphabetical sort.
+//
+// "Zebra" is given an earlier production year than "Alpha" specifically so the two orders are
+// forced to disagree - Order_AUTO must put Zebra first (year ascending) while Order_NAME must put
+// Alpha first (alphabetical) - rather than asserting against Order_NAME alone, which could pass
+// coincidentally: item_parent rows have no explicit ORDER BY at all under Order_NONE, and a plain
+// unordered scan for a given parent_id was observed (empirically, against this suite's Postgres)
+// to consistently come back in descending item_id order - so "Alpha" is deliberately created
+// *first* here (giving it the lower item_id) specifically so that coincidental descending-id
+// fallback would put "Zebra" first instead, correctly failing the alphabetical assertion below if
+// Order_NAME's mapping to items.ItemParentOrderByName were ever accidentally removed or broken.
+func TestGetItemParentsOrderByName(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	randomInt := random.Int()
+
+	parentID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("OrderByNameParent-%d", randomInt),
+		IsGroup:    true,
+		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		Catname:    fmt.Sprintf("order-by-name-parent-%d", randomInt),
+	})
+
+	alphaID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("Alpha-%d", randomInt),
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		BeginYear:  2020,
+		EndYear:    2020,
+	})
+	zebraID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("Zebra-%d", randomInt),
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		BeginYear:  1990,
+		EndYear:    1990,
+	})
+
+	kc := cnt.Keycloak()
+	cfg := config.LoadConfig(".")
+	adminToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+
+	client := NewItemsClient(conn)
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken.AccessToken)
+
+	_, err = client.CreateItemParent(apiCtx, &ItemParent{ItemId: zebraID, ParentId: parentID})
+	require.NoError(t, err)
+
+	_, err = client.CreateItemParent(apiCtx, &ItemParent{ItemId: alphaID, ParentId: parentID})
+	require.NoError(t, err)
+
+	nameRes, err := client.GetItemParents(ctx, &ItemParentsRequest{
+		Options: &ItemParentListOptions{ParentId: parentID},
+		Order:   ItemParentsRequest_NAME,
+	})
+	require.NoError(t, err)
+	require.Len(t, nameRes.GetItems(), 2)
+	require.Equal(t, alphaID, nameRes.GetItems()[0].GetItemId(), "alphabetical: Alpha should sort before Zebra")
+	require.Equal(t, zebraID, nameRes.GetItems()[1].GetItemId(), "alphabetical: Zebra should sort after Alpha")
+
+	autoRes, err := client.GetItemParents(ctx, &ItemParentsRequest{
+		Options: &ItemParentListOptions{ParentId: parentID},
+		Order:   ItemParentsRequest_AUTO,
+	})
+	require.NoError(t, err)
+	require.Len(t, autoRes.GetItems(), 2)
+	require.Equal(t, zebraID, autoRes.GetItems()[0].GetItemId(), "by year: 1990 Zebra should sort before 2020 Alpha")
+	require.Equal(t, alphaID, autoRes.GetItems()[1].GetItemId(), "by year: 2020 Alpha should sort after 1990 Zebra")
+}
+
 func TestItemFields(t *testing.T) {
 	t.Parallel()
 

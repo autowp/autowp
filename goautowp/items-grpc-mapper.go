@@ -365,6 +365,8 @@ func convertItemParentOrder(order ItemParentsRequest_Order) items.ItemParentOrde
 		return items.ItemParentOrderByCategoriesFirst
 	case ItemParentsRequest_AUTO:
 		return items.ItemParentOrderByAuto
+	case ItemParentsRequest_NAME:
+		return items.ItemParentOrderByName
 	}
 
 	return items.ItemParentOrderByNone
