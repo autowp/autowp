@@ -7,16 +7,20 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: 'donate/success',
-    renderMode: RenderMode.Server,
+    renderMode: RenderMode.Prerender,
   },
   {
     path: 'policy',
-    renderMode: RenderMode.Server,
+    renderMode: RenderMode.Prerender,
   },
   {
     path: 'telegram',
-    renderMode: RenderMode.Server,
+    renderMode: RenderMode.Prerender,
   },
+  // Stays Server, not Prerender like its static siblings above: AchievementsComponent calls
+  // AchievementsClient.getAchievementStats() for live per-achievement user counts, so
+  // prerendering it would both freeze those counts until the next deploy and require the backend
+  // to be reachable during `ng build` in CI, which it isn't.
   {
     path: 'achievements',
     renderMode: RenderMode.Server,
@@ -63,6 +67,10 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: 'museums/**',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'mosts/**',
     renderMode: RenderMode.Server,
   },
   {
@@ -137,7 +145,6 @@ export const serverRoutes: ServerRoute[] = [
   {path: 'log/**', renderMode: RenderMode.Client},
   {path: 'map/**', renderMode: RenderMode.Client},
   {path: 'moder/**', renderMode: RenderMode.Client},
-  {path: 'mosts/**', renderMode: RenderMode.Client},
   {path: 'new/**', renderMode: RenderMode.Client},
   {path: 'gallery/**', renderMode: RenderMode.Client},
   {path: 'pulse/**', renderMode: RenderMode.Client},
