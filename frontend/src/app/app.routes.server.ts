@@ -61,6 +61,31 @@ export const serverRoutes: ServerRoute[] = [
     path: 'persons/**',
     renderMode: RenderMode.Server,
   },
+  {
+    path: 'museums/**',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'forums',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'forums/topic/:topic_id',
+    renderMode: RenderMode.Server,
+  },
+  // No `/**` here deliberately, same reasoning as `:brand` below: forums/:theme_id is a generic
+  // positional wildcard matching any single segment after "forums", so its Client siblings below
+  // (also single segments after "forums") must be listed explicitly or they'd be silently
+  // swallowed by it. forums/new-topic/** and forums/message/** are safe without an explicit Client
+  // entry - they're three segments, which this wildcard (no `/**` suffix) never matches - so they
+  // fall through to the final Client catch-all on their own.
+  {
+    path: 'forums/:theme_id',
+    renderMode: RenderMode.Server,
+  },
+  {path: 'forums/move-message', renderMode: RenderMode.Client},
+  {path: 'forums/move-topic', renderMode: RenderMode.Client},
+  {path: 'forums/subscriptions', renderMode: RenderMode.Client},
   // No `/**` here deliberately: only the bare brand page (e.g. /toyota) is server-rendered, not
   // most other things nested under it (e.g. /toyota/corolla, /toyota/moder-only-routes...). A
   // path with more segments than this fails to match this node (it has no children) and falls
@@ -96,24 +121,23 @@ export const serverRoutes: ServerRoute[] = [
   // wildcard match regardless of name, and at each level tries an exact literal match before
   // falling back to it — so without these entries, :brand would silently swallow every route
   // below too (moder/account/upload have no SSR value, Keycloak never runs server-side; new/inbox
-  // render user-specific, timezone-dependent content SSR can't produce correctly; map/museums/
-  // chart/pulse/info depend on browser-only libraries — Leaflet, Chart.js, Monaco — with no
-  // platform guards yet; factories/** is server-rendered because its Leaflet usage is isolated in
-  // FactoryMapComponent, used only inside an @defer block, so it never loads server-side).
+  // render user-specific, timezone-dependent content SSR can't produce correctly; map/chart/pulse/
+  // info depend on browser-only libraries — Leaflet, Chart.js, Monaco — with no platform guards
+  // yet; factories/** and museums/** are server-rendered because their Leaflet usage is isolated
+  // in FactoryMapComponent/MuseumMapComponent, used only inside an @defer block, so it never loads
+  // server-side).
   {path: 'about/**', renderMode: RenderMode.Client},
   {path: 'account/**', renderMode: RenderMode.Client},
   {path: 'cars/**', renderMode: RenderMode.Client},
   {path: 'category/**', renderMode: RenderMode.Client},
   {path: 'chart/**', renderMode: RenderMode.Client},
   {path: 'donate/**', renderMode: RenderMode.Client},
-  {path: 'forums/**', renderMode: RenderMode.Client},
   {path: 'inbox/**', renderMode: RenderMode.Client},
   {path: 'info/**', renderMode: RenderMode.Client},
   {path: 'log/**', renderMode: RenderMode.Client},
   {path: 'map/**', renderMode: RenderMode.Client},
   {path: 'moder/**', renderMode: RenderMode.Client},
   {path: 'mosts/**', renderMode: RenderMode.Client},
-  {path: 'museums/**', renderMode: RenderMode.Client},
   {path: 'new/**', renderMode: RenderMode.Client},
   {path: 'gallery/**', renderMode: RenderMode.Client},
   {path: 'pulse/**', renderMode: RenderMode.Client},

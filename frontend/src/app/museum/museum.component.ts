@@ -1,7 +1,6 @@
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {
   CommentsType,
   Item,
@@ -20,7 +19,6 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {icon, latLng, marker, tileLayer} from 'leaflet';
 import {RemarkModule} from 'ngx-remark';
 import {EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
@@ -28,10 +26,11 @@ import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switch
 import {CommentsComponent} from '../comments/comments/comments.component';
 import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../toasts/toasts.service';
+import {MuseumMapComponent} from './map/museum-map.component';
 
 @Component({
   selector: 'app-museum',
-  imports: [RouterLink, LeafletModule, CommentsComponent, AsyncPipe, ThumbnailComponent, RemarkModule],
+  imports: [RouterLink, CommentsComponent, AsyncPipe, ThumbnailComponent, RemarkModule, MuseumMapComponent],
   templateUrl: './museum.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -138,37 +137,6 @@ export class MuseumComponent {
       });
     }),
     shareReplay({bufferSize: 1, refCount: false}),
-  );
-
-  protected readonly map$ = this.item$.pipe(
-    map((item) => {
-      if (!item.location?.latitude || !item.location?.longitude) {
-        return null;
-      }
-
-      const center = latLng([item.location.latitude, item.location.longitude]);
-      return {
-        markers: [
-          marker(center, {
-            icon: icon({
-              iconAnchor: [13, 41],
-              iconSize: [25, 41],
-              iconUrl: 'assets/marker-icon.png',
-              shadowUrl: 'assets/marker-shadow.png',
-            }),
-          }),
-        ],
-        options: {
-          center,
-          layers: [
-            tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              maxZoom: 18,
-            }),
-          ],
-          zoom: 17,
-        },
-      };
-    }),
   );
 
   protected readonly CommentsType = CommentsType;

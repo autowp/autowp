@@ -19,14 +19,12 @@
       <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
     </p>
   }
-  @if (map$ | async; as map) {
-    <div
-      style="height: 300px"
-      class="mb-4 w-100"
-      leaflet
-      [leafletOptions]="map.options"
-      [leafletLayers]="map.markers"
-    ></div>
+  @if (item.location?.latitude && item.location?.longitude) {
+    @defer {
+      <app-museum-map [latitude]="item.location.latitude" [longitude]="item.location.longitude" />
+    } @placeholder {
+      <div style="height: 300px" class="mb-4 w-100"></div>
+    }
   }
   @if (links$ | async; as links) {
     @if (item && ((links.items && links.items.length > 0) || item.description)) {
