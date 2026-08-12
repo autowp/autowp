@@ -74,6 +74,32 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server,
   },
   {
+    path: 'about',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'twins/**',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'category/**',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'cars/dateless',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'cars/attrs-change-log',
+    renderMode: RenderMode.Server,
+  },
+  // The rest of cars/* are moderator editing tools, not content. Unlike forums/:theme_id or
+  // :brand, none of these are dynamic segments, so there's no wildcard-swallow risk in leaving
+  // them unlisted - listed explicitly anyway for clarity.
+  {path: 'cars/select-engine', renderMode: RenderMode.Client},
+  {path: 'cars/specifications-editor', renderMode: RenderMode.Client},
+  {path: 'cars/specs-admin', renderMode: RenderMode.Client},
+  {
     path: 'forums',
     renderMode: RenderMode.Server,
   },
@@ -134,10 +160,7 @@ export const serverRoutes: ServerRoute[] = [
   // yet; factories/** and museums/** are server-rendered because their Leaflet usage is isolated
   // in FactoryMapComponent/MuseumMapComponent, used only inside an @defer block, so it never loads
   // server-side).
-  {path: 'about/**', renderMode: RenderMode.Client},
   {path: 'account/**', renderMode: RenderMode.Client},
-  {path: 'cars/**', renderMode: RenderMode.Client},
-  {path: 'category/**', renderMode: RenderMode.Client},
   {path: 'chart/**', renderMode: RenderMode.Client},
   {path: 'donate/**', renderMode: RenderMode.Client},
   {path: 'inbox/**', renderMode: RenderMode.Client},
@@ -148,7 +171,6 @@ export const serverRoutes: ServerRoute[] = [
   {path: 'new/**', renderMode: RenderMode.Client},
   {path: 'gallery/**', renderMode: RenderMode.Client},
   {path: 'pulse/**', renderMode: RenderMode.Client},
-  {path: 'twins/**', renderMode: RenderMode.Client},
   {path: 'upload/**', renderMode: RenderMode.Client},
   {path: 'users/**', renderMode: RenderMode.Client},
   {path: 'login/**', renderMode: RenderMode.Client},
