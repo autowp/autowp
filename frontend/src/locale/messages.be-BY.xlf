@@ -5424,6 +5424,14 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <target state="translated">Музеі і заводы</target>
       </trans-unit>
+      <trans-unit id="7531602241051125940" datatype="html">
+        <source>Objects</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/map/map.component.html</context>
+          <context context-type="linenumber">15,21</context>
+        </context-group>
+        <target state="translated">Аб'екты</target>
+      </trans-unit>
       <trans-unit id="7585826646011739428" datatype="html">
         <source>Edit</source>
         <context-group purpose="location">

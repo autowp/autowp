@@ -295,7 +295,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/cars/cars.component.html</context>
-          <context context-type="linenumber">4,8</context>
+          <context context-type="linenumber">7,10</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/concepts/concepts.component.html</context>
@@ -307,7 +307,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/mixed/mixed.component.html</context>
-          <context context-type="linenumber">4,7</context>
+          <context context-type="linenumber">7,10</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/mixed/picture/picture.component.html</context>
@@ -319,7 +319,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/recent/recent.component.html</context>
-          <context context-type="linenumber">4,7</context>
+          <context context-type="linenumber">7,10</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/pictures/picture/picture.component.html</context>
@@ -583,7 +583,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/picture/picture-page.component.html</context>
-          <context context-type="linenumber">4,10</context>
+          <context context-type="linenumber">4,9</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/policy/policy.component.html</context>
@@ -730,19 +730,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/cars/cars.component.html</context>
-          <context context-type="linenumber">18,24</context>
+          <context context-type="linenumber">46,49</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/cars/cars.component.html</context>
-          <context context-type="linenumber">28,31</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/catalogue/cars/cars.component.html</context>
-          <context context-type="linenumber">43,47</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/catalogue/cars/cars.component.html</context>
-          <context context-type="linenumber">55,57</context>
+          <context context-type="linenumber">49,51</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/concepts/concepts.component.html</context>
@@ -754,23 +746,23 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">100,104</context>
+          <context context-type="linenumber">138,142</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">139,143</context>
+          <context context-type="linenumber">167,171</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">168,172</context>
+          <context context-type="linenumber">186,190</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">187,191</context>
+          <context context-type="linenumber">223,226</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">224,226</context>
+          <context context-type="linenumber">226,228</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/mixed/gallery/gallery.component.html</context>
@@ -778,15 +770,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/mixed/mixed.component.html</context>
+          <context context-type="linenumber">35,38</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/catalogue/mixed/mixed.component.html</context>
           <context context-type="linenumber">38,40</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/mixed/picture/picture.component.html</context>
-          <context context-type="linenumber">36,40</context>
+          <context context-type="linenumber">33,36</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/mixed/picture/picture.component.html</context>
-          <context context-type="linenumber">40,42</context>
+          <context context-type="linenumber">36,38</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/mosts/mosts.component.html</context>
@@ -794,11 +790,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/recent/recent.component.html</context>
-          <context context-type="linenumber">19,23</context>
+          <context context-type="linenumber">35,38</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/recent/recent.component.html</context>
-          <context context-type="linenumber">36,38</context>
+          <context context-type="linenumber">38,40</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/pictures/picture/picture.component.html</context>
@@ -1137,6 +1133,10 @@
           <context context-type="linenumber">16,18</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture-page.component.html</context>
+          <context context-type="linenumber">12,15</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/pulse/pulse.component.html</context>
           <context context-type="linenumber">23,26</context>
         </context-group>
@@ -1186,11 +1186,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/rating/rating.component.html</context>
-          <context context-type="linenumber">87,90</context>
+          <context context-type="linenumber">76,77</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/rating/rating.component.html</context>
-          <context context-type="linenumber">105,109</context>
+          <context context-type="linenumber">92,93</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/user/user.component.html</context>
@@ -1779,7 +1779,7 @@ Good luck.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">214,216</context>
+          <context context-type="linenumber">213,215</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
@@ -1965,7 +1965,7 @@ Good luck.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">35,36</context>
+          <context context-type="linenumber">37,38</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/twins/twins.component.html</context>
@@ -2016,7 +2016,7 @@ Good luck.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">43,47</context>
+          <context context-type="linenumber">45,49</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/index.component.html</context>
@@ -2375,7 +2375,7 @@ All images are posted for educational purposes.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">132,139</context>
+          <context context-type="linenumber">131,137</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/categories/category/category.component.html</context>
@@ -2391,7 +2391,7 @@ All images are posted for educational purposes.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/factories/factories.component.html</context>
-          <context context-type="linenumber">80,85</context>
+          <context context-type="linenumber">78,83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/item-of-day/item-of-day/item-of-day.component.html</context>
@@ -2903,7 +2903,7 @@ All images are posted for educational purposes.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">73,76</context>
+          <context context-type="linenumber">75,78</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/pictures/pictures.component.html</context>
@@ -2923,7 +2923,7 @@ All images are posted for educational purposes.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/factories/factories.component.html</context>
-          <context context-type="linenumber">22,28</context>
+          <context context-type="linenumber">22,27</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/factories/items/items.component.html</context>
@@ -3059,7 +3059,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/comments/list/list.component.html</context>
-          <context context-type="linenumber">113,116</context>
+          <context context-type="linenumber">113,117</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
@@ -3086,18 +3086,14 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>In chronological order</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/cars/cars.component.html</context>
-          <context context-type="linenumber">14,18</context>
+          <context context-type="linenumber">14,20</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3968566556790194898" datatype="html">
         <source><x id="PH" equiv-text="itemName"/> in chronological order</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/cars/cars.component.ts</context>
-          <context context-type="linenumber">103</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/catalogue/cars/cars.component.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">128</context>
         </context-group>
       </trans-unit>
       <trans-unit id="788967566322079082" datatype="html">
@@ -3156,21 +3152,21 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/mosts/mosts.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">89</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7058787413690577427" datatype="html">
         <source>Chronological</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">23,27</context>
+          <context context-type="linenumber">25,29</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4832648236620985717" datatype="html">
         <source>New pictures</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">29,32</context>
+          <context context-type="linenumber">31,34</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/pictures/pictures.component.html</context>
@@ -3209,14 +3205,14 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>Brand inbox</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">51,52</context>
+          <context context-type="linenumber">53,54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="117954017715534854" datatype="html">
         <source>comments</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">64,65</context>
+          <context context-type="linenumber">66,67</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/pictures/pictures.component.html</context>
@@ -3231,7 +3227,7 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>add vehicle</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">83,86</context>
+          <context context-type="linenumber">85,88</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/catalogue/catalogue.component.html</context>
@@ -3250,7 +3246,7 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>add engine</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">93,98</context>
+          <context context-type="linenumber">95,100</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/catalogue/catalogue.component.html</context>
@@ -3269,7 +3265,7 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>Factories</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">145,147</context>
+          <context context-type="linenumber">144,146</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/factories/factories.component.html</context>
@@ -3292,14 +3288,14 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>Popular images</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">174,176</context>
+          <context context-type="linenumber">173,175</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7565716024468232322" datatype="html">
         <source>Links</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">193,196</context>
+          <context context-type="linenumber">192,195</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
@@ -3310,14 +3306,14 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>Official websites</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">196,198</context>
+          <context context-type="linenumber">195,196</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8919106225290563498" datatype="html">
         <source>Car clubs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">205,207</context>
+          <context context-type="linenumber">204,206</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5036543902087014214" datatype="html">
@@ -3335,14 +3331,14 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>Latest pictures of <x id="INTERPOLATION" equiv-text="{{ brand.nameOnly }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/recent/recent.component.html</context>
-          <context context-type="linenumber">16,18</context>
+          <context context-type="linenumber">16,19</context>
         </context-group>
       </trans-unit>
       <trans-unit id="729499279769796692" datatype="html">
-        <source>Last pictures of <x id="PH" equiv-text="brand.nameText"/></source>
+        <source>Last pictures of <x id="PH" equiv-text="this.brandResource.value().nameText"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/recent/recent.component.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5313958022317596858" datatype="html">
@@ -3471,7 +3467,11 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/factories/factories.component.html</context>
-          <context context-type="linenumber">47,49</context>
+          <context context-type="linenumber">45,47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/map/map.component.html</context>
+          <context context-type="linenumber">23,30</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/index/index.component.html</context>
@@ -3535,7 +3535,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/rating/rating.component.ts</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="n-vehicles" datatype="html">
@@ -4284,7 +4284,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/factories/factories.component.html</context>
-          <context context-type="linenumber">62,64</context>
+          <context context-type="linenumber">60,62</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/factories/items/items.component.html</context>
@@ -4938,7 +4938,14 @@ If you are not registered yet, please do so now [on the registration page](/sign
         <source>Museums and factories</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/map/map.component.html</context>
-          <context context-type="linenumber">10,15</context>
+          <context context-type="linenumber">10,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7531602241051125940" datatype="html">
+        <source>Objects</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/map/map.component.html</context>
+          <context context-type="linenumber">15,21</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8109444760941768648" datatype="html">
@@ -6598,7 +6605,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/similar/similar.component.ts</context>
-          <context context-type="linenumber">149</context>
+          <context context-type="linenumber">155</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3359219790598602238" datatype="html">
@@ -7769,7 +7776,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/rating/rating.component.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9192327757191548753" datatype="html">
@@ -8609,7 +8616,7 @@ Please note that adding pictures is moderated. That is, all pictures will be rev
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/rating/rating.component.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6997783649334365457" datatype="html">
@@ -8620,7 +8627,7 @@ Please note that adding pictures is moderated. That is, all pictures will be rev
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/rating/rating.component.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">78</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5280218112746407598" datatype="html">
@@ -13618,8 +13625,8 @@ Transmission is not considered</source>
       </trans-unit>
       <trans-unit id="1929970493428392749" datatype="html">
         <source>
-      Voting during <x id="INTERPOLATION" equiv-text="{{ voting.beginDate.toDate() | date: &apos;mediumDate&apos; }}"/> to
-      <x id="INTERPOLATION_1" equiv-text="{{ voting.endDate.toDate() | date: &apos;mediumDate&apos; }}"/>
+      Voting during <x id="INTERPOLATION" equiv-text="{{ beginDate(voting) | date: &apos;mediumDate&apos; }}"/> to
+      <x id="INTERPOLATION_1" equiv-text="{{ endDate(voting) | date: &apos;mediumDate&apos; }}"/>
     </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/voting/voting.component.html</context>

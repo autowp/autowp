@@ -10,6 +10,20 @@
   <h1><ng-container i18n>Map</ng-container> <small i18n>Museums and factories</small></h1>
 </div>
 
+<div class="btn-group mb-3">
+  <a class="btn btn-secondary" routerLink="." i18n [class.active]="mode() === 'objects'" [queryParams]="{mode: null}"
+    >Objects</a
+  >
+  <a
+    class="btn btn-secondary"
+    routerLink="."
+    i18n
+    [class.active]="mode() === 'pictures'"
+    [queryParams]="{mode: 'pictures'}"
+    >Pictures</a
+  >
+</div>
+
 @defer {
   <div
     style="width: 100%; height: 600px"
