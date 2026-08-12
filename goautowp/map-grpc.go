@@ -203,6 +203,12 @@ func (s *MapGRPCServer) GetPoints(
 // with no zoom-level threshold to tune.
 const pictureGridSize = 16
 
+// individualPictureLimit caps the number of pictures GetPicturePoints returns when the caller asks
+// to skip grid clustering (in.GetIndividual()) - intended for re-resolving a cluster against an
+// already tight bounding box, not for browsing the whole map, so the cap only guards against an
+// unexpectedly dense bbox rather than needing to be large.
+const individualPictureLimit = 100
+
 func (s *MapGRPCServer) GetPicturePoints(
 	ctx context.Context,
 	in *MapGetPicturePointsRequest,
@@ -210,6 +216,20 @@ func (s *MapGRPCServer) GetPicturePoints(
 	lngLo, latLo, lngHi, latHi, err := parseMapBounds(in.GetBounds())
 	if err != nil {
 		return nil, err
+	}
+
+	if in.GetIndividual() {
+		ids, err := s.individualPictureIDsInBounds(ctx, lngLo, latLo, lngHi, latHi)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		points, err := s.singlePicturePoints(ctx, ids)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		return &MapPicturePoints{Points: points}, nil
 	}
 
 	cellLat := (latHi - latLo) / pictureGridSize
@@ -261,6 +281,77 @@ func (s *MapGRPCServer) GetPicturePoints(
 	points = append(points, singlePoints...)
 
 	return &MapPicturePoints{Points: points}, nil
+}
+
+func (s *MapGRPCServer) individualPictureIDsInBounds(
+	ctx context.Context,
+	lngLo, latLo, lngHi, latHi float64,
+) ([]int, error) {
+	var ids []int
+
+	for _, lngRange := range normalizedLongitudeRanges(lngLo, lngHi) {
+		rangeIDs, err := s.pictureIDsInRange(
+			ctx, lngRange[0], latLo, lngRange[1], latHi, individualPictureLimit-len(ids),
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		ids = append(ids, rangeIDs...)
+
+		if len(ids) >= individualPictureLimit {
+			break
+		}
+	}
+
+	return ids, nil
+}
+
+func (s *MapGRPCServer) pictureIDsInRange(
+	ctx context.Context,
+	lngLo, latLo, lngHi, latHi float64,
+	limit int,
+) ([]int, error) {
+	if limit <= 0 {
+		return nil, nil
+	}
+
+	rows, err := s.db.Select(schema.PictureTableIDCol).
+		From(schema.PictureTable).
+		Where(
+			schema.PictureTableStatusCol.Eq(schema.PictureStatusAccepted),
+			goqu.Func(
+				"ST_Intersects",
+				goqu.L("?::geometry", schema.PictureTablePointCol),
+				goqu.Func("ST_MakeEnvelope", lngLo, latLo, lngHi, latHi, schema.SRID),
+			),
+		).
+		Limit(uint(limit)).
+		Executor().QueryContext(ctx) //nolint:sqlclosecheck
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	defer util.Close(rows)
+
+	var ids []int
+
+	for rows.Next() {
+		var id int
+
+		err = rows.Scan(&id)
+		if err != nil {
+			return nil, err
+		}
+
+		ids = append(ids, id)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return ids, nil
 }
 
 func (s *MapGRPCServer) pointsWithContent(

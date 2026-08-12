@@ -296,9 +296,9 @@ export class MapComponent implements OnDestroy, OnInit {
 
   // Re-queries a small, fixed-size box around a cluster that can no longer be split apart by
   // zooming (see the maxZoom check above), and shows the result in a popup so its pictures are
-  // still reachable. Pictures whose coordinates are close enough to remain grouped even at this
-  // resolution (or, in the limit, truly identical) still show as a smaller cluster count within
-  // the popup - there's no zoom level that could ever separate those further.
+  // still reachable. Passes individual: true so the backend skips grid clustering for this
+  // request entirely - re-clustering that same tiny box with the usual grid could still fragment
+  // it into several small sub-clusters instead of a flat, browsable list.
   private resolveStuckCluster(cluster: MapPictureCluster): void {
     if (!cluster.location) {
       return;
@@ -311,7 +311,7 @@ export class MapComponent implements OnDestroy, OnInit {
       cluster.location.latitude + CLUSTER_RESOLVE_DELTA,
     ].join(',');
 
-    this.#mapClient.getPicturePoints(new MapGetPicturePointsRequest({bounds})).subscribe({
+    this.#mapClient.getPicturePoints(new MapGetPicturePointsRequest({bounds, individual: true})).subscribe({
       error: (response: unknown) => this.#toastService.handleError(response),
       next: (response) => {
         this.#zone.run(() => {
@@ -345,11 +345,6 @@ export class MapComponent implements OnDestroy, OnInit {
         }
 
         container.appendChild(link);
-      } else if (point.cluster) {
-        const span = this.#document.createElement('span');
-        span.className = 'map-cluster-popup-more';
-        span.textContent = `+${point.cluster.count}`;
-        container.appendChild(span);
       }
     }
 

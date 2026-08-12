@@ -1857,6 +1857,11 @@ message MapPoint {
 
 message MapGetPicturePointsRequest {
   string bounds = 1;
+  // Skips grid clustering entirely, returning every matching picture as an individual point (up
+  // to a small server-side cap) instead. Intended for re-resolving a cluster that was clicked at
+  // max zoom against a small, already-tight bounding box - clustering that same tiny box with the
+  // usual grid can still produce multiple small sub-clusters instead of a flat, browsable list.
+  bool individual = 2;
 }
 
 message MapPicturePoints {

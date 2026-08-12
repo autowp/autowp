@@ -506,29 +506,20 @@ iframe {
 
 // Content of the popup shown when a cluster can no longer be split apart by zooming further (see
 // resolveStuckCluster in map.component.ts) - also Leaflet-managed DOM, same reasoning as above.
+// A fixed width (not just max-width) with an explicit column count is used rather than
+// flex-wrap: Leaflet sizes .leaflet-popup-content to its content's natural width, which left a
+// flex-wrap container free to lay everything out in a single column instead of wrapping.
 .map-cluster-popup {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
   gap: 4px;
-  max-width: 220px;
+  width: 300px;
 }
 
 .map-cluster-popup-item img {
   display: block;
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   object-fit: cover;
   border-radius: var(--bs-border-radius);
-}
-
-.map-cluster-popup-more {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  background: #eee;
-  border-radius: var(--bs-border-radius);
-  font-size: 12px;
-  color: #666;
 }

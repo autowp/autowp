@@ -449,3 +449,54 @@ func TestGetPicturePointsCluster(t *testing.T) {
 	require.InDelta(t, wantLatitude, found.GetLocation().GetLatitude(), 0.0001)
 	require.InDelta(t, wantLongitude, found.GetLocation().GetLongitude(), 0.0001)
 }
+
+// GetPicturePoints with individual: true must skip grid clustering entirely and return every
+// matching picture as a flat MapSinglePicture, even when they'd otherwise fragment into several
+// small sub-clusters within a tight bbox. This is what resolveStuckCluster in map.component.ts
+// relies on: without it, re-querying a small bbox around a max-zoom cluster could still come back
+// with several tiny sub-clusters, rendered as a popup full of unusable "+N" placeholders instead
+// of a clickable list of pictures.
+func TestGetPicturePointsIndividual(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+
+	// Tight enough (comparable to CLUSTER_RESOLVE_DELTA in map.component.ts) that a plain
+	// grid-clustered request over it would fragment even a handful of pictures into multiple small
+	// sub-clusters instead of individual points.
+	const (
+		centerLat    = -33.85
+		centerLng    = 151.2
+		delta        = 0.0005
+		pictureCount = 6
+	)
+
+	bounds := fmt.Sprintf("%f,%f,%f,%f", centerLng-delta, centerLat-delta, centerLng+delta, centerLat+delta)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+
+	identities := make(map[string]bool, pictureCount)
+
+	for range pictureCount {
+		latitude := centerLat + (random.Float64()*2-1)*delta*0.8
+		longitude := centerLng + (random.Float64()*2-1)*delta*0.8
+		identities[createPictureWithPointAt(t, latitude, longitude)] = true
+	}
+
+	client := NewMapClient(conn)
+
+	res, err := client.GetPicturePoints(ctx, &MapGetPicturePointsRequest{Bounds: bounds, Individual: true})
+	require.NoError(t, err)
+
+	found := make(map[string]bool, pictureCount)
+
+	for _, point := range res.GetPoints() {
+		require.Nil(t, point.GetCluster(), "individual mode must never return a cluster point")
+
+		if picture := point.GetPicture(); picture != nil && identities[picture.GetIdentity()] {
+			found[picture.GetIdentity()] = true
+		}
+	}
+
+	require.Len(t, found, pictureCount, "all pictures in the tight bbox must come back as individual points")
+}
