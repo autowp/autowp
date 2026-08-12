@@ -1,13 +1,20 @@
 package goautowp
 
 import (
+	"context"
 	"fmt"
+	"math"
 	"math/rand"
+	"net"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/autowp/goautowp/schema"
+	"github.com/jackc/pgtype"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/twpayne/go-geom"
 	"google.golang.org/genproto/googleapis/type/latlng"
 )
 
@@ -278,4 +285,167 @@ func TestGetPointsWorldWrapPanning(t *testing.T) {
 	require.NotNil(
 		t, found, "point was not returned for a bounding box panned one world copy over from its real location",
 	)
+}
+
+// createPictureWithPointAt inserts an accepted picture directly at the given standard-convention
+// (latitude, longitude), bypassing the upload pipeline - mirrors the direct schema.PictureRow
+// insertion pattern in pictures/repository_test.go's createTestPicture, since GetPicturePoints
+// only cares about status/point/identity, not the rest of the upload flow.
+func createPictureWithPointAt(t *testing.T, latitude, longitude float64) string {
+	t.Helper()
+
+	ctx := t.Context()
+
+	goquDB, err := cnt.GoquDB(ctx)
+	require.NoError(t, err)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	identity := "m" + strconv.Itoa(int(random.Uint32()%100000))
+
+	point, err := geom.NewPoint(geom.XY).SetCoords(geom.Coord{longitude, latitude})
+	require.NoError(t, err)
+
+	point.SetSRID(schema.SRID)
+
+	var pgIP pgtype.Inet
+
+	err = pgIP.Set(net.IPv4(127, 0, 0, 1))
+	require.NoError(t, err)
+
+	var id int64
+
+	success, err := goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
+		Identity:  identity,
+		Status:    schema.PictureStatusAccepted,
+		IP:        pgIP,
+		CreatedAt: time.Now(),
+		Point:     schema.NullPoint{Point: *point, Valid: true},
+	}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &id)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	// Without this, repeated local runs against the same persistent Postgres instance accumulate
+	// picture rows across invocations (this test package's DB isn't reset between `go test`
+	// runs), which can eventually cause two unrelated runs' points to land in the same grid cell
+	// by chance and make TestGetPicturePointsSingle/Cluster flaky.
+	t.Cleanup(func() {
+		_, err := goquDB.Delete(schema.PictureTable).
+			Where(schema.PictureTableIDCol.Eq(id)).
+			Executor().ExecContext(context.Background())
+		assert.NoError(t, err)
+	})
+
+	return identity
+}
+
+// Regression-style coverage for GetPicturePoints: a picture alone in its grid cell must come back
+// as an individual, clickable MapSinglePicture (not folded into a cluster).
+//
+// The picture's position is jittered a little within a fixed viewport (rather than using fixed
+// coordinates) so repeated local test runs against the same persistent Postgres instance don't
+// pile up pictures at the exact same spot and turn "alone in its cell" into "clustered with a
+// leftover picture from a previous run" - a real, if self-inflicted, failure mode observed while
+// developing this test.
+func TestGetPicturePointsSingle(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+
+	// Viewport around London; the picture is placed within its central quarter so it's never near
+	// a grid-cell edge regardless of the jitter.
+	const bounds = "-1,50.5,0.9,52.5"
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	latitude := 51.0 + random.Float64()*0.5
+	longitude := -0.5 + random.Float64()*1.0
+
+	identity := createPictureWithPointAt(t, latitude, longitude)
+
+	client := NewMapClient(conn)
+
+	res, err := client.GetPicturePoints(ctx, &MapGetPicturePointsRequest{Bounds: bounds})
+	require.NoError(t, err)
+
+	var found *MapSinglePicture
+
+	for _, point := range res.GetPoints() {
+		if picture := point.GetPicture(); picture != nil && picture.GetIdentity() == identity {
+			found = picture
+
+			break
+		}
+	}
+
+	require.NotNil(t, found, "lone picture in the viewport was not returned as an individual point")
+	require.InDelta(t, latitude, found.GetLocation().GetLatitude(), 0.01)
+	require.InDelta(t, longitude, found.GetLocation().GetLongitude(), 0.01)
+}
+
+// Several pictures placed close enough together to share a grid cell must come back as one
+// MapPictureCluster with the correct count, not as separate individual points. The cluster's base
+// position is jittered per run for the same reason as TestGetPicturePointsSingle above.
+func TestGetPicturePointsCluster(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+
+	// Viewport around Tokyo - a different area from TestGetPicturePointsSingle (London), to avoid
+	// any chance of overlap between the two tests' jittered positions.
+	const (
+		boundsLngLo  = 139.0
+		boundsLatLo  = 35.0
+		boundsLngHi  = 140.0
+		boundsLatHi  = 36.0
+		bounds       = "139,35,140,36"
+		pictureCount = 5
+	)
+
+	// Placed dead-center of a random interior grid cell (matching GetPicturePoints's own
+	// pictureGridSize) rather than anywhere in the viewport: near a cell edge, the small spread
+	// between the pictureCount pictures below could straddle two cells and split the cluster,
+	// which happened intermittently before this fix.
+	cellLng := (boundsLngHi - boundsLngLo) / pictureGridSize
+	cellLat := (boundsLatHi - boundsLatLo) / pictureGridSize
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	cellLngIndex := 2 + random.Intn(pictureGridSize-4)
+	cellLatIndex := 2 + random.Intn(pictureGridSize-4)
+	baseLongitude := boundsLngLo + (float64(cellLngIndex)+0.5)*cellLng
+	baseLatitude := boundsLatLo + (float64(cellLatIndex)+0.5)*cellLat
+
+	for i := range pictureCount {
+		createPictureWithPointAt(t, baseLatitude+float64(i)*0.001, baseLongitude+float64(i)*0.001)
+	}
+
+	client := NewMapClient(conn)
+
+	res, err := client.GetPicturePoints(ctx, &MapGetPicturePointsRequest{Bounds: bounds})
+	require.NoError(t, err)
+
+	// The cluster's reported location is the average of its pictures' coordinates, so the expected
+	// center is offset from the base by the mean of the per-picture spread (i*0.001 for
+	// i in [0, pictureCount)), not the base itself.
+	wantLatitude := baseLatitude + float64(pictureCount-1)/2*0.001
+	wantLongitude := baseLongitude + float64(pictureCount-1)/2*0.001
+
+	var found *MapPictureCluster
+
+	for _, point := range res.GetPoints() {
+		// Matches on both a tight location window and the exact expected count: on a shared,
+		// non-reset test database, count alone or location alone could coincidentally match an
+		// unrelated cluster left over from another test run.
+		if cluster := point.GetCluster(); cluster != nil &&
+			cluster.GetCount() == pictureCount &&
+			math.Abs(cluster.GetLocation().GetLatitude()-wantLatitude) < 0.001 &&
+			math.Abs(cluster.GetLocation().GetLongitude()-wantLongitude) < 0.001 {
+			found = cluster
+
+			break
+		}
+	}
+
+	require.NotNil(t, found, "colocated pictures were not returned as a cluster")
+	require.EqualValues(t, pictureCount, found.GetCount())
+	require.InDelta(t, wantLatitude, found.GetLocation().GetLatitude(), 0.0001)
+	require.InDelta(t, wantLongitude, found.GetLocation().GetLongitude(), 0.0001)
 }

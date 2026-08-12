@@ -245,6 +245,7 @@ service Log {
 
 service Map {
   rpc GetPoints(MapGetPointsRequest) returns (MapPoints) {}
+  rpc GetPicturePoints(MapGetPicturePointsRequest) returns (MapPicturePoints) {}
 }
 
 service Pictures {
@@ -1852,6 +1853,32 @@ message MapPoint {
   string name = 3;
   repeated string url = 4;
   Image image = 5;
+}
+
+message MapGetPicturePointsRequest {
+  string bounds = 1;
+}
+
+message MapPicturePoints {
+  repeated MapPicturePoint points = 1;
+}
+
+message MapPicturePoint {
+  oneof kind {
+    MapSinglePicture picture = 1;
+    MapPictureCluster cluster = 2;
+  }
+}
+
+message MapSinglePicture {
+  string identity = 1;
+  google.type.LatLng location = 2;
+  Image thumb = 3;
+}
+
+message MapPictureCluster {
+  google.type.LatLng location = 1;
+  int32 count = 2;
 }
 
 message PicturesViewRequest {

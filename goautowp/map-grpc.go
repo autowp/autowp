@@ -76,38 +76,49 @@ func NewMapGRPCServer(
 	}
 }
 
-func (s *MapGRPCServer) GetPoints(
-	ctx context.Context,
-	in *MapGetPointsRequest,
-) (*MapPoints, error) {
+// parseMapBounds parses the "lngLo,latLo,lngHi,latHi" bounds format shared by GetPoints and
+// GetPicturePoints (Leaflet's LatLngBounds.toBBoxString()).
+func parseMapBounds(bounds string) (float64, float64, float64, float64, error) {
 	const numberOfBounds = 4
 
-	bounds := strings.Split(in.GetBounds(), ",")
+	parts := strings.Split(bounds, ",")
 
-	if len(bounds) < numberOfBounds {
-		return nil, status.Error(codes.InvalidArgument, "Invalid bounds")
+	if len(parts) < numberOfBounds {
+		return 0, 0, 0, 0, status.Error(codes.InvalidArgument, "Invalid bounds")
 	}
 
 	const bitSize64 = 64
 
-	lngLo, err := strconv.ParseFloat(bounds[0], bitSize64)
+	lngLo, err := strconv.ParseFloat(parts[0], bitSize64)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return 0, 0, 0, 0, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	latLo, err := strconv.ParseFloat(bounds[1], bitSize64)
+	latLo, err := strconv.ParseFloat(parts[1], bitSize64)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return 0, 0, 0, 0, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	lngHi, err := strconv.ParseFloat(bounds[2], bitSize64)
+	lngHi, err := strconv.ParseFloat(parts[2], bitSize64)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return 0, 0, 0, 0, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	latHi, err := strconv.ParseFloat(bounds[3], bitSize64)
+	latHi, err := strconv.ParseFloat(parts[3], bitSize64)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return 0, 0, 0, 0, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return lngLo, latLo, lngHi, latHi, nil
+}
+
+func (s *MapGRPCServer) GetPoints(
+	ctx context.Context,
+	in *MapGetPointsRequest,
+) (*MapPoints, error) {
+	lngLo, latLo, lngHi, latHi, err := parseMapBounds(in.GetBounds())
+	if err != nil {
+		return nil, err
 	}
 
 	pointsOnly := in.GetPointsOnly()
@@ -184,6 +195,72 @@ func (s *MapGRPCServer) GetPoints(
 	return &MapPoints{
 		Points: mapPoints,
 	}, nil
+}
+
+// pictureGridSize is the number of grid cells per axis GetPicturePoints buckets the viewport into.
+// Cells shrink as the viewport shrinks (i.e. as the user zooms in), so a cell with exactly one
+// picture renders as an individual pin and a cell with more renders as a count cluster - adaptively,
+// with no zoom-level threshold to tune.
+const pictureGridSize = 16
+
+func (s *MapGRPCServer) GetPicturePoints(
+	ctx context.Context,
+	in *MapGetPicturePointsRequest,
+) (*MapPicturePoints, error) {
+	lngLo, latLo, lngHi, latHi, err := parseMapBounds(in.GetBounds())
+	if err != nil {
+		return nil, err
+	}
+
+	cellLat := (latHi - latLo) / pictureGridSize
+	if cellLat <= 0 {
+		return &MapPicturePoints{}, nil
+	}
+
+	var cells []pictureCell
+
+	for _, lngRange := range normalizedLongitudeRanges(lngLo, lngHi) {
+		cellLng := (lngRange[1] - lngRange[0]) / pictureGridSize
+		if cellLng <= 0 {
+			continue
+		}
+
+		rangeCells, err := s.pictureCellsInRange(ctx, lngRange[0], latLo, lngRange[1], latHi, cellLng, cellLat)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		cells = append(cells, rangeCells...)
+	}
+
+	points := make([]*MapPicturePoint, 0, len(cells))
+	singletonIDs := make([]int, 0, len(cells))
+
+	for _, cell := range cells {
+		if cell.count == 1 {
+			singletonIDs = append(singletonIDs, int(cell.sampleID))
+
+			continue
+		}
+
+		points = append(points, &MapPicturePoint{
+			Kind: &MapPicturePoint_Cluster{
+				Cluster: &MapPictureCluster{
+					Location: &latlng.LatLng{Latitude: cell.avgLat, Longitude: cell.avgLng},
+					Count:    int32(cell.count), //nolint: gosec
+				},
+			},
+		})
+	}
+
+	singlePoints, err := s.singlePicturePoints(ctx, singletonIDs)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	points = append(points, singlePoints...)
+
+	return &MapPicturePoints{Points: points}, nil
 }
 
 func (s *MapGRPCServer) pointsWithContent(
@@ -306,4 +383,151 @@ func (s *MapGRPCServer) pointsWithContent(
 	}
 
 	return mapPoints, nil
+}
+
+type pictureCell struct {
+	count    int64
+	avgLng   float64
+	avgLat   float64
+	sampleID int64
+}
+
+func (s *MapGRPCServer) pictureCellsInRange(
+	ctx context.Context,
+	lngLo, latLo, lngHi, latHi, cellLng, cellLat float64,
+) ([]pictureCell, error) {
+	rows, err := s.db.Select(
+		goqu.COUNT(goqu.Star()),
+		goqu.AVG(goqu.L("ST_X(?::geometry)", schema.PictureTablePointCol)),
+		goqu.AVG(goqu.L("ST_Y(?::geometry)", schema.PictureTablePointCol)),
+		goqu.MIN(schema.PictureTableIDCol),
+	).
+		From(schema.PictureTable).
+		Where(
+			schema.PictureTableStatusCol.Eq(schema.PictureStatusAccepted),
+			goqu.Func(
+				"ST_Intersects",
+				goqu.L("?::geometry", schema.PictureTablePointCol),
+				goqu.Func("ST_MakeEnvelope", lngLo, latLo, lngHi, latHi, schema.SRID),
+			),
+		).
+		GroupBy(
+			goqu.L("FLOOR((ST_X(?::geometry) - ?) / ?)", schema.PictureTablePointCol, lngLo, cellLng),
+			goqu.L("FLOOR((ST_Y(?::geometry) - ?) / ?)", schema.PictureTablePointCol, latLo, cellLat),
+		).
+		Executor().QueryContext(ctx) //nolint:sqlclosecheck
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	defer util.Close(rows)
+
+	var cells []pictureCell
+
+	for rows.Next() {
+		var cell pictureCell
+
+		err = rows.Scan(&cell.count, &cell.avgLng, &cell.avgLat, &cell.sampleID)
+		if err != nil {
+			return nil, err
+		}
+
+		cells = append(cells, cell)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return cells, nil
+}
+
+// singlePicturePoints looks up identity/thumbnail for grid cells that contained exactly one
+// picture. Thumbnails are looked up with FormattedImages (cache-only, batched) rather than the
+// generate-on-demand FormattedImage used elsewhere in this file for factory thumbnails: this
+// endpoint can touch far more pictures per request, and reuses picture-thumb-medium specifically
+// because it's already generated for the large majority of pictures (used throughout picture
+// listings app-wide) - a picture whose thumbnail isn't cached yet is shown without one rather than
+// triggering fresh generation from a map viewport pan.
+func (s *MapGRPCServer) singlePicturePoints(ctx context.Context, ids []int) ([]*MapPicturePoint, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
+	rows, err := s.db.Select(
+		schema.PictureTableIdentityCol,
+		schema.PictureTablePointCol,
+		schema.PictureTableImageIDCol,
+	).
+		From(schema.PictureTable).
+		Where(schema.PictureTableIDCol.In(ids)).
+		Executor().QueryContext(ctx) //nolint:sqlclosecheck
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	defer util.Close(rows)
+
+	type pictureRow struct {
+		identity string
+		point    schema.NullPoint
+		imageID  sql.NullInt64
+	}
+
+	var pictureRows []pictureRow
+
+	imageIDs := make([]int, 0, len(ids))
+
+	for rows.Next() {
+		var row pictureRow
+
+		err = rows.Scan(&row.identity, &row.point, &row.imageID)
+		if err != nil {
+			return nil, err
+		}
+
+		pictureRows = append(pictureRows, row)
+
+		if row.imageID.Valid {
+			imageIDs = append(imageIDs, int(row.imageID.Int64))
+		}
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	thumbs := make(map[int]storage.Image)
+
+	if len(imageIDs) > 0 {
+		thumbs, err = s.imageStorage.FormattedImages(ctx, imageIDs, "picture-thumb-medium")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	points := make([]*MapPicturePoint, 0, len(pictureRows))
+
+	for _, row := range pictureRows {
+		if !row.point.Valid {
+			continue
+		}
+
+		picture := &MapSinglePicture{
+			Identity: row.identity,
+			Location: &latlng.LatLng{Latitude: row.point.Point.Y(), Longitude: row.point.Point.X()},
+		}
+
+		if row.imageID.Valid {
+			if thumb, ok := thumbs[int(row.imageID.Int64)]; ok {
+				picture.Thumb = APIImageToGRPC(&thumb)
+			}
+		}
+
+		points = append(points, &MapPicturePoint{
+			Kind: &MapPicturePoint_Picture{Picture: picture},
+		})
+	}
+
+	return points, nil
 }
