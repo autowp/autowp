@@ -2,6 +2,7 @@ package goautowp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -89,11 +90,11 @@ func (s *UsersGRPCServer) GetUser(ctx context.Context, in *GetUserRequest) (*Use
 		Identity: in.GetIdentity(),
 	}, convertUserFields(in.GetFields(), userCtx.Roles), users.OrderByNone)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+		if errors.Is(err, users.ErrUserNotFound) {
+			return nil, status.Error(codes.NotFound, "User not found")
+		}
 
-	if dbUser == nil {
-		return nil, status.Error(codes.NotFound, "User not found")
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	apiUser, err := s.userExtractor.Extract(

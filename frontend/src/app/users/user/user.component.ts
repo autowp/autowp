@@ -41,6 +41,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {getAchievementDescriptionTranslation, getAchievementTranslation} from '@utils/translations';
+import {isNotFoundError} from 'app/grpc';
 import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
 
@@ -109,6 +110,13 @@ export class UsersUserComponent {
       ),
     ),
     catchError((err: unknown) => {
+      if (isNotFoundError(err)) {
+        this.#router.navigate(['/error-404'], {
+          skipLocationChange: true,
+        });
+        return EMPTY;
+      }
+
       this.#toastService.handleError(err);
       return EMPTY;
     }),
