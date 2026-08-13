@@ -19,6 +19,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {type APIItemChildsCounts} from '@services/item';
 import {LanguageService} from '@services/language';
 import {perspectiveIDLogotype, perspectiveIDMixed} from '@services/picture';
+import {notFoundError} from 'app/grpc';
 import {EMPTY, Observable, of, OperatorFunction} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
 
@@ -33,7 +34,7 @@ interface Parent {
   path: string[];
 }
 
-type ParentObservableFunc = () => OperatorFunction<null | Parent, null | Parent>;
+type ParentObservableFunc = () => OperatorFunction<Parent, Parent>;
 
 @Service()
 export class CatalogueService {
@@ -61,13 +62,17 @@ export class CatalogueService {
     );
   }
 
+  // Throws a NOT_FOUND resource error (rather than emitting null) both when the brand catname
+  // doesn't resolve and when any segment of the nested path doesn't - so every rxResource-based
+  // consumer can rely on isNotFoundError()/effect() for the redirect instead of re-implementing
+  // the null check itself.
   public resolveCatalogue$(
     route: ActivatedRoute,
     itemFields?: ItemFields,
-  ): Observable<null | {brand: Item; path: ItemParent[]; type: string}> {
+  ): Observable<{brand: Item; path: ItemParent[]; type: string}> {
     const pathPipeRecursive: ParentObservableFunc = () =>
-      switchMap((parent: null | Parent) => {
-        if (!parent?.id || parent.path.length <= 0) {
+      switchMap((parent: Parent) => {
+        if (parent.path.length <= 0) {
           return of(parent);
         }
 
@@ -107,18 +112,18 @@ export class CatalogueService {
             }),
           )
           .pipe(
-            map((response): null | Parent => {
+            switchMap((response) => {
               const items = response.items || [];
               if (items.length <= 0) {
-                return null;
+                return notFoundError();
               }
               const parentItem = items[0];
 
-              return {
+              return of<Parent>({
                 id: parentItem.itemId,
                 items: parent.items.concat([parentItem]),
                 path: parent.path.splice(1),
-              };
+              });
             }),
             pathPipeRecursive(),
           );
@@ -127,7 +132,7 @@ export class CatalogueService {
     return this.getBrand$(route).pipe(
       switchMap((brand) => {
         if (!brand) {
-          return of(null);
+          return notFoundError();
         }
 
         return CatalogueService.getPath(route).pipe(
@@ -140,19 +145,15 @@ export class CatalogueService {
               }) as Parent,
           ),
           pathPipeRecursive(),
-          switchMap((parent) => {
-            if (!parent) {
-              return of(null);
-            }
-
-            return this.getType$(route).pipe(
+          switchMap((parent) =>
+            this.getType$(route).pipe(
               map((type) => ({
                 brand,
                 path: parent.items,
                 type,
               })),
-            );
-          }),
+            ),
+          ),
         );
       }),
     );

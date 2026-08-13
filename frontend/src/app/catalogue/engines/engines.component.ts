@@ -1,7 +1,8 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
+  Item,
   ItemFields,
   ItemListOptions,
   ItemParentFields,
@@ -19,15 +20,16 @@ import {
   CatalogueListItemComponent,
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {Observable, of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {convertChildsCounts} from '../catalogue-service';
 
 @Component({
   selector: 'app-catalogue-engines',
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
+  imports: [RouterLink, PaginatorComponent, CatalogueListItemComponent],
   templateUrl: './engines.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -38,19 +40,23 @@ export class CatalogueEnginesComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #page$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-    debounceTime(10),
-  );
+  readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
+    requireSync: true,
+  });
 
-  protected readonly brand$ = this.#route.paramMap.pipe(
-    map((params) => params.get('brand')),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((catname) => {
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
+
+  // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
+  // than an imperative Router.navigate() inside the stream - see the constructor effect() below,
+  // which is the single place that navigates off this resource's error() signal.
+  protected readonly brandResource = rxResource({
+    id: `catalogue-engines-brand-${this.#catname() ?? ''}`,
+    params: () => this.#catname(),
+    stream: ({params: catname}): Observable<Item> => {
       if (!catname) {
-        return EMPTY;
+        return notFoundError();
       }
       return this.#itemsClient
         .list(
@@ -69,31 +75,50 @@ export class CatalogueEnginesComponent {
         .pipe(
           switchMap((response) => {
             if (!response.items || response.items.length <= 0) {
-              this.#router.navigate(['/error-404'], {
-                skipLocationChange: true,
-              });
-              return EMPTY;
+              return notFoundError();
             }
             return of(response.items[0]);
           }),
         );
-    }),
-    tap((brand) => {
+    },
+  });
+
+  protected readonly title = computed<string | undefined>(() => {
+    const brand = this.brandResource.hasValue() ? this.brandResource.value() : undefined;
+    return brand ? $localize`${brand.nameOnly} Engines` : undefined;
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const title = this.title();
+      if (title === undefined) {
+        return;
+      }
+
       this.#pageEnv.set({
         pageId: 208,
-        title: $localize`${brand.nameOnly} Engines`,
+        title,
       });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+    });
+  }
 
-  protected readonly data$: Observable<{items: CatalogueListItem[]; paginator: Pages | undefined}> = combineLatest([
-    this.brand$,
-    this.#page$,
-  ]).pipe(
-    switchMap(([brand, page]) =>
-      combineLatest([
-        this.#itemsClient.getItemParents(
+  protected readonly dataResource = rxResource({
+    id: `catalogue-engines-data-${this.#catname() ?? ''}`,
+    params: () => ({brand: this.brandResource.value(), page: this.#page()}),
+    stream: ({
+      params: {brand, page},
+    }): Observable<undefined | {items: CatalogueListItem[]; paginator: Pages | undefined}> => {
+      if (!brand) {
+        return of(undefined);
+      }
+
+      return this.#itemsClient
+        .getItemParents(
           new ItemParentsRequest({
             fields: new ItemParentFields({
               item: new ItemFields({
@@ -126,65 +151,63 @@ export class CatalogueEnginesComponent {
             order: ItemParentsRequest.Order.AUTO,
             page,
           }),
-        ),
-        of(brand),
-      ]),
-    ),
-    map(([response, brand]) => {
-      const items: CatalogueListItem[] = (response.items || []).map((item): CatalogueListItem => {
-        const largeFormat = !!item.item?.previewPictures?.largeFormat;
+        )
+        .pipe(
+          map((response) => {
+            const items: CatalogueListItem[] = (response.items || []).map((item): CatalogueListItem => {
+              const largeFormat = !!item.item?.previewPictures?.largeFormat;
 
-        const routerLink = ['/', brand.catname, item.catname];
+              const routerLink = ['/', brand.catname, item.catname];
 
-        const pictures: CatalogueListItemPicture[] = (item.item?.previewPictures?.pictures || []).map(
-          (picture, idx) => {
-            let thumb = null;
-            if (picture.picture) {
-              thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
-            }
+              const pictures: CatalogueListItemPicture[] = (item.item?.previewPictures?.pictures || []).map(
+                (picture, idx) => {
+                  let thumb = null;
+                  if (picture.picture) {
+                    thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
+                  }
+                  return {
+                    picture: picture?.picture ? picture.picture : null,
+                    routerLink: picture?.picture ? routerLink.concat(['pictures', picture.picture.identity]) : [],
+                    thumb,
+                  };
+                },
+              );
+
+              return {
+                acceptedPicturesCount: item.item?.acceptedPicturesCount,
+                canEditSpecs: !!item.item?.canEditSpecs,
+                categories: item.item?.categories || undefined,
+                childsCounts: item.item?.childsCounts ? convertChildsCounts(item.item.childsCounts) : null,
+                description: item.item?.description || null,
+                design: undefined,
+                details: {
+                  count: item.item?.childsCount || 0,
+                  routerLink,
+                },
+                engineVehicles: item.item?.engineVehicles,
+                hasText: !!item.item?.hasText,
+                id: item.item?.id || '',
+                itemTypeId: item.item?.itemTypeId || 0,
+                nameDefault: item.item?.nameDefault || '',
+                nameHtml: item.item?.nameHtml || '',
+                picturesRouterLink: routerLink.concat(['pictures']),
+                previewPictures: {
+                  largeFormat: !!item.item?.previewPictures?.largeFormat,
+                  pictures,
+                },
+                produced: item.item?.produced?.value,
+                producedExactly: item.item?.producedExactly || null,
+                specsRouterLink:
+                  item.item?.hasSpecs || item.item?.hasChildSpecs ? routerLink.concat(['specifications']) : null,
+              };
+            });
+
             return {
-              picture: picture?.picture ? picture.picture : null,
-              routerLink: picture?.picture ? routerLink.concat(['pictures', picture.picture.identity]) : [],
-              thumb,
+              items,
+              paginator: response.paginator,
             };
-          },
+          }),
         );
-
-        return {
-          acceptedPicturesCount: item.item?.acceptedPicturesCount,
-          canEditSpecs: !!item.item?.canEditSpecs,
-          categories: item.item?.categories || undefined,
-          childsCounts: item.item?.childsCounts ? convertChildsCounts(item.item.childsCounts) : null,
-          description: item.item?.description || null,
-          design: undefined,
-          details: {
-            count: item.item?.childsCount || 0,
-            routerLink,
-          },
-          engineVehicles: item.item?.engineVehicles,
-          hasText: !!item.item?.hasText,
-          id: item.item?.id || '',
-          itemTypeId: item.item?.itemTypeId || 0,
-          nameDefault: item.item?.nameDefault || '',
-          nameHtml: item.item?.nameHtml || '',
-          picturesRouterLink: routerLink.concat(['pictures']),
-          previewPictures: {
-            largeFormat: !!item.item?.previewPictures?.largeFormat,
-            pictures,
-          },
-          produced: item.item?.produced?.value,
-          producedExactly: item.item?.producedExactly || null,
-          specsRouterLink:
-            item.item?.hasSpecs || item.item?.hasChildSpecs ? routerLink.concat(['specifications']) : null,
-        };
-      });
-
-      return {
-        items,
-        paginator: response.paginator,
-      };
-    }),
-  );
-
-  protected readonly title$ = this.brand$.pipe(map((brand) => $localize`${brand.nameOnly} Engines`));
+    },
+  });
 }

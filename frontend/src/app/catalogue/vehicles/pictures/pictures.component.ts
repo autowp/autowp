@@ -1,5 +1,6 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   Item,
@@ -19,8 +20,9 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {getItemTypeTranslation} from '@utils/translations';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {isNotFoundError} from 'app/grpc';
+import {EMPTY, Observable} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 import {chunkBy} from '../../../chunk';
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
@@ -54,102 +56,122 @@ export class CatalogueVehiclesPicturesComponent {
 
   protected readonly canAcceptPicture$ = this.#auth.hasRole$(Role.PICTURES_MODER);
   protected readonly canAddItem$ = this.#auth.hasRole$(Role.CARS_MODER);
-
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  readonly #catalogue$: Observable<{brand: Item; path: ItemParent[]; type: string}> = this.#catalogueService
-    .resolveCatalogue$(this.#route)
-    .pipe(
-      switchMap((data) => {
-        if (!data?.brand || !data.path || data.path.length <= 0) {
-          this.#router.navigate(['/error-404'], {
-            skipLocationChange: true,
-          });
-          return EMPTY;
-        }
-        return of(data);
-      }),
-      shareReplay({bufferSize: 1, refCount: false}),
-    );
+  readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
+    requireSync: true,
+  });
+  readonly #pathParam = toSignal(this.#route.paramMap.pipe(map((params) => params.get('path'))), {
+    requireSync: true,
+  });
+  readonly #typeParam = toSignal(this.#route.paramMap.pipe(map((params) => params.get('type'))), {
+    requireSync: true,
+  });
 
-  readonly #page$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-    debounceTime(10),
-  );
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
 
-  readonly #exact$ = this.#route.data.pipe(
-    map((params) => !!params['exact']),
-    distinctUntilChanged(),
-    debounceTime(10),
-  );
+  readonly #exact = toSignal(this.#route.data.pipe(map((data) => !!data['exact'])), {requireSync: true});
 
-  protected readonly brand$: Observable<Item> = this.#catalogue$.pipe(map(({brand}) => brand));
+  // Missing/unresolvable brand or path segments are surfaced by resolveCatalogue$ itself as a
+  // NOT_FOUND resource error - see the constructor effect() below, which is the single place that
+  // navigates off this resource's error() signal.
+  //
+  // `id` is suffixed with the brand/path/type route params read once at construction time - see
+  // the identical note on CatalogueVehiclesComponent.catalogueResource in ../vehicles.component.ts.
+  protected readonly catalogueResource = rxResource({
+    id: `catalogue-vehicles-pictures-catalogue-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
+    stream: (): Observable<{brand: Item; path: ItemParent[]; type: string}> =>
+      this.#catalogueService.resolveCatalogue$(this.#route),
+  });
 
-  protected readonly breadcrumbs$: Observable<Breadcrumbs[]> = this.#catalogue$.pipe(
-    map(({brand, path}) => CatalogueService.pathToBreadcrumbs(brand, path)),
-  );
+  protected readonly brand = computed(() => this.catalogueResource.value()?.brand);
 
-  protected readonly routerLink$: Observable<string[]> = this.#catalogue$.pipe(
-    map(({brand, path}) => ['/', brand.catname, ...path.map((node) => node.catname)]),
-  );
+  protected readonly breadcrumbs = computed<Breadcrumbs[] | undefined>(() => {
+    const data = this.catalogueResource.value();
+    return data ? CatalogueService.pathToBreadcrumbs(data.brand, data.path) : undefined;
+  });
 
-  protected readonly picturesRouterLink$: Observable<string[]> = combineLatest([this.routerLink$, this.#exact$]).pipe(
-    map(([routerLink, exact]) => [...routerLink, ...(exact ? ['exact'] : []), 'pictures']),
-  );
+  protected readonly routerLink = computed<string[] | undefined>(() => {
+    const data = this.catalogueResource.value();
+    return data ? ['/', data.brand.catname, ...data.path.map((node) => node.catname)] : undefined;
+  });
 
-  protected readonly item$: Observable<Item> = this.#catalogue$.pipe(
-    map(({path}) => path[path.length - 1].item),
-    filter((item) => !!item),
-    tap((item: Item) => {
+  protected readonly picturesRouterLink = computed(() => {
+    const routerLink = this.routerLink();
+    return routerLink ? [...routerLink, ...(this.#exact() ? ['exact'] : []), 'pictures'] : undefined;
+  });
+
+  protected readonly item = computed<Item | undefined>(() => {
+    const data = this.catalogueResource.value();
+    const item = data?.path[data.path.length - 1].item;
+    return item || undefined;
+  });
+
+  protected readonly picturesResource = rxResource({
+    id: `catalogue-vehicles-pictures-list-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
+    params: () => {
+      const item = this.item();
+      return item ? {exact: this.#exact(), item, page: this.#page()} : undefined;
+    },
+    stream: ({params: {exact, item, page}}): Observable<{paginator: Pages | undefined; pictures: Picture[][]}> =>
+      this.#picturesClient
+        .getPictures(
+          new PicturesRequest({
+            fields: new PictureFields({
+              commentsCount: true,
+              moderVote: true,
+              nameHtml: true,
+              nameText: true,
+              thumbMedium: true,
+              views: true,
+              votes: true,
+            }),
+            language: this.#languageService.language,
+            limit: 20,
+            options: new PictureListOptions({
+              pictureItem: new PictureItemListOptions({
+                itemId: exact ? item.id : undefined,
+                itemParentCacheAncestor: exact ? undefined : new ItemParentCacheListOptions({parentId: item.id}),
+              }),
+              status: PictureStatus.PICTURE_STATUS_ACCEPTED,
+            }),
+            order: PicturesRequest.Order.ORDER_PERSPECTIVES,
+            page: page,
+            paginator: true,
+          }),
+        )
+        .pipe(
+          catchError((err: unknown) => {
+            this.#toastService.handleError(err);
+            return EMPTY;
+          }),
+          map((response) => ({
+            paginator: response.paginator,
+            pictures: chunkBy(response.items || [], 4),
+          })),
+        ),
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.catalogueResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const item = this.item();
+      if (!item) {
+        return;
+      }
+
       this.#pageEnv.set({
         pageId: 34,
         title: $localize`All pictures of ${item.nameText}`,
       });
-    }),
-  );
-
-  protected readonly pictures$: Observable<{paginator: Pages | undefined; pictures: Picture[][]}> = combineLatest([
-    this.#exact$,
-    this.item$,
-    this.#page$,
-  ]).pipe(
-    switchMap(([exact, item, page]) =>
-      this.#picturesClient.getPictures(
-        new PicturesRequest({
-          fields: new PictureFields({
-            commentsCount: true,
-            moderVote: true,
-            nameHtml: true,
-            nameText: true,
-            thumbMedium: true,
-            views: true,
-            votes: true,
-          }),
-          language: this.#languageService.language,
-          limit: 20,
-          options: new PictureListOptions({
-            pictureItem: new PictureItemListOptions({
-              itemId: exact ? item.id : undefined,
-              itemParentCacheAncestor: exact ? undefined : new ItemParentCacheListOptions({parentId: item.id}),
-            }),
-            status: PictureStatus.PICTURE_STATUS_ACCEPTED,
-          }),
-          order: PicturesRequest.Order.ORDER_PERSPECTIVES,
-          page: page,
-          paginator: true,
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-    map((response) => ({
-      paginator: response.paginator,
-      pictures: chunkBy(response.items || [], 4),
-    })),
-  );
+    });
+  }
 
   protected getItemTypeTranslation(id: number, type: string) {
     return getItemTypeTranslation(id, type);
