@@ -1,8 +1,12 @@
-@if (group$ | async; as group) {
+@if (groupResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (groupResource.value(); as group) {
   <div class="page-header">
     <h2 i18n>All pictures of {{ group.nameText }}</h2>
   </div>
-  @if (data$ | async; as data) {
+  @if (picturesResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  } @else if (picturesResource.value(); as data) {
     <div class="row">
       @for (picture of data.items || []; track picture) {
         <div class="col-lg-3 col-md-3">

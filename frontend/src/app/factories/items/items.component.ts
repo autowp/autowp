@@ -1,9 +1,9 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   Image,
-  Item,
   ItemFields,
   ItemListOptions,
   ItemRequest,
@@ -25,11 +25,11 @@ import {
   CatalogueListItemComponent,
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
-import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
   selector: 'app-factory-items',
@@ -42,58 +42,48 @@ export class FactoryItemsComponent {
   readonly #router = inject(Router);
   readonly #auth = inject(AuthService);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  readonly #page$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-    debounceTime(10),
-  );
+  readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
+    requireSync: true,
+  });
 
-  protected readonly factory$: Observable<Item> = this.#route.paramMap.pipe(
-    map((params) => params.get('id') ?? ''),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((id) =>
-      this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({
-            nameHtml: true,
-            nameText: true,
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
+
+  protected readonly factoryResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: `factory-items-factory-${this.#itemID()}`,
+    params: () => this.#itemID(),
+    stream: ({params: id}) =>
+      this.#itemsClient
+        .item(
+          new ItemRequest({
+            fields: new ItemFields({
+              nameHtml: true,
+              nameText: true,
+            }),
+            id,
+            language: this.#languageService.language,
           }),
-          id,
-          language: this.#languageService.language,
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      this.#router.navigate(['/error-404'], {
-        skipLocationChange: true,
-      });
-      return EMPTY;
-    }),
-    switchMap((factory) => {
-      if (!factory || factory.itemTypeId !== ItemType.ITEM_TYPE_FACTORY) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
+        )
+        .pipe(
+          switchMap((factory) => (factory.itemTypeId === ItemType.ITEM_TYPE_FACTORY ? of(factory) : notFoundError())),
+        ),
+  });
 
-      this.#pageEnv.set({pageId: 182});
+  protected readonly itemsResource = rxResource({
+    id: `factory-items-list-${this.#itemID()}`,
+    params: () => {
+      const factory = this.factoryResource.value();
 
-      return of(factory);
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
-
-  protected readonly items$ = combineLatest([this.#page$, this.factory$]).pipe(
-    switchMap(([page, factory]) =>
+      return factory ? {factoryID: factory.id, page: this.#page()} : undefined;
+    },
+    stream: ({params: {factoryID, page}}) =>
       this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({
@@ -127,19 +117,22 @@ export class FactoryItemsComponent {
           language: this.#languageService.language,
           limit: 10,
           options: new ItemListOptions({
-            relatedGroupsOf: factory.id,
+            relatedGroupsOf: factoryID,
           }),
           order: ItemsRequest.Order.AGE,
           page,
         }),
       ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-    map((data) => ({
-      items: (data.items || []).map((item) => {
+  });
+
+  protected readonly items = computed(() => {
+    const data = this.itemsResource.value();
+    if (!data) {
+      return null;
+    }
+
+    return {
+      items: (data.items || []).map((item): CatalogueListItem => {
         const largeFormat = !!item.previewPictures?.largeFormat;
 
         const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map((picture, idx) => {
@@ -170,7 +163,7 @@ export class FactoryItemsComponent {
           itemTypeId: item.itemTypeId,
           nameDefault: item.nameDefault,
           nameHtml: item.nameHtml,
-          picturesRouterLink: item.route.length ? item.route.concat(['pictures']) : undefined,
+          picturesRouterLink: item.route.length ? item.route.concat(['pictures']) : null,
           previewPictures: {
             largeFormat: !!item.previewPictures?.largeFormat,
             pictures,
@@ -179,9 +172,22 @@ export class FactoryItemsComponent {
           producedExactly: item.producedExactly,
           specsRouterLink:
             (item.hasSpecs || item.hasChildSpecs) && item.route.length ? item.route.concat(['specifications']) : null,
-        } as CatalogueListItem;
+        };
       }),
       paginator: data.paginator,
-    })),
-  );
+    };
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.factoryResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      if (this.factoryResource.value()) {
+        this.#pageEnv.set({pageId: 182});
+      }
+    });
+  }
 }

@@ -10,30 +10,14 @@
   <h1 i18n>Categories</h1>
 </div>
 
-@if (items$ | async; as chunks) {
+@if (itemsResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (chunks(); as chunks) {
   @for (chunk of chunks; track chunk) {
     <div class="row">
-      @for (category of chunk; track category.item.id) {
+      @for (item of chunk; track item.id) {
         <div class="col-md-3">
-          <div class="card mb-4">
-            @if (category.picture$ | async; as picture) {
-              @if (picture.thumbMedium) {
-                <a [routerLink]="['/category', category.item.catname]">
-                  <img alt="" class="card-img-top" loading="lazy" [src]="picture.thumbMedium.src" />
-                </a>
-              }
-            }
-            <div class="card-body">
-              <h5 class="card-title">
-                <a [routerLink]="['/category', category.item.catname]" [innerHTML]="category.item.nameHtml"></a>
-              </h5>
-              @if (category.item.descendantsCount; as descendantsCount) {
-                <p i18n="@@n-vehicles">
-                  {descendantsCount, plural, one {{{descendantsCount}} vehicle} other {{{descendantsCount}} vehicles}}
-                </p>
-              }
-            </div>
-          </div>
+          <app-categories-index-item [item]="item" />
         </div>
       }
     </div>

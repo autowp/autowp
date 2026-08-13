@@ -1,0 +1,38 @@
+<td>
+  @if (date(); as date) {
+    <p [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</p>
+  }
+</td>
+<td>
+  @if (userResource.value(); as user) {
+    <app-user [user]="user" />
+  }
+</td>
+<td>
+  @if (itemResource.value(); as item) {
+    @if (isModer$ | async) {
+      <a [routerLink]="['/moder/items/item', userValue().itemId]" [innerHTML]="item.nameHtml"></a>
+    } @else {
+      <span [innerHTML]="item.nameHtml"></span>
+    }
+  }
+</td>
+<td class="attribute text-center">
+  @if (pathResource.value(); as path) {
+    @for (node of path; track node) {
+      <span>{{ node }}</span>
+      @if (!$last) {
+        <span> / </span>
+      }
+    }
+  }
+</td>
+<td style="text-align: center">
+  {{ userValue().valueText }}
+  @if (unitAbbrResource.value(); as unitAbbr) {
+    <span class="unit">{{ unitAbbr }}</span>
+  }
+</td>
+<td class="link">
+  <a i18n [routerLink]="['/cars/car-specifications-editor/item_id', userValue().itemId]">to editor</a>
+</td>

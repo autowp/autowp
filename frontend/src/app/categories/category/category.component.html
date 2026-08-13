@@ -7,7 +7,7 @@
       <li class="breadcrumb-item">
         <a routerLink="/category" i18n>Categories</a>
       </li>
-      @for (item of path$ | async; track item; let last = $last) {
+      @for (item of path(); track item; let last = $last) {
         @if (!last) {
           <li class="breadcrumb-item">
             @if (item.item.itemTypeId !== ItemType.ITEM_TYPE_CATEGORY) {
@@ -41,17 +41,17 @@
 }
 
 @if (!pageEnv.layoutParams().isGalleryPage) {
-  @if (current$ | async; as current) {
+  @if (current(); as current) {
     <div class="page-header">
       <h1 [innerHtml]="current.nameHtml"></h1>
     </div>
   }
 }
 
-@if (current$ | async; as current) {
+@if (current(); as current) {
   <div>
     @if (!pageEnv.layoutParams().isGalleryPage) {
-      @if (category$ | async; as category) {
+      @if (category(); as category) {
         @if (isModer$ | async) {
           <p class="mb-4">
             <i class="bi bi-gear-fill" aria-hidden="true"></i>

@@ -1,0 +1,17 @@
+@if (pictureResource.value(); as picture) {
+  @if (picture.thumbMedium) {
+    <a [routerLink]="['/category', item().catname]">
+      <img alt="" class="card-img-top" loading="lazy" [src]="picture.thumbMedium.src" />
+    </a>
+  }
+}
+<div class="card-body">
+  <h5 class="card-title">
+    <a [routerLink]="['/category', item().catname]" [innerHTML]="item().nameHtml"></a>
+  </h5>
+  @if (item().descendantsCount; as descendantsCount) {
+    <p i18n="@@n-vehicles">
+      {descendantsCount, plural, one {{{descendantsCount}} vehicle} other {{{descendantsCount}} vehicles}}
+    </p>
+  }
+</div>

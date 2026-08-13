@@ -1,11 +1,10 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
   CommentsType,
   ItemParentCacheListOptions,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureItemType,
@@ -16,15 +15,16 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {CommentsComponent} from '../../../../comments/comments/comments.component';
 import {PictureComponent} from '../../../../picture/picture.component';
 
 @Component({
   selector: 'app-twins-group-picture',
-  imports: [CommentsComponent, AsyncPipe, PictureComponent],
+  imports: [CommentsComponent, PictureComponent],
   templateUrl: './picture.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -36,99 +36,93 @@ export class TwinsGroupPictureComponent {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #changed$ = new BehaviorSubject<void>(void 0);
-
-  protected readonly groupId$ = this.#route.parent!.parent!.paramMap.pipe(
-    map((route) => route.get('group') ?? ''),
-    distinctUntilChanged(),
-    shareReplay({bufferSize: 1, refCount: false}),
+  protected readonly groupId = toSignal(
+    this.#route.parent!.parent!.paramMap.pipe(map((route) => route.get('group') ?? '')),
+    {requireSync: true},
   );
 
-  readonly #identity$ = this.#route.paramMap.pipe(
-    map((route) => route.get('identity')),
-    distinctUntilChanged(),
-    switchMap((identity) => {
+  readonly #identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
+    requireSync: true,
+  });
+
+  protected readonly pictureResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: `twins-group-picture-${this.groupId()}-${this.#identity() ?? ''}`,
+    params: () => ({groupId: this.groupId(), identity: this.#identity()}),
+    stream: ({params: {groupId, identity}}) => {
       if (!identity) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
+        return notFoundError();
       }
-      return of(identity);
-    }),
-  );
 
-  protected readonly picture$: Observable<Picture> = combineLatest([
-    this.groupId$,
-    this.#identity$,
-    this.#changed$,
-  ]).pipe(
-    switchMap(([groupId, identity]) =>
-      this.#picturesClient.getPicture(
-        new PicturesRequest({
-          fields: new PictureFields({
-            copyrights: true,
-            image: true,
-            moderVoted: true,
-            nameHtml: true,
-            nameText: true,
-            paginator: new PicturesRequest({
-              options: new PictureListOptions({
-                pictureItem: new PictureItemListOptions({
-                  itemParentCacheAncestor: new ItemParentCacheListOptions({
-                    parentId: groupId,
+      return this.#picturesClient
+        .getPicture(
+          new PicturesRequest({
+            fields: new PictureFields({
+              copyrights: true,
+              image: true,
+              moderVoted: true,
+              nameHtml: true,
+              nameText: true,
+              paginator: new PicturesRequest({
+                options: new PictureListOptions({
+                  pictureItem: new PictureItemListOptions({
+                    itemParentCacheAncestor: new ItemParentCacheListOptions({
+                      parentId: groupId,
+                    }),
+                    typeId: PictureItemType.PICTURE_ITEM_CONTENT,
                   }),
-                  typeId: PictureItemType.PICTURE_ITEM_CONTENT,
                 }),
+                order: PicturesRequest.Order.ORDER_PERSPECTIVES,
               }),
-              order: PicturesRequest.Order.ORDER_PERSPECTIVES,
-            }),
-            pictureModerVotes: new PictureModerVoteRequest(),
-            previewLarge: true,
-            replaceable: new PicturesRequest({
-              fields: new PictureFields({nameHtml: true}),
-            }),
-            rights: true,
-            subscribed: true,
-            votes: true,
-          }),
-          language: this.#languageService.language,
-          options: new PictureListOptions({
-            identity,
-            pictureItem: new PictureItemListOptions({
-              itemParentCacheAncestor: new ItemParentCacheListOptions({
-                parentId: groupId,
+              pictureModerVotes: new PictureModerVoteRequest(),
+              previewLarge: true,
+              replaceable: new PicturesRequest({
+                fields: new PictureFields({nameHtml: true}),
               }),
-              typeId: PictureItemType.PICTURE_ITEM_CONTENT,
+              rights: true,
+              subscribed: true,
+              votes: true,
+            }),
+            language: this.#languageService.language,
+            options: new PictureListOptions({
+              identity,
+              pictureItem: new PictureItemListOptions({
+                itemParentCacheAncestor: new ItemParentCacheListOptions({
+                  parentId: groupId,
+                }),
+                typeId: PictureItemType.PICTURE_ITEM_CONTENT,
+              }),
             }),
           }),
-        }),
-      ),
-    ),
-    switchMap((picture) => {
-      if (!picture) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(picture);
-    }),
-    tap((picture) => {
-      this.#meta.updateTag({property: 'og:title', content: picture.nameText});
-      if (picture.previewLarge) {
-        this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
-      }
-      this.#pageEnv.set({
-        pageId: 28,
-        title: picture.nameText,
-      });
-    }),
-  );
+        )
+        .pipe(switchMap((picture) => (picture ? of(picture) : notFoundError())));
+    },
+  });
 
   protected readonly CommentsType = CommentsType;
 
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.pictureResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const picture = this.pictureResource.value();
+      if (picture) {
+        this.#meta.updateTag({property: 'og:title', content: picture.nameText});
+        if (picture.previewLarge) {
+          this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
+        }
+        this.#pageEnv.set({
+          pageId: 28,
+          title: picture.nameText,
+        });
+      }
+    });
+  }
+
   protected reloadPicture() {
-    this.#changed$.next();
+    this.pictureResource.reload();
   }
 }

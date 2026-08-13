@@ -1,9 +1,9 @@
 import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  CommentMessage,
   CommentMessageFields,
   CreateContactRequest,
   CreateTrafficBlacklistItemRequest,
@@ -13,14 +13,10 @@ import {
   DeleteUserRequest,
   GetMessagesRequest,
   GetUserAchievementsRequest,
-  IP,
-  Picture,
   PictureFields,
   PictureListOptions,
   PicturesRequest,
   User,
-  UserAchievementItem,
-  UserAchievementProgress,
   UserFields,
   UserPreferencesRequest,
 } from '@grpc/spec.pb';
@@ -40,10 +36,11 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import {timestampToDate} from '@utils/timestamp';
 import {getAchievementDescriptionTranslation, getAchievementTranslation} from '@utils/translations';
-import {isNotFoundError} from 'app/grpc';
-import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {MessageDialogService} from '../../message-dialog/message-dialog.service';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -91,76 +88,60 @@ export class UsersUserComponent {
   protected readonly canBan$ = this.#auth.hasRole$(Role.USERS_MODER);
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  protected readonly user$: Observable<User> = this.#route.paramMap.pipe(
-    map((params) => '' + params.get('identity')),
-    distinctUntilChanged(),
-    debounceTime(30),
-    switchMap((identity) =>
-      this.#userService.getByIdentity$(
-        identity,
-        new UserFields({
-          gravatarLarge: true,
-          lastIp: true,
-          lastOnline: true,
-          photo: true,
-          picturesAcceptedCount: true,
-          picturesAdded: true,
-          regDate: true,
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      if (isNotFoundError(err)) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
+  protected readonly timestampToDate = timestampToDate;
 
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-    switchMap((user) => {
-      if (!user) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
+  readonly #identity = toSignal(this.#route.paramMap.pipe(map((params) => '' + params.get('identity'))), {
+    requireSync: true,
+  });
 
-      this.#pageEnv.set({
-        pageId: 62,
-        title: user.name,
-      });
+  protected readonly userResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: `users-user-${this.#identity()}`,
+    params: () => this.#identity(),
+    stream: ({params: identity}) =>
+      this.#userService
+        .getByIdentity$(
+          identity,
+          new UserFields({
+            gravatarLarge: true,
+            lastIp: true,
+            lastOnline: true,
+            photo: true,
+            picturesAcceptedCount: true,
+            picturesAdded: true,
+            regDate: true,
+          }),
+        )
+        .pipe(switchMap((user) => (user ? of(user) : notFoundError()))),
+  });
 
-      return of(user);
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  protected readonly picturesResource = rxResource({
+    id: `users-user-pictures-${this.#identity()}`,
+    params: () => this.userResource.value()?.id,
+    stream: ({params: userId}) =>
+      this.#picturesClient
+        .getPictures(
+          new PicturesRequest({
+            fields: new PictureFields({nameHtml: true}),
+            language: this.#languageService.language,
+            limit: 12,
+            options: new PictureListOptions({ownerId: userId}),
+            order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
+            paginator: false,
+          }),
+        )
+        .pipe(map((response) => response.items || [])),
+  });
 
-  protected readonly pictures$: Observable<Picture[]> = this.user$.pipe(
-    switchMap((user) =>
-      this.#picturesClient.getPictures(
-        new PicturesRequest({
-          fields: new PictureFields({nameHtml: true}),
-          language: this.#languageService.language,
-          limit: 12,
-          options: new PictureListOptions({ownerId: user.id}),
-          order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
-          paginator: false,
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-    map((response) => response.items || []),
-  );
+  protected readonly commentsResource = rxResource({
+    id: `users-user-comments-${this.#identity()}`,
+    params: () => {
+      const user = this.userResource.value();
 
-  protected readonly comments$: Observable<CommentMessage[]> = this.user$.pipe(
-    switchMap((user) => {
-      if (user.deleted) {
+      return user ? {deleted: user.deleted, userId: user.id} : undefined;
+    },
+    stream: ({params: {deleted, userId}}) => {
+      if (deleted) {
         return of([]);
       }
 
@@ -173,92 +154,96 @@ export class UsersUserComponent {
             }),
             limit: 15,
             order: GetMessagesRequest.Order.DATE_DESC,
-            userId: user.id + '',
+            userId: userId + '',
           }),
         )
         .pipe(map((response) => (response.items ? response.items : [])));
-    }),
-  );
+    },
+  });
 
-  protected readonly achievements$: Observable<{
-    items: UserAchievementItem[];
-    progress: UserAchievementProgress[];
-  }> = this.user$.pipe(
-    switchMap((user) =>
-      this.#achievementsClient.getUserAchievements(new GetUserAchievementsRequest({userId: user.id})),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-    map((response) => ({items: response.items || [], progress: response.progress || []})),
-  );
+  protected readonly achievementsResource = rxResource({
+    id: `users-user-achievements-${this.#identity()}`,
+    params: () => this.userResource.value()?.id,
+    stream: ({params: userId}) =>
+      this.#achievementsClient
+        .getUserAchievements(new GetUserAchievementsRequest({userId}))
+        .pipe(map((response) => ({items: response.items || [], progress: response.progress || []}))),
+  });
 
-  readonly #ipChange$ = new BehaviorSubject<void>(void 0);
-
-  protected readonly ip$: Observable<IP | null> = combineLatest([this.user$, this.#ipChange$]).pipe(
-    switchMap(([user]) => {
-      if (!user.lastIp) {
-        return of(null);
-      }
-
-      return this.#ipService.getIp$(user.lastIp, ['blacklist', 'rights']).pipe(catchError(() => of(null)));
-    }),
-  );
+  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  readonly #currentUser = toSignal(this.#auth.user$, {initialValue: null});
 
   protected readonly authenticated$ = this.#auth.authenticated$;
 
-  protected readonly isNotMe$ = combineLatest([this.user$, this.#auth.user$]).pipe(
-    map(([user, currentUser]) => {
-      return !currentUser || currentUser.id !== user.id;
-    }),
-  );
+  protected readonly isNotMe = computed(() => {
+    const user = this.userResource.value();
+    const currentUser = this.#currentUser();
 
-  readonly #inContactsChange$ = new BehaviorSubject<void>(void 0);
+    return !user || !currentUser || currentUser.id !== user.id;
+  });
 
-  protected readonly inContacts$ = combineLatest([
-    this.user$,
-    this.#auth.authenticated$,
-    this.isNotMe$,
-    this.#inContactsChange$,
-  ]).pipe(
-    switchMap(([user, authenticated, isNotMe]) => {
+  protected readonly ipResource = rxResource({
+    id: `users-user-ip-${this.#identity()}`,
+    params: () => this.userResource.value()?.lastIp,
+    stream: ({params: lastIp}) => {
+      if (!lastIp) {
+        return of(null);
+      }
+
+      return this.#ipService.getIp$(lastIp, ['blacklist', 'rights']).pipe(catchError(() => of(null)));
+    },
+  });
+
+  protected readonly inContactsResource = rxResource({
+    id: `users-user-in-contacts-${this.#identity()}`,
+    params: () => {
+      const user = this.userResource.value();
+
+      return user ? {authenticated: this.#authenticated(), isNotMe: this.isNotMe(), userId: user.id} : undefined;
+    },
+    stream: ({params: {authenticated, isNotMe, userId}}) => {
       if (!authenticated || !isNotMe) {
         return of(false);
       }
 
-      return this.#appContactsService.isInContacts$(user.id);
-    }),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+      return this.#appContactsService.isInContacts$(userId);
+    },
+  });
 
-  readonly #userUserPreferencesChanged$ = new BehaviorSubject<void>(void 0);
+  protected readonly disableCommentsNotificationsResource = rxResource({
+    id: `users-user-disable-comments-notifications-${this.#identity()}`,
+    params: () => {
+      const user = this.userResource.value();
 
-  protected readonly disableCommentsNotifications$ = combineLatest([
-    this.user$,
-    this.authenticated$,
-    this.isNotMe$,
-    this.#userUserPreferencesChanged$,
-  ]).pipe(
-    switchMap(([user, authenticated, isNotMe]) => {
+      return user ? {authenticated: this.#authenticated(), isNotMe: this.isNotMe(), userId: user.id} : undefined;
+    },
+    stream: ({params: {authenticated, isNotMe, userId}}) => {
       if (!authenticated || !isNotMe) {
         return of(false);
       }
 
       return this.#usersGrpc
-        .getUserPreferences(new UserPreferencesRequest({userId: user.id}))
+        .getUserPreferences(new UserPreferencesRequest({userId}))
         .pipe(map(({disableCommentsNotifications}) => disableCommentsNotifications));
-    }),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+    },
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.userResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const user = this.userResource.value();
+      if (user) {
+        this.#pageEnv.set({
+          pageId: 62,
+          title: user.name,
+        });
+      }
+    });
+  }
 
   protected openMessageForm(user: User) {
     this.#messageDialogService.showDialog('' + user.id);
@@ -270,26 +255,26 @@ export class UsersUserComponent {
       this.#contactsClient
         .createContact(new CreateContactRequest({contact: {contactUserId: user.id}}))
         .subscribe(() => {
-          this.#inContactsChange$.next();
+          this.inContactsResource.reload();
         });
       return;
     }
 
     this.#contactsClient.deleteContact(new DeleteContactRequest({userId: user.id})).subscribe(() => {
-      this.#inContactsChange$.next();
+      this.inContactsResource.reload();
     });
   }
 
   protected setCommentNotificationsDisabled(user: User, value: boolean) {
     if (value) {
       this.#usersGrpc.disableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe(() => {
-        this.#userUserPreferencesChanged$.next();
+        this.disableCommentsNotificationsResource.reload();
       });
       return;
     }
 
     this.#usersGrpc.enableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe(() => {
-      this.#userUserPreferencesChanged$.next();
+      this.disableCommentsNotificationsResource.reload();
     });
   }
 
@@ -328,7 +313,7 @@ export class UsersUserComponent {
     this.#trafficClient.deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip})).subscribe({
       error: (response: unknown) => this.#toastService.handleError(response),
       next: () => {
-        this.#ipChange$.next();
+        this.ipResource.reload();
       },
     });
   }
@@ -347,7 +332,7 @@ export class UsersUserComponent {
       .subscribe({
         error: (response: unknown) => this.#toastService.handleError(response),
         next: () => {
-          this.#ipChange$.next();
+          this.ipResource.reload();
         },
       });
   }

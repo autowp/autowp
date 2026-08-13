@@ -6,7 +6,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/map" i18n>Map</a>
     </li>
-    @if (factory$ | async; as factory) {
+    @if (factoryResource.value(); as factory) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/factories', factory.id]" [innerHTML]="factory.nameHtml"></a>
       </li>
@@ -18,7 +18,7 @@
   <h1 i18n>Products</h1>
 </div>
 
-@if (factory$ | async; as factory) {
+@if (factoryResource.value(); as factory) {
   <ul class="nav nav-pills mb-3">
     <a class="nav-link" [routerLink]="['/factories', factory.id]" [innerHTML]="factory.nameHtml"></a>
     <a class="nav-link active" i18n [routerLink]="['/factories', factory.id, 'items']">Products</a>
@@ -31,7 +31,9 @@
   </ul>
 }
 
-@if (items$ | async; as data) {
+@if (itemsResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (items(); as data) {
   @for (item of data.items; track item.id) {
     <app-catalogue-list-item [item]="item" />
   }

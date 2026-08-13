@@ -6,7 +6,9 @@
   </ol>
 </nav>
 
-@if (user$ | async; as user) {
+@if (userResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (userResource.value(); as user) {
   @if (user) {
     <div class="page-header">
       <h1>{{ user.name }}</h1>
@@ -26,22 +28,20 @@
           <ng-container i18n>Known as:</ng-container>
           <strong>«{{ user.name }}»</strong>
         </p>
-        @if (user.createTime; as date) {
+        @if (timestampToDate(user.createTime); as date) {
           <p>
             <ng-container i18n>Registration date</ng-container>
-            <strong [ngbTooltip]="date.toDate() | date: 'fullDate'">{{ date.toDate() | timeAgo }}</strong>
+            <strong [ngbTooltip]="date | date: 'fullDate'">{{ date | timeAgo }}</strong>
           </p>
         }
-        @if (user.lastOnline) {
+        @if (timestampToDate(user.lastOnline); as lastOnline) {
           <p>
             <ng-container i18n>Last visited</ng-container>:
-            <strong [ngbTooltip]="user.lastOnline.toDate() | date: 'medium'">{{
-              user.lastOnline.toDate() | timeAgo
-            }}</strong>
+            <strong [ngbTooltip]="lastOnline | date: 'medium'">{{ lastOnline | timeAgo }}</strong>
           </p>
         }
         <p i18n>Database id: {{ user.id }}</p>
-        @if (user && isNotMe$ | async) {
+        @if (user && isNotMe()) {
           <p>
             <i class="bi bi-reply" aria-hidden="true"></i>
             <a href="#" i18n (click)="openMessageForm(user)">Send personal message</a>
@@ -81,7 +81,7 @@
             </p>
           }
         </div>
-        @if (achievements$ | async; as achievementsResponse) {
+        @if (achievementsResource.value(); as achievementsResponse) {
           @if (achievementsResponse.items.length || achievementsResponse.progress.length) {
             <div id="achievements">
               <h2 i18n>Achievements</h2>
@@ -141,7 +141,7 @@
             </div>
           }
         }
-        @if (pictures$ | async; as pictures) {
+        @if (picturesResource.value(); as pictures) {
           @if (pictures && pictures.length) {
             <div>
               <h2 i18n>Recent uploads</h2>
@@ -163,7 +163,7 @@
         } @else {
           <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
         }
-        @if (comments$ | async; as comments) {
+        @if (commentsResource.value(); as comments) {
           @if (comments && comments.length > 0) {
             <div>
               <h2>
@@ -191,24 +191,24 @@
         }
       </div>
       <div class="col-md-6">
-        @if ((authenticated$ | async) && !user.deleted && (isNotMe$ | async)) {
+        @if ((authenticated$ | async) && !user.deleted && isNotMe()) {
           <div class="card card-body mb-4">
             <div class="row">
               <div class="col-6">
-                @if ((inContacts$ | async) === false) {
+                @if (inContactsResource.value() === false) {
                   <button type="submit" class="btn btn-lg btn-contact btn-primary" (click)="setInContacts(user, true)">
                     <span class="bi bi-plus-circle me-1" aria-hidden="true"></span>
                     <ng-container i18n>Add to contacts</ng-container>
                   </button>
                 }
-                @if (inContacts$ | async) {
+                @if (inContactsResource.value()) {
                   <button type="submit" class="btn btn-lg btn-contact btn-danger" (click)="setInContacts(user, false)">
                     <span class="bi bi-dash-circle me-1" aria-hidden="true"></span>
                     <ng-container i18n>Remove from contacts</ng-container>
                   </button>
                 }
               </div>
-              @if (disableCommentsNotifications$ | async; as disableCommentsNotifications) {
+              @if (disableCommentsNotificationsResource.value(); as disableCommentsNotifications) {
                 <div class="col-6">
                   <button
                     type="submit"
@@ -260,7 +260,7 @@
                 }
               }
               <p><ng-container i18n>Last visit fom IP-address:</ng-container> {{ user.lastIp }}</p>
-              @if (ip$ | async; as ip) {
+              @if (ipResource.value(); as ip) {
                 @if (ip && ip.blacklist) {
                   <div>
                     <p>
@@ -268,9 +268,9 @@
                       @if (ip.blacklist.byUser) {
                         <app-user [user]="ip.blacklist.byUser" />
                       }
-                      @if (ip.blacklist.until) {
+                      @if (timestampToDate(ip.blacklist.until); as until) {
                         <span>
-                          <ng-container i18n>until</ng-container> {{ ip.blacklist.until.toDate() | date: 'medium' }}
+                          <ng-container i18n>until</ng-container> {{ until | date: 'medium' }}
                           @if (ip.blacklist.reason) {
                             <span> ({{ ip.blacklist.reason }}) </span>
                           }

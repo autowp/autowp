@@ -12,15 +12,16 @@
 
 <ul class="nav nav-pills mb-4">
   <li class="nav-item">
-    <a class="nav-link" routerLink="/persons" i18n [class.active]="(authors$ | async) === false">Persons on photo</a>
+    <a class="nav-link" routerLink="/persons" i18n [class.active]="authors() === false">Persons on photo</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" routerLink="/persons/authors" i18n [class.active]="authors$ | async">Authors</a>
+    <a class="nav-link" routerLink="/persons/authors" i18n [class.active]="authors()">Authors</a>
   </li>
 </ul>
 
-@if (charGroups$ | async; as groups) {
-  @let char = char$ | async;
+@if (charGroupsResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (charGroupsResource.value(); as groups) {
   @for (group of [groups.latin, groups.cyrillic, groups.han, groups.numbers, groups.other]; track group) {
     @if (group.length) {
       <div class="btn-group mb-2">
@@ -28,7 +29,7 @@
           <a
             class="btn btn-secondary"
             routerLink="."
-            [class.active]="c === char"
+            [class.active]="c === char()"
             [queryParams]="{char: c, page: null}"
             >{{ c }}</a
           >
@@ -38,7 +39,9 @@
   }
 }
 
-@if (data$ | async; as data) {
+@if (dataResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (dataResource.value(); as data) {
   @for (item of data.items; track item.id) {
     <app-catalogue-list-item [item]="item" />
   }

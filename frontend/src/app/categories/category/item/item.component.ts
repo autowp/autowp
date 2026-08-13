@@ -1,17 +1,14 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
-  ItemParent,
   ItemParentFields,
   ItemParentListOptions,
   ItemParentsRequest,
   ItemRequest,
   ItemsRequest,
   ItemType,
-  Pages,
   Picture,
   PictureFields,
   PictureItemListOptions,
@@ -26,11 +23,10 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {of} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
-import {ToastsService} from '../../../toasts/toasts.service';
 import {CategoriesListItemComponent} from '../../list-item.component';
 import {CategoriesService} from '../../service';
 
@@ -41,7 +37,7 @@ interface PictureRoute {
 
 @Component({
   selector: 'app-categories-category-item',
-  imports: [CategoriesListItemComponent, RouterLink, PaginatorComponent, AsyncPipe, RemarkModule],
+  imports: [CategoriesListItemComponent, RouterLink, PaginatorComponent, RemarkModule],
   templateUrl: './item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -52,37 +48,35 @@ export class CategoriesCategoryItemComponent {
   readonly #categoriesService = inject(CategoriesService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
-  readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  readonly #categoryData$ = this.#categoriesService.categoryPipe$(this.#route.parent!).pipe(
-    tap(({current}) => {
-      this.#pageEnv.set({
-        pageId: 22,
-        title: current?.nameText || '',
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  // No params function: categoryPipe$'s Observable is itself long-lived and already reacts to
+  // route param changes internally (see CategoriesService.categoryPipe$).
+  protected readonly categoryDataResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'categories-category-item-data',
+    stream: () => this.#categoriesService.categoryPipe$(this.#route.parent!),
+  });
 
-  readonly #page$ = this.#route.queryParamMap.pipe(
-    map((query) => parseInt(query.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-    debounceTime(10),
-  );
+  protected readonly current = computed(() => this.categoryDataResource.value()?.current);
 
-  protected readonly itemParents$: Observable<{
-    items: {item: ItemParent; parentRouterLink: string[]}[];
-    paginator: Pages | undefined;
-  }> = combineLatest([this.#categoryData$, this.#page$]).pipe(
-    switchMap(([{category, current, pathCatnames}, page]) => {
-      if (!current) {
-        return EMPTY;
-      }
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((query) => parseInt(query.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
 
-      return this.#itemsClient
+  protected readonly itemParentsResource = rxResource({
+    id: 'categories-category-item-parents',
+    params: () => {
+      const data = this.categoryDataResource.value();
+
+      return data?.current
+        ? {category: data.category, current: data.current, page: this.#page(), pathCatnames: data.pathCatnames}
+        : undefined;
+    },
+    stream: ({params: {category, current, page, pathCatnames}}) =>
+      this.#itemsClient
         .getItemParents(
           new ItemParentsRequest({
             fields: new ItemParentFields({
@@ -135,22 +129,27 @@ export class CategoriesCategoryItemComponent {
             })),
             paginator: response.paginator,
           })),
-        );
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+        ),
+  });
 
-  protected readonly pictures$: Observable<PictureRoute[]> = combineLatest([
-    this.#categoryData$,
-    this.itemParents$,
-  ]).pipe(
-    switchMap(([{category, current, pathCatnames}, itemParents]) => {
-      if (!current) {
-        return EMPTY;
-      }
+  protected readonly picturesResource = rxResource({
+    id: 'categories-category-item-pictures',
+    params: () => {
+      const data = this.categoryDataResource.value();
+      const itemParents = this.itemParentsResource.value();
 
-      if (current.itemTypeId === ItemType.ITEM_TYPE_CATEGORY || itemParents.items.length <= 0) {
-        return of([]);
+      return data?.current && itemParents
+        ? {
+            category: data.category,
+            current: data.current,
+            itemParentsCount: itemParents.items.length,
+            pathCatnames: data.pathCatnames,
+          }
+        : undefined;
+    },
+    stream: ({params: {category, current, itemParentsCount, pathCatnames}}) => {
+      if (current.itemTypeId === ItemType.ITEM_TYPE_CATEGORY || itemParentsCount <= 0) {
+        return of<PictureRoute[]>([]);
       }
 
       return this.#picturesClient
@@ -167,10 +166,6 @@ export class CategoriesCategoryItemComponent {
           }),
         )
         .pipe(
-          catchError((err: unknown) => {
-            this.#toastService.handleError(err);
-            return EMPTY;
-          }),
           map((response) =>
             (response.items || []).map((picture) => ({
               picture,
@@ -184,30 +179,34 @@ export class CategoriesCategoryItemComponent {
             })),
           ),
         );
-    }),
-  );
+    },
+  });
 
-  protected readonly currentRouterLinkPrefix$ = this.#categoryData$.pipe(
-    map(({category, current, pathCatnames}) => {
-      if (!category || !current) {
-        return null;
-      }
+  protected readonly currentRouterLinkPrefix = computed(() => {
+    const data = this.categoryDataResource.value();
+    if (!data?.category || !data.current) {
+      return null;
+    }
 
-      if (current.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
-        return ['/category', current.catname];
-      }
+    if (data.current.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
+      return ['/category', data.current.catname];
+    }
 
-      return ['/category', category.catname, ...pathCatnames];
-    }),
-  );
+    return ['/category', data.category.catname, ...data.pathCatnames];
+  });
 
-  protected readonly item$: Observable<Item | null> = combineLatest([this.#categoryData$, this.itemParents$]).pipe(
-    switchMap(([{current}, itemParents]) => {
-      if (!current) {
-        return EMPTY;
-      }
+  protected readonly itemResource = rxResource({
+    id: 'categories-category-item-single',
+    params: () => {
+      const data = this.categoryDataResource.value();
+      const itemParents = this.itemParentsResource.value();
 
-      if (current.itemTypeId === ItemType.ITEM_TYPE_CATEGORY || itemParents.items.length > 0) {
+      return data?.current && itemParents
+        ? {current: data.current, itemParentsCount: itemParents.items.length}
+        : undefined;
+    },
+    stream: ({params: {current, itemParentsCount}}) => {
+      if (current.itemTypeId === ItemType.ITEM_TYPE_CATEGORY || itemParentsCount > 0) {
         return of(null);
       }
 
@@ -240,11 +239,16 @@ export class CategoriesCategoryItemComponent {
           language: this.#languageService.language,
         }),
       );
-    }),
-  );
+    },
+  });
 
-  protected readonly current$: Observable<Item | undefined> = this.#categoryData$.pipe(
-    map(({current}) => current),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  constructor() {
+    effect(() => {
+      const current = this.categoryDataResource.value()?.current;
+      this.#pageEnv.set({
+        pageId: 22,
+        title: current?.nameText || '',
+      });
+    });
+  }
 }

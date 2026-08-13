@@ -1,12 +1,11 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
   CommentsType,
   ItemParentCacheListOptions,
   ItemType,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureItemType,
@@ -17,8 +16,9 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {CommentsComponent} from '../../../comments/comments/comments.component';
 import {PictureComponent} from '../../../picture/picture.component';
@@ -26,7 +26,7 @@ import {CategoriesService} from '../../service';
 
 @Component({
   selector: 'app-category-picture',
-  imports: [CommentsComponent, AsyncPipe, PictureComponent],
+  imports: [CommentsComponent, PictureComponent],
   templateUrl: './picture.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -39,138 +39,129 @@ export class CategoryPictureComponent {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #changed$ = new BehaviorSubject<void>(void 0);
+  readonly #identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
+    requireSync: true,
+  });
 
-  readonly #identity$ = this.#route.paramMap.pipe(
-    map((route) => route.get('identity')),
-    distinctUntilChanged(),
-    switchMap((identity) => {
+  // No params function: categoryPipe$'s Observable is itself long-lived and already reacts to
+  // route param changes internally (see CategoriesService.categoryPipe$).
+  protected readonly categoryDataResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'category-picture-category-data',
+    stream: () =>
+      this.#categoriesService
+        .categoryPipe$(this.#route.parent!.parent!)
+        .pipe(switchMap((data) => (data.current ? of(data) : notFoundError()))),
+  });
+
+  protected readonly currentRouterLinkPrefix = computed(() => {
+    const data = this.categoryDataResource.value();
+    if (!data?.category) {
+      return null;
+    }
+
+    if (data.current?.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
+      return ['/category', data.current.catname, 'pictures'];
+    }
+
+    return ['/category', data.category.catname, ...data.pathCatnames, 'pictures'];
+  });
+
+  protected readonly currentRouterLinkGallery = computed(() => {
+    const data = this.categoryDataResource.value();
+    const identity = this.#identity();
+    if (!data?.category || !identity) {
+      return null;
+    }
+
+    if (data.current?.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
+      return ['/category', data.current.catname, 'gallery', identity];
+    }
+
+    return ['/category', data.category.catname, ...data.pathCatnames, 'gallery', identity];
+  });
+
+  protected readonly pictureResource = rxResource({
+    id: `category-picture-${this.#identity() ?? ''}`,
+    params: () => {
+      const current = this.categoryDataResource.value()?.current;
+
+      return current ? {current, identity: this.#identity()} : undefined;
+    },
+    stream: ({params: {current, identity}}) => {
       if (!identity) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(identity);
-    }),
-  );
-
-  readonly #categoryData$ = this.#categoriesService.categoryPipe$(this.#route.parent!.parent!).pipe(
-    switchMap((data) => {
-      if (!data.current) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(data);
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
-
-  protected readonly currentRouterLinkPrefix$ = this.#categoryData$.pipe(
-    map(({category, current, pathCatnames}) => {
-      if (!category) {
-        return null;
+        return notFoundError();
       }
 
-      if (current?.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
-        return ['/category', current.catname, 'pictures'];
-      }
-
-      return ['/category', category.catname, ...pathCatnames, 'pictures'];
-    }),
-  );
-
-  protected readonly picture$: Observable<Picture> = combineLatest([
-    this.#categoryData$,
-    this.#identity$,
-    this.#changed$,
-  ]).pipe(
-    switchMap(([{current}, identity]) => {
-      if (!current) {
-        return EMPTY;
-      }
-
-      return this.#picturesClient.getPicture(
-        new PicturesRequest({
-          fields: new PictureFields({
-            copyrights: true,
-            image: true,
-            moderVoted: true,
-            nameHtml: true,
-            nameText: true,
-            paginator: new PicturesRequest({
-              options: new PictureListOptions({
-                pictureItem: new PictureItemListOptions({
-                  itemParentCacheAncestor: new ItemParentCacheListOptions({
-                    parentId: current.id,
+      return this.#picturesClient
+        .getPicture(
+          new PicturesRequest({
+            fields: new PictureFields({
+              copyrights: true,
+              image: true,
+              moderVoted: true,
+              nameHtml: true,
+              nameText: true,
+              paginator: new PicturesRequest({
+                options: new PictureListOptions({
+                  pictureItem: new PictureItemListOptions({
+                    itemParentCacheAncestor: new ItemParentCacheListOptions({
+                      parentId: current.id,
+                    }),
+                    typeId: PictureItemType.PICTURE_ITEM_CONTENT,
                   }),
-                  typeId: PictureItemType.PICTURE_ITEM_CONTENT,
                 }),
+                order: PicturesRequest.Order.ORDER_PERSPECTIVES,
               }),
-              order: PicturesRequest.Order.ORDER_PERSPECTIVES,
-            }),
-            pictureModerVotes: new PictureModerVoteRequest(),
-            previewLarge: true,
-            replaceable: new PicturesRequest({
-              fields: new PictureFields({nameHtml: true}),
-            }),
-            rights: true,
-            subscribed: true,
-            votes: true,
-          }),
-          language: this.#languageService.language,
-          options: new PictureListOptions({
-            identity,
-            pictureItem: new PictureItemListOptions({
-              itemParentCacheAncestor: new ItemParentCacheListOptions({
-                parentId: current.id,
+              pictureModerVotes: new PictureModerVoteRequest(),
+              previewLarge: true,
+              replaceable: new PicturesRequest({
+                fields: new PictureFields({nameHtml: true}),
               }),
-              typeId: PictureItemType.PICTURE_ITEM_CONTENT,
+              rights: true,
+              subscribed: true,
+              votes: true,
+            }),
+            language: this.#languageService.language,
+            options: new PictureListOptions({
+              identity,
+              pictureItem: new PictureItemListOptions({
+                itemParentCacheAncestor: new ItemParentCacheListOptions({
+                  parentId: current.id,
+                }),
+                typeId: PictureItemType.PICTURE_ITEM_CONTENT,
+              }),
             }),
           }),
-        }),
-      );
-    }),
-    switchMap((picture) => {
-      if (!picture) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(picture);
-    }),
-    tap((picture) => {
-      this.#meta.updateTag({property: 'og:title', content: picture.nameText});
-      if (picture.previewLarge) {
-        this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
-      }
-      this.#pageEnv.set({
-        pageId: 187,
-        title: picture.nameText,
-      });
-    }),
-  );
-
-  protected readonly currentRouterLinkGallery$ = combineLatest([this.#categoryData$, this.#identity$]).pipe(
-    map(([{category, current, pathCatnames}, identity]) => {
-      if (!category || !identity) {
-        return null;
-      }
-
-      if (current?.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
-        return ['/category', current.catname, 'gallery', identity];
-      }
-
-      return ['/category', category.catname, ...pathCatnames, 'gallery', identity];
-    }),
-  );
+        )
+        .pipe(switchMap((picture) => (picture ? of(picture) : notFoundError())));
+    },
+  });
 
   protected readonly CommentsType = CommentsType;
 
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.categoryDataResource.error()) || isNotFoundError(this.pictureResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const picture = this.pictureResource.value();
+      if (picture) {
+        this.#meta.updateTag({property: 'og:title', content: picture.nameText});
+        if (picture.previewLarge) {
+          this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
+        }
+        this.#pageEnv.set({
+          pageId: 187,
+          title: picture.nameText,
+        });
+      }
+    });
+  }
+
   protected reloadPicture() {
-    this.#changed$.next();
+    this.pictureResource.reload();
   }
 }

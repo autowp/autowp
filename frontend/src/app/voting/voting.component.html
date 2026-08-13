@@ -6,7 +6,9 @@
   </ol>
 </nav>
 
-@if (voting$ | async; as voting) {
+@if (votingResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (votingResource.value(); as voting) {
   <div class="page-header">
     <h1>{{ voting.name }}</h1>
   </div>

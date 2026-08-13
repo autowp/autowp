@@ -3,7 +3,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/" i18n>Index page</a>
     </li>
-    @if (user$ | async; as user) {
+    @if (userResource.value(); as user) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]">{{ user.name }}</a>
       </li>
@@ -15,23 +15,23 @@
   <h1 i18n>Comments</h1>
 </div>
 
-@if (order$ | async; as order) {
-  <ul class="nav nav-pills mb-3">
-    @for (corder of orders; track corder) {
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          routerLink="."
-          [class.active]="corder.value === order"
-          [queryParams]="{order: corder.value, page: null}"
-          >{{ corder.name }}</a
-        >
-      </li>
-    }
-  </ul>
-}
+<ul class="nav nav-pills mb-3">
+  @for (corder of orders; track corder) {
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        routerLink="."
+        [class.active]="corder.value === order()"
+        [queryParams]="{order: corder.value, page: null}"
+        >{{ corder.name }}</a
+      >
+    </li>
+  }
+</ul>
 
-@if (comments$ | async; as data) {
+@if (commentsResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (commentsResource.value(); as data) {
   <ul>
     @for (comment of data.items; track comment) {
       <li>

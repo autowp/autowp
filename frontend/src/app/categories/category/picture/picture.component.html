@@ -1,8 +1,10 @@
-@if (picture$ | async; as picture) {
+@if (pictureResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (pictureResource.value(); as picture) {
   <app-picture
     [picture]="picture"
-    [prefix]="(currentRouterLinkPrefix$ | async) || []"
-    [galleryRoute]="(currentRouterLinkGallery$ | async) || []"
+    [prefix]="currentRouterLinkPrefix() || []"
+    [galleryRoute]="currentRouterLinkGallery() || []"
     [h2]="true"
     (changed)="reloadPicture()"
   />

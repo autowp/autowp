@@ -1,8 +1,8 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemRequest,
   ItemType,
@@ -16,12 +16,12 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
-import {ToastsService} from '../toasts/toasts.service';
 import {FactoryMapComponent} from './map/factory-map.component';
 
 @Component({
@@ -35,61 +35,45 @@ export class FactoryComponent {
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
   readonly #auth = inject(AuthService);
-  readonly #toastService = inject(ToastsService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  protected readonly item$: Observable<Item> = this.#route.paramMap.pipe(
-    map((params) => params.get('id') ?? ''),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((id) =>
-      this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({
-            description: true,
-            fullText: true,
-            location: true,
-            nameHtml: true,
-            nameText: true,
-            relatedGroupPictures: true,
+  readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
+    requireSync: true,
+  });
+
+  protected readonly itemResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: `factory-item-${this.#itemID()}`,
+    params: () => this.#itemID(),
+    stream: ({params: id}) =>
+      this.#itemsClient
+        .item(
+          new ItemRequest({
+            fields: new ItemFields({
+              description: true,
+              fullText: true,
+              location: true,
+              nameHtml: true,
+              nameText: true,
+              relatedGroupPictures: true,
+            }),
+            id,
+            language: this.#languageService.language,
           }),
-          id,
-          language: this.#languageService.language,
-        }),
-      ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      this.#router.navigate(['/error-404'], {
-        skipLocationChange: true,
-      });
-      return EMPTY;
-    }),
-    switchMap((factory) => {
-      if (!factory || factory.itemTypeId !== ItemType.ITEM_TYPE_FACTORY) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
+        )
+        .pipe(
+          switchMap((factory) => (factory.itemTypeId === ItemType.ITEM_TYPE_FACTORY ? of(factory) : notFoundError())),
+        ),
+  });
 
-      return of(factory);
-    }),
-    tap((factory) => {
-      this.#pageEnv.set({
-        pageId: 181,
-        title: factory.nameText,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
-
-  protected readonly pictures$ = this.item$.pipe(
-    switchMap((factory) =>
+  protected readonly picturesResource = rxResource({
+    id: `factory-pictures-${this.#itemID()}`,
+    params: () => this.itemResource.value()?.id,
+    stream: ({params: itemId}) =>
       this.#picturesClient.getPictures(
         new PicturesRequest({
           fields: new PictureFields({
@@ -104,17 +88,29 @@ export class FactoryComponent {
           language: this.#languageService.language,
           limit: 24,
           options: new PictureListOptions({
-            pictureItem: new PictureItemListOptions({itemId: '' + factory.id}),
+            pictureItem: new PictureItemListOptions({itemId: '' + itemId}),
             status: PictureStatus.PICTURE_STATUS_ACCEPTED,
           }),
           order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
           paginator: false,
         }),
       ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-  );
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.itemResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const factory = this.itemResource.value();
+      if (factory) {
+        this.#pageEnv.set({
+          pageId: 181,
+          title: factory.nameText,
+        });
+      }
+    });
+  }
 }

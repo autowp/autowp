@@ -1,15 +1,15 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {CommentMessageFields, GetMessagesRequest, User} from '@grpc/spec.pb';
+import {CommentMessageFields, GetMessagesRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
-import {ToastsService} from '../../../toasts/toasts.service';
 
 interface Order {
   apiValue: GetMessagesRequest.Order;
@@ -19,61 +19,50 @@ interface Order {
 
 @Component({
   selector: 'app-users-user-comments',
-  imports: [RouterLink, PaginatorComponent, AsyncPipe],
+  imports: [RouterLink, PaginatorComponent],
   templateUrl: './comments.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersUserCommentsComponent {
   readonly #userService = inject(UserService);
-  readonly #router = inject(Router);
   readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #commentsClient = inject(CommentsClient);
 
-  readonly #page$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-    debounceTime(10),
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
+
+  protected readonly order = toSignal(
+    this.#route.queryParamMap.pipe(map((params) => params.get('order') ?? 'date_desc')),
+    {requireSync: true},
   );
 
-  protected readonly order$ = this.#route.queryParamMap
-    .pipe(
-      map((params) => params.get('order')),
-      distinctUntilChanged(),
-      debounceTime(10),
-    )
-    .pipe(
-      map((order) => order ?? 'date_desc'),
-      shareReplay({bufferSize: 1, refCount: false}),
-    );
+  readonly #identity = toSignal(this.#route.paramMap.pipe(map((params) => params.get('identity') ?? '')), {
+    requireSync: true,
+  });
 
-  protected readonly user$: Observable<User> = this.#route.paramMap.pipe(
-    map((params) => params.get('identity')),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((identity) => (identity ? this.#userService.getByIdentity$(identity, undefined) : EMPTY)),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-    switchMap((user) => {
-      if (!user) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(user);
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  protected readonly userResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: `users-user-comments-user-${this.#identity()}`,
+    params: () => this.#identity(),
+    stream: ({params: identity}) =>
+      identity
+        ? this.#userService
+            .getByIdentity$(identity, undefined)
+            .pipe(switchMap((user) => (user ? of(user) : notFoundError())))
+        : notFoundError(),
+  });
 
-  protected readonly comments$ = combineLatest([this.user$, this.#page$, this.order$]).pipe(
-    tap(() => {
-      this.#pageEnv.set({pageId: 205});
-    }),
-    switchMap(([user, page, order]) =>
+  protected readonly commentsResource = rxResource({
+    id: `users-user-comments-data-${this.#identity()}`,
+    params: () => {
+      const user = this.userResource.value();
+
+      return user ? {order: this.order(), page: this.#page(), userId: user.id} : undefined;
+    },
+    stream: ({params: {order, page, userId}}) =>
       this.#commentsClient.getMessages(
         new GetMessagesRequest({
           fields: new CommentMessageFields({
@@ -84,15 +73,10 @@ export class UsersUserCommentsComponent {
           limit: 30,
           order: this.getOrderApiValue(order),
           page: page,
-          userId: user.id,
+          userId,
         }),
       ),
-    ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-  );
+  });
 
   protected readonly orders: Order[] = [
     {apiValue: GetMessagesRequest.Order.DATE_DESC, name: $localize`New`, value: 'date_desc'},
@@ -100,6 +84,20 @@ export class UsersUserCommentsComponent {
     {apiValue: GetMessagesRequest.Order.VOTE_DESC, name: $localize`Positive`, value: 'vote_desc'},
     {apiValue: GetMessagesRequest.Order.VOTE_ASC, name: $localize`Negative`, value: 'vote_asc'},
   ];
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.userResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      this.order();
+      this.#page();
+      this.userResource.value();
+      this.#pageEnv.set({pageId: 205});
+    });
+  }
 
   protected getOrderApiValue(order: string): GetMessagesRequest.Order | undefined {
     const o = this.orders.find((o) => o.value === order);

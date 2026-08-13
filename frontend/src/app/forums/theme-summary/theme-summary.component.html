@@ -1,0 +1,66 @@
+<div class="row">
+  <div class="col-md-6">
+    <div class="card card-body mb-4">
+      <p>
+        <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+        <strong>
+          <a [routerLink]="['/forums', theme().id]">{{ getForumsThemeTranslation(theme().name) }}</a>
+        </strong>
+      </p>
+      @if (theme().description) {
+        <p>{{ getForumsThemeDescriptionTranslation(theme().description) }}</p>
+      }
+      <p>
+        <ng-container i18n="@@n-topics">{theme().topicsCount, plural,
+          one {{{theme().topicsCount}} topic}
+          other {{{theme().topicsCount}} topics}
+        }</ng-container
+        >,
+        <ng-container i18n="@@n-messages">{theme().messagesCount, plural,
+          one {{{theme().messagesCount}} message}
+          other {{{theme().messagesCount}} messages}
+        }</ng-container>
+      </p>
+      @if (subThemesResource.value(); as themes) {
+        @if ((themes.items || []).length > 0) {
+          <div>
+            <ng-container i18n>Subforums</ng-container>
+            @for (subtheme of themes.items; track subtheme.id) {
+              <a [routerLink]="['/forums', subtheme.id]">{{ getForumsThemeTranslation(subtheme.name) }}</a>
+              @if (!$last) {
+                <span>, </span>
+              }
+            }
+          </div>
+        } @else {
+          <p>
+            <a i18n [routerLink]="['/forums', theme().id]">Go to forum …</a>
+          </p>
+        }
+      }
+    </div>
+  </div>
+  @if (lastTopicResource.value(); as lastTopic) {
+    <div class="col-md-6">
+      <div class="m-4 transparent">
+        <p>
+          <i class="bi bi-chat-fill" aria-hidden="true"></i>
+          <a i18n [routerLink]="['/forums/topic', lastTopic.id]">Last message in topic «{{ lastTopic.name }}»</a>
+        </p>
+        @if (lastMessageResource.value(); as lastMessage) {
+          <p>
+            @if (lastMessageDate(); as date) {
+              <app-past-time-indicator [date]="date" />
+            }
+            @if (lastMessageAuthorResource.value(); as lastMessageAuthor) {
+              <app-user [user]="lastMessageAuthor" />
+            }
+            <a i18n-title title="Go to last message" [routerLink]="['/forums/message', lastMessage.id]">
+              <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
+            </a>
+          </p>
+        }
+      </div>
+    </div>
+  }
+</div>

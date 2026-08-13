@@ -1,6 +1,6 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
-import {HttpErrorResponse} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, ComponentRef, inject} from '@angular/core';
+import {DatePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, ComponentRef, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {CommentsType, CreateVoteRequest, Voting, VotingRequest, VotingVariant} from '@grpc/spec.pb';
@@ -9,8 +9,8 @@ import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {timestampToDate} from '@utils/timestamp';
-import {BehaviorSubject, EMPTY} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
+import {isNotFoundError} from 'app/grpc';
+import {map} from 'rxjs/operators';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
 import {ToastsService} from '../toasts/toasts.service';
@@ -18,7 +18,7 @@ import {VotingVotesComponent} from './votes/votes.component';
 
 @Component({
   selector: 'app-voting',
-  imports: [RouterLink, FormsModule, NgbProgressbar, CommentsComponent, AsyncPipe, DatePipe],
+  imports: [RouterLink, FormsModule, NgbProgressbar, CommentsComponent, DatePipe],
   templateUrl: './voting.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,33 +31,38 @@ export class VotingComponent {
   readonly #toastService = inject(ToastsService);
   readonly #votingClient = inject(VotingsClient);
 
-  readonly #reload$ = new BehaviorSubject<void>(void 0);
-  protected readonly voting$ = this.#route.paramMap.pipe(
-    map((params) => parseInt(params.get('id') ?? '', 10)),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((id) => this.#reload$.pipe(switchMap(() => this.#votingClient.getVoting(new VotingRequest({id}))))),
-    catchError((response: unknown) => {
-      if (response instanceof HttpErrorResponse && response.status === 404) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-      } else {
-        this.#toastService.handleError(response);
-      }
-      return EMPTY;
-    }),
-    tap((voting) => {
-      this.#pageEnv.set({
-        pageId: 157,
-        title: voting.name,
-      });
-    }),
-  );
+  readonly #votingID = toSignal(this.#route.paramMap.pipe(map((params) => parseInt(params.get('id') ?? '', 10))), {
+    requireSync: true,
+  });
+
+  protected readonly votingResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: `voting-${this.#votingID()}`,
+    params: () => this.#votingID(),
+    stream: ({params: id}) => this.#votingClient.getVoting(new VotingRequest({id})),
+  });
+
   protected selected = 0;
   protected readonly selectedMulti: Record<number, number> = {};
 
   protected readonly CommentsType = CommentsType;
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.votingResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const voting = this.votingResource.value();
+      if (voting) {
+        this.#pageEnv.set({
+          pageId: 157,
+          title: voting.name,
+        });
+      }
+    });
+  }
 
   protected vote(voting: Voting) {
     const ids: number[] = [];
@@ -87,7 +92,7 @@ export class VotingComponent {
       .subscribe({
         error: (response: unknown) => this.#toastService.handleError(response),
         next: () => {
-          this.#reload$.next();
+          this.votingResource.reload();
         },
       });
 

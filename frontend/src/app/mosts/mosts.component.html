@@ -8,7 +8,7 @@
 
 <app-mosts-contents
   [prefix]="['/mosts']"
-  [ratingCatname]="ratingCatname$ | async"
-  [typeCatname]="(typeCatname$ | async) || ''"
-  [yearsCatname]="(yearsCatname$ | async) || ''"
+  [ratingCatname]="ratingCatname()"
+  [typeCatname]="typeCatname()"
+  [yearsCatname]="yearsCatname()"
 />

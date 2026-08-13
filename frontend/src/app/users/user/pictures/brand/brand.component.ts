@@ -1,8 +1,7 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -13,22 +12,21 @@ import {
   PictureListOptions,
   PicturesRequest,
   PictureStatus,
-  User,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {PaginatorComponent} from '../../../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.component';
-import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({
   selector: 'app-users-user-pictures-brand',
-  imports: [RouterLink, PaginatorComponent, AsyncPipe, ThumbnailComponent],
+  imports: [RouterLink, PaginatorComponent, ThumbnailComponent],
   templateUrl: './brand.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -37,34 +35,38 @@ export class UsersUserPicturesBrandComponent {
   readonly #router = inject(Router);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly user$: Observable<User> = this.#route.paramMap.pipe(
-    map((params) => params.get('identity')),
-    switchMap((identity) => (identity ? of(identity) : EMPTY)),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((identity) => this.#userService.getByIdentity$(identity, undefined)),
-    switchMap((user) => {
-      if (!user || user.deleted) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(user);
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  readonly #identity = toSignal(this.#route.paramMap.pipe(map((params) => params.get('identity') ?? '')), {
+    requireSync: true,
+  });
 
-  readonly #brand$: Observable<Item> = this.#route.paramMap.pipe(
-    map((params) => params.get('brand') ?? ''),
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((catname) =>
+  readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand') ?? '')), {
+    requireSync: true,
+  });
+
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
+
+  protected readonly userResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: `users-user-pictures-brand-user-${this.#identity()}`,
+    params: () => this.#identity(),
+    stream: ({params: identity}) =>
+      identity
+        ? this.#userService
+            .getByIdentity$(identity, undefined)
+            .pipe(switchMap((user) => (user && !user.deleted ? of(user) : notFoundError())))
+        : notFoundError(),
+  });
+
+  protected readonly brandResource = rxResource({
+    id: `users-user-pictures-brand-${this.#catname()}`,
+    params: () => this.#catname(),
+    stream: ({params: catname}) =>
       this.#itemsClient
         .list(
           new ItemsRequest({
@@ -79,38 +81,24 @@ export class UsersUserPicturesBrandComponent {
             }),
           }),
         )
-        .pipe(map((response) => (response.items?.length ? response.items[0] : null))),
-    ),
-    switchMap((brand) => {
-      if (!brand) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
+        .pipe(switchMap((response) => (response.items?.length ? of(response.items[0]) : notFoundError()))),
+  });
 
-      this.#pageEnv.set({
-        pageId: 141,
-        title: $localize`${brand.nameOnly} pictures`,
-      });
+  protected readonly title = computed(() => {
+    const brand = this.brandResource.value();
 
-      return of(brand);
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+    return brand ? $localize`${brand.nameOnly} pictures` : null;
+  });
 
-  protected readonly title$ = this.#brand$.pipe(map((brand) => $localize`${brand.nameOnly} pictures`));
+  protected readonly dataResource = rxResource({
+    id: `users-user-pictures-brand-data-${this.#identity()}-${this.#catname()}`,
+    params: () => {
+      const user = this.userResource.value();
+      const brand = this.brandResource.value();
 
-  protected readonly data$ = combineLatest([
-    this.user$,
-    this.#brand$,
-    this.#route.queryParamMap.pipe(
-      map((params) => parseInt(params.get('page') ?? '', 10)),
-      distinctUntilChanged(),
-      debounceTime(10),
-    ),
-  ]).pipe(
-    switchMap(([user, brand, page]) =>
+      return user && brand ? {brandId: brand.id, page: this.#page(), userId: user.id} : undefined;
+    },
+    stream: ({params: {brandId, page, userId}}) =>
       this.#picturesClient.getPictures(
         new PicturesRequest({
           fields: new PictureFields({
@@ -125,9 +113,9 @@ export class UsersUserPicturesBrandComponent {
           language: this.#languageService.language,
           limit: 30,
           options: new PictureListOptions({
-            ownerId: user.id,
+            ownerId: userId,
             pictureItem: new PictureItemListOptions({
-              itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: brand.id}),
+              itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: brandId}),
             }),
             status: PictureStatus.PICTURE_STATUS_ACCEPTED,
           }),
@@ -136,10 +124,22 @@ export class UsersUserPicturesBrandComponent {
           paginator: true,
         }),
       ),
-    ),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-  );
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.userResource.error()) || isNotFoundError(this.brandResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        return;
+      }
+
+      const brand = this.brandResource.value();
+      if (brand) {
+        this.#pageEnv.set({
+          pageId: 141,
+          title: $localize`${brand.nameOnly} pictures`,
+        });
+      }
+    });
+  }
 }

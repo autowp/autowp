@@ -1,7 +1,7 @@
-@if (ratingCatnameNormalized$ | async; as ratingCatname) {
+@if (ratingCatnameNormalized(); as ratingCatname) {
   <h1 class="mb-4 mosts-header">
     <span i18n>Most</span>
-    @if (ratings$ | async; as ratings) {
+    @if (ratings(); as ratings) {
       <div class="d-inline-block" ngbDropdown>
         <a href="#" ngbDropdownToggle (click)="(false)">
           @for (rating of ratings; track rating) {
@@ -24,10 +24,10 @@
       </div>
     }
     <span i18n>among</span>
-    @if (vehicleTypes$ | async; as vehicleTypes) {
+    @if (vehicleTypes(); as vehicleTypes) {
       <div class="d-inline-block" ngbDropdown>
         <a href="#" ngbDropdownToggle (click)="(false)">
-          @if (typeCatname$ | async; as typeCatname) {
+          @if (typeCatname(); as typeCatname) {
             @for (type of vehicleTypes; track type) {
               @if (type.catname === typeCatname) {
                 <span>{{ type.nameTranslated }}</span>
@@ -42,7 +42,7 @@
           @for (type of vehicleTypes; track type) {
             <a
               class="dropdown-item"
-              [class.active]="type.catname === (typeCatname$ | async)"
+              [class.active]="type.catname === typeCatname()"
               [routerLink]="prefix().concat([ratingCatname, type.catname])"
               >{{ type.nameTranslated }}</a
             >
@@ -51,25 +51,23 @@
       </div>
     }
 
-    @let yearsCatname = yearsCatname$ | async;
-
-    @if (years$ | async; as years) {
+    @if (years(); as years) {
       <div class="d-inline-block" ngbDropdown>
         <a href="#" ngbDropdownToggle (click)="(false)">
           @for (year of years; track year) {
-            @if (year.catname ? year.catname === yearsCatname : !yearsCatname) {
+            @if (year.catname ? year.catname === yearsCatname() : !yearsCatname()) {
               <span>{{ getMostsPeriodsTranslation(year.name) }}</span>
             }
           }
           <i class="bi bi-caret-down" aria-hidden="true"></i>
         </a>
-        @if (defaultTypeCatname$ | async; as defaultTypeCatname) {
+        @if (defaultTypeCatname(); as defaultTypeCatname) {
           <div ngbDropdownMenu style="max-height: 200px; overflow-x: hidden">
-            @if (typeCatname$ | async; as typeCatname) {
+            @if (typeCatname(); as typeCatname) {
               @for (year of years; track year) {
                 <a
                   class="dropdown-item"
-                  [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
+                  [class.active]="year.catname ? year.catname === yearsCatname() : !yearsCatname()"
                   [routerLink]="prefix().concat([ratingCatname, typeCatname, year.catname ? year.catname : ''])"
                   >{{ getMostsPeriodsTranslation(year.name) }}</a
                 >
@@ -78,7 +76,7 @@
               @for (year of years; track year) {
                 <a
                   class="dropdown-item"
-                  [class.active]="year.catname ? year.catname === yearsCatname : !yearsCatname"
+                  [class.active]="year.catname ? year.catname === yearsCatname() : !yearsCatname()"
                   [routerLink]="prefix().concat([ratingCatname, defaultTypeCatname, year.catname ? year.catname : ''])"
                   >{{ getMostsPeriodsTranslation(year.name) }}</a
                 >
@@ -89,7 +87,9 @@
       </div>
     }
   </h1>
-  @if (items$ | async; as items) {
+  @if (itemsResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  } @else if (itemsResource.value(); as items) {
     @for (item of items; track item; let first = $first) {
       <div class="row">
         <div class="col-md-9">

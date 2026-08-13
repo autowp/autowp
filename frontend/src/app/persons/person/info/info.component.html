@@ -1,5 +1,7 @@
-@if (item$ | async; as item) {
-  @if (links$ | async; as links) {
+@if (itemResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (itemResource.value(); as item) {
+  @if (linksResource.value(); as links) {
     @if (links.length > 0 || item.description) {
       <div class="card card-body mb-4">
         <remark [markdown]="item.description" />
@@ -17,7 +19,7 @@
   }
 }
 
-@if (authorPictures$ | async; as data) {
+@if (authorPicturesResource.value(); as data) {
   @if ((data.items || []).length > 0) {
     <div>
       <h3 i18n>Pictures</h3>
@@ -35,7 +37,7 @@
   }
 }
 
-@if (contentPictures$ | async; as data) {
+@if (contentPicturesResource.value(); as data) {
   @if ((data.items || []).length > 0) {
     <div>
       <h3 i18n>Pictures</h3>

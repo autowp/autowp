@@ -1,8 +1,7 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {MostsItem, MostsItemsRequest, MostsVehicleType} from '@grpc/spec.pb';
+import {MostsItemsRequest, MostsVehicleType} from '@grpc/spec.pb';
 import {MostsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
@@ -16,10 +15,8 @@ import {
   getVehicleTypeRpTranslation,
 } from '@utils/translations';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
-import {ToastsService} from '../../toasts/toasts.service';
 import {MostsService} from '../mosts.service';
 
 export interface MostsVehicleTypeTranslated extends MostsVehicleType.AsObject {
@@ -40,7 +37,7 @@ function vehicleTypesToList(vehicleTypes: MostsVehicleType[]): MostsVehicleTypeT
 
 @Component({
   selector: 'app-mosts-contents',
-  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, NgbTooltip, AsyncPipe, RemarkModule],
+  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLink, NgbTooltip, RemarkModule],
   templateUrl: './contents.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,78 +47,72 @@ export class MostsContentsComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #mostsClient = inject(MostsClient);
   readonly #languageService = inject(LanguageService);
-  readonly #toastService = inject(ToastsService);
 
   readonly prefix = input.required<string[]>();
-
   readonly ratingCatname = input.required<null | string>();
-  readonly #ratingCatname$ = toObservable(this.ratingCatname);
-
-  protected readonly ratingCatnameNormalized$ = this.#ratingCatname$.pipe(
-    switchMap((ratingCatname) =>
-      this.#menu$.pipe(map((menu) => (ratingCatname ? ratingCatname : (menu.ratings || [])[0].catname))),
-    ),
-  );
-
   readonly typeCatname = input.required<null | string>();
-  protected readonly typeCatname$ = toObservable(this.typeCatname);
-
   readonly yearsCatname = input.required<null | string>();
-  protected readonly yearsCatname$ = toObservable(this.yearsCatname);
-
   readonly brandID = input<string>();
-  protected readonly brandID$ = toObservable(this.brandID);
 
-  readonly #menu$ = this.brandID$.pipe(
-    distinctUntilChanged(),
-    debounceTime(10),
-    switchMap((brandID) => this.#mostsService.getMenu$(brandID)),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  protected readonly menuResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    id: 'mosts-contents-menu',
+    params: () => this.brandID(),
+    stream: ({params: brandID}) => this.#mostsService.getMenu$(brandID),
+  });
 
-  protected readonly years$ = this.#menu$.pipe(map((menu) => menu.years));
+  protected readonly years = computed(() => this.menuResource.value()?.years);
+  protected readonly ratings = computed(() => this.menuResource.value()?.ratings);
 
-  protected readonly ratings$ = this.#menu$.pipe(map((menu) => menu.ratings));
+  protected readonly vehicleTypes = computed<MostsVehicleTypeTranslated[] | undefined>(() => {
+    const menu = this.menuResource.value();
 
-  protected readonly vehicleTypes$: Observable<MostsVehicleTypeTranslated[]> = this.#menu$.pipe(
-    map((menu) => vehicleTypesToList(menu.vehicleTypes || [])),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+    return menu ? vehicleTypesToList(menu.vehicleTypes || []) : undefined;
+  });
 
-  protected readonly defaultTypeCatname$ = this.vehicleTypes$.pipe(map((vehicleTypes) => vehicleTypes[0].catname));
+  protected readonly defaultTypeCatname = computed(() => this.vehicleTypes()?.[0]?.catname);
 
-  protected readonly items$: Observable<MostsItem[]> = combineLatest([
-    this.ratingCatnameNormalized$.pipe(distinctUntilChanged(), debounceTime(10)),
-    this.typeCatname$.pipe(distinctUntilChanged(), debounceTime(10)),
-    this.yearsCatname$.pipe(distinctUntilChanged(), debounceTime(10)),
-  ]).pipe(
-    tap(() => {
-      this.initPageEnv();
-    }),
-    switchMap(([ratingCatname, typeCatname, yearsCatname]) =>
-      this.brandID$.pipe(
-        switchMap((brandID) =>
-          this.#mostsClient.getItems(
-            new MostsItemsRequest({
-              brandId: brandID,
-              language: this.#languageService.language,
-              ratingCatname: ratingCatname,
-              typeCatname: typeCatname || '',
-              yearsCatname: yearsCatname || '',
-            }),
-          ),
-        ),
-        catchError((error: unknown) => {
-          this.#toastService.handleError(error);
-          return EMPTY;
-        }),
-      ),
-    ),
-    map((response) => response.items || []),
-  );
+  protected readonly ratingCatnameNormalized = computed(() => this.ratingCatname() || this.ratings()?.[0]?.catname);
 
-  private initPageEnv() {
-    this.#pageEnv.set({pageId: 21});
+  protected readonly itemsResource = rxResource({
+    id: 'mosts-contents-items',
+    params: () => {
+      const ratingCatname = this.ratingCatnameNormalized();
+
+      return ratingCatname === undefined
+        ? undefined
+        : {
+            brandID: this.brandID(),
+            ratingCatname,
+            typeCatname: this.typeCatname() || '',
+            yearsCatname: this.yearsCatname() || '',
+          };
+    },
+    stream: ({params}) =>
+      this.#mostsClient
+        .getItems(
+          new MostsItemsRequest({
+            brandId: params.brandID,
+            language: this.#languageService.language,
+            ratingCatname: params.ratingCatname,
+            typeCatname: params.typeCatname,
+            yearsCatname: params.yearsCatname,
+          }),
+        )
+        .pipe(map((response) => response.items || [])),
+  });
+
+  constructor() {
+    // Mirrors the original tap()-before-fetch placement: MostsComponent's own ngOnInit only runs
+    // once (Angular reuses this component instance across in-place /mosts/** param navigations),
+    // so this effect is what keeps pageEnv correctly set to pageId 21 on every subsequent
+    // rating/type/years change, independent of whether the items fetch below has resolved yet.
+    effect(() => {
+      this.ratingCatnameNormalized();
+      this.typeCatname();
+      this.yearsCatname();
+      this.#pageEnv.set({pageId: 21});
+    });
   }
 
   protected getUnitAbbrTranslation(id: string): string {
