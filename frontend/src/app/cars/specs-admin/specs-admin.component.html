@@ -20,25 +20,23 @@
       @for (row of data.items; track row) {
         <tr>
           <td>
-            @if (row.userValue.updateTime?.toDate(); as date) {
+            @if (row.createdAt; as date) {
               <span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span>
             }
           </td>
           <td>
-            @if (row.user$ | async; as user) {
+            @if (row.user; as user) {
               <app-user [user]="user" />
             }
           </td>
           <td>
-            @if (row.path$ | async; as path) {
-              @for (node of path; track node; let last = $last) {
-                <span>{{ node }}</span>
-                @if (!last) {
-                  <span> / </span>
-                }
+            @for (node of row.path; track node; let last = $last) {
+              <span>{{ node }}</span>
+              @if (!last) {
+                <span> / </span>
               }
             }
-            @if (row.unitAbbr$ | async; as unitAbbr) {
+            @if (row.unitAbbr; as unitAbbr) {
               <span class="unit">{{ unitAbbr }}</span>
             }
           </td>

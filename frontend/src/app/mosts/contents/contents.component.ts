@@ -56,19 +56,26 @@ export class MostsContentsComponent {
 
   protected readonly menuResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    // vehicleTypesToList() (which calls .toObject()) runs here in the stream, on the real
+    // MostsVehicleType instances fresh off the wire, rather than in the vehicleTypes computed()
+    // below reading menuResource.value() lazily: a resource value seeded from TransferState on
+    // hydration is a plain JSON-shaped object, not a real MostsVehicleType class instance, so
+    // .toObject() doesn't exist on it even though the same public fields do.
     id: 'mosts-contents-menu',
     params: () => this.brandID(),
-    stream: ({params: brandID}) => this.#mostsService.getMenu$(brandID),
+    stream: ({params: brandID}) =>
+      this.#mostsService.getMenu$(brandID).pipe(
+        map((menu) => ({
+          ratings: menu.ratings,
+          vehicleTypes: vehicleTypesToList(menu.vehicleTypes || []),
+          years: menu.years,
+        })),
+      ),
   });
 
   protected readonly years = computed(() => this.menuResource.value()?.years);
   protected readonly ratings = computed(() => this.menuResource.value()?.ratings);
-
-  protected readonly vehicleTypes = computed<MostsVehicleTypeTranslated[] | undefined>(() => {
-    const menu = this.menuResource.value();
-
-    return menu ? vehicleTypesToList(menu.vehicleTypes || []) : undefined;
-  });
+  protected readonly vehicleTypes = computed(() => this.menuResource.value()?.vehicleTypes);
 
   protected readonly defaultTypeCatname = computed(() => this.vehicleTypes()?.[0]?.catname);
 

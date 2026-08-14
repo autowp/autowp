@@ -1,4 +1,4 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
@@ -17,24 +17,26 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import {timestampToDate} from '@utils/timestamp';
 import {getUnitAbbrTranslation} from '@utils/translations';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {forkJoin, Observable, of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 interface AttrUserValueListItem {
-  path$: Observable<string[]>;
-  unitAbbr$: Observable<null | string | undefined>;
-  user$: Observable<null | User>;
+  createdAt: Date | undefined;
+  path: string[];
+  unitAbbr: null | string | undefined;
+  user: null | User;
   userValue: AttrUserValue;
 }
 
 @Component({
   selector: 'app-cars-specs-admin',
-  imports: [NgbTooltip, UserComponent, FormsModule, AsyncPipe, DatePipe, TimeAgoPipe],
+  imports: [NgbTooltip, UserComponent, FormsModule, DatePipe, TimeAgoPipe],
   templateUrl: './specs-admin.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -63,6 +65,12 @@ export class CarsSpecsAdminComponent implements OnInit {
     // instance of this component, created by navigating away and back with a different
     // `?item_id=` before Angular's whenStable() ever resolves, match TransferState's
     // still-present entry from the first item and seed itself with the wrong data.
+    //
+    // #mapUserValue() below resolves path/unitAbbr/user eagerly (via forkJoin) into plain fields
+    // rather than storing them as path$/unitAbbr$/user$ Observables on each row: an Observable
+    // doesn't survive the TransferState JSON round-trip (see the identical note on
+    // DonateLogComponent.itemsResource in ../../donate/log/log.component.ts) - it serializes to
+    // '{}', and AsyncPipe throws on that non-Observable, non-Promise value on hydration.
     id: `cars-specs-admin-${this.itemID()}`,
     params: () => this.itemID(),
     stream: ({params: itemId}) =>
@@ -75,20 +83,31 @@ export class CarsSpecsAdminComponent implements OnInit {
           }),
         )
         .pipe(
-          map((response) => ({
-            items: (response.items || []).map((userValue) => this.#mapUserValue(userValue)),
-          })),
+          switchMap((response) => {
+            const rows = response.items || [];
+            if (rows.length === 0) {
+              return of({items: [] as AttrUserValueListItem[]});
+            }
+            return forkJoin(rows.map((userValue) => this.#mapUserValue(userValue))).pipe(map((items) => ({items})));
+          }),
         ),
   });
 
-  #mapUserValue(userValue: AttrUserValue): AttrUserValueListItem {
+  #mapUserValue(userValue: AttrUserValue): Observable<AttrUserValueListItem> {
     const attr$ = this.#attrsService.getAttribute$(userValue.attributeId);
-    return {
-      path$: this.#attrsService.getPath$(userValue.attributeId),
-      unitAbbr$: attr$.pipe(map((attr) => (attr?.unitId ? getUnitAbbrTranslation(attr.unitId) : null))),
-      user$: this.#userService.getUser$(userValue.userId),
-      userValue,
-    };
+    return forkJoin([
+      this.#attrsService.getPath$(userValue.attributeId),
+      attr$.pipe(map((attr) => (attr?.unitId ? getUnitAbbrTranslation(attr.unitId) : null))),
+      this.#userService.getUser$(userValue.userId),
+    ]).pipe(
+      map(([path, unitAbbr, user]) => ({
+        createdAt: timestampToDate(userValue.updateTime),
+        path,
+        unitAbbr,
+        user,
+        userValue,
+      })),
+    );
   }
 
   ngOnInit(): void {
