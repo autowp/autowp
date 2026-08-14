@@ -1,10 +1,12 @@
 import {RenderMode, ServerRoute} from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
-  {
-    path: 'articles/**',
-    renderMode: RenderMode.Server,
-  },
+  // Prerender: fully static pages built once at deploy time, no per-request data dependency.
+  // achievements is deliberately not in this list, even though it looks just as static -
+  // AchievementsComponent calls AchievementsClient.getAchievementStats() for live per-achievement
+  // user counts, so prerendering it would both freeze those counts until the next deploy and
+  // require the backend to be reachable during `ng build` in CI, which it isn't. It's Server via
+  // the fallback at the bottom of this file like everything else not listed here.
   {
     path: 'donate/success',
     renderMode: RenderMode.Prerender,
@@ -17,172 +19,51 @@ export const serverRoutes: ServerRoute[] = [
     path: 'telegram',
     renderMode: RenderMode.Prerender,
   },
-  // Stays Server, not Prerender like its static siblings above: AchievementsComponent calls
-  // AchievementsClient.getAchievementStats() for live per-achievement user counts, so
-  // prerendering it would both freeze those counts until the next deploy and require the backend
-  // to be reachable during `ng build` in CI, which it isn't.
-  {
-    path: 'achievements',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'feedback/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'brands/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'cutaway/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'top-view/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'picture/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'mascots/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'rules/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'voting/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'factories/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'persons/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'museums/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'mosts/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'about',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'twins/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'category/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'users/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'error-404',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'cars/dateless',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'cars/attrs-change-log',
-    renderMode: RenderMode.Server,
-  },
-  // The rest of cars/* are moderator editing tools, not content. Unlike forums/:theme_id or
-  // :brand, none of these are dynamic segments, so there's no wildcard-swallow risk in leaving
-  // them unlisted - listed explicitly anyway for clarity.
+
+  // Every route is Server by default (see the `**` fallback at the bottom) - including the whole
+  // :brand/** catalogue tree (bare brand page, mixed/other/logotypes galleries, cars, recent,
+  // engines, concepts, mosts, and the deep vehicle-catalogue tree matched client-side via a custom
+  // UrlMatcher). Routes below are pinned to Client explicitly because they aren't safe or valuable
+  // to server-render yet - without these entries they'd silently be swallowed by that fallback.
+  {path: 'account/**', renderMode: RenderMode.Client}, // Keycloak never runs server-side
+  // The rest of cars/* (dateless, attrs-change-log) is content and falls through to the Server
+  // fallback on its own; these three are moderator editing tools, not content.
   {path: 'cars/select-engine', renderMode: RenderMode.Client},
   {path: 'cars/specifications-editor', renderMode: RenderMode.Client},
   {path: 'cars/specs-admin', renderMode: RenderMode.Client},
-  {
-    path: 'forums',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'forums/topic/:topic_id',
-    renderMode: RenderMode.Server,
-  },
-  // No `/**` here deliberately, same reasoning as `:brand` below: forums/:theme_id is a generic
-  // positional wildcard matching any single segment after "forums", so its Client siblings below
-  // (also single segments after "forums") must be listed explicitly or they'd be silently
-  // swallowed by it. forums/new-topic/** and forums/message/** are safe without an explicit Client
-  // entry - they're three segments, which this wildcard (no `/**` suffix) never matches - so they
-  // fall through to the final Client catch-all on their own.
-  {
-    path: 'forums/:theme_id',
-    renderMode: RenderMode.Server,
-  },
+  {path: 'chart/**', renderMode: RenderMode.Client}, // Chart.js (ng2-charts), no platform guard yet
+  // donate and donate/log fall through to the Server fallback on their own; donate/vod/** stays
+  // Client - it's a payment form whose content (anonymous checkbox, current user) is inherently
+  // personalized, same as new/inbox below.
+  {path: 'donate/vod/**', renderMode: RenderMode.Client},
   {path: 'forums/move-message', renderMode: RenderMode.Client},
   {path: 'forums/move-topic', renderMode: RenderMode.Client},
+  // No `/**` needed for forums/:theme_id or forums/topic/:topic_id to reach the Server fallback -
+  // both are 2 segments, so they never collide with these two 3-segment Client routes.
+  {path: 'forums/new-topic/**', renderMode: RenderMode.Client},
+  {path: 'forums/message/**', renderMode: RenderMode.Client},
   {path: 'forums/subscriptions', renderMode: RenderMode.Client},
-  // No `/**` here deliberately: only the bare brand page (e.g. /toyota) is server-rendered, not
-  // most other things nested under it (e.g. /toyota/corolla, /toyota/moder-only-routes...). A
-  // path with more segments than this fails to match this node (it has no children) and falls
-  // through to the final Client catch-all below instead - except the entries below, which have
-  // their own more specific paths and are matched first. :brand/{mixed,other,logotypes}/** all
-  // share the same CatalogueMixed*Component classes.
-  {
-    path: ':brand',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: ':brand/mixed/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: ':brand/other/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: ':brand/logotypes/**',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: ':brand/recent',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: ':brand/cars/**',
-    renderMode: RenderMode.Server,
-  },
-  // Every other top-level route pinned to Client explicitly. `:brand` above is a generic
-  // positional wildcard — @angular/ssr's route tree normalizes any ':xxx' segment to the same
-  // wildcard match regardless of name, and at each level tries an exact literal match before
-  // falling back to it — so without these entries, :brand would silently swallow every route
-  // below too (moder/account/upload have no SSR value, Keycloak never runs server-side; new/inbox
-  // render user-specific, timezone-dependent content SSR can't produce correctly; map/chart/pulse/
-  // info depend on browser-only libraries — Leaflet, Chart.js, Monaco — with no platform guards
-  // yet; factories/** and museums/** are server-rendered because their Leaflet usage is isolated
-  // in FactoryMapComponent/MuseumMapComponent, used only inside an @defer block, so it never loads
-  // server-side).
-  {path: 'account/**', renderMode: RenderMode.Client},
-  {path: 'chart/**', renderMode: RenderMode.Client},
-  {path: 'donate/**', renderMode: RenderMode.Client},
-  {path: 'inbox/**', renderMode: RenderMode.Client},
-  {path: 'info/**', renderMode: RenderMode.Client},
+  {path: 'inbox/**', renderMode: RenderMode.Client}, // auth-gated, no SSR value
+  // info/spec falls through to the Server fallback on its own; info/text/** stays Client -
+  // InfoTextComponent renders Monaco's DiffEditorComponent directly in the template with no
+  // @defer/platform guard.
+  {path: 'info/text/**', renderMode: RenderMode.Client},
+  // Requires RoleModer server-side (LogGRPCServer.GetEvents) - an anonymous SSR pass would only
+  // ever render its permission-denied state.
   {path: 'log/**', renderMode: RenderMode.Client},
+  {path: 'login/**', renderMode: RenderMode.Client}, // Keycloak never runs server-side
+  // Leaflet, no platform guard yet - unlike factories/** and museums/** (Server by fallback),
+  // whose own Leaflet usage is isolated in FactoryMapComponent/MuseumMapComponent, used only
+  // inside an @defer block, so it never loads server-side.
   {path: 'map/**', renderMode: RenderMode.Client},
-  {path: 'moder/**', renderMode: RenderMode.Client},
+  {path: 'moder/**', renderMode: RenderMode.Client}, // auth-gated moderation tools, no SSR value
+  // Redirects client-side to today's date on load; no SSR redirect mechanism exists yet for that.
   {path: 'new/**', renderMode: RenderMode.Client},
-  {path: 'gallery/**', renderMode: RenderMode.Client},
-  {path: 'pulse/**', renderMode: RenderMode.Client},
-  {path: 'upload/**', renderMode: RenderMode.Client},
-  {path: 'login/**', renderMode: RenderMode.Client},
+  {path: 'pulse/**', renderMode: RenderMode.Client}, // Chart.js (ng2-charts), no platform guard yet
+  {path: 'upload/**', renderMode: RenderMode.Client}, // auth-gated file upload, no SSR value
+
   {
     path: '**',
-    renderMode: RenderMode.Client,
+    renderMode: RenderMode.Server,
   },
 ];

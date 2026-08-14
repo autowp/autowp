@@ -1,8 +1,39 @@
+import {DOCUMENT} from '@angular/common';
 import {inject} from '@angular/core';
-import {CanActivateFn} from '@angular/router';
+import {CanActivateFn, Router} from '@angular/router';
 import {AuthService, Role} from '@services/auth.service';
+import {LanguageService} from '@services/language';
+import Keycloak from 'keycloak-js';
+import {combineLatest} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 export const moderGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
-  return auth.hasRole$(Role.MODER);
+  const router = inject(Router);
+  const keycloak = inject(Keycloak);
+  const language = inject(LanguageService);
+  const document = inject(DOCUMENT);
+
+  // CanActivateFn legitimately allows boolean | UrlTree, e.g. to redirect unauthorized users to
+  // /error-403.
+  return combineLatest([auth.authenticated$, auth.hasRole$(Role.MODER)]).pipe(
+    // eslint-disable-next-line sonarjs/function-return-type
+    map(([authenticated, isModer]) => {
+      if (!authenticated) {
+        if (document.defaultView) {
+          keycloak.login({
+            locale: language.language,
+            redirectUri: document.defaultView.location.href,
+          });
+        }
+        return false;
+      }
+
+      if (!isModer) {
+        return router.createUrlTree(['/error-403']);
+      }
+
+      return true;
+    }),
+  );
 };

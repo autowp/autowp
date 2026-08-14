@@ -19,10 +19,10 @@ export class IndexBrandsComponent {
   readonly #items = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  // eslint-disable-next-line sonarjs/pseudo-random
-  protected readonly placeholderItems = Array.from({length: 60}, () => Math.round(3 + Math.random() * 5)).map(
-    (item) => ({width: item}),
-  );
+  // Deterministic (not truly random) so the skeleton's widths match between the SSR pass and
+  // client hydration - Math.random() here would produce a different sequence each time and
+  // mismatch the @for block's per-item tracking in the template.
+  protected readonly placeholderItems = Array.from({length: 60}, (_, i) => ({width: 3 + (i % 6)}));
 
   protected readonly result$ = this.#items
     .getTopBrandsList(new GetTopBrandsListRequest({language: this.#languageService.language}))

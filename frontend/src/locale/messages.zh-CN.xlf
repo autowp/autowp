@@ -8594,6 +8594,14 @@ Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*</target>
         </context-group>
         <target state="translated">找不到页面</target>
       </trans-unit>
+      <trans-unit id="1211573871136189242" datatype="html">
+        <source>Access denied</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forbidden.component.ts</context>
+          <context context-type="linenumber">6,9</context>
+        </context-group>
+        <target state="translated">访问被拒绝</target>
+      </trans-unit>
       <trans-unit id="6095534740119293938" datatype="html">
         <source>previous</source>
         <context-group purpose="location">

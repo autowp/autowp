@@ -1,7 +1,7 @@
 <div class="gallery">
-  @if (gallery$ | async; as gallery) {
+  @if (galleryResource.value(); as gallery) {
     <div class="carousel slide">
-      @if (gallery.useCircleIndicator) {
+      @if (useCircleIndicator(gallery)) {
         <ol class="carousel-indicators">
           @for (item of gallery.items; track $index) {
             <li
@@ -20,7 +20,7 @@
           @if (item && $index >= gallery.current - 1 && gallery.current + 1 >= $index) {
             <app-gallery-carousel-item
               class="carousel-item"
-              [class.active]="(current$ | async) === item.identity"
+              [class.active]="current() === item.identity"
               [class.previous]="gallery.current > $index"
               [class.next]="$index > gallery.current"
               [item]="item"
@@ -51,7 +51,7 @@
           <i class="bi bi-chevron-right glyphicon glyphicon-chevron-right fs-1" aria-hidden="true"></i>
         </button>
       }
-      @if (identity$ | async; as identity) {
+      @if (current(); as identity) {
         <button
           type="button"
           class="carousel-control-close"

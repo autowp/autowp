@@ -1,19 +1,23 @@
-import {AsyncPipe, CurrencyPipe, DatePipe} from '@angular/common';
+import {CurrencyPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
+import {User} from '@grpc/spec.pb';
 import {DonationsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {map} from 'rxjs/operators';
+import {timestampToDate} from '@utils/timestamp';
+import {of} from 'rxjs';
+import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
   selector: 'app-donate-log',
-  imports: [RouterLink, NgbTooltip, UserComponent, AsyncPipe, CurrencyPipe, DatePipe, TimeAgoPipe],
+  imports: [RouterLink, NgbTooltip, UserComponent, CurrencyPipe, DatePipe, TimeAgoPipe],
   templateUrl: './log.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -22,17 +26,39 @@ export class DonateLogComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #donations = inject(DonationsClient);
 
-  protected readonly items$ = this.#donations.getTransactions(new Empty()).pipe(
-    map((response) =>
-      (response.items || []).map((item) => ({
-        createdAt: item.createTime?.toDate(),
-        currency: item.currency,
-        purpose: item.purpose,
-        sum: item.sum / 100,
-        user$: this.#userService.getUser$(item.userId),
-      })),
-    ),
-  );
+  // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+  // Donors are resolved into a plain Record alongside items, not a per-item user$ Observable (the
+  // previous shape here): an Observable doesn't survive the TransferState JSON round-trip - RxJS
+  // Observable instances serialize to '{}' (see timestamp.ts for the equivalent issue with
+  // Timestamp/.toDate()), and AsyncPipe throws on that non-Observable, non-Promise value on
+  // hydration.
+  protected readonly itemsResource = rxResource({
+    id: 'donate-log-items',
+    stream: () =>
+      this.#donations.getTransactions(new Empty()).pipe(
+        switchMap((response) => {
+          const items = (response.items || []).map((item) => ({
+            createdAt: timestampToDate(item.createTime),
+            currency: item.currency,
+            purpose: item.purpose,
+            sum: item.sum / 100,
+            userId: item.userId,
+          }));
+
+          const userIds = [...new Set(items.map((item) => item.userId).filter((id) => id && id !== '0'))];
+          if (userIds.length === 0) {
+            return of({items, usersById: {} as Record<string, User>});
+          }
+
+          return this.#userService.getUserMap$(userIds).pipe(
+            map((userMap) => ({items, usersById: Object.fromEntries(userMap)})),
+            // getUserMap$ throws if the backend can't find a requested user. Degrade to showing
+            // no donor rather than erroring the whole resource over one stale reference.
+            catchError(() => of({items, usersById: {} as Record<string, User>})),
+          );
+        }),
+      ),
+  });
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 196});

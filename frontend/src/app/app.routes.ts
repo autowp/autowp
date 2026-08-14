@@ -97,6 +97,7 @@ export const routes: Routes = [
   {loadChildren: () => import('./voting/voting-routing.module').then((m) => m.routes), path: 'voting'},
   {loadChildren: () => import('./index/index-routing.module').then((m) => m.routes), path: ''},
   {loadComponent: () => import('./not-found.component').then((m) => m.PageNotFoundComponent), path: 'error-404'},
+  {loadComponent: () => import('./forbidden.component').then((m) => m.ForbiddenComponent), path: 'error-403'},
   {loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent), path: 'login'},
   {
     loadChildren: () => import('./catalogue/catalogue-routing.module').then((m) => m.routes),

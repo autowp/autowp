@@ -1,6 +1,15 @@
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  Injector,
+  input,
+  OnInit,
+  output,
+  ResourceRef,
+} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {Router, RouterLink} from '@angular/router';
 import {
   GalleryRequest,
@@ -20,12 +29,15 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, tap} from 'rxjs/operators';
+import {isNotFoundError, notFoundError} from 'app/grpc';
+import {EMPTY, Observable, of} from 'rxjs';
+import {catchError, switchMap} from 'rxjs/operators';
 
-import {isNotFoundError} from '../grpc';
 import {ToastsService} from '../toasts/toasts.service';
 import {CarouselItemComponent} from './carousel-item.component';
+
+const MAX_INDICATORS = 30;
+const PER_PAGE = 10;
 
 const galleryFields = new PictureFields({
   commentsCount: true,
@@ -55,104 +67,90 @@ export interface APIGalleryFilter {
   perspectiveID?: number;
 }
 
-class Gallery {
-  readonly #MAX_INDICATORS = 30;
-  readonly #PER_PAGE = 10;
+// Plain data, not a class with methods - this is stored as an rxResource value, which round-trips
+// through TransferState via JSON.stringify/JSON.parse for SSR hydration, losing any prototype a
+// class instance would have. The functions below operate on this shape instead of living on it.
+interface GalleryState {
+  current: number;
+  filter: APIGalleryFilter;
+  items: (null | Picture)[];
+  status: PictureStatus;
+}
 
-  public current = 0;
-  public status: PictureStatus = PictureStatus.PICTURE_STATUS_UNKNOWN;
-  public get useCircleIndicator(): boolean {
-    return this.items.length <= this.#MAX_INDICATORS;
+function galleryFilterParams(state: GalleryState, language: string): PicturesRequest {
+  const options = new PictureListOptions({
+    status: PictureStatus.PICTURE_STATUS_ACCEPTED,
+  });
+
+  let order = PicturesRequest.Order.ORDER_RESOLUTION_DESC;
+  if (state.filter.itemID || state.filter.exactItemID) {
+    order = PicturesRequest.Order.ORDER_PERSPECTIVES;
   }
 
-  constructor(
-    public readonly filter: APIGalleryFilter,
-    public readonly items: (null | Picture)[],
-  ) {}
-
-  public filterParams(language: string): PicturesRequest {
-    const options = new PictureListOptions({
-      status: PictureStatus.PICTURE_STATUS_ACCEPTED,
-    });
-
-    let order = PicturesRequest.Order.ORDER_RESOLUTION_DESC;
-    if (this.filter.itemID || this.filter.exactItemID) {
-      order = PicturesRequest.Order.ORDER_PERSPECTIVES;
-    }
-
-    if (
-      this.filter.itemID ||
-      this.filter.exactItemID ||
-      this.filter.exactItemLinkType ||
-      this.filter.perspectiveID ||
-      this.filter.perspectiveExclude
-    ) {
-      options.pictureItem = new PictureItemListOptions({
-        excludePerspectiveId: this.filter.perspectiveExclude,
-        itemId: this.filter.exactItemID,
-        itemParentCacheAncestor: this.filter.itemID
-          ? new ItemParentCacheListOptions({
-              parentId: this.filter.itemID,
-            })
-          : undefined,
-        perspectiveId: this.filter.perspectiveID,
-        typeId: this.filter.exactItemLinkType,
-      });
-    }
-
-    return new PicturesRequest({
-      fields: galleryFields,
-      language,
-      options,
-      order,
+  if (
+    state.filter.itemID ||
+    state.filter.exactItemID ||
+    state.filter.exactItemLinkType ||
+    state.filter.perspectiveID ||
+    state.filter.perspectiveExclude
+  ) {
+    options.pictureItem = new PictureItemListOptions({
+      excludePerspectiveId: state.filter.perspectiveExclude,
+      itemId: state.filter.exactItemID,
+      itemParentCacheAncestor: state.filter.itemID
+        ? new ItemParentCacheListOptions({
+            parentId: state.filter.itemID,
+          })
+        : undefined,
+      perspectiveId: state.filter.perspectiveID,
+      typeId: state.filter.exactItemLinkType,
     });
   }
 
-  public getItemIndex(identity: string): number {
-    return this.items.findIndex((item) => item && item.identity === identity);
+  return new PicturesRequest({
+    fields: galleryFields,
+    language,
+    options,
+    order,
+  });
+}
+
+function galleryItemIndex(state: GalleryState, identity: string): number {
+  return state.items.findIndex((item) => item && item.identity === identity);
+}
+
+function galleryItemByIndex(state: GalleryState, index: number): null | Picture {
+  if (index < 0 || index >= state.items.length) {
+    return null;
   }
 
-  public getItemByIndex(index: number): null | Picture {
-    if (index < 0 || index >= this.items.length) {
-      return null;
-    }
+  return state.items[index] || null;
+}
 
-    if (!this.items[index]) {
-      return null;
-    }
+function galleryItem(state: GalleryState, identity: string): null | Picture {
+  const index = galleryItemIndex(state, identity);
+  return index < 0 ? null : galleryItemByIndex(state, index);
+}
 
-    return this.items[index];
+function applyGalleryResponse(state: GalleryState, response: GalleryResponse): void {
+  if (state.items.length < response.count) {
+    state.items[response.count - 1] = null;
+    state.status = response.status;
   }
 
-  public getGalleryItem(identity: string): null | Picture {
-    const index = this.getItemIndex(identity);
-    if (index < 0) {
-      return null;
-    }
+  (response.items || []).forEach((item, i) => {
+    const index = (response.page - 1) * PER_PAGE + i;
+    state.items[index] = item;
+  });
+}
 
-    return this.getItemByIndex(index);
-  }
-
-  public applyResponse(response: GalleryResponse) {
-    if (this.items.length < response.count) {
-      this.items[response.count - 1] = null;
-      this.status = response.status;
-    }
-
-    (response.items || []).forEach((item, i) => {
-      const index = (response.page - 1) * this.#PER_PAGE + i;
-      this.items[index] = item;
-    });
-  }
-
-  public getGalleryPageNumberByIndex(index: number) {
-    return Math.floor(index / this.#PER_PAGE) + 1;
-  }
+function galleryPageNumberByIndex(index: number): number {
+  return Math.floor(index / PER_PAGE) + 1;
 }
 
 @Component({
   selector: 'app-gallery',
-  imports: [CarouselItemComponent, RouterLink, AsyncPipe],
+  imports: [CarouselItemComponent, RouterLink],
   templateUrl: './gallery.component.html',
   styleUrl: './gallery.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -162,136 +160,190 @@ class Gallery {
     '(document:keydown.arrowleft)': 'onLeftKeydownHandler()',
   },
 })
-export class GalleryComponent {
+export class GalleryComponent implements OnInit {
   readonly #router = inject(Router);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
   readonly #toastService = inject(ToastsService);
-  readonly #cdr = inject(ChangeDetectorRef);
+  readonly #injector = inject(Injector);
 
   readonly filter = input.required<APIGalleryFilter>();
-
   readonly current = input.required<null | string>();
-  protected readonly current$ = toObservable(this.current);
-
   readonly galleryPrefix = input.required<string[]>();
   readonly picturePrefix = input.required<string[]>();
   readonly pictureSelected = output<null | Picture>();
 
-  readonly #currentFilter$ = toObservable(this.filter).pipe(
-    distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-    debounceTime(50),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  // The accumulator this component builds up as the user pages through the gallery - kept as a
+  // plain mutable object outside any signal, so paging via loadPage$() can fill it in ahead of
+  // navigating without fighting the resource's own value-replacement lifecycle (navigating
+  // afterwards changes `current`, which re-triggers galleryResource's stream() below and picks up
+  // the prefetched item from this same instance). A new instance is only created when the filter
+  // itself actually changes.
+  #state?: GalleryState;
 
-  protected readonly identity$ = this.current$.pipe(
-    distinctUntilChanged(),
-    debounceTime(10),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  // Memoized so an inline object-literal input binding (e.g. [filter]="{}") re-evaluating to a new
+  // reference on every change-detection cycle doesn't look like a param change and re-trigger the
+  // loader - matches the previous distinctUntilChanged((a, b) => JSON.stringify(a) ===
+  // JSON.stringify(b)) on the old Observable-based #currentFilter$.
+  #lastParamsKey?: string;
+  #lastParams?: {filter: APIGalleryFilter; identity: string};
 
-  protected readonly gallery$: Observable<Gallery> = combineLatest([
-    this.#currentFilter$.pipe(switchMap((filter) => (filter ? of(new Gallery(filter, [] as Picture[])) : EMPTY))),
-    this.identity$.pipe(switchMap((identity) => (identity ? of(identity) : EMPTY))),
-  ]).pipe(
-    switchMap(([gallery, identity]) => {
-      if (!gallery.getGalleryItem(identity)) {
+  // Fetches the picture named by `current` as a pending task Angular's SSR whenStable() waits on,
+  // instead of a raw Observable subscribed only via the template's `| async` (the previous shape
+  // here) - that chain's debounceTime(50) on filter and debounceTime(10) on identity, both before
+  // ever making an HTTP call, aren't tracked as pending by anything, so SSR could serialize a 200
+  // before the NOT_FOUND redirect below had even fired. See the constructor effect(), the single
+  // place that navigates off this resource's error() signal.
+  //
+  // Non-NOT_FOUND errors are toasted and resolved with the unchanged state rather than left as a
+  // resource error - this mirrors the previous behavior of leaving the last-good gallery on screen
+  // through a background refresh failure, and keeps this resource's error() meaning exclusively
+  // "not found" for the effect() below.
+  //
+  // Constructed in ngOnInit() (with an explicit injector, since ngOnInit isn't an injection
+  // context), not as a field initializer: filter/current are *required* inputs, and Angular's
+  // compiler forbids reading a required input's value before the class is fully constructed - they
+  // aren't bound yet at field-initializer/constructor time.
+  protected galleryResource!: ResourceRef<GalleryState | undefined>;
+
+  constructor() {
+    // Router.navigate() is fire-and-forget here (not folded into the resource stream): it runs
+    // outside galleryResource's own pending-task lifecycle, so there's no window where the
+    // resource can settle and let SSR's whenStable() serialize before the redirect it triggered has
+    // actually registered.
+    effect(() => {
+      if (isNotFoundError(this.galleryResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    this.galleryResource = rxResource({
+      id: `gallery-${JSON.stringify(this.filter())}-${this.current() ?? ''}`,
+      injector: this.#injector,
+      params: (): undefined | {filter: APIGalleryFilter; identity: string} => {
+        const filter = this.filter();
+        const identity = this.current();
+        if (!identity) {
+          return undefined;
+        }
+
+        const key = JSON.stringify(filter) + '|' + identity;
+        if (this.#lastParamsKey !== key) {
+          this.#lastParamsKey = key;
+          this.#lastParams = {filter, identity};
+        }
+
+        return this.#lastParams;
+      },
+      stream: ({params: {filter, identity}}): Observable<GalleryState> => {
+        if (!this.#state || JSON.stringify(this.#state.filter) !== JSON.stringify(filter)) {
+          this.#state = {current: 0, filter, items: [], status: PictureStatus.PICTURE_STATUS_UNKNOWN};
+        }
+        const state = this.#state;
+
+        if (galleryItem(state, identity)) {
+          return of(this.#withCurrent(state, identity));
+        }
+
         return this.#picturesClient
           .getGallery(
             new GalleryRequest({
               pictureIdentity: identity,
-              request: gallery.filterParams(this.#languageService.language),
+              request: galleryFilterParams(state, this.#languageService.language),
             }),
           )
           .pipe(
+            switchMap((response) => {
+              applyGalleryResponse(state, response);
+              return of(this.#withCurrent(state, identity));
+            }),
             catchError((response: unknown) => {
               if (isNotFoundError(response)) {
-                this.#router.navigate(['/error-404'], {
-                  skipLocationChange: true,
-                });
-              } else {
-                this.#toastService.handleError(response);
+                return notFoundError();
               }
-              return EMPTY;
+              this.#toastService.handleError(response);
+              return of(state);
             }),
-            tap((response) => {
-              gallery.applyResponse(response);
-            }),
-            map(() => ({gallery, identity})),
           );
-      }
-      return of({gallery, identity});
-    }),
-    tap(({gallery, identity}) => {
-      const index = gallery.getItemIndex(identity);
-      gallery.current = index;
-      const currentItem = gallery.getItemByIndex(index);
-      this.pictureSelected.emit(currentItem);
-      this.#cdr.markForCheck();
-    }),
-    map(({gallery}) => gallery),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+      },
+    });
+  }
+
+  #withCurrent(state: GalleryState, identity: string): GalleryState {
+    const index = galleryItemIndex(state, identity);
+    state.current = index;
+    this.pictureSelected.emit(galleryItemByIndex(state, index));
+    return state;
+  }
+
+  protected useCircleIndicator(state: GalleryState): boolean {
+    return state.items.length <= MAX_INDICATORS;
+  }
 
   onKeydownHandler() {
-    this.current$
-      .pipe(
-        take(1),
-        switchMap((current) => (current ? this.#router.navigate(this.picturePrefix().concat([current])) : EMPTY)),
-      )
-      .subscribe();
+    const identity = this.current();
+    if (identity) {
+      void this.#router.navigate(this.picturePrefix().concat([identity]));
+    }
   }
 
   onRightKeydownHandler() {
-    this.gallery$.pipe(take(1)).subscribe((gallery) => {
-      if (gallery.current + 1 < gallery.items.length) {
-        this.navigateToIndex(gallery.current + 1, gallery);
-      }
-    });
+    if (!this.galleryResource.hasValue()) {
+      return;
+    }
+
+    const state = this.galleryResource.value();
+    if (state.current + 1 < state.items.length) {
+      this.navigateToIndex(state.current + 1, state);
+    }
   }
 
   onLeftKeydownHandler() {
-    this.gallery$.pipe(take(1)).subscribe((gallery) => {
-      if (gallery.current > 0) {
-        this.navigateToIndex(gallery.current - 1, gallery);
-      }
-    });
+    if (!this.galleryResource.hasValue()) {
+      return;
+    }
+
+    const state = this.galleryResource.value();
+    if (state.current > 0) {
+      this.navigateToIndex(state.current - 1, state);
+    }
   }
 
-  private loadPage$(page: number, gallery: Gallery): Observable<GalleryResponse> {
-    const request = gallery.filterParams(this.#languageService.language);
-    request.options!.status = gallery.status;
+  private loadPage$(page: number, state: GalleryState): Observable<GalleryResponse> {
+    const request = galleryFilterParams(state, this.#languageService.language);
+    request.options!.status = state.status;
     request.page = page;
 
     return this.#picturesClient.getGallery(new GalleryRequest({request})).pipe(
       catchError((response: unknown) => {
         if (isNotFoundError(response)) {
-          this.#router.navigate(['/error-404'], {
-            skipLocationChange: true,
-          });
+          void this.#router.navigate(['/error-404'], {skipLocationChange: true});
         } else {
           this.#toastService.handleError(response);
         }
         return EMPTY;
       }),
-      tap((response) => {
-        gallery.applyResponse(response);
+      switchMap((response) => {
+        applyGalleryResponse(state, response);
+        return of(response);
       }),
     );
   }
 
-  protected navigateToIndex(index: number, gallery: Gallery): void {
-    const item = gallery.getItemByIndex(index);
+  protected navigateToIndex(index: number, state: GalleryState): void {
+    const item = galleryItemByIndex(state, index);
     if (item) {
-      this.#router.navigate(this.galleryPrefix().concat([item.identity]));
+      void this.#router.navigate(this.galleryPrefix().concat([item.identity]));
       return;
     }
 
-    const page = gallery.getGalleryPageNumberByIndex(index);
-    this.loadPage$(page, gallery).subscribe(() => {
-      const sitem = gallery.getItemByIndex(index);
+    const page = galleryPageNumberByIndex(index);
+    this.loadPage$(page, state).subscribe(() => {
+      const sitem = galleryItemByIndex(state, index);
       if (sitem) {
-        this.#router.navigate(this.galleryPrefix().concat([sitem.identity]));
+        void this.#router.navigate(this.galleryPrefix().concat([sitem.identity]));
       }
     });
   }

@@ -8592,6 +8592,14 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <target state="translated">הדף לא נמצא</target>
       </trans-unit>
+      <trans-unit id="1211573871136189242" datatype="html">
+        <source>Access denied</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forbidden.component.ts</context>
+          <context context-type="linenumber">6,9</context>
+        </context-group>
+        <target state="translated">הגישה נדחתה</target>
+      </trans-unit>
       <trans-unit id="6095534740119293938" datatype="html">
         <source>previous</source>
         <context-group purpose="location">

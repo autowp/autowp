@@ -13,7 +13,9 @@
   <h1 i18n>Donate log</h1>
 </div>
 
-@if (items$ | async; as items) {
+@if (itemsResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+} @else if (itemsResource.value(); as data) {
   <table class="table" aria-describedby="header">
     <thead>
       <tr>
@@ -24,7 +26,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (item of items; track item) {
+      @for (item of data.items; track item) {
         <tr>
           <td>
             @if (item.createdAt; as date) {
@@ -32,7 +34,7 @@
             }
           </td>
           <td>
-            @if (item.user$ | async; as user) {
+            @if (data.usersById[item.userId]; as user) {
               <app-user [user]="user" />
             }
           </td>

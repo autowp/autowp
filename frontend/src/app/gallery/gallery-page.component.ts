@@ -1,15 +1,15 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {Picture} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
-import {distinctUntilChanged, map} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 import {GalleryComponent} from './gallery.component';
 
 @Component({
   selector: 'app-gallery-page',
-  imports: [GalleryComponent, AsyncPipe],
+  imports: [GalleryComponent],
   templateUrl: './gallery-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -17,10 +17,9 @@ export class GalleryPageComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
 
-  protected readonly identity$ = this.#route.paramMap.pipe(
-    map((route) => route.get('identity')),
-    distinctUntilChanged(),
-  );
+  protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
+    requireSync: true,
+  });
 
   ngOnInit(): void {
     this.#pageEnv.set({
