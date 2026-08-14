@@ -1,7 +1,6 @@
 import {DOCUMENT, isPlatformBrowser} from '@angular/common';
 import {inject, PLATFORM_ID, Service} from '@angular/core';
-import {defer, EMPTY, Observable} from 'rxjs';
-import {map, repeat, retry, share} from 'rxjs/operators';
+import {defer, EMPTY, map, Observable, repeat, retry, share} from 'rxjs';
 import {webSocket} from 'rxjs/webSocket';
 
 const RECONNECT_DELAY_MS = 3000;

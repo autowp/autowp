@@ -5,7 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemParentsRequest, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../../../../../paginator/paginator/paginator.component';
 import {ModerItemsItemSelectParentTreeItemComponent} from '../tree-item/tree-item.component';

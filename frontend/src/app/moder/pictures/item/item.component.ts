@@ -1,4 +1,4 @@
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -52,8 +52,20 @@ import {ToastsService} from 'app/toasts/toasts.service';
 import {UserComponent} from 'app/user/user/user.component';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
-import {catchError, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+  tap,
+  throwError,
+} from 'rxjs';
 import {sprintf} from 'sprintf-js';
 
 import {ModerPicturesPerspectivePickerComponent} from '../perspective-picker/perspective-picker.component';
@@ -97,6 +109,7 @@ export class ModerPicturesItemComponent {
   readonly #userService = inject(UserService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
+  readonly #document = inject(DOCUMENT);
   readonly #trafficClient = inject(TrafficClient);
 
   protected readonly replaceLoading = signal(false);
@@ -176,7 +189,7 @@ export class ModerPicturesItemComponent {
       ),
     ),
     catchError(() => {
-      this.#router.navigate(['/error-404'], {
+      void this.#router.navigate(['/error-404'], {
         skipLocationChange: true,
       });
       return EMPTY;
@@ -203,6 +216,7 @@ export class ModerPicturesItemComponent {
 
   protected readonly lastItem$: Observable<LastItemInfo> = this.picture$.pipe(
     switchMap((picture) => {
+      const localStorage = this.#document.defaultView?.localStorage;
       if (!localStorage) {
         return of({hasItem: false, item: null});
       }
@@ -632,7 +646,9 @@ export class ModerPicturesItemComponent {
   protected removeFromBlacklist(ip: string) {
     this.#trafficClient
       .deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip}))
-      .subscribe(() => this.#change$.next());
+      .subscribe(() => {
+        this.#change$.next();
+      });
   }
 
   protected addToBlacklist(ip: string) {
@@ -646,7 +662,9 @@ export class ModerPicturesItemComponent {
           },
         }),
       )
-      .subscribe(() => this.#change$.next());
+      .subscribe(() => {
+        this.#change$.next();
+      });
   }
 
   protected readonly ItemType = ItemType;

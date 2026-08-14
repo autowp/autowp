@@ -7,8 +7,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
-import {Observable, of} from 'rxjs';
-import {shareReplay, switchMap} from 'rxjs/operators';
+import {Observable, of, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../toasts/toasts.service';
 
@@ -27,14 +26,14 @@ export class CarsSpecificationsEditorEngineComponent {
   readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
-  readonly changed = output<void>();
+  readonly changed = output();
   protected readonly isAllowedEditEngine$ = this.#auth
     .hasRole$(Role.CARS_MODER)
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
 
   protected readonly engine$: Observable<Item | null> = this.item$.pipe(
     switchMap((item) => {
-      if (!item?.engineItemId || item?.engineItemId === '0') {
+      if (!item.engineItemId || item.engineItemId === '0') {
         return of(null);
       }
 
@@ -62,8 +61,12 @@ export class CarsSpecificationsEditorEngineComponent {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
-        next: () => this.changed.emit(void 0),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: () => {
+          this.changed.emit(void 0);
+        },
       });
   }
 

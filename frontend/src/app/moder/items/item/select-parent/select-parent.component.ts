@@ -6,8 +6,7 @@ import {Item, ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {catchError, distinctUntilChanged, EMPTY, map, Observable, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 import {ModerItemsItemSelectParentBrandsComponent} from './brands/brands.component';
@@ -59,14 +58,14 @@ export class ModerItemsItemSelectParentComponent implements OnInit {
             nameHtml: true,
             nameText: true,
           }),
-          id: '' + itemID,
+          id: itemID,
           language: this.#languageService.language,
         }),
       ),
     ),
     catchError((error: unknown) => {
       if (error instanceof HttpErrorResponse && error.status === 404) {
-        this.#router.navigate(['/error-404'], {
+        void this.#router.navigate(['/error-404'], {
           skipLocationChange: true,
         });
         return EMPTY;
@@ -108,9 +107,11 @@ export class ModerItemsItemSelectParentComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
-          this.#router.navigate(['/moder/items/item', itemID], {
+          void this.#router.navigate(['/moder/items/item', itemID], {
             queryParams: {
               tab: 'catalogue',
             },

@@ -1,5 +1,6 @@
-import {ComponentRef, inject, Service} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {getModalComponentRef} from '@utils/modal-component-ref';
 
 import {ModalMessageComponent} from './modal-message/modal-message.component';
 
@@ -25,7 +26,7 @@ export class MessageDialogService {
       },
     );
 
-    const componentRef: ComponentRef<ModalMessageComponent> = modalRef['_contentRef'].componentRef;
+    const componentRef = getModalComponentRef<ModalMessageComponent>(modalRef);
     componentRef.setInput('userId', userId);
   }
 }

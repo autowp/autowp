@@ -12,8 +12,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {EMPTY, Observable} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, Observable, switchMap} from 'rxjs';
 
 import {PictureItemMoveSelection} from '../move.component';
 
@@ -49,24 +48,22 @@ export class ModerPictureMoveItemComponent {
 
   protected readonly childs$: Observable<ItemParent[]> = this.item$.pipe(
     switchMap((item) =>
-      item
-        ? this.#itemsClient.getItemParents(
-            new ItemParentsRequest({
-              fields: new ItemParentFields({
-                item: new ItemFields({
-                  childsCount: true,
-                  nameHtml: true,
-                }),
-              }),
-              language: this.#languageService.language,
-              limit: 500,
-              options: new ItemParentListOptions({
-                parentId: item.row.itemId,
-              }),
-              order: ItemParentsRequest.Order.AUTO,
+      this.#itemsClient.getItemParents(
+        new ItemParentsRequest({
+          fields: new ItemParentFields({
+            item: new ItemFields({
+              childsCount: true,
+              nameHtml: true,
             }),
-          )
-        : EMPTY,
+          }),
+          language: this.#languageService.language,
+          limit: 500,
+          options: new ItemParentListOptions({
+            parentId: item.row.itemId,
+          }),
+          order: ItemParentsRequest.Order.AUTO,
+        }),
+      ),
     ),
     map((response) => response.items || []),
   );

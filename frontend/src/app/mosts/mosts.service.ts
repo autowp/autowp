@@ -1,8 +1,7 @@
 import {inject, Service} from '@angular/core';
 import {MostsMenu, MostsMenuRequest} from '@grpc/spec.pb';
 import {MostsClient} from '@grpc/spec.pbsc';
-import {Observable} from 'rxjs';
-import {shareReplay} from 'rxjs/operators';
+import {Observable, shareReplay} from 'rxjs';
 
 @Service()
 export class MostsService {

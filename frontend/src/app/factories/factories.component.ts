@@ -18,8 +18,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, of, switchMap} from 'rxjs';
 
 import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
 import {FactoryMapComponent} from './map/factory-map.component';
@@ -88,7 +87,7 @@ export class FactoryComponent {
           language: this.#languageService.language,
           limit: 24,
           options: new PictureListOptions({
-            pictureItem: new PictureItemListOptions({itemId: '' + itemId}),
+            pictureItem: new PictureItemListOptions({itemId}),
             status: PictureStatus.PICTURE_STATUS_ACCEPTED,
           }),
           order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,

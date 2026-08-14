@@ -21,8 +21,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {Angulartics2GoogleAnalytics} from 'angulartics2';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
-import {Observable} from 'rxjs';
-import {map, shareReplay} from 'rxjs/operators';
+import {map, Observable, shareReplay} from 'rxjs';
 
 import {MenuComponent} from './moder/menu/menu/menu.component';
 import {ContainerComponent} from './toasts/container/container.component';
@@ -127,7 +126,7 @@ export class AppComponent {
 
   protected doLogin() {
     if (this.#document.defaultView) {
-      this.#keycloak.login({
+      void this.#keycloak.login({
         locale: this.#languageService.language,
         redirectUri: this.#document.defaultView.location.href,
       });

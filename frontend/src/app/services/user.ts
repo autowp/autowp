@@ -1,8 +1,7 @@
 import {inject, Service} from '@angular/core';
 import {GetUserRequest, User, UserFields, UsersRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
-import {forkJoin, Observable, of} from 'rxjs';
-import {map, shareReplay, tap} from 'rxjs/operators';
+import {forkJoin, map, Observable, of, shareReplay, tap} from 'rxjs';
 
 @Service()
 export class UserService {
@@ -81,10 +80,9 @@ export class UserService {
       return cached$;
     }
 
-    const o$ = this.#usersClient.getUser(new GetUserRequest({userId: id})).pipe(
-      map((user) => (user ? user : null)),
-      shareReplay({bufferSize: 1, refCount: false}),
-    );
+    const o$ = this.#usersClient
+      .getUser(new GetUserRequest({userId: id}))
+      .pipe(shareReplay({bufferSize: 1, refCount: false}));
     this.#cache2.set(id, o$);
 
     return o$;

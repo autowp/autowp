@@ -4,8 +4,7 @@ import {toObservable} from '@angular/core/rxjs-interop';
 import {CommentVote, GetCommentVotesRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {catchError, debounceTime, distinctUntilChanged, EMPTY, map, Observable, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';

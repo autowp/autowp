@@ -12,19 +12,19 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
-import {BehaviorSubject, EMPTY, Subscription} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Subscription,
+  switchMap,
+} from 'rxjs';
 
-// @ts-expect-error Legacy
-import Jcrop from '../../../../jcrop/jquery.Jcrop.js';
+import Jcrop, {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/jquery.Jcrop.js';
 import {ToastsService} from '../../../../toasts/toasts.service';
-
-interface Crop {
-  h: number;
-  w: number;
-  x: number;
-  y: number;
-}
 
 @Component({
   selector: 'app-moder-pictures-item-crop',
@@ -44,7 +44,7 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
   #routeSub?: Subscription;
   protected aspect = '';
   protected resolution = '';
-  #jcrop: Jcrop;
+  #jcrop: JcropInstance | null = null;
   #currentCrop: Crop = {
     h: 0,
     w: 0,
@@ -142,7 +142,7 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
   }
 
   protected selectAll() {
-    if (this.picture) {
+    if (this.picture && this.#jcrop) {
       this.#jcrop.setSelect([0, 0, this.picture.width, this.picture.height]);
     }
   }
@@ -172,7 +172,7 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
         )
         .subscribe(() => {
           if (this.picture) {
-            this.#router.navigate(['/moder/pictures', this.picture.id]);
+            void this.#router.navigate(['/moder/pictures', this.picture.id]);
           }
         });
     }

@@ -28,8 +28,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {getCatalogueSectionsTranslation} from '@utils/translations';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {forkJoin, Observable, of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, forkJoin, map, Observable, of, switchMap} from 'rxjs';
 
 import {chunk, chunkBy} from '../../chunk';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';

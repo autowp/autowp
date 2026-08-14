@@ -23,8 +23,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {RemarkModule} from 'ngx-remark';
-import {of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, of} from 'rxjs';
 
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
 import {CategoriesListItemComponent} from '../../list-item.component';

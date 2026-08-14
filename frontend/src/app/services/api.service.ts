@@ -4,8 +4,7 @@ import {environment} from '@environment/environment';
 import {GrpcDataEvent, GrpcEvent, GrpcMessage, GrpcMetadata, GrpcRequest} from '@ngx-grpc/common';
 import {GrpcHandler, GrpcInterceptor} from '@ngx-grpc/core';
 import Keycloak from 'keycloak-js';
-import {from, Observable} from 'rxjs';
-import {catchError, switchMap, tap} from 'rxjs/operators';
+import {catchError, from, Observable, switchMap, tap} from 'rxjs';
 
 // Passed to Keycloak#updateToken() on every authenticated request, rather than trusting the
 // cached token's freshness: keycloak-js's own background refresh is driven by a TokenExpired
@@ -82,7 +81,7 @@ export function authInterceptor$(req: HttpRequest<unknown>, next: HttpHandlerFn)
     switchMap(() =>
       next(
         req.clone({
-          headers: req.headers.set('Authorization', 'Bearer ' + keycloak.token),
+          headers: req.headers.set('Authorization', 'Bearer ' + (keycloak.token ?? '')),
         }),
       ),
     ),

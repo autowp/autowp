@@ -6,8 +6,7 @@ import {NewItemsRequest, TopFactoriesListItem} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
-import {EMPTY} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-index-factories-factory',
@@ -25,14 +24,12 @@ export class IndexFactoriesFactoryComponent {
 
   protected readonly response$ = this.factory$.pipe(
     switchMap((factory) =>
-      factory
-        ? this.#itemsClient.getNewItems(
-            new NewItemsRequest({
-              itemId: '' + factory.id,
-              language: this.#languageService.language,
-            }),
-          )
-        : EMPTY,
+      this.#itemsClient.getNewItems(
+        new NewItemsRequest({
+          itemId: factory.id,
+          language: this.#languageService.language,
+        }),
+      ),
     ),
   );
 }

@@ -15,7 +15,7 @@ import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {CommentsComponent} from '../../comments/comments/comments.component';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -90,7 +90,9 @@ export class ForumsTopicComponent {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           topic.subscription = true;
         },
@@ -106,7 +108,9 @@ export class ForumsTopicComponent {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           topic.subscription = false;
         },

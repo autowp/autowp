@@ -34,10 +34,9 @@ import {
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
 import {getItemTypeTranslation} from '@utils/translations';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, EMPTY, map, Observable, of} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -144,44 +143,42 @@ export class CatalogueVehiclesComponent {
         return of(last.item);
       }
 
-      return this.#itemsClient
-        .item(
-          new ItemRequest({
-            fields: new ItemFields({
-              acceptedPicturesCount: true,
-              canEditSpecs: true,
-              categories: new ItemsRequest({
-                fields: new ItemFields({nameHtml: true}),
-              }),
-              childsCounts: true,
-              description: true,
-              design: true,
-              engineVehicles: new ItemsRequest({
-                fields: new ItemFields({nameHtml: true, route: true}),
-              }),
-              fullText: true,
-              hasChildSpecs: true,
-              hasSpecs: true,
-              hasText: true,
-              inboxPicturesCount: isModer,
-              nameDefault: true,
-              nameHtml: true,
-              previewPictures: new PreviewPicturesRequest({
-                pictures: new PicturesRequest({
-                  options: new PictureListOptions({
-                    pictureItem: new PictureItemListOptions({typeId: PictureItemType.PICTURE_ITEM_CONTENT}),
-                    status: PictureStatus.PICTURE_STATUS_ACCEPTED,
-                  }),
+      return this.#itemsClient.item(
+        new ItemRequest({
+          fields: new ItemFields({
+            acceptedPicturesCount: true,
+            canEditSpecs: true,
+            categories: new ItemsRequest({
+              fields: new ItemFields({nameHtml: true}),
+            }),
+            childsCounts: true,
+            description: true,
+            design: true,
+            engineVehicles: new ItemsRequest({
+              fields: new ItemFields({nameHtml: true, route: true}),
+            }),
+            fullText: true,
+            hasChildSpecs: true,
+            hasSpecs: true,
+            hasText: true,
+            inboxPicturesCount: isModer,
+            nameDefault: true,
+            nameHtml: true,
+            previewPictures: new PreviewPicturesRequest({
+              pictures: new PicturesRequest({
+                options: new PictureListOptions({
+                  pictureItem: new PictureItemListOptions({typeId: PictureItemType.PICTURE_ITEM_CONTENT}),
+                  status: PictureStatus.PICTURE_STATUS_ACCEPTED,
                 }),
               }),
-              specsRoute: true,
-              twins: new ItemsRequest(),
             }),
-            id: last.itemId,
-            language: this.#languageService.language,
+            specsRoute: true,
+            twins: new ItemsRequest(),
           }),
-        )
-        .pipe(switchMap((item) => (item ? of(item) : notFoundError())));
+          id: last.itemId,
+          language: this.#languageService.language,
+        }),
+      );
     },
   });
 
@@ -266,8 +263,8 @@ export class CatalogueVehiclesComponent {
                     thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
                   }
                   return {
-                    picture: picture?.picture ? picture.picture : null,
-                    routerLink: picture?.picture ? itemRouterLink.concat(['pictures', picture.picture.identity]) : [],
+                    picture: picture.picture ? picture.picture : null,
+                    routerLink: picture.picture ? itemRouterLink.concat(['pictures', picture.picture.identity]) : [],
                     thumb,
                   };
                 },
@@ -350,7 +347,7 @@ export class CatalogueVehiclesComponent {
             limit: 4,
             options: new PictureListOptions({
               pictureItem: new PictureItemListOptions({
-                itemId: '' + item.id,
+                itemId: item.id,
               }),
               status: PictureStatus.PICTURE_STATUS_ACCEPTED,
             }),
@@ -404,8 +401,8 @@ export class CatalogueVehiclesComponent {
         thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
       }
       return {
-        picture: picture?.picture ? picture.picture : null,
-        routerLink: picture?.picture ? routerLink.concat(['pictures', picture.picture.identity]) : [],
+        picture: picture.picture ? picture.picture : null,
+        routerLink: picture.picture ? routerLink.concat(['pictures', picture.picture.identity]) : [],
         thumb,
       };
     });

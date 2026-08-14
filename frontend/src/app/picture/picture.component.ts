@@ -52,8 +52,7 @@ import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, EMPTY, map, Observable, of} from 'rxjs';
 
 import {ModerPicturesPerspectivePickerComponent} from '../moder/pictures/perspective-picker/perspective-picker.component';
 import {PictureModerVoteComponent} from '../picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
@@ -422,7 +421,7 @@ export class PictureComponent implements OnInit {
       this.openSource(picture);
       return;
     }
-    this.#router.navigate(this.galleryRoute());
+    void this.#router.navigate(this.galleryRoute());
   }
 
   private setPictureStatus(picture: Picture, status: PictureStatus) {

@@ -6,8 +6,7 @@ import {Picture, PictureFields, PictureListOptions, PicturesRequest, User} from 
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
-import {combineLatest, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {catchError, combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, switchMap} from 'rxjs';
 import URLParse from 'url-parse';
 
 import {UserComponent} from '../../user/user/user.component';
@@ -126,7 +125,7 @@ export class UserTextComponent {
   private processHref$(url: string): Observable<CommentTextElement> {
     const uri = URLParse(url);
 
-    const hostAllowed = this.#parseUrlHosts.indexOf(uri.host.toLowerCase()) >= 0;
+    const hostAllowed = this.#parseUrlHosts.includes(uri.host.toLowerCase());
 
     if (hostAllowed) {
       return this.tryUserLink$(uri).pipe(

@@ -3,8 +3,7 @@ import {DeleteModerVoteTemplateRequest, ModerVoteTemplate} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
-import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
-import {map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, map, Observable, shareReplay, switchMap, tap} from 'rxjs';
 
 export interface APIPictureModerVoteTemplatePostData {
   name: string;
@@ -26,10 +25,12 @@ export class APIPictureModerVoteTemplateService {
     );
   }
 
-  public deleteTemplate$(id: string): Observable<Empty | void> {
-    return this.#pictures
-      .deleteModerVoteTemplate(new DeleteModerVoteTemplateRequest({id}))
-      .pipe(tap(() => this.#change$.next()));
+  public deleteTemplate$(id: string): Observable<Empty> {
+    return this.#pictures.deleteModerVoteTemplate(new DeleteModerVoteTemplateRequest({id})).pipe(
+      tap(() => {
+        this.#change$.next();
+      }),
+    );
   }
 
   public createTemplate$(template: APIPictureModerVoteTemplatePostData): Observable<ModerVoteTemplate> {
@@ -40,6 +41,10 @@ export class APIPictureModerVoteTemplateService {
           vote: template.vote,
         }),
       )
-      .pipe(tap(() => this.#change$.next()));
+      .pipe(
+        tap(() => {
+          this.#change$.next();
+        }),
+      );
   }
 }

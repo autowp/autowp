@@ -21,8 +21,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, of, switchMap} from 'rxjs';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
 import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';

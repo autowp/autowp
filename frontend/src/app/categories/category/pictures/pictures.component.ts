@@ -16,8 +16,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {chunkBy} from 'app/chunk';
 import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
-import {of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, of} from 'rxjs';
 
 import {CategoriesService} from '../../service';
 

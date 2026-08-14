@@ -8,8 +8,18 @@ import {
 } from '@grpc/spec.pb';
 import {MessagingClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
-import {catchError, debounceTime, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  debounceTime,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {AuthService} from './auth.service';
@@ -84,13 +94,19 @@ export class MessageService {
   }
 
   public clearFolder$(folder: string): Observable<object> {
-    return this.#messagingClient.clearFolder(new MessagingClearFolder({folder})).pipe(tap(() => this.#deleted$.next()));
+    return this.#messagingClient.clearFolder(new MessagingClearFolder({folder})).pipe(
+      tap(() => {
+        this.#deleted$.next();
+      }),
+    );
   }
 
   public deleteMessage$(messageId: string): Observable<object> {
-    return this.#messagingClient
-      .deleteMessage(new MessagingDeleteMessage({messageId}))
-      .pipe(tap(() => this.#deleted$.next()));
+    return this.#messagingClient.deleteMessage(new MessagingDeleteMessage({messageId})).pipe(
+      tap(() => {
+        this.#deleted$.next();
+      }),
+    );
   }
 
   public getSummary$(): Observable<MessageSummary | null> {
@@ -111,6 +127,10 @@ export class MessageService {
           }),
         }),
       )
-      .pipe(tap(() => this.#sent$.next()));
+      .pipe(
+        tap(() => {
+          this.#sent$.next();
+        }),
+      );
   }
 }

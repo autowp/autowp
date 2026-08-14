@@ -20,8 +20,7 @@ import {type APIItemChildsCounts} from '@services/item';
 import {LanguageService} from '@services/language';
 import {perspectiveIDLogotype, perspectiveIDMixed} from '@services/picture';
 import {notFoundError} from 'app/grpc';
-import {EMPTY, Observable, of, OperatorFunction} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, EMPTY, map, Observable, of, OperatorFunction, switchMap} from 'rxjs';
 
 export interface Breadcrumbs {
   html: string;
@@ -136,14 +135,11 @@ export class CatalogueService {
         }
 
         return CatalogueService.getPath(route).pipe(
-          map(
-            (data) =>
-              ({
-                id: brand.id,
-                items: [],
-                path: data ? data.split('/') : [],
-              }) as Parent,
-          ),
+          map((data) => ({
+            id: brand.id,
+            items: [],
+            path: data ? data.split('/') : [],
+          })),
           pathPipeRecursive(),
           switchMap((parent) =>
             this.getType$(route).pipe(

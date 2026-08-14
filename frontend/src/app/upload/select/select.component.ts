@@ -20,8 +20,20 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {perspectiveIDLogotype, perspectiveIDMixed} from '@services/picture';
-import {combineLatest, EMPTY, forkJoin, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap, tap} from 'rxjs/operators';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import {chunk} from '../../chunk';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -73,7 +85,9 @@ export class UploadSelectComponent implements OnInit {
   ]).pipe(
     map(([search, query]) => ({brandId: query.brandId, page: query.page, search})),
     distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-    tap(() => this.loading.set(true)),
+    tap(() => {
+      this.loading.set(true);
+    }),
     switchMap((params) => {
       const brandId = params.brandId;
       const page = params.page;
@@ -88,7 +102,9 @@ export class UploadSelectComponent implements OnInit {
       brands: chunk(brands?.items ?? [], 6),
       paginator: brands?.paginator,
     })),
-    tap(() => this.loading.set(false)),
+    tap(() => {
+      this.loading.set(false);
+    }),
   );
 
   ngOnInit(): void {
@@ -128,7 +144,7 @@ export class UploadSelectComponent implements OnInit {
   }> {
     return this.#itemsClient.item(new ItemRequest({id: brandId, language: this.#languageService.language})).pipe(
       catchError(() => {
-        this.#router.navigate(['/error-404'], {
+        void this.#router.navigate(['/error-404'], {
           skipLocationChange: true,
         });
         return EMPTY;

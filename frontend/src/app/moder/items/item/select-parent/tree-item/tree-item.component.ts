@@ -11,8 +11,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {combineLatest, EMPTY, Observable} from 'rxjs';
-import {catchError, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {catchError, combineLatest, distinctUntilChanged, EMPTY, map, Observable, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../../../toasts/toasts.service';
 import {ModerItemsItemSelectParentTreeComponent} from '../tree/tree.component';
@@ -46,20 +45,18 @@ export class ModerItemsItemSelectParentTreeItemComponent {
     this.order$.pipe(distinctUntilChanged()),
   ]).pipe(
     switchMap(([item, order]) =>
-      item
-        ? this.#itemsClient.getItemParents(
-            new ItemParentsRequest({
-              language: this.#languageService.language,
-              options: new ItemParentListOptions({
-                item: new ItemListOptions({
-                  isGroup: true,
-                }),
-                parentId: item.id,
-              }),
-              order,
+      this.#itemsClient.getItemParents(
+        new ItemParentsRequest({
+          language: this.#languageService.language,
+          options: new ItemParentListOptions({
+            item: new ItemListOptions({
+              isGroup: true,
             }),
-          )
-        : EMPTY,
+            parentId: item.id,
+          }),
+          order,
+        }),
+      ),
     ),
     catchError((error: unknown) => {
       this.#toastService.handleError(error);

@@ -5,8 +5,7 @@ import {FormsModule} from '@angular/forms';
 import {Item, ItemLink, ItemLinkListOptions, ItemLinkRequest, ItemLinks, ItemLinksRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
-import {forkJoin, Observable, of} from 'rxjs';
-import {catchError, map, tap} from 'rxjs/operators';
+import {catchError, forkJoin, map, Observable, of, tap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 
@@ -114,7 +113,9 @@ export class ModerItemsItemLinksComponent implements OnInit {
 
     this.loadingNumber.set(true);
     forkJoin(promises).subscribe({
-      complete: () => this.loadingNumber.set(false),
+      complete: () => {
+        this.loadingNumber.set(false);
+      },
       next: () => this.linksResource.reload(),
     });
   }

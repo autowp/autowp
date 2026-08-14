@@ -26,8 +26,7 @@ import {PastTimeIndicatorComponent} from '@utils/past-time-indicator/past-time-i
 import {timestampToDate} from '@utils/timestamp';
 import {getForumsThemeDescriptionTranslation, getForumsThemeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
-import {of, throwError} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {catchError, of, throwError} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 

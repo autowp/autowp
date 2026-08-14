@@ -1,62 +1,64 @@
-const translations: Record<string, {'add-sub-item': string; name: string; 'name-plural': string; 'new-item': string}> =
-  {
-    1: {
-      'add-sub-item': $localize`Add sub-vehicle`,
-      name: $localize`Vehicle`,
-      'name-plural': $localize`Vehicles`,
-      'new-item': $localize`New vehicle`,
-    },
-    2: {
-      'add-sub-item': $localize`Add sub-engine`,
-      name: $localize`Engine`,
-      'name-plural': $localize`Engines`,
-      'new-item': $localize`New engine`,
-    },
-    3: {
-      'add-sub-item': $localize`Add sub-category`,
-      name: $localize`Category`,
-      'name-plural': $localize`Categories`,
-      'new-item': $localize`New category`,
-    },
-    4: {
-      'add-sub-item': $localize`Add sub-twins`,
-      name: $localize`Twins`,
-      'name-plural': $localize`Twins`,
-      'new-item': $localize`New twins group`,
-    },
-    5: {
-      'add-sub-item': $localize`Add sub-brand`,
-      name: $localize`Brand`,
-      'name-plural': $localize`Brands`,
-      'new-item': $localize`New brand`,
-    },
-    6: {
-      'add-sub-item': $localize`Add sub-factory`,
-      name: $localize`Factory`,
-      'name-plural': $localize`Factories`,
-      'new-item': $localize`New factory`,
-    },
-    7: {
-      'add-sub-item': $localize`Add sub-museum`,
-      name: $localize`Museum`,
-      'name-plural': $localize`Museums`,
-      'new-item': $localize`New museum`,
-    },
-    8: {
-      'add-sub-item': $localize`Add sub-person`,
-      name: $localize`Person`,
-      'name-plural': $localize`Persons`,
-      'new-item': $localize`New person`,
-    },
-    9: {
-      'add-sub-item': $localize`Add sub copyright block`,
-      name: $localize`Copyright block`,
-      'name-plural': $localize`Copyright blocks`,
-      'new-item': $localize`New copyright block`,
-    },
-  };
+const translations: Record<
+  string,
+  undefined | {'add-sub-item': string; name: string; 'name-plural': string; 'new-item': string}
+> = {
+  1: {
+    'add-sub-item': $localize`Add sub-vehicle`,
+    name: $localize`Vehicle`,
+    'name-plural': $localize`Vehicles`,
+    'new-item': $localize`New vehicle`,
+  },
+  2: {
+    'add-sub-item': $localize`Add sub-engine`,
+    name: $localize`Engine`,
+    'name-plural': $localize`Engines`,
+    'new-item': $localize`New engine`,
+  },
+  3: {
+    'add-sub-item': $localize`Add sub-category`,
+    name: $localize`Category`,
+    'name-plural': $localize`Categories`,
+    'new-item': $localize`New category`,
+  },
+  4: {
+    'add-sub-item': $localize`Add sub-twins`,
+    name: $localize`Twins`,
+    'name-plural': $localize`Twins`,
+    'new-item': $localize`New twins group`,
+  },
+  5: {
+    'add-sub-item': $localize`Add sub-brand`,
+    name: $localize`Brand`,
+    'name-plural': $localize`Brands`,
+    'new-item': $localize`New brand`,
+  },
+  6: {
+    'add-sub-item': $localize`Add sub-factory`,
+    name: $localize`Factory`,
+    'name-plural': $localize`Factories`,
+    'new-item': $localize`New factory`,
+  },
+  7: {
+    'add-sub-item': $localize`Add sub-museum`,
+    name: $localize`Museum`,
+    'name-plural': $localize`Museums`,
+    'new-item': $localize`New museum`,
+  },
+  8: {
+    'add-sub-item': $localize`Add sub-person`,
+    name: $localize`Person`,
+    'name-plural': $localize`Persons`,
+    'new-item': $localize`New person`,
+  },
+  9: {
+    'add-sub-item': $localize`Add sub copyright block`,
+    name: $localize`Copyright block`,
+    'name-plural': $localize`Copyright blocks`,
+    'new-item': $localize`New copyright block`,
+  },
+};
 
-const units: Record<string, {abbr: string; name: string}> = {
+const units: Record<string, undefined | {abbr: string; name: string}> = {
   '1': {
     abbr: $localize`mm`,
     name: $localize`millimeter`,

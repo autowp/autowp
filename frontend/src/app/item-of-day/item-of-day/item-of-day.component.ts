@@ -3,8 +3,7 @@ import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {Item, ItemOfDayPicture, ItemType, User} from '@grpc/spec.pb';
-import {Observable} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, Observable, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 
@@ -23,15 +22,10 @@ export class ItemOfDayComponent {
     first: ItemOfDayPicture[];
     others: ItemOfDayPicture[];
   }> = this._item$.pipe(
-    map((item) => {
-      if (!item) {
-        return null;
-      }
-      return {
-        first: (item.itemOfDayPictures || []).slice(0, 1),
-        others: (item.itemOfDayPictures || []).slice(1, 5),
-      };
-    }),
+    map((item) => ({
+      first: (item.itemOfDayPictures || []).slice(0, 1),
+      others: (item.itemOfDayPictures || []).slice(1, 5),
+    })),
   );
 
   public readonly user$ = input.required<Observable<null | User>>();

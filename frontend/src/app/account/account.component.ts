@@ -1,6 +1,5 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, DestroyRef, inject} from '@angular/core';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
@@ -8,10 +7,7 @@ import {AuthService} from '@services/auth.service';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
 import {PictureService} from '@services/picture';
-import {combineLatest, Observable, of} from 'rxjs';
-import {map, shareReplay, switchMap} from 'rxjs/operators';
-
-import {ToastsService} from '../toasts/toasts.service';
+import {combineLatest, map, Observable, of, shareReplay, switchMap} from 'rxjs';
 
 interface SidebarItem {
   active?: boolean;
@@ -35,9 +31,7 @@ export class AccountComponent {
   readonly #auth = inject(AuthService);
   readonly #pictureService = inject(PictureService);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #toastService = inject(ToastsService);
   readonly #forumsClient = inject(ForumsClient);
-  readonly #destroyRef = inject(DestroyRef);
 
   protected readonly items$: Observable<SidebarItem[]> = combineLatest([
     this.#auth.user$,
@@ -148,20 +142,17 @@ export class AccountComponent {
         },
       ];
 
-      for (const item of items) {
-        if (item.pageId) {
-          this.#pageEnv
-            .isActive$(item.pageId)
-            .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe({
-              error: (response: unknown) => this.#toastService.handleError(response),
-              next: (active) => {
-                item.active = active;
-              },
-            });
-        }
-      }
       return items;
+    }),
+    // Merges each item's active state in reactively instead of subscribing per item inside the
+    // map() above: that pattern started a fresh, never-cleaned-up isActive$ subscription per item
+    // on every re-emission of the outer combineLatest (a subscription leak), and mutating `active`
+    // after the array had already been emitted didn't notify AsyncPipe of anything to re-render.
+    switchMap((items) => {
+      const withActive$ = items.map((item) =>
+        item.pageId ? this.#pageEnv.isActive$(item.pageId).pipe(map((active) => ({...item, active}))) : of(item),
+      );
+      return withActive$.length > 0 ? combineLatest(withActive$) : of(items);
     }),
   );
 }

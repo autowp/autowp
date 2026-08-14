@@ -4,8 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Item, ItemParent, Picture} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError} from 'app/grpc';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, Observable} from 'rxjs';
 
 import {APIGalleryFilter, GalleryComponent} from '../../../gallery/gallery.component';
 import {CatalogueService} from '../../catalogue-service';

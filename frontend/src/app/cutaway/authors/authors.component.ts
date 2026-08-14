@@ -23,7 +23,7 @@ import {
   CatalogueListItemComponent,
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 

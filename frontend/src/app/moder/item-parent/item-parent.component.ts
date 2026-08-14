@@ -20,8 +20,20 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getItemTypeTranslation} from '@utils/translations';
-import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  forkJoin,
+  map,
+  Observable,
+  shareReplay,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -166,7 +178,7 @@ export class ModerItemParentComponent {
   }
 
   protected save(itemParent: ItemParent, languages: LanguageItem[]) {
-    const promises: Observable<Empty | void>[] = [
+    const promises: Observable<Empty>[] = [
       this.#itemsClient.updateItemParent(
         new ItemParent({
           catname: itemParent.catname,

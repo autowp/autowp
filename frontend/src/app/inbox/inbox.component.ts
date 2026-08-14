@@ -19,8 +19,17 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {formatGrpcDate, parseGrpcDate, parseStringToGrpcDate} from '@services/utils';
 import Keycloak from 'keycloak-js';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  switchMap,
+} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
@@ -55,7 +64,7 @@ export class InboxComponent implements OnInit {
     switchMap((authenticated) => {
       if (!authenticated) {
         if (this.#document.defaultView) {
-          this.#keycloak.login({
+          void this.#keycloak.login({
             locale: this.#languageService.language,
             redirectUri: this.#document.defaultView.location.href,
           });
@@ -73,7 +82,7 @@ export class InboxComponent implements OnInit {
     debounceTime(30),
     switchMap((params) => {
       if (!params.brand) {
-        this.#router.navigate(['/inbox', ALL_BRANDS]);
+        void this.#router.navigate(['/inbox', ALL_BRANDS]);
         return EMPTY;
       }
 
@@ -111,12 +120,12 @@ export class InboxComponent implements OnInit {
 
       const currentDateStr = formatGrpcDate(currentDate);
       if (date !== currentDateStr) {
-        this.#router.navigate(['/inbox', brandID ? brandID : 'all', currentDateStr]);
+        void this.#router.navigate(['/inbox', brandID ? brandID : 'all', currentDateStr]);
         return EMPTY;
       }
 
       return of({
-        brandCatname: brandID ? brandID.toString() : 'all',
+        brandCatname: brandID ? brandID : 'all',
         inbox: inbox,
         pictures$: this.#route.queryParamMap.pipe(
           map((params) => parseInt(params.get('page') ?? '', 10)),
@@ -138,9 +147,7 @@ export class InboxComponent implements OnInit {
                 options: new PictureListOptions({
                   createDate: currentDate,
                   pictureItem: new PictureItemListOptions({
-                    itemParentCacheAncestor: brandID
-                      ? new ItemParentCacheListOptions({parentId: '' + brandID})
-                      : undefined,
+                    itemParentCacheAncestor: brandID ? new ItemParentCacheListOptions({parentId: brandID}) : undefined,
                   }),
                   status: PictureStatus.PICTURE_STATUS_INBOX,
                 }),
@@ -166,7 +173,7 @@ export class InboxComponent implements OnInit {
   }
 
   protected changeBrand() {
-    this.#router.navigate(['/inbox', this.brandID.value ? this.brandID.value : 'all']);
+    void this.#router.navigate(['/inbox', this.brandID.value ? this.brandID.value : 'all']);
   }
 
   protected readonly formatGrpcDate = formatGrpcDate;

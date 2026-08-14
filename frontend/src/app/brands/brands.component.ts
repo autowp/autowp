@@ -7,7 +7,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {tap} from 'rxjs/operators';
+import {tap} from 'rxjs';
 
 import {BrandsItemComponent} from './item/item.component';
 

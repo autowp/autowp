@@ -21,8 +21,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {getItemTypeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, EMPTY, map, Observable} from 'rxjs';
 
 import {chunkBy} from '../../../chunk';
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';

@@ -7,8 +7,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {MostsContentsComponent} from 'app/mosts/contents/contents.component';
-import {of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, of, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-catalogue-mosts',

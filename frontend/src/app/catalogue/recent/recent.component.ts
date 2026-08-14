@@ -20,8 +20,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, Observable, of, switchMap} from 'rxjs';
 
 import {chunkBy} from '../../chunk';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';

@@ -18,8 +18,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {combineLatest, Observable, of, Subscription} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, Subscription, switchMap} from 'rxjs';
 
 import {chunk} from '../../../chunk';
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
@@ -138,7 +137,7 @@ export class DonateVodSelectComponent implements OnDestroy, OnInit {
         this.vehicles = [];
         this.concepts = [];
         this.brands = chunk(items?.items || [], 6);
-        this.paginator = items?.paginator ? items?.paginator : null;
+        this.paginator = items?.paginator ? items.paginator : null;
       }
 
       this.#cdr.markForCheck();

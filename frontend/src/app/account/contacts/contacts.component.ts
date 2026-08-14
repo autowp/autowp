@@ -10,8 +10,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import Keycloak from 'keycloak-js';
-import {BehaviorSubject, EMPTY, Observable, of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {BehaviorSubject, catchError, EMPTY, map, Observable, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -37,7 +36,7 @@ export class AccountContactsComponent implements OnInit {
     switchMap((authenticated) => {
       if (!authenticated) {
         if (this.#document.defaultView) {
-          this.#keycloak.login({
+          void this.#keycloak.login({
             locale: this.#languageService.language,
             redirectUri: this.#document.defaultView.location.href,
           });
@@ -61,7 +60,9 @@ export class AccountContactsComponent implements OnInit {
 
   protected deleteContact(userId: string) {
     this.#contactsClient.deleteContact(new DeleteContactRequest({userId})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
       next: () => {
         this.#reload$.next(void 0);
       },

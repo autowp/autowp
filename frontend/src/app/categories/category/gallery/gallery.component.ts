@@ -5,8 +5,7 @@ import {Item, ItemType, Picture} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 import {GalleryComponent} from 'app/gallery/gallery.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, of, switchMap} from 'rxjs';
 
 import {CategoriesService} from '../../service';
 

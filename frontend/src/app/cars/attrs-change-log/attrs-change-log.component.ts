@@ -8,8 +8,7 @@ import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootst
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, map, switchMap} from 'rxjs/operators';
+import {catchError, debounceTime, EMPTY, map, Observable, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {CarsAttrsChangeLogItemCacheService} from './item-cache.service';
@@ -110,9 +109,12 @@ export class CarsAttrsChangeLogComponent {
   }
 
   protected userOnSelect(e: NgbTypeaheadSelectItemEvent): void {
-    this.#router.navigate([], {
+    // e.item is typed `any` by ng-bootstrap - usersDataSource above is the only source feeding
+    // this typeahead, and it resolves (null | User)[].
+    const selected = e.item as null | User;
+    void this.#router.navigate([], {
       queryParams: {
-        user_id: e.item.id,
+        user_id: selected?.id,
       },
       queryParamsHandling: 'merge',
     });
@@ -120,7 +122,7 @@ export class CarsAttrsChangeLogComponent {
 
   protected clearUser(control: FormControl<string>): void {
     control.setValue('');
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         user_id: null,
       },

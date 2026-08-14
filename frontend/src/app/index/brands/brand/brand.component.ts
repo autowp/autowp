@@ -6,8 +6,7 @@ import {NewItemsRequest, TopBrandsListItem} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
-import {EMPTY} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-index-brands-brand',
@@ -25,14 +24,12 @@ export class IndexBrandsBrandComponent {
 
   protected readonly response$ = this.brand$.pipe(
     switchMap((brand) =>
-      brand
-        ? this.#itemsClient.getBrandNewItems(
-            new NewItemsRequest({
-              itemId: brand.id,
-              language: this.#languageService.language,
-            }),
-          )
-        : EMPTY,
+      this.#itemsClient.getBrandNewItems(
+        new NewItemsRequest({
+          itemId: brand.id,
+          language: this.#languageService.language,
+        }),
+      ),
     ),
   );
 }

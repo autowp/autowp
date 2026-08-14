@@ -12,7 +12,13 @@ import vhost from 'vhost';
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// This whole block monkey-patches AngularNodeAppEngine's private, undocumented internals
+// (angularAppEngine, ɵgetOrCreateAngularServerApp, getEntryPointExports, ...) to add per-locale
+// vhost routing, which @angular/ssr doesn't support natively. There's no public type surface for
+// any of it - these are internal Angular implementation details with no declared shape - so
+// `any` and the no-unsafe-* family are disabled for the block rather than faked with speculative
+// interfaces that would silently drift from reality on the next Angular version bump.
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
 async function getAngularServerAppForRequest(this: any, request: Request): Promise<unknown> {
   const potentialLocale = request.headers.get('accept-language');
 
@@ -27,7 +33,6 @@ async function getAngularServerAppForRequest(this: any, request: Request): Promi
   });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function handle(this: any, request: unknown, requestContext?: unknown): Promise<null | Response> {
   const serverApp = await this.getAngularServerAppForRequest(request);
 
@@ -42,6 +47,7 @@ async function handle(this: any, request: unknown, requestContext?: unknown): Pr
 const appEngine = angularApp.angularAppEngine;
 appEngine.handle = handle.bind(appEngine);
 appEngine.getAngularServerAppForRequest = getAngularServerAppForRequest.bind(appEngine);
+/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
 
 for (const lang of environment.languages) {
   const vhostApp = express();
@@ -66,7 +72,16 @@ for (const lang of environment.languages) {
 
     angularApp
       .handle(req)
-      .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
+      .then((response) => {
+        if (response) {
+          // Returned (not just called) so its rejection is still caught by .catch(next) below,
+          // matching the previous `response ? writeResponseToNodeResponse(...) : next()`
+          // implicit-return shape this replaced.
+          return writeResponseToNodeResponse(response, res);
+        }
+        next();
+        return undefined;
+      })
       .catch(next);
   });
 

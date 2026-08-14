@@ -28,8 +28,19 @@ import {
   getUnitAbbrTranslation,
   getUnitNameTranslation,
 } from '@utils/translations';
-import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
-import {catchError, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+  throwError,
+} from 'rxjs';
 
 import {APIAttrsService, AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
 import {ToastsService} from '../../../toasts/toasts.service';
@@ -76,6 +87,13 @@ type AttrFormControls =
 
 export class AttrFormControl<TValue> extends FormControl {
   public attr: APIAttrAttributeInSpecEditor;
+  // Declared, not inherited from FormControl<TValue>: extending the generic FormControl<TValue>
+  // here hits a real TS limitation (TS2510, "base constructors must all have the same return
+  // type") once TValue ranges over a union of unrelated types (boolean | null, string, string[],
+  // ...) - the constructor overload resolution becomes ambiguous. This narrows the same `.value`
+  // getter's return type without touching construction.
+  declare value: TValue;
+
   constructor(attr: APIAttrAttributeInSpecEditor, value: TValue, disabled: boolean) {
     super({disabled, value});
 
@@ -107,7 +125,8 @@ export class CarsSpecificationsEditorSpecComponent {
   readonly #attributes$: Observable<APIAttrAttributeInSpecEditor[]> = this.item$.pipe(
     distinctUntilChanged(),
     switchMap((item) =>
-      item?.attrZoneId
+      // item is a required input(), always defined here.
+      item.attrZoneId
         ? this.#attrsService.getAttributes$(item.attrZoneId, null)
         : throwError(() => new Error('Failed to detect attr_zone_id')),
     ),
@@ -128,7 +147,8 @@ export class CarsSpecificationsEditorSpecComponent {
     this.#change$,
   ]).pipe(
     switchMap(([item, user, attributes]) =>
-      item && user
+      // item is a required input(), always defined here.
+      user
         ? this.#attrsClient
             .getUserValues(
               new AttrUserValuesRequest({
@@ -148,7 +168,11 @@ export class CarsSpecificationsEditorSpecComponent {
       }
 
       for (const attr of attributes) {
-        if (!currentUserValues[attr.id]) {
+        // Object.hasOwn(), not `!currentUserValues[attr.id]`: without noUncheckedIndexedAccess,
+        // TS types a Record's index access as always-present, so the truthiness check reads as
+        // "always false" to the type checker even though the key can genuinely be absent here -
+        // Object.hasOwn() reflects the real runtime check instead of the unsound static type.
+        if (!Object.hasOwn(currentUserValues, attr.id)) {
           currentUserValues[attr.id] = new AttrUserValue({
             value: new AttrValueValue(),
           });
@@ -169,31 +193,26 @@ export class CarsSpecificationsEditorSpecComponent {
         const disabled = !!currentUserValue?.isEmpty;
         const valid = currentUserValue?.valid && !disabled;
 
+        // currentUserValue is narrowed non-nullish inside every `valid ? ... : ...` true branch
+        // below: valid is `currentUserValue?.valid && !disabled`, so valid can only be truthy if
+        // that optional chain already found currentUserValue defined.
+        // The `?? fallback : null/'' /[]` shapes below aren't redundant null-guards on top of the
+        // narrowing above - boolValue/floatValue/intValue/stringValue/listValue are proto3 scalar
+        // fields (one active per attribute type, per its `type` discriminant) that are never
+        // null/undefined themselves; the actual fallback happens on `valid` alone.
         switch (attr.typeId) {
           case AttrAttributeType.Id.BOOLEAN:
-            return new AttrFormControl<boolean | null>(
-              attr,
-              valid ? (currentUserValue?.boolValue ?? null) : null,
-              disabled,
-            );
+            return new AttrFormControl<boolean | null>(attr, valid ? currentUserValue.boolValue : null, disabled);
           case AttrAttributeType.Id.FLOAT:
-            return new AttrFormControl<null | number>(
-              attr,
-              valid ? (currentUserValue?.floatValue ?? null) : null,
-              disabled,
-            );
+            return new AttrFormControl<null | number>(attr, valid ? currentUserValue.floatValue : null, disabled);
           case AttrAttributeType.Id.INTEGER:
-            return new AttrFormControl<null | number>(
-              attr,
-              valid ? (currentUserValue?.intValue ?? null) : null,
-              disabled,
-            );
+            return new AttrFormControl<null | number>(attr, valid ? currentUserValue.intValue : null, disabled);
           case AttrAttributeType.Id.LIST:
           case AttrAttributeType.Id.TREE:
-            return new AttrFormControl<string[]>(attr, valid ? currentUserValue?.listValue || [] : [], disabled);
+            return new AttrFormControl<string[]>(attr, valid ? currentUserValue.listValue : [], disabled);
           case AttrAttributeType.Id.STRING:
           case AttrAttributeType.Id.TEXT:
-            return new AttrFormControl<string>(attr, valid ? (currentUserValue?.stringValue ?? '') : '', disabled);
+            return new AttrFormControl<string>(attr, valid ? currentUserValue.stringValue : '', disabled);
         }
         return new AttrFormControl<null>(attr, null, disabled);
       });
@@ -215,20 +234,19 @@ export class CarsSpecificationsEditorSpecComponent {
   }
 
   protected readonly values$ = combineLatest([this.item$, this.#change$]).pipe(
+    // item is a required input(), always defined here.
     switchMap(([item]) =>
-      item
-        ? this.#attrsClient.getValues(
-            new AttrValuesRequest({
-              itemId: item.id,
-              language: this.#languageService.language,
-              zoneId: item.attrZoneId,
-            }),
-          )
-        : EMPTY,
+      this.#attrsClient.getValues(
+        new AttrValuesRequest({
+          itemId: item.id,
+          language: this.#languageService.language,
+          zoneId: item.attrZoneId,
+        }),
+      ),
     ),
     map((response) => {
       const values = new Map<string, AttrValue>();
-      for (const value of response?.items || []) {
+      for (const value of response.items || []) {
         values.set(value.attributeId, value);
       }
       return values;
@@ -240,21 +258,20 @@ export class CarsSpecificationsEditorSpecComponent {
     this.item$,
     this.#change$,
   ]).pipe(
+    // item is a required input(), always defined here.
     switchMap(([item]) =>
-      item
-        ? this.#attrsClient.getUserValues(
-            new AttrUserValuesRequest({
-              fields: new AttrUserValuesFields({valueText: true}),
-              itemId: item.id,
-              language: this.#languageService.language,
-              zoneId: item.attrZoneId,
-            }),
-          )
-        : EMPTY,
+      this.#attrsClient.getUserValues(
+        new AttrUserValuesRequest({
+          fields: new AttrUserValuesFields({valueText: true}),
+          itemId: item.id,
+          language: this.#languageService.language,
+          zoneId: item.attrZoneId,
+        }),
+      ),
     ),
     map((response) => {
       const uv = new Map<string, AttrUserValueWithUser[]>();
-      this.applyUserValues(uv, response?.items || []);
+      this.applyUserValues(uv, response.items || []);
       return uv;
     }),
     shareReplay({bufferSize: 1, refCount: false}),
@@ -262,36 +279,57 @@ export class CarsSpecificationsEditorSpecComponent {
 
   protected saveSpecs(item: Item, form: FormArray<AttrFormControls>) {
     const items = form.controls.map((control) => {
-      const typeId = control.attr.typeId;
+      // typescript-eslint's type-checked linting reports this specific assignment as "error
+      // typed" (effectively `any`), but ts.getPreEmitDiagnostics() on this file directly (via the
+      // TypeScript compiler API, matching `npx tsc --noEmit`) returns zero diagnostics - a false
+      // positive from eslint's own type resolution, not a real type hole. The explicit annotation
+      // keeps it from also poisoning every downstream use of typeId.
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const typeId: AttrAttributeType.Id = control.attr.typeId;
       let valid;
-      let stringValue = undefined;
-      let listValue = [];
-      let boolValue = undefined;
-      let floatValue = undefined;
-      let intValue = undefined;
+      let stringValue;
+      let listValue: string[] = [];
+      let boolValue;
+      let floatValue;
+      let intValue;
+      // control is typed as the AttrFormControls union (one AttrFormControl<T> per attribute
+      // type), but that union isn't discriminated on typeId the way TS can narrow automatically -
+      // form$ above is the only place controls are constructed, and it pairs each case here with
+      // the exact same typeId, so the cast in each branch reflects a real invariant rather than
+      // papering over an unknown one.
       switch (typeId) {
-        case AttrAttributeType.Id.BOOLEAN:
-          valid = control.value !== null;
-          boolValue = control.value;
+        case AttrAttributeType.Id.BOOLEAN: {
+          const value = (control as AttrFormControl<boolean | null>).value;
+          valid = value !== null;
+          boolValue = value ?? undefined;
           break;
-        case AttrAttributeType.Id.FLOAT:
-          valid = control.value !== null;
-          floatValue = control.value;
+        }
+        case AttrAttributeType.Id.FLOAT: {
+          const value = (control as AttrFormControl<null | number>).value;
+          valid = value !== null;
+          floatValue = value ?? undefined;
           break;
-        case AttrAttributeType.Id.INTEGER:
-          valid = control.value !== null;
-          intValue = control.value | 0;
+        }
+        case AttrAttributeType.Id.INTEGER: {
+          const value = (control as AttrFormControl<null | number>).value;
+          valid = value !== null;
+          intValue = value !== null ? value | 0 : undefined;
           break;
+        }
         case AttrAttributeType.Id.LIST:
-        case AttrAttributeType.Id.TREE:
-          valid = control.value !== null && control.value !== undefined && control.value.length > 0;
-          listValue = (control.value || []).filter((v: unknown) => !!v);
+        case AttrAttributeType.Id.TREE: {
+          const value = (control as AttrFormControl<string[]>).value;
+          valid = value.length > 0;
+          listValue = value.filter((v) => !!v);
           break;
+        }
         case AttrAttributeType.Id.STRING:
-        case AttrAttributeType.Id.TEXT:
-          valid = control.value !== null && control.value !== undefined && control.value.length > 0;
-          stringValue = control.value;
+        case AttrAttributeType.Id.TEXT: {
+          const value = (control as AttrFormControl<string>).value;
+          valid = value.length > 0;
+          stringValue = value;
           break;
+        }
         default:
           valid = control.value !== null;
           break;

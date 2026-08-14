@@ -6,8 +6,7 @@ import {ForumsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {catchError, distinctUntilChanged, EMPTY, map, Observable, of, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 
@@ -37,7 +36,7 @@ export class ForumsMoveTopicComponent implements OnInit {
     distinctUntilChanged(),
     switchMap((topicID) => (topicID ? this.#grpc.getTopic(new GetTopicRequest({id: topicID})) : of(null))),
     catchError(() => {
-      this.#router.navigate(['/error-404'], {
+      void this.#router.navigate(['/error-404'], {
         skipLocationChange: true,
       });
       return EMPTY;
@@ -65,9 +64,11 @@ export class ForumsMoveTopicComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
-          this.#router.navigate(['/forums/topic', topic.id]);
+          void this.#router.navigate(['/forums/topic', topic.id]);
         },
       });
   }

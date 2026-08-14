@@ -8,8 +8,7 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {Observable, of} from 'rxjs';
-import {map, shareReplay, switchMap} from 'rxjs/operators';
+import {map, Observable, of, shareReplay, switchMap} from 'rxjs';
 
 import {AuthService, Role} from './auth.service';
 

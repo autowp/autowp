@@ -4,7 +4,7 @@ import {CanActivateFn} from '@angular/router';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import Keycloak from 'keycloak-js';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
@@ -16,7 +16,7 @@ export const authGuard: CanActivateFn = () => {
     map((authenticated) => {
       if (!authenticated) {
         if (document.defaultView) {
-          keycloak.login({
+          void keycloak.login({
             locale: language.language,
             redirectUri: document.defaultView.location.href,
           });

@@ -14,8 +14,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {of, switchMap} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, of} from 'rxjs';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
 import {PictureComponent} from './picture.component';
@@ -67,33 +66,31 @@ export class PicturePageComponent {
     id: `picture-page-${this.#identity() ?? ''}`,
     params: () => ({canonical: this.canonicalResource.value(), identity: this.#identity()}),
     stream: ({params: {identity, canonical}}) => {
-      if (!identity || !canonical || (canonical.route && canonical.route.length > 0)) {
+      if (!identity || !canonical || canonical.route.length > 0) {
         return of(undefined);
       }
 
-      return this.#picturesClient
-        .getPicture(
-          new PicturesRequest({
-            fields: new PictureFields({
-              copyrights: true,
-              image: true,
-              moderVoted: true,
-              nameHtml: true,
-              nameText: true,
-              pictureModerVotes: new PictureModerVoteRequest(),
-              previewLarge: true,
-              replaceable: new PicturesRequest({
-                fields: new PictureFields({nameHtml: true}),
-              }),
-              rights: true,
-              subscribed: true,
-              votes: true,
+      return this.#picturesClient.getPicture(
+        new PicturesRequest({
+          fields: new PictureFields({
+            copyrights: true,
+            image: true,
+            moderVoted: true,
+            nameHtml: true,
+            nameText: true,
+            pictureModerVotes: new PictureModerVoteRequest(),
+            previewLarge: true,
+            replaceable: new PicturesRequest({
+              fields: new PictureFields({nameHtml: true}),
             }),
-            language: this.#languageService.language,
-            options: new PictureListOptions({identity}),
+            rights: true,
+            subscribed: true,
+            votes: true,
           }),
-        )
-        .pipe(switchMap((picture) => (picture ? of(picture) : notFoundError())));
+          language: this.#languageService.language,
+          options: new PictureListOptions({identity}),
+        }),
+      );
     },
   });
 
@@ -118,7 +115,7 @@ export class PicturePageComponent {
       }
 
       const canonical = this.canonicalResource.value();
-      if (canonical.route && canonical.route.length > 0) {
+      if (canonical.route.length > 0) {
         void this.#router.navigate(canonical.route, {replaceUrl: true});
         return;
       }
@@ -128,16 +125,14 @@ export class PicturePageComponent {
       }
 
       const picture = this.pictureResource.value();
-      if (picture) {
-        this.#meta.updateTag({property: 'og:title', content: picture.nameText});
-        if (picture.previewLarge) {
-          this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
-        }
-        this.#pageEnv.set({
-          pageId: 187,
-          title: picture.nameText,
-        });
+      this.#meta.updateTag({property: 'og:title', content: picture.nameText});
+      if (picture.previewLarge) {
+        this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
       }
+      this.#pageEnv.set({
+        pageId: 187,
+        title: picture.nameText,
+      });
     });
   }
 

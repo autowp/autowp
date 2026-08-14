@@ -30,8 +30,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, switchMap} from 'rxjs/operators';
+import {catchError, EMPTY, Observable, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {CarouselItemComponent} from './carousel-item.component';
@@ -116,7 +115,7 @@ function galleryFilterParams(state: GalleryState, language: string): PicturesReq
 }
 
 function galleryItemIndex(state: GalleryState, identity: string): number {
-  return state.items.findIndex((item) => item && item.identity === identity);
+  return state.items.findIndex((item) => item?.identity === identity);
 }
 
 function galleryItemByIndex(state: GalleryState, index: number): null | Picture {

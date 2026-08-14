@@ -3,8 +3,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {User, UsersRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {BehaviorSubject, map, Observable, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 

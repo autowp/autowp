@@ -9,8 +9,7 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemService} from '@services/item';
 import {InvalidParams} from '@utils/invalid-params.pipe';
-import {EMPTY, forkJoin, Observable, of} from 'rxjs';
-import {catchError, map, tap} from 'rxjs/operators';
+import {catchError, EMPTY, forkJoin, map, Observable, of, tap} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../../grpc';
 import {ToastsService} from '../../../../toasts/toasts.service';
@@ -142,7 +141,9 @@ export class ModerItemsItemMetaComponent implements OnInit {
             }
             return EMPTY;
           }),
-          tap(() => this.invalidParams.set({})),
+          tap(() => {
+            this.invalidParams.set({});
+          }),
           map(() => void 0),
         ),
     ];

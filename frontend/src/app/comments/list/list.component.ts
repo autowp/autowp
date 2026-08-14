@@ -2,7 +2,6 @@ import {DatePipe} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  ComponentRef,
   computed,
   inject,
   Injector,
@@ -27,11 +26,11 @@ import {CommentsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';
+import {getModalComponentRef} from '@utils/modal-component-ref';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {UserTextComponent} from '@utils/user-text/user-text.component';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, EMPTY, map, Observable, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -145,7 +144,9 @@ export class CommentsListComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: (response) => (message.vote = response.vote),
       });
 
@@ -161,7 +162,9 @@ export class CommentsListComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => (message.deleted = value),
       });
   }
@@ -176,7 +179,7 @@ export class CommentsListComponent implements OnInit {
       centered: true,
       size: 'lg',
     });
-    const componentRef: ComponentRef<CommentsVotesComponent> = modalRef['_contentRef'].componentRef;
+    const componentRef = getModalComponentRef<CommentsVotesComponent>(modalRef);
     componentRef.setInput('messageID', message.id);
     return false;
   }

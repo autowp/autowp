@@ -15,6 +15,11 @@ import FieldViolation = BadRequest.FieldViolation;
  * makes that case indistinguishable from a genuine backend NOT_FOUND response.
  */
 export const notFoundError = (): Observable<never> =>
+  // Throws the raw GrpcStatusEvent, not an Error wrapping it: real backend failures reach
+  // catchError as a bare GrpcStatusEvent too (it's what @ngx-grpc's client itself rejects with),
+  // and isNotFoundError()/other `instanceof GrpcStatusEvent` checks throughout the app rely on
+  // both paths having the exact same shape.
+  // eslint-disable-next-line rxjs-x/throw-error
   throwError(() => new GrpcStatusEvent(StatusCode.NOT_FOUND, 'Not found', new GrpcMetadata()));
 
 /**
@@ -22,11 +27,18 @@ export const notFoundError = (): Observable<never> =>
  * or wrapped in an `Error.cause` by rxResource's `encapsulateResourceError`.
  */
 export const isNotFoundError = (error: unknown): boolean => {
+  // GrpcStatusEvent.statusCode is typed as a bare `number` by @ngx-grpc/common (not our
+  // StatusCode enum), so comparing it against StatusCode.NOT_FOUND is a real numeric-code
+  // comparison, not a mismatched-enum bug.
   if (error instanceof GrpcStatusEvent) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     return error.statusCode === StatusCode.NOT_FOUND;
   }
   return (
-    error instanceof Error && error.cause instanceof GrpcStatusEvent && error.cause.statusCode === StatusCode.NOT_FOUND
+    error instanceof Error &&
+    error.cause instanceof GrpcStatusEvent &&
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+    error.cause.statusCode === StatusCode.NOT_FOUND
   );
 };
 
@@ -63,7 +75,10 @@ export const fieldViolations2InvalidParams = (fvs: FieldViolation[]): InvalidPar
   const result: InvalidParams = {};
 
   fvs.forEach((fv) => {
-    if (!result[fv.field]) {
+    // Object.hasOwn(), not `!result[fv.field]`: without noUncheckedIndexedAccess, TS types a
+    // Record's index access as always-present, so this reads as "always false" to the type
+    // checker even though the key is genuinely absent until a field is seen for the first time.
+    if (!Object.hasOwn(result, fv.field)) {
       result[fv.field] = {};
     }
     result[fv.field][fv.description] = fv.description;

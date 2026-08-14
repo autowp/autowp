@@ -8,8 +8,7 @@ import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {EMPTY, switchMap} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -49,6 +48,10 @@ export class AccountDeleteComponent implements OnInit {
               )
             : EMPTY,
         ),
+        // Chained into the main pipe rather than subscribed to inside the outer subscribe's
+        // `next` (a nested subscribe): composing it here keeps a single subscription lifecycle
+        // and lets signOut$() actually complete before navigating.
+        switchMap(() => this.#auth.signOut$()),
       )
       .subscribe({
         error: (response: unknown) => {
@@ -59,8 +62,7 @@ export class AccountDeleteComponent implements OnInit {
           }
         },
         next: () => {
-          this.#auth.signOut$().subscribe();
-          this.#router.navigate(['/account/delete/deleted']);
+          void this.#router.navigate(['/account/delete/deleted']);
         },
       });
   }

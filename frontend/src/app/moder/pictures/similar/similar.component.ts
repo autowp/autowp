@@ -27,8 +27,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, map, switchMap} from 'rxjs/operators';
+import {catchError, debounceTime, EMPTY, map, Observable, of, switchMap} from 'rxjs';
 
 const nonRemovingStatuses = [PictureStatus.PICTURE_STATUS_ACCEPTED, PictureStatus.PICTURE_STATUS_INBOX];
 
@@ -165,7 +164,7 @@ export class ModerPicturesSimilarComponent implements OnInit {
   }
 
   protected brandOnSelect(e: NgbTypeaheadSelectItemEvent<Item>): void {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {brand_id: e.item.id},
       queryParamsHandling: 'merge',
     });
@@ -173,7 +172,7 @@ export class ModerPicturesSimilarComponent implements OnInit {
 
   protected clearBrand(): void {
     this.brandQuery.setValue('');
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {brand_id: null},
       queryParamsHandling: 'merge',
     });

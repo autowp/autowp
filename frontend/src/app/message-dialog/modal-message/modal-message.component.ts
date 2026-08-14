@@ -29,7 +29,9 @@ export class ModalMessageComponent {
     const userId = this.userId();
     if (userId) {
       this.#messageService.send$(userId, this.text.value).subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           this.sending.set(false);
           this.sent.set(true);

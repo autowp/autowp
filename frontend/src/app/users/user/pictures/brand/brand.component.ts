@@ -18,8 +18,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.component';

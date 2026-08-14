@@ -1,3 +1,4 @@
+import {DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -22,8 +23,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams} from '@utils/invalid-params.pipe';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, forkJoin, Observable, of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, EMPTY, forkJoin, map, Observable, of, switchMap} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../../../grpc';
 import {ToastsService} from '../../../../../toasts/toasts.service';
@@ -47,6 +47,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly loading = signal(false);
   protected readonly invalidParams = signal<InvalidParams>({});
@@ -66,7 +67,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
       this.#picturesClient
         .getPictureItems(
           new PictureItemsRequest({
-            options: new PictureItemListOptions({itemId: '' + itemID}),
+            options: new PictureItemListOptions({itemId: itemID}),
           }),
         )
         .pipe(map((response) => response.items || [])),
@@ -222,10 +223,8 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
       )
       .subscribe((item) => {
         this.loading.set(false);
-        if (localStorage) {
-          localStorage.setItem('last_item', item.id);
-        }
-        this.#router.navigate(['/moder/items/item', item.id], {
+        this.#document.defaultView?.localStorage.setItem('last_item', item.id);
+        void this.#router.navigate(['/moder/items/item', item.id], {
           queryParams: {
             tab: 'pictures',
           },

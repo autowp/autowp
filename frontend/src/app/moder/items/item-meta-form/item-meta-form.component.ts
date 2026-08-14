@@ -1,13 +1,5 @@
 import {AsyncPipe} from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ComponentRef,
-  inject,
-  input,
-  output,
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -37,9 +29,9 @@ import {LanguageService} from '@services/language';
 import {SpecService} from '@services/spec';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {getModalComponentRef} from '@utils/modal-component-ref';
 import {getVehicleTypeTranslation} from '@utils/translations';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {map, shareReplay, switchMap} from 'rxjs/operators';
+import {combineLatest, map, Observable, shareReplay} from 'rxjs';
 import {sprintf} from 'sprintf-js';
 
 import {VehicleTypesModalComponent} from '../../../components/vehicle-types-modal/vehicle-types-modal.component';
@@ -219,12 +211,14 @@ export class ItemMetaFormComponent {
   readonly vehicleTypeIDs = input.required<string[]>();
 
   readonly items = input<Item[]>([]);
-  protected readonly items$ = toObservable(this.items).pipe(map((items) => (items && items.length ? items : null)));
+  // items has a default value ([]), so the input itself is never nullish - only its length varies.
+  protected readonly items$ = toObservable(this.items).pipe(map((items) => (items.length ? items : null)));
 
   readonly pictures = input<PictureItem[]>([]);
+  // pictures has a default value ([]), so the input itself is never nullish.
   readonly pictures$ = toObservable(this.pictures).pipe(
     map((pictures) =>
-      pictures && pictures.length > 0
+      pictures.length > 0
         ? pictures.map((p) => ({
             picture$: this.#picturesClient.getPicture(
               new PicturesRequest({
@@ -347,7 +341,8 @@ export class ItemMetaFormComponent {
   );
 
   protected readonly form$: Observable<FormGroup<Form>> = combineLatest([
-    this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
+    // item is a required input(), always defined here.
+    this.item$,
     toObservable(this.vehicleTypeIDs),
     this.#disableIsGroup$,
     this.items$,
@@ -403,7 +398,7 @@ export class ItemMetaFormComponent {
         );
         elements.is_group = new FormControl(
           {
-            disabled: !!(item.childsCount > 0 || disableIsGroup),
+            disabled: item.childsCount > 0 || disableIsGroup,
             value: item.isGroup,
           },
           {nonNullable: true},
@@ -461,8 +456,11 @@ export class ItemMetaFormComponent {
     }
   }
 
-  protected doSubmit(form: FormGroup) {
-    this.submitted.emit(form.value);
+  protected doSubmit(form: FormGroup<Form>) {
+    // FormGroup<Form>.value is inferred as a structurally-loose Partial<...> (every optional
+    // control's value type is itself partial), which doesn't restate cleanly as
+    // ItemMetaFormResult even though the two describe the same actual form shape built above.
+    this.submitted.emit(form.value as unknown as ItemMetaFormResult);
     return false;
   }
 
@@ -472,10 +470,10 @@ export class ItemMetaFormComponent {
       size: 'lg',
     });
 
-    const componentRef: ComponentRef<VehicleTypesModalComponent> = modalRef['_contentRef'].componentRef;
+    const componentRef = getModalComponentRef<VehicleTypesModalComponent>(modalRef);
     componentRef.setInput('ids', vehicleTypeIDs.value);
 
-    modalRef.componentInstance.changed.subscribe((value: string[]) => {
+    componentRef.instance.changed.subscribe((value: string[]) => {
       vehicleTypeIDs.setValue(value);
       this.#cdr.markForCheck();
     });

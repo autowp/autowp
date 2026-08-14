@@ -22,25 +22,16 @@ export class TwinsItemComponent {
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
   protected havePhoto(item: Item) {
-    if (item.previewPictures) {
-      for (const picture of item.previewPictures.pictures || []) {
-        if (picture) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return (item.previewPictures?.pictures || []).length > 0;
   }
 
   protected canHavePhoto(item: Item) {
-    return (
-      [
-        ItemType.ITEM_TYPE_VEHICLE,
-        ItemType.ITEM_TYPE_ENGINE,
-        ItemType.ITEM_TYPE_BRAND,
-        ItemType.ITEM_TYPE_FACTORY,
-        ItemType.ITEM_TYPE_MUSEUM,
-      ].indexOf(item.itemTypeId) !== -1
-    );
+    return [
+      ItemType.ITEM_TYPE_BRAND,
+      ItemType.ITEM_TYPE_ENGINE,
+      ItemType.ITEM_TYPE_FACTORY,
+      ItemType.ITEM_TYPE_MUSEUM,
+      ItemType.ITEM_TYPE_VEHICLE,
+    ].includes(item.itemTypeId);
   }
 }

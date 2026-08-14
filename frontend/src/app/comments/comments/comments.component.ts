@@ -14,8 +14,7 @@ import {
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {RemarkModule} from 'ngx-remark';
-import {Observable, of} from 'rxjs';
-import {catchError, map, tap} from 'rxjs/operators';
+import {catchError, EMPTY, ignoreElements, map, merge, Observable, of} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -82,23 +81,26 @@ export class CommentsComponent implements OnInit {
           return of(undefined);
         }
 
-        return this.load$(itemID, typeID, limit, page).pipe(
-          tap(() => {
-            if (authenticated) {
-              this.#commentsGrpc
-                .view(
-                  new CommentsViewRequest({
-                    itemId: itemID,
-                    typeId: typeID,
-                  }),
-                )
-                .subscribe();
-            }
-          }),
-          map((response) => ({
-            messages: response.items ? response.items : [],
-            paginator: response.paginator,
-          })),
+        // Fires the "mark as viewed" call concurrently via merge()+ignoreElements() rather than
+        // subscribing to it manually inside a tap() - a manual subscribe() nested in a pipe
+        // operator escapes the outer Observable's subscription/cancellation lifecycle. Errors are
+        // swallowed here: a failed view-tracking call shouldn't break the comments load itself,
+        // which is what a bare, unhandled .subscribe() effectively did before too.
+        const view$ = authenticated
+          ? this.#commentsGrpc.view(new CommentsViewRequest({itemId: itemID, typeId: typeID})).pipe(
+              ignoreElements(),
+              catchError(() => EMPTY),
+            )
+          : EMPTY;
+
+        return merge(
+          this.load$(itemID, typeID, limit, page).pipe(
+            map((response) => ({
+              messages: response.items ? response.items : [],
+              paginator: response.paginator,
+            })),
+          ),
+          view$,
         );
       },
     });
@@ -124,7 +126,7 @@ export class CommentsComponent implements OnInit {
           return;
         }
         if (this.page() !== response.page) {
-          this.#router.navigate([], {
+          void this.#router.navigate([], {
             queryParams: {page: response.page},
             queryParamsHandling: 'merge',
           });

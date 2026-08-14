@@ -26,8 +26,17 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
-import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+} from 'rxjs';
 
 @Component({
   selector: 'app-moder-items-item-catalogue',
@@ -65,23 +74,19 @@ export class ModerItemsItemCatalogueComponent {
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
 
   protected readonly organizeTypeId$ = this.item$.pipe(
-    switchMap((item) => (item ? of(item) : EMPTY)),
     map((item) => (item.itemTypeId === ItemType.ITEM_TYPE_BRAND ? ItemType.ITEM_TYPE_VEHICLE : item.itemTypeId)),
   );
 
   protected readonly canHaveParentBrand$ = this.item$.pipe(
-    switchMap((item) => (item ? of(item) : EMPTY)),
     map((item) => [ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)),
   );
 
   protected readonly canHaveParents$ = this.item$.pipe(
-    switchMap((item) => (item ? of(item) : EMPTY)),
     map((item) => ![ItemType.ITEM_TYPE_FACTORY, ItemType.ITEM_TYPE_TWINS].includes(item.itemTypeId)),
   );
 
   protected readonly itemsDataSource: (text$: Observable<string>) => Observable<Item[]> = (text$: Observable<string>) =>
     this.item$.pipe(
-      switchMap((item) => (item ? of(item) : EMPTY)),
       switchMap((item) =>
         text$.pipe(
           debounceTime(50),
@@ -112,10 +117,7 @@ export class ModerItemsItemCatalogueComponent {
       ),
     );
 
-  protected readonly childs$: Observable<ItemParent[]> = combineLatest([
-    this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
-    this.#reloadChilds$,
-  ]).pipe(
+  protected readonly childs$: Observable<ItemParent[]> = combineLatest([this.item$, this.#reloadChilds$]).pipe(
     switchMap(([item]) =>
       this.#itemsClient.getItemParents(
         new ItemParentsRequest({
@@ -125,7 +127,7 @@ export class ModerItemsItemCatalogueComponent {
           }),
           limit: 10,
           options: new ItemParentListOptions({
-            parentId: '' + item.id,
+            parentId: item.id,
           }),
           order: ItemParentsRequest.Order.AUTO,
         }),
@@ -134,10 +136,7 @@ export class ModerItemsItemCatalogueComponent {
     map((response) => response.items || []),
   );
 
-  protected readonly parents$: Observable<ItemParent[]> = combineLatest([
-    this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
-    this.#reloadParents$,
-  ]).pipe(
+  protected readonly parents$: Observable<ItemParent[]> = combineLatest([this.item$, this.#reloadParents$]).pipe(
     switchMap(([item]) =>
       this.#itemsClient.getItemParents(
         new ItemParentsRequest({
@@ -147,7 +146,7 @@ export class ModerItemsItemCatalogueComponent {
           }),
           limit: 10,
           options: new ItemParentListOptions({
-            itemId: '' + item.id,
+            itemId: item.id,
           }),
           order: ItemParentsRequest.Order.AUTO,
         }),
@@ -156,10 +155,7 @@ export class ModerItemsItemCatalogueComponent {
     map((response) => response.items || []),
   );
 
-  protected readonly suggestions$: Observable<Item[]> = combineLatest([
-    this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
-    this.#reloadSuggestions$,
-  ]).pipe(
+  protected readonly suggestions$: Observable<Item[]> = combineLatest([this.item$, this.#reloadSuggestions$]).pipe(
     switchMap(([item]) =>
       this.#itemsClient.list(
         new ItemsRequest({
@@ -167,7 +163,7 @@ export class ModerItemsItemCatalogueComponent {
           language: this.#languageService.language,
           limit: 3,
           options: new ItemListOptions({
-            suggestionsTo: '' + item.id,
+            suggestionsTo: item.id,
           }),
         }),
       ),
@@ -181,7 +177,11 @@ export class ModerItemsItemCatalogueComponent {
 
   protected itemOnSelect(item: Item, e: NgbTypeaheadSelectItemEvent): void {
     e.preventDefault();
-    this.addParent(item, '' + e.item.id);
+    // e.item is typed `any` by ng-bootstrap (a generic typeahead event) - itemsDataSource above
+    // is the only source feeding this typeahead, and it resolves Item[], so the selected item is
+    // always really an Item at runtime.
+    const selected = e.item as Item;
+    this.addParent(item, selected.id);
     this.itemQuery.setValue('');
   }
 
@@ -189,7 +189,7 @@ export class ModerItemsItemCatalogueComponent {
     this.#itemsClient
       .createItemParent(
         new ItemParent({
-          itemId: '' + item.id,
+          itemId: item.id,
           parentId: parentId,
         }),
       )
@@ -217,11 +217,11 @@ export class ModerItemsItemCatalogueComponent {
   }
 
   protected deleteChild(item: Item, itemId: string) {
-    this.deleteItemParent(itemId, '' + item.id);
+    this.deleteItemParent(itemId, item.id);
   }
 
   protected deleteParent(item: Item, parentId: string) {
-    this.deleteItemParent('' + item.id, parentId);
+    this.deleteItemParent(item.id, parentId);
   }
 
   protected readonly ItemParentType = ItemParentType;

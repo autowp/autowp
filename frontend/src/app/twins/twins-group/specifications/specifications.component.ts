@@ -7,8 +7,7 @@ import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, of} from 'rxjs';
 
 @Component({
   selector: 'app-twins-group-specifications',

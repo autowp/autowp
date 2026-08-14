@@ -14,15 +14,7 @@ import {Image, Picture} from '@grpc/spec.pb';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {BehaviorSubject, combineLatest, Subscription} from 'rxjs';
 
-// @ts-expect-error Legacy
-import Jcrop from '../../jcrop/jquery.Jcrop';
-
-interface JcropCrop {
-  h: number;
-  w: number;
-  x: number;
-  y: number;
-}
+import Jcrop, {JcropCrop, JcropInstance} from '../../jcrop/jquery.Jcrop';
 
 @Component({
   selector: 'app-upload-crop',
@@ -36,14 +28,14 @@ export class UploadCropComponent implements OnDestroy, OnInit {
   readonly #cdr = inject(ChangeDetectorRef);
   readonly #document = inject(DOCUMENT);
 
-  readonly changed = output<void>();
+  readonly changed = output();
 
   readonly picture = input.required<Picture>();
   readonly picture$ = toObservable(this.picture);
 
   readonly #minSize = [400, 300];
 
-  #jcrop: Jcrop = null;
+  #jcrop: JcropInstance | null = null;
   protected aspect = '';
   protected resolution = '';
   protected readonly img$ = new BehaviorSubject<HTMLImageElement | null>(null);
@@ -57,7 +49,7 @@ export class UploadCropComponent implements OnDestroy, OnInit {
 
   ngOnInit(): void {
     this.#sub = combineLatest([this.img$, this.picture$]).subscribe(([img, picture]) => {
-      if (img && picture) {
+      if (img) {
         const body = img.parentElement;
 
         if (!body) {
@@ -65,12 +57,12 @@ export class UploadCropComponent implements OnDestroy, OnInit {
         }
 
         this.#jcrop = null;
-        if (picture.image && picture.image.cropWidth && picture.image.cropHeight) {
+        if (picture.image?.cropWidth && picture.image.cropHeight) {
           this.currentCrop = {
-            h: picture.image.cropHeight ?? 0,
-            w: picture.image.cropWidth ?? 0,
-            x: picture.image.cropLeft ?? 0,
-            y: picture.image.cropTop ?? 0,
+            h: picture.image.cropHeight,
+            w: picture.image.cropWidth,
+            x: picture.image.cropLeft,
+            y: picture.image.cropTop,
           };
         } else {
           this.currentCrop = {
@@ -89,8 +81,8 @@ export class UploadCropComponent implements OnDestroy, OnInit {
         const width = picture.width / scale;
         const height = picture.height / scale;
 
-        img.style.width = width + 'px';
-        img.style.height = height + 'px';
+        img.style.width = `${width}px`;
+        img.style.height = `${height}px`;
 
         this.#jcrop = Jcrop(img, {
           boxHeight: height,
@@ -134,12 +126,12 @@ export class UploadCropComponent implements OnDestroy, OnInit {
   }
 
   private updateSelectionText() {
-    const text = Math.round(this.currentCrop.w) + '×' + Math.round(this.currentCrop.h);
+    const text = `${Math.round(this.currentCrop.w)}×${Math.round(this.currentCrop.h)}`;
     const pw = 4;
     const ph = (pw * this.currentCrop.h) / this.currentCrop.w;
     const phRound = Math.round(ph * 10) / 10;
 
-    this.aspect = pw + ':' + phRound;
+    this.aspect = `${pw}:${phRound}`;
     this.resolution = text;
 
     this.#cdr.markForCheck();

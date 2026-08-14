@@ -6,8 +6,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {TwinsSidebarComponent} from '../sidebar.component';
 
@@ -59,11 +58,10 @@ export class TwinsGroupComponent {
     // Distinct id from groupResource above, also suffixed with the group id (see that resource's
     // comment) - this is not actually a singleton per page across different twins groups.
     id: `twins-group-selected-brands-${this.#groupID()}`,
+    // Angular skips stream() entirely while params() returns undefined, so group is always
+    // defined once stream() actually runs.
     params: () => this.groupResource.value(),
     stream: ({params: group}) => {
-      if (!group) {
-        return of([]);
-      }
       return this.#itemsClient
         .list(
           new ItemsRequest({

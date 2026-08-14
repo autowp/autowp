@@ -4,7 +4,7 @@ import {RouterLink} from '@angular/router';
 import {GetTopBrandsListRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {IndexBrandsBrandComponent} from './brand/brand.component';
 

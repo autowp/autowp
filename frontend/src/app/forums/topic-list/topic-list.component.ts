@@ -18,7 +18,7 @@ export class ForumsTopicListComponent {
 
   readonly showSubscribe = input(false);
 
-  readonly reload = output<void>();
+  readonly reload = output();
 
   protected readonly forumAdmin = toSignal(this.#auth.hasRole$(Role.FORUMS_MODER), {initialValue: false});
 }

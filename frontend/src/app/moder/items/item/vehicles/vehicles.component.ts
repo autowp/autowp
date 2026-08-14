@@ -5,8 +5,7 @@ import {RouterLink} from '@angular/router';
 import {Item, ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {EMPTY, Observable} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {EMPTY, map, Observable, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-moder-items-item-vehicles',

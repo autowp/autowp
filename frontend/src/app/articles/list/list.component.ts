@@ -8,8 +8,8 @@ import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {Observable, of} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {timestampToDate} from '@utils/timestamp';
+import {catchError, map, Observable, of} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {UserComponent} from '../../user/user/user.component';
@@ -92,7 +92,7 @@ export class ListComponent implements OnInit {
   #mapArticle(article: Article): ArticleListItem {
     return {
       authorId: article.authorId,
-      createdAt: article.createTime?.toDate(),
+      createdAt: timestampToDate(article.createTime),
       description: article.description,
       id: article.id,
       name: article.name,

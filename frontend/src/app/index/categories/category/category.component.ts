@@ -6,8 +6,7 @@ import {NewItemsRequest, TopCategoriesListItem} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
-import {EMPTY} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-index-categories-category',
@@ -25,14 +24,12 @@ export class IndexCategoriesCategoryComponent {
 
   protected readonly response$ = this.category$.pipe(
     switchMap((category) =>
-      category
-        ? this.#itemsClient.getNewItems(
-            new NewItemsRequest({
-              itemId: category.id,
-              language: this.#languageService.language,
-            }),
-          )
-        : EMPTY,
+      this.#itemsClient.getNewItems(
+        new NewItemsRequest({
+          itemId: category.id,
+          language: this.#languageService.language,
+        }),
+      ),
     ),
   );
 }

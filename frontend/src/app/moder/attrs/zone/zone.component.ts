@@ -4,8 +4,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {AttrZone, AttrZoneAttributesRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, Observable, of} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, EMPTY, map, Observable, of, shareReplay, switchMap, tap} from 'rxjs';
 
 import {APIAttrsService, AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
 import {ModerAttrsZoneAttributeListComponent} from './attribute-list/attribute-list.component';
@@ -34,7 +33,7 @@ export class ModerAttrsZoneComponent {
     switchMap((id) => (id ? this.#attrsService.getZone$(id) : of(null))),
     switchMap((zone) => {
       if (!zone) {
-        this.#router.navigate(['/error-404'], {
+        void this.#router.navigate(['/error-404'], {
           skipLocationChange: true,
         });
         return EMPTY;

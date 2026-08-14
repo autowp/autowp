@@ -9,7 +9,7 @@ import {getAttrsTranslation} from '@utils/translations';
 import {ChartOptions} from 'chart.js';
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {ObjectTyped} from 'object-typed';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 
@@ -88,7 +88,9 @@ export class ChartComponent implements OnInit {
     this.chart.data = [];
 
     this.#attrsClient.getChartData(new ChartDataRequest({id})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
       next: (response) => {
         const datasets = response.datasets || [];
         const yearsSet = new Set<number>();
@@ -101,7 +103,11 @@ export class ChartComponent implements OnInit {
         this.chart.data = datasets.map((dataset) => {
           const numbers: (null | number)[] = [];
           years.forEach((year) => {
-            const value = dataset.values[year];
+            // Object.hasOwn(), not `if (value)`: without noUncheckedIndexedAccess, TS types a
+            // Record's index access as always-present, so this reads as "always truthy" to the
+            // type checker even though `years` is a union of keys across *all* datasets, and this
+            // one genuinely may not have a value for every year in it.
+            const value = Object.hasOwn(dataset.values, year) ? dataset.values[year] : undefined;
             let numberValue: null | number = null;
             if (value) {
               switch (value.type) {

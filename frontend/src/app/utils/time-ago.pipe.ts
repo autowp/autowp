@@ -107,7 +107,9 @@ export class TimeAgoPipe implements OnDestroy, PipeTransform {
             }
 
             this.#currentTimer = null;
-            this.#ngZone.run(() => this.#cdRef.markForCheck());
+            this.#ngZone.run(() => {
+              this.#cdRef.markForCheck();
+            });
           }, timeToUpdate);
         } else {
           return null;

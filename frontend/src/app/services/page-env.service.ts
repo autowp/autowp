@@ -1,8 +1,7 @@
 import {computed, inject, Service, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {Title} from '@angular/platform-browser';
-import {Observable, of} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {Observable, of, switchMap} from 'rxjs';
 
 import {PageService} from './page';
 

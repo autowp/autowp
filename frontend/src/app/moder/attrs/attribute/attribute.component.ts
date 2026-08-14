@@ -4,8 +4,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {AttrAttribute} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 import {getAttrListOptionsTranslation, getAttrsTranslation, getUnitNameTranslation} from '@utils/translations';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {combineLatest, distinctUntilChanged, EMPTY, map, Observable, of, shareReplay, switchMap, tap} from 'rxjs';
 
 import {APIAttrsService, AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
 
@@ -26,7 +25,7 @@ export class ModerAttrsAttributeComponent {
     distinctUntilChanged(),
     switchMap((id) => {
       if (!id) {
-        this.#router.navigate(['/error-404'], {
+        void this.#router.navigate(['/error-404'], {
           skipLocationChange: true,
         });
         return EMPTY;
@@ -40,7 +39,7 @@ export class ModerAttrsAttributeComponent {
     switchMap((id) => this.#attrsService.getAttribute$(id)),
     switchMap((attribute) => {
       if (!attribute) {
-        this.#router.navigate(['/error-404'], {
+        void this.#router.navigate(['/error-404'], {
           skipLocationChange: true,
         });
         return EMPTY;
@@ -74,6 +73,10 @@ export class ModerAttrsAttributeComponent {
     map((types) => {
       const typeMap: Record<string, string> = {};
       for (const item of types) {
+        // typescript-eslint's type-checked linting reports item.id here as "error typed"
+        // (effectively `any`), but `npx tsc --noEmit` on this file directly shows zero
+        // diagnostics - a false positive from eslint's own type resolution, not a real type hole.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         typeMap[item.id] = item.name;
       }
       return typeMap;

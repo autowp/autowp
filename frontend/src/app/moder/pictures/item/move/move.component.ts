@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -24,8 +24,19 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap} from 'rxjs/operators';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
 
 import {chunk} from '../../../../chunk';
 import {PaginatorComponent} from '../../../../paginator/paginator/paginator.component';
@@ -68,6 +79,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly conceptsExpanded = signal(false);
 
@@ -77,8 +89,8 @@ export class ModerPicturesItemMoveComponent implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  readonly #srcType$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('src_type') ?? '', 10) as PictureItemType),
+  readonly #srcType$: Observable<PictureItemType> = this.#route.queryParamMap.pipe(
+    map((params) => parseInt(params.get('src_type') ?? '', 10)),
     distinctUntilChanged(),
     shareReplay({bufferSize: 1, refCount: false}),
   );
@@ -90,7 +102,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
   );
 
   protected readonly src$ = combineLatest([this.id$, this.#srcItemID$, this.#srcType$]).pipe(
-    map(([id, srcItemID, srcType]) => ({id, srcItemID, srcType}) as SrcSelection),
+    map(([id, srcItemID, srcType]) => ({id, srcItemID, srcType})),
   );
 
   private isSrcTypeOrEmpty$(pictureItemType: PictureItemType) {
@@ -437,10 +449,8 @@ export class ModerPicturesItemMoveComponent implements OnInit {
           }),
         )
         .subscribe(() => {
-          if (localStorage) {
-            localStorage.setItem('last_item', dstItemID);
-          }
-          this.#router.navigate(['/moder/pictures', id]);
+          this.#document.defaultView?.localStorage.setItem('last_item', dstItemID);
+          void this.#router.navigate(['/moder/pictures', id]);
         });
     } else {
       this.#picturesClient
@@ -459,10 +469,8 @@ export class ModerPicturesItemMoveComponent implements OnInit {
           }),
         )
         .subscribe(() => {
-          if (localStorage) {
-            localStorage.setItem('last_item', dstItemID);
-          }
-          this.#router.navigate(['/moder/pictures', id]);
+          this.#document.defaultView?.localStorage.setItem('last_item', dstItemID);
+          void this.#router.navigate(['/moder/pictures', id]);
         });
     }
 

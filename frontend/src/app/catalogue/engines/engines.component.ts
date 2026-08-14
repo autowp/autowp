@@ -21,8 +21,7 @@ import {
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, Observable, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {convertChildsCounts} from '../catalogue-service';
@@ -166,8 +165,8 @@ export class CatalogueEnginesComponent {
                     thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
                   }
                   return {
-                    picture: picture?.picture ? picture.picture : null,
-                    routerLink: picture?.picture ? routerLink.concat(['pictures', picture.picture.identity]) : [],
+                    picture: picture.picture ? picture.picture : null,
+                    routerLink: picture.picture ? routerLink.concat(['pictures', picture.picture.identity]) : [],
                     thumb,
                   };
                 },

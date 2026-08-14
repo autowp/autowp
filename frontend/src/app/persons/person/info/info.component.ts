@@ -20,8 +20,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../../thumbnail/thumbnail/thumbnail.component';

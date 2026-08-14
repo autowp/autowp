@@ -17,8 +17,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, of, switchMap} from 'rxjs';
 
 import {CommentsComponent} from '../../../comments/comments/comments.component';
 import {PictureComponent} from '../../../picture/picture.component';
@@ -93,48 +92,46 @@ export class CategoryPictureComponent {
         return notFoundError();
       }
 
-      return this.#picturesClient
-        .getPicture(
-          new PicturesRequest({
-            fields: new PictureFields({
-              copyrights: true,
-              image: true,
-              moderVoted: true,
-              nameHtml: true,
-              nameText: true,
-              paginator: new PicturesRequest({
-                options: new PictureListOptions({
-                  pictureItem: new PictureItemListOptions({
-                    itemParentCacheAncestor: new ItemParentCacheListOptions({
-                      parentId: current.id,
-                    }),
-                    typeId: PictureItemType.PICTURE_ITEM_CONTENT,
+      return this.#picturesClient.getPicture(
+        new PicturesRequest({
+          fields: new PictureFields({
+            copyrights: true,
+            image: true,
+            moderVoted: true,
+            nameHtml: true,
+            nameText: true,
+            paginator: new PicturesRequest({
+              options: new PictureListOptions({
+                pictureItem: new PictureItemListOptions({
+                  itemParentCacheAncestor: new ItemParentCacheListOptions({
+                    parentId: current.id,
                   }),
+                  typeId: PictureItemType.PICTURE_ITEM_CONTENT,
                 }),
-                order: PicturesRequest.Order.ORDER_PERSPECTIVES,
               }),
-              pictureModerVotes: new PictureModerVoteRequest(),
-              previewLarge: true,
-              replaceable: new PicturesRequest({
-                fields: new PictureFields({nameHtml: true}),
-              }),
-              rights: true,
-              subscribed: true,
-              votes: true,
+              order: PicturesRequest.Order.ORDER_PERSPECTIVES,
             }),
-            language: this.#languageService.language,
-            options: new PictureListOptions({
-              identity,
-              pictureItem: new PictureItemListOptions({
-                itemParentCacheAncestor: new ItemParentCacheListOptions({
-                  parentId: current.id,
-                }),
-                typeId: PictureItemType.PICTURE_ITEM_CONTENT,
+            pictureModerVotes: new PictureModerVoteRequest(),
+            previewLarge: true,
+            replaceable: new PicturesRequest({
+              fields: new PictureFields({nameHtml: true}),
+            }),
+            rights: true,
+            subscribed: true,
+            votes: true,
+          }),
+          language: this.#languageService.language,
+          options: new PictureListOptions({
+            identity,
+            pictureItem: new PictureItemListOptions({
+              itemParentCacheAncestor: new ItemParentCacheListOptions({
+                parentId: current.id,
               }),
+              typeId: PictureItemType.PICTURE_ITEM_CONTENT,
             }),
           }),
-        )
-        .pipe(switchMap((picture) => (picture ? of(picture) : notFoundError())));
+        }),
+      );
     },
   });
 

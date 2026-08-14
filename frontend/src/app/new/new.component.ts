@@ -6,8 +6,18 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {formatDate, formatGrpcDate, parseGrpcDate, parseStringToGrpcDate} from '@services/utils';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+} from 'rxjs';
 
 import {chunkBy} from '../chunk';
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
@@ -81,7 +91,7 @@ export class NewComponent implements OnInit {
           switchMap((response) => {
             const currentDateStr = response.currentDate ? formatGrpcDate(response.currentDate) : '';
             if (date !== currentDateStr) {
-              this.#router.navigate(['/new', currentDateStr]);
+              void this.#router.navigate(['/new', currentDateStr]);
               return EMPTY;
             }
             return of(response);

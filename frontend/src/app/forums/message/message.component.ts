@@ -2,8 +2,7 @@ import {ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit} from '@an
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetMessagePageRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
-import {EMPTY, Subscription} from 'rxjs';
-import {catchError, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
+import {catchError, distinctUntilChanged, EMPTY, map, Subscription, switchMap, tap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {MESSAGES_PER_PAGE} from '../forums.module';
@@ -37,7 +36,7 @@ export class MessageComponent implements OnDestroy, OnInit {
           return EMPTY;
         }),
         tap((message) => {
-          this.#router.navigate(['/forums/topic', message.itemId], {
+          void this.#router.navigate(['/forums/topic', message.itemId], {
             queryParams: {
               page: message.page,
             },

@@ -9,8 +9,17 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {icon, LatLng, latLng, LeafletMouseEvent, Map, Marker, marker, TileLayer, tileLayer} from 'leaflet';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap} from 'rxjs/operators';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 
@@ -76,7 +85,7 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
       ),
     ),
     catchError(() => {
-      this.#router.navigate(['/error-404'], {
+      void this.#router.navigate(['/error-404'], {
         skipLocationChange: true,
       });
       return EMPTY;
@@ -88,7 +97,7 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
     map((picture) => {
       let lat = null,
         lng = null;
-      if (picture?.point?.latitude && picture.point.longitude) {
+      if (picture.point?.latitude && picture.point.longitude) {
         lat = picture.point.latitude + '';
         lng = picture.point.longitude + '';
       }
@@ -179,7 +188,7 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
         }),
       )
       .subscribe(() => {
-        this.#router.navigate(['/moder/pictures', picture.id]);
+        void this.#router.navigate(['/moder/pictures', picture.id]);
       });
   }
 }

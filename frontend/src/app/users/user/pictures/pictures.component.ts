@@ -19,8 +19,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, of, switchMap} from 'rxjs';
 
 function addCSS(document: Document, url: string) {
   const cssId = 'brands-css';
@@ -100,7 +99,7 @@ export class UsersUserPicturesComponent implements OnInit {
               descendant: new ItemParentCacheListOptions({
                 pictureItemsByItemId: new PictureItemListOptions({
                   pictures: new PictureListOptions({
-                    ownerId: '' + userId,
+                    ownerId: userId,
                     status: PictureStatus.PICTURE_STATUS_ACCEPTED,
                   }),
                 }),

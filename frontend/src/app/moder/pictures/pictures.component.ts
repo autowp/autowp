@@ -45,8 +45,21 @@ import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {parseStringToGrpcDate} from '@services/utils';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {getPerspectiveTranslation, getVehicleTypeTranslation} from '@utils/translations';
-import {BehaviorSubject, EMPTY, forkJoin, Observable, of, Subscription} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  Subscription,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import {APIPerspectiveService} from '../../api/perspective/perspective.service';
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
@@ -502,7 +515,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
           hasNoReplacePicture: this.replace() === false,
           hasPoint: this.gps() === true,
           hasSpecialName: this.specialName(),
-          ownerId: this.ownerID() ?? undefined,
+          ownerId: this.ownerID(),
           pictureItem:
             vehicleTypeID || this.excludeItemID() || this.itemID() || perspectiveIDVal
               ? new PictureItemListOptions({
@@ -564,7 +577,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
     this.#addedFromSub = this.addedFrom.valueChanges
       .pipe(distinctUntilChanged(), debounceTime(30))
       .subscribe((value) => {
-        this.#router.navigate([], {
+        void this.#router.navigate([], {
           queryParams: {
             added_from: value ? value : null,
           },
@@ -615,18 +628,22 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
   }
 
   protected itemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
-    this.#router.navigate([], {
+    // e.item is typed `any` by ng-bootstrap (a generic typeahead event) - itemsDataSource above
+    // is the only source feeding this typeahead, and it resolves Item[].
+    const selected = e.item as Item;
+    void this.#router.navigate([], {
       queryParams: {
-        item_id: e.item.id,
+        item_id: selected.id,
       },
       queryParamsHandling: 'merge',
     });
   }
 
   protected excludeItemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
-    this.#router.navigate([], {
+    const selected = e.item as Item;
+    void this.#router.navigate([], {
       queryParams: {
-        exclude_item_id: e.item.id,
+        exclude_item_id: selected.id,
       },
       queryParamsHandling: 'merge',
     });
@@ -634,7 +651,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
 
   protected clearItem(): void {
     this.itemQuery.setValue('');
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         item_id: null,
       },
@@ -644,7 +661,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
 
   protected clearExcludeItem(): void {
     this.excludeItemQuery.setValue('');
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         exclude_item_id: null,
       },
@@ -653,9 +670,12 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
   }
 
   protected ownerOnSelect(e: NgbTypeaheadSelectItemEvent): void {
-    this.#router.navigate([], {
+    // e.item is typed `any` by ng-bootstrap - ownersDataSource above is the only source feeding
+    // this typeahead, and it resolves User[].
+    const selected = e.item as User;
+    void this.#router.navigate([], {
       queryParams: {
-        owner_id: e.item.id,
+        owner_id: selected.id,
       },
       queryParamsHandling: 'merge',
     });
@@ -663,7 +683,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
 
   protected clearOwner(): void {
     this.ownerQuery.setValue('');
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         owner_id: null,
       },

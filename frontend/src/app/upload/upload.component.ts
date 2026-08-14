@@ -7,4 +7,5 @@ import {RouterLink, RouterOutlet} from '@angular/router';
   templateUrl: './upload.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class -- pure router-outlet shell, all behavior lives in the decorator/template
 export class UploadComponent {}

@@ -15,8 +15,7 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {forkJoin, Observable, of} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, forkJoin, map, Observable, of} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 

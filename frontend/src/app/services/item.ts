@@ -1,8 +1,7 @@
 import {inject, Service} from '@angular/core';
 import {GetItemVehicleTypesRequest, ItemType, ItemVehicleType, ItemVehicleTypeRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {forkJoin, Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {forkJoin, map, Observable, of, switchMap} from 'rxjs';
 
 export interface APIItemChildsCounts {
   sport: number;
@@ -52,7 +51,7 @@ export class ItemService {
           const currentIds: string[] = [];
           for (const itemVehicleType of response.items ? response.items : []) {
             currentIds.push(itemVehicleType.vehicleTypeId);
-            if (ids.indexOf(itemVehicleType.vehicleTypeId) === -1) {
+            if (!ids.includes(itemVehicleType.vehicleTypeId)) {
               promises.push(
                 this.#itemsClient
                   .deleteItemVehicleType(
@@ -67,7 +66,7 @@ export class ItemService {
           }
 
           for (const vehicleTypeId of ids) {
-            if (currentIds.indexOf(vehicleTypeId) === -1) {
+            if (!currentIds.includes(vehicleTypeId)) {
               promises.push(
                 this.#itemsClient
                   .createItemVehicleType(

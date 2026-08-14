@@ -15,7 +15,7 @@ import {
   getVehicleTypeRpTranslation,
 } from '@utils/translations';
 import {RemarkModule} from 'ngx-remark';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {MostsService} from '../mosts.service';
 

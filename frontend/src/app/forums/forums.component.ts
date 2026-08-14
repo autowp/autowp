@@ -5,8 +5,7 @@ import {GetThemeRequest, ListThemesRequest, ListTopicsRequest, Theme} from '@grp
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
-import {combineLatest} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {combineLatest, map} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {ForumsThemeSummaryComponent} from './theme-summary/theme-summary.component';

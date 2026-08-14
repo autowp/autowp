@@ -4,7 +4,7 @@ import {VehicleType} from '@grpc/spec.pb';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {getVehicleTypeTranslation} from '@utils/translations';
-import {map, shareReplay} from 'rxjs/operators';
+import {map, shareReplay} from 'rxjs';
 
 const translateNames = (types: VehicleType[]): VehicleType[] => {
   types.forEach((type) => {
@@ -32,11 +32,11 @@ export class VehicleTypesModalComponent {
   );
 
   protected isActive(id: string): boolean {
-    return (this.ids() || []).indexOf(id) > -1;
+    return this.ids().includes(id);
   }
 
   protected toggle(id: string) {
-    const index = (this.ids() || []).indexOf(id);
+    const index = this.ids().indexOf(id);
     if (index > -1) {
       this.ids().splice(index, 1);
     } else {

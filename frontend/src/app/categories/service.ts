@@ -3,8 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Item, ItemType, PathItem, PathRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {Observable} from 'rxjs';
-import {distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {distinctUntilChanged, map, Observable, switchMap} from 'rxjs';
 
 export interface CategoryPipeResult {
   category: Item | undefined;

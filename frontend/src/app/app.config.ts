@@ -90,9 +90,15 @@ const provideKeycloakInAppInitializer = (
     // 👇 browser guard: only init keycloak in the browser
     if (isPlatformBrowser(platform)) {
       const injector = inject(EnvironmentInjector);
-      runInInjectionContext(injector, () => features.forEach((feature) => feature.configure()));
+      runInInjectionContext(injector, () => {
+        features.forEach((feature) => {
+          feature.configure();
+        });
+      });
 
-      await keycloak.init(initOptions).catch((error) => console.error('Keycloak initialization failed', error));
+      await keycloak.init(initOptions).catch((error: unknown) => {
+        console.error('Keycloak initialization failed', error);
+      });
     } else {
       console.log('Keycloak initialization skipped on server side');
     }
@@ -187,7 +193,7 @@ export const appConfig: ApplicationConfig = {
         includeRequestsWithAuthHeaders: false,
       }),
     ),
-    provideAppInitializer(async () => {
+    provideAppInitializer(() => {
       const platform = inject(PLATFORM_ID);
       const config = inject(NgbToastConfig);
 

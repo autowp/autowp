@@ -16,8 +16,7 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {EMPTY, Observable} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, Observable, switchMap} from 'rxjs';
 
 import {chunkBy} from '../../../../chunk';
 import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.component';
@@ -36,40 +35,36 @@ export class ModerItemsItemPicturesComponent {
   protected readonly item$ = toObservable(this.item);
 
   protected readonly canUseTurboGroupCreator$ = this.item$.pipe(
-    map((item) =>
-      item ? [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_ENGINE].indexOf(item.itemTypeId) !== -1 : false,
-    ),
+    map((item) => [ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)),
   );
 
   protected readonly picturesChunks$: Observable<Picture[][]> = this.item$.pipe(
     switchMap((item) =>
-      item
-        ? this.#picturesClient.getPictures(
-            new PicturesRequest({
-              fields: new PictureFields({
-                commentsCount: true,
-                dfDistance: new DfDistanceRequest({limit: 1}),
-                moderVote: true,
-                nameHtml: true,
-                nameText: true,
-                pictureItem: new PictureItemsRequest({
-                  options: new PictureItemListOptions({
-                    item: new ItemListOptions({typeIds: [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_BRAND]}),
-                  }),
-                }),
-                thumbMedium: true,
-                views: true,
-                votes: true,
+      this.#picturesClient.getPictures(
+        new PicturesRequest({
+          fields: new PictureFields({
+            commentsCount: true,
+            dfDistance: new DfDistanceRequest({limit: 1}),
+            moderVote: true,
+            nameHtml: true,
+            nameText: true,
+            pictureItem: new PictureItemsRequest({
+              options: new PictureItemListOptions({
+                item: new ItemListOptions({typeIds: [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_BRAND]}),
               }),
-              language: this.#languageService.language,
-              limit: 500,
-              options: new PictureListOptions({
-                pictureItem: new PictureItemListOptions({itemId: '' + item.id}),
-              }),
-              order: PicturesRequest.Order.ORDER_STATUS,
             }),
-          )
-        : EMPTY,
+            thumbMedium: true,
+            views: true,
+            votes: true,
+          }),
+          language: this.#languageService.language,
+          limit: 500,
+          options: new PictureListOptions({
+            pictureItem: new PictureItemListOptions({itemId: item.id}),
+          }),
+          order: PicturesRequest.Order.ORDER_STATUS,
+        }),
+      ),
     ),
     map((response) => chunkBy<Picture>(response.items || [], 6)),
   );

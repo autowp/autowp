@@ -23,6 +23,6 @@ export class TwinsSidebarComponent {
   );
 
   protected active(item: TwinsBrandsListItem): boolean {
-    return this.selected().indexOf(item.catname) !== -1;
+    return this.selected().includes(item.catname);
   }
 }

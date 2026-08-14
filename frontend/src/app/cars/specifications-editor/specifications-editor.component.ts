@@ -6,9 +6,9 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, EMPTY, Observable, of} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {BehaviorSubject, catchError, debounceTime, distinctUntilChanged, EMPTY, map, Observable, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {CarsSpecificationsEditorEngineComponent} from './engine/engine.component';
@@ -64,18 +64,20 @@ export class CarsSpecificationsEditorComponent {
         ),
       ),
     ),
-    switchMap((item) => {
-      if (!item) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
+    catchError((response: unknown) => {
+      if (isNotFoundError(response)) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+      } else {
+        this.#toastService.handleError(response);
       }
+      return EMPTY;
+    }),
+    map((item) => {
       this.#pageEnv.set({
         pageId: 102,
         title: $localize`Specs editor of ${item.nameText}`,
       });
-      return of(item);
+      return item;
     }),
   );
 
@@ -84,10 +86,12 @@ export class CarsSpecificationsEditorComponent {
   }
 
   protected refreshInheritance(item: Item) {
-    this.#itemsClient.refreshInheritance(new RefreshInheritanceRequest({itemId: '' + item.id})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
+    this.#itemsClient.refreshInheritance(new RefreshInheritanceRequest({itemId: item.id})).subscribe({
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
       next: () => {
-        this.#router.navigate(['/cars/specifications-editor'], {
+        void this.#router.navigate(['/cars/specifications-editor'], {
           queryParams: {
             item_id: item.id,
             tab: 'admin',

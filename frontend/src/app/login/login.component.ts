@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.#document.defaultView) {
-      this.#keycloak.login({
+      void this.#keycloak.login({
         locale: this.#languageService.language,
         redirectUri: this.#document.defaultView.location.href,
       });

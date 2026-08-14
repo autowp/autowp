@@ -4,8 +4,7 @@ import {RouterLink} from '@angular/router';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {PictureService} from '@services/picture';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, Observable} from 'rxjs';
 
 import {APICommentsService} from '../../../api/comments/comments.service';
 

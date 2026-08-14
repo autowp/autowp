@@ -13,8 +13,7 @@ import {getForumsThemeTranslation} from '@utils/translations';
 import {extractFieldViolations, fieldViolations2InvalidParams, isNotFoundError, notFoundError} from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {RemarkModule} from 'ngx-remark';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, Observable} from 'rxjs';
 
 @Component({
   selector: 'app-forums-new-topic',
@@ -92,7 +91,7 @@ export class ForumsNewTopicComponent implements OnInit {
           }
         },
         next: (response) => {
-          this.#router.navigate(['/forums/topic', response.id]);
+          void this.#router.navigate(['/forums/topic', response.id]);
         },
       });
   }

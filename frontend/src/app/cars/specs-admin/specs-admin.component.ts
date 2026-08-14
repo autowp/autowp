@@ -19,8 +19,7 @@ import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getUnitAbbrTranslation} from '@utils/translations';
-import {forkJoin, Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {forkJoin, map, Observable, of, switchMap} from 'rxjs';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -124,7 +123,9 @@ export class CarsSpecsAdminComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           this.dataResource.reload();
         },
@@ -144,7 +145,9 @@ export class CarsSpecsAdminComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           this.dataResource.reload();
         },

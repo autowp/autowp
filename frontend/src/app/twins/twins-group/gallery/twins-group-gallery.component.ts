@@ -7,7 +7,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {GalleryComponent} from 'app/gallery/gallery.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 @Component({
   selector: 'app-twins-group-gallery',

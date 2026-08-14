@@ -22,8 +22,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {CommentsComponent} from 'app/comments/comments/comments.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {PictureComponent} from 'app/picture/picture.component';
-import {Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, Observable, of, switchMap} from 'rxjs';
 
 import {BrandPerspectivePageData} from '../../catalogue.module';
 
@@ -109,48 +108,46 @@ export class CatalogueMixedPictureComponent {
 
       const data = this.data();
 
-      return this.#picturesClient
-        .getPicture(
-          new PicturesRequest({
-            fields: new PictureFields({
-              copyrights: true,
-              image: true,
-              moderVoted: true,
-              nameHtml: true,
-              nameText: true,
-              paginator: new PicturesRequest({
-                options: new PictureListOptions({
-                  pictureItem: new PictureItemListOptions({
-                    excludePerspectiveId: data.perspective_exclude_id || [],
-                    itemId: brand.id,
-                    perspectiveId: data.perspective_id,
-                    typeId: PictureItemType.PICTURE_ITEM_CONTENT,
-                  }),
+      return this.#picturesClient.getPicture(
+        new PicturesRequest({
+          fields: new PictureFields({
+            copyrights: true,
+            image: true,
+            moderVoted: true,
+            nameHtml: true,
+            nameText: true,
+            paginator: new PicturesRequest({
+              options: new PictureListOptions({
+                pictureItem: new PictureItemListOptions({
+                  excludePerspectiveId: data.perspective_exclude_id || [],
+                  itemId: brand.id,
+                  perspectiveId: data.perspective_id,
+                  typeId: PictureItemType.PICTURE_ITEM_CONTENT,
                 }),
-                order: PicturesRequest.Order.ORDER_RESOLUTION_DESC,
               }),
-              pictureModerVotes: new PictureModerVoteRequest(),
-              previewLarge: true,
-              replaceable: new PicturesRequest({
-                fields: new PictureFields({nameHtml: true}),
-              }),
-              rights: true,
-              subscribed: true,
-              votes: true,
+              order: PicturesRequest.Order.ORDER_RESOLUTION_DESC,
             }),
-            language: this.#languageService.language,
-            options: new PictureListOptions({
-              identity,
-              pictureItem: new PictureItemListOptions({
-                excludePerspectiveId: data.perspective_exclude_id || [],
-                itemId: brand.id,
-                perspectiveId: data.perspective_id,
-                typeId: PictureItemType.PICTURE_ITEM_CONTENT,
-              }),
+            pictureModerVotes: new PictureModerVoteRequest(),
+            previewLarge: true,
+            replaceable: new PicturesRequest({
+              fields: new PictureFields({nameHtml: true}),
+            }),
+            rights: true,
+            subscribed: true,
+            votes: true,
+          }),
+          language: this.#languageService.language,
+          options: new PictureListOptions({
+            identity,
+            pictureItem: new PictureItemListOptions({
+              excludePerspectiveId: data.perspective_exclude_id || [],
+              itemId: brand.id,
+              perspectiveId: data.perspective_id,
+              typeId: PictureItemType.PICTURE_ITEM_CONTENT,
             }),
           }),
-        )
-        .pipe(switchMap((picture) => (picture ? of(picture) : notFoundError())));
+        }),
+      );
     },
   });
 

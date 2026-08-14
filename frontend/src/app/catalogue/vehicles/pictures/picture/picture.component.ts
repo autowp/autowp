@@ -18,9 +18,8 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {isNotFoundError} from 'app/grpc';
+import {catchError, EMPTY, map, Observable} from 'rxjs';
 
 import {CommentsComponent} from '../../../../comments/comments/comments.component';
 import {PictureComponent} from '../../../../picture/picture.component';
@@ -161,7 +160,6 @@ export class CatalogueVehiclesPicturesPictureComponent {
             this.#toastService.handleError(err);
             return EMPTY;
           }),
-          switchMap((picture) => (picture ? of(picture) : notFoundError())),
         ),
   });
 

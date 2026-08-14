@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Picture, PictureItemType} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 import {GalleryComponent} from 'app/gallery/gallery.component';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 @Component({
   selector: 'app-persons-person-gallery',

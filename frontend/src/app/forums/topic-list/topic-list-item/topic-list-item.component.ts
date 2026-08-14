@@ -28,8 +28,7 @@ import {timestampToDate} from '@utils/timestamp';
 import {isNotFoundError} from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {UserComponent} from 'app/user/user/user.component';
-import {of, throwError} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {catchError, of, throwError} from 'rxjs';
 
 @Component({
   // Attribute selector on tr, not an element selector - see the identical note on
@@ -53,7 +52,7 @@ export class ForumsTopicListItemComponent implements OnInit {
   readonly showSubscribe = input(false);
   readonly forumAdmin = input(false);
 
-  readonly reload = output<void>();
+  readonly reload = output();
 
   protected authorResource!: ResourceRef<null | undefined | User>;
   protected lastMessageResource!: ResourceRef<CommentMessage | null | undefined>;
@@ -97,7 +96,9 @@ export class ForumsTopicListItemComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           this.reload.emit();
         },
@@ -113,7 +114,9 @@ export class ForumsTopicListItemComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           this.topic().status = 'normal';
         },
@@ -129,7 +132,9 @@ export class ForumsTopicListItemComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           this.topic().status = 'closed';
         },
@@ -145,7 +150,9 @@ export class ForumsTopicListItemComponent implements OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           this.reload.emit();
         },

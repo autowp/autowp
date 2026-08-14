@@ -10,8 +10,7 @@ import {
   CatalogueListItemComponent,
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
-import {Observable, of} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, map, Observable, of} from 'rxjs';
 
 import {convertChildsCounts} from '../../catalogue/catalogue-service';
 import {chunkBy} from '../../chunk';
@@ -48,8 +47,8 @@ export class IndexSpecsCarsComponent {
                   }
 
                   return {
-                    picture: picture?.picture ? picture.picture : null,
-                    routerLink: picture?.picture ? [...item.route, 'pictures', picture.picture.identity] : [],
+                    picture: picture.picture ? picture.picture : null,
+                    routerLink: picture.picture ? [...item.route, 'pictures', picture.picture.identity] : [],
                     thumb,
                   };
                 },

@@ -15,8 +15,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, map, shareReplay, switchMap} from 'rxjs/operators';
+import {catchError, EMPTY, map, Observable, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 
@@ -38,38 +37,34 @@ export class DonateVodSelectItemComponent {
 
   protected readonly item$: Observable<Item> = this.itemParent$.pipe(
     switchMap((itemParent) =>
-      itemParent
-        ? this.#itemsClient.item(
-            new ItemRequest({
-              fields: new ItemFields({
-                childsCount: true,
-                isCompilesItemOfDay: true,
-                nameHtml: true,
-              }),
-              id: itemParent.itemId,
-              language: this.#languageService.language,
-            }),
-          )
-        : EMPTY,
+      this.#itemsClient.item(
+        new ItemRequest({
+          fields: new ItemFields({
+            childsCount: true,
+            isCompilesItemOfDay: true,
+            nameHtml: true,
+          }),
+          id: itemParent.itemId,
+          language: this.#languageService.language,
+        }),
+      ),
     ),
   );
 
   protected readonly childs$: Observable<ItemParent[]> = this.itemParent$.pipe(
     switchMap((itemParent) =>
-      itemParent
-        ? this.#itemsClient.getItemParents(
-            new ItemParentsRequest({
-              language: this.#languageService.language,
-              options: new ItemParentListOptions({
-                item: new ItemListOptions({
-                  typeId: ItemType.ITEM_TYPE_VEHICLE,
-                }),
-                parentId: itemParent.itemId,
-              }),
-              order: ItemParentsRequest.Order.AUTO,
+      this.#itemsClient.getItemParents(
+        new ItemParentsRequest({
+          language: this.#languageService.language,
+          options: new ItemParentListOptions({
+            item: new ItemListOptions({
+              typeId: ItemType.ITEM_TYPE_VEHICLE,
             }),
-          )
-        : EMPTY,
+            parentId: itemParent.itemId,
+          }),
+          order: ItemParentsRequest.Order.AUTO,
+        }),
+      ),
     ),
     catchError((e: unknown) => {
       this.#toastService.handleError(e);

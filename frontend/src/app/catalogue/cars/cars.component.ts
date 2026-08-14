@@ -29,8 +29,7 @@ import {
 } from '@utils/list-item/list-item.component';
 import {getVehicleTypeTranslation} from '@utils/translations';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {map, Observable, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {convertChildsCounts} from '../catalogue-service';
@@ -137,7 +136,7 @@ export class CatalogueCarsComponent {
     const current = this.currentVehicleType();
 
     return (this.vehicleTypesResource.value() ?? []).map((type) => ({
-      active: !!(current && type.id === current.id),
+      active: type.id === current?.id,
       id: type.id,
       itemsCount: type.itemsCount,
       name: getVehicleTypeTranslation(type.name),
@@ -237,9 +236,8 @@ export class CatalogueCarsComponent {
                     thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
                   }
                   return {
-                    picture: picture?.picture ? picture.picture : null,
-                    routerLink:
-                      item.route && picture?.picture ? item.route.concat(['pictures', picture.picture.identity]) : [],
+                    picture: picture.picture ? picture.picture : null,
+                    routerLink: picture.picture ? item.route.concat(['pictures', picture.picture.identity]) : [],
                     thumb,
                   };
                 },
@@ -269,7 +267,7 @@ export class CatalogueCarsComponent {
                 },
                 produced: item.produced?.value,
                 producedExactly: item.producedExactly,
-                specsRouterLink: item.specsRoute && (item.hasSpecs || item.hasChildSpecs) ? item.specsRoute : null,
+                specsRouterLink: item.hasSpecs || item.hasChildSpecs ? item.specsRoute : null,
               };
             });
 

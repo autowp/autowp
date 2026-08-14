@@ -5,8 +5,7 @@ import {UsersClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {BehaviorSubject, catchError, combineLatest, EMPTY, map, Observable} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 

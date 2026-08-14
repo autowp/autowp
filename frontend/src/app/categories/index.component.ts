@@ -5,7 +5,7 @@ import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {chunkBy} from '../chunk';
 import {CategoriesIndexItemComponent} from './index-item/index-item.component';

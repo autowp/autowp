@@ -10,10 +10,22 @@ import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
-import {of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, map, Observable, of, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
+
+interface DonateLogItem {
+  createdAt: Date | undefined;
+  currency: string;
+  purpose: string;
+  sum: number;
+  userId: string;
+}
+
+interface DonateLogData {
+  items: DonateLogItem[];
+  usersById: Record<string, User>;
+}
 
 @Component({
   selector: 'app-donate-log',
@@ -34,7 +46,7 @@ export class DonateLogComponent implements OnInit {
   // hydration.
   protected readonly itemsResource = rxResource({
     id: 'donate-log-items',
-    stream: () =>
+    stream: (): Observable<DonateLogData> =>
       this.#donations.getTransactions(new Empty()).pipe(
         switchMap((response) => {
           const items = (response.items || []).map((item) => ({
@@ -47,14 +59,14 @@ export class DonateLogComponent implements OnInit {
 
           const userIds = [...new Set(items.map((item) => item.userId).filter((id) => id && id !== '0'))];
           if (userIds.length === 0) {
-            return of({items, usersById: {} as Record<string, User>});
+            return of({items, usersById: {}});
           }
 
           return this.#userService.getUserMap$(userIds).pipe(
             map((userMap) => ({items, usersById: Object.fromEntries(userMap)})),
             // getUserMap$ throws if the backend can't find a requested user. Degrade to showing
             // no donor rather than erroring the whole resource over one stale reference.
-            catchError(() => of({items, usersById: {} as Record<string, User>})),
+            catchError(() => of({items, usersById: {}})),
           );
         }),
       ),

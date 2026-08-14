@@ -15,8 +15,18 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+} from 'rxjs';
 
 import {chunk} from '../../../../../chunk';
 import {PaginatorComponent} from '../../../../../paginator/paginator/paginator.component';
@@ -126,7 +136,7 @@ export class ModerItemsItemSelectParentCatalogueComponent {
   );
 
   protected doSearch(search: string) {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {search},
       queryParamsHandling: 'merge',
     });

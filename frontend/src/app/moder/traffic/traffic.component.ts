@@ -11,8 +11,7 @@ import {TrafficClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {IpService} from '@services/ip';
 import {PageEnvService} from '@services/page-env.service';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {BehaviorSubject, map, Observable, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 
@@ -54,7 +53,9 @@ export class ModerTrafficComponent implements OnInit {
   protected addToWhitelist(ip: string) {
     this.#trafficClient
       .createTrafficWhitelistItem(new CreateTrafficWhitelistItemRequest({item: {ipAddress: ip, description: ''}}))
-      .subscribe(() => this.#change$.next());
+      .subscribe(() => {
+        this.#change$.next();
+      });
   }
 
   protected addToBlacklist(ip: string) {
@@ -68,12 +69,16 @@ export class ModerTrafficComponent implements OnInit {
           },
         }),
       )
-      .subscribe(() => this.#change$.next());
+      .subscribe(() => {
+        this.#change$.next();
+      });
   }
 
   protected removeFromBlacklist(ip: string) {
     this.#trafficClient
       .deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip}))
-      .subscribe(() => this.#change$.next());
+      .subscribe(() => {
+        this.#change$.next();
+      });
   }
 }

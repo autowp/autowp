@@ -60,12 +60,12 @@ export class ToastsService {
   }
 
   public response(response: HttpResponseBase) {
-    // eslint-disable-next-line sonarjs/deprecation
+    // eslint-disable-next-line sonarjs/deprecation, @typescript-eslint/no-deprecated
     this.error(response.status + ': ' + response.statusText);
   }
 
   public errorResponse(response: HttpErrorResponse) {
-    // eslint-disable-next-line sonarjs/deprecation
+    // eslint-disable-next-line sonarjs/deprecation, @typescript-eslint/no-deprecated
     this.error(response.status + ': ' + response.statusText);
   }
 

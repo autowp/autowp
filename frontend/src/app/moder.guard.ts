@@ -4,8 +4,7 @@ import {CanActivateFn, Router} from '@angular/router';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import Keycloak from 'keycloak-js';
-import {combineLatest} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {combineLatest, map} from 'rxjs';
 
 export const moderGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
@@ -21,7 +20,7 @@ export const moderGuard: CanActivateFn = () => {
     map(([authenticated, isModer]) => {
       if (!authenticated) {
         if (document.defaultView) {
-          keycloak.login({
+          void keycloak.login({
             locale: language.language,
             redirectUri: document.defaultView.location.href,
           });

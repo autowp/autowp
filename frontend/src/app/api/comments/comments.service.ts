@@ -2,8 +2,7 @@ import {inject, Service} from '@angular/core';
 import {GetMessagesRequest, ModeratorAttention} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
-import {Observable, of} from 'rxjs';
-import {map, shareReplay, switchMap} from 'rxjs/operators';
+import {map, Observable, of, shareReplay, switchMap} from 'rxjs';
 
 @Service()
 export class APICommentsService {

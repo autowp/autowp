@@ -1,8 +1,7 @@
 import {inject, Service} from '@angular/core';
 import {GetIPRequest, IP} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, Observable} from 'rxjs';
 
 @Service()
 export class IpService {

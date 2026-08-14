@@ -22,8 +22,21 @@ import {PageEnvService} from '@services/page-env.service';
 import {getItemTypeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {BehaviorSubject, combineLatest, EMPTY, Observable, of, throwError} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+  tap,
+  throwError,
+} from 'rxjs';
 
 import {ModerItemsItemCatalogueComponent} from './catalogue/catalogue.component';
 import {ModerItemsItemLinksComponent} from './links/links.component';
@@ -145,19 +158,10 @@ export class ModerItemsItemComponent {
     ),
     catchError((err: unknown) => {
       this.#toastService.handleError(err);
-      this.#router.navigate(['/error-404'], {
+      void this.#router.navigate(['/error-404'], {
         skipLocationChange: true,
       });
       return EMPTY;
-    }),
-    switchMap((item) => {
-      if (!item) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(item);
     }),
     tap((item) => {
       this.#pageEnv.set({

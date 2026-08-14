@@ -11,8 +11,7 @@ import {
   GrpcStatusEvent,
 } from '@ngx-grpc/common';
 import {GRPC_CLIENT_FACTORY} from '@ngx-grpc/core';
-import {EMPTY, Observable, of, throwError} from 'rxjs';
-import {catchError, switchMap} from 'rxjs/operators';
+import {catchError, EMPTY, Observable, of, switchMap, throwError} from 'rxjs';
 import {base64ToUint8Array, concatUint8Arrays, uint8ArrayToBase64} from 'uint8array-extras';
 
 import {FrameType, GrpcWebStreamParser} from './grpcwebstreamparser';
@@ -52,8 +51,14 @@ export class NgGrpcWebClientFactory implements GrpcClientFactory<NgGrpcWebClient
   });
 
   createClient(serviceId: string, customSettings: NgGrpcWebClientSettings) {
+    // customSettings is typed as required (matching GrpcClientFactory.createClient's own
+    // signature), but kept defensive rather than trusting that type: generated client code calls
+    // this reflectively, so a caller passing undefined at runtime wouldn't be caught by the type
+    // system.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const settings = customSettings || this.#defaultSettings;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!settings) {
       throw new Error(`grpc-web client factory: no settings provided for ${serviceId}`);
     }
@@ -172,6 +177,9 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
             if (GRPC_MESSAGE_HEADER in responseHeaders) {
               grpcStatusMessage = responseHeaders[GRPC_MESSAGE_HEADER];
             }
+            // grpcStatusCode is Number(header value) - a raw wire-protocol number, not our
+            // StatusCode enum - comparing it against a known status constant is legitimate.
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
             if (grpcStatusCode !== StatusCode.OK) {
               return of(this.handleError_(new RpcError(grpcStatusCode, grpcStatusMessage || '', initialMetadata)));
             }
@@ -191,7 +199,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
           } catch (error) {
             return of(
               this.handleError_(
-                new RpcError(StatusCode.UNKNOWN, `Error in parsing response body with parser: ${error}`),
+                new RpcError(StatusCode.UNKNOWN, `Error in parsing response body with parser: ${String(error)}`),
               ),
             );
           }
@@ -218,7 +226,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
                     this.handleError_(
                       new RpcError(
                         StatusCode.INTERNAL,
-                        `Error when deserializing response data from ${url}; error: ${err}`,
+                        `Error when deserializing response data from ${url}; error: ${String(err)}`,
                       ),
                     ),
                   );
@@ -235,12 +243,17 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
                   const trailers = this.parseHttp1Headers_(trailerString);
                   let grpcStatusCode = StatusCode.OK;
                   let grpcStatusMessage = '';
+                  // Deleting the gRPC-specific trailer keys once consumed, so `trailers` (passed
+                  // to RpcError below) holds only the caller-facing metadata - the keys are
+                  // dynamic HTTP header names by nature, not a code smell to design around here.
                   if (GRPC_STATUS_HEADER in trailers) {
                     grpcStatusCode = /** @type {!StatusCode} */ Number(trailers[GRPC_STATUS_HEADER]);
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete trailers[GRPC_STATUS_HEADER];
                   }
                   if (GRPC_MESSAGE_HEADER in trailers) {
                     grpcStatusMessage = trailers[GRPC_MESSAGE_HEADER];
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete trailers[GRPC_MESSAGE_HEADER];
                   }
                   events.push(this.handleError_(new RpcError(grpcStatusCode, grpcStatusMessage, trailers)));

@@ -3,7 +3,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {Picture} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {GalleryComponent} from './gallery.component';
 

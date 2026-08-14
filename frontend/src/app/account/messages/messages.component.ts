@@ -12,8 +12,18 @@ import {MessageDialogService} from 'app/message-dialog/message-dialog.service';
 import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {UserComponent} from 'app/user/user/user.component';
-import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 @Component({
   selector: 'app-account-messages',
@@ -92,7 +102,7 @@ export class AccountMessagesComponent {
     }),
     tap((response) => {
       if (response.items) {
-        this.#messageService.seen(response.items ?? []);
+        this.#messageService.seen(response.items);
       }
     }),
     map((response) => ({
@@ -106,7 +116,9 @@ export class AccountMessagesComponent {
 
   protected deleteMessage(id: string) {
     this.#messageService.deleteMessage$(id).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
       next: () => {
         this.#change$.next();
       },
@@ -117,7 +129,9 @@ export class AccountMessagesComponent {
 
   protected clearFolder(folder: string) {
     this.#messageService.clearFolder$(folder).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
       next: () => {
         this.#change$.next();
       },

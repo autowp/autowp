@@ -4,8 +4,16 @@ import {ActivatedRoute} from '@angular/router';
 import {ListTopicsRequest, Pages, Topic} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
-import {catchError, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  switchMap,
+} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';

@@ -10,8 +10,7 @@ import {
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {getAttrsTranslation} from '@utils/translations';
-import {Observable, of} from 'rxjs';
-import {map, shareReplay, switchMap} from 'rxjs/operators';
+import {map, Observable, of, shareReplay, switchMap} from 'rxjs';
 
 export interface AttrAttributeTreeItem extends AttrAttribute.AsObject {
   childs: AttrAttributeTreeItem[];
@@ -61,7 +60,7 @@ export class APIAttrsService {
   }
 
   public getAttribute$(id: string): Observable<AttrAttribute | undefined> {
-    return this.#attrs$.pipe(map((attrs) => attrs?.find((attr) => attr.id === id)));
+    return this.#attrs$.pipe(map((attrs) => attrs.find((attr) => attr.id === id)));
   }
 
   public getAttributes$(zoneID: null | string, parentID: null | string): Observable<AttrAttributeTreeItem[]> {

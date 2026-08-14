@@ -24,7 +24,7 @@ import {
   CatalogueListItemComponent,
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 
@@ -124,7 +124,7 @@ export class CutawayBrandsComponent implements OnInit {
         description: item.description,
         design: undefined,
         details: {
-          count: item.descendantPicturesCount ?? 0,
+          count: item.descendantPicturesCount,
           routerLink: itemRouterLink,
         },
         hasText: item.hasText,

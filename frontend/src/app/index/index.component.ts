@@ -7,8 +7,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, Observable, of} from 'rxjs';
-import {catchError, shareReplay, switchMap} from 'rxjs/operators';
+import {catchError, EMPTY, Observable, of, shareReplay, switchMap} from 'rxjs';
 
 import {ItemOfDayComponent} from '../item-of-day/item-of-day/item-of-day.component';
 import {ToastsService} from '../toasts/toasts.service';

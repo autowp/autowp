@@ -26,8 +26,8 @@ export class AreaComponent implements AfterViewInit {
     const styles = this.styles();
     const nodeOffset = styles?.['top.px'] || 0;
     const nodeHeight = styles?.['height.px'] || 0;
-    const winCenter = winHeight == undefined ? 0 : winHeight / 2;
-    const nodeCenter = nodeOffset == undefined || nodeHeight == undefined ? 0 : nodeOffset + nodeHeight / 2;
+    const winCenter = winHeight / 2;
+    const nodeCenter = nodeOffset + nodeHeight / 2;
 
     return winCenter > nodeCenter ? 'bottom' : 'top';
   });

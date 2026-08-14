@@ -14,7 +14,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {ItemComponent} from '../../item/item/item.component';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';

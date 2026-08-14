@@ -5,7 +5,7 @@ import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {ethToEur, eurToRub} from '../../currencies';
 

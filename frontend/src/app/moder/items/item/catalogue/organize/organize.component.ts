@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -20,10 +20,21 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams} from '@utils/invalid-params.pipe';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, EMPTY, forkJoin, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+} from 'rxjs';
 
-import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../../../grpc';
+import {extractFieldViolations, fieldViolations2InvalidParams, isNotFoundError} from '../../../../../grpc';
 import {ToastsService} from '../../../../../toasts/toasts.service';
 import {
   ItemMetaFormComponent,
@@ -45,6 +56,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #toastService = inject(ToastsService);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly loading = signal(false);
   protected readonly invalidParams = signal<InvalidParams>({});
@@ -89,40 +101,50 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
       (data.items || [])
         .map((i) => i.item)
         .filter((i): i is Item => !!i)
-        .filter(
-          (item) =>
-            item && item?.itemTypeId && allowedItemTypeCombinations[itemTypeID as ItemType].includes(item?.itemTypeId),
-        ),
+        .filter((item) => {
+          // itemTypeID is Observable<number> (parsed from a query param, not branded ItemType),
+          // so indexing allowedItemTypeCombinations (a Record<ItemType, ItemType[]>) with it
+          // needs an explicit cast - confirmed with `npx tsc --noEmit` directly: removing the
+          // cast reintroduces a real TS7053 error, despite eslint calling it unnecessary here.
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+          return item.itemTypeId && allowedItemTypeCombinations[itemTypeID as ItemType].includes(item.itemTypeId);
+        }),
     ),
   );
 
   protected readonly item$: Observable<Item> = this.#itemID$.pipe(
     switchMap((id) =>
-      this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({
-            childsCount: true,
-            fullName: true,
-            location: true,
-            meta: true,
-            nameDefault: true,
-            nameHtml: true,
-            nameText: true,
+      this.#itemsClient
+        .item(
+          new ItemRequest({
+            fields: new ItemFields({
+              childsCount: true,
+              fullName: true,
+              location: true,
+              meta: true,
+              nameDefault: true,
+              nameHtml: true,
+              nameText: true,
+            }),
+            id,
           }),
-          id,
-        }),
-      ),
+        )
+        .pipe(
+          // A missing item is a NOT_FOUND error from the client, not a null/undefined emission -
+          // the previous `if (!item)` check here could never actually fire.
+          catchError((response: unknown) => {
+            if (isNotFoundError(response)) {
+              void this.#router.navigate(['/error-404'], {
+                skipLocationChange: true,
+              });
+              return EMPTY;
+            }
+            this.#toastService.handleError(response);
+            return EMPTY;
+          }),
+        ),
     ),
     shareReplay({bufferSize: 1, refCount: false}),
-    switchMap((item) => {
-      if (!item) {
-        this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
-        return EMPTY;
-      }
-      return of(item);
-    }),
   );
 
   protected readonly newItem$: Observable<Item> = combineLatest([this.#itemTypeID$, this.item$]).pipe(
@@ -227,10 +249,8 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
         },
         next: () => {
           this.loading.set(false);
-          if (localStorage) {
-            localStorage.setItem('last_item', item.id);
-          }
-          this.#router.navigate(['/moder/items/item', item.id], {
+          this.#document.defaultView?.localStorage.setItem('last_item', item.id);
+          void this.#router.navigate(['/moder/items/item', item.id], {
             queryParams: {
               tab: 'catalogue',
             },

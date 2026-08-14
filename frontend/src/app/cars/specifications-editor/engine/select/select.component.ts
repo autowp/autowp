@@ -21,8 +21,19 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {BehaviorSubject, combineLatest, EMPTY, Observable} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  shareReplay,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import {chunk} from '../../../../chunk';
 import {PaginatorComponent} from '../../../../paginator/paginator/paginator.component';
@@ -170,7 +181,7 @@ export class CarsEngineSelectComponent {
         }),
       )
       .subscribe(() => {
-        this.#router.navigate(['/cars/specifications-editor'], {
+        void this.#router.navigate(['/cars/specifications-editor'], {
           queryParams: {
             item_id: itemID,
             tab: 'engine',

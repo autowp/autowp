@@ -23,8 +23,17 @@ import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootst
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  switchMap,
+} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -122,7 +131,7 @@ export class ModerCommentsComponent implements OnInit {
   );
 
   readonly #moderatorAttention$: Observable<ModeratorAttention> = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('moderator_attention') ?? '', 10) as ModeratorAttention),
+    map((params) => parseInt(params.get('moderator_attention') ?? '', 10)),
     distinctUntilChanged(),
     debounceTime(10),
   );
@@ -145,7 +154,7 @@ export class ModerCommentsComponent implements OnInit {
     paginator?: Pages;
   }> = combineLatest([this.userID$, this.#moderatorAttention$, this.#picturesOfItemID$, this.#page$]).pipe(
     switchMap(([userID, moderatorAttention, picturesOfItemID, page]) => {
-      this.moderatorAttention.setValue(moderatorAttention ?? ModeratorAttention.NONE);
+      this.moderatorAttention.setValue(moderatorAttention);
       this.itemID.set(picturesOfItemID);
 
       return this.#commentsClient.getMessages(
@@ -189,7 +198,7 @@ export class ModerCommentsComponent implements OnInit {
   }
 
   protected setModeratorAttention() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         moderator_attention: this.moderatorAttention,
         page: null,
@@ -203,9 +212,12 @@ export class ModerCommentsComponent implements OnInit {
   }
 
   protected itemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
-    this.#router.navigate([], {
+    // e.item is typed `any` by ng-bootstrap - itemsDataSource above is the only source feeding
+    // this typeahead, and it resolves Item[].
+    const selected = e.item as Item;
+    void this.#router.navigate([], {
       queryParams: {
-        pictures_of_item_id: e.item.id,
+        pictures_of_item_id: selected.id,
       },
       queryParamsHandling: 'merge',
     });
@@ -213,7 +225,7 @@ export class ModerCommentsComponent implements OnInit {
 
   protected clearItem(): void {
     this.itemQuery.setValue('');
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         pictures_of_item_id: null,
       },
@@ -226,9 +238,12 @@ export class ModerCommentsComponent implements OnInit {
   }
 
   protected userOnSelect(e: NgbTypeaheadSelectItemEvent): void {
-    this.#router.navigate([], {
+    // e.item is typed `any` by ng-bootstrap - usersDataSource above is the only source feeding
+    // this typeahead, and it resolves User[].
+    const selected = e.item as User;
+    void this.#router.navigate([], {
       queryParams: {
-        user_id: e.item.id,
+        user_id: selected.id,
       },
       queryParamsHandling: 'merge',
     });
@@ -236,7 +251,7 @@ export class ModerCommentsComponent implements OnInit {
 
   protected clearUser(): void {
     this.userQuery.setValue('');
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         user_id: null,
       },

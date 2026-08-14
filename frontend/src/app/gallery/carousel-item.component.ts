@@ -80,7 +80,7 @@ function maxBounds(bounds: Dimension, max: Dimension): Dimension {
   },
 })
 export class CarouselItemComponent implements AfterViewInit {
-  readonly #el: ElementRef<HTMLElement> = inject(ElementRef);
+  readonly #el = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly #sanitizer = inject(DomSanitizer);
 
   readonly item = input.required<Picture>();
@@ -287,11 +287,6 @@ export class CarouselItemComponent implements AfterViewInit {
   }
 
   protected onResize() {
-    if (!this.#el) {
-      console.debug('this.el is undefined', this.#el);
-      return undefined;
-    }
-
     this.#elSize.update(() => ({
       height: this.#el.nativeElement.clientHeight || 0,
       width: this.#el.nativeElement.clientWidth || 0,

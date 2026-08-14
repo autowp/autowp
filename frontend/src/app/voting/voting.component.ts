@@ -1,5 +1,5 @@
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, ComponentRef, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -8,9 +8,10 @@ import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
+import {getModalComponentRef} from '@utils/modal-component-ref';
 import {timestampToDate} from '@utils/timestamp';
 import {isNotFoundError} from 'app/grpc';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
 import {ToastsService} from '../toasts/toasts.service';
@@ -90,7 +91,9 @@ export class VotingComponent {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           this.votingResource.reload();
         },
@@ -133,7 +136,7 @@ export class VotingComponent {
       size: 'lg',
     });
 
-    const componentRef: ComponentRef<VotingVotesComponent> = modalRef['_contentRef'].componentRef;
+    const componentRef = getModalComponentRef<VotingVotesComponent>(modalRef);
     componentRef.setInput('votingID', voting.id);
     componentRef.setInput('variantID', variant.id);
 

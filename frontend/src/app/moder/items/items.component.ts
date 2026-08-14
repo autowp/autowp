@@ -31,17 +31,19 @@ import {
   CatalogueListItemPicture,
 } from '@utils/list-item/list-item.component';
 import {getVehicleTypeTranslation} from '@utils/translations';
-import {EMPTY, Observable, of} from 'rxjs';
 import {
   catchError,
   debounceTime,
   distinctUntilChanged,
+  EMPTY,
   map,
+  Observable,
+  of,
   shareReplay,
   startWith,
   switchMap,
   tap,
-} from 'rxjs/operators';
+} from 'rxjs';
 
 import {convertChildsCounts} from '../../catalogue/catalogue-service';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -178,7 +180,7 @@ export class ModerItemsComponent implements OnInit {
     map((params) => ({
       ancestorID: parseInt(params.get('ancestor_id') ?? '', 10) || null,
       fromYear: parseInt(params.get('from_year') ?? '', 10) || null,
-      itemTypeID: (parseInt(params.get('item_type_id') ?? '', 10) || ItemType.ITEM_TYPE_UNKNOWN) as ItemType,
+      itemTypeID: parseInt(params.get('item_type_id') ?? '', 10) || ItemType.ITEM_TYPE_UNKNOWN,
       listMode: !!params.get('list'),
       name: params.get('name') ?? '',
       nameExclude: params.get('name_exclude') ?? '',
@@ -321,7 +323,7 @@ export class ModerItemsComponent implements OnInit {
                 },
                 produced: item.produced?.value,
                 producedExactly: item.producedExactly,
-                specsRouterLink: item.hasSpecs || item.hasChildSpecs ? item.specsRoute || null : null,
+                specsRouterLink: item.hasSpecs || item.hasChildSpecs ? item.specsRoute : null,
                 twinsGroups: item.twins,
               };
             });
@@ -350,9 +352,12 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected ancestorOnSelect(e: NgbTypeaheadSelectItemEvent): void {
-    this.#router.navigate([], {
+    // e.item is typed `any` by ng-bootstrap - ancestorsDataSource above is the only source
+    // feeding this typeahead, and it resolves Item[].
+    const selected = e.item as Item;
+    void this.#router.navigate([], {
       queryParams: {
-        ancestor_id: e.item.id,
+        ancestor_id: selected.id,
       },
       queryParamsHandling: 'merge',
     });
@@ -360,7 +365,7 @@ export class ModerItemsComponent implements OnInit {
 
   protected clearAncestor(): void {
     this.ancestorQuery = '';
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         ancestor_id: null,
       },
@@ -369,7 +374,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onNameChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         name: this.name.length ? this.name : null,
         page: null,
@@ -379,7 +384,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onNameExcludeChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         name_exclude: this.nameExclude.length ? this.nameExclude : null,
         page: null,
@@ -389,7 +394,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onItemTypeChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         item_type_id: this.itemTypeID ? this.itemTypeID : null,
         page: null,
@@ -399,7 +404,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onVehicleTypeChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         page: null,
         vehicle_type_id: this.vehicleTypeID ? this.vehicleTypeID : null,
@@ -409,7 +414,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onVehicleChildsTypeChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         page: null,
         vehicle_childs_type_id: this.vehicleChildsTypeID ? this.vehicleChildsTypeID : null,
@@ -419,7 +424,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onSpecChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         page: null,
         spec_id: this.specID ? this.specID : null,
@@ -429,7 +434,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onNoParentChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         no_parent: this.noParent ? '1' : null,
         page: null,
@@ -439,7 +444,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onTextChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         page: null,
         text: this.text ? this.text : null,
@@ -449,7 +454,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onFromYearChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         from_year: this.fromYear ? this.fromYear : null,
         page: null,
@@ -459,7 +464,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onToYearChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         page: null,
         to_year: this.toYear ? this.toYear : null,
@@ -469,7 +474,7 @@ export class ModerItemsComponent implements OnInit {
   }
 
   protected onOrderChanged() {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {
         order: this.order ? this.order : null,
         page: null,

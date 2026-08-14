@@ -39,8 +39,7 @@ import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getAchievementDescriptionTranslation, getAchievementTranslation} from '@utils/translations';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, map, of, switchMap} from 'rxjs';
 
 import {MessageDialogService} from '../../message-dialog/message-dialog.service';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -90,7 +89,7 @@ export class UsersUserComponent {
 
   protected readonly timestampToDate = timestampToDate;
 
-  readonly #identity = toSignal(this.#route.paramMap.pipe(map((params) => '' + params.get('identity'))), {
+  readonly #identity = toSignal(this.#route.paramMap.pipe(map((params) => params.get('identity') ?? '')), {
     requireSync: true,
   });
 
@@ -154,7 +153,7 @@ export class UsersUserComponent {
             }),
             limit: 15,
             order: GetMessagesRequest.Order.DATE_DESC,
-            userId: userId + '',
+            userId,
           }),
         )
         .pipe(map((response) => (response.items ? response.items : [])));
@@ -179,7 +178,7 @@ export class UsersUserComponent {
     const user = this.userResource.value();
     const currentUser = this.#currentUser();
 
-    return !user || !currentUser || currentUser.id !== user.id;
+    return !user || currentUser?.id !== user.id;
   });
 
   protected readonly ipResource = rxResource({
@@ -246,7 +245,7 @@ export class UsersUserComponent {
   }
 
   protected openMessageForm(user: User) {
-    this.#messageDialogService.showDialog('' + user.id);
+    this.#messageDialogService.showDialog(user.id);
     return false;
   }
 
@@ -284,7 +283,9 @@ export class UsersUserComponent {
     }
 
     this.#usersGrpc.deleteUserPhoto(new DeleteUserPhotoRequest({id: user.id})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
       next: () => {
         user.photo = undefined;
       },
@@ -302,7 +303,9 @@ export class UsersUserComponent {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           user.deleted = true;
         },
@@ -311,7 +314,9 @@ export class UsersUserComponent {
 
   protected removeFromBlacklist(ip: string) {
     this.#trafficClient.deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
       next: () => {
         this.ipResource.reload();
       },
@@ -330,7 +335,9 @@ export class UsersUserComponent {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: () => {
           this.ipResource.reload();
         },

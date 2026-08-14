@@ -1,4 +1,4 @@
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {GetItemVehicleTypesRequest, Item, ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb';
@@ -9,8 +9,21 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams} from '@utils/invalid-params.pipe';
 import {getItemTypeTranslation} from '@utils/translations';
-import {combineLatest, EMPTY, forkJoin, Observable, of} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, tap} from 'rxjs/operators';
+import {
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../grpc';
 import {ToastsService} from '../../../toasts/toasts.service';
@@ -35,6 +48,7 @@ export class ModerItemsNewComponent {
   readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
+  readonly #document = inject(DOCUMENT);
 
   protected readonly invalidParams = signal<InvalidParams>({});
 
@@ -145,10 +159,8 @@ export class ModerItemsNewComponent {
 
           return forkJoin(pipes).pipe(
             tap(() => {
-              if (localStorage) {
-                localStorage.setItem('last_item', item.id);
-              }
-              this.#router.navigate(['/moder/items/item', item.id]);
+              this.#document.defaultView?.localStorage.setItem('last_item', item.id);
+              void this.#router.navigate(['/moder/items/item', item.id]);
             }),
           );
         }),

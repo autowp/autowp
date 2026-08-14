@@ -6,9 +6,9 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {timestampToDate} from '@utils/timestamp';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {combineLatest, distinctUntilChanged, EMPTY, map, Observable, of, shareReplay, switchMap} from 'rxjs';
 
 import {usdToRub} from '../../currencies';
 import {ItemOfDayComponent} from '../../item-of-day/item-of-day/item-of-day.component';
@@ -91,7 +91,7 @@ export class DonateVodComponent implements OnInit {
   protected readonly dates$ = combineLatest([this.vod$, this.date$]).pipe(
     map(([vod, currentDate]) =>
       (vod.dates ? vod.dates : []).map((d) => {
-        const date = d.date?.toDate();
+        const date = timestampToDate(d.date);
         const value = date ? formatDate(date, 'yyyy-MM-dd', this.locale, VOD_TIMEZONE) : null;
         return {
           active: value === currentDate,
@@ -115,7 +115,7 @@ export class DonateVodComponent implements OnInit {
         return [];
       }
 
-      const label = 'vod/' + date + '/' + item.id + '/' + (anonymous ? 0 : userID);
+      const label = 'vod/' + date + '/' + item.id + '/' + (anonymous ? 0 : (userID ?? ''));
 
       return [
         {name: 'receiver', value: '41001161017513'},
@@ -129,7 +129,10 @@ export class DonateVodComponent implements OnInit {
         {name: 'label', value: label},
         {name: 'quickpay-form', value: 'donate'},
         {name: 'targets', value: $localize`Order ${label}`},
-        {name: 'successURL', value: 'https://' + this.#document.defaultView?.location.host + '/donate/vod/success'},
+        {
+          name: 'successURL',
+          value: 'https://' + (this.#document.defaultView?.location.host ?? '') + '/donate/vod/success',
+        },
       ];
     }),
   );

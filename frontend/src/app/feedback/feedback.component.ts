@@ -77,7 +77,11 @@ export class FeedbackComponent implements OnInit {
             const fieldViolations = extractFieldViolations(response);
             this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
 
-            if (this.invalidParams()['captcha']) {
+            // Object.hasOwn(), not `this.invalidParams()['captcha']`: without
+            // noUncheckedIndexedAccess, TS types a Record's index access as always-present, which
+            // would make this read as an always-true check even though the key is genuinely
+            // absent unless the backend actually returned a captcha violation.
+            if (Object.hasOwn(this.invalidParams(), 'captcha')) {
               if (!this.form.get(CAPTCHA)) {
                 const control = new FormControl('', {nonNullable: true, validators: Validators.required});
                 this.form.addControl(CAPTCHA, control);
@@ -90,7 +94,7 @@ export class FeedbackComponent implements OnInit {
           }
         },
         next: () => {
-          this.#router.navigate(['/feedback/sent']);
+          void this.#router.navigate(['/feedback/sent']);
         },
       });
   }

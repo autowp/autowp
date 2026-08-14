@@ -2,8 +2,7 @@ import {inject, Service} from '@angular/core';
 import {Item, ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {Observable} from 'rxjs';
-import {shareReplay} from 'rxjs/operators';
+import {Observable, shareReplay} from 'rxjs';
 
 // Not autoProvided/root-scoped: provided by CarsAttrsChangeLogComponent so its cache lives only
 // for that page visit, shared by every CarsAttrsChangeLogRowComponent underneath it - the change

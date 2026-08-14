@@ -12,8 +12,7 @@ import {getPerspectiveTranslation} from '@utils/translations';
 import {APIPerspectiveService} from 'app/api/perspective/perspective.service';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {UserComponent} from 'app/user/user/user.component';
-import {EMPTY} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, EMPTY, map} from 'rxjs';
 
 interface ThumbnailAPIPicture extends Picture {
   selected?: boolean;
@@ -81,10 +80,8 @@ export class ThumbnailComponent {
   }
 
   protected onPictureSelect(picture: ThumbnailAPIPicture) {
-    if (picture) {
-      picture.selected = !picture.selected;
-      this.selected.emit(picture.selected);
-    }
+    picture.selected = !picture.selected;
+    this.selected.emit(picture.selected);
   }
 
   protected readonly PictureStatus = PictureStatus;

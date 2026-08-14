@@ -7,7 +7,7 @@ import {UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {UserComponent} from '../../user/user/user.component';

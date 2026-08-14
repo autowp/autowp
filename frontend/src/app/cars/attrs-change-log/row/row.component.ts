@@ -18,7 +18,7 @@ import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getUnitAbbrTranslation} from '@utils/translations';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {APIAttrsService} from '../../../api/attrs/attrs.service';
 import {UserComponent} from '../../../user/user/user.component';

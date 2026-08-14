@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Item, ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {chunk} from '../../../../../chunk';
 import {PaginatorComponent} from '../../../../../paginator/paginator/paginator.component';
@@ -63,7 +63,7 @@ export class ModerItemsItemSelectParentBrandsComponent {
   });
 
   protected doSearch(search: string) {
-    this.#router.navigate([], {
+    void this.#router.navigate([], {
       queryParams: {search},
       queryParamsHandling: 'merge',
     });

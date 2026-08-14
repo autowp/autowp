@@ -25,8 +25,7 @@ import {
 import {MapClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {divIcon, icon, latLng, LatLngBounds, Map, MapOptions, Marker, marker, Popup, tileLayer} from 'leaflet';
-import {BehaviorSubject, combineLatest, EMPTY} from 'rxjs';
-import {debounceTime, map, switchMap} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, debounceTime, EMPTY, map, switchMap} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {MapPopupComponent} from './popup/popup.component';
@@ -170,7 +169,9 @@ export class MapComponent implements OnDestroy, OnInit {
         }),
       )
       .subscribe({
-        error: (response: unknown) => this.#toastService.handleError(response),
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
         next: ([mode, points]) => {
           if (mode === 'pictures') {
             this.renderPictureData(points as MapPicturePoint[]);
@@ -312,7 +313,9 @@ export class MapComponent implements OnDestroy, OnInit {
     ].join(',');
 
     this.#mapClient.getPicturePoints(new MapGetPicturePointsRequest({bounds, individual: true})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
       next: (response) => {
         this.#zone.run(() => {
           this.showClusterResolutionPopup(cluster, response.points ?? []);

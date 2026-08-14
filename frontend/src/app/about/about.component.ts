@@ -10,7 +10,6 @@ import {UserService} from '@services/user';
 import escapeStringRegexp from 'escape-string-regexp';
 import {marked} from 'marked';
 import {BytesPipe} from 'ngx-pipes';
-import {of} from 'rxjs';
 
 import * as versionJson from '../../version.json';
 
@@ -20,7 +19,7 @@ function replaceAll(str: string, find: string, replace: string): string {
 
 function replacePairs(str: string, pairs: Record<string, string>): string {
   for (const key in pairs) {
-    str = replaceAll(str, String(key), pairs[key]);
+    str = replaceAll(str, key, pairs[key]);
   }
   return str;
 }
@@ -107,12 +106,10 @@ export class AboutComponent implements OnInit {
 
   protected readonly usersResource = rxResource({
     id: 'about-users',
+    // Angular skips stream() entirely while params() returns undefined, so about is always
+    // defined once stream() actually runs.
     params: () => this.aboutResource.value(),
     stream: ({params: about}) => {
-      if (!about) {
-        return of(new Map<string, User>());
-      }
-
       // Fetched into a fresh array rather than pushing onto about.contributors directly - that
       // would mutate the resource's own value and leak the developer/translators into the
       // contributors list below, which already shows them separately.

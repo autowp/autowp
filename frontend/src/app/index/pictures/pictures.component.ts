@@ -7,8 +7,7 @@ import {LanguageService} from '@services/language';
 import {PicturesWebSocketService} from '@services/pictures-ws.service';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, map, startWith, switchMap, throttleTime} from 'rxjs/operators';
+import {catchError, EMPTY, map, Observable, startWith, switchMap, throttleTime} from 'rxjs';
 
 // Reload cadence for live "new picture accepted" notifications: the first accept in a
 // burst reloads right away (leading edge), and if more accepts arrive within the window

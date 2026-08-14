@@ -6,8 +6,7 @@ import {Image, Item, ItemType, Picture} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {combineLatest, map, Observable} from 'rxjs';
 
 interface PictureThumbRoute {
   picture: null | Picture;
@@ -31,38 +30,31 @@ export class CategoriesListItemComponent {
   protected readonly parentRouterLink$ = toObservable(this.parentRouterLink);
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
-  protected readonly havePhoto$ = this.item$.pipe(map((item) => (item ? this.isHavePhoto(item) : false)));
+  // item/parentRouterLink are required input()s, always defined.
+  protected readonly havePhoto$ = this.item$.pipe(map((item) => this.isHavePhoto(item)));
   protected readonly canHavePhoto$ = this.item$.pipe(
     map((item) =>
-      item
-        ? [
-            ItemType.ITEM_TYPE_VEHICLE,
-            ItemType.ITEM_TYPE_ENGINE,
-            ItemType.ITEM_TYPE_BRAND,
-            ItemType.ITEM_TYPE_FACTORY,
-            ItemType.ITEM_TYPE_MUSEUM,
-          ].indexOf(item.itemTypeId) !== -1
-        : false,
+      [
+        ItemType.ITEM_TYPE_BRAND,
+        ItemType.ITEM_TYPE_ENGINE,
+        ItemType.ITEM_TYPE_FACTORY,
+        ItemType.ITEM_TYPE_MUSEUM,
+        ItemType.ITEM_TYPE_VEHICLE,
+      ].includes(item.itemTypeId),
     ),
   );
 
   protected readonly pictures$: Observable<PictureThumbRoute[]> = combineLatest([
-    this.item$.pipe(switchMap((item) => (item ? of(item) : EMPTY))),
+    this.item$,
     this.parentRouterLink$,
   ]).pipe(
     map(([item, parentRouterLink]) => {
       const largeFormat = !!item.previewPictures?.largeFormat;
       return (item.previewPictures?.pictures || []).map((picture, idx) => {
-        let thumb = undefined;
-        if (picture) {
-          thumb = largeFormat && idx == 0 ? picture.picture?.thumbLarge : picture.picture?.thumbMedium;
-        }
+        const thumb = largeFormat && idx == 0 ? picture.picture?.thumbLarge : picture.picture?.thumbMedium;
         return {
-          picture: picture?.picture ? picture.picture : null,
-          route:
-            picture?.picture && parentRouterLink
-              ? parentRouterLink.concat(['pictures', picture.picture.identity])
-              : null,
+          picture: picture.picture ? picture.picture : null,
+          route: picture.picture ? parentRouterLink.concat(['pictures', picture.picture.identity]) : null,
           thumb,
         };
       });
@@ -71,8 +63,8 @@ export class CategoriesListItemComponent {
 
   protected isHavePhoto(item: Item) {
     if (item.previewPictures) {
-      for (const picture of item.previewPictures?.pictures || []) {
-        if (picture?.picture) {
+      for (const picture of item.previewPictures.pictures || []) {
+        if (picture.picture) {
           return true;
         }
       }

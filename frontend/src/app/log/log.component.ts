@@ -20,8 +20,8 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {forkJoin, Observable, of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {timestampToDate} from '@utils/timestamp';
+import {catchError, forkJoin, map, Observable, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {UserComponent} from '../user/user/user.component';
@@ -119,7 +119,7 @@ export class LogComponent implements OnInit {
 
   #fetchPictures$(ids: string[]): Observable<Map<string, Picture>> {
     if (ids.length === 0) {
-      return of(new Map());
+      return of(new Map<string, Picture>());
     }
 
     return this.#picturesClient
@@ -161,7 +161,7 @@ export class LogComponent implements OnInit {
 
     return forkJoin([items$, this.#userService.getUser$(event.userId)]).pipe(
       map(([items, user]) => ({
-        createdAt: event.createTime?.toDate(),
+        createdAt: timestampToDate(event.createTime),
         description: event.description,
         items,
         pictures: event.pictures

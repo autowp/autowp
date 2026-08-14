@@ -4,8 +4,7 @@ import {environment} from '@environment/environment';
 import {MeRequest, UserFields} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, EMPTY, map, Observable} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 

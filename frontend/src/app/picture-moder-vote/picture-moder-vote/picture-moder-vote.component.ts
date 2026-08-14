@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ComponentRef,
   computed,
   inject,
   Injector,
@@ -15,8 +14,8 @@ import {Picture, User} from '@grpc/spec.pb';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {UserService} from '@services/user';
-import {Observable, of} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {getModalComponentRef} from '@utils/modal-component-ref';
+import {catchError, map, Observable, of} from 'rxjs';
 
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -37,7 +36,7 @@ export class PictureModerVoteComponent implements OnInit {
 
   readonly picture = input.required<Picture>();
 
-  readonly changed = output<void>();
+  readonly changed = output();
 
   // Chained off the picture input signal directly rather than a raw Observable stored on an
   // object and subscribed lazily by the template via `| async` (the previous shape here): that
@@ -108,14 +107,12 @@ export class PictureModerVoteComponent implements OnInit {
       size: 'lg',
     });
 
-    if (picture) {
-      const componentRef: ComponentRef<PictureModerVoteModalComponent> = modalRef['_contentRef'].componentRef;
-      componentRef.setInput('pictureId', picture.id);
-      componentRef.setInput('vote', vote);
+    const componentRef = getModalComponentRef<PictureModerVoteModalComponent>(modalRef);
+    componentRef.setInput('pictureId', picture.id);
+    componentRef.setInput('vote', vote);
 
-      modalRef.componentInstance.voted.subscribe(() => {
-        this.changed.emit(void 0);
-      });
-    }
+    componentRef.instance.voted.subscribe(() => {
+      this.changed.emit(void 0);
+    });
   }
 }

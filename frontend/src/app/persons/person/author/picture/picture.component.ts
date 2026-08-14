@@ -15,7 +15,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {CommentsComponent} from '../../../../comments/comments/comments.component';
 import {PictureComponent} from '../../../../picture/picture.component';

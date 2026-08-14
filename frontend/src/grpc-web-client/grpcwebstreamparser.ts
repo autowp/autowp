@@ -69,7 +69,7 @@ export class GrpcWebStreamParser {
           break;
         }
         default: {
-          throw new Error('unexpected parser state: ' + this.#state);
+          throw new Error('unexpected parser state: ' + String(this.#state));
         }
       }
 
@@ -82,9 +82,17 @@ export class GrpcWebStreamParser {
     return msgs.length > 0 ? msgs : null;
   }
 
-  private processFrameByte(b: FrameType): boolean {
+  // b is typed as a plain byte, not FrameType: it's an arbitrary byte read off the wire
+  // (inputBytes[pos] in parse() below), not guaranteed to actually be one of FrameType's two
+  // values - typing it FrameType would make TS treat the frame-type check below as tautological
+  // once DATA is ruled out, when it's a real validity check against malformed/corrupt input.
+  private processFrameByte(b: number): boolean {
+    // b is a raw wire byte, not our FrameType enum - comparing it against a known enum constant
+    // is legitimate here.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     if (b === FrameType.DATA) {
       this.#frame = FrameType.DATA;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     } else if (b === FrameType.TRAILER) {
       this.#frame = FrameType.TRAILER;
     } else {
@@ -117,7 +125,7 @@ export class GrpcWebStreamParser {
 
   private processMessageByte(b: number) {
     if (!this.#messageBuffer) {
-      throw 'messageBuffer is not initialized';
+      throw new Error('messageBuffer is not initialized');
     }
 
     this.#messageBuffer[this.#countMessageBytes++] = b;
@@ -147,7 +155,7 @@ export class GrpcWebStreamParser {
       errorMsg +
       '. ' +
       'With input:\n' +
-      inputBytes;
+      String(inputBytes);
     throw new Error(this.#errorMessage);
   }
 }

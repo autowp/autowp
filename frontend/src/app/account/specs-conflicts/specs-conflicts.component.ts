@@ -18,8 +18,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {getUnitAbbrTranslation} from '@utils/translations';
-import {combineLatest, Observable, of} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs/operators';
+import {combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, shareReplay, switchMap} from 'rxjs';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';

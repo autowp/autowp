@@ -6,8 +6,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {combineLatest, of} from 'rxjs';
-import {map, shareReplay, switchMap} from 'rxjs/operators';
+import {combineLatest, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
 

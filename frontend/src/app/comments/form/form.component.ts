@@ -5,7 +5,7 @@ import {AddCommentRequest, CommentsType} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {switchMap, take} from 'rxjs/operators';
+import {switchMap, take} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -56,7 +56,7 @@ export class CommentsFormComponent {
               message: this.form.message,
               moderatorAttention: this.form.moderator_attention,
               parentId: this.parentID(),
-              resolve: !!resolve,
+              resolve,
               typeId: this.typeID(),
             }),
           ),

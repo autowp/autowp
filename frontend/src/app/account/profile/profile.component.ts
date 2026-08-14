@@ -14,8 +14,18 @@ import {TimezoneService} from '@services/timezone';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -63,7 +73,7 @@ export class AccountProfileComponent implements OnInit {
     switchMap(([user]) => {
       if (!user) {
         if (this.#document.defaultView) {
-          this.#keycloak.login({
+          void this.#keycloak.login({
             locale: this.#languageService.language,
             redirectUri: this.#document.defaultView.location.href,
           });
@@ -146,7 +156,9 @@ export class AccountProfileComponent implements OnInit {
 
   protected resetPhoto(id: string) {
     this.#usersClient.deleteUserPhoto(new DeleteUserPhotoRequest({id})).subscribe({
-      error: (response: unknown) => this.#toastService.handleError(response),
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
       next: () => {
         this.#reload$.next(void 0);
       },
@@ -173,7 +185,10 @@ export class AccountProfileComponent implements OnInit {
             input.nativeElement.value = '';
           }
           if (response instanceof HttpErrorResponse && response.status === 400) {
-            this.photoInvalidParams.set(response.error.invalid_params);
+            // HttpErrorResponse.error is `any` - the backend error body's shape is only known by
+            // convention (a `invalid_params` field), not typed by Angular.
+            const body = response.error as {invalid_params: InvalidParams};
+            this.photoInvalidParams.set(body.invalid_params);
             return EMPTY;
           }
 

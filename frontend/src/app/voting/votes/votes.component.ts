@@ -5,8 +5,7 @@ import {User, VotingRequest} from '@grpc/spec.pb';
 import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UserService} from '@services/user';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, combineLatest, EMPTY, map, Observable, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';

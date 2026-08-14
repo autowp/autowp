@@ -19,7 +19,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {RemarkModule} from 'ngx-remark';
-import {map} from 'rxjs/operators';
+import {map} from 'rxjs';
 
 import {CommentsComponent} from '../../../comments/comments/comments.component';
 import {TwinsItemComponent} from '../../item/item.component';

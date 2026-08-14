@@ -5,8 +5,7 @@ import {MeRequest, User} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {KEYCLOAK_EVENT_SIGNAL, KeycloakEventType} from 'keycloak-angular';
 import Keycloak from 'keycloak-js';
-import {from, Observable, of} from 'rxjs';
-import {catchError, distinctUntilChanged, filter, map, shareReplay, switchMap} from 'rxjs/operators';
+import {catchError, distinctUntilChanged, filter, from, map, Observable, of, shareReplay, switchMap} from 'rxjs';
 
 export enum Role {
   ADMIN = 'admin',

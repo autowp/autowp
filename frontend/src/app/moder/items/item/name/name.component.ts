@@ -7,8 +7,7 @@ import {GetItemLanguagesRequest, Item, ItemLanguage} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavLinkBase, NgbNavOutlet} from '@ng-bootstrap/ng-bootstrap';
 import {ContentLanguageService} from '@services/content-language';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {combineLatest, map, Observable, of, switchMap} from 'rxjs';
 
 import {MarkdownEditComponent} from '../../../../markdown-edit/markdown-edit/markdown-edit.component';
 
@@ -63,13 +62,11 @@ export class ModerItemsItemNameComponent {
 
   protected readonly data$: Observable<ItemLanguage[]> = this.item$.pipe(
     switchMap((item) =>
-      item
-        ? combineLatest([
-            of(item.id),
-            this.#itemsClient.getItemLanguages(new GetItemLanguagesRequest({itemId: item.id})),
-            this.languages$,
-          ])
-        : EMPTY,
+      combineLatest([
+        of(item.id),
+        this.#itemsClient.getItemLanguages(new GetItemLanguagesRequest({itemId: item.id})),
+        this.languages$,
+      ]),
     ),
     map(([itemId, {items}, languages]) => {
       languages.forEach((language) => {

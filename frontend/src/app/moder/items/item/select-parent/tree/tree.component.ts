@@ -4,8 +4,7 @@ import {toObservable} from '@angular/core/rxjs-interop';
 import {ItemFields, ItemParent, ItemParentsRequest, ItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {EMPTY} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {switchMap} from 'rxjs';
 
 import {ModerItemsItemSelectParentTreeItemComponent} from '../tree-item/tree-item.component';
 
@@ -28,15 +27,13 @@ export class ModerItemsItemSelectParentTreeComponent {
 
   protected readonly item$ = this.itemParent$.pipe(
     switchMap((item) =>
-      item
-        ? this.#itemsClient.item(
-            new ItemRequest({
-              fields: new ItemFields({childsCount: true, nameHtml: true}),
-              id: item.itemId,
-              language: this.#languageService.language,
-            }),
-          )
-        : EMPTY,
+      this.#itemsClient.item(
+        new ItemRequest({
+          fields: new ItemFields({childsCount: true, nameHtml: true}),
+          id: item.itemId,
+          language: this.#languageService.language,
+        }),
+      ),
     ),
   );
 

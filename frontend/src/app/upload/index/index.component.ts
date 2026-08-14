@@ -4,7 +4,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ComponentRef,
   ElementRef,
   inject,
   OnInit,
@@ -37,12 +36,26 @@ import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {getModalComponentRef} from '@utils/modal-component-ref';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, concat, EMPTY, Observable, of, throwError} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap, take, tap} from 'rxjs/operators';
+import {
+  catchError,
+  combineLatest,
+  concat,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  Observable,
+  of,
+  switchMap,
+  take,
+  tap,
+  throwError,
+} from 'rxjs';
 
 import {UploadCropComponent} from '../crop/crop.component';
 
@@ -60,7 +73,7 @@ interface UploadProgress {
 }
 
 const cropTitle = (image: Image | undefined): string => {
-  if (!(image?.cropWidth && image?.cropHeight)) {
+  if (!(image?.cropWidth && image.cropHeight)) {
     return '';
   }
   const cropSize = `${image.cropWidth}×${image.cropHeight}+${image.cropLeft}+${image.cropTop}`;
@@ -104,7 +117,7 @@ export class UploadIndexComponent implements OnInit {
   protected readonly formHidden = signal(false);
   protected readonly authenticated$ = this.auth.authenticated$;
 
-  public readonly input = viewChild<ElementRef>('input');
+  public readonly input = viewChild<ElementRef<HTMLInputElement>>('input');
 
   readonly #perspectiveID$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('perspective_id') ?? '', 10)),
@@ -172,7 +185,7 @@ export class UploadIndexComponent implements OnInit {
   }
 
   protected doLogin() {
-    this.#keycloak.login({
+    void this.#keycloak.login({
       locale: this.#languageService.language,
       redirectUri: this.#document.defaultView?.location.href,
     });
@@ -235,7 +248,7 @@ export class UploadIndexComponent implements OnInit {
         }
 
         if (itemID) {
-          formData.append('item_id', itemID + '');
+          formData.append('item_id', itemID);
         }
         if (replace) {
           formData.append('replace_picture_id', replace + '');
@@ -258,7 +271,10 @@ export class UploadIndexComponent implements OnInit {
           progress.percentage = 100;
           progress.failed = true;
 
-          progress.invalidParams = response.error.invalid_params;
+          // HttpErrorResponse.error is `any` - the backend error body's shape is only known by
+          // convention (an `invalid_params` field), not typed by Angular.
+          const body = response.error as {invalid_params: InvalidParams};
+          progress.invalidParams = body.invalid_params;
           this.#cdr.markForCheck();
         }
 
@@ -289,7 +305,7 @@ export class UploadIndexComponent implements OnInit {
           this.#cdr.markForCheck();
 
           if (!event.body) {
-            return throwError(() => 'no response body');
+            return throwError(() => new Error('no response body'));
           }
 
           const pictureID = event.body.id;
@@ -349,7 +365,7 @@ export class UploadIndexComponent implements OnInit {
       size: 'lg',
     });
 
-    const componentRef: ComponentRef<UploadCropComponent> = modalRef['_contentRef'].componentRef;
+    const componentRef = getModalComponentRef<UploadCropComponent>(modalRef);
     componentRef.setInput('picture', picture.picture);
 
     componentRef.instance.changed.subscribe(() => {
