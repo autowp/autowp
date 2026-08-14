@@ -1,4 +1,5 @@
 /.buildpath
+/node_modules
 /data
 /logs
 /cc-test-reporter

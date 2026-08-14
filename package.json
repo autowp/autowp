@@ -1,0 +1,13 @@
+{
+  "name": "autowp",
+  "private": true,
+  "description": "Repo-wide tooling (commit message linting) for the wheelsage.org / autowp.ru monorepo. See frontend/package.json for the Angular app's own tooling.",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19",
+    "@commitlint/config-conventional": "^19",
+    "husky": "^9"
+  }
+}
