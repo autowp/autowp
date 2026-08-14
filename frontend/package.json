@@ -96,6 +96,7 @@
     "eslint-plugin-json": "^5",
     "eslint-plugin-perfectionist": "^5.1.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-rxjs-x": "^1.0.4",
     "eslint-plugin-sonarjs": "^3 || ^4",
     "google-protobuf": "^3.21.2",
     "html-comment-regex": "^1.1.2",

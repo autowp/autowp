@@ -3,6 +3,7 @@ import angular from 'angular-eslint';
 import depend from 'eslint-plugin-depend';
 import perfectionist from 'eslint-plugin-perfectionist';
 import {default as eslintPluginPrettierRecommended} from 'eslint-plugin-prettier/recommended';
+import rxjsX from 'eslint-plugin-rxjs-x';
 import sonarjs from 'eslint-plugin-sonarjs';
 import {defineConfig, globalIgnores} from 'eslint/config';
 import tseslint from 'typescript-eslint';
@@ -22,10 +23,10 @@ export default defineConfig([
     extends: [
       // Apply the recommended core rules
       eslint.configs.recommended,
-      // Apply the recommended TypeScript rules
-      ...tseslint.configs.recommended,
-      // Optionally apply stylistic rules from typescript-eslint that improve code consistency
-      ...tseslint.configs.stylistic,
+      // Type-checked TypeScript rules (superset of recommended/stylistic - see the comment on
+      // languageOptions.parserOptions below for what makes the type info available).
+      ...tseslint.configs.strictTypeChecked,
+      ...tseslint.configs.stylisticTypeChecked,
       // Apply the recommended Angular rules
       ...angular.configs.tsAll,
     ],
@@ -34,11 +35,73 @@ export default defineConfig([
     // Set the custom processor which will allow us to have our inline Component templates extracted
     // and treated as if they are HTML files (and therefore have the .html config below applied to them)
     processor: angular.processInlineTemplates,
+    languageOptions: {
+      // Required for the *TypeChecked rule sets above - they need real TypeScript type info, not
+      // just syntax. `projectService` auto-discovers and builds the program from tsconfig.json
+      // (no per-tsconfig list to keep in sync, unlike the old parserOptions.project array this
+      // replaced - that one pointed at a nonexistent e2e/tsconfig.json).
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     // Override specific rules for TypeScript files (these will take priority over the extended configs above)
     rules: {
       'no-duplicate-imports': 'error',
       'no-restricted-globals': ['error', {globals: ['window', 'document', 'event']}],
+      'no-restricted-syntax': [
+        'error',
+        {
+          message:
+            "Do not call .toDate() directly on a protobuf Timestamp - a resource value seeded from TransferState during SSR hydration is a plain JSON-shaped object, not a real Timestamp class instance, so .toDate() doesn't exist on it even though seconds/nanos do. Use timestampToDate() from '@utils/timestamp' instead.",
+          selector: "CallExpression[callee.type='MemberExpression'][callee.property.name='toDate']",
+        },
+        {
+          message:
+            "Do not embed an Observable-typed field (name ending in '$') in the value returned from rxResource's stream()/loader(). It doesn't survive the TransferState JSON round-trip on hydration - RxJS Observable instances serialize to '{}', and AsyncPipe throws on that non-Observable, non-Promise value. Resolve it (e.g. via forkJoin/switchMap) into a plain value before returning it, or fetch it as a separate resource.",
+          selector:
+            "CallExpression[callee.name='rxResource'] :matches(Property[key.name='stream'], Property[key.name='loader']) Property[key.name=/\\$$/]",
+        },
+      ],
       '@typescript-eslint/prefer-readonly': 'error',
+      // Angular's own Validators.required/Validators.maxLength(...)/etc are static methods passed
+      // by bare reference into a validators: [...] array - the exact pattern this rule normally
+      // warns about, but they're pure (never touch `this`), so there's no real unbound-`this`
+      // hazard. Every current occurrence in this codebase is this one safe, standard idiom.
+      '@typescript-eslint/unbound-method': ['error', {ignoreStatic: true}],
+      // Deferred follow-up, not disabled: strictTypeChecked flags ~260 `||` sites and ~30 `!`
+      // sites repo-wide. Both need real per-site judgment at that volume rather than a blind
+      // sweep - prefer-nullish-coalescing changes behavior wherever the left side's type can be
+      // falsy-but-not-null/undefined (0, '', false), and no-non-null-assertion sites need
+      // checking for whether the assertion is actually hiding a real possible-undefined bug.
+      // Kept visible as warnings rather than silenced outright.
+      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      // strictTypeChecked's defaults for these two (allowNumberAndString/allowNumber: false)
+      // require every `numberValue + 'px'`/`` `${numberValue}px` `` to be spelled out as
+      // `numberValue.toString() + 'px'` - ~90% of this codebase's ~80 flagged sites were exactly
+      // that pattern (building CSS pixel strings, ids, aspect-ratio text), which is safe, common,
+      // and not a real bug source. Relaxed back to allowing plain number+string (matching each
+      // rule's own upstream default for that one flag), while re-stating strictTypeChecked's
+      // other flags explicitly - passing a partial options object merges with the *rule's*
+      // permissive defaults, not with strictTypeChecked's, so leaving them unstated here would
+      // have silently also re-permitted `any`/`unknown`/nullish operands, which is what these
+      // rules are actually for.
+      '@typescript-eslint/restrict-plus-operands': [
+        'error',
+        {allowAny: false, allowBoolean: false, allowNullish: false, allowNumberAndString: true, allowRegExp: false},
+      ],
+      '@typescript-eslint/restrict-template-expressions': [
+        'error',
+        {
+          allowAny: false,
+          allowBoolean: false,
+          allowNever: false,
+          allowNullish: false,
+          allowNumber: true,
+          allowRegExp: false,
+        },
+      ],
       '@angular-eslint/runtime-localize': 'off',
       '@angular-eslint/component-selector': [
         'error',
@@ -94,38 +157,13 @@ export default defineConfig([
     ...sonarjs.configs.recommended,
     files: ['**/*.ts'],
   },
+  {
+    ...rxjsX.configs.recommended,
+    files: ['**/*.ts'],
+  },
   eslintPluginPrettierRecommended,
   {
     ignores: ['src/grpc/**/*', 'src/rest/**/*'],
-  },
-  {
-    files: ['**/*.ts'],
-    languageOptions: {
-      ecmaVersion: 5,
-      parserOptions: {
-        createDefaultProgram: true,
-        project: ['tsconfig.json', 'e2e/tsconfig.json'],
-      },
-      sourceType: 'script',
-    },
-    rules: {
-      '@angular-eslint/component-selector': [
-        'error',
-        {
-          prefix: 'app',
-          style: 'kebab-case',
-          type: 'element',
-        },
-      ],
-      '@angular-eslint/directive-selector': [
-        'error',
-        {
-          prefix: 'app',
-          style: 'camelCase',
-          type: 'attribute',
-        },
-      ],
-    },
   },
   {
     files: ['**/*.html'],
