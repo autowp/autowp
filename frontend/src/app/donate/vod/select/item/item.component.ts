@@ -1,12 +1,13 @@
+import type {Item, ItemParent} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
-  ItemParent,
   ItemParentListOptions,
   ItemParentsRequest,
   ItemParentType,
@@ -15,7 +16,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {catchError, EMPTY, map, Observable, shareReplay, switchMap} from 'rxjs';
+import {catchError, EMPTY, map, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 
@@ -70,7 +71,7 @@ export class DonateVodSelectItemComponent {
       this.#toastService.handleError(e);
       return EMPTY;
     }),
-    map((items) => items.items || []),
+    map((items) => items.items ?? []),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 

@@ -1,9 +1,11 @@
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
 import {DeleteModerVoteTemplateRequest, ModerVoteTemplate} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
-import {BehaviorSubject, combineLatest, map, Observable, shareReplay, switchMap, tap} from 'rxjs';
+import {BehaviorSubject, combineLatest, map, shareReplay, switchMap, tap} from 'rxjs';
 
 export interface APIPictureModerVoteTemplatePostData {
   name: string;
@@ -20,7 +22,7 @@ export class APIPictureModerVoteTemplateService {
   public getTemplates$(): Observable<ModerVoteTemplate[]> {
     return combineLatest([this.#change$, this.#auth.authenticated$]).pipe(
       switchMap(() => this.#pictures.getModerVoteTemplates(new Empty({}))),
-      map((response) => (response.items ? response.items : [])),
+      map((response) => response.items ?? []),
       shareReplay({bufferSize: 1, refCount: false}),
     );
   }

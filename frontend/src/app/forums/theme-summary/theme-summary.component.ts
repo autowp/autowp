@@ -1,25 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  Injector,
-  input,
-  OnInit,
-  ResourceRef,
-} from '@angular/core';
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {CommentMessage, ListThemesResponse, Theme, Topic, User} from '@grpc/spec.pb';
+
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, input} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {
-  CommentMessage,
-  GetThemeRequest,
-  GetTopicRequest,
-  ListThemesRequest,
-  ListThemesResponse,
-  Theme,
-  Topic,
-  User,
-} from '@grpc/spec.pb';
+import {GetThemeRequest, GetTopicRequest, ListThemesRequest} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {UserService} from '@services/user';
 import {PastTimeIndicatorComponent} from '@utils/past-time-indicator/past-time-indicator.component';

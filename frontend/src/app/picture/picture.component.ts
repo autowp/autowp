@@ -1,3 +1,7 @@
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {Item, ItemLink, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {DatePipe, DecimalPipe, DOCUMENT} from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -8,9 +12,7 @@ import {
   inject,
   Injector,
   input,
-  OnInit,
   output,
-  ResourceRef,
   signal,
 } from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
@@ -19,9 +21,7 @@ import {
   CommentsSubscribeRequest,
   CommentsType,
   CommentsUnSubscribeRequest,
-  Item,
   ItemFields,
-  ItemLink,
   ItemLinkListOptions,
   ItemLinksRequest,
   ItemListOptions,
@@ -40,7 +40,6 @@ import {
   PicturesVoteRequest,
   UpdatePictureItemRequest,
   UpdatePictureRequest,
-  User,
 } from '@grpc/spec.pb';
 import {CommentsClient, ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -52,7 +51,7 @@ import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
-import {catchError, EMPTY, map, Observable, of} from 'rxjs';
+import {catchError, EMPTY, map, of} from 'rxjs';
 
 import {ModerPicturesPerspectivePickerComponent} from '../moder/pictures/perspective-picker/perspective-picker.component';
 import {PictureModerVoteComponent} from '../picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
@@ -153,7 +152,7 @@ export class PictureComponent implements OnInit {
   protected readonly moderVotes = computed(() => {
     const usersById = this.moderVoteUsersResource.value() ?? {};
 
-    return (this.picture().pictureModerVotes?.items || []).map((vote) => ({
+    return (this.picture().pictureModerVotes?.items ?? []).map((vote) => ({
       reason: vote.reason,
       user: usersById[vote.userId] ?? null,
       vote: vote.vote,
@@ -185,7 +184,7 @@ export class PictureComponent implements OnInit {
     this.moderVoteUsersResource = rxResource({
       id: `picture-moder-vote-users-${pictureId}`,
       injector: this.#injector,
-      params: () => [...new Set((this.picture().pictureModerVotes?.items || []).map((vote) => vote.userId))],
+      params: () => [...new Set((this.picture().pictureModerVotes?.items ?? []).map((vote) => vote.userId))],
       // A plain object rather than a Map: TransferState round-trips resource values through
       // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
       // enumerable properties, no toJSON), losing all entries.
@@ -221,7 +220,7 @@ export class PictureComponent implements OnInit {
               }),
             }),
           )
-          .pipe(map((response) => response.items || [])),
+          .pipe(map((response) => response.items ?? [])),
     });
 
     this.categoriesResource = rxResource({
@@ -248,7 +247,7 @@ export class PictureComponent implements OnInit {
               }),
             }),
           )
-          .pipe(map((response) => response.items || [])),
+          .pipe(map((response) => response.items ?? [])),
     });
 
     this.twinsResource = rxResource({
@@ -270,7 +269,7 @@ export class PictureComponent implements OnInit {
               }),
             }),
           )
-          .pipe(map((response) => response.items || [])),
+          .pipe(map((response) => response.items ?? [])),
     });
 
     this.brandsResource = rxResource({
@@ -292,7 +291,7 @@ export class PictureComponent implements OnInit {
               }),
             }),
           )
-          .pipe(map((response) => response.items || [])),
+          .pipe(map((response) => response.items ?? [])),
     });
 
     this.pictureItemsResource = rxResource({
@@ -321,7 +320,7 @@ export class PictureComponent implements OnInit {
               options: new PictureItemListOptions({pictureId}),
             }),
           )
-          .pipe(map((response) => response.items || [])),
+          .pipe(map((response) => response.items ?? [])),
     });
 
     this.linksResource = rxResource({
@@ -340,7 +339,7 @@ export class PictureComponent implements OnInit {
               }),
             }),
           )
-          .pipe(map((response) => response.items || [])),
+          .pipe(map((response) => response.items ?? [])),
     });
   }
 

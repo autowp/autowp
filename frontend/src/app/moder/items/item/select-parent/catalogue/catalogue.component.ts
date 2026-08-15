@@ -1,9 +1,11 @@
+import type {Item, Pages} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -11,7 +13,6 @@ import {
   ItemParentsRequest,
   ItemsRequest,
   ItemType,
-  Pages,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
@@ -22,7 +23,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   of,
   shareReplay,
   switchMap,
@@ -106,7 +106,7 @@ export class ModerItemsItemSelectParentCatalogueComponent {
               return EMPTY;
             }),
             map((response) => ({
-              brands: chunk<Item>(response.items ? response.items : [], 6),
+              brands: chunk<Item>(response.items ?? [], 6),
               paginator: response.paginator,
             })),
           ),

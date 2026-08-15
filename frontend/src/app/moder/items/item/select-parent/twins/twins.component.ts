@@ -1,9 +1,10 @@
+import type {Item} from '@grpc/spec.pb';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
 import {rxResource, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -80,7 +81,7 @@ export class ModerItemsItemSelectParentTwinsComponent {
         )
         .pipe(
           map((response) => ({
-            brands: chunk<Item>(response.items ? response.items : [], 6),
+            brands: chunk<Item>(response.items ?? [], 6),
             paginator: response.paginator,
           })),
         );

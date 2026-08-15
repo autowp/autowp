@@ -1,12 +1,15 @@
+import type {Picture, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {Picture, PictureFields, PictureListOptions, PicturesRequest, User} from '@grpc/spec.pb';
+import {PictureFields, PictureListOptions, PicturesRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
-import {catchError, combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, combineLatest, debounceTime, distinctUntilChanged, map, of, switchMap} from 'rxjs';
 import URLParse from 'url-parse';
 
 import {UserComponent} from '../../user/user/user.component';
@@ -136,13 +139,12 @@ export class UserTextComponent {
 
           return of(element);
         }),
-        map((element) =>
-          element
-            ? element
-            : {
-                type: 'a',
-                url,
-              },
+        map(
+          (element) =>
+            element ?? {
+              type: 'a',
+              url,
+            },
         ),
       );
     }

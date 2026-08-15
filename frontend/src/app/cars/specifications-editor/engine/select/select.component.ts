@@ -1,3 +1,6 @@
+import type {ItemParent, Pages} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
@@ -6,7 +9,6 @@ import {
   Item,
   ItemFields,
   ItemListOptions,
-  ItemParent,
   ItemParentCacheListOptions,
   ItemParentFields,
   ItemParentListOptions,
@@ -14,7 +16,6 @@ import {
   ItemRequest,
   ItemsRequest,
   ItemType,
-  Pages,
   UpdateItemRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -29,7 +30,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   shareReplay,
   switchMap,
   tap,
@@ -122,7 +122,7 @@ export class CarsEngineSelectComponent {
       this.#toastService.handleError(response);
       return EMPTY;
     }),
-    map((response) => response.items || []),
+    map((response) => response.items ?? []),
   );
 
   protected readonly brands$: Observable<{items: Item[][]; paginator?: Pages}> = this.#search$.pipe(
@@ -153,7 +153,7 @@ export class CarsEngineSelectComponent {
       return EMPTY;
     }),
     map((response) => ({
-      items: chunk<Item>(response.items ? response.items : [], 6),
+      items: chunk<Item>(response.items ?? [], 6),
       paginator: response.paginator,
     })),
   );

@@ -1,21 +1,14 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  Injector,
-  input,
-  OnInit,
-  output,
-  ResourceRef,
-} from '@angular/core';
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {Picture, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, output} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {Picture, User} from '@grpc/spec.pb';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {UserService} from '@services/user';
 import {getModalComponentRef} from '@utils/modal-component-ref';
-import {catchError, map, Observable, of} from 'rxjs';
+import {catchError, map, of} from 'rxjs';
 
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -52,7 +45,7 @@ export class PictureModerVoteComponent implements OnInit {
   protected readonly votes = computed(() => {
     const usersById = this.voteUsersResource.value() ?? {};
 
-    return (this.picture().pictureModerVotes?.items || []).map((vote) => ({
+    return (this.picture().pictureModerVotes?.items ?? []).map((vote) => ({
       reason: vote.reason,
       user: usersById[vote.userId] ?? null,
       vote: vote.vote,
@@ -71,7 +64,7 @@ export class PictureModerVoteComponent implements OnInit {
     this.voteUsersResource = rxResource({
       id: `picture-moder-vote-list-users-${this.picture().id}`,
       injector: this.#injector,
-      params: () => [...new Set((this.picture().pictureModerVotes?.items || []).map((vote) => vote.userId))],
+      params: () => [...new Set((this.picture().pictureModerVotes?.items ?? []).map((vote) => vote.userId))],
       // A plain object rather than a Map: TransferState round-trips resource values through
       // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
       // enumerable properties, no toJSON), losing all entries.

@@ -1,10 +1,11 @@
-import {ChangeDetectionStrategy, Component, inject, Injector, input, OnInit, ResourceRef} from '@angular/core';
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {Item, Picture} from '@grpc/spec.pb';
+
+import {ChangeDetectionStrategy, Component, inject, Injector, input} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
-  Item,
   ItemParentCacheListOptions,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,

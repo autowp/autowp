@@ -1,10 +1,13 @@
+import type {Picture} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ItemFields, ItemRequest, Picture} from '@grpc/spec.pb';
+import {ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {GalleryComponent} from 'app/gallery/gallery.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
@@ -22,9 +25,12 @@ export class TwinsGroupGalleryComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #groupID = toSignal(this.#route.parent!.parent!.paramMap.pipe(map((route) => route.get('group'))), {
-    requireSync: true,
-  });
+  readonly #groupID = toSignal(
+    requireRouteParent(requireRouteParent(this.#route)).paramMap.pipe(map((route) => route.get('group'))),
+    {
+      requireSync: true,
+    },
+  );
 
   protected readonly groupResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.

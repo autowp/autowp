@@ -1,11 +1,15 @@
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {Item, ItemLinks} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, Injector, input, OnInit, ResourceRef, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, Injector, input, signal} from '@angular/core';
 import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
-import {Item, ItemLink, ItemLinkListOptions, ItemLinkRequest, ItemLinks, ItemLinksRequest} from '@grpc/spec.pb';
+import {ItemLink, ItemLinkListOptions, ItemLinkRequest, ItemLinksRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
-import {catchError, forkJoin, map, Observable, of, tap} from 'rxjs';
+import {catchError, forkJoin, map, of, tap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 

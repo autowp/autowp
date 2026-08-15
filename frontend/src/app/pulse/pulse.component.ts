@@ -1,12 +1,14 @@
+import type {OnInit} from '@angular/core';
+import type {ChartConfiguration} from 'chart.js';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
 import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {PulseRequest} from '@grpc/spec.pb';
 import {StatisticsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {ChartConfiguration} from 'chart.js';
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {combineLatest, EMPTY, map, of, switchMap} from 'rxjs';
 
@@ -59,7 +61,7 @@ export class PulseComponent implements OnInit {
 
   protected readonly legend$ = toObservable(computed(() => this.dataResource.value())).pipe(
     map((response) =>
-      (response?.legend ? response.legend : []).map((item) => ({
+      (response?.legend ?? []).map((item) => ({
         color: item.color,
         user$: this.#usersService.getUser$(item.userId),
       })),
@@ -74,7 +76,7 @@ export class PulseComponent implements OnInit {
         return EMPTY;
       }
       return combineLatest(
-        (response.grid ? response.grid : []).map((dataset) =>
+        (response.grid ?? []).map((dataset) =>
           combineLatest([this.#usersService.getUser$(dataset.userId), of(dataset)]),
         ),
       ).pipe(

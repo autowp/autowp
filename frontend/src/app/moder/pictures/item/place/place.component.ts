@@ -1,5 +1,9 @@
+import type {OnInit} from '@angular/core';
+import type {LatLng, LeafletMouseEvent, Map, Marker, TileLayer} from 'leaflet';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, NgZone, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, NgZone} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
@@ -8,18 +12,8 @@ import {Picture, PictureListOptions, PicturesRequest, UpdatePictureRequest} from
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
-import {icon, LatLng, latLng, LeafletMouseEvent, Map, Marker, marker, TileLayer, tileLayer} from 'leaflet';
-import {
-  catchError,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  Observable,
-  shareReplay,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import {icon, latLng, marker, tileLayer} from 'leaflet';
+import {catchError, debounceTime, distinctUntilChanged, EMPTY, map, shareReplay, startWith, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 

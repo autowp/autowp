@@ -1,6 +1,7 @@
+import type {Pages} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {Pages} from '@grpc/spec.pb';
 
 @Component({
   selector: 'app-paginator',

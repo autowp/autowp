@@ -1,7 +1,9 @@
+import type {MostsVehicleType} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {MostsItemsRequest, MostsVehicleType} from '@grpc/spec.pb';
+import {MostsItemsRequest} from '@grpc/spec.pb';
 import {MostsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
@@ -27,7 +29,7 @@ function vehicleTypesToList(vehicleTypes: MostsVehicleType[]): MostsVehicleTypeT
   const result: MostsVehicleTypeTranslated[] = [];
   for (const item of vehicleTypes) {
     result.push({...item.toObject(), nameTranslated: getVehicleTypeRpTranslation(item.nameRp)});
-    for (const child of item.childs || []) {
+    for (const child of item.childs ?? []) {
       result.push({...child.toObject(), nameTranslated: getVehicleTypeRpTranslation(child.nameRp)});
     }
   }
@@ -67,7 +69,7 @@ export class MostsContentsComponent {
       this.#mostsService.getMenu$(brandID).pipe(
         map((menu) => ({
           ratings: menu.ratings,
-          vehicleTypes: vehicleTypesToList(menu.vehicleTypes || []),
+          vehicleTypes: vehicleTypesToList(menu.vehicleTypes ?? []),
           years: menu.years,
         })),
       ),
@@ -79,6 +81,10 @@ export class MostsContentsComponent {
 
   protected readonly defaultTypeCatname = computed(() => this.vehicleTypes()?.[0]?.catname);
 
+  // ratingCatname() is '' (not null) when the route has no rating_catname param - see
+  // mosts.component.ts's `?? ''` at the source - so the empty-string case must fall through to
+  // the first rating exactly like a real "unset" would. ?? wouldn't treat '' as unset.
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   protected readonly ratingCatnameNormalized = computed(() => this.ratingCatname() || this.ratings()?.[0]?.catname);
 
   protected readonly itemsResource = rxResource({
@@ -91,8 +97,8 @@ export class MostsContentsComponent {
         : {
             brandID: this.brandID(),
             ratingCatname,
-            typeCatname: this.typeCatname() || '',
-            yearsCatname: this.yearsCatname() || '',
+            typeCatname: this.typeCatname() ?? '',
+            yearsCatname: this.yearsCatname() ?? '',
           };
     },
     stream: ({params}) =>
@@ -106,7 +112,7 @@ export class MostsContentsComponent {
             yearsCatname: params.yearsCatname,
           }),
         )
-        .pipe(map((response) => response.items || [])),
+        .pipe(map((response) => response.items ?? [])),
   });
 
   constructor() {

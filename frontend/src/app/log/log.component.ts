@@ -1,18 +1,18 @@
+import type {OnInit} from '@angular/core';
+import type {Item, LogEvent, Picture, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemRequest,
-  LogEvent,
   LogEventsRequest,
-  Picture,
   PictureFields,
   PictureListOptions,
   PicturesRequest,
-  User,
 } from '@grpc/spec.pb';
 import {ItemsClient, LogClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -21,7 +21,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
-import {catchError, forkJoin, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {UserComponent} from '../user/user/user.component';
@@ -97,7 +97,7 @@ export class LogComponent implements OnInit {
           // via `| async` - the latter can race SSR's whenStable() check the same way the Articles
           // list author-lookup did (see the comment on CatalogueIndexComponent.brandResource).
           switchMap((response) => {
-            const events = response.items || [];
+            const events = response.items ?? [];
             if (events.length === 0) {
               return of({items: [], paginator: response.paginator});
             }
@@ -132,7 +132,7 @@ export class LogComponent implements OnInit {
         }),
       )
       .pipe(
-        map((response) => new Map((response.items || []).map((picture) => [picture.id, picture]))),
+        map((response) => new Map((response.items ?? []).map((picture) => [picture.id, picture]))),
         // A failure here shouldn't take down the whole event list - degrade to showing no
         // pictures rather than toasting a background lookup failure.
         catchError(() => of(new Map<string, Picture>())),

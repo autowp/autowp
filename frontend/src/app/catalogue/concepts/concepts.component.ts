@@ -1,13 +1,15 @@
+import type {Item, Pages} from '@grpc/spec.pb';
+import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/list-item.component';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
   ItemsRequest,
-  Pages,
   PictureItemListOptions,
   PictureItemType,
   PictureListOptions,
@@ -18,13 +20,9 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {
-  CatalogueListItem,
-  CatalogueListItemComponent,
-  CatalogueListItemPicture,
-} from '@utils/list-item/list-item.component';
+import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {map, Observable, of, switchMap} from 'rxjs';
+import {map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 
@@ -162,17 +160,17 @@ export class CatalogueConceptsComponent {
         )
         .pipe(
           map((response) => {
-            const items: CatalogueListItem[] = (response.items || []).map((item) => {
+            const items: CatalogueListItem[] = (response.items ?? []).map((item) => {
               const largeFormat = !!item.previewPictures?.largeFormat;
 
-              const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map(
+              const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures ?? []).map(
                 (picture, idx) => {
                   let thumb = null;
                   if (picture.picture) {
                     thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
                   }
                   return {
-                    picture: picture.picture ? picture.picture : null,
+                    picture: picture.picture ?? null,
                     routerLink: picture.picture ? item.route.concat(['pictures', picture.picture.identity]) : [],
                     thumb,
                   };

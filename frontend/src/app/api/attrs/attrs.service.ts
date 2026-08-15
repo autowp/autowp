@@ -1,16 +1,12 @@
+import type {AttrAttribute, AttrAttributeType, AttrListOptionsResponse, AttrZone} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
-import {
-  AttrAttribute,
-  AttrAttributeType,
-  AttrListOptionsRequest,
-  AttrListOptionsResponse,
-  AttrZone,
-  ListAttributesRequest,
-} from '@grpc/spec.pb';
+import {AttrListOptionsRequest, ListAttributesRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {getAttrsTranslation} from '@utils/translations';
-import {map, Observable, of, shareReplay, switchMap} from 'rxjs';
+import {map, of, shareReplay, switchMap} from 'rxjs';
 
 export interface AttrAttributeTreeItem extends AttrAttribute.AsObject {
   childs: AttrAttributeTreeItem[];
@@ -37,12 +33,12 @@ export class APIAttrsService {
   public readonly attributeTypes$: Observable<AttrAttributeType[]> = this.#attrsClient
     .getAttributeTypes(new Empty())
     .pipe(
-      map((response) => (response.items ? response.items : [])),
+      map((response) => response.items ?? []),
       shareReplay({bufferSize: 1, refCount: false}),
     );
 
   public readonly zones$: Observable<AttrZone[]> = this.#attrsClient.getZones(new Empty()).pipe(
-    map((response) => (response.items ? response.items : [])),
+    map((response) => response.items ?? []),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
@@ -66,7 +62,7 @@ export class APIAttrsService {
   public getAttributes$(zoneID: null | string, parentID: null | string): Observable<AttrAttributeTreeItem[]> {
     return this.#attrsClient
       .listAttributes(new ListAttributesRequest({parentId: parentID ?? undefined, zoneId: zoneID ?? undefined}))
-      .pipe(map((response) => toTree(response.items ?? [], parentID ? parentID : '0')));
+      .pipe(map((response) => toTree(response.items ?? [], parentID ?? '0')));
   }
 
   public getListOptions$(attributeId: string | undefined): Observable<AttrListOptionsResponse> {

@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
+
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {PageEnvService} from '@services/page-env.service';
 import {RemarkModule} from 'ngx-remark';
 

@@ -1,26 +1,24 @@
+import type {ActivatedRoute} from '@angular/router';
+import type {ChildsCount, Item, ItemParent, PathTreeItemParent, Picture} from '@grpc/spec.pb';
+import type {Observable, OperatorFunction} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
 import {
-  ChildsCount,
-  Item,
   ItemFields,
   ItemListOptions,
-  ItemParent,
   ItemParentFields,
   ItemParentListOptions,
   ItemParentsRequest,
   ItemParentType,
   ItemsRequest,
   ItemType,
-  PathTreeItemParent,
-  Picture,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {type APIItemChildsCounts} from '@services/item';
 import {LanguageService} from '@services/language';
 import {perspectiveIDLogotype, perspectiveIDMixed} from '@services/picture';
 import {notFoundError} from 'app/grpc';
-import {debounceTime, distinctUntilChanged, EMPTY, map, Observable, of, OperatorFunction, switchMap} from 'rxjs';
+import {debounceTime, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
 export interface Breadcrumbs {
   html: string;
@@ -46,7 +44,7 @@ export class CatalogueService {
     for (const item of path) {
       routerLink.push(item.catname);
       result.push({
-        html: item.item?.nameHtml || '',
+        html: item.item?.nameHtml ?? '',
         routerLink: [...routerLink],
       });
     }
@@ -75,9 +73,7 @@ export class CatalogueService {
           return of(parent);
         }
 
-        if (!itemFields) {
-          itemFields = new ItemFields();
-        }
+        itemFields ??= new ItemFields();
         itemFields.nameHtml = true;
         const isLast = parent.path.length <= 1;
         if (isLast) {
@@ -112,7 +108,7 @@ export class CatalogueService {
           )
           .pipe(
             switchMap((response) => {
-              const items = response.items || [];
+              const items = response.items ?? [];
               if (items.length <= 0) {
                 return notFoundError();
               }
@@ -197,7 +193,7 @@ export class CatalogueService {
         return ['/', parent.item.catname, parent.catname];
       case ItemType.ITEM_TYPE_ENGINE:
       case ItemType.ITEM_TYPE_VEHICLE:
-        for (const sparent of parent.item.parents || []) {
+        for (const sparent of parent.item.parents ?? []) {
           const path = this.pictureRouterLinkItem(sparent);
           if (path) {
             return path.concat([parent.catname]);
@@ -209,7 +205,7 @@ export class CatalogueService {
   }
 
   public picturePathToRoute(picture: Picture): null | string[] {
-    for (const pictureItem of picture.path || []) {
+    for (const pictureItem of picture.path ?? []) {
       switch (pictureItem.item?.itemTypeId) {
         case ItemType.ITEM_TYPE_BRAND:
           switch (pictureItem.perspectiveId) {
@@ -222,7 +218,7 @@ export class CatalogueService {
           }
         case ItemType.ITEM_TYPE_ENGINE:
         case ItemType.ITEM_TYPE_VEHICLE:
-          for (const parent of pictureItem.item.parents || []) {
+          for (const parent of pictureItem.item.parents ?? []) {
             const path = this.pictureRouterLinkItem(parent);
             if (path) {
               return path.concat(['pictures', picture.identity]);

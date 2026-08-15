@@ -1,25 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  Injector,
-  input,
-  OnInit,
-  output,
-  ResourceRef,
-} from '@angular/core';
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {CommentMessage, User} from '@grpc/spec.pb';
+
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, output} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {
-  CommentMessage,
-  CommentsType,
-  CommentsUnSubscribeRequest,
-  GetTopicRequest,
-  Topic,
-  UpdateTopicRequest,
-  User,
-} from '@grpc/spec.pb';
+import {CommentsType, CommentsUnSubscribeRequest, GetTopicRequest, Topic, UpdateTopicRequest} from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {UserService} from '@services/user';

@@ -1,9 +1,11 @@
+import type {ItemParent} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {
   ItemFields,
-  ItemParent,
   ItemParentFields,
   ItemParentListOptions,
   ItemParentsRequest,
@@ -12,9 +14,9 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {map, Observable, switchMap} from 'rxjs';
+import {map, switchMap} from 'rxjs';
 
-import {PictureItemMoveSelection} from '../move.component';
+import type {PictureItemMoveSelection} from '../move.component';
 
 interface ListItem {
   expanded: boolean;
@@ -65,7 +67,7 @@ export class ModerPictureMoveItemComponent {
         }),
       ),
     ),
-    map((response) => response.items || []),
+    map((response) => response.items ?? []),
   );
 
   protected readonly PictureItemType = PictureItemType;

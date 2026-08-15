@@ -1,5 +1,9 @@
+import type {OnInit} from '@angular/core';
+import type {Theme, Topic} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CommentsMoveCommentRequest,
@@ -7,13 +11,11 @@ import {
   GetMessagePageRequest,
   ListThemesRequest,
   ListTopicsRequest,
-  Theme,
-  Topic,
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
-import {catchError, distinctUntilChanged, EMPTY, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {MESSAGES_PER_PAGE} from '../forums.module';
@@ -52,7 +54,7 @@ export class ForumsMoveMessageComponent implements OnInit {
           this.#toastService.handleError(response);
           return EMPTY;
         }),
-        map((response) => (response.items ? response.items : [])),
+        map((response) => response.items ?? []),
       );
     }),
   );
@@ -62,7 +64,7 @@ export class ForumsMoveMessageComponent implements OnInit {
       this.#toastService.handleError(response);
       return EMPTY;
     }),
-    map((response) => (response.items ? response.items : [])),
+    map((response) => response.items ?? []),
   );
 
   ngOnInit(): void {

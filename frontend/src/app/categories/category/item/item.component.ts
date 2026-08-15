@@ -1,3 +1,5 @@
+import type {Picture} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -9,7 +11,6 @@ import {
   ItemRequest,
   ItemsRequest,
   ItemType,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureItemType,
@@ -22,6 +23,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {RemarkModule} from 'ngx-remark';
 import {map, of} from 'rxjs';
 
@@ -56,7 +58,7 @@ export class CategoriesCategoryItemComponent {
   protected readonly categoryDataResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: 'categories-category-item-data',
-    stream: () => this.#categoriesService.categoryPipe$(this.#route.parent!),
+    stream: () => this.#categoriesService.categoryPipe$(requireRouteParent(this.#route)),
   });
 
   protected readonly current = computed(() => this.categoryDataResource.value()?.current);
@@ -114,7 +116,7 @@ export class CategoriesCategoryItemComponent {
         )
         .pipe(
           map((response) => ({
-            items: (response.items || []).map((itemParent) => ({
+            items: (response.items ?? []).map((itemParent) => ({
               item: itemParent,
               parentRouterLink: [
                 '/category',
@@ -166,7 +168,7 @@ export class CategoriesCategoryItemComponent {
         )
         .pipe(
           map((response) =>
-            (response.items || []).map((picture) => ({
+            (response.items ?? []).map((picture) => ({
               picture,
               route: [
                 '/category',
@@ -246,7 +248,7 @@ export class CategoriesCategoryItemComponent {
       const current = this.categoryDataResource.value()?.current;
       this.#pageEnv.set({
         pageId: 22,
-        title: current?.nameText || '',
+        title: current?.nameText ?? '',
       });
     });
   }

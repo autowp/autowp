@@ -1,10 +1,13 @@
+import type {OnInit} from '@angular/core';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {environment} from '@environment/environment';
 import {MeRequest, UserFields} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {catchError, EMPTY, map, Observable} from 'rxjs';
+import {catchError, EMPTY, map} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 

@@ -1,12 +1,15 @@
+import type {Image, Item, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {Image, Item, ItemType, Picture} from '@grpc/spec.pb';
+import {ItemType} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, map, Observable} from 'rxjs';
+import {combineLatest, map} from 'rxjs';
 
 interface PictureThumbRoute {
   picture: null | Picture;
@@ -50,10 +53,10 @@ export class CategoriesListItemComponent {
   ]).pipe(
     map(([item, parentRouterLink]) => {
       const largeFormat = !!item.previewPictures?.largeFormat;
-      return (item.previewPictures?.pictures || []).map((picture, idx) => {
+      return (item.previewPictures?.pictures ?? []).map((picture, idx) => {
         const thumb = largeFormat && idx == 0 ? picture.picture?.thumbLarge : picture.picture?.thumbMedium;
         return {
-          picture: picture.picture ? picture.picture : null,
+          picture: picture.picture ?? null,
           route: picture.picture ? parentRouterLink.concat(['pictures', picture.picture.identity]) : null,
           thumb,
         };
@@ -63,7 +66,7 @@ export class CategoriesListItemComponent {
 
   protected isHavePhoto(item: Item) {
     if (item.previewPictures) {
-      for (const picture of item.previewPictures.pictures || []) {
+      for (const picture of item.previewPictures.pictures ?? []) {
         if (picture.picture) {
           return true;
         }

@@ -1,19 +1,18 @@
+import type {AttrListOption, AttrValue, Item, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {FormArray, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {
   AttrAttributeType,
-  AttrListOption,
   AttrSetUserValuesRequest,
   AttrUserValue,
   AttrUserValuesFields,
   AttrUserValuesRequest,
-  AttrValue,
   AttrValuesRequest,
   AttrValueValue,
-  Item,
-  User,
 } from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -35,14 +34,15 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   of,
   shareReplay,
   switchMap,
   throwError,
 } from 'rxjs';
 
-import {APIAttrsService, AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
+import type {AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
+
+import {APIAttrsService} from '../../../api/attrs/attrs.service';
 import {ToastsService} from '../../../toasts/toasts.service';
 import {UserComponent} from '../../../user/user/user.component';
 
@@ -163,7 +163,7 @@ export class CarsSpecificationsEditorSpecComponent {
     ),
     map(({attributes, response}) => {
       const currentUserValues: Record<string, AttrUserValue> = {};
-      for (const value of response.items || []) {
+      for (const value of response.items ?? []) {
         currentUserValues[value.attributeId] = value;
       }
 
@@ -246,7 +246,7 @@ export class CarsSpecificationsEditorSpecComponent {
     ),
     map((response) => {
       const values = new Map<string, AttrValue>();
-      for (const value of response.items || []) {
+      for (const value of response.items ?? []) {
         values.set(value.attributeId, value);
       }
       return values;
@@ -271,7 +271,7 @@ export class CarsSpecificationsEditorSpecComponent {
     ),
     map((response) => {
       const uv = new Map<string, AttrUserValueWithUser[]>();
-      this.applyUserValues(uv, response.items || []);
+      this.applyUserValues(uv, response.items ?? []);
       return uv;
     }),
     shareReplay({bufferSize: 1, refCount: false}),
@@ -363,7 +363,7 @@ export class CarsSpecificationsEditorSpecComponent {
   readonly #listOptions$: Observable<{attributeId: string; id: string; name: string; parentId: string}[]> =
     this.#attrsService.getListOptions$(undefined).pipe(
       map((response) =>
-        (response.items ? response.items : []).map((i) => ({
+        (response.items ?? []).map((i) => ({
           ...i.toObject(),
           name: getAttrListOptionsTranslation(i.name),
         })),

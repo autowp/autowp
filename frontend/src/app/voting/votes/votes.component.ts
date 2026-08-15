@@ -1,11 +1,14 @@
+import type {User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {User, VotingRequest} from '@grpc/spec.pb';
+import {VotingRequest} from '@grpc/spec.pb';
 import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UserService} from '@services/user';
-import {catchError, combineLatest, EMPTY, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, combineLatest, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -36,6 +39,6 @@ export class VotingVotesComponent {
       this.#toastService.handleError(response);
       return EMPTY;
     }),
-    map((response) => (response?.userIds || []).map((id) => this.#userService.getUser$(id))),
+    map((response) => (response?.userIds ?? []).map((id) => this.#userService.getUser$(id))),
   );
 }

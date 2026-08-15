@@ -1,16 +1,16 @@
+import type {User} from '@grpc/spec.pb';
+import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/list-item.component';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {TopSpecsContributionsRequest, User} from '@grpc/spec.pb';
+import {TopSpecsContributionsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
-import {
-  CatalogueListItem,
-  CatalogueListItemComponent,
-  CatalogueListItemPicture,
-} from '@utils/list-item/list-item.component';
-import {catchError, map, Observable, of} from 'rxjs';
+import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
+import {catchError, map, of} from 'rxjs';
 
 import {convertChildsCounts} from '../../catalogue/catalogue-service';
 import {chunkBy} from '../../chunk';
@@ -36,10 +36,10 @@ export class IndexSpecsCarsComponent {
         .getTopSpecsContributions(new TopSpecsContributionsRequest({language: this.#languageService.language}))
         .pipe(
           map((response) =>
-            (response.items || []).map((item): RawSpecsCarItem => {
+            (response.items ?? []).map((item): RawSpecsCarItem => {
               const largeFormat = !!item.previewPictures?.largeFormat;
 
-              const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map(
+              const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures ?? []).map(
                 (picture, idx) => {
                   let thumb = null;
                   if (picture.picture) {
@@ -47,7 +47,7 @@ export class IndexSpecsCarsComponent {
                   }
 
                   return {
-                    picture: picture.picture ? picture.picture : null,
+                    picture: picture.picture ?? null,
                     routerLink: picture.picture ? [...item.route, 'pictures', picture.picture.identity] : [],
                     thumb,
                   };
@@ -59,7 +59,7 @@ export class IndexSpecsCarsComponent {
                 canEditSpecs: item.canEditSpecs,
                 categories: item.categories,
                 childsCounts: item.childsCounts ? convertChildsCounts(item.childsCounts) : null,
-                contributorIds: (item.specsContributors || []).map((contributor) => contributor.userId),
+                contributorIds: (item.specsContributors ?? []).map((contributor) => contributor.userId),
                 description: item.description,
                 design: item.design,
                 details: {

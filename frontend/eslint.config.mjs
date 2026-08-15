@@ -1,6 +1,8 @@
 import eslint from '@eslint/js';
 import angular from 'angular-eslint';
+import {createTypeScriptImportResolver} from 'eslint-import-resolver-typescript';
 import depend from 'eslint-plugin-depend';
+import importX from 'eslint-plugin-import-x';
 import perfectionist from 'eslint-plugin-perfectionist';
 import {default as eslintPluginPrettierRecommended} from 'eslint-plugin-prettier/recommended';
 import rxjsX from 'eslint-plugin-rxjs-x';
@@ -47,7 +49,11 @@ export default defineConfig([
     },
     // Override specific rules for TypeScript files (these will take priority over the extended configs above)
     rules: {
-      'no-duplicate-imports': 'error',
+      // allowSeparateTypeImports: consistent-type-imports below splits a module's value and
+      // type-only imports into two separate `import`/`import type` statements when only some of
+      // its named imports are type-only - that's two imports from the same source by design, not
+      // an accidental duplicate.
+      'no-duplicate-imports': ['error', {allowSeparateTypeImports: true}],
       'no-restricted-globals': ['error', {globals: ['window', 'document', 'event']}],
       'no-restricted-syntax': [
         'error',
@@ -69,14 +75,12 @@ export default defineConfig([
       // warns about, but they're pure (never touch `this`), so there's no real unbound-`this`
       // hazard. Every current occurrence in this codebase is this one safe, standard idiom.
       '@typescript-eslint/unbound-method': ['error', {ignoreStatic: true}],
-      // Deferred follow-up, not disabled: strictTypeChecked flags ~260 `||` sites and ~30 `!`
-      // sites repo-wide. Both need real per-site judgment at that volume rather than a blind
-      // sweep - prefer-nullish-coalescing changes behavior wherever the left side's type can be
-      // falsy-but-not-null/undefined (0, '', false), and no-non-null-assertion sites need
-      // checking for whether the assertion is actually hiding a real possible-undefined bug.
-      // Kept visible as warnings rather than silenced outright.
-      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/prefer-nullish-coalescing': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      // Prefer import-x's overlapping consistent-type-imports rule not being enabled: this one
+      // gets full type info for free from the projectService config above, so there's no reason to
+      // duplicate it via import-x.
+      '@typescript-eslint/consistent-type-imports': ['error', {prefer: 'type-imports'}],
       // strictTypeChecked's defaults for these two (allowNumberAndString/allowNumber: false)
       // require every `numberValue + 'px'`/`` `${numberValue}px` `` to be spelled out as
       // `numberValue.toString() + 'px'` - ~90% of this codebase's ~80 flagged sites were exactly
@@ -142,6 +146,26 @@ export default defineConfig([
     files: ['**/*.ts'],
     plugins: {
       depend,
+    },
+  },
+  {
+    files: ['**/*.ts'],
+    plugins: {
+      'import-x': importX,
+    },
+    settings: {
+      // Only the TS-aware resolver, not eslint-plugin-import's classic node resolver - it's the
+      // one that understands the '@grpc/*'/'@services/*'/'@utils/*'/'@environment/*' path aliases
+      // from tsconfig.json's `paths`.
+      'import-x/resolver-next': [createTypeScriptImportResolver({project: './tsconfig.json'})],
+    },
+    rules: {
+      // Only no-cycle/no-unresolved, not the full import-x recommended config - `named`/`namespace`
+      // /`default`/`export` duplicate checks TypeScript's own type-checking already does under
+      // strictTypeChecked, and `no-duplicates` overlaps with the core no-duplicate-imports rule
+      // above; pulling in the whole recommended set would just add redundant/conflicting opinions.
+      'import-x/no-cycle': 'error',
+      'import-x/no-unresolved': 'error',
     },
   },
   {

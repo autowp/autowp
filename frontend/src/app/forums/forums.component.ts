@@ -1,7 +1,9 @@
+import type {Theme} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {GetThemeRequest, ListThemesRequest, ListTopicsRequest, Theme} from '@grpc/spec.pb';
+import {GetThemeRequest, ListThemesRequest, ListTopicsRequest} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
@@ -53,7 +55,7 @@ export class ForumsComponent {
     id: `forums-topics-${this.#themeID() ?? ''}`,
     params: () => ({page: this.#page(), themeID: this.#themeID()}),
     stream: ({params: {page, themeID}}) =>
-      this.#grpc.listTopics(new ListTopicsRequest({page, themeId: themeID ? themeID : undefined})),
+      this.#grpc.listTopics(new ListTopicsRequest({page, themeId: themeID ?? undefined})),
   });
 
   constructor() {

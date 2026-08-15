@@ -1,10 +1,12 @@
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {CommentVote, GetCommentVotesRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {catchError, debounceTime, distinctUntilChanged, EMPTY, map, Observable, switchMap} from 'rxjs';
+import {catchError, debounceTime, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -41,8 +43,8 @@ export class CommentsVotesComponent {
       return EMPTY;
     }),
     map((votes) => ({
-      negative: (votes.items ? votes.items : []).filter((v) => v.value === CommentVote.VoteValue.NEGATIVE),
-      positive: (votes.items ? votes.items : []).filter((v) => v.value === CommentVote.VoteValue.POSITIVE),
+      negative: (votes.items ?? []).filter((v) => v.value === CommentVote.VoteValue.NEGATIVE),
+      positive: (votes.items ?? []).filter((v) => v.value === CommentVote.VoteValue.POSITIVE),
     })),
   );
 }

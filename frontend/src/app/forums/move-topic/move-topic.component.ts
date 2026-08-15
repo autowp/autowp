@@ -1,12 +1,16 @@
+import type {OnInit} from '@angular/core';
+import type {Theme} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {GetThemeRequest, GetTopicRequest, ListThemesRequest, Theme, Topic, UpdateTopicRequest} from '@grpc/spec.pb';
+import {GetThemeRequest, GetTopicRequest, ListThemesRequest, Topic, UpdateTopicRequest} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
-import {catchError, distinctUntilChanged, EMPTY, map, Observable, of, shareReplay, switchMap} from 'rxjs';
+import {catchError, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 
@@ -28,7 +32,7 @@ export class ForumsMoveTopicComponent implements OnInit {
       this.#toastService.handleError(response);
       return EMPTY;
     }),
-    map((response) => (response.items ? response.items : [])),
+    map((response) => response.items ?? []),
   );
 
   protected readonly topic$ = this.#route.queryParamMap.pipe(

@@ -1,5 +1,10 @@
+import type {OnInit} from '@angular/core';
+import type {PictureItem} from '@grpc/spec.pb';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -9,7 +14,6 @@ import {
   ItemParent,
   ItemRequest,
   ItemType,
-  PictureItem,
   PictureItemListOptions,
   PictureItemsRequest,
   SetPictureItemItemIDRequest,
@@ -20,18 +24,15 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {ItemService} from '@services/item';
 import {PageEnvService} from '@services/page-env.service';
-import {InvalidParams} from '@utils/invalid-params.pipe';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {catchError, EMPTY, forkJoin, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, EMPTY, forkJoin, map, of, switchMap} from 'rxjs';
+
+import type {ItemMetaFormResult} from '../../../item-meta-form/item-meta-form.component';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../../../grpc';
 import {ToastsService} from '../../../../../toasts/toasts.service';
-import {
-  ItemMetaFormComponent,
-  ItemMetaFormResult,
-  itemMetaFormResultsToAPIItem,
-} from '../../../item-meta-form/item-meta-form.component';
+import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../../../item-meta-form/item-meta-form.component';
 
 @Component({
   selector: 'app-moder-items-item-pictures-organize',
@@ -70,7 +71,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
             options: new PictureItemListOptions({itemId: itemID}),
           }),
         )
-        .pipe(map((response) => response.items || [])),
+        .pipe(map((response) => response.items ?? [])),
   });
 
   // Fetches and NOT_FOUND-checking both happen here; navigating away on NOT_FOUND happens in the
@@ -112,7 +113,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
                 itemId: item.id,
               }),
             )
-            .pipe(map((response) => (response.items ? response.items : []).map((row) => row.vehicleTypeId)))
+            .pipe(map((response) => (response.items ?? []).map((row) => row.vehicleTypeId)))
         : of([] as string[]),
   });
 

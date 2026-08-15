@@ -1,7 +1,9 @@
+import type {Item} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, inject, output} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Item, ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
+import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {map} from 'rxjs';
@@ -56,7 +58,7 @@ export class ModerItemsItemSelectParentBrandsComponent {
         )
         .pipe(
           map((response) => ({
-            items: chunk<Item>(response.items ? response.items : [], 6),
+            items: chunk<Item>(response.items ?? [], 6),
             paginator: response.paginator,
           })),
         ),

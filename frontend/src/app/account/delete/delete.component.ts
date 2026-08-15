@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {DeleteUserRequest} from '@grpc/spec.pb';
@@ -6,7 +9,7 @@ import {UsersClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
-import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RemarkModule} from 'ngx-remark';
 import {EMPTY, switchMap} from 'rxjs';
 

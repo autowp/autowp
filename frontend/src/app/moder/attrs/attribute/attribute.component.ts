@@ -1,12 +1,16 @@
+import type {AttrAttribute} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {AttrAttribute} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 import {getAttrListOptionsTranslation, getAttrsTranslation, getUnitNameTranslation} from '@utils/translations';
-import {combineLatest, distinctUntilChanged, EMPTY, map, Observable, of, shareReplay, switchMap, tap} from 'rxjs';
+import {combineLatest, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap, tap} from 'rxjs';
 
-import {APIAttrsService, AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
+import type {AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
+
+import {APIAttrsService} from '../../../api/attrs/attrs.service';
 
 @Component({
   selector: 'app-moder-attrs-attribute',
@@ -62,7 +66,7 @@ export class ModerAttrsAttributeComponent {
 
   protected readonly listOptions$: Observable<string[]> = this.#attributeID$.pipe(
     switchMap((attributeID) => (attributeID ? this.#attrsService.getListOptions$(attributeID) : EMPTY)),
-    map((response) => (response.items ? response.items : []).map((l) => getAttrListOptionsTranslation(l.name))),
+    map((response) => (response.items ?? []).map((l) => getAttrListOptionsTranslation(l.name))),
   );
 
   protected readonly typeOption$ = combineLatest([this.attribute$, this.#attrsService.attributeTypes$]).pipe(

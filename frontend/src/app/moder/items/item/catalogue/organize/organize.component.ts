@@ -1,9 +1,13 @@
+import type {OnInit} from '@angular/core';
+import type {Item} from '@grpc/spec.pb';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   GetItemVehicleTypesRequest,
-  Item,
   ItemFields,
   ItemParent,
   ItemParentFields,
@@ -18,7 +22,6 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {allowedItemTypeCombinations, ItemService} from '@services/item';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {InvalidParams} from '@utils/invalid-params.pipe';
 import {RemarkModule} from 'ngx-remark';
 import {
   catchError,
@@ -28,19 +31,16 @@ import {
   EMPTY,
   forkJoin,
   map,
-  Observable,
   of,
   shareReplay,
   switchMap,
 } from 'rxjs';
 
+import type {ItemMetaFormResult} from '../../../item-meta-form/item-meta-form.component';
+
 import {extractFieldViolations, fieldViolations2InvalidParams, isNotFoundError} from '../../../../../grpc';
 import {ToastsService} from '../../../../../toasts/toasts.service';
-import {
-  ItemMetaFormComponent,
-  ItemMetaFormResult,
-  itemMetaFormResultsToAPIItem,
-} from '../../../item-meta-form/item-meta-form.component';
+import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../../../item-meta-form/item-meta-form.component';
 
 @Component({
   selector: 'app-moder-items-item-organize',
@@ -98,7 +98,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
     this.#itemTypeID$,
   ]).pipe(
     map(([data, itemTypeID]) =>
-      (data.items || [])
+      (data.items ?? [])
         .map((i) => i.item)
         .filter((i): i is Item => !!i)
         .filter((item) => {
@@ -164,7 +164,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
                 itemId: item.id,
               }),
             )
-            .pipe(map((response) => (response.items ? response.items : []).map((row) => row.vehicleTypeId)))
+            .pipe(map((response) => (response.items ?? []).map((row) => row.vehicleTypeId)))
         : of([] as string[]),
     ),
   );

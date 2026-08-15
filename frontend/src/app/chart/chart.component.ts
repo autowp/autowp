@@ -1,12 +1,15 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {ChartParameter} from '@grpc/spec.pb';
+import type {ChartOptions} from 'chart.js';
+
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {AttrAttributeType, ChartDataRequest, ChartParameter} from '@grpc/spec.pb';
+import {AttrAttributeType, ChartDataRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {getAttrsTranslation} from '@utils/translations';
-import {ChartOptions} from 'chart.js';
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {ObjectTyped} from 'object-typed';
 import {map} from 'rxjs';
@@ -31,7 +34,7 @@ export class ChartComponent implements OnInit {
     stream: () =>
       this.#attrsClient.getChartParameters(new Empty()).pipe(
         map((response) =>
-          (response.parameters || []).map((parameter) => {
+          (response.parameters ?? []).map((parameter) => {
             parameter.name = getAttrsTranslation(parameter.name);
             return parameter;
           }),
@@ -92,7 +95,7 @@ export class ChartComponent implements OnInit {
         this.#toastService.handleError(response);
       },
       next: (response) => {
-        const datasets = response.datasets || [];
+        const datasets = response.datasets ?? [];
         const yearsSet = new Set<number>();
         datasets.forEach((dataset) => {
           ObjectTyped.keys(dataset.values).forEach((key) => yearsSet.add(key));

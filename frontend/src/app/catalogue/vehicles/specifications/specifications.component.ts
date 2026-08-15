@@ -1,15 +1,21 @@
+import type {SafeHtml} from '@angular/platform-browser';
+import type {Item, ItemParent} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {DomSanitizer} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {GetSpecificationsRequest, Item, ItemFields, ItemParent} from '@grpc/spec.pb';
+import {GetSpecificationsRequest, ItemFields} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {map, Observable} from 'rxjs';
+import {map} from 'rxjs';
 
-import {Breadcrumbs, CatalogueService} from '../../catalogue-service';
+import type {Breadcrumbs} from '../../catalogue-service';
+
+import {CatalogueService} from '../../catalogue-service';
 
 @Component({
   selector: 'app-catalogue-vehicles-specifications',
@@ -64,7 +70,7 @@ export class CatalogueVehiclesSpecificationsComponent {
   protected readonly item = computed<Item | undefined>(() => {
     const data = this.catalogueResource.value();
     const item = data?.path[data.path.length - 1].item;
-    return item || undefined;
+    return item ?? undefined;
   });
 
   protected readonly htmlResource = rxResource({

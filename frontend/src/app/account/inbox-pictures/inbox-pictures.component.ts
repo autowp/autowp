@@ -1,12 +1,16 @@
+import type {OnInit} from '@angular/core';
+import type {PicturesList} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {PictureFields, PictureListOptions, PicturesList, PicturesRequest, PictureStatus} from '@grpc/spec.pb';
+import {PictureFields, PictureListOptions, PicturesRequest, PictureStatus} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, Observable, switchMap} from 'rxjs';
+import {catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';

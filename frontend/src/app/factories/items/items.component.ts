@@ -1,9 +1,11 @@
+import type {Image} from '@grpc/spec.pb';
+import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/list-item.component';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Image,
   ItemFields,
   ItemListOptions,
   ItemRequest,
@@ -20,11 +22,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {
-  CatalogueListItem,
-  CatalogueListItemComponent,
-  CatalogueListItemPicture,
-} from '@utils/list-item/list-item.component';
+import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
@@ -131,16 +129,16 @@ export class FactoryItemsComponent {
     }
 
     return {
-      items: (data.items || []).map((item): CatalogueListItem => {
+      items: (data.items ?? []).map((item): CatalogueListItem => {
         const largeFormat = !!item.previewPictures?.largeFormat;
 
-        const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map((picture, idx) => {
+        const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures ?? []).map((picture, idx) => {
           let thumb: Image | undefined = undefined;
           if (picture.picture) {
             thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
           }
           return {
-            picture: picture.picture ? picture.picture : null,
+            picture: picture.picture ?? null,
             routerLink: picture.picture ? item.route.concat(['pictures', picture.picture.identity]) : [],
             thumb: thumb,
           };

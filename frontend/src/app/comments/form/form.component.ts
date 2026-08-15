@@ -1,10 +1,13 @@
+import type {CommentsType} from '@grpc/spec.pb';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+
 import {ChangeDetectionStrategy, Component, effect, inject, input, output, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
-import {AddCommentRequest, CommentsType} from '@grpc/spec.pb';
+import {AddCommentRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
-import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {switchMap, take} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';

@@ -31,7 +31,7 @@ export class IndexDonateComponent {
 
   protected readonly state$ = this.#donations.getTransactions(new Empty()).pipe(
     map((res) => {
-      const operations = res.items || [];
+      const operations = res.items ?? [];
       const donations = operations
         .filter((d) => d.sum > 0)
         .map((d) => ({

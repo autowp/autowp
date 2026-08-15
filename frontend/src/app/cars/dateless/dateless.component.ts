@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
+
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {

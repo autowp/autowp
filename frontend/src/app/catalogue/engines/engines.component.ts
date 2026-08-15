@@ -1,8 +1,11 @@
+import type {Item, Pages} from '@grpc/spec.pb';
+import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/list-item.component';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentFields,
@@ -10,18 +13,13 @@ import {
   ItemParentsRequest,
   ItemsRequest,
   ItemType,
-  Pages,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {
-  CatalogueListItem,
-  CatalogueListItemComponent,
-  CatalogueListItemPicture,
-} from '@utils/list-item/list-item.component';
+import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {map, Observable, of, switchMap} from 'rxjs';
+import {map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {convertChildsCounts} from '../catalogue-service';
@@ -153,19 +151,19 @@ export class CatalogueEnginesComponent {
         )
         .pipe(
           map((response) => {
-            const items: CatalogueListItem[] = (response.items || []).map((item): CatalogueListItem => {
+            const items: CatalogueListItem[] = (response.items ?? []).map((item): CatalogueListItem => {
               const largeFormat = !!item.item?.previewPictures?.largeFormat;
 
               const routerLink = ['/', brand.catname, item.catname];
 
-              const pictures: CatalogueListItemPicture[] = (item.item?.previewPictures?.pictures || []).map(
+              const pictures: CatalogueListItemPicture[] = (item.item?.previewPictures?.pictures ?? []).map(
                 (picture, idx) => {
                   let thumb = null;
                   if (picture.picture) {
                     thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
                   }
                   return {
-                    picture: picture.picture ? picture.picture : null,
+                    picture: picture.picture ?? null,
                     routerLink: picture.picture ? routerLink.concat(['pictures', picture.picture.identity]) : [],
                     thumb,
                   };
@@ -175,27 +173,27 @@ export class CatalogueEnginesComponent {
               return {
                 acceptedPicturesCount: item.item?.acceptedPicturesCount,
                 canEditSpecs: !!item.item?.canEditSpecs,
-                categories: item.item?.categories || undefined,
+                categories: item.item?.categories ?? undefined,
                 childsCounts: item.item?.childsCounts ? convertChildsCounts(item.item.childsCounts) : null,
-                description: item.item?.description || null,
+                description: item.item?.description ?? null,
                 design: undefined,
                 details: {
-                  count: item.item?.childsCount || 0,
+                  count: item.item?.childsCount ?? 0,
                   routerLink,
                 },
                 engineVehicles: item.item?.engineVehicles,
                 hasText: !!item.item?.hasText,
-                id: item.item?.id || '',
-                itemTypeId: item.item?.itemTypeId || 0,
-                nameDefault: item.item?.nameDefault || '',
-                nameHtml: item.item?.nameHtml || '',
+                id: item.item?.id ?? '',
+                itemTypeId: item.item?.itemTypeId ?? 0,
+                nameDefault: item.item?.nameDefault ?? '',
+                nameHtml: item.item?.nameHtml ?? '',
                 picturesRouterLink: routerLink.concat(['pictures']),
                 previewPictures: {
                   largeFormat: !!item.item?.previewPictures?.largeFormat,
                   pictures,
                 },
                 produced: item.item?.produced?.value,
-                producedExactly: item.item?.producedExactly || null,
+                producedExactly: item.item?.producedExactly ?? null,
                 specsRouterLink:
                   item.item?.hasSpecs || item.item?.hasChildSpecs ? routerLink.concat(['specifications']) : null,
               };

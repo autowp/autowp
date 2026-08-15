@@ -1,3 +1,5 @@
+import type {Topic} from '@grpc/spec.pb';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
@@ -8,7 +10,6 @@ import {
   CommentsUnSubscribeRequest,
   GetThemeRequest,
   GetTopicRequest,
-  Topic,
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';

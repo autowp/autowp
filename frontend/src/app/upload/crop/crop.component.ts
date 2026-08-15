@@ -1,20 +1,17 @@
-import {AsyncPipe, DOCUMENT} from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  inject,
-  input,
-  OnDestroy,
-  OnInit,
-  output,
-} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
-import {Image, Picture} from '@grpc/spec.pb';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {BehaviorSubject, combineLatest, Subscription} from 'rxjs';
+import type {OnDestroy, OnInit} from '@angular/core';
+import type {Picture} from '@grpc/spec.pb';
+import type {Subscription} from 'rxjs';
 
-import Jcrop, {JcropCrop, JcropInstance} from '../../jcrop/jquery.Jcrop';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
+import {toObservable} from '@angular/core/rxjs-interop';
+import {Image} from '@grpc/spec.pb';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {BehaviorSubject, combineLatest} from 'rxjs';
+
+import type {JcropCrop, JcropInstance} from '../../jcrop/jquery.Jcrop';
+
+import Jcrop from '../../jcrop/jquery.Jcrop';
 
 @Component({
   selector: 'app-upload-crop',
@@ -144,9 +141,7 @@ export class UploadCropComponent implements OnDestroy, OnInit {
   }
 
   protected onSave(picture: Picture) {
-    if (!picture.image) {
-      picture.image = new Image();
-    }
+    picture.image ??= new Image();
     picture.image.cropLeft = this.currentCrop.x;
     picture.image.cropTop = this.currentCrop.y;
     picture.image.cropWidth = this.currentCrop.w;

@@ -1,7 +1,9 @@
+import type {Item} from '@grpc/spec.pb';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {Item, ItemType} from '@grpc/spec.pb';
+import {ItemType} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {RemarkModule} from 'ngx-remark';
@@ -22,7 +24,7 @@ export class TwinsItemComponent {
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
   protected havePhoto(item: Item) {
-    return (item.previewPictures?.pictures || []).length > 0;
+    return (item.previewPictures?.pictures ?? []).length > 0;
   }
 
   protected canHavePhoto(item: Item) {

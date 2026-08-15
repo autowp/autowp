@@ -1,7 +1,10 @@
+import type {User, UserFields} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
-import {GetUserRequest, User, UserFields, UsersRequest} from '@grpc/spec.pb';
+import {GetUserRequest, UsersRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
-import {forkJoin, map, Observable, of, shareReplay, tap} from 'rxjs';
+import {forkJoin, map, of, shareReplay, tap} from 'rxjs';
 
 @Service()
 export class UserService {
@@ -33,7 +36,7 @@ export class UserService {
         .getUsers(new UsersRequest({id: toRequest, limit: toRequest.length}))
         .pipe(
           tap((response) => {
-            for (const item of response.items || []) {
+            for (const item of response.items ?? []) {
               this.#cache.set(item.id, item);
             }
           }),

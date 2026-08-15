@@ -1,20 +1,22 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {DfDistance, Item, Picture} from '@grpc/spec.pb';
+import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import type {Observable} from 'rxjs';
+
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   DeleteSimilarRequest,
-  DfDistance,
   DfDistanceFields,
   DfDistanceListOptions,
   DfDistanceRequest,
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
   ItemsRequest,
   ItemType,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
@@ -22,12 +24,12 @@ import {
   PictureStatus,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
-import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
 import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {catchError, debounceTime, EMPTY, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, debounceTime, EMPTY, map, of, switchMap} from 'rxjs';
 
 const nonRemovingStatuses = [PictureStatus.PICTURE_STATUS_ACCEPTED, PictureStatus.PICTURE_STATUS_INBOX];
 
@@ -101,7 +103,7 @@ export class ModerPicturesSimilarComponent implements OnInit {
               this.#toastService.handleError(err);
               return EMPTY;
             }),
-            map((response) => response.items || []),
+            map((response) => response.items ?? []),
           );
       }),
     );
@@ -142,7 +144,7 @@ export class ModerPicturesSimilarComponent implements OnInit {
         .pipe(
           map((response) => ({
             paginator: response.paginator,
-            pictures: response.items || [],
+            pictures: response.items ?? [],
           })),
         ),
   });

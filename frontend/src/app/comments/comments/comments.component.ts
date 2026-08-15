@@ -1,20 +1,21 @@
-import {ChangeDetectionStrategy, Component, inject, Injector, input, OnInit, ResourceRef} from '@angular/core';
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {CommentMessage, CommentMessages, Pages} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
+import {ChangeDetectionStrategy, Component, inject, Injector, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {
-  CommentMessage,
   CommentMessageFields,
-  CommentMessages,
   CommentsType,
   CommentsViewRequest,
   GetMessagePageRequest,
   GetMessagesRequest,
-  Pages,
 } from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {RemarkModule} from 'ngx-remark';
-import {catchError, EMPTY, ignoreElements, map, merge, Observable, of} from 'rxjs';
+import {catchError, EMPTY, ignoreElements, map, merge, of} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -96,7 +97,7 @@ export class CommentsComponent implements OnInit {
         return merge(
           this.load$(itemID, typeID, limit, page).pipe(
             map((response) => ({
-              messages: response.items ? response.items : [],
+              messages: response.items ?? [],
               paginator: response.paginator,
             })),
           ),
@@ -151,10 +152,10 @@ export class CommentsComponent implements OnInit {
           vote: true,
         }),
         itemId: itemID,
-        limit: limit ? limit : undefined,
+        limit: limit ?? undefined,
         noParents: true,
         order: GetMessagesRequest.Order.DATE_ASC,
-        page: page ? page : undefined,
+        page: page ?? undefined,
         typeId: typeID,
       }),
     );

@@ -1,3 +1,5 @@
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
@@ -7,7 +9,7 @@ import {AuthService} from '@services/auth.service';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
 import {PictureService} from '@services/picture';
-import {combineLatest, map, Observable, of, shareReplay, switchMap} from 'rxjs';
+import {combineLatest, map, of, shareReplay, switchMap} from 'rxjs';
 
 interface SidebarItem {
   active?: boolean;

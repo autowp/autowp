@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
+
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {ItemsClient} from '@grpc/spec.pbsc';

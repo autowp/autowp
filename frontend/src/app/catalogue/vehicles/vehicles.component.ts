@@ -1,20 +1,20 @@
+import type {Item, ItemParent, Pages, Picture} from '@grpc/spec.pb';
+import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/list-item.component';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
-  ItemParent,
   ItemParentFields,
   ItemParentListOptions,
   ItemParentsRequest,
   ItemParentType,
   ItemRequest,
   ItemsRequest,
-  Pages,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureItemType,
@@ -28,15 +28,11 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
-import {
-  CatalogueListItem,
-  CatalogueListItemComponent,
-  CatalogueListItemPicture,
-} from '@utils/list-item/list-item.component';
+import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {getItemTypeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {catchError, EMPTY, map, Observable, of} from 'rxjs';
+import {catchError, EMPTY, map, of} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -252,10 +248,10 @@ export class CatalogueVehiclesComponent {
         )
         .pipe(
           map((response) => ({
-            items: (response.items || []).map((item): CatalogueListItem => {
+            items: (response.items ?? []).map((item): CatalogueListItem => {
               const itemRouterLink = [...routerLink, item.catname];
 
-              const pictures: CatalogueListItemPicture[] = (item.item?.previewPictures?.pictures || []).map(
+              const pictures: CatalogueListItemPicture[] = (item.item?.previewPictures?.pictures ?? []).map(
                 (picture, idx) => {
                   const largeFormat = !!item.item?.previewPictures?.largeFormat;
                   let thumb = null;
@@ -263,7 +259,7 @@ export class CatalogueVehiclesComponent {
                     thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
                   }
                   return {
-                    picture: picture.picture ? picture.picture : null,
+                    picture: picture.picture ?? null,
                     routerLink: picture.picture ? itemRouterLink.concat(['pictures', picture.picture.identity]) : [],
                     thumb,
                   };
@@ -275,25 +271,25 @@ export class CatalogueVehiclesComponent {
                 canEditSpecs: item.item?.canEditSpecs,
                 categories: item.item?.categories,
                 childsCounts: item.item?.childsCounts ? convertChildsCounts(item.item.childsCounts) : null,
-                description: item.item?.description || '',
+                description: item.item?.description ?? '',
                 design: item.item?.design,
                 details: {
-                  count: item.item?.childsCount || 0,
+                  count: item.item?.childsCount ?? 0,
                   routerLink: itemRouterLink,
                 },
                 engineVehicles: item.item?.engineVehicles,
-                hasText: item.item?.hasText || false,
-                id: item.item?.id || '',
-                itemTypeId: item.item?.itemTypeId || 0,
-                nameDefault: item.item?.nameDefault || '',
-                nameHtml: item.item?.nameHtml || '',
+                hasText: item.item?.hasText ?? false,
+                id: item.item?.id ?? '',
+                itemTypeId: item.item?.itemTypeId ?? 0,
+                nameDefault: item.item?.nameDefault ?? '',
+                nameHtml: item.item?.nameHtml ?? '',
                 picturesRouterLink: itemRouterLink.concat(['pictures']),
                 previewPictures: {
                   largeFormat: !!item.item?.previewPictures?.largeFormat,
                   pictures,
                 },
                 produced: item.item?.produced?.value,
-                producedExactly: item.item?.producedExactly || false,
+                producedExactly: item.item?.producedExactly ?? false,
                 specsRouterLink:
                   item.item?.hasSpecs || item.item?.hasChildSpecs ? itemRouterLink.concat(['specifications']) : null,
                 twinsGroups: item.item?.twins,
@@ -361,12 +357,12 @@ export class CatalogueVehiclesComponent {
             return EMPTY;
           }),
           map((response) => {
-            if ((response.items || []).length <= 0) {
+            if ((response.items ?? []).length <= 0) {
               return null;
             }
             return {
-              count: response.paginator?.totalItemCount || 0,
-              pictures: response.items || [],
+              count: response.paginator?.totalItemCount ?? 0,
+              pictures: response.items ?? [],
               routerLink: routerLink.concat(['exact', 'pictures']),
             };
           }),
@@ -394,14 +390,14 @@ export class CatalogueVehiclesComponent {
   }
 
   private static convertItem(item: Item, routerLink: string[]): CatalogueListItem {
-    const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map((picture, idx) => {
+    const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures ?? []).map((picture, idx) => {
       const largeFormat = !!item.previewPictures?.largeFormat;
       let thumb = null;
       if (picture.picture) {
         thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
       }
       return {
-        picture: picture.picture ? picture.picture : null,
+        picture: picture.picture ?? null,
         routerLink: picture.picture ? routerLink.concat(['pictures', picture.picture.identity]) : [],
         thumb,
       };

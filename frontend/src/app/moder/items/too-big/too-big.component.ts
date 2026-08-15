@@ -1,11 +1,15 @@
+import type {OnInit} from '@angular/core';
+import type {Item} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {Item, ItemFields, ItemsRequest} from '@grpc/spec.pb';
+import {ItemFields, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {map, Observable} from 'rxjs';
+import {map} from 'rxjs';
 
 @Component({
   selector: 'app-moder-items-too-big',
@@ -27,7 +31,7 @@ export class ModerItemsTooBigComponent implements OnInit {
         order: ItemsRequest.Order.CHILDS_COUNT,
       }),
     )
-    .pipe(map((response) => response.items || []));
+    .pipe(map((response) => response.items ?? []));
 
   ngOnInit(): void {
     this.#pageEnv.set({

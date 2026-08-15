@@ -1,6 +1,7 @@
+import type {User} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {User} from '@grpc/spec.pb';
 
 @Component({
   selector: 'app-user',

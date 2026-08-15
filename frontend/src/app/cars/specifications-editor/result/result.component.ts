@@ -1,8 +1,10 @@
+import type {Item} from '@grpc/spec.pb';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {DomSanitizer} from '@angular/platform-browser';
-import {GetSpecificationsRequest, Item} from '@grpc/spec.pb';
+import {GetSpecificationsRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {map, switchMap} from 'rxjs';

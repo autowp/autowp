@@ -16,6 +16,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
@@ -49,7 +50,7 @@ export class CategoryPictureComponent {
     id: 'category-picture-category-data',
     stream: () =>
       this.#categoriesService
-        .categoryPipe$(this.#route.parent!.parent!)
+        .categoryPipe$(requireRouteParent(requireRouteParent(this.#route)))
         .pipe(switchMap((data) => (data.current ? of(data) : notFoundError()))),
   });
 

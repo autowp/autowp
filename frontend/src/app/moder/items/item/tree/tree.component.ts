@@ -1,6 +1,8 @@
+import type {TreeItem} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {ItemParentType, TreeItem} from '@grpc/spec.pb';
+import {ItemParentType} from '@grpc/spec.pb';
 
 @Component({
   selector: 'app-moder-items-item-tree',

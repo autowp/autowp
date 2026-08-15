@@ -18,6 +18,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {RemarkModule} from 'ngx-remark';
 import {map} from 'rxjs';
 
@@ -36,9 +37,12 @@ export class TwinsGroupItemsComponent {
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
 
-  protected readonly groupId = toSignal(this.#route.parent!.paramMap.pipe(map((params) => params.get('group') ?? '')), {
-    requireSync: true,
-  });
+  protected readonly groupId = toSignal(
+    requireRouteParent(this.#route).paramMap.pipe(map((params) => params.get('group') ?? '')),
+    {
+      requireSync: true,
+    },
+  );
 
   protected readonly groupResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.

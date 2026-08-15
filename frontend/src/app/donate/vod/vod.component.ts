@@ -1,14 +1,18 @@
+import type {OnInit} from '@angular/core';
+import type {Item, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DOCUMENT, formatDate} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, LOCALE_ID, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, LOCALE_ID} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {Item, ItemFields, ItemRequest, User} from '@grpc/spec.pb';
+import {ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {timestampToDate} from '@utils/timestamp';
 import {RemarkModule} from 'ngx-remark';
-import {combineLatest, distinctUntilChanged, EMPTY, map, Observable, of, shareReplay, switchMap} from 'rxjs';
+import {combineLatest, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {usdToRub} from '../../currencies';
 import {ItemOfDayComponent} from '../../item-of-day/item-of-day/item-of-day.component';
@@ -47,7 +51,7 @@ export class DonateVodComponent implements OnInit {
 
   protected readonly date$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('date')),
-    map((date) => (date ? date : null)),
+    map((date) => date ?? null),
     distinctUntilChanged(),
   );
 
@@ -90,7 +94,7 @@ export class DonateVodComponent implements OnInit {
 
   protected readonly dates$ = combineLatest([this.vod$, this.date$]).pipe(
     map(([vod, currentDate]) =>
-      (vod.dates ? vod.dates : []).map((d) => {
+      (vod.dates ?? []).map((d) => {
         const date = timestampToDate(d.date);
         const value = date ? formatDate(date, 'yyyy-MM-dd', this.locale, VOD_TIMEZONE) : null;
         return {

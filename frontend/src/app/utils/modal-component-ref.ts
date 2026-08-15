@@ -1,5 +1,5 @@
-import {ComponentRef} from '@angular/core';
-import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import type {ComponentRef} from '@angular/core';
+import type {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 /**
  * Gets the `ComponentRef` for a component opened via `NgbModal.open()`, needed to call

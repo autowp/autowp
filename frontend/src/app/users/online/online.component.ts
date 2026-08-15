@@ -1,9 +1,12 @@
+import type {User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {User, UsersRequest} from '@grpc/spec.pb';
+import {UsersRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {BehaviorSubject, map, Observable, switchMap} from 'rxjs';
+import {BehaviorSubject, map, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 
@@ -20,7 +23,7 @@ export class UsersOnlineComponent {
   readonly #reload$ = new BehaviorSubject<void>(void 0);
   protected readonly users$: Observable<User[]> = this.#reload$.pipe(
     switchMap(() => this.#usersClient.getUsers(new UsersRequest({isOnline: true}))),
-    map((response) => (response.items ? response.items : [])),
+    map((response) => response.items ?? []),
   );
 
   protected load() {

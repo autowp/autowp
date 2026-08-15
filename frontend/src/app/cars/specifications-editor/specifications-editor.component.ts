@@ -1,14 +1,17 @@
+import type {Item} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Item, ItemFields, ItemRequest, ItemType, RefreshInheritanceRequest} from '@grpc/spec.pb';
+import {ItemFields, ItemRequest, ItemType, RefreshInheritanceRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, catchError, debounceTime, distinctUntilChanged, EMPTY, map, Observable, switchMap} from 'rxjs';
+import {BehaviorSubject, catchError, debounceTime, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {CarsSpecificationsEditorEngineComponent} from './engine/engine.component';

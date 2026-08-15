@@ -1,4 +1,6 @@
-import {HttpErrorResponse, HttpResponseBase} from '@angular/common/http';
+import type {HttpResponseBase} from '@angular/common/http';
+
+import {HttpErrorResponse} from '@angular/common/http';
 import {Service, signal} from '@angular/core';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 

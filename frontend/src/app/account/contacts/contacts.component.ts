@@ -1,7 +1,11 @@
+import type {OnInit} from '@angular/core';
+import type {Contact} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {Contact, DeleteContactRequest} from '@grpc/spec.pb';
+import {DeleteContactRequest} from '@grpc/spec.pb';
 import {ContactsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
@@ -10,7 +14,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import Keycloak from 'keycloak-js';
-import {BehaviorSubject, catchError, EMPTY, map, Observable, of, switchMap} from 'rxjs';
+import {BehaviorSubject, catchError, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -51,7 +55,7 @@ export class AccountContactsComponent implements OnInit {
       this.#toastService.handleError(error);
       return EMPTY;
     }),
-    map((response) => response.items || []),
+    map((response) => response.items ?? []),
   );
 
   ngOnInit(): void {

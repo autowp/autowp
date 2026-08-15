@@ -1,6 +1,7 @@
+import type {Topic} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {Topic} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 
 import {ForumsTopicListItemComponent} from './topic-list-item/topic-list-item.component';

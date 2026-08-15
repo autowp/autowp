@@ -93,6 +93,9 @@ for (const lang of environment.languages) {
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
  */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
+  // An explicitly-set but empty `PORT=` env var should still fall back to the default, not be
+  // passed through as an empty string port.
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const port = process.env['PORT'] || 4000;
   app.listen(port, (error) => {
     if (error) {

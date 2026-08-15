@@ -1,13 +1,13 @@
+import type {Item, ItemParent, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CommentsType,
-  Item,
-  ItemParent,
   ItemParentCacheListOptions,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureItemType,
@@ -19,12 +19,14 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError} from 'app/grpc';
-import {catchError, EMPTY, map, Observable} from 'rxjs';
+import {catchError, EMPTY, map} from 'rxjs';
+
+import type {Breadcrumbs} from '../../../catalogue-service';
 
 import {CommentsComponent} from '../../../../comments/comments/comments.component';
 import {PictureComponent} from '../../../../picture/picture.component';
 import {ToastsService} from '../../../../toasts/toasts.service';
-import {Breadcrumbs, CatalogueService} from '../../../catalogue-service';
+import {CatalogueService} from '../../../catalogue-service';
 
 @Component({
   selector: 'app-catalogue-vehicles-pictures-picture',

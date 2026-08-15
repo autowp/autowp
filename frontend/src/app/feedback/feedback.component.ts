@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
@@ -7,7 +10,7 @@ import {AutowpClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {PageEnvService} from '@services/page-env.service';
 import {ReCaptchaService} from '@services/recaptcha';
-import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RecaptchaModule} from 'ng-recaptcha-2';
 import {RemarkModule} from 'ngx-remark';
 

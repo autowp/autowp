@@ -1,8 +1,11 @@
+import type {OnInit} from '@angular/core';
+import type {User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {CurrencyPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {User} from '@grpc/spec.pb';
 import {DonationsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
@@ -10,7 +13,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
-import {catchError, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, map, of, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 
@@ -49,7 +52,7 @@ export class DonateLogComponent implements OnInit {
     stream: (): Observable<DonateLogData> =>
       this.#donations.getTransactions(new Empty()).pipe(
         switchMap((response) => {
-          const items = (response.items || []).map((item) => ({
+          const items = (response.items ?? []).map((item) => ({
             createdAt: timestampToDate(item.createTime),
             currency: item.currency,
             purpose: item.purpose,

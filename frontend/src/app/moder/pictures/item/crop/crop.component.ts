@@ -1,5 +1,8 @@
+import type {OnDestroy, OnInit} from '@angular/core';
+import type {Subscription} from 'rxjs';
+
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   Picture,
@@ -12,18 +15,11 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
-import {
-  BehaviorSubject,
-  catchError,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  Subscription,
-  switchMap,
-} from 'rxjs';
+import {BehaviorSubject, catchError, debounceTime, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
-import Jcrop, {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/jquery.Jcrop.js';
+import type {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/jquery.Jcrop.js';
+
+import Jcrop from '../../../../jcrop/jquery.Jcrop.js';
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({

@@ -1,9 +1,11 @@
+import type {Item, TreeItem} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   GetTreeRequest,
-  Item,
   ItemFields,
   ItemParentCacheListOptions,
   ItemRequest,
@@ -13,7 +15,6 @@ import {
   PictureListOptions,
   PicturesRequest,
   SetUserItemSubscriptionRequest,
-  TreeItem,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
@@ -30,7 +31,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   of,
   shareReplay,
   switchMap,
@@ -122,6 +122,10 @@ export class ModerItemsItemComponent {
     map((params) => params.get('tab')),
     distinctUntilChanged(),
     debounceTime(30),
+    // A `?tab=` query param (present, empty value) yields '' from params.get(), not null - ??
+    // would treat that as a real tab value instead of falling back to 'meta' like the ternary
+    // does.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     map((tab) => (tab ? tab : 'meta')),
   );
 

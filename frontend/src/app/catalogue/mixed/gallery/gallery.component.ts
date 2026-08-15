@@ -1,15 +1,19 @@
+import type {Item, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Item, ItemFields, ItemListOptions, ItemsRequest, Picture} from '@grpc/spec.pb';
+import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {map, Observable, of, switchMap} from 'rxjs';
+import {map, of, switchMap} from 'rxjs';
+
+import type {BrandPerspectivePageData} from '../../catalogue.module';
 
 import {GalleryComponent} from '../../../gallery/gallery.component';
-import {BrandPerspectivePageData} from '../../catalogue.module';
 
 @Component({
   selector: 'app-catalogue-mixed-gallery',

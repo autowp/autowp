@@ -6,6 +6,7 @@ import {GetSpecificationsRequest, ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of} from 'rxjs';
 
@@ -24,9 +25,12 @@ export class TwinsGroupSpecificationsComponent {
   readonly #attrsClient = inject(AttrsClient);
   readonly #sanitizer = inject(DomSanitizer);
 
-  readonly #groupId = toSignal(this.#route.parent!.paramMap.pipe(map((params) => params.get('group') ?? '')), {
-    requireSync: true,
-  });
+  readonly #groupId = toSignal(
+    requireRouteParent(this.#route).paramMap.pipe(map((params) => params.get('group') ?? '')),
+    {
+      requireSync: true,
+    },
+  );
 
   protected readonly groupResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.

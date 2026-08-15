@@ -1,20 +1,20 @@
+import type {OnInit} from '@angular/core';
+import type {Item, ItemList, ItemParent, Pages} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
-  ItemList,
   ItemListOptions,
-  ItemParent,
   ItemParentFields,
   ItemParentListOptions,
   ItemParentsRequest,
   ItemRequest,
   ItemsRequest,
   ItemType,
-  Pages,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
@@ -28,7 +28,6 @@ import {
   EMPTY,
   forkJoin,
   map,
-  Observable,
   of,
   startWith,
   switchMap,
@@ -179,7 +178,7 @@ export class UploadSelectComponent implements OnInit {
           }),
         )
         .pipe(
-          map((response) => response.items || []),
+          map((response) => response.items ?? []),
           catchError((err: unknown) => {
             this.#toastService.handleError(err);
             return EMPTY;
@@ -207,7 +206,7 @@ export class UploadSelectComponent implements OnInit {
           }),
         )
         .pipe(
-          map((response) => response.items || []),
+          map((response) => response.items ?? []),
           catchError((err: unknown) => {
             this.#toastService.handleError(err);
             return EMPTY;
@@ -234,7 +233,7 @@ export class UploadSelectComponent implements OnInit {
           }),
         )
         .pipe(
-          map((response) => response.items || []),
+          map((response) => response.items ?? []),
           catchError((err: unknown) => {
             this.#toastService.handleError(err);
             return EMPTY;

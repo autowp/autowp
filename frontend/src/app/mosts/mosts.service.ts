@@ -1,7 +1,10 @@
+import type {MostsMenu} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
-import {MostsMenu, MostsMenuRequest} from '@grpc/spec.pb';
+import {MostsMenuRequest} from '@grpc/spec.pb';
 import {MostsClient} from '@grpc/spec.pbsc';
-import {Observable, shareReplay} from 'rxjs';
+import {shareReplay} from 'rxjs';
 
 @Service()
 export class MostsService {
@@ -10,7 +13,7 @@ export class MostsService {
   readonly #menus$ = new Map<string, Observable<MostsMenu>>();
 
   public getMenu$(brandID: string | undefined): Observable<MostsMenu> {
-    const key = brandID ? brandID : '';
+    const key = brandID ?? '';
 
     const cached$ = this.#menus$.get(key);
     if (cached$) {

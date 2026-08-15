@@ -1,4 +1,6 @@
-import {RenderMode, ServerRoute} from '@angular/ssr';
+import type {ServerRoute} from '@angular/ssr';
+
+import {RenderMode} from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   // Prerender: fully static pages built once at deploy time, no per-request data dependency.

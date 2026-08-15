@@ -1,14 +1,15 @@
+import type {Item, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CommentsType,
-  Item,
   ItemFields,
   ItemListOptions,
   ItemsRequest,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureItemType,
@@ -22,9 +23,9 @@ import {PageEnvService} from '@services/page-env.service';
 import {CommentsComponent} from 'app/comments/comments/comments.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {PictureComponent} from 'app/picture/picture.component';
-import {map, Observable, of, switchMap} from 'rxjs';
+import {map, of, switchMap} from 'rxjs';
 
-import {BrandPerspectivePageData} from '../../catalogue.module';
+import type {BrandPerspectivePageData} from '../../catalogue.module';
 
 @Component({
   selector: 'app-catalogue-mixed-picture',
@@ -119,7 +120,7 @@ export class CatalogueMixedPictureComponent {
             paginator: new PicturesRequest({
               options: new PictureListOptions({
                 pictureItem: new PictureItemListOptions({
-                  excludePerspectiveId: data.perspective_exclude_id || [],
+                  excludePerspectiveId: data.perspective_exclude_id ?? [],
                   itemId: brand.id,
                   perspectiveId: data.perspective_id,
                   typeId: PictureItemType.PICTURE_ITEM_CONTENT,
@@ -140,7 +141,7 @@ export class CatalogueMixedPictureComponent {
           options: new PictureListOptions({
             identity,
             pictureItem: new PictureItemListOptions({
-              excludePerspectiveId: data.perspective_exclude_id || [],
+              excludePerspectiveId: data.perspective_exclude_id ?? [],
               itemId: brand.id,
               perspectiveId: data.perspective_id,
               typeId: PictureItemType.PICTURE_ITEM_CONTENT,

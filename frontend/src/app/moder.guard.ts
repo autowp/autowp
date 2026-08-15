@@ -1,6 +1,8 @@
+import type {CanActivateFn} from '@angular/router';
+
 import {DOCUMENT} from '@angular/common';
 import {inject} from '@angular/core';
-import {CanActivateFn, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import Keycloak from 'keycloak-js';

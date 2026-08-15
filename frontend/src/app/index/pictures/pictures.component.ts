@@ -1,13 +1,16 @@
+import type {Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {Picture, PictureFields, PictureListOptions, PicturesRequest, PictureStatus} from '@grpc/spec.pb';
+import {PictureFields, PictureListOptions, PicturesRequest, PictureStatus} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PicturesWebSocketService} from '@services/pictures-ws.service';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {catchError, EMPTY, map, Observable, startWith, switchMap, throttleTime} from 'rxjs';
+import {catchError, EMPTY, map, startWith, switchMap, throttleTime} from 'rxjs';
 
 // Reload cadence for live "new picture accepted" notifications: the first accept in a
 // burst reloads right away (leading edge), and if more accepts arrive within the window
@@ -62,6 +65,6 @@ export class IndexPicturesComponent {
           }),
         ),
     ),
-    map((response) => response.items || []),
+    map((response) => response.items ?? []),
   );
 }

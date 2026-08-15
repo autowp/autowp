@@ -1,7 +1,9 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {Picture} from '@grpc/spec.pb';
+
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
-import {Picture} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 import {map} from 'rxjs';
 

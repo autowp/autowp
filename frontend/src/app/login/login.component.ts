@@ -1,5 +1,7 @@
+import type {OnInit} from '@angular/core';
+
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {LanguageService} from '@services/language';
 import Keycloak from 'keycloak-js';
 

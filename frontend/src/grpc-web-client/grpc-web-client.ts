@@ -1,21 +1,17 @@
+import type {Provider} from '@angular/core';
+import type {GrpcClient, GrpcClientFactory, GrpcEvent, GrpcMessage, GrpcMessageClass} from '@ngx-grpc/common';
+import type {Observable} from 'rxjs';
+
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
-import {inject, Provider, Service} from '@angular/core';
-import {
-  GrpcClient,
-  GrpcClientFactory,
-  GrpcDataEvent,
-  GrpcEvent,
-  GrpcMessage,
-  GrpcMessageClass,
-  GrpcMetadata,
-  GrpcStatusEvent,
-} from '@ngx-grpc/common';
+import {inject, Service} from '@angular/core';
+import {GrpcDataEvent, GrpcMetadata, GrpcStatusEvent} from '@ngx-grpc/common';
 import {GRPC_CLIENT_FACTORY} from '@ngx-grpc/core';
-import {catchError, EMPTY, Observable, of, switchMap, throwError} from 'rxjs';
+import {catchError, EMPTY, of, switchMap, throwError} from 'rxjs';
 import {base64ToUint8Array, concatUint8Arrays, uint8ArrayToBase64} from 'uint8array-extras';
 
+import type {Metadata} from './metadata';
+
 import {FrameType, GrpcWebStreamParser} from './grpcwebstreamparser';
-import {Metadata} from './metadata';
 import {RpcError} from './rpcerror';
 import {fromHttpStatus, StatusCode} from './statuscode';
 import {NG_GRPC_WEB_CLIENT_DEFAULT_SETTINGS} from './tokens';

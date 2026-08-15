@@ -1,8 +1,11 @@
+import type {Picture} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Picture, PictureItemType} from '@grpc/spec.pb';
+import {PictureItemType} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {GalleryComponent} from 'app/gallery/gallery.component';
 import {map} from 'rxjs';
 
@@ -24,7 +27,7 @@ export class PersonsPersonAuthorGalleryComponent {
   });
 
   protected readonly itemID = toSignal(
-    this.#route.parent!.parent!.paramMap.pipe(map((params) => params.get('id') ?? '')),
+    requireRouteParent(requireRouteParent(this.#route)).paramMap.pipe(map((params) => params.get('id') ?? '')),
     {requireSync: true},
   );
 

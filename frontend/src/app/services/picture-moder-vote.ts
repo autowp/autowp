@@ -1,8 +1,9 @@
+import type {Empty} from '@ngx-grpc/well-known-types';
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
 import {DeleteModerVoteRequest, UpdateModerVoteRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
-import {Empty} from '@ngx-grpc/well-known-types';
-import {Observable} from 'rxjs';
 
 @Service()
 export class PictureModerVoteService {

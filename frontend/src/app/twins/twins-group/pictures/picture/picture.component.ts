@@ -15,6 +15,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
@@ -36,7 +37,7 @@ export class TwinsGroupPictureComponent {
   readonly #languageService = inject(LanguageService);
 
   protected readonly groupId = toSignal(
-    this.#route.parent!.parent!.paramMap.pipe(map((route) => route.get('group') ?? '')),
+    requireRouteParent(requireRouteParent(this.#route)).paramMap.pipe(map((route) => route.get('group') ?? '')),
     {requireSync: true},
   );
 

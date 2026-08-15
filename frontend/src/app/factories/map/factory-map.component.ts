@@ -1,6 +1,8 @@
+import type {Marker} from 'leaflet';
+
 import {ChangeDetectionStrategy, Component, computed, input} from '@angular/core';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
-import {icon, latLng, Marker, marker, tileLayer} from 'leaflet';
+import {icon, latLng, marker, tileLayer} from 'leaflet';
 
 @Component({
   selector: 'app-factory-map',

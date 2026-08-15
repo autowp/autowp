@@ -1,21 +1,24 @@
-import {DecimalPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, RouterLink} from '@angular/router';
-import {
+import type {OnInit} from '@angular/core';
+import type {
   User,
   UserRatingBrandsResponse,
-  UserRatingDetailsRequest,
   UsersRatingResponse,
   UsersRatingUser,
   UsersRatingUserFan,
 } from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
+import {DecimalPipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {UserRatingDetailsRequest} from '@grpc/spec.pb';
 import {RatingClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {catchError, forkJoin, map, Observable, of} from 'rxjs';
+import {catchError, forkJoin, map, of} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 
@@ -103,7 +106,7 @@ export class UsersRatingComponent implements OnInit {
           o$ = this.#ratingClient.getUserSpecsRating(new Empty());
           break;
       }
-      return o$.pipe(map((response) => (response.users ? response.users : []).map((user) => this.#mapUser(user))));
+      return o$.pipe(map((response) => (response.users ?? []).map((user) => this.#mapUser(user))));
     },
   });
 
@@ -185,7 +188,7 @@ export class UsersRatingComponent implements OnInit {
             ? this.#ratingClient.getUserPictureLikesRatingFans(request)
             : this.#ratingClient.getUserCommentsRatingFans(request);
 
-        return response$.pipe(map((response) => [userId, response.fans || []] as const));
+        return response$.pipe(map((response) => [userId, response.fans ?? []] as const));
       });
 
       return forkJoin(requests).pipe(

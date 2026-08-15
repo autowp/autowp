@@ -1,9 +1,11 @@
+import type {Voting, VotingVariant} from '@grpc/spec.pb';
+
 import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {CommentsType, CreateVoteRequest, Voting, VotingRequest, VotingVariant} from '@grpc/spec.pb';
+import {CommentsType, CreateVoteRequest, VotingRequest} from '@grpc/spec.pb';
 import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '@services/auth.service';

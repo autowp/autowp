@@ -1,10 +1,12 @@
+import type {Item} from '@grpc/spec.pb';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+
 import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse, HttpEventType} from '@angular/common/http';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
-import {Item} from '@grpc/spec.pb';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
-import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, EMPTY, switchMap} from 'rxjs';
 

@@ -1,13 +1,14 @@
+import type {Item, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
   DfDistanceRequest,
-  Item,
   ItemListOptions,
   ItemType,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureItemsRequest,
@@ -16,7 +17,7 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {map, Observable, switchMap} from 'rxjs';
+import {map, switchMap} from 'rxjs';
 
 import {chunkBy} from '../../../../chunk';
 import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.component';
@@ -66,6 +67,6 @@ export class ModerItemsItemPicturesComponent {
         }),
       ),
     ),
-    map((response) => chunkBy<Picture>(response.items || [], 6)),
+    map((response) => chunkBy<Picture>(response.items ?? [], 6)),
   );
 }

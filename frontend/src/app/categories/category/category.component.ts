@@ -1,8 +1,10 @@
+import type {Item} from '@grpc/spec.pb';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
-import {Item, ItemFields, ItemListOptions, ItemParentListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
+import {ItemFields, ItemListOptions, ItemParentListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
@@ -104,7 +106,7 @@ export class CategoriesCategoryComponent {
         )
         .subscribe((response) => {
           item.loaded = true;
-          item.childs = (response.items ? response.items : []).map((i) => ({
+          item.childs = (response.items ?? []).map((i) => ({
             active: i.id === item.item.id,
             nameHtml: i.nameHtml,
             routerLink: ['/category', i.catname],

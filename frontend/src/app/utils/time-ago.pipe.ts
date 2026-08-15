@@ -1,5 +1,7 @@
+import type {OnDestroy, PipeTransform} from '@angular/core';
+
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectorRef, inject, NgZone, OnDestroy, Pipe, PipeTransform} from '@angular/core';
+import {ChangeDetectorRef, inject, NgZone, Pipe} from '@angular/core';
 import {LanguageService} from '@services/language';
 
 const is = (interval: number, cycle: number) => (Math.abs(cycle) >= interval ? Math.round(cycle / interval) : 0);

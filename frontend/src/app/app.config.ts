@@ -1,16 +1,16 @@
+import type {ApplicationConfig, EnvironmentProviders, Provider} from '@angular/core';
+import type {ProvideKeycloakOptions} from 'keycloak-angular';
+
 import {DecimalPipe, isPlatformBrowser} from '@angular/common';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {
-  ApplicationConfig,
   enableProdMode,
   EnvironmentInjector,
-  EnvironmentProviders,
   importProvidersFrom,
   inject,
   makeEnvironmentProviders,
   PLATFORM_ID,
   provideAppInitializer,
-  Provider,
   runInInjectionContext,
 } from '@angular/core';
 import {FormsModule} from '@angular/forms';
@@ -59,7 +59,6 @@ import {
   AutoRefreshTokenService,
   createKeycloakSignal,
   KEYCLOAK_EVENT_SIGNAL,
-  ProvideKeycloakOptions,
   UserActivityService,
   withAutoRefreshToken,
 } from 'keycloak-angular';

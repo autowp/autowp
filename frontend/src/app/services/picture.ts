@@ -1,14 +1,11 @@
+import type {PicturesUserSummary} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
-import {
-  DfDistanceListOptions,
-  PictureListOptions,
-  PicturesRequest,
-  PictureStatus,
-  PicturesUserSummary,
-} from '@grpc/spec.pb';
+import {DfDistanceListOptions, PictureListOptions, PicturesRequest, PictureStatus} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {map, Observable, of, shareReplay, switchMap} from 'rxjs';
+import {map, of, shareReplay, switchMap} from 'rxjs';
 
 import {AuthService, Role} from './auth.service';
 

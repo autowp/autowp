@@ -1,23 +1,25 @@
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {Item} from '@grpc/spec.pb';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, Injector, input, OnInit, ResourceRef, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, Injector, input, signal} from '@angular/core';
 import {rxResource, toObservable} from '@angular/core/rxjs-interop';
-import {GetItemVehicleTypesRequest, Item, ItemType, UpdateItemRequest} from '@grpc/spec.pb';
+import {GetItemVehicleTypesRequest, ItemType, UpdateItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemService} from '@services/item';
-import {InvalidParams} from '@utils/invalid-params.pipe';
-import {catchError, EMPTY, forkJoin, map, Observable, of, tap} from 'rxjs';
+import {catchError, EMPTY, forkJoin, map, of, tap} from 'rxjs';
+
+import type {ItemMetaFormResult} from '../../item-meta-form/item-meta-form.component';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../../grpc';
 import {ToastsService} from '../../../../toasts/toasts.service';
-import {
-  ItemMetaFormComponent,
-  ItemMetaFormResult,
-  itemMetaFormResultsToAPIItem,
-} from '../../item-meta-form/item-meta-form.component';
+import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../../item-meta-form/item-meta-form.component';
 
 @Component({
   selector: 'app-moder-items-item-meta',
@@ -64,7 +66,7 @@ export class ModerItemsItemMetaComponent implements OnInit {
                 itemId: item.id,
               }),
             )
-            .pipe(map((response) => (response.items ? response.items : []).map((row) => row.vehicleTypeId)));
+            .pipe(map((response) => (response.items ?? []).map((row) => row.vehicleTypeId)));
         }
 
         return of([]);

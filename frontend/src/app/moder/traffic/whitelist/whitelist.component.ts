@@ -1,7 +1,10 @@
-import {ChangeDetectionStrategy, Component, effect, inject, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {TrafficWhitelistItem} from '@grpc/spec.pb';
+
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Router, RouterLink} from '@angular/router';
-import {DeleteTrafficWhitelistItemRequest, TrafficWhitelistItem} from '@grpc/spec.pb';
+import {DeleteTrafficWhitelistItemRequest} from '@grpc/spec.pb';
 import {TrafficClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';

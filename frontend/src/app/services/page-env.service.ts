@@ -1,7 +1,9 @@
+import type {Observable} from 'rxjs';
+
 import {computed, inject, Service, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {Title} from '@angular/platform-browser';
-import {Observable, of, switchMap} from 'rxjs';
+import {of, switchMap} from 'rxjs';
 
 import {PageService} from './page';
 
@@ -30,8 +32,8 @@ export class PageEnvService {
     const data = this.pageEnv();
 
     return {
-      isAdminPage: data?.layout?.isAdminPage || false,
-      isGalleryPage: data?.layout?.isGalleryPage || false,
+      isAdminPage: data?.layout?.isAdminPage ?? false,
+      isGalleryPage: data?.layout?.isGalleryPage ?? false,
     };
   });
 

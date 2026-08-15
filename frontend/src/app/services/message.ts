@@ -1,25 +1,11 @@
+import type {MessageSummary} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
-import {
-  CreateMessageRequest,
-  Message,
-  MessageSummary,
-  MessagingClearFolder,
-  MessagingDeleteMessage,
-} from '@grpc/spec.pb';
+import {CreateMessageRequest, Message, MessagingClearFolder, MessagingDeleteMessage} from '@grpc/spec.pb';
 import {MessagingClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  debounceTime,
-  map,
-  Observable,
-  of,
-  shareReplay,
-  switchMap,
-  tap,
-} from 'rxjs';
+import {BehaviorSubject, catchError, combineLatest, debounceTime, map, of, shareReplay, switchMap, tap} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {AuthService} from './auth.service';

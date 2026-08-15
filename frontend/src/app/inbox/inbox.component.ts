@@ -1,15 +1,17 @@
+import type {OnInit} from '@angular/core';
+import type {Inbox, PicturesList} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Inbox,
   InboxRequest,
   ItemParentCacheListOptions,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
-  PicturesList,
   PicturesRequest,
   PictureStatus,
 } from '@grpc/spec.pb';
@@ -19,17 +21,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {formatGrpcDate, parseGrpcDate, parseStringToGrpcDate} from '@services/utils';
 import Keycloak from 'keycloak-js';
-import {
-  catchError,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  Observable,
-  of,
-  switchMap,
-} from 'rxjs';
+import {catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';

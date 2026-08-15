@@ -1,19 +1,24 @@
+import type {OnInit} from '@angular/core';
+import type {Theme} from '@grpc/spec.pb';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {CreateTopicRequest, GetThemeRequest, Theme, Topic} from '@grpc/spec.pb';
+import {CreateTopicRequest, GetThemeRequest, Topic} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
-import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getForumsThemeTranslation} from '@utils/translations';
 import {extractFieldViolations, fieldViolations2InvalidParams, isNotFoundError, notFoundError} from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {RemarkModule} from 'ngx-remark';
-import {map, Observable} from 'rxjs';
+import {map} from 'rxjs';
 
 @Component({
   selector: 'app-forums-new-topic',

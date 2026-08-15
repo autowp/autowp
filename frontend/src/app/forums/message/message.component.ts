@@ -1,8 +1,11 @@
-import {ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit} from '@angular/core';
+import type {OnDestroy, OnInit} from '@angular/core';
+import type {Subscription} from 'rxjs';
+
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetMessagePageRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
-import {catchError, distinctUntilChanged, EMPTY, map, Subscription, switchMap, tap} from 'rxjs';
+import {catchError, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {MESSAGES_PER_PAGE} from '../forums.module';

@@ -1,7 +1,9 @@
+import type {ItemParent} from '@grpc/spec.pb';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {ItemFields, ItemParent, ItemParentsRequest, ItemRequest} from '@grpc/spec.pb';
+import {ItemFields, ItemParentsRequest, ItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {switchMap} from 'rxjs';

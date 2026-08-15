@@ -1,17 +1,10 @@
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {AttrUserValue, Item, User} from '@grpc/spec.pb';
+
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  Injector,
-  input,
-  OnInit,
-  ResourceRef,
-} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, input} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {AttrUserValue, Item, User} from '@grpc/spec.pb';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';

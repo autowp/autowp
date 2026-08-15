@@ -1,8 +1,10 @@
+import type {OnInit} from '@angular/core';
+import type {User} from '@grpc/spec.pb';
+
 import {DecimalPipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Router, RouterLink} from '@angular/router';
-import {User} from '@grpc/spec.pb';
 import {StatisticsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';

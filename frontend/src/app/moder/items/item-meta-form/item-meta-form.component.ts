@@ -1,37 +1,24 @@
+import type {AbstractControl} from '@angular/forms';
+import type {Picture, PictureItem, Spec, VehicleType} from '@grpc/spec.pb';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {
-  AbstractControl,
-  FormArray,
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {LatLng} from '@grpc/google/type/latlng.pb';
-import {
-  Item,
-  ItemType,
-  Picture,
-  PictureFields,
-  PictureItem,
-  PictureListOptions,
-  PicturesRequest,
-  Spec,
-  VehicleType,
-} from '@grpc/spec.pb';
+import {Item, ItemType, PictureFields, PictureListOptions, PicturesRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {BoolValue, Int32Value} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {SpecService} from '@services/spec';
 import {VehicleTypeService} from '@services/vehicle-type';
-import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {getVehicleTypeTranslation} from '@utils/translations';
-import {combineLatest, map, Observable, shareReplay} from 'rxjs';
+import {combineLatest, map, shareReplay} from 'rxjs';
 import {sprintf} from 'sprintf-js';
 
 import {VehicleTypesModalComponent} from '../../../components/vehicle-types-modal/vehicle-types-modal.component';
@@ -133,27 +120,27 @@ interface PicturesListItem {
 
 export function itemMetaFormResultsToAPIItem(result: ItemMetaFormResult): Item {
   return new Item({
-    beginModelYear: result.model_years?.begin_year || undefined,
+    beginModelYear: result.model_years?.begin_year ?? undefined,
     beginModelYearFraction: result.model_years?.begin_year_fraction,
-    beginMonth: result.begin?.month || undefined,
-    beginYear: result.begin?.year || undefined,
+    beginMonth: result.begin?.month ?? undefined,
+    beginYear: result.begin?.year ?? undefined,
     body: result.body,
     catname: result.catname,
-    endModelYear: result.model_years?.end_year || undefined,
+    endModelYear: result.model_years?.end_year ?? undefined,
     endModelYearFraction: result.model_years?.end_year_fraction,
-    endMonth: result.end?.month || undefined,
-    endYear: result.end?.year || undefined,
+    endMonth: result.end?.month ?? undefined,
+    endYear: result.end?.year ?? undefined,
     fullName: result.full_name,
     isConcept: result.is_concept === 'inherited' ? false : result.is_concept,
     isConceptInherit: result.is_concept === 'inherited',
     isGroup: result.is_group,
     location: result.point
-      ? new LatLng({latitude: result.point.lat || undefined, longitude: result.point.lng || undefined})
+      ? new LatLng({latitude: result.point.lat ?? undefined, longitude: result.point.lng ?? undefined})
       : undefined,
     name: result.name,
     produced: result.produced?.count ? new Int32Value({value: result.produced.count}) : undefined,
-    producedExactly: result.produced?.exactly || false,
-    specId: result.spec_id === 'inherited' ? undefined : result.spec_id || undefined,
+    producedExactly: result.produced?.exactly ?? false,
+    specId: result.spec_id === 'inherited' ? undefined : (result.spec_id ?? undefined),
     specInherit: result.spec_id === 'inherited',
     today: result.end?.today === null ? undefined : new BoolValue({value: result.end?.today}),
   });
@@ -174,7 +161,7 @@ function specsToPlain(options: Spec[], deep: number): ItemMetaFormAPISpec[] {
       id: item.id,
       short_name: item.shortName,
     });
-    for (const subitem of specsToPlain(item.childs ? item.childs : [], deep + 1)) {
+    for (const subitem of specsToPlain(item.childs ?? [], deep + 1)) {
       result.push(subitem);
     }
   }
@@ -425,8 +412,8 @@ export class ItemMetaFormComponent {
         });
       }
       if ([ItemType.ITEM_TYPE_FACTORY, ItemType.ITEM_TYPE_MUSEUM].includes(item.itemTypeId)) {
-        const lat = item.location?.latitude || 0;
-        const lng = item.location?.longitude || 0;
+        const lat = item.location?.latitude ?? 0;
+        const lng = item.location?.longitude ?? 0;
         elements.point = new FormControl({disabled: false, value: {lat, lng}}, {nonNullable: true});
       }
       if (items) {

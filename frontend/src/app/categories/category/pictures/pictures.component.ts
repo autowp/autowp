@@ -1,9 +1,10 @@
+import type {Picture} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {
   ItemParentCacheListOptions,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
@@ -13,6 +14,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {chunkBy} from 'app/chunk';
 import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
@@ -44,12 +46,18 @@ export class CategoriesCategoryPicturesComponent {
 
   // Read once at construction time purely to scope the resources' TransferState ids below -
   // categoryResource itself re-derives these reactively from the route inside categoryPipe$.
-  readonly #category = toSignal(this.#route.parent!.parent!.paramMap.pipe(map((params) => params.get('category'))), {
-    requireSync: true,
-  });
-  readonly #path = toSignal(this.#route.parent!.parent!.paramMap.pipe(map((params) => params.get('path'))), {
-    requireSync: true,
-  });
+  readonly #category = toSignal(
+    requireRouteParent(requireRouteParent(this.#route)).paramMap.pipe(map((params) => params.get('category'))),
+    {
+      requireSync: true,
+    },
+  );
+  readonly #path = toSignal(
+    requireRouteParent(requireRouteParent(this.#route)).paramMap.pipe(map((params) => params.get('path'))),
+    {
+      requireSync: true,
+    },
+  );
 
   protected readonly categoryResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
@@ -59,7 +67,7 @@ export class CategoriesCategoryPicturesComponent {
     // TransferState's still-present entry from the first category and seed itself with the wrong
     // data.
     id: `categories-category-pictures-category-${this.#category() ?? ''}-${this.#path() ?? ''}`,
-    stream: () => this.#categoriesService.categoryPipe$(this.#route.parent!.parent!),
+    stream: () => this.#categoriesService.categoryPipe$(requireRouteParent(requireRouteParent(this.#route))),
   });
 
   protected readonly picturesResource = rxResource({
@@ -99,7 +107,7 @@ export class CategoriesCategoryPicturesComponent {
         )
         .pipe(
           map(({items, paginator}) => {
-            const pics: PictureRoute[] = (items || []).map((pic) => ({
+            const pics: PictureRoute[] = (items ?? []).map((pic) => ({
               picture: pic,
               route: ['/category', category.catname, ...pathCatnames, 'pictures', pic.identity],
             }));

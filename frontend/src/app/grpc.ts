@@ -1,11 +1,13 @@
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {BadRequest} from '@grpc/google/rpc/error-details.pb';
 import {Status} from '@grpc/google/rpc/status.pb';
 import {ErrorDetails} from '@grpc/spec.pb';
 import {GrpcMetadata, GrpcStatusEvent} from '@ngx-grpc/common';
-import {InvalidParams} from '@utils/invalid-params.pipe';
 import {GRPC_STATUS_DETAILS_BIN_HEADER} from 'grpc-web-client/grpc-web-client';
 import {StatusCode} from 'grpc-web-client/statuscode';
-import {Observable, throwError} from 'rxjs';
+import {throwError} from 'rxjs';
 import {base64ToUint8Array, stringToUint8Array} from 'uint8array-extras';
 
 import FieldViolation = BadRequest.FieldViolation;

@@ -1,7 +1,9 @@
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
 import {AutowpClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {map, Observable, shareReplay} from 'rxjs';
+import {map, shareReplay} from 'rxjs';
 
 @Service()
 export class TimezoneService {

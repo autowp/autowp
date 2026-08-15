@@ -1,12 +1,16 @@
+import type {OnInit} from '@angular/core';
+import type {Item} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Item, ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb';
+import {ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {catchError, distinctUntilChanged, EMPTY, map, Observable, shareReplay, switchMap} from 'rxjs';
+import {catchError, distinctUntilChanged, EMPTY, map, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 import {ModerItemsItemSelectParentBrandsComponent} from './brands/brands.component';
@@ -45,7 +49,7 @@ export class ModerItemsItemSelectParentComponent implements OnInit {
 
   protected readonly itemID$: Observable<string> = this.#route.paramMap.pipe(
     map((params) => params.get('id')),
-    map((itemID) => (itemID ? itemID : '')),
+    map((itemID) => itemID ?? ''),
     distinctUntilChanged(),
     shareReplay({bufferSize: 1, refCount: false}),
   );

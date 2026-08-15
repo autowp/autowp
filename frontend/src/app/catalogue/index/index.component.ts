@@ -1,19 +1,19 @@
+import type {Item, ItemLink, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   GetBrandSectionsRequest,
-  Item,
   ItemFields,
-  ItemLink,
   ItemLinkListOptions,
   ItemLinksRequest,
   ItemListOptions,
   ItemParentCacheListOptions,
   ItemsRequest,
   ItemType,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
@@ -28,7 +28,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {getCatalogueSectionsTranslation} from '@utils/translations';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {catchError, forkJoin, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
 import {chunk, chunkBy} from '../../chunk';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
@@ -192,7 +192,7 @@ export class CatalogueIndexComponent {
         )
         .pipe(
           map((response) => {
-            const pictures: PictureRoute[] = (response.items || []).map((pic) => ({
+            const pictures: PictureRoute[] = (response.items ?? []).map((pic) => ({
               picture: pic,
               route: this.#catalogue.picturePathToRoute(pic),
             }));
@@ -211,7 +211,7 @@ export class CatalogueIndexComponent {
           const official: ItemLink[] = [];
           const club: ItemLink[] = [];
           const other: ItemLink[] = [];
-          (response.items ? response.items : []).forEach((item) => {
+          (response.items ?? []).forEach((item) => {
             switch (item.type) {
               case 'club':
                 club.push(item);
@@ -259,7 +259,7 @@ export class CatalogueIndexComponent {
         )
         .pipe(
           switchMap((response) => {
-            const items = response.items || [];
+            const items = response.items ?? [];
             if (items.length === 0) {
               return of([]);
             }
@@ -303,8 +303,8 @@ export class CatalogueIndexComponent {
         )
         .pipe(
           map((response) =>
-            (response.sections || []).map((section) => ({
-              halfChunks: chunk(section.groups || [], 2).map((halfChunk) => chunk(halfChunk, 2)),
+            (response.sections ?? []).map((section) => ({
+              halfChunks: chunk(section.groups ?? [], 2).map((halfChunk) => chunk(halfChunk, 2)),
               name: getCatalogueSectionsTranslation(section.name),
               routerLink: section.routerLink,
             })),

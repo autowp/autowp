@@ -1,6 +1,6 @@
 import {InjectionToken} from '@angular/core';
 
-import {NgGrpcWebClientSettings} from './grpc-web-client';
+import type {NgGrpcWebClientSettings} from './grpc-web-client';
 
 /**
  * Default configuration for grpc-web clients. Will be used for every GrpcWebClient unless service-specific config is provided

@@ -1,9 +1,10 @@
+import type {Design, Image, Item, Picture, User} from '@grpc/spec.pb';
 import type {APIItemChildsCounts} from '@services/item';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {Design, Image, Item, ItemType, Picture, User} from '@grpc/spec.pb';
+import {ItemType} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
 import {RemarkModule} from 'ngx-remark';
 

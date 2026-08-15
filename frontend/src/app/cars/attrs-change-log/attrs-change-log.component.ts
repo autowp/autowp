@@ -1,14 +1,17 @@
+import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {AttrUserValuesFields, AttrUserValuesRequest, User, UsersRequest} from '@grpc/spec.pb';
 import {AttrsClient, UsersClient} from '@grpc/spec.pbsc';
-import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {catchError, debounceTime, EMPTY, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, debounceTime, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {CarsAttrsChangeLogItemCacheService} from './item-cache.service';
@@ -54,7 +57,7 @@ export class CarsAttrsChangeLogComponent {
             userId: userID ? userID : undefined,
           }),
         )
-        .pipe(map((response) => response.items || [])),
+        .pipe(map((response) => response.items ?? [])),
   });
 
   readonly #control = new FormControl<string>('', {nonNullable: true});
@@ -84,7 +87,7 @@ export class CarsAttrsChangeLogComponent {
             this.#toastService.handleError(err);
             return EMPTY;
           }),
-          map((response) => response.items || []),
+          map((response) => response.items ?? []),
         );
       }),
     );

@@ -1,10 +1,13 @@
-import {HttpEvent, HttpHandlerFn, HttpRequest} from '@angular/common/http';
+import type {HttpEvent, HttpHandlerFn, HttpRequest} from '@angular/common/http';
+import type {GrpcEvent, GrpcMessage, GrpcRequest} from '@ngx-grpc/common';
+import type {GrpcHandler, GrpcInterceptor} from '@ngx-grpc/core';
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
 import {environment} from '@environment/environment';
-import {GrpcDataEvent, GrpcEvent, GrpcMessage, GrpcMetadata, GrpcRequest} from '@ngx-grpc/common';
-import {GrpcHandler, GrpcInterceptor} from '@ngx-grpc/core';
+import {GrpcDataEvent, GrpcMetadata} from '@ngx-grpc/common';
 import Keycloak from 'keycloak-js';
-import {catchError, from, Observable, switchMap, tap} from 'rxjs';
+import {catchError, from, switchMap, tap} from 'rxjs';
 
 // Passed to Keycloak#updateToken() on every authenticated request, rather than trusting the
 // cached token's freshness: keycloak-js's own background refresh is driven by a TokenExpired

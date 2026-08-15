@@ -1,3 +1,5 @@
+import type {User} from '@grpc/spec.pb';
+
 import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
@@ -16,7 +18,6 @@ import {
   PictureFields,
   PictureListOptions,
   PicturesRequest,
-  User,
   UserFields,
   UserPreferencesRequest,
 } from '@grpc/spec.pb';
@@ -129,7 +130,7 @@ export class UsersUserComponent {
             paginator: false,
           }),
         )
-        .pipe(map((response) => response.items || [])),
+        .pipe(map((response) => response.items ?? [])),
   });
 
   protected readonly commentsResource = rxResource({
@@ -156,7 +157,7 @@ export class UsersUserComponent {
             userId,
           }),
         )
-        .pipe(map((response) => (response.items ? response.items : [])));
+        .pipe(map((response) => response.items ?? []));
     },
   });
 
@@ -166,7 +167,7 @@ export class UsersUserComponent {
     stream: ({params: userId}) =>
       this.#achievementsClient
         .getUserAchievements(new GetUserAchievementsRequest({userId}))
-        .pipe(map((response) => ({items: response.items || [], progress: response.progress || []}))),
+        .pipe(map((response) => ({items: response.items ?? [], progress: response.progress ?? []}))),
   });
 
   readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});

@@ -1,7 +1,9 @@
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
 import {GetContactRequest} from '@grpc/spec.pb';
 import {ContactsClient} from '@grpc/spec.pbsc';
-import {catchError, map, Observable, of, throwError} from 'rxjs';
+import {catchError, map, of, throwError} from 'rxjs';
 
 import {isNotFoundError} from '../grpc';
 

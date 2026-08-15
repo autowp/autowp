@@ -1,8 +1,11 @@
+import type {OnInit} from '@angular/core';
+import type {BrandsListCharacter} from '@grpc/spec.pb';
+
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {BrandsListCharacter, GetBrandsRequest} from '@grpc/spec.pb';
+import {GetBrandsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';

@@ -1,6 +1,10 @@
+import type {ElementRef, OnInit} from '@angular/core';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {environment} from '@environment/environment';
 import {DeleteUserPhotoRequest, MeRequest, UpdateUserRequest, User, UserFields} from '@grpc/spec.pb';
@@ -11,21 +15,10 @@ import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {TimezoneService} from '@services/timezone';
-import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  EMPTY,
-  map,
-  Observable,
-  of,
-  shareReplay,
-  switchMap,
-  tap,
-} from 'rxjs';
+import {BehaviorSubject, catchError, combineLatest, EMPTY, map, of, shareReplay, switchMap, tap} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';

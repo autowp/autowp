@@ -1,7 +1,9 @@
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
 import {GetItemVehicleTypesRequest, ItemType, ItemVehicleType, ItemVehicleTypeRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {forkJoin, map, Observable, of, switchMap} from 'rxjs';
+import {forkJoin, map, of, switchMap} from 'rxjs';
 
 export interface APIItemChildsCounts {
   sport: number;
@@ -49,7 +51,7 @@ export class ItemService {
           const promises: Observable<null>[] = [];
 
           const currentIds: string[] = [];
-          for (const itemVehicleType of response.items ? response.items : []) {
+          for (const itemVehicleType of response.items ?? []) {
             currentIds.push(itemVehicleType.vehicleTypeId);
             if (!ids.includes(itemVehicleType.vehicleTypeId)) {
               promises.push(

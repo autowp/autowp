@@ -1,13 +1,13 @@
+import type {Item, Pages, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemsRequest,
-  Pages,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
@@ -18,12 +18,13 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {map, Observable, of, switchMap} from 'rxjs';
+import {map, of, switchMap} from 'rxjs';
+
+import type {BrandPerspectivePageData} from '../catalogue.module';
 
 import {chunkBy} from '../../chunk';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
-import {BrandPerspectivePageData} from '../catalogue.module';
 
 @Component({
   selector: 'app-catalogue-mixed',
@@ -139,7 +140,7 @@ export class CatalogueMixedComponent {
             limit: 12,
             options: new PictureListOptions({
               pictureItem: new PictureItemListOptions({
-                excludePerspectiveId: data.perspective_exclude_id ? data.perspective_exclude_id : undefined,
+                excludePerspectiveId: data.perspective_exclude_id ?? undefined,
                 itemId: brand.id,
                 perspectiveId: data.perspective_id,
               }),
@@ -153,7 +154,7 @@ export class CatalogueMixedComponent {
         .pipe(
           map((response) => ({
             paginator: response.paginator,
-            pictures: chunkBy(response.items || [], 4),
+            pictures: chunkBy(response.items ?? [], 4),
           })),
         );
     },

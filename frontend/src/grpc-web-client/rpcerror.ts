@@ -16,8 +16,10 @@
  *
  */
 
-import {Metadata} from './metadata';
-import {StatusCode, statusCodeName} from './statuscode';
+import type {Metadata} from './metadata';
+import type {StatusCode} from './statuscode';
+
+import {statusCodeName} from './statuscode';
 
 /**
  * gRPC-Web Error object, contains the {@link StatusCode}, a string message

@@ -1,35 +1,33 @@
+import type {OnInit} from '@angular/core';
+import type {Item, Pages, Spec, VehicleType} from '@grpc/spec.pb';
+import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/list-item.component';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
   ItemsRequest,
   ItemType,
   ItemVehicleTypeListOptions,
-  Pages,
   PictureItemListOptions,
   PictureItemType,
   PictureListOptions,
   PicturesRequest,
   PreviewPicturesRequest,
-  Spec,
-  VehicleType,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {SpecService} from '@services/spec';
 import {VehicleTypeService} from '@services/vehicle-type';
-import {
-  CatalogueListItem,
-  CatalogueListItemComponent,
-  CatalogueListItemPicture,
-} from '@utils/list-item/list-item.component';
+import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {getVehicleTypeTranslation} from '@utils/translations';
 import {
   catchError,
@@ -37,7 +35,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   of,
   shareReplay,
   startWith,
@@ -64,7 +61,7 @@ function toPlainSpec(options: APISpecInItems[], deep: number): APISpecInItems[] 
   for (const item of options) {
     item.deep = deep;
     result.push(item);
-    for (const subitem of toPlainSpec(item.childs ? item.childs : [], deep + 1)) {
+    for (const subitem of toPlainSpec(item.childs ?? [], deep + 1)) {
       result.push(subitem);
     }
   }
@@ -79,7 +76,7 @@ function toPlainVehicleType(options: VehicleType[], deep: number): APIVehicleTyp
       id: item.id,
       name: getVehicleTypeTranslation(item.name),
     });
-    for (const subitem of toPlainVehicleType(item.childs ? item.childs : [], deep + 1)) {
+    for (const subitem of toPlainVehicleType(item.childs ?? [], deep + 1)) {
       result.push(subitem);
     }
   }
@@ -157,7 +154,7 @@ export class ModerItemsComponent implements OnInit {
             this.#toastService.handleError(err);
             return EMPTY;
           }),
-          map((response) => (response.items ? response.items : [])),
+          map((response) => response.items ?? []),
         );
       }),
     );
@@ -254,7 +251,7 @@ export class ModerItemsComponent implements OnInit {
             language: this.#languageService.language,
             limit,
             options: new ItemListOptions({
-              beginYear: params.fromYear ? params.fromYear : undefined,
+              beginYear: params.fromYear ?? undefined,
               descendant:
                 params.ancestorID || params.vehicleChildsTypeID
                   ? new ItemParentCacheListOptions({
@@ -264,7 +261,7 @@ export class ModerItemsComponent implements OnInit {
                       parentId: params.ancestorID ? '' + params.ancestorID : undefined,
                     })
                   : undefined,
-              endYear: params.toYear ? params.toYear : undefined,
+              endYear: params.toYear ?? undefined,
               itemVehicleType: params.vehicleTypeID
                 ? new ItemVehicleTypeListOptions({vehicleTypeId: '' + params.vehicleTypeID})
                 : undefined,
@@ -282,17 +279,17 @@ export class ModerItemsComponent implements OnInit {
         )
         .pipe(
           map((response) => {
-            const items: CatalogueListItem[] = (response.items || []).map((item) => {
+            const items: CatalogueListItem[] = (response.items ?? []).map((item) => {
               const largeFormat = !!item.previewPictures?.largeFormat;
 
-              const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map(
+              const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures ?? []).map(
                 (picture, idx) => {
                   let thumb = null;
                   if (picture.picture) {
                     thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
                   }
                   return {
-                    picture: picture.picture ? picture.picture : null,
+                    picture: picture.picture ?? null,
                     routerLink: picture.picture ? ['/picture', picture.picture.identity] : undefined,
                     thumb,
                   };
@@ -407,7 +404,7 @@ export class ModerItemsComponent implements OnInit {
     void this.#router.navigate([], {
       queryParams: {
         page: null,
-        vehicle_type_id: this.vehicleTypeID ? this.vehicleTypeID : null,
+        vehicle_type_id: this.vehicleTypeID ?? null,
       },
       queryParamsHandling: 'merge',
     });
@@ -417,7 +414,7 @@ export class ModerItemsComponent implements OnInit {
     void this.#router.navigate([], {
       queryParams: {
         page: null,
-        vehicle_childs_type_id: this.vehicleChildsTypeID ? this.vehicleChildsTypeID : null,
+        vehicle_childs_type_id: this.vehicleChildsTypeID ?? null,
       },
       queryParamsHandling: 'merge',
     });
@@ -427,7 +424,7 @@ export class ModerItemsComponent implements OnInit {
     void this.#router.navigate([], {
       queryParams: {
         page: null,
-        spec_id: this.specID ? this.specID : null,
+        spec_id: this.specID ?? null,
       },
       queryParamsHandling: 'merge',
     });
@@ -456,7 +453,7 @@ export class ModerItemsComponent implements OnInit {
   protected onFromYearChanged() {
     void this.#router.navigate([], {
       queryParams: {
-        from_year: this.fromYear ? this.fromYear : null,
+        from_year: this.fromYear ?? null,
         page: null,
       },
       queryParamsHandling: 'merge',
@@ -467,7 +464,7 @@ export class ModerItemsComponent implements OnInit {
     void this.#router.navigate([], {
       queryParams: {
         page: null,
-        to_year: this.toYear ? this.toYear : null,
+        to_year: this.toYear ?? null,
       },
       queryParamsHandling: 'merge',
     });

@@ -1,9 +1,11 @@
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {AchievementsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {ACHIEVEMENT_CODES, getAchievementDescriptionTranslation, getAchievementTranslation} from '@utils/translations';
-import {catchError, map, Observable, of} from 'rxjs';
+import {catchError, map, of} from 'rxjs';
 
 interface AchievementGroup {
   codes: string[];
@@ -46,7 +48,7 @@ export class AchievementsComponent {
   protected readonly counts$: Observable<Record<string, string>> = this.#achievementsClient
     .getAchievementStats(new Empty())
     .pipe(
-      map((response) => Object.fromEntries((response.items || []).map((item) => [item.code, item.usersCount]))),
+      map((response) => Object.fromEntries((response.items ?? []).map((item) => [item.code, item.usersCount]))),
       catchError(() => of({})),
     );
 

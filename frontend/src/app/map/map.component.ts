@@ -1,30 +1,24 @@
+import type {ComponentRef, OnDestroy, OnInit} from '@angular/core';
+import type {MapPictureCluster, MapPicturePoint, MapPoint, MapSinglePicture} from '@grpc/spec.pb';
+import type {LatLngBounds, Map, MapOptions, Marker} from 'leaflet';
+
 import {DOCUMENT} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ComponentRef,
   inject,
   NgZone,
-  OnDestroy,
-  OnInit,
   signal,
   ViewContainerRef,
 } from '@angular/core';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
-import {
-  MapGetPicturePointsRequest,
-  MapGetPointsRequest,
-  MapPictureCluster,
-  MapPicturePoint,
-  MapPoint,
-  MapSinglePicture,
-} from '@grpc/spec.pb';
+import {MapGetPicturePointsRequest, MapGetPointsRequest} from '@grpc/spec.pb';
 import {MapClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {divIcon, icon, latLng, LatLngBounds, Map, MapOptions, Marker, marker, Popup, tileLayer} from 'leaflet';
+import {divIcon, icon, latLng, marker, Popup, tileLayer} from 'leaflet';
 import {BehaviorSubject, combineLatest, debounceTime, EMPTY, map, switchMap} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';

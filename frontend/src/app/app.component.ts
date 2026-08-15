@@ -1,3 +1,6 @@
+import type {Language} from '@services/language';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, DestroyRef, inject, Renderer2, signal} from '@angular/core';
 import {rxResource, takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
@@ -15,13 +18,13 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {skipAuthMetadata} from '@services/api.service';
 import {AuthService} from '@services/auth.service';
-import {Language, LanguageService} from '@services/language';
+import {LanguageService} from '@services/language';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
 import {Angulartics2GoogleAnalytics} from 'angulartics2';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
-import {map, Observable, shareReplay} from 'rxjs';
+import {map, shareReplay} from 'rxjs';
 
 import {MenuComponent} from './moder/menu/menu/menu.component';
 import {ContainerComponent} from './toasts/container/container.component';

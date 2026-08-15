@@ -1,7 +1,10 @@
+import type {ControlValueAccessor} from '@angular/forms';
+import type {LatLng, Layer, LeafletMouseEvent, Map, MapOptions} from 'leaflet';
+
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, NgZone} from '@angular/core';
-import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {FormsModule, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
-import {icon, LatLng, latLng, Layer, LeafletMouseEvent, Map, MapOptions, marker, tileLayer} from 'leaflet';
+import {icon, latLng, marker, tileLayer} from 'leaflet';
 
 export interface Point {
   lat: number;

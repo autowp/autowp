@@ -1,5 +1,6 @@
+import type {Spec} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
-import {Spec} from '@grpc/spec.pb';
 
 @Component({
   selector: 'app-info-spec-row',

@@ -1,15 +1,19 @@
+import type {OnInit} from '@angular/core';
+import type {Article, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {Article, ArticlesRequest, User} from '@grpc/spec.pb';
+import {ArticlesRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
-import {catchError, map, Observable, of} from 'rxjs';
+import {catchError, map, of} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {UserComponent} from '../../user/user/user.component';
@@ -55,7 +59,7 @@ export class ListComponent implements OnInit {
     stream: ({params: page}) =>
       this.#articlesClient.getList(new ArticlesRequest({limit: 10, page})).pipe(
         map((response) => ({
-          articles: (response.items || []).map((article) => this.#mapArticle(article)),
+          articles: (response.items ?? []).map((article) => this.#mapArticle(article)),
           paginator: response.paginator,
         })),
       ),

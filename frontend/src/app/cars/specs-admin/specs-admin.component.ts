@@ -1,15 +1,17 @@
+import type {OnInit} from '@angular/core';
+import type {AttrUserValue, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {
-  AttrUserValue,
   AttrUserValuesFields,
   AttrUserValuesRequest,
   DeleteAttrUserValuesRequest,
   MoveAttrUserValuesRequest,
-  User,
 } from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -19,7 +21,7 @@ import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getUnitAbbrTranslation} from '@utils/translations';
-import {forkJoin, map, Observable, of, switchMap} from 'rxjs';
+import {forkJoin, map, of, switchMap} from 'rxjs';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -83,7 +85,7 @@ export class CarsSpecsAdminComponent implements OnInit {
         )
         .pipe(
           switchMap((response) => {
-            const rows = response.items || [];
+            const rows = response.items ?? [];
             if (rows.length === 0) {
               return of({items: [] as AttrUserValueListItem[]});
             }

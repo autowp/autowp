@@ -1,13 +1,16 @@
+import type {Item} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, UpperCasePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
-import {GetItemLanguagesRequest, Item, ItemLanguage} from '@grpc/spec.pb';
+import {GetItemLanguagesRequest, ItemLanguage} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavLinkBase, NgbNavOutlet} from '@ng-bootstrap/ng-bootstrap';
 import {ContentLanguageService} from '@services/content-language';
-import {combineLatest, map, Observable, of, switchMap} from 'rxjs';
+import {combineLatest, map, of, switchMap} from 'rxjs';
 
 import {MarkdownEditComponent} from '../../../../markdown-edit/markdown-edit/markdown-edit.component';
 
@@ -73,7 +76,7 @@ export class ModerItemsItemNameComponent {
         language.itemId = itemId;
       });
 
-      for (const value of items ? items : []) {
+      for (const value of items ?? []) {
         languages.set(value.language, value);
       }
 

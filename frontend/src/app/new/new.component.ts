@@ -1,7 +1,11 @@
+import type {OnInit} from '@angular/core';
+import type {Item, Pages, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Item, NewboxRequest, Pages, Picture} from '@grpc/spec.pb';
+import {NewboxRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -13,7 +17,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   of,
   shareReplay,
   switchMap,
@@ -103,7 +106,7 @@ export class NewComponent implements OnInit {
         count: response.currentCount,
         date: response.currentDate ? parseGrpcDate(response.currentDate) : null,
       },
-      groups: (response.groups || [])
+      groups: (response.groups ?? [])
         .filter((group) => group.type === 'item' || group.type === 'pictures')
         .map((group) => {
           let repackedGroup: APINewGroupRepacked | null = null;
@@ -114,7 +117,7 @@ export class NewComponent implements OnInit {
               break;
             case 'pictures':
               repackedGroup = {
-                chunks: chunkBy(group.pictures || [], 6),
+                chunks: chunkBy(group.pictures ?? [], 6),
                 type: group.type,
               };
               break;

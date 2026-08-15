@@ -1,20 +1,14 @@
+import type {ElementRef, OnInit} from '@angular/core';
+import type {Image, Item} from '@grpc/spec.pb';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {HttpClient, HttpErrorResponse, HttpEventType} from '@angular/common/http';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  inject,
-  OnInit,
-  signal,
-  viewChild,
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal, viewChild} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  Image,
-  Item,
   ItemFields,
   ItemListOptions,
   ItemRequest,
@@ -35,7 +29,7 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
@@ -49,7 +43,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   of,
   switchMap,
   take,
@@ -176,7 +169,7 @@ export class UploadIndexComponent implements OnInit {
   protected readonly selection$ = combineLatest([this.#replacePicture$, this.#item$]).pipe(
     map(([replace, item]) => ({
       name: replace?.nameHtml ?? item?.nameHtml ?? '',
-      selected: !!(replace || item),
+      selected: !!(replace ?? item),
     })),
   );
 
@@ -204,7 +197,7 @@ export class UploadIndexComponent implements OnInit {
 
     const xhrs: Observable<Picture>[] = [];
 
-    for (const file of this.files ? this.files : []) {
+    for (const file of this.files ?? []) {
       xhrs.push(this.uploadFile$(file));
     }
 

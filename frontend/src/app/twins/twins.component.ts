@@ -1,12 +1,12 @@
+import type {Item, ItemParent} from '@grpc/spec.pb';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
-  ItemParent,
   ItemParentCacheListOptions,
   ItemParentFields,
   ItemParentsRequest,
@@ -145,8 +145,8 @@ export class TwinsComponent {
     }
 
     return {
-      groups: (response.items || []).map((group): ChunkedGroup => ({
-        childs: chunkBy(group.itemParentChilds?.items || [], 3),
+      groups: (response.items ?? []).map((group): ChunkedGroup => ({
+        childs: chunkBy(group.itemParentChilds?.items ?? [], 3),
         hasMoreImages: TwinsComponent.hasMoreImages(group),
         item: group,
       })),
@@ -156,7 +156,7 @@ export class TwinsComponent {
 
   private static hasMoreImages(group: Item): boolean {
     let count = 0;
-    for (const itemParent of group.itemParentChilds?.items || []) {
+    for (const itemParent of group.itemParentChilds?.items ?? []) {
       if (itemParent.childDescendantPictures?.items?.length) {
         count++;
       }

@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
+
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
@@ -40,7 +42,7 @@ export class CategoriesIndexComponent implements OnInit {
             }),
           }),
         )
-        .pipe(map((response) => response.items || [])),
+        .pipe(map((response) => response.items ?? [])),
   });
 
   protected readonly chunks = computed(() => {

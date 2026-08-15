@@ -1,7 +1,10 @@
+import type {Message, Pages, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {Message, MessagingGetMessagesRequest, Pages, User} from '@grpc/spec.pb';
+import {MessagingGetMessagesRequest} from '@grpc/spec.pb';
 import {MessagingClient} from '@grpc/spec.pbsc';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
@@ -20,7 +23,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   switchMap,
   tap,
 } from 'rxjs';
@@ -106,7 +108,7 @@ export class AccountMessagesComponent {
       }
     }),
     map((response) => ({
-      items: (response.items || []).map((msg) => ({
+      items: (response.items ?? []).map((msg) => ({
         author$: this.#userService.getUser$(msg.authorId),
         message: msg,
       })),

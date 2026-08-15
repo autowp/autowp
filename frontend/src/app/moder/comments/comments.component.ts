@@ -1,39 +1,29 @@
+import type {OnInit} from '@angular/core';
+import type {User as APIUser2, CommentMessage, Item, Pages, User} from '@grpc/spec.pb';
+import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  User as APIUser2,
-  CommentMessage,
   CommentMessageFields,
   GetMessagesRequest,
   GetUserRequest,
-  Item,
   ItemFields,
   ItemListOptions,
   ItemsRequest,
   ModeratorAttention,
-  Pages,
   PictureStatus,
-  User,
   UsersRequest,
 } from '@grpc/spec.pb';
 import {CommentsClient, ItemsClient, UsersClient} from '@grpc/spec.pbsc';
-import {NgbTypeahead, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {
-  catchError,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  Observable,
-  of,
-  switchMap,
-} from 'rxjs';
+import {catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -88,7 +78,7 @@ export class ModerCommentsComponent implements OnInit {
             this.#toastService.handleError(err);
             return EMPTY;
           }),
-          map((response) => response.items || []),
+          map((response) => response.items ?? []),
         );
       }),
     );
@@ -117,7 +107,7 @@ export class ModerCommentsComponent implements OnInit {
             this.#toastService.handleError(err);
             return EMPTY;
           }),
-          map((response) => response.items || []),
+          map((response) => response.items ?? []),
         );
       }),
     );
@@ -180,7 +170,7 @@ export class ModerCommentsComponent implements OnInit {
       return EMPTY;
     }),
     map((response) => ({
-      comments: (response.items ? response.items : []).map((comment) => ({
+      comments: (response.items ?? []).map((comment) => ({
         comment,
         user$: this.#userService.getUser$(comment.authorId),
       })),

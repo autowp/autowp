@@ -1,5 +1,7 @@
+import type {ErrorHandler} from '@angular/core';
+
 import {DOCUMENT} from '@angular/common';
-import {ErrorHandler, inject, Service} from '@angular/core';
+import {inject, Service} from '@angular/core';
 
 @Service()
 export class GlobalErrorHandler implements ErrorHandler {

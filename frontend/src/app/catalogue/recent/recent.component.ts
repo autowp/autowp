@@ -1,14 +1,14 @@
+import type {Item, Pages, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
   ItemsRequest,
-  Pages,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
@@ -20,7 +20,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {map, Observable, of, switchMap} from 'rxjs';
+import {map, of, switchMap} from 'rxjs';
 
 import {chunkBy} from '../../chunk';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -152,7 +152,7 @@ export class CatalogueRecentComponent {
         )
         .pipe(
           map((response) => {
-            const pictures: PictureRoute[] = (response.items || []).map((picture) => ({
+            const pictures: PictureRoute[] = (response.items ?? []).map((picture) => ({
               picture,
               route: this.#catalogue.picturePathToRoute(picture),
             }));

@@ -1,26 +1,17 @@
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {CommentMessage, CommentsType, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {DatePipe} from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  Injector,
-  input,
-  OnInit,
-  output,
-  ResourceRef,
-} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, output} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
-  CommentMessage,
   CommentMessageFields,
   CommentsSetDeletedRequest,
-  CommentsType,
   CommentsVoteCommentRequest,
   GetMessageRequest,
   ModeratorAttention,
-  User,
 } from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -30,7 +21,7 @@ import {getModalComponentRef} from '@utils/modal-component-ref';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {UserTextComponent} from '@utils/user-text/user-text.component';
-import {catchError, EMPTY, map, Observable, of, switchMap} from 'rxjs';
+import {catchError, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';

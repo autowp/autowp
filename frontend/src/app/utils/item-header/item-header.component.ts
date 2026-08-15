@@ -1,6 +1,7 @@
+import type {Design} from '@grpc/spec.pb';
+
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {Design} from '@grpc/spec.pb';
 
 export interface ItemHeader {
   design?: Design | null;

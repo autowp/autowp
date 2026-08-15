@@ -1,8 +1,12 @@
-import {ChangeDetectionStrategy, Component, effect, inject, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {Item, Picture} from '@grpc/spec.pb';
+
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Item, ItemType, Picture} from '@grpc/spec.pb';
+import {ItemType} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {GalleryComponent} from 'app/gallery/gallery.component';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
@@ -38,7 +42,7 @@ export class CategoryGalleryComponent implements OnInit {
         return notFoundError();
       }
       return this.#categoriesService
-        .categoryPipe$(this.#route.parent!)
+        .categoryPipe$(requireRouteParent(this.#route))
         .pipe(switchMap((data) => (data.current ? of(data) : notFoundError())));
     },
   });

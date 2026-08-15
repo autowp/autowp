@@ -1,3 +1,7 @@
+import type {Item} from '@grpc/spec.pb';
+import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
@@ -5,7 +9,6 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {
   DeleteItemParentRequest,
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParent,
@@ -17,13 +20,7 @@ import {
   ItemType,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {
-  NgbDropdown,
-  NgbDropdownMenu,
-  NgbDropdownToggle,
-  NgbTypeahead,
-  NgbTypeaheadSelectItemEvent,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {
@@ -32,7 +29,6 @@ import {
   debounceTime,
   distinctUntilChanged,
   map,
-  Observable,
   of,
   shareReplay,
   switchMap,
@@ -111,7 +107,7 @@ export class ModerItemsItemCatalogueComponent {
                   }),
                 }),
               )
-              .pipe(map((response) => response.items || []));
+              .pipe(map((response) => response.items ?? []));
           }),
         ),
       ),
@@ -133,7 +129,7 @@ export class ModerItemsItemCatalogueComponent {
         }),
       ),
     ),
-    map((response) => response.items || []),
+    map((response) => response.items ?? []),
   );
 
   protected readonly parents$: Observable<ItemParent[]> = combineLatest([this.item$, this.#reloadParents$]).pipe(
@@ -152,7 +148,7 @@ export class ModerItemsItemCatalogueComponent {
         }),
       ),
     ),
-    map((response) => response.items || []),
+    map((response) => response.items ?? []),
   );
 
   protected readonly suggestions$: Observable<Item[]> = combineLatest([this.item$, this.#reloadSuggestions$]).pipe(
@@ -168,7 +164,7 @@ export class ModerItemsItemCatalogueComponent {
         }),
       ),
     ),
-    map((response) => response.items || []),
+    map((response) => response.items ?? []),
   );
 
   protected itemFormatter(x: Item) {

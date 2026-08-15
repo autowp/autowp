@@ -1,3 +1,6 @@
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -7,7 +10,6 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {ItemService} from '@services/item';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {InvalidParams} from '@utils/invalid-params.pipe';
 import {getItemTypeTranslation} from '@utils/translations';
 import {
   catchError,
@@ -17,7 +19,6 @@ import {
   EMPTY,
   forkJoin,
   map,
-  Observable,
   of,
   shareReplay,
   switchMap,
@@ -25,14 +26,11 @@ import {
   tap,
 } from 'rxjs';
 
+import type {ItemMetaFormResult, ParentIsConcept} from '../item-meta-form/item-meta-form.component';
+
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../grpc';
 import {ToastsService} from '../../../toasts/toasts.service';
-import {
-  ItemMetaFormComponent,
-  ItemMetaFormResult,
-  itemMetaFormResultsToAPIItem,
-  ParentIsConcept,
-} from '../item-meta-form/item-meta-form.component';
+import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../item-meta-form/item-meta-form.component';
 
 @Component({
   selector: 'app-moder-items-new',
@@ -112,7 +110,7 @@ export class ModerItemsNewComponent {
               itemId: item.id,
             }),
           )
-          .pipe(map((response) => (response.items ? response.items : []).map((row) => row.vehicleTypeId)));
+          .pipe(map((response) => (response.items ?? []).map((row) => row.vehicleTypeId)));
       }
       return of([] as string[]);
     }),

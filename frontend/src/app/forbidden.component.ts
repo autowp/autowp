@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, RESPONSE_INIT} from '@angular/core';
+import type {OnInit} from '@angular/core';
+
+import {ChangeDetectionStrategy, Component, inject, RESPONSE_INIT} from '@angular/core';
 
 @Component({
   selector: 'app-forbidden',

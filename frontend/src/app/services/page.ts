@@ -1,5 +1,7 @@
+import type {Observer} from 'rxjs';
+
 import {Service} from '@angular/core';
-import {map, Observable, Observer} from 'rxjs';
+import {map, Observable} from 'rxjs';
 
 import * as pagesJson from './pages.json';
 

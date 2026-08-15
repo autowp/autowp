@@ -1,3 +1,5 @@
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
@@ -7,7 +9,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
-import {Observable, of, shareReplay, switchMap} from 'rxjs';
+import {of, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../toasts/toasts.service';
 

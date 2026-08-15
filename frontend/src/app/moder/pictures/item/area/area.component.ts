@@ -1,8 +1,11 @@
+import type {OnDestroy, OnInit} from '@angular/core';
+import type {Picture} from '@grpc/spec.pb';
+import type {Subscription} from 'rxjs';
+
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Picture,
   PictureFields,
   PictureItem,
   PictureItemListOptions,
@@ -14,19 +17,11 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
-import {
-  BehaviorSubject,
-  catchError,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  Subscription,
-  switchMap,
-  tap,
-} from 'rxjs';
+import {BehaviorSubject, catchError, debounceTime, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
 
-import Jcrop, {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/jquery.Jcrop.js';
+import type {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/jquery.Jcrop.js';
+
+import Jcrop from '../../../../jcrop/jquery.Jcrop.js';
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({
@@ -88,7 +83,7 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
         switchMap((picture) =>
           this.#route.queryParamMap.pipe(
             map((params) => ({
-              item_id: params.get('item_id') || '',
+              item_id: params.get('item_id') ?? '',
               type: parseInt(params.get('type') ?? '', 10),
             })),
             distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),

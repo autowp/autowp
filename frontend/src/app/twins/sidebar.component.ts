@@ -1,10 +1,12 @@
+import type {TwinsBrandsList, TwinsBrandsListItem} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {GetTwinsBrandsListRequest, TwinsBrandsList, TwinsBrandsListItem} from '@grpc/spec.pb';
+import {GetTwinsBrandsListRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-twins-sidebar',

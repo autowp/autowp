@@ -1,6 +1,8 @@
+import type {AfterViewInit} from '@angular/core';
+import type {PictureItem} from '@grpc/spec.pb';
+
 import {DOCUMENT, NgStyle} from '@angular/common';
-import {AfterViewInit, ChangeDetectionStrategy, Component, computed, inject, input, signal} from '@angular/core';
-import {PictureItem} from '@grpc/spec.pb';
+import {ChangeDetectionStrategy, Component, computed, inject, input, signal} from '@angular/core';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -24,8 +26,8 @@ export class AreaComponent implements AfterViewInit {
   protected readonly placement = computed<'bottom' | 'top'>(() => {
     const winHeight = this.#windowHeight();
     const styles = this.styles();
-    const nodeOffset = styles?.['top.px'] || 0;
-    const nodeHeight = styles?.['height.px'] || 0;
+    const nodeOffset = styles?.['top.px'] ?? 0;
+    const nodeHeight = styles?.['height.px'] ?? 0;
     const winCenter = winHeight / 2;
     const nodeCenter = nodeOffset + nodeHeight / 2;
 

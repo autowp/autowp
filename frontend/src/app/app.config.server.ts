@@ -1,5 +1,7 @@
+import type {ApplicationConfig} from '@angular/core';
+
 import {HTTP_TRANSFER_CACHE_ORIGIN_MAP} from '@angular/common/http';
-import {ApplicationConfig, inject, mergeApplicationConfig, REQUEST} from '@angular/core';
+import {inject, mergeApplicationConfig, REQUEST} from '@angular/core';
 import {provideServerRendering, withRoutes} from '@angular/ssr';
 import {environment} from '@environment/environment';
 

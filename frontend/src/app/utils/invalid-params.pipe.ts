@@ -1,4 +1,6 @@
-import {Pipe, PipeTransform} from '@angular/core';
+import type {PipeTransform} from '@angular/core';
+
+import {Pipe} from '@angular/core';
 
 export type InvalidParams = Record<string, Record<string, string>>;
 

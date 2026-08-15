@@ -1,15 +1,10 @@
+import type {ItemParent} from '@grpc/spec.pb';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {
-  ItemFields,
-  ItemParent,
-  ItemParentFields,
-  ItemParentListOptions,
-  ItemParentsRequest,
-  ItemParentType,
-} from '@grpc/spec.pb';
+import {ItemFields, ItemParentFields, ItemParentListOptions, ItemParentsRequest, ItemParentType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 

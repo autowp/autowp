@@ -1,11 +1,14 @@
+import type {User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {DOCUMENT} from '@angular/common';
 import {inject, Service} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {MeRequest, User} from '@grpc/spec.pb';
+import {MeRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {KEYCLOAK_EVENT_SIGNAL, KeycloakEventType} from 'keycloak-angular';
 import Keycloak from 'keycloak-js';
-import {catchError, distinctUntilChanged, filter, from, map, Observable, of, shareReplay, switchMap} from 'rxjs';
+import {catchError, distinctUntilChanged, filter, from, map, of, shareReplay, switchMap} from 'rxjs';
 
 export enum Role {
   ADMIN = 'admin',
@@ -37,7 +40,7 @@ export class AuthService {
       ].includes(event.type),
     ),
     map(() => this.#keycloak.tokenParsed),
-    distinctUntilChanged((a, b) => (a && b && a['jti'] === b['jti']) || (!a && !b)),
+    distinctUntilChanged((a, b) => (a && b && a['jti'] === b['jti']) ?? (!a && !b)),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
@@ -80,7 +83,7 @@ export class AuthService {
 
   public hasRole$(role: Role): Observable<boolean> {
     return this.#token$.pipe(
-      map((token) => (token?.resource_access?.['autowp']?.roles || []).includes(role)),
+      map((token) => (token?.resource_access?.['autowp']?.roles ?? []).includes(role)),
       distinctUntilChanged(),
       shareReplay({bufferSize: 1, refCount: false}),
     );

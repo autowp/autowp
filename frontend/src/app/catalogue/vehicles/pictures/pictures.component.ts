@@ -1,13 +1,12 @@
+import type {Item, ItemParent, Pages, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
-  ItemParent,
   ItemParentCacheListOptions,
-  Pages,
-  Picture,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
@@ -21,13 +20,15 @@ import {PageEnvService} from '@services/page-env.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {getItemTypeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
-import {catchError, EMPTY, map, Observable} from 'rxjs';
+import {catchError, EMPTY, map} from 'rxjs';
+
+import type {Breadcrumbs} from '../../catalogue-service';
 
 import {chunkBy} from '../../../chunk';
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../../../toasts/toasts.service';
-import {Breadcrumbs, CatalogueService, convertChildsCounts} from '../../catalogue-service';
+import {CatalogueService, convertChildsCounts} from '../../catalogue-service';
 import {CatalogueItemMenuComponent} from '../../item-menu/item-menu.component';
 
 @Component({
@@ -105,7 +106,7 @@ export class CatalogueVehiclesPicturesComponent {
   protected readonly item = computed<Item | undefined>(() => {
     const data = this.catalogueResource.value();
     const item = data?.path[data.path.length - 1].item;
-    return item || undefined;
+    return item ?? undefined;
   });
 
   protected readonly picturesResource = rxResource({
@@ -148,7 +149,7 @@ export class CatalogueVehiclesPicturesComponent {
           }),
           map((response) => ({
             paginator: response.paginator,
-            pictures: chunkBy(response.items || [], 4),
+            pictures: chunkBy(response.items ?? [], 4),
           })),
         ),
   });

@@ -1,24 +1,23 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit} from '@angular/core';
+import type {OnDestroy, OnInit} from '@angular/core';
+import type {Item, ItemList, ItemParent, ItemParents, Pages} from '@grpc/spec.pb';
+import type {Observable, Subscription} from 'rxjs';
+
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
-  ItemList,
   ItemListOptions,
-  ItemParent,
   ItemParentCacheListOptions,
   ItemParentListOptions,
-  ItemParents,
   ItemParentsRequest,
   ItemRequest,
   ItemsRequest,
   ItemType,
-  Pages,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, Subscription, switchMap} from 'rxjs';
+import {combineLatest, debounceTime, distinctUntilChanged, map, of, switchMap} from 'rxjs';
 
 import {chunk} from '../../../chunk';
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
@@ -128,16 +127,16 @@ export class DonateVodSelectComponent implements OnDestroy, OnInit {
       const items = r?.items;
       if (brand) {
         this.brand = brand.brand;
-        this.vehicles = brand.vehicles.items || [];
-        this.concepts = brand.concepts.items || [];
+        this.vehicles = brand.vehicles.items ?? [];
+        this.concepts = brand.concepts.items ?? [];
         this.brands = [];
         this.paginator = null;
       } else {
         this.brand = null;
         this.vehicles = [];
         this.concepts = [];
-        this.brands = chunk(items?.items || [], 6);
-        this.paginator = items?.paginator ? items.paginator : null;
+        this.brands = chunk(items?.items ?? [], 6);
+        this.paginator = items?.paginator ?? null;
       }
 
       this.#cdr.markForCheck();

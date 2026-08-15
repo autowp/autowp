@@ -1,12 +1,17 @@
+import type {AttrZone} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {AttrZone, AttrZoneAttributesRequest} from '@grpc/spec.pb';
+import {AttrZoneAttributesRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {debounceTime, distinctUntilChanged, EMPTY, map, Observable, of, shareReplay, switchMap, tap} from 'rxjs';
+import {debounceTime, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap, tap} from 'rxjs';
 
-import {APIAttrsService, AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
+import type {AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
+
+import {APIAttrsService} from '../../../api/attrs/attrs.service';
 import {ModerAttrsZoneAttributeListComponent} from './attribute-list/attribute-list.component';
 
 @Component({
@@ -58,7 +63,7 @@ export class ModerAttrsZoneComponent {
     ),
     map((zoneAttributes) => {
       const zoneAttribute: Record<string, boolean> = {};
-      for (const item of zoneAttributes.items ? zoneAttributes.items : []) {
+      for (const item of zoneAttributes.items ?? []) {
         zoneAttribute[item.attributeId] = true;
       }
       return zoneAttribute;

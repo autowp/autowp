@@ -1,19 +1,14 @@
+import type {OnInit} from '@angular/core';
+import type {Pages, Topic} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {ListTopicsRequest, Pages, Topic} from '@grpc/spec.pb';
+import {ListTopicsRequest} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  Observable,
-  switchMap,
-} from 'rxjs';
+import {BehaviorSubject, catchError, combineLatest, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ToastsService} from '../../toasts/toasts.service';

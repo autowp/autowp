@@ -1,9 +1,11 @@
+import type {OnInit} from '@angular/core';
+import type {Item} from '@grpc/spec.pb';
+
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, effect, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -109,7 +111,7 @@ export class UsersUserPicturesComponent implements OnInit {
             order: ItemsRequest.Order.NAME_NAT,
           }),
         )
-        .pipe(map((brands) => (brands.items ? brands.items : []))),
+        .pipe(map((brands) => brands.items ?? [])),
   });
 
   constructor() {

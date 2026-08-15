@@ -1,4 +1,6 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import type {AfterViewInit} from '@angular/core';
+
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';

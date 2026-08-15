@@ -1,17 +1,20 @@
+import type {OnInit} from '@angular/core';
+import type {TrafficTopItem} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {
   CreateTrafficBlacklistItemRequest,
   CreateTrafficWhitelistItemRequest,
   DeleteTrafficBlacklistItemRequest,
-  TrafficTopItem,
 } from '@grpc/spec.pb';
 import {TrafficClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {IpService} from '@services/ip';
 import {PageEnvService} from '@services/page-env.service';
-import {BehaviorSubject, map, Observable, switchMap} from 'rxjs';
+import {BehaviorSubject, map, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 
@@ -36,7 +39,7 @@ export class ModerTrafficComponent implements OnInit {
   protected readonly items$: Observable<ListItem[]> = this.#change$.pipe(
     switchMap(() => this.#trafficClient.getTrafficTop(new Empty())),
     map((response) =>
-      (response.items ? response.items : []).map((item) => ({
+      (response.items ?? []).map((item) => ({
         hostname$: this.#ipService.getHostByAddr$(item.ipAddress),
         item,
       })),

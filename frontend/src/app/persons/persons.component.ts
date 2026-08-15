@@ -1,8 +1,11 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {Item} from '@grpc/spec.pb';
+import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/list-item.component';
+
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
@@ -19,11 +22,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {
-  CatalogueListItem,
-  CatalogueListItemComponent,
-  CatalogueListItemPicture,
-} from '@utils/list-item/list-item.component';
+import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
@@ -117,7 +116,7 @@ export class PersonsComponent implements OnInit {
         )
         .pipe(
           map((response) => ({
-            items: this.prepareItems(response.items || [], authors),
+            items: this.prepareItems(response.items ?? [], authors),
             paginator: response.paginator,
           })),
         );
@@ -135,7 +134,7 @@ export class PersonsComponent implements OnInit {
 
       const largeFormat = !!item.previewPictures?.largeFormat;
 
-      const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures || []).map((picture, idx) => {
+      const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures ?? []).map((picture, idx) => {
         let thumb = null;
         let routerLink: string[] = [];
         if (picture.picture) {
@@ -146,7 +145,7 @@ export class PersonsComponent implements OnInit {
             routerLink = itemRouterLink.concat([picture.picture.identity]);
           }
         }
-        return {picture: picture.picture || null, routerLink, thumb};
+        return {picture: picture.picture ?? null, routerLink, thumb};
       });
 
       return {

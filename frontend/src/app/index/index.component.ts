@@ -1,13 +1,17 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {ItemOfDay} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {GetTopPersonsListRequest, ItemOfDay, ItemOfDayRequest, PictureItemType} from '@grpc/spec.pb';
+import {GetTopPersonsListRequest, ItemOfDayRequest, PictureItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {RemarkModule} from 'ngx-remark';
-import {catchError, EMPTY, Observable, of, shareReplay, switchMap} from 'rxjs';
+import {catchError, EMPTY, of, shareReplay, switchMap} from 'rxjs';
 
 import {ItemOfDayComponent} from '../item-of-day/item-of-day/item-of-day.component';
 import {ToastsService} from '../toasts/toasts.service';

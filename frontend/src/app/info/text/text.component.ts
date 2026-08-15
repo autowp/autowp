@@ -1,22 +1,17 @@
+import type {OnInit} from '@angular/core';
+import type {User} from '@grpc/spec.pb';
+import type {DiffEditorModel} from 'ngx-monaco-editor-v2';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {GetTextRequest, User} from '@grpc/spec.pb';
+import {GetTextRequest} from '@grpc/spec.pb';
 import {TextClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {DiffEditorComponent, DiffEditorModel} from 'ngx-monaco-editor-v2';
-import {
-  catchError,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  Observable,
-  of,
-  switchMap,
-} from 'rxjs';
+import {DiffEditorComponent} from 'ngx-monaco-editor-v2';
+import {catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -113,7 +108,7 @@ export class InfoTextComponent implements OnInit {
             }
           : null,
       prevModel: {
-        code: response.prev?.text || '',
+        code: response.prev?.text ?? '',
         language: 'text/markdown',
       },
     })),

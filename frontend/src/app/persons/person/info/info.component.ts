@@ -18,6 +18,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, map, of, switchMap} from 'rxjs';
@@ -42,7 +43,7 @@ export class PersonsPersonInfoComponent {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  readonly #itemID = toSignal(this.#route.parent!.paramMap.pipe(map((params) => params.get('id') ?? '')), {
+  readonly #itemID = toSignal(requireRouteParent(this.#route).paramMap.pipe(map((params) => params.get('id') ?? '')), {
     requireSync: true,
   });
 
@@ -74,7 +75,7 @@ export class PersonsPersonInfoComponent {
     params: () => this.#itemID(),
     stream: ({params: itemID}) =>
       this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId: itemID})})).pipe(
-        map((response) => (response.items ? response.items : [])),
+        map((response) => response.items ?? []),
         catchError(() => of([])),
       ),
   });

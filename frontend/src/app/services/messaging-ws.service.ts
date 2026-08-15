@@ -1,7 +1,9 @@
+import type {Observable} from 'rxjs';
+
 import {DOCUMENT, isPlatformBrowser} from '@angular/common';
 import {inject, PLATFORM_ID, Service} from '@angular/core';
 import Keycloak from 'keycloak-js';
-import {defer, EMPTY, map, Observable, repeat, retry, share, startWith, switchMap} from 'rxjs';
+import {defer, EMPTY, map, repeat, retry, share, startWith, switchMap} from 'rxjs';
 import {webSocket} from 'rxjs/webSocket';
 
 import {AuthService} from './auth.service';

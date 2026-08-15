@@ -1,3 +1,7 @@
+import type {Empty} from '@ngx-grpc/well-known-types';
+import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, UpperCasePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
@@ -14,11 +18,10 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
-import {Empty} from '@ngx-grpc/well-known-types';
 import {ContentLanguageService} from '@services/content-language';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {InvalidParams, InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getItemTypeTranslation} from '@utils/translations';
 import {
   BehaviorSubject,
@@ -29,7 +32,6 @@ import {
   EMPTY,
   forkJoin,
   map,
-  Observable,
   shareReplay,
   switchMap,
   tap,
@@ -161,7 +163,7 @@ export class ModerItemParentComponent {
         name: null,
       }));
 
-      for (const languageData of itemParentLanguage.items ? itemParentLanguage.items : []) {
+      for (const languageData of itemParentLanguage.items ?? []) {
         for (const i of resLanguages) {
           if (i.language === languageData.language) {
             i.name = languageData.name;

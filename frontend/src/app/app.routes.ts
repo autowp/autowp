@@ -1,4 +1,4 @@
-import {Routes} from '@angular/router';
+import type {Routes} from '@angular/router';
 
 export const routes: Routes = [
   {loadChildren: () => import('./about/about-routing.module').then((m) => m.routes), path: 'about'},

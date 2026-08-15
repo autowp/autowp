@@ -1,20 +1,21 @@
+import type {OnInit} from '@angular/core';
+import type {Item, ItemParent, Pages} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CreatePictureItemRequest,
-  Item,
   ItemFields,
   ItemListOptions,
-  ItemParent,
   ItemParentCacheListOptions,
   ItemParentFields,
   ItemParentListOptions,
   ItemParentsRequest,
   ItemsRequest,
   ItemType,
-  Pages,
   PictureItem,
   PictureItemType,
   SetPictureItemItemIDRequest,
@@ -31,7 +32,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   of,
   shareReplay,
   startWith,
@@ -206,7 +206,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
   ): Observable<{items: HtmlAndSelectItemParams[]; paginator?: Pages}> {
     return combineLatest([this.src$, this.#itemsClient.list(new ItemsRequest(request))]).pipe(
       map(([src, {items, paginator}]) => ({
-        items: (items ? items : []).map((item) => ({
+        items: (items ?? []).map((item) => ({
           html: item.nameHtml,
           selection: {
             selection: {
@@ -321,13 +321,17 @@ export class ModerPicturesItemMoveComponent implements OnInit {
             item: new ItemListOptions({
               typeId: ItemType.ITEM_TYPE_VEHICLE,
             }),
+            // brandID comes straight from params.get('brand_id') (no `?? ''`) - a literal
+            // `?brand_id=` query value still yields '', which must be treated the same as "no
+            // filter" as null is, not passed through as a real (nonexistent) empty brand id.
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             parentId: brandID ? brandID : undefined,
           }),
           order: ItemParentsRequest.Order.NAME,
         }),
       ),
     ),
-    map((response) => response.items || []),
+    map((response) => response.items ?? []),
   );
 
   protected readonly engines$: Observable<ItemParent[]> = this.brandId$.pipe(
@@ -346,13 +350,17 @@ export class ModerPicturesItemMoveComponent implements OnInit {
             item: new ItemListOptions({
               typeId: ItemType.ITEM_TYPE_ENGINE,
             }),
+            // brandID comes straight from params.get('brand_id') (no `?? ''`) - a literal
+            // `?brand_id=` query value still yields '', which must be treated the same as "no
+            // filter" as null is, not passed through as a real (nonexistent) empty brand id.
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             parentId: brandID ? brandID : undefined,
           }),
           order: ItemParentsRequest.Order.NAME,
         }),
       ),
     ),
-    map((response) => response.items || []),
+    map((response) => response.items ?? []),
   );
 
   protected readonly concepts$: Observable<{items: HtmlAndSelectItemParams[]; paginator?: Pages}> = this.brandId$.pipe(
@@ -366,6 +374,10 @@ export class ModerPicturesItemMoveComponent implements OnInit {
           limit: 500,
           options: new ItemListOptions({
             ancestor: new ItemParentCacheListOptions({
+              // brandID comes straight from params.get('brand_id') (no `?? ''`) - a literal
+              // `?brand_id=` query value still yields '', which must be treated the same as "no
+              // filter" as null is, not passed through as a real (nonexistent) empty brand id.
+              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
               parentId: brandID ? brandID : undefined,
             }),
             isConcept: true,
@@ -397,7 +409,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
       ),
     ),
     map((response) => ({
-      items: chunk<Item>(response.items ? response.items : [], 6),
+      items: chunk<Item>(response.items ?? [], 6),
       paginator: response.paginator,
     })),
   );

@@ -1,11 +1,14 @@
+import type {Item} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
-import {Item, ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
+import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {EMPTY, map, Observable, switchMap} from 'rxjs';
+import {EMPTY, map, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-moder-items-item-vehicles',
@@ -34,6 +37,6 @@ export class ModerItemsItemVehiclesComponent {
           )
         : EMPTY,
     ),
-    map((response) => (response.items ? response.items : [])),
+    map((response) => response.items ?? []),
   );
 }

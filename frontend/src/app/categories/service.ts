@@ -1,9 +1,12 @@
+import type {ActivatedRoute} from '@angular/router';
+import type {Item, PathItem} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {inject, Service} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {Item, ItemType, PathItem, PathRequest} from '@grpc/spec.pb';
+import {ItemType, PathRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {distinctUntilChanged, map, Observable, switchMap} from 'rxjs';
+import {distinctUntilChanged, map, switchMap} from 'rxjs';
 
 export interface CategoryPipeResult {
   category: Item | undefined;
@@ -56,7 +59,7 @@ export class CategoriesService {
       ),
       map((response) => {
         let category: Item | undefined = undefined;
-        const path = response.path || [];
+        const path = response.path ?? [];
         for (const item of path) {
           if (item.item?.itemTypeId !== ItemType.ITEM_TYPE_CATEGORY) {
             break;
@@ -75,6 +78,10 @@ export class CategoriesService {
             pathCatnames.push(item.catname);
           }
           pathItems.push({
+            // PathRequest's response always populates .item for every path segment it returns -
+            // the optional-chained reads above are for TS's benefit navigating the proto message
+            // shape, not because a segment can actually come back without one.
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             item: item.item!,
             loaded: false,
             parentId: item.parentId,

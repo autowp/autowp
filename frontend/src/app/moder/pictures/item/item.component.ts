@@ -1,3 +1,6 @@
+import type {DfDistance, IP, Item, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
@@ -8,11 +11,8 @@ import {
   DeletePictureItemRequest,
   DeleteSimilarRequest,
   DeleteTrafficBlacklistItemRequest,
-  DfDistance,
   DfDistanceFields,
   DfDistanceRequest,
-  IP,
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheFields,
@@ -35,7 +35,6 @@ import {
   SetPictureItemItemIDRequest,
   UpdatePictureItemRequest,
   UpdatePictureRequest,
-  User,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, TrafficClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -59,7 +58,6 @@ import {
   distinctUntilChanged,
   EMPTY,
   map,
-  Observable,
   of,
   shareReplay,
   switchMap,
@@ -242,7 +240,7 @@ export class ModerPicturesItemComponent {
             console.error(error);
             return throwError(() => error);
           }),
-          map((item) => ({hasItem: item ? this.hasItem(picture.pictureItems?.items || [], item.id) : false, item})),
+          map((item) => ({hasItem: item ? this.hasItem(picture.pictureItems?.items ?? [], item.id) : false, item})),
         );
     }),
     shareReplay({bufferSize: 1, refCount: false}),
@@ -658,7 +656,7 @@ export class ModerPicturesItemComponent {
           item: {
             ipAddress: ip,
             period: this.banPeriod,
-            reason: this.banReason || '',
+            reason: this.banReason ?? '',
           },
         }),
       )

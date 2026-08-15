@@ -14,6 +14,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {requireRouteParent} from '@utils/require-route-parent';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
@@ -38,9 +39,12 @@ export class PersonsPersonAuthorPictureComponent {
     requireSync: true,
   });
 
-  readonly #personID = toSignal(this.#route.parent!.parent!.paramMap.pipe(map((params) => params.get('id') ?? '')), {
-    requireSync: true,
-  });
+  readonly #personID = toSignal(
+    requireRouteParent(requireRouteParent(this.#route)).paramMap.pipe(map((params) => params.get('id') ?? '')),
+    {
+      requireSync: true,
+    },
+  );
 
   protected readonly picturesRouterLink = computed(() => ['/persons', this.#personID(), 'author']);
 

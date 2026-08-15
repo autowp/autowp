@@ -1,24 +1,18 @@
+import type {OnInit} from '@angular/core';
+import type {AttrAttribute, AttrConflict, AttrConflictValue, Item, Pages, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {
-  AttrAttribute,
-  AttrConflict,
-  AttrConflictsRequest,
-  AttrConflictValue,
-  Item,
-  ItemFields,
-  ItemRequest,
-  Pages,
-  User,
-} from '@grpc/spec.pb';
+import {AttrConflictsRequest, ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {getUnitAbbrTranslation} from '@utils/translations';
-import {combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, shareReplay, switchMap} from 'rxjs';
+import {combineLatest, debounceTime, distinctUntilChanged, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -111,7 +105,7 @@ export class AccountSpecsConflictsComponent implements OnInit {
         ]),
       ),
       map(([data, user]) => ({
-        conflicts: (data.items || []).map((conflict): APIAttrConflictInList => {
+        conflicts: (data.items ?? []).map((conflict): APIAttrConflictInList => {
           const attribute$ = this.#attrsService.getAttribute$(conflict.attributeId);
           return {
             attribute$,
@@ -120,7 +114,7 @@ export class AccountSpecsConflictsComponent implements OnInit {
             unitName$: attribute$.pipe(
               map((attr) => (attr?.unitId && attr.unitId !== '0' ? getUnitAbbrTranslation(attr.unitId) : null)),
             ),
-            values: (conflict.values || []).map((value) => ({
+            values: (conflict.values ?? []).map((value) => ({
               user$: user?.id === value.userId ? of(null) : this.#userService.getUser$(value.userId),
               value,
             })),

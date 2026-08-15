@@ -1,17 +1,10 @@
+import type {AfterViewInit} from '@angular/core';
+import type {Picture, PictureItem} from '@grpc/spec.pb';
+
 import {NgStyle} from '@angular/common';
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  ElementRef,
-  inject,
-  input,
-  signal,
-} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, signal} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {RouterLink} from '@angular/router';
-import {Picture, PictureItem} from '@grpc/spec.pb';
 import {NgMathPipesModule} from 'ngx-pipes';
 
 import {AreaComponent} from './area.component';
@@ -269,7 +262,7 @@ export class CarouselItemComponent implements AfterViewInit {
       };
     }
 
-    return (item.pictureItems?.items || []).map((pictureItem) => {
+    return (item.pictureItems?.items ?? []).map((pictureItem) => {
       return {
         pictureItem: pictureItem,
         styles: {

@@ -1,9 +1,11 @@
+import type {Picture} from '@grpc/spec.pb';
+
 import {AsyncPipe, DecimalPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
-import {Picture, PictureItem, PictureStatus, UpdatePictureItemRequest} from '@grpc/spec.pb';
+import {PictureItem, PictureStatus, UpdatePictureItemRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';

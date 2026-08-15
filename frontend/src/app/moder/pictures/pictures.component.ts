@@ -1,5 +1,11 @@
+import type {OnDestroy, OnInit} from '@angular/core';
+import type {Item, Pages, User, VehicleType} from '@grpc/spec.pb';
+import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import type {Empty} from '@ngx-grpc/well-known-types';
+import type {Observable, Subscription} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -7,14 +13,12 @@ import {
   DfDistanceListOptions,
   DfDistanceRequest,
   GetUserRequest,
-  Item,
   ItemFields,
   ItemListOptions,
   ItemParentCacheListOptions,
   ItemsRequest,
   ItemType,
   ItemVehicleTypeListOptions,
-  Pages,
   Picture,
   PictureFields,
   PictureItemFields,
@@ -26,19 +30,11 @@ import {
   PicturesRequest,
   PictureStatus,
   UpdatePictureRequest,
-  User,
   UsersRequest,
-  VehicleType,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, UsersClient} from '@grpc/spec.pbsc';
-import {
-  NgbDropdown,
-  NgbDropdownMenu,
-  NgbDropdownToggle,
-  NgbTypeahead,
-  NgbTypeaheadSelectItemEvent,
-} from '@ng-bootstrap/ng-bootstrap';
-import {Empty, FieldMask} from '@ngx-grpc/well-known-types';
+import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
@@ -53,10 +49,8 @@ import {
   EMPTY,
   forkJoin,
   map,
-  Observable,
   of,
   shareReplay,
-  Subscription,
   switchMap,
   tap,
 } from 'rxjs';
@@ -87,7 +81,7 @@ function toPlainVehicleTypes(options: VehicleType[], deep: number): VehicleTypeI
       name: getVehicleTypeTranslation(item.name),
       value: item.id,
     });
-    for (const subitem of toPlainVehicleTypes(item.childs ? item.childs : [], deep + 1)) {
+    for (const subitem of toPlainVehicleTypes(item.childs ?? [], deep + 1)) {
       result.push(subitem);
     }
   }
@@ -341,7 +335,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
             this.#toastService.handleError(err);
             return EMPTY;
           }),
-          map((response) => response.items || []),
+          map((response) => response.items ?? []),
         );
       }),
     );
@@ -380,7 +374,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
             this.#toastService.handleError(err);
             return EMPTY;
           }),
-          map((response) => (response.items ? response.items : [])),
+          map((response) => response.items ?? []),
         );
       }),
     );
@@ -557,9 +551,9 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
       );
     }),
     map((response) => ({
-      chunks: chunkBy<Picture>(response.items || [], 3),
+      chunks: chunkBy<Picture>(response.items ?? [], 3),
       paginator: response.paginator,
-      pictures: response.items || [],
+      pictures: response.items ?? [],
     })),
     shareReplay({bufferSize: 1, refCount: false}),
   );

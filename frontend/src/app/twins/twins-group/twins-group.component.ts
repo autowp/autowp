@@ -75,7 +75,7 @@ export class TwinsGroupComponent {
             }),
           }),
         )
-        .pipe(map((response) => (response.items || []).map((item) => item.catname)));
+        .pipe(map((response) => (response.items ?? []).map((item) => item.catname)));
     },
   });
 

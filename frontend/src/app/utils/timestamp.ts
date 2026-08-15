@@ -1,4 +1,4 @@
-import {Timestamp} from '@ngx-grpc/well-known-types';
+import type {Timestamp} from '@ngx-grpc/well-known-types';
 
 /**
  * Converts a Timestamp to a Date from its seconds/nanos fields directly, rather than by calling

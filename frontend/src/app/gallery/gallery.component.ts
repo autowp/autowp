@@ -1,23 +1,15 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  Injector,
-  input,
-  OnInit,
-  output,
-  ResourceRef,
-} from '@angular/core';
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {GalleryResponse, Picture} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
+import {ChangeDetectionStrategy, Component, effect, inject, Injector, input, output} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Router, RouterLink} from '@angular/router';
 import {
   GalleryRequest,
-  GalleryResponse,
   ItemFields,
   ItemParentCacheListOptions,
   ItemsRequest,
-  Picture,
   PictureFields,
   PictureItemFields,
   PictureItemListOptions,
@@ -30,7 +22,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {isNotFoundError, notFoundError} from 'app/grpc';
-import {catchError, EMPTY, Observable, of, switchMap} from 'rxjs';
+import {catchError, EMPTY, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {CarouselItemComponent} from './carousel-item.component';
@@ -123,7 +115,7 @@ function galleryItemByIndex(state: GalleryState, index: number): null | Picture 
     return null;
   }
 
-  return state.items[index] || null;
+  return state.items[index] ?? null;
 }
 
 function galleryItem(state: GalleryState, identity: string): null | Picture {
@@ -137,7 +129,7 @@ function applyGalleryResponse(state: GalleryState, response: GalleryResponse): v
     state.status = response.status;
   }
 
-  (response.items || []).forEach((item, i) => {
+  (response.items ?? []).forEach((item, i) => {
     const index = (response.page - 1) * PER_PAGE + i;
     state.items[index] = item;
   });
@@ -312,6 +304,10 @@ export class GalleryComponent implements OnInit {
 
   private loadPage$(page: number, state: GalleryState): Observable<GalleryResponse> {
     const request = galleryFilterParams(state, this.#languageService.language);
+    // galleryFilterParams() always constructs and sets `options` on the PicturesRequest it
+    // returns - TS just can't see that across the function boundary since the field itself is
+    // optional on the generated proto message type.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     request.options!.status = state.status;
     request.page = page;
 

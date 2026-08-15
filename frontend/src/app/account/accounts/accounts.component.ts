@@ -1,11 +1,15 @@
+import type {OnInit} from '@angular/core';
+import type {AccountsAccount} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
-import {AccountsAccount, DeleteUserAccountRequest} from '@grpc/spec.pb';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {DeleteUserAccountRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, catchError, combineLatest, EMPTY, map, Observable} from 'rxjs';
+import {BehaviorSubject, catchError, combineLatest, EMPTY, map} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 
@@ -29,7 +33,7 @@ export class AccountAccountsComponent implements OnInit {
       this.#toastService.handleError(error);
       return EMPTY;
     }),
-    map(([response]) => response.items || []),
+    map(([response]) => response.items ?? []),
   );
 
   protected readonly disconnectFailed = signal(false);
