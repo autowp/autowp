@@ -526,7 +526,7 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 		return err
 	}
 
-	sourceUrl := url.URL{Path: dir.Bucket() + "/" + img.Filepath}
+	sourceURL := url.URL{Path: dir.Bucket() + "/" + img.Filepath}
 	bucket := dir.Bucket()
 
 	ctx = context.WithoutCancel(ctx)
@@ -543,8 +543,8 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 			return errSelfRename
 		}
 
-		destUrl := url.URL{Path: destFileName}
-		escapedDestUrl := destUrl.EscapedPath()
+		destURL := url.URL{Path: destFileName}
+		escapedDestURL := destURL.EscapedPath()
 
 		_, insertAttemptException = s.db.Update(schema.ImageTable).
 			Set(goqu.Record{schema.ImageTableFilepathColName: destFileName}).
@@ -553,15 +553,15 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 		if insertAttemptException == nil {
 			_, err = s3Client.CopyObject(ctx, &s3.CopyObjectInput{
 				Bucket:     &bucket,
-				CopySource: aws.String(sourceUrl.EscapedPath()),
-				Key:        aws.String(escapedDestUrl),
+				CopySource: aws.String(sourceURL.EscapedPath()),
+				Key:        aws.String(escapedDestURL),
 				ACL:        types.ObjectCannedACLPublicRead,
 			})
 			if err != nil {
 				logrus.Errorf(
 					"CopyObject from `%s` to `%s` failed: %s",
-					sourceUrl.EscapedPath(),
-					escapedDestUrl,
+					sourceURL.EscapedPath(),
+					escapedDestURL,
 					err.Error(),
 				)
 

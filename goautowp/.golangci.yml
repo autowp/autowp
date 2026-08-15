@@ -12,9 +12,9 @@ linters:
     - containedctx
     - contextcheck
     - copyloopvar
-    # - cyclop
+    # - cyclop # complexity metric largely redundant with gocognit/maintidx/wsl_v5; noisy on this codebase (50+ findings capped)
     - decorder
-    # - depguard
+    # - depguard # needs a curated import allow/deny list to be meaningful; without one it denies every non-stdlib import repo-wide
     - dogsled
     - dupl
     - dupword
@@ -26,22 +26,22 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    # - exhaustruct
+    # - exhaustruct # would force every struct literal to set every field, including options structs with intentional zero-value defaults
     - exptostd
     - fatcontext
     - forbidigo
     - forcetypeassert
     - funcorder
-    # - funlen
+    # - funlen # complexity/length metric, noisy on this codebase (50+ findings capped) and overlaps maintidx/gocognit
     - ginkgolinter
     - gocheckcompilerdirectives
-    # - gochecknoglobals
+    # - gochecknoglobals # flags this codebase's normal package-level sentinel errors/regexes/config vars (50+ findings capped)
     - gochecknoinits
     - gochecksumtype
-    # - gocognit
+    # - gocognit # complexity metric, noisy on this codebase (41 findings) and overlaps maintidx/wsl_v5
     - goconst
     - gocritic
-    # - gocyclo
+    # - gocyclo # complexity metric, noisy on this codebase (18 findings) and overlaps gocognit/maintidx
     - godot
     - godox
     - goheader
@@ -49,7 +49,7 @@ linters:
     - gomodguard_v2
     - goprintffuncname
     - gosec
-    # - gosmopolitan
+    # - gosmopolitan # false positive: flags deliberate non-Latin test fixtures (Chinese strings in i18n/search tests)
     - govet
     - grouper
     - iface
@@ -58,7 +58,7 @@ linters:
     - ineffassign
     - interfacebloat
     - intrange
-    # - ireturn
+    # - ireturn # fights this codebase's intentional interface-returning APIs (e.g. items.AliaseableExpression query builders)
     - lll
     - loggercheck
     - maintidx
@@ -68,13 +68,13 @@ linters:
     - mnd
     - musttag
     - nakedret
-    # - nestif
+    # - nestif # complexity metric, noisy on this codebase (50+ findings capped) and overlaps gocognit/maintidx
     - nilerr
     - nilnesserr
     - nilnil
     - nlreturn
     - noctx
-    # - noinlineerr
+    # - noinlineerr # fights the idiomatic `if err := f(); err != nil` Go pattern used throughout this codebase
     - nolintlint
     - nonamedreturns
     - nosprintfhostport
@@ -85,18 +85,18 @@ linters:
     - promlinter
     - protogetter
     - reassign
-    # - recvcheck
-    # - revive
+    - recvcheck
+    - revive
     - rowserrcheck
     - sloglint
     - spancheck
     - sqlclosecheck
     - staticcheck
     - tagalign
-    # - tagliatelle
+    # - tagliatelle # would rename existing struct tags/JSON field names repo-wide (47 findings) - a breaking-change-risk scope, not a lint fix
     - testableexamples
     - testifylint
-    # - testpackage
+    # - testpackage # would force ~30 internal test files into external _test packages, likely requiring unexported helpers to be exported just to stay testable
     - thelper
     - tparallel
     - unconvert
@@ -107,8 +107,8 @@ linters:
     - varnamelen
     - wastedassign
     - whitespace
-    # - wrapcheck
-    # - wsl
+    # - wrapcheck # 476 findings repo-wide - wrapping every internal error at the call site is a large, high-risk refactor, not attempted in this pass
+    # - wsl # superseded by wsl_v5, already enabled below
     - wsl_v5
     - zerologlint
   settings:

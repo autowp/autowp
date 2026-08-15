@@ -10,6 +10,10 @@ import (
 
 var errUnsupportedAttributeTypeID = errors.New("unsupported type for AttributeTypeID")
 
+// Scan uses a pointer receiver (it must mutate in place) and Value uses a value receiver (read-only) -
+// the standard sql.Scanner/driver.Valuer split also used by sql.NullString et al, not an inconsistency.
+//
+//nolint:recvcheck
 type NullAttributeTypeID struct {
 	AttributeTypeID AttrsAttributeTypeID
 	Valid           bool // Valid is true if AttributeTypeID is not NULL

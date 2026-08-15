@@ -20,6 +20,11 @@ var (
 // NullPoint represents a [geo.Point] that may be null.
 // NullPoint implements the [Scanner] interface so
 // it can be used as a scan destination, similar to [NullString].
+//
+// Scan uses a pointer receiver (it must mutate in place) and Value uses a value receiver (read-only) -
+// the standard sql.Scanner/driver.Valuer split also used by sql.NullString et al, not an inconsistency.
+//
+//nolint:recvcheck
 type NullPoint struct {
 	Point geom.Point
 	Valid bool // Valid is true if Point is not NULL

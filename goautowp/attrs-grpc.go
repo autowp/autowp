@@ -382,7 +382,7 @@ func (s *AttrsGRPCServer) GetUserValues(
 
 		extractedValue := extractAttrValue(value)
 
-		var updateDate *timestamppb.Timestamp = nil
+		var updateDate *timestamppb.Timestamp
 		if row.UpdateDate.Valid {
 			updateDate = timestamppb.New(row.UpdateDate.Time)
 		}
