@@ -12,13 +12,20 @@
 
 <div class="mb-3 d-flex justify-content-between">
   <div class="btn-group">
-    <a class="btn btn-secondary" routerLink="." i18n [class.active]="mode() === 'objects'" [queryParams]="{mode: null}"
+    <a
+      class="btn btn-secondary"
+      routerLink="."
+      i18n
+      queryParamsHandling="merge"
+      [class.active]="mode() === 'objects'"
+      [queryParams]="{mode: null}"
       >Objects</a
     >
     <a
       class="btn btn-secondary"
       routerLink="."
       i18n
+      queryParamsHandling="merge"
       [class.active]="mode() === 'pictures'"
       [queryParams]="{mode: 'pictures'}"
       >Pictures</a

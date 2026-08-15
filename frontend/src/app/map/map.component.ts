@@ -1,6 +1,6 @@
 import type {ComponentRef, OnDestroy, OnInit} from '@angular/core';
 import type {MapPictureCluster, MapPicturePoint, MapPoint, MapSinglePicture} from '@grpc/spec.pb';
-import type {LatLngBounds, Map, MapOptions, Marker} from 'leaflet';
+import type {LatLng, LatLngBounds, Map, MapOptions, Marker} from 'leaflet';
 
 import {DOCUMENT} from '@angular/common';
 import {
@@ -39,6 +39,24 @@ const CLUSTER_ZOOM_STEP = 2;
 // without being so small that a normal, deliberately grouped set of nearby photos (e.g. a small
 // venue) gets needlessly split apart.
 const CLUSTER_RESOLVE_DELTA = 0.0005;
+
+const DEFAULT_CENTER_LAT = 50;
+const DEFAULT_CENTER_LNG = 20;
+const DEFAULT_ZOOM = 4;
+
+// ~1m of precision at the equator - plenty for restoring a view on refresh, short enough to keep
+// the URL readable.
+const CENTER_QUERY_PARAM_PRECISION = 5;
+
+function parseQueryParamNumber(value: null | string, fallback: number, min: number, max: number): number {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback;
+}
 
 function createMarker(lat: number, lng: number): Marker {
   return marker([lat, lng], {
@@ -126,8 +144,24 @@ export class MapComponent implements OnDestroy, OnInit {
   readonly #mode$ = toObservable(this.mode);
   readonly #bounds$ = new BehaviorSubject<LatLngBounds | null>(null);
 
+  // Read once at construction time (via the route snapshot, not the reactive queryParamMap) so
+  // the map is centered correctly on first render - by the time ngOnInit/onMapReady run, Leaflet
+  // needs its initial options already in hand.
+  private initialCenter(): LatLng {
+    const params = this.#route.snapshot.queryParamMap;
+
+    return latLng(
+      parseQueryParamNumber(params.get('lat'), DEFAULT_CENTER_LAT, -90, 90),
+      parseQueryParamNumber(params.get('lng'), DEFAULT_CENTER_LNG, -180, 180),
+    );
+  }
+
+  private initialZoom(): number {
+    return parseQueryParamNumber(this.#route.snapshot.queryParamMap.get('zoom'), DEFAULT_ZOOM, 0, 18);
+  }
+
   public readonly options: MapOptions = {
-    center: latLng(50, 20),
+    center: this.initialCenter(),
     doubleClickZoom: true,
     dragging: true,
     layers: [
@@ -135,10 +169,32 @@ export class MapComponent implements OnDestroy, OnInit {
         maxZoom: 18,
       }),
     ],
-    zoom: 4,
+    zoom: this.initialZoom(),
     zoomAnimation: true,
     zoomControl: true,
   };
+
+  // Mirrors the map's current view into the URL (merged with the existing mode param) so a
+  // refresh or a switch between objects/pictures mode restores the same view instead of resetting
+  // to the default center/zoom. replaceUrl: true replaces the current history entry instead of
+  // pushing a new one, so a pan/zoom never adds a browser-history entry - the back button always
+  // lands on whatever page was open before this one, never on an earlier map position. Because
+  // this still goes through the Router (unlike a raw Location.replaceState call), the Router's own
+  // query-param state stays current too, so the Objects/Pictures links' queryParamsHandling="merge"
+  // below keeps picking up the latest lat/lng/zoom automatically.
+  private updateUrlFromMap(lmap: Map): void {
+    const center = lmap.getCenter();
+
+    void this.#router.navigate([], {
+      queryParams: {
+        lat: center.lat.toFixed(CENTER_QUERY_PARAM_PRECISION),
+        lng: center.lng.toFixed(CENTER_QUERY_PARAM_PRECISION),
+        zoom: lmap.getZoom(),
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 117});
@@ -182,6 +238,7 @@ export class MapComponent implements OnDestroy, OnInit {
     lmap.on('moveend', () => {
       this.#zone.run(() => {
         this.#bounds$.next(lmap.getBounds());
+        this.updateUrlFromMap(lmap);
       });
     });
 
