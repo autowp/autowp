@@ -1,8 +1,6 @@
 import eslint from '@eslint/js';
 import angular from 'angular-eslint';
-import {createTypeScriptImportResolver} from 'eslint-import-resolver-typescript';
 import depend from 'eslint-plugin-depend';
-import importX from 'eslint-plugin-import-x';
 import perfectionist from 'eslint-plugin-perfectionist';
 import {default as eslintPluginPrettierRecommended} from 'eslint-plugin-prettier/recommended';
 import rxjsX from 'eslint-plugin-rxjs-x';
@@ -146,26 +144,6 @@ export default defineConfig([
     files: ['**/*.ts'],
     plugins: {
       depend,
-    },
-  },
-  {
-    files: ['**/*.ts'],
-    plugins: {
-      'import-x': importX,
-    },
-    settings: {
-      // Only the TS-aware resolver, not eslint-plugin-import's classic node resolver - it's the
-      // one that understands the '@grpc/*'/'@services/*'/'@utils/*'/'@environment/*' path aliases
-      // from tsconfig.json's `paths`.
-      'import-x/resolver-next': [createTypeScriptImportResolver({project: './tsconfig.json'})],
-    },
-    rules: {
-      // Only no-cycle/no-unresolved, not the full import-x recommended config - `named`/`namespace`
-      // /`default`/`export` duplicate checks TypeScript's own type-checking already does under
-      // strictTypeChecked, and `no-duplicates` overlaps with the core no-duplicate-imports rule
-      // above; pulling in the whole recommended set would just add redundant/conflicting opinions.
-      'import-x/no-cycle': 'error',
-      'import-x/no-unresolved': 'error',
     },
   },
   {
