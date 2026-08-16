@@ -186,6 +186,15 @@ func (s *Container) GoquDB(ctx context.Context) (*goqu.Database, error) {
 		time.Sleep(reconnectDelay)
 	}
 
+	// Left at database/sql's own default (MaxOpenConns unbounded, MaxIdleConns 2), a burst of
+	// concurrent requests in this single process can open enough connections on its own to hit
+	// Postgres' server-side max_connections, starving every other client - these bounds cap this
+	// process' share instead.
+	db.SetMaxOpenConns(s.config.PostgresPool.MaxOpenConns)
+	db.SetMaxIdleConns(s.config.PostgresPool.MaxIdleConns)
+	db.SetConnMaxLifetime(s.config.PostgresPool.ConnMaxLifetime)
+	db.SetConnMaxIdleTime(s.config.PostgresPool.ConnMaxIdleTime)
+
 	s.goquDB = goqu.New("postgres", db)
 
 	return s.goquDB, nil

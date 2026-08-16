@@ -29,6 +29,11 @@ file-storage:
 rabbitmq: amqp://guest:guest@127.0.0.1:5672/
 monitoring_queue: input
 postgres-dsn: postgres://traffic:password@127.0.0.1:5432/traffic?sslmode=disable
+postgres-pool:
+  max-open-conns: 20
+  max-idle-conns: 10
+  conn-max-lifetime: 5m
+  conn-max-idle-time: 2m
 postgres-migrations:
   dsn: postgres://traffic:password@127.0.0.1/traffic?sslmode=disable
   dir: ./migrations

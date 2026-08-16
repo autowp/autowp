@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -12,6 +13,16 @@ import (
 type MigrationsConfig struct {
 	DSN string `mapstructure:"dsn" yaml:"dsn"`
 	Dir string `mapstructure:"dir" yaml:"dir"`
+}
+
+// PostgresPoolConfig bounds the *sql.DB connection pool shared by every request in this process -
+// left at Go's unbounded default, a burst of concurrent requests can open enough connections to
+// hit Postgres' own max_connections before any single one of them is overloaded.
+type PostgresPoolConfig struct {
+	MaxOpenConns    int           `mapstructure:"max-open-conns"     yaml:"max-open-conns"`
+	MaxIdleConns    int           `mapstructure:"max-idle-conns"     yaml:"max-idle-conns"`
+	ConnMaxLifetime time.Duration `mapstructure:"conn-max-lifetime"  yaml:"conn-max-lifetime"`
+	ConnMaxIdleTime time.Duration `mapstructure:"conn-max-idle-time" yaml:"conn-max-idle-time"`
 }
 
 // LanguageConfig LanguageConfig.
@@ -132,6 +143,7 @@ type Config struct {
 	MonitoringQueue    string                    `mapstructure:"monitoring_queue"     yaml:"monitoring_queue"`
 	Telegram           TelegramConfig            `mapstructure:"telegram"             yaml:"telegram"`
 	PostgresDSN        string                    `mapstructure:"postgres-dsn"         yaml:"postgres-dsn"`
+	PostgresPool       PostgresPoolConfig        `mapstructure:"postgres-pool"        yaml:"postgres-pool"`
 	PostgresMigrations MigrationsConfig          `mapstructure:"postgres-migrations"  yaml:"postgres-migrations"`
 	Recaptcha          RecaptchaConfig           `mapstructure:"recaptcha"            yaml:"recaptcha"`
 	MockEmailSender    bool                      `mapstructure:"mock-email-sender"    yaml:"mock-email-sender"`
