@@ -9,6 +9,7 @@ import {StatisticsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
+import {errorMessage} from 'app/grpc';
 import escapeStringRegexp from 'escape-string-regexp';
 import {marked} from 'marked';
 import {BytesPipe} from 'ngx-pipes';
@@ -106,11 +107,18 @@ export class AboutComponent implements OnInit {
     stream: () => this.#statisticsClient.getAboutData(new Empty()),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so usersResource's params() below doesn't blow up on a non-NOT_FOUND
+  // aboutResource error (surfaced generically by the template instead).
+  protected readonly aboutData = computed(() =>
+    this.aboutResource.hasValue() ? this.aboutResource.value() : undefined,
+  );
+
   protected readonly usersResource = rxResource({
     id: 'about-users',
     // Angular skips stream() entirely while params() returns undefined, so about is always
     // defined once stream() actually runs.
-    params: () => this.aboutResource.value(),
+    params: () => this.aboutData(),
     stream: ({params: about}) => {
       // Fetched into a fresh array rather than pushing onto about.contributors directly - that
       // would mutate the resource's own value and leak the developer/translators into the
@@ -163,6 +171,8 @@ export class AboutComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 136});
   }
+
+  protected readonly errorMessage = errorMessage;
 
   private userHtml(user: null | undefined | User): string {
     if (!user) {

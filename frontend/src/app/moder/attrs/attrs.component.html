@@ -18,7 +18,7 @@
     <h2 i18n>Zones</h2>
     <div class="card card-body">
       @if (zonesResource.error(); as error) {
-        <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+        <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
       } @else if (zonesResource.isLoading()) {
         <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
       } @else if (zonesResource.value(); as zones) {
@@ -35,7 +35,7 @@
   <div class="col-md-6">
     <h2 i18n>Attributes</h2>
     @if (attributesResource.error(); as error) {
-      <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+      <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
     } @else if (attributesResource.isLoading()) {
       <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
     } @else if (attributesResource.value(); as attributes) {

@@ -17,7 +17,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {requireRouteParent} from '@utils/require-route-parent';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {CommentsComponent} from '../../../comments/comments/comments.component';
@@ -54,8 +54,16 @@ export class CategoryPictureComponent {
         .pipe(switchMap((data) => (data.current ? of(data) : notFoundError()))),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that; this resource's error has no dedicated slot in the template (only
+  // pictureResource's is shown), so every consumer below just degrades to its "no data yet"
+  // branch (same as while still loading).
+  protected readonly categoryData = computed(() =>
+    this.categoryDataResource.hasValue() ? this.categoryDataResource.value() : undefined,
+  );
+
   protected readonly currentRouterLinkPrefix = computed(() => {
-    const data = this.categoryDataResource.value();
+    const data = this.categoryData();
     if (!data?.category) {
       return null;
     }
@@ -68,7 +76,7 @@ export class CategoryPictureComponent {
   });
 
   protected readonly currentRouterLinkGallery = computed(() => {
-    const data = this.categoryDataResource.value();
+    const data = this.categoryData();
     const identity = this.#identity();
     if (!data?.category || !identity) {
       return null;
@@ -84,7 +92,7 @@ export class CategoryPictureComponent {
   protected readonly pictureResource = rxResource({
     id: `category-picture-${this.#identity() ?? ''}`,
     params: () => {
-      const current = this.categoryDataResource.value()?.current;
+      const current = this.categoryData()?.current;
 
       return current ? {current, identity: this.#identity()} : undefined;
     },
@@ -145,21 +153,28 @@ export class CategoryPictureComponent {
         return;
       }
 
-      const picture = this.pictureResource.value();
-      if (picture) {
-        this.#meta.updateTag({property: 'og:title', content: picture.nameText});
-        if (picture.previewLarge) {
-          this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
-        }
-        this.#pageEnv.set({
-          pageId: 187,
-          title: picture.nameText,
-        });
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
+      // template instead) doesn't blow up this effect.
+      if (!this.pictureResource.hasValue()) {
+        return;
       }
+
+      const picture = this.pictureResource.value();
+      this.#meta.updateTag({property: 'og:title', content: picture.nameText});
+      if (picture.previewLarge) {
+        this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
+      }
+      this.#pageEnv.set({
+        pageId: 187,
+        title: picture.nameText,
+      });
     });
   }
 
   protected reloadPicture() {
     this.pictureResource.reload();
   }
+
+  protected readonly errorMessage = errorMessage;
 }

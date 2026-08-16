@@ -1,4 +1,4 @@
-import type {Item, ItemParent, Pages, Picture} from '@grpc/spec.pb';
+import type {Item, Pages, Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
@@ -19,15 +19,14 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {getItemTypeTranslation} from '@utils/translations';
-import {isNotFoundError} from 'app/grpc';
-import {catchError, EMPTY, map} from 'rxjs';
+import {errorMessage, isNotFoundError} from 'app/grpc';
+import {map} from 'rxjs';
 
-import type {Breadcrumbs} from '../../catalogue-service';
+import type {Breadcrumbs, CatalogueData} from '../../catalogue-service';
 
 import {chunkBy} from '../../../chunk';
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../../thumbnail/thumbnail/thumbnail.component';
-import {ToastsService} from '../../../toasts/toasts.service';
 import {CatalogueService, convertChildsCounts} from '../../catalogue-service';
 import {CatalogueItemMenuComponent} from '../../item-menu/item-menu.component';
 
@@ -52,7 +51,6 @@ export class CatalogueVehiclesPicturesComponent {
   readonly #router = inject(Router);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
-  readonly #toastService = inject(ToastsService);
 
   protected readonly canAcceptPicture$ = this.#auth.hasRole$(Role.PICTURES_MODER);
   protected readonly canAddItem$ = this.#auth.hasRole$(Role.CARS_MODER);
@@ -82,19 +80,27 @@ export class CatalogueVehiclesPicturesComponent {
   // the identical note on CatalogueVehiclesComponent.catalogueResource in ../vehicles.component.ts.
   protected readonly catalogueResource = rxResource({
     id: `catalogue-vehicles-pictures-catalogue-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
-    stream: (): Observable<{brand: Item; path: ItemParent[]; type: string}> =>
-      this.#catalogueService.resolveCatalogue$(this.#route),
+    stream: (): Observable<CatalogueData> => this.#catalogueService.resolveCatalogue$(this.#route),
   });
 
-  protected readonly brand = computed(() => this.catalogueResource.value()?.brand);
+  // Reading a resource's value() while it's in an error state throws - every other computed()
+  // and resource params() below that needs catalogueResource's data reads it through this signal
+  // instead of the resource directly, so a real (non-NOT_FOUND) failure here degrades the rest of
+  // the page to its "no data yet" branches instead of taking the whole component down. The error
+  // itself is shown inline in the template (pictures.component.html), not swallowed here.
+  protected readonly catalogueData = computed(() =>
+    this.catalogueResource.hasValue() ? this.catalogueResource.value() : undefined,
+  );
+
+  protected readonly brand = computed(() => this.catalogueData()?.brand);
 
   protected readonly breadcrumbs = computed<Breadcrumbs[] | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     return data ? CatalogueService.pathToBreadcrumbs(data.brand, data.path) : undefined;
   });
 
   protected readonly routerLink = computed<string[] | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     return data ? ['/', data.brand.catname, ...data.path.map((node) => node.catname)] : undefined;
   });
 
@@ -104,7 +110,7 @@ export class CatalogueVehiclesPicturesComponent {
   });
 
   protected readonly item = computed<Item | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     const item = data?.path[data.path.length - 1].item;
     return item ?? undefined;
   });
@@ -143,10 +149,6 @@ export class CatalogueVehiclesPicturesComponent {
           }),
         )
         .pipe(
-          catchError((err: unknown) => {
-            this.#toastService.handleError(err);
-            return EMPTY;
-          }),
           map((response) => ({
             paginator: response.paginator,
             pictures: chunkBy(response.items ?? [], 4),
@@ -178,4 +180,5 @@ export class CatalogueVehiclesPicturesComponent {
   }
 
   protected readonly convertChildsCounts = convertChildsCounts;
+  protected readonly errorMessage = errorMessage;
 }

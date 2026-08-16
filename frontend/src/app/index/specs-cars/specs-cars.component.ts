@@ -93,10 +93,17 @@ export class IndexSpecsCarsComponent {
   // did — the outer resource's pending task completes before the deferred change-detection pass
   // that would subscribe to it. Chaining this resource off #rawItemsResource keeps the lookup
   // inside Angular's pending-task tracking instead.
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that. This component has no inline error slot in the template, so a transient
+  // error just leaves the section empty instead of throwing.
+  readonly #rawItemsData = computed(() =>
+    this.#rawItemsResource.hasValue() ? this.#rawItemsResource.value() : undefined,
+  );
+
   readonly #contributorsResource = rxResource({
     id: 'index-specs-cars-contributors',
     params: () => {
-      const items = this.#rawItemsResource.value();
+      const items = this.#rawItemsData();
       if (!items) {
         return [];
       }
@@ -119,11 +126,11 @@ export class IndexSpecsCarsComponent {
   });
 
   protected readonly items = computed<CatalogueListItem[][] | undefined>(() => {
-    const items = this.#rawItemsResource.value();
+    const items = this.#rawItemsData();
     if (!items) {
       return undefined;
     }
-    const usersById = this.#contributorsResource.value() ?? {};
+    const usersById = (this.#contributorsResource.hasValue() ? this.#contributorsResource.value() : undefined) ?? {};
 
     return chunkBy(
       items.map(({contributorIds, ...item}) => ({

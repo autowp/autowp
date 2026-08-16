@@ -16,6 +16,7 @@ import {
   getUnitNameTranslation,
   getVehicleTypeRpTranslation,
 } from '@utils/translations';
+import {errorMessage} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {map} from 'rxjs';
 
@@ -75,9 +76,14 @@ export class MostsContentsComponent {
       ),
   });
 
-  protected readonly years = computed(() => this.menuResource.value()?.years);
-  protected readonly ratings = computed(() => this.menuResource.value()?.ratings);
-  protected readonly vehicleTypes = computed(() => this.menuResource.value()?.vehicleTypes);
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the computeds below don't blow up when menuResource errors (the page
+  // just renders nothing, since ratingCatnameNormalized() falls through to undefined too).
+  protected readonly menuData = computed(() => (this.menuResource.hasValue() ? this.menuResource.value() : undefined));
+
+  protected readonly years = computed(() => this.menuData()?.years);
+  protected readonly ratings = computed(() => this.menuData()?.ratings);
+  protected readonly vehicleTypes = computed(() => this.menuData()?.vehicleTypes);
 
   protected readonly defaultTypeCatname = computed(() => this.vehicleTypes()?.[0]?.catname);
 
@@ -147,4 +153,6 @@ export class MostsContentsComponent {
   protected getMostsPeriodsTranslation(id: string): string {
     return getMostsPeriodsTranslation(id);
   }
+
+  protected readonly errorMessage = errorMessage;
 }

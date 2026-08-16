@@ -1,5 +1,5 @@
 @if (itemResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (itemResource.value(); as item) {
   @if (linksResource.value(); as links) {
     @if (links.length > 0 || item.description) {

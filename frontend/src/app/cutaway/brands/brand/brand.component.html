@@ -10,7 +10,7 @@
 </nav>
 
 @if (brandResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (brandResource.value(); as brand) {
   <div class="page-header">
     <h1 [innerHTML]="brand.nameHtml"></h1>
@@ -32,7 +32,7 @@
 </ul>
 
 @if (picturesResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (picturesResource.value(); as response) {
   <div class="row">
     @for (picture of response.items || []; track picture) {

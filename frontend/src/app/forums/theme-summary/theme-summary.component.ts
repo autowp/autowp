@@ -39,7 +39,25 @@ export class ForumsThemeSummaryComponent implements OnInit {
   // which time ngOnInit has already assigned it below) - a plain computed() doesn't need the
   // ngOnInit+injector treatment the resources above do, since it has no DI/lifecycle registration
   // of its own.
-  protected readonly lastMessageDate = computed(() => timestampToDate(this.lastMessageResource.value()?.createTime));
+  //
+  // These are all small widget tiles nested inside a list with no natural slot for an inline
+  // error message (unlike a page body) - resource.value() throws while its resource is in an
+  // error state, so each is read through a hasValue()-guarded accessor below and just renders
+  // nothing on a transient error rather than taking the whole forums list down with it.
+  protected readonly subThemesData = computed(() =>
+    this.subThemesResource.hasValue() ? this.subThemesResource.value() : undefined,
+  );
+  protected readonly lastTopicData = computed(() =>
+    this.lastTopicResource.hasValue() ? this.lastTopicResource.value() : undefined,
+  );
+  protected readonly lastMessageData = computed(() =>
+    this.lastMessageResource.hasValue() ? this.lastMessageResource.value() : undefined,
+  );
+  protected readonly lastMessageAuthorData = computed(() =>
+    this.lastMessageAuthorResource.hasValue() ? this.lastMessageAuthorResource.value() : undefined,
+  );
+
+  protected readonly lastMessageDate = computed(() => timestampToDate(this.lastMessageData()?.createTime));
 
   ngOnInit(): void {
     this.subThemesResource = rxResource({

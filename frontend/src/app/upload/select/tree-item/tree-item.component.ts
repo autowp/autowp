@@ -7,6 +7,7 @@ import {RouterLink} from '@angular/router';
 import {ItemFields, ItemParentFields, ItemParentListOptions, ItemParentsRequest, ItemParentType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {errorMessage} from 'app/grpc';
 
 @Component({
   selector: 'app-upload-select-tree-item',
@@ -44,4 +45,5 @@ export class UploadSelectTreeItemComponent {
       ),
   });
   protected readonly ItemParentType = ItemParentType;
+  protected readonly errorMessage = errorMessage;
 }

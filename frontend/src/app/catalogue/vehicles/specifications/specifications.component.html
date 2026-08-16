@@ -1,5 +1,5 @@
 @if (catalogueResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else {
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -30,7 +30,7 @@
   }
 
   @if (htmlResource.error(); as error) {
-    <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
   } @else if (htmlResource.value(); as html) {
     <div [innerHtml]="html"></div>
   }

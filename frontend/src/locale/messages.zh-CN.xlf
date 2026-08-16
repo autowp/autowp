@@ -5035,6 +5035,14 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <target state="translated">主题已被管理员关闭</target>
       </trans-unit>
+      <trans-unit id="2657043015926552641" datatype="html">
+        <source>Unknown error</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grpc.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+        <target state="translated">未知错误</target>
+      </trans-unit>
       <trans-unit id="n-pictures" datatype="html">
         <source>{VAR_PLURAL, plural, one {<x id="INTERPOLATION"/> picture} other {<x id="INTERPOLATION"/> pictures}}</source>
         <context-group purpose="location">

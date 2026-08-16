@@ -1,7 +1,7 @@
 import type {Topic} from '@grpc/spec.pb';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -15,7 +15,7 @@ import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
-import {isNotFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {CommentsComponent} from '../../comments/comments/comments.component';
@@ -59,11 +59,24 @@ export class ForumsTopicComponent {
     stream: ({params: topicID}) => this.#grpc.getTopic(new GetTopicRequest({id: topicID})),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so themeResource's params() and the effect/breadcrumb below don't blow up
+  // on a non-NOT_FOUND topicResource error (surfaced generically by the template instead).
+  protected readonly topicData = computed(() =>
+    this.topicResource.hasValue() ? this.topicResource.value() : undefined,
+  );
+
   protected readonly themeResource = rxResource({
     id: `forums-topic-theme-${this.#topicID()}`,
-    params: () => this.topicResource.value()?.themeId,
+    params: () => this.topicData()?.themeId,
     stream: ({params: themeId}) => this.#grpc.getTheme(new GetThemeRequest({id: themeId})),
   });
+
+  // Same reasoning as topicData above - this is used unguarded in the breadcrumb, which has no
+  // error-check of its own for themeResource.
+  protected readonly themeData = computed(() =>
+    this.themeResource.hasValue() ? this.themeResource.value() : undefined,
+  );
 
   constructor() {
     effect(() => {
@@ -72,7 +85,7 @@ export class ForumsTopicComponent {
         return;
       }
 
-      const topic = this.topicResource.value();
+      const topic = this.topicData();
       if (topic) {
         this.#pageEnv.set({
           pageId: 44,
@@ -121,4 +134,6 @@ export class ForumsTopicComponent {
   protected getForumsThemeTranslation(id: string): string {
     return getForumsThemeTranslation(id);
   }
+
+  protected readonly errorMessage = errorMessage;
 }

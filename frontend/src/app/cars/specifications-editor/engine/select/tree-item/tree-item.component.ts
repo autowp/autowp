@@ -13,6 +13,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {errorMessage} from 'app/grpc';
 
 @Component({
   selector: 'app-cars-select-engine-tree-item',
@@ -65,4 +66,5 @@ export class CarsSelectEngineTreeItemComponent {
   }
 
   protected readonly ItemParentType = ItemParentType;
+  protected readonly errorMessage = errorMessage;
 }

@@ -1,11 +1,11 @@
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {CommentMessageFields, GetMessagesRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
@@ -54,10 +54,15 @@ export class UsersUserCommentsComponent {
         : notFoundError(),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so commentsResource's params() and the breadcrumb below don't blow up on
+  // a non-NOT_FOUND userResource error (surfaced generically by the template instead).
+  protected readonly userData = computed(() => (this.userResource.hasValue() ? this.userResource.value() : undefined));
+
   protected readonly commentsResource = rxResource({
     id: `users-user-comments-data-${this.#identity()}`,
     params: () => {
-      const user = this.userResource.value();
+      const user = this.userData();
 
       return user ? {order: this.order(), page: this.#page(), userId: user.id} : undefined;
     },
@@ -93,7 +98,7 @@ export class UsersUserCommentsComponent {
 
       this.order();
       this.#page();
-      this.userResource.value();
+      this.userData();
       this.#pageEnv.set({pageId: 205});
     });
   }
@@ -102,4 +107,6 @@ export class UsersUserCommentsComponent {
     const o = this.orders.find((o) => o.value === order);
     return o ? o.apiValue : undefined;
   }
+
+  protected readonly errorMessage = errorMessage;
 }

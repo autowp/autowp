@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -15,7 +15,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
@@ -65,10 +65,17 @@ export class CutawayBrandsBrandComponent {
         .pipe(switchMap((response) => (response.items?.length ? of(response.items[0]) : notFoundError()))),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so picturesResource's params() below doesn't blow up on a non-NOT_FOUND
+  // brandResource error (surfaced generically by the template instead).
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
   protected readonly picturesResource = rxResource({
     id: `cutaway-brand-pictures-${this.#catname()}`,
     params: () => {
-      const brand = this.brandResource.value();
+      const brand = this.brandData();
 
       return brand ? {brandID: brand.id, page: this.#page()} : undefined;
     },
@@ -109,4 +116,6 @@ export class CutawayBrandsBrandComponent {
 
     this.#pageEnv.set({pageId: 109});
   }
+
+  protected readonly errorMessage = errorMessage;
 }

@@ -7,6 +7,7 @@ import {PictureFields, PictureItemListOptions, PictureListOptions, PicturesReque
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
@@ -62,4 +63,6 @@ export class MascotsComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 201});
   }
+
+  protected readonly errorMessage = errorMessage;
 }

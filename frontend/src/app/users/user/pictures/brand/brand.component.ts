@@ -17,7 +17,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../../../paginator/paginator/paginator.component';
@@ -83,8 +83,16 @@ export class UsersUserPicturesBrandComponent {
         .pipe(switchMap((response) => (response.items?.length ? of(response.items[0]) : notFoundError()))),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so downstream consumers below don't blow up on a non-NOT_FOUND
+  // userResource/brandResource error (surfaced generically by the template instead).
+  protected readonly userData = computed(() => (this.userResource.hasValue() ? this.userResource.value() : undefined));
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
   protected readonly title = computed(() => {
-    const brand = this.brandResource.value();
+    const brand = this.brandData();
 
     return brand ? $localize`${brand.nameOnly} pictures` : null;
   });
@@ -92,8 +100,8 @@ export class UsersUserPicturesBrandComponent {
   protected readonly dataResource = rxResource({
     id: `users-user-pictures-brand-data-${this.#identity()}-${this.#catname()}`,
     params: () => {
-      const user = this.userResource.value();
-      const brand = this.brandResource.value();
+      const user = this.userData();
+      const brand = this.brandData();
 
       return user && brand ? {brandId: brand.id, page: this.#page(), userId: user.id} : undefined;
     },
@@ -132,7 +140,7 @@ export class UsersUserPicturesBrandComponent {
         return;
       }
 
-      const brand = this.brandResource.value();
+      const brand = this.brandData();
       if (brand) {
         this.#pageEnv.set({
           pageId: 141,
@@ -141,4 +149,6 @@ export class UsersUserPicturesBrandComponent {
       }
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

@@ -10,6 +10,7 @@ import {AttrsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {getAttrsTranslation} from '@utils/translations';
+import {errorMessage} from 'app/grpc';
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {ObjectTyped} from 'object-typed';
 import {map} from 'rxjs';
@@ -140,4 +141,6 @@ export class ChartComponent implements OnInit {
 
     return false;
   }
+
+  protected readonly errorMessage = errorMessage;
 }

@@ -20,7 +20,7 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 function addCSS(document: Document, url: string) {
@@ -71,11 +71,14 @@ export class UsersUserPicturesComponent implements OnInit {
         .pipe(switchMap((user) => (user ? of(user) : notFoundError()))),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that.
   protected readonly user = computed(() => {
-    const user = this.userResource.value();
-    if (!user) {
+    if (!this.userResource.hasValue()) {
       return null;
     }
+
+    const user = this.userResource.value();
 
     return {
       id: user.id,
@@ -86,7 +89,7 @@ export class UsersUserPicturesComponent implements OnInit {
 
   protected readonly brandsResource = rxResource({
     id: `users-user-pictures-brands-${this.#identity()}`,
-    params: () => this.userResource.value()?.id,
+    params: () => this.user()?.id,
     stream: ({params: userId}) =>
       this.#itemsClient
         .list(
@@ -114,6 +117,18 @@ export class UsersUserPicturesComponent implements OnInit {
         .pipe(map((brands) => brands.items ?? [])),
   });
 
+  // Decorative only (background image on each brand tile) - silently omitted on a transient
+  // iconsResource error rather than taking down the whole page over it.
+  protected readonly iconsData = computed(() =>
+    this.iconsResource.hasValue() ? this.iconsResource.value() : undefined,
+  );
+
+  // Same reasoning as userData/iconsData above - lets the template show brandsResource's error
+  // inline instead of throwing while iterating.
+  protected readonly brandsData = computed(() =>
+    this.brandsResource.hasValue() ? this.brandsResource.value() : undefined,
+  );
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.userResource.error())) {
@@ -136,4 +151,6 @@ export class UsersUserPicturesComponent implements OnInit {
   protected cssClass(item: Item) {
     return item.catname.replace(/\./g, '_');
   }
+
+  protected readonly errorMessage = errorMessage;
 }

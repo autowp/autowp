@@ -4,7 +4,7 @@ import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -15,7 +15,13 @@ import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getForumsThemeTranslation} from '@utils/translations';
-import {extractFieldViolations, fieldViolations2InvalidParams, isNotFoundError, notFoundError} from 'app/grpc';
+import {
+  errorMessage,
+  extractFieldViolations,
+  fieldViolations2InvalidParams,
+  isNotFoundError,
+  notFoundError,
+} from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {RemarkModule} from 'ngx-remark';
 import {map} from 'rxjs';
@@ -58,6 +64,13 @@ export class ForumsNewTopicComponent implements OnInit {
   });
 
   protected readonly authenticated$: Observable<boolean> = this.auth.authenticated$;
+
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the breadcrumb in the template doesn't blow up on a non-NOT_FOUND
+  // themeResource error (surfaced generically by the template instead).
+  protected readonly themeData = computed(() =>
+    this.themeResource.hasValue() ? this.themeResource.value() : undefined,
+  );
 
   constructor() {
     effect(() => {
@@ -104,4 +117,6 @@ export class ForumsNewTopicComponent implements OnInit {
   protected getForumsThemeTranslation(id: string): string {
     return getForumsThemeTranslation(id);
   }
+
+  protected readonly errorMessage = errorMessage;
 }

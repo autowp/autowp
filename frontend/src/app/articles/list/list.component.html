@@ -11,7 +11,7 @@
 </div>
 
 @if (articlesResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (articlesResource.isLoading()) {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 } @else if (articlesResource.value(); as response) {

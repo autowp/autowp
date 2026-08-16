@@ -3,7 +3,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/" i18n>Index page</a>
     </li>
-    @if (brandResource.value()) {
+    @if (brandData()) {
       <li class="breadcrumb-item">
         <a routerLink="/twins" i18n>Twins</a>
       </li>
@@ -14,7 +14,7 @@
 <div class="row">
   <div class="col-sm-8 order-2">
     <div class="page-header mb-4">
-      @if (brandResource.value(); as brand) {
+      @if (brandData(); as brand) {
         <h1>{{ brand.nameOnly }}</h1>
       } @else {
         <h1 i18n>Twins</h1>
@@ -22,7 +22,7 @@
     </div>
 
     @if (dataResource.error(); as error) {
-      <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+      <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
     } @else if (data(); as data) {
       @for (group of data.groups; track group) {
         <div>

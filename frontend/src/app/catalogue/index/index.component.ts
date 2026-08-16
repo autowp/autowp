@@ -1,7 +1,7 @@
 import type {Item, ItemLink, Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -26,7 +26,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {getCatalogueSectionsTranslation} from '@utils/translations';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
@@ -136,7 +136,7 @@ export class CatalogueIndexComponent {
     // can settle and let SSR's whenStable() serialize before the redirect it triggered has
     // actually registered - matching the pattern in ArticlesArticleComponent/PicturePageComponent.
     // Non-NOT_FOUND errors aren't toasted here - the template already renders
-    // `brandResource.error().message` inline, so a toast would just duplicate it.
+    // `errorMessage(brandResource.error())` inline, so a toast would just duplicate it.
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
         void this.#router.navigate(['/error-404'], {skipLocationChange: true});
@@ -162,9 +162,16 @@ export class CatalogueIndexComponent {
     });
   }
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the chained resources below don't blow up on a non-NOT_FOUND
+  // brandResource error (surfaced generically by the template instead).
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
   protected readonly picturesResource = rxResource({
     id: `catalogue-brand-pictures-${this.#catname() ?? ''}`,
-    params: () => this.brandResource.value(),
+    params: () => this.brandData(),
     stream: ({params: brand}) =>
       this.#picturesClient
         .getPictures(
@@ -204,7 +211,7 @@ export class CatalogueIndexComponent {
 
   protected readonly linksResource = rxResource({
     id: `catalogue-brand-links-${this.#catname() ?? ''}`,
-    params: () => this.brandResource.value(),
+    params: () => this.brandData(),
     stream: ({params: brand}) =>
       this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId: brand.id})})).pipe(
         map((response) => {
@@ -234,7 +241,7 @@ export class CatalogueIndexComponent {
   // here, which raced SSR's whenStable() check the same way the Articles list author lookup did).
   protected readonly factoriesResource = rxResource({
     id: `catalogue-brand-factories-${this.#catname() ?? ''}`,
-    params: () => this.brandResource.value(),
+    params: () => this.brandData(),
     stream: ({params: brand}) =>
       this.#itemsClient
         .list(
@@ -292,7 +299,7 @@ export class CatalogueIndexComponent {
 
   protected readonly sectionsResource = rxResource({
     id: `catalogue-brand-sections-${this.#catname() ?? ''}`,
-    params: () => this.brandResource.value(),
+    params: () => this.brandData(),
     stream: ({params: brand}) =>
       this.#itemsClient
         .getBrandSections(
@@ -311,4 +318,6 @@ export class CatalogueIndexComponent {
           ),
         ),
   });
+
+  protected readonly errorMessage = errorMessage;
 }

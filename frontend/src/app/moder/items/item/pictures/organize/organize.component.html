@@ -9,7 +9,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/moder/items" i18n>Items</a>
     </li>
-    @if (itemResource.value(); as item) {
+    @if (itemData(); as item) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
       </li>
@@ -24,7 +24,7 @@
 <remark i18n-markdown markdown="Turbo group creator from pictures" />
 
 @if (itemResource.error() ?? picturesResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (itemResource.isLoading() || picturesResource.isLoading()) {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 } @else if (itemResource.value(); as item) {
@@ -34,7 +34,7 @@
         <app-item-meta-form
           class="mb-4"
           [item]="newItem"
-          [vehicleTypeIDs]="vehicleTypeIDsResource.value() || []"
+          [vehicleTypeIDs]="vehicleTypeIDsData() || []"
           [invalidParams]="invalidParams()"
           [pictures]="pictures"
           (submitted)="submit(item, $event, pictures)"

@@ -5,6 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemParentsRequest, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../../../../../paginator/paginator/paginator.component';
@@ -60,4 +61,5 @@ export class ModerItemsItemSelectParentCategoriesComponent {
   }
 
   protected readonly ItemParentsRequest = ItemParentsRequest;
+  protected readonly errorMessage = errorMessage;
 }

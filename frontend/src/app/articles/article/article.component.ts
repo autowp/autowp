@@ -5,7 +5,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ArticleByCatnameRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
 @Component({
@@ -48,14 +48,21 @@ export class ArticlesArticleComponent {
         return;
       }
 
-      const article = this.articleResource.value();
-      if (article) {
-        this.#pageEnv.set({
-          pageId: 32,
-          title: article.name,
-        });
-        this.#meta.updateTag({property: 'og:title', content: article.name});
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
+      // template instead) doesn't blow up this effect.
+      if (!this.articleResource.hasValue()) {
+        return;
       }
+
+      const article = this.articleResource.value();
+      this.#pageEnv.set({
+        pageId: 32,
+        title: article.name,
+      });
+      this.#meta.updateTag({property: 'og:title', content: article.name});
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

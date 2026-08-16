@@ -7,6 +7,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {errorMessage} from 'app/grpc';
 
 @Component({
   selector: 'app-moder-stat',
@@ -30,4 +31,6 @@ export class ModerStatComponent implements OnInit {
       pageId: 119,
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

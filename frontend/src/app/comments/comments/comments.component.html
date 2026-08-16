@@ -1,7 +1,9 @@
 <div class="comments">
   @if (typeID(); as typeID) {
     @if (itemID(); as itemID) {
-      @if (dataResource.value(); as data) {
+      @if (dataResource.error(); as error) {
+        <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+      } @else if (dataResource.value(); as data) {
         @if (data.messages && typeID !== CommentsType.FORUMS_TYPE_ID) {
           <h2 i18n>Comments</h2>
         }

@@ -4,12 +4,12 @@
   }
 </td>
 <td>
-  @if (userResource.value(); as user) {
+  @if (userData(); as user) {
     <app-user [user]="user" />
   }
 </td>
 <td>
-  @if (itemResource.value(); as item) {
+  @if (itemData(); as item) {
     @if (isModer$ | async) {
       <a [routerLink]="['/moder/items/item', userValue().itemId]" [innerHTML]="item.nameHtml"></a>
     } @else {
@@ -18,7 +18,7 @@
   }
 </td>
 <td class="attribute text-center">
-  @if (pathResource.value(); as path) {
+  @if (pathData(); as path) {
     @for (node of path; track node) {
       <span>{{ node }}</span>
       @if (!$last) {
@@ -29,7 +29,7 @@
 </td>
 <td style="text-align: center">
   {{ userValue().valueText }}
-  @if (unitAbbrResource.value(); as unitAbbr) {
+  @if (unitAbbrData(); as unitAbbr) {
     <span class="unit">{{ unitAbbr }}</span>
   }
 </td>

@@ -1,5 +1,5 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -16,7 +16,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {map, of, switchMap} from 'rxjs';
 
@@ -69,9 +69,14 @@ export class FactoryComponent {
         ),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so downstream consumers below don't blow up on a non-NOT_FOUND
+  // itemResource error (surfaced generically by the template instead).
+  protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
+
   protected readonly picturesResource = rxResource({
     id: `factory-pictures-${this.#itemID()}`,
-    params: () => this.itemResource.value()?.id,
+    params: () => this.itemData()?.id,
     stream: ({params: itemId}) =>
       this.#picturesClient.getPictures(
         new PicturesRequest({
@@ -96,6 +101,12 @@ export class FactoryComponent {
       ),
   });
 
+  // Same reasoning as itemData above - picturesResource has no inline error slot in the template,
+  // so a transient error just leaves the pictures section empty instead of throwing.
+  protected readonly picturesData = computed(() =>
+    this.picturesResource.hasValue() ? this.picturesResource.value() : undefined,
+  );
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.itemResource.error())) {
@@ -103,7 +114,7 @@ export class FactoryComponent {
         return;
       }
 
-      const factory = this.itemResource.value();
+      const factory = this.itemData();
       if (factory) {
         this.#pageEnv.set({
           pageId: 181,
@@ -112,4 +123,6 @@ export class FactoryComponent {
       }
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

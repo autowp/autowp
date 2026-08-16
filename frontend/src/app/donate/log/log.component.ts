@@ -13,6 +13,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
+import {errorMessage} from 'app/grpc';
 import {catchError, map, of, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
@@ -78,4 +79,6 @@ export class DonateLogComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 196});
   }
+
+  protected readonly errorMessage = errorMessage;
 }

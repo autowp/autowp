@@ -88,7 +88,7 @@
     }
   </h1>
   @if (itemsResource.error(); as error) {
-    <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
   } @else if (itemsResource.value(); as items) {
     @for (item of items; track item; let first = $first) {
       <div class="row">

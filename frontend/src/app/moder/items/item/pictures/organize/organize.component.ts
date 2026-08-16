@@ -24,7 +24,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {ItemService} from '@services/item';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, EMPTY, forkJoin, map, of, switchMap} from 'rxjs';
 
@@ -102,9 +102,14 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
     },
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so vehicleTypeIDsResource's params() below and the template don't blow up
+  // on a non-NOT_FOUND itemResource error (surfaced generically by the template instead).
+  protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
+
   protected readonly vehicleTypeIDsResource = rxResource({
     id: `moder-items-item-pictures-organize-vehicle-types-${this.#itemID()}`,
-    params: () => this.itemResource.value(),
+    params: () => this.itemData(),
     stream: ({params: item}) =>
       [ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)
         ? this.#itemsClient
@@ -117,12 +122,18 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
         : of([] as string[]),
   });
 
+  // Same reasoning as itemData above.
+  protected readonly vehicleTypeIDsData = computed(() =>
+    this.vehicleTypeIDsResource.hasValue() ? this.vehicleTypeIDsResource.value() : undefined,
+  );
+
   protected readonly newItem = computed<Item | undefined>(() => {
-    if (!this.itemResource.hasValue()) {
+    const item = this.itemData();
+    if (!item) {
       return undefined;
     }
 
-    const newItem = {...this.itemResource.value().toObject()} as Item;
+    const newItem = {...item.toObject()} as Item;
     newItem.isGroup = false;
     return newItem;
   });
@@ -232,4 +243,6 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
         });
       });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

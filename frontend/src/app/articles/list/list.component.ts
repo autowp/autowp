@@ -3,7 +3,7 @@ import type {Article, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {ArticlesRequest} from '@grpc/spec.pb';
@@ -13,6 +13,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
+import {errorMessage} from 'app/grpc';
 import {catchError, map, of} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -65,6 +66,13 @@ export class ListComponent implements OnInit {
       ),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so authorsResource's params() below doesn't blow up on a non-NOT_FOUND
+  // articlesResource error (surfaced generically by the template instead).
+  protected readonly articlesData = computed(() =>
+    this.articlesResource.hasValue() ? this.articlesResource.value() : undefined,
+  );
+
   // A raw Observable + `| async` subscribed lazily from the template only starts once the
   // template first evaluates it, which can race Angular's SSR whenStable() check: the article
   // list's own resource reports its pending task done as soon as its HTTP response arrives, but
@@ -74,7 +82,7 @@ export class ListComponent implements OnInit {
   // author lookups inside Angular's pending-task tracking the whole way through.
   protected readonly authorsResource = rxResource({
     id: 'articles-list-authors',
-    params: () => this.articlesResource.value()?.articles.map((article) => article.authorId) ?? [],
+    params: () => this.articlesData()?.articles.map((article) => article.authorId) ?? [],
     // A plain object rather than a Map: TransferState round-trips resource values through
     // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
     // enumerable properties), losing all entries and coming back as a plain object anyway.
@@ -104,4 +112,6 @@ export class ListComponent implements OnInit {
       routerLink: ['/articles', article.catname],
     };
   }
+
+  protected readonly errorMessage = errorMessage;
 }

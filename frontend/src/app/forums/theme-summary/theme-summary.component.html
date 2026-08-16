@@ -21,7 +21,7 @@
           other {{{theme().messagesCount}} messages}
         }</ng-container>
       </p>
-      @if (subThemesResource.value(); as themes) {
+      @if (subThemesData(); as themes) {
         @if ((themes.items || []).length > 0) {
           <div>
             <ng-container i18n>Subforums</ng-container>
@@ -40,19 +40,19 @@
       }
     </div>
   </div>
-  @if (lastTopicResource.value(); as lastTopic) {
+  @if (lastTopicData(); as lastTopic) {
     <div class="col-md-6">
       <div class="m-4 transparent">
         <p>
           <i class="bi bi-chat-fill" aria-hidden="true"></i>
           <a i18n [routerLink]="['/forums/topic', lastTopic.id]">Last message in topic «{{ lastTopic.name }}»</a>
         </p>
-        @if (lastMessageResource.value(); as lastMessage) {
+        @if (lastMessageData(); as lastMessage) {
           <p>
             @if (lastMessageDate(); as date) {
               <app-past-time-indicator [date]="date" />
             }
-            @if (lastMessageAuthorResource.value(); as lastMessageAuthor) {
+            @if (lastMessageAuthorData(); as lastMessageAuthor) {
               <app-user [user]="lastMessageAuthor" />
             }
             <a i18n-title title="Go to last message" [routerLink]="['/forums/message', lastMessage.id]">

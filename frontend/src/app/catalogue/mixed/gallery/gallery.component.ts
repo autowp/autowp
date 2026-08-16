@@ -8,7 +8,7 @@ import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import type {BrandPerspectivePageData} from '../../catalogue.module';
@@ -96,4 +96,6 @@ export class CatalogueMixedGalleryComponent {
       });
     }
   }
+
+  protected readonly errorMessage = errorMessage;
 }

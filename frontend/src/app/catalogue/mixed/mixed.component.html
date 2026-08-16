@@ -1,5 +1,5 @@
 @if (brandResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (brandResource.value(); as brand) {
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
   </div>
 
   @if (picturesResource.error(); as error) {
-    <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
   } @else if (picturesResource.value(); as pictures) {
     @for (chunk of pictures.pictures; track chunk) {
       <div class="row">

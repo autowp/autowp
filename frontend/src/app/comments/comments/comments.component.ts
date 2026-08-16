@@ -14,6 +14,7 @@ import {
 } from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
+import {errorMessage} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, EMPTY, ignoreElements, map, merge, of} from 'rxjs';
 
@@ -136,6 +137,8 @@ export class CommentsComponent implements OnInit {
         }
       });
   }
+
+  protected readonly errorMessage = errorMessage;
 
   protected load$(
     itemID: string,

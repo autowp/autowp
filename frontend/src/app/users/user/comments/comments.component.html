@@ -3,7 +3,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/" i18n>Index page</a>
     </li>
-    @if (userResource.value(); as user) {
+    @if (userData(); as user) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]">{{ user.name }}</a>
       </li>
@@ -30,7 +30,7 @@
 </ul>
 
 @if (commentsResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (commentsResource.value(); as data) {
   <ul>
     @for (comment of data.items; track comment) {

@@ -44,7 +44,22 @@ export class ForumsTopicListItemComponent implements OnInit {
   protected lastMessageAuthorResource!: ResourceRef<null | undefined | User>;
 
   protected readonly createdAt = computed(() => timestampToDate(this.topic().createTime));
-  protected readonly lastMessageDate = computed(() => timestampToDate(this.lastMessageResource.value()?.createTime));
+
+  // A row nested inside a table with no natural slot for an inline error message - resource.value()
+  // throws while its resource is in an error state, so each is read through a hasValue()-guarded
+  // accessor below and just renders nothing on a transient error rather than taking the whole
+  // topic list down with it.
+  protected readonly authorData = computed(() =>
+    this.authorResource.hasValue() ? this.authorResource.value() : undefined,
+  );
+  protected readonly lastMessageData = computed(() =>
+    this.lastMessageResource.hasValue() ? this.lastMessageResource.value() : undefined,
+  );
+  protected readonly lastMessageAuthorData = computed(() =>
+    this.lastMessageAuthorResource.hasValue() ? this.lastMessageAuthorResource.value() : undefined,
+  );
+
+  protected readonly lastMessageDate = computed(() => timestampToDate(this.lastMessageData()?.createTime));
 
   ngOnInit(): void {
     this.authorResource = rxResource({

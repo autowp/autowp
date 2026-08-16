@@ -1,7 +1,7 @@
 import type {Item, Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -21,7 +21,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {CommentsComponent} from 'app/comments/comments/comments.component';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {PictureComponent} from 'app/picture/picture.component';
 import {map, of, switchMap} from 'rxjs';
 
@@ -95,12 +95,19 @@ export class CatalogueMixedPictureComponent {
     },
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so downstream consumers below don't blow up on a non-NOT_FOUND
+  // brandResource error (surfaced generically by the template instead).
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
   // Only fetches once brandResource has resolved - while it's still loading or in an error state,
   // this stays idle so the picture is never fetched (and never briefly flashed) under the wrong
   // brand.
   protected readonly pictureResource = rxResource({
     id: `catalogue-mixed-picture-${this.data().catname}-${this.#catname() ?? ''}-${this.identity() ?? ''}`,
-    params: () => this.brandResource.value(),
+    params: () => this.brandData(),
     stream: ({params: brand}): Observable<Picture> => {
       const identity = this.identity();
       if (!identity) {
@@ -185,4 +192,6 @@ export class CatalogueMixedPictureComponent {
   protected reloadPicture() {
     this.pictureResource.reload();
   }
+
+  protected readonly errorMessage = errorMessage;
 }

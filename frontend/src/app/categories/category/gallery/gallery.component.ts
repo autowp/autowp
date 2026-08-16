@@ -8,7 +8,7 @@ import {ItemType} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
 import {requireRouteParent} from '@utils/require-route-parent';
 import {GalleryComponent} from 'app/gallery/gallery.component';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {CategoriesService} from '../../service';
@@ -84,4 +84,6 @@ export class CategoryGalleryComponent implements OnInit {
       });
     }
   }
+
+  protected readonly errorMessage = errorMessage;
 }

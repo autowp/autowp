@@ -4,7 +4,7 @@
       <div ngbDropdown>
         <button class="btn btn-success" type="button" ngbDropdownToggle i18n>Want accept</button>
         <div ngbDropdownMenu>
-          @for (template of moderVoteTemplatesResource.value(); track template.id) {
+          @for (template of moderVoteTemplatesData(); track template.id) {
             @if (template.vote > 0) {
               <button
                 type="button"
@@ -22,7 +22,7 @@
       <div ngbDropdown>
         <button class="btn btn-danger" type="button" ngbDropdownToggle i18n>Want delete</button>
         <div ngbDropdownMenu>
-          @for (template of moderVoteTemplatesResource.value(); track template.id) {
+          @for (template of moderVoteTemplatesData(); track template.id) {
             @if (template.vote < 0) {
               <button
                 type="button"

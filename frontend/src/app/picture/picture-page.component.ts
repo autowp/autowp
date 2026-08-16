@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -13,7 +13,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of} from 'rxjs';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
@@ -59,12 +59,19 @@ export class PicturePageComponent {
     },
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so pictureResource's params() below doesn't blow up on a non-NOT_FOUND
+  // canonicalResource error (surfaced generically by the template instead).
+  protected readonly canonicalData = computed(() =>
+    this.canonicalResource.hasValue() ? this.canonicalResource.value() : undefined,
+  );
+
   // Only fetches once the canonical route has resolved to *this* page (an empty route) - while
   // canonicalResource is still loading, or resolved to a redirect elsewhere, this stays idle so
   // the picture is never fetched (and never briefly flashed) under the wrong URL.
   protected readonly pictureResource = rxResource({
     id: `picture-page-${this.#identity() ?? ''}`,
-    params: () => ({canonical: this.canonicalResource.value(), identity: this.#identity()}),
+    params: () => ({canonical: this.canonicalData(), identity: this.#identity()}),
     stream: ({params: {identity, canonical}}) => {
       if (!identity || !canonical || canonical.route.length > 0) {
         return of(undefined);
@@ -139,4 +146,6 @@ export class PicturePageComponent {
   protected reloadPicture() {
     this.pictureResource.reload();
   }
+
+  protected readonly errorMessage = errorMessage;
 }

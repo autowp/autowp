@@ -1,4 +1,4 @@
-import type {Item, ItemParent, Picture} from '@grpc/spec.pb';
+import type {Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
@@ -18,14 +18,13 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError} from 'app/grpc';
-import {catchError, EMPTY, map} from 'rxjs';
+import {errorMessage, isNotFoundError} from 'app/grpc';
+import {map} from 'rxjs';
 
-import type {Breadcrumbs} from '../../../catalogue-service';
+import type {Breadcrumbs, CatalogueData} from '../../../catalogue-service';
 
 import {CommentsComponent} from '../../../../comments/comments/comments.component';
 import {PictureComponent} from '../../../../picture/picture.component';
-import {ToastsService} from '../../../../toasts/toasts.service';
 import {CatalogueService} from '../../../catalogue-service';
 
 @Component({
@@ -42,7 +41,6 @@ export class CatalogueVehiclesPicturesPictureComponent {
   readonly #router = inject(Router);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
-  readonly #toastService = inject(ToastsService);
 
   protected readonly CommentsType = CommentsType;
 
@@ -70,12 +68,20 @@ export class CatalogueVehiclesPicturesPictureComponent {
   // the identical note on CatalogueVehiclesComponent.catalogueResource in ../../vehicles.component.ts.
   protected readonly catalogueResource = rxResource({
     id: `catalogue-vehicles-pictures-picture-catalogue-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
-    stream: (): Observable<{brand: Item; path: ItemParent[]; type: string}> =>
-      this.#catalogueService.resolveCatalogue$(this.#route),
+    stream: (): Observable<CatalogueData> => this.#catalogueService.resolveCatalogue$(this.#route),
   });
 
+  // Reading a resource's value() while it's in an error state throws - every other computed()
+  // and resource params() below that needs catalogueResource's data reads it through this signal
+  // instead of the resource directly, so a real (non-NOT_FOUND) failure here degrades the rest of
+  // the page to its "no data yet" branches instead of taking the whole component down. The error
+  // itself is shown inline in the template (picture.component.html), not swallowed here.
+  protected readonly catalogueData = computed(() =>
+    this.catalogueResource.hasValue() ? this.catalogueResource.value() : undefined,
+  );
+
   readonly #routerLink = computed<string[] | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     if (!data) {
       return undefined;
     }
@@ -83,10 +89,10 @@ export class CatalogueVehiclesPicturesPictureComponent {
     return ['/', data.brand.catname, ...data.path.map((node) => node.catname), ...(this.#exact() ? ['exact'] : [])];
   });
 
-  protected readonly brand = computed(() => this.catalogueResource.value()?.brand);
+  protected readonly brand = computed(() => this.catalogueData()?.brand);
 
   protected readonly breadcrumbs = computed<Breadcrumbs[] | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     return data ? CatalogueService.pathToBreadcrumbs(data.brand, data.path) : undefined;
   });
 
@@ -111,58 +117,51 @@ export class CatalogueVehiclesPicturesPictureComponent {
   protected readonly pictureResource = rxResource({
     id: `catalogue-vehicles-pictures-picture-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}-${this.identity() ?? ''}`,
     params: () => {
-      const data = this.catalogueResource.value();
+      const data = this.catalogueData();
       const identity = this.identity();
       return data && identity ? {identity, itemID: data.path[data.path.length - 1].itemId} : undefined;
     },
     stream: ({params: {identity, itemID}}): Observable<Picture> =>
-      this.#picturesClient
-        .getPicture(
-          new PicturesRequest({
-            fields: new PictureFields({
-              copyrights: true,
-              image: true,
-              moderVoted: true,
-              nameHtml: true,
-              nameText: true,
-              paginator: new PicturesRequest({
-                options: new PictureListOptions({
-                  pictureItem: new PictureItemListOptions({
-                    itemParentCacheAncestor: new ItemParentCacheListOptions({
-                      parentId: itemID,
-                    }),
-                    typeId: PictureItemType.PICTURE_ITEM_CONTENT,
+      this.#picturesClient.getPicture(
+        new PicturesRequest({
+          fields: new PictureFields({
+            copyrights: true,
+            image: true,
+            moderVoted: true,
+            nameHtml: true,
+            nameText: true,
+            paginator: new PicturesRequest({
+              options: new PictureListOptions({
+                pictureItem: new PictureItemListOptions({
+                  itemParentCacheAncestor: new ItemParentCacheListOptions({
+                    parentId: itemID,
                   }),
+                  typeId: PictureItemType.PICTURE_ITEM_CONTENT,
                 }),
-                order: PicturesRequest.Order.ORDER_PERSPECTIVES,
               }),
-              pictureModerVotes: new PictureModerVoteRequest(),
-              previewLarge: true,
-              replaceable: new PicturesRequest({
-                fields: new PictureFields({nameHtml: true}),
-              }),
-              rights: true,
-              subscribed: true,
-              votes: true,
+              order: PicturesRequest.Order.ORDER_PERSPECTIVES,
             }),
-            language: this.#languageService.language,
-            options: new PictureListOptions({
-              identity,
-              pictureItem: new PictureItemListOptions({
-                itemParentCacheAncestor: new ItemParentCacheListOptions({
-                  parentId: itemID,
-                }),
-                typeId: PictureItemType.PICTURE_ITEM_CONTENT,
+            pictureModerVotes: new PictureModerVoteRequest(),
+            previewLarge: true,
+            replaceable: new PicturesRequest({
+              fields: new PictureFields({nameHtml: true}),
+            }),
+            rights: true,
+            subscribed: true,
+            votes: true,
+          }),
+          language: this.#languageService.language,
+          options: new PictureListOptions({
+            identity,
+            pictureItem: new PictureItemListOptions({
+              itemParentCacheAncestor: new ItemParentCacheListOptions({
+                parentId: itemID,
               }),
+              typeId: PictureItemType.PICTURE_ITEM_CONTENT,
             }),
           }),
-        )
-        .pipe(
-          catchError((err: unknown) => {
-            this.#toastService.handleError(err);
-            return EMPTY;
-          }),
-        ),
+        }),
+      ),
   });
 
   constructor() {
@@ -191,4 +190,6 @@ export class CatalogueVehiclesPicturesPictureComponent {
   protected reloadPicture() {
     this.pictureResource.reload();
   }
+
+  protected readonly errorMessage = errorMessage;
 }

@@ -15,7 +15,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {requireRouteParent} from '@utils/require-route-parent';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {CommentsComponent} from '../../../comments/comments/comments.component';
@@ -103,21 +103,27 @@ export class PersonsPersonPictureComponent {
         return;
       }
 
-      const picture = this.pictureResource.value();
-      if (picture) {
-        this.#meta.updateTag({property: 'og:title', content: picture.nameText});
-        if (picture.previewLarge) {
-          this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
-        }
-        this.#pageEnv.set({
-          pageId: 34,
-          title: picture.nameText,
-        });
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that.
+      if (!this.pictureResource.hasValue()) {
+        return;
       }
+
+      const picture = this.pictureResource.value();
+      this.#meta.updateTag({property: 'og:title', content: picture.nameText});
+      if (picture.previewLarge) {
+        this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
+      }
+      this.#pageEnv.set({
+        pageId: 34,
+        title: picture.nameText,
+      });
     });
   }
 
   protected reloadPicture() {
     this.pictureResource.reload();
   }
+
+  protected readonly errorMessage = errorMessage;
 }

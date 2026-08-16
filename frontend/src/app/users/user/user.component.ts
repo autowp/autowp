@@ -39,7 +39,7 @@ import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getAchievementDescriptionTranslation, getAchievementTranslation} from '@utils/translations';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {catchError, map, of, switchMap} from 'rxjs';
 
 import {MessageDialogService} from '../../message-dialog/message-dialog.service';
@@ -115,9 +115,14 @@ export class UsersUserComponent {
         .pipe(switchMap((user) => (user ? of(user) : notFoundError()))),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the chained resources/computeds below don't blow up on a non-NOT_FOUND
+  // userResource error (surfaced generically by the template instead).
+  protected readonly userData = computed(() => (this.userResource.hasValue() ? this.userResource.value() : undefined));
+
   protected readonly picturesResource = rxResource({
     id: `users-user-pictures-${this.#identity()}`,
-    params: () => this.userResource.value()?.id,
+    params: () => this.userData()?.id,
     stream: ({params: userId}) =>
       this.#picturesClient
         .getPictures(
@@ -136,7 +141,7 @@ export class UsersUserComponent {
   protected readonly commentsResource = rxResource({
     id: `users-user-comments-${this.#identity()}`,
     params: () => {
-      const user = this.userResource.value();
+      const user = this.userData();
 
       return user ? {deleted: user.deleted, userId: user.id} : undefined;
     },
@@ -163,7 +168,7 @@ export class UsersUserComponent {
 
   protected readonly achievementsResource = rxResource({
     id: `users-user-achievements-${this.#identity()}`,
-    params: () => this.userResource.value()?.id,
+    params: () => this.userData()?.id,
     stream: ({params: userId}) =>
       this.#achievementsClient
         .getUserAchievements(new GetUserAchievementsRequest({userId}))
@@ -176,7 +181,7 @@ export class UsersUserComponent {
   protected readonly authenticated$ = this.#auth.authenticated$;
 
   protected readonly isNotMe = computed(() => {
-    const user = this.userResource.value();
+    const user = this.userData();
     const currentUser = this.#currentUser();
 
     return !user || currentUser?.id !== user.id;
@@ -184,7 +189,7 @@ export class UsersUserComponent {
 
   protected readonly ipResource = rxResource({
     id: `users-user-ip-${this.#identity()}`,
-    params: () => this.userResource.value()?.lastIp,
+    params: () => this.userData()?.lastIp,
     stream: ({params: lastIp}) => {
       if (!lastIp) {
         return of(null);
@@ -197,7 +202,7 @@ export class UsersUserComponent {
   protected readonly inContactsResource = rxResource({
     id: `users-user-in-contacts-${this.#identity()}`,
     params: () => {
-      const user = this.userResource.value();
+      const user = this.userData();
 
       return user ? {authenticated: this.#authenticated(), isNotMe: this.isNotMe(), userId: user.id} : undefined;
     },
@@ -213,7 +218,7 @@ export class UsersUserComponent {
   protected readonly disableCommentsNotificationsResource = rxResource({
     id: `users-user-disable-comments-notifications-${this.#identity()}`,
     params: () => {
-      const user = this.userResource.value();
+      const user = this.userData();
 
       return user ? {authenticated: this.#authenticated(), isNotMe: this.isNotMe(), userId: user.id} : undefined;
     },
@@ -228,6 +233,17 @@ export class UsersUserComponent {
     },
   });
 
+  // Small toggle buttons with no dedicated error slot in the template - a transient error here
+  // just leaves them showing their loading fallback instead of throwing.
+  protected readonly inContactsData = computed(() =>
+    this.inContactsResource.hasValue() ? this.inContactsResource.value() : undefined,
+  );
+  protected readonly disableCommentsNotificationsData = computed(() =>
+    this.disableCommentsNotificationsResource.hasValue()
+      ? this.disableCommentsNotificationsResource.value()
+      : undefined,
+  );
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.userResource.error())) {
@@ -235,7 +251,7 @@ export class UsersUserComponent {
         return;
       }
 
-      const user = this.userResource.value();
+      const user = this.userData();
       if (user) {
         this.#pageEnv.set({
           pageId: 62,
@@ -352,4 +368,6 @@ export class UsersUserComponent {
   protected getAchievementDescriptionTranslation(code: string): string {
     return getAchievementDescriptionTranslation(code);
   }
+
+  protected readonly errorMessage = errorMessage;
 }

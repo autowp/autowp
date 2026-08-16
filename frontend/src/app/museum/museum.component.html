@@ -10,7 +10,7 @@
 </nav>
 
 @if (itemResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (itemResource.value(); as item) {
   <div class="page-header">
     <h1 [innerHTML]="item.nameHtml"></h1>
@@ -28,7 +28,9 @@
       <div style="height: 300px" class="mb-4 w-100"></div>
     }
   }
-  @if (linksResource.value(); as links) {
+  @if (linksResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+  } @else if (linksResource.value(); as links) {
     @if (item && ((links.items && links.items.length > 0) || item.description)) {
       <div class="card card-body">
         <remark [markdown]="item.description" />
@@ -46,7 +48,9 @@
   }
 }
 
-@if (picturesResource.value(); as data) {
+@if (picturesResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+} @else if (picturesResource.value(); as data) {
   @if ((data.items || []).length > 0) {
     <div>
       <h3 i18n>Pictures</h3>
@@ -61,6 +65,6 @@
   }
 }
 
-@if (itemResource.value(); as item) {
+@if (itemData(); as item) {
   <app-comments [itemID]="item.id" [typeID]="CommentsType.ITEM_TYPE_ID" />
 }

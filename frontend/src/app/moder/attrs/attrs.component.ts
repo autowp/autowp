@@ -4,6 +4,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
+import {errorMessage} from 'app/grpc';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {ModerAttrsAttributeListComponent} from './attribute-list/attribute-list.component';
@@ -36,4 +37,6 @@ export class ModerAttrsComponent implements OnInit {
       pageId: 100,
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

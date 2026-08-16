@@ -16,12 +16,12 @@
     <app-past-time-indicator [date]="createdAt" />
   }
   <br />
-  @if (authorResource.value(); as author) {
+  @if (authorData(); as author) {
     <app-user [user]="author" />
   }
 </td>
 <td>
-  @if (lastMessageResource.value(); as lastMessage) {
+  @if (lastMessageData(); as lastMessage) {
     <div>
       @if (lastMessageDate(); as date) {
         <small>
@@ -29,7 +29,7 @@
         </small>
         <br />
       }
-      @if (lastMessageAuthorResource.value(); as lastMessageAuthor) {
+      @if (lastMessageAuthorData(); as lastMessageAuthor) {
         <app-user [user]="lastMessageAuthor" />
       }
       <a i18n-title title="Go to last message" [routerLink]="['/forums/message', lastMessage.id]">

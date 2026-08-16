@@ -21,6 +21,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
+import {errorMessage} from 'app/grpc';
 import {catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
@@ -175,4 +176,6 @@ export class LogComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 75});
   }
+
+  protected readonly errorMessage = errorMessage;
 }

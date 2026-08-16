@@ -1,4 +1,6 @@
-@if (filter(); as filter) {
+@if (catalogueResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+} @else if (filter(); as filter) {
   <app-gallery
     [filter]="filter"
     [current]="identity() ?? null"

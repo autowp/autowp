@@ -26,6 +26,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
+import {errorMessage} from 'app/grpc';
 import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
@@ -200,4 +201,6 @@ export class ModerPicturesSimilarComponent implements OnInit {
         },
       });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

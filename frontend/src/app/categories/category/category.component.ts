@@ -48,10 +48,17 @@ export class CategoriesCategoryComponent {
     stream: () => this.#categoriesService.categoryPipe$(this.#route),
   });
 
-  protected readonly current = computed(() => this.categoryDataResource.value()?.current);
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that; this resource's error has no dedicated slot in the template, so every
+  // consumer below just degrades to its "no data yet" branch (same as while still loading).
+  protected readonly categoryData = computed(() =>
+    this.categoryDataResource.hasValue() ? this.categoryDataResource.value() : undefined,
+  );
+
+  protected readonly current = computed(() => this.categoryData()?.current);
 
   protected readonly category = computed(() => {
-    const category = this.categoryDataResource.value()?.category;
+    const category = this.categoryData()?.category;
     if (!category) {
       return null;
     }
@@ -63,7 +70,7 @@ export class CategoriesCategoryComponent {
   });
 
   protected readonly path = computed(() => {
-    const pathItems = this.categoryDataResource.value()?.pathItems;
+    const pathItems = this.categoryData()?.pathItems;
 
     return pathItems?.map((pi): CategoryPathItem => ({
       childs: [],
@@ -76,7 +83,7 @@ export class CategoriesCategoryComponent {
 
   constructor() {
     effect(() => {
-      const current = this.categoryDataResource.value()?.current;
+      const current = this.categoryData()?.current;
       this.pageEnv.set({
         pageId: 22,
         title: current?.nameText,

@@ -56,7 +56,7 @@
     @if (itemsResource.error(); as error) {
       <tr>
         <td colspan="6">
-          <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+          <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
         </td>
       </tr>
     } @else if (itemsResource.value(); as items) {

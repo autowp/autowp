@@ -21,6 +21,7 @@ import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getUnitAbbrTranslation} from '@utils/translations';
+import {errorMessage} from 'app/grpc';
 import {forkJoin, map, of, switchMap} from 'rxjs';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
@@ -155,4 +156,6 @@ export class CarsSpecsAdminComponent implements OnInit {
         },
       });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

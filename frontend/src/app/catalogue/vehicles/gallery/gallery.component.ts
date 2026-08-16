@@ -1,14 +1,15 @@
-import type {Item, ItemParent, Picture} from '@grpc/spec.pb';
+import type {Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
 import type {APIGalleryFilter} from '../../../gallery/gallery.component';
+import type {CatalogueData} from '../../catalogue-service';
 
 import {GalleryComponent} from '../../../gallery/gallery.component';
 import {CatalogueService} from '../../catalogue-service';
@@ -49,12 +50,20 @@ export class CatalogueVehiclesGalleryComponent {
   // the identical note on CatalogueVehiclesComponent.catalogueResource in ../vehicles.component.ts.
   protected readonly catalogueResource = rxResource({
     id: `catalogue-vehicles-gallery-catalogue-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
-    stream: (): Observable<{brand: Item; path: ItemParent[]; type: string}> =>
-      this.#catalogueService.resolveCatalogue$(this.#route),
+    stream: (): Observable<CatalogueData> => this.#catalogueService.resolveCatalogue$(this.#route),
   });
 
+  // Reading a resource's value() while it's in an error state throws - every other computed()
+  // below that needs catalogueResource's data reads it through this signal instead of the
+  // resource directly, so a real (non-NOT_FOUND) failure here degrades the rest of the page to
+  // its "no data yet" branches instead of taking the whole component down. The error itself is
+  // shown inline in the template (gallery.component.html), not swallowed here.
+  protected readonly catalogueData = computed(() =>
+    this.catalogueResource.hasValue() ? this.catalogueResource.value() : undefined,
+  );
+
   readonly #routerLink = computed<string[] | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     if (!data) {
       return undefined;
     }
@@ -73,7 +82,7 @@ export class CatalogueVehiclesGalleryComponent {
   });
 
   protected readonly filter = computed<APIGalleryFilter | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     if (!data) {
       return undefined;
     }
@@ -103,4 +112,6 @@ export class CatalogueVehiclesGalleryComponent {
       });
     }
   }
+
+  protected readonly errorMessage = errorMessage;
 }

@@ -1,12 +1,13 @@
 import type {Theme} from '@grpc/spec.pb';
 
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {GetThemeRequest, ListThemesRequest, ListTopicsRequest} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {getForumsThemeTranslation} from '@utils/translations';
+import {errorMessage} from 'app/grpc';
 import {combineLatest, map} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
@@ -58,9 +59,14 @@ export class ForumsComponent {
       this.#grpc.listTopics(new ListTopicsRequest({page, themeId: themeID ?? undefined})),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the effect below and the breadcrumb in the template don't blow up on a
+  // non-NOT_FOUND dataResource error (surfaced generically by the template instead).
+  protected readonly dataData = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
+
   constructor() {
     effect(() => {
-      const data = this.dataResource.value();
+      const data = this.dataData();
       if (!data) {
         return;
       }
@@ -83,4 +89,6 @@ export class ForumsComponent {
   protected reload() {
     this.topicsResource.reload();
   }
+
+  protected readonly errorMessage = errorMessage;
 }

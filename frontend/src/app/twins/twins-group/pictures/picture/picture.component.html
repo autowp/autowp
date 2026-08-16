@@ -1,5 +1,5 @@
 @if (pictureResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (pictureResource.value(); as picture) {
   <app-picture
     [picture]="picture"

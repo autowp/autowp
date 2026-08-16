@@ -1,4 +1,4 @@
-@if (pictureResource.value(); as picture) {
+@if (pictureData(); as picture) {
   @if (picture.thumbMedium) {
     <a [routerLink]="['/category', item().catname]">
       <img alt="" class="card-img-top" loading="lazy" [src]="picture.thumbMedium.src" />

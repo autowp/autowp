@@ -22,6 +22,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
+import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -141,4 +142,6 @@ export class CutawayBrandsComponent implements OnInit {
       };
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

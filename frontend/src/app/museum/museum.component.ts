@@ -1,5 +1,5 @@
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -19,7 +19,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {map, of, switchMap} from 'rxjs';
 
@@ -69,16 +69,21 @@ export class MuseumComponent {
         .pipe(switchMap((item) => (item.itemTypeId === ItemType.ITEM_TYPE_MUSEUM ? of(item) : notFoundError()))),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the chained resources and template below don't blow up on a
+  // non-NOT_FOUND itemResource error (surfaced generically by the template instead).
+  protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
+
   protected readonly linksResource = rxResource({
     id: `museum-links-${this.#itemID()}`,
-    params: () => this.itemResource.value()?.id,
+    params: () => this.itemData()?.id,
     stream: ({params: itemId}) =>
       this.#itemsClient.getItemLinks(new ItemLinksRequest({options: new ItemLinkListOptions({itemId})})),
   });
 
   protected readonly picturesResource = rxResource({
     id: `museum-pictures-${this.#itemID()}`,
-    params: () => this.itemResource.value()?.id,
+    params: () => this.itemData()?.id,
     stream: ({params: itemId}) =>
       this.#picturesClient.getPictures(
         new PicturesRequest({
@@ -112,7 +117,7 @@ export class MuseumComponent {
         return;
       }
 
-      const item = this.itemResource.value();
+      const item = this.itemData();
       if (item) {
         this.#pageEnv.set({
           pageId: 159,
@@ -121,4 +126,6 @@ export class MuseumComponent {
       }
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

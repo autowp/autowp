@@ -7,7 +7,7 @@ import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {requireRouteParent} from '@utils/require-route-parent';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of} from 'rxjs';
 
 @Component({
@@ -59,7 +59,14 @@ export class TwinsGroupSpecificationsComponent {
         : of(null),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that; htmlResource's error has no dedicated slot in the template, so it just
+  // degrades to null (same as while still loading).
   protected readonly html = computed(() => {
+    if (!this.htmlResource.hasValue()) {
+      return null;
+    }
+
     const response = this.htmlResource.value();
 
     // eslint-disable-next-line sonarjs/no-angular-bypass-sanitization
@@ -73,13 +80,20 @@ export class TwinsGroupSpecificationsComponent {
         return;
       }
 
-      const group = this.groupResource.value();
-      if (group) {
-        this.#pageEnv.set({
-          pageId: 27,
-          title: $localize`Specifications of ${group.nameText}`,
-        });
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
+      // template instead) doesn't blow up this effect.
+      if (!this.groupResource.hasValue()) {
+        return;
       }
+
+      const group = this.groupResource.value();
+      this.#pageEnv.set({
+        pageId: 27,
+        title: $localize`Specifications of ${group.nameText}`,
+      });
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

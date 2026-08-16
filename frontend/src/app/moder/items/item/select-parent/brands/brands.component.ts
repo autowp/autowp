@@ -6,6 +6,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {chunk} from '../../../../../chunk';
@@ -75,4 +76,6 @@ export class ModerItemsItemSelectParentBrandsComponent {
     this.selected.emit(itemID);
     return false;
   }
+
+  protected readonly errorMessage = errorMessage;
 }

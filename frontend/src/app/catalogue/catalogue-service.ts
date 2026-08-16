@@ -31,6 +31,12 @@ interface Parent {
   path: string[];
 }
 
+export interface CatalogueData {
+  brand: Item;
+  path: ItemParent[];
+  type: string;
+}
+
 type ParentObservableFunc = () => OperatorFunction<Parent, Parent>;
 
 @Service()
@@ -62,11 +68,11 @@ export class CatalogueService {
   // Throws a NOT_FOUND resource error (rather than emitting null) both when the brand catname
   // doesn't resolve and when any segment of the nested path doesn't - so every rxResource-based
   // consumer can rely on isNotFoundError()/effect() for the redirect instead of re-implementing
-  // the null check itself.
-  public resolveCatalogue$(
-    route: ActivatedRoute,
-    itemFields?: ItemFields,
-  ): Observable<{brand: Item; path: ItemParent[]; type: string}> {
+  // the null check itself. Any other failure (a transient backend/DB error, not a real 404) is
+  // left as a genuine resource error() too - consumers show it inline via
+  // `@if (catalogueResource.error(); as error)` rather than have it swallowed here, since a toast
+  // is easy to miss (and meaningless during SSR, where there's no live client to show it to yet).
+  public resolveCatalogue$(route: ActivatedRoute, itemFields?: ItemFields): Observable<CatalogueData> {
     const pathPipeRecursive: ParentObservableFunc = () =>
       switchMap((parent: Parent) => {
         if (parent.path.length <= 0) {

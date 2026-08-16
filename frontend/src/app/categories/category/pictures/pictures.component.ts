@@ -1,6 +1,6 @@
 import type {Picture} from '@grpc/spec.pb';
 
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {
@@ -16,6 +16,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {requireRouteParent} from '@utils/require-route-parent';
 import {chunkBy} from 'app/chunk';
+import {errorMessage} from 'app/grpc';
 import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {map, of} from 'rxjs';
@@ -70,10 +71,17 @@ export class CategoriesCategoryPicturesComponent {
     stream: () => this.#categoriesService.categoryPipe$(requireRouteParent(requireRouteParent(this.#route))),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so picturesResource's params() below doesn't blow up on a
+  // categoryResource error (surfaced generically by the template instead).
+  protected readonly categoryData = computed(() =>
+    this.categoryResource.hasValue() ? this.categoryResource.value() : undefined,
+  );
+
   protected readonly picturesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: `categories-category-pictures-${this.#category() ?? ''}-${this.#path() ?? ''}`,
-    params: () => ({categoryData: this.categoryResource.value(), page: this.#page()}),
+    params: () => ({categoryData: this.categoryData(), page: this.#page()}),
     stream: ({params: {categoryData, page}}) => {
       if (!categoryData?.category || !categoryData.current) {
         return of(undefined);
@@ -123,9 +131,11 @@ export class CategoriesCategoryPicturesComponent {
 
   constructor() {
     effect(() => {
-      if (this.picturesResource.value()) {
+      if (this.picturesResource.hasValue()) {
         this.#pageEnv.set({pageId: 22});
       }
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

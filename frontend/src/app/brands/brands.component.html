@@ -11,7 +11,7 @@
 </div>
 
 @if (itemsResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (itemsResource.isLoading()) {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 } @else if (itemsResource.value(); as items) {
@@ -37,7 +37,7 @@
           <div class="brand-icons row">
             @for (brand of info.items; track brand.id) {
               <div class="col-12 col-sm-6 col-md-4 col-lg-4">
-                @if (iconsResource.value(); as icons) {
+                @if (iconsData(); as icons) {
                   <app-brands-item [brand]="brand" [icons]="icons" />
                 }
               </div>

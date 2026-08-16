@@ -149,8 +149,15 @@ export class PictureComponent implements OnInit {
   protected ownerResource!: ResourceRef<null | undefined | User>;
   protected moderVoteUsersResource!: ResourceRef<Record<string, User> | undefined>;
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that. None of the resources on this component have an inline error slot in the
+  // template, so a transient error just leaves that section empty instead of throwing.
+  protected readonly ownerData = computed(() =>
+    this.ownerResource.hasValue() ? this.ownerResource.value() : undefined,
+  );
+
   protected readonly moderVotes = computed(() => {
-    const usersById = this.moderVoteUsersResource.value() ?? {};
+    const usersById = (this.moderVoteUsersResource.hasValue() ? this.moderVoteUsersResource.value() : undefined) ?? {};
 
     return (this.picture().pictureModerVotes?.items ?? []).map((vote) => ({
       reason: vote.reason,
@@ -470,11 +477,33 @@ export class PictureComponent implements OnInit {
   protected brandsResource!: ResourceRef<Item[] | undefined>;
   protected pictureItemsResource!: ResourceRef<PictureItem[] | undefined>;
 
+  // Same reasoning as ownerData above.
+  protected readonly factoriesData = computed(() =>
+    this.factoriesResource.hasValue() ? this.factoriesResource.value() : undefined,
+  );
+  protected readonly categoriesData = computed(() =>
+    this.categoriesResource.hasValue() ? this.categoriesResource.value() : undefined,
+  );
+  protected readonly twinsData = computed(() =>
+    this.twinsResource.hasValue() ? this.twinsResource.value() : undefined,
+  );
+  protected readonly brandsData = computed(() =>
+    this.brandsResource.hasValue() ? this.brandsResource.value() : undefined,
+  );
+  protected readonly pictureItemsData = computed(() =>
+    this.pictureItemsResource.hasValue() ? this.pictureItemsResource.value() : undefined,
+  );
+
   protected readonly contentItems = computed(() =>
-    (this.pictureItemsResource.value() ?? []).filter((item) => item.type === PictureItemType.PICTURE_ITEM_CONTENT),
+    (this.pictureItemsData() ?? []).filter((item) => item.type === PictureItemType.PICTURE_ITEM_CONTENT),
   );
 
   protected linksResource!: ResourceRef<ItemLink[] | undefined>;
+
+  // Same reasoning as ownerData above.
+  protected readonly linksData = computed(() =>
+    this.linksResource.hasValue() ? this.linksResource.value() : undefined,
+  );
 
   protected readonly takenDate = computed<null | {date: Date; format: string}>(() => {
     const date = this.picture().takenDate;

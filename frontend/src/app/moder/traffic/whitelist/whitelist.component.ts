@@ -8,7 +8,7 @@ import {DeleteTrafficWhitelistItemRequest} from '@grpc/spec.pb';
 import {TrafficClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError} from 'app/grpc';
 
 @Component({
   selector: 'app-moder-traffic-whitelist',
@@ -49,4 +49,6 @@ export class ModerTrafficWhitelistComponent implements OnInit {
       pageId: 77,
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

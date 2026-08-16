@@ -1,11 +1,11 @@
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {MostsContentsComponent} from 'app/mosts/contents/contents.component';
 import {map, of, switchMap} from 'rxjs';
 
@@ -74,6 +74,13 @@ export class CatalogueMostsComponent {
     },
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the effect and template below don't blow up on a non-NOT_FOUND
+  // brandResource error (surfaced generically by the template instead).
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
@@ -81,7 +88,7 @@ export class CatalogueMostsComponent {
         return;
       }
 
-      const brand = this.brandResource.value();
+      const brand = this.brandData();
       if (brand) {
         this.#pageEnv.set({
           pageId: 208,
@@ -90,4 +97,6 @@ export class CatalogueMostsComponent {
       }
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

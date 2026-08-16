@@ -13,7 +13,7 @@
 
 <div class="row">
   @if (groupResource.error(); as error) {
-    <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
   } @else if (groupResource.isLoading()) {
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   } @else if (groupResource.value(); as group) {
@@ -56,7 +56,7 @@
   @if (!pageEnv.layoutParams().isGalleryPage) {
     <div class="col-sm-4 order-1">
       @if (selectedBrandsResource.error(); as error) {
-        <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+        <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
       } @else if (selectedBrandsResource.isLoading()) {
         <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
       } @else if (selectedBrandsResource.value(); as selectedBrands) {

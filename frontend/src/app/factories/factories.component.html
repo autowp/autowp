@@ -10,7 +10,7 @@
 </nav>
 
 @if (itemResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (itemResource.value(); as factory) {
   <div class="page-header">
     <h1 [innerHTML]="factory.nameHtml"></h1>
@@ -41,7 +41,7 @@
   }
 }
 
-@if (picturesResource.value(); as pictures) {
+@if (picturesData(); as pictures) {
   @if ((pictures.items || []).length > 0) {
     <div>
       <h3 i18n>Pictures</h3>
@@ -56,7 +56,7 @@
   }
 }
 
-@if (itemResource.value(); as factory) {
+@if (itemData(); as factory) {
   @if (factory.relatedGroupPictures && factory.relatedGroupPictures.length > 0) {
     <div>
       <h3 i18n>Products</h3>

@@ -1,7 +1,7 @@
 import type {Picture} from '@grpc/spec.pb';
 
 import {AsyncPipe, DecimalPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
@@ -58,6 +58,14 @@ export class ThumbnailComponent {
     params: () => this.picture().ownerId,
     stream: ({params: ownerId}) => this.#userService.getUser$(ownerId),
   });
+
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so a transient error here (this card has no inline slot for an error
+  // message, and this component renders once per picture on list pages) just leaves the owner
+  // line off the card instead of taking the whole list down.
+  protected readonly ownerData = computed(() =>
+    this.ownerResource.hasValue() ? this.ownerResource.value() : undefined,
+  );
 
   protected savePerspective(pictureItem: PictureItem) {
     this.#picturesClient

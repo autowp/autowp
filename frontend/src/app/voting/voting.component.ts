@@ -12,7 +12,7 @@ import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {timestampToDate} from '@utils/timestamp';
-import {isNotFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {CommentsComponent} from '../comments/comments/comments.component';
@@ -57,13 +57,18 @@ export class VotingComponent {
         return;
       }
 
-      const voting = this.votingResource.value();
-      if (voting) {
-        this.#pageEnv.set({
-          pageId: 157,
-          title: voting.name,
-        });
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
+      // template instead) doesn't blow up this effect.
+      if (!this.votingResource.hasValue()) {
+        return;
       }
+
+      const voting = this.votingResource.value();
+      this.#pageEnv.set({
+        pageId: 157,
+        title: voting.name,
+      });
     });
   }
 
@@ -144,4 +149,6 @@ export class VotingComponent {
 
     return false;
   }
+
+  protected readonly errorMessage = errorMessage;
 }

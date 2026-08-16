@@ -1,4 +1,4 @@
-import type {Item, ItemParent, Pages, Picture} from '@grpc/spec.pb';
+import type {Item, Pages, Picture} from '@grpc/spec.pb';
 import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/list-item.component';
 import type {Observable} from 'rxjs';
 
@@ -30,12 +30,13 @@ import {PageEnvService} from '@services/page-env.service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {getItemTypeTranslation} from '@utils/translations';
-import {isNotFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {catchError, EMPTY, map, of} from 'rxjs';
+import {map, of} from 'rxjs';
+
+import type {CatalogueData} from '../catalogue-service';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
-import {ToastsService} from '../../toasts/toasts.service';
 import {CatalogueService, convertChildsCounts} from '../catalogue-service';
 import {CatalogueItemMenuComponent} from '../item-menu/item-menu.component';
 
@@ -61,7 +62,6 @@ export class CatalogueVehiclesComponent {
   readonly #router = inject(Router);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
-  readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
@@ -94,19 +94,27 @@ export class CatalogueVehiclesComponent {
   // still-present entry from the first brand/path and seed itself with the wrong data.
   protected readonly catalogueResource = rxResource({
     id: `catalogue-vehicles-catalogue-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
-    stream: (): Observable<{brand: Item; path: ItemParent[]; type: string}> =>
-      this.#catalogueService.resolveCatalogue$(this.#route),
+    stream: (): Observable<CatalogueData> => this.#catalogueService.resolveCatalogue$(this.#route),
   });
 
-  protected readonly brand = computed(() => this.catalogueResource.value()?.brand);
+  // Reading a resource's value() while it's in an error state throws - every other computed()
+  // and resource params() below that needs catalogueResource's data reads it through this signal
+  // instead of the resource directly, so a real (non-NOT_FOUND) failure here degrades the rest of
+  // the page to its "no data yet" branches instead of taking the whole component down. The error
+  // itself is shown inline in the template (see vehicles.component.html), not swallowed here.
+  protected readonly catalogueData = computed(() =>
+    this.catalogueResource.hasValue() ? this.catalogueResource.value() : undefined,
+  );
+
+  protected readonly brand = computed(() => this.catalogueData()?.brand);
 
   protected readonly breadcrumbs = computed(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     return data ? CatalogueService.pathToBreadcrumbs(data.brand, data.path) : undefined;
   });
 
   protected readonly routerLink = computed<string[] | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     if (!data) {
       return undefined;
     }
@@ -119,7 +127,7 @@ export class CatalogueVehiclesComponent {
   });
 
   protected readonly menu = computed(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     const routerLink = this.routerLink();
     return data && routerLink ? {routerLink, type: data.type} : undefined;
   });
@@ -129,7 +137,7 @@ export class CatalogueVehiclesComponent {
   protected readonly itemResource = rxResource({
     id: `catalogue-vehicles-item-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
     params: () => {
-      const data = this.catalogueResource.value();
+      const data = this.catalogueData();
       return data ? {isModer: this.#isModer(), path: data.path} : undefined;
     },
     stream: ({params: {isModer, path}}): Observable<Item> => {
@@ -178,11 +186,14 @@ export class CatalogueVehiclesComponent {
     },
   });
 
+  // Same reasoning as catalogueData above.
+  protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
+
   protected readonly itemsResource = rxResource({
     id: `catalogue-vehicles-items-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
     params: () => {
-      const data = this.catalogueResource.value();
-      const item = this.itemResource.value();
+      const data = this.catalogueData();
+      const item = this.itemData();
       const routerLink = this.routerLink();
 
       return data && item && routerLink
@@ -301,15 +312,20 @@ export class CatalogueVehiclesComponent {
     },
   });
 
+  // Same reasoning as catalogueData above.
+  protected readonly itemsData = computed(() =>
+    this.itemsResource.hasValue() ? this.itemsResource.value() : undefined,
+  );
+
   // Only active (and only then does it hit the network) once the group listing above is showing
   // its last page - "other pictures" is meant to surface pictures not already covered by that
   // listing, so it would be premature (and wasted work) to fetch it before reaching the end.
   protected readonly otherPicturesResource = rxResource({
     id: `catalogue-vehicles-other-pictures-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
     params: () => {
-      const data = this.catalogueResource.value();
-      const items = this.itemsResource.value();
-      const item = this.itemResource.value();
+      const data = this.catalogueData();
+      const items = this.itemsData();
+      const item = this.itemData();
       const routerLink = this.routerLink();
 
       if (!data || !item || !routerLink) {
@@ -352,10 +368,6 @@ export class CatalogueVehiclesComponent {
           }),
         )
         .pipe(
-          catchError((err: unknown) => {
-            this.#toastService.handleError(err);
-            return EMPTY;
-          }),
           map((response) => {
             if ((response.items ?? []).length <= 0) {
               return null;
@@ -447,4 +459,5 @@ export class CatalogueVehiclesComponent {
   }
 
   protected readonly convertChildsCounts = convertChildsCounts;
+  protected readonly errorMessage = errorMessage;
 }

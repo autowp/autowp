@@ -44,6 +44,27 @@ export const isNotFoundError = (error: unknown): boolean => {
   );
 };
 
+/**
+ * Extracts a human-readable message from a resource error for inline display, whether it's the
+ * raw GrpcStatusEvent caught by a plain `catchError` or wrapped in an `Error.cause` by
+ * rxResource's `encapsulateResourceError` (see isNotFoundError() above for the same two shapes).
+ * GrpcStatusEvent has no `.message` of its own - reading `error.message` directly, as several
+ * `@if (resource.error(); as error)` templates in this codebase do, renders blank for the raw
+ * shape and the unhelpful literal text "[object Object]" for the wrapped one.
+ */
+export const errorMessage = (error: unknown): string => {
+  if (error instanceof GrpcStatusEvent) {
+    return error.statusMessage;
+  }
+  if (error instanceof Error) {
+    if (error.cause instanceof GrpcStatusEvent) {
+      return error.cause.statusMessage;
+    }
+    return error.message;
+  }
+  return typeof error === 'string' ? error : $localize`Unknown error`;
+};
+
 export const extractFieldViolations = (response: GrpcStatusEvent): FieldViolation[] => {
   if (!(response instanceof GrpcStatusEvent)) {
     return [];

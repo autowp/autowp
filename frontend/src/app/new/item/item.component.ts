@@ -16,6 +16,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {parseStringToGrpcDate} from '@services/utils';
+import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -69,13 +70,18 @@ export class NewItemComponent {
 
   constructor() {
     effect(() => {
-      const item = this.itemResource.value();
-      if (item) {
-        this.#pageEnv.set({
-          pageId: 210,
-          title: item.nameText,
-        });
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
+      // template instead) doesn't blow up this effect.
+      if (!this.itemResource.hasValue()) {
+        return;
       }
+
+      const item = this.itemResource.value();
+      this.#pageEnv.set({
+        pageId: 210,
+        title: item.nameText,
+      });
     });
   }
 
@@ -110,4 +116,6 @@ export class NewItemComponent {
         }),
       ),
   });
+
+  protected readonly errorMessage = errorMessage;
 }

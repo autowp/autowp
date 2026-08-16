@@ -9,6 +9,7 @@ import {PulseRequest} from '@grpc/spec.pb';
 import {StatisticsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
+import {errorMessage} from 'app/grpc';
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {combineLatest, EMPTY, map, of, switchMap} from 'rxjs';
 
@@ -59,7 +60,14 @@ export class PulseComponent implements OnInit {
     stream: ({params: period}) => this.#statisticsClient.getPulse(new PulseRequest({period})),
   });
 
-  protected readonly legend$ = toObservable(computed(() => this.dataResource.value())).pipe(
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that. toObservable() below runs its computed()'s effect regardless of what the
+  // template is currently showing (unlike a template-only `resource.value()` read, which the
+  // `@else` branch below only evaluates once dataResource.error() is already known falsy), so an
+  // unguarded read here would throw even while the error is already being shown inline.
+  protected readonly dataData = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
+
+  protected readonly legend$ = toObservable(this.dataData).pipe(
     map((response) =>
       (response?.legend ?? []).map((item) => ({
         color: item.color,
@@ -68,9 +76,9 @@ export class PulseComponent implements OnInit {
     ),
   );
 
-  protected readonly labels = computed(() => this.dataResource.value()?.labels);
+  protected readonly labels = computed(() => this.dataData()?.labels);
 
-  protected readonly gridData$ = toObservable(computed(() => this.dataResource.value())).pipe(
+  protected readonly gridData$ = toObservable(this.dataData).pipe(
     switchMap((response) => {
       if (!response) {
         return EMPTY;
@@ -103,4 +111,6 @@ export class PulseComponent implements OnInit {
 
     return false;
   }
+
+  protected readonly errorMessage = errorMessage;
 }

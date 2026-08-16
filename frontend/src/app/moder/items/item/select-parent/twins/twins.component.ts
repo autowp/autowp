@@ -15,6 +15,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {errorMessage} from 'app/grpc';
 import {map, of} from 'rxjs';
 
 import {chunk} from '../../../../../chunk';
@@ -124,4 +125,5 @@ export class ModerItemsItemSelectParentTwinsComponent {
   }
 
   protected readonly ItemParentsRequest = ItemParentsRequest;
+  protected readonly errorMessage = errorMessage;
 }

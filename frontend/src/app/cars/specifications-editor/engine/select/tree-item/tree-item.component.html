@@ -17,7 +17,7 @@
       @if (open()) {
         <ul class="list-unstyled">
           @if (childsResource.error(); as error) {
-            <li class="text-danger" style="margin-left: 16px">{{ error.message }}</li>
+            <li class="text-danger" style="margin-left: 16px">{{ errorMessage(error) }}</li>
           } @else if (childsResource.isLoading()) {
             <li style="margin-left: 16px">
               <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>

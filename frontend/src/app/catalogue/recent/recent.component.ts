@@ -1,7 +1,7 @@
 import type {Item, Pages, Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -19,7 +19,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {chunkBy} from '../../chunk';
@@ -114,9 +114,16 @@ export class CatalogueRecentComponent {
     });
   }
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so picturesResource's params() below doesn't blow up on a non-NOT_FOUND
+  // brandResource error (surfaced generically by the template instead).
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
   protected readonly picturesResource = rxResource({
     id: `catalogue-recent-pictures-${this.#catname() ?? ''}`,
-    params: () => ({brand: this.brandResource.value(), page: this.#page()}),
+    params: () => ({brand: this.brandData(), page: this.#page()}),
     stream: ({
       params: {brand, page},
     }): Observable<undefined | {paginator: Pages | undefined; pictures: PictureRoute[][]}> => {
@@ -164,4 +171,6 @@ export class CatalogueRecentComponent {
         );
     },
   });
+
+  protected readonly errorMessage = errorMessage;
 }

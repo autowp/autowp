@@ -57,6 +57,13 @@ export class PictureModerVoteComponent implements OnInit {
     stream: () => this.#moderVoteTemplateService.getTemplates$(),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so a transient error here (this dropdown has no inline slot for an error
+  // message) just leaves the template list empty instead of throwing.
+  protected readonly moderVoteTemplatesData = computed(() =>
+    this.moderVoteTemplatesResource.hasValue() ? this.moderVoteTemplatesResource.value() : undefined,
+  );
+
   protected reason = '';
   protected save = false;
 

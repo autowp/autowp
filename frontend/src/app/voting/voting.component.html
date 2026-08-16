@@ -7,7 +7,7 @@
 </nav>
 
 @if (votingResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (votingResource.value(); as voting) {
   <div class="page-header">
     <h1>{{ voting.name }}</h1>

@@ -4,7 +4,7 @@ import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, Injector, input, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, signal} from '@angular/core';
 import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {GetItemVehicleTypesRequest, ItemType, UpdateItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -73,6 +73,14 @@ export class ModerItemsItemMetaComponent implements OnInit {
       },
     });
   }
+
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the template below doesn't blow up on a non-NOT_FOUND
+  // vehicleTypeIDsResource error (this form section has no inline slot for an error message, so it
+  // just stays hidden instead).
+  protected readonly vehicleTypeIDsData = computed(() =>
+    this.vehicleTypeIDsResource.hasValue() ? this.vehicleTypeIDsResource.value() : undefined,
+  );
 
   protected saveMeta(item: Item, event: ItemMetaFormResult) {
     this.loadingNumber.set(true);

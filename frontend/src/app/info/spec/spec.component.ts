@@ -6,6 +6,7 @@ import {RouterLink} from '@angular/router';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {errorMessage} from 'app/grpc';
 
 import {InfoSpecRowComponent} from './row/row.component';
 
@@ -28,4 +29,6 @@ export class InfoSpecComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 174});
   }
+
+  protected readonly errorMessage = errorMessage;
 }

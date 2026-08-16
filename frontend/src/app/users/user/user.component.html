@@ -7,7 +7,7 @@
 </nav>
 
 @if (userResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (userResource.value(); as user) {
   @if (user) {
     <div class="page-header">
@@ -81,7 +81,9 @@
             </p>
           }
         </div>
-        @if (achievementsResource.value(); as achievementsResponse) {
+        @if (achievementsResource.error(); as error) {
+          <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+        } @else if (achievementsResource.value(); as achievementsResponse) {
           @if (achievementsResponse.items.length || achievementsResponse.progress.length) {
             <div id="achievements">
               <h2 i18n>Achievements</h2>
@@ -141,7 +143,9 @@
             </div>
           }
         }
-        @if (picturesResource.value(); as pictures) {
+        @if (picturesResource.error(); as error) {
+          <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+        } @else if (picturesResource.value(); as pictures) {
           @if (pictures && pictures.length) {
             <div>
               <h2 i18n>Recent uploads</h2>
@@ -163,7 +167,9 @@
         } @else {
           <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
         }
-        @if (commentsResource.value(); as comments) {
+        @if (commentsResource.error(); as error) {
+          <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+        } @else if (commentsResource.value(); as comments) {
           @if (comments && comments.length > 0) {
             <div>
               <h2>
@@ -195,20 +201,20 @@
           <div class="card card-body mb-4">
             <div class="row">
               <div class="col-6">
-                @if (inContactsResource.value() === false) {
+                @if (inContactsData() === false) {
                   <button type="submit" class="btn btn-lg btn-contact btn-primary" (click)="setInContacts(user, true)">
                     <span class="bi bi-plus-circle me-1" aria-hidden="true"></span>
                     <ng-container i18n>Add to contacts</ng-container>
                   </button>
                 }
-                @if (inContactsResource.value()) {
+                @if (inContactsData()) {
                   <button type="submit" class="btn btn-lg btn-contact btn-danger" (click)="setInContacts(user, false)">
                     <span class="bi bi-dash-circle me-1" aria-hidden="true"></span>
                     <ng-container i18n>Remove from contacts</ng-container>
                   </button>
                 }
               </div>
-              @if (disableCommentsNotificationsResource.value(); as disableCommentsNotifications) {
+              @if (disableCommentsNotificationsData(); as disableCommentsNotifications) {
                 <div class="col-6">
                   <button
                     type="submit"

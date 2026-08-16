@@ -21,7 +21,7 @@
   <a class="nav-link active" routerLink="/moder/traffic/whitelist" i18n>Whitelist</a>
 </div>
 @if (itemsResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (itemsResource.isLoading()) {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 } @else if (itemsResource.value(); as data) {

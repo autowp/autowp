@@ -21,6 +21,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {errorMessage} from 'app/grpc';
 import {map, of} from 'rxjs';
 
 import {chunkBy} from '../chunk';
@@ -86,10 +87,18 @@ export class TwinsComponent {
     },
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so dataResource's params() and the constructor effect() below don't blow
+  // up on a brandResource error (which the template has no dedicated slot for - it just degrades
+  // to the "no brand" branches, same as while brandResource is still loading).
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
   protected readonly dataResource = rxResource({
     id: `twins-data-${this.currentBrandCatname() ?? ''}`,
     params: () => {
-      const brand = this.brandResource.value();
+      const brand = this.brandData();
 
       return brand === undefined ? undefined : {brand, page: this.page()};
     },
@@ -166,7 +175,7 @@ export class TwinsComponent {
 
   constructor() {
     effect(() => {
-      const brand = this.brandResource.value();
+      const brand = this.brandData();
       if (brand === undefined) {
         return;
       }
@@ -181,4 +190,6 @@ export class TwinsComponent {
       }
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

@@ -20,7 +20,7 @@
 </ul>
 
 @if (charGroupsResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (charGroupsResource.value(); as groups) {
   @for (group of [groups.latin, groups.cyrillic, groups.han, groups.numbers, groups.other]; track group) {
     @if (group.length) {
@@ -40,7 +40,7 @@
 }
 
 @if (dataResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (dataResource.value(); as data) {
   @for (item of data.items; track item.id) {
     <app-catalogue-list-item [item]="item" />

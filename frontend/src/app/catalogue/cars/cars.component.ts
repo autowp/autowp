@@ -25,7 +25,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {getVehicleTypeTranslation} from '@utils/translations';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -98,21 +98,33 @@ export class CatalogueCarsComponent {
     },
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so downstream consumers below don't blow up on a non-NOT_FOUND
+  // brandResource error (surfaced generically by the template instead).
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
   protected readonly vehicleTypesResource = rxResource({
     id: `catalogue-cars-vehicle-types-${this.#catname() ?? ''}`,
-    params: () => this.brandResource.value(),
+    params: () => this.brandData(),
     stream: ({params: brand}): Observable<BrandVehicleType[]> =>
       this.#itemsClient
         .getBrandVehicleTypes(new GetBrandVehicleTypesRequest({brandId: +brand.id}))
         .pipe(map((response) => response.items ?? [])),
   });
 
+  // Same reasoning as brandData above.
+  protected readonly vehicleTypesData = computed(() =>
+    this.vehicleTypesResource.hasValue() ? this.vehicleTypesResource.value() : undefined,
+  );
+
   protected readonly currentVehicleType = computed(() =>
-    this.vehicleTypesResource.value()?.find((type) => type.catname === this.vehicleTypeCatname()),
+    this.vehicleTypesData()?.find((type) => type.catname === this.vehicleTypeCatname()),
   );
 
   protected readonly title = computed<string | undefined>(() => {
-    const brand = this.brandResource.hasValue() ? this.brandResource.value() : undefined;
+    const brand = this.brandData();
     if (!brand) {
       return undefined;
     }
@@ -125,14 +137,14 @@ export class CatalogueCarsComponent {
   });
 
   protected readonly vehicleTypeOptions = computed(() => {
-    const brand = this.brandResource.hasValue() ? this.brandResource.value() : undefined;
+    const brand = this.brandData();
     if (!brand) {
       return [];
     }
 
     const current = this.currentVehicleType();
 
-    return (this.vehicleTypesResource.value() ?? []).map((type) => ({
+    return (this.vehicleTypesData() ?? []).map((type) => ({
       active: type.id === current?.id,
       id: type.id,
       itemsCount: type.itemsCount,
@@ -163,7 +175,7 @@ export class CatalogueCarsComponent {
   protected readonly resultResource = rxResource({
     id: `catalogue-cars-result-${this.#catname() ?? ''}`,
     params: () => ({
-      brand: this.brandResource.value(),
+      brand: this.brandData(),
       currentVehicleType: this.currentVehicleType(),
       page: this.#page(),
     }),
@@ -276,4 +288,6 @@ export class CatalogueCarsComponent {
         );
     },
   });
+
+  protected readonly errorMessage = errorMessage;
 }

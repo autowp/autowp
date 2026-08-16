@@ -18,6 +18,7 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
+import {errorMessage} from 'app/grpc';
 import {catchError, forkJoin, map, of} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
@@ -118,6 +119,13 @@ export class UsersRatingComponent implements OnInit {
     };
   }
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the chained resources/computeds below don't blow up on a non-NOT_FOUND
+  // usersResource error (surfaced generically by the template instead).
+  protected readonly usersData = computed(() =>
+    this.usersResource.hasValue() ? this.usersResource.value() : undefined,
+  );
+
   // Per-item lookups here used to be raw Observables created inside #mapUser and consumed via
   // `| async` in the template. That races Angular's SSR whenStable() check (the outer resource's
   // pending task completes before the template's deferred change-detection pass ever subscribes
@@ -125,7 +133,7 @@ export class UsersRatingComponent implements OnInit {
   // resources off usersResource keeps every lookup inside Angular's pending-task tracking.
   protected readonly usersByIdResource = rxResource({
     id: `users-rating-users-${this.rating()}`,
-    params: () => this.usersResource.value()?.map((row) => row.userId) ?? [],
+    params: () => this.usersData()?.map((row) => row.userId) ?? [],
     // A plain object rather than a Map: TransferState round-trips resource values through
     // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
     // enumerable properties, no toJSON), losing all entries.
@@ -144,8 +152,7 @@ export class UsersRatingComponent implements OnInit {
 
   readonly #topUserIds = computed(
     () =>
-      this.usersResource
-        .value()
+      this.usersData()
         ?.slice(0, EXPANDED_ROWS_COUNT)
         .map((row) => row.userId) ?? [],
   );
@@ -220,6 +227,7 @@ export class UsersRatingComponent implements OnInit {
 
   protected readonly Rating = Rating;
   protected readonly EXPANDED_ROWS_COUNT = EXPANDED_ROWS_COUNT;
+  protected readonly errorMessage = errorMessage;
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 173});

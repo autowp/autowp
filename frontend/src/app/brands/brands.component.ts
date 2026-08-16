@@ -2,7 +2,7 @@ import type {OnInit} from '@angular/core';
 import type {BrandsListCharacter} from '@grpc/spec.pb';
 
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {GetBrandsRequest} from '@grpc/spec.pb';
@@ -10,6 +10,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {errorMessage} from 'app/grpc';
 import {tap} from 'rxjs';
 
 import {BrandsItemComponent} from './item/item.component';
@@ -77,4 +78,13 @@ export class BrandsComponent implements OnInit {
     }
     return false;
   }
+
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, since the template reads iconsResource.value() without an error() check
+  // of its own (a missing icon set just leaves the brand icons unrendered).
+  protected readonly iconsData = computed(() =>
+    this.iconsResource.hasValue() ? this.iconsResource.value() : undefined,
+  );
+
+  protected readonly errorMessage = errorMessage;
 }

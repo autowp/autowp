@@ -23,7 +23,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -73,10 +73,17 @@ export class FactoryItemsComponent {
         ),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so downstream consumers below don't blow up on a non-NOT_FOUND
+  // factoryResource error (surfaced generically by the template instead).
+  protected readonly factoryData = computed(() =>
+    this.factoryResource.hasValue() ? this.factoryResource.value() : undefined,
+  );
+
   protected readonly itemsResource = rxResource({
     id: `factory-items-list-${this.#itemID()}`,
     params: () => {
-      const factory = this.factoryResource.value();
+      const factory = this.factoryData();
 
       return factory ? {factoryID: factory.id, page: this.#page()} : undefined;
     },
@@ -182,9 +189,11 @@ export class FactoryItemsComponent {
         return;
       }
 
-      if (this.factoryResource.value()) {
+      if (this.factoryData()) {
         this.#pageEnv.set({pageId: 182});
       }
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

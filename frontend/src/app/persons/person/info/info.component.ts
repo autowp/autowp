@@ -19,7 +19,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {requireRouteParent} from '@utils/require-route-parent';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, map, of, switchMap} from 'rxjs';
 
@@ -153,13 +153,19 @@ export class PersonsPersonInfoComponent {
         return;
       }
 
-      const item = this.itemResource.value();
-      if (item) {
-        this.#pageEnv.set({
-          pageId: 213,
-          title: item.nameText,
-        });
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that.
+      if (!this.itemResource.hasValue()) {
+        return;
       }
+
+      const item = this.itemResource.value();
+      this.#pageEnv.set({
+        pageId: 213,
+        title: item.nameText,
+      });
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

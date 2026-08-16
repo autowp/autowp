@@ -11,6 +11,7 @@ import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
+import {errorMessage} from 'app/grpc';
 import {catchError, debounceTime, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
@@ -132,4 +133,6 @@ export class CarsAttrsChangeLogComponent {
       queryParamsHandling: 'merge',
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

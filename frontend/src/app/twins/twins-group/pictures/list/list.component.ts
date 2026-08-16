@@ -15,7 +15,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {requireRouteParent} from '@utils/require-route-parent';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../../../../paginator/paginator/paginator.component';
@@ -102,13 +102,20 @@ export class TwinsGroupPicturesListComponent {
         return;
       }
 
-      const group = this.groupResource.value();
-      if (group) {
-        this.#pageEnv.set({
-          pageId: 28,
-          title: $localize`All pictures of ${group.nameText}`,
-        });
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
+      // template instead) doesn't blow up this effect.
+      if (!this.groupResource.hasValue()) {
+        return;
       }
+
+      const group = this.groupResource.value();
+      this.#pageEnv.set({
+        pageId: 28,
+        title: $localize`All pictures of ${group.nameText}`,
+      });
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

@@ -7,6 +7,7 @@ import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {chunkBy} from '../chunk';
@@ -54,4 +55,6 @@ export class CategoriesIndexComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({pageId: 22});
   }
+
+  protected readonly errorMessage = errorMessage;
 }

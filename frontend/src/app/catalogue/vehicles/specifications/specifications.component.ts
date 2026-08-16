@@ -1,5 +1,5 @@
 import type {SafeHtml} from '@angular/platform-browser';
-import type {Item, ItemParent} from '@grpc/spec.pb';
+import type {Item} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
@@ -10,10 +10,10 @@ import {GetSpecificationsRequest, ItemFields} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
-import type {Breadcrumbs} from '../../catalogue-service';
+import type {Breadcrumbs, CatalogueData} from '../../catalogue-service';
 
 import {CatalogueService} from '../../catalogue-service';
 
@@ -50,7 +50,7 @@ export class CatalogueVehiclesSpecificationsComponent {
   // the identical note on CatalogueVehiclesComponent.catalogueResource in ../vehicles.component.ts.
   protected readonly catalogueResource = rxResource({
     id: `catalogue-vehicles-specifications-catalogue-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
-    stream: (): Observable<{brand: Item; path: ItemParent[]; type: string}> =>
+    stream: (): Observable<CatalogueData> =>
       this.#catalogueService.resolveCatalogue$(
         this.#route,
         new ItemFields({
@@ -60,15 +60,24 @@ export class CatalogueVehiclesSpecificationsComponent {
       ),
   });
 
-  protected readonly brand = computed(() => this.catalogueResource.value()?.brand);
+  // Reading a resource's value() while it's in an error state throws - every other computed()
+  // and resource params() below that needs catalogueResource's data reads it through this signal
+  // instead of the resource directly, so a real (non-NOT_FOUND) failure here degrades the rest of
+  // the page to its "no data yet" branches instead of taking the whole component down. The error
+  // itself is shown inline in the template (specifications.component.html), not swallowed here.
+  protected readonly catalogueData = computed(() =>
+    this.catalogueResource.hasValue() ? this.catalogueResource.value() : undefined,
+  );
+
+  protected readonly brand = computed(() => this.catalogueData()?.brand);
 
   protected readonly breadcrumbs = computed<Breadcrumbs[] | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     return data ? CatalogueService.pathToBreadcrumbs(data.brand, data.path) : undefined;
   });
 
   protected readonly item = computed<Item | undefined>(() => {
-    const data = this.catalogueResource.value();
+    const data = this.catalogueData();
     const item = data?.path[data.path.length - 1].item;
     return item ?? undefined;
   });
@@ -124,4 +133,6 @@ export class CatalogueVehiclesSpecificationsComponent {
       });
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

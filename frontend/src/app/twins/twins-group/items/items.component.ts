@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {
@@ -109,9 +109,21 @@ export class TwinsGroupItemsComponent {
 
   protected readonly CommentsType = CommentsType;
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the effect and template below don't blow up on an error (this nested
+  // tab view has no dedicated error slot, so it just degrades to showing nothing, same as while
+  // still loading).
+  protected readonly groupData = computed(() =>
+    this.groupResource.hasValue() ? this.groupResource.value() : undefined,
+  );
+
+  protected readonly childsData = computed(() =>
+    this.childsResource.hasValue() ? this.childsResource.value() : undefined,
+  );
+
   constructor() {
     effect(() => {
-      const group = this.groupResource.value();
+      const group = this.groupData();
       if (group) {
         this.#pageEnv.set({
           pageId: 25,

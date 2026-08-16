@@ -3,7 +3,7 @@
     @if (h2()) {
       <h2>
         <span [innerHTML]="picture.nameHtml"></span>
-        @if (pictureItemsResource.value(); as items) {
+        @if (pictureItemsData(); as items) {
           @if (items.length === 1 && items[0].item?.design) {
             @if (items[0].item?.design; as design) {
               <sup class="design-brand">
@@ -17,7 +17,7 @@
     } @else {
       <h1>
         <span [innerHTML]="picture.nameHtml"></span>
-        @if (pictureItemsResource.value(); as items) {
+        @if (pictureItemsData(); as items) {
           @if (items.length === 1 && items[0].item?.design) {
             @if (items[0].item?.design; as design) {
               <sup class="design-brand">
@@ -44,7 +44,7 @@
           >
             <img alt="" class="rounded border border-light w-100" loading="lazy" [src]="picture.previewLarge.src" />
           </span>
-          @if (pictureItemsResource.value(); as pictureItems) {
+          @if (pictureItemsData(); as pictureItems) {
             @if (pictureItems.length === 1) {
               @if (pictureItems[0].item; as item) {
                 @if (item.altNames && item.altNames.length > 0) {
@@ -165,7 +165,7 @@
       @if (showShareDialog() && location) {
         <app-share [url]="location.href" [text]="picture.nameText" />
       }
-      @if (pictureItemsResource.value(); as items) {
+      @if (pictureItemsData(); as items) {
         @for (item of items; track item.itemId) {
           @if (item.type === PictureItemType.PICTURE_ITEM_AUTHOR) {
             <p>
@@ -180,7 +180,7 @@
           <remark [markdown]="picture.copyrights" />
         </div>
       }
-      @if (pictureItemsResource.value(); as pictureItems) {
+      @if (pictureItemsData(); as pictureItems) {
         @for (pictureItem of pictureItems; track pictureItem.itemId) {
           @if (pictureItem.item; as item) {
             @if (pictureItem.type === PictureItemType.PICTURE_ITEM_COPYRIGHTS && item.description) {
@@ -229,7 +229,7 @@
             <ng-container i18n>Filesize</ng-container>: <strong>{{ picture.image.filesize | bytes: 2 }}</strong>
           </li>
         }
-        @if (ownerResource.value(); as owner) {
+        @if (ownerData(); as owner) {
           <li>
             <ng-container i18n>Added by:</ng-container>
             <app-user [user]="owner" />,
@@ -267,26 +267,26 @@
   Discuss anything and just talk about cars and not only can you on [the forum](/forums/)."
       />
       <ul class="unstyled">
-        @for (link of linksResource.value(); track link) {
+        @for (link of linksData(); track link) {
           <li>
             <a target="_blank" [href]="link.url"><i class="bi bi-globe" aria-hidden="true"></i> {{ link.name }}</a>
           </li>
         }
-        @for (category of categoriesResource.value(); track category.id) {
+        @for (category of categoriesData(); track category.id) {
           <li>
             <a [routerLink]="['/category', category.catname]">
               <i class="bi bi-tag-fill" aria-hidden="true"></i> <span [innerHTML]="category.nameHtml"></span>
             </a>
           </li>
         }
-        @for (group of twinsResource.value(); track group.id) {
+        @for (group of twinsData(); track group.id) {
           <li>
             <a [routerLink]="['/twins/group', group.id]">
               <i class="bi bi-circle-half" aria-hidden="true"></i> <span [innerHTML]="group.nameHtml"></span>
             </a>
           </li>
         }
-        @for (factory of factoriesResource.value(); track factory.id) {
+        @for (factory of factoriesData(); track factory.id) {
           <li>
             <a [routerLink]="['/factories', factory.id]">
               <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>
@@ -295,7 +295,7 @@
           </li>
         }
         @if (authenticated(); as canEditSpecs) {
-          @if (pictureItemsResource.value(); as pictureItems) {
+          @if (pictureItemsData(); as pictureItems) {
             @for (pictureItem of pictureItems; track pictureItem.itemId) {
               @if (pictureItem.item; as item) {
                 @if (
@@ -362,7 +362,7 @@
           }
         }
         @if (authenticated()) {
-          @if (pictureItemsResource.value(); as pictureItems) {
+          @if (pictureItemsData(); as pictureItems) {
             @if (pictureItems.length > 0) {
               <li>
                 <a routerLink="/upload" [queryParams]="{replace: picture.id}">
@@ -469,7 +469,7 @@
               <i class="bi bi-gear-fill" aria-hidden="true"></i>
               <a i18n [routerLink]="['/moder/pictures', picture.id]">Edit picture №{{ picture.id }}</a>
             </p>
-            @if (pictureItemsResource.value(); as items) {
+            @if (pictureItemsData(); as items) {
               @for (item of items; track item.itemId) {
                 <p>
                   <i class="bi bi-gear-fill" aria-hidden="true"></i>
@@ -478,7 +478,7 @@
                   </a>
                 </p>
               }
-              @for (brand of brandsResource.value(); track brand.id) {
+              @for (brand of brandsData(); track brand.id) {
                 <p>
                   <i class="bi bi-gear-fill" aria-hidden="true"></i>
                   <a [routerLink]="['/moder/items/item', brand.id]">

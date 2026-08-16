@@ -20,7 +20,7 @@
         <ul class="list-unstyled">
           @if (childsResource.error(); as error) {
             <li class="ms-4">
-              <span class="alert alert-danger" role="alert">{{ error.message }}</span>
+              <span class="alert alert-danger" role="alert">{{ errorMessage(error) }}</span>
             </li>
           } @else if (childsResource.isLoading()) {
             <li class="ms-4">

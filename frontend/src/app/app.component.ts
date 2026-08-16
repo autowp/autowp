@@ -2,7 +2,7 @@ import type {Language} from '@services/language';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, DestroyRef, inject, Renderer2, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Renderer2, signal} from '@angular/core';
 import {rxResource, takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {environment} from '@environment/environment';
@@ -92,6 +92,14 @@ export class AppComponent {
         skipAuthMetadata(),
       ),
   });
+
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so a transient error here (this dropdown has no inline slot for an error
+  // message, unlike a page body) just leaves the categories dropdown empty instead of taking down
+  // the whole app shell.
+  protected readonly categoriesData = computed(() =>
+    this.categoriesResource.hasValue() ? this.categoriesResource.value() : undefined,
+  );
 
   protected readonly language: string = this.#languageService.language;
   protected readonly urlPath$ = this.router.events.pipe(

@@ -18,7 +18,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -80,8 +80,17 @@ export class CatalogueEnginesComponent {
     },
   });
 
+  // Reading a resource's value() while it's in an error state throws - dataResource's params()
+  // below reads brandResource's data through this signal instead of the resource directly, so a
+  // real (non-NOT_FOUND) failure here degrades dataResource to its "no data yet" branch instead of
+  // taking the whole component down. The error itself is shown inline in the template
+  // (engines.component.html), not swallowed here.
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
   protected readonly title = computed<string | undefined>(() => {
-    const brand = this.brandResource.hasValue() ? this.brandResource.value() : undefined;
+    const brand = this.brandData();
     return brand ? $localize`${brand.nameOnly} Engines` : undefined;
   });
 
@@ -106,7 +115,7 @@ export class CatalogueEnginesComponent {
 
   protected readonly dataResource = rxResource({
     id: `catalogue-engines-data-${this.#catname() ?? ''}`,
-    params: () => ({brand: this.brandResource.value(), page: this.#page()}),
+    params: () => ({brand: this.brandData(), page: this.#page()}),
     stream: ({
       params: {brand, page},
     }): Observable<undefined | {items: CatalogueListItem[]; paginator: Pages | undefined}> => {
@@ -207,4 +216,6 @@ export class CatalogueEnginesComponent {
         );
     },
   });
+
+  protected readonly errorMessage = errorMessage;
 }

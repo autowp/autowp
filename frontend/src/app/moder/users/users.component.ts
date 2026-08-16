@@ -9,6 +9,7 @@ import {UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -53,4 +54,6 @@ export class ModerUsersComponent implements OnInit {
       pageId: 203,
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

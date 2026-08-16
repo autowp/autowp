@@ -1,11 +1,11 @@
 @if (groupId(); as groupId) {
-  @if (childsResource.value(); as childs) {
+  @if (childsData(); as childs) {
     @for (item of childs.items; track item.id) {
       <app-twins-item [groupId]="groupId" [item]="item" />
     }
   }
 
-  @if (groupResource.value(); as group) {
+  @if (groupData(); as group) {
     @if (group.description) {
       <div>
         <h3 i18n>Description</h3>

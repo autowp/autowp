@@ -7,7 +7,7 @@
 }
 
 @if (itemParentsResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (itemParentsResource.value(); as itemParents) {
   @for (itemParent of itemParents.items; track itemParent) {
     @if (itemParent.item.item) {
@@ -18,12 +18,12 @@
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }
 
-@if (itemResource.value(); as item) {
+@if (itemData(); as item) {
   <app-categories-list-item [item]="item" [parentRouterLink]="currentRouterLinkPrefix() || []" />
 }
 
 @if (picturesResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (picturesResource.value(); as pictures) {
   @if (pictures.length > 0) {
     <div class="twins row">
@@ -63,7 +63,7 @@
 </span>
 </div>-->
 
-@if (itemParentsResource.value(); as itemParents) {
+@if (itemParentsData(); as itemParents) {
   @if (itemParents.paginator) {
     <app-paginator [data]="itemParents.paginator" />
   }

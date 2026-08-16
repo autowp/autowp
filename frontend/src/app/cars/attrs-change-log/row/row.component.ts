@@ -80,4 +80,15 @@ export class CarsAttrsChangeLogRowComponent implements OnInit {
       stream: ({params: userId}) => this.#userService.getUser$(userId),
     });
   }
+
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so a transient error in any of these cells (none of them have an inline
+  // error slot, unlike a page body) just leaves that cell empty instead of taking down the whole
+  // row's render.
+  protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
+  protected readonly pathData = computed(() => (this.pathResource.hasValue() ? this.pathResource.value() : undefined));
+  protected readonly unitAbbrData = computed(() =>
+    this.unitAbbrResource.hasValue() ? this.unitAbbrResource.value() : undefined,
+  );
+  protected readonly userData = computed(() => (this.userResource.hasValue() ? this.userResource.value() : undefined));
 }

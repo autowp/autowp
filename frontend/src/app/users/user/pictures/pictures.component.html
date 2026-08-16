@@ -16,23 +16,27 @@
 </div>
 
 @if (userResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (user(); as user) {
-  <div class="brand-icons row">
-    @for (brand of brandsResource.value(); track brand.id) {
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        @if (iconsResource.value(); as icons) {
-          <a
-            [routerLink]="['/users', user.identity, 'pictures', brand.catname]"
-            [class]="'brandicon brandicon-' + cssClass(brand)"
-            [style.background-image]="'url(' + icons.image + ')'"
-          ></a>
-        }
-        <h4>
-          <a [routerLink]="['/users', user.identity, 'pictures', brand.catname]">{{ brand.nameOnly }}</a>
-          <small>({{ brand.descendantPicturesCount }})</small>
-        </h4>
-      </div>
-    }
-  </div>
+  @if (brandsResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+  } @else {
+    <div class="brand-icons row">
+      @for (brand of brandsData() ?? []; track brand.id) {
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+          @if (iconsData(); as icons) {
+            <a
+              [routerLink]="['/users', user.identity, 'pictures', brand.catname]"
+              [class]="'brandicon brandicon-' + cssClass(brand)"
+              [style.background-image]="'url(' + icons.image + ')'"
+            ></a>
+          }
+          <h4>
+            <a [routerLink]="['/users', user.identity, 'pictures', brand.catname]">{{ brand.nameOnly }}</a>
+            <small>({{ brand.descendantPicturesCount }})</small>
+          </h4>
+        </div>
+      }
+    </div>
+  }
 }

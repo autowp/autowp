@@ -9,6 +9,7 @@ import {FormsModule} from '@angular/forms';
 import {ItemLink, ItemLinkListOptions, ItemLinkRequest, ItemLinksRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
+import {errorMessage} from 'app/grpc';
 import {catchError, forkJoin, map, of, tap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
@@ -123,4 +124,6 @@ export class ModerItemsItemLinksComponent implements OnInit {
       next: () => this.linksResource.reload(),
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

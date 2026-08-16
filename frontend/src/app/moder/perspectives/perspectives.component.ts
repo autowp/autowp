@@ -7,6 +7,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {getPerspectiveTranslation} from '@utils/translations';
+import {errorMessage} from 'app/grpc';
 
 @Component({
   selector: 'app-moder-perspectives',
@@ -34,4 +35,6 @@ export class ModerPerspectivesComponent implements OnInit {
   protected getPerspectiveTranslation(id: string): string {
     return getPerspectiveTranslation(id);
   }
+
+  protected readonly errorMessage = errorMessage;
 }

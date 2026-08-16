@@ -24,6 +24,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {requireRouteParent} from '@utils/require-route-parent';
+import {errorMessage} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {map, of} from 'rxjs';
 
@@ -61,7 +62,14 @@ export class CategoriesCategoryItemComponent {
     stream: () => this.#categoriesService.categoryPipe$(requireRouteParent(this.#route)),
   });
 
-  protected readonly current = computed(() => this.categoryDataResource.value()?.current);
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that; this resource's error has no dedicated slot in the template, so every
+  // consumer below just degrades to its "no data yet" branch (same as while still loading).
+  protected readonly categoryData = computed(() =>
+    this.categoryDataResource.hasValue() ? this.categoryDataResource.value() : undefined,
+  );
+
+  protected readonly current = computed(() => this.categoryData()?.current);
 
   readonly #page = toSignal(this.#route.queryParamMap.pipe(map((query) => parseInt(query.get('page') ?? '', 10))), {
     requireSync: true,
@@ -70,7 +78,7 @@ export class CategoriesCategoryItemComponent {
   protected readonly itemParentsResource = rxResource({
     id: 'categories-category-item-parents',
     params: () => {
-      const data = this.categoryDataResource.value();
+      const data = this.categoryData();
 
       return data?.current
         ? {category: data.category, current: data.current, page: this.#page(), pathCatnames: data.pathCatnames}
@@ -133,11 +141,16 @@ export class CategoriesCategoryItemComponent {
         ),
   });
 
+  // Same reasoning as categoryData above.
+  protected readonly itemParentsData = computed(() =>
+    this.itemParentsResource.hasValue() ? this.itemParentsResource.value() : undefined,
+  );
+
   protected readonly picturesResource = rxResource({
     id: 'categories-category-item-pictures',
     params: () => {
-      const data = this.categoryDataResource.value();
-      const itemParents = this.itemParentsResource.value();
+      const data = this.categoryData();
+      const itemParents = this.itemParentsData();
 
       return data?.current && itemParents
         ? {
@@ -184,7 +197,7 @@ export class CategoriesCategoryItemComponent {
   });
 
   protected readonly currentRouterLinkPrefix = computed(() => {
-    const data = this.categoryDataResource.value();
+    const data = this.categoryData();
     if (!data?.category || !data.current) {
       return null;
     }
@@ -199,8 +212,8 @@ export class CategoriesCategoryItemComponent {
   protected readonly itemResource = rxResource({
     id: 'categories-category-item-single',
     params: () => {
-      const data = this.categoryDataResource.value();
-      const itemParents = this.itemParentsResource.value();
+      const data = this.categoryData();
+      const itemParents = this.itemParentsData();
 
       return data?.current && itemParents
         ? {current: data.current, itemParentsCount: itemParents.items.length}
@@ -243,13 +256,18 @@ export class CategoriesCategoryItemComponent {
     },
   });
 
+  // Same reasoning as categoryData above.
+  protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
+
   constructor() {
     effect(() => {
-      const current = this.categoryDataResource.value()?.current;
+      const current = this.categoryData()?.current;
       this.#pageEnv.set({
         pageId: 22,
         title: current?.nameText ?? '',
       });
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

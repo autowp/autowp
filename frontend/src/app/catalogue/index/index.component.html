@@ -1,5 +1,5 @@
 @if (brandResource.error(); as error) {
-  <p class="alert alert-danger" role="alert">{{ error.message }}</p>
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (brandResource.value(); as brand) {
   <header class="mb-4">
     <div class="p-5 mb-4 rounded-3 brand-hero-unit clearfix">
@@ -99,7 +99,9 @@
     </ul>
   </header>
 
-  @if (sectionsResource.value(); as sections) {
+  @if (sectionsResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+  } @else if (sectionsResource.value(); as sections) {
     @for (section of sections; track section) {
       @if (section.halfChunks.length) {
         <div class="card mb-4">
@@ -138,7 +140,9 @@
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 
-  @if (factoriesResource.value(); as factories) {
+  @if (factoriesResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+  } @else if (factoriesResource.value(); as factories) {
     @if (factories.length) {
       <section>
         <h2 i18n>Factories</h2>
@@ -167,7 +171,9 @@
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 
-  @if (picturesResource.value(); as pictures) {
+  @if (picturesResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+  } @else if (picturesResource.value(); as pictures) {
     @if (pictures.length) {
       <section>
         <h2 i18n>Popular images</h2>
@@ -186,7 +192,9 @@
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 
-  @if (linksResource.value(); as links) {
+  @if (linksResource.error(); as error) {
+    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+  } @else if (linksResource.value(); as links) {
     @if (links.official.length + links.club.length + links.other.length > 0) {
       <section>
         <h2 i18n>Links</h2>

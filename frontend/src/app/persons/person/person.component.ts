@@ -7,7 +7,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {isNotFoundError, notFoundError} from 'app/grpc';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 @Component({
@@ -60,13 +60,19 @@ export class PersonsPersonComponent {
         return;
       }
 
-      const item = this.itemResource.value();
-      if (item) {
-        this.pageEnv.set({
-          pageId: 213,
-          title: item.nameText,
-        });
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that.
+      if (!this.itemResource.hasValue()) {
+        return;
       }
+
+      const item = this.itemResource.value();
+      this.pageEnv.set({
+        pageId: 213,
+        title: item.nameText,
+      });
     });
   }
+
+  protected readonly errorMessage = errorMessage;
 }

@@ -14,7 +14,7 @@ import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RecaptchaModule} from 'ng-recaptcha-2';
 import {RemarkModule} from 'ngx-remark';
 
-import {extractFieldViolations, fieldViolations2InvalidParams} from '../grpc';
+import {errorMessage, extractFieldViolations, fieldViolations2InvalidParams} from '../grpc';
 import {ToastsService} from '../toasts/toasts.service';
 
 const CAPTCHA = 'captcha';
@@ -107,4 +107,6 @@ export class FeedbackComponent implements OnInit {
       this.form.get(CAPTCHA)?.setValue(captchaResponse);
     }
   }
+
+  protected readonly errorMessage = errorMessage;
 }
