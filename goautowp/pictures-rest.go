@@ -262,7 +262,7 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 		ctxWithoutCancel,
 		handle,
 		userCtx.UserID,
-		ctx.RemoteIP(),
+		ctx.ClientIP(),
 		values.ItemID,
 		values.PerspectiveID,
 		values.ReplacePictureID,
@@ -300,7 +300,7 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 			0,
 			userCtx.UserID,
 			values.Comment,
-			ctx.RemoteIP(),
+			ctx.ClientIP(),
 			false,
 		)
 		if err != nil {
