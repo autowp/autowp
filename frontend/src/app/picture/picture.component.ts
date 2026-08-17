@@ -395,10 +395,17 @@ export class PictureComponent implements OnInit {
             typeId: CommentsType.PICTURES_TYPE_ID,
           }),
         )
-    ).subscribe(() => {
-      picture.subscribed = value;
-      this.#cdr.markForCheck();
-    });
+    )
+      .pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return EMPTY;
+        }),
+      )
+      .subscribe(() => {
+        picture.subscribed = value;
+        this.#cdr.markForCheck();
+      });
   }
 
   protected vote(picture: Picture, value: number) {
@@ -407,6 +414,12 @@ export class PictureComponent implements OnInit {
         new PicturesVoteRequest({
           pictureId: picture.id,
           value,
+        }),
+      )
+      .pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return EMPTY;
         }),
       )
       .subscribe((votes) => {

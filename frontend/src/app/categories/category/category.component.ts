@@ -12,6 +12,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {getItemTypeTranslation} from '@utils/translations';
 
+import {ToastsService} from '../../toasts/toasts.service';
 import {CategoriesService} from '../service';
 
 export interface CategoryPathItem {
@@ -35,6 +36,7 @@ export class CategoriesCategoryComponent {
   readonly #categoriesService = inject(CategoriesService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
+  readonly #toastService = inject(ToastsService);
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
   protected readonly canAddCar$ = this.#auth.hasRole$(Role.CARS_MODER);
@@ -111,13 +113,18 @@ export class CategoriesCategoryComponent {
             }),
           }),
         )
-        .subscribe((response) => {
-          item.loaded = true;
-          item.childs = (response.items ?? []).map((i) => ({
-            active: i.id === item.item.id,
-            nameHtml: i.nameHtml,
-            routerLink: ['/category', i.catname],
-          }));
+        .subscribe({
+          error: (error: unknown) => {
+            this.#toastService.handleError(error);
+          },
+          next: (response) => {
+            item.loaded = true;
+            item.childs = (response.items ?? []).map((i) => ({
+              active: i.id === item.item.id,
+              nameHtml: i.nameHtml,
+              routerLink: ['/category', i.catname],
+            }));
+          },
         });
     }
   }

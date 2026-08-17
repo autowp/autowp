@@ -156,13 +156,20 @@ export class UploadIndexComponent implements OnInit {
       if (!id) {
         return of(null);
       }
-      return this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({nameHtml: true}),
-          id,
-          language: this.#languageService.language,
-        }),
-      );
+      return this.#itemsClient
+        .item(
+          new ItemRequest({
+            fields: new ItemFields({nameHtml: true}),
+            id,
+            language: this.#languageService.language,
+          }),
+        )
+        .pipe(
+          catchError((response: unknown) => {
+            this.#toastService.handleError(response);
+            return of(null);
+          }),
+        );
     }),
   );
 

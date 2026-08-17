@@ -6,6 +6,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
+import {ToastsService} from 'app/toasts/toasts.service';
 
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
 
@@ -18,6 +19,7 @@ import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-t
 export class ModerPictureVoteTemplatesComponent implements OnInit {
   readonly #voteTemplateService = inject(APIPictureModerVoteTemplateService);
   readonly #pageEnv = inject(PageEnvService);
+  readonly #toastService = inject(ToastsService);
 
   protected readonly templates$ = this.#voteTemplateService.getTemplates$();
   protected vote = -1;
@@ -31,7 +33,11 @@ export class ModerPictureVoteTemplatesComponent implements OnInit {
   }
 
   protected deleteTemplate(template: ModerVoteTemplate) {
-    this.#voteTemplateService.deleteTemplate$(template.id).subscribe();
+    this.#voteTemplateService.deleteTemplate$(template.id).subscribe({
+      error: (error: unknown) => {
+        this.#toastService.handleError(error);
+      },
+    });
   }
 
   protected createTemplate() {
@@ -40,6 +46,10 @@ export class ModerPictureVoteTemplatesComponent implements OnInit {
         name: this.name,
         vote: this.vote,
       })
-      .subscribe();
+      .subscribe({
+        error: (error: unknown) => {
+          this.#toastService.handleError(error);
+        },
+      });
   }
 }

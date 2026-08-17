@@ -249,9 +249,14 @@ export class ModerItemsItemComponent {
           subscribed: newValue,
         }),
       )
-      .subscribe(() => {
-        item.subscription = newValue;
-        this.#cdr.markForCheck();
+      .subscribe({
+        error: (error: unknown) => {
+          this.#toastService.handleError(error);
+        },
+        next: () => {
+          item.subscription = newValue;
+          this.#cdr.markForCheck();
+        },
       });
   }
 

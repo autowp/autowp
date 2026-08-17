@@ -690,7 +690,12 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
       const promises: Observable<Empty>[] = [];
       for (const picture of pictures) {
         if (picture.id === id) {
-          const q$ = this.#moderVoteService.vote$(picture.id, vote, reason);
+          const q$ = this.#moderVoteService.vote$(picture.id, vote, reason).pipe(
+            catchError((err: unknown) => {
+              this.#toastService.handleError(err);
+              return EMPTY;
+            }),
+          );
           promises.push(q$);
         }
       }

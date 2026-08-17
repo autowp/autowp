@@ -23,6 +23,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
+import {ToastsService} from 'app/toasts/toasts.service';
 import {
   BehaviorSubject,
   combineLatest,
@@ -53,6 +54,7 @@ export class ModerItemsItemCatalogueComponent {
   readonly #auth = inject(AuthService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
+  readonly #toastService = inject(ToastsService);
 
   readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
@@ -189,9 +191,14 @@ export class ModerItemsItemCatalogueComponent {
           parentId: parentId,
         }),
       )
-      .subscribe(() => {
-        this.#reloadParents$.next();
-        this.#reloadSuggestions$.next();
+      .subscribe({
+        error: (error: unknown) => {
+          this.#toastService.handleError(error);
+        },
+        next: () => {
+          this.#reloadParents$.next();
+          this.#reloadSuggestions$.next();
+        },
       });
 
     return false;
@@ -205,10 +212,15 @@ export class ModerItemsItemCatalogueComponent {
           parentId: parentID,
         }),
       )
-      .subscribe(() => {
-        this.#reloadChilds$.next();
-        this.#reloadParents$.next();
-        this.#reloadSuggestions$.next();
+      .subscribe({
+        error: (error: unknown) => {
+          this.#toastService.handleError(error);
+        },
+        next: () => {
+          this.#reloadChilds$.next();
+          this.#reloadParents$.next();
+          this.#reloadSuggestions$.next();
+        },
       });
   }
 

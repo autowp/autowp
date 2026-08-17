@@ -17,10 +17,11 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {combineLatest, debounceTime, distinctUntilChanged, map, of, switchMap} from 'rxjs';
+import {catchError, combineLatest, debounceTime, distinctUntilChanged, map, of, switchMap} from 'rxjs';
 
 import {chunk} from '../../../chunk';
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
+import {ToastsService} from '../../../toasts/toasts.service';
 import {DonateVodSelectItemComponent} from './item/item.component';
 
 @Component({
@@ -35,6 +36,7 @@ export class DonateVodSelectComponent implements OnDestroy, OnInit {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
   readonly #cdr = inject(ChangeDetectorRef);
+  readonly #toastService = inject(ToastsService);
 
   #querySub?: Subscription;
   protected brands: Item[][] = [];
@@ -114,7 +116,15 @@ export class DonateVodSelectComponent implements OnDestroy, OnInit {
               ),
             )
           : of(null),
-      ]);
+      ]).pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return of([null, null] as [
+            ItemList | null,
+            null | {brand: Item; concepts: ItemParents; vehicles: ItemParents},
+          ]);
+        }),
+      );
     }),
     map(([items, brand]) => ({brand, items})),
   );

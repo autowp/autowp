@@ -62,17 +62,18 @@ export class ModerItemsItemLogoComponent {
       })
       .pipe(
         catchError((response: unknown) => {
-          if (response instanceof HttpErrorResponse) {
-            if (this.progress) {
-              this.progress.percentage = 100;
-              this.progress.failed = true;
+          if (this.progress) {
+            this.progress.percentage = 100;
+            this.progress.failed = true;
 
+            if (response instanceof HttpErrorResponse) {
               // HttpErrorResponse.error is `any` - the backend error body's shape is only known
               // by convention (an `invalid_params` field), not typed by Angular.
               const body = response.error as {invalid_params: InvalidParams};
               this.progress.invalidParams = body.invalid_params;
-              this.#cdr.markForCheck();
             }
+
+            this.#cdr.markForCheck();
           }
 
           return EMPTY;

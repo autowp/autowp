@@ -644,8 +644,16 @@ export class ModerPicturesItemComponent {
   protected removeFromBlacklist(ip: string) {
     this.#trafficClient
       .deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip}))
-      .subscribe(() => {
-        this.#change$.next();
+      .pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return EMPTY;
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.#change$.next();
+        },
       });
   }
 
@@ -660,8 +668,16 @@ export class ModerPicturesItemComponent {
           },
         }),
       )
-      .subscribe(() => {
-        this.#change$.next();
+      .pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return EMPTY;
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.#change$.next();
+        },
       });
   }
 

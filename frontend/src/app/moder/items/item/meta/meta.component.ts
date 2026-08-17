@@ -165,6 +165,10 @@ export class ModerItemsItemMetaComponent implements OnInit {
       complete: () => {
         this.loadingNumber.set(false);
       },
+      error: (error: unknown) => {
+        this.loadingNumber.set(false);
+        this.#toastService.handleError(error);
+      },
     });
   }
 }

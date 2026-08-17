@@ -28,6 +28,7 @@ import {map, shareReplay} from 'rxjs';
 
 import {MenuComponent} from './moder/menu/menu/menu.component';
 import {ContainerComponent} from './toasts/container/container.component';
+import {ToastsService} from './toasts/toasts.service';
 import {UsersOnlineComponent} from './users/online/online.component';
 
 @Component({
@@ -54,6 +55,7 @@ export class AppComponent {
   readonly #auth = inject(AuthService);
   protected readonly router = inject(Router);
   readonly #messageService = inject(MessageService);
+  readonly #toastService = inject(ToastsService);
   protected readonly pageEnv = inject(PageEnvService);
   readonly #languageService = inject(LanguageService);
   readonly #modalService = inject(NgbModal);
@@ -147,7 +149,7 @@ export class AppComponent {
   protected signOut() {
     this.#auth.signOut$().subscribe({
       error: (error: unknown) => {
-        console.error(error);
+        this.#toastService.handleError(error);
       },
     });
 

@@ -8,6 +8,7 @@ import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbModal} from '@ng-boo
 import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {UserService} from '@services/user';
 import {getModalComponentRef} from '@utils/modal-component-ref';
+import {ToastsService} from 'app/toasts/toasts.service';
 import {catchError, map, of} from 'rxjs';
 
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
@@ -26,6 +27,7 @@ export class PictureModerVoteComponent implements OnInit {
   readonly #modalService = inject(NgbModal);
   readonly #userService = inject(UserService);
   readonly #injector = inject(Injector);
+  readonly #toastService = inject(ToastsService);
 
   readonly picture = input.required<Picture>();
 
@@ -90,14 +92,24 @@ export class PictureModerVoteComponent implements OnInit {
   }
 
   protected votePicture(picture: Picture, vote: number, reason: string): void {
-    this.#moderVoteService.vote$(picture.id, vote, reason).subscribe(() => {
-      this.changed.emit(void 0);
+    this.#moderVoteService.vote$(picture.id, vote, reason).subscribe({
+      error: (error: unknown) => {
+        this.#toastService.handleError(error);
+      },
+      next: () => {
+        this.changed.emit(void 0);
+      },
     });
   }
 
   protected cancelVotePicture(picture: Picture): void {
-    this.#moderVoteService.cancel$(picture.id).subscribe(() => {
-      this.changed.emit(void 0);
+    this.#moderVoteService.cancel$(picture.id).subscribe({
+      error: (error: unknown) => {
+        this.#toastService.handleError(error);
+      },
+      next: () => {
+        this.changed.emit(void 0);
+      },
     });
   }
 

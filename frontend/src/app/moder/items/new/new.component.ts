@@ -163,7 +163,14 @@ export class ModerItemsNewComponent {
           );
         }),
       )
-      .subscribe();
+      .subscribe({
+        // The item itself was already created by this point (createItem succeeded above) - a
+        // failure here is in the follow-up parent/vehicle-type linking or the navigate, so there's
+        // nothing to undo, just surface it instead of silently not-navigating.
+        error: (error: unknown) => {
+          this.#toastService.handleError(error);
+        },
+      });
   }
 
   protected readonly formParams$: Observable<{

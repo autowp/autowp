@@ -14,6 +14,7 @@ import {TrafficClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {IpService} from '@services/ip';
 import {PageEnvService} from '@services/page-env.service';
+import {ToastsService} from 'app/toasts/toasts.service';
 import {BehaviorSubject, map, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
@@ -33,6 +34,7 @@ export class ModerTrafficComponent implements OnInit {
   readonly #trafficClient = inject(TrafficClient);
   readonly #ipService = inject(IpService);
   readonly #pageEnv = inject(PageEnvService);
+  readonly #toastService = inject(ToastsService);
 
   readonly #change$ = new BehaviorSubject<void>(void 0);
 
@@ -56,8 +58,13 @@ export class ModerTrafficComponent implements OnInit {
   protected addToWhitelist(ip: string) {
     this.#trafficClient
       .createTrafficWhitelistItem(new CreateTrafficWhitelistItemRequest({item: {ipAddress: ip, description: ''}}))
-      .subscribe(() => {
-        this.#change$.next();
+      .subscribe({
+        error: (error: unknown) => {
+          this.#toastService.handleError(error);
+        },
+        next: () => {
+          this.#change$.next();
+        },
       });
   }
 
@@ -72,16 +79,24 @@ export class ModerTrafficComponent implements OnInit {
           },
         }),
       )
-      .subscribe(() => {
-        this.#change$.next();
+      .subscribe({
+        error: (error: unknown) => {
+          this.#toastService.handleError(error);
+        },
+        next: () => {
+          this.#change$.next();
+        },
       });
   }
 
   protected removeFromBlacklist(ip: string) {
-    this.#trafficClient
-      .deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip}))
-      .subscribe(() => {
+    this.#trafficClient.deleteTrafficBlacklistItem(new DeleteTrafficBlacklistItemRequest({ipAddress: ip})).subscribe({
+      error: (error: unknown) => {
+        this.#toastService.handleError(error);
+      },
+      next: () => {
         this.#change$.next();
-      });
+      },
+    });
   }
 }

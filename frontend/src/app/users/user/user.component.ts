@@ -268,29 +268,47 @@ export class UsersUserComponent {
 
   protected setInContacts(user: User, value: boolean) {
     if (value) {
-      this.#contactsClient
-        .createContact(new CreateContactRequest({contact: {contactUserId: user.id}}))
-        .subscribe(() => {
+      this.#contactsClient.createContact(new CreateContactRequest({contact: {contactUserId: user.id}})).subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: () => {
           this.inContactsResource.reload();
-        });
+        },
+      });
       return;
     }
 
-    this.#contactsClient.deleteContact(new DeleteContactRequest({userId: user.id})).subscribe(() => {
-      this.inContactsResource.reload();
+    this.#contactsClient.deleteContact(new DeleteContactRequest({userId: user.id})).subscribe({
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
+      next: () => {
+        this.inContactsResource.reload();
+      },
     });
   }
 
   protected setCommentNotificationsDisabled(user: User, value: boolean) {
     if (value) {
-      this.#usersGrpc.disableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe(() => {
-        this.disableCommentsNotificationsResource.reload();
+      this.#usersGrpc.disableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: () => {
+          this.disableCommentsNotificationsResource.reload();
+        },
       });
       return;
     }
 
-    this.#usersGrpc.enableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe(() => {
-      this.disableCommentsNotificationsResource.reload();
+    this.#usersGrpc.enableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe({
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
+      next: () => {
+        this.disableCommentsNotificationsResource.reload();
+      },
     });
   }
 
