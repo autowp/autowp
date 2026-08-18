@@ -172,8 +172,14 @@ export class CatalogueCarsComponent {
     });
   }
 
+  // `id` is suffixed with the vehicle-type catname as well as the brand: `/:brand/cars` and
+  // `/:brand/cars/:vehicle_type` are sibling route configs sharing this component, so switching
+  // between them destroys and recreates the instance. Without the vehicle type in the key, the
+  // new instance would match the TransferState entry the previous one's SSR pass wrote and seed
+  // itself with the wrong (unfiltered, or differently-filtered) list - and stick with it, since
+  // params() never changes afterwards.
   protected readonly resultResource = rxResource({
-    id: `catalogue-cars-result-${this.#catname() ?? ''}`,
+    id: `catalogue-cars-result-${this.#catname() ?? ''}-${this.vehicleTypeCatname() ?? ''}`,
     params: () => ({
       brand: this.brandData(),
       currentVehicleType: this.currentVehicleType(),

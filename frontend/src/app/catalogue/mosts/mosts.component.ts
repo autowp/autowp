@@ -90,9 +90,12 @@ export class CatalogueMostsComponent {
 
       const brand = this.brandData();
       if (brand) {
+        // pageId 21 is the mosts page - matching MostsContentsComponent's own effect, which runs
+        // after this one (it's a child component) and would otherwise leave the two disagreeing.
+        // That child sets no title, so the title set here is the one that reaches the document.
         this.#pageEnv.set({
-          pageId: 208,
-          title: $localize`${brand.nameText} Engines`,
+          pageId: 21,
+          title: $localize`${brand.nameText} Mostly`,
         });
       }
     });

@@ -115,8 +115,14 @@ export class CatalogueVehiclesPicturesComponent {
     return item ?? undefined;
   });
 
+  // `id` includes `exact` on top of the brand/path/type route params: `.../pictures` and
+  // `.../exact/pictures` are sibling route configs sharing this component (so switching between
+  // them - e.g. via the "all pictures" link on the vehicle page - recreates the instance), and
+  // `exact` materially changes the query below (itemId vs itemParentCacheAncestor). Without it the
+  // new instance would seed from the other variant's TransferState entry and stick with it, since
+  // params() never changes afterwards.
   protected readonly picturesResource = rxResource({
-    id: `catalogue-vehicles-pictures-list-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
+    id: `catalogue-vehicles-pictures-list-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}-${this.#exact() ? 'exact' : ''}`,
     params: () => {
       const item = this.item();
       return item ? {exact: this.#exact(), item, page: this.#page()} : undefined;
