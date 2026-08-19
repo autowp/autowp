@@ -3,7 +3,7 @@ import type {Image, Item} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DOCUMENT} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse, HttpEventType} from '@angular/common/http';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal, viewChild} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -29,6 +29,7 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {browserWindow} from '@utils/browser-window';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
@@ -101,7 +102,7 @@ export class UploadIndexComponent implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #cdr = inject(ChangeDetectorRef);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   protected files: File[] | undefined;
   protected readonly note = new FormControl<string>('', {nonNullable: true});
@@ -187,7 +188,7 @@ export class UploadIndexComponent implements OnInit {
   protected doLogin() {
     void this.#keycloak.login({
       locale: this.#languageService.language,
-      redirectUri: this.#document.defaultView?.location.href,
+      redirectUri: this.#window?.location.href,
     });
   }
 

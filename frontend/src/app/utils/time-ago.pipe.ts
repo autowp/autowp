@@ -1,8 +1,8 @@
 import type {OnDestroy, PipeTransform} from '@angular/core';
 
-import {DOCUMENT} from '@angular/common';
 import {ChangeDetectorRef, inject, NgZone, Pipe} from '@angular/core';
 import {LanguageService} from '@services/language';
+import {browserWindow} from '@utils/browser-window';
 
 const is = (interval: number, cycle: number) => (Math.abs(cycle) >= interval ? Math.round(cycle / interval) : 0);
 
@@ -16,7 +16,7 @@ export class TimeAgoPipe implements OnDestroy, PipeTransform {
   readonly #cdRef = inject(ChangeDetectorRef);
   readonly #ngZone = inject(NgZone);
   readonly #languageService = inject(LanguageService);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   #currentTimer: null | number = null;
   #lastTime: null | number = null;
@@ -102,8 +102,8 @@ export class TimeAgoPipe implements OnDestroy, PipeTransform {
     if (this.#lastValue) {
       const timeToUpdate = this.getSecondsUntilUpdate(this.#lastValue) * 1000;
       this.#currentTimer = this.#ngZone.runOutsideAngular(() => {
-        if (this.#document.defaultView) {
-          return this.#document.defaultView.setTimeout(() => {
+        if (this.#window) {
+          return this.#window.setTimeout(() => {
             if (this.#lastValue) {
               this.#lastText = this.format(this.#lastValue);
             }
@@ -122,7 +122,7 @@ export class TimeAgoPipe implements OnDestroy, PipeTransform {
 
   private removeTimer() {
     if (this.#currentTimer) {
-      this.#document.defaultView?.clearTimeout(this.#currentTimer);
+      this.#window?.clearTimeout(this.#currentTimer);
       this.#currentTimer = null;
     }
   }

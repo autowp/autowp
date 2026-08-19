@@ -66,6 +66,11 @@ export default defineConfig([
           selector:
             "CallExpression[callee.name='rxResource'] :matches(Property[key.name='stream'], Property[key.name='loader']) Property[key.name=/\\$$/]",
         },
+        {
+          message:
+            "Do not read DOCUMENT.defaultView - it is not a browser check. @angular/platform-server builds its document with domino's createWindow(), so defaultView is a truthy, partially-implemented Window during SSR (working location/setTimeout, but no localStorage/open/confirm/innerHeight). Use browserWindow() from '@utils/browser-window', which returns null on the server.",
+          selector: "MemberExpression[property.name='defaultView']",
+        },
       ],
       '@typescript-eslint/prefer-readonly': 'error',
       // Angular's own Validators.required/Validators.maxLength(...)/etc are static methods passed

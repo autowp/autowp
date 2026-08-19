@@ -2,7 +2,7 @@ import type {OnInit} from '@angular/core';
 import type {Item, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DOCUMENT, formatDate} from '@angular/common';
+import {AsyncPipe, formatDate} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, LOCALE_ID} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {ItemFields, ItemRequest} from '@grpc/spec.pb';
@@ -10,6 +10,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {browserWindow} from '@utils/browser-window';
 import {timestampToDate} from '@utils/timestamp';
 import {RemarkModule} from 'ngx-remark';
 import {combineLatest, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap} from 'rxjs';
@@ -34,7 +35,7 @@ export class DonateVodComponent implements OnInit {
   protected readonly locale = inject(LOCALE_ID);
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   readonly #user$ = this.auth.user$;
 
@@ -135,7 +136,7 @@ export class DonateVodComponent implements OnInit {
         {name: 'targets', value: $localize`Order ${label}`},
         {
           name: 'successURL',
-          value: 'https://' + (this.#document.defaultView?.location.host ?? '') + '/donate/vod/success',
+          value: 'https://' + (this.#window?.location.host ?? '') + '/donate/vod/success',
         },
       ];
     }),

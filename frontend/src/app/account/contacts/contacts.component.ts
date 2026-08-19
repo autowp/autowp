@@ -2,7 +2,7 @@ import type {OnInit} from '@angular/core';
 import type {Contact} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
+import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {DeleteContactRequest} from '@grpc/spec.pb';
@@ -12,6 +12,7 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {browserWindow} from '@utils/browser-window';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import Keycloak from 'keycloak-js';
 import {BehaviorSubject, catchError, EMPTY, map, of, switchMap} from 'rxjs';
@@ -32,17 +33,17 @@ export class AccountContactsComponent implements OnInit {
   readonly #contactsClient = inject(ContactsClient);
   readonly #languageService = inject(LanguageService);
   readonly #keycloak = inject(Keycloak);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   readonly #reload$ = new BehaviorSubject<void>(void 0);
 
   protected readonly items$: Observable<Contact[]> = this.#auth.authenticated$.pipe(
     switchMap((authenticated) => {
       if (!authenticated) {
-        if (this.#document.defaultView) {
+        if (this.#window) {
           void this.#keycloak.login({
             locale: this.#languageService.language,
-            redirectUri: this.#document.defaultView.location.href,
+            redirectUri: this.#window.location.href,
           });
         }
         return EMPTY;

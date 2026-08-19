@@ -2,7 +2,7 @@ import type {OnInit} from '@angular/core';
 import type {Inbox, PicturesList} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
+import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -20,6 +20,7 @@ import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {formatGrpcDate, parseGrpcDate, parseStringToGrpcDate} from '@services/utils';
+import {browserWindow} from '@utils/browser-window';
 import Keycloak from 'keycloak-js';
 import {catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
@@ -50,15 +51,15 @@ export class InboxComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #picturesClient = inject(PicturesClient);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   protected readonly inbox$: Observable<InboxData> = this.#auth.authenticated$.pipe(
     switchMap((authenticated) => {
       if (!authenticated) {
-        if (this.#document.defaultView) {
+        if (this.#window) {
           void this.#keycloak.login({
             locale: this.#languageService.language,
-            redirectUri: this.#document.defaultView.location.href,
+            redirectUri: this.#window.location.href,
           });
         }
         return EMPTY;

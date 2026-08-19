@@ -1,7 +1,7 @@
 import type {Observable} from 'rxjs';
 
-import {DOCUMENT, isPlatformBrowser} from '@angular/common';
-import {inject, PLATFORM_ID, Service} from '@angular/core';
+import {Service} from '@angular/core';
+import {browserWindow} from '@utils/browser-window';
 import {defer, EMPTY, map, repeat, retry, share} from 'rxjs';
 import {webSocket} from 'rxjs/webSocket';
 
@@ -13,16 +13,13 @@ const RECONNECT_DELAY_MS = 3000;
 // needs no auth — accepted pictures are public information, visible to every visitor.
 @Service()
 export class PicturesWebSocketService {
-  readonly #document = inject(DOCUMENT);
-  readonly #platformId = inject(PLATFORM_ID);
+  readonly #window = browserWindow();
 
-  public readonly pictureAccepted$: Observable<void> = isPlatformBrowser(this.#platformId)
-    ? this.#connect$().pipe(share())
-    : EMPTY;
+  public readonly pictureAccepted$: Observable<void> = this.#window ? this.#connect$().pipe(share()) : EMPTY;
 
   #connect$(): Observable<void> {
     return defer(() => {
-      const location = this.#document.defaultView?.location;
+      const location = this.#window?.location;
 
       if (!location) {
         return EMPTY;

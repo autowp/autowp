@@ -1,7 +1,7 @@
 import type {DfDistance, IP, Item, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
+import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -43,6 +43,7 @@ import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
+import {browserWindow} from '@utils/browser-window';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {isNotFoundError} from 'app/grpc';
 import {MarkdownEditComponent} from 'app/markdown-edit/markdown-edit/markdown-edit.component';
@@ -107,8 +108,8 @@ export class ModerPicturesItemComponent {
   readonly #userService = inject(UserService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
-  readonly #document = inject(DOCUMENT);
   readonly #trafficClient = inject(TrafficClient);
+  readonly #window = browserWindow();
 
   protected readonly replaceLoading = signal(false);
   protected readonly pictureItemLoading = signal(false);
@@ -214,7 +215,7 @@ export class ModerPicturesItemComponent {
 
   protected readonly lastItem$: Observable<LastItemInfo> = this.picture$.pipe(
     switchMap((picture) => {
-      const localStorage = this.#document.defaultView?.localStorage;
+      const localStorage = this.#window?.localStorage;
       if (!localStorage) {
         return of({hasItem: false, item: null});
       }

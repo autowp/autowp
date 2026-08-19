@@ -2,11 +2,12 @@ import type {OnDestroy, OnInit} from '@angular/core';
 import type {Picture} from '@grpc/spec.pb';
 import type {Subscription} from 'rxjs';
 
-import {AsyncPipe, DOCUMENT} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {Image} from '@grpc/spec.pb';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {browserWindow} from '@utils/browser-window';
 import {BehaviorSubject, combineLatest} from 'rxjs';
 
 import type {JcropCrop, JcropInstance} from '../../jcrop/jquery.Jcrop';
@@ -23,7 +24,7 @@ import Jcrop from '../../jcrop/jquery.Jcrop';
 export class UploadCropComponent implements OnDestroy, OnInit {
   protected readonly activeModal = inject(NgbActiveModal);
   readonly #cdr = inject(ChangeDetectorRef);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   readonly changed = output();
 
@@ -70,7 +71,7 @@ export class UploadCropComponent implements OnDestroy, OnInit {
           };
         }
 
-        const styles = this.#document.defaultView?.getComputedStyle(body, null);
+        const styles = this.#window?.getComputedStyle(body, null);
         const bWidth =
           body.clientWidth - parseFloat(styles?.paddingLeft ?? '0') - parseFloat(styles?.paddingRight ?? '0') || 1;
 

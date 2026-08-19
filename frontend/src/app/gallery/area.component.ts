@@ -1,9 +1,10 @@
 import type {AfterViewInit} from '@angular/core';
 import type {PictureItem} from '@grpc/spec.pb';
 
-import {DOCUMENT, NgStyle} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, input, signal} from '@angular/core';
+import {NgStyle} from '@angular/common';
+import {ChangeDetectionStrategy, Component, computed, input, signal} from '@angular/core';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {browserWindow} from '@utils/browser-window';
 
 @Component({
   selector: 'app-gallery-carousel-item-area',
@@ -16,7 +17,7 @@ import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
   },
 })
 export class AreaComponent implements AfterViewInit {
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   readonly styles = input.required<Record<string, number> | undefined>({});
   readonly area = input.required<PictureItem>();
@@ -39,6 +40,6 @@ export class AreaComponent implements AfterViewInit {
   }
 
   protected onResize() {
-    this.#windowHeight.set(this.#document.defaultView?.innerHeight ?? 0);
+    this.#windowHeight.set(this.#window?.innerHeight ?? 0);
   }
 }

@@ -1,6 +1,6 @@
 import type {User} from '@grpc/spec.pb';
 
-import {AsyncPipe, DatePipe, DOCUMENT} from '@angular/common';
+import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
@@ -36,6 +36,7 @@ import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
+import {browserWindow} from '@utils/browser-window';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getAchievementDescriptionTranslation, getAchievementTranslation} from '@utils/translations';
@@ -69,8 +70,8 @@ export class UsersUserComponent {
   readonly #commentsClient = inject(CommentsClient);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
-  readonly #document = inject(DOCUMENT);
   readonly #achievementsClient = inject(AchievementsClient);
+  readonly #window = browserWindow();
 
   protected readonly banPeriods = [
     {name: $localize`hour`, value: 1},
@@ -313,7 +314,7 @@ export class UsersUserComponent {
   }
 
   protected deletePhoto(user: User) {
-    if (!this.#document.defaultView?.confirm('Are you sure?')) {
+    if (!this.#window?.confirm('Are you sure?')) {
       return;
     }
 
@@ -328,7 +329,7 @@ export class UsersUserComponent {
   }
 
   protected deleteUser(user: User) {
-    if (!this.#document.defaultView?.confirm('Are you sure?')) {
+    if (!this.#window?.confirm('Are you sure?')) {
       return;
     }
     this.#usersGrpc

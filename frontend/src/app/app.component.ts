@@ -21,6 +21,7 @@ import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
+import {browserWindow} from '@utils/browser-window';
 import {Angulartics2GoogleAnalytics} from 'angulartics2';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
@@ -64,6 +65,7 @@ export class AppComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #document = inject(DOCUMENT);
   readonly #destroyRef = inject(DestroyRef);
+  readonly #window = browserWindow();
 
   protected readonly languages: Language[] = environment.languages;
   protected readonly authenticated$: Observable<boolean> = this.#auth.authenticated$;
@@ -138,10 +140,10 @@ export class AppComponent {
   }
 
   protected doLogin() {
-    if (this.#document.defaultView) {
+    if (this.#window) {
       void this.#keycloak.login({
         locale: this.#languageService.language,
-        redirectUri: this.#document.defaultView.location.href,
+        redirectUri: this.#window.location.href,
       });
     }
   }

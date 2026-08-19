@@ -1,7 +1,7 @@
 import type {Observable} from 'rxjs';
 
-import {DOCUMENT, isPlatformBrowser} from '@angular/common';
-import {inject, PLATFORM_ID, Service} from '@angular/core';
+import {inject, Service} from '@angular/core';
+import {browserWindow} from '@utils/browser-window';
 import Keycloak from 'keycloak-js';
 import {defer, EMPTY, map, repeat, retry, share, startWith, switchMap} from 'rxjs';
 import {webSocket} from 'rxjs/webSocket';
@@ -22,12 +22,11 @@ const RECONNECT_DELAY_MS = 3000;
 export class MessagingWebSocketService {
   readonly #auth = inject(AuthService);
   readonly #keycloak = inject(Keycloak);
-  readonly #document = inject(DOCUMENT);
-  readonly #platformId = inject(PLATFORM_ID);
+  readonly #window = browserWindow();
 
   public readonly messagesChanged$: Observable<void> = this.#auth.authenticated$.pipe(
     switchMap((authenticated) => {
-      if (!authenticated || !isPlatformBrowser(this.#platformId)) {
+      if (!authenticated || !this.#window) {
         return EMPTY;
       }
 
@@ -39,7 +38,7 @@ export class MessagingWebSocketService {
 
   #connect$(): Observable<void> {
     return defer(() => {
-      const location = this.#document.defaultView?.location;
+      const location = this.#window?.location;
       const token = this.#keycloak.token;
 
       if (!location || !token) {

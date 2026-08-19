@@ -1,11 +1,11 @@
 import type {User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {DOCUMENT} from '@angular/common';
 import {inject, Service} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {MeRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
+import {browserWindow} from '@utils/browser-window';
 import {KEYCLOAK_EVENT_SIGNAL, KeycloakEventType} from 'keycloak-angular';
 import Keycloak from 'keycloak-js';
 import {catchError, distinctUntilChanged, filter, from, map, of, shareReplay, switchMap} from 'rxjs';
@@ -25,8 +25,8 @@ export enum Role {
 export class AuthService {
   readonly #keycloak = inject(Keycloak);
   readonly #usersClient = inject(UsersClient);
-  readonly #document = inject(DOCUMENT);
   readonly #keycloakSignal = inject(KEYCLOAK_EVENT_SIGNAL);
+  readonly #window = browserWindow();
 
   readonly #token$ = toObservable(this.#keycloakSignal).pipe(
     filter((event) =>
@@ -78,7 +78,7 @@ export class AuthService {
   );
 
   public signOut$(): Observable<void> {
-    return from(this.#keycloak.logout({redirectUri: this.#document.defaultView?.location.href}));
+    return from(this.#keycloak.logout({redirectUri: this.#window?.location.href}));
   }
 
   public hasRole$(role: Role): Observable<boolean> {

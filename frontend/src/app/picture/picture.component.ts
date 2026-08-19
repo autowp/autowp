@@ -2,7 +2,7 @@ import type {OnInit, ResourceRef} from '@angular/core';
 import type {Item, ItemLink, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {DatePipe, DecimalPipe, DOCUMENT} from '@angular/common';
+import {DatePipe, DecimalPipe} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -47,6 +47,7 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
+import {browserWindow} from '@utils/browser-window';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
@@ -95,8 +96,8 @@ export class PictureComponent implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
   readonly #cdr = inject(ChangeDetectorRef);
-  readonly #document = inject(DOCUMENT);
   readonly #injector = inject(Injector);
+  readonly #window = browserWindow();
 
   readonly prefix = input.required<string[]>();
   readonly galleryRoute = input.required<string[]>();
@@ -169,7 +170,7 @@ export class PictureComponent implements OnInit {
   protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER), {initialValue: false});
   protected readonly authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
   protected readonly showShareDialog = signal(false);
-  protected readonly location = this.#document.defaultView?.location;
+  protected readonly location = this.#window?.location;
   protected readonly statusLoading = signal(false);
 
   constructor() {
@@ -430,8 +431,8 @@ export class PictureComponent implements OnInit {
   }
 
   protected openSource(picture: Picture) {
-    if (picture.image && this.#document.defaultView) {
-      this.#document.defaultView.open(picture.image.src);
+    if (picture.image && this.#window) {
+      this.#window.open(picture.image.src);
     }
   }
 

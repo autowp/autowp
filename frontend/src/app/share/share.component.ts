@@ -1,6 +1,6 @@
-import {DOCUMENT} from '@angular/common';
 import {HttpParams} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {browserWindow} from '@utils/browser-window';
 
 @Component({
   selector: 'app-share',
@@ -10,7 +10,7 @@ import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShareComponent {
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   readonly url = input.required<string>();
   readonly text = input.required<string>();
@@ -25,8 +25,8 @@ export class ShareComponent {
   }
 
   protected share(href: string) {
-    if (this.#document.defaultView) {
-      this.#document.defaultView.open(
+    if (this.#window) {
+      this.#window.open(
         href,
         undefined,
         'height=600,width=600,resizable=yes,scrollbars=no,status=no,toolbar=no,location=no,directories=no',

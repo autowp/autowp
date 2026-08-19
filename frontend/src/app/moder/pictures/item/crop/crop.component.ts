@@ -1,7 +1,6 @@
 import type {OnDestroy, OnInit} from '@angular/core';
 import type {Subscription} from 'rxjs';
 
-import {DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -15,6 +14,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {browserWindow} from '@utils/browser-window';
 import {BehaviorSubject, catchError, debounceTime, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
 import type {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/jquery.Jcrop.js';
@@ -35,7 +35,7 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
   readonly #cdr = inject(ChangeDetectorRef);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   #routeSub?: Subscription;
   protected aspect = '';
@@ -97,7 +97,7 @@ export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
             };
           }
 
-          const styles = this.#document.defaultView?.getComputedStyle(body, null);
+          const styles = this.#window?.getComputedStyle(body, null);
           const bWidth =
             body.clientWidth - parseFloat(styles?.paddingLeft ?? '0') - parseFloat(styles?.paddingRight ?? '0') || 1;
 

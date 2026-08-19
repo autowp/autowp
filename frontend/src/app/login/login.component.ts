@@ -1,8 +1,8 @@
 import type {OnInit} from '@angular/core';
 
-import {DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {LanguageService} from '@services/language';
+import {browserWindow} from '@utils/browser-window';
 import Keycloak from 'keycloak-js';
 
 @Component({
@@ -15,13 +15,13 @@ import Keycloak from 'keycloak-js';
 export class LoginComponent implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #keycloak = inject(Keycloak);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   ngOnInit(): void {
-    if (this.#document.defaultView) {
+    if (this.#window) {
       void this.#keycloak.login({
         locale: this.#languageService.language,
-        redirectUri: this.#document.defaultView.location.href,
+        redirectUri: this.#window.location.href,
       });
     }
   }

@@ -3,7 +3,6 @@ import type {PictureItem} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
-import {DOCUMENT} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -24,6 +23,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {ItemService} from '@services/item';
 import {PageEnvService} from '@services/page-env.service';
+import {browserWindow} from '@utils/browser-window';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, EMPTY, forkJoin, map, of, switchMap} from 'rxjs';
@@ -48,7 +48,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   protected readonly loading = signal(false);
   protected readonly invalidParams = signal<InvalidParams>({});
@@ -235,7 +235,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
       )
       .subscribe((item) => {
         this.loading.set(false);
-        this.#document.defaultView?.localStorage.setItem('last_item', item.id);
+        this.#window?.localStorage.setItem('last_item', item.id);
         void this.#router.navigate(['/moder/items/item', item.id], {
           queryParams: {
             tab: 'pictures',

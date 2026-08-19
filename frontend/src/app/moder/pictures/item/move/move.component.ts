@@ -2,7 +2,7 @@ import type {OnInit} from '@angular/core';
 import type {Item, ItemParent, Pages} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DOCUMENT} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -25,6 +25,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {browserWindow} from '@utils/browser-window';
 import {
   catchError,
   combineLatest,
@@ -79,7 +80,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   protected readonly conceptsExpanded = signal(false);
 
@@ -461,7 +462,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
           }),
         )
         .subscribe(() => {
-          this.#document.defaultView?.localStorage.setItem('last_item', dstItemID);
+          this.#window?.localStorage.setItem('last_item', dstItemID);
           void this.#router.navigate(['/moder/pictures', id]);
         });
     } else {
@@ -481,7 +482,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
           }),
         )
         .subscribe(() => {
-          this.#document.defaultView?.localStorage.setItem('last_item', dstItemID);
+          this.#window?.localStorage.setItem('last_item', dstItemID);
           void this.#router.navigate(['/moder/pictures', id]);
         });
     }

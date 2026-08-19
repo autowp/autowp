@@ -3,7 +3,7 @@ import type {Item} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DOCUMENT} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -22,6 +22,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {allowedItemTypeCombinations, ItemService} from '@services/item';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {browserWindow} from '@utils/browser-window';
 import {RemarkModule} from 'ngx-remark';
 import {
   catchError,
@@ -56,7 +57,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #toastService = inject(ToastsService);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   protected readonly loading = signal(false);
   protected readonly invalidParams = signal<InvalidParams>({});
@@ -249,7 +250,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
         },
         next: () => {
           this.loading.set(false);
-          this.#document.defaultView?.localStorage.setItem('last_item', item.id);
+          this.#window?.localStorage.setItem('last_item', item.id);
           void this.#router.navigate(['/moder/items/item', item.id], {
             queryParams: {
               tab: 'catalogue',

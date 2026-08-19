@@ -2,7 +2,7 @@ import type {ElementRef, OnInit} from '@angular/core';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DOCUMENT} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -15,6 +15,7 @@ import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {TimezoneService} from '@services/timezone';
+import {browserWindow} from '@utils/browser-window';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
@@ -43,7 +44,7 @@ export class AccountProfileComponent implements OnInit {
   readonly #timezone = inject(TimezoneService);
   readonly #toastService = inject(ToastsService);
   readonly #usersClient = inject(UsersClient);
-  readonly #document = inject(DOCUMENT);
+  readonly #window = browserWindow();
 
   protected readonly settingsInvalidParams = signal<InvalidParams>({});
   protected readonly photoInvalidParams = signal<InvalidParams>({});
@@ -65,10 +66,10 @@ export class AccountProfileComponent implements OnInit {
   protected readonly user$ = combineLatest([this.#auth.user$, this.#reload$]).pipe(
     switchMap(([user]) => {
       if (!user) {
-        if (this.#document.defaultView) {
+        if (this.#window) {
           void this.#keycloak.login({
             locale: this.#languageService.language,
-            redirectUri: this.#document.defaultView.location.href,
+            redirectUri: this.#window.location.href,
           });
         }
         return EMPTY;
