@@ -54,7 +54,15 @@ export class PersonsComponent implements OnInit {
 
   protected readonly charGroupsResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'persons-char-groups',
+    //
+    // `id` is suffixed with the authors flag (read once at construction time, off route data):
+    // /persons and /persons/authors are two sibling route configs on this component (see
+    // persons-routing.module.ts), linked to each other by the tabs in this component's own
+    // template, so switching between them destroys and recreates the instance. With a static id
+    // the new instance would match the TransferState entry the previous one's SSR pass wrote and
+    // seed itself with the other list's data - and stick with it, since params() never changes
+    // afterwards.
+    id: `persons-char-groups-${this.authors() ? 'authors' : 'content'}`,
     params: () => this.authors(),
     stream: ({params: authors}) => {
       const typeId = authors ? PictureItemType.PICTURE_ITEM_AUTHOR : PictureItemType.PICTURE_ITEM_CONTENT;
@@ -77,7 +85,8 @@ export class PersonsComponent implements OnInit {
   });
 
   protected readonly dataResource = rxResource({
-    id: 'persons-data',
+    // Suffixed with the authors flag for the same reason as charGroupsResource above.
+    id: `persons-data-${this.authors() ? 'authors' : 'content'}`,
     params: () => ({authors: this.authors(), char: this.char(), page: this.#page()}),
     stream: ({params: {authors, char, page}}) => {
       const typeId = authors ? PictureItemType.PICTURE_ITEM_AUTHOR : PictureItemType.PICTURE_ITEM_CONTENT;

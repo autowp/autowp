@@ -137,7 +137,10 @@ export class UsersUserPicturesComponent implements OnInit {
     });
 
     effect(() => {
-      const icons = this.iconsResource.value();
+      // Reads iconsData(), not iconsResource.value(): value() throws while the resource is in an
+      // error state, and an effect that throws takes the error to the ErrorHandler on every
+      // recompute rather than just leaving the decorative brand icons unstyled.
+      const icons = this.iconsData();
       if (icons) {
         addCSS(this.#document, icons.css);
       }
