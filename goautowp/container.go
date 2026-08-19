@@ -55,6 +55,7 @@ type Container struct {
 	attrsRepository              *attrs.Repository
 	autowpDB                     *sql.DB
 	banRepository                *ban.Repository
+	banChecker                   *BanChecker
 	catalogue                    *Catalogue
 	commentsRepository           *comments.Repository
 	mostsRepository              *mosts.Repository
@@ -121,6 +122,7 @@ func NewContainer(cfg config.Config) *Container {
 
 func (s *Container) Close() error {
 	s.banRepository = nil
+	s.banChecker = nil
 	s.catalogue = nil
 	s.commentsRepository = nil
 	s.contactsRepository = nil
@@ -214,6 +216,21 @@ func (s *Container) BanRepository(ctx context.Context) (*ban.Repository, error) 
 	}
 
 	return s.banRepository, nil
+}
+
+// BanChecker returns the shared ban lookup used by the gRPC interceptors and the REST middleware -
+// one instance, so they share its cache.
+func (s *Container) BanChecker(ctx context.Context) (*BanChecker, error) {
+	if s.banChecker == nil {
+		banRepository, err := s.BanRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.banChecker = NewBanChecker(banRepository)
+	}
+
+	return s.banChecker, nil
 }
 
 func (s *Container) Catalogue(ctx context.Context) (*Catalogue, error) {
@@ -683,12 +700,12 @@ func (s *Container) PublicRouter(ctx context.Context) (http.HandlerFunc, error) 
 		ginEngine.Use(cors.New(corsConfig))
 	}
 
-	banRepository, err := s.BanRepository(ctx)
+	banChecker, err := s.BanChecker(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("BanRepository(): %w", err)
+		return nil, fmt.Errorf("BanChecker(): %w", err)
 	}
 
-	ginEngine.Use(BanGinMiddleware(banRepository)) //nolint: contextcheck
+	ginEngine.Use(BanGinMiddleware(banChecker)) //nolint: contextcheck
 
 	yoomoney.SetupRouter(ctx, ginEngine)
 
@@ -859,7 +876,7 @@ func (s *Container) GRPCServerWithServices(ctx context.Context) (*grpc.Server, e
 		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
 	}
 
-	banRepository, err := s.BanRepository(ctx)
+	banChecker, err := s.BanChecker(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -868,12 +885,12 @@ func (s *Container) GRPCServerWithServices(ctx context.Context) (*grpc.Server, e
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.UnaryServerInterceptorOpts(opts...),
-			BanUnaryServerInterceptor(banRepository),
+			BanUnaryServerInterceptor(banChecker),
 		),
 		grpc.ChainStreamInterceptor(
 			logging.StreamServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.StreamServerInterceptorOpts(opts...),
-			BanStreamServerInterceptor(banRepository), //nolint: contextcheck
+			BanStreamServerInterceptor(banChecker), //nolint: contextcheck
 		),
 	)
 	RegisterArticlesServer(grpcServer, articlesSrv)
