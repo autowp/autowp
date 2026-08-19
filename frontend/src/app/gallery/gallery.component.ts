@@ -179,12 +179,14 @@ export class GalleryComponent implements OnInit {
   #lastParamsKey?: string;
   #lastParams?: {filter: APIGalleryFilter; identity: string};
 
-  // Fetches the picture named by `current` as a pending task Angular's SSR whenStable() waits on,
-  // instead of a raw Observable subscribed only via the template's `| async` (the previous shape
-  // here) - that chain's debounceTime(50) on filter and debounceTime(10) on identity, both before
-  // ever making an HTTP call, aren't tracked as pending by anything, so SSR could serialize a 200
-  // before the NOT_FOUND redirect below had even fired. See the constructor effect(), the single
-  // place that navigates off this resource's error() signal.
+  // Fetches the picture named by `current` as a pending task Angular's SSR whenStable() waits on
+  // through Angular's reactive graph, instead of a raw Observable subscribed only via the
+  // template's `| async` (the previous shape here) - that chain's debounceTime(50) on filter and
+  // debounceTime(10) on identity, both before ever making an HTTP call, only register as pending
+  // via ZoneStablePendingTask, the zone-based-CD bridge that holds a task while any macrotask is
+  // pending; it covers them today, but it disappears with the zone, and then SSR could serialize a
+  // 200 before the NOT_FOUND redirect below had even fired. See the constructor effect(), the
+  // single place that navigates off this resource's error() signal.
   //
   // Non-NOT_FOUND errors are toasted and resolved with the unchanged state rather than left as a
   // resource error - this mirrors the previous behavior of leaving the last-good gallery on screen

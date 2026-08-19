@@ -37,13 +37,14 @@ export class PicturePageComponent {
     requireSync: true,
   });
 
-  // Chained off a signal rather than a raw Observable pipe with debounceTime(10): Angular's actual
-  // SSR whenStable() (used by platform-server's renderApplication) tracks only
-  // PendingTasksInternal, not zone macrotasks, so a setTimeout-based delay before this chain's
-  // first HTTP call isn't tracked as pending by anything — if some other resource on the page
-  // happened to resolve during that window, SSR could serialize before this chain, and everything
-  // depending on it (the whole page), had even started. distinctUntilChanged already prevents
-  // redundant refetches for the same identity.
+  // Chained off a signal rather than a raw Observable pipe with debounceTime(10): Angular's SSR
+  // whenStable() (used by platform-server's renderApplication) resolves once PendingTasksInternal
+  // is empty, and a resource registers its pending task there through Angular's reactive graph. A
+  // setTimeout-based delay before the chain's first HTTP call only reaches PendingTasksInternal
+  // via ZoneStablePendingTask, the zone-based-CD bridge that holds a task while any macrotask is
+  // pending — it covers this today, but it disappears the moment the app goes zoneless, and then
+  // SSR could serialize before this chain, and everything depending on it (the whole page), had
+  // even started. distinctUntilChanged already prevents redundant refetches for the same identity.
   protected readonly canonicalResource = rxResource({
     // Suffixed with the identity read once at construction time - a static id would let a
     // second instance of this component, created by navigating away and to a different

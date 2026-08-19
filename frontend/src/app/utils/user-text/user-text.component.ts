@@ -9,7 +9,7 @@ import {PictureFields, PictureListOptions, PicturesRequest} from '@grpc/spec.pb'
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
-import {catchError, combineLatest, debounceTime, distinctUntilChanged, map, of, switchMap} from 'rxjs';
+import {catchError, combineLatest, distinctUntilChanged, map, of, switchMap} from 'rxjs';
 import URLParse from 'url-parse';
 
 import {UserComponent} from '../../user/user/user.component';
@@ -54,9 +54,14 @@ export class UserTextComponent {
     'wheelsage.org',
   ];
 
+  // No debounceTime() before prepareText$(): `text` is a comment/message body that changes only
+  // when the message itself does, so there was nothing to coalesce (distinctUntilChanged already
+  // drops repeats), and a macrotask delay ahead of the first HTTP call is exactly the shape that
+  // stops registering as pending for SSR's whenStable() once the app drops zone-based change
+  // detection - see the note on CommentsComponent.dataResource. Every comment body on the site is
+  // rendered through here, so it must be in the SSR output.
   protected readonly textPrepared$ = toObservable(this.text).pipe(
     distinctUntilChanged(),
-    debounceTime(10),
     switchMap((text) => this.prepareText$(text ? text : '')),
   );
 

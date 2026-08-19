@@ -44,13 +44,16 @@ export class CommentsComponent implements OnInit {
   protected readonly authenticated = toSignal(this.auth.authenticated$, {initialValue: false});
 
   // Chained off the input/auth signals directly rather than raw Observables with debounceTime(10)
-  // on four separate sources feeding a combineLatest (the previous shape here). Angular's actual
-  // SSR whenStable() (used by platform-server's renderApplication) tracks only
-  // PendingTasksInternal, not zone macrotasks, so a setTimeout-based delay before this chain's
-  // first HTTP call isn't tracked as pending by anything — every comment section on the site could
-  // go missing from SSR output if some other resource happened to resolve during that window.
-  // resource() registers its pending task through Angular's reactive graph instead, so there's no
-  // such window.
+  // on four separate sources feeding a combineLatest (the previous shape here). Angular's SSR
+  // whenStable() (used by platform-server's renderApplication) resolves once PendingTasksInternal
+  // is empty. With the zone-based change detection this app still runs (provideZoneChangeDetection
+  // in main.server.ts), ZoneStablePendingTask bridges zone instability into that and holds its
+  // task while any macrotask is pending, so a setTimeout-based delay before this chain's first
+  // HTTP call does still hold the render today — but that bridge is the only thing holding it, and
+  // it goes away with the zone: under zoneless CD nothing would track that gap, and every comment
+  // section on the site could go missing from SSR output if some other resource happened to
+  // resolve during the window. resource() registers its pending task through Angular's reactive
+  // graph in both modes, so there's no such window either way.
   //
   // Constructed in ngOnInit() (with an explicit injector) rather than as a field initializer:
   // itemID/typeID are *required* inputs, unreadable until Angular has bound them, which happens
