@@ -133,6 +133,10 @@ type AttrsAttrs struct {
 
 // Config Application config definition.
 type Config struct {
+	// GinMode is gin.DebugMode/TestMode/ReleaseMode. Applied at startup (see cmd/goautowp), where
+	// the --ginmode flag overrides it when passed explicitly - without this the key that every
+	// deployment sets in its config.yaml went nowhere and gin ran in debug mode in production.
+	GinMode            string                    `mapstructure:"gin-mode"             yaml:"gin-mode"`
 	GRPC               GRPCConfig                `mapstructure:"grpc"                 yaml:"grpc"`
 	Metrics            MetricsConfig             `mapstructure:"metrics"              yaml:"metrics"`
 	Attrs              AttrsAttrs                `mapstructure:"attrs"                yaml:"attrs"`

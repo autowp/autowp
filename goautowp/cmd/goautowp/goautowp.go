@@ -65,6 +65,12 @@ func mainReturnWithCode() int { //nolint: maintidx
 
 	config.ValidateConfig(cfg)
 
+	// Before the CLI runs, so an explicitly passed --ginmode still wins (its flag Action fires
+	// only when the flag is actually given, and that happens later).
+	if cfg.GinMode != "" {
+		gin.SetMode(cfg.GinMode)
+	}
+
 	autowpApp = goautowp.NewApplication(cfg)
 	defer util.Close(autowpApp)
 
