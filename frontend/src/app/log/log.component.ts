@@ -160,7 +160,9 @@ export class LogComponent implements OnInit {
           ).pipe(map((items) => items.filter((item): item is Item => item !== null)))
         : of([]);
 
-    return forkJoin([items$, this.#userService.getUser$(event.userId)]).pipe(
+    // Authenticated lookup: the log is moderators-only, and an admin reading it is meant to see
+    // a deleted account's name rather than the stub the cacheable anonymous lookup returns.
+    return forkJoin([items$, this.#userService.getUser$(event.userId, {authenticated: true})]).pipe(
       map(([items, user]) => ({
         createdAt: timestampToDate(event.createTime),
         description: event.description,

@@ -197,11 +197,14 @@ export class ModerPicturesItemComponent {
   );
 
   protected readonly changeStatusUser$: Observable<null | User> = this.picture$.pipe(
-    switchMap((picture) => this.#userService.getUser$(picture.changeStatusUserId)),
+    // Authenticated lookups on this screen (and for the owner below): it is a moderation tool,
+    // where an admin is meant to see a deleted account's name rather than the stub the cacheable
+    // anonymous lookup returns.
+    switchMap((picture) => this.#userService.getUser$(picture.changeStatusUserId, {authenticated: true})),
   );
 
   protected readonly owner$: Observable<null | User> = this.picture$.pipe(
-    switchMap((picture) => this.#userService.getUser$(picture.ownerId)),
+    switchMap((picture) => this.#userService.getUser$(picture.ownerId, {authenticated: true})),
   );
 
   protected readonly ip$: Observable<IP | null> = this.picture$.pipe(

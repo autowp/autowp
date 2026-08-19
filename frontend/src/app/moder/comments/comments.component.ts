@@ -172,7 +172,9 @@ export class ModerCommentsComponent implements OnInit {
     map((response) => ({
       comments: (response.items ?? []).map((comment) => ({
         comment,
-        user$: this.#userService.getUser$(comment.authorId),
+        // Authenticated lookup: this is a moderation screen, where an admin is meant to see a
+        // deleted account's name rather than the stub the cacheable anonymous lookup returns.
+        user$: this.#userService.getUser$(comment.authorId, {authenticated: true}),
       })),
       paginator: response.paginator,
     })),
