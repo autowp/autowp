@@ -6,10 +6,22 @@ import {
 } from '@angular/ssr/node';
 import {environment} from '@environment/environment';
 import express from 'express';
+import cluster from 'node:cluster';
 import {join} from 'node:path';
 import vhost from 'vhost';
 
 import {SsrPageCache, ssrPageCacheOptionsFromEnv} from './ssr-cache';
+
+/**
+ * How many processes render in parallel.
+ *
+ * Rendering is single-threaded, so one process saturates exactly one core no matter what the
+ * container is allowed - which is what production looked like: ~1 CPU per pod against a 4 CPU
+ * limit, with everything else queued behind the render loop. Read from the environment rather than
+ * os.availableParallelism(), which reports the *node's* cores and would fork dozens of workers
+ * against a container limit of four.
+ */
+const workers = Math.max(1, parseInt(process.env['SSR_WORKERS'] ?? '', 10) || 1);
 
 const app = express();
 
@@ -20,7 +32,14 @@ app.disable('x-powered-by');
 const angularApp = new AngularNodeAppEngine();
 
 // Shared by every locale's vhost app - entries are keyed by host, so they can't bleed across.
-const ssrCache = new SsrPageCache(ssrPageCacheOptionsFromEnv(process.env));
+// The budget is per worker, so the configured one is split between them: each has its own copy of
+// this cache, and requests for one URL land on whichever worker the round-robin picked (so expect
+// the hit rate to fall roughly in proportion to the worker count, too).
+const cacheOptions = ssrPageCacheOptionsFromEnv(process.env);
+const ssrCache = new SsrPageCache({
+  ...cacheOptions,
+  maxBytes: cacheOptions.maxBytes === undefined ? undefined : Math.floor(cacheOptions.maxBytes / workers),
+});
 
 // This whole block monkey-patches AngularNodeAppEngine's private, undocumented internals
 // (angularAppEngine, ɵgetOrCreateAngularServerApp, getEntryPointExports, ...) to add per-locale
@@ -111,13 +130,31 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
   // passed through as an empty string port.
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const port = process.env['PORT'] || 4000;
-  app.listen(port, (error) => {
-    if (error) {
-      throw error;
+
+  if (cluster.isPrimary && workers > 1) {
+    console.log(`Node Express server starting ${workers} workers on http://localhost:${port}`);
+
+    for (let i = 0; i < workers; i++) {
+      cluster.fork();
     }
 
-    console.log(`Node Express server listening on http://localhost:${port}`);
-  });
+    // A worker that dies takes its share of the capacity with it until it is replaced, and nothing
+    // else would replace it - the pod stays "ready" as long as the remaining workers answer.
+    cluster.on('exit', (worker, code, signal) => {
+      console.error(`SSR worker ${worker.process.pid ?? '?'} exited (code ${code}, signal ${signal}), restarting`);
+      cluster.fork();
+    });
+  } else {
+    // Workers all listen on the same port: cluster hands the accepted connections out between
+    // them (round-robin on Linux), so no port juggling or proxy in front is needed.
+    app.listen(port, (error) => {
+      if (error) {
+        throw error;
+      }
+
+      console.log(`Node Express server listening on http://localhost:${port}`);
+    });
+  }
 }
 
 /**

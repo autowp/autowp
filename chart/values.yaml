@@ -88,6 +88,11 @@ frontend:
       digest: ""
       pullPolicy: IfNotPresent
       pullSecrets: []
+  ## Render processes per pod. Rendering is single-threaded, so one process uses exactly one core
+  ## however many the container is allowed - production sat at ~1 CPU per pod against a 4 CPU
+  ## limit until this existed. Keep it at or below the CPU limit below; unlike adding replicas, it
+  ## costs no extra postgres connections, since those belong to the goautowp container.
+  workers: 4
   ## In-memory cache of server-rendered pages, per SSR pod (see src/ssr-cache.ts). Rendering one
   ## page costs 10-30 gRPC calls, so this is mostly here to collapse concurrent requests for the
   ## same URL into a single render - that part works even with ttlMs: 0, which disables reuse.
