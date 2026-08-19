@@ -132,6 +132,11 @@ goautowp:
     dsn: https://1234567890abcdef1234567890abcdef@sentry.example.com/1
   postgres:
     password: password
+  ## gRPC calls that take at least this long are logged at warn level, which is the level
+  ## production runs at - the middleware logger reports every finished call, but at info, so
+  ## without this only failed calls are visible and a slow-but-successful one leaves no trace.
+  ## Set to 0s to turn it off.
+  slowCallThreshold: 1s
   ## Bounds of the postgres connection pool held by *each* goautowp process, and every process
   ## gets its own: the 3 serve replicas (4 while a rollout surges), plus one per scheduler job pod
   ## that happens to be running - up to 3 of those overlap at midnight (hourly + daily + midnight).

@@ -9,6 +9,7 @@ public-rest:
       {{- end }}
 grpc:
   listen: ":8082"
+  slow-call-threshold: {{ .Values.goautowp.slowCallThreshold | quote }}
 sentry:
   dsn: {{ .Values.goautowp.sentry.dsn | quote }}
   environment: production

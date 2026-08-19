@@ -883,6 +883,9 @@ func (s *Container) GRPCServerWithServices(ctx context.Context) (*grpc.Server, e
 
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
+			// Outermost, so what it times is the whole call - ban check and all - the same span the
+			// caller waits on.
+			SlowCallUnaryServerInterceptor(s.config.GRPC.SlowCallThreshold),
 			logging.UnaryServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.UnaryServerInterceptorOpts(opts...),
 			BanUnaryServerInterceptor(banChecker),

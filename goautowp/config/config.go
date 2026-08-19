@@ -121,6 +121,10 @@ type YoomoneyConfig struct {
 
 type GRPCConfig struct {
 	Listen string `mapstructure:"listen" yaml:"listen"`
+	// SlowCallThreshold makes calls that take at least this long visible in the log at warn level
+	// (see SlowCallUnaryServerInterceptor); the middleware logger reports finished calls at info,
+	// which production's log level hides. 0 turns it off.
+	SlowCallThreshold time.Duration `mapstructure:"slow-call-threshold" yaml:"slow-call-threshold"`
 }
 
 type MetricsConfig struct {

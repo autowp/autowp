@@ -3,6 +3,8 @@ public-rest:
   listen: ":8080"
 grpc:
   listen: ":8082"
+  # Calls at least this slow are logged at warn level - see GRPCConfig.SlowCallThreshold.
+  slow-call-threshold: 1s
 sentry:
   dsn: ""
   environment: development
