@@ -11,7 +11,7 @@ import {TextClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {DiffEditorComponent} from 'ngx-monaco-editor-v2';
-import {catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
+import {catchError, combineLatest, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -57,7 +57,6 @@ export class InfoTextComponent implements OnInit {
   readonly #id$ = this.#route.paramMap.pipe(
     map((params) => params.get('id')),
     distinctUntilChanged(),
-    debounceTime(10),
     switchMap((id) => {
       if (!id) {
         void this.#router.navigate(['/error-404'], {
@@ -72,7 +71,6 @@ export class InfoTextComponent implements OnInit {
   readonly #revision$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('revision') ?? ''),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   protected readonly data$: Observable<InfoText> = combineLatest([this.#id$, this.#revision$]).pipe(

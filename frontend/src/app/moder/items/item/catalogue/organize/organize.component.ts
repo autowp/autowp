@@ -24,18 +24,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {browserWindow} from '@utils/browser-window';
 import {RemarkModule} from 'ngx-remark';
-import {
-  catchError,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  forkJoin,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-} from 'rxjs';
+import {catchError, combineLatest, distinctUntilChanged, EMPTY, forkJoin, map, of, shareReplay, switchMap} from 'rxjs';
 
 import type {ItemMetaFormResult} from '../../../item-meta-form/item-meta-form.component';
 
@@ -65,14 +54,12 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
   readonly #itemTypeID$: Observable<number> = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('item_type_id') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(30),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
   readonly #itemID$ = this.#route.paramMap.pipe(
     map((params) => params.get('id') ?? ''),
     distinctUntilChanged(),
-    debounceTime(30),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 

@@ -7,7 +7,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {AttrZoneAttributesRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
-import {debounceTime, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap, tap} from 'rxjs';
+import {distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap, tap} from 'rxjs';
 
 import type {AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
 
@@ -30,7 +30,6 @@ export class ModerAttrsZoneComponent {
   readonly #zoneID$ = this.#route.paramMap.pipe(
     map((params) => params.get('id')),
     distinctUntilChanged(),
-    debounceTime(10),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 

@@ -399,7 +399,6 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
     pictures: Picture[];
   }> = this.#route.queryParamMap.pipe(
     distinctUntilChanged(),
-    debounceTime(10),
     // eslint-disable-next-line sonarjs/cognitive-complexity
     switchMap((params) => {
       this.addedFrom.setValue(params.get('added_from') ?? '');

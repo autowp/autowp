@@ -12,7 +12,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {getUnitAbbrTranslation} from '@utils/translations';
-import {combineLatest, debounceTime, distinctUntilChanged, map, of, shareReplay, switchMap} from 'rxjs';
+import {combineLatest, distinctUntilChanged, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -65,13 +65,11 @@ export class AccountSpecsConflictsComponent implements OnInit {
   protected readonly page$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   protected readonly filter$: Observable<AttrConflictsRequest.Filter> = this.#route.queryParamMap.pipe(
     map((params) => params.get('filter')),
     distinctUntilChanged(),
-    debounceTime(10),
     map((filter) => mapFilter(filter)),
   );
 

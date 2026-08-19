@@ -17,7 +17,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
-import {catchError, combineLatest, debounceTime, distinctUntilChanged, map, of, switchMap} from 'rxjs';
+import {catchError, combineLatest, distinctUntilChanged, map, of, switchMap} from 'rxjs';
 
 import {chunk} from '../../../chunk';
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
@@ -61,7 +61,6 @@ export class DonateVodSelectComponent implements OnDestroy, OnInit {
       page: parseInt(params.get('page') ?? '', 10),
     })),
     distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-    debounceTime(30),
     switchMap((params) => {
       const page = params.page || 1;
       const brandID = params.brand_id;

@@ -16,17 +16,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {
-  catchError,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-} from 'rxjs';
+import {catchError, combineLatest, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {chunk} from '../../../../../chunk';
 import {PaginatorComponent} from '../../../../../paginator/paginator/paginator.component';
@@ -64,7 +54,6 @@ export class ModerItemsItemSelectParentCatalogueComponent {
   readonly #search$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('search')),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   protected readonly brandID$ = this.#route.queryParamMap.pipe(

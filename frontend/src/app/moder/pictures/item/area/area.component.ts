@@ -17,7 +17,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {browserWindow} from '@utils/browser-window';
-import {BehaviorSubject, catchError, debounceTime, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
+import {BehaviorSubject, catchError, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
 
 import type {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/jquery.Jcrop.js';
 
@@ -66,7 +66,6 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
       .pipe(
         map((params) => params.get('id') ?? ''),
         distinctUntilChanged(),
-        debounceTime(30),
         switchMap((id) =>
           this.#picturesClient.getPicture(
             new PicturesRequest({
@@ -87,7 +86,6 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
               type: parseInt(params.get('type') ?? '', 10),
             })),
             distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-            debounceTime(30),
             map((params) => ({params, picture})),
           ),
         ),

@@ -27,7 +27,6 @@ import {
   BehaviorSubject,
   catchError,
   combineLatest,
-  debounceTime,
   distinctUntilChanged,
   EMPTY,
   map,
@@ -121,7 +120,6 @@ export class ModerItemsItemComponent {
   protected readonly activeTab$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('tab')),
     distinctUntilChanged(),
-    debounceTime(30),
     // A `?tab=` query param (present, empty value) yields '' from params.get(), not null - ??
     // would treat that as a real tab value instead of falling back to 'meta' like the ternary
     // does.
@@ -132,7 +130,6 @@ export class ModerItemsItemComponent {
   readonly #itemID: Observable<string> = this.#route.paramMap.pipe(
     map((params) => params.get('id') ?? ''),
     distinctUntilChanged(),
-    debounceTime(30),
   );
 
   protected readonly item$: Observable<Item> = combineLatest([this.#itemID, this.reloadItem$]).pipe(

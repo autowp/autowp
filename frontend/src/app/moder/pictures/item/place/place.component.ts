@@ -13,7 +13,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {icon, latLng, marker, tileLayer} from 'leaflet';
-import {catchError, debounceTime, distinctUntilChanged, EMPTY, map, shareReplay, startWith, switchMap} from 'rxjs';
+import {catchError, distinctUntilChanged, EMPTY, map, shareReplay, startWith, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 
@@ -70,7 +70,6 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
   protected readonly picture$: Observable<Picture> = this.#route.paramMap.pipe(
     map((params) => params.get('id') ?? ''),
     distinctUntilChanged(),
-    debounceTime(10),
     switchMap((id) =>
       this.#picturesClient.getPicture(
         new PicturesRequest({

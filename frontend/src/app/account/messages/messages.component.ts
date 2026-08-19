@@ -49,19 +49,16 @@ export class AccountMessagesComponent {
   protected readonly folder$: Observable<string> = this.#route.queryParamMap.pipe(
     map((params) => params.get('folder') ?? 'inbox'),
     distinctUntilChanged(),
-    debounceTime(30),
   );
 
   protected readonly page$: Observable<number> = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(30),
   );
 
   readonly #userId$: Observable<string | undefined> = this.#route.queryParamMap.pipe(
     map((params) => params.get('user_id') ?? undefined),
     distinctUntilChanged(),
-    debounceTime(30),
   );
 
   protected readonly messages$: Observable<{

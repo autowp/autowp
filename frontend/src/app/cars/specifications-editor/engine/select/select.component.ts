@@ -60,20 +60,17 @@ export class CarsEngineSelectComponent {
   protected readonly itemID$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('item_id') ?? ''),
     distinctUntilChanged(),
-    debounceTime(10),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
   protected readonly brandID$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('brand_id') ?? ''),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   readonly #page$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   protected readonly item$ = this.itemID$.pipe(

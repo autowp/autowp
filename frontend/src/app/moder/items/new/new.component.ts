@@ -15,7 +15,6 @@ import {getItemTypeTranslation} from '@utils/translations';
 import {
   catchError,
   combineLatest,
-  debounceTime,
   distinctUntilChanged,
   EMPTY,
   forkJoin,
@@ -54,7 +53,6 @@ export class ModerItemsNewComponent {
   readonly #itemTypeID$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('item_type_id') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(10),
     shareReplay({bufferSize: 1, refCount: false}),
     tap((itemTypeID) => {
       this.#pageEnv.set({

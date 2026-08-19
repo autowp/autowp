@@ -27,7 +27,6 @@ import {
   BehaviorSubject,
   catchError,
   combineLatest,
-  debounceTime,
   distinctUntilChanged,
   EMPTY,
   forkJoin,
@@ -82,13 +81,11 @@ export class ModerItemParentComponent {
   readonly #itemID$ = this.#route.paramMap.pipe(
     map((params) => parseInt(params.get('item_id') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(30),
   );
 
   readonly #parentID$ = this.#route.paramMap.pipe(
     map((params) => parseInt(params.get('parent_id') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(30),
   );
 
   readonly #reload$ = new BehaviorSubject<void>(void 0);

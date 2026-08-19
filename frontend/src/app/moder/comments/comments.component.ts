@@ -117,26 +117,22 @@ export class ModerCommentsComponent implements OnInit {
   protected readonly userID$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('user_id')),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   readonly #moderatorAttention$: Observable<ModeratorAttention> = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('moderator_attention') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   readonly #picturesOfItemID$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('pictures_of_item_id')),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   readonly #page$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '', 10)),
     map((page) => (page ? page : 0)),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   protected readonly data$: Observable<{

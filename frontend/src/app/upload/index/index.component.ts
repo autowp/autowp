@@ -40,7 +40,6 @@ import {
   catchError,
   combineLatest,
   concat,
-  debounceTime,
   distinctUntilChanged,
   EMPTY,
   map,
@@ -116,13 +115,11 @@ export class UploadIndexComponent implements OnInit {
   readonly #perspectiveID$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('perspective_id') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   protected readonly replace$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('replace') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   readonly #replacePicture$: Observable<null | Picture> = this.replace$.pipe(
@@ -149,7 +146,6 @@ export class UploadIndexComponent implements OnInit {
   protected readonly itemID$: Observable<string> = this.#route.queryParamMap.pipe(
     map((params) => params.get('item_id') ?? ''),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   readonly #item$: Observable<Item | null> = this.itemID$.pipe(

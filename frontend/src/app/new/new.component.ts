@@ -10,17 +10,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {formatDate, formatGrpcDate, parseGrpcDate, parseStringToGrpcDate} from '@services/utils';
-import {
-  catchError,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-} from 'rxjs';
+import {catchError, combineLatest, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {chunkBy} from '../chunk';
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
@@ -66,13 +56,11 @@ export class NewComponent implements OnInit {
   readonly #page$: Observable<number> = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '', 10)),
     distinctUntilChanged(),
-    debounceTime(10),
   );
 
   protected readonly date$: Observable<string> = this.#route.paramMap.pipe(
     map((params) => params.get('date') ?? ''),
     distinctUntilChanged(),
-    debounceTime(10),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 

@@ -6,7 +6,7 @@ import {toObservable} from '@angular/core/rxjs-interop';
 import {CommentVote, GetCommentVotesRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {catchError, debounceTime, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
+import {catchError, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
@@ -30,7 +30,6 @@ export class CommentsVotesComponent {
     positive: CommentVote[];
   }> = this.#messageID$.pipe(
     distinctUntilChanged(),
-    debounceTime(1),
     switchMap((messageID) =>
       this.#commentsGrpc.getCommentVotes(
         new GetCommentVotesRequest({

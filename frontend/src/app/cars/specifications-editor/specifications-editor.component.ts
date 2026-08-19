@@ -11,7 +11,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, catchError, debounceTime, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
+import {BehaviorSubject, catchError, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {CarsSpecificationsEditorEngineComponent} from './engine/engine.component';
@@ -49,7 +49,6 @@ export class CarsSpecificationsEditorComponent {
   protected readonly data$: Observable<Item> = this.#route.queryParamMap.pipe(
     map((params) => params.get('item_id') ?? ''),
     distinctUntilChanged(),
-    debounceTime(30),
     switchMap((itemID) =>
       this.#change$.pipe(
         switchMap(() =>

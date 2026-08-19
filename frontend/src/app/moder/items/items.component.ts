@@ -192,7 +192,6 @@ export class ModerItemsComponent implements OnInit {
         params.get('vehicle_type_id') === 'empty' ? 'empty' : parseInt(params.get('vehicle_type_id') ?? '', 10) || null,
     })),
     distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-    debounceTime(30),
     tap((params) => {
       this.name = params.name;
       this.nameExclude = params.nameExclude;

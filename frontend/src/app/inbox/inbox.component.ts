@@ -22,7 +22,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {formatGrpcDate, parseGrpcDate, parseStringToGrpcDate} from '@services/utils';
 import {browserWindow} from '@utils/browser-window';
 import Keycloak from 'keycloak-js';
-import {catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
+import {catchError, combineLatest, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../thumbnail/thumbnail/thumbnail.component';
@@ -72,7 +72,6 @@ export class InboxComponent implements OnInit {
       date: params.get('date') ?? '',
     })),
     distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-    debounceTime(30),
     switchMap((params) => {
       if (!params.brand) {
         void this.#router.navigate(['/inbox', ALL_BRANDS]);
