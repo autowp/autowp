@@ -16,9 +16,13 @@ import (
 const mostsLimit = 7
 
 var (
-	errRatingNotFound      = errors.New("unknown rating")
+	// Exported so the gRPC layer can answer NOT_FOUND for them: both mean "this URL names a rating
+	// or a years range that doesn't exist", which is a 404, not a server fault. Bogus values reach
+	// us routinely - crawlers walk mangled /mosts/... URLs, and a page's relative asset links
+	// resolve against the current path for clients that ignore <base href>.
+	ErrRatingNotFound      = errors.New("unknown rating")
+	ErrYearsRangeNotFound  = errors.New("years range not found")
 	errLanguageNotProvided = errors.New("language not provided")
-	errYearsRangeNotFound  = errors.New("years range not found")
 )
 
 type Repository struct {
@@ -80,7 +84,7 @@ func (s *Repository) Items(
 	})
 
 	if ratingIndex == -1 {
-		return nil, 0, fmt.Errorf("%w: `%s`", errRatingNotFound, options.Most)
+		return nil, 0, fmt.Errorf("%w: `%s`", ErrRatingNotFound, options.Most)
 	}
 
 	rating := ratings[ratingIndex]
@@ -106,7 +110,7 @@ func (s *Repository) Items(
 		return options.Years == r.Folder
 	})
 	if yearIndex == -1 && len(options.Years) > 0 {
-		return nil, 0, fmt.Errorf("%w: %s", errYearsRangeNotFound, options.Years)
+		return nil, 0, fmt.Errorf("%w: %s", ErrYearsRangeNotFound, options.Years)
 	}
 
 	if yearIndex != -1 {

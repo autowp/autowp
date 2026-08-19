@@ -2,6 +2,7 @@ package goautowp
 
 import (
 	"context"
+	"errors"
 
 	"github.com/autowp/goautowp/mosts"
 	"google.golang.org/grpc/codes"
@@ -74,6 +75,14 @@ func (s *MostsGRPCServer) GetItems(
 		BrandID:  brandID,
 	}, repoFields)
 	if err != nil {
+		// A rating or years range that doesn't exist is a 404, not a server fault: these URLs are
+		// walked by crawlers all the time, and answering Internal both hides real failures in the
+		// noise and makes the frontend render an error page (HTTP 200) where it should render a
+		// 404.
+		if errors.Is(err, mosts.ErrRatingNotFound) || errors.Is(err, mosts.ErrYearsRangeNotFound) {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 

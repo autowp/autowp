@@ -3,7 +3,7 @@ import type {MostsItem, MostsRating, MostsVehicleType, YearsRange} from '@grpc/s
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject, Injector, input} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {MostsItemsRequest} from '@grpc/spec.pb';
 import {MostsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -17,7 +17,7 @@ import {
   getUnitNameTranslation,
   getVehicleTypeRpTranslation,
 } from '@utils/translations';
-import {errorMessage} from 'app/grpc';
+import {errorMessage, isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {map} from 'rxjs';
 
@@ -58,6 +58,7 @@ export class MostsContentsComponent implements OnInit {
   readonly #mostsClient = inject(MostsClient);
   readonly #languageService = inject(LanguageService);
   readonly #injector = inject(Injector);
+  readonly #router = inject(Router);
 
   readonly prefix = input.required<string[]>();
   readonly ratingCatname = input.required<null | string>();
@@ -153,6 +154,16 @@ export class MostsContentsComponent implements OnInit {
   protected readonly ratingCatnameNormalized = computed(() => this.ratingCatname() || this.ratings()?.[0]?.catname);
 
   constructor() {
+    // A rating or years range the backend doesn't know is a bad URL, not a failure worth an error
+    // panel: /mosts/** is walked by crawlers with mangled catnames (and by clients that resolve a
+    // page's relative asset links against the current path), and without this the page answered
+    // HTTP 200 with an error message on every one of them.
+    effect(() => {
+      if (isNotFoundError(this.itemsResource.error())) {
+        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+      }
+    });
+
     // Mirrors the original tap()-before-fetch placement: MostsComponent's own ngOnInit only runs
     // once (Angular reuses this component instance across in-place /mosts/** param navigations),
     // so this effect is what keeps pageEnv correctly set to pageId 21 on every subsequent
