@@ -76,6 +76,16 @@ frontend:
     digest: ""
     pullPolicy: IfNotPresent
     pullSecrets: []
+  ## In-memory cache of server-rendered pages, per SSR pod (see src/ssr-cache.ts). Rendering one
+  ## page costs 10-30 gRPC calls, so this is mostly here to collapse concurrent requests for the
+  ## same URL into a single render - that part works even with ttlMs: 0, which disables reuse.
+  ## Reuse itself is short by design: a served page carries its data in the transfer cache, so the
+  ## visitor sees whatever the render captured until they navigate.
+  ## maxBytes is a quoted string on purpose: helm parses YAML numbers as float64, and an unquoted
+  ## 67108864 renders into the pod spec as "6.7108864e+07".
+  ssrCache:
+    ttlMs: 10000
+    maxBytes: "67108864"
 backend:
   sentry:
     dsn: https://1234567890abcdef1234567890abcdef@sentry.example.com/1

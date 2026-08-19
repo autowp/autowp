@@ -26,6 +26,11 @@ spec:
         - name: frontend
           image: {{ include "autowp.frontend.image" . }}
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy | quote }}
+          env:
+            - name: SSR_CACHE_TTL_MS
+              value: {{ .Values.frontend.ssrCache.ttlMs | quote }}
+            - name: SSR_CACHE_MAX_BYTES
+              value: {{ .Values.frontend.ssrCache.maxBytes | quote }}
           ports:
             - name: frontend-port
               containerPort: 4000

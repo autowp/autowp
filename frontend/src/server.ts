@@ -9,8 +9,13 @@ import express from 'express';
 import {join} from 'node:path';
 import vhost from 'vhost';
 
+import {SsrPageCache, ssrPageCacheOptionsFromEnv} from './ssr-cache';
+
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+// Shared by every locale's vhost app - entries are keyed by host, so they can't bleed across.
+const ssrCache = new SsrPageCache(ssrPageCacheOptionsFromEnv(process.env));
 
 // This whole block monkey-patches AngularNodeAppEngine's private, undocumented internals
 // (angularAppEngine, ɵgetOrCreateAngularServerApp, getEntryPointExports, ...) to add per-locale
@@ -70,8 +75,10 @@ for (const lang of environment.languages) {
   vhostApp.use((req, res, next) => {
     req.headers['accept-language'] = lang.locale;
 
-    angularApp
-      .handle(req)
+    // Through the cache rather than straight to angularApp.handle(): a render costs 10-30 gRPC
+    // calls, and this collapses concurrent requests for the same page into one of them.
+    ssrCache
+      .handle(req, () => angularApp.handle(req))
       .then((response) => {
         if (response) {
           // Returned (not just called) so its rejection is still caught by .catch(next) below,
