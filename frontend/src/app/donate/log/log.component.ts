@@ -68,8 +68,9 @@ export class DonateLogComponent implements OnInit {
 
           return this.#userService.getUserMap$(userIds).pipe(
             map((userMap) => ({items, usersById: Object.fromEntries(userMap)})),
-            // getUserMap$ throws if the backend can't find a requested user. Degrade to showing
-            // no donor rather than erroring the whole resource over one stale reference.
+            // getUserMap$ leaves out users the backend doesn't return (deleted accounts), so
+            // this only catches a genuine RPC failure - degrade to showing no donor rather than
+            // erroring the whole resource over it.
             catchError(() => of({items, usersById: {}})),
           );
         }),

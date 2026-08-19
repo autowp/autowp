@@ -91,9 +91,9 @@ export class ListComponent implements OnInit {
       if (ids.length === 0) {
         return of({});
       }
-      // getUserMap$ throws if the backend can't find a requested author (e.g. a deleted account).
-      // Degrade to showing no author for the page rather than erroring the whole resource over one
-      // stale reference.
+      // getUserMap$ leaves out authors the backend doesn't return (e.g. a deleted account), so
+      // the catchError below only covers a genuine RPC failure - degrade to showing no author
+      // rather than erroring the whole resource over it.
       return this.#userService.getUserMap$(ids).pipe(
         map((userMap) => Object.fromEntries(userMap)),
         catchError(() => of({})),
