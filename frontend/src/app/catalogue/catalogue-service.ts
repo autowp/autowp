@@ -18,7 +18,7 @@ import {type APIItemChildsCounts} from '@services/item';
 import {LanguageService} from '@services/language';
 import {perspectiveIDLogotype, perspectiveIDMixed} from '@services/picture';
 import {notFoundError} from 'app/grpc';
-import {debounceTime, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
+import {distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
 export interface Breadcrumbs {
   html: string;
@@ -57,11 +57,15 @@ export class CatalogueService {
     return result;
   }
 
+  // No delay here or in getType$/getBrand$ below: each reads a single source (the route's
+  // paramMap, which emits once per navigation) straight after distinctUntilChanged, so there was
+  // never a burst to coalesce - only 10ms of sleeping added to every catalogue page render,
+  // serially, ahead of each of the three fetches. A fast sequence of navigations is already
+  // handled by the switchMap below cancelling the previous request.
   private static getPath(route: ActivatedRoute) {
     return route.paramMap.pipe(
       map((params) => params.get('path')),
       distinctUntilChanged(),
-      debounceTime(10),
     );
   }
 
@@ -161,7 +165,6 @@ export class CatalogueService {
     return route.paramMap.pipe(
       map((paramMap) => paramMap.get('type') ?? 'default'),
       distinctUntilChanged(),
-      debounceTime(10),
     );
   }
 
@@ -169,7 +172,6 @@ export class CatalogueService {
     return route.paramMap.pipe(
       map((params) => params.get('brand')),
       distinctUntilChanged(),
-      debounceTime(10),
       switchMap((catname) => {
         if (!catname) {
           return EMPTY;

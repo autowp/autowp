@@ -5,7 +5,18 @@ import {inject, Service} from '@angular/core';
 import {CreateMessageRequest, Message, MessagingClearFolder, MessagingDeleteMessage} from '@grpc/spec.pb';
 import {MessagingClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {BehaviorSubject, catchError, combineLatest, debounceTime, map, of, shareReplay, switchMap, tap} from 'rxjs';
+import {
+  asapScheduler,
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  debounceTime,
+  map,
+  of,
+  shareReplay,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {AuthService} from './auth.service';
@@ -32,7 +43,11 @@ export class MessageService {
     this.#seen$,
     this.#ws.messagesChanged$,
   ]).pipe(
-    debounceTime(10),
+    // Coalesces the burst of synchronous emissions the sources above produce on subscribe into a
+    // single request, on a microtask rather than a timer: a timer is work SSR's whenStable() only
+    // waits for through the zone bridge, which goes away with zone-based change detection, and
+    // this runs in the app shell on every page.
+    debounceTime(0, asapScheduler),
     switchMap(([authenticated]) => {
       if (!authenticated) {
         return of(null);
@@ -55,7 +70,8 @@ export class MessageService {
     this.#ws.messagesChanged$,
   ]).pipe(
     map(([, , , authenticated]) => authenticated),
-    debounceTime(10),
+    // Same coalescing as #new$ above, same reason.
+    debounceTime(0, asapScheduler),
     switchMap((authenticated) => {
       if (!authenticated) {
         return of(null);
