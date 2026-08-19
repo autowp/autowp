@@ -12,6 +12,9 @@ spec:
             checksum/config: {{ (tpl (.Files.Glob "configs/goautowp/*").AsConfig . ) | sha256sum }}
         spec:
           {{- include "autowp.imagePullSecrets" . | nindent 10 }}
+          # Nothing in these containers talks to the Kubernetes API, so the token is only an
+          # unnecessary credential sitting in the filesystem.
+          automountServiceAccountToken: false
           volumes:
             - secret:
                 defaultMode: 420

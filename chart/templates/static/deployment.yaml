@@ -55,6 +55,9 @@ spec:
         app.kubernetes.io/component: static
     spec:
       {{- include "autowp.imagePullSecrets" . | nindent 6 }}
+      # Nothing in these containers talks to the Kubernetes API, so the token is only an
+      # unnecessary credential sitting in the filesystem.
+      automountServiceAccountToken: false
       volumes:
         - name: img
           persistentVolumeClaim:
