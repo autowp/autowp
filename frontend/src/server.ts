@@ -12,6 +12,11 @@ import vhost from 'vhost';
 import {SsrPageCache, ssrPageCacheOptionsFromEnv} from './ssr-cache';
 
 const app = express();
+
+// Express advertises itself on every response otherwise. Both this app and each vhost app below
+// get it: the header is set by Express' own init middleware, before anything of ours runs, so it
+// has to be turned off on whichever app ends up handling the request.
+app.disable('x-powered-by');
 const angularApp = new AngularNodeAppEngine();
 
 // Shared by every locale's vhost app - entries are keyed by host, so they can't bleed across.
@@ -56,6 +61,8 @@ appEngine.getAngularServerAppForRequest = getAngularServerAppForRequest.bind(app
 
 for (const lang of environment.languages) {
   const vhostApp = express();
+
+  vhostApp.disable('x-powered-by');
   const browserDistFolder = join(import.meta.dirname, '../browser/' + lang.locale);
 
   /**
