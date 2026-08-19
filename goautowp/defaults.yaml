@@ -30,8 +30,14 @@ rabbitmq: amqp://guest:guest@127.0.0.1:5672/
 monitoring_queue: input
 postgres-dsn: postgres://traffic:password@127.0.0.1:5432/traffic?sslmode=disable
 postgres-pool:
+  # max-idle-conns matches max-open-conns on purpose: a lower idle cap makes the pool close
+  # connections the moment a burst subsides and open them again on the next one, and reopening is
+  # exactly what fails (with "remaining connection slots are reserved...") when the server is near
+  # its own max_connections. Keep max-open-conns x (serve replicas + concurrently running jobs)
+  # comfortably below postgres' max_connections - these values are the local/test ones, production
+  # overrides them from the chart (goautowp.postgresPool in chart/values.yaml).
   max-open-conns: 20
-  max-idle-conns: 10
+  max-idle-conns: 20
   conn-max-lifetime: 5m
   conn-max-idle-time: 2m
 postgres-migrations:

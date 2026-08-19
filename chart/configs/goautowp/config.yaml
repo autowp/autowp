@@ -25,6 +25,11 @@ file-storage:
       secret: {{ .Values.s3.secret | quote }}
     use_path_style_endpoint: true
 rabbitmq: amqp://guest:guest@{{ include "common.names.fullname" .Subcharts.rabbitmq }}:5672/
+postgres-pool:
+  max-open-conns: {{ .Values.goautowp.postgresPool.maxOpenConns }}
+  max-idle-conns: {{ .Values.goautowp.postgresPool.maxIdleConns }}
+  conn-max-lifetime: {{ .Values.goautowp.postgresPool.connMaxLifetime | quote }}
+  conn-max-idle-time: {{ .Values.goautowp.postgresPool.connMaxIdleTime | quote }}
 postgres-dsn: postgres://{{ .Values.traffic.postgres.username }}:{{ .Values.traffic.postgres.password }}@{{ .Values.postgres.hostname }}:{{ .Values.postgres.port }}/traffic?sslmode=disable
 postgres-migrations:
   dsn: postgres://{{ .Values.traffic.postgres.username }}:{{ .Values.traffic.postgres.password }}@{{ .Values.postgres.hostname }}/traffic?sslmode=disable

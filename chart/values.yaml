@@ -122,6 +122,22 @@ goautowp:
     dsn: https://1234567890abcdef1234567890abcdef@sentry.example.com/1
   postgres:
     password: password
+  ## Bounds of the postgres connection pool held by *each* goautowp process, and every process
+  ## gets its own: the 3 serve replicas (4 while a rollout surges), plus one per scheduler job pod
+  ## that happens to be running - up to 3 of those overlap at midnight (hourly + daily + midnight).
+  ## So the worst case this chart asks of the server is roughly maxOpenConns x 7, plus a connection
+  ## per starting pod for the migrations.
+  ##
+  ## Sized for max_connections = 300 (3 of them superuser-reserved): 30 x 7 = 210, leaving ~85 for
+  ## psql sessions and anything else sharing the server. Raise this only together with the server's
+  ## max_connections - a pool that cannot *open* a connection is what surfaces as "remaining
+  ## connection slots are reserved for roles with the SUPERUSER attribute", and more connections
+  ## buy no throughput past the point where postgres runs out of cores for the active ones.
+  postgresPool:
+    maxOpenConns: 30
+    maxIdleConns: 30
+    connMaxLifetime: 5m
+    connMaxIdleTime: 2m
   podMonitor:
     ## @param metrics.podMonitor.enabled Create PodMonitor Resource for scraping metrics using PrometheusOperator
     ##
