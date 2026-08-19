@@ -32,9 +32,14 @@ export class FeedbackComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
 
+  // The captcha control only ever exists after a submit the backend rejected with a captcha
+  // violation (see submit() below) - `params` returning undefined until then keeps this resource
+  // idle, so the site key isn't fetched on every page view, including the SSR pass that could
+  // never render <re-captcha> anyway.
+  protected readonly captchaRequired = signal(false);
   protected readonly recaptchaKeyResource = rxResource({
-    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: 'feedback-recaptcha-key',
+    params: () => (this.captchaRequired() ? true : undefined),
     stream: () => this.#reCaptchaService.get$(),
   });
   protected readonly invalidParams = signal<InvalidParams>({});
@@ -89,8 +94,10 @@ export class FeedbackComponent implements OnInit {
                 const control = new FormControl('', {nonNullable: true, validators: Validators.required});
                 this.form.addControl(CAPTCHA, control);
               }
+              this.captchaRequired.set(true);
             } else {
               this.form.removeControl(CAPTCHA as never);
+              this.captchaRequired.set(false);
             }
           } else {
             this.#toastService.handleError(response);
