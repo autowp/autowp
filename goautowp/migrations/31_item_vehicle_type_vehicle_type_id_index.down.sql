@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS item_vehicle_type_vehicle_type_id_index;
