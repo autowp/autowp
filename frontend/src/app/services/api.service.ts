@@ -46,6 +46,30 @@ const PUBLIC_GRPC_PATH_PREFIXES = [
   '/goautowp.Pictures/GetPerspectives',
   '/goautowp.Pictures/GetPerspectivePages',
   '/goautowp.Pictures/GetCanonicalRoute',
+  '/goautowp.Map/GetPicturePoints',
+  '/goautowp.Mosts/GetMenu',
+  '/goautowp.Comments/GetMessagePage',
+  '/goautowp.Votings/GetVotingVariantVotes',
+  // The whole service, unlike the rule above: all eight Rating methods are ratings over public
+  // data, and not one of them calls auth.ValidateGRPC.
+  '/goautowp.Rating/',
+  // Items mixes public and moderator-gated methods (Item, List, GetItemParents and friends all
+  // branch on roles), so these are listed one by one - each of their handlers takes no user
+  // context at all.
+  '/goautowp.Items/GetItemOfDay',
+  '/goautowp.Items/GetItemLinks',
+  '/goautowp.Items/GetBrandIcons',
+  '/goautowp.Items/GetBrandSections',
+  '/goautowp.Items/GetBrandVehicleTypes',
+  '/goautowp.Items/GetBrands',
+  '/goautowp.Items/GetContentLanguages',
+  '/goautowp.Items/GetSpecs',
+  '/goautowp.Items/GetTopBrandsList',
+  '/goautowp.Items/GetTopCategoriesList',
+  '/goautowp.Items/GetTopFactoriesList',
+  '/goautowp.Items/GetTopPersonsList',
+  '/goautowp.Items/GetTopTwinsBrandsList',
+  '/goautowp.Items/GetTwinsBrandsList',
 ];
 
 function isPublicGrpcPath(path: string): boolean {
