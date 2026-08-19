@@ -145,4 +145,13 @@
   } @else {
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
+} @else if (menuResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+} @else if (menuResource.isLoading()) {
+  <!--
+    The rating shown - and with it everything above - comes from the menu when the URL doesn't name
+    one (plain /mosts), so without these two branches the page stayed completely blank while the
+    menu loaded, and stayed blank for good if it failed.
+  -->
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }
