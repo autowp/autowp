@@ -17,6 +17,10 @@ spec:
       port: 4000
       protocol: TCP
       targetPort: frontend-port
+    - name: assets-port
+      port: {{ .Values.frontend.assets.port }}
+      protocol: TCP
+      targetPort: assets-port
   selector: {{ include "common.labels.matchLabels" . | nindent 4 }}
     app.kubernetes.io/component: goautowp-serve
   type: ClusterIP

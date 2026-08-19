@@ -22,7 +22,78 @@ spec:
           name: config
         - name: tmp
           emptyDir: {}
+        - name: frontend-assets
+          emptyDir: {}
+        - name: frontend-assets-nginx-tmp
+          emptyDir: {}
+        - name: frontend-assets-config
+          configMap:
+            name: {{ printf "%s-frontend-assets" (include "autowp.goautowp.serve.fullname" .) | quote }}
+      initContainers:
+        # The bundle lives in the frontend image; nginx serves it from a volume the two containers
+        # share, so it has to be copied out once at startup.
+        - name: frontend-assets-copy
+          image: {{ include "autowp.frontend.image" . }}
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy | quote }}
+          command: ["sh", "-c", "cp -a /app/browser/. /srv/browser/"]
+          volumeMounts:
+            - mountPath: /srv/browser
+              name: frontend-assets
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              memory: 500M
+              cpu: 1000m
+            requests:
+              memory: 10M
+              cpu: 50m
       containers:
+        - name: frontend-assets
+          image: {{ include "autowp.frontend.assets.image" . }}
+          imagePullPolicy: {{ .Values.frontend.assets.image.pullPolicy | quote }}
+          ports:
+            - name: assets-port
+              containerPort: {{ .Values.frontend.assets.port }}
+          livenessProbe:
+            tcpSocket:
+              port: assets-port
+            initialDelaySeconds: 3
+          readinessProbe:
+            tcpSocket:
+              port: assets-port
+            initialDelaySeconds: 5
+          volumeMounts:
+            - mountPath: /srv/browser
+              name: frontend-assets
+              readOnly: true
+            - mountPath: /etc/nginx/nginx.conf
+              name: frontend-assets-config
+              subPath: nginx.conf
+              readOnly: true
+            - mountPath: /tmp
+              name: frontend-assets-nginx-tmp
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              memory: 500M
+              cpu: 2000m
+            requests:
+              memory: 10M
+              cpu: 50m
         - name: frontend
           image: {{ include "autowp.frontend.image" . }}
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy | quote }}

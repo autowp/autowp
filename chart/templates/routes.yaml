@@ -226,13 +226,18 @@ spec:
               name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
+        # Pages go to the nginx sidecar, not straight to the SSR server: it answers for the built
+        # bundle off disk and passes only what isn't a file through to Node. The backend paths
+        # above keep going directly to goautowp - routing them through the sidecar would make the
+        # peer loopback, which is outside trusted-network, and realip would drop the client's
+        # X-Forwarded-For.
         - path: /
           pathType: Prefix
           backend:
             service:
               name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
-                name: frontend-port
+                name: assets-port
   {{- end }}
 
 ---

@@ -1,0 +1,94 @@
+{{/*
+nginx that fronts the SSR container: it answers for the built frontend bundle off disk and hands
+only page requests to Node. Serving those files from the Node process itself put them in the same
+single-threaded queue as server-side rendering, where they waited tens of seconds behind renders.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  name: {{ printf "%s-frontend-assets" (include "autowp.goautowp.serve.fullname" .) | quote }}
+data:
+  nginx.conf: |
+    worker_processes auto;
+    error_log /dev/stderr warn;
+    pid /tmp/nginx.pid;
+
+    events {
+      worker_connections 4096;
+    }
+
+    http {
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+
+      access_log off;
+      sendfile on;
+      tcp_nopush on;
+      server_tokens off;
+
+      # Everything nginx writes goes to the tmp volume: the container's root filesystem is
+      # read-only.
+      client_body_temp_path /tmp/client_body;
+      proxy_temp_path /tmp/proxy;
+      fastcgi_temp_path /tmp/fastcgi;
+      uwsgi_temp_path /tmp/uwsgi;
+      scgi_temp_path /tmp/scgi;
+
+      # Caches the existence check too (open_file_cache_errors), so page requests - which never
+      # match a file - stop paying for a stat on every hit.
+      open_file_cache max=10000 inactive=60s;
+      open_file_cache_valid 60s;
+      open_file_cache_min_uses 2;
+      open_file_cache_errors on;
+
+      gzip on;
+      gzip_vary on;
+      gzip_types text/css text/plain application/javascript application/json application/xml image/svg+xml;
+
+      # Each locale is built into its own directory (i18n.locales in frontend/angular.json), and the
+      # host decides which one - the same mapping the SSR server applies with vhost.
+      map $host $frontend_root {
+        default /srv/browser/{{ (first .Values.languages).locale }};
+        {{ range $language := .Values.languages }}
+        {{ $language.hostname }} /srv/browser/{{ $language.locale }};
+        {{ range $language.aliases }}
+        {{ . }} /srv/browser/{{ $language.locale }};
+        {{ end }}
+        {{ end }}
+      }
+
+      server {
+        listen {{ .Values.frontend.assets.port }};
+        root $frontend_root;
+
+        # A missing asset is a 404, not a reason to render a page. Without this, a mistyped or
+        # relatively-resolved asset URL (/mosts/.../favicons/icon.png, say) reaches the router,
+        # matches a route, and costs a full server-side render to answer with HTML.
+        location ~* ^/(assets|favicons)/ {
+          try_files $uri =404;
+          expires 1y;
+          add_header Cache-Control "public, immutable";
+        }
+
+        location ~* \.(js|mjs|css|map|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|eot|xml|txt|webmanifest)$ {
+          try_files $uri =404;
+          expires 1y;
+          add_header Cache-Control "public, immutable";
+        }
+
+        location / {
+          try_files $uri @ssr;
+        }
+
+        location @ssr {
+          proxy_pass http://127.0.0.1:4000;
+          proxy_http_version 1.1;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_read_timeout 120s;
+        }
+      }
+    }

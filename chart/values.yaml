@@ -76,6 +76,18 @@ frontend:
     digest: ""
     pullPolicy: IfNotPresent
     pullSecrets: []
+  ## nginx sidecar that serves the built bundle off disk and proxies only page requests to the SSR
+  ## process - see templates/goautowp/frontend-assets-cm.yaml. Port 8081 because the pod's network
+  ## namespace is shared: 8080/8082/2112 belong to goautowp and 4000 to the SSR server.
+  assets:
+    port: 8081
+    image:
+      registry: docker.io
+      repository: nginxinc/nginx-unprivileged
+      tag: 1-alpine
+      digest: ""
+      pullPolicy: IfNotPresent
+      pullSecrets: []
   ## In-memory cache of server-rendered pages, per SSR pod (see src/ssr-cache.ts). Rendering one
   ## page costs 10-30 gRPC calls, so this is mostly here to collapse concurrent requests for the
   ## same URL into a single render - that part works even with ttlMs: 0, which disables reuse.
@@ -203,6 +215,44 @@ rabbitmq:
   volumePermissions:
     image:
       repository: bitnamilegacy/os-shell
+## The locales the site is served in, and the host each one answers on. One list feeds both
+## the goautowp config (code -> hostname/aliases) and the SSR sidecar's nginx, which needs to
+## know which directory of the frontend build a host is served from - `locale` is that
+## directory name, i.e. a key of i18n.locales in frontend/angular.json (plus its sourceLocale).
+languages:
+  - code: en
+    locale: en-GB
+    hostname: en.wheelsage.org
+    aliases:
+      - wheelsage.org
+      - www.wheelsage.org
+  - code: zh
+    locale: zh-CN
+    hostname: zh.wheelsage.org
+  - code: ru
+    locale: ru
+    hostname: www.autowp.ru
+  - code: pt-br
+    locale: pt-BR
+    hostname: br.wheelsage.org
+  - code: fr
+    locale: fr
+    hostname: fr.wheelsage.org
+  - code: be
+    locale: be
+    hostname: be.wheelsage.org
+  - code: uk
+    locale: uk
+    hostname: uk.wheelsage.org
+  - code: es
+    locale: es-ES
+    hostname: es.wheelsage.org
+  - code: it
+    locale: it
+    hostname: it.wheelsage.org
+  - code: he
+    locale: he
+    hostname: he.wheelsage.org
 postgres:
   hostname: 127.0.0.1
   port: 5432

@@ -18,6 +18,10 @@
 {{ include "common.images.image" (dict "imageRoot" .Values.frontend.image "global" .Values.global) }}
 {{- end -}}
 
+{{- define "autowp.frontend.assets.image" -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.frontend.assets.image "global" .Values.global) }}
+{{- end -}}
+
 {{- define "autowp.goautowp.fullname" -}}
 {{- printf "%s-goautowp" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
