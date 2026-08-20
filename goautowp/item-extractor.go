@@ -16,6 +16,7 @@ import (
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
 	"google.golang.org/genproto/googleapis/type/latlng"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -1060,6 +1061,22 @@ func (s *ItemExtractor) extractEngineVehiclesCount(
 	return int32(res), err //nolint: gosec
 }
 
+// previewPictureFields is the field set a preview picture is extracted with: what the caller asked
+// for, plus the name every caller of preview pictures displays, and exactly one of the two
+// thumbnail sizes.
+func previewPictureFields(requested *PictureFields, thumbLarge bool) *PictureFields {
+	fields, _ := proto.Clone(requested).(*PictureFields)
+	if fields == nil {
+		fields = &PictureFields{}
+	}
+
+	fields.NameText = true
+	fields.ThumbLarge = thumbLarge
+	fields.ThumbMedium = !thumbLarge
+
+	return fields
+}
+
 func (s *ItemExtractor) extractPreviewPictures(
 	ctx context.Context, fields *ItemFields, row *items.Item, lang string, userCtx UserContext,
 ) (*PreviewPictures, error) {
@@ -1109,39 +1126,60 @@ func (s *ItemExtractor) extractPreviewPictures(
 
 	pictureExtractor := s.container.PictureExtractor()
 
-	pictureFields := picturesRequest.GetFields()
-	if pictureFields == nil {
-		pictureFields = &PictureFields{}
+	// Two field sets rather than one mutated between pictures: only the first picture of a
+	// large-format item gets the large thumbnail, the rest get the medium one. Cloned because the
+	// message that arrived belongs to the caller's request, and because both are now alive at
+	// once - each is used for a whole batch.
+	thumbMediumFields := previewPictureFields(picturesRequest.GetFields(), false)
+	thumbLargeFields := previewPictureFields(picturesRequest.GetFields(), true)
+
+	// Which is what makes this two batches instead of a call per picture: extracting one at a time
+	// meant the picture extractor's preloads - names, images, formatted variants, routes - ran once
+	// per preview picture, and a catalogue listing shows several per item and dozens of items.
+	extractedPics := make([]*NullPicture, len(result.Pictures))
+	for idx := range extractedPics {
+		extractedPics[idx] = &NullPicture{Kind: &NullPicture_Null{}}
 	}
 
-	pictureFields.NameText = true
-
-	extractedPics := make([]*NullPicture, 0, len(result.Pictures))
+	largeIdx := -1
+	mediumRows := make([]*schema.PictureRow, 0, len(result.Pictures))
+	mediumIdxs := make([]int, 0, len(result.Pictures))
 
 	for idx, pic := range result.Pictures {
-		pictureFields.ThumbLarge = result.LargeFormat && idx == 0
-		pictureFields.ThumbMedium = !pictureFields.GetThumbLarge()
-
-		oneOf := &NullPicture{
-			Kind: &NullPicture_Null{},
+		if pic == nil || pic.Row == nil {
+			continue
 		}
 
-		if pic != nil && pic.Row != nil {
-			extractedPic, err := pictureExtractor.Extract(
-				ctx,
-				pic.Row,
-				pictureFields,
-				lang,
-				userCtx,
-			)
-			if err != nil {
-				return nil, err
-			}
+		if result.LargeFormat && idx == 0 {
+			largeIdx = idx
 
-			oneOf.Kind = &NullPicture_Picture{Picture: extractedPic}
+			continue
 		}
 
-		extractedPics = append(extractedPics, oneOf)
+		mediumRows = append(mediumRows, pic.Row)
+		mediumIdxs = append(mediumIdxs, idx)
+	}
+
+	if len(mediumRows) > 0 {
+		extracted, err := pictureExtractor.ExtractRows(ctx, mediumRows, thumbMediumFields, lang, userCtx)
+		if err != nil {
+			return nil, err
+		}
+
+		for idx, extractedPic := range extracted {
+			extractedPics[mediumIdxs[idx]] = &NullPicture{Kind: &NullPicture_Picture{Picture: extractedPic}}
+		}
+	}
+
+	if largeIdx >= 0 {
+		extracted, err := pictureExtractor.ExtractRows(
+			ctx, []*schema.PictureRow{result.Pictures[largeIdx].Row}, thumbLargeFields, lang, userCtx,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		extractedPics[largeIdx] = &NullPicture{Kind: &NullPicture_Picture{Picture: extracted[0]}}
 	}
 
 	return &PreviewPictures{
