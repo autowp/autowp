@@ -1,7 +1,8 @@
 {{/*
-nginx that fronts the SSR container: it answers for the built frontend bundle off disk and hands
-only page requests to Node. Serving those files from the Node process itself put them in the same
-single-threaded queue as server-side rendering, where they waited tens of seconds behind renders.
+nginx that fronts the SSR container: it answers for the built frontend bundle off disk, caches
+rendered pages, and hands only the page requests it can't answer itself to Node. Serving those
+files from the Node process itself put them in the same single-threaded queue as server-side
+rendering, where they waited tens of seconds behind renders.
 */}}
 apiVersion: v1
 kind: ConfigMap
@@ -41,6 +42,14 @@ data:
       open_file_cache_valid 60s;
       open_file_cache_min_uses 2;
       open_file_cache_errors on;
+
+      # Rendered pages, shared by the whole pod. The SSR process has its own in-memory cache
+      # (frontend/src/ssr-cache.ts), but that one is per worker, so the cluster's round-robin
+      # splits its hit rate across every worker; this one sits in front of all of them and, unlike
+      # that cache, costs no heap in the process that has to do the rendering. Under /tmp because
+      # the container's root filesystem is read-only.
+      proxy_cache_path /tmp/ssr-cache levels=1:2 keys_zone=ssr:{{ .Values.frontend.assets.cache.keysZone }}
+                       max_size={{ .Values.frontend.assets.cache.maxSize }} inactive={{ .Values.frontend.assets.cache.inactive }} use_temp_path=off;
 
       gzip on;
       gzip_vary on;
@@ -89,6 +98,29 @@ data:
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
           proxy_read_timeout 120s;
+
+          proxy_cache ssr;
+          # Host is part of the key because one nginx serves every locale, and the same path
+          # renders differently per host. Deliberately not varying on Cookie: a server-side render
+          # is anonymous by construction (Keycloak never initializes on the server), so two
+          # visitors requesting the same URL get byte-identical HTML - see the same reasoning in
+          # frontend/src/ssr-cache.ts. Responses that do carry a Set-Cookie are left uncached by
+          # nginx's own default, which is why that default is not overridden here.
+          proxy_cache_key "$host$request_uri";
+          proxy_cache_valid 200 301 302 {{ .Values.frontend.assets.cache.ttl }};
+          # Crawlers walking dead URLs shouldn't each cost a render of the 404 page.
+          proxy_cache_valid 404 {{ .Values.frontend.assets.cache.notFoundTtl }};
+          # A burst of requests for one uncached URL waits on a single render instead of starting
+          # one each - the thing that actually protects a 4-worker pod from a crawler.
+          proxy_cache_lock on;
+          proxy_cache_lock_age 30s;
+          proxy_cache_lock_timeout 120s;
+          # Once an entry expires, one request refreshes it in the background while everyone else
+          # keeps getting the stale copy - so an expiry never turns into a latency spike, and an
+          # SSR hiccup never turns into an error page for a URL that was fine a minute ago.
+          proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+          proxy_cache_background_update on;
+          add_header X-SSR-Page-Cache $upstream_cache_status always;
         }
       }
     }

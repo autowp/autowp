@@ -81,6 +81,19 @@ frontend:
   ## namespace is shared: 8080/8082/2112 belong to goautowp and 4000 to the SSR server.
   assets:
     port: 8081
+    ## Cache of server-rendered pages held by that nginx, shared by every SSR worker in the pod
+    ## (the process' own cache in frontend/src/ssr-cache.ts is per worker, so cluster round-robin
+    ## splits its hit rate). ttl is short on purpose - a served page carries its data inline in the
+    ## transfer cache, so a visitor sees whatever the render captured - but expiry is never paid
+    ## for by a visitor: stale entries are served while one background request refreshes them.
+    cache:
+      ttl: 60s
+      notFoundTtl: 30s
+      ## Shared-memory zone for the keys (~8000 keys per megabyte) and the on-disk body budget.
+      keysZone: 10m
+      maxSize: 512m
+      ## Entries untouched for this long are dropped regardless of ttl.
+      inactive: 10m
     image:
       registry: docker.io
       repository: nginxinc/nginx-unprivileged
