@@ -132,6 +132,15 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 	}
 
+	var paths map[int64][]*PathTreePictureItem
+
+	if pathRequest := fields.GetPath(); pathRequest != nil {
+		paths, err = s.preloadPaths(ctx, rows, pathRequest.GetParentId())
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	for _, row := range rows {
 		resultRow := &Picture{
 			Id:               row.ID,
@@ -315,12 +324,8 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			resultRow.ModerVoteVote = sum
 		}
 
-		path := fields.GetPath()
-		if path != nil {
-			resultRow.Path, err = s.path(ctx, row.ID, path.GetParentId())
-			if err != nil {
-				return nil, err
-			}
+		if paths != nil {
+			resultRow.Path = paths[row.ID]
 		}
 
 		pictureItemRequest := fields.GetPictureItem()
@@ -824,17 +829,28 @@ type pathTreeGraph struct {
 	parents map[int64][]*items.ItemParent
 }
 
-func (s *PictureExtractor) path(
-	ctx context.Context, pictureID int64, targetItemID int64,
-) ([]*PathTreePictureItem, error) {
-	picturesRepositury, err := s.container.PicturesRepository(ctx)
+// preloadPaths builds the routes of every picture in one go: one query for the picture-items of
+// all of them, one collection of the item graph they reach (see collectPathTree), and one builder
+// shared between them - so a listing of two dozen pictures, which is what the catalogue asks for,
+// costs what a single picture used to rather than two dozen times that. Pictures of the same item,
+// or of items under a shared parent, now also share the nodes above them instead of each
+// discovering them again.
+func (s *PictureExtractor) preloadPaths(
+	ctx context.Context, rows []*schema.PictureRow, targetItemID int64,
+) (map[int64][]*PathTreePictureItem, error) {
+	picturesRepository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	piRows, err := picturesRepositury.PictureItems(ctx, &query.PictureItemListOptions{
-		PictureID: pictureID,
-		TypeID:    schema.PictureItemTypeContent,
+	pictureIDs := make([]int64, 0, len(rows))
+	for _, row := range rows {
+		pictureIDs = append(pictureIDs, row.ID)
+	}
+
+	piRows, err := picturesRepository.PictureItems(ctx, &query.PictureItemListOptions{
+		PictureIDs: pictureIDs,
+		TypeID:     schema.PictureItemTypeContent,
 	}, pictures.PictureItemOrderByNone, 0)
 	if err != nil {
 		return nil, err
@@ -852,18 +868,18 @@ func (s *PictureExtractor) path(
 
 	builder := &pathTreeBuilder{
 		graph:        graph,
-		targetItemID: targetItemID,
 		built:        make(map[int64]*PathTreeItem),
 		building:     make(map[int64]bool),
+		targetItemID: targetItemID,
 	}
 
-	result := make([]*PathTreePictureItem, 0, len(piRows))
+	result := make(map[int64][]*PathTreePictureItem, len(rows))
 
 	for _, piRow := range piRows {
 		item := builder.route(piRow.ItemID)
 
 		if item != nil {
-			result = append(result, &PathTreePictureItem{
+			result[piRow.PictureID] = append(result[piRow.PictureID], &PathTreePictureItem{
 				PerspectiveId: util.NullInt32ToScalar(piRow.PerspectiveID),
 				Item:          item,
 			})

@@ -13,6 +13,7 @@ const (
 type PictureItemListOptions struct {
 	TypeID                      schema.PictureItemType
 	PictureID                   int64
+	PictureIDs                  []int64
 	ItemID                      int64
 	ItemIDs                     []int64
 	ItemIDExpr                  exp.Expression
@@ -125,6 +126,10 @@ func (s *PictureItemListOptions) apply(
 
 	if s.PictureID != 0 {
 		sqSelect = sqSelect.Where(pictureIDCol.Eq(s.PictureID))
+	}
+
+	if len(s.PictureIDs) > 0 {
+		sqSelect = sqSelect.Where(pictureIDCol.In(s.PictureIDs))
 	}
 
 	if s.ItemID != 0 {
