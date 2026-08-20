@@ -1,7 +1,8 @@
 import type {HttpResponseBase} from '@angular/common/http';
 
+import {isPlatformBrowser} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
-import {Service, signal} from '@angular/core';
+import {inject, PLATFORM_ID, Service, signal} from '@angular/core';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 
 export interface Toast {
@@ -12,6 +13,8 @@ export interface Toast {
 
 @Service()
 export class ToastsService {
+  readonly #isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   public readonly toasts = signal<Toast[]>([]);
 
   public handleError(error: unknown) {
@@ -42,6 +45,20 @@ export class ToastsService {
   }
 
   public show(options: Toast) {
+    // Nothing shows a toast during server-side rendering - nobody is there to see it, and the
+    // rendered markup is thrown away on hydration anyway - but rendering one is far from free:
+    // NgbToast's autohide timer (5s, see toasts/container/container.component.html) is a zone
+    // macrotask, and @angular/ssr only flushes the HTML once the zone is stable. One failing gRPC
+    // call was therefore enough to turn a 0.25s render into a 5.3s one, with the whole component
+    // tree and its responses pinned in the heap for those five seconds.
+    //
+    // Logging instead of dropping it silently is the other half: server-side failures used to
+    // vanish into a toast no visitor ever saw, so they never reached the pod logs.
+    if (!this.#isBrowser) {
+      console.error(`[ssr] ${options.type}: ${options.message}`);
+      return;
+    }
+
     this.toasts.update((values) => [...values, options]);
   }
 
