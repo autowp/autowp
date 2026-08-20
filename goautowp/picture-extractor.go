@@ -810,6 +810,20 @@ func (s *PictureExtractor) preloadTopicsStat(
 	return stats, nil
 }
 
+// Item types whose parents continue a route. Anything else ends it.
+var pathTreeParentItemTypes = []schema.ItemTableItemTypeID{
+	schema.ItemTableItemTypeIDCategory,
+	schema.ItemTableItemTypeIDEngine,
+	schema.ItemTableItemTypeIDVehicle,
+}
+
+// pathTreeGraph is the slice of the item graph a picture's routes can reach: the items on them,
+// and the edges to the parents of those whose type continues a route.
+type pathTreeGraph struct {
+	items   map[int64]*items.Item
+	parents map[int64][]*items.ItemParent
+}
+
 func (s *PictureExtractor) path(
 	ctx context.Context, pictureID int64, targetItemID int64,
 ) ([]*PathTreePictureItem, error) {
@@ -826,13 +840,27 @@ func (s *PictureExtractor) path(
 		return nil, err
 	}
 
-	result := make([]*PathTreePictureItem, 0)
+	itemIDs := make([]int64, 0, len(piRows))
+	for _, piRow := range piRows {
+		itemIDs = append(itemIDs, piRow.ItemID)
+	}
+
+	graph, err := s.collectPathTree(ctx, itemIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	builder := &pathTreeBuilder{
+		graph:        graph,
+		targetItemID: targetItemID,
+		built:        make(map[int64]*PathTreeItem),
+		building:     make(map[int64]bool),
+	}
+
+	result := make([]*PathTreePictureItem, 0, len(piRows))
 
 	for _, piRow := range piRows {
-		item, err := s.itemRoute(ctx, piRow.ItemID, targetItemID)
-		if err != nil {
-			return nil, err
-		}
+		item := builder.route(piRow.ItemID)
 
 		if item != nil {
 			result = append(result, &PathTreePictureItem{
@@ -845,84 +873,140 @@ func (s *PictureExtractor) path(
 	return result, nil
 }
 
-func (s *PictureExtractor) itemRoute(
-	ctx context.Context,
-	itemID int64,
-	targetItemID int64,
-) (*PathTreeItem, error) {
+// collectPathTree walks the parent graph upwards a level at a time: two queries per level - the
+// items of the whole level, then the parent edges of the whole level - rather than two per node.
+//
+// The routes it collects are then assembled in memory, without touching the database again. Walked
+// node by node instead, as this used to be, the number of queries grew with the number of *routes*
+// through the graph rather than with its size: an item reachable through several parents had its
+// whole subtree re-walked once per route reaching it, on a call production logs showed at 10-14s.
+func (s *PictureExtractor) collectPathTree(ctx context.Context, itemIDs []int64) (*pathTreeGraph, error) {
 	itemsRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	row, err := itemsRepository.Item(ctx, &query.ItemListOptions{
-		ItemID: itemID,
-	}, nil)
-	if err != nil {
-		if errors.Is(err, items.ErrItemNotFound) {
-			return nil, nil //nolint: nilnil
+	graph := &pathTreeGraph{
+		items:   make(map[int64]*items.Item),
+		parents: make(map[int64][]*items.ItemParent),
+	}
+
+	// Every id ever queued, including the ones no item came back for: without it a deleted parent
+	// would be asked for on every level that references it, forever.
+	seen := make(map[int64]bool, len(itemIDs))
+	frontier := make([]int64, 0, len(itemIDs))
+
+	queue := func(ids ...int64) {
+		for _, id := range ids {
+			if id > 0 && !seen[id] {
+				seen[id] = true
+
+				frontier = append(frontier, id)
+			}
 		}
-
-		return nil, err
 	}
 
-	parentItemTypes := []schema.ItemTableItemTypeID{
-		schema.ItemTableItemTypeIDCategory,
-		schema.ItemTableItemTypeIDEngine,
-		schema.ItemTableItemTypeIDVehicle,
-	}
+	queue(itemIDs...)
 
-	parents := make([]*PathTreeItemParent, 0)
-	if util.Contains(parentItemTypes, row.ItemTypeID) {
-		parents, err = s.itemParentRoute(ctx, row.ID, targetItemID)
+	for len(frontier) > 0 {
+		rows, _, err := itemsRepository.List(
+			ctx, &query.ItemListOptions{ItemIDs: frontier}, nil, items.OrderByNone, false,
+		)
 		if err != nil {
 			return nil, err
 		}
+
+		expandable := make([]int64, 0, len(rows))
+
+		for _, row := range rows {
+			graph.items[row.ID] = row
+
+			if util.Contains(pathTreeParentItemTypes, row.ItemTypeID) {
+				expandable = append(expandable, row.ID)
+			}
+		}
+
+		frontier = frontier[:0]
+
+		if len(expandable) == 0 {
+			break
+		}
+
+		parentRows, _, err := itemsRepository.ItemParents(
+			ctx, &query.ItemParentListOptions{ItemIDs: expandable}, items.ItemParentFields{},
+			items.ItemParentOrderByNone,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, parentRow := range parentRows {
+			graph.parents[parentRow.ItemID] = append(graph.parents[parentRow.ItemID], parentRow)
+
+			queue(parentRow.ParentID)
+		}
 	}
 
-	if len(parents) == 0 && targetItemID != 0 && itemID != targetItemID {
-		return nil, nil //nolint: nilnil
+	return graph, nil
+}
+
+// pathTreeBuilder assembles the response tree out of a collected graph, memoized per item: a node
+// several routes lead to is built once and shared between them instead of expanded again. The tree
+// that comes out is the same one node-by-node walking produced.
+type pathTreeBuilder struct {
+	graph        *pathTreeGraph
+	built        map[int64]*PathTreeItem
+	building     map[int64]bool
+	targetItemID int64
+}
+
+func (s *pathTreeBuilder) route(itemID int64) *PathTreeItem {
+	if built, ok := s.built[itemID]; ok {
+		return built
 	}
 
-	return &PathTreeItem{
+	// A cycle in item_parent would otherwise recurse until the stack runs out - which the previous
+	// implementation would have done too, one query per step. The node that closes the cycle keeps
+	// (and caches) the truncated parents it was built with; on data that has no cycles, which is
+	// what item_parent is meant to hold, this never comes up.
+	if s.building[itemID] {
+		return nil
+	}
+
+	row, ok := s.graph.items[itemID]
+	if !ok {
+		// No such item any more: the route through it is dropped, as it was before.
+		return nil
+	}
+
+	s.building[itemID] = true
+	defer delete(s.building, itemID)
+
+	parents := make([]*PathTreeItemParent, 0, len(s.graph.parents[itemID]))
+
+	for _, parentRow := range s.graph.parents[itemID] {
+		item := s.route(parentRow.ParentID)
+
+		if item != nil {
+			parents = append(parents, &PathTreeItemParent{
+				Catname: parentRow.Catname,
+				Item:    item,
+			})
+		}
+	}
+
+	// A route that reaches neither the item asked about nor anything above it is not a route to it.
+	if len(parents) == 0 && s.targetItemID != 0 && itemID != s.targetItemID {
+		return nil
+	}
+
+	result := &PathTreeItem{
 		ItemTypeId: extractItemTypeID(row.ItemTypeID),
 		Catname:    util.NullStringToString(row.Catname),
 		Parents:    parents,
-	}, nil
-}
-
-func (s *PictureExtractor) itemParentRoute(
-	ctx context.Context, itemID int64, targetItemID int64,
-) ([]*PathTreeItemParent, error) {
-	itemsRepository, err := s.container.ItemsRepository(ctx)
-	if err != nil {
-		return nil, err
 	}
 
-	result := make([]*PathTreeItemParent, 0)
+	s.built[itemID] = result
 
-	if itemID > 0 {
-		rows, _, err := itemsRepository.ItemParents(ctx, &query.ItemParentListOptions{
-			ItemID: itemID,
-		}, items.ItemParentFields{}, items.ItemParentOrderByNone)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, row := range rows {
-			item, err := s.itemRoute(ctx, row.ParentID, targetItemID)
-			if err != nil {
-				return nil, err
-			}
-
-			if item != nil {
-				result = append(result, &PathTreeItemParent{
-					Catname: row.Catname,
-					Item:    item,
-				})
-			}
-		}
-	}
-
-	return result, nil
+	return result
 }

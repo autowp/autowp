@@ -18,6 +18,7 @@ func AppendItemParentAlias(alias string, suffix string) string {
 
 type ItemParentListOptions struct {
 	ItemID                             int64
+	ItemIDs                            []int64
 	ParentID                           int64
 	ParentIDs                          []int64
 	Type                               schema.ItemParentType
@@ -130,6 +131,10 @@ func (s *ItemParentListOptions) apply(
 
 	if s.ItemID != 0 {
 		sqSelect = sqSelect.Where(itemIDCol.Eq(s.ItemID))
+	}
+
+	if len(s.ItemIDs) > 0 {
+		sqSelect = sqSelect.Where(itemIDCol.In(s.ItemIDs))
 	}
 
 	if s.ParentID != 0 {
