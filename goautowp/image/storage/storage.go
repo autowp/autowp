@@ -18,6 +18,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/autowp/goautowp/config"
@@ -70,6 +71,10 @@ type Storage struct {
 	formats               map[string]*sampler.Format
 	formattedImageDirName string
 	sampler               *sampler.Sampler
+
+	// Built once, on first use, and shared from then on - see s3Client.
+	s3ClientMutex sync.Mutex
+	s3ClientValue *s3.Client
 }
 
 type FlushOptions struct {
@@ -1259,7 +1264,34 @@ func (s *Storage) dir(dirName string) *Dir {
 	return nil
 }
 
+// s3Client returns the shared S3 client, building it on first use.
+//
+// It used to be built per call, and it is called from a dozen places - several of them once per
+// image and per format - so a page of thumbnails loaded the AWS config, parsed the endpoint and
+// constructed a credentials cache that many times over. The client is safe for concurrent use, and
+// the context only matters while the config is being loaded: requests carry their own.
+//
+// A failure is not cached, so a build that fails is retried by the next caller rather than
+// disabling the storage for the lifetime of the process.
 func (s *Storage) s3Client(ctx context.Context) (*s3.Client, error) {
+	s.s3ClientMutex.Lock()
+	defer s.s3ClientMutex.Unlock()
+
+	if s.s3ClientValue != nil {
+		return s.s3ClientValue, nil
+	}
+
+	client, err := s.newS3Client(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	s.s3ClientValue = client
+
+	return client, nil
+}
+
+func (s *Storage) newS3Client(ctx context.Context) (*s3.Client, error) {
 	cfg, err := awsconfig.LoadDefaultConfig(ctx, awsconfig.WithRegion(s.config.S3.Region))
 	if err != nil {
 		return nil, err
