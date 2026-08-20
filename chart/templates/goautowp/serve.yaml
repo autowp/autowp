@@ -107,6 +107,14 @@ spec:
               value: {{ .Values.frontend.ssrCache.ttlMs | quote }}
             - name: SSR_CACHE_MAX_BYTES
               value: {{ .Values.frontend.ssrCache.maxBytes | quote }}
+            - name: SSR_MAX_CONCURRENT_RENDERS
+              value: {{ .Values.frontend.render.maxConcurrent | quote }}
+            - name: SSR_MAX_QUEUED_RENDERS
+              value: {{ .Values.frontend.render.maxQueued | quote }}
+            - name: SSR_QUEUE_TIMEOUT_MS
+              value: {{ .Values.frontend.render.queueTimeoutMs | quote }}
+            - name: NODE_OPTIONS
+              value: {{ printf "--max-old-space-size=%v" .Values.frontend.maxOldSpaceSizeMb | quote }}
           ports:
             - name: frontend-port
               containerPort: 4000

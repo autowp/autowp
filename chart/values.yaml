@@ -101,6 +101,21 @@ frontend:
       digest: ""
       pullPolicy: IfNotPresent
       pullSecrets: []
+  ## Admission control in front of the renderer (frontend/src/render-queue.ts), per worker - so a
+  ## pod allows workers x maxConcurrent renders at once. Bounding this is what keeps a crawl from
+  ## turning into hundreds of simultaneous renders, thousands of concurrent backend calls, and a
+  ## queue inside Postgres, which is how renders ended up taking 20-40s. Requests that can't get a
+  ## slot within queueTimeoutMs are answered with the client-side rendering shell instead: no SEO
+  ## content on that response, but the visitor gets the page and the pod stays alive.
+  render:
+    maxConcurrent: 2
+    maxQueued: 8
+    queueTimeoutMs: 5000
+  ## Heap cap per worker, in MB. Without it V8 sizes the heap from the *node's* memory (~4GB on any
+  ## real machine) and ignores the container limit, so four workers can each grow past what the pod
+  ## is allowed before GC gets serious - and the container is killed mid-render instead. Keep
+  ## workers x (this + ~200MB of bundles and overhead) comfortably under the memory limit below.
+  maxOldSpaceSizeMb: 768
   ## Render processes per pod. Rendering is single-threaded, so one process uses exactly one core
   ## however many the container is allowed - production sat at ~1 CPU per pod against a 4 CPU
   ## limit until this existed. Keep it at or below the CPU limit below; unlike adding replicas, it

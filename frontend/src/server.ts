@@ -10,9 +10,11 @@ import {environment} from '@environment/environment';
 import {SSR_REQUEST_ID_HEADER} from '@utils/ssr-request';
 import express from 'express';
 import cluster from 'node:cluster';
+import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import vhost from 'vhost';
 
+import {RenderQueue, RenderShedError} from './render-queue';
 import {SsrPageCache, ssrPageCacheOptionsFromEnv} from './ssr-cache';
 
 /**
@@ -25,6 +27,23 @@ import {SsrPageCache, ssrPageCacheOptionsFromEnv} from './ssr-cache';
  * against a container limit of four.
  */
 const workers = Math.max(1, parseInt(process.env['SSR_WORKERS'] ?? '', 10) || 1);
+
+function intFromEnv(name: string, fallback: number): number {
+  const parsed = parseInt(process.env[name] ?? '', 10);
+
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+/**
+ * Bounds how many renders happen at once - see render-queue.ts for why that is the thing worth
+ * bounding. Per worker, like the cache budget: the cluster hands each worker its own share of the
+ * connections, so the pod's real limit is this times `workers`.
+ */
+const renderQueue = new RenderQueue({
+  maxConcurrent: Math.max(1, intFromEnv('SSR_MAX_CONCURRENT_RENDERS', 2)),
+  maxQueued: intFromEnv('SSR_MAX_QUEUED_RENDERS', 8),
+  queueTimeoutMs: intFromEnv('SSR_QUEUE_TIMEOUT_MS', 5000),
+});
 
 /**
  * A render slower than this is logged as a warning rather than as an ordinary line.
@@ -61,6 +80,17 @@ function logRender(requestId: string, request: ExpressRequest, status: number, c
   } else {
     console.log(line);
   }
+}
+
+/**
+ * A shed request is not an error - it is this process refusing to take on work it cannot finish -
+ * but it does mean the pod is at its limit, which is worth a warning.
+ */
+function logShed(requestId: string, request: ExpressRequest, error: RenderShedError, served: string): void {
+  console.warn(
+    `[ssr] id=${requestId} ${request.method} ${request.headers.host ?? '-'}${request.originalUrl} shed after ` +
+      `${error.waitedMs}ms active=${renderQueue.active} queued=${error.queued} served=${served}`,
+  );
 }
 
 const app = express();
@@ -124,6 +154,27 @@ for (const lang of environment.languages) {
   vhostApp.disable('x-powered-by');
   const browserDistFolder = join(import.meta.dirname, '../browser/' + lang.locale);
 
+  // What a shed request gets instead of a render: the same shell the browser bootstrapped itself
+  // from before SSR existed, so the visitor still gets the page - just built client-side.
+  //
+  // Read on the first shed rather than at startup, and remembered from then on: this module is
+  // also loaded by the build's prerender step, where the locale directories don't exist yet and
+  // reading eagerly only produced ten ENOENT lines per build.
+  let csrShell: null | string | undefined;
+
+  const readCsrShell = (): null | string => {
+    if (csrShell === undefined) {
+      try {
+        csrShell = readFileSync(join(browserDistFolder, 'index.csr.html'), 'utf8');
+      } catch (error) {
+        csrShell = null;
+        console.error(`[ssr] no index.csr.html for ${lang.locale}, shed requests are answered 503`, error);
+      }
+    }
+
+    return csrShell;
+  };
+
   /**
    * Serve static files from /browser
    */
@@ -151,7 +202,10 @@ for (const lang of environment.languages) {
     // Through the cache rather than straight to angularApp.handle(): a render costs 10-30 gRPC
     // calls, and this collapses concurrent requests for the same page into one of them.
     ssrCache
-      .handle(req, () => angularApp.handle(req))
+      // The queue wraps only the render itself, inside the cache: a page the cache can answer
+      // costs nothing to serve and must not wait behind renders, and requests collapsed onto one
+      // in-flight render take one slot between them rather than one each.
+      .handle(req, () => renderQueue.run(() => angularApp.handle(req)))
       .then((response) => {
         if (response) {
           // Absent on the paths the cache doesn't handle at all, i.e. anything but GET.
@@ -172,6 +226,27 @@ for (const lang of environment.languages) {
         return undefined;
       })
       .catch((error: unknown) => {
+        if (error instanceof RenderShedError) {
+          const shell = readCsrShell();
+
+          logShed(requestId, req, error, shell ? 'csr-shell' : '503');
+
+          if (!shell) {
+            res.status(503).set('Retry-After', '30').send('Service Unavailable');
+
+            return;
+          }
+
+          // no-store, or nginx would cache this shell for the next minute and hand it to everyone
+          // else asking for the page - including the crawler this shell has nothing to offer.
+          res
+            .status(200)
+            .set({'Cache-Control': 'no-store', 'Content-Type': 'text/html; charset=utf-8', 'X-SSR-Shell': '1'})
+            .send(shell);
+
+          return;
+        }
+
         // Logged here rather than left to Express' default handler: that one prints a stack with
         // nothing to say which page produced it, and this is the one failure mode that costs a
         // visitor an error page.

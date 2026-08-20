@@ -97,7 +97,17 @@ data:
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
-          proxy_read_timeout 120s;
+          # A render nobody is waiting for any more is worse than no render: it holds a slot in the
+          # SSR process and an nginx worker for as long as it runs. Anything past this is given up
+          # on, and the shell below is served instead.
+          proxy_read_timeout 30s;
+
+          # When the SSR process can't answer at all - overloaded, restarting, gone - the visitor
+          # gets the client-side rendering shell rather than nginx's 502 page. It is the same
+          # bundle this nginx already serves off disk, so it costs a file read and works while the
+          # pod recovers. Only nginx's own failures land here; statuses the app itself returns
+          # (404s and the like) pass through untouched, since proxy_intercept_errors stays off.
+          error_page 502 504 = @csr_shell;
 
           proxy_cache ssr;
           # Host is part of the key because one nginx serves every locale, and the same path
@@ -114,13 +124,21 @@ data:
           # one each - the thing that actually protects a 4-worker pod from a crawler.
           proxy_cache_lock on;
           proxy_cache_lock_age 30s;
-          proxy_cache_lock_timeout 120s;
+          proxy_cache_lock_timeout 60s;
           # Once an entry expires, one request refreshes it in the background while everyone else
           # keeps getting the stale copy - so an expiry never turns into a latency spike, and an
           # SSR hiccup never turns into an error page for a URL that was fine a minute ago.
           proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
           proxy_cache_background_update on;
           add_header X-SSR-Page-Cache $upstream_cache_status always;
+        }
+
+        location @csr_shell {
+          internal;
+          # Never cached, by nginx or by the visitor: this is a stand-in for a page, not the page.
+          add_header Cache-Control "no-store" always;
+          add_header X-SSR-Shell "1" always;
+          try_files /index.csr.html =503;
         }
       }
     }
