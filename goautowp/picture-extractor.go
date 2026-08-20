@@ -18,12 +18,18 @@ import (
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
 	"github.com/jackc/pgtype"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const maxPaginatorLength = 500
+
+// How many of a row's independent lookups may be in flight at once, across the whole batch being
+// extracted. Kept well under the Postgres pool (30 connections per pod in the chart) because a pod
+// runs several renders at a time and each of them can be extracting pictures.
+const pictureExtractorParallelism = 4
 
 var errItemNotFound = errors.New("item not found")
 
@@ -132,6 +138,25 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 	}
 
+	var pictureItemExtractor *PictureItemExtractor
+	if fields.GetPictureItem() != nil {
+		pictureItemExtractor = s.container.PictureItemExtractor()
+	}
+
+	var dfDistanceExtractor *DfDistanceExtractor
+	if fields.GetDfDistance() != nil {
+		dfDistanceExtractor = s.container.DfDistanceExtractor()
+	}
+
+	var commentsRepository *comments.Repository
+
+	if fields.GetSubscribed() && userCtx.UserID > 0 {
+		commentsRepository, err = s.container.CommentsRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	var paths map[int64][]*PathTreePictureItem
 
 	if pathRequest := fields.GetPath(); pathRequest != nil {
@@ -140,6 +165,18 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			return nil, err
 		}
 	}
+
+	// Everything a row needs beyond what was preloaded above is independent of everything else it
+	// needs - a vote count knows nothing about a thumbnail - and all of it is a round trip to
+	// Postgres, to text storage or to S3. Run sequentially, as this used to be, a picture page's
+	// worth of them added up: copyrights, votes, moderator votes, subscription, the replaced
+	// picture and its own extraction, one after another. They now go out together, bounded so a
+	// listing of two dozen pictures cannot put a multiple of that on the connection pool at once.
+	//
+	// Each task writes its own field of its own row, and reads only what was preloaded before the
+	// loop, so no two of them touch the same memory.
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.SetLimit(pictureExtractorParallelism)
 
 	for _, row := range rows {
 		resultRow := &Picture{
@@ -220,91 +257,121 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetThumbMedium() && row.ImageID.Valid {
-			image, err := imageStorage.FormattedImage(
-				ctx,
-				int(row.ImageID.Int64),
-				"picture-thumb-medium",
-			)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				image, err := imageStorage.FormattedImage(
+					groupCtx,
+					int(row.ImageID.Int64),
+					"picture-thumb-medium",
+				)
+				if err != nil {
+					return err
+				}
 
-			resultRow.ThumbMedium = APIImageToGRPC(image)
+				resultRow.ThumbMedium = APIImageToGRPC(image)
+
+				return nil
+			})
 		}
 
 		if fields.GetThumbLarge() && row.ImageID.Valid {
-			image, err := imageStorage.FormattedImage(
-				ctx,
-				int(row.ImageID.Int64),
-				"picture-thumb-large",
-			)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				image, err := imageStorage.FormattedImage(
+					groupCtx,
+					int(row.ImageID.Int64),
+					"picture-thumb-large",
+				)
+				if err != nil {
+					return err
+				}
 
-			resultRow.ThumbLarge = APIImageToGRPC(image)
+				resultRow.ThumbLarge = APIImageToGRPC(image)
+
+				return nil
+			})
 		}
 
 		if fields.GetImageGalleryFull() && row.ImageID.Valid {
-			image, err := imageStorage.FormattedImage(
-				ctx,
-				int(row.ImageID.Int64),
-				"picture-gallery-full",
-			)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				image, err := imageStorage.FormattedImage(
+					groupCtx,
+					int(row.ImageID.Int64),
+					"picture-gallery-full",
+				)
+				if err != nil {
+					return err
+				}
 
-			resultRow.ImageGalleryFull = APIImageToGRPC(image)
+				resultRow.ImageGalleryFull = APIImageToGRPC(image)
+
+				return nil
+			})
 		}
 
 		if fields.GetImageGallery() && row.ImageID.Valid {
-			if img, ok := images[int(row.ImageID.Int64)]; ok && img.CropHeight() > 0 &&
-				img.CropWidth() > 0 {
-				image, err := imageStorage.FormattedImage(
-					ctx,
-					int(row.ImageID.Int64),
-					"picture-gallery",
-				)
-				if err != nil {
-					return nil, err
+			group.Go(func() error {
+				if img, ok := images[int(row.ImageID.Int64)]; ok && img.CropHeight() > 0 &&
+					img.CropWidth() > 0 {
+					image, err := imageStorage.FormattedImage(
+						groupCtx,
+						int(row.ImageID.Int64),
+						"picture-gallery",
+					)
+					if err != nil {
+						return err
+					}
+
+					resultRow.ImageGallery = APIImageToGRPC(image)
 				}
 
-				resultRow.ImageGallery = APIImageToGRPC(image)
-			}
+				return nil
+			})
 		}
 
 		if fields.GetPreviewLarge() && row.ImageID.Valid {
-			image, err := imageStorage.FormattedImage(
-				ctx,
-				int(row.ImageID.Int64),
-				"picture-preview-large",
-			)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				image, err := imageStorage.FormattedImage(
+					groupCtx,
+					int(row.ImageID.Int64),
+					"picture-preview-large",
+				)
+				if err != nil {
+					return err
+				}
 
-			resultRow.PreviewLarge = APIImageToGRPC(image)
+				resultRow.PreviewLarge = APIImageToGRPC(image)
+
+				return nil
+			})
 		}
 
 		if fields.GetViews() {
-			resultRow.Views, err = picturesRepository.PictureViews(ctx, row.ID)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				views, err := picturesRepository.PictureViews(groupCtx, row.ID)
+				if err != nil {
+					return err
+				}
+
+				resultRow.Views = views
+
+				return nil
+			})
 		}
 
 		if fields.GetVotes() {
-			vote, err := picturesRepository.GetVote(ctx, row.ID, userCtx.UserID)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				vote, err := picturesRepository.GetVote(groupCtx, row.ID, userCtx.UserID)
+				if err != nil {
+					return err
+				}
 
-			resultRow.Votes = &PicturesVoteSummary{
-				Value:    vote.Value,
-				Positive: vote.Positive,
-				Negative: vote.Negative,
-			}
+				resultRow.Votes = &PicturesVoteSummary{
+					Value:    vote.Value,
+					Positive: vote.Positive,
+					Negative: vote.Negative,
+				}
+
+				return nil
+			})
 		}
 
 		if fields.GetCommentsCount() {
@@ -315,13 +382,17 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetModerVote() {
-			count, sum, err := picturesRepository.ModerVoteCount(ctx, row.ID)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				count, sum, err := picturesRepository.ModerVoteCount(groupCtx, row.ID)
+				if err != nil {
+					return err
+				}
 
-			resultRow.ModerVoteCount = count
-			resultRow.ModerVoteVote = sum
+				resultRow.ModerVoteCount = count
+				resultRow.ModerVoteVote = sum
+
+				return nil
+			})
 		}
 
 		if paths != nil {
@@ -330,153 +401,90 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 
 		pictureItemRequest := fields.GetPictureItem()
 		if pictureItemRequest != nil {
-			piOptions, err := convertPictureItemListOptions(pictureItemRequest.GetOptions())
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				piOptions, err := convertPictureItemListOptions(pictureItemRequest.GetOptions())
+				if err != nil {
+					return err
+				}
 
-			if piOptions == nil {
-				piOptions = &query.PictureItemListOptions{}
-			}
+				if piOptions == nil {
+					piOptions = &query.PictureItemListOptions{}
+				}
 
-			piOptions.PictureID = row.ID
+				piOptions.PictureID = row.ID
 
-			order := convertPictureItemsOrder(pictureItemRequest.GetOrder())
+				order := convertPictureItemsOrder(pictureItemRequest.GetOrder())
 
-			piRows, err := picturesRepository.PictureItems(ctx, piOptions, order, 0)
-			if err != nil {
-				return nil, err
-			}
+				piRows, err := picturesRepository.PictureItems(groupCtx, piOptions, order, 0)
+				if err != nil {
+					return err
+				}
 
-			extractor := s.container.PictureItemExtractor()
+				res, err := pictureItemExtractor.ExtractRows(
+					groupCtx,
+					piRows,
+					pictureItemRequest.GetFields(),
+					lang,
+					userCtx,
+				)
+				if err != nil {
+					return err
+				}
 
-			res, err := extractor.ExtractRows(
-				ctx,
-				piRows,
-				pictureItemRequest.GetFields(),
-				lang,
-				userCtx,
-			)
-			if err != nil {
-				return nil, err
-			}
+				resultRow.PictureItems = &PictureItems{
+					Items: res,
+				}
 
-			resultRow.PictureItems = &PictureItems{
-				Items: res,
-			}
+				return nil
+			})
 		}
 
 		dfDistanceRequest := fields.GetDfDistance()
 		if dfDistanceRequest != nil {
-			ddOptions, err := convertDfDistanceListOptions(dfDistanceRequest.GetOptions())
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				ddOptions, err := convertDfDistanceListOptions(dfDistanceRequest.GetOptions())
+				if err != nil {
+					return err
+				}
 
-			if ddOptions == nil {
-				ddOptions = &query.DfDistanceListOptions{}
-			}
+				if ddOptions == nil {
+					ddOptions = &query.DfDistanceListOptions{}
+				}
 
-			ddOptions.SrcPictureID = row.ID
+				ddOptions.SrcPictureID = row.ID
 
-			ddRows, err := picturesRepository.DfDistances(
-				ctx,
-				ddOptions,
-				dfDistanceRequest.GetLimit(),
-			)
-			if err != nil {
-				return nil, err
-			}
+				ddRows, err := picturesRepository.DfDistances(
+					groupCtx,
+					ddOptions,
+					dfDistanceRequest.GetLimit(),
+				)
+				if err != nil {
+					return err
+				}
 
-			dfDistanceExtractor := s.container.DfDistanceExtractor()
+				res, err := dfDistanceExtractor.ExtractRows(
+					groupCtx,
+					ddRows,
+					dfDistanceRequest.GetFields(),
+					lang,
+					userCtx,
+				)
+				if err != nil {
+					return err
+				}
 
-			res, err := dfDistanceExtractor.ExtractRows(
-				ctx,
-				ddRows,
-				dfDistanceRequest.GetFields(),
-				lang,
-				userCtx,
-			)
-			if err != nil {
-				return nil, err
-			}
+				resultRow.DfDistances = &DfDistances{
+					Items: res,
+				}
 
-			resultRow.DfDistances = &DfDistances{
-				Items: res,
-			}
+				return nil
+			})
 		}
 
 		if fields.GetAcceptedCount() {
-			acceptedCount, err := picturesRepository.Count(ctx, &query.PictureListOptions{
-				Status: schema.PictureStatusAccepted,
-				PictureItem: &query.PictureItemListOptions{
-					PictureItemByItemID: &query.PictureItemListOptions{
-						PictureID: row.ID,
-					},
-				},
-			})
-			if err != nil {
-				return nil, err
-			}
-
-			resultRow.AcceptedCount = int32(acceptedCount) //nolint: gosec
-		}
-
-		if fields.GetCopyrights() {
-			if row.CopyrightsTextID.Valid {
-				copyrights, err := textstorageRepository.Text(ctx, row.CopyrightsTextID.Int32)
-				if err != nil && !errors.Is(err, textstorage.ErrTextNotFound) {
-					return nil, err
-				}
-
-				if err == nil {
-					resultRow.Copyrights = copyrights
-				}
-			}
-		}
-
-		if fields.GetExif() && row.ImageID.Valid {
-			exif, err := imageStorage.ImageEXIF(ctx, int(row.ImageID.Int64))
-			if err != nil {
-				return nil, err
-			}
-
-			var exifStr strings.Builder
-
-			skipSections := []string{"FILE", "COMPUTED"}
-
-			if len(exif) > 0 {
-				for key, section := range exif {
-					if util.Contains(skipSections, key) {
-						continue
-					}
-
-					exifStr.WriteString("<p>[" + html.EscapeString(key) + "]")
-
-					var exifStrSb strings.Builder
-					for name, val := range section {
-						exifStrSb.WriteString("<br />" + html.EscapeString(
-							fmt.Sprintf(
-								"%s: %v",
-								name, val,
-							)),
-						)
-					}
-
-					exifStrSb.WriteString("</p>")
-				}
-			}
-
-			resultRow.Exif = exifStr.String()
-		}
-
-		if fields.GetIsLast() {
-			hasOtherPicture := true
-
-			if row.Status == schema.PictureStatusAccepted {
-				hasOtherPicture, err = picturesRepository.Exists(ctx, &query.PictureListOptions{
-					ExcludeID: row.ID,
-					Status:    schema.PictureStatusAccepted,
+			group.Go(func() error {
+				acceptedCount, err := picturesRepository.Count(groupCtx, &query.PictureListOptions{
+					Status: schema.PictureStatusAccepted,
 					PictureItem: &query.PictureItemListOptions{
 						PictureItemByItemID: &query.PictureItemListOptions{
 							PictureID: row.ID,
@@ -484,182 +492,289 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 					},
 				})
 				if err != nil {
-					return nil, err
+					return err
 				}
-			}
 
-			resultRow.IsLast = !hasOtherPicture
+				resultRow.AcceptedCount = int32(acceptedCount) //nolint: gosec
+
+				return nil
+			})
+		}
+
+		if fields.GetCopyrights() {
+			group.Go(func() error {
+				if row.CopyrightsTextID.Valid {
+					copyrights, err := textstorageRepository.Text(groupCtx, row.CopyrightsTextID.Int32)
+					if err != nil && !errors.Is(err, textstorage.ErrTextNotFound) {
+						return err
+					}
+
+					if err == nil {
+						resultRow.Copyrights = copyrights
+					}
+				}
+
+				return nil
+			})
+		}
+
+		if fields.GetExif() && row.ImageID.Valid {
+			group.Go(func() error {
+				exif, err := imageStorage.ImageEXIF(groupCtx, int(row.ImageID.Int64))
+				if err != nil {
+					return err
+				}
+
+				var exifStr strings.Builder
+
+				skipSections := []string{"FILE", "COMPUTED"}
+
+				if len(exif) > 0 {
+					for key, section := range exif {
+						if util.Contains(skipSections, key) {
+							continue
+						}
+
+						exifStr.WriteString("<p>[" + html.EscapeString(key) + "]")
+
+						var exifStrSb strings.Builder
+						for name, val := range section {
+							exifStrSb.WriteString("<br />" + html.EscapeString(
+								fmt.Sprintf(
+									"%s: %v",
+									name, val,
+								)),
+							)
+						}
+
+						exifStrSb.WriteString("</p>")
+					}
+				}
+
+				resultRow.Exif = exifStr.String()
+
+				return nil
+			})
+		}
+
+		if fields.GetIsLast() {
+			group.Go(func() error {
+				hasOtherPicture := true
+
+				if row.Status == schema.PictureStatusAccepted {
+					exists, err := picturesRepository.Exists(groupCtx, &query.PictureListOptions{
+						ExcludeID: row.ID,
+						Status:    schema.PictureStatusAccepted,
+						PictureItem: &query.PictureItemListOptions{
+							PictureItemByItemID: &query.PictureItemListOptions{
+								PictureID: row.ID,
+							},
+						},
+					})
+					if err != nil {
+						return err
+					}
+
+					hasOtherPicture = exists
+				}
+
+				resultRow.IsLast = !hasOtherPicture
+
+				return nil
+			})
 		}
 
 		if fields.GetModerVoted() && userCtx.UserID != 0 {
-			resultRow.ModerVoted, err = picturesRepository.HasModerVote(ctx, row.ID, userCtx.UserID)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				moderVoted, err := picturesRepository.HasModerVote(groupCtx, row.ID, userCtx.UserID)
+				if err != nil {
+					return err
+				}
+
+				resultRow.ModerVoted = moderVoted
+
+				return nil
+			})
 		}
 
 		pictureModerVoteRequest := fields.GetPictureModerVotes()
 		if pictureModerVoteRequest != nil {
-			pmvOptions := convertPictureModerVoteListOptions(pictureModerVoteRequest.GetOptions())
-			if pmvOptions == nil {
-				pmvOptions = &query.PictureModerVoteListOptions{}
-			}
+			group.Go(func() error {
+				pmvOptions := convertPictureModerVoteListOptions(pictureModerVoteRequest.GetOptions())
+				if pmvOptions == nil {
+					pmvOptions = &query.PictureModerVoteListOptions{}
+				}
 
-			pmvOptions.PictureID = row.ID
+				pmvOptions.PictureID = row.ID
 
-			pmvRows, err := picturesRepository.PictureModerVotes(ctx, pmvOptions)
-			if err != nil {
-				return nil, err
-			}
+				pmvRows, err := picturesRepository.PictureModerVotes(groupCtx, pmvOptions)
+				if err != nil {
+					return err
+				}
 
-			pmvExtractor := NewPictureModerVoteExtractor()
+				pmvExtractor := NewPictureModerVoteExtractor()
 
-			res, err := pmvExtractor.ExtractRows(pmvRows)
-			if err != nil {
-				return nil, err
-			}
+				res, err := pmvExtractor.ExtractRows(pmvRows)
+				if err != nil {
+					return err
+				}
 
-			resultRow.PictureModerVotes = &PictureModerVotes{
-				Items: res,
-			}
+				resultRow.PictureModerVotes = &PictureModerVotes{
+					Items: res,
+				}
+
+				return nil
+			})
 		}
 
 		replaceableRequest := fields.GetReplaceable()
 		if replaceableRequest != nil && row.ReplacePictureID.Valid {
-			pOptions, err := convertPictureListOptions(replaceableRequest.GetOptions())
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				pOptions, err := convertPictureListOptions(replaceableRequest.GetOptions())
+				if err != nil {
+					return err
+				}
 
-			if pOptions == nil {
-				pOptions = &query.PictureListOptions{}
-			}
+				if pOptions == nil {
+					pOptions = &query.PictureListOptions{}
+				}
 
-			pOptions.ID = row.ReplacePictureID.Int64
+				pOptions.ID = row.ReplacePictureID.Int64
 
-			pFields := convertPictureFields(replaceableRequest.GetFields())
+				pFields := convertPictureFields(replaceableRequest.GetFields())
 
-			pRow, err := picturesRepository.Picture(ctx, pOptions, pFields, pictures.OrderByNone)
-			if err != nil {
-				return nil, err
-			}
+				pRow, err := picturesRepository.Picture(groupCtx, pOptions, pFields, pictures.OrderByNone)
+				if err != nil {
+					return err
+				}
 
-			res, err := s.Extract(ctx, pRow, replaceableRequest.GetFields(), lang, userCtx)
-			if err != nil {
-				return nil, err
-			}
+				res, err := s.Extract(groupCtx, pRow, replaceableRequest.GetFields(), lang, userCtx)
+				if err != nil {
+					return err
+				}
 
-			resultRow.Replaceable = res
+				resultRow.Replaceable = res
+
+				return nil
+			})
 		}
 
 		if fields.GetRights() {
-			canAccept, err := picturesRepository.CanAccept(ctx, row)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				canAccept, err := picturesRepository.CanAccept(groupCtx, row)
+				if err != nil {
+					return err
+				}
 
-			canDelete, err := picturesRepository.CanDelete(ctx, row)
-			if err != nil {
-				return nil, err
-			}
+				canDelete, err := picturesRepository.CanDelete(groupCtx, row)
+				if err != nil {
+					return err
+				}
 
-			resultRow.Rights = &PictureRights{
-				Move: util.Contains(userCtx.Roles, users.RolePicturesModer),
-				Unaccept: (row.Status == schema.PictureStatusAccepted) &&
-					util.Contains(userCtx.Roles, users.RolePicturesModer),
-				Accept: canAccept && util.Contains(userCtx.Roles, users.RolePicturesModer),
-				Restore: (row.Status == schema.PictureStatusRemoving) &&
-					util.Contains(userCtx.Roles, users.RoleAdmin),
-				Normalize: (row.Status == schema.PictureStatusInbox) &&
-					util.Contains(userCtx.Roles, users.RolePicturesModer),
-				Flop: (row.Status == schema.PictureStatusInbox) &&
-					util.Contains(userCtx.Roles, users.RolePicturesModer),
-				Crop:   util.Contains(userCtx.Roles, users.RolePicturesModer),
-				Delete: canDelete,
-			}
+				resultRow.Rights = &PictureRights{
+					Move: util.Contains(userCtx.Roles, users.RolePicturesModer),
+					Unaccept: (row.Status == schema.PictureStatusAccepted) &&
+						util.Contains(userCtx.Roles, users.RolePicturesModer),
+					Accept: canAccept && util.Contains(userCtx.Roles, users.RolePicturesModer),
+					Restore: (row.Status == schema.PictureStatusRemoving) &&
+						util.Contains(userCtx.Roles, users.RoleAdmin),
+					Normalize: (row.Status == schema.PictureStatusInbox) &&
+						util.Contains(userCtx.Roles, users.RolePicturesModer),
+					Flop: (row.Status == schema.PictureStatusInbox) &&
+						util.Contains(userCtx.Roles, users.RolePicturesModer),
+					Crop:   util.Contains(userCtx.Roles, users.RolePicturesModer),
+					Delete: canDelete,
+				}
+
+				return nil
+			})
 		}
 
 		siblings := fields.GetSiblings()
 		if siblings != nil {
-			resultRow.Siblings = &PictureSiblings{
-				Prev:    nil,
-				Next:    nil,
-				PrevNew: nil,
-				NextNew: nil,
-			}
-
-			sFields := siblings.GetFields()
-			scFields := convertPictureFields(sFields)
-
-			prevPicture, err := picturesRepository.Picture(ctx, &query.PictureListOptions{
-				IDLt: row.ID,
-			}, scFields, pictures.OrderByIDDesc)
-			if err != nil && !errors.Is(err, sql.ErrNoRows) {
-				return nil, err
-			}
-
-			if err == nil {
-				resultRow.Siblings.Prev, err = s.Extract(ctx, prevPicture, sFields, lang, userCtx)
-				if err != nil {
-					return nil, err
+			group.Go(func() error {
+				resultRow.Siblings = &PictureSiblings{
+					Prev:    nil,
+					Next:    nil,
+					PrevNew: nil,
+					NextNew: nil,
 				}
-			}
 
-			nextPicture, err := picturesRepository.Picture(ctx, &query.PictureListOptions{
-				IDGt: row.ID,
-			}, scFields, pictures.OrderByIDAsc)
-			if err != nil && !errors.Is(err, sql.ErrNoRows) {
-				return nil, err
-			}
+				sFields := siblings.GetFields()
+				scFields := convertPictureFields(sFields)
 
-			if err == nil {
-				resultRow.Siblings.Next, err = s.Extract(ctx, nextPicture, sFields, lang, userCtx)
-				if err != nil {
-					return nil, err
+				prevPicture, err := picturesRepository.Picture(groupCtx, &query.PictureListOptions{
+					IDLt: row.ID,
+				}, scFields, pictures.OrderByIDDesc)
+				if err != nil && !errors.Is(err, sql.ErrNoRows) {
+					return err
 				}
-			}
 
-			prevNewPicture, err := picturesRepository.Picture(ctx, &query.PictureListOptions{
-				IDLt:   row.ID,
-				Status: schema.PictureStatusInbox,
-			}, scFields, pictures.OrderByIDDesc)
-			if err != nil && !errors.Is(err, sql.ErrNoRows) {
-				return nil, err
-			}
-
-			if err == nil {
-				resultRow.Siblings.PrevNew, err = s.Extract(
-					ctx,
-					prevNewPicture,
-					sFields,
-					lang,
-					userCtx,
-				)
-				if err != nil {
-					return nil, err
+				if err == nil {
+					resultRow.Siblings.Prev, err = s.Extract(groupCtx, prevPicture, sFields, lang, userCtx)
+					if err != nil {
+						return err
+					}
 				}
-			}
 
-			nextNewPicture, err := picturesRepository.Picture(ctx, &query.PictureListOptions{
-				IDGt:   row.ID,
-				Status: schema.PictureStatusInbox,
-			}, scFields, pictures.OrderByIDAsc)
-			if err != nil && !errors.Is(err, sql.ErrNoRows) {
-				return nil, err
-			}
-
-			if err == nil {
-				resultRow.Siblings.NextNew, err = s.Extract(
-					ctx,
-					nextNewPicture,
-					sFields,
-					lang,
-					userCtx,
-				)
-				if err != nil {
-					return nil, err
+				nextPicture, err := picturesRepository.Picture(groupCtx, &query.PictureListOptions{
+					IDGt: row.ID,
+				}, scFields, pictures.OrderByIDAsc)
+				if err != nil && !errors.Is(err, sql.ErrNoRows) {
+					return err
 				}
-			}
+
+				if err == nil {
+					resultRow.Siblings.Next, err = s.Extract(groupCtx, nextPicture, sFields, lang, userCtx)
+					if err != nil {
+						return err
+					}
+				}
+
+				prevNewPicture, err := picturesRepository.Picture(groupCtx, &query.PictureListOptions{
+					IDLt:   row.ID,
+					Status: schema.PictureStatusInbox,
+				}, scFields, pictures.OrderByIDDesc)
+				if err != nil && !errors.Is(err, sql.ErrNoRows) {
+					return err
+				}
+
+				if err == nil {
+					resultRow.Siblings.PrevNew, err = s.Extract(
+						groupCtx,
+						prevNewPicture,
+						sFields,
+						lang,
+						userCtx,
+					)
+					if err != nil {
+						return err
+					}
+				}
+
+				nextNewPicture, err := picturesRepository.Picture(groupCtx, &query.PictureListOptions{
+					IDGt:   row.ID,
+					Status: schema.PictureStatusInbox,
+				}, scFields, pictures.OrderByIDAsc)
+				if err != nil && !errors.Is(err, sql.ErrNoRows) {
+					return err
+				}
+
+				if err == nil {
+					resultRow.Siblings.NextNew, err = s.Extract(
+						groupCtx,
+						nextNewPicture,
+						sFields,
+						lang,
+						userCtx,
+					)
+					if err != nil {
+						return err
+					}
+				}
+
+				return nil
+			})
 		}
 
 		if row.IP.Status == pgtype.Present && row.IP.IPNet != nil && util.Contains(userCtx.Roles, users.RoleModer) {
@@ -667,24 +782,37 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetSubscribed() && userCtx.UserID > 0 {
-			commentsRepo, err := s.container.CommentsRepository(ctx)
-			if err != nil {
-				return nil, err
-			}
+			group.Go(func() error {
+				subscribed, err := commentsRepository.IsSubscribed(groupCtx, userCtx.UserID,
+					schema.CommentMessageTypeIDPictures, row.ID)
+				if err != nil {
+					return err
+				}
 
-			resultRow.Subscribed, err = commentsRepo.IsSubscribed(ctx, userCtx.UserID,
-				schema.CommentMessageTypeIDPictures, row.ID)
-			if err != nil {
-				return nil, err
-			}
+				resultRow.Subscribed = subscribed
+
+				return nil
+			})
 		}
 
-		resultRow.Paginator, err = s.buildPicturesPaginator(ctx, row, fields.GetPaginator(), picturesRepository)
-		if err != nil {
-			return nil, err
+		if fields.GetPaginator() != nil {
+			group.Go(func() error {
+				paginator, err := s.buildPicturesPaginator(groupCtx, row, fields.GetPaginator(), picturesRepository)
+				if err != nil {
+					return err
+				}
+
+				resultRow.Paginator = paginator
+
+				return nil
+			})
 		}
 
 		result = append(result, resultRow)
+	}
+
+	if err = group.Wait(); err != nil {
+		return nil, err
 	}
 
 	return result, nil

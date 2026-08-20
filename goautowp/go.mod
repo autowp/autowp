@@ -49,6 +49,7 @@ require (
 	github.com/urfave/cli/v3 v3.7.0
 	golang.org/x/exp v0.0.0-20260811152304-ee035b5b010f
 	golang.org/x/image v0.45.0
+	golang.org/x/sync v0.22.0
 	golang.org/x/text v0.41.0
 	google.golang.org/genproto v0.0.0-20260810153831-ec0a7760b754
 	google.golang.org/genproto/googleapis/api v0.0.0-20260810153831-ec0a7760b754
