@@ -2269,12 +2269,17 @@ func (s *ItemsGRPCServer) GetPath(ctx context.Context, in *PathRequest) (*PathRe
 
 	lang := in.GetLanguage()
 
-	fields := ItemFields{
-		NameHtml: true,
-		NameText: true,
-		NameOnly: true,
+	// Built per call rather than shared: ItemFields is a proto message, so the last breadcrumb's
+	// extra description cannot be turned on by copying and tweaking one.
+	pathItemFields := func(description bool) *ItemFields {
+		return &ItemFields{
+			Description: description,
+			NameHtml:    true,
+			NameText:    true,
+			NameOnly:    true,
+		}
 	}
-	convertedFields := convertItemFields(&fields)
+	convertedFields := convertItemFields(pathItemFields(false))
 
 	currentCategory, err := s.repository.Item(ctx, &query.ItemListOptions{
 		Language: lang,
@@ -2353,26 +2358,43 @@ func (s *ItemsGRPCServer) GetPath(ctx context.Context, in *PathRequest) (*PathRe
 		})
 	}
 
-	res := make([]*PathItem, 0)
+	// The whole path through the extractor at once, rather than a crumb at a time. Extract is a
+	// single-row wrapper around ExtractRows (see item-extractor.go), whose preloads are batched
+	// per call - so extracting in a loop ran every one of those preloads once per breadcrumb, N
+	// times the queries for the same answer, on a path several levels deep. Two calls rather than
+	// one only because the last crumb is the only one carrying a description.
+	last := len(breadcrumbs) - 1
+
+	head := make([]*items.Item, 0, last)
+	for _, crumb := range breadcrumbs[:last] {
+		head = append(head, crumb.Item)
+	}
+
+	extracted, err := s.extractor.ExtractRows(ctx, head, pathItemFields(false), lang, userCtx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	extractedLast, err := s.extractor.ExtractRows(
+		ctx, []*items.Item{breadcrumbs[last].Item}, pathItemFields(true), lang, userCtx,
+	)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	extracted = append(extracted, extractedLast...)
+
+	res := make([]*PathItem, 0, len(breadcrumbs))
 
 	var parentID int64
 
-	for idx, item := range breadcrumbs {
-		if idx == len(breadcrumbs)-1 {
-			fields.Description = true
-		}
-
-		extracted, err := s.extractor.Extract(ctx, item.Item, &fields, lang, userCtx)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
+	for idx, crumb := range breadcrumbs {
 		res = append(res, &PathItem{
-			Catname:  item.Catname,
+			Catname:  crumb.Catname,
 			ParentId: parentID,
-			Item:     extracted,
+			Item:     extracted[idx],
 		})
-		parentID = item.Item.ID
+		parentID = crumb.Item.ID
 	}
 
 	return &PathResponse{
