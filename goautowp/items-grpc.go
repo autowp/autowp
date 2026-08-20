@@ -2269,23 +2269,36 @@ func (s *ItemsGRPCServer) GetPath(ctx context.Context, in *PathRequest) (*PathRe
 
 	lang := in.GetLanguage()
 
-	// Built per call rather than shared: ItemFields is a proto message, so the last breadcrumb's
-	// extra description cannot be turned on by copying and tweaking one.
-	pathItemFields := func(description bool) *ItemFields {
-		return &ItemFields{
-			Description: description,
-			NameHtml:    true,
-			NameText:    true,
-			NameOnly:    true,
-		}
+	var path []string
+	if len(in.GetPath()) > 0 {
+		path = strings.Split(in.GetPath(), "/")
 	}
-	convertedFields := convertItemFields(pathItemFields(false))
+
+	// Only the last breadcrumb is rendered with its description (the category page prints it under
+	// the heading), and whether that is the category itself or the deepest path node depends on
+	// the request - hence two field sets, picked per query below.
+	//
+	// It has to be decided here, at the repository, and not at the extractor: the description is a
+	// column the repository selects (a reference into text storage), and the extractor copies
+	// row.Description through unconditionally without ever consulting its own Description flag.
+	// Setting that flag on the extractor - which is what this code used to do - therefore fetched
+	// nothing, and the description arrived empty on every category page.
+	fields := &ItemFields{NameHtml: true, NameText: true, NameOnly: true}
+	fieldsWithDescription := &ItemFields{Description: true, NameHtml: true, NameText: true, NameOnly: true}
+
+	convertedFields := convertItemFields(fields)
+	convertedFieldsWithDescription := convertItemFields(fieldsWithDescription)
+
+	currentCategoryFields := convertedFields
+	if len(path) == 0 {
+		currentCategoryFields = convertedFieldsWithDescription
+	}
 
 	currentCategory, err := s.repository.Item(ctx, &query.ItemListOptions{
 		Language: lang,
 		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDCategory},
 		Catname:  in.GetCatname(),
-	}, convertedFields)
+	}, currentCategoryFields)
 	if err != nil {
 		if errors.Is(err, items.ErrItemNotFound) {
 			return nil, status.Error(codes.NotFound, "category not found")
@@ -2330,20 +2343,21 @@ func (s *ItemsGRPCServer) GetPath(ctx context.Context, in *PathRequest) (*PathRe
 		}}, breadcrumbs...)
 	}
 
-	var path []string
-	if len(in.GetPath()) > 0 {
-		path = strings.Split(in.GetPath(), "/")
-	}
-
 	currentCar := currentCategory
-	for _, pathNode := range path {
+
+	for idx, pathNode := range path {
+		nodeFields := convertedFields
+		if idx == len(path)-1 {
+			nodeFields = convertedFieldsWithDescription
+		}
+
 		currentCar, err = s.repository.Item(ctx, &query.ItemListOptions{
 			Language: lang,
 			ItemParentParent: &query.ItemParentListOptions{
 				ParentID: currentCar.ID,
 				Catname:  pathNode,
 			},
-		}, convertedFields)
+		}, nodeFields)
 		if err != nil {
 			if errors.Is(err, items.ErrItemNotFound) {
 				return nil, status.Error(codes.NotFound, "path node not found")
@@ -2358,31 +2372,21 @@ func (s *ItemsGRPCServer) GetPath(ctx context.Context, in *PathRequest) (*PathRe
 		})
 	}
 
-	// The whole path through the extractor at once, rather than a crumb at a time. Extract is a
-	// single-row wrapper around ExtractRows (see item-extractor.go), whose preloads are batched
+	// The whole path through the extractor in one call, rather than a crumb at a time. Extract is
+	// a single-row wrapper around ExtractRows (see item-extractor.go), whose preloads are batched
 	// per call - so extracting in a loop ran every one of those preloads once per breadcrumb, N
-	// times the queries for the same answer, on a path several levels deep. Two calls rather than
-	// one only because the last crumb is the only one carrying a description.
-	last := len(breadcrumbs) - 1
-
-	head := make([]*items.Item, 0, last)
-	for _, crumb := range breadcrumbs[:last] {
-		head = append(head, crumb.Item)
+	// times the queries for the same answer, on a path several levels deep.
+	rows := make([]*items.Item, 0, len(breadcrumbs))
+	for _, crumb := range breadcrumbs {
+		rows = append(rows, crumb.Item)
 	}
 
-	extracted, err := s.extractor.ExtractRows(ctx, head, pathItemFields(false), lang, userCtx)
+	// One field set for every crumb: which of them carries a description was settled when the rows
+	// were fetched, and the extractor passes through whatever the row holds.
+	extracted, err := s.extractor.ExtractRows(ctx, rows, fieldsWithDescription, lang, userCtx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-
-	extractedLast, err := s.extractor.ExtractRows(
-		ctx, []*items.Item{breadcrumbs[last].Item}, pathItemFields(true), lang, userCtx,
-	)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	extracted = append(extracted, extractedLast...)
 
 	res := make([]*PathItem, 0, len(breadcrumbs))
 
