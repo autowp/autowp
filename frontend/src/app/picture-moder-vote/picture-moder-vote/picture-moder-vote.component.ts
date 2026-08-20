@@ -73,7 +73,11 @@ export class PictureModerVoteComponent implements OnInit {
     this.voteUsersResource = rxResource({
       id: `picture-moder-vote-list-users-${this.picture().id}`,
       injector: this.#injector,
-      params: () => [...new Set((this.picture().pictureModerVotes?.items ?? []).map((vote) => vote.userId))],
+      // A comma-joined string rather than the id array: a resource compares params by identity,
+      // and a fresh array every recomputation makes it restart on hydration - throwing away the
+      // value that arrived over TransferState and blanking every author on the page until the
+      // refetch lands (or for good, if it comes back empty).
+      params: () => [...new Set((this.picture().pictureModerVotes?.items ?? []).map((vote) => vote.userId))].join(','),
       // A plain object rather than a Map: TransferState round-trips resource values through
       // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
       // enumerable properties, no toJSON), losing all entries.
@@ -81,7 +85,7 @@ export class PictureModerVoteComponent implements OnInit {
         if (userIds.length === 0) {
           return of({});
         }
-        return this.#userService.getUserMap$(userIds).pipe(
+        return this.#userService.getUserMap$(userIds.split(',')).pipe(
           map((userMap) => Object.fromEntries(userMap)),
           // getUserMap$ leaves out users the backend doesn't return (deleted or anonymous), so
           // this only catches a genuine RPC failure - degrade to showing no user rather than
