@@ -6,6 +6,7 @@ import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {
   enableProdMode,
   EnvironmentInjector,
+  ErrorHandler,
   importProvidersFrom,
   inject,
   makeEnvironmentProviders,
@@ -67,6 +68,7 @@ import {provideMonacoEditor} from 'ngx-monaco-editor-v2';
 import {NgPipesModule} from 'ngx-pipes';
 
 import {routes} from './app.routes';
+import {GlobalErrorHandler} from './global-error-handler';
 
 if (environment.production) {
   enableProdMode();
@@ -86,21 +88,23 @@ const provideKeycloakInAppInitializer = (
   return provideAppInitializer(async () => {
     const platform = inject(PLATFORM_ID);
 
-    // 👇 browser guard: only init keycloak in the browser
-    if (isPlatformBrowser(platform)) {
-      const injector = inject(EnvironmentInjector);
-      runInInjectionContext(injector, () => {
-        features.forEach((feature) => {
-          feature.configure();
-        });
-      });
-
-      await keycloak.init(initOptions).catch((error: unknown) => {
-        console.error('Keycloak initialization failed', error);
-      });
-    } else {
-      console.log('Keycloak initialization skipped on server side');
+    // 👇 browser guard: only init keycloak in the browser. Silently on the server - it is skipped
+    // on every single render, and saying so once per render only buries the lines that do carry
+    // something (see the [ssr] lines from server.ts).
+    if (!isPlatformBrowser(platform)) {
+      return;
     }
+
+    const injector = inject(EnvironmentInjector);
+    runInInjectionContext(injector, () => {
+      features.forEach((feature) => {
+        feature.configure();
+      });
+    });
+
+    await keycloak.init(initOptions).catch((error: unknown) => {
+      console.error('Keycloak initialization failed', error);
+    });
   });
 };
 
@@ -142,6 +146,10 @@ export const appConfig: ApplicationConfig = {
       settings: {host: environment.grpcHost},
     }),
     {multi: true, provide: GRPC_INTERCEPTORS, useClass: GrpcLogInterceptor},
+    // Was written but never registered, so nothing ever reached it: chunk-load failures went
+    // unhandled in the browser, and render failures were logged by Angular's default handler with
+    // no clue which page they came from.
+    {provide: ErrorHandler, useClass: GlobalErrorHandler},
     provideKeycloakSSR({
       config: environment.keycloak,
       features: [

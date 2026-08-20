@@ -4,6 +4,7 @@ import {isPlatformBrowser} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
 import {inject, PLATFORM_ID, Service, signal} from '@angular/core';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
+import {ssrRequestLabel} from '@utils/ssr-request';
 
 export interface Toast {
   icon: string;
@@ -14,6 +15,7 @@ export interface Toast {
 @Service()
 export class ToastsService {
   readonly #isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  readonly #ssrLabel = ssrRequestLabel();
 
   public readonly toasts = signal<Toast[]>([]);
 
@@ -55,7 +57,7 @@ export class ToastsService {
     // Logging instead of dropping it silently is the other half: server-side failures used to
     // vanish into a toast no visitor ever saw, so they never reached the pod logs.
     if (!this.#isBrowser) {
-      console.error(`[ssr] ${options.type}: ${options.message}`);
+      console.error(`[ssr] ${this.#ssrLabel ?? '-'} toast ${options.type}: ${options.message}`);
       return;
     }
 
@@ -89,7 +91,10 @@ export class ToastsService {
   }
 
   public grpcErrorResponse(event: GrpcStatusEvent) {
-    this.error(event.statusMessage);
+    // Not every backend error carries a message - a bare status code arrives with an empty one,
+    // and `this.error('')` is a blank red toast for the visitor and a blank log line for us. The
+    // fallback is deliberately untranslated: it is a wire-protocol code, not prose.
+    this.error(event.statusMessage || `gRPC error ${event.statusCode}`);
   }
 
   public remove(toast: Toast) {

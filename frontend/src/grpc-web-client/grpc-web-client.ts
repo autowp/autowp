@@ -262,7 +262,11 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
         }),
         catchError((error: unknown) => {
           if (error instanceof HttpErrorResponse) {
-            console.error(error);
+            // The whole HttpErrorResponse used to go to the console - some thirty lines of headers
+            // and internals per failure, which in a pod log is noise that also breaks line-based
+            // parsing. Everything that identifies the failure fits on one line; callers that need
+            // the rest get it through the RpcError built below.
+            console.error(`grpc-web transport failure: ${url} status=${error.status} ${error.message}`);
 
             const xhrStatusCode = error.status;
             const grpcStatusCode = fromHttpStatus(xhrStatusCode);

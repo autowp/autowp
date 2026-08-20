@@ -6,6 +6,7 @@ import type {Observable} from 'rxjs';
 import {inject, Service} from '@angular/core';
 import {environment} from '@environment/environment';
 import {GrpcDataEvent, GrpcMetadata} from '@ngx-grpc/common';
+import {ssrRequestLabel} from '@utils/ssr-request';
 import Keycloak from 'keycloak-js';
 import {catchError, from, switchMap, tap} from 'rxjs';
 
@@ -121,6 +122,10 @@ export class GrpcLogInterceptor implements GrpcInterceptor {
   readonly #errorStyle = 'color: red;';
   readonly #statusOkStyle = 'color: #0ffcf5;';
 
+  // Captured here because reading REQUEST needs an injection context, and intercept() runs outside
+  // one. Null in the browser, which is also what decides whether the production branch below logs.
+  readonly #ssrLabel = ssrRequestLabel();
+
   intercept<Q extends GrpcMessage, S extends GrpcMessage>(
     request: GrpcRequest<Q, S>,
     next: GrpcHandler,
@@ -128,7 +133,34 @@ export class GrpcLogInterceptor implements GrpcInterceptor {
     const start = Date.now();
 
     if (environment.production) {
-      return next.handle(request);
+      // Into a local so it stays narrowed to a string inside the callbacks below.
+      const ssrLabel = this.#ssrLabel;
+
+      // Silent in the browser: the network panel says all of this and more, to someone who is
+      // there to look at it.
+      if (ssrLabel === null) {
+        return next.handle(request);
+      }
+
+      // During a server-side render nobody is watching and there is no network panel, so a failed
+      // call has to say so in the pod log or it is invisible - as it was until now. Failures only,
+      // one line each: request and response payloads are large and can carry personal data.
+      return next.handle(request).pipe(
+        tap({
+          error: (error: unknown) => {
+            console.error(`[ssr] ${ssrLabel} grpc ${request.path} threw after ${Date.now() - start}ms`, error);
+          },
+          next: (event) => {
+            if (event instanceof GrpcDataEvent || event.statusCode === 0) {
+              return;
+            }
+
+            console.error(
+              `[ssr] ${ssrLabel} grpc ${request.path} failed status=${event.statusCode} message=${JSON.stringify(event.statusMessage)} ${Date.now() - start}ms`,
+            );
+          },
+        }),
+      );
     }
 
     return next.handle(request).pipe(

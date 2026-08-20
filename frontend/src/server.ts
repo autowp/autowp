@@ -1,3 +1,5 @@
+import type {Request as ExpressRequest} from 'express';
+
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -5,6 +7,7 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import {environment} from '@environment/environment';
+import {SSR_REQUEST_ID_HEADER} from '@utils/ssr-request';
 import express from 'express';
 import cluster from 'node:cluster';
 import {join} from 'node:path';
@@ -22,6 +25,43 @@ import {SsrPageCache, ssrPageCacheOptionsFromEnv} from './ssr-cache';
  * against a container limit of four.
  */
 const workers = Math.max(1, parseInt(process.env['SSR_WORKERS'] ?? '', 10) || 1);
+
+/**
+ * A render slower than this is logged as a warning rather than as an ordinary line.
+ *
+ * The tail is what hurts: a render holds its whole component tree, every gRPC response it
+ * collected and its transfer state in the heap until it finishes, so a page that takes seconds
+ * multiplies the number of renders in flight - and with them the memory - far faster than the
+ * request rate suggests. One toast with a 5s autohide timer was enough to do exactly that, and
+ * nothing in the log said so.
+ */
+const SLOW_RENDER_MS = 1000;
+
+// pid included because every worker runs its own counter, and all of them log to the same stream.
+let renderCounter = 0;
+
+function nextRequestId(): string {
+  renderCounter += 1;
+
+  return `${process.pid.toString(36)}-${renderCounter.toString(36)}`;
+}
+
+/**
+ * One line per render, always. Now that nginx caches pages in front of this process (see the
+ * chart's frontend-assets ConfigMap) a render is a rare and expensive event, so logging every one
+ * costs nothing - and it is the only place the latency tail, and which pages produce it, shows up.
+ */
+function logRender(requestId: string, request: ExpressRequest, status: number, cache: string, ms: number): void {
+  const line = `[ssr] id=${requestId} ${request.method} ${request.headers.host ?? '-'}${request.originalUrl} ${status} ${ms}ms cache=${cache}`;
+
+  if (status >= 500) {
+    console.error(line);
+  } else if (ms >= SLOW_RENDER_MS) {
+    console.warn(`${line} slow`);
+  } else {
+    console.log(line);
+  }
+}
 
 const app = express();
 
@@ -101,13 +141,29 @@ for (const lang of environment.languages) {
   vhostApp.use((req, res, next) => {
     req.headers['accept-language'] = lang.locale;
 
+    // Read back inside the render through the REQUEST token (see @utils/ssr-request), so a gRPC
+    // failure logged mid-render can be matched to the line reporting the page it broke.
+    const requestId = nextRequestId();
+    req.headers[SSR_REQUEST_ID_HEADER] = requestId;
+
+    const startedAt = Date.now();
+
     // Through the cache rather than straight to angularApp.handle(): a render costs 10-30 gRPC
     // calls, and this collapses concurrent requests for the same page into one of them.
     ssrCache
       .handle(req, () => angularApp.handle(req))
       .then((response) => {
         if (response) {
-          // Returned (not just called) so its rejection is still caught by .catch(next) below,
+          // Absent on the paths the cache doesn't handle at all, i.e. anything but GET.
+          logRender(
+            requestId,
+            req,
+            response.status,
+            response.headers.get('X-SSR-Cache') ?? '-',
+            Date.now() - startedAt,
+          );
+
+          // Returned (not just called) so its rejection is still caught by .catch() below,
           // matching the previous `response ? writeResponseToNodeResponse(...) : next()`
           // implicit-return shape this replaced.
           return writeResponseToNodeResponse(response, res);
@@ -115,7 +171,16 @@ for (const lang of environment.languages) {
         next();
         return undefined;
       })
-      .catch(next);
+      .catch((error: unknown) => {
+        // Logged here rather than left to Express' default handler: that one prints a stack with
+        // nothing to say which page produced it, and this is the one failure mode that costs a
+        // visitor an error page.
+        console.error(
+          `[ssr] id=${requestId} ${req.method} ${req.headers.host ?? '-'}${req.originalUrl} render failed after ${Date.now() - startedAt}ms`,
+          error,
+        );
+        next(error);
+      });
   });
 
   app.use(vhost(lang.hostname, vhostApp));
