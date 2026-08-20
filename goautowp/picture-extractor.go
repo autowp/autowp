@@ -26,6 +26,18 @@ import (
 
 const maxPaginatorLength = 500
 
+// The formatted variants of a picture's image the fields ask for by name.
+const (
+	pictureGalleryFormat      = "picture-gallery"
+	pictureGalleryFullFormat  = "picture-gallery-full"
+	picturePreviewLargeFormat = "picture-preview-large"
+	pictureThumbLargeFormat   = "picture-thumb-large"
+	pictureThumbMediumFormat  = "picture-thumb-medium"
+
+	// How many of them there are, for sizing the maps keyed by format.
+	pictureImageFormatCount = 5
+)
+
 // How many of a row's independent lookups may be in flight at once, across the whole batch being
 // extracted. Kept well under the Postgres pool (30 connections per pod in the chart) because a pod
 // runs several renders at a time and each of them can be extracting pictures.
@@ -135,6 +147,21 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		images, err = imageStorage.Images(ctx, ids)
 		if err != nil {
 			return nil, err
+		}
+	}
+
+	// Formatted variants for the whole batch: one query per format asked for, rather than one per
+	// format per row - a gallery of two dozen pictures used to make two dozen of them. It is the
+	// same call the per-row code made, only plural: FormattedImages looks the format up for a set
+	// of images and generates the ones that are missing, exactly as FormattedImage does for one.
+	formatted := make(map[string]map[int]storage.Image, pictureImageFormatCount)
+
+	if formatRequests := pictureImageFormatRequests(rows, fields, images); len(formatRequests) > 0 {
+		for formatName, ids := range formatRequests {
+			formatted[formatName], err = imageStorage.FormattedImages(ctx, ids, formatName)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -257,91 +284,33 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetThumbMedium() && row.ImageID.Valid {
-			group.Go(func() error {
-				image, err := imageStorage.FormattedImage(
-					groupCtx,
-					int(row.ImageID.Int64),
-					"picture-thumb-medium",
-				)
-				if err != nil {
-					return err
-				}
-
-				resultRow.ThumbMedium = APIImageToGRPC(image)
-
-				return nil
-			})
+			if image, ok := formatted[pictureThumbMediumFormat][int(row.ImageID.Int64)]; ok {
+				resultRow.ThumbMedium = APIImageToGRPC(&image)
+			}
 		}
 
 		if fields.GetThumbLarge() && row.ImageID.Valid {
-			group.Go(func() error {
-				image, err := imageStorage.FormattedImage(
-					groupCtx,
-					int(row.ImageID.Int64),
-					"picture-thumb-large",
-				)
-				if err != nil {
-					return err
-				}
-
-				resultRow.ThumbLarge = APIImageToGRPC(image)
-
-				return nil
-			})
+			if image, ok := formatted[pictureThumbLargeFormat][int(row.ImageID.Int64)]; ok {
+				resultRow.ThumbLarge = APIImageToGRPC(&image)
+			}
 		}
 
 		if fields.GetImageGalleryFull() && row.ImageID.Valid {
-			group.Go(func() error {
-				image, err := imageStorage.FormattedImage(
-					groupCtx,
-					int(row.ImageID.Int64),
-					"picture-gallery-full",
-				)
-				if err != nil {
-					return err
-				}
-
-				resultRow.ImageGalleryFull = APIImageToGRPC(image)
-
-				return nil
-			})
+			if image, ok := formatted[pictureGalleryFullFormat][int(row.ImageID.Int64)]; ok {
+				resultRow.ImageGalleryFull = APIImageToGRPC(&image)
+			}
 		}
 
 		if fields.GetImageGallery() && row.ImageID.Valid {
-			group.Go(func() error {
-				if img, ok := images[int(row.ImageID.Int64)]; ok && img.CropHeight() > 0 &&
-					img.CropWidth() > 0 {
-					image, err := imageStorage.FormattedImage(
-						groupCtx,
-						int(row.ImageID.Int64),
-						"picture-gallery",
-					)
-					if err != nil {
-						return err
-					}
-
-					resultRow.ImageGallery = APIImageToGRPC(image)
-				}
-
-				return nil
-			})
+			if image, ok := formatted[pictureGalleryFormat][int(row.ImageID.Int64)]; ok {
+				resultRow.ImageGallery = APIImageToGRPC(&image)
+			}
 		}
 
 		if fields.GetPreviewLarge() && row.ImageID.Valid {
-			group.Go(func() error {
-				image, err := imageStorage.FormattedImage(
-					groupCtx,
-					int(row.ImageID.Int64),
-					"picture-preview-large",
-				)
-				if err != nil {
-					return err
-				}
-
-				resultRow.PreviewLarge = APIImageToGRPC(image)
-
-				return nil
-			})
+			if image, ok := formatted[picturePreviewLargeFormat][int(row.ImageID.Int64)]; ok {
+				resultRow.PreviewLarge = APIImageToGRPC(&image)
+			}
 		}
 
 		if fields.GetViews() {
@@ -955,6 +924,65 @@ var pathTreeParentItemTypes = []schema.ItemTableItemTypeID{
 type pathTreeGraph struct {
 	items   map[int64]*items.Item
 	parents map[int64][]*items.ItemParent
+}
+
+// pictureImageFormatRequests maps each formatted variant the fields ask for to the images it is
+// needed for. Only the gallery format is selective: it was only ever fetched for cropped images,
+// and asking for it more widely would not just cost a lookup - it would generate variants that
+// were never generated before.
+func pictureImageFormatRequests(
+	rows []*schema.PictureRow, fields *PictureFields, images map[int]*storage.Image,
+) map[string][]int {
+	imageIDs := make([]int, 0, len(rows))
+	croppedImageIDs := make([]int, 0, len(rows))
+	seen := make(map[int]bool, len(rows))
+
+	for _, row := range rows {
+		if !row.ImageID.Valid {
+			continue
+		}
+
+		imageID := int(row.ImageID.Int64)
+		if seen[imageID] {
+			continue
+		}
+
+		seen[imageID] = true
+
+		imageIDs = append(imageIDs, imageID)
+
+		if img, ok := images[imageID]; ok && img.CropHeight() > 0 && img.CropWidth() > 0 {
+			croppedImageIDs = append(croppedImageIDs, imageID)
+		}
+	}
+
+	if len(imageIDs) == 0 {
+		return nil
+	}
+
+	requests := make(map[string][]int, pictureImageFormatCount)
+
+	if fields.GetThumbMedium() {
+		requests[pictureThumbMediumFormat] = imageIDs
+	}
+
+	if fields.GetThumbLarge() {
+		requests[pictureThumbLargeFormat] = imageIDs
+	}
+
+	if fields.GetImageGalleryFull() {
+		requests[pictureGalleryFullFormat] = imageIDs
+	}
+
+	if fields.GetPreviewLarge() {
+		requests[picturePreviewLargeFormat] = imageIDs
+	}
+
+	if fields.GetImageGallery() && len(croppedImageIDs) > 0 {
+		requests[pictureGalleryFormat] = croppedImageIDs
+	}
+
+	return requests
 }
 
 // preloadPaths builds the routes of every picture in one go: one query for the picture-items of
