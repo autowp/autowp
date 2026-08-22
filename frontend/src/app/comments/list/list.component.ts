@@ -3,7 +3,16 @@ import type {CommentMessage, CommentsType, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, output} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  inject,
+  Injector,
+  input,
+  output,
+} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
@@ -46,6 +55,7 @@ export class CommentsListComponent implements OnInit {
   readonly #commentsGrpc = inject(CommentsClient);
   readonly #userService = inject(UserService);
   readonly #injector = inject(Injector);
+  readonly #cdr = inject(ChangeDetectorRef);
 
   readonly itemID = input.required<string>();
   readonly typeID = input.required<CommentsType>();
@@ -143,7 +153,10 @@ export class CommentsListComponent implements OnInit {
         error: (response: unknown) => {
           this.#toastService.handleError(response);
         },
-        next: (response) => (message.vote = response.vote),
+        next: (response) => {
+          message.vote = response.vote;
+          this.#cdr.markForCheck();
+        },
       });
 
     return false;
@@ -161,7 +174,10 @@ export class CommentsListComponent implements OnInit {
         error: (response: unknown) => {
           this.#toastService.handleError(response);
         },
-        next: () => (message.deleted = value),
+        next: () => {
+          message.deleted = value;
+          this.#cdr.markForCheck();
+        },
       });
   }
 

@@ -2,7 +2,7 @@ import type {OnInit} from '@angular/core';
 import type {ChartParameter} from '@grpc/spec.pb';
 import type {ChartOptions} from 'chart.js';
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {AttrAttributeType, ChartDataRequest} from '@grpc/spec.pb';
@@ -28,6 +28,7 @@ export class ChartComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #attrsClient = inject(AttrsClient);
+  readonly #cdr = inject(ChangeDetectorRef);
 
   protected readonly parametersResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
@@ -90,6 +91,7 @@ export class ChartComponent implements OnInit {
 
   private loadData(id: string) {
     this.chart.data = [];
+    this.#cdr.markForCheck();
 
     this.#attrsClient.getChartData(new ChartDataRequest({id})).subscribe({
       error: (response: unknown) => {
@@ -131,6 +133,8 @@ export class ChartComponent implements OnInit {
             label: dataset.name,
           };
         });
+
+        this.#cdr.markForCheck();
       },
     });
   }
