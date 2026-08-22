@@ -71,12 +71,15 @@ export class BrandsComponent implements OnInit {
     this.#pageEnv.set({pageId: 61});
   }
 
-  protected scrollTo(info: BrandsListCharacter) {
+  // A button rather than a link to the fragment, which is what this used to be: index.html carries
+  // a <base href>, and a bare `#char42` href resolves against *that*, not against the current URL -
+  // so opening one in a new tab landed on the index page with a fragment nothing on it matches.
+  // Scrolling the current page is all these do, and a button is what that is.
+  protected scrollTo(info: BrandsListCharacter): void {
     const element = this.#document.getElementById('char' + info.id);
     if (element) {
       element.scrollIntoView({behavior: 'smooth'});
     }
-    return false;
   }
 
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive

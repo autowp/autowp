@@ -21,7 +21,7 @@
         <div>
           <div class="btn-group">
             @for (info of line.characters; track info.id) {
-              <a class="btn btn-secondary" [href]="'#char' + info.id" (click)="scrollTo(info)">{{ info.character }}</a>
+              <button class="btn btn-secondary" type="button" (click)="scrollTo(info)">{{ info.character }}</button>
             }
           </div>
         </div>
