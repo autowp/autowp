@@ -26,7 +26,7 @@ import type {
   PositionCallback,
 } from './Jcrop';
 
-import {Coords, defaults, px, Selection, setStyle, Touch, Tracker} from './Jcrop';
+import {Coords, defaults, px, Selection, setStyle, Touch} from './Jcrop';
 
 @Component({
   selector: 'app-jcrop',
@@ -40,6 +40,17 @@ import {Coords, defaults, px, Selection, setStyle, Touch, Tracker} from './Jcrop
   // `styles` array already gave this stylesheet before it moved here.
   // eslint-disable-next-line @angular-eslint/use-component-view-encapsulation
   encapsulation: ViewEncapsulation.None,
+  // Nothing here calls document.addEventListener()/removeEventListener() itself to track an active
+  // drag - Angular has no equivalent to attaching/detaching a document-level listener conditionally,
+  // so these are permanently bound (from the moment this component is created, well before #init()
+  // ever runs) and just forward every event unconditionally; the on*() methods below are what
+  // actually gate on whether a drag is in progress (#trackerBtndown/#trackerIstouch).
+  host: {
+    '(document:mousemove)': 'onDocumentMouseMove($event)',
+    '(document:mouseup)': 'onDocumentMouseUp($event)',
+    '(document:touchend)': 'onDocumentTouchEnd($event)',
+    '(document:touchmove)': 'onDocumentTouchMove($event)',
+  },
 })
 export class JcropComponent implements OnDestroy {
   readonly #elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -65,6 +76,16 @@ export class JcropComponent implements OnDestroy {
   // that style itself.
   protected readonly handlesVisible = signal(false);
 
+  // The #tracker template element's cursor - set directly via style manipulation in the vendored
+  // original; #interfaceUpdate() (the first thing to set it, at the end of #init()) always sets
+  // 'crosshair' first, so that's the signal's initial value too, matching what the element would
+  // otherwise briefly render before #init() has ever run.
+  protected readonly trackerCursor = signal('crosshair');
+
+  // The #tracker template element's z-index - toggled between 290 (resting) and 450 (while a drag
+  // started from it is in progress) by #activateTrackerHandlers()/#finishTrackerDrag() below.
+  protected readonly trackerZIndex = signal(290);
+
   // Everything below is Jcrop's own former per-instance state - it used to belong to a separately
   // constructed Jcrop object, but that was pure indirection given this component is its only ever
   // consumer, so it was folded in directly (see the file-level comment in Jcrop.ts). All of it is
@@ -84,7 +105,19 @@ export class JcropComponent implements OnDestroy {
   #touch!: Touch;
   #bgopacity!: number;
   #selection!: Selection;
-  #tracker!: Tracker;
+  // Document-level drag-tracking state (what used to be a separate Tracker class - see Jcrop.ts):
+  // whether a drag is currently active, whether it started from a touch, and the move/done callback
+  // the caller currently has active (set via #activateTrackerHandlers(), one call per drag gesture:
+  // #newSelection() for a fresh drag, #startDragMode() for resizing/moving an existing one). Unlike
+  // the vendored original, the on*() methods below are always reachable (Angular has no equivalent
+  // to conditionally attaching/detaching a document listener) and gate themselves on #trackerBtndown
+  // (and, to ignore a stray event of the wrong kind - e.g. a touch brushing the screen mid mouse-drag
+  // on a hybrid device - #trackerIstouch) rather than relying on not being called at all while no
+  // drag is active.
+  #trackerBtndown: boolean | undefined;
+  #trackerIstouch: boolean | undefined;
+  #trackerOnDone: PositionCallback = function () {};
+  #trackerOnMove: PositionCallback = function () {};
   // Starts as a placeholder div, replaced with a real <img> further down in #init() -
   // #moveto() (inside Selection, via the getImg2 getter passed to it) is the only thing that reads
   // this afterward, so the placeholder is never actually rendered.
@@ -204,16 +237,39 @@ export class JcropComponent implements OnDestroy {
     this.#selection.touchDragStart(ord, e);
   }
 
+  protected onDocumentMouseMove(e: MouseEvent): void {
+    if (!this.#initialized || !this.#trackerBtndown || this.#trackerIstouch) return;
+    this.#trackerOnMove(this.#mouseAbs(e));
+  }
+
+  protected onDocumentMouseUp(e: MouseEvent): void {
+    if (!this.#initialized || !this.#trackerBtndown || this.#trackerIstouch) return;
+    this.#finishTrackerDrag(e);
+  }
+
+  protected onDocumentTouchMove(e: TouchEvent): void {
+    if (!this.#initialized || !this.#trackerBtndown || !this.#trackerIstouch) return;
+    this.#trackerOnMove(this.#mouseAbs(this.#touch.cfilter(e)));
+  }
+
+  protected onDocumentTouchEnd(e: TouchEvent): void {
+    if (!this.#initialized || !this.#trackerBtndown || !this.#trackerIstouch) return;
+    this.#finishTrackerDrag(this.#touch.cfilter(e));
+  }
+
   // The vendored plugin's own single closure-based factory function, ported first to a class and
   // then merged directly onto this component: everything that used to be a local variable closed
-  // over by every nested function is now a private field, and the standalone Touch/Selection/
-  // Tracker/Coords modules it built as IIFEs (see Jcrop.ts) are collaborator objects constructed
-  // here and wired together explicitly instead.
+  // over by every nested function is now a private field, and the standalone Touch/Selection/Coords
+  // modules it built as IIFEs (see Jcrop.ts) are collaborator objects constructed here and wired
+  // together explicitly instead. (The would-be fourth module, Tracker, never had a distinct piece of
+  // DOM/state of its own - just fields closing over this component's collaborators - so it's folded
+  // in directly as #trackerBtndown/#trackerIstouch/#trackerOnMove/#trackerOnDone and the
+  // #activateTrackerHandlers()/#finishTrackerDrag() methods below instead of a class in Jcrop.ts.)
   //
   // A handful of methods below are field arrows rather than ordinary methods -
   // #getPos/#mouseAbs/#startDragMode/#createDragger/#doneSelect/#selectDrag - because each is handed
-  // to a collaborator (Touch/Selection/Tracker) by bare reference rather than called directly; an
-  // ordinary method read that way loses its `this` binding the moment something else invokes it.
+  // to a collaborator (Touch/Selection) by bare reference rather than called directly; an ordinary
+  // method read that way loses its `this` binding the moment something else invokes it.
   #init(origimg: HTMLImageElement, opt: JcropOptions, win: Window): void {
     this.#win = win;
     this.#options = {...defaults};
@@ -283,14 +339,13 @@ export class JcropComponent implements OnDestroy {
 
     const bound = this.#options.boundary;
     const trk = this.trackerRef().nativeElement;
-    // position is static CSS on .jcrop-tracker; zIndex is left here even though 290 is also its
-    // resting value, because Tracker#toFront()/#toBack() toggle it between 290 and 450 at runtime.
+    // position is static CSS on .jcrop-tracker; z-index is the trackerZIndex signal (bound in the
+    // template), toggled by Tracker itself between 290 and 450 at runtime.
     setStyle(trk, {
       height: px(this.#boundy + bound * 2),
       left: px(-bound),
       top: px(-bound),
       width: px(this.#boundx + bound * 2),
-      zIndex: '290',
     });
 
     this.#img2 = this.#document.createElement('div');
@@ -349,19 +404,6 @@ export class JcropComponent implements OnDestroy {
       },
     );
 
-    // Tracker Module {{{
-    this.#tracker = new Tracker(
-      this.#document,
-      trk,
-      (e) => this.#mouseAbs(e),
-      (e) => this.#touch.cfilter(e),
-      () => {
-        if (this.#selection.isAwake()) {
-          this.#options.onSelect.call(this, this.#unscale(this.#coords.getFixed()));
-        }
-      },
-    );
-
     this.#img2 = this.#document.createElement('img');
     (this.#img2 as HTMLImageElement).src = img.getAttribute('src') ?? '';
     setStyle(this.#img2, imgStyle);
@@ -404,10 +446,10 @@ export class JcropComponent implements OnDestroy {
 
   readonly #startDragMode = (mode: DragMode, pos: Point, touch?: boolean): void => {
     this.#docOffset = this.#getPos(this.#img);
-    this.#tracker.setCursor(mode === 'move' ? mode : mode + '-resize');
+    this.trackerCursor.set(mode === 'move' ? mode : mode + '-resize');
 
     if (mode === 'move') {
-      this.#tracker.activateHandlers(this.#createMover(pos), this.#doneSelect, touch);
+      this.#activateTrackerHandlers(this.#createMover(pos), this.#doneSelect, touch);
       return;
     }
 
@@ -418,7 +460,7 @@ export class JcropComponent implements OnDestroy {
     this.#coords.setPressed(this.#coords.getCorner(opp));
     this.#coords.setCurrent(opc);
 
-    this.#tracker.activateHandlers(this.#dragmodeHandler(mode, fc), this.#doneSelect, touch);
+    this.#activateTrackerHandlers(this.#dragmodeHandler(mode, fc), this.#doneSelect, touch);
   };
 
   #dragmodeHandler(mode: Ordinal, f: JcropCrop & {x2: number; y2: number}): PositionCallback {
@@ -520,17 +562,17 @@ export class JcropComponent implements OnDestroy {
     } else {
       this.#selection.release();
     }
-    this.#tracker.setCursor('crosshair');
+    this.trackerCursor.set('crosshair');
   };
 
   #newSelection(e: JcropMouseEvent): void {
     this.#docOffset = this.#getPos(this.#img);
     this.#selection.disableHandles();
-    this.#tracker.setCursor('crosshair');
+    this.trackerCursor.set('crosshair');
     const pos = this.#mouseAbs(e);
     this.#coords.setPressed(pos);
     this.#selection.update();
-    this.#tracker.activateHandlers(this.#selectDrag, this.#doneSelect, e.type.startsWith('touch'));
+    this.#activateTrackerHandlers(this.#selectDrag, this.#doneSelect, e.type.startsWith('touch'));
 
     e.stopPropagation();
     e.preventDefault();
@@ -541,6 +583,33 @@ export class JcropComponent implements OnDestroy {
     this.#selection.update();
   };
 
+  // The tracker equivalent of Selection#dragStart/touchDragStart et al.: what used to be Tracker's
+  // own activateHandlers()/#finish() (Jcrop.ts), folded in directly since every collaborator those
+  // needed was already a closure over this component anyway.
+  #activateTrackerHandlers(move: PositionCallback, done: PositionCallback, touch?: boolean): void {
+    this.#trackerBtndown = true;
+    this.#trackerIstouch = touch;
+    this.#trackerOnMove = move;
+    this.#trackerOnDone = done;
+    this.trackerZIndex.set(450);
+  }
+
+  #finishTrackerDrag(e: JcropMouseEvent): void {
+    e.preventDefault();
+    e.stopPropagation();
+
+    this.#trackerBtndown = false;
+
+    this.#trackerOnDone(this.#mouseAbs(e));
+    if (this.#selection.isAwake()) {
+      this.#options.onSelect.call(this, this.#unscale(this.#coords.getFixed()));
+    }
+
+    this.trackerZIndex.set(290);
+    this.#trackerOnMove = function () {};
+    this.#trackerOnDone = function () {};
+  }
+
   #setSelectRaw(l: [number, number, number, number]): void {
     this.#coords.setPressed([l[0], l[1]]);
     this.#coords.setCurrent([l[2], l[3]]);
@@ -549,7 +618,7 @@ export class JcropComponent implements OnDestroy {
 
   // This method tweaks the interface based on options object. Called once, at end of #init().
   #interfaceUpdate(): void {
-    this.#tracker.setCursor('crosshair');
+    this.trackerCursor.set('crosshair');
 
     if (Object.hasOwn(this.#options, 'trueSize') && this.#options.trueSize) {
       this.#xscale = this.#options.trueSize[0] / this.#boundx;

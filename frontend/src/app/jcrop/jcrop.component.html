@@ -5,11 +5,11 @@
   or reparent them into place itself. The one thing #init() still appends here imperatively is the
   cloned working <img> (into #holder) - it can't be a static element since it's a runtime clone of
   the img above. Classes/inline styles below are exactly what #init() used to set imperatively for
-  properties that never change at runtime - anything that does (size, position while dragging,
-  z-index while tracking) is still set from there, with one exception: #hdlHolder's visibility is
-  driven by the handlesVisible signal instead, since - unlike the rest - it toggles for a reason
-  Angular can already see (Selection#disableHandles()/enableHandles() during a drag), not from
-  runtime layout math. Likewise, every mousedown/touchstart below is exactly what #init() and the
+  properties that never change at runtime - anything that does from runtime layout math (size,
+  position while dragging) is still set from there. What toggles for a reason Angular can already
+  see instead - #hdlHolder's visibility (Selection#disableHandles()/enableHandles()) and #tracker's
+  cursor/z-index (the component's own drag-mode changes) - is driven by signals instead (handlesVisible,
+  trackerCursor, trackerZIndex). Likewise, every mousedown/touchstart below is exactly what #init() and the
   Selection class (Jcrop.ts) used to attach imperatively with addEventListener() - all of these
   elements are static and permanent for the life of this component, so there's no need to
   attach/detach anything by hand. #tracker/#selectionTracker call straight into the drag logic
@@ -130,6 +130,8 @@
   <div
     #tracker
     class="jcrop-tracker"
+    [style.cursor]="trackerCursor()"
+    [style.z-index]="trackerZIndex()"
     (mousedown)="onTrackerMouseDown($event)"
     (touchstart)="onTrackerTouchStart($event)"
   ></div>

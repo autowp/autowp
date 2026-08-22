@@ -29,11 +29,13 @@
  * }}}
  *
  * The plugin's own orchestrating factory function (constructing and wiring up Touch/Selection/
- * Tracker/Coords, driving the drag/resize state machine) now lives directly on JcropComponent -
- * there's only ever one consumer, so a separate "Jcrop instance" object was pure indirection. What
- * remains here are the four collaborator classes (kept separate, unlike the orchestration, since
- * each owns a distinct piece of DOM/state) plus the option types/defaults and small DOM helpers they
- * and JcropComponent both need.
+ * Coords, driving the drag/resize state machine) now lives directly on JcropComponent - there's
+ * only ever one consumer, so a separate "Jcrop instance" object was pure indirection. The
+ * document-level drag-tracking state (what used to be a separate Tracker class) lives there too now,
+ * for the same reason: every collaborator it needed (mouseAbs/touchCfilter/notifySelectionSettled/
+ * setZIndex) was already a closure over JcropComponent itself, so the class was pure indirection as
+ * well. What remains here are the three collaborator classes that actually own a distinct piece of
+ * DOM/state, plus the option types/defaults and small DOM helpers they and JcropComponent both need.
  */
 
 function hasTouchSupport(win: Window): boolean {
@@ -133,97 +135,6 @@ export function setStyle(el: HTMLElement, styles: Partial<CSSStyleDeclaration>):
 
 export function px(n: number): string {
   return Math.round(n) + 'px';
-}
-
-// Owns the "new selection" tracker overlay - the invisible full-image click target used both to
-// start a fresh selection drag and, once active, to forward mousemove/touchmove/mouseup/touchend on
-// `document` to whichever move/done callback the caller currently has active (set via
-// activateHandlers(), one call per drag gesture: newSelection() for a fresh drag, startDragMode()
-// for resizing/moving an existing one). Kept independent of Selection/Coords/options - the two
-// things it needs from outside are provided as plain function references so it doesn't have to know
-// about those modules at all: `mouseAbs`/`touchCfilter` (shared, stateful math owned by
-// JcropComponent) and `notifySelectionSettled` (what to do once a drag ends and the selection has
-// possibly changed - checking whether there's now an awake selection and firing onSelect is the
-// caller's business, not Tracker's).
-export class Tracker {
-  #btndown: boolean | undefined;
-  #onDone: PositionCallback = function () {};
-  #onMove: PositionCallback = function () {};
-
-  constructor(
-    private readonly doc: Document,
-    private readonly trk: HTMLDivElement,
-    private readonly mouseAbs: (e: JcropMouseEvent) => Point,
-    private readonly touchCfilter: (e: JcropMouseEvent) => JcropMouseEvent,
-    private readonly notifySelectionSettled: () => void,
-  ) {}
-
-  activateHandlers(move: PositionCallback, done: PositionCallback, touch?: boolean): void {
-    this.#btndown = true;
-    this.#onMove = move;
-    this.#onDone = done;
-    this.#toFront(touch);
-  }
-
-  setCursor(t: string): void {
-    setStyle(this.trk, {cursor: t});
-  }
-
-  #toFront(touch?: boolean): void {
-    setStyle(this.trk, {zIndex: '450'});
-
-    if (touch) {
-      this.doc.addEventListener('touchmove', this.#trackTouchMove);
-      this.doc.addEventListener('touchend', this.#trackTouchEnd);
-    } else {
-      this.doc.addEventListener('mousemove', this.#trackMove);
-      this.doc.addEventListener('mouseup', this.#trackUp);
-    }
-  }
-
-  #toBack(): void {
-    setStyle(this.trk, {zIndex: '290'});
-    this.doc.removeEventListener('mousemove', this.#trackMove);
-    this.doc.removeEventListener('mouseup', this.#trackUp);
-    this.doc.removeEventListener('touchmove', this.#trackTouchMove);
-    this.doc.removeEventListener('touchend', this.#trackTouchEnd);
-  }
-
-  // Field arrows (not methods): registered on `document` via addEventListener/removeEventListener
-  // pairs in #toFront/#toBack, which match handlers by reference - a plain method isn't auto-bound
-  // to `this`, so `this.#trackMove` etc. have to be the same stable, already-bound function object
-  // every time they're read, both to add and to later remove the exact same listener.
-  readonly #trackMove = (e: JcropMouseEvent): boolean => {
-    this.#onMove(this.mouseAbs(e));
-    return false;
-  };
-
-  readonly #trackUp = (e: JcropMouseEvent): boolean => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (this.#btndown) {
-      this.#btndown = false;
-
-      this.#onDone(this.mouseAbs(e));
-      this.notifySelectionSettled();
-
-      this.#toBack();
-      this.#onMove = function () {};
-      this.#onDone = function () {};
-    }
-
-    return false;
-  };
-
-  readonly #trackTouchMove = (e: JcropMouseEvent): boolean => {
-    this.#onMove(this.mouseAbs(this.touchCfilter(e)));
-    return false;
-  };
-
-  readonly #trackTouchEnd = (e: JcropMouseEvent): boolean => {
-    return this.#trackUp(this.touchCfilter(e));
-  };
 }
 
 // Owns the selection rectangle's coordinate math: the pressed/current corner state (x1/y1/x2/y2)
@@ -404,7 +315,7 @@ export class Coords {
 // touchDragStart() below, the same way it already does for the "move" tracker overlay via
 // createDragger/createTouchDragger directly. Kept independent of Touch by taking its
 // touch-specific bit (how to build a touch-drag handler) as a plain function rather than the Touch
-// object itself - same decoupling as Tracker. `coords` is taken as the real collaborator object it
+// object itself. `coords` is taken as the real collaborator object it
 // is (not individually wrapped getters), since by the time Selection needs it, it already exists
 // and never gets replaced.
 export class Selection {
