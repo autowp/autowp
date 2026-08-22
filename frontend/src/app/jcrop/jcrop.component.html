@@ -6,14 +6,24 @@
   cloned working <img> (into #holder) - it can't be a static element since it's a runtime clone of
   the img above. Classes/inline styles below are exactly what #init() used to set imperatively for
   properties that never change at runtime - anything that does (size, position while dragging,
-  z-index while tracking, visibility) is still set from there. Likewise, mousedown/touchstart below
-  are exactly what #init() (and, for #selectionTracker, the Selection class in Jcrop.ts) used to
-  attach imperatively with addEventListener() - both elements are static and permanent for the life
-  of this component, so there's no need to attach/detach them by hand.
+  z-index while tracking) is still set from there, with one exception: #hdlHolder's visibility is
+  driven by the handlesVisible signal instead, since - unlike the rest - it toggles for a reason
+  Angular can already see (Selection#disableHandles()/enableHandles() during a drag), not from
+  runtime layout math. Likewise, mousedown/touchstart below are exactly what #init() (and, for
+  #selectionTracker, the Selection class in Jcrop.ts) used to attach imperatively with
+  addEventListener() - both elements are static and permanent for the life of this component, so
+  there's no need to attach/detach them by hand.
 -->
 <div #holder class="jcrop-holder">
   <div #sel style="position: absolute; z-index: 600">
     <div #imgHolder style="position: absolute; overflow: hidden; height: 100%; width: 100%; z-index: 310">
+      <!-- Fully static: opacity/position come from .jcrop-vline/.jcrop-hline (jcrop.component.scss),
+           and Selection never touches these at all any more (contrast the dragbars/handles below,
+           which still get mousedown/touchstart wired up in Jcrop.ts). -->
+      <div #borderN class="jcrop-hline"></div>
+      <div #borderS class="jcrop-hline bottom"></div>
+      <div #borderE class="jcrop-vline right"></div>
+      <div #borderW class="jcrop-vline"></div>
       <div
         #selectionTracker
         class="jcrop-tracker"
@@ -22,7 +32,25 @@
         (touchstart)="onSelectionTrackerTouchStart($event)"
       ></div>
     </div>
-    <div #hdlHolder style="height: 100%; width: 100%; z-index: 320"></div>
+    <div #hdlHolder style="height: 100%; width: 100%; z-index: 320" [style.display]="handlesVisible() ? '' : 'none'">
+      <!-- cursor/opacity/position/class are static (jcrop.component.scss); z-index is inline since
+           it's the one thing genuinely unique per element, not shareable via a class. Jcrop.ts
+           (#dragDiv) still wires up mousedown/touchstart on each - fixed in number and identity,
+           since createDragbars/createHandles are DefaultedOptions fields nothing can override any
+           more, but still real drag targets, unlike the borders above. -->
+      <div #dragbarN class="jcrop-dragbar ord-n" style="z-index: 370"></div>
+      <div #dragbarS class="jcrop-dragbar ord-s" style="z-index: 371"></div>
+      <div #dragbarE class="jcrop-dragbar ord-e" style="z-index: 372"></div>
+      <div #dragbarW class="jcrop-dragbar ord-w" style="z-index: 373"></div>
+      <div #handleN class="jcrop-handle ord-n" style="z-index: 374"></div>
+      <div #handleS class="jcrop-handle ord-s" style="z-index: 375"></div>
+      <div #handleE class="jcrop-handle ord-e" style="z-index: 376"></div>
+      <div #handleW class="jcrop-handle ord-w" style="z-index: 377"></div>
+      <div #handleNw class="jcrop-handle ord-nw" style="z-index: 378"></div>
+      <div #handleNe class="jcrop-handle ord-ne" style="z-index: 379"></div>
+      <div #handleSe class="jcrop-handle ord-se" style="z-index: 380"></div>
+      <div #handleSw class="jcrop-handle ord-sw" style="z-index: 381"></div>
+    </div>
   </div>
   <div
     #tracker

@@ -8,6 +8,7 @@ import {
   inject,
   input,
   output,
+  signal,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -23,6 +24,7 @@ import type {
   Ordinal,
   Point,
   PositionCallback,
+  SelectionElements,
 } from './Jcrop';
 
 import {Coords, defaults, px, Selection, setStyle, Touch, Tracker} from './Jcrop';
@@ -56,8 +58,31 @@ export class JcropComponent implements OnDestroy {
   private readonly holderRef = viewChild.required<ElementRef<HTMLDivElement>>('holder');
   private readonly selRef = viewChild.required<ElementRef<HTMLDivElement>>('sel');
   private readonly imgHolderRef = viewChild.required<ElementRef<HTMLDivElement>>('imgHolder');
-  private readonly hdlHolderRef = viewChild.required<ElementRef<HTMLDivElement>>('hdlHolder');
   private readonly trackerRef = viewChild.required<ElementRef<HTMLDivElement>>('tracker');
+
+  // The dragbar/handle divs Selection wires up drag listeners for (see SelectionElements in
+  // Jcrop.ts) - declared statically here instead of Selection building them with
+  // document.createElement(). The 4 border divs are declared the same way in the template (see
+  // #borderN et al. there), but nothing here needs a reference to them - unlike these, they're
+  // purely static markup Selection never touches.
+  private readonly dragbarNRef = viewChild.required<ElementRef<HTMLDivElement>>('dragbarN');
+  private readonly dragbarSRef = viewChild.required<ElementRef<HTMLDivElement>>('dragbarS');
+  private readonly dragbarERef = viewChild.required<ElementRef<HTMLDivElement>>('dragbarE');
+  private readonly dragbarWRef = viewChild.required<ElementRef<HTMLDivElement>>('dragbarW');
+  private readonly handleNRef = viewChild.required<ElementRef<HTMLDivElement>>('handleN');
+  private readonly handleSRef = viewChild.required<ElementRef<HTMLDivElement>>('handleS');
+  private readonly handleERef = viewChild.required<ElementRef<HTMLDivElement>>('handleE');
+  private readonly handleWRef = viewChild.required<ElementRef<HTMLDivElement>>('handleW');
+  private readonly handleNwRef = viewChild.required<ElementRef<HTMLDivElement>>('handleNw');
+  private readonly handleNeRef = viewChild.required<ElementRef<HTMLDivElement>>('handleNe');
+  private readonly handleSeRef = viewChild.required<ElementRef<HTMLDivElement>>('handleSe');
+  private readonly handleSwRef = viewChild.required<ElementRef<HTMLDivElement>>('handleSw');
+
+  // Whether the resize handles/dragbars are shown - driven by Selection#disableHandles()/
+  // enableHandles() via the setHandlesVisible callback passed into it below, and read directly by
+  // the #hdlHolder template element's [style.display] binding instead of Jcrop imperatively setting
+  // that style itself.
+  protected readonly handlesVisible = signal(false);
 
   // Everything below is Jcrop's own former per-instance state - it used to belong to a separately
   // constructed Jcrop object, but that was pure indirection given this component is its only ever
@@ -70,7 +95,6 @@ export class JcropComponent implements OnDestroy {
   #win!: Window;
   #origimg!: HTMLImageElement;
   #img!: HTMLImageElement;
-  #hdlHolder!: HTMLDivElement;
   #imgHolder!: HTMLDivElement;
   #div!: HTMLDivElement;
   #boundx!: number;
@@ -200,10 +224,8 @@ export class JcropComponent implements OnDestroy {
     this.#win = win;
     this.#options = {...defaults};
 
-    // hdlHolder/imgHolder's styling (height/width/z-index, and imgHolder's overflow/position) never
-    // changes at runtime, so it's static CSS on their template elements (jcrop.component.html/.scss)
-    // instead of set here.
-    this.#hdlHolder = this.hdlHolderRef().nativeElement;
+    // imgHolder's styling (height/width/z-index/overflow/position) never changes at runtime, so
+    // it's static CSS on its template element (jcrop.component.html/.scss) instead of set here.
     this.#imgHolder = this.imgHolderRef().nativeElement;
 
     this.#mergeOptions(opt);
@@ -247,8 +269,15 @@ export class JcropComponent implements OnDestroy {
     setStyle(img, {display: ''});
 
     setStyle(img, {height: px(origimg.offsetHeight), width: px(origimg.offsetWidth)});
-    origimg.after(img);
     setStyle(origimg, {display: 'none'});
+
+    // #holder is already positioned right where the clone belongs (jcrop.component.html declares it
+    // immediately after the real <img>) - append the clone straight into it instead of first
+    // attaching it as origimg's sibling and reparenting it in afterward. offsetWidth/offsetHeight
+    // below only need the clone attached to the DOM somewhere, not specifically to this parent.
+    const div = this.holderRef().nativeElement;
+    this.#div = div;
+    div.append(img);
 
     this.#presize(img, this.#options.boxWidth, this.#options.boxHeight);
 
@@ -256,10 +285,7 @@ export class JcropComponent implements OnDestroy {
     this.#boundy = img.offsetHeight;
     // backgroundColor/position are static CSS on .jcrop-holder (jcrop.component.scss); only the
     // image-dependent size is set here.
-    const div = this.holderRef().nativeElement;
-    this.#div = div;
     setStyle(div, {height: px(this.#boundy), width: px(this.#boundx)});
-    div.append(img);
 
     const bound = this.#options.boundary;
     const trk = this.trackerRef().nativeElement;
@@ -314,10 +340,7 @@ export class JcropComponent implements OnDestroy {
     });
 
     this.#selection = new Selection(
-      this.#document,
       img,
-      this.#imgHolder,
-      this.#hdlHolder,
       () => this.#img2,
       sel,
       this.#bgopacity,
@@ -329,6 +352,27 @@ export class JcropComponent implements OnDestroy {
       (c) => {
         this.#options.onSelect.call(this, this.#unscale(c));
       },
+      (visible) => {
+        this.handlesVisible.set(visible);
+      },
+      {
+        dragbars: {
+          e: this.dragbarERef().nativeElement,
+          n: this.dragbarNRef().nativeElement,
+          s: this.dragbarSRef().nativeElement,
+          w: this.dragbarWRef().nativeElement,
+        },
+        handles: {
+          e: this.handleERef().nativeElement,
+          n: this.handleNRef().nativeElement,
+          ne: this.handleNeRef().nativeElement,
+          nw: this.handleNwRef().nativeElement,
+          s: this.handleSRef().nativeElement,
+          se: this.handleSeRef().nativeElement,
+          sw: this.handleSwRef().nativeElement,
+          w: this.handleWRef().nativeElement,
+        },
+      } satisfies SelectionElements,
     );
 
     // Tracker Module {{{
@@ -352,7 +396,6 @@ export class JcropComponent implements OnDestroy {
 
     this.#docOffset = this.#getPos(img);
 
-    setStyle(this.#hdlHolder, {display: 'none'});
     this.#initialized = true;
     this.#interfaceUpdate();
   }

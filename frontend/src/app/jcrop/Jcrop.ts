@@ -48,14 +48,16 @@ export interface JcropCrop {
 }
 
 // The only options JcropComponent (the sole consumer) ever passes at construction. Everything else
-// the upstream plugin supported (bgOpacity/borderOpacity/boundary/createBorders/createDragbars/
-// createHandles/handleOpacity/minSelect/touchSupport) is still implemented - it just always runs
-// with its DefaultedOptions default now, since nothing here can override it any more.
-// addClass/aspectRatio/disabled/handleSize/keySupport/maxSize/outerImage were dropped entirely
-// (not just defaulted): each was either dead on arrival (keySupport - no keyboard-nudge support was
-// ever ported into this vendored copy) or gated a whole branch behind a falsy sentinel
-// (null/0/[0,0]/false) that, once unoverridable, could never turn truthy again, so the branch
-// itself was dead code, not just fixed-at-its-default.
+// the upstream plugin supported (bgOpacity/boundary/createDragbars/createHandles/minSelect/
+// touchSupport) is still implemented - it just always runs with its DefaultedOptions default now,
+// since nothing here can override it any more.
+// addClass/aspectRatio/borderOpacity/createBorders/disabled/handleOpacity/handleSize/keySupport/
+// maxSize/outerImage were dropped entirely (not just defaulted): each was either dead on arrival
+// (keySupport - no keyboard-nudge support was ever ported into this vendored copy), gated a whole
+// branch behind a falsy sentinel (null/0/[0,0]/false) that, once unoverridable, could never turn
+// truthy again, or - once its DefaultedOptions default became the only value it could ever hold -
+// ended up read only by code that's now static markup instead (border/handle opacity, which class
+// classes get, which per-side divs even exist to begin with; see jcrop.component.html/.scss).
 export interface JcropOptions {
   boxHeight?: number;
   boxWidth?: number;
@@ -70,14 +72,11 @@ export interface JcropOptions {
 // `options.hasOwnProperty(...)` check.
 interface DefaultedOptions {
   bgOpacity: number;
-  borderOpacity: number;
   boundary: number;
   boxHeight: number;
   boxWidth: number;
-  createBorders: Ordinal[];
-  createDragbars: Ordinal[];
+  createDragbars: Side[];
   createHandles: Ordinal[];
-  handleOpacity: number;
   minSelect: number[];
   minSize: number[];
   onSelect: (crop: JcropCrop) => void;
@@ -102,6 +101,12 @@ export type PositionCallback = (pos: Point) => void;
 export type Ordinal = 'e' | 'n' | 'ne' | 'nw' | 's' | 'se' | 'sw' | 'w';
 export type DragMode = 'move' | Ordinal;
 
+// The 4 non-diagonal Ordinals - what createDragbars actually ever contains (dragbars, like borders,
+// only ever run along an edge, never sit at a corner - border div identity/class is static markup
+// now, not derived from a Side-typed list at all any more, but SelectionElements.dragbars is still
+// keyed by this).
+export type Side = 'e' | 'n' | 's' | 'w';
+
 // oppLockCorner only ever maps onto a diagonal - the corner opposite the dragged edge/corner, which
 // getCorner then reads off Coords - so both are typed to this narrower union rather than Ordinal.
 export type Corner = 'ne' | 'nw' | 'se' | 'sw';
@@ -110,16 +115,12 @@ export type Corner = 'ne' | 'nw' | 'se' | 'sw';
 export const defaults: DefaultedOptions = {
   // Styling Options
   bgOpacity: 0.6,
-  borderOpacity: 0.4,
   boundary: 2,
 
   boxHeight: 0,
   boxWidth: 0,
-  createBorders: ['n', 's', 'e', 'w'],
   createDragbars: ['n', 's', 'e', 'w'],
   createHandles: ['n', 's', 'e', 'w', 'nw', 'ne', 'se', 'sw'],
-
-  handleOpacity: 0.5,
 
   minSelect: [0, 0],
   minSize: [0, 0],
@@ -139,10 +140,6 @@ export function setStyle(el: HTMLElement, styles: Partial<CSSStyleDeclaration>):
 
 export function px(n: number): string {
   return Math.round(n) + 'px';
-}
-
-export function cssClass(cl: string): string {
-  return 'jcrop-' + cl;
 }
 
 // Owns the "new selection" tracker overlay - the invisible full-image click target used both to
@@ -407,6 +404,17 @@ export class Coords {
   }
 }
 
+// The 4 dragbar + 8 handle divs Selection still wires up drag listeners for - fixed in number and
+// identity for the lifetime of a JcropComponent instance (createDragbars/createHandles are
+// DefaultedOptions fields nothing can override any more), so JcropComponent declares them
+// statically in its own template rather than Selection building them with document.createElement().
+// The 4 border divs aren't here: Selection doesn't touch them at all any more, since nothing about
+// them (styling, class, or behavior) is dynamic - see jcrop.component.html/.scss.
+export interface SelectionElements {
+  dragbars: Record<Side, HTMLDivElement>;
+  handles: Record<Ordinal, HTMLDivElement>;
+}
+
 // Owns the visible selection box: its resize handles, dragbars, borders, and the crop-preview image
 // clipped to it. The "move" tracker overlay for dragging an existing selection is a sibling concern,
 // not owned here - JcropComponent binds mousedown/touchstart on it directly in its own template,
@@ -418,13 +426,9 @@ export class Coords {
 // gets replaced.
 export class Selection {
   #awake: boolean | undefined;
-  #hdep = 370;
 
   constructor(
-    private readonly doc: Document,
     private readonly img: HTMLImageElement,
-    private readonly imgHolder: HTMLDivElement,
-    private readonly hdlHolder: HTMLDivElement,
     // img2 starts as a placeholder div and is replaced with a real <img> right after Selection is
     // constructed (see JcropComponent's own img2 field for why) - a getter so #moveto() always
     // styles whichever element is current by the time it's actually called, not the placeholder.
@@ -437,21 +441,25 @@ export class Selection {
     private readonly getOptions: () => InternalOptions,
     private readonly coords: Coords,
     private readonly notifySelect: (crop: JcropCrop & {x2: number; y2: number}) => void,
+    // Handle/dragbar visibility is a JcropComponent signal ([style.display] on the #hdlHolder
+    // template element), not a style this class sets directly any more.
+    private readonly setHandlesVisible: (visible: boolean) => void,
+    private readonly elements: SelectionElements,
   ) {
     const options = this.getOptions();
 
-    // createDragbars/createHandles/createBorders are DefaultedOptions fields (not part of the
-    // public JcropOptions surface any more), so they're always real arrays here - no
-    // Array.isArray() guard needed.
+    // createDragbars/createHandles are DefaultedOptions fields (not part of the public JcropOptions
+    // surface any more), so they're always real arrays here - no Array.isArray() guard needed.
+    // Borders have no equivalent call any more - their styling/class is entirely static now (see
+    // jcrop.component.html/.scss), so nothing here needs to touch them.
     this.#createDragbars(options.createDragbars);
     this.#createHandles(options.createHandles);
-    this.#createBorders(options.createBorders);
 
     this.disableHandles();
   }
 
   disableHandles(): void {
-    setStyle(this.hdlHolder, {display: 'none'});
+    this.setHandlesVisible(false);
   }
 
   done(): void {
@@ -459,7 +467,7 @@ export class Selection {
   }
 
   enableHandles(): void {
-    setStyle(this.hdlHolder, {display: ''});
+    this.setHandlesVisible(true);
   }
 
   isAwake(): boolean {
@@ -497,68 +505,27 @@ export class Selection {
     }
   }
 
-  #insertBorder(type: string): void {
-    const el = this.doc.createElement('div');
-    setStyle(el, {opacity: String(this.getOptions().borderOpacity), position: 'absolute'});
-    el.classList.add(cssClass(type));
-    this.imgHolder.append(el);
-  }
-
-  #dragDiv(ord: Ordinal, zi: number): HTMLDivElement {
-    const el = this.doc.createElement('div');
+  // el is one of the static per-side/per-corner divs JcropComponent declares in its own template
+  // (see SelectionElements) - cursor/position/z-index/class are static there too now (borderOpacity/
+  // handleOpacity as well, for borders/handles respectively), so this only wires up the drag
+  // listeners, it doesn't create, place, or style anything.
+  #dragDiv(ord: Ordinal, el: HTMLDivElement): void {
     el.addEventListener('mousedown', this.createDragger(ord));
-    setStyle(el, {cursor: ord + '-resize', position: 'absolute', zIndex: String(zi)});
-    el.classList.add('ord-' + ord);
 
     if (this.touchSupport) {
       el.addEventListener('touchstart', this.createTouchDragger(ord));
     }
-
-    this.hdlHolder.append(el);
-    return el;
   }
 
-  #insertHandle(ord: Ordinal): void {
-    const div = this.#dragDiv(ord, this.#hdep++);
-    setStyle(div, {opacity: String(this.getOptions().handleOpacity)});
-    div.classList.add(cssClass('handle'));
-  }
-
-  #insertDragbar(ord: Ordinal): void {
-    const el = this.#dragDiv(ord, this.#hdep++);
-    el.classList.add('jcrop-dragbar');
-  }
-
-  #createDragbars(li: Ordinal[]): void {
+  #createDragbars(li: Side[]): void {
     for (const ord of li) {
-      this.#insertDragbar(ord);
-    }
-  }
-
-  #createBorders(li: Ordinal[]): void {
-    let cl = '';
-    for (const ord of li) {
-      switch (ord) {
-        case 'e':
-          cl = 'vline right';
-          break;
-        case 'n':
-          cl = 'hline';
-          break;
-        case 's':
-          cl = 'hline bottom';
-          break;
-        case 'w':
-          cl = 'vline';
-          break;
-      }
-      this.#insertBorder(cl);
+      this.#dragDiv(ord, this.elements.dragbars[ord]);
     }
   }
 
   #createHandles(li: Ordinal[]): void {
     for (const ord of li) {
-      this.#insertHandle(ord);
+      this.#dragDiv(ord, this.elements.handles[ord]);
     }
   }
 

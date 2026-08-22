@@ -23,6 +23,7 @@
 .jcrop-hline {
   background: #fff url('Jcrop.gif');
   font-size: 0;
+  opacity: 0.4;
   position: absolute;
 }
 
@@ -67,6 +68,8 @@
   width: 7px;
   height: 7px;
   font-size: 1px;
+  opacity: 0.5;
+  position: absolute;
 
   &.ord-n {
     left: 50%;
@@ -127,6 +130,8 @@
 
 /* Dragbars */
 .jcrop-dragbar {
+  position: absolute;
+
   &.ord-n,
   &.ord-s {
     height: 7px;
@@ -156,6 +161,40 @@
   &.ord-w {
     margin-left: -4px;
   }
+}
+
+/* Resize cursor per ordinal - shared between handles and dragbars (the .ord-* class is the same
+   set on both), unlike the sizing/position rules above which differ by role. */
+.ord-e {
+  cursor: e-resize;
+}
+
+.ord-n {
+  cursor: n-resize;
+}
+
+.ord-ne {
+  cursor: ne-resize;
+}
+
+.ord-nw {
+  cursor: nw-resize;
+}
+
+.ord-s {
+  cursor: s-resize;
+}
+
+.ord-se {
+  cursor: se-resize;
+}
+
+.ord-sw {
+  cursor: sw-resize;
+}
+
+.ord-w {
+  cursor: w-resize;
 }
 
 /* Fix for twitter bootstrap et al. */
