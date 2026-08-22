@@ -131,11 +131,12 @@ export const serverRoutes: ServerRoute[] = [
   // for it a level at a time rather than all at once. So far: the brand page itself, the three
   // galleries under it with everything inside them (their index, the `gallery/:identity` view and
   // the `:identity` picture pages), the car lists - `:brand/cars` and its per-vehicle-type
-  // `:brand/cars/:vehicle_type` - and the recent-pictures list.
+  // `:brand/cars/:vehicle_type` - the recent-pictures list, the concepts list, and the per-brand
+  // mosts with their rating/type/years combinations.
   //
-  // The rest of the tree stays client-rendered for now: engines, concepts and mosts, and the
-  // vehicle tree matched by cataloguePathMatcher, which is the deep half of the catalogue and the
-  // one worth turning on last. Note what that costs while it lasts - a nested catalogue URL
+  // The rest of the tree stays client-rendered for now: engines, and the vehicle tree matched by
+  // cataloguePathMatcher, which is the deep half of the catalogue and the one worth turning on
+  // last. Note what that costs while it lasts - a nested catalogue URL
   // that doesn't exist answers 200 with an empty shell rather than a 404, because deciding that
   // requires the render this step skips.
   //
@@ -143,8 +144,12 @@ export const serverRoutes: ServerRoute[] = [
   // matches any single segment that isn't one of them.
   {path: ':brand', renderMode: RenderMode.Server},
   {path: ':brand/cars/**', renderMode: RenderMode.Server},
+  {path: ':brand/concepts/**', renderMode: RenderMode.Server},
   {path: ':brand/logotypes/**', renderMode: RenderMode.Server},
   {path: ':brand/mixed/**', renderMode: RenderMode.Server},
+  // MostsContentsComponent, which this renders, is the same one behind the top-level mosts/**
+  // route that has been server-rendered all along.
+  {path: ':brand/mosts/**', renderMode: RenderMode.Server},
   {path: ':brand/other/**', renderMode: RenderMode.Server},
   {path: ':brand/recent/**', renderMode: RenderMode.Server},
   {path: ':brand/**', renderMode: RenderMode.Client},
