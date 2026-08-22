@@ -90,9 +90,12 @@ export class MostsContentsComponent implements OnInit {
       // entry and stick with it, since params() never changes afterwards.
       id: `mosts-contents-menu-${this.brandID() ?? ''}`,
       injector: this.#injector,
-      params: () => this.brandID(),
-      stream: ({params: brandID}) =>
-        this.#mostsService.getMenu$(brandID).pipe(
+      // Wrapped in an object so params() itself is never `undefined`: on the global /mosts page
+      // (no brandID input bound) a bare `() => this.brandID()` would return undefined, and the
+      // resource API treats that as "no request" - it goes idle and never calls stream at all.
+      params: () => ({brandID: this.brandID()}),
+      stream: ({params}) =>
+        this.#mostsService.getMenu$(params.brandID).pipe(
           map((menu) => ({
             ratings: menu.ratings,
             vehicleTypes: vehicleTypesToList(menu.vehicleTypes ?? []),
