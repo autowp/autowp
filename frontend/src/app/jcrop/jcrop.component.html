@@ -1,19 +1,33 @@
 <img alt="" [src]="src()" (load)="onLoad($event)" />
 <!--
-  Jcrop's fixed-identity container elements (see JcropElements in Jcrop.ts) - declared here, already
-  nested the way Jcrop's constructor expects them, so it doesn't have to build them with
-  document.createElement() or reparent them into place itself. The one thing Jcrop still appends here
-  imperatively is the cloned working <img> (into #holder) - it can't be a static element since it's a
-  runtime clone of the img above. Classes/inline styles below are exactly what Jcrop.ts used to set
-  imperatively for properties that never change at runtime - anything that does (size, position while
-  dragging, z-index while tracking, visibility) is still set from there.
+  Jcrop's fixed-identity container elements - declared here, already nested the way #init()
+  (jcrop.component.ts) expects them, so it doesn't have to build them with document.createElement()
+  or reparent them into place itself. The one thing #init() still appends here imperatively is the
+  cloned working <img> (into #holder) - it can't be a static element since it's a runtime clone of
+  the img above. Classes/inline styles below are exactly what #init() used to set imperatively for
+  properties that never change at runtime - anything that does (size, position while dragging,
+  z-index while tracking, visibility) is still set from there. Likewise, mousedown/touchstart below
+  are exactly what #init() (and, for #selectionTracker, the Selection class in Jcrop.ts) used to
+  attach imperatively with addEventListener() - both elements are static and permanent for the life
+  of this component, so there's no need to attach/detach them by hand.
 -->
 <div #holder class="jcrop-holder">
   <div #sel style="position: absolute; z-index: 600">
     <div #imgHolder style="position: absolute; overflow: hidden; height: 100%; width: 100%; z-index: 310">
-      <div #selectionTracker class="jcrop-tracker" style="cursor: move; z-index: 360"></div>
+      <div
+        #selectionTracker
+        class="jcrop-tracker"
+        style="cursor: move; z-index: 360"
+        (mousedown)="onSelectionTrackerMouseDown($event)"
+        (touchstart)="onSelectionTrackerTouchStart($event)"
+      ></div>
     </div>
     <div #hdlHolder style="height: 100%; width: 100%; z-index: 320"></div>
   </div>
-  <div #tracker class="jcrop-tracker"></div>
+  <div
+    #tracker
+    class="jcrop-tracker"
+    (mousedown)="onTrackerMouseDown($event)"
+    (touchstart)="onTrackerTouchStart($event)"
+  ></div>
 </div>
