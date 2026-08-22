@@ -38,9 +38,11 @@
  * setSelSize) was already a closure over JcropComponent itself, and none of them held a DOM
  * reference of their own any more either - so all three classes were pure indirection. What remains
  * here is Coords, the one collaborator class that actually owns a distinct piece of state, plus the
- * option types and small DOM helpers it and JcropComponent both need. The default option values
- * themselves (what used to be a `defaults` constant here) live directly in JcropComponent's
- * onLoad() now, for the same reason - it was the only consumer.
+ * few types (JcropCrop/Point/Corner) it and JcropComponent both need. Everything else that used to
+ * live here - the other types (InternalOptions, JcropMouseEvent, PositionCallback, Ordinal,
+ * DragMode), the setStyle()/px() DOM helpers, and the option default values (what used to be a
+ * `defaults` constant) - moved to JcropComponent itself once nothing here (Coords never did) needed
+ * them any more either; it was always the only real consumer.
  */
 
 export interface JcropCrop {
@@ -50,73 +52,20 @@ export interface JcropCrop {
   y: number;
 }
 
-// The only options JcropComponent (the sole consumer) ever actually varies per crop - boxHeight/
-// boxWidth (the fitted display box size) and minSize (the minSize input) - so, unlike the vendored
-// plugin's original options object, all three are required rather than optional: onLoad() always
-// provides a fresh value for each, in its own #options field initializer.
-// addClass/aspectRatio/bgOpacity/borderOpacity/boundary/createBorders/createDragbars/createHandles/
-// disabled/handleOpacity/handleSize/keySupport/maxSize/minSelect/outerImage/setSelect/touchSupport/
-// trueSize were dropped entirely (not just defaulted): each was either dead on arrival (keySupport -
-// no keyboard-nudge support was ever ported into this vendored copy), gated a whole branch behind a
-// falsy sentinel (null/0/[0,0]/false) that, once unoverridable, could never turn truthy again
-// (touchSupport's null - once it could never be true/false instead, JcropComponent's own constructor
-// always fell through to feature-detecting the window, so the override check itself was dead too),
-// once its fixed default became the only value it could ever hold, ended up read only by code that's
-// now static markup instead (border/handle opacity and classes, which per-side/per-corner divs even
-// exist to begin with, and - for createDragbars/createHandles specifically - which of them get their
-// mousedown/touchstart bound directly in the template now instead of via a runtime loop; see
-// jcrop.component.html/.scss), or - bgOpacity/boundary/minSelect/setSelect/trueSize - was never
-// genuinely variable to begin with, so JcropComponent just uses a fixed value or an already-in-scope
-// local variable directly now (#selectionUpdate()'s bgopacity, onLoad()'s tracker sizing,
-// #doneSelect()'s minSelect check, and onLoad()'s own #setSelect()/xscale/yscale calls respectively)
-// instead of routing any of them through #options at all.
-export interface InternalOptions {
-  boxHeight: number;
-  boxWidth: number;
-  minSize: number[];
-}
-
 export type Point = [number, number];
 
-// A native MouseEvent/TouchEvent, widened with a writable pageX/pageY: JcropComponent's own
-// #touchCfilter() copies the active touch's page coordinates onto the event itself so mouseAbs() can
-// read event.pageX/pageY the same way regardless of whether the drag started from a mouse or touch
-// listener - TouchEvent doesn't carry its own pageX/pageY (only the individual Touch entries in its
-// touch lists do).
-export type JcropMouseEvent = (MouseEvent | TouchEvent) & {pageX?: number; pageY?: number};
-
-export type PositionCallback = (pos: Point) => void;
-
-// A handle/border/dragbar position, or the drag mode passed around while resizing/moving the
-// selection - 'move' alongside the 8 ordinals rather than a separate type, since startDragMode's
-// mode parameter is exactly this union and every ordinal-only site narrows it via `mode !== 'move'`.
-export type Ordinal = 'e' | 'n' | 'ne' | 'nw' | 's' | 'se' | 'sw' | 'w';
-export type DragMode = 'move' | Ordinal;
-
-// oppLockCorner only ever maps onto a diagonal - the corner opposite the dragged edge/corner, which
-// getCorner then reads off Coords - so both are typed to this narrower union rather than Ordinal.
+// oppLockCorner (jcrop.component.ts) only ever maps onto a diagonal - the corner opposite the
+// dragged edge/corner, which getCorner then reads off Coords - so both are typed to this narrower
+// union rather than the full Ordinal union (jcrop.component.ts).
 export type Corner = 'ne' | 'nw' | 'se' | 'sw';
 
-// Every element Jcrop creates keeps zero border/padding (either by never setting any, or via
-// imgStyle explicitly zeroing them), so content-box width/height - what a getter needs to return to
-// stay faithful to the plugin's original jQuery .width()/.height() reads - always equals
-// offsetWidth/offsetHeight here. No box-model conversion needed.
-export function setStyle(el: HTMLElement, styles: Partial<CSSStyleDeclaration>): void {
-  Object.assign(el.style, styles);
-}
-
-export function px(n: number): string {
-  return Math.round(n) + 'px';
-}
-
 // Owns the selection rectangle's coordinate math: the pressed/current corner state (x1/y1/x2/y2)
-// and everything derived from it (min-size clamping, bounding to the image). `boundx`/`boundy`
-// never change after construction, so they're plain constructor values; `minSize` (read off
-// #options, which JcropComponent's own onLoad() sets once per crop and never mutates afterward) and
-// `xscale`/`yscale` (recomputed by #presize()/onLoad() outside this class) do change, so those are
-// read live through the two getters instead of copied in once. xmin/ymin, by contrast, are written
-// from outside (onLoad()) but read only here, so they're owned outright as private state with a
-// setter.
+// and everything derived from it (min-size clamping, bounding to the image). `boundx`/`boundy` never
+// change after construction, so they're plain constructor values. `#scale` does change (recomputed by
+// the presizing math/trueSize calculation in onLoad()): onLoad() (its only writer) pushes a new value
+// in via setScale() every time #xscale/#yscale change there, rather than this class pulling the
+// latest value through a callback. xmin/ymin are likewise written from outside (onLoad(), via
+// setLimits()) but read only here, so both pairs are owned outright as private state with a setter.
 export class Coords {
   #x1 = 0;
   #x2 = 0;
@@ -126,15 +75,24 @@ export class Coords {
   #xmin = 0;
   #ymin = 0;
 
+  #scale: {xscale: number; yscale: number};
+
   constructor(
     private readonly boundx: number,
     private readonly boundy: number,
-    private readonly getScale: () => {xscale: number; yscale: number},
-  ) {}
+    xscale: number,
+    yscale: number,
+  ) {
+    this.#scale = {xscale, yscale};
+  }
 
   setLimits(xmin: number, ymin: number): void {
     this.#xmin = xmin;
     this.#ymin = ymin;
+  }
+
+  setScale(xscale: number, yscale: number): void {
+    this.#scale = {xscale, yscale};
   }
 
   setPressed(pos: Point): void {
@@ -219,7 +177,7 @@ export class Coords {
     let delta;
     const xsize = this.#x2 - this.#x1,
       ysize = this.#y2 - this.#y1;
-    const {xscale, yscale} = this.getScale();
+    const {xscale, yscale} = this.#scale;
 
     if (this.#ymin / yscale && Math.abs(ysize) < this.#ymin / yscale) {
       this.#y2 = ysize > 0 ? this.#y1 + this.#ymin / yscale : this.#y1 - this.#ymin / yscale;

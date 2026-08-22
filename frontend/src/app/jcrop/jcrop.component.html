@@ -36,31 +36,29 @@
 -->
 <div class="jcrop-holder" [style.height.px]="holderHeight()" [style.width.px]="holderWidth()">
   <div
-    style="position: absolute; z-index: 600"
+    class="jcrop-sel"
     [style.display]="selVisible() ? '' : 'none'"
     [style.left.px]="selLeft()"
     [style.top.px]="selTop()"
     [style.height.px]="selHeight()"
     [style.width.px]="selWidth()"
   >
-    <div #imgHolder style="position: absolute; overflow: hidden; height: 100%; width: 100%; z-index: 310">
+    <div class="jcrop-img-holder">
       <!-- Fully static: opacity/position come from .jcrop-vline/.jcrop-hline (jcrop.component.scss),
            and nothing touches these at all any more (contrast the dragbars/handles below, which still
            get mousedown/touchstart wired up to onDragMouseDown/onDragTouchStart below). -->
-      <div #borderN class="jcrop-hline"></div>
-      <div #borderS class="jcrop-hline bottom"></div>
-      <div #borderE class="jcrop-vline right"></div>
-      <div #borderW class="jcrop-vline"></div>
+      <div class="jcrop-hline"></div>
+      <div class="jcrop-hline bottom"></div>
+      <div class="jcrop-vline right"></div>
+      <div class="jcrop-vline"></div>
       <div
-        #selectionTracker
-        class="jcrop-tracker"
-        style="cursor: move; z-index: 360"
+        class="jcrop-tracker jcrop-selection-tracker"
         (mousedown)="onSelectionTrackerMouseDown($event)"
         (touchstart)="onSelectionTrackerTouchStart($event)"
       ></div>
       <img
         alt=""
-        style="position: absolute; border: none; margin: 0; padding: 0; visibility: visible"
+        class="jcrop-preview"
         [src]="src()"
         [style.height.px]="img2Height()"
         [style.width.px]="img2Width()"
@@ -68,96 +66,29 @@
         [style.top.px]="img2Top()"
       />
     </div>
-    <div #hdlHolder style="height: 100%; width: 100%; z-index: 320" [style.display]="handlesVisible() ? '' : 'none'">
-      <!-- cursor/opacity/position/class are static (jcrop.component.scss); z-index is inline since
-           it's the one thing genuinely unique per element, not shareable via a class. Each still
-           forwards mousedown/touchstart into #createDragger()/#createTouchDragger()
-           (jcrop.component.ts) via onDragMouseDown/onDragTouchStart, passing its own fixed ordinal -
-           fixed in number and identity now, but still real drag targets, unlike the borders above. -->
-      <div
-        #dragbarN
-        class="jcrop-dragbar ord-n"
-        style="z-index: 370"
-        (mousedown)="onDragMouseDown('n', $event)"
-        (touchstart)="onDragTouchStart('n', $event)"
-      ></div>
-      <div
-        #dragbarS
-        class="jcrop-dragbar ord-s"
-        style="z-index: 371"
-        (mousedown)="onDragMouseDown('s', $event)"
-        (touchstart)="onDragTouchStart('s', $event)"
-      ></div>
-      <div
-        #dragbarE
-        class="jcrop-dragbar ord-e"
-        style="z-index: 372"
-        (mousedown)="onDragMouseDown('e', $event)"
-        (touchstart)="onDragTouchStart('e', $event)"
-      ></div>
-      <div
-        #dragbarW
-        class="jcrop-dragbar ord-w"
-        style="z-index: 373"
-        (mousedown)="onDragMouseDown('w', $event)"
-        (touchstart)="onDragTouchStart('w', $event)"
-      ></div>
-      <div
-        #handleN
-        class="jcrop-handle ord-n"
-        style="z-index: 374"
-        (mousedown)="onDragMouseDown('n', $event)"
-        (touchstart)="onDragTouchStart('n', $event)"
-      ></div>
-      <div
-        #handleS
-        class="jcrop-handle ord-s"
-        style="z-index: 375"
-        (mousedown)="onDragMouseDown('s', $event)"
-        (touchstart)="onDragTouchStart('s', $event)"
-      ></div>
-      <div
-        #handleE
-        class="jcrop-handle ord-e"
-        style="z-index: 376"
-        (mousedown)="onDragMouseDown('e', $event)"
-        (touchstart)="onDragTouchStart('e', $event)"
-      ></div>
-      <div
-        #handleW
-        class="jcrop-handle ord-w"
-        style="z-index: 377"
-        (mousedown)="onDragMouseDown('w', $event)"
-        (touchstart)="onDragTouchStart('w', $event)"
-      ></div>
-      <div
-        #handleNw
-        class="jcrop-handle ord-nw"
-        style="z-index: 378"
-        (mousedown)="onDragMouseDown('nw', $event)"
-        (touchstart)="onDragTouchStart('nw', $event)"
-      ></div>
-      <div
-        #handleNe
-        class="jcrop-handle ord-ne"
-        style="z-index: 379"
-        (mousedown)="onDragMouseDown('ne', $event)"
-        (touchstart)="onDragTouchStart('ne', $event)"
-      ></div>
-      <div
-        #handleSe
-        class="jcrop-handle ord-se"
-        style="z-index: 380"
-        (mousedown)="onDragMouseDown('se', $event)"
-        (touchstart)="onDragTouchStart('se', $event)"
-      ></div>
-      <div
-        #handleSw
-        class="jcrop-handle ord-sw"
-        style="z-index: 381"
-        (mousedown)="onDragMouseDown('sw', $event)"
-        (touchstart)="onDragTouchStart('sw', $event)"
-      ></div>
+    <div class="jcrop-handles-holder" [style.display]="handlesVisible() ? '' : 'none'">
+      <!-- cursor/opacity/position/class are static (jcrop.component.scss); z-index is inline (via
+           dragbars/handles, jcrop.component.ts) since it's the one thing genuinely unique per
+           element, not shareable via a class. Each still forwards mousedown/touchstart into
+           #createDragger()/#createTouchDragger() (jcrop.component.ts) via
+           onDragMouseDown/onDragTouchStart, passing its own fixed ordinal - fixed in number and
+           identity now, but still real drag targets, unlike the borders above. -->
+      @for (dragbar of dragbars; track dragbar.ord) {
+        <div
+          class="jcrop-dragbar ord-{{ dragbar.ord }}"
+          [style.z-index]="dragbar.zIndex"
+          (mousedown)="onDragMouseDown(dragbar.ord, $event)"
+          (touchstart)="onDragTouchStart(dragbar.ord, $event)"
+        ></div>
+      }
+      @for (handle of handles; track handle.ord) {
+        <div
+          class="jcrop-handle ord-{{ handle.ord }}"
+          [style.z-index]="handle.zIndex"
+          (mousedown)="onDragMouseDown(handle.ord, $event)"
+          (touchstart)="onDragTouchStart(handle.ord, $event)"
+        ></div>
+      }
     </div>
   </div>
   <div
@@ -171,11 +102,5 @@
     (mousedown)="onTrackerMouseDown($event)"
     (touchstart)="onTrackerTouchStart($event)"
   ></div>
-  <img
-    #workingImg
-    alt=""
-    style="position: absolute; border: none; margin: 0; padding: 0; top: 0; left: 0; visibility: visible"
-    [src]="src()"
-    [style.opacity]="imgOpacity()"
-  />
+  <img #workingImg alt="" class="jcrop-working-image" [src]="src()" [style.opacity]="imgOpacity()" />
 </div>

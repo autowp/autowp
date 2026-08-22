@@ -11,18 +11,63 @@ import {
 } from '@angular/core';
 import {browserWindow} from '@utils/browser-window';
 
-import type {
-  Corner,
-  DragMode,
-  InternalOptions,
-  JcropCrop,
-  JcropMouseEvent,
-  Ordinal,
-  Point,
-  PositionCallback,
-} from './Jcrop';
+import type {Corner, JcropCrop, Point} from './Jcrop';
 
-import {Coords, px, setStyle} from './Jcrop';
+import {Coords} from './Jcrop';
+
+// Every element Jcrop creates keeps zero border/padding (either by never setting any, or via
+// imgStyle explicitly zeroing them), so content-box width/height - what a getter needs to return to
+// stay faithful to the plugin's original jQuery .width()/.height() reads - always equals
+// offsetWidth/offsetHeight here. No box-model conversion needed.
+function setStyle(el: HTMLElement, styles: Partial<CSSStyleDeclaration>): void {
+  Object.assign(el.style, styles);
+}
+
+function px(n: number): string {
+  return Math.round(n) + 'px';
+}
+
+// The subset of the vendored plugin's own options JcropComponent (the sole consumer) actually
+// varies per crop - boxHeight/boxWidth (the fitted display box size) and minSize (the minSize
+// input) - so, unlike the vendored plugin's original options object, all three are required rather
+// than optional: onLoad() always provides a fresh value for each, in its own #options field
+// initializer. Every other option the vendored plugin supported
+// (addClass/aspectRatio/bgOpacity/borderOpacity/boundary/createBorders/createDragbars/createHandles/
+// disabled/handleOpacity/handleSize/keySupport/maxSize/minSelect/outerImage/setSelect/touchSupport/
+// trueSize) was dropped entirely (not just defaulted): each was either dead on arrival (keySupport -
+// no keyboard-nudge support was ever ported into this vendored copy), gated a whole branch behind a
+// falsy sentinel (null/0/[0,0]/false) that, once unoverridable, could never turn truthy again
+// (touchSupport's null - once it could never be true/false instead, JcropComponent's own constructor
+// always fell through to feature-detecting the window, so the override check itself was dead too),
+// once its fixed default became the only value it could ever hold, ended up read only by code that's
+// now static markup instead (border/handle opacity and classes, which per-side/per-corner divs even
+// exist to begin with, and - for createDragbars/createHandles specifically - which of them get their
+// mousedown/touchstart bound directly in the template now instead of via a runtime loop; see
+// jcrop.component.html/.scss), or - bgOpacity/boundary/minSelect/setSelect/trueSize - was never
+// genuinely variable to begin with, so JcropComponent just uses a fixed value or an already-in-scope
+// local variable directly now (#selectionUpdate()'s bgopacity, onLoad()'s tracker sizing,
+// #doneSelect()'s minSelect check, and onLoad()'s own #setSelect()/xscale/yscale calls respectively)
+// instead of routing any of them through #options at all.
+interface InternalOptions {
+  boxHeight: number;
+  boxWidth: number;
+  minSize: number[];
+}
+
+// A native MouseEvent/TouchEvent, widened with a writable pageX/pageY: #touchCfilter() below copies
+// the active touch's page coordinates onto the event itself so #mouseAbs() can read event.pageX/
+// pageY the same way regardless of whether the drag started from a mouse or touch listener -
+// TouchEvent doesn't carry its own pageX/pageY (only the individual Touch entries in its touch
+// lists do).
+type JcropMouseEvent = (MouseEvent | TouchEvent) & {pageX?: number; pageY?: number};
+
+type PositionCallback = (pos: Point) => void;
+
+// A handle/border/dragbar position, or the drag mode passed around while resizing/moving the
+// selection - 'move' alongside the 8 ordinals rather than a separate type, since #startDragMode's
+// mode parameter is exactly this union and every ordinal-only site narrows it via `mode !== 'move'`.
+type Ordinal = 'e' | 'n' | 'ne' | 'nw' | 's' | 'se' | 'sw' | 'w';
+type DragMode = 'move' | Ordinal;
 
 @Component({
   selector: 'app-jcrop',
@@ -73,6 +118,28 @@ export class JcropComponent {
 
   private readonly origimgRef = viewChild.required<ElementRef<HTMLImageElement>>('origimg');
   private readonly workingImgRef = viewChild.required<ElementRef<HTMLImageElement>>('workingImg');
+
+  // Rendered with @for (jcrop.component.html) instead of one static element per ordinal - z-index is
+  // listed alongside each ordinal here (rather than computed from array position in the template)
+  // since it's the one thing genuinely unique per element, not shareable via a class or derivable
+  // from the ordinal itself.
+  protected readonly dragbars: {ord: Ordinal; zIndex: number}[] = [
+    {ord: 'n', zIndex: 370},
+    {ord: 's', zIndex: 371},
+    {ord: 'e', zIndex: 372},
+    {ord: 'w', zIndex: 373},
+  ];
+
+  protected readonly handles: {ord: Ordinal; zIndex: number}[] = [
+    {ord: 'n', zIndex: 374},
+    {ord: 's', zIndex: 375},
+    {ord: 'e', zIndex: 376},
+    {ord: 'w', zIndex: 377},
+    {ord: 'nw', zIndex: 378},
+    {ord: 'ne', zIndex: 379},
+    {ord: 'se', zIndex: 380},
+    {ord: 'sw', zIndex: 381},
+  ];
 
   constructor() {
     // Feature-detect the window (what used to be Touch's own constructor logic and the free
@@ -133,10 +200,10 @@ export class JcropComponent {
   // The real <img> template element's display/visibility - true (its default) until onLoad() hides it
   // once #workingImg (a second, static template <img> - see onLoad() below) is ready to show in its
   // place. #workingImg's own height/width, by contrast, stay a direct setStyle() call in onLoad()
-  // rather than a signal: #presize() and the offsetHeight/offsetWidth reads right after both need
-  // that size actually committed to the DOM synchronously - a signal only takes effect on Angular's
-  // next change-detection pass, which would leave #workingImg (and everything sized off it) built
-  // from the wrong dimensions.
+  // rather than a signal: the presizing math and the offsetHeight/offsetWidth reads right after both
+  // need that size actually committed to the DOM synchronously - a signal only takes effect on
+  // Angular's next change-detection pass, which would leave #workingImg (and everything sized off
+  // it) built from the wrong dimensions.
   protected readonly origimgVisible = signal(true);
 
   // #sel's own display - whether the selection box (and everything clipped/nested inside it: borders,
@@ -286,16 +353,32 @@ export class JcropComponent {
     // origimg - its src is bound the same way origimg's own is ([src]="src()"), and its static
     // styling (position/border/margin/padding/top/left/visibility) is a plain template attribute
     // instead of set here. Its height/width, unlike #holder/#tracker below, stay a direct setStyle()
-    // call rather than a signal - #presize() and the offsetWidth/offsetHeight reads right after both
-    // need that size committed to the DOM synchronously, and a signal only takes effect on Angular's
-    // next change-detection pass (same reasoning as origimgVisible above).
+    // call rather than a signal - the presizing math below and the offsetWidth/offsetHeight reads
+    // right after both need that size committed to the DOM synchronously, and a signal only takes
+    // effect on Angular's next change-detection pass (same reasoning as origimgVisible above).
     const workingImg = this.workingImgRef().nativeElement;
     this.#img = workingImg;
 
     setStyle(workingImg, {height: px(img.offsetHeight), width: px(img.offsetWidth)});
     this.origimgVisible.set(false);
 
-    this.#presize(workingImg, this.#options.boxWidth, this.#options.boxHeight);
+    // Shrinks #workingImg to fit inside the boxWidth/boxHeight box (preserving aspect ratio) if it's
+    // currently bigger than that in either dimension, and derives #xscale/#yscale (the ratio between
+    // #workingImg's real, unshrunk size and its on-screen presized size) from however much shrinking
+    // that took.
+    let presizedHeight = workingImg.offsetHeight,
+      presizedWidth = workingImg.offsetWidth;
+    if (presizedWidth > this.#options.boxWidth && this.#options.boxWidth > 0) {
+      presizedWidth = this.#options.boxWidth;
+      presizedHeight = (this.#options.boxWidth / workingImg.offsetWidth) * workingImg.offsetHeight;
+    }
+    if (presizedHeight > this.#options.boxHeight && this.#options.boxHeight > 0) {
+      presizedHeight = this.#options.boxHeight;
+      presizedWidth = (this.#options.boxHeight / workingImg.offsetHeight) * workingImg.offsetWidth;
+    }
+    this.#xscale = workingImg.offsetWidth / presizedWidth;
+    this.#yscale = workingImg.offsetHeight / presizedHeight;
+    setStyle(workingImg, {height: px(presizedHeight), width: px(presizedWidth)});
 
     this.#boundx = workingImg.offsetWidth;
     this.#boundy = workingImg.offsetHeight;
@@ -326,7 +409,7 @@ export class JcropComponent {
     // never needs a DOM reference either.
 
     // Coords Module {{{
-    this.#coords = new Coords(this.#boundx, this.#boundy, () => ({xscale: this.#xscale, yscale: this.#yscale}));
+    this.#coords = new Coords(this.#boundx, this.#boundy, this.#xscale, this.#yscale);
     // }}}
 
     // Matches what used to be Selection's own constructor (Jcrop.ts) resetting handle visibility on
@@ -342,11 +425,13 @@ export class JcropComponent {
 
     // trueSize's own role (the true/full-resolution size, as opposed to #boundx/#boundy's displayed
     // size, to compute the scale factor between the two) used to be a JcropOptions field routed
-    // through #options - it never needed to be, since #presize() and this xscale/yscale computation
-    // both already run inside onLoad(), which has pictureWidth/pictureHeight (this same #xscale/
-    // #yscale calculation, just from the real image size instead) as plain local variables above.
+    // through #options - it never needed to be, since the presizing math above and this xscale/yscale
+    // computation both already run inside onLoad(), which has pictureWidth/pictureHeight (this same
+    // #xscale/#yscale calculation, just from the real image size instead) as plain local variables
+    // above.
     this.#xscale = pictureWidth / this.#boundx;
     this.#yscale = pictureHeight / this.#boundy;
+    this.#coords.setScale(this.#xscale, this.#yscale);
 
     // setSelect's own role (the initial selection rect to apply once, on load) used to be a
     // JcropOptions field routed through #options, deleted after being consumed so it wouldn't reapply
@@ -565,22 +650,6 @@ export class JcropComponent {
     e.pageX = touch.pageX;
     e.pageY = touch.pageY;
     return e;
-  }
-
-  #presize(el: HTMLElement, w: number, h: number): void {
-    let nh = el.offsetHeight,
-      nw = el.offsetWidth;
-    if (nw > w && w > 0) {
-      nw = w;
-      nh = (w / el.offsetWidth) * el.offsetHeight;
-    }
-    if (nh > h && h > 0) {
-      nh = h;
-      nw = (h / el.offsetHeight) * el.offsetWidth;
-    }
-    this.#xscale = el.offsetWidth / nw;
-    this.#yscale = el.offsetHeight / nh;
-    setStyle(el, {height: px(nh), width: px(nw)});
   }
 
   #unscale(c: JcropCrop & {x2: number; y2: number}): JcropCrop {

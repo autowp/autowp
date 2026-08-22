@@ -18,6 +18,34 @@
   text-align: left;
 }
 
+/* The selection box itself - clips/positions the border lines, crop preview, and resize
+   handles/dragbars nested inside it. */
+.jcrop-sel {
+  position: absolute;
+  z-index: 600;
+}
+
+.jcrop-img-holder {
+  position: absolute;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  z-index: 310;
+}
+
+.jcrop-handles-holder {
+  height: 100%;
+  width: 100%;
+  z-index: 320;
+}
+
+/* The invisible "start a new selection" overlay, moved (via .jcrop-selection-tracker) rather than
+   sized/positioned like the outer .jcrop-tracker below, since it always exactly fills #sel. */
+.jcrop-selection-tracker {
+  cursor: move;
+  z-index: 360;
+}
+
 /* Selection Border */
 .jcrop-vline,
 .jcrop-hline {
@@ -195,6 +223,22 @@
 
 .ord-w {
   cursor: w-resize;
+}
+
+/* The crop preview clipped inside .jcrop-img-holder and the full working image respectively -
+   position/left/top are set by JcropComponent (jcrop.component.ts), the rest never changes. */
+.jcrop-preview,
+.jcrop-working-image {
+  position: absolute;
+  border: none;
+  margin: 0;
+  padding: 0;
+  visibility: visible;
+}
+
+.jcrop-working-image {
+  top: 0;
+  left: 0;
 }
 
 /* Fix for twitter bootstrap et al. */
